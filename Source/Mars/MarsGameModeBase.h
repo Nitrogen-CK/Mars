@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "CkPluginsGameModeBase.generated.h"
+#include "MarsGameModeBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CKPLUGINS_API ACkPluginsGameModeBase : public AGameModeBase
+class MARS_API AMarsGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	

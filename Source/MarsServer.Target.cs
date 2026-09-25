@@ -4,14 +4,14 @@ using UnrealBuildTool;
 using System.Collections.Generic;
 
 [SupportedPlatforms(UnrealPlatformClass.Server)]
-public class CkPluginsServerTarget : TargetRules
+public class MarsServerTarget : TargetRules
 {
-	public CkPluginsServerTarget( TargetInfo Target) : base(Target)
+	public MarsServerTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Server;
 		bWithPushModel = true;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
-		ExtraModuleNames.Add("CkPlugins");
+		ExtraModuleNames.Add("Mars");
 	}
 }

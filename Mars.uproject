@@ -6,7 +6,7 @@
 	"DisableEnginePluginsByDefault": true,
 	"Modules": [
 		{
-			"Name": "CkPlugins",
+			"Name": "Mars",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

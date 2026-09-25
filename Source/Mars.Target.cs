@@ -3,14 +3,14 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class CkPluginsTarget : TargetRules
+public class MarsTarget : TargetRules
 {
-	public CkPluginsTarget( TargetInfo Target) : base(Target)
+	public MarsTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 		bWithPushModel = true;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
-		ExtraModuleNames.Add("CkPlugins");
+		ExtraModuleNames.Add("Mars");
 	}
 }

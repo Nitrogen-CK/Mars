@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CkPlugins is an Unreal Engine 5.5 project that serves as the **development host for the Chainkemists plugin ecosystem**. The host project itself is intentionally minimal — a default `GameModeBase` and a near-empty `Source/CkPlugins/` module. The real content is the plugin submodules under `Plugins/`, which are developed, tested, and iterated on inside this clean project before being consumed by downstream game projects.
+Mars (formerly CkPlugins / Orion; GitHub: `Nitrogen-CK/Mars`) is an Unreal Engine 5.5 project that serves as the **development host for the Chainkemists plugin ecosystem**. The host project itself is intentionally minimal — a default `GameModeBase` and a near-empty `Source/Mars/` module. The real content is the plugin submodules under `Plugins/`, which are developed, tested, and iterated on inside this clean project before being consumed by downstream game projects.
 
 Use this project when you need to work on a Chainkemists plugin in isolation: you get a full UE project to compile against, the AngelScript runtime via CkFoundation, and the CkTests harness — without the weight of a full game project on top.
 
@@ -29,7 +29,7 @@ Other plugins under `Plugins/` may adopt the same pattern over time; check their
 
 ## Repository Structure
 
-- `/Source/CkPlugins/` — Minimal host module (`GameModeBase` only). You will rarely edit this.
+- `/Source/Mars/` — Minimal host module (`GameModeBase` only). You will rarely edit this.
 - `/Plugins/` — The Chainkemists plugin submodules and a few third-party dev tools. See **Plugin Ecosystem** below.
 - `/CkAuto/` — Shared developer scripts (build, run, submodule management) — itself a submodule.
 - `/Config/` — UE project config (`DefaultEngine.ini`, `DefaultGame.ini`, etc.). Mostly stock.
@@ -68,8 +68,8 @@ For editor-only iteration without going through runreal, invoke the engine's `Bu
 
 ```powershell
 $engine = & "$env:CLAUDE_PROJECT_DIR\CkAuto\Get-ProjectEnginePath.ps1"
-& "$engine\Engine\Build\BatchFiles\Build.bat" CkPluginsEditor Win64 Development `
-    -Project="$env:CLAUDE_PROJECT_DIR\CkPlugins.uproject" -WaitMutex -FromMsBuild
+& "$engine\Engine\Build\BatchFiles\Build.bat" MarsEditor Win64 Development `
+    -Project="$env:CLAUDE_PROJECT_DIR\Mars.uproject" -WaitMutex -FromMsBuild
 ```
 
 The same `PreToolUse` hook that guards git ops (see *Hooks / safety guards*) also blocks `Build.bat` invocations whenever UnrealEditor is running for this project — building while the editor has DLLs loaded corrupts hot-reload state. Close the editor first, or set `SKIP_UNREAL_GUARD=1` if you know what you're doing.
@@ -136,9 +136,9 @@ When working in the plugin ecosystem (most edits in this project), the patterns 
 
 Most work in this project is *inside* a plugin submodule (e.g. editing `Plugins/CkFoundation/Source/...`). When you do this:
 
-1. The change lives in the submodule's git history, not CkPlugins's.
+1. The change lives in the submodule's git history, not Mars's.
 2. Commit and push from inside the submodule (`cd Plugins/CkFoundation && git commit && git push`).
-3. Then bump CkPlugins's pointer to the new submodule SHA: `cd <project root> && git add Plugins/CkFoundation && git commit -m "chore(submodule): bump CkFoundation"`.
+3. Then bump Mars's pointer to the new submodule SHA: `cd <project root> && git add Plugins/CkFoundation && git commit -m "chore(submodule): bump CkFoundation"`.
 4. The same submodule may also need pointer-bumping in any downstream consumer that uses it.
 
 The `CkAuto/UpdateAllSubmodules_PUSH_DEV.bat` helper can automate steps 2–3 across all submodules in one pass.
@@ -156,7 +156,7 @@ Detection is per-project: probes `Saved/Logs/*.log` for an exclusive write lock 
 
 Submodule-aware: commands like `cd Plugins/CkFoundation && git checkout <ref>` are recognised — the script resolves the effective repo root via `git rev-parse --show-toplevel`, enumerates against that repo, and prefixes the resulting paths with the submodule's offset under the project root before classification.
 
-**Limitation — submodule-rooted sessions:** the hook is wired through `CkPlugins/.claude/settings.json`, which Claude Code only loads when the session's project root *is* CkPlugins. If you launch Claude Code from inside a submodule, our hook is not active. Workarounds: (a) launch Claude Code from the CkPlugins root for any session that may do git ops, or (b) add a personal `~/.claude/settings.json` invoking a copy of the script kept somewhere stable outside the repo — note this only protects you, not teammates.
+**Limitation — submodule-rooted sessions:** the hook is wired through `Mars/.claude/settings.json`, which Claude Code only loads when the session's project root *is* Mars. If you launch Claude Code from inside a submodule, our hook is not active. Workarounds: (a) launch Claude Code from the Mars root for any session that may do git ops, or (b) add a personal `~/.claude/settings.json` invoking a copy of the script kept somewhere stable outside the repo — note this only protects you, not teammates.
 
 Override for the deny tier: `SKIP_UNREAL_GUARD=1`. Use only when you know the affected assets aren't loaded in the editor — the natural recovery is to close the editor and retry.
 

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class CkPlugins : ModuleRules
+public class Mars : ModuleRules
 {
-    public CkPlugins(ReadOnlyTargetRules Target) : base(Target)
+    public Mars(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

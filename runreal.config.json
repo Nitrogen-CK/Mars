@@ -1,6 +1,6 @@
 {
   "project": {
-    "name": "CkPlugins"
+    "name": "Mars"
   },
 	"engine": {
 		"gitSource": "https://github.com/Chainkemists/UnrealEngine-Internal",
