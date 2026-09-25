@@ -110,7 +110,6 @@ CkAuto/SubmodulesCustomCommand.bat "git status"
 ### Chainkemists plugins (the reason this project exists)
 
 - **CkFoundation** — ECS framework using EnTT 3.15.0; the foundation everything else builds on.
-- **CkApplication** — Application-level functionality on top of CkFoundation.
 - **CkGameplayDebugger** — Debug tools integration with UE's gameplay debugger.
 - **CkTests** — Test harness (AutoTests + Gym framework). See its own AGENTS.md and the `Script/Common/` specifications for authoring tests and gyms against CkFoundation features.
 - **GitLink** — Source-control / git integration plugin.
