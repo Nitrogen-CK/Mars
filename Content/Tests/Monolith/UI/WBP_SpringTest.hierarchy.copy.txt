@@ -1,0 +1,14 @@
+Begin Object Class=/Script/UMG.CanvasPanel Name="RootCanvas" ExportPath="/Script/UMG.CanvasPanel'/Game/Tests/Monolith/UI/WBP_SpringTest.WBP_SpringTest:WidgetTree.RootCanvas'"
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Tests/Monolith/UI/WBP_SpringTest.WBP_SpringTest:WidgetTree.RootCanvas.CanvasPanelSlot_0'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Tests/Monolith/UI/WBP_SpringTest.WBP_SpringTest:WidgetTree.RootCanvas.CanvasPanelSlot_0'"
+      Parent="/Script/UMG.CanvasPanel'RootCanvas'"
+      Content="/Script/UMG.Image'MyImage'"
+   End Object
+   Slots(0)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_0'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_1" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_1'"
+   WidgetName="RootCanvas"
+End Object
+Begin Object Class=/Script/UMG.Image Name="MyImage" ExportPath="/Script/UMG.Image'/Game/Tests/Monolith/UI/WBP_SpringTest.WBP_SpringTest:WidgetTree.MyImage'"
+End Object

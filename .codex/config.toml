@@ -1,0 +1,2 @@
+[mcp_servers.monolith]
+url = "http://localhost:9316/mcp"

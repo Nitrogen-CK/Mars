@@ -1,0 +1,43 @@
+Begin Object Class=/Script/UMG.WidgetAnimation Name="FadeIn" ExportPath="/Script/UMG.WidgetAnimation'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn'"
+   Begin Object Class=/Script/MovieScene.MovieScene Name="FadeIn" ExportPath="/Script/MovieScene.MovieScene'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn'"
+      Begin Object Class=/Script/MovieSceneTracks.MovieSceneFloatTrack Name="MovieSceneFloatTrack_0" ExportPath="/Script/MovieSceneTracks.MovieSceneFloatTrack'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0'"
+         Begin Object Class=/Script/MovieSceneTracks.MovieSceneFloatSection Name="MovieSceneFloatSection_0" ExportPath="/Script/MovieSceneTracks.MovieSceneFloatSection'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0'"
+            Begin Object Class=/Script/MovieScene.MovieSceneBuiltInEasingFunction Name="EaseOutFunction" Archetype="/Script/MovieScene.MovieSceneBuiltInEasingFunction'/Script/MovieSceneTracks.Default__MovieSceneFloatSection:EaseOutFunction'" ExportPath="/Script/MovieScene.MovieSceneBuiltInEasingFunction'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0.EaseOutFunction'"
+            End Object
+            Begin Object Class=/Script/MovieScene.MovieSceneBuiltInEasingFunction Name="EaseInFunction" Archetype="/Script/MovieScene.MovieSceneBuiltInEasingFunction'/Script/MovieSceneTracks.Default__MovieSceneFloatSection:EaseInFunction'" ExportPath="/Script/MovieScene.MovieSceneBuiltInEasingFunction'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0.EaseInFunction'"
+            End Object
+         End Object
+      End Object
+      Begin Object Class=/Script/MovieScene.MovieSceneNodeGroupCollection Name="NodeGroupCollection" Archetype="/Script/MovieScene.MovieSceneNodeGroupCollection'/Script/MovieScene.Default__MovieScene:NodeGroupCollection'" ExportPath="/Script/MovieScene.MovieSceneNodeGroupCollection'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.NodeGroupCollection'"
+      End Object
+   End Object
+   Begin Object Name="FadeIn" ExportPath="/Script/MovieScene.MovieScene'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn'"
+      Begin Object Name="MovieSceneFloatTrack_0" ExportPath="/Script/MovieSceneTracks.MovieSceneFloatTrack'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0'"
+         Begin Object Name="MovieSceneFloatSection_0" ExportPath="/Script/MovieSceneTracks.MovieSceneFloatSection'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0'"
+            Begin Object Name="EaseOutFunction" ExportPath="/Script/MovieScene.MovieSceneBuiltInEasingFunction'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0.EaseOutFunction'"
+            End Object
+            Begin Object Name="EaseInFunction" ExportPath="/Script/MovieScene.MovieSceneBuiltInEasingFunction'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0.EaseInFunction'"
+            End Object
+            FloatCurve=(Times=((),(Value=30000)),Values=((Tangent=(LeaveTangent=0.000033),InterpMode=RCIM_Linear),(Value=1.000000,Tangent=(ArriveTangent=0.000033),InterpMode=RCIM_Linear)))
+            Easing=(EaseIn=MovieSceneBuiltInEasingFunction'WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0.EaseInFunction',EaseOut=MovieSceneBuiltInEasingFunction'WBP_WithAnim:FadeIn.FadeIn.MovieSceneFloatTrack_0.MovieSceneFloatSection_0.EaseOutFunction')
+            SectionRange=Inclusive:0:Exclusive:30000
+            Signature=2B01A6EB4EA74B2C7B26F087F89EDE0D
+         End Object
+         PropertyBinding=(PropertyName="RenderOpacity",PropertyPath="RenderOpacity",bCanUseClassLookup=True)
+         Sections(0)="/Script/MovieSceneTracks.MovieSceneFloatSection'MovieSceneFloatSection_0'"
+         Signature=BD7CAD5F4201A4D5DD08619504F64E27
+      End Object
+      Begin Object Name="NodeGroupCollection" ExportPath="/Script/MovieScene.MovieSceneNodeGroupCollection'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:FadeIn.FadeIn.NodeGroupCollection'"
+      End Object
+      Possessables(0)=(Guid=01685E2644C810D3C2AB709980811528,Name="Label",PossessedObjectClass="/Script/UMG.Widget")
+      ObjectBindings(0)=(ObjectGuid=01685E2644C810D3C2AB709980811528,Tracks=("/Script/MovieSceneTracks.MovieSceneFloatTrack'MovieSceneFloatTrack_0'"))
+      PlaybackRange=Inclusive:0:Exclusive:30000
+      EditorData=()
+      NodeGroupCollection="NodeGroupCollection"
+      Signature=DD0F8B234A5A10341019BCBD377DA90C
+   End Object
+   MovieScene="/Script/MovieScene.MovieScene'FadeIn'"
+   AnimationBindings(0)=(WidgetName="Label",AnimationGuid=01685E2644C810D3C2AB709980811528)
+   DisplayLabel="FadeIn"
+   Signature=DBEF48994508967F06117CA515A8CBE3
+End Object

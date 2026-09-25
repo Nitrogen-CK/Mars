@@ -31,3 +31,7 @@
 [submodule "Plugins/GitLink"]
 	path = Plugins/GitLink
 	url = https://github.com/CommitAndChill/GitLink.git
+[submodule "Plugins/Monolith"]
+	path = Plugins/Monolith
+	url = https://github.com/tumourlove/monolith.git
+	branch = master
