@@ -111,3 +111,756 @@ namespace UCk_PlaceableTest_Sphere_EntityScript
     }
 }
 
+USTRUCT()
+struct FMars_SmCondition_AllTasksSucceeded_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_AllTasksSucceeded
+{
+    FMars_SmCondition_AllTasksSucceeded_SpawnParams Params()
+    {
+        return FMars_SmCondition_AllTasksSucceeded_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_AnyTaskFailed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_AnyTaskFailed
+{
+    FMars_SmCondition_AnyTaskFailed_SpawnParams Params()
+    {
+        return FMars_SmCondition_AnyTaskFailed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_ByteAttribute_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_ByteAttribute
+{
+    FMars_SmCondition_ByteAttribute_SpawnParams Params()
+    {
+        return FMars_SmCondition_ByteAttribute_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_CrouchPressed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_CrouchPressed
+{
+    FMars_SmCondition_CrouchPressed_SpawnParams Params()
+    {
+        return FMars_SmCondition_CrouchPressed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HasMoveIntent_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HasMoveIntent
+{
+    FMars_SmCondition_HasMoveIntent_SpawnParams Params()
+    {
+        return FMars_SmCondition_HasMoveIntent_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IntentActive_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IntentActive
+{
+    FMars_SmCondition_IntentActive_SpawnParams Params()
+    {
+        return FMars_SmCondition_IntentActive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IntentPressed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IntentPressed
+{
+    FMars_SmCondition_IntentPressed_SpawnParams Params()
+    {
+        return FMars_SmCondition_IntentPressed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_InteractableIsDisabled_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_InteractableIsDisabled
+{
+    FMars_SmCondition_InteractableIsDisabled_SpawnParams Params()
+    {
+        return FMars_SmCondition_InteractableIsDisabled_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_InteractableIsEnabled_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_InteractableIsEnabled
+{
+    FMars_SmCondition_InteractableIsEnabled_SpawnParams Params()
+    {
+        return FMars_SmCondition_InteractableIsEnabled_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_InteractableIsFocused_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_InteractableIsFocused
+{
+    FMars_SmCondition_InteractableIsFocused_SpawnParams Params()
+    {
+        return FMars_SmCondition_InteractableIsFocused_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_InteractableIsNotFocused_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_InteractableIsNotFocused
+{
+    FMars_SmCondition_InteractableIsNotFocused_SpawnParams Params()
+    {
+        return FMars_SmCondition_InteractableIsNotFocused_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_InteractedWith_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_InteractedWith
+{
+    FMars_SmCondition_InteractedWith_SpawnParams Params()
+    {
+        return FMars_SmCondition_InteractedWith_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsDowned_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsDowned
+{
+    FMars_SmCondition_IsDowned_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsDowned_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsFalling_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsFalling
+{
+    FMars_SmCondition_IsFalling_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsFalling_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsGrounded_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsGrounded
+{
+    FMars_SmCondition_IsGrounded_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsGrounded_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsNotDowned_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsNotDowned
+{
+    FMars_SmCondition_IsNotDowned_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsNotDowned_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_JumpHeld_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_JumpHeld
+{
+    FMars_SmCondition_JumpHeld_SpawnParams Params()
+    {
+        return FMars_SmCondition_JumpHeld_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_JumpPressed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_JumpPressed
+{
+    FMars_SmCondition_JumpPressed_SpawnParams Params()
+    {
+        return FMars_SmCondition_JumpPressed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_JumpReleased_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_JumpReleased
+{
+    FMars_SmCondition_JumpReleased_SpawnParams Params()
+    {
+        return FMars_SmCondition_JumpReleased_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_NoMoveIntent_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_NoMoveIntent
+{
+    FMars_SmCondition_NoMoveIntent_SpawnParams Params()
+    {
+        return FMars_SmCondition_NoMoveIntent_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_SprintHeld_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_SprintHeld
+{
+    FMars_SmCondition_SprintHeld_SpawnParams Params()
+    {
+        return FMars_SmCondition_SprintHeld_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_SprintReleased_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_SprintReleased
+{
+    FMars_SmCondition_SprintReleased_SpawnParams Params()
+    {
+        return FMars_SmCondition_SprintReleased_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Alive_SpawnParams
+{
+}
+
+namespace UMars_SmState_Alive
+{
+    FMars_SmState_Alive_SpawnParams Params()
+    {
+        return FMars_SmState_Alive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Downed_SpawnParams
+{
+}
+
+namespace UMars_SmState_Downed
+{
+    FMars_SmState_Downed_SpawnParams Params()
+    {
+        return FMars_SmState_Downed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_ExitAndTerminate_SpawnParams
+{
+}
+
+namespace UMars_SmState_ExitAndTerminate
+{
+    FMars_SmState_ExitAndTerminate_SpawnParams Params()
+    {
+        return FMars_SmState_ExitAndTerminate_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Interactable_Disabled_SpawnParams
+{
+}
+
+namespace UMars_SmState_Interactable_Disabled
+{
+    FMars_SmState_Interactable_Disabled_SpawnParams Params()
+    {
+        return FMars_SmState_Interactable_Disabled_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Interactable_Focused_SpawnParams
+{
+}
+
+namespace UMars_SmState_Interactable_Focused
+{
+    FMars_SmState_Interactable_Focused_SpawnParams Params()
+    {
+        return FMars_SmState_Interactable_Focused_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Interactable_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Interactable_Idle
+{
+    FMars_SmState_Interactable_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Interactable_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Interactable_Interacting_SpawnParams
+{
+}
+
+namespace UMars_SmState_Interactable_Interacting
+{
+    FMars_SmState_Interactable_Interacting_SpawnParams Params()
+    {
+        return FMars_SmState_Interactable_Interacting_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_InteractTarget_Enter_SpawnParams
+{
+}
+
+namespace UMars_SmState_InteractTarget_Enter
+{
+    FMars_SmState_InteractTarget_Enter_SpawnParams Params()
+    {
+        return FMars_SmState_InteractTarget_Enter_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Loco_Airborne_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Airborne
+{
+    FMars_SmState_Loco_Airborne_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Airborne_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Loco_Crouch_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Crouch
+{
+    FMars_SmState_Loco_Crouch_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Crouch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Loco_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Idle
+{
+    FMars_SmState_Loco_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Loco_Jump_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Jump
+{
+    FMars_SmState_Loco_Jump_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Jump_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Loco_Sprint_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Sprint
+{
+    FMars_SmState_Loco_Sprint_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Sprint_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Loco_Walk_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Walk
+{
+    FMars_SmState_Loco_Walk_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Walk_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Locomotion_SpawnParams
+{
+}
+
+namespace UMars_SmState_Locomotion
+{
+    FMars_SmState_Locomotion_SpawnParams Params()
+    {
+        return FMars_SmState_Locomotion_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_TestLamp_Toggle_SpawnParams
+{
+}
+
+namespace UMars_SmState_TestLamp_Toggle
+{
+    FMars_SmState_TestLamp_Toggle_SpawnParams Params()
+    {
+        return FMars_SmState_TestLamp_Toggle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_AliveSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_AliveSubSm
+{
+    FMars_SmTask_AliveSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_AliveSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Crouch_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crouch
+{
+    FMars_SmTask_Crouch_SpawnParams Params()
+    {
+        return FMars_SmTask_Crouch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_IntentToResolver_SpawnParams
+{
+}
+
+namespace UMars_SmTask_IntentToResolver
+{
+    FMars_SmTask_IntentToResolver_SpawnParams Params()
+    {
+        return FMars_SmTask_IntentToResolver_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Interactable_Outline_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Interactable_Outline
+{
+    FMars_SmTask_Interactable_Outline_SpawnParams Params()
+    {
+        return FMars_SmTask_Interactable_Outline_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Interactable_ShowPrompt_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Interactable_ShowPrompt
+{
+    FMars_SmTask_Interactable_ShowPrompt_SpawnParams Params()
+    {
+        return FMars_SmTask_Interactable_ShowPrompt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_InteractionFocus_SpawnParams
+{
+}
+
+namespace UMars_SmTask_InteractionFocus
+{
+    FMars_SmTask_InteractionFocus_SpawnParams Params()
+    {
+        return FMars_SmTask_InteractionFocus_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_InteractionResolverBinds_SpawnParams
+{
+}
+
+namespace UMars_SmTask_InteractionResolverBinds
+{
+    FMars_SmTask_InteractionResolverBinds_SpawnParams Params()
+    {
+        return FMars_SmTask_InteractionResolverBinds_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Jump_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Jump
+{
+    FMars_SmTask_Jump_SpawnParams Params()
+    {
+        return FMars_SmTask_Jump_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_LocomotionSpeed_SpawnParams
+{
+}
+
+namespace UMars_SmTask_LocomotionSpeed
+{
+    FMars_SmTask_LocomotionSpeed_SpawnParams Params()
+    {
+        return FMars_SmTask_LocomotionSpeed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_LocomotionSpeed_Sprint_SpawnParams
+{
+}
+
+namespace UMars_SmTask_LocomotionSpeed_Sprint
+{
+    FMars_SmTask_LocomotionSpeed_Sprint_SpawnParams Params()
+    {
+        return FMars_SmTask_LocomotionSpeed_Sprint_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_LocomotionSpeed_Walk_SpawnParams
+{
+}
+
+namespace UMars_SmTask_LocomotionSpeed_Walk
+{
+    FMars_SmTask_LocomotionSpeed_Walk_SpawnParams Params()
+    {
+        return FMars_SmTask_LocomotionSpeed_Walk_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_LocomotionSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_LocomotionSubSm
+{
+    FMars_SmTask_LocomotionSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_LocomotionSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Movement_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Movement
+{
+    FMars_SmTask_Movement_SpawnParams Params()
+    {
+        return FMars_SmTask_Movement_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PerformInteractionSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PerformInteractionSubSm
+{
+    FMars_SmTask_PerformInteractionSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_PerformInteractionSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_TerminateOwningSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_TerminateOwningSm
+{
+    FMars_SmTask_TerminateOwningSm_SpawnParams Params()
+    {
+        return FMars_SmTask_TerminateOwningSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_TestLamp_Toggle_SpawnParams
+{
+}
+
+namespace UMars_SmTask_TestLamp_Toggle
+{
+    FMars_SmTask_TestLamp_Toggle_SpawnParams Params()
+    {
+        return FMars_SmTask_TestLamp_Toggle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_UseIntentToResolver_SpawnParams
+{
+}
+
+namespace UMars_SmTask_UseIntentToResolver
+{
+    FMars_SmTask_UseIntentToResolver_SpawnParams Params()
+    {
+        return FMars_SmTask_UseIntentToResolver_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_ViewpointSync_SpawnParams
+{
+}
+
+namespace UMars_SmTask_ViewpointSync
+{
+    FMars_SmTask_ViewpointSync_SpawnParams Params()
+    {
+        return FMars_SmTask_ViewpointSync_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_TestLamp_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    const TWeakObjectPtr<AActor> _OwningActor = nullptr;
+
+    FMars_TestLamp_EntityScript_SpawnParams(const TObjectPtr<AActor> In_OwningActor)
+    {
+        _OwningActor = TWeakObjectPtr<AActor>(In_OwningActor);
+    }
+}
+
+namespace UMars_TestLamp_EntityScript
+{
+    FMars_TestLamp_EntityScript_SpawnParams Params()
+    {
+        return FMars_TestLamp_EntityScript_SpawnParams();
+    }
+
+    FMars_TestLamp_EntityScript_SpawnParams Params(const TObjectPtr<AActor> In_OwningActor)
+    {
+        return FMars_TestLamp_EntityScript_SpawnParams(In_OwningActor);
+    }
+}
+
