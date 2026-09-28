@@ -1,0 +1,402 @@
+{
+	"material": "ProtoGrid_Wall_Mars_MI",
+	"packagePath": "/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "285b1efb520f4e543bef58328186728c",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid.M_CkUsf_Look_ProtoGrid"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"CameraVectorWS": 1,
+		"Custom": 1,
+		"PixelDepth": 1,
+		"ScalarParameter": 5,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"VectorParameter": 3,
+		"VertexColor": 1,
+		"VertexNormalWS": 1,
+		"VertexTangentWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "WorldPosition",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "CameraVector",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "VertexNormal",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "VertexTangent",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "PixelDepth",
+						"node": 5,
+						"output": 0,
+						"mask": "r"
+					},
+					{
+						"index": 5,
+						"name": "VertexColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 6,
+						"name": "PrimaryColor",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 7,
+						"name": "SecondaryColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "LineColor",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 9,
+						"name": "CellSize",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "SubCells",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "LineWidth",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "ShiftX",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "ShiftY",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Time",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "UV",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"EmissiveColor",
+					"Roughness",
+					"Metallic",
+					"Specular",
+					"AmbientOcclusion",
+					"Normal",
+					"Opacity",
+					"OpacityMask",
+					"Refraction",
+					"SubsurfaceColor",
+					"ClearCoat",
+					"ClearCoatRoughness"
+				],
+				"props":
+				{
+					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = CkUsf_Look_ProtoGrid(In, PrimaryColor.rgb, SecondaryColor.rgb, LineColor.rgb, CellSize, SubCells, LineWidth, ShiftX, ShiftY);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
+					"IncludeFilePaths": [
+						"/CkUsf/Looks/ProtoGrid.ush"
+					]
+				}
+			},
+			{
+				"id": 1,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 2,
+				"class": "CameraVectorWS",
+				"name": "MaterialExpressionCameraVectorWS_0"
+			},
+			{
+				"id": 3,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 4,
+				"class": "VertexTangentWS",
+				"name": "MaterialExpressionVertexTangentWS_0"
+			},
+			{
+				"id": 5,
+				"class": "PixelDepth",
+				"name": "MaterialExpressionPixelDepth_0"
+			},
+			{
+				"id": 6,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.109000,G=0.160000,B=0.230000,A=1.000000)",
+					"ParameterName": "PrimaryColor"
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.148000,G=0.216000,B=0.310000,A=1.000000)",
+					"ParameterName": "SecondaryColor"
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.766000,G=0.922000,B=1.000000,A=1.000000)",
+					"ParameterName": "LineColor"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 100,
+					"ParameterName": "CellSize"
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 10,
+					"ParameterName": "SubCells"
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 1.5,
+					"ParameterName": "LineWidth"
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"ParameterName": "ShiftX"
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"ParameterName": "ShiftY"
+				}
+			},
+			{
+				"id": 15,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 16,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 0,
+				"output": 1
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 0,
+				"output": 3
+			},
+			{
+				"property": "MP_Specular",
+				"node": 0,
+				"output": 4
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 0,
+				"output": 2
+			},
+			{
+				"property": "MP_Normal",
+				"node": 0,
+				"output": 6
+			},
+			{
+				"property": "MP_AmbientOcclusion",
+				"node": 0,
+				"output": 5
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "CellSize",
+			"value": 100
+		},
+		{
+			"name": "SubCells",
+			"value": 10
+		},
+		{
+			"name": "LineWidth",
+			"value": 1.5
+		},
+		{
+			"name": "ShiftX",
+			"value": 0
+		},
+		{
+			"name": "ShiftY",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "PrimaryColor",
+			"value": "RGBA(0.109, 0.16, 0.23, 1)"
+		},
+		{
+			"name": "SecondaryColor",
+			"value": "RGBA(0.148, 0.216, 0.31, 1)"
+		},
+		{
+			"name": "LineColor",
+			"value": "RGBA(0.766, 0.922, 1, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
