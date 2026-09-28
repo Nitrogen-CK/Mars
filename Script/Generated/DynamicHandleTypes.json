@@ -1,0 +1,50 @@
+{
+	"HandleTypes": [
+		{
+			"TypeName": "FCk_Handle_InputIntents",
+			"ShortName": "InputIntents",
+			"Description": "An entity whose gameplay reads the CkIntent matcher of the input layer that drives it",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_InputIntentsHandle",
+			"RequiredFragments": [
+				"Mars_Feature_InputIntents"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Interactable",
+			"ShortName": "Interactable",
+			"Description": "An entity that has the interactable feature set",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_InteractableHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Interactable"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_InteractPrompt",
+			"ShortName": "InteractPrompt",
+			"Description": "An entity that has interact prompt configuration (input action, text, color)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_InteractPromptHandle",
+			"RequiredFragments": [
+				"Mars_Feature_InteractPrompt"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_InteractPromptDisplay",
+			"ShortName": "InteractPromptDisplay",
+			"Description": "An entity that manages stacked interact prompt display (lives on the player)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_InteractPromptDisplayHandle",
+			"RequiredFragments": [
+				"Mars_Feature_InteractPromptDisplay"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_PlayerViewpoint",
+			"ShortName": "PlayerViewpoint",
+			"Description": "A player's view in ECS: a transform that follows the camera, and the interaction trace cast from it",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlayerViewpointHandle",
+			"RequiredFragments": [
+				"Mars_Feature_PlayerViewpoint"
+			]
+		}
+	],
+	"Version": 1
+}
