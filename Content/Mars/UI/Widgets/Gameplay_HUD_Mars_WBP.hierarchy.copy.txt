@@ -1,0 +1,32 @@
+Begin Object Class=/Script/UMG.CanvasPanel Name="CanvasPanel_25" ExportPath="/Script/UMG.CanvasPanel'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.CanvasPanel_25'"
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_1" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.CanvasPanel_25.CanvasPanelSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.CanvasPanel_25.CanvasPanelSlot_0'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_1" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.CanvasPanel_25.CanvasPanelSlot_1'"
+      LayoutData=(Offsets=(Top=50.000000),Anchors=(Minimum=(X=0.500000,Y=0.500000),Maximum=(X=0.500000,Y=0.500000)),Alignment=(X=0.500000,Y=0.500000))
+      bAutoSize=True
+      Parent="/Script/UMG.CanvasPanel'CanvasPanel_25'"
+      Content="/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP_C'InteractPromptBox'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.CanvasPanel_25.CanvasPanelSlot_0'"
+      LayoutData=(Anchors=(Minimum=(X=0.500000,Y=0.500000),Maximum=(X=0.500000,Y=0.500000)),Alignment=(X=0.500000,Y=0.500000))
+      bAutoSize=True
+      Parent="/Script/UMG.CanvasPanel'CanvasPanel_25'"
+      Content="/Game/Mars/UI/Widgets/Crosshair/Crosshair_Mars_WBP.Crosshair_Mars_WBP_C'Crosshair'"
+   End Object
+   Slots(0)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_0'"
+   Slots(1)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_1'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_5" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_5'"
+   WidgetName="CanvasPanel_25"
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/Crosshair/Crosshair_Mars_WBP.Crosshair_Mars_WBP_C Name="Crosshair" ExportPath="/Game/Mars/UI/Widgets/Crosshair/Crosshair_Mars_WBP.Crosshair_Mars_WBP_C'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.Crosshair'"
+   bIsVariable=False
+   DisplayLabel="Crosshair"
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP_C Name="InteractPromptBox" ExportPath="/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP_C'/Game/Mars/UI/Widgets/Gameplay_HUD_Mars_WBP.Gameplay_HUD_Mars_WBP:WidgetTree.InteractPromptBox'"
+   bIsVariable=False
+   DisplayLabel="InteractPromptBox"
+End Object

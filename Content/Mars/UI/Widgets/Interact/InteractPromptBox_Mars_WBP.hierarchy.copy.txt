@@ -1,0 +1,19 @@
+Begin Object Class=/Script/UMG.SizeBox Name="SizeBox_14" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP:WidgetTree.SizeBox_14'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP:WidgetTree.SizeBox_14.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP:WidgetTree.SizeBox_14.SizeBoxSlot_0'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.SizeBox'SizeBox_14'"
+      Content="/Script/UMG.HorizontalBox'PromptContainer'"
+   End Object
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   bExpandedInDesigner=True
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_8" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_8'"
+   WidgetName="SizeBox_14"
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="PromptContainer" ExportPath="/Script/UMG.HorizontalBox'/Game/Mars/UI/Widgets/Interact/InteractPromptBox_Mars_WBP.InteractPromptBox_Mars_WBP:WidgetTree.PromptContainer'"
+   bExpandedInDesigner=True
+   DisplayLabel="PromptContainer"
+End Object
