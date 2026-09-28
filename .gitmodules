@@ -32,3 +32,6 @@
 	path = Plugins/Monolith
 	url = https://github.com/tumourlove/monolith.git
 	branch = master
+[submodule "Plugins/EmmsUI"]
+	path = Plugins/EmmsUI
+	url = https://github.com/Hazelight/EmmsUI.git
