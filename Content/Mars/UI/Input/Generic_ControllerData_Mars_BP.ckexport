@@ -1,0 +1,1937 @@
+{
+	"assetName": "Generic_ControllerData_Mars_BP",
+	"assetPath": "/Game/Mars/UI/Input/Generic_ControllerData_Mars_BP.Generic_ControllerData_Mars_BP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "03caea6b4f6a457333520c07ba8d3328",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "Mars_GenericGamepad_ControllerData",
+	"parentClassPath": "/Script/Angelscript.Mars_GenericGamepad_ControllerData",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "InputType",
+			"type": "ECommonInputType",
+			"category": "Default",
+			"value": "Gamepad"
+		},
+		{
+			"name": "GamepadName",
+			"type": "FName",
+			"category": "Gamepad",
+			"value": "Windows"
+		},
+		{
+			"name": "GamepadDisplayName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadCategory",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadPlatformName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadHardwareIdMapping",
+			"type": "TArray",
+			"category": "Gamepad",
+			"value": []
+		},
+		{
+			"name": "ControllerTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "ControllerButtonMaskTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "InputBrushDataMap",
+			"type": "TArray",
+			"category": "Display",
+			"value": [
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_DPad_Up"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_ArrowUp_Mars_T.Prompt_Joystick_ArrowUp_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_DPad_Down"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_ArrowDown_Mars_T.Prompt_Joystick_ArrowDown_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_DPad_Right"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_ArrowRight_Mars_T.Prompt_Joystick_ArrowRight_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_DPad_Left"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_ArrowLeft_Mars_T.Prompt_Joystick_ArrowLeft_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftStick_Up"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_LUp_Mars_T.Prompt_Joystick_LUp_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftStick_Down"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_LDown_Mars_T.Prompt_Joystick_LDown_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftStick_Right"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_LRight_Mars_T.Prompt_Joystick_LRight_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftStick_Left"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_LLeft_Mars_T.Prompt_Joystick_LLeft_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightStick_Up"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_RUp_Mars_T.Prompt_Joystick_RUp_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightStick_Down"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_RDown_Mars_T.Prompt_Joystick_RDown_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightStick_Right"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_RRight_Mars_T.Prompt_Joystick_RRight_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightStick_Left"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_RLeft_Mars_T.Prompt_Joystick_RLeft_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_Special_Left"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_Share_Mars_T.Prompt_Joystick_Share_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_Special_Right"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_Start_Mars_T.Prompt_Joystick_Start_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_FaceButton_Bottom"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_A_Mars_T.Prompt_Joystick_A_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_FaceButton_Right"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_B_Mars_T.Prompt_Joystick_B_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_FaceButton_Left"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_X_Mars_T.Prompt_Joystick_X_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_FaceButton_Top"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_Y_Mars_T.Prompt_Joystick_Y_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftShoulder"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_LB_Mars_T.Prompt_Joystick_LB_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightShoulder"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_RB_Mars_T.Prompt_Joystick_RB_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftTrigger"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_LT_Mars_T.Prompt_Joystick_LT_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightTrigger"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_RT_Mars_T.Prompt_Joystick_RT_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_LeftThumbstick"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_L3_Mars_T.Prompt_Joystick_L3_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Gamepad_RightThumbstick"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_R3_Mars_T.Prompt_Joystick_R3_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				}
+			]
+		},
+		{
+			"name": "InputBrushKeySets",
+			"type": "TArray",
+			"category": "Display",
+			"value": []
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

@@ -1,0 +1,88 @@
+{
+	"assetName": "PS5_ControllerData_Mars_BP",
+	"assetPath": "/Game/Mars/UI/Input/PS5_ControllerData_Mars_BP.PS5_ControllerData_Mars_BP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "7e4b04c6b41c7fdd57ede556d3f37bfd",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "Mars_PS5Gamepad_ControllerData",
+	"parentClassPath": "/Script/Angelscript.Mars_PS5Gamepad_ControllerData",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "InputType",
+			"type": "ECommonInputType",
+			"category": "Default",
+			"value": "Gamepad"
+		},
+		{
+			"name": "GamepadName",
+			"type": "FName",
+			"category": "Gamepad",
+			"value": "PS5"
+		},
+		{
+			"name": "GamepadDisplayName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadCategory",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadPlatformName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadHardwareIdMapping",
+			"type": "TArray",
+			"category": "Gamepad",
+			"value": []
+		},
+		{
+			"name": "ControllerTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "ControllerButtonMaskTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "InputBrushDataMap",
+			"type": "TArray",
+			"category": "Display",
+			"value": []
+		},
+		{
+			"name": "InputBrushKeySets",
+			"type": "TArray",
+			"category": "Display",
+			"value": []
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

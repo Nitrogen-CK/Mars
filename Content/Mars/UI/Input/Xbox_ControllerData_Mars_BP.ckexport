@@ -1,0 +1,88 @@
+{
+	"assetName": "Xbox_ControllerData_Mars_BP",
+	"assetPath": "/Game/Mars/UI/Input/Xbox_ControllerData_Mars_BP.Xbox_ControllerData_Mars_BP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e86cf914099d3dac4c417f89d4798cc3",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "Mars_XboxGamepad_ControllerData",
+	"parentClassPath": "/Script/Angelscript.Mars_XboxGamepad_ControllerData",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "InputType",
+			"type": "ECommonInputType",
+			"category": "Default",
+			"value": "Gamepad"
+		},
+		{
+			"name": "GamepadName",
+			"type": "FName",
+			"category": "Gamepad",
+			"value": "XboxOne"
+		},
+		{
+			"name": "GamepadDisplayName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadCategory",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadPlatformName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadHardwareIdMapping",
+			"type": "TArray",
+			"category": "Gamepad",
+			"value": []
+		},
+		{
+			"name": "ControllerTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "ControllerButtonMaskTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "InputBrushDataMap",
+			"type": "TArray",
+			"category": "Display",
+			"value": []
+		},
+		{
+			"name": "InputBrushKeySets",
+			"type": "TArray",
+			"category": "Display",
+			"value": []
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

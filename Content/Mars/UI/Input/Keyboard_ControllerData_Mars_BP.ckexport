@@ -1,0 +1,7712 @@
+{
+	"assetName": "Keyboard_ControllerData_Mars_BP",
+	"assetPath": "/Game/Mars/UI/Input/Keyboard_ControllerData_Mars_BP.Keyboard_ControllerData_Mars_BP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "2cae2b262008d3fd0737b846cb5e2fd6",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "Mars_Keyboard_ControllerData",
+	"parentClassPath": "/Script/Angelscript.Mars_Keyboard_ControllerData",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "InputType",
+			"type": "ECommonInputType",
+			"category": "Default",
+			"value": "MouseAndKeyboard"
+		},
+		{
+			"name": "GamepadName",
+			"type": "FName",
+			"category": "Gamepad",
+			"value": "None"
+		},
+		{
+			"name": "GamepadDisplayName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadCategory",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadPlatformName",
+			"type": "FText",
+			"category": "Gamepad",
+			"value": ""
+		},
+		{
+			"name": "GamepadHardwareIdMapping",
+			"type": "TArray",
+			"category": "Gamepad",
+			"value": []
+		},
+		{
+			"name": "ControllerTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "ControllerButtonMaskTexture",
+			"type": "TSoftObjectPtr<UTexture2D>",
+			"category": "Display",
+			"value": ""
+		},
+		{
+			"name": "InputBrushDataMap",
+			"type": "TArray",
+			"category": "Display",
+			"value": [
+				{
+					"Key":
+					{
+						"KeyName": "LeftMouseButton"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_MouseLeftClick_Mars_T.Prompt_PC_MouseLeftClick_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "RightMouseButton"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_MouseRightClick_Mars_T.Prompt_PC_MouseRightClick_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "MiddleMouseButton"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_MouseMiddleClick_Mars_T.Prompt_PC_MouseMiddleClick_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Tab"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Tab_Mars_T.Prompt_PC_Tab_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Enter"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Enter_Mars_T.Prompt_PC_Enter_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "CapsLock"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_CapsLock_Mars_T.Prompt_PC_CapsLock_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Escape"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_ESC_Mars_T.Prompt_PC_ESC_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "SpaceBar"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Space_Mars_T.Prompt_PC_Space_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "PageUp"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_PageUp_Mars_T.Prompt_PC_PageUp_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "PageDown"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_PageDown_Mars_T.Prompt_PC_PageDown_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "End"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_End_Mars_T.Prompt_PC_End_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Home"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Home_Mars_T.Prompt_PC_Home_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Left"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Left_Mars_T.Prompt_PC_Left_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Up"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Up_Mars_T.Prompt_PC_Up_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Right"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Right_Mars_T.Prompt_PC_Right_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Down"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Down_Mars_T.Prompt_PC_Down_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Insert"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Insert_Mars_T.Prompt_PC_Insert_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Delete"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Delete_Mars_T.Prompt_PC_Delete_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Zero"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_0_Mars_T.Prompt_PC_0_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "One"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_1_Mars_T.Prompt_PC_1_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Two"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_2_Mars_T.Prompt_PC_2_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Three"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_3_Mars_T.Prompt_PC_3_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Four"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_4_Mars_T.Prompt_PC_4_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Five"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_5_Mars_T.Prompt_PC_5_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Six"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_6_Mars_T.Prompt_PC_6_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Seven"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_7_Mars_T.Prompt_PC_7_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Eight"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_8_Mars_T.Prompt_PC_8_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Nine"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_9_Mars_T.Prompt_PC_9_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "A"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_A_Mars_T.Prompt_PC_A_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "B"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_B_Mars_T.Prompt_PC_B_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "C"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_C_Mars_T.Prompt_PC_C_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "D"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_D_Mars_T.Prompt_PC_D_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "E"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_E_Mars_T.Prompt_PC_E_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F_Mars_T.Prompt_PC_F_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "G"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_G_Mars_T.Prompt_PC_G_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "H"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_H_Mars_T.Prompt_PC_H_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "I"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_I_Mars_T.Prompt_PC_I_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "J"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_J_Mars_T.Prompt_PC_J_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "K"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_K_Mars_T.Prompt_PC_K_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "L"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_L_Mars_T.Prompt_PC_L_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "M"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_M_Mars_T.Prompt_PC_M_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "N"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_N_Mars_T.Prompt_PC_N_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "O"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_O_Mars_T.Prompt_PC_O_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "P"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_P_Mars_T.Prompt_PC_P_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Q"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Q_Mars_T.Prompt_PC_Q_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "R"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_R_Mars_T.Prompt_PC_R_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "S"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_S_Mars_T.Prompt_PC_S_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "T"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_T_Mars_T.Prompt_PC_T_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "U"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_U_Mars_T.Prompt_PC_U_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "V"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_V_Mars_T.Prompt_PC_V_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "W"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_W_Mars_T.Prompt_PC_W_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "X"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_X_Mars_T.Prompt_PC_X_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Y"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Y_Mars_T.Prompt_PC_Y_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Z"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Z_Mars_T.Prompt_PC_Z_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadZero"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_0_Mars_T.Prompt_PC_0_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadOne"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_1_Mars_T.Prompt_PC_1_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadTwo"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_2_Mars_T.Prompt_PC_2_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadThree"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_3_Mars_T.Prompt_PC_3_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadFour"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_4_Mars_T.Prompt_PC_4_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadFive"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_5_Mars_T.Prompt_PC_5_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadSix"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_6_Mars_T.Prompt_PC_6_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadSeven"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_7_Mars_T.Prompt_PC_7_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadEight"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_8_Mars_T.Prompt_PC_8_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumPadNine"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_9_Mars_T.Prompt_PC_9_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Multiply"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Multiply_Mars_T.Prompt_PC_Multiply_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Add"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Add_Mars_T.Prompt_PC_Add_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Subtract"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Subtract_Mars_T.Prompt_PC_Subtract_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Divide"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Slash_Mars_T.Prompt_PC_Slash_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F1"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F1_Mars_T.Prompt_PC_F1_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F2"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F2_Mars_T.Prompt_PC_F2_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F3"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F3_Mars_T.Prompt_PC_F3_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F4"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F4_Mars_T.Prompt_PC_F4_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F5"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F5_Mars_T.Prompt_PC_F5_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F6"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F6_Mars_T.Prompt_PC_F6_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F7"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F7_Mars_T.Prompt_PC_F7_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F8"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F8_Mars_T.Prompt_PC_F8_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F9"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F9_Mars_T.Prompt_PC_F9_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F10"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F10_Mars_T.Prompt_PC_F10_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F11"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F11_Mars_T.Prompt_PC_F11_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "F12"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_F12_Mars_T.Prompt_PC_F12_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "NumLock"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_NumLock_Mars_T.Prompt_PC_NumLock_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "ScrollLock"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_ScrollLock_Mars_T.Prompt_PC_ScrollLock_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "LeftShift"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_LShift_Mars_T.Prompt_PC_LShift_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "RightShift"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_RShift_Mars_T.Prompt_PC_RShift_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "LeftControl"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Ctrl_Mars_T.Prompt_PC_Ctrl_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "RightControl"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Ctrl_Mars_T.Prompt_PC_Ctrl_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "LeftAlt"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Alt_Mars_T.Prompt_PC_Alt_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "RightAlt"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 64,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Alt_Mars_T.Prompt_PC_Alt_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Semicolon"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_SemiColon_Mars_T.Prompt_PC_SemiColon_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Equals"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Equals_Mars_T.Prompt_PC_Equals_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Comma"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Comma_Mars_T.Prompt_PC_Comma_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Hyphen"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Subtract_Mars_T.Prompt_PC_Subtract_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Period"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Period_Mars_T.Prompt_PC_Period_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Slash"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Slash_Mars_T.Prompt_PC_Slash_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "LeftBracket"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_LBracket_Mars_T.Prompt_PC_LBracket_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Backslash"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Backslash_Mars_T.Prompt_PC_Backslash_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "RightBracket"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_RBracket_Mars_T.Prompt_PC_RBracket_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Apostrophe"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Apostrophe_Mars_T.Prompt_PC_Apostrophe_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				},
+				{
+					"Key":
+					{
+						"KeyName": "Quote"
+					},
+					"KeyBrush":
+					{
+						"TintColor":
+						{
+							"SpecifiedColor":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"ColorUseRule": "UseColor_Specified"
+						},
+						"DrawAs": "Image",
+						"Tiling": "NoTile",
+						"Mirroring": "NoMirror",
+						"ImageType": "FullColor",
+						"ImageSize":
+						{
+							"X": 32,
+							"Y": 32
+						},
+						"Margin":
+						{
+							"Left": 0,
+							"Top": 0,
+							"Right": 0,
+							"Bottom": 0
+						},
+						"ResourceObject": "/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Quote_Mars_T.Prompt_PC_Quote_Mars_T",
+						"OutlineSettings":
+						{
+							"CornerRadii":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 0
+							},
+							"Color":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0,
+									"G": 0,
+									"B": 0,
+									"A": 0
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"Width": 0,
+							"RoundingType": "HalfHeightRadius",
+							"bUseBrushTransparency": false
+						},
+						"UVRegion":
+						{
+							"Min":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"Max":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"bIsValid": false
+						},
+						"bIsDynamicallyLoaded": false,
+						"ResourceName": "None"
+					}
+				}
+			]
+		},
+		{
+			"name": "InputBrushKeySets",
+			"type": "TArray",
+			"category": "Display",
+			"value": []
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}
