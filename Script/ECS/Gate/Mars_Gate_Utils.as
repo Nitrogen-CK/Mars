@@ -5,17 +5,18 @@ namespace utils_gate
         const auto StartOffset = InParams.StartOpen ? InParams.OpenOffset : FVector::ZeroVector;
         auto MovingNode = utils_scene_node::Create(InOwner, FTransform(FRotator::ZeroRotator, StartOffset, FVector::OneVector));
 
-        auto Params = FMars_Fragment_Gate_Params();
-        Params.OpenOffset = InParams.OpenOffset;
-        Params.MoveDuration = InParams.MoveDuration;
-        Params.Easing = InParams.Easing;
+        auto MoverSpec = FMars_Mover_Spec();
+        MoverSpec.EndLocation = InParams.OpenOffset;
+        MoverSpec.Duration = InParams.MoveDuration;
+        MoverSpec.Easing = InParams.Easing;
+        MoverSpec.StartAtEnd = InParams.StartOpen;
+        utils_mover::Add(MovingNode, MoverSpec);
 
         auto State = FMars_Fragment_Gate();
         State.IsOpen = InParams.StartOpen;
         State.MovingNode = MovingNode;
 
         InOwner.Add_Fragment(FMars_Feature_Gate());
-        InOwner.Add_Fragment(Params);
         InOwner.Add_Fragment(State);
         InOwner.Add_Fragment(FMars_Tag_Gate_NeedsSetup());
         return InOwner.As_Gate();

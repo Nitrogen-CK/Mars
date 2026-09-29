@@ -20,7 +20,8 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Sink))
         {
             Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"));
-            Gate.Request_SetOpen(Sink.Get_IsPowered());
+            if (Sink.Get_HasEvaluated())
+            { Gate.Request_SetOpen(Sink.Get_IsPowered()); }
         }
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);

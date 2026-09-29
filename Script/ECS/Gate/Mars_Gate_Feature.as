@@ -31,22 +31,6 @@ struct FMars_Gate_Spec
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Params
-//--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_Fragment_Gate_Params
-{
-    UPROPERTY()
-    FVector OpenOffset = FVector(0.0, 0.0, 220.0);
-
-    UPROPERTY()
-    float32 MoveDuration = 0.8f;
-
-    UPROPERTY()
-    ECk_TweenEasing Easing = ECk_TweenEasing::InOutSine;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -55,11 +39,9 @@ struct FMars_Fragment_Gate
     UPROPERTY()
     bool IsOpen = false;
 
+    // Carries the Mover that slides the leaf.
     UPROPERTY()
     FCk_Handle_SceneNode MovingNode;
-
-    UPROPERTY()
-    FCk_Handle_Tween MoveTween;
 }
 
 struct FMars_Tag_Gate_NeedsSetup {}

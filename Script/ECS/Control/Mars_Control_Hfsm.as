@@ -1,4 +1,4 @@
-class UMars_SmState_Lever_Pull : UCk_SmState_EntityScript
+class UMars_SmState_Control_Engage : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
     TArray<FGameplayTag> DoGet_StatesToOverride() const
@@ -10,7 +10,7 @@ class UMars_SmState_Lever_Pull : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
-        AddTask(InHandle, UMars_SmTask_Lever_Pull);
+        AddTask(InHandle, UMars_SmTask_Control_Engage);
 
         auto OnSuccess = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
         AddCondition(OnSuccess, UMars_SmCondition_AllTasksSucceeded);
@@ -20,7 +20,7 @@ class UMars_SmState_Lever_Pull : UCk_SmState_EntityScript
     }
 }
 
-class UMars_SmTask_Lever_Pull : UCk_SmTask_EntityScript
+class UMars_SmTask_Control_Engage : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
@@ -35,14 +35,14 @@ class UMars_SmTask_Lever_Pull : UCk_SmTask_EntityScript
         }
 
         auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Lever = Owner.As_Lever(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Lever))
+        auto Control = Owner.As_Control(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Control))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
         }
 
-        Lever.Request_Toggle();
+        Control.Request_Engage();
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }

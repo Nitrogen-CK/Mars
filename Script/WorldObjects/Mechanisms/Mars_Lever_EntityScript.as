@@ -1,5 +1,5 @@
-// Placeable floor lever. The origin is the pivot on the mounting surface and the handle points up local +Z; pulling
-// pitches it by Lever.PulledAngle (positive leans toward local -X). Asserts an optional MechanismSource while pulled.
+// Placeable floor lever. The origin is the pivot on the mounting surface and the handle points up local +Z; activating
+// pitches it by PulledAngle (positive leans toward local -X). Asserts an optional MechanismSource while active.
 class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
@@ -9,11 +9,18 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY(ExposeOnSpawn)
-    FMars_Lever_Spec Lever;
+    FMars_Control_Spec Control;
 
     // No source is added while OutputChannel is unset.
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
+
+    // Handle pitch when active. The Mover lerps it per component, so any angle is safe.
+    UPROPERTY(ExposeOnSpawn)
+    float32 PulledAngle = 70.0f;
+
+    UPROPERTY(ExposeOnSpawn)
+    float32 MoveDuration = 0.35f;
 
     UPROPERTY(ExposeOnSpawn)
     FText PromptText = NSLOCTEXT("MarsInteraction", "PullLeverPrompt", "Pull lever");
@@ -24,18 +31,26 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
         auto LeverRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InHandle, n"TAG_MarsLever");
 
-        auto LeverHandle = utils_lever::Add(LeverRoot, Lever);
+        auto HandleNode = utils_scene_node::Create(LeverRoot, FTransform::Identity);
+
+        auto MoverSpec = FMars_Mover_Spec();
+        MoverSpec.EndRotation = FRotator(PulledAngle, 0.0, 0.0);
+        MoverSpec.Duration = MoveDuration;
+        MoverSpec.StartAtEnd = Control.StartActive;
+        auto Mover = utils_mover::Add(HandleNode, MoverSpec);
+
+        utils_control::Add(InHandle, Control, Mover);
 
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }
 
-        AddVisuals(LeverRoot, LeverHandle);
+        AddVisuals(LeverRoot, HandleNode);
         AddInteractable(LeverRoot);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Lever InLever)
+    private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InHandleNode)
     {
         auto CubeMesh = engine::load::Cube();
         auto CylinderMesh = engine::load::Cylinder();
@@ -47,8 +62,7 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
             CylinderMesh, Material, collision::profile::BlockAll, n"Lever_Base");
 
         // On a child of the handle node so the node's offset stays a pure pull rotation about the pivot.
-        auto HandleNode = InLever.Get_HandleNode();
-        auto HandleTransform = HandleNode.As_Transform();
+        auto HandleTransform = InHandleNode.As_Transform();
         AddMesh(HandleTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0), FVector(0.08, 0.08, 0.9)),
             CubeMesh, Material, collision::profile::NoCollision, n"Lever_Handle");
     }
@@ -60,21 +74,9 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
         Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(FVector(40.0, 40.0, 55.0)));
         Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0));
 
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = PromptText;
-
-        auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
-
-        auto Target = FMars_Interactable_TargetEntry();
-        Target.InteractTargetSpec = TargetSpec;
-        Target.InteractPromptSpec = Prompt;
-        Target.InteractionStateClass = UMars_SmState_Lever_Pull;
-
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(Target);
+        Spec.Targets.Add(utils_control::Make_InteractTarget(Control, PromptText));
 
         utils_interactable::Create(InRoot, Spec);
     }

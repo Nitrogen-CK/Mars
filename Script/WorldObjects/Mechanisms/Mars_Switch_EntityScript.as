@@ -1,6 +1,6 @@
-// Placeable momentary push switch. The origin is the mounting surface and the button faces local +Z (pitch -90 to
-// face +X on a wall); pressing moves it by Switch.PressOffset and it releases after Switch.HoldSeconds. Asserts an
-// optional MechanismSource while pressed.
+// Placeable push switch. The origin is the mounting surface and the button faces local +Z (pitch -90 to face +X on a
+// wall); activating moves the button by PressOffset. Momentary by default: it releases Control.ActiveSeconds after the
+// last press. Asserts an optional MechanismSource while active.
 class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
@@ -10,11 +10,19 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY(ExposeOnSpawn)
-    FMars_Switch_Spec Switch;
+    FMars_Control_Spec Control;
+    default Control.Behavior = EMars_Control_Behavior::Momentary;
 
     // No source is added while OutputChannel is unset.
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
+
+    // Button node local offset while active.
+    UPROPERTY(ExposeOnSpawn)
+    FVector PressOffset = FVector(0.0, 0.0, -6.0);
+
+    UPROPERTY(ExposeOnSpawn)
+    float32 MoveDuration = 0.15f;
 
     UPROPERTY(ExposeOnSpawn)
     FText PromptText = NSLOCTEXT("MarsInteraction", "PressSwitchPrompt", "Press switch");
@@ -25,18 +33,26 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
         auto SwitchRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InHandle, n"TAG_MarsSwitch");
 
-        auto SwitchHandle = utils_switch::Add(SwitchRoot, Switch);
+        auto ButtonNode = utils_scene_node::Create(SwitchRoot, FTransform::Identity);
+
+        auto MoverSpec = FMars_Mover_Spec();
+        MoverSpec.EndLocation = PressOffset;
+        MoverSpec.Duration = MoveDuration;
+        MoverSpec.StartAtEnd = Control.StartActive;
+        auto Mover = utils_mover::Add(ButtonNode, MoverSpec);
+
+        utils_control::Add(InHandle, Control, Mover);
 
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }
 
-        AddVisuals(SwitchRoot, SwitchHandle);
+        AddVisuals(SwitchRoot, ButtonNode);
         AddInteractable(SwitchRoot);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Switch InSwitch)
+    private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InButtonNode)
     {
         auto CubeMesh = engine::load::Cube();
         auto CylinderMesh = engine::load::Cylinder();
@@ -48,8 +64,7 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
             CubeMesh, Material, collision::profile::BlockAll, n"Switch_Plate");
 
         // On a child of the button node so the node's offset stays a pure press translation.
-        auto ButtonNode = InSwitch.Get_ButtonNode();
-        auto ButtonTransform = ButtonNode.As_Transform();
+        auto ButtonTransform = InButtonNode.As_Transform();
         AddMesh(ButtonTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 10.0), FVector(0.16, 0.16, 0.08)),
             CylinderMesh, Material, collision::profile::NoCollision, n"Switch_Button");
     }
@@ -61,21 +76,9 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
         Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(FVector(30.0, 30.0, 20.0)));
         Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 10.0));
 
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = PromptText;
-
-        auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
-
-        auto Target = FMars_Interactable_TargetEntry();
-        Target.InteractTargetSpec = TargetSpec;
-        Target.InteractPromptSpec = Prompt;
-        Target.InteractionStateClass = UMars_SmState_Switch_Press;
-
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(Target);
+        Spec.Targets.Add(utils_control::Make_InteractTarget(Control, PromptText));
 
         utils_interactable::Create(InRoot, Spec);
     }
