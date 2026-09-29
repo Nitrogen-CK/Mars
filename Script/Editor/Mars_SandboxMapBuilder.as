@@ -14,6 +14,9 @@
 // suppressed while WheelJ is held on (8s), two spike tiles suppressed while LeverK is pulled, an unwired pendulum. To
 // add room 3 to an already-built sandbox map, open it and run: Mars.Sandbox.BuildRoom3
 //
+// Sandbox items (2x Rock, Ration, Cog - World-mode WorldItem presets) sit in front of the player starts. To place them in
+// an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
+//
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
 // sandbox map, open it and run: Mars.Sandbox.ApplyMaterials
@@ -58,6 +61,14 @@ void Mars_BuildSandboxRoom3Func(const TArray<FString>& Args)
 
 const FConsoleCommand Mars_BuildSandboxRoom3Command("Mars.Sandbox.BuildRoom3", n"Mars_BuildSandboxRoom3Func");
 
+UFUNCTION()
+void Mars_PlaceSandboxItemsFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceItems();
+}
+
+const FConsoleCommand Mars_PlaceSandboxItemsCommand("Mars.Sandbox.PlaceItems", n"Mars_PlaceSandboxItemsFunc");
+
 namespace utils_mars_sandbox
 {
     const FString k_MapPath = "/Game/Mars/Maps/Sandbox_Mars_MAP";
@@ -65,6 +76,7 @@ namespace utils_mars_sandbox
     const FString k_ProtoGridMaster = "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid.M_CkUsf_Look_ProtoGrid";
     const FString k_Room2FloorLabel = "Room2_Floor";
     const FString k_Room3FloorLabel = "Room3_Floor";
+    const FString k_ItemLabelPrefix = "Item_";
 
     void Build()
     {
@@ -187,6 +199,37 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.BuildRoom3] built, saved={Saved}");
+    }
+
+    // Four World-mode items on a line 150uu in front of the room-1 player starts (X=-600, facing +X, Y -225..225):
+    // enough to fill three bag slots and the overflow slot. They drop the 50uu onto the floor.
+    void PlaceItems()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceItems] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel().StartsWith(k_ItemLabelPrefix))
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceItems] [{Actor.GetActorLabel()}] already exists. Delete the {k_ItemLabelPrefix} actors first to re-place.");
+                return;
+            }
+        }
+
+        const float64 ItemX = -450.0;
+        const float64 ItemZ = 50.0;
+        Spawn_Mechanism(UMars_WorldItem_Rock_EntityScript, f"{k_ItemLabelPrefix}Rock_0", FVector(ItemX, -300.0, ItemZ));
+        Spawn_Mechanism(UMars_WorldItem_Rock_EntityScript, f"{k_ItemLabelPrefix}Rock_1", FVector(ItemX, -100.0, ItemZ));
+        Spawn_Mechanism(UMars_WorldItem_Ration_EntityScript, f"{k_ItemLabelPrefix}Ration", FVector(ItemX, 100.0, ItemZ));
+        Spawn_Mechanism(UMars_WorldItem_Cog_EntityScript, f"{k_ItemLabelPrefix}Cog", FVector(ItemX, 300.0, ItemZ));
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceItems] placed, saved={Saved}");
     }
 
     // Room 2 spans X 2000..4000, Y -700..700 (the main floor ends at X=2000). The gated bays sit in a partition at
