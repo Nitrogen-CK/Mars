@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "7f89edb1eecfe688e1ff0a633d7288f1",
+		"sourceHash": "cc29f25a53e5f6d26fa7db528da9af65",
 		"exporterVersion": 3
 	},
 	"blueprintType": "WidgetBlueprint",

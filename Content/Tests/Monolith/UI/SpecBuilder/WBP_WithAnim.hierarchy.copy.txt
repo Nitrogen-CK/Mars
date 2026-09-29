@@ -11,5 +11,5 @@ Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_2" Expo
    WidgetName="RootBox"
 End Object
 Begin Object Class=/Script/UMG.TextBlock Name="Label" ExportPath="/Script/UMG.TextBlock'/Game/Tests/Monolith/UI/SpecBuilder/WBP_WithAnim.WBP_WithAnim:WidgetTree.Label'"
-   Text=NSLOCTEXT("", "CEF43B9E4EC7616C1D047C998F91110C", "Hello, Spec")
+   Text=NSLOCTEXT("", "66500BFB451B884AC0BB4A8ABAAC0A46", "Hello, Spec")
 End Object
