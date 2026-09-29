@@ -16,6 +16,7 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
         auto Self = InHandle.As_MechanismSink();
 
         const auto SetChannelInputRequests = InRequests.SetChannelInputRequests;
+        const auto NotifyInputEdgeRequests = InRequests.NotifyInputEdgeRequests;
 
         // Swap-and-pop - InRequests is dead past this line; a request enqueued by a listener survives to next pass.
         Self.Request_TryRemove(FMars_Fragment_MechanismSink_Requests);
@@ -37,13 +38,24 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
         if (Params.Latch && InSinkComp.IsPowered)
         { Powered = true; }
 
-        if (InSinkComp.IsPowered == Powered)
+        const auto FirstEvaluation = InSinkComp.HasEvaluated == false && SetChannelInputRequests.Num() > 0;
+        if (FirstEvaluation || InSinkComp.IsPowered != Powered)
+        {
+            InSinkComp.IsPowered = Powered;
+            InSinkComp.HasEvaluated = true;
+
+            if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals))
+            { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Self, Powered); }
+        }
+
+        if (NotifyInputEdgeRequests.Num() == 0 || Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals) == false)
         { return; }
 
-        InSinkComp.IsPowered = Powered;
-
-        if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals))
-        { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Self, Powered); }
+        for (const auto& Edge : NotifyInputEdgeRequests)
+        {
+            // Fetched per edge: a listener binding a signal on another entity can reallocate the signals storage.
+            Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge.Broadcast(Self, Edge.Channel, Edge.Asserted);
+        }
     }
 
     private bool Evaluate_Rule(EMars_MechanismSink_Rule InRule, const TArray<FMars_MechanismSink_ChannelInput>& InInputs)

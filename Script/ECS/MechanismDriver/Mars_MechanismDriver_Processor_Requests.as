@@ -128,12 +128,30 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
         }
     }
 
-    // Only flags a recompute, so several same-frame flips coalesce into one pass.
+    // Edges go out immediately so their order across sources is the signal order; counts only flag a recompute, so
+    // several same-frame flips coalesce into one pass.
     UFUNCTION()
     private void OnSourceAssertedChanged(FCk_Handle_MechanismSource InSource, bool InAsserted)
     {
         if (ck::Is_NOT_Valid(_Driver))
         { return; }
+
+        if (ck::IsValid(InSource))
+        {
+            const auto Channel = InSource.Get_OutputChannel();
+            const TSet<FCk_Handle_MechanismSink> Sinks = _Driver.Get_Sinks();
+            for (const auto& Sink : Sinks)
+            {
+                if (ck::Is_NOT_Valid(Sink))
+                { continue; }
+
+                if (Sink.Get_InputChannels().Contains(Channel) == false)
+                { continue; }
+
+                auto MutableSink = Sink;
+                MutableSink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(Channel, InAsserted));
+            }
+        }
 
         _Driver.Request_Recompute();
     }

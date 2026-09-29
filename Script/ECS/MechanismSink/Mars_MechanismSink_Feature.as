@@ -77,6 +77,10 @@ struct FMars_Fragment_MechanismSink
 
     UPROPERTY()
     bool IsPowered = false;
+
+    // False until the driver's first push; link setups wait for the first OnPoweredChanged instead of reading a default.
+    UPROPERTY()
+    bool HasEvaluated = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -86,9 +90,13 @@ struct FMars_Fragment_MechanismSink
 delegate void FMars_Delegate_MechanismSink_OnPoweredChanged(FCk_Handle_MechanismSink InSink, bool InPowered);
 event void FMars_Delegate_MechanismSink_OnPoweredChanged_MC(FCk_Handle_MechanismSink InSink, bool InPowered);
 
+delegate void FMars_Delegate_MechanismSink_OnInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, bool InAsserted);
+event void FMars_Delegate_MechanismSink_OnInputEdge_MC(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, bool InAsserted);
+
 struct FMars_Fragment_MechanismSink_Signals
 {
     FMars_Delegate_MechanismSink_OnPoweredChanged_MC OnPoweredChanged;
+    FMars_Delegate_MechanismSink_OnInputEdge_MC OnInputEdge;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -114,9 +122,28 @@ struct FMars_Request_MechanismSink_SetChannelInput
     }
 }
 
+// One source flip on an input channel, delivered by the driver in signal order; never coalesced.
+struct FMars_Request_MechanismSink_NotifyInputEdge
+{
+    UPROPERTY()
+    FGameplayTag Channel;
+
+    UPROPERTY()
+    bool Asserted = false;
+
+    FMars_Request_MechanismSink_NotifyInputEdge(FGameplayTag InChannel, bool InAsserted)
+    {
+        Channel = InChannel;
+        Asserted = InAsserted;
+    }
+}
+
 struct FMars_Fragment_MechanismSink_Requests
 {
     // At most one entry per channel; a later request for the same channel overwrites.
     UPROPERTY()
     TArray<FMars_Request_MechanismSink_SetChannelInput> SetChannelInputRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_MechanismSink_NotifyInputEdge> NotifyInputEdgeRequests;
 }

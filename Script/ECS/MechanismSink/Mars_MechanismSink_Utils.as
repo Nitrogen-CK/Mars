@@ -42,6 +42,11 @@ mixin bool Get_IsLatch(const FCk_Handle_MechanismSink& Self)
     return Self.Get_Fragment(FMars_Fragment_MechanismSink_Params).Latch;
 }
 
+mixin bool Get_HasEvaluated(const FCk_Handle_MechanismSink& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_MechanismSink).HasEvaluated;
+}
+
 mixin bool Get_IsPowered(const FCk_Handle_MechanismSink& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_MechanismSink).IsPowered;
@@ -85,6 +90,13 @@ mixin void Request_SetChannelInput(FCk_Handle_MechanismSink& Self, const FMars_R
     Requests.SetChannelInputRequests.Add(InRequest);
 }
 
+// Only the mechanism driver calls this, once per source flip; edges are delivered in enqueue order.
+mixin void Request_NotifyInputEdge(FCk_Handle_MechanismSink& Self, const FMars_Request_MechanismSink_NotifyInputEdge& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismSink_Requests);
+    Requests.NotifyInputEdgeRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
@@ -101,4 +113,18 @@ mixin void UnbindFrom_OnPoweredChanged(FCk_Handle_MechanismSink& Self, FMars_Del
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnInputEdge(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnInputEdge InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_MechanismSink_Signals);
+    Fragment.OnInputEdge.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnInputEdge(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnInputEdge InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
