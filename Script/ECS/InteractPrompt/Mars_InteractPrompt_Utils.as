@@ -1,9 +1,19 @@
 namespace utils_interact_prompt
 {
-    FCk_Handle_InteractPrompt Add(FCk_Handle& InHandle, FMars_Fragment_InteractPrompt InParams)
+    FCk_Handle_InteractPrompt Add(FCk_Handle& InHandle, FMars_InteractPrompt_Spec InParams)
     {
+        auto Params = FMars_Fragment_InteractPrompt_Params();
+        Params.InputAction = InParams.InputAction;
+        Params.SortOrder = InParams.SortOrder;
+        Params.IsTimedInteraction = InParams.IsTimedInteraction;
+
+        auto State = FMars_Fragment_InteractPrompt();
+        State.PromptText = InParams.PromptText;
+        State.TextColor = InParams.TextColor;
+
         InHandle.Add_Fragment(FMars_Feature_InteractPrompt());
-        InHandle.Add_Fragment(InParams);
+        InHandle.Add_Fragment(Params);
+        InHandle.Add_Fragment(State);
         return InHandle.As_InteractPrompt();
     }
 }
@@ -14,7 +24,7 @@ namespace utils_interact_prompt
 
 mixin UInputAction Get_InputAction(const FCk_Handle_InteractPrompt& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).InputAction.Get();
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).InputAction.Get();
 }
 
 mixin FText Get_PromptText(const FCk_Handle_InteractPrompt& Self)
@@ -29,7 +39,7 @@ mixin FLinearColor Get_PromptTextColor(const FCk_Handle_InteractPrompt& Self)
 
 mixin bool Get_IsTimedInteraction(const FCk_Handle_InteractPrompt& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).IsTimedInteraction;
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).IsTimedInteraction;
 }
 
 mixin FCk_Handle_Interaction Get_CurrentInteraction(const FCk_Handle_InteractPrompt& Self)

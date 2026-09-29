@@ -11,10 +11,11 @@ asset Mars_PlayerViewpointHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_PlayerViewpoint {}
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Params
+// Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Fragment_PlayerViewpoint_Params
+// Consumed at Add (it shapes the trace); not retained.
+struct FMars_PlayerViewpoint_Spec
 {
     UPROPERTY()
     float32 InteractionTraceDistance = 250.0f;
@@ -26,7 +27,7 @@ struct FMars_Fragment_PlayerViewpoint_Params
 
 // Loose fragment - no processor. The view is pushed into Viewpoint by the player HFSM's viewpoint
 // sync task; the trace rides it.
-struct FMars_Fragment_PlayerViewpoint_Current
+struct FMars_Fragment_PlayerViewpoint
 {
     UPROPERTY()
     FCk_Handle_Transform Viewpoint;

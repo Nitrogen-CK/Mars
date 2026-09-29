@@ -11,10 +11,10 @@ asset Mars_InteractPromptHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_InteractPrompt {}
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Params / State
+// Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Fragment_InteractPrompt
+struct FMars_InteractPrompt_Spec
 {
     UPROPERTY()
     TSoftObjectPtr<UInputAction> InputAction;
@@ -31,6 +31,37 @@ struct FMars_Fragment_InteractPrompt
     // Stamped at composition from the target's completion policy; the widget shows a hold bar.
     UPROPERTY()
     bool IsTimedInteraction = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Params
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The spec fields read after construction. Text and color are mutable, so they live in FMars_Fragment_InteractPrompt.
+struct FMars_Fragment_InteractPrompt_Params
+{
+    UPROPERTY()
+    TSoftObjectPtr<UInputAction> InputAction;
+
+    UPROPERTY()
+    int32 SortOrder = 999;
+
+    UPROPERTY()
+    bool IsTimedInteraction = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// State
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Seeded from the spec; UpdateText requests change the text/color here.
+struct FMars_Fragment_InteractPrompt
+{
+    UPROPERTY()
+    FText PromptText;
+
+    UPROPERTY()
+    FLinearColor TextColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     // The in-progress interaction on this prompt's target, tracked while the prompt is displayed.
     UPROPERTY()
@@ -60,8 +91,6 @@ struct FMars_Request_InteractPrompt_UpdateText
 
     UPROPERTY()
     TOptional<FLinearColor> NewColor;
-
-    FMars_Request_InteractPrompt_UpdateText() {}
 
     FMars_Request_InteractPrompt_UpdateText(const FText& InNewText)
     {

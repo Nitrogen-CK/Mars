@@ -1,22 +1,21 @@
 namespace utils_player_viewpoint
 {
-    FCk_Handle_PlayerViewpoint Add(FCk_Handle& InHandle, FTransform InInitialView, FMars_Fragment_PlayerViewpoint_Params InParams)
+    FCk_Handle_PlayerViewpoint Add(FCk_Handle& InHandle, FTransform InInitialView, FMars_PlayerViewpoint_Spec InParams)
     {
-        auto Current = FMars_Fragment_PlayerViewpoint_Current();
-        Current.Viewpoint = utils_target_point::Create(InHandle, InInitialView);
-        utils_handle::Set_DebugName(Current.Viewpoint, n"PlayerViewpoint");
+        auto State = FMars_Fragment_PlayerViewpoint();
+        State.Viewpoint = utils_target_point::Create(InHandle, InInitialView);
+        utils_handle::Set_DebugName(State.Viewpoint, n"PlayerViewpoint");
 
         auto TraceSettings = FCk_Probe_RayCastPersistent_Settings(
-            Current.Viewpoint,
+            State.Viewpoint,
             FVector(InParams.InteractionTraceDistance, 0.0, 0.0),
             GameplayTag::MakeGameplayTagContainerFromTag(GameplayTags::Probe_Mars_Interact));
         TraceSettings.Set_TracePolicy(ECk_ProbeTrace_Policy::Multi);
-        Current.InteractionTrace = utils_probe_trace::Create_LineTrace_Persistent(TraceSettings);
-        utils_handle::Set_DebugName(Current.InteractionTrace, n"PlayerViewpoint.InteractionTrace");
+        State.InteractionTrace = utils_probe_trace::Create_LineTrace_Persistent(TraceSettings);
+        utils_handle::Set_DebugName(State.InteractionTrace, n"PlayerViewpoint.InteractionTrace");
 
         InHandle.Add_Fragment(FMars_Feature_PlayerViewpoint());
-        InHandle.Add_Fragment(InParams);
-        InHandle.Add_Fragment(Current);
+        InHandle.Add_Fragment(State);
         return InHandle.As_PlayerViewpoint();
     }
 }
@@ -27,12 +26,12 @@ namespace utils_player_viewpoint
 
 mixin FCk_Handle_Transform Get_Viewpoint(const FCk_Handle_PlayerViewpoint& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint_Current).Viewpoint;
+    return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint).Viewpoint;
 }
 
 mixin FCk_Handle_ProbeTrace Get_InteractionTrace(const FCk_Handle_PlayerViewpoint& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint_Current).InteractionTrace;
+    return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint).InteractionTrace;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

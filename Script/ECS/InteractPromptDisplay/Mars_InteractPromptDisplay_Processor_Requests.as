@@ -37,7 +37,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         { return; }
 
         const auto SlotKey = InRequest.PromptHandle.Get_SlotKeyFromPrompt();
-        const auto SortOrder = InRequest.PromptHandle.Get_Fragment(FMars_Fragment_InteractPrompt).SortOrder;
+        const auto SortOrder = InRequest.PromptHandle.Get_Fragment(FMars_Fragment_InteractPrompt_Params).SortOrder;
 
         auto Entry = FMars_InteractPromptDisplay_Entry();
         Entry.PromptHandle = InRequest.PromptHandle;

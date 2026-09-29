@@ -8,27 +8,31 @@ namespace utils_interactable
         return 999;
     }
 
-    FCk_Handle_Interactable Create(FCk_Handle_Transform& InOwner, FMars_Fragment_Interactable InParams)
+    FCk_Handle_Interactable Create(FCk_Handle_Transform& InOwner, FMars_Interactable_Spec InParams)
     {
         FCk_Handle_Transform InteractableHandle;
         if (InParams.ProbeInfo.IsSet())
         {
             auto Probe = InParams.ProbeInfo.GetValue();
             // QueryOnly: traceable by the player's view ray, never a physical contact.
-            Probe.ProbeParams
+            Probe.ProbeSpec
                 .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent)
                 .Set_ContactParticipation(ECk_Probe_ContactParticipation::QueryOnly);
-            InteractableHandle = utils_prefab::Create_ProbeNode(InOwner, Probe.ProbeShape, Probe.ProbeParams, Probe.ProbeOffset).As_Transform();
+            InteractableHandle = utils_prefab::Create_ProbeNode(InOwner, Probe.ProbeShape, Probe.ProbeSpec, Probe.ProbeOffset).As_Transform();
         }
         else
         {
             InteractableHandle = utils_scene_node::Create(InOwner, FTransform::Identity).As_Transform();
         }
 
-        InteractableHandle.Add_Fragment(InParams);
+        auto Params = FMars_Fragment_Interactable_Params();
+        for (const auto& Entry : InParams.Targets)
+        { Params.TargetChannels.Add(Entry.InteractTargetSpec.Get_InteractionChannel()); }
+
+        InteractableHandle.Add_Fragment(Params);
         InteractableHandle.Add_Fragment(FMars_Feature_Interactable());
 
-        auto InitialState = FMars_Fragment_Interactable_State();
+        auto InitialState = FMars_Fragment_Interactable();
         InitialState.EnableDisable = InParams.StartEnableDisable;
         InteractableHandle.Add_Fragment(InitialState);
 
@@ -43,18 +47,18 @@ namespace utils_interactable
 
         for (const auto& Entry : InParams.Targets)
         {
-            auto InteractTarget = utils_interact_target::Add(InteractableHandle, Entry.InteractTargetParams);
+            auto InteractTarget = utils_interact_target::Add(InteractableHandle, Entry.InteractTargetSpec);
             auto TargetHandle = InteractTarget.H();
             InteractTarget.Request_OverrideToSelf();
             TargetHandle.Add_Fragment(Context);
 
-            if (Entry.InteractPromptParams.IsSet())
+            if (Entry.InteractPromptSpec.IsSet())
             {
-                auto PromptParams = Entry.InteractPromptParams.GetValue();
-                PromptParams.SortOrder = Get_SortOrderFromChannel(Entry.InteractTargetParams.Get_InteractionChannel());
-                PromptParams.IsTimedInteraction =
-                    Entry.InteractTargetParams.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed;
-                utils_interact_prompt::Add(TargetHandle, PromptParams);
+                auto PromptSpec = Entry.InteractPromptSpec.GetValue();
+                PromptSpec.SortOrder = Get_SortOrderFromChannel(Entry.InteractTargetSpec.Get_InteractionChannel());
+                PromptSpec.IsTimedInteraction =
+                    Entry.InteractTargetSpec.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed;
+                utils_interact_prompt::Add(TargetHandle, PromptSpec);
             }
 
             auto InteractionStateClass = Entry.InteractionStateClass.Get();
@@ -81,11 +85,11 @@ mixin FCk_Handle_InteractTarget Get_InteractTarget(const FCk_Handle_Interactable
 
 mixin TArray<FCk_Handle_InteractTarget> Get_AllInteractTargets(const FCk_Handle_Interactable& Self)
 {
-    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_Interactable);
+    const auto& Params = Self.Get_Fragment(FMars_Fragment_Interactable_Params);
     auto Result = TArray<FCk_Handle_InteractTarget>();
-    for (const auto& Entry : Fragment.Targets)
+    for (const auto& Channel : Params.TargetChannels)
     {
-        auto Target = utils_interact_target::TryGet(Self, Entry.InteractTargetParams.Get_InteractionChannel());
+        auto Target = utils_interact_target::TryGet(Self, Channel);
         if (ck::IsValid(Target))
         { Result.Add(Target); }
     }
@@ -94,17 +98,17 @@ mixin TArray<FCk_Handle_InteractTarget> Get_AllInteractTargets(const FCk_Handle_
 
 mixin ECk_EnableDisable Get_EnableDisable(const FCk_Handle_Interactable& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Interactable_State).EnableDisable;
+    return Self.Get_Fragment(FMars_Fragment_Interactable).EnableDisable;
 }
 
 mixin bool Get_IsFocused(const FCk_Handle_Interactable& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Interactable_State).IsFocused;
+    return Self.Get_Fragment(FMars_Fragment_Interactable).IsFocused;
 }
 
 mixin FCk_Handle Get_CurrentFocuser(const FCk_Handle_Interactable& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Interactable_State).CurrentFocuser;
+    return Self.Get_Fragment(FMars_Fragment_Interactable).CurrentFocuser;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

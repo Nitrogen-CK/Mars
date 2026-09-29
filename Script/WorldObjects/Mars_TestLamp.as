@@ -58,10 +58,10 @@ class AMars_TestLamp : AActor
         utils_handle::Set_DebugName(Lamp, n"TestLamp");
 
         auto Probe = FMars_Interactable_ProbeInfo();
-        Probe.ProbeParams = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
+        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
         Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(GetActorScale3D() * 50.0));
 
-        auto Prompt = FMars_Fragment_InteractPrompt();
+        auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
         Prompt.PromptText = PromptText;
 
@@ -69,13 +69,13 @@ class AMars_TestLamp : AActor
         TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
         auto Target = FMars_Interactable_TargetEntry();
-        Target.InteractTargetParams = TargetSpec;
-        Target.InteractPromptParams = Prompt;
+        Target.InteractTargetSpec = TargetSpec;
+        Target.InteractPromptSpec = Prompt;
         Target.InteractionStateClass = UMars_SmState_TestLamp_Toggle;
 
-        auto Params = FMars_Fragment_Interactable();
-        Params.ProbeInfo = Probe;
-        Params.Targets.Add(Target);
+        auto Spec = FMars_Interactable_Spec();
+        Spec.ProbeInfo = Probe;
+        Spec.Targets.Add(Target);
 
         auto LampTransform = Lamp.As_Transform();
 
@@ -84,7 +84,7 @@ class AMars_TestLamp : AActor
         auto Visual = utils_unreal_component::Add(Lamp, VisualParams);
         utils_unreal_component::BindTo_OnAdded(Visual, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnVisualAdded"));
 
-        utils_interactable::Create(LampTransform, Params);
+        utils_interactable::Create(LampTransform, Spec);
     }
 
     UFUNCTION()

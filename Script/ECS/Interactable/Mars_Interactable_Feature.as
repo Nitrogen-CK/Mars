@@ -51,7 +51,7 @@ struct FMars_Fragment_Interactable_Signals
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Params
+// Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
 struct FMars_Tag_Interactable_NeedsSetup {}
@@ -59,7 +59,7 @@ struct FMars_Tag_Interactable_NeedsSetup {}
 struct FMars_Interactable_ProbeInfo
 {
     UPROPERTY()
-    FCk_Probe_Spec ProbeParams;
+    FCk_Probe_Spec ProbeSpec;
 
     UPROPERTY()
     FCk_AnyShape ProbeShape;
@@ -70,15 +70,15 @@ struct FMars_Interactable_ProbeInfo
 
 struct FMars_Interactable_TargetEntry
 {
-    FCk_InteractTarget_Spec InteractTargetParams;
-    TOptional<FMars_Fragment_InteractPrompt> InteractPromptParams;
+    FCk_InteractTarget_Spec InteractTargetSpec;
+    TOptional<FMars_InteractPrompt_Spec> InteractPromptSpec;
 
     // Overrides UMars_SmState_InteractTarget_Enter in the per-interaction sub-SM: what the
     // interaction DOES. Route it to UMars_SmState_ExitAndTerminate when done.
     TSoftClassPtr<UCk_SmState_EntityScript> InteractionStateClass;
 }
 
-struct FMars_Fragment_Interactable
+struct FMars_Interactable_Spec
 {
     // Set -> probe-driven focus from the player's view trace. Unset -> a transform-only child whose
     // focus the caller drives directly.
@@ -88,10 +88,21 @@ struct FMars_Fragment_Interactable
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Params
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The spec residue read after construction: which channels the targets were created on.
+struct FMars_Fragment_Interactable_Params
+{
+    UPROPERTY()
+    TArray<FGameplayTag> TargetChannels;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Fragment_Interactable_State
+struct FMars_Fragment_Interactable
 {
     UPROPERTY()
     FCk_Handle CurrentFocuser;

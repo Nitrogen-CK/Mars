@@ -15,7 +15,7 @@ namespace utils_interact_prompt_display
 // Slot by channel (SortOrder carries the channel identity), so one button never renders two prompts.
 mixin FName Get_SlotKeyFromPrompt(const FCk_Handle_InteractPrompt& Self)
 {
-    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt);
+    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params);
     if (Fragment.SortOrder == 0) { return n"InteractChannel_Use"; }
 
     auto InputAction = Fragment.InputAction.Get();

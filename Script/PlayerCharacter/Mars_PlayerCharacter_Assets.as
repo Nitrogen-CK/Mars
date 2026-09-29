@@ -38,7 +38,7 @@ class UMars_PlayerCharacter_Config : UDataAsset
     float32 EyeHeight = 64.0f;
 
     UPROPERTY(Category = "Interaction")
-    FMars_Fragment_PlayerViewpoint_Params Viewpoint;
+    FMars_PlayerViewpoint_Spec Viewpoint;
 
     UPROPERTY(Category = "Interaction")
     FCk_InteractionResolver_Spec InteractionResolver;

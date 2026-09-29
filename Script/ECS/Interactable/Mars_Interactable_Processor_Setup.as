@@ -32,7 +32,7 @@ class UMars_Processor_Interactable_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Interactable))
         { return; }
 
-        auto& State = Interactable.Get_Fragment(FMars_Fragment_Interactable_State);
+        auto& State = Interactable.Get_Fragment(FMars_Fragment_Interactable);
         State.CurrentInteractTarget = InTarget;
         State.CurrentInteraction = InInteraction;
 

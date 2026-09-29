@@ -11,7 +11,7 @@ class UMars_Processor_Interactable_HandleRequests : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle,
                        FMars_Fragment_Interactable_Requests& InRequests,
-                       FMars_Fragment_Interactable_State& InState)
+                       FMars_Fragment_Interactable& InState)
     {
         auto Self = InHandle.As_Interactable();
 

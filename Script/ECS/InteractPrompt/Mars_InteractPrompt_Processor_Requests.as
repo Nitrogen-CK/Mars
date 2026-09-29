@@ -11,22 +11,22 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle,
                        FMars_Fragment_InteractPrompt_Requests& InRequests,
-                       FMars_Fragment_InteractPrompt& InState)
+                       FMars_Fragment_InteractPrompt& InPromptComp)
     {
         auto Self = InHandle.As_InteractPrompt();
 
         auto Changed = false;
         for (const auto& UpdateRequest : InRequests.UpdateRequests)
         {
-            if (InState.PromptText.ToString() != UpdateRequest.NewText.ToString())
+            if (InPromptComp.PromptText.ToString() != UpdateRequest.NewText.ToString())
             {
-                InState.PromptText = UpdateRequest.NewText;
+                InPromptComp.PromptText = UpdateRequest.NewText;
                 Changed = true;
             }
 
-            if (UpdateRequest.NewColor.IsSet() && InState.TextColor != UpdateRequest.NewColor.GetValue())
+            if (UpdateRequest.NewColor.IsSet() && InPromptComp.TextColor != UpdateRequest.NewColor.GetValue())
             {
-                InState.TextColor = UpdateRequest.NewColor.GetValue();
+                InPromptComp.TextColor = UpdateRequest.NewColor.GetValue();
                 Changed = true;
             }
         }
