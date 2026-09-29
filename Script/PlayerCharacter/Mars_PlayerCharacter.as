@@ -55,6 +55,15 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_interaction_resolver::Add(Player, Config.InteractionResolver, ECk_Replication::DoesNotReplicate);
         utils_interact_prompt_display::Add(Player);
 
+        // Silent: volumes that filter on Probe.Mars.Player detect the player; the player detects nothing through it.
+        auto PlayerTransform = Player.As_Transform();
+        auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
+        BodyProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
+                     .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
+        auto BodyProbeNode = utils_prefab::Create_ProbeNode_Capsule(
+            PlayerTransform, CapsuleComponent.CapsuleHalfHeight, CapsuleComponent.CapsuleRadius, BodyProbeSpec);
+        utils_handle::Set_DebugName(FCk_Handle(BodyProbeNode), n"Player.Probe.Body");
+
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
         utils_byte_attribute::Add(Player, DownedSpec, ECk_Replication::DoesNotReplicate);
