@@ -42,6 +42,16 @@ class UMars_PlayerCharacter_Config : UDataAsset
 
     UPROPERTY(Category = "Interaction")
     FCk_InteractionResolver_Spec InteractionResolver;
+
+    UPROPERTY(Category = "Inventory")
+    int32 BagSlotCount = 3;
+
+    // Hand attach point relative to the first-person camera (X forward, Y right, Z up).
+    UPROPERTY(Category = "Inventory")
+    FTransform HandOffset = FTransform(FRotator::ZeroRotator, FVector(60.0, 25.0, -20.0), FVector::OneVector);
+
+    UPROPERTY(Category = "Inventory")
+    float32 ThrowHoldSeconds = 0.35f;
 }
 
 namespace mars
@@ -53,6 +63,11 @@ namespace mars
 
         TArray<FCk_InteractionResolver_IntentChannelMapping> Mappings;
         Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, UseChannels));
+
+        TArray<FGameplayTag> PrimaryChannels;
+        PrimaryChannels.Add(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Primary.UsableItem"));
+        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(
+            GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Primary"), PrimaryChannels));
 
         InteractionResolver = FCk_InteractionResolver_Spec(Mappings);
     }

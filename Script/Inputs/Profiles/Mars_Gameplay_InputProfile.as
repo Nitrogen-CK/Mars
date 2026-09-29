@@ -52,6 +52,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnMove"));
         InInputComponent.BindAction(mars::Mars_IA_Look, ETriggerEvent::Triggered,
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnLook"));
+        InInputComponent.BindAction(mars::Mars_IA_CycleSlot, ETriggerEvent::Triggered,
+            FEnhancedInputActionHandlerDynamicSignature(this, n"OnCycleSlot"));
     }
 
     UFUNCTION(BlueprintOverride)
@@ -147,6 +149,12 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Interact_Primary, EKeys::LeftMouseButton);
         Context.MapKey(mars::Mars_IA_Interact_Secondary, EKeys::RightMouseButton);
         Context.MapKey(mars::Mars_IA_Interact_Use, EKeys::E);
+        Context.MapKey(mars::Mars_IA_Slot1, EKeys::One);
+        Context.MapKey(mars::Mars_IA_Slot2, EKeys::Two);
+        Context.MapKey(mars::Mars_IA_Slot3, EKeys::Three);
+        Context.MapKey(mars::Mars_IA_Slot4, EKeys::Four);
+        Context.MapKey(mars::Mars_IA_Drop, EKeys::Q);
+        Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::MouseWheelAxis);
 
         Context.MapKey(mars::Mars_IA_ToggleDebugger, EKeys::F9);
     }
@@ -180,6 +188,14 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Interact_Primary, EKeys::Gamepad_RightTrigger);
         Context.MapKey(mars::Mars_IA_Interact_Secondary, EKeys::Gamepad_LeftTrigger);
         Context.MapKey(mars::Mars_IA_Interact_Use, EKeys::Gamepad_FaceButton_Left);
+        Context.MapKey(mars::Mars_IA_Slot1, EKeys::Gamepad_DPad_Left);
+        Context.MapKey(mars::Mars_IA_Slot2, EKeys::Gamepad_DPad_Up);
+        Context.MapKey(mars::Mars_IA_Slot3, EKeys::Gamepad_DPad_Right);
+        Context.MapKey(mars::Mars_IA_Slot4, EKeys::Gamepad_DPad_Down);
+        Context.MapKey(mars::Mars_IA_Drop, EKeys::Gamepad_FaceButton_Top);
+        Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::Gamepad_RightShoulder);
+        auto& MappingCyclePrevious = Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::Gamepad_LeftShoulder);
+        MappingCyclePrevious.Modifiers.Add(NewObject(Context, UInputModifierNegate));
     }
 
     //--------------------------------------------------------------------------------------------
@@ -212,6 +228,31 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         ControlledPawn.AddControllerPitchInput(float32(-LookDelta.Y) * MouseLookScale);
     }
 
+    // A wheel tick is pressed and released inside one frame, which a polled level row can miss - so cycling is an
+    // axis handled here, alongside Move/Look.
+    UFUNCTION()
+    private void OnCycleSlot(FInputActionValue ActionValue, float32 ElapsedTime,
+        float32 TriggeredTime, const UInputAction SourceAction)
+    {
+        auto Hotbar = TryGet_PawnHotbar();
+        if (ck::Is_NOT_Valid(Hotbar))
+        { return; }
+
+        const auto Value = ActionValue.GetAxis1D();
+        if (Value > 0.0f)
+        { Hotbar.Request_CycleNext(); }
+        else if (Value < 0.0f)
+        { Hotbar.Request_CyclePrevious(); }
+    }
+
+    private FCk_Handle_Hotbar TryGet_PawnHotbar() const
+    {
+        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_IsActorEcsReady() == false)
+        { return FCk_Handle_Hotbar(); }
+
+        return ControlledPawn.TryGet_ActorEntityHandle().As_Hotbar(ECk_SanityCheck::UnChecked);
+    }
+
     //--------------------------------------------------------------------------------------------
     // CkIntent composition
     //--------------------------------------------------------------------------------------------
@@ -225,6 +266,11 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("IP", n"IA_Interact_Primary", GameplayTags::Mars_Intent_Interact_Primary));
         Rows.Add(FMars_Gameplay_IntentRow("IS", n"IA_Interact_Secondary", GameplayTags::Mars_Intent_Interact_Secondary));
         Rows.Add(FMars_Gameplay_IntentRow("IU", n"IA_Interact_Use", GameplayTags::Mars_Intent_Interact_Use));
+        Rows.Add(FMars_Gameplay_IntentRow("SA", n"IA_Slot1", GameplayTags::Mars_Intent_Slot1));
+        Rows.Add(FMars_Gameplay_IntentRow("SB", n"IA_Slot2", GameplayTags::Mars_Intent_Slot2));
+        Rows.Add(FMars_Gameplay_IntentRow("SC", n"IA_Slot3", GameplayTags::Mars_Intent_Slot3));
+        Rows.Add(FMars_Gameplay_IntentRow("SD", n"IA_Slot4", GameplayTags::Mars_Intent_Slot4));
+        Rows.Add(FMars_Gameplay_IntentRow("DR", n"IA_Drop", GameplayTags::Mars_Intent_Drop));
         return Rows;
     }
 
