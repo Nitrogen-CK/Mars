@@ -220,15 +220,105 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
     }
 }
 
-// Mirrors a CkIntent level row onto a resolver intent: Active opens it, Idle closes it.
-class UMars_SmTask_IntentToResolver : UCk_SmTask_EntityScript
+// Owns the player's intent-matcher subscription: binds on enter, follows every matcher swap (the matcher usually arrives
+// after enter, and Deactivate/Repoint swap it to INVALID), unbinds on exit. Subclasses override the hooks and filter on
+// their own intent tags; they cache their handles BEFORE Super::DoEnterTask, because the first OnMatcherRebound runs
+// inside it.
+//
+// Phase changes already in flight when binding are ignored, so a row held on enter is not a press.
+class UMars_SmTask_IntentEdges : UCk_SmTask_EntityScript
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
+    private FCk_Handle_InputIntents _Intents;
+    private FCk_Handle_IntentMatcher _Matcher;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        auto Player = ck::Ctx(InHandle);
+        _Intents = Player.As_InputIntents();
+        _Intents.BindTo_OnMatcherChanged(FMars_Delegate_InputIntents_OnMatcherChanged(this, n"OnMatcherChanged"));
+
+        Rebind(_Intents.Get_Matcher());
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_Intents))
+        { _Intents.UnbindFrom_OnMatcherChanged(FMars_Delegate_InputIntents_OnMatcherChanged(this, n"OnMatcherChanged")); }
+
+        if (ck::IsValid(_Matcher))
+        { utils_intent_matcher::UnbindFrom_OnIntentPhaseChanged(_Matcher, FCk_Delegate_IntentMatcher_PhaseChanged(this, n"OnIntentPhaseChanged")); }
+
+        _Intents = FCk_Handle_InputIntents();
+        _Matcher = FCk_Handle_IntentMatcher();
+    }
+
+    protected void OnMatcherRebound()
+    {
+    }
+
+    protected void OnIntentPressed(FGameplayTag InIntent)
+    {
+    }
+
+    protected void OnIntentReleased(FGameplayTag InIntent)
+    {
+    }
+
+    protected bool Get_IsRowActive(FGameplayTag InIntent) const
+    {
+        if (ck::Is_NOT_Valid(_Intents))
+        { return false; }
+
+        return _Intents.Get_IsIntentActive(InIntent);
+    }
+
+    private void Rebind(FCk_Handle_IntentMatcher InNewMatcher)
+    {
+        if (ck::IsValid(_Matcher))
+        { utils_intent_matcher::UnbindFrom_OnIntentPhaseChanged(_Matcher, FCk_Delegate_IntentMatcher_PhaseChanged(this, n"OnIntentPhaseChanged")); }
+
+        _Matcher = InNewMatcher;
+
+        if (ck::IsValid(_Matcher))
+        {
+            utils_intent_matcher::BindTo_OnIntentPhaseChanged(_Matcher,
+                FCk_Delegate_IntentMatcher_PhaseChanged(this, n"OnIntentPhaseChanged"), ECk_Signal_BindingPolicy::IgnorePayloadInFlight);
+        }
+
+        OnMatcherRebound();
+    }
+
+    UFUNCTION()
+    private void OnMatcherChanged(FCk_Handle_InputIntents InIntents, FCk_Handle_IntentMatcher InPrev, FCk_Handle_IntentMatcher InNew)
+    {
+        Rebind(InNew);
+    }
+
+    UFUNCTION()
+    private void OnIntentPhaseChanged(FCk_Handle_IntentMatcher InMatcher, FName InIntentName, FGameplayTag InIntentTag,
+                                      ECk_Intent_Phase InPreviousPhase, ECk_Intent_Phase InNewPhase, int32 InFrame)
+    {
+        const auto IsPressed = InNewPhase == ECk_Intent_Phase::Active && InPreviousPhase != ECk_Intent_Phase::Active;
+        const auto IsReleased = InPreviousPhase == ECk_Intent_Phase::Active && InNewPhase != ECk_Intent_Phase::Active;
+
+        if (IsPressed)
+        { OnIntentPressed(InIntentTag); }
+        else if (IsReleased)
+        { OnIntentReleased(InIntentTag); }
+    }
+}
+
+// Mirrors a CkIntent level row onto a resolver intent: a press opens it, a release closes it. A matcher swap re-syncs to
+// the new matcher's level (a key held across the compose opens; the swap to INVALID closes).
+class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
+{
     protected FGameplayTag InputIntent;
     protected FGameplayTag ResolverIntent;
 
-    private FCk_Handle_InputIntents _Intents;
     private FCk_Handle_InteractionResolver _Resolver;
     private bool _IntentOpen = false;
 
@@ -236,34 +326,49 @@ class UMars_SmTask_IntentToResolver : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto Player = ck::Ctx(InHandle);
-        _Intents = Player.As_InputIntents();
         _Resolver = Player.As_InteractionResolver();
         _IntentOpen = false;
-    }
 
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        const auto IsActive = _Intents.Get_IsIntentActive(InputIntent);
-        if (IsActive == _IntentOpen)
-        { return ECk_SmTaskResult::Running; }
-
-        _IntentOpen = IsActive;
-        if (IsActive)
-        { _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(ResolverIntent)); }
-        else
-        { _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(ResolverIntent)); }
-
-        return ECk_SmTaskResult::Running;
+        Super::DoEnterTask(InHandle, InNetContext);
     }
 
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        if (_IntentOpen && ck::IsValid(_Resolver))
-        { _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(ResolverIntent)); }
+        Super::DoExitTask(InHandle, InNetContext);
 
+        Set_IntentOpen(false);
         _IntentOpen = false;
+        _Resolver = FCk_Handle_InteractionResolver();
+    }
+
+    protected void OnMatcherRebound() override
+    {
+        Set_IntentOpen(Get_IsRowActive(InputIntent));
+    }
+
+    protected void OnIntentPressed(FGameplayTag InIntent) override
+    {
+        if (InIntent == InputIntent)
+        { Set_IntentOpen(true); }
+    }
+
+    protected void OnIntentReleased(FGameplayTag InIntent) override
+    {
+        if (InIntent == InputIntent)
+        { Set_IntentOpen(false); }
+    }
+
+    private void Set_IntentOpen(bool InOpen)
+    {
+        if (InOpen == _IntentOpen || ck::Is_NOT_Valid(_Resolver))
+        { return; }
+
+        _IntentOpen = InOpen;
+        if (InOpen)
+        { _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(ResolverIntent)); }
+        else
+        { _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(ResolverIntent)); }
     }
 }
 

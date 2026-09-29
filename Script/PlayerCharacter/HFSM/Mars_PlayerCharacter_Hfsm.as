@@ -2,6 +2,8 @@
 // |- Alive       ->Downed [IsDowned]
 // |    tasks: ViewpointSync, InteractionFocus, InteractionResolverBinds, Use/PrimaryIntentToResolver,
 // |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), AliveSubSm
+// |    modes: ViewpointSync is the only Tick task (it samples the controller view every frame); every other task is
+// |           EnterExitOnly and signal-driven - the intent tasks through UMars_SmTask_IntentEdges' matcher edges
 // |    `- Alive sub-SM (initial = Locomotion)
 // |         `- Locomotion   tasks: LocomotionSubSm
 // |              `- Loco sub-SM (initial = Idle): Idle / Walk / Sprint / Crouch / Jump / Airborne

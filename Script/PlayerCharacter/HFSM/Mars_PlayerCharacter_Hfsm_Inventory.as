@@ -1,34 +1,30 @@
 // Alive-scoped inventory links. The features stay pure data + request processors; these tasks decide when they talk:
 //
-//   HotbarIntents          : Slot1..4 level rows                          -> Hotbar::Select
+//   HotbarIntents          : Slot1..4 presses                             -> Hotbar::Select
 //   HotbarDrivesHeldItem   : Hotbar selection / slot contents / eject     -> HeldItem::SetSlot, HeldItemUse::Drop
 //   HeldItemDrivesUse      : HeldItem::OnHeldItemChanged                  -> HeldItemUse::RefreshFromHeldItem
-//   DropThrowIntent        : Drop level row (tap / hold-release)          -> HeldItemUse::Drop / Throw
-//   HeldItemHints          : HeldItem::OnHeldItemChanged + ThrowArmed     -> ActionHintDisplay rows
+//   DropThrowIntent        : Drop press / hold timer / release            -> HeldItemUse::Drop / Throw / SetThrowArmed
+//   HeldItemHints          : OnHeldItemChanged + OnThrowArmedChanged      -> ActionHintDisplay rows
 //
-// Tasks never call into each other; they meet only through the features' fragments.
+// Every task is EnterExitOnly and signal-driven; the two intent tasks derive from UMars_SmTask_IntentEdges.
+// Tasks never call into each other; they meet only through the features' fragments and signals.
 // Single-player: these run on the local pawn only. Multiplayer needs a local-controller gate on the hint and input tasks.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // HotbarIntents
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Rising edge of SlotK selects index K-1; the key one past the last bag slot selects the overflow slot (Slot4 with 3 bag
+// A press of SlotK selects index K-1; the key one past the last bag slot selects the overflow slot (Slot4 with 3 bag
 // slots), and keys beyond it do nothing.
-class UMars_SmTask_HotbarIntents : UCk_SmTask_EntityScript
+class UMars_SmTask_HotbarIntents : UMars_SmTask_IntentEdges
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private FCk_Handle_InputIntents _Intents;
     private FCk_Handle_Hotbar _Hotbar;
     private TArray<FGameplayTag> _SlotIntents;
-    private TArray<bool> _WasActive;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto Player = ck::Ctx(InHandle);
-        _Intents = Player.As_InputIntents();
         _Hotbar = Player.As_Hotbar();
 
         _SlotIntents.Empty();
@@ -37,30 +33,24 @@ class UMars_SmTask_HotbarIntents : UCk_SmTask_EntityScript
         _SlotIntents.Add(GameplayTags::Mars_Intent_Slot3);
         _SlotIntents.Add(GameplayTags::Mars_Intent_Slot4);
 
-        // Seeded from the current rows so a key already held on enter is not a press.
-        _WasActive.Empty();
-        for (const auto& Intent : _SlotIntents)
-        { _WasActive.Add(_Intents.Get_IsIntentActive(Intent)); }
+        Super::DoEnterTask(InHandle, InNetContext);
     }
 
     UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        const auto OverflowIndex = _Hotbar.Get_OverflowIndex();
+        Super::DoExitTask(InHandle, InNetContext);
 
-        for (int32 Index = 0; Index < _SlotIntents.Num(); ++Index)
-        {
-            const auto IsActive = _Intents.Get_IsIntentActive(_SlotIntents[Index]);
-            const auto IsRisingEdge = IsActive && _WasActive[Index] == false;
-            _WasActive[Index] = IsActive;
+        _Hotbar = FCk_Handle_Hotbar();
+    }
 
-            if (IsRisingEdge == false || Index > OverflowIndex)
-            { continue; }
+    protected void OnIntentPressed(FGameplayTag InIntent) override
+    {
+        const auto Index = _SlotIntents.FindIndex(InIntent);
+        if (Index < 0 || ck::Is_NOT_Valid(_Hotbar) || Index > _Hotbar.Get_OverflowIndex())
+        { return; }
 
-            _Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index));
-        }
-
-        return ECk_SmTaskResult::Running;
+        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index));
     }
 }
 
@@ -180,93 +170,141 @@ class UMars_SmTask_HeldItemDrivesUse : UCk_SmTask_EntityScript
 // DropThrowIntent
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Drop pressed and released before ThrowHoldSeconds drops; held past it arms a throw (ThrowArmed, for the hint), and the
-// release throws. Does nothing, and disarms, while the hands are empty.
-class UMars_SmTask_DropThrowIntent : UCk_SmTask_EntityScript
+// Drop pressed and released before ThrowHoldSeconds drops; held past it (a hold timer on the player) arms a throw, and
+// the release throws. A press with empty hands does nothing, and the hands emptying mid-hold cancels the hold and
+// disarms. A matcher swap that reads Drop Idle mid-hold is a release.
+//
+// Throw-vs-drop is decided from this task's own _Armed, set in the timer callback: the feature's ThrowArmed is written by
+// a request drain, so a release in the frame the timer fires would still read it unarmed. SetThrowArmed is requested
+// only so the hint task can show "release to throw".
+class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private FCk_Handle_InputIntents _Intents;
+    private FCk_Handle _Player;
     private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_HeldItemUse _Use;
     private float32 _ThrowHoldSeconds = 0.35f;
 
-    private bool _WasActive = false;
-    private bool _Holding = false;
-    private float64 _HeldSeconds = 0.0;
+    // Valid from the press until the release or a cancel - including after it finishes (StopOnDone).
+    private FCk_Handle_Timer _HoldTimer;
+
+    // Set when the hold timer finishes, cleared by every cancel; what Release reads.
+    private bool _Armed = false;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Player = ck::Ctx(InHandle);
-        _Intents = Player.As_InputIntents();
-        _HeldItem = Player.As_HeldItem();
-        _Use = Player.As_HeldItemUse();
+        _Player = ck::Ctx(InHandle);
+        _HeldItem = _Player.As_HeldItem();
+        _Use = _Player.As_HeldItemUse();
 
-        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
+        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(_Player, ECk_SanityCheck::UnChecked));
         if (ck::IsValid(Character) && ck::IsValid(Character.Config))
         { _ThrowHoldSeconds = Character.Config.ThrowHoldSeconds; }
 
-        // A Drop already held on enter is not a press.
-        _WasActive = _Intents.Get_IsIntentActive(GameplayTags::Mars_Intent_Drop);
-        _Holding = false;
-        _HeldSeconds = 0.0;
-    }
+        _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
 
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        const auto IsActive = _Intents.Get_IsIntentActive(GameplayTags::Mars_Intent_Drop);
-        const auto WasActive = _WasActive;
-        _WasActive = IsActive;
-
-        if (ck::Is_NOT_Valid(_HeldItem.Get_CurrentItem()))
-        {
-            Disarm();
-            return ECk_SmTaskResult::Running;
-        }
-
-        if (IsActive && WasActive == false)
-        {
-            _Holding = true;
-            _HeldSeconds = 0.0;
-            return ECk_SmTaskResult::Running;
-        }
-
-        if (_Holding == false)
-        { return ECk_SmTaskResult::Running; }
-
-        if (IsActive)
-        {
-            _HeldSeconds += InDeltaT.Get_Seconds();
-            if (_HeldSeconds >= _ThrowHoldSeconds && _Use.Get_ThrowArmed() == false)
-            { _Use.Set_ThrowArmed(true); }
-
-            return ECk_SmTaskResult::Running;
-        }
-
-        if (_Use.Get_ThrowArmed())
-        { _Use.Request_Throw(); }
-        else
-        { _Use.Request_Drop(); }
-
-        Disarm();
-        return ECk_SmTaskResult::Running;
+        Super::DoEnterTask(InHandle, InNetContext);
     }
 
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        Disarm();
+        Super::DoExitTask(InHandle, InNetContext);
+
+        if (ck::IsValid(_HeldItem))
+        { _HeldItem.UnbindFrom_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged")); }
+
+        CancelHold();
+
+        _Player = FCk_Handle();
+        _HeldItem = FCk_Handle_HeldItem();
+        _Use = FCk_Handle_HeldItemUse();
     }
 
-    private void Disarm()
+    protected void OnMatcherRebound() override
     {
-        _Holding = false;
-        _HeldSeconds = 0.0;
+        if (ck::IsValid(_HoldTimer) && Get_IsRowActive(GameplayTags::Mars_Intent_Drop) == false)
+        { Release(); }
+    }
 
-        if (ck::IsValid(_Use) && _Use.Get_ThrowArmed())
-        { _Use.Set_ThrowArmed(false); }
+    protected void OnIntentPressed(FGameplayTag InIntent) override
+    {
+        if (InIntent != GameplayTags::Mars_Intent_Drop)
+        { return; }
+
+        CancelHold();
+
+        if (ck::Is_NOT_Valid(_HeldItem) || ck::Is_NOT_Valid(_HeldItem.Get_CurrentItem()))
+        { return; }
+
+        auto TimerSpec = FCk_Timer_Spec(FCk_Time(_ThrowHoldSeconds));
+        TimerSpec.Set_StartingState(ECk_Timer_State::Running)
+                 .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
+
+        _HoldTimer = utils_timer::Add(_Player, TimerSpec);
+        if (ck::IsValid(_HoldTimer))
+        { _HoldTimer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnHoldTimerDone")); }
+    }
+
+    protected void OnIntentReleased(FGameplayTag InIntent) override
+    {
+        if (InIntent == GameplayTags::Mars_Intent_Drop)
+        { Release(); }
+    }
+
+    UFUNCTION()
+    private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
+    {
+        if (ck::Is_NOT_Valid(InNew))
+        { CancelHold(); }
+    }
+
+    UFUNCTION()
+    private void OnHoldTimerDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        // A cancelled timer can still finish in the frame it was destroyed.
+        if ((FCk_Handle(_HoldTimer) == FCk_Handle(InTimer)) == false)
+        { return; }
+
+        _Armed = true;
+
+        if (ck::IsValid(_Use))
+        { _Use.Request_SetThrowArmed(FMars_Request_HeldItemUse_SetThrowArmed(true)); }
+    }
+
+    private void Release()
+    {
+        if (ck::Is_NOT_Valid(_HoldTimer))
+        { return; }
+
+        if (ck::IsValid(_Use) && ck::IsValid(_HeldItem) && ck::IsValid(_HeldItem.Get_CurrentItem()))
+        {
+            if (_Armed)
+            { _Use.Request_Throw(); }
+            else
+            { _Use.Request_Drop(); }
+        }
+
+        CancelHold();
+    }
+
+    private void CancelHold()
+    {
+        if (ck::IsValid(_HoldTimer))
+        {
+            _HoldTimer.UnbindFrom_OnDone(FCk_Delegate_Timer(this, n"OnHoldTimerDone"));
+            utils_timer::Request_Stop(_HoldTimer);
+            utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(_HoldTimer));
+        }
+
+        _HoldTimer = FCk_Handle_Timer();
+
+        // Only this task arms the feature flag, so it is set exactly while _Armed is.
+        const auto WasArmed = _Armed;
+        _Armed = false;
+
+        if (WasArmed && ck::IsValid(_Use))
+        { _Use.Request_SetThrowArmed(FMars_Request_HeldItemUse_SetThrowArmed(false)); }
     }
 }
 
@@ -277,12 +315,12 @@ class UMars_SmTask_DropThrowIntent : UCk_SmTask_EntityScript
 // Owns every legend row keyed k_OwnerKey: the item's use verb (when it has a UseAction), drop, and throw (hold). The
 // throw row reads "release to throw" while a throw is armed.
 //
-// A held-item change unregisters the previous rows by id, not by owner: the display drains registers before
+// A held-item change unregisters the previous rows by row handle, not by owner: the display drains registers before
 // owner-unregisters, so an owner-unregister queued beside the new rows would remove them too. Exit, which registers
 // nothing, removes by owner.
 class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private const FName k_OwnerKey = n"HeldItem";
 
@@ -290,9 +328,8 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
     private FCk_Handle_HeldItemUse _Use;
     private FCk_Handle_ActionHintDisplay _Display;
 
-    private TArray<FMars_ActionHint_ID> _RowIds;
-    private FMars_ActionHint_ID _ThrowRowId;
-    private bool _LastArmed = false;
+    private TArray<FCk_Handle_ActionHintRow> _Rows;
+    private FCk_Handle_ActionHintRow _ThrowRow;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -303,25 +340,8 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
         _Display = Player.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
 
         _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
+        _Use.BindTo_OnThrowArmedChanged(FMars_Delegate_HeldItemUse_OnThrowArmedChanged(this, n"OnThrowArmedChanged"));
         Refresh_Rows(_HeldItem.Get_CurrentItem());
-    }
-
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        const auto IsArmed = _Use.Get_ThrowArmed();
-        if (IsArmed == _LastArmed)
-        { return ECk_SmTaskResult::Running; }
-
-        _LastArmed = IsArmed;
-
-        if (ck::IsValid(_Display) && _ThrowRowId.Value >= 0)
-        {
-            const auto Text = IsArmed ? FText::FromString("release to throw") : FText::FromString("throw");
-            _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_ThrowRowId, Text));
-        }
-
-        return ECk_SmTaskResult::Running;
     }
 
     UFUNCTION(BlueprintOverride)
@@ -330,12 +350,14 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
         if (ck::IsValid(_HeldItem))
         { _HeldItem.UnbindFrom_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged")); }
 
+        if (ck::IsValid(_Use))
+        { _Use.UnbindFrom_OnThrowArmedChanged(FMars_Delegate_HeldItemUse_OnThrowArmedChanged(this, n"OnThrowArmedChanged")); }
+
         if (ck::IsValid(_Display))
         { _Display.Request_UnregisterHintsByOwner(FMars_Request_ActionHintDisplay_UnregisterByOwner(k_OwnerKey)); }
 
-        _RowIds.Empty();
-        _ThrowRowId = FMars_ActionHint_ID();
-        _LastArmed = false;
+        _Rows.Empty();
+        _ThrowRow = FCk_Handle_ActionHintRow();
         _HeldItem = FCk_Handle_HeldItem();
         _Use = FCk_Handle_HeldItemUse();
         _Display = FCk_Handle_ActionHintDisplay();
@@ -347,17 +369,31 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
         Refresh_Rows(InNew);
     }
 
+    UFUNCTION()
+    private void OnThrowArmedChanged(FCk_Handle_HeldItemUse InUse, bool InArmed)
+    {
+        Update_ThrowRow(InArmed);
+    }
+
+    private void Update_ThrowRow(bool InArmed)
+    {
+        if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_ThrowRow))
+        { return; }
+
+        const auto Text = InArmed ? FText::FromString("release to throw") : FText::FromString("throw");
+        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_ThrowRow, Text));
+    }
+
     private void Refresh_Rows(FCk_Handle_Item InItem)
     {
         if (ck::Is_NOT_Valid(_Display))
         { return; }
 
-        for (const auto& RowId : _RowIds)
-        { _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(RowId)); }
+        for (const auto& Row : _Rows)
+        { _Display.Request_UnregisterHint(FMars_Request_ActionHintDisplay_Unregister(Row)); }
 
-        _RowIds.Empty();
-        _ThrowRowId = FMars_ActionHint_ID();
-        _LastArmed = false;
+        _Rows.Empty();
+        _ThrowRow = FCk_Handle_ActionHintRow();
 
         if (ck::Is_NOT_Valid(InItem))
         { return; }
@@ -368,16 +404,20 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
             const UMars_ItemTrait_UseAction UseAction = Item.Get_UseAction();
             if (UseAction.HintText.IsEmpty() == false)
             {
-                _RowIds.Add(_Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-                    FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, UseAction.HintText, 0, k_OwnerKey))));
+                _Rows.Add(_Display.Request_RegisterHint(
+                    FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, UseAction.HintText, 0, k_OwnerKey)));
             }
         }
 
-        _RowIds.Add(_Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("drop"), 1, k_OwnerKey))));
+        _Rows.Add(_Display.Request_RegisterHint(
+            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("drop"), 1, k_OwnerKey)));
 
-        _ThrowRowId = _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("throw"), FText::FromString("hold"), 2, k_OwnerKey)));
-        _RowIds.Add(_ThrowRowId);
+        _ThrowRow = _Display.Request_RegisterHint(
+            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("throw"), FText::FromString("hold"), 2, k_OwnerKey));
+        _Rows.Add(_ThrowRow);
+
+        // A throw can stay armed across a swap to another item; the display drains Register before Update.
+        if (ck::IsValid(_Use) && _Use.Get_ThrowArmed())
+        { Update_ThrowRow(true); }
     }
 }
