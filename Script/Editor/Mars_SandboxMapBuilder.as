@@ -2,7 +2,12 @@
 //   1. File > New Level > Empty Level
 //   2. Console: Mars.Sandbox.Build
 // It populates the open untitled level (floor, lights, player starts, jump ledge, crouch tunnel, two test
-// interactables) and saves it to the map path.
+// interactables, mechanisms room 2) and saves it to the map path.
+//
+// Room 2 (mechanisms) sits east of the main floor, entered through a gap in its west wall. Three gated bays:
+// LeverA -> GateA, LeverB1 + LeverB2 -> GateB (all sources), SwitchC (4s hold) -> GateC. Each mechanism is an
+// ACk_EntitySpawner_UE with its entity script instanced on it. To add room 2 to an already-built sandbox map,
+// open it and run: Mars.Sandbox.BuildRoom2
 //
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
@@ -32,11 +37,20 @@ void Mars_ApplySandboxMaterialsFunc(const TArray<FString>& Args)
 
 const FConsoleCommand Mars_ApplySandboxMaterialsCommand("Mars.Sandbox.ApplyMaterials", n"Mars_ApplySandboxMaterialsFunc");
 
+UFUNCTION()
+void Mars_BuildSandboxRoom2Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildRoom2();
+}
+
+const FConsoleCommand Mars_BuildSandboxRoom2Command("Mars.Sandbox.BuildRoom2", n"Mars_BuildSandboxRoom2Func");
+
 namespace utils_mars_sandbox
 {
     const FString k_MapPath = "/Game/Mars/Maps/Sandbox_Mars_MAP";
     const FString k_MaterialFolder = "/Game/Mars/Materials/ProtoGrid";
     const FString k_ProtoGridMaster = "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid.M_CkUsf_Look_ProtoGrid";
+    const FString k_Room2FloorLabel = "Room2_Floor";
 
     void Build()
     {
@@ -87,6 +101,8 @@ namespace utils_mars_sandbox
         Actors.SpawnActorFromClass(AMars_TestLamp, FVector(0.0, 300.0, 50.0)).SetActorLabel("TestLamp_A");
         Actors.SpawnActorFromClass(AMars_TestLamp, FVector(0.0, -300.0, 50.0)).SetActorLabel("TestLamp_B");
 
+        Spawn_Room2(Cube);
+
         Apply_ProtoGridMaterials();
 
         const bool Saved = UEditorLoadingAndSavingUtils::SaveMap(World, k_MapPath);
@@ -106,6 +122,85 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.ApplyMaterials] applied, saved={Saved}");
+    }
+
+    void BuildRoom2()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.BuildRoom2] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_Room2FloorLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.BuildRoom2] [{k_Room2FloorLabel}] already exists. Delete the Room2_ and Mech_ actors first to rebuild.");
+                return;
+            }
+        }
+
+        Spawn_Room2(engine::load::Cube());
+        Apply_ProtoGridMaterials();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.BuildRoom2] built, saved={Saved}");
+    }
+
+    // Room 2 spans X 2000..4000, Y -700..700 (the main floor ends at X=2000). The gated bays sit in a partition at
+    // X=3500 with an alcove behind each gate; controls stand 250uu in front (-X) of their gate.
+    void Spawn_Room2(UStaticMesh InCube)
+    {
+        Spawn_Block(InCube, k_Room2FloorLabel, FVector(3000.0, 0.0, -10.0), FVector(20.0, 14.0, 0.2));
+
+        // West wall shared with the main floor, with a 300uu doorway centred on Y=0.
+        Spawn_Block(InCube, "Room2_WallWest_South", FVector(2000.0, -425.0, 150.0), FVector(0.2, 5.5, 3.0));
+        Spawn_Block(InCube, "Room2_WallWest_North", FVector(2000.0, 425.0, 150.0), FVector(0.2, 5.5, 3.0));
+        Spawn_Block(InCube, "Room2_WallEast", FVector(4000.0, 0.0, 150.0), FVector(0.2, 14.2, 3.0));
+        Spawn_Block(InCube, "Room2_WallSouth", FVector(3000.0, -700.0, 150.0), FVector(20.0, 0.2, 3.0));
+        Spawn_Block(InCube, "Room2_WallNorth", FVector(3000.0, 700.0, 150.0), FVector(20.0, 0.2, 3.0));
+
+        // Partition at X=3500 around three 240uu gate frames centred on Y = -460, 0, 460; headers close the gap
+        // between each 240uu frame and the 300uu wall top.
+        const float64 PartitionX = 3500.0;
+        const float64 ControlX = PartitionX - 250.0;
+        Spawn_Block(InCube, "Room2_Partition_0", FVector(PartitionX, -640.0, 150.0), FVector(0.2, 1.2, 3.0));
+        Spawn_Block(InCube, "Room2_Partition_1", FVector(PartitionX, -230.0, 150.0), FVector(0.2, 2.2, 3.0));
+        Spawn_Block(InCube, "Room2_Partition_2", FVector(PartitionX, 230.0, 150.0), FVector(0.2, 2.2, 3.0));
+        Spawn_Block(InCube, "Room2_Partition_3", FVector(PartitionX, 640.0, 150.0), FVector(0.2, 1.2, 3.0));
+        Spawn_Block(InCube, "Room2_AlcoveDivider_South", FVector(3750.0, -230.0, 150.0), FVector(5.0, 0.2, 3.0));
+        Spawn_Block(InCube, "Room2_AlcoveDivider_North", FVector(3750.0, 230.0, 150.0), FVector(5.0, 0.2, 3.0));
+
+        // Bay A: one lever opens the gate.
+        Spawn_Block(InCube, "Room2_GateHeader_A", FVector(PartitionX, -460.0, 270.0), FVector(0.2, 2.4, 0.6));
+        Spawn_Mechanism(UMars_Sandbox_GateA_EntityScript, "Mech_GateA", FVector(PartitionX, -460.0, 0.0));
+        Spawn_Mechanism(UMars_Sandbox_LeverA_EntityScript, "Mech_LeverA", FVector(ControlX, -460.0, 0.0));
+
+        // Bay B: both levers on the same channel must be pulled.
+        Spawn_Block(InCube, "Room2_GateHeader_B", FVector(PartitionX, 0.0, 270.0), FVector(0.2, 2.4, 0.6));
+        Spawn_Mechanism(UMars_Sandbox_GateB_EntityScript, "Mech_GateB", FVector(PartitionX, 0.0, 0.0));
+        Spawn_Mechanism(UMars_Sandbox_LeverB_EntityScript, "Mech_LeverB1", FVector(ControlX, -80.0, 0.0));
+        Spawn_Mechanism(UMars_Sandbox_LeverB_EntityScript, "Mech_LeverB2", FVector(ControlX, 80.0, 0.0));
+
+        // Bay C: a momentary switch on a 100uu pedestal holds the gate open for 4 seconds.
+        Spawn_Block(InCube, "Room2_GateHeader_C", FVector(PartitionX, 460.0, 270.0), FVector(0.2, 2.4, 0.6));
+        Spawn_Mechanism(UMars_Sandbox_GateC_EntityScript, "Mech_GateC", FVector(PartitionX, 460.0, 0.0));
+        Spawn_Block(InCube, "Room2_SwitchPedestal_C", FVector(ControlX, 460.0, 50.0), FVector(0.4, 0.4, 1.0));
+        Spawn_Mechanism(UMars_Sandbox_SwitchC_EntityScript, "Mech_SwitchC", FVector(ControlX, 460.0, 100.0));
+    }
+
+    // Goes through the spawner's actor factory (the Place Actors path): it instances the script class on a new
+    // ACk_EntitySpawner_UE, and the spawner injects its actor transform into SpawnTransform at spawn.
+    void Spawn_Mechanism(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InLabel, FVector InLocation)
+    {
+        auto Spawner = Cast<ACk_EntitySpawner_UE>(
+            UEditorActorSubsystem::Get().SpawnActorFromObject(InScriptClass.Get(), InLocation, FRotator::ZeroRotator));
+        if (ck::EnsureIfNot(ck::IsValid(Spawner), f"[Mars.Sandbox] Failed to place [{InLabel}] through the entity spawner factory"))
+        { return; }
+
+        Spawner.SetActorLabel(InLabel);
     }
 
     // Matches blocks by the labels Build gives them.
@@ -141,6 +236,10 @@ namespace utils_mars_sandbox
             else if (Label.StartsWith("Ledge_"))
             { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Tunnel_"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label == k_Room2FloorLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label.StartsWith("Room2_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
         }
     }
