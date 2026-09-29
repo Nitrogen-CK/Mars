@@ -74,7 +74,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     {
         auto OldIntents = TryGet_PawnIntents();
         if (ck::IsValid(OldIntents))
-        { OldIntents.Set_Matcher(FCk_Handle_IntentMatcher()); }
+        { OldIntents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(FCk_Handle_IntentMatcher())); }
 
         Super::Repoint(InNewPawn);
         DoTryCompose();
@@ -90,8 +90,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         auto Intents = TryGet_PawnIntents();
         if (ck::IsValid(Intents))
         {
-            Intents.Set_Matcher(FCk_Handle_IntentMatcher());
-            Intents.Set_MoveDirection(FVector::ZeroVector);
+            Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(FCk_Handle_IntentMatcher()));
+            Intents.Request_SetMoveDirection(FMars_Request_InputIntents_SetMoveDirection(FVector::ZeroVector));
         }
 
         if (ck::IsValid(_Layer))
@@ -211,7 +211,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         { return; }
 
         const auto Input = ActionValue.GetAxis2D();
-        Intents.Set_MoveDirection(FVector(Input.X, Input.Y, 0.0));
+        Intents.Request_SetMoveDirection(FMars_Request_InputIntents_SetMoveDirection(FVector(Input.X, Input.Y, 0.0)));
     }
 
     // Legacy input scales are on (DefaultInput.ini bEnableLegacyInputScales): the controller scales
@@ -314,7 +314,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         if (ck::Is_NOT_Valid(Intents))
         { return; }
 
-        Intents.Set_Matcher(_Matcher);
+        Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(_Matcher));
         System::ClearAndInvalidateTimerHandle(_ComposeTimer);
     }
 

@@ -47,15 +47,37 @@ mixin int32 TryGet_IntentActivationFrame(const FCk_Handle_InputIntents& Self, FG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Operations
+// Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Set_Matcher(FCk_Handle_InputIntents& Self, FCk_Handle_IntentMatcher InMatcher)
+// The drain broadcasts OnMatcherChanged when the matcher actually changes - including the swap to INVALID, so consumers
+// unbind from the dying matcher.
+mixin void Request_SetMatcher(FCk_Handle_InputIntents& Self, const FMars_Request_InputIntents_SetMatcher& InRequest)
 {
-    Self.Get_Fragment(FMars_Fragment_InputIntents).Matcher = InMatcher;
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InputIntents_Requests);
+    Requests.SetMatcherRequests.Add(InRequest);
 }
 
-mixin void Set_MoveDirection(FCk_Handle_InputIntents& Self, FVector InMoveDirection)
+mixin void Request_SetMoveDirection(FCk_Handle_InputIntents& Self, const FMars_Request_InputIntents_SetMoveDirection& InRequest)
 {
-    Self.Get_Fragment(FMars_Fragment_InputIntents).MoveDirection = InMoveDirection;
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InputIntents_Requests);
+    Requests.SetMoveDirectionRequests.Add(InRequest);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Signal Binding
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void BindTo_OnMatcherChanged(FCk_Handle_InputIntents& Self, FMars_Delegate_InputIntents_OnMatcherChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_InputIntents_Signals);
+    Fragment.OnMatcherChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnMatcherChanged(FCk_Handle_InputIntents& Self, FMars_Delegate_InputIntents_OnMatcherChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_InputIntents_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_InputIntents_Signals).OnMatcherChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
