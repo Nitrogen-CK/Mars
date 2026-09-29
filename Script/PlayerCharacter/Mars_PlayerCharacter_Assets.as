@@ -50,6 +50,10 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Inventory")
     FTransform HandOffset = FTransform(FRotator::ZeroRotator, FVector(60.0, 25.0, -20.0), FVector::OneVector);
 
+    // Damped-spring lag of the held item behind the hand (CkSway). Tune in the Mars_PlayerCharacter_Config asset.
+    UPROPERTY(Category = "Inventory")
+    FCk_Sway_Spec HandSway;
+
     UPROPERTY(Category = "Inventory")
     float32 ThrowHoldSeconds = 0.35f;
 }
@@ -70,5 +74,17 @@ namespace mars
             GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Primary"), PrimaryChannels));
 
         InteractionResolver = FCk_InteractionResolver_Spec(Mappings);
+
+        HandSway = FCk_Sway_Spec();
+        HandSway.Set_Location(FCk_Sway_Response(FVector(12.0, 16.0, 12.0), 3.5f, 0.7f));
+        HandSway.Set_Rotation(FCk_Sway_Response(FVector(8.0, 10.0, 12.0), 4.5f, 0.75f));
+        HandSway.Set_RotationFromAngularVelocity(FVector(0.008, 0.020, 0.024));
+        HandSway.Set_LocationFromLinearVelocity(FVector(0.012, 0.012, 0.016));
+        HandSway.Set_LateralCmFromYawRate(0.040f);
+        HandSway.Set_VerticalCmFromPitchRate(0.030f);
+        HandSway.Set_RollDegFromLateralVelocity(0.012f);
+        HandSway.Set_PitchDegFromForwardVelocity(0.0f);
+        HandSway.Set_TeleportDistanceCm(300.0f);
+        HandSway.Set_TeleportAngleDeg(90.0f);
     }
 }

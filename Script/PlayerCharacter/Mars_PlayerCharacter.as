@@ -73,6 +73,9 @@ class AMars_PlayerCharacter : ACk_Character_UE
         auto Hand = utils_scene_node::CreateAndAttachToUnrealComponent(PlayerTransform, FirstPersonCamera, Config.HandOffset);
         utils_handle::Set_DebugName(FCk_Handle(Hand), n"Player.Hand");
 
+        // Damped-spring lag of the hand behind the camera. CkSway owns the Hand offset from here on; HandOffset is its rest.
+        utils_sway::Add(Hand, Config.HandSway);
+
         auto HotbarSpec = FMars_Hotbar_Spec();
         HotbarSpec.BagSlotCount = Config.BagSlotCount;
         utils_hotbar::Add(Player, HotbarSpec);
