@@ -10,6 +10,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_ActionHintRow",
+			"ShortName": "ActionHintRow",
+			"Description": "One row of an action-hint legend - a child entity of its ActionHintDisplay",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_ActionHintRowHandle",
+			"RequiredFragments": [
+				"Mars_Feature_ActionHintRow"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Control",
 			"ShortName": "Control",
 			"Description": "An entity whose interaction toggles or pulses an active state (lever, switch, hand wheel, seal)",

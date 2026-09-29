@@ -138,6 +138,19 @@ namespace UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted
 }
 
 USTRUCT()
+struct FMars_AutoTest_ActionHintDisplay_UnregisterDestroysRow_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_ActionHintDisplay_UnregisterDestroysRow
+{
+    FMars_AutoTest_ActionHintDisplay_UnregisterDestroysRow_SpawnParams Params()
+    {
+        return FMars_AutoTest_ActionHintDisplay_UnregisterDestroysRow_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange_SpawnParams
 {
 }
@@ -1890,6 +1903,19 @@ namespace UMars_SmTask_HotbarIntents
     FMars_SmTask_HotbarIntents_SpawnParams Params()
     {
         return FMars_SmTask_HotbarIntents_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_IntentEdges_SpawnParams
+{
+}
+
+namespace UMars_SmTask_IntentEdges
+{
+    FMars_SmTask_IntentEdges_SpawnParams Params()
+    {
+        return FMars_SmTask_IntentEdges_SpawnParams();
     }
 }
 
