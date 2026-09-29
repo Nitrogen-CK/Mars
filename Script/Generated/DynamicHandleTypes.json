@@ -1,12 +1,39 @@
 {
 	"HandleTypes": [
 		{
+			"TypeName": "FCk_Handle_Control",
+			"ShortName": "Control",
+			"Description": "An entity whose interaction toggles or pulses an active state (lever, switch, hand wheel, seal)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_ControlHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Control"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Cycle",
+			"ShortName": "Cycle",
+			"Description": "An entity that steps through a timed table of gameplay-tagged phases, optionally looping",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CycleHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Cycle"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Gate",
 			"ShortName": "Gate",
 			"Description": "An entity with a gate whose moving node slides between closed and open offsets",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_GateHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Gate"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Hazard",
+			"ShortName": "Hazard",
+			"Description": "An entity that, while armed, hits whatever is inside its trigger and optionally pushes characters",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HazardHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Hazard"
 			]
 		},
 		{
@@ -46,15 +73,6 @@
 			]
 		},
 		{
-			"TypeName": "FCk_Handle_Lever",
-			"ShortName": "Lever",
-			"Description": "An entity with a two-state lever whose handle node rotates when pulled",
-			"SourceAsset": "/Script/AngelscriptAssets.Mars_LeverHandle",
-			"RequiredFragments": [
-				"Mars_Feature_Lever"
-			]
-		},
-		{
 			"TypeName": "FCk_Handle_MechanismDriver",
 			"ShortName": "MechanismDriver",
 			"Description": "Per-world singleton that tracks every mechanism source and sink and pushes per-channel input counts to sinks",
@@ -82,6 +100,42 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Mover",
+			"ShortName": "Mover",
+			"Description": "A scene-node entity that tweens its own offset between a start and an end pose",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_MoverHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Mover"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Occupancy",
+			"ShortName": "Occupancy",
+			"Description": "An entity that is active while enough entities are inside its trigger, releasing after a delay",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_OccupancyHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Occupancy"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Oscillator",
+			"ShortName": "Oscillator",
+			"Description": "A scene node that swings sinusoidally about one rotation axis, easing in on start and settling on stop",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_OscillatorHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Oscillator"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Pendulum",
+			"ShortName": "Pendulum",
+			"Description": "A swinging hazard: an oscillator whose hazard is armed while it runs",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PendulumHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Pendulum"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_PlayerViewpoint",
 			"ShortName": "PlayerViewpoint",
 			"Description": "A player's view in ECS: a transform that follows the camera, and the interaction trace cast from it",
@@ -91,12 +145,39 @@
 			]
 		},
 		{
-			"TypeName": "FCk_Handle_Switch",
-			"ShortName": "Switch",
-			"Description": "An entity with a momentary push switch that auto-releases after a hold time",
-			"SourceAsset": "/Script/AngelscriptAssets.Mars_SwitchHandle",
+			"TypeName": "FCk_Handle_RotateTowards",
+			"ShortName": "RotateTowards",
+			"Description": "A transform entity that turns to face a target transform at a limited rate, optionally clamped to a range",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_RotateTowardsHandle",
 			"RequiredFragments": [
-				"Mars_Feature_Switch"
+				"Mars_Feature_RotateTowards"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Sequence",
+			"ShortName": "Sequence",
+			"Description": "A logic node that asserts its mechanism source once its sink's input channels rise in a set order",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_SequenceHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Sequence"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Trap",
+			"ShortName": "Trap",
+			"Description": "A cycle-driven trap that arms a hazard and optionally moves a part per phase",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_TrapHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Trap"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Trigger",
+			"ShortName": "Trigger",
+			"Description": "A probe volume entity that tracks the entities inside it and fires OnEntityEntered/OnEntityExited",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_TriggerHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Trigger"
 			]
 		}
 	],

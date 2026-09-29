@@ -2,12 +2,17 @@
 //   1. File > New Level > Empty Level
 //   2. Console: Mars.Sandbox.Build
 // It populates the open untitled level (floor, lights, player starts, jump ledge, crouch tunnel, two test
-// interactables, mechanisms room 2) and saves it to the map path.
+// interactables, mechanisms rooms 2 and 3) and saves it to the map path.
 //
 // Room 2 (mechanisms) sits east of the main floor, entered through a gap in its west wall. Three gated bays:
 // LeverA -> GateA, LeverB1 + LeverB2 -> GateB (all sources), SwitchC (4s hold) -> GateC. Each mechanism is an
 // ACk_EntitySpawner_UE with its entity script instanced on it. To add room 2 to an already-built sandbox map,
 // open it and run: Mars.Sandbox.BuildRoom2
+//
+// Room 3 (phase-2 mechanisms) sits north of room 2, entered through a doorway at X=3000 in their shared wall. West
+// half: PlateF -> GateF, SealH then SealG -> SequenceI -> GateI (latched). East half, three dead-end corridors: a vent
+// suppressed while WheelJ is held on (8s), two spike tiles suppressed while LeverK is pulled, an unwired pendulum. To
+// add room 3 to an already-built sandbox map, open it and run: Mars.Sandbox.BuildRoom3
 //
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
@@ -45,12 +50,21 @@ void Mars_BuildSandboxRoom2Func(const TArray<FString>& Args)
 
 const FConsoleCommand Mars_BuildSandboxRoom2Command("Mars.Sandbox.BuildRoom2", n"Mars_BuildSandboxRoom2Func");
 
+UFUNCTION()
+void Mars_BuildSandboxRoom3Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildRoom3();
+}
+
+const FConsoleCommand Mars_BuildSandboxRoom3Command("Mars.Sandbox.BuildRoom3", n"Mars_BuildSandboxRoom3Func");
+
 namespace utils_mars_sandbox
 {
     const FString k_MapPath = "/Game/Mars/Maps/Sandbox_Mars_MAP";
     const FString k_MaterialFolder = "/Game/Mars/Materials/ProtoGrid";
     const FString k_ProtoGridMaster = "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid.M_CkUsf_Look_ProtoGrid";
     const FString k_Room2FloorLabel = "Room2_Floor";
+    const FString k_Room3FloorLabel = "Room3_Floor";
 
     void Build()
     {
@@ -102,6 +116,7 @@ namespace utils_mars_sandbox
         Actors.SpawnActorFromClass(AMars_TestLamp, FVector(0.0, -300.0, 50.0)).SetActorLabel("TestLamp_B");
 
         Spawn_Room2(Cube);
+        Spawn_Room3(Cube);
 
         Apply_ProtoGridMaterials();
 
@@ -149,6 +164,31 @@ namespace utils_mars_sandbox
         ck::Trace(f"[Mars.Sandbox.BuildRoom2] built, saved={Saved}");
     }
 
+    void BuildRoom3()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.BuildRoom3] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_Room3FloorLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.BuildRoom3] [{k_Room3FloorLabel}] already exists. Delete the Room3_ and Mech3_ actors first to rebuild.");
+                return;
+            }
+        }
+
+        Spawn_Room3(engine::load::Cube());
+        Apply_ProtoGridMaterials();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.BuildRoom3] built, saved={Saved}");
+    }
+
     // Room 2 spans X 2000..4000, Y -700..700 (the main floor ends at X=2000). The gated bays sit in a partition at
     // X=3500 with an alcove behind each gate; controls stand 250uu in front (-X) of their gate.
     void Spawn_Room2(UStaticMesh InCube)
@@ -191,12 +231,76 @@ namespace utils_mars_sandbox
         Spawn_Mechanism(UMars_Sandbox_SwitchC_EntityScript, "Mech_SwitchC", FVector(ControlX, 460.0, 100.0));
     }
 
+    // Room 3 spans X 2000..4000, Y 700..2100, entered from room 2 through a 300uu doorway at X=3000 in the shared wall
+    // (room 2's single north wall is replaced by two segments). A 300uu aisle runs north from the doorway. West of it,
+    // a partition at Y=1600 holds GateI and GateF with alcoves behind; the seals sit on the west wall. East of it,
+    // three corridors run to the east wall: vent (330 wide, the jet's reach), spikes (200, one tile), pendulum (300).
+    void Spawn_Room3(UStaticMesh InCube)
+    {
+        auto Actors = UEditorActorSubsystem::Get();
+        for (auto Actor : Actors.GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == "Room2_WallNorth")
+            { Actors.DestroyActor(Actor); }
+        }
+
+        Spawn_Block(InCube, k_Room3FloorLabel, FVector(3000.0, 1400.0, -10.0), FVector(20.0, 14.0, 0.2));
+
+        Spawn_Block(InCube, "Room3_WallSouth_West", FVector(2425.0, 700.0, 150.0), FVector(8.5, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_WallSouth_East", FVector(3575.0, 700.0, 150.0), FVector(8.5, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_WallWest", FVector(2000.0, 1400.0, 150.0), FVector(0.2, 14.0, 3.0));
+        Spawn_Block(InCube, "Room3_WallEast", FVector(4000.0, 1400.0, 150.0), FVector(0.2, 14.0, 3.0));
+        Spawn_Block(InCube, "Room3_WallNorth", FVector(3000.0, 2100.0, 150.0), FVector(20.2, 0.2, 3.0));
+
+        // West half. Gates are yawed 90 so their opening spans X; frames are 240uu wide, centred on X = 2250 and 2600.
+        const float64 PartitionY = 1600.0;
+        const auto GateRotation = FRotator(0.0, 90.0, 0.0);
+        Spawn_Block(InCube, "Room3_Partition_0", FVector(2065.0, PartitionY, 150.0), FVector(1.3, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_Partition_1", FVector(2425.0, PartitionY, 150.0), FVector(1.1, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_Partition_2", FVector(2785.0, PartitionY, 150.0), FVector(1.3, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_AlcoveDivider", FVector(2425.0, 1850.0, 150.0), FVector(0.2, 5.0, 3.0));
+        Spawn_Block(InCube, "Room3_AlcoveWall_East", FVector(2850.0, 1850.0, 150.0), FVector(0.2, 5.0, 3.0));
+
+        // Bay 1: standing on the plate opens GateF; it closes 1.5s after stepping off.
+        Spawn_Block(InCube, "Room3_GateHeader_F", FVector(2600.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Mechanism(UMars_Sandbox_GateF_EntityScript, "Mech3_GateF", FVector(2600.0, PartitionY, 0.0), GateRotation);
+        Spawn_Mechanism(UMars_Sandbox_PlateF_EntityScript, "Mech3_Plate", FVector(2600.0, 1250.0, 0.0));
+
+        // Bay 2: seals face +X off the west wall (pitch -90); pressing H then G completes the sequence and latches GateI.
+        const auto SealRotation = FRotator(-90.0, 0.0, 0.0);
+        Spawn_Mechanism(UMars_Sandbox_SealG_EntityScript, "Mech3_Seal1", FVector(2010.0, 1000.0, 120.0), SealRotation);
+        Spawn_Mechanism(UMars_Sandbox_SealH_EntityScript, "Mech3_Seal2", FVector(2010.0, 1200.0, 120.0), SealRotation);
+        Spawn_Mechanism(UMars_Sandbox_SequenceI_EntityScript, "Mech3_SeqNode", FVector(2100.0, 1400.0, 0.0));
+        Spawn_Block(InCube, "Room3_GateHeader_I", FVector(2250.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Mechanism(UMars_Sandbox_GateI_EntityScript, "Mech3_GateI", FVector(2250.0, PartitionY, 0.0), GateRotation);
+
+        // East half: corridor dividers from the aisle (X=3150) to the east wall.
+        Spawn_Block(InCube, "Room3_CorridorWall_0", FVector(3575.0, 1050.0, 150.0), FVector(8.5, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_CorridorWall_1", FVector(3575.0, 1270.0, 150.0), FVector(8.5, 0.2, 3.0));
+        Spawn_Block(InCube, "Room3_CorridorWall_2", FVector(3575.0, 1590.0, 150.0), FVector(8.5, 0.2, 3.0));
+
+        // Bay 3 (Y 710..1040): the vent on the south wall fires north across the corridor; holding the wheel for 2s
+        // suppresses it for 8s. Both are yawed 90 so their local +X points north.
+        const auto NorthRotation = FRotator(0.0, 90.0, 0.0);
+        Spawn_Mechanism(UMars_Sandbox_WheelJ_EntityScript, "Mech3_Wheel", FVector(3300.0, 710.0, 110.0), NorthRotation);
+        Spawn_Mechanism(UMars_Sandbox_VentJ_EntityScript, "Mech3_Vent", FVector(3600.0, 710.0, 0.0), NorthRotation);
+
+        // Bay 4 (Y 1060..1260): two spike tiles in a row, suppressed while the lever before them is pulled.
+        Spawn_Mechanism(UMars_Sandbox_LeverK_EntityScript, "Mech3_LeverK", FVector(3280.0, 1215.0, 0.0));
+        Spawn_Mechanism(UMars_Sandbox_SpikesK_EntityScript, "Mech3_Spikes1", FVector(3500.0, 1160.0, 0.0));
+        Spawn_Mechanism(UMars_Sandbox_SpikesK_EntityScript, "Mech3_Spikes2", FVector(3700.0, 1160.0, 0.0));
+
+        // Bay 5 (Y 1280..1580): the pendulum swings across the corridor (yawed so its swing plane is north-south).
+        Spawn_Mechanism(UMars_Sandbox_Pendulum_EntityScript, "Mech3_Pendulum", FVector(3600.0, 1430.0, 0.0), NorthRotation);
+    }
+
     // Goes through the spawner's actor factory (the Place Actors path): it instances the script class on a new
     // ACk_EntitySpawner_UE, and the spawner injects its actor transform into SpawnTransform at spawn.
-    void Spawn_Mechanism(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InLabel, FVector InLocation)
+    void Spawn_Mechanism(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InLabel, FVector InLocation,
+                         FRotator InRotation = FRotator::ZeroRotator)
     {
         auto Spawner = Cast<ACk_EntitySpawner_UE>(
-            UEditorActorSubsystem::Get().SpawnActorFromObject(InScriptClass.Get(), InLocation, FRotator::ZeroRotator));
+            UEditorActorSubsystem::Get().SpawnActorFromObject(InScriptClass.Get(), InLocation, InRotation));
         if (ck::EnsureIfNot(ck::IsValid(Spawner), f"[Mars.Sandbox] Failed to place [{InLabel}] through the entity spawner factory"))
         { return; }
 
@@ -240,6 +344,10 @@ namespace utils_mars_sandbox
             else if (Label == k_Room2FloorLabel)
             { Block.StaticMeshComponent.SetMaterial(0, Floor); }
             else if (Label.StartsWith("Room2_"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label == k_Room3FloorLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label.StartsWith("Room3_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
         }
     }
