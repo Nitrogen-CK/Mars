@@ -31,9 +31,9 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
             { continue; }
 
             if (Index == OverflowIndex)
-            { utils_hotbar::DoApplySelection(Self, InState, OverflowIndex); }
+            { ApplySelection(Self, InState, OverflowIndex); }
             else if (InState.SelectedIndex == -1)
-            { utils_hotbar::DoApplySelection(Self, InState, Index); }
+            { ApplySelection(Self, InState, Index); }
         }
 
         if (InState.PendingSelectedIndex == -2 || ck::IsValid(InState.LastSeen[OverflowIndex]))
@@ -41,6 +41,19 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 
         const auto ParkedIndex = InState.PendingSelectedIndex;
         InState.PendingSelectedIndex = -2;
-        utils_hotbar::DoApplySelection(Self, InState, ParkedIndex);
+        ApplySelection(Self, InState, ParkedIndex);
+    }
+
+    // SelectedIndex is written only here and in the other hotbar processor's copy (UMars_Processor_Hotbar_HandleRequests).
+    private void ApplySelection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, int32 InNewIndex)
+    {
+        const auto PrevIndex = InState.SelectedIndex;
+        if (PrevIndex == InNewIndex)
+        { return; }
+
+        InState.SelectedIndex = InNewIndex;
+
+        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
+        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar, PrevIndex, InNewIndex); }
     }
 }

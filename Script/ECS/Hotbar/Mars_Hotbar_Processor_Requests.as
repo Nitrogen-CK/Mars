@@ -18,7 +18,7 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_Hotbar();
 
         TArray<FMars_Request_Hotbar_Select> SelectRequests = InRequests.SelectRequests;
-        const auto NumDeselectRequests = InRequests.DeselectRequestCount;
+        TArray<FMars_Request_Hotbar_Deselect> DeselectRequests = InRequests.DeselectRequests;
         TArray<FMars_Request_Hotbar_Cycle> CycleRequests = InRequests.CycleRequests;
 
         // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
@@ -27,7 +27,7 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Request : SelectRequests)
         { HandleSelectRequest(Self, InState, Request.Index); }
 
-        for (int32 Index = 0; Index < NumDeselectRequests; ++Index)
+        for (int32 Index = 0; Index < DeselectRequests.Num(); ++Index)
         { HandleDeselectRequest(Self, InState); }
 
         for (const auto& Request : CycleRequests)
@@ -50,7 +50,7 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         if (InIndex != OverflowIndex && TryPark(InHotbar, InState, InIndex))
         { return; }
 
-        utils_hotbar::DoApplySelection(InHotbar, InState, InIndex);
+        ApplySelection(InHotbar, InState, InIndex);
     }
 
     private void HandleDeselectRequest(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState)
@@ -58,7 +58,7 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         if (TryPark(InHotbar, InState, -1))
         { return; }
 
-        utils_hotbar::DoApplySelection(InHotbar, InState, -1);
+        ApplySelection(InHotbar, InState, -1);
     }
 
     private void HandleCycleRequest(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, int32 InDirection)
@@ -92,5 +92,18 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
         { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnOverflowEjectRequested.Broadcast(InHotbar, OverflowItem, InTargetIndex); }
 
         return true;
+    }
+
+    // SelectedIndex is written only here and in the other hotbar processor's copy (UMars_Processor_Hotbar_Sync).
+    private void ApplySelection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, int32 InNewIndex)
+    {
+        const auto PrevIndex = InState.SelectedIndex;
+        if (PrevIndex == InNewIndex)
+        { return; }
+
+        InState.SelectedIndex = InNewIndex;
+
+        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
+        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar, PrevIndex, InNewIndex); }
     }
 }

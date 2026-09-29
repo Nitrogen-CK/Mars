@@ -57,7 +57,7 @@ mixin FCk_Handle_Transform Get_HandAttachPoint(const FCk_Handle_HeldItem& Self)
 mixin void Request_SetSlot(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetSlot& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
-    Requests.SetSlot = TOptional<FMars_Request_HeldItem_SetSlot>(InRequest);
+    Requests.SetSlotRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -37,19 +37,6 @@ namespace utils_hotbar
         return InPlayer.As_Hotbar();
     }
 
-    // Processor-side: the one place SelectedIndex changes.
-    void DoApplySelection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, int32 InNewIndex)
-    {
-        const auto PrevIndex = InState.SelectedIndex;
-        if (PrevIndex == InNewIndex)
-        { return; }
-
-        InState.SelectedIndex = InNewIndex;
-
-        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
-        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar, PrevIndex, InNewIndex); }
-    }
-
     FCk_Handle_Item DoGet_FirstItem(FCk_Handle_Inventory_DataOnly InSlot)
     {
         if (ck::Is_NOT_Valid(InSlot) || InSlot.Get_NumItems() == 0)
@@ -159,7 +146,7 @@ mixin void Request_Select(FCk_Handle_Hotbar& Self, const FMars_Request_Hotbar_Se
 mixin void Request_Deselect(FCk_Handle_Hotbar& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.DeselectRequestCount += 1;
+    Requests.DeselectRequests.Add(FMars_Request_Hotbar_Deselect());
 }
 
 mixin void Request_CycleNext(FCk_Handle_Hotbar& Self)

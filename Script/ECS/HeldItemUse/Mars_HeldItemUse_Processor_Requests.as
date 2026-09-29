@@ -1,4 +1,7 @@
-// Drains Refresh, then Drop, then Throw.
+// Drains Refresh, then Drop, then Throw, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each kind is
+// applied at most once per drain however many were queued (a second Refresh would rebuild the use interactable again; a
+// second Drop/Throw is already a no-op through LaunchedItem). SetThrowArmed applies in order and broadcasts
+// OnThrowArmedChanged on every change.
 //
 // Refresh owns the use interactable: a no-probe child of the player whose single Primary.UsableItem target runs the held
 // item's UseAction state. Nothing traces it, so it is focused and offered to the player's resolver here, and torn down
@@ -24,9 +27,10 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_HeldItemUse();
 
-        const auto Refresh = InRequests.RefreshFromHeldItem.IsSet();
-        const auto Drop = InRequests.Drop.IsSet();
-        const auto Throw = InRequests.Throw.IsSet();
+        const auto Refresh = InRequests.RefreshFromHeldItemRequests.Num() > 0;
+        const auto Drop = InRequests.DropRequests.Num() > 0;
+        const auto Throw = InRequests.ThrowRequests.Num() > 0;
+        TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests = InRequests.SetThrowArmedRequests;
 
         // Swap-and-pop - InRequests is dead past this line. Removing before acting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_HeldItemUse_Requests);
@@ -39,6 +43,27 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Throw)
         { LaunchHeldItem(InHandle, InState, true); }
+
+        for (const auto& Request : SetThrowArmedRequests)
+        { HandleSetThrowArmedRequest(Self, InState, Request); }
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------
+    // Throw armed (HUD-only)
+    //--------------------------------------------------------------------------------------------------------------------------
+
+    private void HandleSetThrowArmedRequest(
+        FCk_Handle_HeldItemUse& InUse,
+        FMars_Fragment_HeldItemUse& InState,
+        const FMars_Request_HeldItemUse_SetThrowArmed& InRequest)
+    {
+        if (InState.ThrowArmed == InRequest.Armed)
+        { return; }
+
+        InState.ThrowArmed = InRequest.Armed;
+
+        if (InUse.Has_Fragment(FMars_Fragment_HeldItemUse_Signals))
+        { InUse.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnThrowArmedChanged.Broadcast(InUse, InRequest.Armed); }
     }
 
     //--------------------------------------------------------------------------------------------------------------------------

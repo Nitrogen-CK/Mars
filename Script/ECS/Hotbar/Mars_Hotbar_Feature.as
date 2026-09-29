@@ -95,6 +95,16 @@ struct FMars_Request_Hotbar_Select
     }
 }
 
+// Hands empty (parked instead while an occupied overflow slot is selected). AngelScript rejects a TArray of an empty
+// struct ("Subtype is an empty struct", Bind_TArray.cpp), so it carries one placeholder field.
+struct FMars_Request_Hotbar_Deselect
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Hotbar_Deselect() {}
+}
+
 // Steps through the bag slots only, wrapping; the overflow slot is never a cycle target.
 struct FMars_Request_Hotbar_Cycle
 {
@@ -115,9 +125,8 @@ struct FMars_Fragment_Hotbar_Requests
     UPROPERTY()
     TArray<FMars_Request_Hotbar_Select> SelectRequests;
 
-    // A deselect carries no payload, and AngelScript rejects arrays of empty structs, so deselects are counted.
     UPROPERTY()
-    int32 DeselectRequestCount = 0;
+    TArray<FMars_Request_Hotbar_Deselect> DeselectRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Hotbar_Cycle> CycleRequests;

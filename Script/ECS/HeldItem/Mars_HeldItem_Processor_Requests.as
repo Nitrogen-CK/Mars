@@ -1,5 +1,8 @@
 // Commits the new held item, replaces its HeldVisual world item, then broadcasts OnHeldItemChanged. An unchanged item
 // only records the (possibly different, empty) selected slot.
+//
+// Only the LAST queued SetSlot is applied: each one is a full snapshot of the selection, and applying the earlier ones
+// would spawn and destroy an intermediate HeldVisual and broadcast a held item that was never current at a drain.
 class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -17,14 +20,13 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_HeldItem();
 
-        const auto HasSetSlot = InRequests.SetSlot.IsSet();
-        auto SetSlot = HasSetSlot ? InRequests.SetSlot.GetValue() : FMars_Request_HeldItem_SetSlot();
+        TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests = InRequests.SetSlotRequests;
 
         // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_HeldItem_Requests);
 
-        if (HasSetSlot)
-        { HandleSetSlotRequest(Self, InState, SetSlot); }
+        if (SetSlotRequests.Num() > 0)
+        { HandleSetSlotRequest(Self, InState, SetSlotRequests.Last()); }
     }
 
     private void HandleSetSlotRequest(FCk_Handle_HeldItem& InHeldItem, FMars_Fragment_HeldItem& InState, const FMars_Request_HeldItem_SetSlot& InRequest)

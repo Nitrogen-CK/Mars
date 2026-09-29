@@ -89,9 +89,9 @@ struct FMars_Request_HeldItem_SetSlot
     }
 }
 
-// Latest wins: back-to-back slot changes inside one frame collapse to the last one.
+// Latest wins: back-to-back slot changes inside one frame collapse to the last one (see the processor).
 struct FMars_Fragment_HeldItem_Requests
 {
     UPROPERTY()
-    TOptional<FMars_Request_HeldItem_SetSlot> SetSlot;
+    TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests;
 }

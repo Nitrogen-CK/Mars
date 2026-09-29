@@ -35,8 +35,8 @@ struct FMars_Fragment_HeldItemUse
     UPROPERTY()
     FCk_Handle_Interactable CurrentInteractable;
 
-    // HUD-only: set by the drop/throw input task once Drop has been held past the throw threshold, read by the
-    // action-hint task. Written immediately (not a request) and never read by gameplay.
+    // HUD-only: requested by the drop/throw input task once Drop has been held past the throw threshold, read by the
+    // action-hint task. Never read by gameplay - the input task decides throw-vs-drop from its own flag.
     UPROPERTY()
     bool ThrowArmed = false;
 
@@ -47,36 +47,72 @@ struct FMars_Fragment_HeldItemUse
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Signals
+//--------------------------------------------------------------------------------------------------------------------------
+
+delegate void FMars_Delegate_HeldItemUse_OnThrowArmedChanged(FCk_Handle_HeldItemUse InUse, bool InArmed);
+event void FMars_Delegate_HeldItemUse_OnThrowArmedChanged_MC(FCk_Handle_HeldItemUse InUse, bool InArmed);
+
+struct FMars_Fragment_HeldItemUse_Signals
+{
+    FMars_Delegate_HeldItemUse_OnThrowArmedChanged_MC OnThrowArmedChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+// AngelScript rejects a TArray of an empty struct ("Subtype is an empty struct", Bind_TArray.cpp), so the payload-less
+// requests carry one placeholder field.
 struct FMars_Request_HeldItemUse_RefreshFromHeldItem
 {
     UPROPERTY()
     bool Requested = true;
+
+    FMars_Request_HeldItemUse_RefreshFromHeldItem() {}
 }
 
 struct FMars_Request_HeldItemUse_Drop
 {
     UPROPERTY()
     bool Requested = true;
+
+    FMars_Request_HeldItemUse_Drop() {}
 }
 
 struct FMars_Request_HeldItemUse_Throw
 {
     UPROPERTY()
     bool Requested = true;
+
+    FMars_Request_HeldItemUse_Throw() {}
 }
 
-// Latest wins per kind; drained Refresh -> Drop -> Throw.
+struct FMars_Request_HeldItemUse_SetThrowArmed
+{
+    UPROPERTY()
+    bool Armed = false;
+
+    FMars_Request_HeldItemUse_SetThrowArmed() {}
+
+    FMars_Request_HeldItemUse_SetThrowArmed(bool InArmed)
+    {
+        Armed = InArmed;
+    }
+}
+
+// Drained Refresh -> Drop -> Throw -> SetThrowArmed; see the processor.
 struct FMars_Fragment_HeldItemUse_Requests
 {
     UPROPERTY()
-    TOptional<FMars_Request_HeldItemUse_RefreshFromHeldItem> RefreshFromHeldItem;
+    TArray<FMars_Request_HeldItemUse_RefreshFromHeldItem> RefreshFromHeldItemRequests;
 
     UPROPERTY()
-    TOptional<FMars_Request_HeldItemUse_Drop> Drop;
+    TArray<FMars_Request_HeldItemUse_Drop> DropRequests;
 
     UPROPERTY()
-    TOptional<FMars_Request_HeldItemUse_Throw> Throw;
+    TArray<FMars_Request_HeldItemUse_Throw> ThrowRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests;
 }
