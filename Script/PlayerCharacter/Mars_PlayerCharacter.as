@@ -54,6 +54,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_player_viewpoint::Add(Player, FirstPersonCamera.GetWorldTransform(), Config.Viewpoint);
         utils_interaction_resolver::Add(Player, Config.InteractionResolver, ECk_Replication::DoesNotReplicate);
         utils_interact_prompt_display::Add(Player);
+        utils_action_hint_display::Add(Player);
 
         // Silent: volumes that filter on Probe.Mars.Player detect the player; the player detects nothing through it.
         auto PlayerTransform = Player.As_Transform();
@@ -67,6 +68,16 @@ class AMars_PlayerCharacter : ACk_Character_UE
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
         utils_byte_attribute::Add(Player, DownedSpec, ECk_Replication::DoesNotReplicate);
+
+        // Follows the first-person camera; only the held item's mesh is visible under it.
+        auto Hand = utils_scene_node::CreateAndAttachToUnrealComponent(PlayerTransform, FirstPersonCamera, Config.HandOffset);
+        utils_handle::Set_DebugName(FCk_Handle(Hand), n"Player.Hand");
+
+        auto HotbarSpec = FMars_Hotbar_Spec();
+        HotbarSpec.BagSlotCount = Config.BagSlotCount;
+        utils_hotbar::Add(Player, HotbarSpec);
+        utils_held_item::Add(Player, FMars_HeldItem_Spec(Hand.As_Transform()));
+        utils_held_item_use::Add(Player);
 
         utils_state_machine::Add(Player, FCk_StateMachine_Spec(UMars_SmState_Alive));
     }

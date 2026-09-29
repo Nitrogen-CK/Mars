@@ -272,3 +272,9 @@ class UMars_SmTask_UseIntentToResolver : UMars_SmTask_IntentToResolver
     default InputIntent = GameplayTags::Mars_Intent_Interact_Use;
     default ResolverIntent = GameplayTags::InteractionIntent_Mars_Use;
 }
+
+class UMars_SmTask_PrimaryIntentToResolver : UMars_SmTask_IntentToResolver
+{
+    default InputIntent = GameplayTags::Mars_Intent_Interact_Primary;
+    default ResolverIntent = GameplayTags::InteractionIntent_Mars_Primary;
+}

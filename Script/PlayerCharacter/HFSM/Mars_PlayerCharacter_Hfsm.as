@@ -1,6 +1,7 @@
 // Root (on the player entity, initial = Alive)
 // |- Alive       ->Downed [IsDowned]
-// |    tasks: ViewpointSync, InteractionFocus, InteractionResolverBinds, UseIntentToResolver, AliveSubSm
+// |    tasks: ViewpointSync, InteractionFocus, InteractionResolverBinds, Use/PrimaryIntentToResolver,
+// |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), AliveSubSm
 // |    `- Alive sub-SM (initial = Locomotion)
 // |         `- Locomotion   tasks: LocomotionSubSm
 // |              `- Loco sub-SM (initial = Idle): Idle / Walk / Sprint / Crouch / Jump / Airborne
@@ -45,6 +46,12 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_InteractionFocus);
         AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
+        AddTask(InHandle, UMars_SmTask_PrimaryIntentToResolver);
+        AddTask(InHandle, UMars_SmTask_HotbarIntents);
+        AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
+        AddTask(InHandle, UMars_SmTask_HeldItemDrivesUse);
+        AddTask(InHandle, UMars_SmTask_DropThrowIntent);
+        AddTask(InHandle, UMars_SmTask_HeldItemHints);
         AddTask(InHandle, UMars_SmTask_AliveSubSm);
     }
 
