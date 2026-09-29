@@ -23,6 +23,10 @@ namespace assets
     TSoftClassPtr<UMars_PS5Gamepad_ControllerData> PS5_ControllerData_Mars_BP_Class() { return TSoftClassPtr<UMars_PS5Gamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/PS5_ControllerData_Mars_BP.PS5_ControllerData_Mars_BP_C")); }
     TSoftObjectPtr<UMars_XboxGamepad_ControllerData> Xbox_ControllerData_Mars_BP() { return TSoftObjectPtr<UMars_XboxGamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/Xbox_ControllerData_Mars_BP.Xbox_ControllerData_Mars_BP")); }
     TSoftClassPtr<UMars_XboxGamepad_ControllerData> Xbox_ControllerData_Mars_BP_Class() { return TSoftClassPtr<UMars_XboxGamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/Xbox_ControllerData_Mars_BP.Xbox_ControllerData_Mars_BP_C")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Floor_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Floor_Mars_MI.ProtoGrid_Floor_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Interactable_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Platform_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Platform_Mars_MI.ProtoGrid_Platform_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Wall_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Wall_Mars_MI.ProtoGrid_Wall_Mars_MI")); }
     TSoftObjectPtr<UTexture2D> Cursor_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Cursor_T.Cursor_T")); }
     TSoftObjectPtr<UTexture2D> Hand_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Hand_T.Hand_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_Joystick_A_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_A_Mars_T.Prompt_Joystick_A_Mars_T")); }
@@ -137,6 +141,7 @@ namespace assets
     TSoftObjectPtr<UTexture2D> Prompt_PC_X_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_X_Mars_T.Prompt_PC_X_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_PC_Y_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Y_Mars_T.Prompt_PC_Y_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_PC_Z_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Z_Mars_T.Prompt_PC_Z_Mars_T")); }
+    TSoftObjectPtr<UWorld> Sandbox_Mars_MAP() { return TSoftObjectPtr<UWorld>(FSoftObjectPath("/Game/Mars/Maps/Sandbox_Mars_MAP.Sandbox_Mars_MAP")); }
 }
 
 // Blocking loads - loads asset immediately
@@ -294,6 +299,42 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadClassAsset_Blocking(assets::Xbox_ControllerData_Mars_BP_Class());
+    }
+    UMaterialInstanceConstant ProtoGrid_Floor_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ProtoGrid_Floor_Mars_MI() called before engine init. Use assets::ProtoGrid_Floor_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ProtoGrid_Floor_Mars_MI());
+    }
+    UMaterialInstanceConstant ProtoGrid_Interactable_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ProtoGrid_Interactable_Mars_MI() called before engine init. Use assets::ProtoGrid_Interactable_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ProtoGrid_Interactable_Mars_MI());
+    }
+    UMaterialInstanceConstant ProtoGrid_Platform_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ProtoGrid_Platform_Mars_MI() called before engine init. Use assets::ProtoGrid_Platform_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ProtoGrid_Platform_Mars_MI());
+    }
+    UMaterialInstanceConstant ProtoGrid_Wall_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ProtoGrid_Wall_Mars_MI() called before engine init. Use assets::ProtoGrid_Wall_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ProtoGrid_Wall_Mars_MI());
     }
     UTexture2D Cursor_T()
     {
@@ -1320,5 +1361,14 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Prompt_PC_Z_Mars_T());
+    }
+    UWorld Sandbox_Mars_MAP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Sandbox_Mars_MAP() called before engine init. Use assets::Sandbox_Mars_MAP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Sandbox_Mars_MAP());
     }
 }

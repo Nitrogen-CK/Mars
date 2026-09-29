@@ -112,6 +112,315 @@ namespace UCk_PlaceableTest_Sphere_EntityScript
 }
 
 USTRUCT()
+struct FMars_Gate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Gate_EntityScript
+{
+    FMars_Gate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Lever_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Lever_Spec Lever = FMars_Lever_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull lever");
+
+    FMars_Lever_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Lever_Spec InLever, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Lever = InLever;
+        Source = InSource;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Lever_EntityScript
+{
+    FMars_Lever_EntityScript_SpawnParams Params()
+    {
+        return FMars_Lever_EntityScript_SpawnParams();
+    }
+
+    FMars_Lever_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Lever_Spec InLever, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        return FMars_Lever_EntityScript_SpawnParams(InSpawnTransform, InLever, InSource, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_MechanismDriver_EntityScript_SpawnParams
+{
+}
+
+namespace UMars_MechanismDriver_EntityScript
+{
+    FMars_MechanismDriver_EntityScript_SpawnParams Params()
+    {
+        return FMars_MechanismDriver_EntityScript_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_GateA_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_Sandbox_GateA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Sandbox_GateA_EntityScript
+{
+    FMars_Sandbox_GateA_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_GateA_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_GateA_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Sandbox_GateA_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_GateB_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_Sandbox_GateB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Sandbox_GateB_EntityScript
+{
+    FMars_Sandbox_GateB_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_GateB_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_GateB_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Sandbox_GateB_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_GateC_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_Sandbox_GateC_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Sandbox_GateC_EntityScript
+{
+    FMars_Sandbox_GateC_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_GateC_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_GateC_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Sandbox_GateC_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_LeverA_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Lever_Spec Lever = FMars_Lever_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull lever");
+
+    FMars_Sandbox_LeverA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Lever_Spec InLever, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Lever = InLever;
+        Source = InSource;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Sandbox_LeverA_EntityScript
+{
+    FMars_Sandbox_LeverA_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_LeverA_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_LeverA_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Lever_Spec InLever, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        return FMars_Sandbox_LeverA_EntityScript_SpawnParams(InSpawnTransform, InLever, InSource, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_LeverB_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Lever_Spec Lever = FMars_Lever_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull lever");
+
+    FMars_Sandbox_LeverB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Lever_Spec InLever, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Lever = InLever;
+        Source = InSource;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Sandbox_LeverB_EntityScript
+{
+    FMars_Sandbox_LeverB_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_LeverB_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_LeverB_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Lever_Spec InLever, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        return FMars_Sandbox_LeverB_EntityScript_SpawnParams(InSpawnTransform, InLever, InSource, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_SwitchC_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Switch_Spec Switch = FMars_Switch_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Press switch");
+
+    FMars_Sandbox_SwitchC_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Switch_Spec InSwitch, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Switch = InSwitch;
+        Source = InSource;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Sandbox_SwitchC_EntityScript
+{
+    FMars_Sandbox_SwitchC_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_SwitchC_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_SwitchC_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Switch_Spec InSwitch, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        return FMars_Sandbox_SwitchC_EntityScript_SpawnParams(InSpawnTransform, InSwitch, InSource, InPromptText);
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_AllTasksSucceeded_SpawnParams
 {
 }
@@ -502,6 +811,19 @@ namespace UMars_SmState_InteractTarget_Enter
 }
 
 USTRUCT()
+struct FMars_SmState_Lever_Pull_SpawnParams
+{
+}
+
+namespace UMars_SmState_Lever_Pull
+{
+    FMars_SmState_Lever_Pull_SpawnParams Params()
+    {
+        return FMars_SmState_Lever_Pull_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Loco_Airborne_SpawnParams
 {
 }
@@ -589,6 +911,19 @@ namespace UMars_SmState_Locomotion
     FMars_SmState_Locomotion_SpawnParams Params()
     {
         return FMars_SmState_Locomotion_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Switch_Press_SpawnParams
+{
+}
+
+namespace UMars_SmState_Switch_Press
+{
+    FMars_SmState_Switch_Press_SpawnParams Params()
+    {
+        return FMars_SmState_Switch_Press_SpawnParams();
     }
 }
 
@@ -710,6 +1045,19 @@ namespace UMars_SmTask_Jump
 }
 
 USTRUCT()
+struct FMars_SmTask_Lever_Pull_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Lever_Pull
+{
+    FMars_SmTask_Lever_Pull_SpawnParams Params()
+    {
+        return FMars_SmTask_Lever_Pull_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_LocomotionSpeed_SpawnParams
 {
 }
@@ -788,6 +1136,19 @@ namespace UMars_SmTask_PerformInteractionSubSm
 }
 
 USTRUCT()
+struct FMars_SmTask_Switch_Press_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Switch_Press
+{
+    FMars_SmTask_Switch_Press_SpawnParams Params()
+    {
+        return FMars_SmTask_Switch_Press_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_TerminateOwningSm_SpawnParams
 {
 }
@@ -836,6 +1197,43 @@ namespace UMars_SmTask_ViewpointSync
     FMars_SmTask_ViewpointSync_SpawnParams Params()
     {
         return FMars_SmTask_ViewpointSync_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_Switch_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Switch_Spec Switch = FMars_Switch_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Press switch");
+
+    FMars_Switch_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Switch_Spec InSwitch, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Switch = InSwitch;
+        Source = InSource;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Switch_EntityScript
+{
+    FMars_Switch_EntityScript_SpawnParams Params()
+    {
+        return FMars_Switch_EntityScript_SpawnParams();
+    }
+
+    FMars_Switch_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Switch_Spec InSwitch, FMars_MechanismSource_Spec InSource, FText InPromptText)
+    {
+        return FMars_Switch_EntityScript_SpawnParams(InSpawnTransform, InSwitch, InSource, InPromptText);
     }
 }
 

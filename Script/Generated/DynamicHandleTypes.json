@@ -1,6 +1,15 @@
 {
 	"HandleTypes": [
 		{
+			"TypeName": "FCk_Handle_Gate",
+			"ShortName": "Gate",
+			"Description": "An entity with a gate whose moving node slides between closed and open offsets",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_GateHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Gate"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_InputIntents",
 			"ShortName": "InputIntents",
 			"Description": "An entity whose gameplay reads the CkIntent matcher of the input layer that drives it",
@@ -37,12 +46,57 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Lever",
+			"ShortName": "Lever",
+			"Description": "An entity with a two-state lever whose handle node rotates when pulled",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_LeverHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Lever"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_MechanismDriver",
+			"ShortName": "MechanismDriver",
+			"Description": "Per-world singleton that tracks every mechanism source and sink and pushes per-channel input counts to sinks",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_MechanismDriverHandle",
+			"RequiredFragments": [
+				"Mars_Feature_MechanismDriver"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_MechanismSink",
+			"ShortName": "MechanismSink",
+			"Description": "An entity powered by one or more mechanism input channels combined with a rule (gate)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_MechanismSinkHandle",
+			"RequiredFragments": [
+				"Mars_Feature_MechanismSink"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_MechanismSource",
+			"ShortName": "MechanismSource",
+			"Description": "An entity that asserts one mechanism output channel (lever, switch, gate-as-relay)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_MechanismSourceHandle",
+			"RequiredFragments": [
+				"Mars_Feature_MechanismSource"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_PlayerViewpoint",
 			"ShortName": "PlayerViewpoint",
 			"Description": "A player's view in ECS: a transform that follows the camera, and the interaction trace cast from it",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlayerViewpointHandle",
 			"RequiredFragments": [
 				"Mars_Feature_PlayerViewpoint"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Switch",
+			"ShortName": "Switch",
+			"Description": "An entity with a momentary push switch that auto-releases after a hold time",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_SwitchHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Switch"
 			]
 		}
 	],
