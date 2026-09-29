@@ -141,6 +141,7 @@ namespace assets
     TSoftObjectPtr<UTexture2D> Prompt_PC_X_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_X_Mars_T.Prompt_PC_X_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_PC_Y_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Y_Mars_T.Prompt_PC_Y_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_PC_Z_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Z_Mars_T.Prompt_PC_Z_Mars_T")); }
+    TSoftObjectPtr<UWorld> AutoTests_Mars_MAP() { return TSoftObjectPtr<UWorld>(FSoftObjectPath("/Game/Mars/Maps/AutoTests_Mars_MAP.AutoTests_Mars_MAP")); }
     TSoftObjectPtr<UWorld> Sandbox_Mars_MAP() { return TSoftObjectPtr<UWorld>(FSoftObjectPath("/Game/Mars/Maps/Sandbox_Mars_MAP.Sandbox_Mars_MAP")); }
 }
 
@@ -1361,6 +1362,15 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Prompt_PC_Z_Mars_T());
+    }
+    UWorld AutoTests_Mars_MAP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::AutoTests_Mars_MAP() called before engine init. Use assets::AutoTests_Mars_MAP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::AutoTests_Mars_MAP());
     }
     UWorld Sandbox_Mars_MAP()
     {

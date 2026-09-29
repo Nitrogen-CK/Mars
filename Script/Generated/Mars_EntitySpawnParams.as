@@ -112,6 +112,149 @@ namespace UCk_PlaceableTest_Sphere_EntityScript
 }
 
 USTRUCT()
+struct FMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner
+{
+    FMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner_SpawnParams Params()
+    {
+        return FMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted
+{
+    FMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted_SpawnParams Params()
+    {
+        return FMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange
+{
+    FMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange_SpawnParams Params()
+    {
+        return FMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection
+{
+    FMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_LeavingOverflowParksSelection_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_LeavingOverflowParksSelection
+{
+    FMars_AutoTest_Hotbar_LeavingOverflowParksSelection_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_LeavingOverflowParksSelection_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow
+{
+    FMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_SlotItemChangedBroadcasts_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_SlotItemChangedBroadcasts
+{
+    FMars_AutoTest_Hotbar_SlotItemChangedBroadcasts_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_SlotItemChangedBroadcasts_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_StowFillsBagThenOverflow_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_StowFillsBagThenOverflow
+{
+    FMars_AutoTest_Hotbar_StowFillsBagThenOverflow_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_StowFillsBagThenOverflow_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull
+{
+    FMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Smoke_Boots_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Smoke_Boots
+{
+    FMars_AutoTest_Smoke_Boots_SpawnParams Params()
+    {
+        return FMars_AutoTest_Smoke_Boots_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_PickupStows_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_PickupStows
+{
+    FMars_AutoTest_WorldItem_PickupStows_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_PickupStows_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_Gate_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -1504,6 +1647,32 @@ namespace UMars_SmState_InteractTarget_Enter
 }
 
 USTRUCT()
+struct FMars_SmState_ItemUse_Consume_SpawnParams
+{
+}
+
+namespace UMars_SmState_ItemUse_Consume
+{
+    FMars_SmState_ItemUse_Consume_SpawnParams Params()
+    {
+        return FMars_SmState_ItemUse_Consume_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_ItemUse_Throw_SpawnParams
+{
+}
+
+namespace UMars_SmState_ItemUse_Throw
+{
+    FMars_SmState_ItemUse_Throw_SpawnParams Params()
+    {
+        return FMars_SmState_ItemUse_Throw_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Loco_Airborne_SpawnParams
 {
 }
@@ -1608,6 +1777,19 @@ namespace UMars_SmState_TestLamp_Toggle
 }
 
 USTRUCT()
+struct FMars_SmState_WorldItem_PickUp_SpawnParams
+{
+}
+
+namespace UMars_SmState_WorldItem_PickUp
+{
+    FMars_SmState_WorldItem_PickUp_SpawnParams Params()
+    {
+        return FMars_SmState_WorldItem_PickUp_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_AliveSubSm_SpawnParams
 {
 }
@@ -1643,6 +1825,71 @@ namespace UMars_SmTask_Crouch
     FMars_SmTask_Crouch_SpawnParams Params()
     {
         return FMars_SmTask_Crouch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_DropThrowIntent_SpawnParams
+{
+}
+
+namespace UMars_SmTask_DropThrowIntent
+{
+    FMars_SmTask_DropThrowIntent_SpawnParams Params()
+    {
+        return FMars_SmTask_DropThrowIntent_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HeldItemDrivesUse_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HeldItemDrivesUse
+{
+    FMars_SmTask_HeldItemDrivesUse_SpawnParams Params()
+    {
+        return FMars_SmTask_HeldItemDrivesUse_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HeldItemHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HeldItemHints
+{
+    FMars_SmTask_HeldItemHints_SpawnParams Params()
+    {
+        return FMars_SmTask_HeldItemHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HotbarDrivesHeldItem_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HotbarDrivesHeldItem
+{
+    FMars_SmTask_HotbarDrivesHeldItem_SpawnParams Params()
+    {
+        return FMars_SmTask_HotbarDrivesHeldItem_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HotbarIntents_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HotbarIntents
+{
+    FMars_SmTask_HotbarIntents_SpawnParams Params()
+    {
+        return FMars_SmTask_HotbarIntents_SpawnParams();
     }
 }
 
@@ -1708,6 +1955,32 @@ namespace UMars_SmTask_InteractionResolverBinds
     FMars_SmTask_InteractionResolverBinds_SpawnParams Params()
     {
         return FMars_SmTask_InteractionResolverBinds_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_ItemUse_Consume_SpawnParams
+{
+}
+
+namespace UMars_SmTask_ItemUse_Consume
+{
+    FMars_SmTask_ItemUse_Consume_SpawnParams Params()
+    {
+        return FMars_SmTask_ItemUse_Consume_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_ItemUse_Throw_SpawnParams
+{
+}
+
+namespace UMars_SmTask_ItemUse_Throw
+{
+    FMars_SmTask_ItemUse_Throw_SpawnParams Params()
+    {
+        return FMars_SmTask_ItemUse_Throw_SpawnParams();
     }
 }
 
@@ -1803,6 +2076,19 @@ namespace UMars_SmTask_PerformInteractionSubSm
 }
 
 USTRUCT()
+struct FMars_SmTask_PrimaryIntentToResolver_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PrimaryIntentToResolver
+{
+    FMars_SmTask_PrimaryIntentToResolver_SpawnParams Params()
+    {
+        return FMars_SmTask_PrimaryIntentToResolver_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_TerminateOwningSm_SpawnParams
 {
 }
@@ -1851,6 +2137,19 @@ namespace UMars_SmTask_ViewpointSync
     FMars_SmTask_ViewpointSync_SpawnParams Params()
     {
         return FMars_SmTask_ViewpointSync_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_WorldItem_StowIntoInitiator_SpawnParams
+{
+}
+
+namespace UMars_SmTask_WorldItem_StowIntoInitiator
+{
+    FMars_SmTask_WorldItem_StowIntoInitiator_SpawnParams Params()
+    {
+        return FMars_SmTask_WorldItem_StowIntoInitiator_SpawnParams();
     }
 }
 
@@ -1999,6 +2298,234 @@ namespace UMars_Vent_EntityScript
     FMars_Vent_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trap_Spec InTrap, FMars_MechanismSink_Spec InSink, FMars_Hazard_Spec InHazard)
     {
         return FMars_Vent_EntityScript_SpawnParams(InSpawnTransform, InTrap, InSink, InHazard);
+    }
+}
+
+USTRUCT()
+struct FMars_WorldItem_Cog_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    FMars_WorldItem_Cog_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+    }
+}
+
+namespace UMars_WorldItem_Cog_EntityScript
+{
+    FMars_WorldItem_Cog_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_Cog_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_Cog_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        return FMars_WorldItem_Cog_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+    }
+}
+
+USTRUCT()
+struct FMars_WorldItem_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    FMars_WorldItem_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+    }
+}
+
+namespace UMars_WorldItem_EntityScript
+{
+    FMars_WorldItem_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        return FMars_WorldItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+    }
+}
+
+USTRUCT()
+struct FMars_WorldItem_Ration_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    FMars_WorldItem_Ration_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+    }
+}
+
+namespace UMars_WorldItem_Ration_EntityScript
+{
+    FMars_WorldItem_Ration_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_Ration_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_Ration_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        return FMars_WorldItem_Ration_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+    }
+}
+
+USTRUCT()
+struct FMars_WorldItem_Rock_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    FMars_WorldItem_Rock_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+    }
+}
+
+namespace UMars_WorldItem_Rock_EntityScript
+{
+    FMars_WorldItem_Rock_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_Rock_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_Rock_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    {
+        return FMars_WorldItem_Rock_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
     }
 }
 

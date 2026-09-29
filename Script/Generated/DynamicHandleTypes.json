@@ -1,6 +1,15 @@
 {
 	"HandleTypes": [
 		{
+			"TypeName": "FCk_Handle_ActionHintDisplay",
+			"ShortName": "ActionHintDisplay",
+			"Description": "An entity that manages the contextual action-hint legend (lives on the player)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_ActionHintDisplayHandle",
+			"RequiredFragments": [
+				"Mars_Feature_ActionHintDisplay"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Control",
 			"ShortName": "Control",
 			"Description": "An entity whose interaction toggles or pulses an active state (lever, switch, hand wheel, seal)",
@@ -34,6 +43,33 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_HazardHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Hazard"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_HeldItem",
+			"ShortName": "HeldItem",
+			"Description": "The item in the player's hands, derived from the selected hotbar slot, and its first-person held visual",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HeldItemHandle",
+			"RequiredFragments": [
+				"Mars_Feature_HeldItem"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_HeldItemUse",
+			"ShortName": "HeldItemUse",
+			"Description": "Uses, drops and throws the item in the player's hands through a no-probe interactable on the player",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HeldItemUseHandle",
+			"RequiredFragments": [
+				"Mars_Feature_HeldItemUse"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Hotbar",
+			"ShortName": "Hotbar",
+			"Description": "The player's PEAK-style hotbar: capacity-1 bag slot inventories plus one overflow slot, and the selected slot",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HotbarHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Hotbar"
 			]
 		},
 		{
@@ -178,6 +214,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_TriggerHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Trigger"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_WorldItem",
+			"ShortName": "WorldItem",
+			"Description": "An item presented outside an inventory: pickable with physics in the world, or a visual in the player's hand",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_WorldItemHandle",
+			"RequiredFragments": [
+				"Mars_Feature_WorldItem"
 			]
 		}
 	],
