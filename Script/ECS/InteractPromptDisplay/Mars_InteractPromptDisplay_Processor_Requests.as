@@ -1,3 +1,4 @@
+// Drains Add, then Refresh, then Remove. Entries are keyed by their prompt handle.
 class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,17 +16,21 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
     {
         auto Self = InHandle.As_InteractPromptDisplay();
 
-        for (const auto& AddRequest : InRequests.AddRequests)
+        TArray<FMars_Request_InteractPromptDisplay_AddPrompt> AddRequests = InRequests.AddRequests;
+        TArray<FMars_Request_InteractPromptDisplay_RefreshPrompt> RefreshRequests = InRequests.RefreshRequests;
+        TArray<FMars_Request_InteractPromptDisplay_RemovePrompt> RemoveRequests = InRequests.RemoveRequests;
+
+        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        Self.Request_TryRemove(FMars_Fragment_InteractPromptDisplay_Requests);
+
+        for (const auto& AddRequest : AddRequests)
         { HandleAddRequest(Self, InState, AddRequest); }
 
-        for (const auto& RefreshRequest : InRequests.RefreshRequests)
+        for (const auto& RefreshRequest : RefreshRequests)
         { HandleRefreshRequest(Self, InState, RefreshRequest); }
 
-        for (const auto& RemoveRequest : InRequests.RemoveRequests)
+        for (const auto& RemoveRequest : RemoveRequests)
         { HandleRemoveRequest(Self, InState, RemoveRequest); }
-
-        // Swap-and-pop - InRequests is dead past this line.
-        Self.Request_TryRemove(FMars_Fragment_InteractPromptDisplay_Requests);
     }
 
     private void HandleAddRequest(
@@ -33,15 +38,14 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         FMars_Fragment_InteractPromptDisplay& InState,
         const FMars_Request_InteractPromptDisplay_AddPrompt& InRequest)
     {
-        if (ck::Is_NOT_Valid(InRequest.PromptHandle))
+        if (ck::Is_NOT_Valid(InRequest.Prompt))
         { return; }
 
-        const auto SlotKey = InRequest.PromptHandle.Get_SlotKeyFromPrompt();
-        const auto SortOrder = InRequest.PromptHandle.Get_Fragment(FMars_Fragment_InteractPrompt_Params).SortOrder;
+        const auto SlotKey = InRequest.Prompt.Get_SlotKeyFromPrompt();
+        const auto SortOrder = InRequest.Prompt.Get_Fragment(FMars_Fragment_InteractPrompt_Params).SortOrder;
 
         auto Entry = FMars_InteractPromptDisplay_Entry();
-        Entry.PromptHandle = InRequest.PromptHandle;
-        Entry.Id = InRequest.PreAssignedId;
+        Entry.PromptHandle = InRequest.Prompt;
 
         int32 SlotIndex = -1;
         for (int32 Index = 0; Index < InState.Slots.Num(); ++Index)
@@ -76,10 +80,9 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         PruneInvalidTopEntries(InState.Slots[SlotIndex]);
         InState.Slots[SlotIndex].Stack.Add(Entry);
 
-        auto PromptHandle = InRequest.PromptHandle;
+        auto PromptHandle = InRequest.Prompt;
         auto& Binding = PromptHandle.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_DisplayBinding);
         Binding.Display = InDisplay;
-        Binding.Id = Entry.Id;
 
         if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals) == false)
         { return; }
@@ -87,9 +90,9 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         auto& Signals = InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals);
         const auto SlotSortOrder = InState.Slots[SlotIndex].SortOrder;
         if (WasEmpty)
-        { Signals.OnPromptAppeared.Broadcast(InDisplay, SlotKey, SlotSortOrder, InRequest.PromptHandle); }
+        { Signals.OnPromptAppeared.Broadcast(InDisplay, SlotKey, SlotSortOrder, InRequest.Prompt); }
         else
-        { Signals.OnPromptUpdated.Broadcast(InDisplay, SlotKey, SlotSortOrder, InRequest.PromptHandle); }
+        { Signals.OnPromptUpdated.Broadcast(InDisplay, SlotKey, SlotSortOrder, InRequest.Prompt); }
     }
 
     private void HandleRefreshRequest(
@@ -104,7 +107,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
             { continue; }
 
             const auto TopIndex = Slot.Stack.Num() - 1;
-            if (Slot.Stack[TopIndex].Id.Value != InRequest.Id.Value)
+            if ((Slot.Stack[TopIndex].PromptHandle == InRequest.Prompt) == false)
             { continue; }
 
             auto TopPrompt = Slot.Stack[TopIndex].PromptHandle;
@@ -141,7 +144,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
 
             for (int32 EntryIndex = Slot.Stack.Num() - 1; EntryIndex >= 0; --EntryIndex)
             {
-                if (Slot.Stack[EntryIndex].Id.Value != InRequest.Id.Value)
+                if ((Slot.Stack[EntryIndex].PromptHandle == InRequest.Prompt) == false)
                 { continue; }
 
                 WasTop = EntryIndex == Slot.Stack.Num() - 1;

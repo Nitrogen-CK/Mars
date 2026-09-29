@@ -1,3 +1,5 @@
+// Drains UpdateText, then SetInteraction, then broadcasts OnChanged once if anything was applied. Every SetInteraction
+// counts as a change (its consumer re-renders the hold bar from it).
 class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,8 +17,14 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
     {
         auto Self = InHandle.As_InteractPrompt();
 
+        TArray<FMars_Request_InteractPrompt_UpdateText> UpdateRequests = InRequests.UpdateRequests;
+        TArray<FMars_Request_InteractPrompt_SetInteraction> SetInteractionRequests = InRequests.SetInteractionRequests;
+
+        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        Self.Request_TryRemove(FMars_Fragment_InteractPrompt_Requests);
+
         auto Changed = false;
-        for (const auto& UpdateRequest : InRequests.UpdateRequests)
+        for (const auto& UpdateRequest : UpdateRequests)
         {
             if (InPromptComp.PromptText.ToString() != UpdateRequest.NewText.ToString())
             {
@@ -31,6 +39,12 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
             }
         }
 
+        for (const auto& SetInteractionRequest : SetInteractionRequests)
+        {
+            InPromptComp.CurrentInteraction = SetInteractionRequest.Interaction;
+            Changed = true;
+        }
+
         if (Changed && Self.Has_Fragment(FMars_Fragment_InteractPrompt_Signals))
         { Self.Get_Fragment(FMars_Fragment_InteractPrompt_Signals).OnChanged.Broadcast(Self); }
 
@@ -40,10 +54,7 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
             const auto& Binding = Self.Get_Fragment(FMars_Fragment_InteractPrompt_DisplayBinding);
             auto BoundDisplay = Binding.Display;
             if (ck::IsValid(BoundDisplay))
-            { BoundDisplay.Request_RefreshPrompt(FMars_Request_InteractPromptDisplay_RefreshPrompt(Binding.Id)); }
+            { BoundDisplay.Request_RefreshPrompt(FMars_Request_InteractPromptDisplay_RefreshPrompt(Self)); }
         }
-
-        // Swap-and-pop - InRequests is dead past this line.
-        Self.Request_TryRemove(FMars_Fragment_InteractPrompt_Requests);
     }
 }

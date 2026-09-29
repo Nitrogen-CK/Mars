@@ -11,16 +11,6 @@ asset Mars_InteractPromptDisplayHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_InteractPromptDisplay {}
 
 //--------------------------------------------------------------------------------------------------------------------------
-// ID
-//--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_InteractPromptDisplay_ID
-{
-    UPROPERTY()
-    int64 Value = -1;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -50,23 +40,19 @@ struct FMars_Fragment_InteractPromptDisplay_Signals
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Stamped onto a prompt when it joins a display, so a prompt text change can refresh that display.
+// Stamped onto a prompt (by the display processor) when it joins a display, so a prompt text change can refresh that
+// display.
 struct FMars_Fragment_InteractPrompt_DisplayBinding
 {
     UPROPERTY()
     FCk_Handle_InteractPromptDisplay Display;
-
-    UPROPERTY()
-    FMars_InteractPromptDisplay_ID Id;
 }
 
+// Entries are keyed by the prompt handle itself.
 struct FMars_InteractPromptDisplay_Entry
 {
     UPROPERTY()
     FCk_Handle_InteractPrompt PromptHandle;
-
-    UPROPERTY()
-    FMars_InteractPromptDisplay_ID Id;
 }
 
 // One slot per channel; only the top of a slot's stack is visible.
@@ -86,9 +72,6 @@ struct FMars_Fragment_InteractPromptDisplay
 {
     UPROPERTY()
     TArray<FMars_InteractPromptDisplay_Slot> Slots;
-
-    UPROPERTY()
-    int64 NextId = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -98,42 +81,41 @@ struct FMars_Fragment_InteractPromptDisplay
 struct FMars_Request_InteractPromptDisplay_AddPrompt
 {
     UPROPERTY()
-    FCk_Handle_InteractPrompt PromptHandle;
-
-    UPROPERTY()
-    FMars_InteractPromptDisplay_ID PreAssignedId;
+    FCk_Handle_InteractPrompt Prompt;
 
     FMars_Request_InteractPromptDisplay_AddPrompt() {}
 
-    FMars_Request_InteractPromptDisplay_AddPrompt(const FCk_Handle_InteractPrompt& InPromptHandle)
+    FMars_Request_InteractPromptDisplay_AddPrompt(const FCk_Handle_InteractPrompt& InPrompt)
     {
-        PromptHandle = InPromptHandle;
+        Prompt = InPrompt;
     }
 }
 
+// Removes the most recently added entry of that prompt.
 struct FMars_Request_InteractPromptDisplay_RemovePrompt
 {
     UPROPERTY()
-    FMars_InteractPromptDisplay_ID Id;
+    FCk_Handle_InteractPrompt Prompt;
 
     FMars_Request_InteractPromptDisplay_RemovePrompt() {}
 
-    FMars_Request_InteractPromptDisplay_RemovePrompt(const FMars_InteractPromptDisplay_ID& InId)
+    FMars_Request_InteractPromptDisplay_RemovePrompt(const FCk_Handle_InteractPrompt& InPrompt)
     {
-        Id = InId;
+        Prompt = InPrompt;
     }
 }
 
+// Re-broadcasts the slot whose top entry is that prompt.
 struct FMars_Request_InteractPromptDisplay_RefreshPrompt
 {
     UPROPERTY()
-    FMars_InteractPromptDisplay_ID Id;
+    FCk_Handle_InteractPrompt Prompt;
 
     FMars_Request_InteractPromptDisplay_RefreshPrompt() {}
 
-    FMars_Request_InteractPromptDisplay_RefreshPrompt(const FMars_InteractPromptDisplay_ID& InId)
+    FMars_Request_InteractPromptDisplay_RefreshPrompt(const FCk_Handle_InteractPrompt& InPrompt)
     {
-        Id = InId;
+        Prompt = InPrompt;
     }
 }
 

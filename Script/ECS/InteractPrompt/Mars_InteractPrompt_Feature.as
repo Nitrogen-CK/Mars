@@ -104,8 +104,25 @@ struct FMars_Request_InteractPrompt_UpdateText
     }
 }
 
+// The in-progress interaction on the prompt's target (invalid when it finishes), for the widget's hold bar.
+struct FMars_Request_InteractPrompt_SetInteraction
+{
+    UPROPERTY()
+    FCk_Handle_Interaction Interaction;
+
+    FMars_Request_InteractPrompt_SetInteraction() {}
+
+    FMars_Request_InteractPrompt_SetInteraction(const FCk_Handle_Interaction& InInteraction)
+    {
+        Interaction = InInteraction;
+    }
+}
+
 struct FMars_Fragment_InteractPrompt_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_InteractPrompt_UpdateText> UpdateRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_InteractPrompt_SetInteraction> SetInteractionRequests;
 }

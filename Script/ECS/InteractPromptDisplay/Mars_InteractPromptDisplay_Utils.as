@@ -34,23 +34,12 @@ mixin TArray<FMars_InteractPromptDisplay_Slot> Get_Slots(const FCk_Handle_Intera
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin FMars_InteractPromptDisplay_ID Request_AddPrompt(
+mixin void Request_AddPrompt(
     FCk_Handle_InteractPromptDisplay& Self,
     const FMars_Request_InteractPromptDisplay_AddPrompt& InRequest)
 {
-    auto& State = Self.Get_Fragment(FMars_Fragment_InteractPromptDisplay);
-
-    auto AssignedId = FMars_InteractPromptDisplay_ID();
-    AssignedId.Value = State.NextId;
-    State.NextId += 1;
-
-    auto QueuedRequest = InRequest;
-    QueuedRequest.PreAssignedId = AssignedId;
-
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPromptDisplay_Requests);
-    Requests.AddRequests.Add(QueuedRequest);
-
-    return AssignedId;
+    Requests.AddRequests.Add(InRequest);
 }
 
 mixin void Request_RemovePrompt(

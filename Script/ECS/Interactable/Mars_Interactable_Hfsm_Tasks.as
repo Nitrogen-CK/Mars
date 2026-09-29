@@ -4,8 +4,7 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
-    // Parallel arrays: SubscribedPrompts[i] was added to the display as StoredPromptIds[i].
-    private TArray<FMars_InteractPromptDisplay_ID> StoredPromptIds;
+    // Every prompt this task added to the display (and bound OnPromptChanged on); removed by prompt on exit.
     private TArray<FCk_Handle_InteractPrompt> SubscribedPrompts;
     private FCk_Handle_InteractPromptDisplay PlayerDisplay;
 
@@ -24,7 +23,6 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(PlayerDisplay))
         { return; }
 
-        StoredPromptIds.Empty();
         SubscribedPrompts.Empty();
 
         auto AllTargets = Interactable.Get_AllInteractTargets();
@@ -34,7 +32,7 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Prompt))
             { continue; }
 
-            StoredPromptIds.Add(PlayerDisplay.Request_AddPrompt(FMars_Request_InteractPromptDisplay_AddPrompt(Prompt)));
+            PlayerDisplay.Request_AddPrompt(FMars_Request_InteractPromptDisplay_AddPrompt(Prompt));
             SubscribedPrompts.Add(Prompt);
 
             Prompt.BindTo_OnPromptChanged(FMars_Delegate_InteractPrompt_OnChanged(this, n"OnPromptChanged"));
@@ -60,17 +58,13 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
                 Target.UnbindFrom_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnTargetInteractionFinished"));
             }
         }
-        SubscribedPrompts.Empty();
 
         if (ck::IsValid(PlayerDisplay))
         {
-            for (auto& StoredId : StoredPromptIds)
-            {
-                if (StoredId.Value >= 0)
-                { PlayerDisplay.Request_RemovePrompt(FMars_Request_InteractPromptDisplay_RemovePrompt(StoredId)); }
-            }
+            for (auto& Prompt : SubscribedPrompts)
+            { PlayerDisplay.Request_RemovePrompt(FMars_Request_InteractPromptDisplay_RemovePrompt(Prompt)); }
         }
-        StoredPromptIds.Empty();
+        SubscribedPrompts.Empty();
     }
 
     UFUNCTION()
@@ -91,15 +85,15 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
         Set_PromptInteraction(InTarget, FCk_Handle_Interaction());
     }
 
-    // Records the in-progress interaction on the prompt so its widget can fill a hold bar.
+    // Records the in-progress interaction on the prompt so its widget can fill a hold bar. The prompt's drain
+    // broadcasts OnPromptChanged, which refreshes the display through OnPromptChanged below.
     private void Set_PromptInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
     {
         auto Prompt = FCk_Handle(InTarget).As_InteractPrompt(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Prompt))
         { return; }
 
-        Prompt.Get_Fragment(FMars_Fragment_InteractPrompt).CurrentInteraction = InInteraction;
-        DoRefreshPrompt(Prompt);
+        Prompt.Request_SetInteraction(FMars_Request_InteractPrompt_SetInteraction(InInteraction));
     }
 
     private void DoRefreshPrompt(FCk_Handle_InteractPrompt InPrompt)
@@ -107,14 +101,8 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(PlayerDisplay))
         { return; }
 
-        for (int32 Index = 0; Index < SubscribedPrompts.Num(); ++Index)
-        {
-            if (SubscribedPrompts[Index] == InPrompt && StoredPromptIds[Index].Value >= 0)
-            {
-                PlayerDisplay.Request_RefreshPrompt(FMars_Request_InteractPromptDisplay_RefreshPrompt(StoredPromptIds[Index]));
-                return;
-            }
-        }
+        if (SubscribedPrompts.Contains(InPrompt))
+        { PlayerDisplay.Request_RefreshPrompt(FMars_Request_InteractPromptDisplay_RefreshPrompt(InPrompt)); }
     }
 }
 

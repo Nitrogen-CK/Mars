@@ -63,6 +63,12 @@ mixin void Request_UpdateText(FCk_Handle_InteractPrompt& Self, const FMars_Reque
     Requests.UpdateRequests.Add(InRequest);
 }
 
+mixin void Request_SetInteraction(FCk_Handle_InteractPrompt& Self, const FMars_Request_InteractPrompt_SetInteraction& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Requests);
+    Requests.SetInteractionRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
