@@ -3,8 +3,8 @@
 class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
 {
     private FCk_Handle_ActionHintDisplay _Display;
-    private FMars_ActionHint_ID _IdX;
-    private FMars_ActionHint_ID _IdY;
+    private FCk_Handle_ActionHintRow _RowX;
+    private FCk_Handle_ActionHintRow _RowY;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -29,8 +29,7 @@ class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_RegisterX(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _IdX = _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("x"), 0, n"OwnerX")));
+        _RowX = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("x"), 0, n"OwnerX"));
     }
 
     UFUNCTION()
@@ -38,7 +37,7 @@ class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
     {
         auto Visible = _Display.Get_VisibleHints();
         auto Res = OutResult;
-        Res.Set(Visible.Num() == 1 && Visible[0].Id.Value == _IdX.Value);
+        Res.Set(Visible.Num() == 1 && Visible[0] == _RowX);
     }
 
     UFUNCTION()
@@ -58,8 +57,7 @@ class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_RegisterY(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _IdY = _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("y"), 1, n"OwnerY")));
+        _RowY = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("y"), 1, n"OwnerY"));
     }
 
     UFUNCTION()
@@ -67,7 +65,7 @@ class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
     {
         auto Visible = _Display.Get_VisibleHints();
         auto Res = OutResult;
-        Res.Set(Visible.Num() == 1 && Visible[0].Id.Value == _IdY.Value);
+        Res.Set(Visible.Num() == 1 && Visible[0] == _RowY);
     }
 
     UFUNCTION()
@@ -88,8 +86,8 @@ class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
     {
         auto Visible = _Display.Get_VisibleHints();
         Assert_Equals_Int(Visible.Num(), 1, "visible rows after the first release");
-        Assert_True(Visible.Num() == 1 && Visible[0].Id.Value == _IdY.Value, "the surviving visible row is Y");
-        Assert_True(_Display.Get_IsHidden(_IdX), "X stays hidden while one suppress is outstanding");
+        Assert_True(Visible.Num() == 1 && Visible[0] == _RowY, "the surviving visible row is Y");
+        Assert_True(_Display.Get_IsHidden(_RowX), "X stays hidden while one suppress is outstanding");
     }
 
     UFUNCTION()
@@ -97,7 +95,7 @@ class UMars_AutoTest_ActionHintDisplay_SuppressIsRefCounted : UCk_AutoTest_Base
     {
         auto Visible = _Display.Get_VisibleHints();
         auto Res = OutResult;
-        Res.Set(Visible.Num() == 2 && Visible[0].Id.Value == _IdX.Value && Visible[1].Id.Value == _IdY.Value);
+        Res.Set(Visible.Num() == 2 && Visible[0] == _RowX && Visible[1] == _RowY);
     }
 
     private int32 Get_SuppressDepth()

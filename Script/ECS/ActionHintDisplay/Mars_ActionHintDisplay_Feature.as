@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------------------------------
-// Dynamic Handle Definition
+// Dynamic Handle Definitions
 //--------------------------------------------------------------------------------------------------------------------------
 
 asset Mars_ActionHintDisplayHandle of UCkDynamic_HandleDefinition
@@ -10,15 +10,13 @@ asset Mars_ActionHintDisplayHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_ActionHintDisplay {}
 
-//--------------------------------------------------------------------------------------------------------------------------
-// ID
-//--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_ActionHint_ID
+asset Mars_ActionHintRowHandle of UCkDynamic_HandleDefinition
 {
-    UPROPERTY()
-    int64 Value = -1;
+    TypeName = "FCk_Handle_ActionHintRow";
+    RequiredFragments.Add(FMars_Feature_ActionHintRow);
+    Description = "One row of an action-hint legend - a child entity of its ActionHintDisplay";
 }
+struct FMars_Feature_ActionHintRow {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
@@ -65,31 +63,44 @@ struct FMars_ActionHint_Spec
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// State
+// Row
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_ActionHintDisplay_Entry
+// Set once when Request_RegisterHint mints the row; the display processor copies it into the row state on register.
+struct FMars_Fragment_ActionHintRow_Params
 {
-    UPROPERTY()
-    FMars_ActionHint_ID Id;
-
     UPROPERTY()
     FMars_ActionHint_Spec Spec;
 }
 
+// Written only by the display processor. Sequence stays -1 until the row's register drains.
+struct FMars_Fragment_ActionHintRow
+{
+    UPROPERTY()
+    FMars_ActionHint_Spec Spec;
+
+    UPROPERTY()
+    int64 Sequence = -1;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// State
+//--------------------------------------------------------------------------------------------------------------------------
+
 // Suppression never touches Hints, only what the display broadcasts, so a hidden row's owner can still unregister it.
 struct FMars_Fragment_ActionHintDisplay
 {
+    // Registered rows, in registration order.
     UPROPERTY()
-    TArray<FMars_ActionHintDisplay_Entry> Hints;
+    TArray<FCk_Handle_ActionHintRow> Hints;
 
     UPROPERTY()
-    int64 NextId = 0;
+    int64 NextSequence = 0;
 
     UPROPERTY()
     int32 SuppressDepth = 0;
 
-    // Ids below it are hidden while SuppressDepth > 0.
+    // Rows whose Sequence is below it are hidden while SuppressDepth > 0.
     UPROPERTY()
     int64 SuppressWatermark = -1;
 }
@@ -99,19 +110,20 @@ struct FMars_Fragment_ActionHintDisplay
 //--------------------------------------------------------------------------------------------------------------------------
 
 delegate void FMars_Delegate_ActionHintDisplay_OnHintRegistered(
-    FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec);
+    FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow);
 event void FMars_Delegate_ActionHintDisplay_OnHintRegistered_MC(
-    FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec);
+    FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow);
 
+// The row is still alive when this fires; its destroy is requested right after.
 delegate void FMars_Delegate_ActionHintDisplay_OnHintUnregistered(
-    FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId);
+    FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow);
 event void FMars_Delegate_ActionHintDisplay_OnHintUnregistered_MC(
-    FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId);
+    FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow);
 
 delegate void FMars_Delegate_ActionHintDisplay_OnHintUpdated(
-    FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec);
+    FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow);
 event void FMars_Delegate_ActionHintDisplay_OnHintUpdated_MC(
-    FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec);
+    FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow);
 
 struct FMars_Fragment_ActionHintDisplay_Signals
 {
@@ -124,32 +136,30 @@ struct FMars_Fragment_ActionHintDisplay_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Queued by Request_RegisterHint with the row it minted.
 struct FMars_Request_ActionHintDisplay_Register
 {
     UPROPERTY()
-    FMars_ActionHint_Spec Spec;
-
-    UPROPERTY()
-    FMars_ActionHint_ID PreAssignedId;
+    FCk_Handle_ActionHintRow Row;
 
     FMars_Request_ActionHintDisplay_Register() {}
 
-    FMars_Request_ActionHintDisplay_Register(const FMars_ActionHint_Spec& InSpec)
+    FMars_Request_ActionHintDisplay_Register(const FCk_Handle_ActionHintRow& InRow)
     {
-        Spec = InSpec;
+        Row = InRow;
     }
 }
 
 struct FMars_Request_ActionHintDisplay_Unregister
 {
     UPROPERTY()
-    FMars_ActionHint_ID Id;
+    FCk_Handle_ActionHintRow Row;
 
     FMars_Request_ActionHintDisplay_Unregister() {}
 
-    FMars_Request_ActionHintDisplay_Unregister(const FMars_ActionHint_ID& InId)
+    FMars_Request_ActionHintDisplay_Unregister(const FCk_Handle_ActionHintRow& InRow)
     {
-        Id = InId;
+        Row = InRow;
     }
 }
 
@@ -170,7 +180,7 @@ struct FMars_Request_ActionHintDisplay_UnregisterByOwner
 struct FMars_Request_ActionHintDisplay_Update
 {
     UPROPERTY()
-    FMars_ActionHint_ID Id;
+    FCk_Handle_ActionHintRow Row;
 
     UPROPERTY()
     TOptional<FText> NewText;
@@ -180,20 +190,20 @@ struct FMars_Request_ActionHintDisplay_Update
 
     FMars_Request_ActionHintDisplay_Update() {}
 
-    FMars_Request_ActionHintDisplay_Update(const FMars_ActionHint_ID& InId)
+    FMars_Request_ActionHintDisplay_Update(const FCk_Handle_ActionHintRow& InRow)
     {
-        Id = InId;
+        Row = InRow;
     }
 
-    FMars_Request_ActionHintDisplay_Update(const FMars_ActionHint_ID& InId, const FText& InNewText)
+    FMars_Request_ActionHintDisplay_Update(const FCk_Handle_ActionHintRow& InRow, const FText& InNewText)
     {
-        Id = InId;
+        Row = InRow;
         NewText = TOptional<FText>(InNewText);
     }
 
-    FMars_Request_ActionHintDisplay_Update(const FMars_ActionHint_ID& InId, const FText& InNewText, const FText& InNewHoldLabel)
+    FMars_Request_ActionHintDisplay_Update(const FCk_Handle_ActionHintRow& InRow, const FText& InNewText, const FText& InNewHoldLabel)
     {
-        Id = InId;
+        Row = InRow;
         NewText = TOptional<FText>(InNewText);
         NewHoldLabel = TOptional<FText>(InNewHoldLabel);
     }

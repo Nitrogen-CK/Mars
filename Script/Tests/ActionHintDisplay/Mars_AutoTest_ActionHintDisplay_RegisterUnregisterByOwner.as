@@ -20,7 +20,7 @@ class UMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner : UCk_AutoTest_
     }
 
     UFUNCTION()
-    private void OnHintUnregistered(FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId)
+    private void OnHintUnregistered(FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow)
     {
         _UnregisteredCount += 1;
     }
@@ -28,12 +28,9 @@ class UMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner : UCk_AutoTest_
     UFUNCTION()
     private void Step_RegisterThree(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("a1"), 0, n"OwnerA")));
-        _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("a2"), 1, n"OwnerA")));
-        _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("b1"), 2, n"OwnerB")));
+        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("a1"), 0, n"OwnerA"));
+        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("a2"), 1, n"OwnerA"));
+        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("b1"), 2, n"OwnerB"));
     }
 
     UFUNCTION()
@@ -54,7 +51,7 @@ class UMars_AutoTest_ActionHintDisplay_RegisterUnregisterByOwner : UCk_AutoTest_
     {
         auto Visible = _Display.Get_VisibleHints();
         auto Res = OutResult;
-        Res.Set(Visible.Num() == 1 && Visible[0].Spec.OwnerKey == n"OwnerB");
+        Res.Set(Visible.Num() == 1 && Visible[0].Get_OwnerKey() == n"OwnerB");
     }
 
     UFUNCTION()

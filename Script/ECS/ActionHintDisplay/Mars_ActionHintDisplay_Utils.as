@@ -9,27 +9,48 @@ namespace utils_action_hint_display
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Getters
+// Row Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin bool Get_IsHidden(const FCk_Handle_ActionHintDisplay& Self, FMars_ActionHint_ID InId)
+// Default-constructed until the row's register drains.
+mixin FMars_ActionHint_Spec Get_Spec(const FCk_Handle_ActionHintRow& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_ActionHintRow).Spec;
+}
+
+// -1 until the row's register drains; afterwards the display-wide registration order.
+mixin int64 Get_Sequence(const FCk_Handle_ActionHintRow& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_ActionHintRow).Sequence;
+}
+
+mixin FName Get_OwnerKey(const FCk_Handle_ActionHintRow& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_ActionHintRow).Spec.OwnerKey;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Display Getters
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin bool Get_IsHidden(const FCk_Handle_ActionHintDisplay& Self, const FCk_Handle_ActionHintRow& InRow)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_ActionHintDisplay);
-    return State.SuppressDepth > 0 && InId.Value < State.SuppressWatermark;
+    return State.SuppressDepth > 0 && InRow.Get_Sequence() < State.SuppressWatermark;
 }
 
 // What a legend should show right now: suppressed rows filtered out, registration order preserved.
-mixin TArray<FMars_ActionHintDisplay_Entry> Get_VisibleHints(const FCk_Handle_ActionHintDisplay& Self)
+mixin TArray<FCk_Handle_ActionHintRow> Get_VisibleHints(const FCk_Handle_ActionHintDisplay& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_ActionHintDisplay);
 
-    TArray<FMars_ActionHintDisplay_Entry> Visible;
-    for (const auto& Entry : State.Hints)
+    TArray<FCk_Handle_ActionHintRow> Visible;
+    for (const auto& Row : State.Hints)
     {
-        if (State.SuppressDepth > 0 && Entry.Id.Value < State.SuppressWatermark)
+        if (State.SuppressDepth > 0 && Row.Get_Sequence() < State.SuppressWatermark)
         { continue; }
 
-        Visible.Add(Entry);
+        Visible.Add(Row);
     }
     return Visible;
 }
@@ -38,26 +59,29 @@ mixin TArray<FMars_ActionHintDisplay_Entry> Get_VisibleHints(const FCk_Handle_Ac
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The id is assigned here, synchronously, so the caller can update or unregister before the register drains.
-mixin FMars_ActionHint_ID Request_RegisterHint(
+// Mints the row synchronously - a child entity of the display carrying the spec - so the caller can update or unregister
+// it before the register drains. The display processor fills the row's state in on the drain.
+mixin FCk_Handle_ActionHintRow Request_RegisterHint(
     FCk_Handle_ActionHintDisplay& Self,
-    const FMars_Request_ActionHintDisplay_Register& InRequest)
+    const FMars_ActionHint_Spec& InSpec)
 {
-    auto& State = Self.Get_Fragment(FMars_Fragment_ActionHintDisplay);
+    auto RowEntity = utils_entity_lifetime::Request_CreateEntity(FCk_Handle(Self));
 
-    auto AssignedId = FMars_ActionHint_ID();
-    AssignedId.Value = State.NextId;
-    State.NextId += 1;
+    auto Params = FMars_Fragment_ActionHintRow_Params();
+    Params.Spec = InSpec;
 
-    auto QueuedRequest = InRequest;
-    QueuedRequest.PreAssignedId = AssignedId;
+    RowEntity.Add_Fragment(FMars_Feature_ActionHintRow());
+    RowEntity.Add_Fragment(Params);
+    RowEntity.Add_Fragment(FMars_Fragment_ActionHintRow());
+    auto Row = RowEntity.As_ActionHintRow();
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
-    Requests.RegisterRequests.Add(QueuedRequest);
+    Requests.RegisterRequests.Add(FMars_Request_ActionHintDisplay_Register(Row));
 
-    return AssignedId;
+    return Row;
 }
 
+// The row is destroyed by the drain that removes it.
 mixin void Request_UnregisterHint(
     FCk_Handle_ActionHintDisplay& Self,
     const FMars_Request_ActionHintDisplay_Unregister& InRequest)
@@ -74,26 +98,22 @@ mixin void Request_UnregisterHintsByOwner(
     Requests.UnregisterByOwnerRequests.Add(InRequest);
 }
 
-// Skips the queue when the row already holds the requested values, so per-frame callers do not churn the fragment.
+// Skips the queue when the registered row already holds the requested values, so per-frame callers do not churn the
+// fragment. A row whose register has not drained yet always queues (its state is still default).
 mixin void Request_UpdateHint(
     FCk_Handle_ActionHintDisplay& Self,
     const FMars_Request_ActionHintDisplay_Update& InRequest)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_ActionHintDisplay);
-    for (const auto& Entry : State.Hints)
+    if (ck::IsValid(InRequest.Row) && InRequest.Row.Get_Sequence() >= 0)
     {
-        if (Entry.Id.Value != InRequest.Id.Value)
-        { continue; }
-
+        const auto Spec = InRequest.Row.Get_Spec();
         const auto TextUnchanged = InRequest.NewText.IsSet() == false
-            || Entry.Spec.Text.ToString() == InRequest.NewText.GetValue().ToString();
+            || Spec.Text.ToString() == InRequest.NewText.GetValue().ToString();
         const auto HoldLabelUnchanged = InRequest.NewHoldLabel.IsSet() == false
-            || Entry.Spec.HoldLabel.ToString() == InRequest.NewHoldLabel.GetValue().ToString();
+            || Spec.HoldLabel.ToString() == InRequest.NewHoldLabel.GetValue().ToString();
 
         if (TextUnchanged && HoldLabelUnchanged)
         { return; }
-
-        break;
     }
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);

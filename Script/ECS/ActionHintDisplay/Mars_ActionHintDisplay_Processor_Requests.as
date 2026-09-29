@@ -1,5 +1,9 @@
 // Drains in one fixed order - Register, Update, Unregister, UnregisterByOwner, Suppress - so a suppress queued in
-// the same frame as a register always sees that register's row and takes it under the watermark.
+// the same frame as a register always sees that register's row and takes it under the watermark, and an update or
+// unregister queued right after Request_RegisterHint finds its row already registered.
+//
+// Rows are child entities of the display. Register fills a row's state from its Params and gives it the next Sequence;
+// every removal broadcasts (while visible) and then destroys the row.
 class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -47,15 +51,26 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
         FMars_Fragment_ActionHintDisplay& InState,
         const FMars_Request_ActionHintDisplay_Register& InRequest)
     {
-        auto Entry = FMars_ActionHintDisplay_Entry();
-        Entry.Id = InRequest.PreAssignedId;
-        Entry.Spec = InRequest.Spec;
-        InState.Hints.Add(Entry);
+        auto Row = InRequest.Row;
+        if (ck::Is_NOT_Valid(Row))
+        {
+            ck::Warning(f"[ActionHintDisplay] [{InDisplay.ToString()}] skipped a Register whose row was destroyed before it drained");
+            return;
+        }
 
-        if (IsRowHidden(InState, Entry.Id))
+        const auto Spec = Row.Get_Fragment(FMars_Fragment_ActionHintRow_Params).Spec;
+
+        auto& RowState = Row.Get_Fragment(FMars_Fragment_ActionHintRow);
+        RowState.Spec = Spec;
+        RowState.Sequence = InState.NextSequence;
+        InState.NextSequence += 1;
+
+        InState.Hints.Add(Row);
+
+        if (IsRowHidden(InState, Row))
         { return; }
 
-        Broadcast_Registered(InDisplay, Entry.Id, Entry.Spec);
+        Broadcast_Registered(InDisplay, Row);
     }
 
     private void HandleUpdateRequest(
@@ -63,31 +78,27 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
         FMars_Fragment_ActionHintDisplay& InState,
         const FMars_Request_ActionHintDisplay_Update& InRequest)
     {
-        for (int32 Index = 0; Index < InState.Hints.Num(); ++Index)
+        if (InState.Hints.Contains(InRequest.Row) == false)
+        { return; }
+
+        auto Row = InRequest.Row;
+        auto Changed = false;
+        auto& Spec = Row.Get_Fragment(FMars_Fragment_ActionHintRow).Spec;
+
+        if (InRequest.NewText.IsSet() && Spec.Text.ToString() != InRequest.NewText.GetValue().ToString())
         {
-            if (InState.Hints[Index].Id.Value != InRequest.Id.Value)
-            { continue; }
-
-            auto Changed = false;
-            auto& Spec = InState.Hints[Index].Spec;
-
-            if (InRequest.NewText.IsSet() && Spec.Text.ToString() != InRequest.NewText.GetValue().ToString())
-            {
-                Spec.Text = InRequest.NewText.GetValue();
-                Changed = true;
-            }
-
-            if (InRequest.NewHoldLabel.IsSet() && Spec.HoldLabel.ToString() != InRequest.NewHoldLabel.GetValue().ToString())
-            {
-                Spec.HoldLabel = InRequest.NewHoldLabel.GetValue();
-                Changed = true;
-            }
-
-            if (Changed && IsRowHidden(InState, InRequest.Id) == false)
-            { Broadcast_Updated(InDisplay, InState.Hints[Index].Id, InState.Hints[Index].Spec); }
-
-            return;
+            Spec.Text = InRequest.NewText.GetValue();
+            Changed = true;
         }
+
+        if (InRequest.NewHoldLabel.IsSet() && Spec.HoldLabel.ToString() != InRequest.NewHoldLabel.GetValue().ToString())
+        {
+            Spec.HoldLabel = InRequest.NewHoldLabel.GetValue();
+            Changed = true;
+        }
+
+        if (Changed && IsRowHidden(InState, Row) == false)
+        { Broadcast_Updated(InDisplay, Row); }
     }
 
     private void HandleUnregisterRequest(
@@ -95,14 +106,11 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
         FMars_Fragment_ActionHintDisplay& InState,
         const FMars_Request_ActionHintDisplay_Unregister& InRequest)
     {
-        for (int32 Index = InState.Hints.Num() - 1; Index >= 0; --Index)
-        {
-            if (InState.Hints[Index].Id.Value != InRequest.Id.Value)
-            { continue; }
+        const auto Index = InState.Hints.FindIndex(InRequest.Row);
+        if (Index < 0)
+        { return; }
 
-            RemoveHintAt(InDisplay, InState, Index);
-            return;
-        }
+        RemoveHintAt(InDisplay, InState, Index);
     }
 
     private void HandleUnregisterByOwnerRequest(
@@ -112,7 +120,7 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
     {
         for (int32 Index = InState.Hints.Num() - 1; Index >= 0; --Index)
         {
-            if (InState.Hints[Index].Spec.OwnerKey != InRequest.OwnerKey)
+            if (InState.Hints[Index].Get_OwnerKey() != InRequest.OwnerKey)
             { continue; }
 
             RemoveHintAt(InDisplay, InState, Index);
@@ -130,11 +138,11 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
             if (InState.SuppressDepth != 1)
             { return; }
 
-            InState.SuppressWatermark = InState.NextId;
-            for (const auto& Entry : InState.Hints)
+            InState.SuppressWatermark = InState.NextSequence;
+            for (const auto& Row : InState.Hints)
             {
-                if (Entry.Id.Value < InState.SuppressWatermark)
-                { Broadcast_Unregistered(InDisplay, Entry.Id); }
+                if (Row.Get_Sequence() < InState.SuppressWatermark)
+                { Broadcast_Unregistered(InDisplay, Row); }
             }
             return;
         }
@@ -148,43 +156,45 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
 
         const auto ReleasedWatermark = InState.SuppressWatermark;
         InState.SuppressWatermark = -1;
-        for (const auto& Entry : InState.Hints)
+        for (const auto& Row : InState.Hints)
         {
-            if (Entry.Id.Value < ReleasedWatermark)
-            { Broadcast_Registered(InDisplay, Entry.Id, Entry.Spec); }
+            if (Row.Get_Sequence() < ReleasedWatermark)
+            { Broadcast_Registered(InDisplay, Row); }
         }
     }
 
     private void RemoveHintAt(FCk_Handle_ActionHintDisplay& InDisplay, FMars_Fragment_ActionHintDisplay& InState, int32 InIndex)
     {
-        const auto RemovedId = InState.Hints[InIndex].Id;
-        const auto WasHidden = IsRowHidden(InState, RemovedId);
+        auto RemovedRow = InState.Hints[InIndex];
+        const auto WasHidden = IsRowHidden(InState, RemovedRow);
         InState.Hints.RemoveAt(InIndex);
 
         if (WasHidden == false)
-        { Broadcast_Unregistered(InDisplay, RemovedId); }
+        { Broadcast_Unregistered(InDisplay, RemovedRow); }
+
+        utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(RemovedRow));
     }
 
-    private bool IsRowHidden(const FMars_Fragment_ActionHintDisplay& InState, FMars_ActionHint_ID InId)
+    private bool IsRowHidden(const FMars_Fragment_ActionHintDisplay& InState, const FCk_Handle_ActionHintRow& InRow)
     {
-        return InState.SuppressDepth > 0 && InId.Value < InState.SuppressWatermark;
+        return InState.SuppressDepth > 0 && InRow.Get_Sequence() < InState.SuppressWatermark;
     }
 
-    private void Broadcast_Registered(FCk_Handle_ActionHintDisplay& InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec)
-    {
-        if (InDisplay.Has_Fragment(FMars_Fragment_ActionHintDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_ActionHintDisplay_Signals).OnHintRegistered.Broadcast(InDisplay, InId, InSpec); }
-    }
-
-    private void Broadcast_Unregistered(FCk_Handle_ActionHintDisplay& InDisplay, FMars_ActionHint_ID InId)
+    private void Broadcast_Registered(FCk_Handle_ActionHintDisplay& InDisplay, FCk_Handle_ActionHintRow InRow)
     {
         if (InDisplay.Has_Fragment(FMars_Fragment_ActionHintDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_ActionHintDisplay_Signals).OnHintUnregistered.Broadcast(InDisplay, InId); }
+        { InDisplay.Get_Fragment(FMars_Fragment_ActionHintDisplay_Signals).OnHintRegistered.Broadcast(InDisplay, InRow); }
     }
 
-    private void Broadcast_Updated(FCk_Handle_ActionHintDisplay& InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec)
+    private void Broadcast_Unregistered(FCk_Handle_ActionHintDisplay& InDisplay, FCk_Handle_ActionHintRow InRow)
     {
         if (InDisplay.Has_Fragment(FMars_Fragment_ActionHintDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_ActionHintDisplay_Signals).OnHintUpdated.Broadcast(InDisplay, InId, InSpec); }
+        { InDisplay.Get_Fragment(FMars_Fragment_ActionHintDisplay_Signals).OnHintUnregistered.Broadcast(InDisplay, InRow); }
+    }
+
+    private void Broadcast_Updated(FCk_Handle_ActionHintDisplay& InDisplay, FCk_Handle_ActionHintRow InRow)
+    {
+        if (InDisplay.Has_Fragment(FMars_Fragment_ActionHintDisplay_Signals))
+        { InDisplay.Get_Fragment(FMars_Fragment_ActionHintDisplay_Signals).OnHintUpdated.Broadcast(InDisplay, InRow); }
     }
 }

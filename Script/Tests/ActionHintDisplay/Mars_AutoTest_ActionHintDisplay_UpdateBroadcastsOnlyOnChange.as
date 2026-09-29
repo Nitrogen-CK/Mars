@@ -2,7 +2,7 @@
 class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTest_Base
 {
     private FCk_Handle_ActionHintDisplay _Display;
-    private FMars_ActionHint_ID _Id;
+    private FCk_Handle_ActionHintRow _Row;
     private int32 _UpdatedCount = 0;
 
     UFUNCTION(BlueprintOverride)
@@ -24,7 +24,7 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
     }
 
     UFUNCTION()
-    private void OnHintUpdated(FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec)
+    private void OnHintUpdated(FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow)
     {
         _UpdatedCount += 1;
     }
@@ -32,8 +32,7 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
     UFUNCTION()
     private void Step_Register(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Id = _Display.Request_RegisterHint(FMars_Request_ActionHintDisplay_Register(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("old"), 0, n"Owner")));
+        _Row = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Use, FText::FromString("old"), 0, n"Owner"));
     }
 
     UFUNCTION()
@@ -46,7 +45,7 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
     UFUNCTION()
     private void Step_UpdateSame(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_Id, FText::FromString("old")));
+        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_Row, FText::FromString("old")));
     }
 
     UFUNCTION()
@@ -58,7 +57,7 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
     UFUNCTION()
     private void Step_UpdateNew(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_Id, FText::FromString("new")));
+        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_Row, FText::FromString("new")));
     }
 
     UFUNCTION()
@@ -76,6 +75,6 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
         auto Visible = _Display.Get_VisibleHints();
         Assert_Equals_Int(Visible.Num(), 1, "visible rows after the update");
         if (Visible.Num() == 1)
-        { Assert_Equals_String(Visible[0].Spec.Text.ToString(), "new", "row text after the update"); }
+        { Assert_Equals_String(Visible[0].Get_Spec().Text.ToString(), "new", "row text after the update"); }
     }
 }

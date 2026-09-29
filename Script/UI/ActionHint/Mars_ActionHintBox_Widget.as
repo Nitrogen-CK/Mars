@@ -49,8 +49,8 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
 
         // The signals are edge-only; converge on what the display already shows, suppressed rows excluded.
         auto VisibleHints = _Display.Get_VisibleHints();
-        for (const auto& Entry : VisibleHints)
-        { OnHintRegistered(_Display, Entry.Id, Entry.Spec); }
+        for (const auto& Row : VisibleHints)
+        { OnHintRegistered(_Display, Row); }
     }
 
     UFUNCTION(BlueprintOverride)
@@ -72,9 +72,13 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
     }
 
     UFUNCTION()
-    private void OnHintRegistered(FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec)
+    private void OnHintRegistered(FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow)
     {
-        if (_ActiveHints.Contains(InId.Value))
+        if (ck::Is_NOT_Valid(InRow))
+        { return; }
+
+        const auto Sequence = InRow.Get_Sequence();
+        if (_ActiveHints.Contains(Sequence))
         { return; }
 
         if (ck::EnsureIfNot(HintWidgetClass != nullptr, "[Mars_ActionHintBox] HintWidgetClass is not set on the widget blueprint"))
@@ -84,66 +88,76 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
         if (ck::Is_NOT_Valid(NewWidget))
         { return; }
 
-        _ActiveHints.Add(InId.Value, NewWidget);
-        _SortOrders.Add(InId.Value, InSpec.SortOrder);
-        NewWidget.OnVisualUpdate(InSpec);
+        const auto Spec = InRow.Get_Spec();
+        _ActiveHints.Add(Sequence, NewWidget);
+        _SortOrders.Add(Sequence, Spec.SortOrder);
+        NewWidget.OnVisualUpdate(Spec);
 
         RebuildContainer();
     }
 
     UFUNCTION()
-    private void OnHintUnregistered(FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId)
+    private void OnHintUnregistered(FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow)
     {
-        if (_ActiveHints.Contains(InId.Value) == false)
+        if (ck::Is_NOT_Valid(InRow))
         { return; }
 
-        _ActiveHints[InId.Value].RemoveFromParent();
-        _ActiveHints.Remove(InId.Value);
-        _SortOrders.Remove(InId.Value);
+        const auto Sequence = InRow.Get_Sequence();
+        if (_ActiveHints.Contains(Sequence) == false)
+        { return; }
+
+        _ActiveHints[Sequence].RemoveFromParent();
+        _ActiveHints.Remove(Sequence);
+        _SortOrders.Remove(Sequence);
     }
 
     UFUNCTION()
-    private void OnHintUpdated(FCk_Handle_ActionHintDisplay InDisplay, FMars_ActionHint_ID InId, FMars_ActionHint_Spec InSpec)
+    private void OnHintUpdated(FCk_Handle_ActionHintDisplay InDisplay, FCk_Handle_ActionHintRow InRow)
     {
-        if (_ActiveHints.Contains(InId.Value) == false)
+        if (ck::Is_NOT_Valid(InRow))
         { return; }
 
-        _ActiveHints[InId.Value].OnVisualUpdate(InSpec);
+        const auto Sequence = InRow.Get_Sequence();
+        if (_ActiveHints.Contains(Sequence) == false)
+        { return; }
+
+        _ActiveHints[Sequence].OnVisualUpdate(InRow.Get_Spec());
     }
 
-    // Ordered by (SortOrder, Id): ties keep registration order, so equal-priority rows never swap between rebuilds.
+    // Ordered by (SortOrder, Sequence): ties keep registration order, so equal-priority rows never swap between rebuilds.
+    // Keyed by the row's Sequence, which the display assigns before the first broadcast of that row.
     private void RebuildContainer()
     {
         if (ck::Is_NOT_Valid(HintContainer))
         { return; }
 
-        TArray<int64> SortedIds;
-        _ActiveHints.GetKeys(SortedIds);
+        TArray<int64> SortedSequences;
+        _ActiveHints.GetKeys(SortedSequences);
 
-        for (int32 Current = 1; Current < SortedIds.Num(); ++Current)
+        for (int32 Current = 1; Current < SortedSequences.Num(); ++Current)
         {
-            const auto Moving = SortedIds[Current];
+            const auto Moving = SortedSequences[Current];
             auto Insert = Current;
-            while (Insert > 0 && IsOrderedBefore(Moving, SortedIds[Insert - 1]))
+            while (Insert > 0 && IsOrderedBefore(Moving, SortedSequences[Insert - 1]))
             {
-                SortedIds[Insert] = SortedIds[Insert - 1];
+                SortedSequences[Insert] = SortedSequences[Insert - 1];
                 Insert -= 1;
             }
-            SortedIds[Insert] = Moving;
+            SortedSequences[Insert] = Moving;
         }
 
         HintContainer.ClearChildren();
-        for (auto Id : SortedIds)
-        { HintContainer.AddChild(_ActiveHints[Id]); }
+        for (auto Sequence : SortedSequences)
+        { HintContainer.AddChild(_ActiveHints[Sequence]); }
     }
 
-    private bool IsOrderedBefore(int64 InLeftId, int64 InRightId)
+    private bool IsOrderedBefore(int64 InLeftSequence, int64 InRightSequence)
     {
-        const auto LeftOrder = _SortOrders[InLeftId];
-        const auto RightOrder = _SortOrders[InRightId];
+        const auto LeftOrder = _SortOrders[InLeftSequence];
+        const auto RightOrder = _SortOrders[InRightSequence];
         if (LeftOrder != RightOrder)
         { return LeftOrder < RightOrder; }
 
-        return InLeftId < InRightId;
+        return InLeftSequence < InRightSequence;
     }
 }
