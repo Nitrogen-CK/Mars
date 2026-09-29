@@ -1,0 +1,72 @@
+{
+	"assetName": "JoltIndex",
+	"assetPath": "/Game/CkJoltData/CkTests/TestGyms/TestGyms_CkTests_Level/JoltIndex.JoltIndex",
+	"assetClass": "Ck_Jolt_CookedWorldIndex_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "948877d48e76cc2cd3d4e41d173b4856",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_SourceMapPackage",
+			"type": "FName",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": "/CkTests/TestGyms/TestGyms_CkTests_Level"
+		},
+		{
+			"name": "_BakeFilterHash",
+			"type": "uint64",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 3.2379971469817421e+18,
+			"tooltip": "Fingerprint of the bake filter the cook ran under. Compared against the CURRENT settings-built\nfilter at load: cooked data baked under different filter settings is stale for the whole map."
+		},
+		{
+			"name": "_Cells",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": [
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -5875,
+							"Y": 18425,
+							"Z": 0
+						},
+						"Max":
+						{
+							"X": -1000,
+							"Y": 21000,
+							"Z": 250
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/CkTests/TestGyms/TestGyms_CkTests_Level/JoltCell_-1_0.JoltCell_-1_0"
+				}
+			]
+		}
+	]
+}

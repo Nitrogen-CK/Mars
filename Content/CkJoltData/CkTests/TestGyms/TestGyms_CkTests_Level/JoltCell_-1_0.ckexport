@@ -1,0 +1,139 @@
+{
+	"assetName": "JoltCell_-1_0",
+	"assetPath": "/Game/CkJoltData/CkTests/TestGyms/TestGyms_CkTests_Level/JoltCell_-1_0.JoltCell_-1_0",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "0725981b1788e53667214d8fcab7d427",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": -1,
+				"Y": 0
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 2
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "Landscape_0",
+					"_SourceLevelPackage": "/CkTests/TestGyms/TestGyms_CkTests_Level",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/CkTests/TestGyms/TestGyms_CkTests_Level",
+							"AssetName": "TestGyms_CkTests_Level"
+						},
+						"SubPathString": "PersistentLevel.Landscape_0"
+					},
+					"_SourceHash": -1.6021856176068078e+18,
+					"_RuntimeCheckHash": -1.6021856176068078e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -5875,
+								"Y": 18425,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Actor_0",
+					"_SourceLevelPackage": "/CkTests/TestGyms/TestGyms_CkTests_Level",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/CkTests/TestGyms/TestGyms_CkTests_Level",
+							"AssetName": "TestGyms_CkTests_Level"
+						},
+						"SubPathString": "PersistentLevel.Actor_0"
+					},
+					"_SourceHash": 7.5936734141932288e+17,
+					"_RuntimeCheckHash": -8.6270134290207734e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -1000,
+								"Y": 21000,
+								"Z": 250
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				}
+			]
+		}
+	]
+}

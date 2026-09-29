@@ -1,0 +1,96 @@
+{
+	"assetName": "JoltIndex",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/Sandbox_Mars_MAP/JoltIndex.JoltIndex",
+	"assetClass": "Ck_Jolt_CookedWorldIndex_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "083b449c2d9c09cb9fc3a742d9f0f418",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_SourceMapPackage",
+			"type": "FName",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": "/Game/Mars/Maps/Sandbox_Mars_MAP"
+		},
+		{
+			"name": "_BakeFilterHash",
+			"type": "uint64",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 3.2379971469817421e+18,
+			"tooltip": "Fingerprint of the bake filter the cook ran under. Compared against the CURRENT settings-built\nfilter at load: cooked data baked under different filter settings is stale for the whole map."
+		},
+		{
+			"name": "_Cells",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": [
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 0,
+							"Y": -110,
+							"Z": -10
+						},
+						"Max":
+						{
+							"X": 4000,
+							"Y": 700,
+							"Z": 270
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Sandbox_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 0,
+							"Y": -700,
+							"Z": 0
+						},
+						"Max":
+						{
+							"X": 3750,
+							"Y": -80,
+							"Z": 270
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Sandbox_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
+				}
+			]
+		}
+	]
+}
