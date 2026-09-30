@@ -2,10 +2,12 @@
 //
 // World: the entity hosts a capacity-1 holder and the real item entity lives inside it, so dropping and picking up are
 // entity-preserving transfers. A Jolt body carries it, and a pickup interactable on the Use channel stows it into the
-// focuser's hotbar. The entity destroys itself once its holder empties.
+// focuser's hotbar. A Transient item's entity destroys itself once its holder empties; a Persistent item's entity is the
+// item's body and mounts to its carrier instead (Carry / Hold / Release requests, see UMars_Processor_WorldItem_*).
 //
-// HeldVisual: a mesh scene-node-parented under the player's hand. It never composes the item (utils_item::Add), so item
-// traits do not run a second time on the visual.
+// Visual: a mesh scene-node-parented under AttachTo (the player's hand, a cargo slot). It never composes the item
+// (utils_item::Add), so item traits do not run a second time on the visual. With ArriveFrom set it starts at that world
+// pose and lerps to AttachOffset.
 class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 {
     default _Replication = ECk_Replication::DoesNotReplicate;
@@ -20,7 +22,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
 
-    // HeldVisual: the hand node this visual follows.
+    // Visual: the node this visual follows.
     UPROPERTY(ExposeOnSpawn)
     FCk_Handle AttachTo;
 
@@ -39,6 +41,10 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
     UPROPERTY(ExposeOnSpawn)
     FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    // Visual: when set, the visual starts at this world pose and lerps to AttachOffset over Presentation.ArriveSeconds.
+    UPROPERTY(ExposeOnSpawn)
+    FMars_WorldItem_Arrival ArriveFrom;
 
     private const float32 k_MassKg = 2.0f;
     private const float32 k_LinearDamping = 0.2f;
@@ -97,13 +103,27 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         else
         {
             auto AttachTransform = AttachTo.As_Transform(ECk_SanityCheck::UnChecked);
-            if (ck::EnsureIfNot(ck::IsValid(AttachTransform), f"[WorldItem] HeldVisual [{InHandle.ToString()}] has no hand transform to attach to"))
+            if (ck::EnsureIfNot(ck::IsValid(AttachTransform), f"[WorldItem] Visual [{InHandle.ToString()}] has no transform to attach to"))
             {
                 utils_entity_lifetime::Request_DestroyEntity(InHandle);
                 return ECk_EntityScript_ConstructionFlow::Finished;
             }
 
-            utils_scene_node::Add(Root, AttachTransform, AttachOffset);
+            if (ArriveFrom.IsSet)
+            {
+                // Start where the item visually was and let the Arrive processor lerp the offset to AttachOffset.
+                const auto AttachWorld = utils_transform::Get_EntityCurrentTransform(AttachTransform);
+                const auto FromOffset = ArriveFrom.World.GetRelativeTransform(AttachWorld);
+                utils_scene_node::Add(Root, AttachTransform, FromOffset);
+
+                auto Arrival = FMars_Fragment_WorldItem_Arrival();
+                Arrival.FromOffset = FromOffset;
+                Arrival.ToOffset = AttachOffset;
+                Arrival.Duration = ck::IsValid(Presentation) ? Presentation.ArriveSeconds : 0.0f;
+                InHandle.Add_Fragment(Arrival);
+            }
+            else
+            { utils_scene_node::Add(Root, AttachTransform, AttachOffset); }
         }
 
         auto Params = FMars_Fragment_WorldItem_Params();
@@ -278,7 +298,13 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     {
         const auto Seeded = InResult == ECk_Inventory_OperationResult_AddByDefinition::Success_AllAdded;
         if (ck::EnsureIfNot(Seeded, f"[WorldItem] Seeding [{_SelfEntity.ToString()}] failed with [{InResult :n}]"))
-        { utils_entity_lifetime::Request_DestroyEntity(_SelfEntity); }
+        {
+            utils_entity_lifetime::Request_DestroyEntity(_SelfEntity);
+            return;
+        }
+
+        if (InItemsCreated.Num() > 0)
+        { StampPersistentWorldItem(InItemsCreated[0]); }
     }
 
     UFUNCTION()
@@ -292,10 +318,16 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         // A failed adopt would leave an empty pickable in the world.
         const auto Adopted = InResult == ECk_Inventory_OperationResult_Transfer::Success;
         if (ck::EnsureIfNot(Adopted, f"[WorldItem] Adopting into [{_SelfEntity.ToString()}] failed with [{InResult :n}]"))
-        { utils_entity_lifetime::Request_DestroyEntity(_SelfEntity); }
+        {
+            utils_entity_lifetime::Request_DestroyEntity(_SelfEntity);
+            return;
+        }
+
+        StampPersistentWorldItem(InNewItemInTarget);
     }
 
-    // The item was stowed: nothing is left to present.
+    // Transient: the item was stowed and nothing is left to present. Persistent: the world item IS the item's body and
+    // follows it (the pickup task requests Carry), so it never destroys itself here.
     UFUNCTION()
     private void OnHolderItemsChanged(FCk_Handle_Inventory InInventory,
                                       const TArray<FCk_Handle_Item>&in InItemsAdded,
@@ -304,7 +336,34 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (InItemsRemoved.Num() == 0 || InInventory.Get_NumItems() != 0)
         { return; }
 
+        auto WorldItem = _SelfEntity.As_WorldItem(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(WorldItem) && WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
+        { return; }
+
         utils_entity_lifetime::Request_DestroyEntity(_SelfEntity);
+    }
+
+    // The sanctioned construction-like marker (design 7.3/7.5): a Persistent world item links its item back to itself
+    // once, so HeldItem / HeldItemUse / the pickup task can route the item's moves through this entity.
+    private void StampPersistentWorldItem(FCk_Handle_Item InItem)
+    {
+        auto WorldItem = _SelfEntity.As_WorldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(WorldItem) || ck::Is_NOT_Valid(InItem) ||
+            WorldItem.Get_Persistence() != EMars_WorldItem_Persistence::Persistent)
+        { return; }
+
+        auto Item = InItem;
+        if (Item.Has_PersistentWorldItem())
+        {
+            const auto Existing = Item.Get_PersistentWorldItem();
+            ck::EnsureIfNot(Existing == WorldItem,
+                f"[WorldItem] Item [{Item.ToString()}] is already linked to world item [{Existing.ToString()}], not [{WorldItem.ToString()}]");
+            return;
+        }
+
+        auto Marker = FMars_Fragment_Item_PersistentWorldItem();
+        Marker.WorldItem = WorldItem;
+        Item.Add_Fragment(Marker);
     }
 
     // A full hotbar disables the pickup (no prompt) until one of its slots frees up.
@@ -312,7 +371,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private void OnPickupFocused(FCk_Handle_Interactable InInteractable, FCk_Handle InFocusedBy)
     {
         auto Hotbar = InFocusedBy.As_Hotbar(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hotbar) || Hotbar.Get_CanStow() || _DisabledForFull)
+        if (ck::Is_NOT_Valid(Hotbar) || DoGet_CanStowSelf(Hotbar) || _DisabledForFull)
         { return; }
 
         _DisabledForFull = true;
@@ -324,7 +383,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnGatingHotbarSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
     {
-        if (InHotbar.Get_CanStow() == false)
+        if (DoGet_CanStowSelf(InHotbar) == false)
         { return; }
 
         _DisabledForFull = false;
@@ -333,5 +392,15 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         if (ck::IsValid(_Pickup))
         { _Pickup.Request_SetEnableDisable(ECk_EnableDisable::Enable); }
+    }
+
+    // An item-aware stow check: a second backpack has nowhere to go while one is worn. No held item -> cannot stow.
+    private bool DoGet_CanStowSelf(FCk_Handle_Hotbar InHotbar)
+    {
+        const auto Item = _SelfEntity.As_WorldItem().Get_HeldItem();
+        if (ck::Is_NOT_Valid(Item))
+        { return false; }
+
+        return InHotbar.Get_CanStow(Item);
     }
 }

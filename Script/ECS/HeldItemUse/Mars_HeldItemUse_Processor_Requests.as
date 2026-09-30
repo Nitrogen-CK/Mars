@@ -8,8 +8,9 @@
 // the same way the view-trace focus tears down a world interactable. It carries no prompt: a held item's key hint is an
 // action-hint row, not a centre-screen prompt.
 //
-// Drop and Throw launch the held item as a World-mode world item that adopts it out of the selected slot. The hotbar's
-// sync pass sees the slot empty and the held item follows.
+// Drop and Throw launch the held item as a World-mode world item that adopts it out of the selected slot. A Persistent
+// item already has its world item: it is asked to Release (detach, go Dynamic, launch, take the item back). Either way
+// the hotbar's sync pass sees the slot empty and the held item follows.
 class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -176,15 +177,28 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         const auto View = Get_ViewTransform(InPlayer);
         const auto Forward = View.GetRotation().GetForwardVector();
 
-        auto SpawnTransform = FTransform(View.Rotator(), View.GetLocation() + Forward * constants_held_item_use::k_NoHandSpawnDistance);
-        auto Hand = HeldItem.Get_HandAttachPoint();
-        if (ck::IsValid(Hand))
-        { SpawnTransform = utils_transform::Get_EntityCurrentTransform(Hand); }
-
         auto PawnVelocity = FVector::ZeroVector;
         auto Character = Cast<ACharacter>(ck::ToActor(InPlayer, ECk_SanityCheck::UnChecked));
         if (ck::IsValid(Character))
         { PawnVelocity = Character.GetVelocity(); }
+
+        if (Item.Has_PersistentWorldItem())
+        {
+            auto WorldItem = Item.Get_PersistentWorldItem();
+            if (ck::EnsureIfNot(ck::IsValid(WorldItem), f"[HeldItemUse] Persistent item [{Item.ToString()}] has lost its world item"))
+            { return; }
+
+            WorldItem.Request_Release(FMars_Request_WorldItem_Release(
+                Item, HeldItem.Get_CurrentInventory(), Forward * Speed + PawnVelocity, AngularVelocityDeg));
+
+            InState.LaunchedItem = Item;
+            return;
+        }
+
+        auto SpawnTransform = FTransform(View.Rotator(), View.GetLocation() + Forward * constants_held_item_use::k_NoHandSpawnDistance);
+        auto Hand = HeldItem.Get_HandAttachPoint();
+        if (ck::IsValid(Hand))
+        { SpawnTransform = utils_transform::Get_EntityCurrentTransform(Hand); }
 
         auto SpawnParams = UMars_WorldItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(SpawnTransform.Rotator(), SpawnTransform.GetLocation());
@@ -196,7 +210,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         SpawnParams.AngularVelocityDeg = AngularVelocityDeg;
 
         // The dropped item outlives the player; it destroys itself once picked up.
-        utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), Get_WorldItemScriptClass(Item), SpawnParams);
+        utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
 
         InState.LaunchedItem = Item;
     }
@@ -212,18 +226,5 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         { return utils_transform::Get_EntityCurrentTransform(PlayerTransform); }
 
         return FTransform::Identity;
-    }
-
-    private TSubclassOf<UMars_WorldItem_EntityScript> Get_WorldItemScriptClass(FCk_Handle_Item& InItem) const
-    {
-        TSubclassOf<UMars_WorldItem_EntityScript> ScriptClass = UMars_WorldItem_EntityScript;
-        if (InItem.Has_Presentation() == false)
-        { return ScriptClass; }
-
-        const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
-        if (ck::IsValid(Presentation.WorldItemScriptClass))
-        { ScriptClass = Presentation.WorldItemScriptClass; }
-
-        return ScriptClass;
     }
 }

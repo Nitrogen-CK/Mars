@@ -1,8 +1,9 @@
-// Applies a dropped or thrown item's launch velocity once its Jolt body actually exists.
+// Applies a dropped or thrown item's launch velocity once its Jolt body actually exists and reads Dynamic.
 //
 // JoltBody setup is deferred by at least one frame (FProcessor_JoltBody_Setup batches the AddBodies pass), so a
 // velocity request issued from DoConstruct would be drained against a body that has not been added and silently do
-// nothing. Get_IsBodyAdded is the gate.
+// nothing. A released Persistent item's body is switched Kinematic -> Dynamic by a deferred SetMotionType, and a
+// Kinematic body ignores velocity. Get_IsBodyAdded && Get_MotionType == Dynamic is the gate.
 class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -23,8 +24,8 @@ class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
             return;
         }
 
-        // Still waiting on the batched AddBodies pass - try again next frame.
-        if (utils_jolt_body::Get_IsBodyAdded(Body) == false)
+        // Still waiting on the batched AddBodies pass, or on the switch back to Dynamic - try again next frame.
+        if (utils_jolt_body::Get_IsBodyAdded(Body) == false || utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Dynamic)
         { return; }
 
         // Snapshot before the remove: Request_TryRemove is immediate (entt swap-and-pop), so the fragment reference is

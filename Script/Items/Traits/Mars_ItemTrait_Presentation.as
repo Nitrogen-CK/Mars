@@ -40,6 +40,24 @@ class UMars_ItemTrait_Presentation : UCk_ItemTrait
     // Null = the base WorldItem entity script. Set it only for an item family that needs behaviour of its own.
     UPROPERTY()
     TSubclassOf<UMars_WorldItem_EntityScript> WorldItemScriptClass;
+
+    UPROPERTY()
+    EMars_WorldItem_Persistence Persistence = EMars_WorldItem_Persistence::Transient;
+
+    // Persistent only: the carrier's attach point the item mounts to while carried and not held (AttachPoint.Mars.Back).
+    UPROPERTY()
+    FGameplayTag CarryPoint;
+
+    UPROPERTY()
+    FTransform CarryOffset;
+
+    // Relative to a cargo slot node while stowed in a backpack.
+    UPROPERTY()
+    FTransform CargoOffset;
+
+    // Seconds a mount transition / stow / take lerps. 0 = snap.
+    UPROPERTY()
+    float32 ArriveSeconds = 0.25f;
 }
 
 mixin bool Has_Presentation(const FCk_Handle_Item& Self)

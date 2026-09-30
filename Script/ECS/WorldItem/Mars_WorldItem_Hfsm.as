@@ -22,17 +22,22 @@ class UMars_SmState_WorldItem_PickUp : UCk_SmState_EntityScript
 }
 
 // Transfers the world item's held item into the initiator's hotbar stow target and runs until the transfer reports.
-// The world item destroys itself once its holder empties.
+// A Transient world item destroys itself once its holder empties; a Persistent one is asked to Carry itself onto the
+// initiator once the stow succeeds.
 class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
+    private FCk_Handle _Initiator;
+    private FCk_Handle_WorldItem _WorldItem;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Outcome = ECk_SmTaskResult::Running;
+        _Initiator = FCk_Handle();
+        _WorldItem = FCk_Handle_WorldItem();
 
         auto Context = Get_StateMachineContext();
         auto SubSm = FCk_Handle(Get_OwningStateMachine());
@@ -55,12 +60,15 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
         }
 
         auto Item = WorldItem.Get_HeldItem();
-        auto Target = Hotbar.TryGet_StowTarget();
+        auto Target = Hotbar.TryGet_StowTarget(Item);
         if (ck::Is_NOT_Valid(Item) || ck::Is_NOT_Valid(Target))
         {
             DoFail("the world item holds nothing, or the hotbar has nowhere to stow it");
             return;
         }
+
+        _Initiator = Initiator;
+        _WorldItem = WorldItem;
 
         auto Holder = WorldItem.Get_Holder();
         Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),
@@ -83,6 +91,10 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
     {
         if (InResult == ECk_Inventory_OperationResult_Transfer::Success)
         {
+            auto Item = ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem;
+            if (ck::IsValid(Item) && Item.Has_PersistentWorldItem() && ck::IsValid(_WorldItem))
+            { _WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(_Initiator)); }
+
             _Outcome = ECk_SmTaskResult::Succeeded;
             return;
         }
