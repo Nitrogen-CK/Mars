@@ -19,6 +19,33 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_AttachPoints",
+			"ShortName": "AttachPoints",
+			"Description": "A carrier that publishes named transform attach points (hand, back) by gameplay tag for items to mount to",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_AttachPointsHandle",
+			"RequiredFragments": [
+				"Mars_Feature_AttachPoints"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Backpack",
+			"ShortName": "Backpack",
+			"Description": "A backpack on a persistent world item: the list of its cargo slot child entities",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_BackpackHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Backpack"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_CargoSlot",
+			"ShortName": "CargoSlot",
+			"Description": "One backpack cargo slot: a child of the pack with a capacity-1 inventory, a probe interactable and the stowed item's visual",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CargoSlotHandle",
+			"RequiredFragments": [
+				"Mars_Feature_CargoSlot"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Control",
 			"ShortName": "Control",
 			"Description": "An entity whose interaction toggles or pulses an active state (lever, switch, hand wheel, seal)",

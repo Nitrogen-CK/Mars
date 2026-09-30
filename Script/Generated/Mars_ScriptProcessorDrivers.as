@@ -27,6 +27,77 @@ class UMars_Processor_ActionHintDisplay_HandleRequests_Driver : UMars_Processor_
     }
 }
 
+class UMars_Processor_CargoSlot_HandleRequests_Driver : UMars_Processor_CargoSlot_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_CargoSlot_Requests);
+        Query.ReadWrite(FMars_Fragment_CargoSlot);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_CargoSlot_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_CargoSlot_Requests& P0 = Batch.Get(i, FMars_Fragment_CargoSlot_Requests);
+            FMars_Fragment_CargoSlot& P1 = Batch.Get(i, FMars_Fragment_CargoSlot);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_CargoSlot_Prompt_Driver : UMars_Processor_CargoSlot_Prompt
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_CargoSlot);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_CargoSlot_Prompt_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_CargoSlot& P0 = Batch.Get(i, FMars_Fragment_CargoSlot);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_CargoSlot_Sync_Driver : UMars_Processor_CargoSlot_Sync
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_CargoSlot);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_CargoSlot_Sync_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_CargoSlot& P0 = Batch.Get(i, FMars_Fragment_CargoSlot);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_Control_HandleRequests_Driver : UMars_Processor_Control_HandleRequests
 {
     UFUNCTION(BlueprintOverride)
@@ -708,6 +779,54 @@ class UMars_Processor_Trigger_Setup_Driver : UMars_Processor_Trigger_Setup
     }
 }
 
+class UMars_Processor_WorldItem_Arrive_Driver : UMars_Processor_WorldItem_Arrive
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_WorldItem_Arrival);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_WorldItem_Arrive_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_WorldItem_Arrival& P0 = Batch.Get(i, FMars_Fragment_WorldItem_Arrival);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_WorldItem_HandleRequests_Driver : UMars_Processor_WorldItem_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_WorldItem_Requests);
+        Query.ReadWrite(FMars_Fragment_WorldItem);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_WorldItem_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_WorldItem_Requests& P0 = Batch.Get(i, FMars_Fragment_WorldItem_Requests);
+            FMars_Fragment_WorldItem& P1 = Batch.Get(i, FMars_Fragment_WorldItem);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
 class UMars_Processor_WorldItem_Launch_Driver : UMars_Processor_WorldItem_Launch
 {
     UFUNCTION(BlueprintOverride)
@@ -727,6 +846,31 @@ class UMars_Processor_WorldItem_Launch_Driver : UMars_Processor_WorldItem_Launch
             auto Handle = Batch.GetHandle(i);
             FMars_Fragment_WorldItem_PendingLaunch& P0 = Batch.Get(i, FMars_Fragment_WorldItem_PendingLaunch);
             ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_WorldItem_Mount_Driver : UMars_Processor_WorldItem_Mount
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_WorldItem_PendingMount);
+        Query.ReadWrite(FMars_Fragment_WorldItem);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_WorldItem_Mount_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_WorldItem_PendingMount& P0 = Batch.Get(i, FMars_Fragment_WorldItem_PendingMount);
+            FMars_Fragment_WorldItem& P1 = Batch.Get(i, FMars_Fragment_WorldItem);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
         }
     }
 }

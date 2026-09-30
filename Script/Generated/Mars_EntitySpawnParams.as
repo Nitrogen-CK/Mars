@@ -164,6 +164,58 @@ namespace UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange
 }
 
 USTRUCT()
+struct FMars_AutoTest_AttachPoints_LookupByTag_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_AttachPoints_LookupByTag
+{
+    FMars_AutoTest_AttachPoints_LookupByTag_SpawnParams Params()
+    {
+        return FMars_AutoTest_AttachPoints_LookupByTag_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Backpack_CargoRejectsBackpack_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Backpack_CargoRejectsBackpack
+{
+    FMars_AutoTest_Backpack_CargoRejectsBackpack_SpawnParams Params()
+    {
+        return FMars_AutoTest_Backpack_CargoRejectsBackpack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Backpack_CargoStowThenTake_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Backpack_CargoStowThenTake
+{
+    FMars_AutoTest_Backpack_CargoStowThenTake_SpawnParams Params()
+    {
+        return FMars_AutoTest_Backpack_CargoStowThenTake_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks
+{
+    FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection_SpawnParams
 {
 }
@@ -242,6 +294,19 @@ namespace UMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull
 }
 
 USTRUCT()
+struct FMars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot
+{
+    FMars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Smoke_Boots_SpawnParams
 {
 }
@@ -255,6 +320,32 @@ namespace UMars_AutoTest_Smoke_Boots
 }
 
 USTRUCT()
+struct FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset
+{
+    FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_PersistentCarryHoldRelease_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_PersistentCarryHoldRelease
+{
+    FMars_AutoTest_WorldItem_PersistentCarryHoldRelease_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_PersistentCarryHoldRelease_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_WorldItem_PickupStows_SpawnParams
 {
 }
@@ -264,6 +355,67 @@ namespace UMars_AutoTest_WorldItem_PickupStows
     FMars_AutoTest_WorldItem_PickupStows_SpawnParams Params()
     {
         return FMars_AutoTest_WorldItem_PickupStows_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_Backpack_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_Backpack_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_Backpack_EntityScript
+{
+    FMars_Backpack_EntityScript_SpawnParams Params()
+    {
+        return FMars_Backpack_EntityScript_SpawnParams();
+    }
+
+    FMars_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -1556,6 +1708,19 @@ namespace UMars_SmState_Alive
 }
 
 USTRUCT()
+struct FMars_SmState_CargoSlot_Interact_SpawnParams
+{
+}
+
+namespace UMars_SmState_CargoSlot_Interact
+{
+    FMars_SmState_CargoSlot_Interact_SpawnParams Params()
+    {
+        return FMars_SmState_CargoSlot_Interact_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Control_Engage_SpawnParams
 {
 }
@@ -1812,6 +1977,19 @@ namespace UMars_SmTask_AliveSubSm
     FMars_SmTask_AliveSubSm_SpawnParams Params()
     {
         return FMars_SmTask_AliveSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_CargoSlot_StowOrTake_SpawnParams
+{
+}
+
+namespace UMars_SmTask_CargoSlot_StowOrTake
+{
+    FMars_SmTask_CargoSlot_StowOrTake_SpawnParams Params()
+    {
+        return FMars_SmTask_CargoSlot_StowOrTake_SpawnParams();
     }
 }
 
@@ -2341,6 +2519,67 @@ namespace UMars_Vent_EntityScript
 }
 
 USTRUCT()
+struct FMars_WorldItem_Backpack_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_Backpack_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_WorldItem_Backpack_EntityScript
+{
+    FMars_WorldItem_Backpack_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_Backpack_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_WorldItem_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
 struct FMars_WorldItem_Cog_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -2370,7 +2609,10 @@ struct FMars_WorldItem_Cog_EntityScript_SpawnParams
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
-    FMars_WorldItem_Cog_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_Cog_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         SpawnTransform = InSpawnTransform;
         Definition = InDefinition;
@@ -2381,6 +2623,7 @@ struct FMars_WorldItem_Cog_EntityScript_SpawnParams
         SourceInventory = InSourceInventory;
         LaunchVelocity = InLaunchVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
     }
 }
 
@@ -2391,9 +2634,9 @@ namespace UMars_WorldItem_Cog_EntityScript
         return FMars_WorldItem_Cog_EntityScript_SpawnParams();
     }
 
-    FMars_WorldItem_Cog_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    FMars_WorldItem_Cog_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
-        return FMars_WorldItem_Cog_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+        return FMars_WorldItem_Cog_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -2427,7 +2670,10 @@ struct FMars_WorldItem_EntityScript_SpawnParams
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
-    FMars_WorldItem_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         SpawnTransform = InSpawnTransform;
         Definition = InDefinition;
@@ -2438,6 +2684,7 @@ struct FMars_WorldItem_EntityScript_SpawnParams
         SourceInventory = InSourceInventory;
         LaunchVelocity = InLaunchVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
     }
 }
 
@@ -2448,9 +2695,9 @@ namespace UMars_WorldItem_EntityScript
         return FMars_WorldItem_EntityScript_SpawnParams();
     }
 
-    FMars_WorldItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    FMars_WorldItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
-        return FMars_WorldItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+        return FMars_WorldItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -2484,7 +2731,10 @@ struct FMars_WorldItem_Ration_EntityScript_SpawnParams
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
-    FMars_WorldItem_Ration_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_Ration_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         SpawnTransform = InSpawnTransform;
         Definition = InDefinition;
@@ -2495,6 +2745,7 @@ struct FMars_WorldItem_Ration_EntityScript_SpawnParams
         SourceInventory = InSourceInventory;
         LaunchVelocity = InLaunchVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
     }
 }
 
@@ -2505,9 +2756,9 @@ namespace UMars_WorldItem_Ration_EntityScript
         return FMars_WorldItem_Ration_EntityScript_SpawnParams();
     }
 
-    FMars_WorldItem_Ration_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    FMars_WorldItem_Ration_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
-        return FMars_WorldItem_Ration_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+        return FMars_WorldItem_Ration_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -2541,7 +2792,10 @@ struct FMars_WorldItem_Rock_EntityScript_SpawnParams
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
-    FMars_WorldItem_Rock_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_Rock_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         SpawnTransform = InSpawnTransform;
         Definition = InDefinition;
@@ -2552,6 +2806,7 @@ struct FMars_WorldItem_Rock_EntityScript_SpawnParams
         SourceInventory = InSourceInventory;
         LaunchVelocity = InLaunchVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
     }
 }
 
@@ -2562,9 +2817,9 @@ namespace UMars_WorldItem_Rock_EntityScript
         return FMars_WorldItem_Rock_EntityScript_SpawnParams();
     }
 
-    FMars_WorldItem_Rock_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg)
+    FMars_WorldItem_Rock_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
-        return FMars_WorldItem_Rock_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg);
+        return FMars_WorldItem_Rock_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
