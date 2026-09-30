@@ -1,0 +1,192 @@
+Begin Object Class=/Script/UMG.VerticalBox Name="Root" ExportPath="/Script/UMG.VerticalBox'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root'"
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root.VerticalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_2" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root.VerticalBoxSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root.VerticalBoxSlot_1'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root.VerticalBoxSlot_0'"
+      Padding=(Left=-48.000000,Right=-48.000000,Bottom=-16.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.VerticalBox'Root'"
+      Content="/Script/UMG.Overlay'Nameplate'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_2" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root.VerticalBoxSlot_2'"
+      Padding=(Top=-6.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.VerticalBox'Root'"
+      Content="/Script/UMG.SizeBox'BadgeBox'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Root.VerticalBoxSlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.VerticalBox'Root'"
+      Content="/Script/UMG.SizeBox'SlotBox'"
+   End Object
+   Slots(0)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_0'"
+   Slots(1)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_1'"
+   Slots(2)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_2'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_1" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_1'"
+   WidgetName="Root"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="Nameplate" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Nameplate'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Nameplate.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Nameplate.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Nameplate.OverlaySlot_1'"
+      Padding=(Left=24.000000,Right=24.000000,Bottom=1.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Nameplate'"
+      Content="/Script/CommonUI.CommonTextBlock'ItemName'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.Nameplate.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Nameplate'"
+      Content="/Script/UMG.Image'NameplateBackground'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="NameplateBackground" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.NameplateBackground'"
+   Brush=(DrawAs=Box,ImageSize=(X=128.000000,Y=48.000000),Margin=(Left=0.170000,Right=0.170000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/Inventory/Inventory_Nameplate_Mars_T.Inventory_Nameplate_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="ItemName" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.ItemName'"
+   bStyleNoLongerNeedsConversion=True
+   Text=NSLOCTEXT("", "31F30C3F4FB7316FDD4846B58A83BE9E", "ITEM")
+   ColorAndOpacity=(SpecifiedColor=(R=0.913099,G=0.791298,B=0.577580,A=1.000000))
+   Font=(Size=11.000000,LetterSpacing=60)
+   TextTransformPolicy=ToUpper
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="SlotBox" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotBox.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'SlotBox'"
+      Content="/Script/UMG.Overlay'SlotFrame'"
+   End Object
+   WidthOverride=96.000000
+   HeightOverride=96.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="SlotFrame" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame.OverlaySlot_2'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'SlotFrame'"
+      Content="/Script/UMG.Image'SlotFill'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'SlotFrame'"
+      Content="/Script/UMG.Image'SlotOutline'"
+   End Object
+   Begin Object Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFrame.OverlaySlot_2'"
+      Padding=(Left=20.000000,Top=20.000000,Right=20.000000,Bottom=20.000000)
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'SlotFrame'"
+      Content="/Script/UMG.Overlay'_ItemPanel'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Slots(2)="/Script/UMG.OverlaySlot'OverlaySlot_2'"
+End Object
+Begin Object Class=/Script/UMG.Image Name="SlotFill" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotFill'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/Inventory/Inventory_SlotFill_Mars_T.Inventory_SlotFill_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="SlotOutline" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotOutline'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/Inventory/Inventory_SlotOutline_Mars_T.Inventory_SlotOutline_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="_ItemPanel" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree._ItemPanel'"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="BadgeBox" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeBox.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'BadgeBox'"
+      Content="/Script/UMG.Overlay'BadgeRow'"
+   End Object
+   WidthOverride=34.000000
+   HeightOverride=34.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="BadgeRow" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeRow'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeRow.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeRow.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeRow.OverlaySlot_1'"
+      Padding=(Left=1.000000,Top=1.000000,Right=1.000000,Bottom=1.000000)
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'BadgeRow'"
+      Content="/Script/UMG.Image'HandMarker'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.BadgeRow.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'BadgeRow'"
+      Content="/Script/UMG.Overlay'KeyBadge'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="KeyBadge" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.KeyBadge'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.KeyBadge.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.KeyBadge.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.KeyBadge.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'KeyBadge'"
+      Content="/Script/CommonUI.CommonTextBlock'SlotNumber'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.KeyBadge.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'KeyBadge'"
+      Content="/Script/UMG.Image'KeyBadgeBackground'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="KeyBadgeBackground" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.KeyBadgeBackground'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/Inventory/Inventory_KeyBadge_Mars_T.Inventory_KeyBadge_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="SlotNumber" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.SlotNumber'"
+   bStyleNoLongerNeedsConversion=True
+   Text=NSLOCTEXT("", "CB8DAA8E45FAC7E17E899F8356BB4E2F", "1")
+   ColorAndOpacity=(SpecifiedColor=(R=0.017642,G=0.011612,B=0.009134,A=1.000000))
+   Font=(Size=13.000000)
+   Justification=Center
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="HandMarker" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP:WidgetTree.HandMarker'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/Inventory/Inventory_HandMarker_Mars_T.Inventory_HandMarker_Mars_T'")
+   Visibility=HitTestInvisible
+End Object

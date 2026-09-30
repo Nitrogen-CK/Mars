@@ -1,0 +1,99 @@
+Begin Object Class=/Script/UMG.Overlay Name="Root" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Root'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Root.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Root.OverlaySlot_0'"
+      Padding=(Top=2.000000,Bottom=2.000000)
+      HorizontalAlignment=HAlign_Right
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Root'"
+      Content="/Script/UMG.Overlay'Plaque'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_7" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_7'"
+   WidgetName="Root"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="Plaque" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Plaque'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Plaque.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Plaque.OverlaySlot_1'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Plaque.OverlaySlot_0'"
+      Padding=(Top=-12.000000,Bottom=-12.000000)
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Plaque'"
+      Content="/Script/UMG.Image'PlaqueBackground'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Plaque.OverlaySlot_1'"
+      Padding=(Left=20.000000,Right=22.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Plaque'"
+      Content="/Script/UMG.HorizontalBox'Content'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+End Object
+Begin Object Class=/Script/UMG.Image Name="PlaqueBackground" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.PlaqueBackground'"
+   Brush=(DrawAs=Box,ImageSize=(X=160.000000,Y=60.000000),Margin=(Left=0.170000,Right=0.170000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/Inventory/Inventory_Nameplate_Mars_T.Inventory_Nameplate_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="Content" ExportPath="/Script/UMG.HorizontalBox'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content.HorizontalBoxSlot_2'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content.HorizontalBoxSlot_0'"
+      Padding=(Right=8.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Content'"
+      Content="/Script/UMG.SizeBox'GlyphBox'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content.HorizontalBoxSlot_1'"
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Content'"
+      Content="/Script/CommonUI.CommonTextBlock'HintText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.Content.HorizontalBoxSlot_2'"
+      Padding=(Left=6.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Content'"
+      Content="/Script/CommonUI.CommonTextBlock'HoldLabel'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_2'"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="GlyphBox" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.GlyphBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.GlyphBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.GlyphBox.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'GlyphBox'"
+      Content="/Script/CkWidgets.Ck_InputActionWidget_UE'HintIcon'"
+   End Object
+   WidthOverride=26.000000
+   HeightOverride=26.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/CkWidgets.Ck_InputActionWidget_UE Name="HintIcon" ExportPath="/Script/CkWidgets.Ck_InputActionWidget_UE'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.HintIcon'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="HintText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.HintText'"
+   Text=NSLOCTEXT("", "FBF8CBA84E61114B4AD405A1A5A63CA6", "DROP")
+   ColorAndOpacity=(SpecifiedColor=(R=0.913099,G=0.791298,B=0.577580,A=1.000000))
+   Font=(Size=12.000000,LetterSpacing=60)
+   TextTransformPolicy=ToUpper
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="HoldLabel" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP:WidgetTree.HoldLabel'"
+   Text=NSLOCTEXT("", "197F3BA04D6E4E69C654DDB65C6B5DB1", "HOLD")
+   ColorAndOpacity=(SpecifiedColor=(R=0.913099,G=0.791298,B=0.577580,A=0.627451))
+   Font=(Size=9.000000,LetterSpacing=40)
+   TextTransformPolicy=ToUpper
+   Visibility=HitTestInvisible
+End Object

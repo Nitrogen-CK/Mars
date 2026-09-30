@@ -1,0 +1,518 @@
+{
+	"assetName": "ActionHintBox_Mars_WBP",
+	"assetPath": "/Game/Mars/UI/Widgets/ActionHint/ActionHintBox_Mars_WBP.ActionHintBox_Mars_WBP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "ba0c6ce776286d6938042390917526ce",
+		"exporterVersion": 3
+	},
+	"blueprintType": "WidgetBlueprint",
+	"parentClass": "Mars_ActionHintBox_Widget",
+	"parentClassPath": "/Script/Angelscript.Mars_ActionHintBox_Widget",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "HintContainer",
+			"type": "UPanelWidget*",
+			"value": "None"
+		},
+		{
+			"name": "HintWidgetClass",
+			"type": "TSubclassOf<UMars_ActionHint_Widget>",
+			"category": "ActionHint",
+			"value": "/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP_C"
+		},
+		{
+			"name": "_ContextReceiver",
+			"type": "FCk_Handle_ContextReceiver",
+			"category": "Ck|UI|Context",
+			"value":
+			{
+				"_ContextEntity":
+				{
+				}
+			}
+		},
+		{
+			"name": "_InheritContextFromParent",
+			"type": "bool",
+			"category": "Ck|UI|Context",
+			"value": true
+		},
+		{
+			"name": "_DoNotDestroyDuringTransitions",
+			"type": "bool",
+			"category": "Ck|UI|Lifecycle",
+			"value": false
+		},
+		{
+			"name": "bDisplayInActionBar",
+			"type": "bool",
+			"category": "Input",
+			"value": false,
+			"tooltip": "True to generally display this widget's actions in the action bar, assuming it has actions."
+		},
+		{
+			"name": "bConsumePointerInput",
+			"type": "bool",
+			"category": "Input",
+			"value": false,
+			"tooltip": "Set this to true if you don't want any pointer (mouse and touch) input to bubble past this widget"
+		},
+		{
+			"name": "ColorAndOpacity",
+			"type": "FLinearColor",
+			"category": "Appearance",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 1
+			},
+			"tooltip": "The color and opacity of this widget.  Tints all child widgets."
+		},
+		{
+			"name": "ForegroundColor",
+			"type": "FSlateColor",
+			"category": "Appearance",
+			"value":
+			{
+				"SpecifiedColor":
+				{
+					"R": 1,
+					"G": 0,
+					"B": 1,
+					"A": 1
+				},
+				"ColorUseRule": "UseColor_Foreground"
+			},
+			"tooltip": "The foreground color of the widget, this is inherited by sub widgets.  Any color property\nthat is marked as inherit will use this color."
+		},
+		{
+			"name": "Padding",
+			"type": "FMargin",
+			"category": "Appearance",
+			"value":
+			{
+				"Left": 0,
+				"Top": 0,
+				"Right": 0,
+				"Bottom": 0
+			},
+			"tooltip": "The padding area around the content."
+		},
+		{
+			"name": "Priority",
+			"type": "int32",
+			"category": "Input",
+			"value": 0
+		},
+		{
+			"name": "bIsFocusable",
+			"type": "uint8",
+			"category": "Interaction",
+			"value": false,
+			"tooltip": "Setting this flag to true, allows this widget to accept focus when clicked, or when navigated to."
+		},
+		{
+			"name": "bStopAction",
+			"type": "uint8",
+			"category": "Input",
+			"value": false
+		},
+		{
+			"name": "PreviewBackground",
+			"type": "TObjectPtr<UTexture2D>",
+			"category": "Designer",
+			"value": "None",
+			"tooltip": "A preview background that you can use when designing the UI to get a sense of scale on the screen.  Use\na texture with a screenshot of your game in it, for example if you were designing a HUD."
+		},
+		{
+			"name": "TickFrequency",
+			"type": "EWidgetTickFrequency",
+			"category": "Performance",
+			"value": "Auto",
+			"tooltip": "This widget is allowed to tick. If this is unchecked tick will never be called, animations will not play correctly, and latent actions will not execute.\nUncheck this for performance reasons only"
+		},
+		{
+			"name": "DesiredFocusWidget",
+			"type": "FWidgetChild",
+			"category": "Interaction",
+			"value":
+			{
+				"WidgetName": "None"
+			}
+		},
+		{
+			"name": "Slot",
+			"type": "TObjectPtr<UPanelSlot>",
+			"category": "Layout",
+			"value": "None",
+			"tooltip": "The parent slot of the UWidget.  Allows us to easily inline edit the layout controlling this widget."
+		},
+		{
+			"name": "ToolTipText",
+			"type": "FText",
+			"category": "Behavior",
+			"value": "",
+			"tooltip": "Tooltip text to show when the user hovers over the widget with the mouse"
+		},
+		{
+			"name": "ToolTipWidget",
+			"type": "TObjectPtr<UWidget>",
+			"category": "Behavior",
+			"value": "None",
+			"tooltip": "Tooltip widget to show when the user hovers over the widget with the mouse"
+		},
+		{
+			"name": "RenderTransform",
+			"type": "FWidgetTransform",
+			"category": "Render Transform",
+			"value":
+			{
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0
+				},
+				"Scale":
+				{
+					"X": 1,
+					"Y": 1
+				},
+				"Shear":
+				{
+					"X": 0,
+					"Y": 0
+				},
+				"Angle": 0
+			},
+			"tooltip": "The render transform of the widget allows for arbitrary 2D transforms to be applied to the widget."
+		},
+		{
+			"name": "RenderTransformPivot",
+			"type": "FVector2D",
+			"category": "Render Transform",
+			"value":
+			{
+				"X": 0.5,
+				"Y": 0.5
+			},
+			"tooltip": "The render transform pivot controls the location about which transforms are applied.\nThis value is a normalized coordinate about which things like rotations will occur."
+		},
+		{
+			"name": "FlowDirectionPreference",
+			"type": "EFlowDirectionPreference",
+			"category": "Localization",
+			"value": "Inherit",
+			"tooltip": "Allows you to set a new flow direction"
+		},
+		{
+			"name": "bIsEnabled",
+			"type": "uint8",
+			"category": "Behavior",
+			"value": true,
+			"tooltip": "Sets whether this widget can be modified interactively by the user"
+		},
+		{
+			"name": "bOverride_Cursor",
+			"type": "uint8",
+			"category": "Behavior",
+			"value": false
+		},
+		{
+			"name": "bOverrideAccessibleDefaults",
+			"type": "uint8",
+			"category": "Accessibility",
+			"value": false,
+			"tooltip": "Override all of the default accessibility behavior and text for this widget."
+		},
+		{
+			"name": "bCanChildrenBeAccessible",
+			"type": "uint8",
+			"category": "Accessibility",
+			"value": true,
+			"tooltip": "Whether or not children of this widget can appear as distinct accessible widgets."
+		},
+		{
+			"name": "AccessibleBehavior",
+			"type": "ESlateAccessibleBehavior",
+			"category": "Accessibility",
+			"value": "NotAccessible",
+			"tooltip": "Whether or not the widget is accessible, and how to describe it. If set to custom, additional customization options will appear."
+		},
+		{
+			"name": "AccessibleSummaryBehavior",
+			"type": "ESlateAccessibleBehavior",
+			"category": "Accessibility",
+			"value": "Auto",
+			"tooltip": "How to describe this widget when it's being presented through a summary of a parent widget. If set to custom, additional customization options will appear."
+		},
+		{
+			"name": "AccessibleText",
+			"type": "FText",
+			"category": "Accessibility",
+			"value": "",
+			"tooltip": "When AccessibleBehavior is set to Custom, this is the text that will be used to describe the widget."
+		},
+		{
+			"name": "AccessibleSummaryText",
+			"type": "FText",
+			"category": "Accessibility",
+			"value": "",
+			"tooltip": "When AccessibleSummaryBehavior is set to Custom, this is the text that will be used to describe the widget."
+		},
+		{
+			"name": "bIsVolatile",
+			"type": "uint8",
+			"category": "Performance",
+			"value": false,
+			"tooltip": "If true prevents the widget or its child's geometry or layout information from being cached.  If this widget\nchanges every frame, but you want it to still be in an invalidation panel you should make it as volatile\ninstead of invalidating it every frame, which would prevent the invalidation panel from actually\never caching anything."
+		},
+		{
+			"name": "Cursor",
+			"type": "TEnumAsByte<EMouseCursor::Type>",
+			"category": "Behavior",
+			"value": "Default",
+			"tooltip": "The cursor to show when the mouse is over the widget"
+		},
+		{
+			"name": "Clipping",
+			"type": "EWidgetClipping",
+			"category": "Rendering",
+			"value": "Inherit",
+			"tooltip": "Controls how the clipping behavior of this widget.  Normally content that overflows the\nbounds of the widget continues rendering.  Enabling clipping prevents that overflowing content\nfrom being seen.\n\nNOTE: Elements in different clipping spaces can not be batched together, and so there is a\nperformance cost to clipping.  Do not enable clipping unless a panel actually needs to prevent\ncontent from showing up outside its bounds."
+		},
+		{
+			"name": "Visibility",
+			"type": "ESlateVisibility",
+			"category": "Behavior",
+			"value": "SelfHitTestInvisible",
+			"tooltip": "The visibility of the widget"
+		},
+		{
+			"name": "PixelSnapping",
+			"type": "EWidgetPixelSnapping",
+			"category": "Rendering",
+			"value": "Inherit",
+			"tooltip": "If the widget will draw snapped to the nearest pixel.  Improves clarity but might cause visibile stepping in animation"
+		},
+		{
+			"name": "RenderOpacity",
+			"type": "float",
+			"category": "Rendering",
+			"value": 1,
+			"tooltip": "The opacity of the widget"
+		},
+		{
+			"name": "Navigation",
+			"type": "TObjectPtr<UWidgetNavigation>",
+			"category": "Navigation",
+			"value": "None",
+			"tooltip": "The navigation object for this widget is optionally created if the user has configured custom\nnavigation rules for this widget in the widget designer.  Those rules determine how navigation transitions\ncan occur between widgets."
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event PreConstruct",
+					"entryNodeId": "Node_mTFKuk5ucyRhmKaHmSNPbQ",
+					"steps": [
+						{
+							"nodeId": "Node_mTFKuk5ucyRhmKaHmSNPbQ",
+							"title": "Event PreConstruct"
+						},
+						{
+							"nodeId": "Node_TdBWdkBVZVzc9iavqmScpg",
+							"title": "Parent: PreConstruct"
+						}
+					]
+				},
+				{
+					"entryPoint": "Event Construct",
+					"entryNodeId": "Node_IU8oHk0kGBe9ZbuCjtDipA",
+					"steps": [
+						{
+							"nodeId": "Node_IU8oHk0kGBe9ZbuCjtDipA",
+							"title": "Event Construct"
+						},
+						{
+							"nodeId": "Node_HyvQDkXwlbwoIoC72JRSmw",
+							"title": "Parent: Construct"
+						}
+					]
+				},
+				{
+					"entryPoint": "Event Tick",
+					"entryNodeId": "Node_iz1iP0HaBrRDfJ6HkDWFog",
+					"steps": [
+						{
+							"nodeId": "Node_iz1iP0HaBrRDfJ6HkDWFog",
+							"title": "Event Tick"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_mTFKuk5ucyRhmKaHmSNPbQ",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event PreConstruct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output",
+							"connections": [
+								"Node_TdBWdkBVZVzc9iavqmScpg.execute"
+							]
+						},
+						{
+							"pinName": "IsDesignTime",
+							"pinType": "Boolean",
+							"direction": "Output",
+							"defaultValue": "false",
+							"connections": [
+								"Node_TdBWdkBVZVzc9iavqmScpg.IsDesignTime"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_TdBWdkBVZVzc9iavqmScpg",
+					"nodeClass": "K2Node_CallParentFunction",
+					"nodeTitle": "Parent: PreConstruct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "execute",
+							"pinType": "exec",
+							"direction": "Input",
+							"connections": [
+								"Node_mTFKuk5ucyRhmKaHmSNPbQ.then"
+							]
+						},
+						{
+							"pinName": "IsDesignTime",
+							"pinType": "Boolean",
+							"direction": "Input",
+							"defaultValue": "false",
+							"connections": [
+								"Node_mTFKuk5ucyRhmKaHmSNPbQ.IsDesignTime"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_IU8oHk0kGBe9ZbuCjtDipA",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event Construct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output",
+							"connections": [
+								"Node_HyvQDkXwlbwoIoC72JRSmw.execute"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_HyvQDkXwlbwoIoC72JRSmw",
+					"nodeClass": "K2Node_CallParentFunction",
+					"nodeTitle": "Parent: Construct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "execute",
+							"pinType": "exec",
+							"direction": "Input",
+							"connections": [
+								"Node_IU8oHk0kGBe9ZbuCjtDipA.then"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_iz1iP0HaBrRDfJ6HkDWFog",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event Tick",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "MyGeometry",
+							"pinType": "Geometry",
+							"direction": "Output"
+						},
+						{
+							"pinName": "InDeltaTime",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": [],
+	"widgetHierarchy":
+	{
+		"root":
+		{
+			"name": "HintContainer",
+			"class": "VerticalBox",
+			"isVariable": false,
+			"visibility": "SelfHitTestInvisible"
+		}
+	},
+	"animations": []
+}

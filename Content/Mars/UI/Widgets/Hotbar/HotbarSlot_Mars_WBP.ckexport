@@ -1,0 +1,2522 @@
+{
+	"assetName": "HotbarSlot_Mars_WBP",
+	"assetPath": "/Game/Mars/UI/Widgets/Hotbar/HotbarSlot_Mars_WBP.HotbarSlot_Mars_WBP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "4a0d91973cf578cbcce76c55b8b99f8c",
+		"exporterVersion": 3
+	},
+	"blueprintType": "WidgetBlueprint",
+	"parentClass": "Mars_HotbarSlot_Widget",
+	"parentClassPath": "/Script/Angelscript.Mars_HotbarSlot_Widget",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "NameplateBackground",
+			"type": "UImage*",
+			"category": "HotbarSlot_Mars_WBP",
+			"value": "None"
+		},
+		{
+			"name": "KeyBadgeBackground",
+			"type": "UImage*",
+			"category": "HotbarSlot_Mars_WBP",
+			"value": "None"
+		},
+		{
+			"name": "SlotFill",
+			"type": "UImage*",
+			"value": "None"
+		},
+		{
+			"name": "SlotOutline",
+			"type": "UImage*",
+			"value": "None"
+		},
+		{
+			"name": "SlotNumber",
+			"type": "UCommonTextBlock*",
+			"value": "None"
+		},
+		{
+			"name": "KeyBadge",
+			"type": "UWidget*",
+			"value": "None",
+			"tooltip": "Holds SlotNumber; bag slots only."
+		},
+		{
+			"name": "HandMarker",
+			"type": "UWidget*",
+			"value": "None",
+			"tooltip": "Takes the key badge's place on the overflow slot (PEAK: that item is carried in hand, not stowed under a key)."
+		},
+		{
+			"name": "Nameplate",
+			"type": "UWidget*",
+			"value": "None",
+			"tooltip": "the same height and the frames stay aligned."
+		},
+		{
+			"name": "ItemName",
+			"type": "UCommonTextBlock*",
+			"value": "None"
+		},
+		{
+			"name": "EmptyFillColor",
+			"type": "FLinearColor",
+			"category": "Hotbar|Style",
+			"value":
+			{
+				"R": 0.019999999552965164,
+				"G": 0.019999999552965164,
+				"B": 0.019999999552965164,
+				"A": 0.20000000298023224
+			},
+			"tooltip": "The fill and outline textures are ivory; these tints multiply them."
+		},
+		{
+			"name": "OccupiedFillColor",
+			"type": "FLinearColor",
+			"category": "Hotbar|Style",
+			"value":
+			{
+				"R": 0.019999999552965164,
+				"G": 0.019999999552965164,
+				"B": 0.019999999552965164,
+				"A": 0.34999999403953552
+			}
+		},
+		{
+			"name": "SelectedFillColor",
+			"type": "FLinearColor",
+			"category": "Hotbar|Style",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 1
+			}
+		},
+		{
+			"name": "EmptyOutlineColor",
+			"type": "FLinearColor",
+			"category": "Hotbar|Style",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 0.5
+			}
+		},
+		{
+			"name": "OccupiedOutlineColor",
+			"type": "FLinearColor",
+			"category": "Hotbar|Style",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 0.75
+			}
+		},
+		{
+			"name": "SelectedOutlineColor",
+			"type": "FLinearColor",
+			"category": "Hotbar|Style",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 1
+			}
+		},
+		{
+			"name": "_ItemPanel",
+			"type": "TObjectPtr<UPanelWidget>",
+			"category": "Ck_InventoryUI_DataOnlyPanel",
+			"value": "None",
+			"tooltip": "Panel widget for the item layout.\nMust be named \"_ItemPanel\" in Blueprint.\nCan be any UPanelWidget subclass: VerticalBox, HorizontalBox, WrapBox, etc."
+		},
+		{
+			"name": "_OverrideSlotSize",
+			"type": "bool",
+			"category": "Ck|UI|Inventory|Panel",
+			"value": false,
+			"tooltip": "When enabled, every slot is wrapped in a USizeBox forced to _SlotSize,\noverriding the slot widget's own authored size."
+		},
+		{
+			"name": "_SlotSize",
+			"type": "FVector2D",
+			"category": "Ck|UI|Inventory|Panel",
+			"value":
+			{
+				"X": 64,
+				"Y": 64
+			},
+			"tooltip": "Per-slot size applied when _OverrideSlotSize is enabled.\nUse non-square values for rectangular slots."
+		},
+		{
+			"name": "_Columns",
+			"type": "int32",
+			"category": "Ck|UI|Inventory|Panel",
+			"value": 1,
+			"tooltip": "Number of columns when _ItemPanel is a UUniformGridPanel. Ignored for other panel types."
+		},
+		{
+			"name": "_SlotClass",
+			"type": "TSubclassOf<UCk_InventoryUI_ItemSlotEntry>",
+			"category": "Ck|UI|Inventory|Panel",
+			"value": "/Game/Mars/UI/Widgets/Hotbar/ItemSlot_Mars_WBP.ItemSlot_Mars_WBP_C",
+			"tooltip": "The slot widget class to instantiate for each grid cell or list entry."
+		},
+		{
+			"name": "_DragWidgetClass",
+			"type": "TSubclassOf<UCk_InventoryUI_DragWidget>",
+			"category": "Ck|UI|Inventory|Panel",
+			"value": "None",
+			"tooltip": "The drag widget class used by item slots in this panel."
+		},
+		{
+			"name": "_DragDropPolicy",
+			"type": "FCk_InventoryUI_DragDropPolicy",
+			"category": "Ck|UI|Inventory|Panel",
+			"value":
+			{
+				"_AllowDropIn": true,
+				"_AllowTakeOut": true
+			},
+			"tooltip": "Drag-and-drop access policy, propagated to every item slot."
+		},
+		{
+			"name": "_InventoryHandle",
+			"type": "FCk_Handle_Inventory",
+			"category": "Ck_InventoryUI_InventoryPanel",
+			"value":
+			{
+			}
+		},
+		{
+			"name": "ColorAndOpacity",
+			"type": "FLinearColor",
+			"category": "Appearance",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 1
+			},
+			"tooltip": "The color and opacity of this widget.  Tints all child widgets."
+		},
+		{
+			"name": "ForegroundColor",
+			"type": "FSlateColor",
+			"category": "Appearance",
+			"value":
+			{
+				"SpecifiedColor":
+				{
+					"R": 1,
+					"G": 0,
+					"B": 1,
+					"A": 1
+				},
+				"ColorUseRule": "UseColor_Foreground"
+			},
+			"tooltip": "The foreground color of the widget, this is inherited by sub widgets.  Any color property\nthat is marked as inherit will use this color."
+		},
+		{
+			"name": "Padding",
+			"type": "FMargin",
+			"category": "Appearance",
+			"value":
+			{
+				"Left": 0,
+				"Top": 0,
+				"Right": 0,
+				"Bottom": 0
+			},
+			"tooltip": "The padding area around the content."
+		},
+		{
+			"name": "Priority",
+			"type": "int32",
+			"category": "Input",
+			"value": 0
+		},
+		{
+			"name": "bIsFocusable",
+			"type": "uint8",
+			"category": "Interaction",
+			"value": false,
+			"tooltip": "Setting this flag to true, allows this widget to accept focus when clicked, or when navigated to."
+		},
+		{
+			"name": "bStopAction",
+			"type": "uint8",
+			"category": "Input",
+			"value": false
+		},
+		{
+			"name": "PreviewBackground",
+			"type": "TObjectPtr<UTexture2D>",
+			"category": "Designer",
+			"value": "None",
+			"tooltip": "A preview background that you can use when designing the UI to get a sense of scale on the screen.  Use\na texture with a screenshot of your game in it, for example if you were designing a HUD."
+		},
+		{
+			"name": "TickFrequency",
+			"type": "EWidgetTickFrequency",
+			"category": "Performance",
+			"value": "Auto",
+			"tooltip": "This widget is allowed to tick. If this is unchecked tick will never be called, animations will not play correctly, and latent actions will not execute.\nUncheck this for performance reasons only"
+		},
+		{
+			"name": "DesiredFocusWidget",
+			"type": "FWidgetChild",
+			"category": "Interaction",
+			"value":
+			{
+				"WidgetName": "None"
+			}
+		},
+		{
+			"name": "Slot",
+			"type": "TObjectPtr<UPanelSlot>",
+			"category": "Layout",
+			"value": "None",
+			"tooltip": "The parent slot of the UWidget.  Allows us to easily inline edit the layout controlling this widget."
+		},
+		{
+			"name": "ToolTipText",
+			"type": "FText",
+			"category": "Behavior",
+			"value": "",
+			"tooltip": "Tooltip text to show when the user hovers over the widget with the mouse"
+		},
+		{
+			"name": "ToolTipWidget",
+			"type": "TObjectPtr<UWidget>",
+			"category": "Behavior",
+			"value": "None",
+			"tooltip": "Tooltip widget to show when the user hovers over the widget with the mouse"
+		},
+		{
+			"name": "RenderTransform",
+			"type": "FWidgetTransform",
+			"category": "Render Transform",
+			"value":
+			{
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0
+				},
+				"Scale":
+				{
+					"X": 1,
+					"Y": 1
+				},
+				"Shear":
+				{
+					"X": 0,
+					"Y": 0
+				},
+				"Angle": 0
+			},
+			"tooltip": "The render transform of the widget allows for arbitrary 2D transforms to be applied to the widget."
+		},
+		{
+			"name": "RenderTransformPivot",
+			"type": "FVector2D",
+			"category": "Render Transform",
+			"value":
+			{
+				"X": 0.5,
+				"Y": 0.5
+			},
+			"tooltip": "The render transform pivot controls the location about which transforms are applied.\nThis value is a normalized coordinate about which things like rotations will occur."
+		},
+		{
+			"name": "FlowDirectionPreference",
+			"type": "EFlowDirectionPreference",
+			"category": "Localization",
+			"value": "Inherit",
+			"tooltip": "Allows you to set a new flow direction"
+		},
+		{
+			"name": "bIsEnabled",
+			"type": "uint8",
+			"category": "Behavior",
+			"value": true,
+			"tooltip": "Sets whether this widget can be modified interactively by the user"
+		},
+		{
+			"name": "bOverride_Cursor",
+			"type": "uint8",
+			"category": "Behavior",
+			"value": false
+		},
+		{
+			"name": "bOverrideAccessibleDefaults",
+			"type": "uint8",
+			"category": "Accessibility",
+			"value": false,
+			"tooltip": "Override all of the default accessibility behavior and text for this widget."
+		},
+		{
+			"name": "bCanChildrenBeAccessible",
+			"type": "uint8",
+			"category": "Accessibility",
+			"value": true,
+			"tooltip": "Whether or not children of this widget can appear as distinct accessible widgets."
+		},
+		{
+			"name": "AccessibleBehavior",
+			"type": "ESlateAccessibleBehavior",
+			"category": "Accessibility",
+			"value": "NotAccessible",
+			"tooltip": "Whether or not the widget is accessible, and how to describe it. If set to custom, additional customization options will appear."
+		},
+		{
+			"name": "AccessibleSummaryBehavior",
+			"type": "ESlateAccessibleBehavior",
+			"category": "Accessibility",
+			"value": "Auto",
+			"tooltip": "How to describe this widget when it's being presented through a summary of a parent widget. If set to custom, additional customization options will appear."
+		},
+		{
+			"name": "AccessibleText",
+			"type": "FText",
+			"category": "Accessibility",
+			"value": "",
+			"tooltip": "When AccessibleBehavior is set to Custom, this is the text that will be used to describe the widget."
+		},
+		{
+			"name": "AccessibleSummaryText",
+			"type": "FText",
+			"category": "Accessibility",
+			"value": "",
+			"tooltip": "When AccessibleSummaryBehavior is set to Custom, this is the text that will be used to describe the widget."
+		},
+		{
+			"name": "bIsVolatile",
+			"type": "uint8",
+			"category": "Performance",
+			"value": false,
+			"tooltip": "If true prevents the widget or its child's geometry or layout information from being cached.  If this widget\nchanges every frame, but you want it to still be in an invalidation panel you should make it as volatile\ninstead of invalidating it every frame, which would prevent the invalidation panel from actually\never caching anything."
+		},
+		{
+			"name": "Cursor",
+			"type": "TEnumAsByte<EMouseCursor::Type>",
+			"category": "Behavior",
+			"value": "Default",
+			"tooltip": "The cursor to show when the mouse is over the widget"
+		},
+		{
+			"name": "Clipping",
+			"type": "EWidgetClipping",
+			"category": "Rendering",
+			"value": "Inherit",
+			"tooltip": "Controls how the clipping behavior of this widget.  Normally content that overflows the\nbounds of the widget continues rendering.  Enabling clipping prevents that overflowing content\nfrom being seen.\n\nNOTE: Elements in different clipping spaces can not be batched together, and so there is a\nperformance cost to clipping.  Do not enable clipping unless a panel actually needs to prevent\ncontent from showing up outside its bounds."
+		},
+		{
+			"name": "Visibility",
+			"type": "ESlateVisibility",
+			"category": "Behavior",
+			"value": "SelfHitTestInvisible",
+			"tooltip": "The visibility of the widget"
+		},
+		{
+			"name": "PixelSnapping",
+			"type": "EWidgetPixelSnapping",
+			"category": "Rendering",
+			"value": "Inherit",
+			"tooltip": "If the widget will draw snapped to the nearest pixel.  Improves clarity but might cause visibile stepping in animation"
+		},
+		{
+			"name": "RenderOpacity",
+			"type": "float",
+			"category": "Rendering",
+			"value": 1,
+			"tooltip": "The opacity of the widget"
+		},
+		{
+			"name": "Navigation",
+			"type": "TObjectPtr<UWidgetNavigation>",
+			"category": "Navigation",
+			"value": "None",
+			"tooltip": "The navigation object for this widget is optionally created if the user has configured custom\nnavigation rules for this widget in the widget designer.  Those rules determine how navigation transitions\ncan occur between widgets."
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event PreConstruct",
+					"entryNodeId": "Node_0cJKrkzw8CxwGkW4wlGFPA",
+					"steps": [
+						{
+							"nodeId": "Node_0cJKrkzw8CxwGkW4wlGFPA",
+							"title": "Event PreConstruct"
+						}
+					]
+				},
+				{
+					"entryPoint": "Event Construct",
+					"entryNodeId": "Node_S8oCAkZ-cGxIBFGFq_PCLA",
+					"steps": [
+						{
+							"nodeId": "Node_S8oCAkZ-cGxIBFGFq_PCLA",
+							"title": "Event Construct"
+						}
+					]
+				},
+				{
+					"entryPoint": "Event Tick",
+					"entryNodeId": "Node_3DEeb0-ubtA3_aa_5X6q1g",
+					"steps": [
+						{
+							"nodeId": "Node_3DEeb0-ubtA3_aa_5X6q1g",
+							"title": "Event Tick"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_0cJKrkzw8CxwGkW4wlGFPA",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event PreConstruct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "IsDesignTime",
+							"pinType": "Boolean",
+							"direction": "Output",
+							"defaultValue": "false"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_S8oCAkZ-cGxIBFGFq_PCLA",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event Construct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_3DEeb0-ubtA3_aa_5X6q1g",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event Tick",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "MyGeometry",
+							"pinType": "Geometry",
+							"direction": "Output"
+						},
+						{
+							"pinName": "InDeltaTime",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": [],
+	"widgetHierarchy":
+	{
+		"root":
+		{
+			"name": "Root",
+			"class": "VerticalBox",
+			"isVariable": false,
+			"visibility": "SelfHitTestInvisible",
+			"children": [
+				{
+					"name": "Nameplate",
+					"class": "Overlay",
+					"isVariable": false,
+					"visibility": "HitTestInvisible",
+					"slot":
+					{
+						"type": "VerticalBoxSlot",
+						"properties": [
+							{
+								"name": "Size",
+								"type": "FSlateChildSize",
+								"category": "Layout|Vertical Box Slot",
+								"value":
+								{
+									"Value": 1,
+									"SizeRule": "Automatic"
+								},
+								"tooltip": "How much space this slot should occupy in the direction of the panel."
+							},
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Vertical Box Slot",
+								"value":
+								{
+									"Left": -48,
+									"Top": 0,
+									"Right": -48,
+									"Bottom": -16
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Vertical Box Slot",
+								"value": "HAlign_Center",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Vertical Box Slot",
+								"value": "VAlign_Bottom",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"children": [
+						{
+							"name": "NameplateBackground",
+							"class": "Image",
+							"isVariable": true,
+							"visibility": "HitTestInvisible",
+							"slot":
+							{
+								"type": "OverlaySlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|Overlay Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "HAlign_Fill",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "VAlign_Fill",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "Brush",
+									"type": "FSlateBrush",
+									"category": "Appearance",
+									"value":
+									{
+										"TintColor":
+										{
+											"SpecifiedColor":
+											{
+												"R": 1,
+												"G": 1,
+												"B": 1,
+												"A": 1
+											},
+											"ColorUseRule": "UseColor_Specified"
+										},
+										"DrawAs": "Box",
+										"Tiling": "NoTile",
+										"Mirroring": "NoMirror",
+										"ImageType": "NoImage",
+										"ImageSize":
+										{
+											"X": 128,
+											"Y": 48
+										},
+										"Margin":
+										{
+											"Left": 0.17000000178813934,
+											"Top": 0,
+											"Right": 0.17000000178813934,
+											"Bottom": 0
+										},
+										"ResourceObject": "/Game/Mars/UI/Textures/Inventory/Inventory_Nameplate_Mars_T.Inventory_Nameplate_Mars_T",
+										"OutlineSettings":
+										{
+											"CornerRadii":
+											{
+												"X": 0,
+												"Y": 0,
+												"Z": 0,
+												"W": 0
+											},
+											"Color":
+											{
+												"SpecifiedColor":
+												{
+													"R": 0,
+													"G": 0,
+													"B": 0,
+													"A": 0
+												},
+												"ColorUseRule": "UseColor_Specified"
+											},
+											"Width": 0,
+											"RoundingType": "HalfHeightRadius",
+											"bUseBrushTransparency": false
+										},
+										"UVRegion":
+										{
+											"Min":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"Max":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"bIsValid": false
+										},
+										"bIsDynamicallyLoaded": false,
+										"ResourceName": "None"
+									},
+									"tooltip": "Image to draw"
+								},
+								{
+									"name": "ColorAndOpacity",
+									"type": "FLinearColor",
+									"category": "Appearance",
+									"value":
+									{
+										"R": 1,
+										"G": 1,
+										"B": 1,
+										"A": 1
+									},
+									"tooltip": "Color and opacity"
+								},
+								{
+									"name": "bFlipForRightToLeftFlowDirection",
+									"type": "bool",
+									"category": "Localization",
+									"value": false,
+									"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+								},
+								{
+									"name": "OnMouseButtonDownEvent",
+									"type": "FOnPointerEvent",
+									"category": "Events",
+									"value": "(null).None"
+								}
+							]
+						},
+						{
+							"name": "ItemName",
+							"class": "CommonTextBlock",
+							"isVariable": false,
+							"visibility": "HitTestInvisible",
+							"slot":
+							{
+								"type": "OverlaySlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|Overlay Slot",
+										"value":
+										{
+											"Left": 24,
+											"Top": 0,
+											"Right": 24,
+											"Bottom": 1
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "HAlign_Center",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "VAlign_Center",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "MobileFontSizeMultiplier",
+									"type": "float",
+									"category": "Mobile",
+									"value": 1,
+									"tooltip": "Mobile font size multiplier. Activated by default on mobile. See CVar Mobile_PreviewFontSize"
+								},
+								{
+									"name": "bIsScrollingEnabled",
+									"type": "bool",
+									"category": "CommonText",
+									"value": true,
+									"tooltip": "If scrolling is enabled/disabled initially, this can be updated in blueprint"
+								},
+								{
+									"name": "bAutoCollapseWithEmptyText",
+									"type": "bool",
+									"category": "CommonText",
+									"value": false,
+									"tooltip": "True to automatically collapse this text block when set to display an empty string. Conversely, will be SelfHitTestInvisible when showing a non-empty string."
+								},
+								{
+									"name": "Style",
+									"type": "TSubclassOf<UCommonTextStyle>",
+									"category": "CommonText",
+									"value": "None",
+									"tooltip": "References the text style to use"
+								},
+								{
+									"name": "ScrollStyle",
+									"type": "TSubclassOf<UCommonTextScrollStyle>",
+									"category": "CommonText",
+									"value": "None",
+									"tooltip": "References the scroll style asset to use, no reference disables scrolling"
+								},
+								{
+									"name": "ScrollOrientation",
+									"type": "TEnumAsByte<EOrientation>",
+									"category": "CommonText",
+									"value": "Orient_Horizontal",
+									"tooltip": "The orientation the text will scroll if out of bounds."
+								},
+								{
+									"name": "Text",
+									"type": "FText",
+									"category": "Content",
+									"value": "ITEM",
+									"tooltip": "The text to display"
+								},
+								{
+									"name": "ColorAndOpacity",
+									"type": "FSlateColor",
+									"category": "Appearance",
+									"value":
+									{
+										"SpecifiedColor":
+										{
+											"R": 0.91309863328933716,
+											"G": 0.79129791259765625,
+											"B": 0.57758045196533203,
+											"A": 1
+										},
+										"ColorUseRule": "UseColor_Specified"
+									},
+									"tooltip": "The color of the text"
+								},
+								{
+									"name": "MinDesiredWidth",
+									"type": "float",
+									"category": "Appearance",
+									"value": 0,
+									"tooltip": "The minimum desired size for the text"
+								},
+								{
+									"name": "Font",
+									"type": "FSlateFontInfo",
+									"category": "Appearance",
+									"value":
+									{
+										"FontObject": "/Engine/EngineFonts/Roboto.Roboto",
+										"FontMaterial": "None",
+										"OutlineSettings":
+										{
+											"OutlineSize": 0,
+											"bMiteredCorners": false,
+											"bSeparateFillAlpha": false,
+											"bApplyOutlineToDropShadows": false,
+											"OutlineMaterial": "None",
+											"OutlineColor":
+											{
+												"R": 0,
+												"G": 0,
+												"B": 0,
+												"A": 1
+											}
+										},
+										"TypefaceFontName": "Bold",
+										"Size": 11,
+										"LetterSpacing": 60,
+										"SkewAmount": 0,
+										"bForceMonospaced": false,
+										"bMaterialIsStencil": false,
+										"MonospacedWidth": 1
+									},
+									"tooltip": "The font to render the text with"
+								},
+								{
+									"name": "StrikeBrush",
+									"type": "FSlateBrush",
+									"category": "Appearance",
+									"value":
+									{
+										"TintColor":
+										{
+											"SpecifiedColor":
+											{
+												"R": 1,
+												"G": 1,
+												"B": 1,
+												"A": 1
+											},
+											"ColorUseRule": "UseColor_Specified"
+										},
+										"DrawAs": "Image",
+										"Tiling": "NoTile",
+										"Mirroring": "NoMirror",
+										"ImageType": "NoImage",
+										"ImageSize":
+										{
+											"X": 32,
+											"Y": 32
+										},
+										"Margin":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"ResourceObject": "None",
+										"OutlineSettings":
+										{
+											"CornerRadii":
+											{
+												"X": 0,
+												"Y": 0,
+												"Z": 0,
+												"W": 0
+											},
+											"Color":
+											{
+												"SpecifiedColor":
+												{
+													"R": 0,
+													"G": 0,
+													"B": 0,
+													"A": 0
+												},
+												"ColorUseRule": "UseColor_Specified"
+											},
+											"Width": 0,
+											"RoundingType": "HalfHeightRadius",
+											"bUseBrushTransparency": false
+										},
+										"UVRegion":
+										{
+											"Min":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"Max":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"bIsValid": false
+										},
+										"bIsDynamicallyLoaded": false,
+										"ResourceName": "None"
+									},
+									"tooltip": "The brush to strike through text with"
+								},
+								{
+									"name": "ShadowOffset",
+									"type": "FVector2D",
+									"category": "Appearance",
+									"value":
+									{
+										"X": 1,
+										"Y": 1
+									},
+									"tooltip": "The direction the shadow is cast"
+								},
+								{
+									"name": "ShadowColorAndOpacity",
+									"type": "FLinearColor",
+									"category": "Appearance",
+									"value":
+									{
+										"R": 0,
+										"G": 0,
+										"B": 0,
+										"A": 0
+									},
+									"tooltip": "The color of the shadow"
+								},
+								{
+									"name": "bWrapWithInvalidationPanel",
+									"type": "bool",
+									"category": "Performance",
+									"value": false,
+									"tooltip": "If true, it will automatically wrap this text widget with an invalidation panel"
+								},
+								{
+									"name": "TextTransformPolicy",
+									"type": "ETextTransformPolicy",
+									"category": "Appearance",
+									"value": "ToUpper",
+									"tooltip": "The text transformation policy to apply to this text block."
+								},
+								{
+									"name": "TextOverflowPolicy",
+									"type": "ETextOverflowPolicy",
+									"category": "Clipping",
+									"value": "Clip",
+									"tooltip": "Sets what happens to text that is clipped and doesn't fit within the clip rect for this widget"
+								},
+								{
+									"name": "bSimpleTextMode",
+									"type": "bool",
+									"category": "Performance",
+									"value": false,
+									"tooltip": "If this is enabled, text shaping, wrapping, justification are disabled in favor of much faster text layout and measurement.\nThis feature is only suitable for \"simple\" text (ie, text containing only numbers or basic ASCII) as it disables the complex text rendering support required for certain languages (such as Arabic and Thai).\nIt is significantly faster for text that can take advantage of it (particularly if that text changes frequently), but shouldn't be used for localized user-facing text."
+								},
+								{
+									"name": "ShapedTextOptions",
+									"type": "FShapedTextOptions",
+									"category": "Localization",
+									"value":
+									{
+										"bOverride_TextShapingMethod": false,
+										"bOverride_TextFlowDirection": false,
+										"TextShapingMethod": "Auto",
+										"TextFlowDirection": "Auto"
+									},
+									"tooltip": "Controls how the text within this widget should be shaped."
+								},
+								{
+									"name": "Justification",
+									"type": "TEnumAsByte<ETextJustify::Type>",
+									"category": "Appearance",
+									"value": "Left",
+									"tooltip": "How the text should be aligned with the margin."
+								},
+								{
+									"name": "WrappingPolicy",
+									"type": "ETextWrappingPolicy",
+									"category": "Wrapping",
+									"value": "DefaultWrapping",
+									"tooltip": "The wrapping policy to use."
+								},
+								{
+									"name": "AutoWrapText",
+									"type": "uint8",
+									"category": "Wrapping",
+									"value": false,
+									"tooltip": "True if we're wrapping text automatically based on the computed horizontal space for this widget."
+								},
+								{
+									"name": "ApplyLineHeightToBottomLine",
+									"type": "bool",
+									"category": "Appearance",
+									"value": true,
+									"tooltip": "Whether to leave extra space below the last line due to line height."
+								},
+								{
+									"name": "WrapTextAt",
+									"type": "float",
+									"category": "Wrapping",
+									"value": 0,
+									"tooltip": "Whether text wraps onto a new line when it's length exceeds this width; if this value is zero or negative, no wrapping occurs."
+								},
+								{
+									"name": "Margin",
+									"type": "FMargin",
+									"category": "Appearance",
+									"value":
+									{
+										"Left": 0,
+										"Top": 0,
+										"Right": 0,
+										"Bottom": 0
+									},
+									"tooltip": "The amount of blank space left around the edges of text area."
+								},
+								{
+									"name": "LineHeightPercentage",
+									"type": "float",
+									"category": "Appearance",
+									"value": 1,
+									"tooltip": "The amount to scale each lines height by."
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "SlotBox",
+					"class": "SizeBox",
+					"isVariable": false,
+					"visibility": "SelfHitTestInvisible",
+					"slot":
+					{
+						"type": "VerticalBoxSlot",
+						"properties": [
+							{
+								"name": "Size",
+								"type": "FSlateChildSize",
+								"category": "Layout|Vertical Box Slot",
+								"value":
+								{
+									"Value": 1,
+									"SizeRule": "Automatic"
+								},
+								"tooltip": "How much space this slot should occupy in the direction of the panel."
+							},
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Vertical Box Slot",
+								"value":
+								{
+									"Left": 0,
+									"Top": 0,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Vertical Box Slot",
+								"value": "HAlign_Center",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Vertical Box Slot",
+								"value": "VAlign_Top",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"properties": [
+						{
+							"name": "WidthOverride",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 96,
+							"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+						},
+						{
+							"name": "HeightOverride",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 96,
+							"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+						},
+						{
+							"name": "MinDesiredWidth",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+						},
+						{
+							"name": "MinDesiredHeight",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+						},
+						{
+							"name": "MaxDesiredWidth",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+						},
+						{
+							"name": "MaxDesiredHeight",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+						},
+						{
+							"name": "MinAspectRatio",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 1
+						},
+						{
+							"name": "MaxAspectRatio",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 1
+						},
+						{
+							"name": "bOverride_WidthOverride",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": true
+						},
+						{
+							"name": "bOverride_HeightOverride",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": true
+						},
+						{
+							"name": "bOverride_MinDesiredWidth",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MinDesiredHeight",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxDesiredWidth",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxDesiredHeight",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MinAspectRatio",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxAspectRatio",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						}
+					],
+					"children": [
+						{
+							"name": "SlotFrame",
+							"class": "Overlay",
+							"isVariable": false,
+							"visibility": "SelfHitTestInvisible",
+							"slot":
+							{
+								"type": "SizeBoxSlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|SizeBox Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|SizeBox Slot",
+										"value": "HAlign_Fill",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|SizeBox Slot",
+										"value": "VAlign_Fill",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"children": [
+								{
+									"name": "SlotFill",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "OverlaySlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|Overlay Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 32,
+													"Y": 32
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/Inventory/Inventory_SlotFill_Mars_T.Inventory_SlotFill_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"Max":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"bIsValid": false
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 1,
+												"G": 1,
+												"B": 1,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								},
+								{
+									"name": "SlotOutline",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "OverlaySlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|Overlay Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 32,
+													"Y": 32
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/Inventory/Inventory_SlotOutline_Mars_T.Inventory_SlotOutline_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"Max":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"bIsValid": false
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 1,
+												"G": 1,
+												"B": 1,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								},
+								{
+									"name": "_ItemPanel",
+									"class": "Overlay",
+									"isVariable": false,
+									"visibility": "SelfHitTestInvisible",
+									"slot":
+									{
+										"type": "OverlaySlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|Overlay Slot",
+												"value":
+												{
+													"Left": 20,
+													"Top": 20,
+													"Right": 20,
+													"Bottom": 20
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "BadgeBox",
+					"class": "SizeBox",
+					"isVariable": false,
+					"visibility": "SelfHitTestInvisible",
+					"slot":
+					{
+						"type": "VerticalBoxSlot",
+						"properties": [
+							{
+								"name": "Size",
+								"type": "FSlateChildSize",
+								"category": "Layout|Vertical Box Slot",
+								"value":
+								{
+									"Value": 1,
+									"SizeRule": "Automatic"
+								},
+								"tooltip": "How much space this slot should occupy in the direction of the panel."
+							},
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Vertical Box Slot",
+								"value":
+								{
+									"Left": 0,
+									"Top": -6,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Vertical Box Slot",
+								"value": "HAlign_Center",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Vertical Box Slot",
+								"value": "VAlign_Top",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"properties": [
+						{
+							"name": "WidthOverride",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 34,
+							"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+						},
+						{
+							"name": "HeightOverride",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 34,
+							"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+						},
+						{
+							"name": "MinDesiredWidth",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+						},
+						{
+							"name": "MinDesiredHeight",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+						},
+						{
+							"name": "MaxDesiredWidth",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+						},
+						{
+							"name": "MaxDesiredHeight",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+						},
+						{
+							"name": "MinAspectRatio",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 1
+						},
+						{
+							"name": "MaxAspectRatio",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 1
+						},
+						{
+							"name": "bOverride_WidthOverride",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": true
+						},
+						{
+							"name": "bOverride_HeightOverride",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": true
+						},
+						{
+							"name": "bOverride_MinDesiredWidth",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MinDesiredHeight",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxDesiredWidth",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxDesiredHeight",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MinAspectRatio",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxAspectRatio",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						}
+					],
+					"children": [
+						{
+							"name": "BadgeRow",
+							"class": "Overlay",
+							"isVariable": false,
+							"visibility": "SelfHitTestInvisible",
+							"slot":
+							{
+								"type": "SizeBoxSlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|SizeBox Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|SizeBox Slot",
+										"value": "HAlign_Fill",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|SizeBox Slot",
+										"value": "VAlign_Fill",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"children": [
+								{
+									"name": "KeyBadge",
+									"class": "Overlay",
+									"isVariable": false,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "OverlaySlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|Overlay Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"children": [
+										{
+											"name": "KeyBadgeBackground",
+											"class": "Image",
+											"isVariable": true,
+											"visibility": "HitTestInvisible",
+											"slot":
+											{
+												"type": "OverlaySlot",
+												"properties": [
+													{
+														"name": "Padding",
+														"type": "FMargin",
+														"category": "Layout|Overlay Slot",
+														"value":
+														{
+															"Left": 0,
+															"Top": 0,
+															"Right": 0,
+															"Bottom": 0
+														},
+														"tooltip": "The padding area between the slot and the content it contains."
+													},
+													{
+														"name": "HorizontalAlignment",
+														"type": "TEnumAsByte<EHorizontalAlignment>",
+														"category": "Layout|Overlay Slot",
+														"value": "HAlign_Fill",
+														"tooltip": "The alignment of the object horizontally."
+													},
+													{
+														"name": "VerticalAlignment",
+														"type": "TEnumAsByte<EVerticalAlignment>",
+														"category": "Layout|Overlay Slot",
+														"value": "VAlign_Fill",
+														"tooltip": "The alignment of the object vertically."
+													}
+												]
+											},
+											"properties": [
+												{
+													"name": "Brush",
+													"type": "FSlateBrush",
+													"category": "Appearance",
+													"value":
+													{
+														"TintColor":
+														{
+															"SpecifiedColor":
+															{
+																"R": 1,
+																"G": 1,
+																"B": 1,
+																"A": 1
+															},
+															"ColorUseRule": "UseColor_Specified"
+														},
+														"DrawAs": "Image",
+														"Tiling": "NoTile",
+														"Mirroring": "NoMirror",
+														"ImageType": "NoImage",
+														"ImageSize":
+														{
+															"X": 32,
+															"Y": 32
+														},
+														"Margin":
+														{
+															"Left": 0,
+															"Top": 0,
+															"Right": 0,
+															"Bottom": 0
+														},
+														"ResourceObject": "/Game/Mars/UI/Textures/Inventory/Inventory_KeyBadge_Mars_T.Inventory_KeyBadge_Mars_T",
+														"OutlineSettings":
+														{
+															"CornerRadii":
+															{
+																"X": 0,
+																"Y": 0,
+																"Z": 0,
+																"W": 0
+															},
+															"Color":
+															{
+																"SpecifiedColor":
+																{
+																	"R": 0,
+																	"G": 0,
+																	"B": 0,
+																	"A": 0
+																},
+																"ColorUseRule": "UseColor_Specified"
+															},
+															"Width": 0,
+															"RoundingType": "HalfHeightRadius",
+															"bUseBrushTransparency": false
+														},
+														"UVRegion":
+														{
+															"Min":
+															{
+																"X": 0,
+																"Y": 0
+															},
+															"Max":
+															{
+																"X": 0,
+																"Y": 0
+															},
+															"bIsValid": false
+														},
+														"bIsDynamicallyLoaded": false,
+														"ResourceName": "None"
+													},
+													"tooltip": "Image to draw"
+												},
+												{
+													"name": "ColorAndOpacity",
+													"type": "FLinearColor",
+													"category": "Appearance",
+													"value":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"tooltip": "Color and opacity"
+												},
+												{
+													"name": "bFlipForRightToLeftFlowDirection",
+													"type": "bool",
+													"category": "Localization",
+													"value": false,
+													"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+												},
+												{
+													"name": "OnMouseButtonDownEvent",
+													"type": "FOnPointerEvent",
+													"category": "Events",
+													"value": "(null).None"
+												}
+											]
+										},
+										{
+											"name": "SlotNumber",
+											"class": "CommonTextBlock",
+											"isVariable": false,
+											"visibility": "HitTestInvisible",
+											"slot":
+											{
+												"type": "OverlaySlot",
+												"properties": [
+													{
+														"name": "Padding",
+														"type": "FMargin",
+														"category": "Layout|Overlay Slot",
+														"value":
+														{
+															"Left": 0,
+															"Top": 0,
+															"Right": 0,
+															"Bottom": 0
+														},
+														"tooltip": "The padding area between the slot and the content it contains."
+													},
+													{
+														"name": "HorizontalAlignment",
+														"type": "TEnumAsByte<EHorizontalAlignment>",
+														"category": "Layout|Overlay Slot",
+														"value": "HAlign_Center",
+														"tooltip": "The alignment of the object horizontally."
+													},
+													{
+														"name": "VerticalAlignment",
+														"type": "TEnumAsByte<EVerticalAlignment>",
+														"category": "Layout|Overlay Slot",
+														"value": "VAlign_Center",
+														"tooltip": "The alignment of the object vertically."
+													}
+												]
+											},
+											"properties": [
+												{
+													"name": "MobileFontSizeMultiplier",
+													"type": "float",
+													"category": "Mobile",
+													"value": 1,
+													"tooltip": "Mobile font size multiplier. Activated by default on mobile. See CVar Mobile_PreviewFontSize"
+												},
+												{
+													"name": "bIsScrollingEnabled",
+													"type": "bool",
+													"category": "CommonText",
+													"value": true,
+													"tooltip": "If scrolling is enabled/disabled initially, this can be updated in blueprint"
+												},
+												{
+													"name": "bAutoCollapseWithEmptyText",
+													"type": "bool",
+													"category": "CommonText",
+													"value": false,
+													"tooltip": "True to automatically collapse this text block when set to display an empty string. Conversely, will be SelfHitTestInvisible when showing a non-empty string."
+												},
+												{
+													"name": "Style",
+													"type": "TSubclassOf<UCommonTextStyle>",
+													"category": "CommonText",
+													"value": "None",
+													"tooltip": "References the text style to use"
+												},
+												{
+													"name": "ScrollStyle",
+													"type": "TSubclassOf<UCommonTextScrollStyle>",
+													"category": "CommonText",
+													"value": "None",
+													"tooltip": "References the scroll style asset to use, no reference disables scrolling"
+												},
+												{
+													"name": "ScrollOrientation",
+													"type": "TEnumAsByte<EOrientation>",
+													"category": "CommonText",
+													"value": "Orient_Horizontal",
+													"tooltip": "The orientation the text will scroll if out of bounds."
+												},
+												{
+													"name": "Text",
+													"type": "FText",
+													"category": "Content",
+													"value": "1",
+													"tooltip": "The text to display"
+												},
+												{
+													"name": "ColorAndOpacity",
+													"type": "FSlateColor",
+													"category": "Appearance",
+													"value":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0.017641954123973846,
+															"G": 0.011612244881689548,
+															"B": 0.009134058840572834,
+															"A": 1
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"tooltip": "The color of the text"
+												},
+												{
+													"name": "MinDesiredWidth",
+													"type": "float",
+													"category": "Appearance",
+													"value": 0,
+													"tooltip": "The minimum desired size for the text"
+												},
+												{
+													"name": "Font",
+													"type": "FSlateFontInfo",
+													"category": "Appearance",
+													"value":
+													{
+														"FontObject": "/Engine/EngineFonts/Roboto.Roboto",
+														"FontMaterial": "None",
+														"OutlineSettings":
+														{
+															"OutlineSize": 0,
+															"bMiteredCorners": false,
+															"bSeparateFillAlpha": false,
+															"bApplyOutlineToDropShadows": false,
+															"OutlineMaterial": "None",
+															"OutlineColor":
+															{
+																"R": 0,
+																"G": 0,
+																"B": 0,
+																"A": 1
+															}
+														},
+														"TypefaceFontName": "Bold",
+														"Size": 13,
+														"LetterSpacing": 0,
+														"SkewAmount": 0,
+														"bForceMonospaced": false,
+														"bMaterialIsStencil": false,
+														"MonospacedWidth": 1
+													},
+													"tooltip": "The font to render the text with"
+												},
+												{
+													"name": "StrikeBrush",
+													"type": "FSlateBrush",
+													"category": "Appearance",
+													"value":
+													{
+														"TintColor":
+														{
+															"SpecifiedColor":
+															{
+																"R": 1,
+																"G": 1,
+																"B": 1,
+																"A": 1
+															},
+															"ColorUseRule": "UseColor_Specified"
+														},
+														"DrawAs": "Image",
+														"Tiling": "NoTile",
+														"Mirroring": "NoMirror",
+														"ImageType": "NoImage",
+														"ImageSize":
+														{
+															"X": 32,
+															"Y": 32
+														},
+														"Margin":
+														{
+															"Left": 0,
+															"Top": 0,
+															"Right": 0,
+															"Bottom": 0
+														},
+														"ResourceObject": "None",
+														"OutlineSettings":
+														{
+															"CornerRadii":
+															{
+																"X": 0,
+																"Y": 0,
+																"Z": 0,
+																"W": 0
+															},
+															"Color":
+															{
+																"SpecifiedColor":
+																{
+																	"R": 0,
+																	"G": 0,
+																	"B": 0,
+																	"A": 0
+																},
+																"ColorUseRule": "UseColor_Specified"
+															},
+															"Width": 0,
+															"RoundingType": "HalfHeightRadius",
+															"bUseBrushTransparency": false
+														},
+														"UVRegion":
+														{
+															"Min":
+															{
+																"X": 0,
+																"Y": 0
+															},
+															"Max":
+															{
+																"X": 0,
+																"Y": 0
+															},
+															"bIsValid": false
+														},
+														"bIsDynamicallyLoaded": false,
+														"ResourceName": "None"
+													},
+													"tooltip": "The brush to strike through text with"
+												},
+												{
+													"name": "ShadowOffset",
+													"type": "FVector2D",
+													"category": "Appearance",
+													"value":
+													{
+														"X": 1,
+														"Y": 1
+													},
+													"tooltip": "The direction the shadow is cast"
+												},
+												{
+													"name": "ShadowColorAndOpacity",
+													"type": "FLinearColor",
+													"category": "Appearance",
+													"value":
+													{
+														"R": 0,
+														"G": 0,
+														"B": 0,
+														"A": 0
+													},
+													"tooltip": "The color of the shadow"
+												},
+												{
+													"name": "bWrapWithInvalidationPanel",
+													"type": "bool",
+													"category": "Performance",
+													"value": false,
+													"tooltip": "If true, it will automatically wrap this text widget with an invalidation panel"
+												},
+												{
+													"name": "TextTransformPolicy",
+													"type": "ETextTransformPolicy",
+													"category": "Appearance",
+													"value": "None",
+													"tooltip": "The text transformation policy to apply to this text block."
+												},
+												{
+													"name": "TextOverflowPolicy",
+													"type": "ETextOverflowPolicy",
+													"category": "Clipping",
+													"value": "Clip",
+													"tooltip": "Sets what happens to text that is clipped and doesn't fit within the clip rect for this widget"
+												},
+												{
+													"name": "bSimpleTextMode",
+													"type": "bool",
+													"category": "Performance",
+													"value": false,
+													"tooltip": "If this is enabled, text shaping, wrapping, justification are disabled in favor of much faster text layout and measurement.\nThis feature is only suitable for \"simple\" text (ie, text containing only numbers or basic ASCII) as it disables the complex text rendering support required for certain languages (such as Arabic and Thai).\nIt is significantly faster for text that can take advantage of it (particularly if that text changes frequently), but shouldn't be used for localized user-facing text."
+												},
+												{
+													"name": "ShapedTextOptions",
+													"type": "FShapedTextOptions",
+													"category": "Localization",
+													"value":
+													{
+														"bOverride_TextShapingMethod": false,
+														"bOverride_TextFlowDirection": false,
+														"TextShapingMethod": "Auto",
+														"TextFlowDirection": "Auto"
+													},
+													"tooltip": "Controls how the text within this widget should be shaped."
+												},
+												{
+													"name": "Justification",
+													"type": "TEnumAsByte<ETextJustify::Type>",
+													"category": "Appearance",
+													"value": "Center",
+													"tooltip": "How the text should be aligned with the margin."
+												},
+												{
+													"name": "WrappingPolicy",
+													"type": "ETextWrappingPolicy",
+													"category": "Wrapping",
+													"value": "DefaultWrapping",
+													"tooltip": "The wrapping policy to use."
+												},
+												{
+													"name": "AutoWrapText",
+													"type": "uint8",
+													"category": "Wrapping",
+													"value": false,
+													"tooltip": "True if we're wrapping text automatically based on the computed horizontal space for this widget."
+												},
+												{
+													"name": "ApplyLineHeightToBottomLine",
+													"type": "bool",
+													"category": "Appearance",
+													"value": true,
+													"tooltip": "Whether to leave extra space below the last line due to line height."
+												},
+												{
+													"name": "WrapTextAt",
+													"type": "float",
+													"category": "Wrapping",
+													"value": 0,
+													"tooltip": "Whether text wraps onto a new line when it's length exceeds this width; if this value is zero or negative, no wrapping occurs."
+												},
+												{
+													"name": "Margin",
+													"type": "FMargin",
+													"category": "Appearance",
+													"value":
+													{
+														"Left": 0,
+														"Top": 0,
+														"Right": 0,
+														"Bottom": 0
+													},
+													"tooltip": "The amount of blank space left around the edges of text area."
+												},
+												{
+													"name": "LineHeightPercentage",
+													"type": "float",
+													"category": "Appearance",
+													"value": 1,
+													"tooltip": "The amount to scale each lines height by."
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "HandMarker",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "OverlaySlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|Overlay Slot",
+												"value":
+												{
+													"Left": 1,
+													"Top": 1,
+													"Right": 1,
+													"Bottom": 1
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|Overlay Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 32,
+													"Y": 32
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/Inventory/Inventory_HandMarker_Mars_T.Inventory_HandMarker_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"Max":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"bIsValid": false
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 1,
+												"G": 1,
+												"B": 1,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	},
+	"animations": []
+}
