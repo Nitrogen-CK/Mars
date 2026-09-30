@@ -312,8 +312,8 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
 // HeldItemHints
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Owns every legend row keyed k_OwnerKey: the item's use verb (when it has a UseAction), drop, and throw (hold). The
-// throw row reads "release to throw" while a throw is armed.
+// Owns every legend row keyed k_OwnerKey: the item's use verb (when it has a UseAction) and one throw row for the Drop
+// action, which covers both tap-to-drop and hold-to-throw. The throw row reads "release to throw" while a throw is armed.
 //
 // A held-item change unregisters the previous rows by row handle, not by owner: the display drains registers before
 // owner-unregisters, so an owner-unregister queued beside the new rows would remove them too. Exit, which registers
@@ -409,11 +409,8 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
             }
         }
 
-        _Rows.Add(_Display.Request_RegisterHint(
-            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("drop"), 1, k_OwnerKey)));
-
         _ThrowRow = _Display.Request_RegisterHint(
-            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("throw"), FText::FromString("hold"), 2, k_OwnerKey));
+            FMars_ActionHint_Spec(mars::Mars_IA_Drop, FText::FromString("throw"), 1, k_OwnerKey));
         _Rows.Add(_ThrowRow);
 
         // A throw can stay armed across a swap to another item; the display drains Register before Update.
