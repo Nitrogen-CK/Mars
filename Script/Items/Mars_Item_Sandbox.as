@@ -7,7 +7,7 @@ asset Mars_ItemDef_Rock of UCk_InventoryItem_Definition
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
     Presentation.Mesh = engine::Sphere();
     Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Interactable_Mars_MI().ToSoftObjectPath());
+    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -21,7 +21,7 @@ asset Mars_ItemDef_Ration of UCk_InventoryItem_Definition
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
     Presentation.Mesh = engine::Cube();
     Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Interactable_Mars_MI().ToSoftObjectPath());
+    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
@@ -43,7 +43,7 @@ asset Mars_ItemDef_Cog of UCk_InventoryItem_Definition
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
     Presentation.Mesh = engine::Cylinder();
     Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Interactable_Mars_MI().ToSoftObjectPath());
+    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
