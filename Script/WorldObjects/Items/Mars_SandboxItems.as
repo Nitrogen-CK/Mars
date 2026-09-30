@@ -15,3 +15,9 @@ class UMars_WorldItem_Cog_EntityScript : UMars_WorldItem_EntityScript
 {
     default Definition = mars_items::Cog();
 }
+
+// The backpack preset composes the cargo slots too (Mars.Sandbox.PlaceBackpack).
+class UMars_WorldItem_Backpack_EntityScript : UMars_Backpack_EntityScript
+{
+    default Definition = mars_items::Backpack();
+}

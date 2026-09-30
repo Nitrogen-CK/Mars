@@ -16,6 +16,8 @@
 //
 // Sandbox items (2x Rock, Ration, Cog - World-mode WorldItem presets) sit in front of the player starts. To place them in
 // an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
+// The sandbox backpack (a World-mode Backpack preset with four cargo slots) sits beside them. To place it in an
+// already-built sandbox map, open it and run: Mars.Sandbox.PlaceBackpack
 //
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
@@ -68,6 +70,14 @@ void Mars_PlaceSandboxItemsFunc(const TArray<FString>& Args)
 }
 
 const FConsoleCommand Mars_PlaceSandboxItemsCommand("Mars.Sandbox.PlaceItems", n"Mars_PlaceSandboxItemsFunc");
+
+UFUNCTION()
+void Mars_PlaceSandboxBackpackFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceBackpack();
+}
+
+const FConsoleCommand Mars_PlaceSandboxBackpackCommand("Mars.Sandbox.PlaceBackpack", n"Mars_PlaceSandboxBackpackFunc");
 
 namespace utils_mars_sandbox
 {
@@ -230,6 +240,32 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.PlaceItems] placed, saved={Saved}");
+    }
+
+    // The backpack sits past the Cog on the item line (Y=500) and drops the 60uu onto the floor.
+    void PlaceBackpack()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceBackpack] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        const FString Label = f"{k_ItemLabelPrefix}Backpack";
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == Label)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceBackpack] [{Label}] already exists. Delete it first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Mechanism(UMars_WorldItem_Backpack_EntityScript, Label, FVector(-450.0, 500.0, 60.0));
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceBackpack] placed, saved={Saved}");
     }
 
     // Room 2 spans X 2000..4000, Y -700..700 (the main floor ends at X=2000). The gated bays sit in a partition at
