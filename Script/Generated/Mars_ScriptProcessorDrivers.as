@@ -599,52 +599,6 @@ class UMars_Processor_Pendulum_Setup_Driver : UMars_Processor_Pendulum_Setup
     }
 }
 
-class UMars_Processor_RotateTowards_HandleRequests_Driver : UMars_Processor_RotateTowards_HandleRequests
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_RotateTowards_Requests);
-        Super::Configure(Query);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_RotateTowards_HandleRequests_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_RotateTowards_Requests& P0 = Batch.Get(i, FMars_Fragment_RotateTowards_Requests);
-            ForEachEntity(InDeltaT, Handle, P0);
-        }
-    }
-}
-
-class UMars_Processor_RotateTowards_Update_Driver : UMars_Processor_RotateTowards_Update
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_RotateTowards);
-        Super::Configure(Query);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_RotateTowards_Update_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_RotateTowards& P0 = Batch.Get(i, FMars_Fragment_RotateTowards);
-            ForEachEntity(InDeltaT, Handle, P0);
-        }
-    }
-}
-
 class UMars_Processor_Sequence_HandleRequests_Driver : UMars_Processor_Sequence_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

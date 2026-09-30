@@ -190,15 +190,6 @@
 			]
 		},
 		{
-			"TypeName": "FCk_Handle_RotateTowards",
-			"ShortName": "RotateTowards",
-			"Description": "A transform entity that turns to face a target transform at a limited rate, optionally clamped to a range",
-			"SourceAsset": "/Script/AngelscriptAssets.Mars_RotateTowardsHandle",
-			"RequiredFragments": [
-				"Mars_Feature_RotateTowards"
-			]
-		},
-		{
 			"TypeName": "FCk_Handle_Sequence",
 			"ShortName": "Sequence",
 			"Description": "A logic node that asserts its mechanism source once its sink's input channels rise in a set order",
