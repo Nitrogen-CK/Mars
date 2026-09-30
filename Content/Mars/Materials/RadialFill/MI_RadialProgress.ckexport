@@ -1,0 +1,387 @@
+{
+	"material": "MI_RadialProgress",
+	"packagePath": "/Game/Mars/Materials/RadialFill/MI_RadialProgress",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "37ac6eb8d4fcef588996b5a7a5e79c61",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Materials/RadialFill/M_RadialProgress.M_RadialProgress"
+	],
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_UI",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"Add": 1,
+		"Constant": 5,
+		"Constant2Vector": 1,
+		"Floor": 1,
+		"MaterialFunctionCall": 4,
+		"Multiply": 2,
+		"ScalarParameter": 2,
+		"SmoothStep": 1,
+		"Subtract": 3,
+		"TextureCoordinate": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 1,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 8,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.5
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.20000000298023224,
+					"ParameterName": "Thickness"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_3",
+				"props":
+				{
+					"R": 60
+				}
+			},
+			{
+				"id": 6,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 2,
+						"name": "Radius (S)",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Density (S)",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions01/Gradient/RadialGradientExponential.RadialGradientExponential"
+				}
+			},
+			{
+				"id": 7,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_1",
+				"inputs": [
+					{
+						"index": 2,
+						"name": "Radius (S)",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Density (S)",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions01/Gradient/RadialGradientExponential.RadialGradientExponential"
+				}
+			},
+			{
+				"id": 8,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 7,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 9,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 10,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_4",
+				"props":
+				{
+					"R": 0.25
+				}
+			},
+			{
+				"id": 11,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UVs (V2)",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Rotation Angle (0-1) (S)",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions02/Texturing/CustomRotator.CustomRotator"
+				}
+			},
+			{
+				"id": 12,
+				"class": "Subtract",
+				"name": "MaterialExpressionSubtract_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 13,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 13,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_5",
+				"props":
+				{
+					"R": 0.5
+				}
+			},
+			{
+				"id": 14,
+				"class": "Constant2Vector",
+				"name": "MaterialExpressionConstant2Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"R": 1,
+					"G": -1
+				}
+			},
+			{
+				"id": 15,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 14,
+						"output": 0,
+						"mask": "rg"
+					}
+				]
+			},
+			{
+				"id": 16,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Vector or UVs (V2)",
+						"node": 15,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Radial Coordinates",
+					"Vector Converted to Angle",
+					"Linear Distance"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions02/Utility/VectorToRadialValue.VectorToRadialValue"
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "Percent"
+				}
+			},
+			{
+				"id": 18,
+				"class": "Add",
+				"name": "MaterialExpressionAdd_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 16,
+						"output": 1
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 17,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 19,
+				"class": "Floor",
+				"name": "MaterialExpressionFloor_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 18,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 20,
+				"class": "SmoothStep",
+				"name": "MaterialExpressionSmoothStep_0",
+				"inputs": [
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstMin": 0.10000000149011612,
+					"ConstMax": 0.30000001192092896
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Thickness",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "Percent",
+			"value": 1
+		}
+	],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": []
+}

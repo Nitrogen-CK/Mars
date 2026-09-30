@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "f13f288e58d667a13c7793bd0b70b795",
+		"sourceHash": "42d630865411ceb5c0f36777aeeb8735",
 		"exporterVersion": 3
 	},
 	"blueprintType": "WidgetBlueprint",
@@ -14,22 +14,36 @@
 	"variables": [],
 	"classDefaults": [
 		{
-			"name": "DurationOverlay",
-			"type": "UOverlay*",
-			"category": "InteractPrompt_Mars_WBP",
-			"value": "None"
-		},
-		{
 			"name": "DurationBackground",
 			"type": "UImage*",
 			"category": "InteractPrompt_Mars_WBP",
 			"value": "None"
 		},
 		{
+			"name": "PromptText",
+			"type": "UCommonTextBlock*",
+			"value": "None"
+		},
+		{
+			"name": "PromptIcon",
+			"type": "UCk_InputActionWidget_UE*",
+			"value": "None"
+		},
+		{
 			"name": "Duration",
 			"type": "UImage*",
-			"category": "InteractPrompt_Mars_WBP",
 			"value": "None"
+		},
+		{
+			"name": "DurationOverlay",
+			"type": "UWidget*",
+			"value": "None"
+		},
+		{
+			"name": "ProgressParameterName",
+			"type": "FName",
+			"category": "InteractPrompt|Hold",
+			"value": "Percent"
 		},
 		{
 			"name": "_ContextReceiver",
@@ -671,7 +685,7 @@
 									"Right": 0,
 									"Bottom": 0
 								},
-								"ResourceObject": "/Game/BusterBlock/UI/Textures/HUD/InteractPromptBackground_T.InteractPromptBackground_T",
+								"ResourceObject": "/Game/Mars/UI/Textures/Interaction/InteractPromptBackground_T.InteractPromptBackground_T",
 								"OutlineSettings":
 								{
 									"CornerRadii":
@@ -1612,7 +1626,7 @@
 															"Right": 0,
 															"Bottom": 0
 														},
-														"ResourceObject": "/Game/BusterBlock/UI/Widgets/M_RadialProgress.M_RadialProgress",
+														"ResourceObject": "/Game/Mars/Materials/RadialFill/M_RadialProgress.M_RadialProgress",
 														"OutlineSettings":
 														{
 															"CornerRadii":
@@ -1756,7 +1770,7 @@
 															"Right": 0,
 															"Bottom": 0
 														},
-														"ResourceObject": "/Game/BusterBlock/UI/Widgets/MI_RadialProgress.MI_RadialProgress",
+														"ResourceObject": "/Game/Mars/Materials/RadialFill/MI_RadialProgress.MI_RadialProgress",
 														"OutlineSettings":
 														{
 															"CornerRadii":
