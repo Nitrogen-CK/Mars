@@ -1,0 +1,331 @@
+{
+	"material": "MiseAtlas_Rootstep_Mars_MI",
+	"packagePath": "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Rootstep_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "fdc56109a3a9196fa2d1a6b15f5e0f9b",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Environment/Materials/MiseAtlas_Mars_M.MiseAtlas_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"LinearInterpolate": 1,
+		"Multiply": 3,
+		"ScalarParameter": 3,
+		"TextureSampleParameter2D": 6
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "ORM",
+					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_ORM_Mars_T.MiseAtlas_Bellfold_ORM_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_3",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Emissive",
+					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Emissive_Mars_T.MiseAtlas_Bellfold_Emissive_Mars_T"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "AOStrength"
+				}
+			},
+			{
+				"id": 4,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_4",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "BaseColor",
+					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_BaseColor_Mars_T.MiseAtlas_Bellfold_BaseColor_Mars_T"
+				}
+			},
+			{
+				"id": 5,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_5",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "ORM",
+					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_ORM_Mars_T.MiseAtlas_Bellfold_ORM_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 6,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_6",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Normal",
+					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Normal_Mars_T.MiseAtlas_Bellfold_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 7,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_7",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Emissive",
+					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Emissive_Mars_T.MiseAtlas_Bellfold_Emissive_Mars_T"
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 4,
+					"ParameterName": "EmissiveStrength"
+				}
+			},
+			{
+				"id": 9,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 8,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 10,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "AOStrength"
+				}
+			},
+			{
+				"id": 12,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 11,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 13,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 12,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 9,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 13,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 5,
+				"output": 3,
+				"mask": "b"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 5,
+				"output": 2,
+				"mask": "g"
+			},
+			{
+				"property": "MP_Normal",
+				"node": 6,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "AOStrength",
+			"value": 1
+		},
+		{
+			"name": "EmissiveStrength",
+			"value": 4
+		}
+	],
+	"vectorParams": [],
+	"textureParams": [
+		{
+			"name": "ORM",
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_ORM_Mars_T.MiseAtlas_Rootstep_ORM_Mars_T"
+		},
+		{
+			"name": "Emissive",
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Emissive_Mars_T.MiseAtlas_Rootstep_Emissive_Mars_T"
+		},
+		{
+			"name": "BaseColor",
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_BaseColor_Mars_T.MiseAtlas_Rootstep_BaseColor_Mars_T"
+		},
+		{
+			"name": "Normal",
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Normal_Mars_T.MiseAtlas_Rootstep_Normal_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Normal_Mars_T.MiseAtlas_Rootstep_Normal_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Emissive_Mars_T.MiseAtlas_Rootstep_Emissive_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_BaseColor_Mars_T.MiseAtlas_Rootstep_BaseColor_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_ORM_Mars_T.MiseAtlas_Rootstep_ORM_Mars_T"
+	]
+}

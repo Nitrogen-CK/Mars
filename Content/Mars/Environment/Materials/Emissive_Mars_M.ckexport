@@ -1,0 +1,105 @@
+{
+	"material": "Emissive_Mars_M",
+	"packagePath": "/Game/Mars/Environment/Materials/Emissive_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "4a96640d6cd2fa2e1ab886d8bfa76f13",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Multiply": 1,
+		"ScalarParameter": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.700000,B=0.350000,A=1.000000)",
+					"ParameterName": "Color"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 6,
+					"ParameterName": "Strength"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Strength",
+			"value": 6
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Color",
+			"value": "RGBA(1, 0.7, 0.35, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

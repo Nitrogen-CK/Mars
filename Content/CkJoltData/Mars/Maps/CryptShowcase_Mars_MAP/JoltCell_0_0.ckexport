@@ -1,0 +1,1749 @@
+{
+	"assetName": "JoltCell_0_0",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/CryptShowcase_Mars_MAP/JoltCell_0_0.JoltCell_0_0",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "d065623338a2a141fc653707dd19e610",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": 0,
+				"Y": 0
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 39
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "StaticMeshActor_53",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_53"
+					},
+					"_SourceHash": 7.3769191571376241e+18,
+					"_RuntimeCheckHash": -3.1450726839810627e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": 150.1043314114213,
+								"Y": 1140.9142434597015,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_54",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_54"
+					},
+					"_SourceHash": 1.4190012307193021e+17,
+					"_RuntimeCheckHash": 2.0253042553845532e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": 498.33465442061424,
+								"Y": 1140.981462597847,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_55",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_55"
+					},
+					"_SourceHash": 3.0588547727002537e+18,
+					"_RuntimeCheckHash": -1.0081292921951131e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": 1047.2840152680874,
+								"Y": 1143.9999997615814,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_56",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_56"
+					},
+					"_SourceHash": 8.1861960780230502e+18,
+					"_RuntimeCheckHash": -1.8657473983162043e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 3,
+							"_Position":
+							{
+								"X": 1397.2840152680874,
+								"Y": 1143.9999997615814,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_57",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_57"
+					},
+					"_SourceHash": -4.8681547613392415e+18,
+					"_RuntimeCheckHash": 8.4914269010020352e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": 1947.2840152680874,
+								"Y": 1143.9999997615814,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_58",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_58"
+					},
+					"_SourceHash": 1.4766326665111887e+18,
+					"_RuntimeCheckHash": 7.5934489032167107e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 5,
+							"_Position":
+							{
+								"X": 2297.2840152680874,
+								"Y": 1141.1271065473557,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_59",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_59"
+					},
+					"_SourceHash": 2.2411033227204024e+18,
+					"_RuntimeCheckHash": -4.7655903034277652e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": 2847.2840152680874,
+								"Y": 1141.1811530590057,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_60",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_60"
+					},
+					"_SourceHash": -6.2622517813300511e+18,
+					"_RuntimeCheckHash": -7.3100860834494915e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": 3497.2840152680874,
+								"Y": 1150,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_61",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_61"
+					},
+					"_SourceHash": 7.4014312419122278e+17,
+					"_RuntimeCheckHash": 2.3559509208621967e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 8,
+							"_Position":
+							{
+								"X": 4034.2840157449245,
+								"Y": 1104.0000006556511,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_62",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_62"
+					},
+					"_SourceHash": 7.7839863726269676e+18,
+					"_RuntimeCheckHash": -6.8666540255737334e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": 4571.2840043008327,
+								"Y": 1150,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_63",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_63"
+					},
+					"_SourceHash": -5.3158341528492728e+18,
+					"_RuntimeCheckHash": 1.2565936500580636e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 10,
+							"_Position":
+							{
+								"X": 5121.2840043008327,
+								"Y": 1150,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_64",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_64"
+					},
+					"_SourceHash": 7.9482010407362089e+18,
+					"_RuntimeCheckHash": -6.6464814905591788e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 11,
+							"_Position":
+							{
+								"X": 6071.2840043008327,
+								"Y": 1148.0000019073486,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_65",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_65"
+					},
+					"_SourceHash": -4.0377453237363958e+18,
+					"_RuntimeCheckHash": -6.4670836293145723e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 12,
+							"_Position":
+							{
+								"X": 6921.284007281065,
+								"Y": 1167.0000016689301,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_66",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_66"
+					},
+					"_SourceHash": -7.8377391290376858e+18,
+					"_RuntimeCheckHash": 1.4288613754638871e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": 7516.2840060889721,
+								"Y": 1100.3417635336518,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_67",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_67"
+					},
+					"_SourceHash": 3.5513811219868114e+18,
+					"_RuntimeCheckHash": -4.2988680935490181e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": 7777.4133019149303,
+								"Y": 1165.9895181655884,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_68",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_68"
+					},
+					"_SourceHash": -3.2469292152452403e+17,
+					"_RuntimeCheckHash": -1.3506561621591762e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": 8059.4698958098888,
+								"Y": 1166.0498082637787,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_69",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_69"
+					},
+					"_SourceHash": 3.2124194259808205e+18,
+					"_RuntimeCheckHash": 3.0502779728650286e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 16,
+							"_Position":
+							{
+								"X": 8275.7999949157238,
+								"Y": 1115.0000005960464,
+								"Z": -269.0000057220459
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_73",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_73"
+					},
+					"_SourceHash": -3.0032739639558292e+18,
+					"_RuntimeCheckHash": -8.0296622164774615e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 17,
+							"_Position":
+							{
+								"X": 150,
+								"Y": 1932.251250743866,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_74",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_74"
+					},
+					"_SourceHash": -4.5310572210380175e+18,
+					"_RuntimeCheckHash": -5.0271163741024891e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 18,
+							"_Position":
+							{
+								"X": 700,
+								"Y": 1652.2512555122375,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_75",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_75"
+					},
+					"_SourceHash": -6.0064892176758712e+18,
+					"_RuntimeCheckHash": -4.9399679143254364e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 19,
+							"_Position":
+							{
+								"X": 1250,
+								"Y": 1932.251250743866,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_76",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_76"
+					},
+					"_SourceHash": -9.5497407531468096e+17,
+					"_RuntimeCheckHash": -6.5970160948353464e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 20,
+							"_Position":
+							{
+								"X": 1800,
+								"Y": 1932.251250743866,
+								"Z": -350
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_77",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_77"
+					},
+					"_SourceHash": 2.9038038923143706e+18,
+					"_RuntimeCheckHash": -9.117629349186306e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 21,
+							"_Position":
+							{
+								"X": 2250,
+								"Y": 1932.251250743866,
+								"Z": -350
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_78",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_78"
+					},
+					"_SourceHash": -2.4395284880117519e+18,
+					"_RuntimeCheckHash": 6.340577066009728e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 22,
+							"_Position":
+							{
+								"X": 3148.0000019073486,
+								"Y": 2254.251229763031,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_79",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_79"
+					},
+					"_SourceHash": -1.7125165026117491e+18,
+					"_RuntimeCheckHash": 8.093138373532073e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 23,
+							"_Position":
+							{
+								"X": 3304.8000331968069,
+								"Y": 2254.251229763031,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_80",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_80"
+					},
+					"_SourceHash": -7.0700940984938383e+18,
+					"_RuntimeCheckHash": -2.6482551207204961e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 24,
+							"_Position":
+							{
+								"X": 3753.6000248044729,
+								"Y": 1682.251250743866,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_81",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_81"
+					},
+					"_SourceHash": 3.4196055868819994e+18,
+					"_RuntimeCheckHash": 3.8497341310366807e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 25,
+							"_Position":
+							{
+								"X": 4243.600058183074,
+								"Y": 2252.2512316703796,
+								"Z": 40.000000596046448
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_82",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_82"
+					},
+					"_SourceHash": -6.0497083374708244e+18,
+					"_RuntimeCheckHash": 7.1536566990555023e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 26,
+							"_Position":
+							{
+								"X": 4695.6000562757254,
+								"Y": 1569.2512512207031,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_83",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_83"
+					},
+					"_SourceHash": 8.1180513396209521e+18,
+					"_RuntimeCheckHash": 8.5242421386182646e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 27,
+							"_Position":
+							{
+								"X": 5249.6000524610281,
+								"Y": 1550.2512514591217,
+								"Z": -98.000001907348633
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_84",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_84"
+					},
+					"_SourceHash": -4.6633617344847913e+18,
+					"_RuntimeCheckHash": 8.0030296625304259e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 28,
+							"_Position":
+							{
+								"X": 5801.6000505536795,
+								"Y": 1632.251250743866,
+								"Z": 116.35525226593018
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_85",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_85"
+					},
+					"_SourceHash": -1.4999765161394619e+18,
+					"_RuntimeCheckHash": 8.4545925178563768e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 29,
+							"_Position":
+							{
+								"X": 6912.1000524610281,
+								"Y": 1792.7512526512146,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_86",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_86"
+					},
+					"_SourceHash": -7.1084672088721101e+18,
+					"_RuntimeCheckHash": 8.465914206023415e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 30,
+							"_Position":
+							{
+								"X": 7653.6000546067953,
+								"Y": 1563.2512509822845,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_87",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_87"
+					},
+					"_SourceHash": -6.8884815067178056e+18,
+					"_RuntimeCheckHash": 1.0537794672746177e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 31,
+							"_Position":
+							{
+								"X": 7885.6000538915396,
+								"Y": 1583.2512497901917,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_88",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_88"
+					},
+					"_SourceHash": 2.8038457269495127e+18,
+					"_RuntimeCheckHash": 7.9434492827346186e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 32,
+							"_Position":
+							{
+								"X": 8147.6000484079123,
+								"Y": 1593.251246213913,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_89",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_89"
+					},
+					"_SourceHash": 5.0860756330268334e+18,
+					"_RuntimeCheckHash": -3.5496107525533599e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 33,
+							"_Position":
+							{
+								"X": 8418.600046262145,
+								"Y": 1592.2512531280518,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_90",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_90"
+					},
+					"_SourceHash": -4.0869944755175916e+18,
+					"_RuntimeCheckHash": 3.5645582914092093e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 34,
+							"_Position":
+							{
+								"X": 8689.6000441163778,
+								"Y": 1593.251246213913,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_91",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_91"
+					},
+					"_SourceHash": -7.78581080771298e+18,
+					"_RuntimeCheckHash": -3.1876161487289769e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 35,
+							"_Position":
+							{
+								"X": 8980.6000407785177,
+								"Y": 1592.2512531280518,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_96",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_96"
+					},
+					"_SourceHash": 1.1616515102425951e+18,
+					"_RuntimeCheckHash": -5.8749650581461985e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 36,
+							"_Position":
+							{
+								"X": 144.79431509971619,
+								"Y": 2612.2512318193913,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Actor_3",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptShowcase_Mars_MAP",
+							"AssetName": "CryptShowcase_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Actor_3"
+					},
+					"_SourceHash": -2.1325223175353592e+18,
+					"_RuntimeCheckHash": 2.3594061187990339e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 37,
+							"_Position":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 38,
+							"_Position":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				}
+			]
+		}
+	]
+}

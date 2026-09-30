@@ -1,0 +1,382 @@
+{
+	"material": "StoneWall_Spillring_Mars_MI",
+	"packagePath": "/Game/Mars/Environment/Materials/Instances/StoneWall_Spillring_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f484cce4126d4cf2bd6f47355dfa15d5",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Environment/Materials/Surface_Mars_M.Surface_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"ComponentMask": 2,
+		"Constant": 1,
+		"Custom": 1,
+		"LinearInterpolate": 1,
+		"Multiply": 2,
+		"ScalarParameter": 1,
+		"TextureSampleParameter2D": 3,
+		"VectorParameter": 2,
+		"VertexNormalWS": 2,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 1,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_0",
+				"props":
+				{
+					"R": true,
+					"G": true
+				}
+			},
+			{
+				"id": 2,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_1",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 3,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_1"
+			},
+			{
+				"id": 4,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=4.000000,G=4.000000,B=0.000000,A=0.000000)",
+					"ParameterName": "TileMetres"
+				}
+			},
+			{
+				"id": 5,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 4,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"R": true,
+					"G": true
+				}
+			},
+			{
+				"id": 6,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 a = abs(N);\nfloat2 uv;\nif (a.z >= a.x && a.z >= a.y) { uv = P.xy; }\nelse if (a.x >= a.y) { uv = float2(P.y * sign(N.x), -P.z); }\nelse { uv = float2(-P.x * sign(N.y), -P.z); }\nreturn uv / (Tile * 100.0);",
+					"OutputType": "CMOT_Float2",
+					"Description": "WorldAxisUV (Mise)"
+				}
+			},
+			{
+				"id": 7,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "BaseColor",
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_BaseColor_Mars_T.StoneWall_Bellfold_BaseColor_Mars_T"
+				}
+			},
+			{
+				"id": 8,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "ORM",
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_ORM_Mars_T.StoneWall_Bellfold_ORM_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 9,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Normal",
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_Normal_Mars_T.StoneWall_Bellfold_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 10,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint"
+				}
+			},
+			{
+				"id": 11,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "AOStrength"
+				}
+			},
+			{
+				"id": 13,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 8,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 12,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 14,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 13,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 15,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 15,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 8,
+				"output": 3,
+				"mask": "b"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 8,
+				"output": 2,
+				"mask": "g"
+			},
+			{
+				"property": "MP_Normal",
+				"node": 9,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "AOStrength",
+			"value": 1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "TileMetres",
+			"value": "RGBA(2.6232, 2.5, 0, 0)"
+		},
+		{
+			"name": "Tint",
+			"value": "RGBA(1, 1, 1, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "BaseColor",
+			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_BaseColor_Mars_T.StoneWall_Spillring_BaseColor_Mars_T"
+		},
+		{
+			"name": "ORM",
+			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_ORM_Mars_T.StoneWall_Spillring_ORM_Mars_T"
+		},
+		{
+			"name": "Normal",
+			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_Normal_Mars_T.StoneWall_Spillring_Normal_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_Normal_Mars_T.StoneWall_Spillring_Normal_Mars_T",
+		"/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_BaseColor_Mars_T.StoneWall_Spillring_BaseColor_Mars_T",
+		"/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_ORM_Mars_T.StoneWall_Spillring_ORM_Mars_T"
+	]
+}

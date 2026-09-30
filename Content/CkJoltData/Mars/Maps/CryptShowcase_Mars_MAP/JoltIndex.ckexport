@@ -1,0 +1,144 @@
+{
+	"assetName": "JoltIndex",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/CryptShowcase_Mars_MAP/JoltIndex.JoltIndex",
+	"assetClass": "Ck_Jolt_CookedWorldIndex_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "c849976ab1723ebe2b73039e97c78ee6",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_SourceMapPackage",
+			"type": "FName",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": "/Game/Mars/Maps/CryptShowcase_Mars_MAP"
+		},
+		{
+			"name": "_BakeFilterHash",
+			"type": "uint64",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 3.2379971469817421e+18,
+			"tooltip": "Fingerprint of the bake filter the cook ran under. Compared against the CURRENT settings-built\nfilter at load: cooked data baked under different filter settings is stale for the whole map."
+		},
+		{
+			"name": "_Cells",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": [
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -1220,
+							"Y": -2420,
+							"Z": 0
+						},
+						"Max":
+						{
+							"X": 1220,
+							"Y": 20,
+							"Z": 800
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/CryptShowcase_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 2780,
+							"Y": -2420,
+							"Z": 0
+						},
+						"Max":
+						{
+							"X": 9220,
+							"Y": 20,
+							"Z": 800
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/CryptShowcase_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
+				},
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -1600,
+							"Y": 1125.7097780704498,
+							"Z": 0
+						},
+						"Max":
+						{
+							"X": -171.99711799621582,
+							"Y": 3200,
+							"Z": 40.000000596046448
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/CryptShowcase_Mars_MAP/JoltCell_-1_0.JoltCell_-1_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": -350
+						},
+						"Max":
+						{
+							"X": 8980.6000407785177,
+							"Y": 2612.2512318193913,
+							"Z": 116.35525226593018
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/CryptShowcase_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				}
+			]
+		}
+	]
+}
