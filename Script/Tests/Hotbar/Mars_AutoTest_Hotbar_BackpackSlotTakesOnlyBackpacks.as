@@ -1,0 +1,242 @@
+// The backpack slot takes only backpack items and a backpack item fits nowhere else: stow targets are item-aware, a
+// backpack arrival never changes the selection (PEAK: the pack goes on the back), a second backpack has nowhere to go,
+// and the slot's accept policy refuses a forced transfer that bypasses the stow target.
+class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UCk_AutoTest_Base
+{
+    private FCk_Handle_Hotbar _Hotbar;
+
+    // [0] Rock, [1] Backpack, [2] second Backpack, [3] Cog.
+    private TArray<FCk_Handle_Inventory_DataOnly> _Holders;
+    private TArray<FCk_Handle_Item> _Items;
+
+    private bool _CogTransferRecorded = false;
+    private ECk_Inventory_OperationResult_Transfer _CogTransferResult = ECk_Inventory_OperationResult_Transfer::Success;
+    private bool _Backpack2TransferRecorded = false;
+    private ECk_Inventory_OperationResult_Transfer _Backpack2TransferResult = ECk_Inventory_OperationResult_Transfer::Success;
+
+    UFUNCTION(BlueprintOverride)
+    void DoBeginPlay(FCk_Handle InHandle)
+    {
+        auto LocalHandle = InHandle;
+        auto Spec = FMars_Hotbar_Spec();
+        Spec.BagSlotCount = 1;
+        _Hotbar = utils_hotbar::Add(LocalHandle, Spec);
+
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Backpack()));
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Backpack()));
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Cog()));
+
+        Add_Step_WaitUntil("every holder holds its item", n"Check_HoldersSeeded");
+        Add_Step("stow targets are item-aware", n"Step_AssertStowTargets");
+        Add_Step("force the cog into the empty backpack slot", n"Step_ForceCogIntoBackpackSlot");
+        Add_Step_WaitUntil("the forced cog transfer reported", n"Check_CogTransferRecorded");
+        Add_Step("the backpack slot's policy refused the cog", n"Step_AssertCogRefused");
+        Add_Step("stow the rock", n"Step_StowRock");
+        Add_Step_WaitUntil("slot 0 holds the rock and is auto-held", n"Check_RockStowedAndSelected");
+        Add_Step("stow the backpack", n"Step_StowBackpack");
+        Add_Step_WaitUntil("the backpack slot holds it", n"Check_WearingBackpack");
+        Add_Step_WaitFrames("let the sync pass observe the backpack arrival", 3);
+        Add_Step("the backpack arrival kept the selection", n"Step_AssertSelectionKept");
+        Add_Step("a second backpack has nowhere to go", n"Step_AssertSecondBackpackHasNoTarget");
+        Add_Step("force the second backpack into the occupied backpack slot", n"Step_ForceBackpack2IntoBackpackSlot");
+        Add_Step_WaitUntil("the forced backpack transfer reported", n"Check_Backpack2TransferRecorded");
+        Add_Step("the occupied backpack slot refused it", n"Step_AssertBackpack2Refused");
+        Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Check_HoldersSeeded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto AllSeeded = true;
+        for (const auto& Holder : _Holders)
+        { AllSeeded = AllSeeded && Holder.Get_NumItems() == 1; }
+
+        if (AllSeeded && _Items.Num() == 0)
+        {
+            for (const auto& Holder : _Holders)
+            {
+                auto Items = Holder.Get_Items();
+                _Items.Add(Items[0]);
+            }
+        }
+
+        auto Res = OutResult;
+        Res.Set(AllSeeded);
+    }
+
+    UFUNCTION()
+    private void Step_AssertStowTargets(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_Hotbar.Get_HasBackpackSlot(), "Get_HasBackpackSlot with the default spec");
+        Assert_Equals_Int(_Hotbar.Get_BackpackIndex(), 2, "Get_BackpackIndex with one bag slot");
+        Assert_Equals_Int(_Hotbar.Get_LastIndex(), 2, "Get_LastIndex with one bag slot");
+        Assert_True(_Hotbar.TryGet_StowTarget(_Items[0]) == _Hotbar.Get_Slot(0), "the rock's stow target is bag slot 0");
+        Assert_True(_Hotbar.TryGet_StowTarget(_Items[1]) == _Hotbar.Get_BackpackSlot(), "the backpack's stow target is the backpack slot");
+    }
+
+    UFUNCTION()
+    private void Step_ForceCogIntoBackpackSlot(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto Holder = _Holders[3];
+        Holder.Request_TransferItem_ToDataOnly(
+            FCk_Request_Inventory_TransferItem_ToDataOnly(_Items[3], _Hotbar.Get_BackpackSlot()),
+            FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnForcedCogTransfer"));
+    }
+
+    UFUNCTION()
+    private void OnForcedCogTransfer(FCk_Handle_Inventory InSource,
+                                     FCk_Handle_Item InItem,
+                                     FCk_Handle_Inventory InTarget,
+                                     int32 InCount,
+                                     FCk_Handle_Item InNewItemInTarget,
+                                     ECk_Inventory_OperationResult_Transfer InResult)
+    {
+        _CogTransferRecorded = true;
+        _CogTransferResult = InResult;
+    }
+
+    UFUNCTION()
+    private void Check_CogTransferRecorded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_CogTransferRecorded);
+    }
+
+    UFUNCTION()
+    private void Step_AssertCogRefused(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_CogTransferResult != ECk_Inventory_OperationResult_Transfer::Success,
+            f"a cog forced into the empty backpack slot reports a non-Success result (got [{_CogTransferResult :n}])");
+        Assert_Equals_Int(_Hotbar.Get_BackpackSlot().Get_NumItems(), 0, "the backpack slot after the refused cog");
+        Assert_Equals_Int(_Holders[3].Get_NumItems(), 1, "the cog's holder after the refused transfer");
+    }
+
+    UFUNCTION()
+    private void Step_StowRock(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        StowFrom(_Holders[0]);
+    }
+
+    UFUNCTION()
+    private void Check_RockStowedAndSelected(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == 0);
+    }
+
+    UFUNCTION()
+    private void Step_StowBackpack(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        StowFrom(_Holders[1]);
+    }
+
+    UFUNCTION()
+    private void Check_WearingBackpack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hotbar.Get_IsWearingBackpack());
+    }
+
+    UFUNCTION()
+    private void Step_AssertSelectionKept(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_Hotbar.Get_SelectedIndex(), 0, "SelectedIndex after the backpack arrival");
+        Assert_True(_Hotbar.Get_BackpackItem() == _Items[1], "Get_BackpackItem is the stowed backpack");
+    }
+
+    UFUNCTION()
+    private void Step_AssertSecondBackpackHasNoTarget(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_False(ck::IsValid(_Hotbar.TryGet_StowTarget(_Items[2])), "TryGet_StowTarget(second backpack) while one is worn");
+        Assert_False(_Hotbar.Get_CanStow(_Items[2]), "Get_CanStow(second backpack) while one is worn");
+    }
+
+    UFUNCTION()
+    private void Step_ForceBackpack2IntoBackpackSlot(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto Holder = _Holders[2];
+        Holder.Request_TransferItem_ToDataOnly(
+            FCk_Request_Inventory_TransferItem_ToDataOnly(_Items[2], _Hotbar.Get_BackpackSlot()),
+            FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnForcedBackpack2Transfer"));
+    }
+
+    UFUNCTION()
+    private void OnForcedBackpack2Transfer(FCk_Handle_Inventory InSource,
+                                           FCk_Handle_Item InItem,
+                                           FCk_Handle_Inventory InTarget,
+                                           int32 InCount,
+                                           FCk_Handle_Item InNewItemInTarget,
+                                           ECk_Inventory_OperationResult_Transfer InResult)
+    {
+        _Backpack2TransferRecorded = true;
+        _Backpack2TransferResult = InResult;
+    }
+
+    UFUNCTION()
+    private void Check_Backpack2TransferRecorded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Backpack2TransferRecorded);
+    }
+
+    UFUNCTION()
+    private void Step_AssertBackpack2Refused(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_Backpack2TransferResult != ECk_Inventory_OperationResult_Transfer::Success,
+            f"a second backpack forced into the occupied backpack slot reports a non-Success result (got [{_Backpack2TransferResult :n}])");
+        Assert_Equals_Int(_Holders[2].Get_NumItems(), 1, "the second backpack's holder after the refused transfer");
+        Assert_True(_Hotbar.Get_BackpackItem() == _Items[1], "the backpack slot still holds the first backpack");
+    }
+
+    private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
+    {
+        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        auto Params = utils_inventory_data_only::Make_Params_Bounded(
+            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
+            FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
+        auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
+
+        auto Request = FCk_Request_Inventory_AddItemByDefinition(InDefinition, 1);
+        Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
+        Holder.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
+        return Holder;
+    }
+
+    // What the pickup task does: transfer into whatever the hotbar names as the stow target for the item.
+    private void StowFrom(FCk_Handle_Inventory_DataOnly InHolder)
+    {
+        auto Items = InHolder.Get_Items();
+        auto Target = FCk_Handle_Inventory_DataOnly();
+        if (Items.Num() == 1)
+        { Target = _Hotbar.TryGet_StowTarget(Items[0]); }
+
+        if (ck::Is_NOT_Valid(Target) || Items.Num() != 1)
+        {
+            FinishFailure("stow precondition: a valid stow target and a holder with one item");
+            return;
+        }
+
+        auto Holder = InHolder;
+        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Items[0], Target),
+            FCk_Delegate_Inventory_OnOperationResult_Transfer());
+    }
+}
+
+// Hand-authored so CkInventory's rollback Warning for each of the two deliberately refused transfers is expected rather
+// than a failure (the automation controller elevates Warnings to test errors). One entry per refusal, each pinned to the
+// item definition and the refusal reason so an unrelated refusal still fails the test.
+class AMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_Actor : ACk_AutoTestRunner
+{
+    default _TestEntityScriptClass = UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks;
+
+    UFUNCTION(BlueprintOverride)
+    TArray<FString> Get_ExpectedLogErrors() const
+    {
+        TArray<FString> Out;
+        Out.Add("(Mars_ItemDef_Cog))] (Failed Rejected by Custom Acceptance Logic)");
+        Out.Add("(Mars_ItemDef_Backpack))] (Failed No Space Available)");
+        return Out;
+    }
+}

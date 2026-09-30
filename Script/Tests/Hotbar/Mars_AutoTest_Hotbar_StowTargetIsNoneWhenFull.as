@@ -79,8 +79,10 @@ class UMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertNoStowTarget(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_False(ck::IsValid(_Hotbar.TryGet_StowTarget()), "TryGet_StowTarget with every slot full");
-        Assert_False(_Hotbar.Get_CanStow(), "Get_CanStow with every slot full");
+        // Any non-backpack item asks the same question; the stowed rock in slot 0 is one at hand.
+        const auto Rock = _Hotbar.Get_ItemAt(0);
+        Assert_False(ck::IsValid(_Hotbar.TryGet_StowTarget(Rock)), "TryGet_StowTarget(rock) with every slot full");
+        Assert_False(_Hotbar.Get_CanStow(Rock), "Get_CanStow(rock) with every slot full");
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
@@ -101,8 +103,11 @@ class UMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull : UCk_AutoTest_Base
     // What the pickup task does: transfer into whatever the hotbar names as the stow target.
     private void StowFrom(FCk_Handle_Inventory_DataOnly InHolder)
     {
-        auto Target = _Hotbar.TryGet_StowTarget();
         auto Items = InHolder.Get_Items();
+        auto Target = FCk_Handle_Inventory_DataOnly();
+        if (Items.Num() == 1)
+        { Target = _Hotbar.TryGet_StowTarget(Items[0]); }
+
         if (ck::Is_NOT_Valid(Target) || Items.Num() != 1)
         {
             FinishFailure("stow precondition: a valid stow target and a holder with one item");

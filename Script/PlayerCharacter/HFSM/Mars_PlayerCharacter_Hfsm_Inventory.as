@@ -14,8 +14,9 @@
 // HotbarIntents
 //--------------------------------------------------------------------------------------------------------------------------
 
-// A press of SlotK selects index K-1; the key one past the last bag slot selects the overflow slot (Slot4 with 3 bag
-// slots), and keys beyond it do nothing.
+// A press of SlotK selects bag slot K-1 while K <= BagSlotCount; the key one past the last bag slot selects the backpack
+// slot when the hotbar has one (Slot4 with 3 bag slots), and keys beyond it do nothing. The overflow slot has no key: it
+// is auto-selected while occupied.
 class UMars_SmTask_HotbarIntents : UMars_SmTask_IntentEdges
 {
     private FCk_Handle_Hotbar _Hotbar;
@@ -47,10 +48,18 @@ class UMars_SmTask_HotbarIntents : UMars_SmTask_IntentEdges
     protected void OnIntentPressed(FGameplayTag InIntent) override
     {
         const auto Index = _SlotIntents.FindIndex(InIntent);
-        if (Index < 0 || ck::Is_NOT_Valid(_Hotbar) || Index > _Hotbar.Get_OverflowIndex())
+        if (Index < 0 || ck::Is_NOT_Valid(_Hotbar))
         { return; }
 
-        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index));
+        const auto BagSlotCount = _Hotbar.Get_BagSlotCount();
+        if (Index < BagSlotCount)
+        {
+            _Hotbar.Request_Select(FMars_Request_Hotbar_Select(Index));
+            return;
+        }
+
+        if (Index == BagSlotCount && _Hotbar.Get_HasBackpackSlot())
+        { _Hotbar.Request_Select(FMars_Request_Hotbar_Select(_Hotbar.Get_BackpackIndex())); }
     }
 }
 

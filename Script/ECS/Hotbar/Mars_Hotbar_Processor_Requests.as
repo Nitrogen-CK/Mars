@@ -37,8 +37,9 @@ class UMars_Processor_Hotbar_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleSelectRequest(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, int32 InIndex)
     {
         const auto OverflowIndex = InHotbar.Get_OverflowIndex();
-        const auto IndexIsInRange = InIndex >= 0 && InIndex <= OverflowIndex;
-        if (ck::EnsureIfNot(IndexIsInRange, f"[Hotbar] Select index [{InIndex}] is outside [0, {OverflowIndex}]"))
+        const auto LastIndex = InHotbar.Get_LastIndex();
+        const auto IndexIsInRange = InIndex >= 0 && InIndex <= LastIndex;
+        if (ck::EnsureIfNot(IndexIsInRange, f"[Hotbar] Select index [{InIndex}] is outside [0, {LastIndex}] (the last index is the backpack slot when present, else the overflow slot)"))
         { return; }
 
         if (InIndex == InState.SelectedIndex)

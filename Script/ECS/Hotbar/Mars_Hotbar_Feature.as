@@ -19,6 +19,24 @@ struct FMars_Hotbar_Spec
     // The overflow slot is always added on top, at index BagSlotCount.
     UPROPERTY()
     int32 BagSlotCount = 3;
+
+    // Adds the backpack slot after the overflow slot, at index BagSlotCount + 1. Only a backpack item fits it, and a
+    // backpack item fits nowhere else.
+    UPROPERTY()
+    bool HasBackpackSlot = true;
+}
+
+// BagSlotCount in [1, utils_hotbar::k_MaxBagSlotCount]: the Inventory.Mars.Slot.N tags only go that far.
+mixin FMars_Validation Validate(const FMars_Hotbar_Spec& Self)
+{
+    const auto BagSlotCountIsValid = Self.BagSlotCount >= 1 && Self.BagSlotCount <= utils_hotbar::k_MaxBagSlotCount;
+    if (BagSlotCountIsValid == false)
+    {
+        return FMars_Validation(
+            f"BagSlotCount [{Self.BagSlotCount}] is outside [1, {utils_hotbar::k_MaxBagSlotCount}] - Inventory.Mars.Slot.N tags only go that far");
+    }
+
+    return FMars_Validation();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -29,6 +47,9 @@ struct FMars_Fragment_Hotbar_Params
 {
     UPROPERTY()
     int32 BagSlotCount = 3;
+
+    UPROPERTY()
+    bool HasBackpackSlot = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -39,7 +60,7 @@ struct FMars_Fragment_Hotbar_Params
 // slot: any selection that would leave it is parked in PendingSelectedIndex until its item has been dropped.
 struct FMars_Fragment_Hotbar
 {
-    // Num == BagSlotCount + 1; the last entry is the overflow slot.
+    // Layout: [0 .. N-1] bag, [N] overflow, [N+1] backpack (only when HasBackpackSlot), N = BagSlotCount.
     UPROPERTY()
     TArray<FCk_Handle_Inventory_DataOnly> Slots;
 

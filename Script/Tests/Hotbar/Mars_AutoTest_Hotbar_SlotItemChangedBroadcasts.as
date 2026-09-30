@@ -88,8 +88,11 @@ class UMars_AutoTest_Hotbar_SlotItemChangedBroadcasts : UCk_AutoTest_Base
     // What the pickup task does: transfer into whatever the hotbar names as the stow target.
     private void StowFrom(FCk_Handle_Inventory_DataOnly InHolder)
     {
-        auto Target = _Hotbar.TryGet_StowTarget();
         auto Items = InHolder.Get_Items();
+        auto Target = FCk_Handle_Inventory_DataOnly();
+        if (Items.Num() == 1)
+        { Target = _Hotbar.TryGet_StowTarget(Items[0]); }
+
         if (ck::Is_NOT_Valid(Target) || Items.Num() != 1)
         {
             FinishFailure("stow precondition: a valid stow target and a holder with one item");

@@ -1,6 +1,7 @@
 // Polls every slot's first item against the last pass: a change broadcasts OnSlotItemChanged, and an arrival applies
-// the arrival rule (overflow always selects itself; a bag slot is auto-held while hands are empty). Items only ever
-// arrive by stow, so the rule needs no provenance. Then a parked selection applies once the overflow slot reads empty.
+// the arrival rule (overflow always selects itself; a bag slot is auto-held while hands are empty; a backpack arrival
+// never selects (PEAK: the pack goes on the back)). Items only ever arrive by stow, so the rule needs no provenance.
+// Then a parked selection applies once the overflow slot reads empty.
 class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -32,7 +33,7 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 
             if (Index == OverflowIndex)
             { ApplySelection(Self, InState, OverflowIndex); }
-            else if (InState.SelectedIndex == -1)
+            else if (InState.SelectedIndex == -1 && Index != Self.Get_BackpackIndex())
             { ApplySelection(Self, InState, Index); }
         }
 

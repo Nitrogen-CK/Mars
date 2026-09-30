@@ -47,8 +47,8 @@ class UMars_AutoTest_WorldItem_PickupStows : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Stow(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Target = _Hotbar.TryGet_StowTarget();
         auto Item = _WorldItem.Get_HeldItem();
+        auto Target = _Hotbar.TryGet_StowTarget(Item);
         if (ck::Is_NOT_Valid(Target) || ck::Is_NOT_Valid(Item))
         {
             FinishFailure("stow precondition: a valid stow target and a world item holding one item");

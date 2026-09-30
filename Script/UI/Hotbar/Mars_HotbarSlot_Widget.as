@@ -1,3 +1,12 @@
+enum EMars_HotbarSlot_Kind
+{
+    Bag,
+    // Carried in hand, keyless, only on screen while occupied.
+    Overflow,
+    // The reserved backpack slot: keyed like a bag slot and always on screen.
+    Backpack
+}
+
 // One hotbar slot. The DataOnlyPanel base renders the slot inventory's item through _SlotClass into _ItemPanel and
 // refreshes itself on the inventory's OnItemsChanged; this class drives the frame, key badge and nameplate from the
 // selected/occupied state the hotbar widget pushes in.
@@ -13,7 +22,7 @@ class UMars_HotbarSlot_Widget : UCk_InventoryUI_DataOnlyPanel
     UPROPERTY(meta = (BindWidget))
     UCommonTextBlock SlotNumber;
 
-    // Holds SlotNumber; bag slots only.
+    // Holds SlotNumber; bag and backpack slots.
     UPROPERTY(meta = (BindWidgetOptional))
     UWidget KeyBadge;
 
@@ -48,24 +57,28 @@ class UMars_HotbarSlot_Widget : UCk_InventoryUI_DataOnlyPanel
     UPROPERTY(EditDefaultsOnly, Category = "Hotbar|Style")
     FLinearColor SelectedOutlineColor = FLinearColor(1.0, 1.0, 1.0, 1.0);
 
-    private bool _IsOverflow = false;
+    private EMars_HotbarSlot_Kind _Kind = EMars_HotbarSlot_Kind::Bag;
     private bool _IsSelected = false;
     private FCk_Handle_Item _Item;
 
-    // The label is the number key that selects the slot (key K selects index K - 1).
-    void Setup(int32 InIndex, bool InIsOverflow)
+    // The label is the number key that selects the slot: key K selects bag index K - 1, and the key one past the last
+    // bag slot selects the backpack slot (index BagSlotCount + 1, so its badge reads InIndex, not InIndex + 1).
+    void Setup(int32 InIndex, EMars_HotbarSlot_Kind InKind)
     {
-        _IsOverflow = InIsOverflow;
+        _Kind = InKind;
         _IsSelected = false;
         _Item = FCk_Handle_Item();
 
-        SlotNumber.SetText(FText::FromString(f"{InIndex + 1}"));
+        const auto KeyNumber = InKind == EMars_HotbarSlot_Kind::Backpack ? InIndex : InIndex + 1;
+        SlotNumber.SetText(FText::FromString(f"{KeyNumber}"));
+
+        const auto IsOverflow = InKind == EMars_HotbarSlot_Kind::Overflow;
 
         if (ck::IsValid(KeyBadge))
-        { KeyBadge.SetVisibility(InIsOverflow ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible); }
+        { KeyBadge.SetVisibility(IsOverflow ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible); }
 
         if (ck::IsValid(HandMarker))
-        { HandMarker.SetVisibility(InIsOverflow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed); }
+        { HandMarker.SetVisibility(IsOverflow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed); }
 
         DoRefresh_State();
     }
@@ -87,7 +100,7 @@ class UMars_HotbarSlot_Widget : UCk_InventoryUI_DataOnlyPanel
         const auto IsOccupied = ck::IsValid(_Item);
 
         // PEAK layout: the overflow slot is only on screen while it holds something.
-        if (_IsOverflow)
+        if (_Kind == EMars_HotbarSlot_Kind::Overflow)
         { SetVisibility(IsOccupied ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed); }
 
         if (_IsSelected)
