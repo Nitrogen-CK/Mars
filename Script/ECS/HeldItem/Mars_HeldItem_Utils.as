@@ -1,14 +1,15 @@
 namespace utils_held_item
 {
     // What is held is pushed in by the player HFSM (UMars_SmTask_HotbarDrivesHeldItem); the feature never reads the
-    // hotbar itself.
-    FCk_Handle_HeldItem Add(FCk_Handle& InPlayer, FMars_HeldItem_Spec InSpec)
+    // hotbar itself. The hand is the player's AttachPoint.Mars.Hand, so AttachPoints must be composed first.
+    FCk_Handle_HeldItem Add(FCk_Handle& InPlayer)
     {
-        auto Params = FMars_Fragment_HeldItem_Params();
-        Params.HandAttachPoint = InSpec.HandAttachPoint;
+        const auto AttachPoints = InPlayer.As_AttachPoints(ECk_SanityCheck::UnChecked);
+        const auto HasHand = ck::IsValid(AttachPoints) && AttachPoints.Has_AttachPoint(GameplayTags::AttachPoint_Mars_Hand);
+        if (ck::EnsureIfNot(HasHand, f"[HeldItem] [{InPlayer.ToString()}] needs AttachPoints with AttachPoint.Mars.Hand before HeldItem"))
+        { return FCk_Handle_HeldItem(); }
 
         InPlayer.Add_Fragment(FMars_Feature_HeldItem());
-        InPlayer.Add_Fragment(Params);
         InPlayer.Add_Fragment(FMars_Fragment_HeldItem());
         return InPlayer.As_HeldItem();
     }
@@ -39,7 +40,7 @@ mixin FCk_Handle_Inventory_DataOnly Get_CurrentInventory(const FCk_Handle_HeldIt
     return Self.Get_Fragment(FMars_Fragment_HeldItem).CurrentInventory;
 }
 
-// Invalid when the held item has no Presentation trait.
+// Invalid when the held item has no Presentation trait. For a Persistent item it is the item's own world item.
 mixin FCk_Handle Get_PresentationEntity(const FCk_Handle_HeldItem& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_HeldItem).PresentationEntity;
@@ -47,7 +48,7 @@ mixin FCk_Handle Get_PresentationEntity(const FCk_Handle_HeldItem& Self)
 
 mixin FCk_Handle_Transform Get_HandAttachPoint(const FCk_Handle_HeldItem& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_HeldItem_Params).HandAttachPoint;
+    return FCk_Handle(Self).As_AttachPoints().Get_AttachPoint(GameplayTags::AttachPoint_Mars_Hand);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

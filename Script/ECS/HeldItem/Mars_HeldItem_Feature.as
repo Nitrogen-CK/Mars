@@ -11,39 +11,12 @@ asset Mars_HeldItemHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_HeldItem {}
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Spec
-//--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_HeldItem_Spec
-{
-    // The scene node the held visual is parented under.
-    UPROPERTY()
-    FCk_Handle_Transform HandAttachPoint;
-
-    FMars_HeldItem_Spec() {}
-
-    FMars_HeldItem_Spec(const FCk_Handle_Transform& InHandAttachPoint)
-    {
-        HandAttachPoint = InHandAttachPoint;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-// Params
-//--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_Fragment_HeldItem_Params
-{
-    UPROPERTY()
-    FCk_Handle_Transform HandAttachPoint;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Derived, never authored: the hotbar's selected slot and its item. PresentationEntity is the HeldVisual world item,
-// recorded synchronously at spawn so a faster re-equip can still destroy it.
+// Derived, never authored: the hotbar's selected slot and its item. PresentationEntity is the Visual-mode world item,
+// recorded synchronously at spawn so a faster re-equip can still destroy it - or, for a Persistent item, the item's own
+// World-mode world item (not owned: never destroyed by HeldItem).
 struct FMars_Fragment_HeldItem
 {
     UPROPERTY()

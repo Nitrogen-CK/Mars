@@ -54,6 +54,10 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Inventory")
     FCk_Sway_Spec HandSway;
 
+    // Worn-backpack mount relative to the capsule root (X forward).
+    UPROPERTY(Category = "Inventory")
+    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0), FVector::OneVector);
+
     UPROPERTY(Category = "Inventory")
     float32 ThrowHoldSeconds = 0.35f;
 

@@ -110,10 +110,18 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_hand_bob::Add(HandBob, Config.FPHands.Bob);
         _HandNode = HandBob.As_Transform();
 
+        auto Back = utils_scene_node::Create(PlayerTransform, Config.BackOffset);
+        utils_handle::Set_DebugName(FCk_Handle(Back), n"Player.Back");
+
+        auto AttachPointsSpec = FMars_AttachPoints_Spec();
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, Back.As_Transform()));
+        utils_attach_points::Add(Player, AttachPointsSpec);
+
         auto HotbarSpec = FMars_Hotbar_Spec();
         HotbarSpec.BagSlotCount = Config.BagSlotCount;
         utils_hotbar::Add(Player, HotbarSpec);
-        auto HeldItem = utils_held_item::Add(Player, FMars_HeldItem_Spec(_HandNode));
+        auto HeldItem = utils_held_item::Add(Player);
         HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
         utils_held_item_use::Add(Player);
 
