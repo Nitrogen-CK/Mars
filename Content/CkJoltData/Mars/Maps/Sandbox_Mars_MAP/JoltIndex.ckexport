@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "002b608e2a39eb66a92a6b35e6abf65b",
+		"sourceHash": "d062b9fae72e4520f19abdd8c92d29b4",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -46,6 +46,30 @@
 					"_CellId":
 					{
 						"X": 0,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 0,
+							"Y": -110,
+							"Z": -10
+						},
+						"Max":
+						{
+							"X": 4000,
+							"Y": 2100,
+							"Z": 300
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Sandbox_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
 						"Y": -1
 					},
 					"_Bounds":
@@ -65,30 +89,6 @@
 						"IsValid": true
 					},
 					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Sandbox_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
-				},
-				{
-					"_CellId":
-					{
-						"X": 0,
-						"Y": 0
-					},
-					"_Bounds":
-					{
-						"Min":
-						{
-							"X": 0,
-							"Y": -110,
-							"Z": -10
-						},
-						"Max":
-						{
-							"X": 4000,
-							"Y": 2100,
-							"Z": 270
-						},
-						"IsValid": true
-					},
-					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Sandbox_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
 				}
 			]
 		}
