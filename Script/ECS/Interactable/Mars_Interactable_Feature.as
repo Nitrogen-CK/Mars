@@ -85,17 +85,23 @@ struct FMars_Interactable_Spec
     TOptional<FMars_Interactable_ProbeInfo> ProbeInfo;
     TArray<FMars_Interactable_TargetEntry> Targets;
     ECk_EnableDisable StartEnableDisable = ECk_EnableDisable::Enable;
+
+    // Higher wins focus when several interactables sit under the view ray; ties fall back to distance. Cargo slots use 10.
+    int32 FocusPriority = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The spec residue read after construction: which channels the targets were created on.
+// The spec residue read after construction: which channels the targets were created on, and how it ranks for focus.
 struct FMars_Fragment_Interactable_Params
 {
     UPROPERTY()
     TArray<FGameplayTag> TargetChannels;
+
+    UPROPERTY()
+    int32 FocusPriority = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

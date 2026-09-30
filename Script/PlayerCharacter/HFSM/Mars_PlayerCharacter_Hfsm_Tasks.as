@@ -99,12 +99,14 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
         Recompute_Focus();
     }
 
-    // Same distance metric the resolver sorts by, so the prompt and the interaction agree.
+    // The highest FocusPriority wins; ties use the same distance metric the resolver sorts by, so the prompt and the
+    // interaction agree.
     private void Recompute_Focus()
     {
         const auto PlayerLocation = Get_Location(_Player);
 
         auto Best = FCk_Handle_Interactable();
+        int32 BestPriority = 0;
         float64 BestDistSq = 0.0;
         for (int32 Index = _Candidates.Num() - 1; Index >= 0; --Index)
         {
@@ -118,10 +120,15 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
             if (Candidate.Get_EnableDisable() == ECk_EnableDisable::Disable)
             { continue; }
 
+            const auto Priority = Candidate.Get_FocusPriority();
             const auto DistSq = (Get_Location(Candidate) - PlayerLocation).SizeSquared();
-            if (ck::Is_NOT_Valid(Best) || DistSq < BestDistSq)
+            const auto Wins = ck::Is_NOT_Valid(Best)
+                || Priority > BestPriority
+                || (Priority == BestPriority && DistSq < BestDistSq);
+            if (Wins)
             {
                 Best = Candidate;
+                BestPriority = Priority;
                 BestDistSq = DistSq;
             }
         }

@@ -28,6 +28,7 @@ namespace utils_interactable
         auto Params = FMars_Fragment_Interactable_Params();
         for (const auto& Entry : InParams.Targets)
         { Params.TargetChannels.Add(Entry.InteractTargetSpec.Get_InteractionChannel()); }
+        Params.FocusPriority = InParams.FocusPriority;
 
         InteractableHandle.Add_Fragment(Params);
         InteractableHandle.Add_Fragment(FMars_Feature_Interactable());
@@ -94,6 +95,11 @@ mixin TArray<FCk_Handle_InteractTarget> Get_AllInteractTargets(const FCk_Handle_
         { Result.Add(Target); }
     }
     return Result;
+}
+
+mixin int32 Get_FocusPriority(const FCk_Handle_Interactable& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Interactable_Params).FocusPriority;
 }
 
 mixin ECk_EnableDisable Get_EnableDisable(const FCk_Handle_Interactable& Self)
