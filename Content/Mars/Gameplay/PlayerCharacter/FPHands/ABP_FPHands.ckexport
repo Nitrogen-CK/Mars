@@ -1,0 +1,1301 @@
+{
+	"assetName": "ABP_FPHands",
+	"assetPath": "/Game/Mars/Gameplay/PlayerCharacter/FPHands/ABP_FPHands.ABP_FPHands",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "0d969199cff7f93e70bd19ac84b7b970",
+		"exporterVersion": 3
+	},
+	"blueprintType": "AnimBlueprint",
+	"parentClass": "Mars_FPHands_AnimInstance",
+	"parentClassPath": "/Script/Angelscript.Mars_FPHands_AnimInstance",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "GripPoseIndex_L",
+			"type": "int32",
+			"category": "FPHands",
+			"value": 0,
+			"tooltip": "Blend Poses by Int child index per glove (EMars_HandGripPose)."
+		},
+		{
+			"name": "GripPoseIndex_R",
+			"type": "int32",
+			"category": "FPHands",
+			"value": 0
+		},
+		{
+			"name": "LowerArmLocation_L",
+			"type": "FVector",
+			"category": "FPHands",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			},
+			"tooltip": "Component space; fed to the Transform (Modify) Bone nodes on lowerarm_l / lowerarm_r."
+		},
+		{
+			"name": "LowerArmRotation_L",
+			"type": "FRotator",
+			"category": "FPHands",
+			"value":
+			{
+				"Pitch": 0,
+				"Yaw": 0,
+				"Roll": 0
+			}
+		},
+		{
+			"name": "LowerArmLocation_R",
+			"type": "FVector",
+			"category": "FPHands",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			}
+		},
+		{
+			"name": "LowerArmRotation_R",
+			"type": "FRotator",
+			"category": "FPHands",
+			"value":
+			{
+				"Pitch": 0,
+				"Yaw": 0,
+				"Roll": 0
+			}
+		},
+		{
+			"name": "PlacementAlpha",
+			"type": "float",
+			"category": "FPHands",
+			"value": 0,
+			"tooltip": "0 until the owner provides targets (editor preview, pawn still constructing) - the gloves keep their anim pose."
+		},
+		{
+			"name": "Curl_L_Thumb",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1,
+			"tooltip": "Finger contact, fed to CR_FPHands_Contact: how far (0..1) each digit closes toward its authored grip pose."
+		},
+		{
+			"name": "Curl_L_Index",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "Curl_L_Middle",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "Curl_L_Pinky",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Thumb",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Index",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Middle",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Pinky",
+			"type": "float",
+			"category": "FPHands|Contact",
+			"value": 1
+		},
+		{
+			"name": "ContactCurves",
+			"type": "TMap",
+			"category": "FPHands|Contact",
+			"value": [],
+			"tooltip": "CR_FPHands_Contact reads them back into its variables (its input mapping works on curves)."
+		},
+		{
+			"name": "RootMotionMode",
+			"type": "TEnumAsByte<ERootMotionMode::Type>",
+			"category": "RootMotion",
+			"value": "RootMotionFromMontagesOnly",
+			"tooltip": "Sets where this blueprint pulls Root Motion from"
+		},
+		{
+			"name": "bReceiveNotifiesFromLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to process notifies from any linked anim instances"
+		},
+		{
+			"name": "bPropagateNotifiesToLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to propagate notifies to any linked anim instances"
+		},
+		{
+			"name": "bUseMainInstanceMontageEvaluationData",
+			"type": "uint8",
+			"category": "Montage",
+			"value": false,
+			"tooltip": "If true, linked instances will use the main instance's montage data. (i.e. playing a montage on a main instance will play it on the linked layer too.)"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event BlueprintUpdateAnimation",
+					"entryNodeId": "Node_zFugDUAvlKAuHfKdEgo4jw",
+					"steps": [
+						{
+							"nodeId": "Node_zFugDUAvlKAuHfKdEgo4jw",
+							"title": "Event BlueprintUpdateAnimation"
+						},
+						{
+							"nodeId": "Node_g0OZX0Djw_vmZc-g95y5jQ",
+							"title": "Parent: BlueprintUpdateAnimation"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_zFugDUAvlKAuHfKdEgo4jw",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output",
+							"connections": [
+								"Node_g0OZX0Djw_vmZc-g95y5jQ.execute"
+							]
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_g0OZX0Djw_vmZc-g95y5jQ.DeltaTimeX"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_g0OZX0Djw_vmZc-g95y5jQ",
+					"nodeClass": "K2Node_CallParentFunction",
+					"nodeTitle": "Parent: BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "execute",
+							"pinType": "exec",
+							"direction": "Input",
+							"connections": [
+								"Node_zFugDUAvlKAuHfKdEgo4jw.then"
+							]
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_zFugDUAvlKAuHfKdEgo4jw.DeltaTimeX"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_p2dWoERjvi_TobaaOutaGg",
+					"nodeClass": "K2Node_CallFunction",
+					"nodeTitle": "Try Get Pawn Owner\nTarget is Anim Instance",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "self",
+							"pinType": "AnimInstance",
+							"direction": "Input"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ReturnValue",
+							"pinType": "Pawn",
+							"direction": "Output"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [
+		{
+			"graphName": "AnimGraph",
+			"graphCategory": "Function",
+			"executionFlows": [],
+			"nodes": [
+				{
+					"nodeId": "Node_EomoK0QUixUHK2-2UprMWw",
+					"nodeClass": "AnimGraphNode_Root",
+					"nodeTitle": "Output Pose\nAnimGraph",
+					"inputPins": [
+						{
+							"pinName": "Result",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_DebZ6ERWYwbz1AGR-p5Kxg.Pose"
+							]
+						}
+					],
+					"outputPins": []
+				},
+				{
+					"nodeId": "Node_efeTbUUu0wKfL_aP8oCvSw",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Idle\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_0"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_D-yl90hMhoUO7OGdJKVRvQ",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Power\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_1"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_1uVOL0d3qjEEjMihk8gPfQ",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Pinch\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_2"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_oXWDe03zenuJcjq73UCUhg",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Cradle\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_3"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_gBSWT0FAXZ2AkxO79EMQLQ",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Hook\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_4"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_k2RWDUDzqIAe2Uisx4Us_Q",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Fist\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_5"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_5670M0XgziLUi7WALt96gQ",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Open\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.BlendPose_6"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_na0pjkdutWfiTnuFWcXmYQ",
+					"nodeClass": "AnimGraphNode_BlendListByInt",
+					"nodeTitle": "Blend Poses by int",
+					"inputPins": [
+						{
+							"pinName": "BlendPose_0",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_efeTbUUu0wKfL_aP8oCvSw.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_1",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_D-yl90hMhoUO7OGdJKVRvQ.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_2",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_1uVOL0d3qjEEjMihk8gPfQ.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_3",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_oXWDe03zenuJcjq73UCUhg.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_4",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_gBSWT0FAXZ2AkxO79EMQLQ.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_5",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_k2RWDUDzqIAe2Uisx4Us_Q.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_6",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_5670M0XgziLUi7WALt96gQ.Pose"
+							]
+						},
+						{
+							"pinName": "BlendTime_0",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_1",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_2",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_3",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_4",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_5",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_6",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "ActiveChildIndex",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "0",
+							"connections": [
+								"Node_BNVXBkDZDUIZrDuqTSVG0Q.GripPoseIndex_L"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_oapQak8TbSKocT67GIxIkg.BasePose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_BNVXBkDZDUIZrDuqTSVG0Q",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get GripPoseIndex_L",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "GripPoseIndex_L",
+							"pinType": "Integer",
+							"direction": "Output",
+							"defaultValue": "0",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.ActiveChildIndex"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_MkKwwU2Wejk6alqGdgUyIw",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Idle\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_0"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_MzAQgk7AiUO2MBqBIzNzQQ",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Power\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_1"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_YTKgpkwz2-vJNrShIB5CXw",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Pinch\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_2"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_3gVldELO-OVPY56Vjt-xVA",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Cradle\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_3"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_rX9Zg0PUCgiogBGb2yANsg",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Grip_Hook\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_4"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_v5nkIUpgJf-QbWelkE6VFg",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Fist\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_5"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_byrP-EXN8GOmuvWe34mhNg",
+					"nodeClass": "AnimGraphNode_SequencePlayer",
+					"nodeTitle": "A_FPHands_Open\nSequence Player",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.BlendPose_6"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_xRrV-kZAfNF8HPGSk6awbw",
+					"nodeClass": "AnimGraphNode_BlendListByInt",
+					"nodeTitle": "Blend Poses by int",
+					"inputPins": [
+						{
+							"pinName": "BlendPose_0",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_MkKwwU2Wejk6alqGdgUyIw.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_1",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_MzAQgk7AiUO2MBqBIzNzQQ.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_2",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_YTKgpkwz2-vJNrShIB5CXw.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_3",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_3gVldELO-OVPY56Vjt-xVA.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_4",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_rX9Zg0PUCgiogBGb2yANsg.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_5",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_v5nkIUpgJf-QbWelkE6VFg.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPose_6",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"connections": [
+								"Node_byrP-EXN8GOmuvWe34mhNg.Pose"
+							]
+						},
+						{
+							"pinName": "BlendTime_0",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_1",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_2",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_3",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_4",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_5",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "BlendTime_6",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.100000"
+						},
+						{
+							"pinName": "ActiveChildIndex",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "0",
+							"connections": [
+								"Node_ZKJ_ZkRS9GhY5NSd9tR0Eg.GripPoseIndex_R"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_oapQak8TbSKocT67GIxIkg.BlendPoses_0"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_ZKJ_ZkRS9GhY5NSd9tR0Eg",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get GripPoseIndex_R",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "GripPoseIndex_R",
+							"pinType": "Integer",
+							"direction": "Output",
+							"defaultValue": "0",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.ActiveChildIndex"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_oapQak8TbSKocT67GIxIkg",
+					"nodeClass": "AnimGraphNode_LayeredBoneBlend",
+					"nodeTitle": "Layered blend per bone",
+					"inputPins": [
+						{
+							"pinName": "BasePose",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_na0pjkdutWfiTnuFWcXmYQ.Pose"
+							]
+						},
+						{
+							"pinName": "BlendPoses_0",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_xRrV-kZAfNF8HPGSk6awbw.Pose"
+							]
+						},
+						{
+							"pinName": "BlendWeights_0",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_yuPpuk76OgNJqVW9M4GbDA.Source"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node__pH-RUplsfw68xiBC8LkPg",
+					"nodeClass": "AnimGraphNode_LocalToComponentSpace",
+					"nodeTitle": "Local To Component",
+					"inputPins": [
+						{
+							"pinName": "LocalPose",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_-mP9bEqamXkFgwCy3N93Ew.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_rvASCktqwXRZYd6YQtEJXQ.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_rvASCktqwXRZYd6YQtEJXQ",
+					"nodeClass": "AnimGraphNode_ModifyBone",
+					"nodeTitle": "Transform (Modify) Bone\nBone: lowerarm_l",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node__pH-RUplsfw68xiBC8LkPg.ComponentPose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000",
+							"connections": [
+								"Node_QqDxLE4PhFa1k8ukavHwEA.PlacementAlpha"
+							]
+						},
+						{
+							"pinName": "Translation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000",
+							"connections": [
+								"Node_ZlBcZ0bn2AWmY5GrMdWWmw.LowerArmLocation_L"
+							]
+						},
+						{
+							"pinName": "Rotation",
+							"pinType": "Rotator",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000",
+							"connections": [
+								"Node_Vlo76kjZtoj_F1apGRApcA.LowerArmRotation_L"
+							]
+						},
+						{
+							"pinName": "Scale",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "1.000000,1.000000,1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_3rUihk3NvhUiIeKq1js5yw.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_ZlBcZ0bn2AWmY5GrMdWWmw",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get LowerArmLocation_L",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "LowerArmLocation_L",
+							"pinType": "Vector",
+							"direction": "Output",
+							"defaultValue": "0, 0, 0",
+							"connections": [
+								"Node_rvASCktqwXRZYd6YQtEJXQ.Translation"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_Vlo76kjZtoj_F1apGRApcA",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get LowerArmRotation_L",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "LowerArmRotation_L",
+							"pinType": "Rotator",
+							"direction": "Output",
+							"defaultValue": "0, 0, 0",
+							"connections": [
+								"Node_rvASCktqwXRZYd6YQtEJXQ.Rotation"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_QqDxLE4PhFa1k8ukavHwEA",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get PlacementAlpha",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "PlacementAlpha",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_rvASCktqwXRZYd6YQtEJXQ.Alpha"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_3rUihk3NvhUiIeKq1js5yw",
+					"nodeClass": "AnimGraphNode_ModifyBone",
+					"nodeTitle": "Transform (Modify) Bone\nBone: lowerarm_r",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_rvASCktqwXRZYd6YQtEJXQ.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000",
+							"connections": [
+								"Node_bg3ck0zIiC9CzSy3gs05Lg.PlacementAlpha"
+							]
+						},
+						{
+							"pinName": "Translation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000",
+							"connections": [
+								"Node_3dRqyUFfAUGvVuCeN1k43A.LowerArmLocation_R"
+							]
+						},
+						{
+							"pinName": "Rotation",
+							"pinType": "Rotator",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000",
+							"connections": [
+								"Node_jh2v307ng4yUJYSVdMarlw.LowerArmRotation_R"
+							]
+						},
+						{
+							"pinName": "Scale",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "1.000000,1.000000,1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_3Cnr8kd9qcLxG8GUG9FBnQ.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_3dRqyUFfAUGvVuCeN1k43A",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get LowerArmLocation_R",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "LowerArmLocation_R",
+							"pinType": "Vector",
+							"direction": "Output",
+							"defaultValue": "0, 0, 0",
+							"connections": [
+								"Node_3rUihk3NvhUiIeKq1js5yw.Translation"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_jh2v307ng4yUJYSVdMarlw",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get LowerArmRotation_R",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "LowerArmRotation_R",
+							"pinType": "Rotator",
+							"direction": "Output",
+							"defaultValue": "0, 0, 0",
+							"connections": [
+								"Node_3rUihk3NvhUiIeKq1js5yw.Rotation"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_bg3ck0zIiC9CzSy3gs05Lg",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get PlacementAlpha",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "PlacementAlpha",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_3rUihk3NvhUiIeKq1js5yw.Alpha"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_3Cnr8kd9qcLxG8GUG9FBnQ",
+					"nodeClass": "AnimGraphNode_SpringBone",
+					"nodeTitle": "Spring controller\nBone: cuff_l",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_3rUihk3NvhUiIeKq1js5yw.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_a0cd3Uv-YgrKnwibvhPmIA.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_a0cd3Uv-YgrKnwibvhPmIA",
+					"nodeClass": "AnimGraphNode_SpringBone",
+					"nodeTitle": "Spring controller\nBone: cuff_r",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_3Cnr8kd9qcLxG8GUG9FBnQ.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_DebZ6ERWYwbz1AGR-p5Kxg.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_DebZ6ERWYwbz1AGR-p5Kxg",
+					"nodeClass": "AnimGraphNode_ComponentToLocalSpace",
+					"nodeTitle": "Component To Local",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_a0cd3Uv-YgrKnwibvhPmIA.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_EomoK0QUixUHK2-2UprMWw.Result"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_-mP9bEqamXkFgwCy3N93Ew",
+					"nodeClass": "AnimGraphNode_ControlRig",
+					"nodeTitle": "Control Rig",
+					"inputPins": [
+						{
+							"pinName": "Source",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_uC8--0bvUK-vJJKvFK7R1w.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node__pH-RUplsfw68xiBC8LkPg.LocalPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_uC8--0bvUK-vJJKvFK7R1w",
+					"nodeClass": "AnimGraphNode_ModifyCurve",
+					"nodeTitle": "Modify Curve",
+					"inputPins": [
+						{
+							"pinName": "SourcePose",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_yuPpuk76OgNJqVW9M4GbDA.Pose"
+							]
+						},
+						{
+							"pinName": "CurveMap",
+							"pinType": "TMap<Name, real>",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_LViZ60DRWs0IOxyPbVgcWg.ContactCurves"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_-mP9bEqamXkFgwCy3N93Ew.Source"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_LViZ60DRWs0IOxyPbVgcWg",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get ContactCurves",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "ContactCurves",
+							"pinType": "TMap<Name, real>",
+							"direction": "Output",
+							"connections": [
+								"Node_uC8--0bvUK-vJJKvFK7R1w.CurveMap"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_yuPpuk76OgNJqVW9M4GbDA",
+					"nodeClass": "AnimGraphNode_Slot",
+					"nodeTitle": "Slot 'DefaultSlot'\nGroup 'DefaultGroup'",
+					"inputPins": [
+						{
+							"pinName": "Source",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_oapQak8TbSKocT67GIxIkg.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_uC8--0bvUK-vJJKvFK7R1w.SourcePose"
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"macroGraphs": []
+}

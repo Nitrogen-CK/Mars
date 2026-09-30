@@ -114,6 +114,51 @@ namespace mars
         Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
     }
 
+    asset Mars_IA_Emote_Wave of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_Emote_Wave, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_Emote_Wave";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindEmoteWave", "Emote: Wave");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryEmotes", "Emotes");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
+    asset Mars_IA_Emote_ThumbsUp of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_Emote_ThumbsUp, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_Emote_ThumbsUp";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindEmoteThumbsUp", "Emote: Thumbs Up");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryEmotes", "Emotes");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
+    asset Mars_IA_Emote_Point of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_Emote_Point, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_Emote_Point";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindEmotePoint", "Emote: Point");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryEmotes", "Emotes");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
+    asset Mars_IA_Emote_Clap of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_Emote_Clap, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_Emote_Clap";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindEmoteClap", "Emote: Clap");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryEmotes", "Emotes");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
+    asset Mars_IA_Emote_FlipOff of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_Emote_FlipOff, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_Emote_FlipOff";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindEmoteFlipOff", "Emote: Middle Finger");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryEmotes", "Emotes");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
     // An axis like Move/Look: a wheel tick is pressed and released inside one frame, which a polled
     // level row can miss. Not player-mappable.
     asset Mars_IA_CycleSlot of UCk_Axis1d_InputAction

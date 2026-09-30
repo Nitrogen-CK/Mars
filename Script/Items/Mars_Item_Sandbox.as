@@ -7,6 +7,7 @@ asset Mars_ItemDef_Rock of UCk_InventoryItem_Definition
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
     Presentation.Mesh = engine::Sphere();
     Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
+    Presentation.GripShape = EMars_FPHands_GripShape::Sphere;
     Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 

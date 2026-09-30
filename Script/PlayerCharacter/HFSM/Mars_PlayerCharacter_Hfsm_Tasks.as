@@ -69,6 +69,7 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
 
         _Candidates.Empty();
         _Focused = FCk_Handle_Interactable();
+        mars_interaction_focus::Set(_Player, _Focused);
     }
 
     UFUNCTION()
@@ -132,6 +133,7 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
         { DoUnfocus(_Focused); }
 
         _Focused = Best;
+        mars_interaction_focus::Set(_Player, _Focused);
 
         if (ck::IsValid(_Focused))
         { DoFocus(_Focused); }

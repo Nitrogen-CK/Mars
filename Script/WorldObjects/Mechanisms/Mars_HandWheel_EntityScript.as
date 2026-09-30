@@ -72,9 +72,11 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
 
         // Wheel: 50 across, 5 thick; the cylinder's Z axis is pitched onto X, the roll axis. The spoke makes the turn
         // readable on an otherwise symmetric disc.
+        // A cylinder with Grip_R / Grip_L sockets on the rim at 2 and 10 o'clock: the first-person gloves take it with both hands.
+        auto WheelMesh = Cast<UStaticMesh>(LoadObject(this, "/Game/Mars/Gameplay/Mechanisms/HandWheel_Mars_SM.HandWheel_Mars_SM"));
         auto WheelTransform = InWheelNode.As_Transform();
         AddMesh(WheelTransform, FTransform(FRotator(90.0, 0.0, 0.0), FVector::ZeroVector, FVector(0.5, 0.5, 0.05)),
-            CylinderMesh, Material, collision::profile::NoCollision, n"HandWheel_Wheel");
+            ck::IsValid(WheelMesh) ? WheelMesh : CylinderMesh, Material, collision::profile::NoCollision, n"HandWheel_Wheel");
         AddMesh(WheelTransform, FTransform(FRotator::ZeroRotator, FVector(4.0, 0.0, 0.0), FVector(0.04, 0.46, 0.06)),
             CubeMesh, Material, collision::profile::NoCollision, n"HandWheel_Spoke");
     }

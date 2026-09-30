@@ -1,0 +1,155 @@
+{
+	"assetName": "CR_FPHands_Contact",
+	"assetPath": "/Game/Mars/Gameplay/PlayerCharacter/FPHands/CR_FPHands_Contact.CR_FPHands_Contact",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "1ef531d3f58bc4444198370449b997fe",
+		"exporterVersion": 3
+	},
+	"blueprintType": "ControlRigBlueprint",
+	"parentClass": "ControlRig",
+	"parentClassPath": "/Script/ControlRig.ControlRig",
+	"implementedInterfaces": [],
+	"variables": [
+		{
+			"varName": "Curl_L_Thumb",
+			"friendlyName": "Curl L Thumb",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_L_Index",
+			"friendlyName": "Curl L Index",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_L_Middle",
+			"friendlyName": "Curl L Middle",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_L_Pinky",
+			"friendlyName": "Curl L Pinky",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_R_Thumb",
+			"friendlyName": "Curl R Thumb",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_R_Index",
+			"friendlyName": "Curl R Index",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_R_Middle",
+			"friendlyName": "Curl R Middle",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		},
+		{
+			"varName": "Curl_R_Pinky",
+			"friendlyName": "Curl R Pinky",
+			"varType": "float",
+			"category": "Default",
+			"defaultValue": "",
+			"isReplicated": false
+		}
+	],
+	"classDefaults": [
+		{
+			"name": "Curl_L_Thumb",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_L_Index",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_L_Middle",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_L_Pinky",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Thumb",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Index",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Middle",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "Curl_R_Pinky",
+			"type": "float",
+			"category": "Default",
+			"value": 1
+		},
+		{
+			"name": "AssetUserData",
+			"type": "TArray",
+			"category": "Default",
+			"value": [],
+			"tooltip": "Array of user data stored with the asset"
+		},
+		{
+			"name": "AssetUserDataEditorOnly",
+			"type": "TArray",
+			"category": "Default",
+			"value": [],
+			"tooltip": "Array of user data stored with the asset"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "Rig",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

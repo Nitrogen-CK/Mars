@@ -56,6 +56,14 @@ struct FMars_Fragment_HeldItem
     FCk_Handle PresentationEntity;
 }
 
+// One-shot: the next held visual spawns at this world transform (instead of at its hold offset) and keeps that offset
+// from the hand, e.g. an item picked up by the first-person gloves starts where it lay and rides in with them.
+struct FMars_Fragment_HeldItem_SpawnFrom
+{
+    UPROPERTY()
+    FTransform WorldTransform;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------

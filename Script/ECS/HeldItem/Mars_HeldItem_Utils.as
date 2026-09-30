@@ -54,6 +54,18 @@ mixin FCk_Handle_Transform Get_HandAttachPoint(const FCk_Handle_HeldItem& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The next held visual spawns at InWorldTransform (consumed by that spawn). Clear it if no spawn follows.
+mixin void Set_NextSpawnFrom(FCk_Handle_HeldItem& Self, const FTransform& InWorldTransform)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_SpawnFrom);
+    Fragment.WorldTransform = InWorldTransform;
+}
+
+mixin void Clear_NextSpawnFrom(FCk_Handle_HeldItem& Self)
+{
+    Self.Request_TryRemove(FMars_Fragment_HeldItem_SpawnFrom);
+}
+
 mixin void Request_SetSlot(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetSlot& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);

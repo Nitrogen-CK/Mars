@@ -16,6 +16,23 @@ class UMars_ItemTrait_Presentation : UCk_ItemTrait
     UPROPERTY()
     FTransform HeldOffset;
 
+    // Finger pose the first-person gloves use while holding this item.
+    UPROPERTY()
+    EMars_HandGripPose GripPose = EMars_HandGripPose::Cradle;
+
+    // Both gloves hold the item by its sides (the hold centres on screen); otherwise only the right glove grips it,
+    // at the Hand attach point.
+    UPROPERTY()
+    bool IsTwoHanded = true;
+
+    // Two-handed: half the distance between the palms. <= 0 measures the Mesh bounds (x MeshScale, through HeldOffset).
+    UPROPERTY()
+    float32 GripHalfWidth = 0.0f;
+
+    // The primitive the gloves' fingers close on, fitted to the Mesh bounds (finger contact).
+    UPROPERTY()
+    EMars_FPHands_GripShape GripShape = EMars_FPHands_GripShape::Auto;
+
     // World-mode pickup probe radius.
     UPROPERTY()
     float32 PickupProbeRadius = 40.0f;

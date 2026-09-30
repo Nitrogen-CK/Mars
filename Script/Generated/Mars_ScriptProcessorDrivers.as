@@ -144,6 +144,29 @@ class UMars_Processor_Gate_Setup_Driver : UMars_Processor_Gate_Setup
     }
 }
 
+class UMars_Processor_HandBob_Tick_Driver : UMars_Processor_HandBob_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_HandBob);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_HandBob_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_HandBob& P0 = Batch.Get(i, FMars_Fragment_HandBob);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_Hazard_HandleRequests_Driver : UMars_Processor_Hazard_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

@@ -50,6 +50,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
         AddTask(InHandle, UMars_SmTask_PrimaryIntentToResolver);
         AddTask(InHandle, UMars_SmTask_HotbarIntents);
+        AddTask(InHandle, UMars_SmTask_EmoteIntents);
         AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
         AddTask(InHandle, UMars_SmTask_HeldItemDrivesUse);
         AddTask(InHandle, UMars_SmTask_DropThrowIntent);

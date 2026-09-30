@@ -1,0 +1,83 @@
+{
+	"material": "M_Glove",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/M_Glove",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "c009a8aea0fa26311d84e1a525176ded",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ScalarParameter": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.200000,G=0.095000,B=0.045000,A=1.000000)",
+					"ParameterName": "BaseColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.72000002861022949,
+					"ParameterName": "Roughness"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Roughness",
+			"value": 0.72000002861022949
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "BaseColor",
+			"value": "RGBA(0.2, 0.095, 0.045, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

@@ -62,9 +62,11 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
             CylinderMesh, Material, collision::profile::BlockAll, n"Lever_Base");
 
         // On a child of the handle node so the node's offset stays a pure pull rotation about the pivot.
+        // A cube with a Grip socket near the top of the bar: the first-person gloves reach for it.
+        auto HandleMesh = Cast<UStaticMesh>(LoadObject(this, "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM"));
         auto HandleTransform = InHandleNode.As_Transform();
         AddMesh(HandleTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0), FVector(0.08, 0.08, 0.9)),
-            CubeMesh, Material, collision::profile::NoCollision, n"Lever_Handle");
+            ck::IsValid(HandleMesh) ? HandleMesh : CubeMesh, Material, collision::profile::NoCollision, n"Lever_Handle");
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot)

@@ -154,6 +154,11 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Slot3, EKeys::Three);
         Context.MapKey(mars::Mars_IA_Slot4, EKeys::Four);
         Context.MapKey(mars::Mars_IA_Drop, EKeys::Q);
+        Context.MapKey(mars::Mars_IA_Emote_Wave, EKeys::Five);
+        Context.MapKey(mars::Mars_IA_Emote_ThumbsUp, EKeys::Six);
+        Context.MapKey(mars::Mars_IA_Emote_Point, EKeys::Seven);
+        Context.MapKey(mars::Mars_IA_Emote_Clap, EKeys::Eight);
+        Context.MapKey(mars::Mars_IA_Emote_FlipOff, EKeys::Nine);
         Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::MouseWheelAxis);
 
         Context.MapKey(mars::Mars_IA_ToggleDebugger, EKeys::F9);
@@ -271,6 +276,11 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("SC", n"IA_Slot3", GameplayTags::Mars_Intent_Slot3));
         Rows.Add(FMars_Gameplay_IntentRow("SD", n"IA_Slot4", GameplayTags::Mars_Intent_Slot4));
         Rows.Add(FMars_Gameplay_IntentRow("DR", n"IA_Drop", GameplayTags::Mars_Intent_Drop));
+        Rows.Add(FMars_Gameplay_IntentRow("EW", n"IA_Emote_Wave", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Wave")));
+        Rows.Add(FMars_Gameplay_IntentRow("ET", n"IA_Emote_ThumbsUp", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.ThumbsUp")));
+        Rows.Add(FMars_Gameplay_IntentRow("EP", n"IA_Emote_Point", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Point")));
+        Rows.Add(FMars_Gameplay_IntentRow("EC", n"IA_Emote_Clap", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Clap")));
+        Rows.Add(FMars_Gameplay_IntentRow("EF", n"IA_Emote_FlipOff", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.FlipOff")));
         return Rows;
     }
 

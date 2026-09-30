@@ -1855,6 +1855,19 @@ namespace UMars_SmTask_DropThrowIntent
 }
 
 USTRUCT()
+struct FMars_SmTask_EmoteIntents_SpawnParams
+{
+}
+
+namespace UMars_SmTask_EmoteIntents
+{
+    FMars_SmTask_EmoteIntents_SpawnParams Params()
+    {
+        return FMars_SmTask_EmoteIntents_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_HeldItemDrivesUse_SpawnParams
 {
 }
