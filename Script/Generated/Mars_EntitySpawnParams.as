@@ -255,6 +255,58 @@ namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone
+{
+    FMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_SubSmExitResetsToNone_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_SubSmExitResetsToNone
+{
+    FMars_AutoTest_FPHands_SubSmExitResetsToNone_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_SubSmExitResetsToNone_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha
+{
+    FMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_TimedReachHoldsUntilRelease_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease
+{
+    FMars_AutoTest_FPHands_TimedReachHoldsUntilRelease_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_TimedReachHoldsUntilRelease_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams
 {
 }
@@ -1513,6 +1565,123 @@ namespace UMars_SmCondition_CrouchPressed
 }
 
 USTRUCT()
+struct FMars_SmCondition_HandsPhaseElapsed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPhaseElapsed
+{
+    FMars_SmCondition_HandsPhaseElapsed_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPhaseElapsed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsPhaseElapsed_Grip_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPhaseElapsed_Grip
+{
+    FMars_SmCondition_HandsPhaseElapsed_Grip_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPhaseElapsed_Grip_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsPhaseElapsed_Reach_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPhaseElapsed_Reach
+{
+    FMars_SmCondition_HandsPhaseElapsed_Reach_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPhaseElapsed_Reach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsPhaseElapsed_Release_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPhaseElapsed_Release
+{
+    FMars_SmCondition_HandsPhaseElapsed_Release_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPhaseElapsed_Release_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsPhaseElapsed_Return_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPhaseElapsed_Return
+{
+    FMars_SmCondition_HandsPhaseElapsed_Return_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPhaseElapsed_Return_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsReachRequested_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsReachRequested
+{
+    FMars_SmCondition_HandsReachRequested_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsReachRequested_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsReachRequested_Instant_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsReachRequested_Instant
+{
+    FMars_SmCondition_HandsReachRequested_Instant_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsReachRequested_Instant_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsReachRequested_Timed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsReachRequested_Timed
+{
+    FMars_SmCondition_HandsReachRequested_Timed_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsReachRequested_Timed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsTargetLost_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsTargetLost
+{
+    FMars_SmCondition_HandsTargetLost_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsTargetLost_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_HasMoveIntent_SpawnParams
 {
 }
@@ -1838,6 +2007,84 @@ namespace UMars_SmState_ExitAndTerminate
 }
 
 USTRUCT()
+struct FMars_SmState_Hands_Grip_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Grip
+{
+    FMars_SmState_Hands_Grip_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Grip_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Hands_Hold_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Hold
+{
+    FMars_SmState_Hands_Hold_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Hold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Hands_Reach_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Reach
+{
+    FMars_SmState_Hands_Reach_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Reach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Hands_Release_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Release
+{
+    FMars_SmState_Hands_Release_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Release_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Hands_Rest_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Rest
+{
+    FMars_SmState_Hands_Rest_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Rest_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Hands_Return_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Return
+{
+    FMars_SmState_Hands_Return_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Return_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Interactable_Disabled_SpawnParams
 {
 }
@@ -2120,6 +2367,136 @@ namespace UMars_SmTask_EmoteIntents
     FMars_SmTask_EmoteIntents_SpawnParams Params()
     {
         return FMars_SmTask_EmoteIntents_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase
+{
+    FMars_SmTask_Hands_SetPhase_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_Grip_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_Grip
+{
+    FMars_SmTask_Hands_SetPhase_Grip_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_Grip_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_Hold_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_Hold
+{
+    FMars_SmTask_Hands_SetPhase_Hold_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_Hold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_None_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_None
+{
+    FMars_SmTask_Hands_SetPhase_None_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_None_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_Reach_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_Reach
+{
+    FMars_SmTask_Hands_SetPhase_Reach_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_Reach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_Release_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_Release
+{
+    FMars_SmTask_Hands_SetPhase_Release_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_Release_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_Return_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_Return
+{
+    FMars_SmTask_Hands_SetPhase_Return_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_Return_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Hands_StopEmote_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_StopEmote
+{
+    FMars_SmTask_Hands_StopEmote_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_StopEmote_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HandsResolverBinds_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HandsResolverBinds
+{
+    FMars_SmTask_HandsResolverBinds_SpawnParams Params()
+    {
+        return FMars_SmTask_HandsResolverBinds_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HandsSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HandsSubSm
+{
+    FMars_SmTask_HandsSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_HandsSubSm_SpawnParams();
     }
 }
 

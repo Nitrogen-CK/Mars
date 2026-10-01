@@ -73,6 +73,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_FPHands",
+			"ShortName": "FPHands",
+			"Description": "The first-person gloves: reach/grip/return/hold/release phase owned by the Hands sub-HFSM, focus lean, hold and carry",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_FPHandsHandle",
+			"RequiredFragments": [
+				"Mars_Feature_FPHands"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Gate",
 			"ShortName": "Gate",
 			"Description": "An entity with a gate whose moving node slides between closed and open offsets",
