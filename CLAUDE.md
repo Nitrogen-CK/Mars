@@ -168,3 +168,40 @@ Override for the deny tier: `SKIP_UNREAL_GUARD=1`. Use only when you know the af
 ### Assets
 - Plugin assets live under `Plugins/<Plugin>/Content/` with the plugin's prefix in the asset name.
 - Type suffixes: `_BP` (Blueprint), `_DA` (DataAsset), `_ST` (Struct), `_WBP` (Widget Blueprint).
+
+## Mars gameplay script conventions (`Script/`, code name Mars)
+
+These are maintainer rulings; they override defaults from the framework skills where the two differ.
+
+- **Naming.** Game code uses the code name: `Mars_` AngelScript prefix, `FMars_`/`UMars_`/`AMars_` types,
+  `_Mars_` asset suffix. Never the concept title in code or asset names.
+- **Features.** Every gameplay system is a feature set under `Script/ECS/<Feature>/` with a typed handle
+  (`asset Mars_<Feature>Handle of UCkDynamic_HandleDefinition`, `FMars_Feature_<Feature>` marker) and a
+  `utils_<feature>` namespace. Spec passed to `Add` is `FMars_<Feature>_Spec`; retained spec fields live in
+  `FMars_Fragment_<Feature>_Params`; primary state is the bare noun `FMars_Fragment_<Feature>` (no `_Current`).
+  Visuals live in entity scripts, never in features. New typed handles are hand-added to
+  `Script/Generated/DynamicHandleTypes.json` (headless boots cannot self-heal it).
+- **Request doctrine.** Only a feature's processors (and its `Add`) write its fragments. No `Set_X` mixins that
+  write state, no fragment writes from HFSM tasks, entity scripts, widgets or actors. Every mutation is a
+  `FMars_Request_<Feature>_<Verb>` struct (UPROPERTY fields, ctors, a placeholder field when payload-less) in a
+  `TArray<...>` per kind on `FMars_Fragment_<Feature>_Requests`, drained by `UMars_Processor_<Feature>_HandleRequests`
+  (snapshot → `Request_TryRemove` → apply in documented order → broadcast). Signals are `delegate`/`event _MC` pairs in
+  `FMars_Fragment_<Feature>_Signals`, bound lazily, broadcast only `if (Has_Fragment(Signals))`.
+- **Namespaces.** Only `utils_<feature>` namespaces exist. No helper namespaces (`mars_foo`, `mars_foo_math`); fold
+  them into the feature's utils when you touch them. Functions that read feature state are `mixin`s on the typed
+  handle; pure helpers are `utils_<feature>` functions.
+- **Parameters.** A function takes at most 3 parameters (a mixin's `Self` excluded, out-params included). Beyond
+  that, pack inputs into a struct (`FMars_<Feature>_<Thing>Query` / `_Frame` / `_State`). A struct that grows past
+  roughly seven fields nests related fields into sub-structs instead of staying flat. Request mixins take the request
+  struct (`Request_X(const FMars_Request_<Feature>_X&)`) with full positional ctors so call sites stay one line.
+- **Spec validity** is a `mixin FMars_Validation Validate(const FMars_X_Spec& Self)` on the Spec
+  (`Script/Common/Mars_Validation.as`); `Add` wraps it in `ck::EnsureIfNot`. No `DoGet_SpecError`-style helpers.
+- **Fragments hold no strong `UObject`/`UClass` refs** (`Schema.IsSafe` rejects the fragment): use
+  `TSoftObjectPtr`/`TSoftClassPtr`/`TWeakObjectPtr`/handles.
+- **Behaviour lives in HFSM tasks; actors are composition.** Sequences with phases are state machines (sub-SMs under
+  the owning state), with enter tasks issuing requests and polled/event-driven conditions deciding transitions.
+- **Widgets** are `UCLASS(Abstract)` with `meta = (BindWidget)` members and logic only; child widget classes are
+  `EditDefaultsOnly` set in the WBP; never build widget trees in code.
+- **Input** buttons are CkIntent level rows on the gameplay input profile, read by HFSM tasks; only Move/Look bind
+  Enhanced Input directly.
+- **Surfaces** use the CkUsf ProtoGrid material instances under `/Game/Mars/Materials/ProtoGrid`.
