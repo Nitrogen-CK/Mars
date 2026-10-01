@@ -15,7 +15,8 @@ struct FMars_Feature_InputIntents {}
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Written only by UMars_Processor_InputIntents_HandleRequests, from the input profile's SetMatcher /
-// SetMoveDirection requests - so Get_Matcher / Get_MoveDirection read one drain behind the write. The matcher arrives
+// SetMoveDirection / AddLookDelta requests - so Get_Matcher / Get_MoveDirection / Get_LookDelta read one drain behind
+// the write. The matcher arrives
 // late (the input profile composes its layer on a retry tick), so readers resolve it on every read and treat an invalid
 // matcher as "no input yet". Consumers of the matcher's own signals rebind on OnMatcherChanged.
 struct FMars_Fragment_InputIntents
@@ -26,6 +27,15 @@ struct FMars_Fragment_InputIntents
     // Move stays on Enhanced Input (an analog pair, not a button the matcher grades).
     UPROPERTY()
     FVector MoveDirection = FVector::ZeroVector;
+
+    // Look stays on Enhanced Input (an analog pair). The last drained per-frame delta in the camera director's
+    // intention units (X yaw right+, Y pitch DOWN+), and a counter that advances once per drain that carried one -
+    // a reader applies a delta once per sequence value, whatever the processor order, and a still frame advances nothing.
+    UPROPERTY()
+    FVector LookDelta = FVector::ZeroVector;
+
+    UPROPERTY()
+    int32 LookDeltaSequence = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -70,6 +80,20 @@ struct FMars_Request_InputIntents_SetMoveDirection
     }
 }
 
+// One frame's look delta; the drain sums every one it holds.
+struct FMars_Request_InputIntents_AddLookDelta
+{
+    UPROPERTY()
+    FVector LookDelta = FVector::ZeroVector;
+
+    FMars_Request_InputIntents_AddLookDelta() {}
+
+    FMars_Request_InputIntents_AddLookDelta(const FVector& InLookDelta)
+    {
+        LookDelta = InLookDelta;
+    }
+}
+
 struct FMars_Fragment_InputIntents_Requests
 {
     UPROPERTY()
@@ -77,4 +101,7 @@ struct FMars_Fragment_InputIntents_Requests
 
     UPROPERTY()
     TArray<FMars_Request_InputIntents_SetMoveDirection> SetMoveDirectionRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_InputIntents_AddLookDelta> AddLookDeltaRequests;
 }
