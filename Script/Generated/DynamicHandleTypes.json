@@ -64,6 +64,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Countdown",
+			"ShortName": "Countdown",
+			"Description": "A logic node that a rising input charges to full and that drains one step at a time, asserting its mechanism source while charged",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CountdownHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Countdown"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Cycle",
 			"ShortName": "Cycle",
 			"Description": "An entity that steps through a timed table of gameplay-tagged phases, optionally looping",
