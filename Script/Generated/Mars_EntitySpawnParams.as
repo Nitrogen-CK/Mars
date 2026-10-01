@@ -307,6 +307,19 @@ namespace UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack
 }
 
 USTRUCT()
+struct FMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain
+{
+    FMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies_SpawnParams
 {
 }
@@ -329,6 +342,58 @@ namespace UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack
     FMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack_SpawnParams Params()
     {
         return FMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime
+{
+    FMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime_SpawnParams Params()
+    {
+        return FMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Countdown_RechargeWhileDrainingRefills_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Countdown_RechargeWhileDrainingRefills
+{
+    FMars_AutoTest_Countdown_RechargeWhileDrainingRefills_SpawnParams Params()
+    {
+        return FMars_AutoTest_Countdown_RechargeWhileDrainingRefills_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows
+{
+    FMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows_SpawnParams Params()
+    {
+        return FMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless
+{
+    FMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless_SpawnParams Params()
+    {
+        return FMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless_SpawnParams();
     }
 }
 
@@ -736,13 +801,50 @@ namespace UMars_HandWheel_EntityScript
 }
 
 USTRUCT()
+struct FMars_LampBank_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Countdown_Spec Countdown = FMars_Countdown_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_LampBank_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Countdown = InCountdown;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_LampBank_EntityScript
+{
+    FMars_LampBank_EntityScript_SpawnParams Params()
+    {
+        return FMars_LampBank_EntityScript_SpawnParams();
+    }
+
+    FMars_LampBank_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_LampBank_EntityScript_SpawnParams(InSpawnTransform, InCountdown, InSink, InSource);
+    }
+}
+
+USTRUCT()
 struct FMars_Lever_EntityScript_SpawnParams
 {
     UPROPERTY()
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
@@ -876,6 +978,104 @@ namespace UMars_PressurePlate_EntityScript
     FMars_PressurePlate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize)
     {
         return FMars_PressurePlate_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize);
+    }
+}
+
+USTRUCT()
+struct FMars_PullChain_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    float32 PullDistance = 40.0f;
+
+    UPROPERTY()
+    float32 ChainLength = 110.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 0.30000001192092896f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull chain");
+
+    FMars_PullChain_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        PullDistance = InPullDistance;
+        ChainLength = InChainLength;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_PullChain_EntityScript
+{
+    FMars_PullChain_EntityScript_SpawnParams Params()
+    {
+        return FMars_PullChain_EntityScript_SpawnParams();
+    }
+
+    FMars_PullChain_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_PullChain_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPullDistance, InChainLength, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_ChainL_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    float32 PullDistance = 40.0f;
+
+    UPROPERTY()
+    float32 ChainLength = 110.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 0.30000001192092896f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull chain");
+
+    FMars_Sandbox_ChainL_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        PullDistance = InPullDistance;
+        ChainLength = InChainLength;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Sandbox_ChainL_EntityScript
+{
+    FMars_Sandbox_ChainL_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_ChainL_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_ChainL_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Sandbox_ChainL_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPullDistance, InChainLength, InMoveDuration, InPromptText);
     }
 }
 
@@ -1065,13 +1265,87 @@ namespace UMars_Sandbox_GateI_EntityScript
 }
 
 USTRUCT()
+struct FMars_Sandbox_GateM_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_Sandbox_GateM_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Sandbox_GateM_EntityScript
+{
+    FMars_Sandbox_GateM_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_GateM_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_GateM_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Sandbox_GateM_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_LampsL_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Countdown_Spec Countdown = FMars_Countdown_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    FMars_Sandbox_LampsL_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Countdown = InCountdown;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Sandbox_LampsL_EntityScript
+{
+    FMars_Sandbox_LampsL_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_LampsL_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_LampsL_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Sandbox_LampsL_EntityScript_SpawnParams(InSpawnTransform, InCountdown, InSink, InSource);
+    }
+}
+
+USTRUCT()
 struct FMars_Sandbox_LeverA_EntityScript_SpawnParams
 {
     UPROPERTY()
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -1116,7 +1390,7 @@ struct FMars_Sandbox_LeverB_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
@@ -1161,7 +1435,7 @@ struct FMars_Sandbox_LeverK_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f));
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
 
     UPROPERTY()
     FMars_MechanismSource_Spec Source;
