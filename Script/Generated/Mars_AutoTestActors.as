@@ -291,6 +291,30 @@ class AMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless_Actor : ACk_Au
     }
 }
 
+class AMars_AutoTest_EmoteWheel_OpenHoverChooseClose_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_EmoteWheel_OpenHoverChooseClose");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_EmoteWheel_SectorMathAndSpec_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_EmoteWheel_SectorMathAndSpec");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
