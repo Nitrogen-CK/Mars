@@ -2333,6 +2333,19 @@ namespace UMars_SmCondition_SprintHeld
 }
 
 USTRUCT()
+struct FMars_SmCondition_SprintPressed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_SprintPressed
+{
+    FMars_SmCondition_SprintPressed_SpawnParams Params()
+    {
+        return FMars_SmCondition_SprintPressed_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_SprintReleased_SpawnParams
 {
 }
