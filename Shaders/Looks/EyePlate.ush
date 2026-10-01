@@ -1,0 +1,77 @@
+// /Project/Looks/EyePlate.ush
+//
+// The eye-plate look — two glowing eyes on a black void, drawn on one quad. The quad's left and right
+// halves are one eye each; each eye samples one cell of an 8x4 distance-field atlas, where 0.5 is the
+// shape's edge and the value rises inside. Every cell is authored for the RIGHT half, so the left half
+// mirrors U and an asymmetric shape (a chevron, an angry slant) comes out facing the right way.
+//
+// Everything that animates arrives as custom primitive data: the two current cells and the two cells
+// being crossfaded away from, the blend between them, a per-eye blink that squashes V, a look offset,
+// the colour and an overall strength. With nothing written Strength is 0 and the plate is pure black.
+//
+// The atlas is fetched with SampleLevel at mip 0 only: an implicit-derivative sample would be illegal
+// outside the pixel stage and, at the U = 0.5 seam where the two halves jump to different cells, would
+// pick a wrong mip. The only derivative taken is inside CkUsf_SdfEdgeAA, which guards it.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+float Mars_EyePlate_SampleCell(Texture2D Atlas, SamplerState AtlasSampler, float Cell, float2 EyeUV, float Cols, float Rows, float Pad)
+{
+    const float2 CellXY = float2(fmod(Cell, Cols), floor(Cell / Cols));
+    const float2 AtlasUV = (CellXY + clamp(EyeUV, Pad, 1.0f - Pad)) / float2(Cols, Rows);
+    return Atlas.SampleLevel(AtlasSampler, AtlasUV, 0).r;
+}
+
+FCkUsf_SurfaceOutput Mars_Look_EyePlate(
+    FCkUsf_SurfaceInput In,
+    Texture2D           Atlas,
+    SamplerState        AtlasSampler,
+    float               LeftCell,
+    float               RightCell,
+    float               PrevLeftCell,
+    float               PrevRightCell,
+    float               Blend,
+    float               BlinkLeft,
+    float               BlinkRight,
+    float               Strength,
+    float               LookX,
+    float               LookY,
+    float3              EyeColor,
+    float               AtlasCols,
+    float               AtlasRows,
+    float               EyeScale,
+    float               LookMaxUV,
+    float               MinBlinkScale,
+    float               GlowStrength,
+    float               CellPad)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const bool IsLeft = In.UV.x < 0.5f;
+    float2 EyeUV = float2(frac(In.UV.x * 2.0f), In.UV.y);
+    EyeUV -= float2(LookX, -LookY) * LookMaxUV;
+    if (IsLeft)
+    { EyeUV.x = 1.0f - EyeUV.x; }
+
+    EyeUV = (EyeUV - 0.5f) / EyeScale + 0.5f;
+    const float Blink = IsLeft ? BlinkLeft : BlinkRight;
+    EyeUV.y = (EyeUV.y - 0.5f) / max(1.0f - Blink, MinBlinkScale) + 0.5f;
+
+    const float Inside = (all(EyeUV > 0.0f) && all(EyeUV < 1.0f)) ? 1.0f : 0.0f;
+    const float Cell = IsLeft ? LeftCell : RightCell;
+    const float PrevCell = IsLeft ? PrevLeftCell : PrevRightCell;
+
+    const float Field = lerp(
+        Mars_EyePlate_SampleCell(Atlas, AtlasSampler, PrevCell, EyeUV, AtlasCols, AtlasRows, CellPad),
+        Mars_EyePlate_SampleCell(Atlas, AtlasSampler, Cell, EyeUV, AtlasCols, AtlasRows, CellPad),
+        saturate(Blend)) * Inside;
+
+    // Field is 0.5 on the shape's edge and rises inside; CkUsf_SdfEdgeAA takes a signed distance that is
+    // negative inside, so the field is re-centred and flipped rather than fed in directly.
+    const float Core = CkUsf_SdfEdgeAA(0.5f - Field);
+    const float Glow = smoothstep(0.25f, 0.5f, Field) * GlowStrength;
+
+    O.BaseColor = 0.0f;
+    O.EmissiveColor = EyeColor * Strength * saturate(Core + Glow);
+    return O;
+}

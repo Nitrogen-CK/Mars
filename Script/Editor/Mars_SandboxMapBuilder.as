@@ -18,6 +18,7 @@
 // an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
 // The sandbox backpack (a World-mode Backpack preset with four cargo slots) sits beside them. To place it in an
 // already-built sandbox map, open it and run: Mars.Sandbox.PlaceBackpack
+// The eyes dummy faces the player starts. To place it in an already-built sandbox map, run: Mars.Sandbox.PlaceEyesDummy
 //
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
@@ -78,6 +79,14 @@ void Mars_PlaceSandboxBackpackFunc(const TArray<FString>& Args)
 }
 
 const FConsoleCommand Mars_PlaceSandboxBackpackCommand("Mars.Sandbox.PlaceBackpack", n"Mars_PlaceSandboxBackpackFunc");
+
+UFUNCTION()
+void Mars_PlaceSandboxEyesDummyFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceEyesDummy();
+}
+
+const FConsoleCommand Mars_PlaceSandboxEyesDummyCommand("Mars.Sandbox.PlaceEyesDummy", n"Mars_PlaceSandboxEyesDummyFunc");
 
 namespace utils_mars_sandbox
 {
@@ -264,6 +273,33 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.PlaceBackpack] placed, saved={Saved}");
+    }
+
+    // The eyes dummy stands on the floor 450uu in front of the room-1 player starts, past the item line, yawed 180 so it
+    // faces them.
+    void PlaceEyesDummy()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceEyesDummy] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        const FString Label = "EyesDummy";
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == Label)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceEyesDummy] [{Label}] already exists. Delete it first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Mechanism(UMars_EyesDummy_EntityScript, Label, FVector(-150.0, 0.0, 0.0), FRotator(0.0, 180.0, 0.0));
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceEyesDummy] placed, saved={Saved}");
     }
 
     // Room 2 spans X 2000..4000, Y -700..700 (the main floor ends at X=2000). The gated bays sit in a partition at

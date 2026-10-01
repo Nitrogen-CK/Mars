@@ -115,9 +115,14 @@ class AMars_PlayerCharacter : ACk_Character_UE
         auto Back = utils_scene_node::Create(PlayerTransform, Config.BackOffset);
         utils_handle::Set_DebugName(FCk_Handle(Back), n"Player.Back");
 
+        // Other characters' gazes look here: the camera is where the player's eyes are.
+        auto Head = utils_scene_node::CreateAndAttachToUnrealComponent(PlayerTransform, FirstPersonCamera, FTransform::Identity);
+        utils_handle::Set_DebugName(FCk_Handle(Head), n"Player.Head");
+
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, Back.As_Transform()));
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Head, Head.As_Transform()));
         utils_attach_points::Add(Player, AttachPointsSpec);
 
         auto HotbarSpec = FMars_Hotbar_Spec();
