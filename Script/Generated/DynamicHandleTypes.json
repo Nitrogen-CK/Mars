@@ -109,6 +109,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_EyeHeight",
+			"ShortName": "EyeHeight",
+			"Description": "A character's eye node: rides at a fixed height above the capsule centre and eases across capsule resizes (crouch, uncrouch) instead of snapping",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_EyeHeightHandle",
+			"RequiredFragments": [
+				"Mars_Feature_EyeHeight"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Gate",
 			"ShortName": "Gate",
 			"Description": "An entity with a gate whose moving node slides between closed and open offsets",

@@ -33,9 +33,9 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Body")
     float32 CrouchedHalfHeight = 52.0f;
 
-    // Above the capsule center.
+    // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch.
     UPROPERTY(Category = "Camera")
-    float32 EyeHeight = 64.0f;
+    FMars_EyeHeight_Spec EyeHeight;
 
     // Stride clock of the character (CkGait); the head and hand bobs read it. Tune in the Mars_PlayerCharacter_Config asset.
     UPROPERTY(Category = "Camera")

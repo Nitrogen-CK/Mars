@@ -47,7 +47,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     void ConstructionScript()
     {
         CapsuleComponent.SetCapsuleSize(Config.CapsuleRadius, Config.CapsuleHalfHeight);
-        CameraComponent.SetRelativeLocation(FVector(0.0, 0.0, Config.EyeHeight));
+        CameraComponent.SetRelativeLocation(FVector(0.0, 0.0, Config.EyeHeight.Height));
 
         CharacterMovement.MaxWalkSpeed = Config.WalkSpeed;
         CharacterMovement.MaxWalkSpeedCrouched = Config.CrouchSpeed;
@@ -90,12 +90,16 @@ class AMars_PlayerCharacter : ACk_Character_UE
         GaitSpec.Set_MovementComponent(CharacterMovement);
         _Gait = utils_gait::Add(Player, GaitSpec);
 
-        // The view: a bob node at eye height is the director's input anchor, so the rendered view bobs with the gait
-        // (PEAK-style positional bob). The director lives on the head node; PlayerViewpoint keeps the handles.
+        // The view: a bob node on the eye node is the director's input anchor, so the rendered view bobs with the gait
+        // (PEAK-style positional bob) and eases with the eye across a crouch. The director lives on the head node;
+        // PlayerViewpoint keeps the handles.
         auto PlayerTransform = Player.As_Transform();
+        auto Eye = utils_eye_height::Create(PlayerTransform, Config.EyeHeight, this);
+        utils_handle::Set_DebugName(FCk_Handle(Eye), n"Player.Eye");
+        auto EyeTransform = Eye.As_Transform();
         auto HeadBobSpec = Config.HeadBob;
         HeadBobSpec.Set_Gait(_Gait);
-        auto Head = utils_bob::Create(PlayerTransform, FTransform(FVector(0.0, 0.0, Config.EyeHeight)), HeadBobSpec);
+        auto Head = utils_bob::Create(EyeTransform, FTransform::Identity, HeadBobSpec);
         utils_handle::Set_DebugName(FCk_Handle(Head), n"Player.Head");
 
         auto CameraSpec = FCk_Camera_Spec(CameraComponent);
