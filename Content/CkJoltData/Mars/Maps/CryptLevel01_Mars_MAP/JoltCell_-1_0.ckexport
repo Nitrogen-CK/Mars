@@ -1,0 +1,2575 @@
+{
+	"assetName": "JoltCell_-1_0",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/CryptLevel01_Mars_MAP/JoltCell_-1_0.JoltCell_-1_0",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "0e28dcaffcefde401f6bd96c30153246",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": -1,
+				"Y": 0
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 20
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "Actor_4",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptLevel01_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptLevel01_Mars_MAP",
+							"AssetName": "CryptLevel01_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Actor_4"
+					},
+					"_SourceHash": 1.6862791226887706e+18,
+					"_RuntimeCheckHash": -2.2372098451480361e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -2500,
+								"Y": 520,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.17364817766693039,
+								"W": 0.98480775301220813
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -1500,
+								"Y": 520,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -2480,
+								"Y": 1480,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.1305261922200516,
+								"W": 0.99144486137381049
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -1520,
+								"Y": 1480,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.1305261922200516,
+								"W": 0.99144486137381049
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -2350,
+								"Y": 1150,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -2350,
+								"Y": 750,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -1650,
+								"Y": 1150,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 3,
+							"_Position":
+							{
+								"X": -1800,
+								"Y": 800,
+								"Z": 208
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -2620,
+								"Y": 1620,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -2620,
+								"Y": 380,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -1380,
+								"Y": 1620,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -1380,
+								"Y": 380,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 5,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 5,
+							"_Position":
+							{
+								"X": -1800,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -2200,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -2200,
+								"Y": 1200,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -2200,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": -1400,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": -1800,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 8,
+							"_Position":
+							{
+								"X": -1800,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": -2200,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 10,
+							"_Position":
+							{
+								"X": -2000,
+								"Y": 400,
+								"Z": 330
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 11,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 12,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 1000,
+								"Z": 145
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1400,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1800,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 1200,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -2600,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -2200,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -1800,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -1400,
+								"Y": 1200,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -1400,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -1400,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Actor_5",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptLevel01_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptLevel01_Mars_MAP",
+							"AssetName": "CryptLevel01_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Actor_5"
+					},
+					"_SourceHash": -2.3291894053802388e+18,
+					"_RuntimeCheckHash": 1578448667752862,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -4500,
+								"Y": 520,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.087155742747658194,
+								"W": 0.99619469809174555
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -3500,
+								"Y": 520,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.17364817766693039,
+								"W": 0.98480775301220813
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -4480,
+								"Y": 1480,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -3520,
+								"Y": 1480,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.10452846326765375,
+								"W": 0.99452189536827329
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -4350,
+								"Y": 1150,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -4350,
+								"Y": 750,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -3650,
+								"Y": 1150,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 3,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 800,
+								"Z": 208
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -4620,
+								"Y": 1620,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -4620,
+								"Y": 380,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -3380,
+								"Y": 1620,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -3380,
+								"Y": 380,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 5,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 5,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 1200,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": -3400,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 8,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 10,
+							"_Position":
+							{
+								"X": -4000,
+								"Y": 1600,
+								"Z": 330
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 10,
+							"_Position":
+							{
+								"X": -4000,
+								"Y": 400,
+								"Z": 330
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 11,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 12,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 1000,
+								"Z": 145
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -3400,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -3400,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 1200,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 1600,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -3400,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -3400,
+								"Y": 1200,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -4600,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Actor_6",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CryptLevel01_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CryptLevel01_Mars_MAP",
+							"AssetName": "CryptLevel01_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Actor_6"
+					},
+					"_SourceHash": -3.1455277779223219e+18,
+					"_RuntimeCheckHash": 4.647081984034006e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -4300,
+								"Y": 2120,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.087155742747658194,
+								"W": 0.99619469809174555
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -3700,
+								"Y": 2120,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.17364817766693039,
+								"W": 0.98480775301220813
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -4280,
+								"Y": 2680,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.1305261922200516,
+								"W": 0.99144486137381049
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -3720,
+								"Y": 2680,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -4420,
+								"Y": 2820,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -4420,
+								"Y": 1980,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -3580,
+								"Y": 2820,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -3580,
+								"Y": 1980,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 16,
+							"_Position":
+							{
+								"X": -4400,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 16,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 2400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": -4200,
+								"Y": 2000,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 10,
+							"_Position":
+							{
+								"X": -4000,
+								"Y": 2000,
+								"Z": 330
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 17,
+							"_Position":
+							{
+								"X": -4400,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -4000,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -3600,
+								"Y": 2400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -4400,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -4400,
+								"Y": 2400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654746
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 18,
+							"_Position":
+							{
+								"X": -3800,
+								"Y": 2000,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -3600,
+								"Y": 2800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 1,
+								"W": -6.1232339957367673e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -3600,
+								"Y": 2000,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 19,
+							"_Position":
+							{
+								"X": -4400,
+								"Y": 2000,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				}
+			]
+		}
+	]
+}

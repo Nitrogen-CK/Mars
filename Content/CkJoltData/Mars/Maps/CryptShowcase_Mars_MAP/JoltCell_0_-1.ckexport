@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "8c624ac70fa72cdee53d2fb8ffe46c8f",
+		"sourceHash": "edf59d0bdb4b2c56e1204e5a0b202c3c",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -57,7 +57,7 @@
 						},
 						"SubPathString": "PersistentLevel.Actor_1"
 					},
-					"_SourceHash": 4.8135659048938797e+17,
+					"_SourceHash": -5.8607507772340296e+18,
 					"_RuntimeCheckHash": 5.4815990622375782e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -5457,7 +5457,7 @@
 						},
 						"SubPathString": "PersistentLevel.Actor_2"
 					},
-					"_SourceHash": 1.9848438457304351e+18,
+					"_SourceHash": -2.8525715287115295e+18,
 					"_RuntimeCheckHash": 7.8515684610504643e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [

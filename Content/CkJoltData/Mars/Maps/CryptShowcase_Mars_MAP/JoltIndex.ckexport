@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "c849976ab1723ebe2b73039e97c78ee6",
+		"sourceHash": "9e6c5a5f15aa633de6796b80806245bc",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -106,8 +106,8 @@
 						},
 						"Max":
 						{
-							"X": -171.99711799621582,
-							"Y": 3200,
+							"X": -126.00001096725464,
+							"Y": 4000,
 							"Z": 40.000000596046448
 						},
 						"IsValid": true
@@ -130,9 +130,9 @@
 						},
 						"Max":
 						{
-							"X": 8980.6000407785177,
-							"Y": 2612.2512318193913,
-							"Z": 116.35525226593018
+							"X": 8885.625272616744,
+							"Y": 3319.5607706904411,
+							"Z": 189.15146589279175
 						},
 						"IsValid": true
 					},
