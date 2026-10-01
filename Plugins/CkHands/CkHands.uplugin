@@ -1,0 +1,54 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "0.1.0",
+  "FriendlyName": "Ck Hands",
+  "Description": "Procedural hands: Control Rig and anim graph nodes that curl digits onto what they hold and place floating hands on grip targets.",
+  "Category": "Animation",
+  "CreatedBy": "Chainkemists",
+  "CreatedByURL": "https://www.chainkemists.xyz/",
+  "DocsURL": "",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": false,
+  "IsBetaVersion": true,
+  "IsExperimentalVersion": false,
+  "EnabledByDefault": true,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "CkHands",
+      "Type": "Runtime",
+      "LoadingPhase": "Default",
+      "WhitelistPlatforms": [
+        "Win64",
+        "Mac",
+        "Linux"
+      ]
+    },
+    {
+      "Name": "CkHandsEditor",
+      "Type": "UncookedOnly",
+      "LoadingPhase": "Default",
+      "WhitelistPlatforms": [
+        "Win64",
+        "Mac",
+        "Linux"
+      ]
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "ControlRig",
+      "Enabled": true
+    },
+    {
+      "Name": "RigVM",
+      "Enabled": true
+    },
+    {
+      "Name": "CkFoundation",
+      "Enabled": true
+    }
+  ]
+}
