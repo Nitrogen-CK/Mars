@@ -53,12 +53,26 @@ struct FMars_FPHands_ReachSpec
     UPROPERTY(Category = "Grab")
     float32 GrabBackSeconds = 0.25f;
 
+    // Curve shape of the reach out and the return, from the CkTween easing table. InOutSine is within two percent
+    // of the smoothstep the gloves shipped with.
+    UPROPERTY(Category = "Grab")
+    ECk_TweenEasing GrabOutEasing = ECk_TweenEasing::InOutSine;
+
+    UPROPERTY(Category = "Grab")
+    ECk_TweenEasing GrabBackEasing = ECk_TweenEasing::InOutSine;
+
     // Timed interactions: reach time, and let-go time when the interaction ends (seconds).
     UPROPERTY(Category = "Hold")
     float32 HoldReachSeconds = 0.16f;
 
     UPROPERTY(Category = "Hold")
     float32 ReleaseSeconds = 0.22f;
+
+    UPROPERTY(Category = "Hold")
+    ECk_TweenEasing HoldReachEasing = ECk_TweenEasing::InOutSine;
+
+    UPROPERTY(Category = "Hold")
+    ECk_TweenEasing ReleaseEasing = ECk_TweenEasing::InOutSine;
 }
 
 struct FMars_FPHands_Reach
@@ -126,10 +140,10 @@ namespace mars_fphands_reach
         return Get_Alpha(InReach, InSpec);
     }
 
-    float32 Ease(float32 InT)
+    // Eased progress of one phase, shaped by the spec's easing; the 0to1 range type clamps InT.
+    float32 Ease(ECk_TweenEasing InEasing, float32 InT)
     {
-        const auto T = Math::Clamp(InT, 0.0f, 1.0f);
-        return T * T * (3.0f - 2.0f * T);
+        return utils_tween::Get_EasedProgress(InEasing, FCk_FloatRange_0to1(InT));
     }
 
     void Start(FMars_FPHands_Reach& InReach, const FCk_Handle_InteractTarget& InInteractTarget,
@@ -186,19 +200,19 @@ namespace mars_fphands_reach
         if (InReach.Phase == EMars_FPHands_ReachPhase::Grab)
         {
             if (T < InSpec.GrabOutSeconds)
-            { return Ease(T / Math::Max(InSpec.GrabOutSeconds, 0.01f)); }
+            { return Ease(InSpec.GrabOutEasing, T / Math::Max(InSpec.GrabOutSeconds, 0.01f)); }
 
             if (T < InSpec.GrabOutSeconds + InSpec.GrabGripSeconds)
             { return 1.0f; }
 
-            return 1.0f - Ease((T - InSpec.GrabOutSeconds - InSpec.GrabGripSeconds) / Math::Max(InSpec.GrabBackSeconds, 0.01f));
+            return 1.0f - Ease(InSpec.GrabBackEasing, (T - InSpec.GrabOutSeconds - InSpec.GrabGripSeconds) / Math::Max(InSpec.GrabBackSeconds, 0.01f));
         }
 
         if (InReach.Phase == EMars_FPHands_ReachPhase::Hold)
-        { return Ease(T / Math::Max(InSpec.HoldReachSeconds, 0.01f)); }
+        { return Ease(InSpec.HoldReachEasing, T / Math::Max(InSpec.HoldReachSeconds, 0.01f)); }
 
         if (InReach.Phase == EMars_FPHands_ReachPhase::Release)
-        { return InReach.ReleaseFromAlpha * (1.0f - Ease(T / Math::Max(InSpec.ReleaseSeconds, 0.01f))); }
+        { return InReach.ReleaseFromAlpha * (1.0f - Ease(InSpec.ReleaseEasing, T / Math::Max(InSpec.ReleaseSeconds, 0.01f))); }
 
         return 0.0f;
     }

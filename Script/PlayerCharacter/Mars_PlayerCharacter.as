@@ -26,7 +26,10 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default FPHands.bOnlyOwnerSee = true;
     default FPHands.CastShadow = false;
     default FPHands.bReceivesDecals = false;
-    default FPHands.VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+    // The gloves are placed in view by the anim graph, so OnlyTickPoseWhenRendered deadlocks: never rendered at the
+    // reference pose -> never ticks -> never placed -> never rendered, until the camera happens to sweep the ref-pose
+    // bounds (the "look down once" bug). Owner-only and one mesh, so always ticking costs nothing.
+    default FPHands.VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
     default FPHands.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     UPROPERTY(ExposeOnSpawn)
@@ -283,7 +286,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
             // Out of reach, the gloves stop short: the item comes to meet them while they reach out.
             const auto HandWorld = utils_transform::Get_EntityCurrentTransform(_HandNode);
             const auto& ReachSpec = Config.FPHands.Reach;
-            const auto ReachOut = mars_fphands_reach::Ease(Ahead.Time / Math::Max(ReachSpec.GrabOutSeconds, 0.01f));
+            const auto ReachOut = mars_fphands_reach::Ease(ReachSpec.GrabOutEasing, Ahead.Time / Math::Max(ReachSpec.GrabOutSeconds, 0.01f));
             const auto PickedWorld = FTransform(_Carry.StartWorld.GetRotation(),
                 _Carry.StartWorld.GetLocation() + Get_GloveShortfall(HandWorld) * ReachOut, FVector::OneVector);
             const auto Picked = PickedWorld.GetRelativeTransform(HandWorld);
