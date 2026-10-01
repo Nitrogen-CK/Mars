@@ -1,0 +1,144 @@
+{
+	"assetName": "JoltIndex",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltIndex.JoltIndex",
+	"assetClass": "Ck_Jolt_CookedWorldIndex_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "2dd2d56772b7e2366f87532887dfbb5e",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_SourceMapPackage",
+			"type": "FName",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": "/Game/Mars/Maps/Camp_Mars_MAP"
+		},
+		{
+			"name": "_BakeFilterHash",
+			"type": "uint64",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": 3.2379971469817421e+18,
+			"tooltip": "Fingerprint of the bake filter the cook ran under. Compared against the CURRENT settings-built\nfilter at load: cooked data baked under different filter settings is stale for the whole map."
+		},
+		{
+			"name": "_Cells",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedWorldIndex_UE",
+			"value": [
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": -10
+						},
+						"Max":
+						{
+							"X": 1050,
+							"Y": 742.4621364729004,
+							"Z": 270
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": 0
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -742.4621689269502,
+							"Y": 494.97471437653087,
+							"Z": 45
+						},
+						"Max":
+						{
+							"X": -3.0597973022850056e-05,
+							"Y": 1049.9999999999989,
+							"Z": 150
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_-1_0.JoltCell_-1_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -798.73869942879719,
+							"Y": -837.08660869902701,
+							"Z": 10
+						},
+						"Max":
+						{
+							"X": -147.60084531181371,
+							"Y": -290.71719941343952,
+							"Z": 150
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": 9.1793918954863329e-05,
+							"Y": -1049.9999999999911,
+							"Z": 45
+						},
+						"Max":
+						{
+							"X": 1050,
+							"Y": -275,
+							"Z": 150
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
+				}
+			]
+		}
+	]
+}

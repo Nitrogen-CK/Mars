@@ -1,0 +1,315 @@
+{
+	"assetName": "JoltCell_-1_0",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_-1_0.JoltCell_-1_0",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f50a0cf1d4d5ee83993b38901fdf7c6b",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 6
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": -1,
+				"Y": 0
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 4
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "StaticMeshActor_4",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
+							"AssetName": "Camp_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_4"
+					},
+					"_SourceHash": -1.1833157607247145e+18,
+					"_RuntimeCheckHash": 6.5212968888065618e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -4.5896959477431665e-05,
+								"Y": 1049.9999999999989,
+								"Z": 150
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_5",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
+							"AssetName": "Camp_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_5"
+					},
+					"_SourceHash": 4.2010277573623521e+18,
+					"_RuntimeCheckHash": 1.2126093785113546e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -742.4621689269502,
+								"Y": 742.46207156479625,
+								"Z": 150
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.92387953251128663,
+								"W": 0.38268343236508984
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_13",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
+							"AssetName": "Camp_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_13"
+					},
+					"_SourceHash": -1.4361392901562314e+18,
+					"_RuntimeCheckHash": -4.0856398222235085e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -3.0597973022850056e-05,
+								"Y": 699.99999999999932,
+								"Z": 45
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_14",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
+							"AssetName": "Camp_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_14"
+					},
+					"_SourceHash": -7.117164390530729e+18,
+					"_RuntimeCheckHash": -17002387865932592,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -494.97477928463354,
+								"Y": 494.97471437653087,
+								"Z": 45
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.38268343236508978,
+								"W": 0.92387953251128663
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_17",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
+							"AssetName": "Camp_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_17"
+					},
+					"_SourceHash": -3.7482305561230356e+18,
+					"_RuntimeCheckHash": 8.3137343578430956e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -3.5843339787788864e-05,
+								"Y": 819.9999999999992,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_18",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
+							"AssetName": "Camp_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_18"
+					},
+					"_SourceHash": -1.255107290178484e+18,
+					"_RuntimeCheckHash": 8.0837799306141553e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 3,
+							"_Position":
+							{
+								"X": -728.32003237596064,
+								"Y": 728.31993686832402,
+								"Z": 150
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.38268343236508978,
+								"W": 0.92387953251128663
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				}
+			]
+		}
+	]
+}
