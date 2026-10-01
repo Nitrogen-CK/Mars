@@ -334,6 +334,29 @@ class UMars_Processor_EmoteWheel_HandleRequests_Driver : UMars_Processor_EmoteWh
     }
 }
 
+class UMars_Processor_EyeHeight_Tick_Driver : UMars_Processor_EyeHeight_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_EyeHeight);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_EyeHeight_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_EyeHeight& P0 = Batch.Get(i, FMars_Fragment_EyeHeight);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_FPHands_HandleRequests_Driver : UMars_Processor_FPHands_HandleRequests
 {
     UFUNCTION(BlueprintOverride)
