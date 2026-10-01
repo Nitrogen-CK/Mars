@@ -1,5 +1,6 @@
-// Every frame: advances PhaseTime, follows moving reach/focus anchors, eases the focus lean and rides a picked-up item
-// in with the gloves. The phase itself is not moved here (the Hands sub-SM owns it).
+// Every frame: advances PhaseTime, follows moving reach/focus anchors, drops a focus whose interactable has died, eases
+// the focus lean and rides a picked-up item in with the gloves. The phase itself is not moved here (the Hands sub-SM
+// owns it).
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -27,6 +28,15 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 
         utils_fphands::Update_ReachTarget(InState.Target);
         utils_fphands::Update_ReachTarget(InState.FocusTarget);
+
+        // A focused interactable can die without an unfocus (a pickup destroys the item under the view trace). A dead
+        // focus is no focus: its anchor is frozen where the item lay, so a glove would otherwise keep leaning toward that
+        // world spot, a fixed offset from its hold, until something else is looked at.
+        if (InState.FocusTarget.IsValid && ck::Is_NOT_Valid(InState.FocusedFor))
+        {
+            InState.FocusTarget = FMars_FPHands_ReachTarget();
+            InState.FocusedFor = FCk_Handle_Interactable();
+        }
 
         // A reach takes the larger of lean and reach, so it launches from and settles back into the lean.
         const auto HasFocus = InState.FocusTarget.IsValid;
@@ -107,6 +117,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
             Sum += Reached.GetLocation() - Grip.WorldGrip.GetLocation();
             ++Count;
         }
+
         return Count > 0 ? Sum / Count : FVector::ZeroVector;
     }
 }
