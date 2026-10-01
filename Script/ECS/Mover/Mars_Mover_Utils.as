@@ -63,6 +63,18 @@ mixin void Request_MoveTo(FCk_Handle_Mover& Self, bool InAtEnd)
     Requests.MoveToRequest = FMars_Request_Mover_MoveTo(InAtEnd);
 }
 
+mixin void Request_Scrub(FCk_Handle_Mover& Self, const FMars_Request_Mover_Scrub& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Mover_Requests);
+    Requests.ScrubRequest = InRequest;
+}
+
+mixin void Request_Settle(FCk_Handle_Mover& Self)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Mover_Requests);
+    Requests.SettleRequest = FMars_Request_Mover_Settle();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
