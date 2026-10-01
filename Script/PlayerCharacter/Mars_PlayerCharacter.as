@@ -4,6 +4,10 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default bUseControllerRotationPitch = false;
     default bUseControllerRotationRoll = false;
 
+    // A PlayerStart brushing a prop must not lose the player (UE's own character templates use this). Placement bugs
+    // still show as an adjusted spawn location, not a missing pawn.
+    default SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
     default CharacterMovement.bOrientRotationToMovement = false;
     default CharacterMovement.NavAgentProps.bCanCrouch = true;
     default CharacterMovement.bCanWalkOffLedgesWhenCrouching = true;

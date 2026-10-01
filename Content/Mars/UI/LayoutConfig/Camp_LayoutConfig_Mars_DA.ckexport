@@ -1,0 +1,110 @@
+{
+	"assetName": "Camp_LayoutConfig_Mars_DA",
+	"assetPath": "/Game/Mars/UI/LayoutConfig/Camp_LayoutConfig_Mars_DA.Camp_LayoutConfig_Mars_DA",
+	"assetClass": "Ck_UI_LayoutConfigAsset_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "638c569fd8650400a7c68e56e277b29d",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"PrimaryDataAsset",
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_LayoutZOrder",
+			"type": "int32",
+			"category": "Rendering",
+			"value": 10
+		},
+		{
+			"name": "_DefaultInputMode",
+			"type": "ECk_UI_InputMode",
+			"category": "Default Input",
+			"value": "GameOnly",
+			"tooltip": "Input mode to use when no layers have active widgets.\nTypically this should be GameOnly to return control to gameplay."
+		},
+		{
+			"name": "_DefaultMouseCaptureMode",
+			"type": "EMouseCaptureMode",
+			"category": "Default Input",
+			"value": "CapturePermanently",
+			"tooltip": "Mouse capture mode to use when no layers have active widgets.\nOnly applies to GameOnly and GameAndUI modes."
+		},
+		{
+			"name": "_LayerConfigs",
+			"type": "TArray",
+			"category": "Layers",
+			"value": [
+				{
+					"_LayerTag": "UI.Layer.Game",
+					"_LayerWidgetClass": "/Script/CkUI.Ck_UI_LayerStack_ContextProvider_UE",
+					"_Priority": 0,
+					"_InputMode": "GameOnly",
+					"_MouseCaptureMode": "CapturePermanently",
+					"_TransitionType": "FadeOnly",
+					"_TransitionCurve": "CubicInOut",
+					"_TransitionDuration":
+					{
+						"_Seconds": 0
+					},
+					"_StartingWidgetClasses": []
+				},
+				{
+					"_LayerTag": "UI.Layer.GameMenu",
+					"_LayerWidgetClass": "/Script/CkUI.Ck_UI_LayerStack_ContextProvider_UE",
+					"_Priority": 20,
+					"_InputMode": "GameAndUI",
+					"_MouseCaptureMode": "NoCapture",
+					"_TransitionType": "FadeOnly",
+					"_TransitionCurve": "CubicInOut",
+					"_TransitionDuration":
+					{
+						"_Seconds": 0
+					},
+					"_StartingWidgetClasses": []
+				},
+				{
+					"_LayerTag": "UI.Layer.Menu",
+					"_LayerWidgetClass": "/Script/CkUI.Ck_UI_LayerStack_ContextProvider_UE",
+					"_Priority": 40,
+					"_InputMode": "UIOnly",
+					"_MouseCaptureMode": "CapturePermanently",
+					"_TransitionType": "FadeOnly",
+					"_TransitionCurve": "CubicInOut",
+					"_TransitionDuration":
+					{
+						"_Seconds": 0
+					},
+					"_StartingWidgetClasses": [
+						"/Game/Mars/UI/Widgets/Camp/CampMenu_Mars_WBP.CampMenu_Mars_WBP_C"
+					]
+				},
+				{
+					"_LayerTag": "UI.Layer.Modal",
+					"_LayerWidgetClass": "/Script/CkUI.Ck_UI_LayerStack_ContextProvider_UE",
+					"_Priority": 60,
+					"_InputMode": "UIOnly",
+					"_MouseCaptureMode": "CapturePermanently",
+					"_TransitionType": "FadeOnly",
+					"_TransitionCurve": "CubicInOut",
+					"_TransitionDuration":
+					{
+						"_Seconds": 0
+					},
+					"_StartingWidgetClasses": []
+				}
+			],
+			"tooltip": "Layer definitions. Layer Priority determines visual stacking (higher = on top)."
+		},
+		{
+			"name": "_HUDElements",
+			"type": "TArray",
+			"category": "HUD Elements",
+			"value": [],
+			"tooltip": "HUD elements to register as extensions.\nThese widgets will be automatically loaded and registered with the extension subsystem."
+		}
+	]
+}
