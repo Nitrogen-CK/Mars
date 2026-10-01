@@ -159,6 +159,78 @@ class AMars_AutoTest_CampSession_StartLiveSpecIsLive_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_Control_PullDegreesFollowTheScreenTangent_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_PullDegreesFollowTheScreenTangent");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Control_PullFromActiveTowardStartEngagesOff_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_PullFromActiveTowardStartEngagesOff");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Control_PullPastEngageAlphaEndsTheInteraction_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_PullPastEngageAlphaEndsTheInteraction");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Control_ThresholdInteractionFailingSettlesBack");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -177,6 +249,18 @@ class AMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_Actor : ACk_A
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_FPHands_SocketGripFollowsMovingPart_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FPHands_SocketGripFollowsMovingPart");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -297,6 +381,30 @@ class AMars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot_Actor : ACk_Au
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
