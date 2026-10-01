@@ -137,8 +137,7 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         const auto HandNode = Hands.Get_HandNode();
         const auto HandWorld = utils_transform::Get_EntityCurrentTransform(HandNode);
         auto Targets = FMars_FPHands_HandTargets();
-        Hands.Get_HandTargets(FMars_FPHands_TargetFrame(HandWorld, utils_hand_bob::Get_ArmSwing_Left(HandNode),
-            utils_hand_bob::Get_ArmSwing_Right(HandNode)), Targets);
+        Hands.Get_HandTargets(FMars_FPHands_TargetFrame(HandWorld, Hands.Get_ArmSwing_Left(), Hands.Get_ArmSwing_Right()), Targets);
         const auto& Left = Targets.Left;
         const auto& Right = Targets.Right;
 
@@ -160,7 +159,12 @@ class UMars_FPHands_AnimInstance : UAnimInstance
             _GripInHand_R = InterpGrip(_GripInHand_R, Right.GripInHand, GripAlpha);
         }
 
-        const auto ComponentWorld = Mesh.GetWorldTransform();
+        // The gloves attach to the UCk_CameraComponent, which FollowView moves onto the rendered view at the end of the frame;
+        // the hand node hangs off that same view (the director's view anchor). Composing against the anchor rather than
+        // Mesh.GetWorldTransform() keeps both sides in one ECS snapshot whatever the actor/ECS tick order.
+        const auto Viewpoint = Character.TryGet_ActorEntityHandle().As_PlayerViewpoint().Get_Viewpoint();
+        const auto ComponentWorld = Mesh.GetRelativeTransform() * utils_transform::Get_EntityCurrentTransform(Viewpoint);
+
         const auto Grip_L = (WithReach(WithSwing(_GripInHand_L, Left.Swing), Left) * HandWorld).GetRelativeTransform(ComponentWorld);
         const auto Grip_R = (WithReach(WithSwing(_GripInHand_R, Right.Swing), Right) * HandWorld).GetRelativeTransform(ComponentWorld);
 
@@ -281,6 +285,7 @@ class UMars_FPHands_AnimInstance : UAnimInstance
             Result = Result * InMesh.GetRefPoseTransform(BoneIndex);
             Bone = InMesh.GetParentBone(Bone);
         }
+
         return Result;
     }
 }

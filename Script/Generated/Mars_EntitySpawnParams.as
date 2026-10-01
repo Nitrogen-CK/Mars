@@ -2800,19 +2800,6 @@ namespace UMars_SmTask_UseIntentToResolver
 }
 
 USTRUCT()
-struct FMars_SmTask_ViewpointSync_SpawnParams
-{
-}
-
-namespace UMars_SmTask_ViewpointSync
-{
-    FMars_SmTask_ViewpointSync_SpawnParams Params()
-    {
-        return FMars_SmTask_ViewpointSync_SpawnParams();
-    }
-}
-
-USTRUCT()
 struct FMars_SmTask_WorldItem_StowIntoInitiator_SpawnParams
 {
 }

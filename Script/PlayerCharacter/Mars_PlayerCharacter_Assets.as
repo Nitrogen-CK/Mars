@@ -37,6 +37,14 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Camera")
     float32 EyeHeight = 64.0f;
 
+    // Stride clock of the character (CkGait); the head and hand bobs read it. Tune in the Mars_PlayerCharacter_Config asset.
+    UPROPERTY(Category = "Camera")
+    FCk_Gait_Spec Gait;
+
+    // PEAK-style positional camera bob on the head node (CkGait Bob). Roll/pitch stay 0: PEAK's walk has no rotational bob.
+    UPROPERTY(Category = "Camera")
+    FCk_Bob_Spec HeadBob;
+
     UPROPERTY(Category = "Interaction")
     FMars_PlayerViewpoint_Spec Viewpoint;
 
@@ -93,6 +101,33 @@ namespace mars
         HandSway.Set_PitchDegFromForwardVelocity(0.0f);
         HandSway.Set_TeleportDistanceCm(300.0f);
         HandSway.Set_TeleportAngleDeg(90.0f);
+
+        Gait = FCk_Gait_Spec();   // the movement component is supplied by the pawn at Add; only tunables live here
+        auto GaitStride = Gait.Get_Stride();
+        GaitStride.Set_ReferenceSpeed(420.0f);
+        Gait.Set_Stride(GaitStride);
+
+        // The gait is supplied by the pawn at composition (Set_Gait); only tunables live here.
+        auto HeadBobStride = FCk_Bob_StrideParams();
+        HeadBobStride.Set_VerticalCm(6.0f);
+        HeadBobStride.Set_LateralCm(3.0f);
+        HeadBobStride.Set_ForwardCm(0.0f);
+        HeadBobStride.Set_RollDeg(0.0f);
+        HeadBobStride.Set_PitchDeg(0.0f);
+
+        auto HeadBobAir = FCk_Bob_AirParams();
+        HeadBobAir.Set_LiftCmPerFallSpeed(0.004f);
+        HeadBobAir.Set_MaxLiftCm(3.0f);
+        HeadBobAir.Set_LandKickPerImpactSpeed(0.05f);
+        HeadBobAir.Set_MaxLandKick(40.0f);
+        HeadBobAir.Set_Spring(FCk_Bob_SpringResponse(4.0f, 0.6f));
+
+        HeadBob = FCk_Bob_Spec();
+        HeadBob.Set_Stride(HeadBobStride);
+        HeadBob.Set_Air(HeadBobAir);
+        HeadBob.Set_LagRate(14.0f);
+        HeadBob.Set_BreathCm(0.25f);
+        HeadBob.Set_MaxOffsetCm(10.0f);
 
         FPHands.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/SK_FPHands.SK_FPHands"));
         FPHands.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/ABP_FPHands.ABP_FPHands_C"));

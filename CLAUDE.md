@@ -204,4 +204,7 @@ These are maintainer rulings; they override defaults from the framework skills w
   `EditDefaultsOnly` set in the WBP; never build widget trees in code.
 - **Input** buttons are CkIntent level rows on the gameplay input profile, read by HFSM tasks; only Move/Look bind
   Enhanced Input directly.
+- **View.** The player's view is the CkCamera director on `Player.Head` (a CkGait bob node at eye height); the hand chain
+  hangs off the director's view anchor; the interaction trace rides the anchor. Never add a `UCameraComponent` or read
+  `GetPlayerViewPoint` — go through `utils_player_viewpoint`. The gait (`utils_gait`) is the one stride clock for every bob.
 - **Surfaces** use the CkUsf ProtoGrid material instances under `/Game/Mars/Materials/ProtoGrid`.

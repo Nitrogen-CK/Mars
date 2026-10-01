@@ -219,18 +219,35 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Intents.Request_SetMoveDirection(FMars_Request_InputIntents_SetMoveDirection(FVector(Input.X, Input.Y, 0.0)));
     }
 
-    // Legacy input scales are on (DefaultInput.ini bEnableLegacyInputScales): the controller scales
-    // pitch by -2.5, so stick/mouse up needs a negative pitch input.
+    // The legacy controller input scale the previous controller-rotation look path applied (engine BaseGame.ini InputYawScale); kept as an
+    // explicit factor so the tuned mouse and stick feel carry over to the camera director's intention.
+    private const float32 LegacyLookScale = 2.5f;
+
+    // CkCamera consumes the intention as a per-frame delta: degrees of view rotation = intention x the profile's LookSpeed.
+    // A positive Y pitches DOWN, so mouse/stick up is negated here. The stick mapping is already dt-scaled (SetupGamepadBindings).
     UFUNCTION()
     private void OnLook(FInputActionValue ActionValue, float32 ElapsedTime,
         float32 TriggeredTime, const UInputAction SourceAction)
     {
-        if (ck::Is_NOT_Valid(ControlledPawn))
+        auto Camera = TryGet_PawnCamera();
+        if (ck::Is_NOT_Valid(Camera))
         { return; }
 
         const auto LookDelta = ActionValue.GetAxis2D();
-        ControlledPawn.AddControllerYawInput(float32(LookDelta.X) * MouseLookScale);
-        ControlledPawn.AddControllerPitchInput(float32(-LookDelta.Y) * MouseLookScale);
+        const auto Scale = MouseLookScale * LegacyLookScale;
+        Camera.Request_SetOrientationIntention(FVector(LookDelta.X * Scale, -LookDelta.Y * Scale, 0.0));
+    }
+
+    private FCk_Handle_Camera TryGet_PawnCamera() const
+    {
+        if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_IsActorEcsReady() == false)
+        { return FCk_Handle_Camera(); }
+
+        auto Viewpoint = ControlledPawn.TryGet_ActorEntityHandle().As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Viewpoint))
+        { return FCk_Handle_Camera(); }
+
+        return Viewpoint.Get_Camera();
     }
 
     // A wheel tick is pressed and released inside one frame, which a polled level row can miss - so cycling is an
@@ -359,6 +376,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
             if (utils_input_button_map::TryGet_KeyForButton(InButtonMap, Button).IsValid() == false)
             { return false; }
         }
+
         return true;
     }
 

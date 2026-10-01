@@ -14,13 +14,16 @@ class AMars_PlayerCharacter : ACk_Character_UE
 
     default Mesh.SetVisibility(false, true);
 
+    // The CkCamera director's output sink. Its GetCameraView delivers the director's composed view to the player camera
+    // manager; FollowView also moves the component onto that view each frame, so the gloves attached below render exactly
+    // where the view renders. Its placement on the pawn is otherwise irrelevant (the director's anchor is Player.Head).
     UPROPERTY(DefaultComponent)
-    UCameraComponent FirstPersonCamera;
-    default FirstPersonCamera.bUsePawnControlRotation = true;
+    UCk_CameraComponent CameraComponent;
+    default CameraComponent._Placement = ECk_Camera_OutputComponentPlacement::FollowView;
 
     // Floating first-person gloves. Owner-only: other players see the full body. Mesh and anim class come from
     // Config.FPHands; UMars_FPHands_AnimInstance places each glove from the player entity's FPHands feature.
-    UPROPERTY(DefaultComponent, Attach = FirstPersonCamera)
+    UPROPERTY(DefaultComponent, Attach = CameraComponent)
     USkeletalMeshComponent FPHands;
     default FPHands.RelativeRotation = FRotator(0.0, -90.0, 0.0);
     default FPHands.bOnlyOwnerSee = true;
@@ -35,6 +38,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     UPROPERTY(ExposeOnSpawn)
     UMars_PlayerCharacter_Config Config = mars::Mars_PlayerCharacter_Config;
 
+    private FCk_Handle_Gait _Gait;
     private FCk_Handle_Transform _HandNode;
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
@@ -43,7 +47,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     void ConstructionScript()
     {
         CapsuleComponent.SetCapsuleSize(Config.CapsuleRadius, Config.CapsuleHalfHeight);
-        FirstPersonCamera.SetRelativeLocation(FVector(0.0, 0.0, Config.EyeHeight));
+        CameraComponent.SetRelativeLocation(FVector(0.0, 0.0, Config.EyeHeight));
 
         CharacterMovement.MaxWalkSpeed = Config.WalkSpeed;
         CharacterMovement.MaxWalkSpeedCrouched = Config.CrouchSpeed;
@@ -79,13 +83,33 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_handle::Set_DebugName(Player, n"Player");
 
         utils_input_intents::Add(Player);
-        utils_player_viewpoint::Add(Player, FirstPersonCamera.GetWorldTransform(), Config.Viewpoint);
+
+        // The character's stride clock; the head and hand bobs below read it. The spec's tunables come from the config,
+        // its motion source is this pawn's movement component.
+        auto GaitSpec = Config.Gait;
+        GaitSpec.Set_MovementComponent(CharacterMovement);
+        _Gait = utils_gait::Add(Player, GaitSpec);
+
+        // The view: a bob node at eye height is the director's input anchor, so the rendered view bobs with the gait
+        // (PEAK-style positional bob). The director lives on the head node; PlayerViewpoint keeps the handles.
+        auto PlayerTransform = Player.As_Transform();
+        auto HeadBobSpec = Config.HeadBob;
+        HeadBobSpec.Set_Gait(_Gait);
+        auto Head = utils_bob::Create(PlayerTransform, FTransform(FVector(0.0, 0.0, Config.EyeHeight)), HeadBobSpec);
+        utils_handle::Set_DebugName(FCk_Handle(Head), n"Player.Head");
+
+        auto CameraSpec = FCk_Camera_Spec(CameraComponent);
+        CameraSpec.Set_Profile(utils_player_viewpoint::Make_CameraProfile(Config.Viewpoint));
+        CameraSpec.Set_DriveControllerControlRotation(true);
+        auto HeadTransform = Head.As_Transform();
+        auto Camera = utils_camera::Add(HeadTransform, CameraSpec);
+
+        utils_player_viewpoint::Add(Player, Camera, Config.Viewpoint);
         utils_interaction_resolver::Add(Player, Config.InteractionResolver, ECk_Replication::DoesNotReplicate);
         utils_interact_prompt_display::Add(Player);
         utils_action_hint_display::Add(Player);
 
         // Silent: volumes that filter on Probe.Mars.Player detect the player; the player detects nothing through it.
-        auto PlayerTransform = Player.As_Transform();
         auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
         BodyProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
                      .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
@@ -97,18 +121,20 @@ class AMars_PlayerCharacter : ACk_Character_UE
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
         utils_byte_attribute::Add(Player, DownedSpec, ECk_Replication::DoesNotReplicate);
 
-        // Follows the first-person camera; only the held item's mesh is visible under it.
-        auto Hand = utils_scene_node::CreateAndAttachToUnrealComponent(PlayerTransform, FirstPersonCamera,
-            utils_fphands::Get_HandRestOffset(Config.FPHands, FMars_FPHands_Hold(), Config.HandOffset));
+        // Hangs off the rendered view (the director's view anchor), so it carries the view's pitch in the same frame.
+        auto ViewAnchor = Camera.Get_ViewAnchor();
+        auto Hand = utils_scene_node::Create(ViewAnchor, utils_fphands::Get_HandRestOffset(Config.FPHands, FMars_FPHands_Hold(), Config.HandOffset));
         utils_handle::Set_DebugName(FCk_Handle(Hand), n"Player.Hand");
 
-        // Damped-spring lag of the hand behind the camera. CkSway owns the Hand offset from here on; HandOffset is its rest.
+        // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; HandOffset is its rest.
         _HandSway = utils_sway::Add(Hand, Config.HandSway);
 
-        // Locomotion bob under the swaying hand; the held item and both gloves hang off it.
-        auto HandBob = utils_scene_node::Create(Hand.As_Transform(), FTransform::Identity);
+        // Locomotion bob under the swaying hand, in phase with the head; the held item and both gloves hang off it.
+        auto HandTransform = Hand.As_Transform();
+        auto HandBobSpec = Config.FPHands.Bob;
+        HandBobSpec.Set_Gait(_Gait);
+        auto HandBob = utils_bob::Create(HandTransform, FTransform::Identity, HandBobSpec);
         utils_handle::Set_DebugName(FCk_Handle(HandBob), n"Player.HandBob");
-        utils_hand_bob::Add(HandBob, Config.FPHands.Bob);
         _HandNode = HandBob.As_Transform();
         _Hands = utils_fphands::Add(Player, Config.FPHands, _HandNode);
 

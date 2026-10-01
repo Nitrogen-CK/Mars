@@ -11,10 +11,24 @@ namespace utils_fphands
         Params.Spec = InSpec;
         Params.HandNode = InHandNode;
 
+        // The player composes its gait before its hands; a missing gait only disables the arm swing.
+        if (InPlayer.Is_Gait())
+        { Params.Gait = InPlayer.As_Gait(); }
+
         InPlayer.Add_Fragment(FMars_Feature_FPHands());
         InPlayer.Add_Fragment(Params);
         InPlayer.Add_Fragment(FMars_Fragment_FPHands());
         return InPlayer.As_FPHands();
+    }
+
+    FVector Make_ArmSwing(const FCk_Handle_FPHands& InHands, float32 InSide)
+    {
+        const auto& Params = InHands.Get_Fragment(FMars_Fragment_FPHands_Params);
+        if (ck::Is_NOT_Valid(Params.Gait))
+        { return FVector::ZeroVector; }
+
+        const auto Swing = Math::Sin(Params.Gait.Get_Phase()) * Params.Gait.Get_Amount() * InSide;
+        return FVector(Params.Spec.ArmSwingCm * Swing, 0.0, Params.Spec.ArmSwingLiftCm * Math::Max(Swing, 0.0f));
     }
 }
 
@@ -86,6 +100,17 @@ mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_FPHands& Self)
 mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec;
+}
+
+// Free-hand arm swing this frame in the hand node's frame: the gait's stride swing, opposite per hand; the forward hand lifts.
+mixin FVector Get_ArmSwing_Left(const FCk_Handle_FPHands& Self)
+{
+    return utils_fphands::Make_ArmSwing(Self, -1.0f);
+}
+
+mixin FVector Get_ArmSwing_Right(const FCk_Handle_FPHands& Self)
+{
+    return utils_fphands::Make_ArmSwing(Self, 1.0f);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
