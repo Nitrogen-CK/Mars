@@ -398,6 +398,32 @@ namespace UMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless
 }
 
 USTRUCT()
+struct FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_EmoteWheel_OpenHoverChooseClose
+{
+    FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams Params()
+    {
+        return FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_EmoteWheel_SectorMathAndSpec_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_EmoteWheel_SectorMathAndSpec
+{
+    FMars_AutoTest_EmoteWheel_SectorMathAndSpec_SpawnParams Params()
+    {
+        return FMars_AutoTest_EmoteWheel_SectorMathAndSpec_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_SpawnParams
 {
 }
@@ -2771,6 +2797,19 @@ namespace UMars_SmTask_EmoteIntents
     FMars_SmTask_EmoteIntents_SpawnParams Params()
     {
         return FMars_SmTask_EmoteIntents_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_EmoteWheelIntent_SpawnParams
+{
+}
+
+namespace UMars_SmTask_EmoteWheelIntent
+{
+    FMars_SmTask_EmoteWheelIntent_SpawnParams Params()
+    {
+        return FMars_SmTask_EmoteWheelIntent_SpawnParams();
     }
 }
 
