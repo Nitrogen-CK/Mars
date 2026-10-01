@@ -38,13 +38,13 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
         MoverSpec.StartAtEnd = Control.StartActive;
         auto Mover = utils_mover::Add(ButtonNode, MoverSpec);
 
-        utils_control::Add(InHandle, Control, Mover);
+        auto ControlHandle = utils_control::Add(InHandle, Control, Mover);
 
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }
 
         AddVisuals(SealRoot, ButtonNode);
-        AddInteractable(SealRoot);
+        AddInteractable(SealRoot, ControlHandle);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
@@ -78,8 +78,12 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
             GlyphArchetype, n"Seal_Glyph");
     }
 
-    private void AddInteractable(FCk_Handle_Transform& InRoot)
+    private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
     {
+        // A rejected Control spec already ensured in utils_control::Add.
+        if (ck::Is_NOT_Valid(InControl))
+        { return; }
+
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
         Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(FVector(30.0, 30.0, 20.0)));
@@ -87,7 +91,7 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(utils_control::Make_InteractTarget(Control, PromptText));
+        Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
 
         utils_interactable::Create(InRoot, Spec);
     }

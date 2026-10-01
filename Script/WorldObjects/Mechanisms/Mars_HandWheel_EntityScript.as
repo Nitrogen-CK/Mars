@@ -11,7 +11,7 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
 
     UPROPERTY(ExposeOnSpawn)
     FMars_Control_Spec Control;
-    default Control.Interaction = EMars_Control_Interaction::Timed;
+    default Control.Interaction = ECk_Interaction_CompletionPolicy::Timed;
     default Control.HoldSeconds = 2.0f;
 
     // No source is added while OutputChannel is unset.
@@ -48,13 +48,13 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
         MoverSpec.StartAtEnd = Control.StartActive;
         auto Mover = utils_mover::Add(WheelNode, MoverSpec);
 
-        utils_control::Add(InHandle, Control, Mover);
+        auto ControlHandle = utils_control::Add(InHandle, Control, Mover);
 
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }
 
         AddVisuals(WheelRoot, WheelNode);
-        AddInteractable(WheelRoot);
+        AddInteractable(WheelRoot, ControlHandle);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
@@ -81,8 +81,12 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
             CubeMesh, Material, collision::profile::NoCollision, n"HandWheel_Spoke");
     }
 
-    private void AddInteractable(FCk_Handle_Transform& InRoot)
+    private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
     {
+        // A rejected Control spec already ensured in utils_control::Add.
+        if (ck::Is_NOT_Valid(InControl))
+        { return; }
+
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
         Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(FVector(20.0, 30.0, 30.0)));
@@ -90,7 +94,7 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(utils_control::Make_InteractTarget(Control, PromptText));
+        Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
 
         utils_interactable::Create(InRoot, Spec);
     }

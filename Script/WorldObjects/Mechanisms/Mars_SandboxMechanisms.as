@@ -112,7 +112,7 @@ class UMars_Sandbox_WheelJ_EntityScript : UMars_HandWheel_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        Control.Interaction = EMars_Control_Interaction::Timed;
+        Control.Interaction = ECk_Interaction_CompletionPolicy::Timed;
         Control.HoldSeconds = 2.0f;
         Control.Behavior = EMars_Control_Behavior::Momentary;
         Control.ActiveSeconds = 8.0f;
