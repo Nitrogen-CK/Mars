@@ -255,6 +255,19 @@ namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean
+{
+    FMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_SpawnParams
 {
 }
