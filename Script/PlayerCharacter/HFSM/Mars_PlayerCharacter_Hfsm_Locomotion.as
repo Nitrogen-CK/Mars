@@ -2,7 +2,9 @@
 //   Idle     ->Airborne[IsFalling] ->Jump[JumpPressed] ->Crouch[CrouchPressed] ->Walk[HasMoveIntent]
 //   Walk     ->Airborne ->Jump ->Crouch ->Idle[NoMoveIntent] ->Sprint[SprintHeld]
 //   Sprint   ->Airborne ->Jump ->Crouch ->Idle[NoMoveIntent] ->Walk[SprintReleased]
-//   Crouch   ->Airborne ->Jump[JumpPressed] ->Idle[CrouchPressed]   (toggle: a fresh press stands up)
+//   Crouch   ->Airborne ->Jump[JumpPressed] ->Sprint[SprintPressed + HasMoveIntent] ->Idle[CrouchPressed]
+//            (toggle: a fresh crouch press stands up; a fresh sprint press stands up and runs - a fresh press, not a
+//            hold, so crouching mid-sprint with sprint still held does not bounce straight back to Sprint)
 //   Jump     ->Airborne[IsFalling] ->Idle[JumpReleased + IsGrounded]   (jump refused)
 //   Airborne ->Sprint[IsGrounded + HasMoveIntent + SprintHeld] ->Walk[IsGrounded + HasMoveIntent] ->Idle[IsGrounded]
 //            (landing goes straight to the moving state: a frame in Idle drops MaxWalkSpeed and input, braking the run)
@@ -30,6 +32,11 @@ class UMars_SmCondition_SprintHeld : UMars_SmCondition_IntentActive
 class UMars_SmCondition_SprintReleased : UMars_SmCondition_SprintHeld
 {
     default _NegateResult = true;
+}
+
+class UMars_SmCondition_SprintPressed : UMars_SmCondition_IntentPressed
+{
+    default IntentTag = GameplayTags::Mars_Intent_Sprint;
 }
 
 class UMars_SmCondition_CrouchPressed : UMars_SmCondition_IntentPressed
@@ -172,6 +179,10 @@ class UMars_SmState_Loco_Crouch : UCk_SmState_EntityScript
 
         auto ToJump = AddTransition(InHandle, UMars_SmState_Loco_Jump);
         AddCondition(ToJump, UMars_SmCondition_JumpPressed);
+
+        auto ToSprint = AddTransition(InHandle, UMars_SmState_Loco_Sprint);
+        AddCondition(ToSprint, UMars_SmCondition_SprintPressed);
+        AddCondition(ToSprint, UMars_SmCondition_HasMoveIntent);
 
         auto ToIdle = AddTransition(InHandle, UMars_SmState_Loco_Idle);
         AddCondition(ToIdle, UMars_SmCondition_CrouchPressed);
