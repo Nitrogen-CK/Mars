@@ -71,6 +71,10 @@ class UMars_PlayerCharacter_Config : UDataAsset
 
     UPROPERTY(Category = "Hands")
     FMars_FPHands_Spec FPHands;
+
+    // The wheel's entries live in its Definition asset; only the pointer feel is tuned here.
+    UPROPERTY(Category = "Emotes")
+    FMars_EmoteWheel_Spec EmoteWheel;
 }
 
 namespace mars
@@ -143,5 +147,7 @@ namespace mars
         HandBobAir.Set_LiftCmPerFallSpeed(0.0f);
         HandBobAir.Set_MaxLiftCm(0.0f);
         FPHands.Bob.Set_Air(HandBobAir);
+
+        EmoteWheel.Definition = TSoftObjectPtr<UMars_EmoteWheel_Definition>(FSoftObjectPath("/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA"));
     }
 }

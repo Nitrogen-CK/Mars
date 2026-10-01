@@ -114,6 +114,16 @@ namespace mars
         Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
     }
 
+    // Held: the wheel stays open while the key is down; the release chooses.
+    asset Mars_IA_EmoteWheel of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_EmoteWheel, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_EmoteWheel";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindEmoteWheel", "Emote Wheel (hold)");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryEmotes", "Emotes");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
     asset Mars_IA_Emote_Wave of UCk_Boolean_InputAction
     {
         PlayerMappableKeySettings = NewObject(Mars_IA_Emote_Wave, UCk_PlayerMappableKeySettings_UE);
