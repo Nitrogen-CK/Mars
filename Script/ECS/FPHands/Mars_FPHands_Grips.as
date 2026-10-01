@@ -27,6 +27,11 @@ struct FMars_FPHands_MeshGrips
 
     UPROPERTY()
     FTransform Left;
+
+    // The entity whose static mesh carries the sockets (entity-built mechanisms only). A reach anchors to it, so the gloves
+    // follow a moving part - a lever's handle - rather than the object's root.
+    UPROPERTY()
+    FCk_Handle_Transform Host;
 }
 
 // What a reach (or the focus lean) goes for. Grips are in the anchor's space so the gloves follow it if it moves.
@@ -247,9 +252,12 @@ namespace utils_fphands
             if (ck::Is_NOT_Valid(Entity))
             { continue; }
 
-            const auto Grips = Find_ComponentSockets(utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent));
+            auto Grips = Find_ComponentSockets(utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent));
             if (Grips.HasRight)
-            { return Grips; }
+            {
+                Grips.Host = Entity.As_Transform(ECk_SanityCheck::UnChecked);
+                return Grips;
+            }
 
             for (auto Dependent : Entity.Get_LifetimeDependents())
             { Queue.Add(Dependent); }
@@ -347,6 +355,13 @@ namespace utils_fphands
         { ActorSockets = Find_ActorSockets(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Subject.Owner)); }
         if (ActorSockets.HasRight)
         {
+            // The part carrying the sockets may move on its own (a lever's handle under its Mover node): anchor to it.
+            if (ck::IsValid(ActorSockets.Host))
+            {
+                Target.Anchor = ActorSockets.Host;
+                Target.AnchorWorld = utils_transform::Get_EntityCurrentTransform(ActorSockets.Host);
+            }
+
             Target.Layout = EMars_FPHands_GripLayout::Authored;
             Target.Grip_R = ActorSockets.Right.GetRelativeTransform(Target.AnchorWorld);
             Target.Grip_L = ActorSockets.HasLeft ? ActorSockets.Left.GetRelativeTransform(Target.AnchorWorld) : Target.Grip_R;
