@@ -115,9 +115,41 @@ struct FMars_Request_Mover_MoveTo
     }
 }
 
-// Absolute and latest-wins: one pending value, overwritten by each new request.
+// Puts the handle at an alpha right now, stopping any tween. AtEnd (the target) is untouched; a later MoveTo or
+// Settle tweens from here.
+struct FMars_Request_Mover_Scrub
+{
+    UPROPERTY()
+    float32 Alpha = 0.0f;
+
+    FMars_Request_Mover_Scrub() {}
+
+    FMars_Request_Mover_Scrub(float32 InAlpha)
+    {
+        Alpha = InAlpha;
+    }
+}
+
+// Tweens from the current alpha back to the AtEnd pose (after a scrub left the handle part way). AngelScript rejects
+// an empty struct in a TOptional/TArray, so it carries one placeholder field.
+struct FMars_Request_Mover_Settle
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Mover_Settle() {}
+}
+
+// Absolute and latest-wins: one pending value per kind, overwritten by each new request. Drained Scrub -> MoveTo ->
+// Settle, so a tween requested in the same frame as a scrub starts from the scrubbed alpha.
 struct FMars_Fragment_Mover_Requests
 {
     UPROPERTY()
     TOptional<FMars_Request_Mover_MoveTo> MoveToRequest;
+
+    UPROPERTY()
+    TOptional<FMars_Request_Mover_Scrub> ScrubRequest;
+
+    UPROPERTY()
+    TOptional<FMars_Request_Mover_Settle> SettleRequest;
 }

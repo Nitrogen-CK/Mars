@@ -15,27 +15,67 @@ class UMars_Processor_Mover_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Mover();
 
-        const auto HasRequest = InRequests.MoveToRequest.IsSet();
+        const auto HasScrub = InRequests.ScrubRequest.IsSet();
+        auto ScrubAlpha = 0.0f;
+        if (HasScrub)
+        { ScrubAlpha = InRequests.ScrubRequest.GetValue().Alpha; }
+
+        const auto HasMoveTo = InRequests.MoveToRequest.IsSet();
         auto TargetAtEnd = false;
-        if (HasRequest)
+        if (HasMoveTo)
         { TargetAtEnd = InRequests.MoveToRequest.GetValue().AtEnd; }
+
+        const auto HasSettle = InRequests.SettleRequest.IsSet();
 
         // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Mover_Requests);
 
-        if (HasRequest == false || InState.AtEnd == TargetAtEnd)
-        { return; }
+        if (HasScrub)
+        { Scrub(Self, InState, ScrubAlpha); }
 
-        InState.AtEnd = TargetAtEnd;
-        const auto ArrivedImmediately = StartMove(Self, InState);
+        auto HandledMove = false;
+        auto ArrivedImmediately = false;
+        if (HasMoveTo && InState.AtEnd != TargetAtEnd)
+        {
+            InState.AtEnd = TargetAtEnd;
+            ArrivedImmediately = StartMove(Self, InState);
+            HandledMove = true;
+        }
+
+        // A MoveTo applied this drain already tweens from the current alpha.
+        if (HasSettle && HandledMove == false)
+        { ArrivedImmediately = StartMove(Self, InState); }
+
+        const auto AtEnd = InState.AtEnd;
 
         if (Self.Has_Fragment(FMars_Fragment_Mover_Signals) == false)
         { return; }
 
-        Self.Get_Fragment(FMars_Fragment_Mover_Signals).OnTargetChanged.Broadcast(Self, TargetAtEnd);
+        if (HandledMove)
+        { Self.Get_Fragment(FMars_Fragment_Mover_Signals).OnTargetChanged.Broadcast(Self, AtEnd); }
 
         if (ArrivedImmediately && Self.Has_Fragment(FMars_Fragment_Mover_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mover_Signals).OnArrived.Broadcast(Self, TargetAtEnd); }
+        { Self.Get_Fragment(FMars_Fragment_Mover_Signals).OnArrived.Broadcast(Self, AtEnd); }
+    }
+
+    // Holds the handle at InAlpha with no tween. The stopped tween's OnMoveComplete still fires this frame and is
+    // rejected by its handle check.
+    private void Scrub(FCk_Handle_Mover& InMover, FMars_Fragment_Mover& InState, float32 InAlpha)
+    {
+        StopTween(InState);
+
+        InState.Alpha = Math::Clamp(InAlpha, 0.0f, 1.0f);
+        auto Node = FCk_Handle(InMover).As_SceneNode();
+        utils_mover::Request_ApplyAlpha(Node, InMover.Get_Fragment(FMars_Fragment_Mover_Params), InState.Alpha);
+    }
+
+    private void StopTween(FMars_Fragment_Mover& InState)
+    {
+        if (ck::Is_NOT_Valid(InState.Tween))
+        { return; }
+
+        utils_tween::Stop(InState.Tween, ECk_TweenStopBehavior::SelfDestruct);
+        InState.Tween = FCk_Handle_Tween();
     }
 
     // Tweens Alpha from its current value, so reversing mid-move continues from the current pose instead of
@@ -44,11 +84,7 @@ class UMars_Processor_Mover_HandleRequests : UCk_Processor_Script_Base_UE
     {
         const auto& Params = InMover.Get_Fragment(FMars_Fragment_Mover_Params);
 
-        if (ck::IsValid(InState.Tween))
-        {
-            utils_tween::Stop(InState.Tween, ECk_TweenStopBehavior::SelfDestruct);
-            InState.Tween = FCk_Handle_Tween();
-        }
+        StopTween(InState);
 
         const auto TargetAlpha = InState.AtEnd ? 1.0f : 0.0f;
         const auto Duration = Params.Duration * Math::Abs(TargetAlpha - InState.Alpha);
