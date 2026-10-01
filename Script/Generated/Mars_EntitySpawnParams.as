@@ -203,6 +203,58 @@ namespace UMars_AutoTest_Backpack_CargoStowThenTake
 }
 
 USTRUCT()
+struct FMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive
+{
+    FMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CampSession_PlayTransitionsToLive_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampSession_PlayTransitionsToLive
+{
+    FMars_AutoTest_CampSession_PlayTransitionsToLive_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampSession_PlayTransitionsToLive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CampSession_PlayWhileLiveIsIgnored_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampSession_PlayWhileLiveIsIgnored
+{
+    FMars_AutoTest_CampSession_PlayWhileLiveIsIgnored_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampSession_PlayWhileLiveIsIgnored_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CampSession_StartLiveSpecIsLive_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
+{
+    FMars_AutoTest_CampSession_StartLiveSpecIsLive_SpawnParams Params()
+    {
+        return FMars_AutoTest_CampSession_StartLiveSpecIsLive_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams
 {
 }
@@ -1704,6 +1756,32 @@ namespace UMars_SmState_Alive
     FMars_SmState_Alive_SpawnParams Params()
     {
         return FMars_SmState_Alive_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Camp_Live_SpawnParams
+{
+}
+
+namespace UMars_SmState_Camp_Live
+{
+    FMars_SmState_Camp_Live_SpawnParams Params()
+    {
+        return FMars_SmState_Camp_Live_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Camp_Lobby_SpawnParams
+{
+}
+
+namespace UMars_SmState_Camp_Lobby
+{
+    FMars_SmState_Camp_Lobby_SpawnParams Params()
+    {
+        return FMars_SmState_Camp_Lobby_SpawnParams();
     }
 }
 

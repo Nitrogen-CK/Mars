@@ -37,6 +37,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_CampSession",
+			"ShortName": "CampSession",
+			"Description": "The camp's session phase - Lobby (menu up, viewer pawns) or Live (chefs spawned) - mirrored from a CkStateMachine",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CampSessionHandle",
+			"RequiredFragments": [
+				"Mars_Feature_CampSession"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_CargoSlot",
 			"ShortName": "CargoSlot",
 			"Description": "One backpack cargo slot: a child of the pack with a capacity-1 inventory, a probe interactable and the stowed item's visual",
