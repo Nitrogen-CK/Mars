@@ -255,6 +255,201 @@ namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
 }
 
 USTRUCT()
+struct FMars_AutoTest_Eyes_ApplyWritesPlate_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_ApplyWritesPlate
+{
+    FMars_AutoTest_Eyes_ApplyWritesPlate_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_ApplyWritesPlate_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_BlinkCountsAtFixedInterval_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_BlinkCountsAtFixedInterval
+{
+    FMars_AutoTest_Eyes_BlinkCountsAtFixedInterval_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_BlinkCountsAtFixedInterval_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_EmoteOverStateLayer_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_EmoteOverStateLayer
+{
+    FMars_AutoTest_Eyes_EmoteOverStateLayer_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_EmoteOverStateLayer_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_ExpressionOverridesThenExpires_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_ExpressionOverridesThenExpires
+{
+    FMars_AutoTest_Eyes_ExpressionOverridesThenExpires_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_ExpressionOverridesThenExpires_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_ExpressionSuppressesBlink_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_ExpressionSuppressesBlink
+{
+    FMars_AutoTest_Eyes_ExpressionSuppressesBlink_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_ExpressionSuppressesBlink_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_LookFollowsGaze_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_LookFollowsGaze
+{
+    FMars_AutoTest_Eyes_LookFollowsGaze_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_LookFollowsGaze_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_LookMasterResolves_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_LookMasterResolves
+{
+    FMars_AutoTest_Eyes_LookMasterResolves_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_LookMasterResolves_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_LookMatchesMaterialSlots_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_LookMatchesMaterialSlots
+{
+    FMars_AutoTest_Eyes_LookMatchesMaterialSlots_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_LookMatchesMaterialSlots_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye
+{
+    FMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_RejectsBadRequest_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_RejectsBadRequest
+{
+    FMars_AutoTest_Eyes_RejectsBadRequest_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_RejectsBadRequest_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell
+{
+    FMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_SpecRejectsBadInput_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_SpecRejectsBadInput
+{
+    FMars_AutoTest_Eyes_SpecRejectsBadInput_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_SpecRejectsBadInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote
+{
+    FMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Eyes_WinkKeepsOneEye_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_WinkKeepsOneEye
+{
+    FMars_AutoTest_Eyes_WinkKeepsOneEye_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_WinkKeepsOneEye_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
+{
+    FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams Params()
+    {
+        return FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_SpawnParams
 {
 }
@@ -303,6 +498,136 @@ namespace UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease
     FMars_AutoTest_FPHands_TimedReachHoldsUntilRelease_SpawnParams Params()
     {
         return FMars_AutoTest_FPHands_TimedReachHoldsUntilRelease_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_HysteresisHoldsTarget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_HysteresisHoldsTarget
+{
+    FMars_AutoTest_Gaze_HysteresisHoldsTarget_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_HysteresisHoldsTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_IgnoresOutOfRangeAndBehind_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_IgnoresOutOfRangeAndBehind
+{
+    FMars_AutoTest_Gaze_IgnoresOutOfRangeAndBehind_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_IgnoresOutOfRangeAndBehind_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_NeverTargetsOwnOwner_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_NeverTargetsOwnOwner
+{
+    FMars_AutoTest_Gaze_NeverTargetsOwnOwner_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_NeverTargetsOwnOwner_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_PicksNearestInCone_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_PicksNearestInCone
+{
+    FMars_AutoTest_Gaze_PicksNearestInCone_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_PicksNearestInCone_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_SpecRejectsBadInput_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_SpecRejectsBadInput
+{
+    FMars_AutoTest_Gaze_SpecRejectsBadInput_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_SpecRejectsBadInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_TargetDestroyedClears_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_TargetDestroyedClears
+{
+    FMars_AutoTest_Gaze_TargetDestroyedClears_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_TargetDestroyedClears_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gaze_TargetWithoutHeadEnsures_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gaze_TargetWithoutHeadEnsures
+{
+    FMars_AutoTest_Gaze_TargetWithoutHeadEnsures_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gaze_TargetWithoutHeadEnsures_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HandBob_BreathNeverInverts_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HandBob_BreathNeverInverts
+{
+    FMars_AutoTest_HandBob_BreathNeverInverts_SpawnParams Params()
+    {
+        return FMars_AutoTest_HandBob_BreathNeverInverts_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HandBob_LandingKickDisplacesThenSettles_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HandBob_LandingKickDisplacesThenSettles
+{
+    FMars_AutoTest_HandBob_LandingKickDisplacesThenSettles_SpawnParams Params()
+    {
+        return FMars_AutoTest_HandBob_LandingKickDisplacesThenSettles_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HandBob_NonFiniteInputEnsures_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HandBob_NonFiniteInputEnsures
+{
+    FMars_AutoTest_HandBob_NonFiniteInputEnsures_SpawnParams Params()
+    {
+        return FMars_AutoTest_HandBob_NonFiniteInputEnsures_SpawnParams();
     }
 }
 
@@ -520,6 +845,31 @@ namespace UMars_Backpack_EntityScript
     FMars_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_EyesDummy_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    FMars_EyesDummy_EntityScript_SpawnParams(FTransform InSpawnTransform)
+    {
+        SpawnTransform = InSpawnTransform;
+    }
+}
+
+namespace UMars_EyesDummy_EntityScript
+{
+    FMars_EyesDummy_EntityScript_SpawnParams Params()
+    {
+        return FMars_EyesDummy_EntityScript_SpawnParams();
+    }
+
+    FMars_EyesDummy_EntityScript_SpawnParams Params(FTransform InSpawnTransform)
+    {
+        return FMars_EyesDummy_EntityScript_SpawnParams(InSpawnTransform);
     }
 }
 
