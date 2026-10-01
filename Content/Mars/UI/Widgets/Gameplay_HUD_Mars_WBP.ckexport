@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "c8bc1d5e9d965b961de4818efd6ed13f",
+		"sourceHash": "2c222495e5d399dda653f54c4550b791",
 		"exporterVersion": 3
 	},
 	"blueprintType": "WidgetBlueprint",
@@ -32,6 +32,11 @@
 		{
 			"name": "Hotbar",
 			"type": "UMars_Hotbar_Widget*",
+			"value": "None"
+		},
+		{
+			"name": "EmoteWheel",
+			"type": "UMars_EmoteWheel_Widget*",
 			"value": "None"
 		},
 		{
@@ -1025,6 +1030,11 @@
 							"value": "None"
 						},
 						{
+							"name": "BackpackContainer",
+							"type": "UPanelWidget*",
+							"value": "None"
+						},
+						{
 							"name": "SlotWidgetClass",
 							"type": "TSubclassOf<UMars_HotbarSlot_Widget>",
 							"category": "Hotbar",
@@ -1224,6 +1234,411 @@
 							"type": "TSubclassOf<UMars_ActionHint_Widget>",
 							"category": "ActionHint",
 							"value": "/Game/Mars/UI/Widgets/ActionHint/ActionHint_Mars_WBP.ActionHint_Mars_WBP_C"
+						},
+						{
+							"name": "_ContextReceiver",
+							"type": "FCk_Handle_ContextReceiver",
+							"category": "Ck|UI|Context",
+							"value":
+							{
+								"_ContextEntity":
+								{
+								}
+							}
+						},
+						{
+							"name": "_InheritContextFromParent",
+							"type": "bool",
+							"category": "Ck|UI|Context",
+							"value": true
+						},
+						{
+							"name": "_DoNotDestroyDuringTransitions",
+							"type": "bool",
+							"category": "Ck|UI|Lifecycle",
+							"value": false
+						},
+						{
+							"name": "bDisplayInActionBar",
+							"type": "bool",
+							"category": "Input",
+							"value": false,
+							"tooltip": "True to generally display this widget's actions in the action bar, assuming it has actions."
+						},
+						{
+							"name": "bConsumePointerInput",
+							"type": "bool",
+							"category": "Input",
+							"value": false,
+							"tooltip": "Set this to true if you don't want any pointer (mouse and touch) input to bubble past this widget"
+						},
+						{
+							"name": "ColorAndOpacity",
+							"type": "FLinearColor",
+							"category": "Appearance",
+							"value":
+							{
+								"R": 1,
+								"G": 1,
+								"B": 1,
+								"A": 1
+							},
+							"tooltip": "The color and opacity of this widget.  Tints all child widgets."
+						},
+						{
+							"name": "ForegroundColor",
+							"type": "FSlateColor",
+							"category": "Appearance",
+							"value":
+							{
+								"SpecifiedColor":
+								{
+									"R": 1,
+									"G": 0,
+									"B": 1,
+									"A": 1
+								},
+								"ColorUseRule": "UseColor_Foreground"
+							},
+							"tooltip": "The foreground color of the widget, this is inherited by sub widgets.  Any color property\nthat is marked as inherit will use this color."
+						},
+						{
+							"name": "Padding",
+							"type": "FMargin",
+							"category": "Appearance",
+							"value":
+							{
+								"Left": 0,
+								"Top": 0,
+								"Right": 0,
+								"Bottom": 0
+							},
+							"tooltip": "The padding area around the content."
+						},
+						{
+							"name": "Priority",
+							"type": "int32",
+							"category": "Input",
+							"value": 0
+						},
+						{
+							"name": "bIsFocusable",
+							"type": "uint8",
+							"category": "Interaction",
+							"value": false,
+							"tooltip": "Setting this flag to true, allows this widget to accept focus when clicked, or when navigated to."
+						},
+						{
+							"name": "bStopAction",
+							"type": "uint8",
+							"category": "Input",
+							"value": false
+						},
+						{
+							"name": "PreviewBackground",
+							"type": "TObjectPtr<UTexture2D>",
+							"category": "Designer",
+							"value": "None",
+							"tooltip": "A preview background that you can use when designing the UI to get a sense of scale on the screen.  Use\na texture with a screenshot of your game in it, for example if you were designing a HUD."
+						},
+						{
+							"name": "TickFrequency",
+							"type": "EWidgetTickFrequency",
+							"category": "Performance",
+							"value": "Auto",
+							"tooltip": "This widget is allowed to tick. If this is unchecked tick will never be called, animations will not play correctly, and latent actions will not execute.\nUncheck this for performance reasons only"
+						},
+						{
+							"name": "DesiredFocusWidget",
+							"type": "FWidgetChild",
+							"category": "Interaction",
+							"value":
+							{
+								"WidgetName": "None"
+							}
+						}
+					]
+				},
+				{
+					"name": "EmoteWheel",
+					"class": "EmoteWheel_Mars_WBP_C",
+					"isVariable": true,
+					"visibility": "SelfHitTestInvisible",
+					"slot":
+					{
+						"type": "CanvasPanelSlot",
+						"properties": [
+							{
+								"name": "LayoutData",
+								"type": "FAnchorData",
+								"category": "Layout|Canvas Slot",
+								"value":
+								{
+									"Offsets":
+									{
+										"Left": 0,
+										"Top": 0,
+										"Right": 100,
+										"Bottom": 30
+									},
+									"Anchors":
+									{
+										"Minimum":
+										{
+											"X": 0.5,
+											"Y": 0.5
+										},
+										"Maximum":
+										{
+											"X": 0.5,
+											"Y": 0.5
+										}
+									},
+									"Alignment":
+									{
+										"X": 0.5,
+										"Y": 0.5
+									}
+								},
+								"tooltip": "The anchoring information for the slot"
+							},
+							{
+								"name": "bAutoSize",
+								"type": "bool",
+								"category": "Layout|Canvas Slot",
+								"value": true,
+								"tooltip": "When AutoSize is true we use the widget's desired size"
+							},
+							{
+								"name": "ZOrder",
+								"type": "int32",
+								"category": "Layout|Canvas Slot",
+								"value": 10,
+								"tooltip": "The order priority this widget is rendered in.  Higher values are rendered last (and so they will appear to be on top)."
+							}
+						]
+					},
+					"properties": [
+						{
+							"name": "TopPanelImage",
+							"type": "UImage*",
+							"category": "EmoteWheel_Mars_WBP",
+							"value": "None"
+						},
+						{
+							"name": "SelectorImage",
+							"type": "UImage*",
+							"category": "EmoteWheel_Mars_WBP",
+							"value": "None"
+						},
+						{
+							"name": "Ring",
+							"type": "UImage*",
+							"category": "EmoteWheel_Mars_WBP",
+							"value": "None"
+						},
+						{
+							"name": "CenterButton",
+							"type": "UImage*",
+							"category": "EmoteWheel_Mars_WBP",
+							"value": "None"
+						},
+						{
+							"name": "BottomPanelImage",
+							"type": "UImage*",
+							"category": "EmoteWheel_Mars_WBP",
+							"value": "None"
+						},
+						{
+							"name": "Disk",
+							"type": "UImage*",
+							"value": "None",
+							"tooltip": "Paper disk + sector dividers + hovered-sector fill (EmoteWheelDisk_Mars_M)."
+						},
+						{
+							"name": "SegmentCanvas",
+							"type": "UCanvasPanel*",
+							"value": "None",
+							"tooltip": "Fills the wheel frame; segments are anchored at its centre."
+						},
+						{
+							"name": "Selector",
+							"type": "UWidget*",
+							"value": "None",
+							"tooltip": "Centred in the frame; moved onto the hovered sector and turned to point along it."
+						},
+						{
+							"name": "CenterCancel",
+							"type": "UWidget*",
+							"value": "None",
+							"tooltip": "The centre cancel button's content (the X and its caption); dimmed while a sector is hovered."
+						},
+						{
+							"name": "HoveredName",
+							"type": "UCommonTextBlock*",
+							"value": "None"
+						},
+						{
+							"name": "Instruction",
+							"type": "UCommonTextBlock*",
+							"value": "None"
+						},
+						{
+							"name": "SegmentWidgetClass",
+							"type": "TSubclassOf<UMars_EmoteWheelSegment_Widget>",
+							"category": "EmoteWheel",
+							"value": "/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheelSegment_Mars_WBP.EmoteWheelSegment_Mars_WBP_C"
+						},
+						{
+							"name": "PreviewDefinition",
+							"type": "TSoftObjectPtr<UMars_EmoteWheel_Definition>",
+							"category": "EmoteWheel|Preview",
+							"value": "/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA",
+							"tooltip": "Design-time only: the entries the designer preview lays out (the game reads the player's feature)."
+						},
+						{
+							"name": "PreviewHoveredIndex",
+							"type": "int32",
+							"category": "EmoteWheel|Preview",
+							"value": 0
+						},
+						{
+							"name": "SegmentRadius",
+							"type": "float",
+							"category": "EmoteWheel|Layout",
+							"value": 136,
+							"tooltip": "Icon centres."
+						},
+						{
+							"name": "LabelRadius",
+							"type": "float",
+							"category": "EmoteWheel|Layout",
+							"value": 212,
+							"tooltip": "Label centres - their own ring, outside the icons, so neighbouring sectors never collide."
+						},
+						{
+							"name": "SelectorRadius",
+							"type": "float",
+							"category": "EmoteWheel|Layout",
+							"value": 78
+						},
+						{
+							"name": "CenterIdleOpacity",
+							"type": "float",
+							"category": "EmoteWheel|Style",
+							"value": 0.69999998807907104
+						},
+						{
+							"name": "PlayerTint",
+							"type": "FLinearColor",
+							"category": "EmoteWheel|Style",
+							"value":
+							{
+								"R": 0.58410000801086426,
+								"G": 0.070399999618530273,
+								"B": 0.036899998784065247,
+								"A": 1
+							},
+							"tooltip": "Until players pick a colour: the kit's reference red."
+						},
+						{
+							"name": "HoveredColor",
+							"type": "FLinearColor",
+							"category": "EmoteWheel|Style",
+							"value":
+							{
+								"R": 0.81480002403259277,
+								"G": 0.41249999403953552,
+								"B": 0.056099999696016312,
+								"A": 1
+							}
+						},
+						{
+							"name": "DisabledHoveredColor",
+							"type": "FLinearColor",
+							"category": "EmoteWheel|Style",
+							"value":
+							{
+								"R": 0.39680001139640808,
+								"G": 0.32310000061988831,
+								"B": 0.23839999735355377,
+								"A": 1
+							}
+						},
+						{
+							"name": "CancelName",
+							"type": "FText",
+							"category": "EmoteWheel|Text",
+							"value": "Cancel"
+						},
+						{
+							"name": "PerformInstruction",
+							"type": "FText",
+							"category": "EmoteWheel|Text",
+							"value": "Release to perform"
+						},
+						{
+							"name": "CancelInstruction",
+							"type": "FText",
+							"category": "EmoteWheel|Text",
+							"value": "Release to cancel"
+						},
+						{
+							"name": "UnavailableInstruction",
+							"type": "FText",
+							"category": "EmoteWheel|Text",
+							"value": "Not available yet"
+						},
+						{
+							"name": "OpenSound",
+							"type": "USoundBase*",
+							"category": "EmoteWheel|Audio",
+							"value": "None",
+							"tooltip": "Sound hooks - unset plays nothing."
+						},
+						{
+							"name": "HoverSound",
+							"type": "USoundBase*",
+							"category": "EmoteWheel|Audio",
+							"value": "None",
+							"tooltip": "Played on entering an emote sector (not the centre)."
+						},
+						{
+							"name": "SelectSound",
+							"type": "USoundBase*",
+							"category": "EmoteWheel|Audio",
+							"value": "None"
+						},
+						{
+							"name": "CancelSound",
+							"type": "USoundBase*",
+							"category": "EmoteWheel|Audio",
+							"value": "None",
+							"tooltip": "Played when the wheel closes without a choice."
+						},
+						{
+							"name": "SectorCountParameter",
+							"type": "FName",
+							"category": "EmoteWheel|Material",
+							"value": "SectorCount"
+						},
+						{
+							"name": "HoveredIndexParameter",
+							"type": "FName",
+							"category": "EmoteWheel|Material",
+							"value": "HoveredIndex"
+						},
+						{
+							"name": "HoveredColorParameter",
+							"type": "FName",
+							"category": "EmoteWheel|Material",
+							"value": "HoveredColor"
+						},
+						{
+							"name": "DeadZoneParameter",
+							"type": "FName",
+							"category": "EmoteWheel|Material",
+							"value": "DeadZone"
 						},
 						{
 							"name": "_ContextReceiver",

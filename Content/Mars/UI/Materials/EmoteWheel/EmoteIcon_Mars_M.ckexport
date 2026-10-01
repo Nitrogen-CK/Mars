@@ -1,0 +1,289 @@
+{
+	"material": "EmoteIcon_Mars_M",
+	"packagePath": "/Game/Mars/UI/Materials/EmoteWheel/EmoteIcon_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "8eaa92ce5a5f88db16d20f01320e5c1e",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_UI",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"ComponentMask": 2,
+		"Custom": 1,
+		"ScalarParameter": 5,
+		"TextureSampleParameter2D": 1,
+		"VectorParameter": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Icon",
+					"Texture": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Wave_Mars_T.Emote_Wave_Mars_T"
+				}
+			},
+			{
+				"id": 1,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "C",
+						"node": 0,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 1,
+						"name": "MaskLow",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "MaskHigh",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "TintAmount",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Brightness",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "StateOpacity",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "NeutralTint",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 7,
+						"name": "PlayerTint",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"Code": "\nfloat V = max(C.r, max(C.g, C.b));\nfloat Other = max(C.g, C.b);\nfloat Chroma = saturate((C.r - Other) / max(V, 0.0001));\nfloat T = saturate((Chroma - MaskLow) / max(MaskHigh - MaskLow, 0.0001));\nfloat ClothMask = T * T * (3.0 - 2.0 * T);\nfloat3 Col = V * lerp(NeutralTint, PlayerTint, ClothMask * TintAmount) * Brightness;\nreturn float4(Col, C.a * StateOpacity);\n",
+					"OutputType": "CMOT_Float4",
+					"Description": "EmoteIconTint"
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.20000000298023224,
+					"ParameterName": "MaskLow"
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": 0.69999998807907104,
+					"ParameterName": "MaskHigh"
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "TintAmount"
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "Brightness"
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "StateOpacity"
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.904700,G=0.791300,B=0.577600,A=1.000000)",
+					"ParameterName": "NeutralTint"
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.584100,G=0.070400,B=0.036900,A=1.000000)",
+					"ParameterName": "PlayerTint"
+				}
+			},
+			{
+				"id": 9,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"R": true,
+					"G": true,
+					"B": true
+				}
+			},
+			{
+				"id": 10,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"A": true
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 9,
+				"output": 0
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 10,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "MaskLow",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "MaskHigh",
+			"value": 0.69999998807907104
+		},
+		{
+			"name": "TintAmount",
+			"value": 1
+		},
+		{
+			"name": "Brightness",
+			"value": 1
+		},
+		{
+			"name": "StateOpacity",
+			"value": 1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "NeutralTint",
+			"value": "RGBA(0.9047, 0.7913, 0.5776, 1)"
+		},
+		{
+			"name": "PlayerTint",
+			"value": "RGBA(0.5841, 0.0704, 0.0369, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "Icon",
+			"value": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Wave_Mars_T.Emote_Wave_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/UI/Textures/EmoteWheel/Emote_Wave_Mars_T.Emote_Wave_Mars_T"
+	]
+}

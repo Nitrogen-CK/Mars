@@ -13,4 +13,7 @@ class UMars_Hud_Widget : UCk_ActivatableWidget_UE
 
     UPROPERTY(meta = (BindWidgetOptional))
     UMars_Hotbar_Widget Hotbar;
+
+    UPROPERTY(meta = (BindWidgetOptional))
+    UMars_EmoteWheel_Widget EmoteWheel;
 }

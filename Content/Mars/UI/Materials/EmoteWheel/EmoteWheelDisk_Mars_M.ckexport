@@ -1,0 +1,318 @@
+{
+	"material": "EmoteWheelDisk_Mars_M",
+	"packagePath": "/Game/Mars/UI/Materials/EmoteWheel/EmoteWheelDisk_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "08cf2b84cff5c68473eb98cc05e967b4",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_UI",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"ComponentMask": 2,
+		"Custom": 1,
+		"ScalarParameter": 4,
+		"TextureCoordinate": 1,
+		"TextureSampleParameter2D": 1,
+		"VectorParameter": 3
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 1,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Paper",
+					"Texture": "/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Paper_Mars_T.EmoteWheel_Paper_Mars_T"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Paper",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "SectorCount",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "HoveredIndex",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "DeadZone",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "DividerWidth",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "NormalColor",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 7,
+						"name": "HoveredColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "DividerColor",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"Code": "\nfloat2 P = UV - 0.5;\nfloat r = length(P) * 2.0;\nfloat aa = max(fwidth(r), 1e-4);\nfloat disk = 1.0 - smoothstep(1.0 - aa, 1.0, r);\nfloat N = max(round(SectorCount), 1.0);\nconst float TwoPi = 6.28318530718;\nfloat w = TwoPi / N;\nfloat a = atan2(P.x, -P.y);\na = a < 0.0 ? a + TwoPi : a;\nfloat idx = floor(a / w + 0.5);\nidx = idx >= N ? idx - N : idx;\nfloat rel = a - idx * w;\nrel = rel > 3.14159265 ? rel - TwoPi : rel;\nfloat arc = (w * 0.5 - abs(rel)) * r;\nfloat arcAA = max(fwidth(arc), 1e-4);\nfloat divider = 1.0 - smoothstep(DividerWidth - arcAA, DividerWidth + arcAA, arc);\ndivider *= smoothstep(DeadZone - aa, DeadZone + aa, r);\nfloat hovered = (HoveredIndex >= 0.0 && abs(idx - HoveredIndex) < 0.5) ? 1.0 : 0.0;\nfloat3 col = Paper * lerp(NormalColor, HoveredColor, hovered);\ncol = lerp(col, DividerColor, divider);\nreturn float4(col, disk);\n",
+					"OutputType": "CMOT_Float4",
+					"Description": "EmoteWheelDisk"
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 8,
+					"ParameterName": "SectorCount"
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"DefaultValue": -1,
+					"ParameterName": "HoveredIndex"
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"ParameterName": "DeadZone"
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 0.004999999888241291,
+					"ParameterName": "DividerWidth"
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.871400,G=0.737900,B=0.527100,A=1.000000)",
+					"ParameterName": "NormalColor"
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.814800,G=0.412500,B=0.056100,A=1.000000)",
+					"ParameterName": "HoveredColor"
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.034300,G=0.018500,B=0.011000,A=1.000000)",
+					"ParameterName": "DividerColor"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"R": true,
+					"G": true,
+					"B": true
+				}
+			},
+			{
+				"id": 11,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"A": true
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 10,
+				"output": 0
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 11,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "SectorCount",
+			"value": 8
+		},
+		{
+			"name": "HoveredIndex",
+			"value": -1
+		},
+		{
+			"name": "DeadZone",
+			"value": 0.25
+		},
+		{
+			"name": "DividerWidth",
+			"value": 0.004999999888241291
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "NormalColor",
+			"value": "RGBA(0.8714, 0.7379, 0.5271, 1)"
+		},
+		{
+			"name": "HoveredColor",
+			"value": "RGBA(0.8148, 0.4125, 0.0561, 1)"
+		},
+		{
+			"name": "DividerColor",
+			"value": "RGBA(0.0343, 0.0185, 0.011, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "Paper",
+			"value": "/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Paper_Mars_T.EmoteWheel_Paper_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Paper_Mars_T.EmoteWheel_Paper_Mars_T"
+	]
+}

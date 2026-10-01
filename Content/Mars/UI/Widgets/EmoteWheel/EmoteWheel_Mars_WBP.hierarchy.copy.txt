@@ -1,0 +1,309 @@
+Begin Object Class=/Script/UMG.SizeBox Name="WheelFrame" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.WheelFrame'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.WheelFrame.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.WheelFrame.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'WheelFrame'"
+      Content="/Script/UMG.Overlay'Layers'"
+   End Object
+   WidthOverride=720.000000
+   HeightOverride=720.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_22" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_22'"
+   WidgetName="WheelFrame"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="Layers" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_6" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_6'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_5" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_5'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_4" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_4'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_3'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_6" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_6'"
+      Padding=(Bottom=12.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.SizeBox'BottomPanel'"
+   End Object
+   Begin Object Name="OverlaySlot_5" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_5'"
+      Padding=(Top=18.000000)
+      HorizontalAlignment=HAlign_Center
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.SizeBox'TopPanel'"
+   End Object
+   Begin Object Name="OverlaySlot_4" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_4'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.SizeBox'CenterButtonBox'"
+   End Object
+   Begin Object Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_3'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.SizeBox'Selector'"
+   End Object
+   Begin Object Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_2'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.CanvasPanel'SegmentCanvas'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.SizeBox'RingBox'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Layers.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'Layers'"
+      Content="/Script/UMG.SizeBox'DiskBox'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Slots(2)="/Script/UMG.OverlaySlot'OverlaySlot_2'"
+   Slots(3)="/Script/UMG.OverlaySlot'OverlaySlot_3'"
+   Slots(4)="/Script/UMG.OverlaySlot'OverlaySlot_4'"
+   Slots(5)="/Script/UMG.OverlaySlot'OverlaySlot_5'"
+   Slots(6)="/Script/UMG.OverlaySlot'OverlaySlot_6'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="DiskBox" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.DiskBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.DiskBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.DiskBox.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'DiskBox'"
+      Content="/Script/UMG.Image'Disk'"
+   End Object
+   WidthOverride=510.000000
+   HeightOverride=510.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="Disk" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Disk'"
+   Brush=(ResourceObject="/Script/Engine.Material'/Game/Mars/UI/Materials/EmoteWheel/EmoteWheelDisk_Mars_M.EmoteWheelDisk_Mars_M'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="RingBox" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.RingBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.RingBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.RingBox.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'RingBox'"
+      Content="/Script/UMG.Image'Ring'"
+   End Object
+   WidthOverride=548.000000
+   HeightOverride=535.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="Ring" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Ring'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Ring_Mars_T.EmoteWheel_Ring_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.CanvasPanel Name="SegmentCanvas" ExportPath="/Script/UMG.CanvasPanel'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.SegmentCanvas'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="Selector" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Selector'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Selector.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Selector.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'Selector'"
+      Content="/Script/UMG.Image'SelectorImage'"
+   End Object
+   WidthOverride=16.000000
+   HeightOverride=34.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="SelectorImage" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.SelectorImage'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Selector_Mars_T.EmoteWheel_Selector_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="CenterButtonBox" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterButtonBox'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterButtonBox.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterButtonBox.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'CenterButtonBox'"
+      Content="/Script/UMG.Overlay'CenterLayers'"
+   End Object
+   WidthOverride=128.000000
+   HeightOverride=126.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="CenterLayers" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterLayers'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterLayers.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterLayers.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterLayers.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'CenterLayers'"
+      Content="/Script/UMG.VerticalBox'CenterCancel'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterLayers.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'CenterLayers'"
+      Content="/Script/UMG.Image'CenterButton'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="CenterButton" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterButton'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_CenterButton_Mars_T.EmoteWheel_CenterButton_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.VerticalBox Name="CenterCancel" ExportPath="/Script/UMG.VerticalBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterCancel'"
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterCancel.VerticalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.VerticalBoxSlot Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterCancel.VerticalBoxSlot_0'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_1" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterCancel.VerticalBoxSlot_1'"
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.VerticalBox'CenterCancel'"
+      Content="/Script/CommonUI.CommonTextBlock'CancelLabel'"
+   End Object
+   Begin Object Name="VerticalBoxSlot_0" ExportPath="/Script/UMG.VerticalBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CenterCancel.VerticalBoxSlot_0'"
+      Padding=(Top=-6.000000,Bottom=-10.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Top
+      Parent="/Script/UMG.VerticalBox'CenterCancel'"
+      Content="/Script/CommonUI.CommonTextBlock'CancelGlyph'"
+   End Object
+   Slots(0)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_0'"
+   Slots(1)="/Script/UMG.VerticalBoxSlot'VerticalBoxSlot_1'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="CancelGlyph" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CancelGlyph'"
+   Text=NSLOCTEXT("", "E0AEB9F04AAA1EBF859E99BF3A3DA47B", "×")
+   ColorAndOpacity=(SpecifiedColor=(R=0.904661,G=0.791298,B=0.577580,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="SemiBold",Size=44.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="CancelLabel" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.CancelLabel'"
+   Text=NSLOCTEXT("", "AE314D3942EF9F59AA3010AB373066EC", "Cancel")
+   ColorAndOpacity=(SpecifiedColor=(R=0.904661,G=0.791298,B=0.577580,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="SemiBold",Size=15.000000,LetterSpacing=60)
+   TextTransformPolicy=ToUpper
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="TopPanel" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopPanel'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopPanel.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopPanel.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'TopPanel'"
+      Content="/Script/UMG.Overlay'TopLayers'"
+   End Object
+   WidthOverride=250.000000
+   HeightOverride=74.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="TopLayers" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopLayers'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopLayers.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopLayers.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopLayers.OverlaySlot_1'"
+      Padding=(Bottom=2.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'TopLayers'"
+      Content="/Script/CommonUI.CommonTextBlock'HoveredName'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopLayers.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'TopLayers'"
+      Content="/Script/UMG.Image'TopPanelImage'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="TopPanelImage" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.TopPanelImage'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_LabelPanel_Mars_T.EmoteWheel_LabelPanel_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="HoveredName" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.HoveredName'"
+   Text=NSLOCTEXT("", "7326E0224FC3BACE51D7329DE50BE853", "Wave")
+   ColorAndOpacity=(SpecifiedColor=(R=0.017642,G=0.010330,B=0.006995,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="SemiBold",LetterSpacing=50)
+   TextTransformPolicy=ToUpper
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="BottomPanel" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomPanel'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomPanel.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomPanel.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'BottomPanel'"
+      Content="/Script/UMG.Overlay'BottomLayers'"
+   End Object
+   WidthOverride=320.000000
+   HeightOverride=86.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="BottomLayers" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomLayers'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomLayers.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomLayers.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomLayers.OverlaySlot_1'"
+      Padding=(Bottom=2.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'BottomLayers'"
+      Content="/Script/CommonUI.CommonTextBlock'Instruction'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomLayers.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'BottomLayers'"
+      Content="/Script/UMG.Image'BottomPanelImage'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="BottomPanelImage" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.BottomPanelImage'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_LabelPanel_Mars_T.EmoteWheel_LabelPanel_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="Instruction" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/EmoteWheel/EmoteWheel_Mars_WBP.EmoteWheel_Mars_WBP:WidgetTree.Instruction'"
+   Text=NSLOCTEXT("", "98A6494042C4BAA158246CAAC36CE35C", "Release to perform")
+   ColorAndOpacity=(SpecifiedColor=(R=0.017642,G=0.010330,B=0.006995,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="SemiBold",Size=16.000000,LetterSpacing=40)
+   TextTransformPolicy=ToUpper
+   Visibility=HitTestInvisible
+End Object
