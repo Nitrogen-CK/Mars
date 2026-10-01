@@ -58,7 +58,8 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     float32 ReachInterpSpeed = 14.0f;
 
-    // Locomotion bob of the hand node (CkGait Bob on Player.HandBob): stride dip/sway, jump/land bounce, breathing.
+    // Locomotion bob of the hand node (CkGait Bob on Player.HandBob): stride dip/sway, landing bounce, breathing. The
+    // airborne lift is CkSway's, on the parent Hand node.
     UPROPERTY(Category = "Bob")
     FCk_Bob_Spec Bob;
 
