@@ -60,8 +60,9 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         {
             InState.IsActive = NewActive;
 
+            // A returns-to-rest handle is not a state display: it springs back after every pull.
             auto Mover = InState.Mover;
-            if (ck::IsValid(Mover))
+            if (ck::IsValid(Mover) && Self.Get_ReturnsToRest() == false)
             { Mover.Request_MoveTo(NewActive); }
         }
 
