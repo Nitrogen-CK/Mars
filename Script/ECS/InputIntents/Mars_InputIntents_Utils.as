@@ -22,6 +22,19 @@ mixin FVector Get_MoveDirection(const FCk_Handle_InputIntents& Self)
     return Self.Get_Fragment(FMars_Fragment_InputIntents).MoveDirection;
 }
 
+// The last drained look delta (camera intention units: X yaw right+, Y pitch DOWN+). Stays put on still frames, so a
+// reader applies it once per Get_LookDeltaSequence value.
+mixin FVector Get_LookDelta(const FCk_Handle_InputIntents& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InputIntents).LookDelta;
+}
+
+// Advances once per drain that carried a look delta.
+mixin int32 Get_LookDeltaSequence(const FCk_Handle_InputIntents& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InputIntents).LookDeltaSequence;
+}
+
 mixin ECk_Intent_Phase Get_IntentPhase(const FCk_Handle_InputIntents& Self, FGameplayTag InIntent)
 {
     const auto Matcher = Self.Get_Matcher();
@@ -62,6 +75,13 @@ mixin void Request_SetMoveDirection(FCk_Handle_InputIntents& Self, const FMars_R
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InputIntents_Requests);
     Requests.SetMoveDirectionRequests.Add(InRequest);
+}
+
+// Every request of one drain is summed into one delta.
+mixin void Request_AddLookDelta(FCk_Handle_InputIntents& Self, const FMars_Request_InputIntents_AddLookDelta& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InputIntents_Requests);
+    Requests.AddLookDeltaRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
