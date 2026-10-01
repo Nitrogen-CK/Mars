@@ -29,7 +29,7 @@ class UMars_SmTask_ViewpointSync : UCk_SmTask_EntityScript
 }
 
 // View trace -> focus. The nearest overlapped interactable wins; its targets are offered to the
-// player's resolver and it is told who focuses it (which drives its prompt).
+// player's resolver, it is told who focuses it (which drives its prompt) and the first-person gloves lean toward it.
 class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -37,6 +37,7 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
     private FCk_Handle _Player;
     private FCk_Handle_ProbeTrace _Trace;
     private FCk_Handle_InteractionResolver _Resolver;
+    private FCk_Handle_FPHands _Hands;
     private TArray<FCk_Handle_Interactable> _Candidates;
     private FCk_Handle_Interactable _Focused;
 
@@ -46,6 +47,7 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
         _Player = ck::Ctx(InHandle);
         _Trace = _Player.As_PlayerViewpoint().Get_InteractionTrace();
         _Resolver = _Player.As_InteractionResolver();
+        _Hands = _Player.As_FPHands(ECk_SanityCheck::UnChecked);
 
         _Trace.BindTo_OnBeginOverlap(FCk_Delegate_ProbeTrace_OnBeginOverlap(this, n"OnTraceBeginOverlap"));
         _Trace.BindTo_OnEndOverlap(FCk_Delegate_ProbeTrace_OnEndOverlap(this, n"OnTraceEndOverlap"));
@@ -152,6 +154,9 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
 
         for (auto Target : InInteractable.Get_AllInteractTargets())
         { _Resolver.Request_AddInteractTarget(FCk_Request_InteractionResolver_AddInteractTarget(Target)); }
+
+        if (ck::IsValid(_Hands))
+        { _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus(InInteractable, Get_InteractableOwner(InInteractable))); }
     }
 
     private void DoUnfocus(FCk_Handle_Interactable& InInteractable)
@@ -164,6 +169,20 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
             Target.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Player));
             _Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(Target));
         }
+
+        if (ck::IsValid(_Hands))
+        { _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus()); }
+    }
+
+    // The entity an interactable belongs to (world item, lever root), via the context stamped on its targets.
+    private FCk_Handle Get_InteractableOwner(const FCk_Handle_Interactable& InInteractable) const
+    {
+        for (auto Target : InInteractable.Get_AllInteractTargets())
+        {
+            if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext))
+            { return Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner; }
+        }
+        return FCk_Handle();
     }
 
     private FVector Get_Location(FCk_Handle InEntity) const

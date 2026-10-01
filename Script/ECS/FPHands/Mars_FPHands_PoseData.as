@@ -1,12 +1,12 @@
 // GENERATED - do not edit. Baked from /Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/A_FPHands_* by
 // Content/Python/mars_fphands_bake.py. Re-bake after re-importing the grip poses.
 // Local (parent-space) rotations of the 24 digit bones for each EMars_HandGripPose; runtime cannot sample anim poses.
-namespace mars_fphands_posedata
+namespace utils_fphands
 {
-    const int32 BoneCount = 24;
+    const int32 DigitBoneCount = 24;
 
     // Bone order: per side (l, r): thumb, index, middle, pinky x segments 01..03.
-    FName Get_BoneName(int32 InBone)
+    FName Get_DigitBoneName(int32 InBone)
     {
         switch (InBone)
         {
@@ -38,9 +38,9 @@ namespace mars_fphands_posedata
         return NAME_None;
     }
 
-    FQuat Get_Rotation(EMars_HandGripPose InPose, int32 InBone)
+    FQuat Get_DigitBoneRotation(EMars_HandGripPose InPose, int32 InBone)
     {
-        switch (int32(InPose) * BoneCount + InBone)
+        switch (int32(InPose) * DigitBoneCount + InBone)
         {
             case 0: return FQuat(-0.666261, -0.189562, -0.494865, 0.524663); // Relaxed thumb_01_l
             case 1: return FQuat(-0.075434, -0.257267, 0.133362, 0.954117); // Relaxed thumb_02_l

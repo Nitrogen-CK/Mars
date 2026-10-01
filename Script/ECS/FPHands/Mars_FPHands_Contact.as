@@ -30,6 +30,15 @@ struct FMars_FPHands_ContactShape
     FVector Extent;
 }
 
+struct FMars_FPHands_ContactShapes
+{
+    UPROPERTY()
+    FMars_FPHands_ContactShape Left;
+
+    UPROPERTY()
+    FMars_FPHands_ContactShape Right;
+}
+
 struct FMars_FPHands_ContactSpec
 {
     UPROPERTY()
@@ -64,7 +73,7 @@ struct FMars_FPHands_ContactRig
     UPROPERTY()
     bool IsValid = false;
 
-    // Per digit bone (mars_fphands_posedata order): local ref transform.
+    // Per digit bone (utils_fphands::Get_DigitBoneName order): local ref transform.
     UPROPERTY()
     TArray<FTransform> RefLocal;
 
@@ -76,17 +85,73 @@ struct FMars_FPHands_ContactRig
     FTransform HandInLowerArm_R;
 }
 
-namespace mars_fphands_contact
+// A mesh's bounds as a contact primitive: the mesh (MeshScale applied) placed by MeshWorld.
+struct FMars_FPHands_BoundsQuery
+{
+    UPROPERTY()
+    UStaticMesh Mesh;
+
+    UPROPERTY()
+    FVector MeshScale = FVector::OneVector;
+
+    UPROPERTY()
+    EMars_FPHands_GripShape Type = EMars_FPHands_GripShape::Auto;
+
+    UPROPERTY()
+    FTransform MeshWorld;
+
+    FMars_FPHands_BoundsQuery() {}
+
+    FMars_FPHands_BoundsQuery(UStaticMesh InMesh, FVector InMeshScale, EMars_FPHands_GripShape InType, FTransform InMeshWorld)
+    {
+        Mesh = InMesh;
+        MeshScale = InMeshScale;
+        Type = InType;
+        MeshWorld = InMeshWorld;
+    }
+}
+
+// One digit of one glove closing on a shape, curled from rest toward Pose.
+struct FMars_FPHands_DigitQuery
+{
+    UPROPERTY()
+    FMars_FPHands_ContactShape Shape;
+
+    UPROPERTY()
+    FTransform HandWorld;
+
+    UPROPERTY()
+    EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
+
+    UPROPERTY()
+    bool IsRightHand = false;
+
+    // 0 = thumb, then index, middle, pinky.
+    UPROPERTY()
+    int32 Digit = 0;
+
+    FMars_FPHands_DigitQuery() {}
+
+    FMars_FPHands_DigitQuery(FMars_FPHands_ContactShape InShape, FTransform InHandWorld, EMars_HandGripPose InPose, bool InIsRightHand)
+    {
+        Shape = InShape;
+        HandWorld = InHandWorld;
+        Pose = InPose;
+        IsRightHand = InIsRightHand;
+    }
+}
+
+namespace utils_fphands
 {
     const int32 DigitCount = 4;
     const int32 SegmentsPerDigit = 3;
 
-    FMars_FPHands_ContactRig Make_Rig(USkeletalMeshComponent InMesh)
+    FMars_FPHands_ContactRig Make_ContactRig(USkeletalMeshComponent InMesh)
     {
         auto Rig = FMars_FPHands_ContactRig();
-        for (int32 Bone = 0; Bone < mars_fphands_posedata::BoneCount; ++Bone)
+        for (int32 Bone = 0; Bone < utils_fphands::DigitBoneCount; ++Bone)
         {
-            const auto Index = InMesh.GetBoneIndex(mars_fphands_posedata::Get_BoneName(Bone));
+            const auto Index = InMesh.GetBoneIndex(utils_fphands::Get_DigitBoneName(Bone));
             if (Index == -1)
             { return Rig; }
 
@@ -105,7 +170,7 @@ namespace mars_fphands_contact
     }
 
     // Signed distance from InPoint to the shape's surface (negative inside).
-    float Get_Distance(const FMars_FPHands_ContactShape& InShape, const FVector& InPoint)
+    float Get_ShapeDistance(const FMars_FPHands_ContactShape& InShape, const FVector& InPoint)
     {
         const auto Local = InShape.World.InverseTransformPositionNoScale(InPoint);
         if (InShape.Type == EMars_FPHands_GripShape::Sphere)
@@ -124,26 +189,28 @@ namespace mars_fphands_contact
     }
 
     // Distances from the shape to sample points along the digit (joints, segment midpoints, fingertip), curled InCurl
-    // of the way from rest toward InPose. The segment rooted in the palm is skipped: it cannot move out of the way.
-    TArray<float> Sample_Distances(const FMars_FPHands_ContactRig& InRig, const FMars_FPHands_ContactShape& InShape, const FTransform& InHandWorld,
-                                   EMars_HandGripPose InPose, int32 InFirstBone, float InCurl)
+    // of the way from rest toward the query's pose. The segment rooted in the palm is skipped: it cannot move out of
+    // the way.
+    TArray<float> Sample_DigitDistances(const FMars_FPHands_ContactRig& InRig, const FMars_FPHands_DigitQuery& InQuery, float InCurl)
     {
+        const auto FirstBone = (InQuery.IsRightHand ? DigitCount * SegmentsPerDigit : 0) + InQuery.Digit * SegmentsPerDigit;
+
         TArray<float> Distances;
-        auto Parent = InHandWorld;
+        auto Parent = InQuery.HandWorld;
         auto Previous = FVector::ZeroVector;
         auto LastLength = 0.0;
         for (int32 Segment = 0; Segment < SegmentsPerDigit; ++Segment)
         {
-            const auto Bone = InFirstBone + Segment;
+            const auto Bone = FirstBone + Segment;
             const auto& Ref = InRig.RefLocal[Bone];
-            const auto Rotation = FQuat::Slerp(Ref.GetRotation(), mars_fphands_posedata::Get_Rotation(InPose, Bone), InCurl);
+            const auto Rotation = FQuat::Slerp(Ref.GetRotation(), utils_fphands::Get_DigitBoneRotation(InQuery.Pose, Bone), InCurl);
             const auto Joint = FTransform(Rotation, Ref.GetLocation()) * Parent;
 
             if (Segment > 0)
             {
                 if (Segment > 1)
-                { Distances.Add(Get_Distance(InShape, (Previous + Joint.GetLocation()) * 0.5)); }
-                Distances.Add(Get_Distance(InShape, Joint.GetLocation()));
+                { Distances.Add(Get_ShapeDistance(InQuery.Shape, (Previous + Joint.GetLocation()) * 0.5)); }
+                Distances.Add(Get_ShapeDistance(InQuery.Shape, Joint.GetLocation()));
             }
 
             LastLength = Ref.GetLocation().Size();
@@ -153,8 +220,8 @@ namespace mars_fphands_contact
 
         // Fingertip: the last segment has no child bone; take it as long as the one before it.
         const auto Tip = Parent.TransformPosition(FVector(LastLength * 0.9, 0.0, 0.0));
-        Distances.Add(Get_Distance(InShape, (Previous + Tip) * 0.5));
-        Distances.Add(Get_Distance(InShape, Tip));
+        Distances.Add(Get_ShapeDistance(InQuery.Shape, (Previous + Tip) * 0.5));
+        Distances.Add(Get_ShapeDistance(InQuery.Shape, Tip));
         return Distances;
     }
 
@@ -171,22 +238,20 @@ namespace mars_fphands_contact
     }
 
     // How far (0..1 of the authored curl) a digit can close before touching the shape. 1 = authored pose.
-    float32 Solve_Digit(const FMars_FPHands_ContactSpec& InSpec, const FMars_FPHands_ContactRig& InRig, const FMars_FPHands_ContactShape& InShape,
-                        const FTransform& InHandWorld, EMars_HandGripPose InPose, bool InIsRightHand, int32 InDigit)
+    float32 Solve_Digit(const FMars_FPHands_ContactSpec& InSpec, const FMars_FPHands_ContactRig& InRig, const FMars_FPHands_DigitQuery& InQuery)
     {
-        if (InShape.IsValid == false || InRig.IsValid == false)
+        if (InQuery.Shape.IsValid == false || InRig.IsValid == false)
         { return 1.0f; }
 
-        const auto FirstBone = (InIsRightHand ? DigitCount * SegmentsPerDigit : 0) + InDigit * SegmentsPerDigit;
-        const auto Radius = InDigit == 0 ? InSpec.ThumbRadiusCm : InSpec.FingerRadiusCm;
+        const auto Radius = InQuery.Digit == 0 ? InSpec.ThumbRadiusCm : InSpec.FingerRadiusCm;
         const auto Steps = Math::Max(InSpec.SearchSteps, 2);
-        const auto Rest = Sample_Distances(InRig, InShape, InHandWorld, InPose, FirstBone, 0.0);
+        const auto Rest = Sample_DigitDistances(InRig, InQuery, 0.0);
 
         auto Clear = 0.0;
         for (int32 Step = 1; Step <= Steps; ++Step)
         {
             const auto Curl = float(Step) / float(Steps);
-            if (Is_Touching(Rest, Sample_Distances(InRig, InShape, InHandWorld, InPose, FirstBone, Curl), Radius) == false)
+            if (Is_Touching(Rest, Sample_DigitDistances(InRig, InQuery, Curl), Radius) == false)
             {
                 Clear = Curl;
                 continue;
@@ -197,7 +262,7 @@ namespace mars_fphands_contact
             for (int32 Iteration = 0; Iteration < 4; ++Iteration)
             {
                 const auto Mid = (Clear + Touch) * 0.5;
-                if (Is_Touching(Rest, Sample_Distances(InRig, InShape, InHandWorld, InPose, FirstBone, Mid), Radius))
+                if (Is_Touching(Rest, Sample_DigitDistances(InRig, InQuery, Mid), Radius))
                 { Touch = Mid; }
                 else
                 { Clear = Mid; }
@@ -207,22 +272,21 @@ namespace mars_fphands_contact
         return 1.0f;
     }
 
-    // A primitive fitted to a mesh's bounds (mesh space, MeshScale applied), placed by InMeshWorld.
-    FMars_FPHands_ContactShape Make_BoundsShape(UStaticMesh InMesh, const FVector& InMeshScale, EMars_FPHands_GripShape InType,
-                                                const FTransform& InMeshWorld)
+    // A primitive fitted to a mesh's bounds (mesh space, MeshScale applied), placed by MeshWorld.
+    FMars_FPHands_ContactShape Make_BoundsShape(const FMars_FPHands_BoundsQuery& InQuery)
     {
         auto Shape = FMars_FPHands_ContactShape();
-        if (ck::Is_NOT_Valid(InMesh))
+        if (ck::Is_NOT_Valid(InQuery.Mesh))
         { return Shape; }
 
-        const auto Bounds = InMesh.GetBounds();
-        const auto Extent = FVector(Math::Abs(Bounds.BoxExtent.X * InMeshScale.X), Math::Abs(Bounds.BoxExtent.Y * InMeshScale.Y),
-                                    Math::Abs(Bounds.BoxExtent.Z * InMeshScale.Z));
-        const auto CenterWorld = InMeshWorld.TransformPosition(Bounds.Origin * InMeshScale);
+        const auto Bounds = InQuery.Mesh.GetBounds();
+        const auto Extent = FVector(Math::Abs(Bounds.BoxExtent.X * InQuery.MeshScale.X), Math::Abs(Bounds.BoxExtent.Y * InQuery.MeshScale.Y),
+                                    Math::Abs(Bounds.BoxExtent.Z * InQuery.MeshScale.Z));
+        const auto CenterWorld = InQuery.MeshWorld.TransformPosition(Bounds.Origin * InQuery.MeshScale);
 
         Shape.IsValid = true;
-        Shape.Type = InType == EMars_FPHands_GripShape::Auto ? EMars_FPHands_GripShape::Box : InType;
-        Shape.World = FTransform(InMeshWorld.GetRotation(), CenterWorld, FVector::OneVector);
+        Shape.Type = InQuery.Type == EMars_FPHands_GripShape::Auto ? EMars_FPHands_GripShape::Box : InQuery.Type;
+        Shape.World = FTransform(InQuery.MeshWorld.GetRotation(), CenterWorld, FVector::OneVector);
         Shape.Extent = Extent;
 
         if (Shape.Type == EMars_FPHands_GripShape::Sphere)
@@ -238,7 +302,7 @@ namespace mars_fphands_contact
             else if (Extent.Z >= Extent.X && Extent.Z >= Extent.Y)
             { Axis = FVector::UpVector; Length = Extent.Z; Radius = Math::Max(Extent.X, Extent.Y); }
 
-            const auto AxisWorld = InMeshWorld.GetRotation().RotateVector(Axis);
+            const auto AxisWorld = InQuery.MeshWorld.GetRotation().RotateVector(Axis);
             Shape.World = FTransform(FQuat::FindBetweenNormals(FVector::ForwardVector, AxisWorld), CenterWorld, FVector::OneVector);
             Shape.Extent = FVector(Math::Max(Length - Radius, 0.0), Radius, 0.0);
         }
@@ -255,4 +319,48 @@ namespace mars_fphands_contact
         Shape.Extent = FVector(InSpec.SocketHandleHalfLengthCm, InSpec.SocketHandleRadiusCm, 0.0);
         return Shape;
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Contact shapes (read the feature)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// What each glove's fingers close on this frame (invalid = keep the authored pose): a reaching glove near contact
+// closes on its target, a holding glove on its item.
+mixin void Get_ContactShapes(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, FMars_FPHands_ContactShapes& OutShapes)
+{
+    OutShapes.Left = Self.Get_ContactShape(InHandWorld, false);
+    OutShapes.Right = Self.Get_ContactShape(InHandWorld, true);
+}
+
+mixin FMars_FPHands_ContactShape Get_ContactShape(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, bool InIsRightHand)
+{
+    const auto& Spec = Self.Get_Spec();
+    if (Self.Get_IsReaching(InIsRightHand) && Self.Get_ReachAlpha() > 0.6f)
+    {
+        const auto Target = Self.Get_Target();
+        if (ck::IsValid(Target.ShapeMesh.Get()))
+        {
+            return utils_fphands::Make_BoundsShape(
+                FMars_FPHands_BoundsQuery(Target.ShapeMesh.Get(), Target.ShapeScale, Target.ShapeType, Target.AnchorWorld));
+        }
+
+        if (Target.Layout == EMars_FPHands_GripLayout::Authored)
+        {
+            auto Grip = FMars_FPHands_GripQuery(InHandWorld, InIsRightHand, FTransform());
+            utils_fphands::Resolve_WorldGrip(Spec, Target, Grip);
+            return utils_fphands::Make_SocketShape(Spec.Contact, Grip.WorldGrip);
+        }
+        return FMars_FPHands_ContactShape();
+    }
+
+    const auto Hold = Self.Get_Hold();
+    const auto HoldsWithThisHand = Hold.IsHolding && (Hold.IsTwoHanded || InIsRightHand);
+    if (HoldsWithThisHand && ck::IsValid(Hold.ShapeMesh.Get()))
+    {
+        return utils_fphands::Make_BoundsShape(
+            FMars_FPHands_BoundsQuery(Hold.ShapeMesh.Get(), Hold.ShapeScale, Hold.ShapeType, Hold.ShapeOffset * InHandWorld));
+    }
+
+    return FMars_FPHands_ContactShape();
 }

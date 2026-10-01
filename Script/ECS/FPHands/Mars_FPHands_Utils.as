@@ -1,0 +1,169 @@
+namespace utils_fphands
+{
+    // The gloves of InPlayer. The phase is driven by a Hands state machine (UMars_SmState_Hands_Rest as its initial state)
+    // whose context is InPlayer; InHandNode is what the gloves hang off and what reaches are measured from.
+    FCk_Handle_FPHands Add(FCk_Handle& InPlayer, FMars_FPHands_Spec InSpec, FCk_Handle_Transform InHandNode)
+    {
+        if (ck::EnsureIfNot(ck::IsValid(InHandNode), f"[FPHands] [{InPlayer.ToString()}] needs a valid hand node"))
+        { return FCk_Handle_FPHands(); }
+
+        auto Params = FMars_Fragment_FPHands_Params();
+        Params.Spec = InSpec;
+        Params.HandNode = InHandNode;
+
+        InPlayer.Add_Fragment(FMars_Feature_FPHands());
+        InPlayer.Add_Fragment(Params);
+        InPlayer.Add_Fragment(FMars_Fragment_FPHands());
+        return InPlayer.As_FPHands();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Getters
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin EMars_FPHands_Phase Get_Phase(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Phase;
+}
+
+mixin float32 Get_PhaseTime(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PhaseTime;
+}
+
+mixin float32 Get_ReleaseFromAlpha(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).ReleaseFromAlpha;
+}
+
+mixin FMars_FPHands_PhaseState Get_PhaseState(const FCk_Handle_FPHands& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_FPHands);
+    return FMars_FPHands_PhaseState(State.Phase, State.PhaseTime, State.ReleaseFromAlpha);
+}
+
+mixin FMars_FPHands_ReachTarget Get_Target(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Target;
+}
+
+mixin FCk_Handle_InteractTarget Get_InteractTarget(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).InteractTarget;
+}
+
+mixin bool Get_IsInstant(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).IsInstant;
+}
+
+mixin FMars_FPHands_ReachTarget Get_FocusTarget(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).FocusTarget;
+}
+
+mixin float32 Get_FocusAlpha_L(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).FocusAlpha_L;
+}
+
+mixin float32 Get_FocusAlpha_R(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).FocusAlpha_R;
+}
+
+mixin FMars_FPHands_Hold Get_Hold(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Hold;
+}
+
+mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands_Params).HandNode;
+}
+
+mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Requests
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void Request_SetPhase(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_SetPhase& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.SetPhaseRequests.Add(InRequest);
+}
+
+mixin void Request_StartReach(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_StartReach& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.StartReachRequests.Add(InRequest);
+}
+
+mixin void Request_Release(FCk_Handle_FPHands& Self)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.ReleaseRequests.Add(FMars_Request_FPHands_Release());
+}
+
+mixin void Request_SetFocus(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_SetFocus& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.SetFocusRequests.Add(InRequest);
+}
+
+mixin void Request_SetHold(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_SetHold& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.SetHoldRequests.Add(InRequest);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Signal Binding
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void BindTo_OnReachRequested(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachRequested InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Signals);
+    Fragment.OnReachRequested.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnReachRequested(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachRequested InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FPHands_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnReachTargetLost(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachTargetLost InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Signals);
+    Fragment.OnReachTargetLost.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnReachTargetLost(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachTargetLost InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FPHands_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachTargetLost.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnPhaseChanged(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnPhaseChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Signals);
+    Fragment.OnPhaseChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPhaseChanged(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnPhaseChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FPHands_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPhaseChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}

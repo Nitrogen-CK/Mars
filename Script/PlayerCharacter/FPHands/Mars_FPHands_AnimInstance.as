@@ -1,5 +1,47 @@
-// Parent class of ABP_FPHands. Turns the pawn's per-glove grip targets (world space) into what the anim graph needs:
-// a finger pose index per glove and a component-space transform for each floating glove's lowerarm bone.
+// One glove's frame for the finger contact: its lowerarm (component space) and the finger pose it plays.
+struct FMars_FPHands_GloveFrame
+{
+    UPROPERTY()
+    FTransform LowerArm;
+
+    UPROPERTY()
+    EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
+
+    FMars_FPHands_GloveFrame() {}
+
+    FMars_FPHands_GloveFrame(FTransform InLowerArm, EMars_HandGripPose InPose)
+    {
+        LowerArm = InLowerArm;
+        Pose = InPose;
+    }
+}
+
+// What the finger contact solves against this frame.
+struct FMars_FPHands_ContactFrame
+{
+    UPROPERTY()
+    FMars_FPHands_GloveFrame Left;
+
+    UPROPERTY()
+    FMars_FPHands_GloveFrame Right;
+
+    UPROPERTY()
+    FTransform HandNodeWorld;
+
+    UPROPERTY()
+    FTransform ComponentWorld;
+
+    UPROPERTY()
+    float32 DeltaSeconds = 0.0f;
+
+    // An emote montage owns the fingers; no contact.
+    UPROPERTY()
+    bool IsEmoting = false;
+}
+
+// Parent class of ABP_FPHands. Composes per-glove grip targets from the pawn's FPHands feature (read only) and turns
+// them into what the anim graph needs: a finger pose index per glove and a component-space transform for each floating
+// glove's lowerarm bone.
 class UMars_FPHands_AnimInstance : UAnimInstance
 {
     // Blend Poses by Int child index per glove (EMars_HandGripPose).
@@ -79,17 +121,26 @@ class UMars_FPHands_AnimInstance : UAnimInstance
             return;
         }
 
-        Character.Tick_FPHands(float32(DeltaTimeX));
+        auto Hands = FCk_Handle_FPHands();
+        if (Character.Get_IsActorEcsReady())
+        { Hands = Character.TryGet_ActorEntityHandle().As_FPHands(ECk_SanityCheck::UnChecked); }
 
-        auto HandWorld = FTransform();
-        auto Left = FMars_FPHands_HandTarget();
-        auto Right = FMars_FPHands_HandTarget();
-        if (Character.Get_FPHandTargets(HandWorld, Left, Right) == false)
+        if (ck::Is_NOT_Valid(Hands))
         {
             PlacementAlpha = 0.0f;
             _HasGrips = false;
             return;
         }
+
+        // Composed here, with the hand node's current transform, rather than stored by the feature: an ECS-time
+        // composition reads the hand node one settle behind and jitters under movement.
+        const auto HandNode = Hands.Get_HandNode();
+        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(HandNode);
+        auto Targets = FMars_FPHands_HandTargets();
+        Hands.Get_HandTargets(FMars_FPHands_TargetFrame(HandWorld, utils_hand_bob::Get_ArmSwing_Left(HandNode),
+            utils_hand_bob::Get_ArmSwing_Right(HandNode)), Targets);
+        const auto& Left = Targets.Left;
+        const auto& Right = Targets.Right;
 
         if (_HasRefPose == false)
         { CacheRefPose(Mesh); }
@@ -104,8 +155,9 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         }
         else
         {
-            _GripInHand_L = InterpGrip(_GripInHand_L, Left.GripInHand, DeltaTimeX, InterpSpeed);
-            _GripInHand_R = InterpGrip(_GripInHand_R, Right.GripInHand, DeltaTimeX, InterpSpeed);
+            const auto GripAlpha = Math::Clamp(1.0 - Math::Exp(-InterpSpeed * DeltaTimeX), 0.0, 1.0);
+            _GripInHand_L = InterpGrip(_GripInHand_L, Left.GripInHand, GripAlpha);
+            _GripInHand_R = InterpGrip(_GripInHand_R, Right.GripInHand, GripAlpha);
         }
 
         const auto ComponentWorld = Mesh.GetWorldTransform();
@@ -126,35 +178,40 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         const auto EmoteWeight = Blueprint_GetSlotMontageLocalWeight(Character.Config.FPHands.EmoteSlot);
         PlacementAlpha = float32(1.0 - Math::Clamp(EmoteWeight, 0.0, 1.0));
 
-        Update_Contact(Character, Mesh, HandWorld, ComponentWorld, LowerArm_L, LowerArm_R, Left.Pose, Right.Pose, float32(DeltaTimeX),
-                       EmoteWeight > 0.01);
+        auto ContactFrame = FMars_FPHands_ContactFrame();
+        ContactFrame.Left = FMars_FPHands_GloveFrame(LowerArm_L, Left.Pose);
+        ContactFrame.Right = FMars_FPHands_GloveFrame(LowerArm_R, Right.Pose);
+        ContactFrame.HandNodeWorld = HandWorld;
+        ContactFrame.ComponentWorld = ComponentWorld;
+        ContactFrame.DeltaSeconds = float32(DeltaTimeX);
+        ContactFrame.IsEmoting = EmoteWeight > 0.01;
+        Update_Contact(Character.Config.FPHands.Contact, Hands, ContactFrame);
     }
 
-    private void Update_Contact(AMars_PlayerCharacter InCharacter, USkeletalMeshComponent InMesh, const FTransform& InHandNodeWorld,
-                                const FTransform& InComponentWorld, const FTransform& InLowerArm_L, const FTransform& InLowerArm_R,
-                                EMars_HandGripPose InPose_L, EMars_HandGripPose InPose_R, float32 InDeltaSeconds, bool InIsEmoting)
+    private void Update_Contact(const FMars_FPHands_ContactSpec& InSpec, const FCk_Handle_FPHands& InHands,
+                                const FMars_FPHands_ContactFrame& InFrame)
     {
-        const auto& Spec = InCharacter.Config.FPHands.Contact;
         if (_ContactRig.IsValid == false)
-        { _ContactRig = mars_fphands_contact::Make_Rig(InMesh); }
+        { _ContactRig = utils_fphands::Make_ContactRig(GetOwningComponent()); }
 
-        auto Shape_L = FMars_FPHands_ContactShape();
-        auto Shape_R = FMars_FPHands_ContactShape();
-        if (Spec.IsEnabled && InIsEmoting == false)
-        { InCharacter.Get_FPHandContactShapes(InHandNodeWorld, Shape_L, Shape_R); }
+        auto Shapes = FMars_FPHands_ContactShapes();
+        if (InSpec.IsEnabled && InFrame.IsEmoting == false)
+        { InHands.Get_ContactShapes(InFrame.HandNodeWorld, Shapes); }
 
-        const auto HandWorld_L = _ContactRig.HandInLowerArm_L * InLowerArm_L * InComponentWorld;
-        const auto HandWorld_R = _ContactRig.HandInLowerArm_R * InLowerArm_R * InComponentWorld;
-        const auto Alpha = float32(1.0 - Math::Exp(-Spec.CurlInterpSpeed * InDeltaSeconds));
+        const auto HandWorld_L = _ContactRig.HandInLowerArm_L * InFrame.Left.LowerArm * InFrame.ComponentWorld;
+        const auto HandWorld_R = _ContactRig.HandInLowerArm_R * InFrame.Right.LowerArm * InFrame.ComponentWorld;
+        const auto Alpha = float32(1.0 - Math::Exp(-InSpec.CurlInterpSpeed * InFrame.DeltaSeconds));
+        const auto Digits_L = FMars_FPHands_DigitQuery(Shapes.Left, HandWorld_L, InFrame.Left.Pose, false);
+        const auto Digits_R = FMars_FPHands_DigitQuery(Shapes.Right, HandWorld_R, InFrame.Right.Pose, true);
 
-        Curl_L_Thumb  = Ease(Curl_L_Thumb,  Solve(Spec, Shape_L, HandWorld_L, InPose_L, false, 0), Alpha);
-        Curl_L_Index  = Ease(Curl_L_Index,  Solve(Spec, Shape_L, HandWorld_L, InPose_L, false, 1), Alpha);
-        Curl_L_Middle = Ease(Curl_L_Middle, Solve(Spec, Shape_L, HandWorld_L, InPose_L, false, 2), Alpha);
-        Curl_L_Pinky  = Ease(Curl_L_Pinky,  Solve(Spec, Shape_L, HandWorld_L, InPose_L, false, 3), Alpha);
-        Curl_R_Thumb  = Ease(Curl_R_Thumb,  Solve(Spec, Shape_R, HandWorld_R, InPose_R, true, 0), Alpha);
-        Curl_R_Index  = Ease(Curl_R_Index,  Solve(Spec, Shape_R, HandWorld_R, InPose_R, true, 1), Alpha);
-        Curl_R_Middle = Ease(Curl_R_Middle, Solve(Spec, Shape_R, HandWorld_R, InPose_R, true, 2), Alpha);
-        Curl_R_Pinky  = Ease(Curl_R_Pinky,  Solve(Spec, Shape_R, HandWorld_R, InPose_R, true, 3), Alpha);
+        Curl_L_Thumb  = Ease(Curl_L_Thumb,  Solve(InSpec, Digits_L, 0), Alpha);
+        Curl_L_Index  = Ease(Curl_L_Index,  Solve(InSpec, Digits_L, 1), Alpha);
+        Curl_L_Middle = Ease(Curl_L_Middle, Solve(InSpec, Digits_L, 2), Alpha);
+        Curl_L_Pinky  = Ease(Curl_L_Pinky,  Solve(InSpec, Digits_L, 3), Alpha);
+        Curl_R_Thumb  = Ease(Curl_R_Thumb,  Solve(InSpec, Digits_R, 0), Alpha);
+        Curl_R_Index  = Ease(Curl_R_Index,  Solve(InSpec, Digits_R, 1), Alpha);
+        Curl_R_Middle = Ease(Curl_R_Middle, Solve(InSpec, Digits_R, 2), Alpha);
+        Curl_R_Pinky  = Ease(Curl_R_Pinky,  Solve(InSpec, Digits_R, 3), Alpha);
 
         ContactCurves.Add(n"Curl_L_Thumb", Curl_L_Thumb);
         ContactCurves.Add(n"Curl_L_Index", Curl_L_Index);
@@ -166,10 +223,11 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         ContactCurves.Add(n"Curl_R_Pinky", Curl_R_Pinky);
     }
 
-    private float32 Solve(const FMars_FPHands_ContactSpec& InSpec, const FMars_FPHands_ContactShape& InShape, const FTransform& InHandWorld,
-                          EMars_HandGripPose InPose, bool InIsRightHand, int32 InDigit)
+    private float32 Solve(const FMars_FPHands_ContactSpec& InSpec, const FMars_FPHands_DigitQuery& InDigits, int32 InDigit)
     {
-        return mars_fphands_contact::Solve_Digit(InSpec, _ContactRig, InShape, InHandWorld, InPose, InIsRightHand, InDigit);
+        auto Query = InDigits;
+        Query.Digit = InDigit;
+        return utils_fphands::Solve_Digit(InSpec, _ContactRig, Query);
     }
 
     private float32 Ease(float32 InCurrent, float32 InTarget, float32 InAlpha)
@@ -195,12 +253,11 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         return Result;
     }
 
-    private FTransform InterpGrip(const FTransform& InCurrent, const FTransform& InTarget, float InDeltaTime, float32 InSpeed)
+    private FTransform InterpGrip(const FTransform& InCurrent, const FTransform& InTarget, float InAlpha)
     {
-        const auto Alpha = Math::Clamp(1.0 - Math::Exp(-InSpeed * InDeltaTime), 0.0, 1.0);
         auto Result = FTransform();
-        Result.SetLocation(Math::Lerp(InCurrent.GetLocation(), InTarget.GetLocation(), Alpha));
-        Result.SetRotation(FQuat::Slerp(InCurrent.GetRotation(), InTarget.GetRotation(), Alpha));
+        Result.SetLocation(Math::Lerp(InCurrent.GetLocation(), InTarget.GetLocation(), InAlpha));
+        Result.SetRotation(FQuat::Slerp(InCurrent.GetRotation(), InTarget.GetRotation(), InAlpha));
         return Result;
     }
 

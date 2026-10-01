@@ -1,15 +1,7 @@
 // The gloves reaching for an interactable: a small lean while the player looks at it, then a full reach on Use.
-// One glove or both, to the grips resolved by mars_fphands_grips (sockets, the object's sides, or its interaction
-// point). Instant interactions (pickups, switches) play a quick grab gesture; timed ones keep the gloves on the target
-// until the interaction ends.
-enum EMars_FPHands_ReachPhase
-{
-    None,
-    Grab,
-    Hold,
-    Release
-}
-
+// One glove or both, to the grips resolved by utils_fphands::Resolve_ReachTarget (sockets, the object's sides, or its
+// interaction point). Instant interactions (pickups, switches) play a quick grab gesture; timed ones keep the gloves on
+// the target until the interaction ends. The phase (EMars_FPHands_Phase) is owned by the Hands sub-HFSM.
 struct FMars_FPHands_ReachSpec
 {
     // Looking at an interactable: the gloves that would reach lean this fraction of their full reach, hands open.
@@ -75,42 +67,6 @@ struct FMars_FPHands_ReachSpec
     ECk_TweenEasing ReleaseEasing = ECk_TweenEasing::InOutSine;
 }
 
-struct FMars_FPHands_Reach
-{
-    UPROPERTY()
-    EMars_FPHands_ReachPhase Phase = EMars_FPHands_ReachPhase::None;
-
-    UPROPERTY()
-    FMars_FPHands_ReachTarget Target;
-
-    UPROPERTY()
-    FCk_Handle_InteractTarget InteractTarget;
-
-    UPROPERTY()
-    float32 Time = 0.0f;
-
-    UPROPERTY()
-    float32 ReleaseFromAlpha = 1.0f;
-
-    // What the gloves lean toward while it is looked at, re-resolved when focus changes.
-    UPROPERTY()
-    FMars_FPHands_ReachTarget FocusTarget;
-
-    UPROPERTY()
-    FCk_Handle_Interactable FocusedFor;
-
-    // Smoothed focus lean per glove (each eases on its own, so switching sides cross-fades).
-    UPROPERTY()
-    float32 FocusAlpha_L = 0.0f;
-
-    UPROPERTY()
-    float32 FocusAlpha_R = 0.0f;
-
-    // Single-handed targets near the centre line stay with this glove.
-    UPROPERTY()
-    bool PreferRightHand = true;
-}
-
 // A picked-up item riding in the gloves: it stays where it lay while the gloves reach and close on it, then travels
 // back to its hold offset with the gloves (the held visual otherwise spawns straight at the hold).
 struct FMars_FPHands_Carry
@@ -125,154 +81,176 @@ struct FMars_FPHands_Carry
     FTransform HeldOffset;
 }
 
-namespace mars_fphands_reach
+// Where the gloves are in their phase: what the reach math reads from the feature's state.
+struct FMars_FPHands_PhaseState
 {
-    // 1 = the item is where it was picked up, 0 = at its hold offset. Follows the grab: held in place until the gloves
-    // have closed on it, then along the gloves' return.
-    float32 Get_CarryWeight(const FMars_FPHands_Reach& InReach, const FMars_FPHands_ReachSpec& InSpec)
+    UPROPERTY()
+    EMars_FPHands_Phase Phase = EMars_FPHands_Phase::None;
+
+    // Seconds since the phase began.
+    UPROPERTY()
+    float32 PhaseTime = 0.0f;
+
+    // The reach alpha when Release began.
+    UPROPERTY()
+    float32 ReleaseFromAlpha = 1.0f;
+
+    FMars_FPHands_PhaseState() {}
+
+    FMars_FPHands_PhaseState(EMars_FPHands_Phase InPhase, float32 InPhaseTime, float32 InReleaseFromAlpha)
     {
-        if (InReach.Phase != EMars_FPHands_ReachPhase::Grab)
-        { return 0.0f; }
-
-        if (InReach.Time < InSpec.GrabOutSeconds + InSpec.GrabGripSeconds)
-        { return 1.0f; }
-
-        return Get_Alpha(InReach, InSpec);
+        Phase = InPhase;
+        PhaseTime = InPhaseTime;
+        ReleaseFromAlpha = InReleaseFromAlpha;
     }
+}
 
+namespace utils_fphands
+{
     // Eased progress of one phase, shaped by the spec's easing; the 0to1 range type clamps InT.
     float32 Ease(ECk_TweenEasing InEasing, float32 InT)
     {
         return utils_tween::Get_EasedProgress(InEasing, FCk_FloatRange_0to1(InT));
     }
 
-    void Start(FMars_FPHands_Reach& InReach, const FCk_Handle_InteractTarget& InInteractTarget,
-               const FMars_FPHands_ReachTarget& InTarget, bool InIsInstant)
+    // 0 = gloves at rest, 1 = fully reached. Reach, Grip and Return are the grab's three time slices.
+    float32 Get_PhaseAlpha(const FMars_FPHands_PhaseState& InState, const FMars_FPHands_ReachSpec& InSpec)
     {
-        InReach.Phase = InIsInstant ? EMars_FPHands_ReachPhase::Grab : EMars_FPHands_ReachPhase::Hold;
-        InReach.InteractTarget = InInteractTarget;
-        InReach.Target = InTarget;
-        InReach.Time = 0.0f;
-    }
+        const auto T = InState.PhaseTime;
+        if (InState.Phase == EMars_FPHands_Phase::Reach)
+        { return Ease(InSpec.GrabOutEasing, T / Math::Max(InSpec.GrabOutSeconds, 0.01f)); }
 
-    // Timed interactions let go when the interaction ends; a grab gesture always finishes on its own.
-    void Release(FMars_FPHands_Reach& InReach, const FMars_FPHands_ReachSpec& InSpec)
-    {
-        if (InReach.Phase != EMars_FPHands_ReachPhase::Hold)
-        { return; }
+        if (InState.Phase == EMars_FPHands_Phase::Grip)
+        { return 1.0f; }
 
-        InReach.ReleaseFromAlpha = Get_Alpha(InReach, InSpec);
-        InReach.Phase = EMars_FPHands_ReachPhase::Release;
-        InReach.Time = 0.0f;
-    }
+        if (InState.Phase == EMars_FPHands_Phase::Return)
+        { return 1.0f - Ease(InSpec.GrabBackEasing, T / Math::Max(InSpec.GrabBackSeconds, 0.01f)); }
 
-    void Tick(FMars_FPHands_Reach& InReach, const FMars_FPHands_ReachSpec& InSpec, float32 InDeltaSeconds, bool InHasFocus)
-    {
-        InReach.Time += InDeltaSeconds;
-        mars_fphands_grips::Update(InReach.Target);
-        mars_fphands_grips::Update(InReach.FocusTarget);
-
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Grab
-            && InReach.Time >= InSpec.GrabOutSeconds + InSpec.GrabGripSeconds + InSpec.GrabBackSeconds)
-        { InReach.Phase = EMars_FPHands_ReachPhase::None; }
-
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Release && InReach.Time >= InSpec.ReleaseSeconds)
-        { InReach.Phase = EMars_FPHands_ReachPhase::None; }
-
-        // A reach takes the larger of lean and reach, so it launches from and settles back into the lean.
-        const auto HasFocus = InHasFocus && InReach.FocusTarget.IsValid;
-        const auto LeanAlpha = float32(1.0 - Math::Exp(-InSpec.FocusInterpSpeed * InDeltaSeconds));
-        const auto LeanR = HasFocus && InReach.FocusTarget.UsesRight ? InSpec.FocusLean : 0.0f;
-        const auto LeanL = HasFocus && InReach.FocusTarget.UsesLeft ? InSpec.FocusLean : 0.0f;
-        InReach.FocusAlpha_R += (LeanR - InReach.FocusAlpha_R) * LeanAlpha;
-        InReach.FocusAlpha_L += (LeanL - InReach.FocusAlpha_L) * LeanAlpha;
-    }
-
-    bool Is_Reaching(const FMars_FPHands_Reach& InReach, bool InIsRightHand)
-    {
-        return InReach.Phase != EMars_FPHands_ReachPhase::None && mars_fphands_grips::Uses(InReach.Target, InIsRightHand);
-    }
-
-    // 0 = gloves at rest, 1 = fully reached.
-    float32 Get_Alpha(const FMars_FPHands_Reach& InReach, const FMars_FPHands_ReachSpec& InSpec)
-    {
-        const auto T = InReach.Time;
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Grab)
-        {
-            if (T < InSpec.GrabOutSeconds)
-            { return Ease(InSpec.GrabOutEasing, T / Math::Max(InSpec.GrabOutSeconds, 0.01f)); }
-
-            if (T < InSpec.GrabOutSeconds + InSpec.GrabGripSeconds)
-            { return 1.0f; }
-
-            return 1.0f - Ease(InSpec.GrabBackEasing, (T - InSpec.GrabOutSeconds - InSpec.GrabGripSeconds) / Math::Max(InSpec.GrabBackSeconds, 0.01f));
-        }
-
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Hold)
+        if (InState.Phase == EMars_FPHands_Phase::Hold)
         { return Ease(InSpec.HoldReachEasing, T / Math::Max(InSpec.HoldReachSeconds, 0.01f)); }
 
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Release)
-        { return InReach.ReleaseFromAlpha * (1.0f - Ease(InSpec.ReleaseEasing, T / Math::Max(InSpec.ReleaseSeconds, 0.01f))); }
+        if (InState.Phase == EMars_FPHands_Phase::Release)
+        { return InState.ReleaseFromAlpha * (1.0f - Ease(InSpec.ReleaseEasing, T / Math::Max(InSpec.ReleaseSeconds, 0.01f))); }
 
         return 0.0f;
     }
 
-    // Finger pose while reaching; false = keep the glove's own pose.
-    bool Get_Pose(const FMars_FPHands_Reach& InReach, const FMars_FPHands_ReachSpec& InSpec, EMars_HandGripPose& OutPose)
+    // 1 while the item waits where it lay (Reach, Grip), the return alpha during Return, 0 otherwise.
+    float32 Get_PhaseCarryWeight(const FMars_FPHands_PhaseState& InState, const FMars_FPHands_ReachSpec& InSpec)
     {
-        const auto Contact = InReach.Target.HasContactPose ? InReach.Target.ContactPose : InSpec.ContactPose;
-        const auto T = InReach.Time;
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Grab)
-        {
-            if (T < InSpec.GrabOutSeconds * 0.7f)
-            { OutPose = InSpec.ApproachPose; return true; }
+        if (InState.Phase == EMars_FPHands_Phase::Reach || InState.Phase == EMars_FPHands_Phase::Grip)
+        { return 1.0f; }
 
-            if (T < InSpec.GrabOutSeconds + InSpec.GrabGripSeconds + InSpec.GrabBackSeconds * 0.5f)
-            { OutPose = Contact; return true; }
+        if (InState.Phase == EMars_FPHands_Phase::Return)
+        { return Get_PhaseAlpha(InState, InSpec); }
 
-            return false;
-        }
-
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Hold)
-        {
-            OutPose = T < InSpec.HoldReachSeconds * 0.7f ? InSpec.ApproachPose : Contact;
-            return true;
-        }
-
-        if (InReach.Phase == EMars_FPHands_ReachPhase::Release && T < InSpec.ReleaseSeconds * 0.6f)
-        {
-            OutPose = InSpec.ApproachPose;
-            return true;
-        }
-
-        return false;
+        return 0.0f;
     }
 
-    // The glove's grip (hand node space) when fully reached toward InWorldGrip from its rest grip. Authored grips are
-    // matched exactly when in reach; out of reach the glove stretches its maximum toward them.
-    FTransform Make_ReachedGrip(const FMars_FPHands_ReachSpec& InSpec, const FTransform& InRestGrip, const FTransform& InHandWorld,
-                                const FTransform& InWorldGrip, bool InIsAuthored, float InStandoff)
+    // Seconds the phase lasts before the sub-SM moves on; Hold and None never time out (0).
+    float32 Get_PhaseSeconds(EMars_FPHands_Phase InPhase, const FMars_FPHands_ReachSpec& InSpec)
     {
-        const auto TargetInHand = InHandWorld.InverseTransformPosition(InWorldGrip.GetLocation());
-        const auto ToTarget = TargetInHand - InRestGrip.GetLocation();
+        if (InPhase == EMars_FPHands_Phase::Reach)
+        { return InSpec.GrabOutSeconds; }
+
+        if (InPhase == EMars_FPHands_Phase::Grip)
+        { return InSpec.GrabGripSeconds; }
+
+        if (InPhase == EMars_FPHands_Phase::Return)
+        { return InSpec.GrabBackSeconds; }
+
+        if (InPhase == EMars_FPHands_Phase::Release)
+        { return InSpec.ReleaseSeconds; }
+
+        return 0.0f;
+    }
+
+    // The glove's grip (hand node space) when fully reached from InGrip.RestGrip toward InGrip.WorldGrip. Authored
+    // grips are matched exactly when in reach; out of reach the glove stretches its maximum toward them.
+    FTransform Make_ReachedGrip(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_GripQuery& InGrip)
+    {
+        const auto TargetInHand = InGrip.HandWorld.InverseTransformPosition(InGrip.WorldGrip.GetLocation());
+        const auto ToTarget = TargetInHand - InGrip.RestGrip.GetLocation();
         const auto Distance = ToTarget.Size();
         if (Distance < KINDA_SMALL_NUMBER)
-        { return InRestGrip; }
+        { return InGrip.RestGrip; }
 
         const auto Direction = ToTarget / Distance;
-        const auto Wanted = Math::Max(Distance - InStandoff, 0.0);
+        const auto Wanted = Math::Max(Distance - InGrip.Standoff, 0.0);
         const auto Length = Math::Min(Wanted, float(InSpec.MaxReachCm));
 
-        auto Result = InRestGrip;
-        Result.SetLocation(InRestGrip.GetLocation() + Direction * Length);
+        auto Result = InGrip.RestGrip;
+        Result.SetLocation(InGrip.RestGrip.GetLocation() + Direction * Length);
 
-        if (InIsAuthored && Wanted <= InSpec.MaxReachCm + 1.0)
-        { Result.SetRotation(InHandWorld.InverseTransformRotation(InWorldGrip.GetRotation())); }
+        if (InGrip.IsAuthored && Wanted <= InSpec.MaxReachCm + 1.0)
+        { Result.SetRotation(InGrip.HandWorld.InverseTransformRotation(InGrip.WorldGrip.GetRotation())); }
         else
         {
             const auto Aim = FQuat::Slerp(FQuat::Identity, FQuat::FindBetweenNormals(FVector::ForwardVector, Direction), InSpec.AimFraction);
-            Result.SetRotation(Aim * InRestGrip.GetRotation());
+            Result.SetRotation(Aim * InGrip.RestGrip.GetRotation());
         }
         return Result;
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Reach state (read the feature)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// 0 = gloves at rest, 1 = fully reached.
+mixin float32 Get_ReachAlpha(const FCk_Handle_FPHands& Self)
+{
+    return utils_fphands::Get_PhaseAlpha(Self.Get_PhaseState(), Self.Get_Spec().Reach);
+}
+
+// 1 = a picked-up item is where it lay, 0 = at its hold offset. Follows the grab.
+mixin float32 Get_CarryWeight(const FCk_Handle_FPHands& Self)
+{
+    return utils_fphands::Get_PhaseCarryWeight(Self.Get_PhaseState(), Self.Get_Spec().Reach);
+}
+
+mixin bool Get_IsReaching(const FCk_Handle_FPHands& Self, bool InIsRightHand)
+{
+    return Self.Get_Phase() != EMars_FPHands_Phase::None && utils_fphands::Get_UsesHand(Self.Get_Target(), InIsRightHand);
+}
+
+// Finger pose while reaching; false = keep the glove's own pose.
+mixin bool Get_ReachPose(const FCk_Handle_FPHands& Self, EMars_HandGripPose& OutPose)
+{
+    const auto& Spec = Self.Get_Spec();
+    const auto Target = Self.Get_Target();
+    const auto Phase = Self.Get_Phase();
+    const auto T = Self.Get_PhaseTime();
+    const auto Contact = Target.HasContactPose ? Target.ContactPose : Spec.Reach.ContactPose;
+    if (Phase == EMars_FPHands_Phase::Reach)
+    {
+        OutPose = T < Spec.Reach.GrabOutSeconds * 0.7f ? Spec.Reach.ApproachPose : Contact;
+        return true;
+    }
+
+    if (Phase == EMars_FPHands_Phase::Grip)
+    {
+        OutPose = Contact;
+        return true;
+    }
+
+    if (Phase == EMars_FPHands_Phase::Return && T < Spec.Reach.GrabBackSeconds * 0.5f)
+    {
+        OutPose = Contact;
+        return true;
+    }
+
+    if (Phase == EMars_FPHands_Phase::Hold)
+    {
+        OutPose = T < Spec.Reach.HoldReachSeconds * 0.7f ? Spec.Reach.ApproachPose : Contact;
+        return true;
+    }
+
+    if (Phase == EMars_FPHands_Phase::Release && T < Spec.Reach.ReleaseSeconds * 0.6f)
+    {
+        OutPose = Spec.Reach.ApproachPose;
+        return true;
+    }
+
+    return false;
 }

@@ -105,6 +105,38 @@ struct FMars_FPHands_HandTarget
     EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
 }
 
+struct FMars_FPHands_HandTargets
+{
+    UPROPERTY()
+    FMars_FPHands_HandTarget Left;
+
+    UPROPERTY()
+    FMars_FPHands_HandTarget Right;
+}
+
+// What the glove targets are composed against this frame: the hand node's current world transform and each glove's
+// arm swing (hand node space).
+struct FMars_FPHands_TargetFrame
+{
+    UPROPERTY()
+    FTransform HandWorld;
+
+    UPROPERTY()
+    FVector Swing_L;
+
+    UPROPERTY()
+    FVector Swing_R;
+
+    FMars_FPHands_TargetFrame() {}
+
+    FMars_FPHands_TargetFrame(FTransform InHandWorld, FVector InSwing_L, FVector InSwing_R)
+    {
+        HandWorld = InHandWorld;
+        Swing_L = InSwing_L;
+        Swing_R = InSwing_R;
+    }
+}
+
 // How the current held item is gripped, measured once per item change.
 struct FMars_FPHands_Hold
 {
@@ -136,8 +168,9 @@ struct FMars_FPHands_Hold
     FTransform SocketGrip_L;
 
     // What the fingers close on: the item mesh bounds, placed by HeldOffset under the hand node.
+    // Weak: fragments may not hold strong UObject refs (Schema.IsSafe); the item's presentation owns the mesh.
     UPROPERTY()
-    UStaticMesh ShapeMesh;
+    TWeakObjectPtr<UStaticMesh> ShapeMesh;
 
     UPROPERTY()
     FVector ShapeScale = FVector::OneVector;
@@ -149,27 +182,21 @@ struct FMars_FPHands_Hold
     EMars_FPHands_GripShape ShapeType = EMars_FPHands_GripShape::Auto;
 }
 
-namespace mars_fphands
+namespace utils_fphands
 {
-    // Where the two gloves go for the current hold, in the hand node's space. Free hands take the arm swing; a reach
-    // (or the focus lean) overrides one glove.
-    void Make_Targets(
-        const FMars_FPHands_Spec& InSpec,
-        const FMars_FPHands_Hold& InHold,
-        const FMars_FPHands_Reach& InReach,
-        const FTransform& InHandWorld,
-        const FVector& InArmSwing_L,
-        const FVector& InArmSwing_R,
-        FMars_FPHands_HandTarget& OutLeft,
-        FMars_FPHands_HandTarget& OutRight)
+    // Where the two gloves rest for a hold, in the hand node's space, before any reach or lean. Free hands take the
+    // arm swing.
+    FMars_FPHands_HandTargets Get_RestTargets(const FMars_FPHands_Spec& InSpec, const FMars_FPHands_Hold& InHold,
+                                              const FMars_FPHands_TargetFrame& InFrame)
     {
-        OutLeft.Swing = InArmSwing_L;
-        OutRight.Swing = InArmSwing_R;
+        auto Targets = FMars_FPHands_HandTargets();
+        Targets.Left.Swing = InFrame.Swing_L;
+        Targets.Right.Swing = InFrame.Swing_R;
         // Empty hands: both gloves either side of the centred Hand node.
         auto GripRight = FTransform(InSpec.GripRestRotation_R, FVector(0.0, InSpec.FreeHandHalfSpacing, 0.0), FVector::OneVector);
         auto GripLeft = FTransform(InSpec.GripRestRotation_L, FVector(0.0, -InSpec.FreeHandHalfSpacing, 0.0), FVector::OneVector);
-        OutRight.Pose = EMars_HandGripPose::Relaxed;
-        OutLeft.Pose = EMars_HandGripPose::Relaxed;
+        Targets.Right.Pose = EMars_HandGripPose::Relaxed;
+        Targets.Left.Pose = EMars_HandGripPose::Relaxed;
 
         if (InHold.IsHolding && InHold.IsTwoHanded)
         {
@@ -179,10 +206,10 @@ namespace mars_fphands
             GripLeft = InHold.HasSocketGrips
                 ? InHold.SocketGrip_L
                 : FTransform(InSpec.GripRestRotation_L, FVector(0.0, InHold.LeftFaceY - InSpec.PalmSurfaceOffset, 0.0), FVector::OneVector);
-            OutRight.Pose = InHold.Pose;
-            OutLeft.Pose = InHold.Pose;
-            OutRight.Swing = FVector::ZeroVector;
-            OutLeft.Swing = FVector::ZeroVector;
+            Targets.Right.Pose = InHold.Pose;
+            Targets.Left.Pose = InHold.Pose;
+            Targets.Right.Swing = FVector::ZeroVector;
+            Targets.Left.Swing = FVector::ZeroVector;
         }
         else if (InHold.IsHolding)
         {
@@ -191,46 +218,13 @@ namespace mars_fphands
                 ? InHold.SocketGrip_R
                 : FTransform(InSpec.GripRestRotation_R, FVector::ZeroVector, FVector::OneVector);
             GripLeft = FTransform(InSpec.GripRestRotation_L, InSpec.OffHandRestOffset, FVector::OneVector);
-            OutRight.Pose = InHold.Pose;
-            OutRight.Swing = FVector::ZeroVector;
+            Targets.Right.Pose = InHold.Pose;
+            Targets.Right.Swing = FVector::ZeroVector;
         }
 
-        OutRight.GripInHand = GripRight;
-        OutLeft.GripInHand = GripLeft;
-
-        Apply_HandReach(InSpec, InReach, OutRight, InHandWorld, true, InReach.FocusAlpha_R);
-        Apply_HandReach(InSpec, InReach, OutLeft, InHandWorld, false, InReach.FocusAlpha_L);
-    }
-
-    // A glove takes the larger of its focus lean and its reach (to its own grip on the target); the reach's finger
-    // pose wins while it plays.
-    void Apply_HandReach(const FMars_FPHands_Spec& InSpec, const FMars_FPHands_Reach& InReach, FMars_FPHands_HandTarget& InOutHand,
-                         const FTransform& InHandWorld, bool InIsRightHand, float32 InFocusAlpha)
-    {
-        const auto IsReaching = mars_fphands_reach::Is_Reaching(InReach, InIsRightHand);
-        const auto ReachAlpha = IsReaching ? mars_fphands_reach::Get_Alpha(InReach, InSpec.Reach) : 0.0f;
-        const auto FocusAlpha = mars_fphands_grips::Uses(InReach.FocusTarget, InIsRightHand) ? InFocusAlpha : 0.0f;
-        const auto Alpha = Math::Max(ReachAlpha, FocusAlpha);
-        if (Alpha <= 0.001f)
-        { return; }
-
-        auto Pose = InSpec.Reach.ApproachPose;
-        auto HasPose = IsReaching && mars_fphands_reach::Get_Pose(InReach, InSpec.Reach, Pose);
-        if (HasPose == false)
-        {
-            Pose = InSpec.Reach.ApproachPose;
-            HasPose = FocusAlpha > InSpec.Reach.FocusLean * 0.5f;
-        }
-
-        const auto Target = ReachAlpha >= FocusAlpha ? InReach.Target : InReach.FocusTarget;
-        auto IsAuthored = false;
-        const auto WorldGrip = mars_fphands_grips::Get_WorldGrip(InSpec, Target, InHandWorld, InIsRightHand, IsAuthored);
-        const auto Standoff = Target.Layout == EMars_FPHands_GripLayout::Point ? InSpec.Reach.StandoffCm : 0.0f;
-
-        InOutHand.ReachGrip = mars_fphands_reach::Make_ReachedGrip(InSpec.Reach, InOutHand.GripInHand, InHandWorld, WorldGrip, IsAuthored, Standoff);
-        InOutHand.ReachAlpha = Alpha;
-        if (HasPose)
-        { InOutHand.Pose = Pose; }
+        Targets.Right.GripInHand = GripRight;
+        Targets.Left.GripInHand = GripLeft;
+        return Targets;
     }
 
     // Hand node rest offset for a hold: right-side for one-handed items, centred otherwise.
@@ -262,7 +256,7 @@ namespace mars_fphands
         // Authored sockets win over the fitted grips.
         if (Presentation.Mesh.IsNull() == false)
         {
-            const auto Sockets = mars_fphands_grips::Find_MeshSockets(System::LoadAsset_Blocking(Presentation.Mesh), Presentation.MeshScale);
+            const auto Sockets = utils_fphands::Find_MeshSockets(System::LoadAsset_Blocking(Presentation.Mesh), Presentation.MeshScale);
             if (Sockets.HasRight)
             {
                 Hold.HasSocketGrips = true;
@@ -302,4 +296,53 @@ namespace mars_fphands
         Hold.LeftFaceY = MinY;
         return Hold;
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Glove targets (read the feature; composed by the anim instance with the hand node's current transform)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Where the two gloves go this frame, in the hand node's space: the rest targets for the hold, then a reach (or the
+// focus lean) on each glove.
+mixin void Get_HandTargets(const FCk_Handle_FPHands& Self, const FMars_FPHands_TargetFrame& InFrame, FMars_FPHands_HandTargets& OutTargets)
+{
+    OutTargets = utils_fphands::Get_RestTargets(Self.Get_Spec(), Self.Get_Hold(), InFrame);
+    Self.Apply_HandReach(InFrame.HandWorld, true, OutTargets.Right);
+    Self.Apply_HandReach(InFrame.HandWorld, false, OutTargets.Left);
+}
+
+// A glove takes the larger of its focus lean and its reach (to its own grip on the target); the reach's finger pose
+// wins while it plays.
+mixin void Apply_HandReach(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, bool InIsRightHand,
+                           FMars_FPHands_HandTarget& InOutHand)
+{
+    const auto& Spec = Self.Get_Spec();
+    const auto FocusTarget = Self.Get_FocusTarget();
+    const auto IsReaching = Self.Get_IsReaching(InIsRightHand);
+    const auto ReachAlpha = IsReaching ? Self.Get_ReachAlpha() : 0.0f;
+    const auto LeanAlpha = InIsRightHand ? Self.Get_FocusAlpha_R() : Self.Get_FocusAlpha_L();
+    const auto FocusAlpha = utils_fphands::Get_UsesHand(FocusTarget, InIsRightHand) ? LeanAlpha : 0.0f;
+    const auto Alpha = Math::Max(ReachAlpha, FocusAlpha);
+    if (Alpha <= 0.001f)
+    { return; }
+
+    auto Pose = Spec.Reach.ApproachPose;
+    auto HasPose = IsReaching && Self.Get_ReachPose(Pose);
+    if (HasPose == false)
+    {
+        Pose = Spec.Reach.ApproachPose;
+        HasPose = FocusAlpha > Spec.Reach.FocusLean * 0.5f;
+    }
+
+    auto Target = FocusTarget;
+    if (ReachAlpha >= FocusAlpha)
+    { Target = Self.Get_Target(); }
+
+    auto Grip = FMars_FPHands_GripQuery(InHandWorld, InIsRightHand, InOutHand.GripInHand);
+    utils_fphands::Resolve_WorldGrip(Spec, Target, Grip);
+
+    InOutHand.ReachGrip = utils_fphands::Make_ReachedGrip(Spec.Reach, Grip);
+    InOutHand.ReachAlpha = Alpha;
+    if (HasPose)
+    { InOutHand.Pose = Pose; }
 }

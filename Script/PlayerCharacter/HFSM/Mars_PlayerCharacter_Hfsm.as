@@ -1,12 +1,13 @@
 // Root (on the player entity, initial = Alive)
 // |- Alive       ->Downed [IsDowned]
 // |    tasks: ViewpointSync, InteractionFocus, InteractionResolverBinds, Use/PrimaryIntentToResolver,
-// |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), AliveSubSm
+// |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), AliveSubSm, HandsSubSm
 // |    modes: ViewpointSync is the only Tick task (it samples the controller view every frame); every other task is
 // |           EnterExitOnly and signal-driven - the intent tasks through UMars_SmTask_IntentEdges' matcher edges
-// |    `- Alive sub-SM (initial = Locomotion)
-// |         `- Locomotion   tasks: LocomotionSubSm
-// |              `- Loco sub-SM (initial = Idle): Idle / Walk / Sprint / Crouch / Jump / Airborne
+// |    |- Alive sub-SM (initial = Locomotion)
+// |    |    `- Locomotion   tasks: LocomotionSubSm
+// |    |         `- Loco sub-SM (initial = Idle): Idle / Walk / Sprint / Crouch / Jump / Airborne
+// |    `- Hands sub-SM (initial = Rest): Rest / Reach / Grip / Return / Hold / Release (Script/ECS/FPHands/Mars_FPHands_Hfsm.as)
 // `- Downed      ->Alive [IsNotDowned]
 //
 // A parent's transitions keep firing while any descendant is active, and leaving a parent tears
@@ -56,6 +57,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_DropThrowIntent);
         AddTask(InHandle, UMars_SmTask_HeldItemHints);
         AddTask(InHandle, UMars_SmTask_AliveSubSm);
+        AddTask(InHandle, UMars_SmTask_HandsSubSm);
     }
 
     UFUNCTION(BlueprintOverride)
