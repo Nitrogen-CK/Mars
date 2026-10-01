@@ -4,9 +4,11 @@ struct FMars_Feature_HandBob {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Procedural motion of the first-person hands from the owning character's locomotion: a stride bob while walking, arm
-// swing on free hands, float while airborne, a springy squash on landing, and breathing at rest. Offsets are in the
-// hand node's frame (X forward, Y right, Z up). Complements CkSway, which only lags the hands behind camera motion.
+// Procedural motion of the first-person hands from the owning character's locomotion, written as the offset of the
+// HandBob node (X forward, Y right, Z up): a stride bob while walking, arm swing on free hands, a springy squash on
+// landing, and breathing at rest. CkSway, on the parent Hand node, owns everything driven by camera and body motion -
+// including the hands lagging while the character rises and falls (Config.HandSway LocationFromLinearVelocity.Z) - so
+// HandBob adds no airborne offset of its own: one owner per effect.
 struct FMars_HandBob_Spec
 {
     // Ground speed at which the stride runs at StridesPerSecond and the bob at full amplitude (cm/s).
@@ -52,12 +54,6 @@ struct FMars_HandBob_Spec
     UPROPERTY(Category = "Arm Swing")
     float32 ArmSwingLiftCm = 1.0f;
 
-    UPROPERTY(Category = "Air")
-    float32 AirLiftPerFallSpeed = 0.006f;
-
-    UPROPERTY(Category = "Air")
-    float32 MaxAirLiftCm = 5.0f;
-
     // Downward kick on landing per cm/s of impact speed (cm/s of spring velocity).
     UPROPERTY(Category = "Air")
     float32 LandKickPerImpactSpeed = 0.09f;
@@ -65,7 +61,7 @@ struct FMars_HandBob_Spec
     UPROPERTY(Category = "Air")
     float32 MaxLandKick = 70.0f;
 
-    // The vertical spring that carries air lift and the landing squash. Low damping = bouncy.
+    // The vertical spring that carries the landing squash. Low damping = bouncy.
     UPROPERTY(Category = "Air")
     float32 SpringFrequencyHz = 3.0f;
 
@@ -107,7 +103,7 @@ struct FMars_Fragment_HandBob
     UPROPERTY()
     float32 BreathTime = 0.0f;
 
-    // Vertical spring (air lift + landing squash).
+    // Vertical spring (landing squash).
     UPROPERTY()
     float32 SpringOffset = 0.0f;
 
@@ -123,4 +119,24 @@ struct FMars_Fragment_HandBob
     // Signed arm swing this frame, [-1, 1] x Amount: positive = right hand forward, left hand back.
     UPROPERTY()
     float32 ArmSwing = 0.0f;
+}
+
+// What the bob reads from the owning character each frame.
+struct FMars_HandBob_Input
+{
+    // Time to advance by; must be > 0.
+    UPROPERTY()
+    float32 DeltaSeconds = 0.0f;
+
+    UPROPERTY()
+    float GroundSpeed = 0.0;
+
+    UPROPERTY()
+    float32 VerticalSpeed = 0.0f;
+
+    UPROPERTY()
+    bool IsFalling = false;
+
+    UPROPERTY()
+    bool IsCrouched = false;
 }
