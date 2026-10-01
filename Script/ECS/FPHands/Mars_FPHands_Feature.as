@@ -8,6 +8,7 @@ asset Mars_FPHandsHandle of UCkDynamic_HandleDefinition
     RequiredFragments.Add(FMars_Feature_FPHands);
     Description = "The first-person gloves: reach/grip/return/hold/release phase owned by the Hands sub-HFSM, focus lean, hold and carry";
 }
+
 struct FMars_Feature_FPHands {}
 
 // Phase of the gloves. Set ONLY by the Hands sub-SM's state enter tasks through Request_SetPhase. Reach/Grip/Return is
@@ -32,9 +33,13 @@ struct FMars_Fragment_FPHands_Params
     UPROPERTY()
     FMars_FPHands_Spec Spec;
 
-    // The swaying, bobbing hand node the gloves hang off (Player.HandBob).
+    // The swaying, bobbing hand node the gloves hang off (Player.HandBob, a CkGait bob node).
     UPROPERTY()
     FCk_Handle_Transform HandNode;
+
+    // The character's stride clock (CkGait); the free-hand arm swing is derived from it.
+    UPROPERTY()
+    FCk_Handle_Gait Gait;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

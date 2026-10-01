@@ -58,9 +58,17 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     float32 ReachInterpSpeed = 14.0f;
 
-    // Locomotion bob, arm swing, jump/land bounce and breathing (on the Player.HandBob node).
-    UPROPERTY()
-    FMars_HandBob_Spec Bob;
+    // Locomotion bob of the hand node (CkGait Bob on Player.HandBob): stride dip/sway, jump/land bounce, breathing.
+    UPROPERTY(Category = "Bob")
+    FCk_Bob_Spec Bob;
+
+    // Free hands swing forward/back in opposite phase, like arms (cm), from the character's gait.
+    UPROPERTY(Category = "Arm Swing")
+    float32 ArmSwingCm = 3.5f;
+
+    // The hand swinging forward lifts a little (cm).
+    UPROPERTY(Category = "Arm Swing")
+    float32 ArmSwingLiftCm = 1.0f;
 
     // Leaning toward and reaching for interactables.
     UPROPERTY()
@@ -292,6 +300,7 @@ namespace utils_fphands
             MinY = Math::Min(MinY, InHand.Y);
             MaxY = Math::Max(MaxY, InHand.Y);
         }
+
         Hold.RightFaceY = MaxY;
         Hold.LeftFaceY = MinY;
         return Hold;

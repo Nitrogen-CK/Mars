@@ -1,9 +1,9 @@
 // Root (on the player entity, initial = Alive)
 // |- Alive       ->Downed [IsDowned]
-// |    tasks: ViewpointSync, InteractionFocus, InteractionResolverBinds, Use/PrimaryIntentToResolver,
+// |    tasks: InteractionFocus, InteractionResolverBinds, Use/PrimaryIntentToResolver,
 // |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), AliveSubSm, HandsSubSm
-// |    modes: ViewpointSync is the only Tick task (it samples the controller view every frame); every other task is
-// |           EnterExitOnly and signal-driven - the intent tasks through UMars_SmTask_IntentEdges' matcher edges
+// |    modes: every task is EnterExitOnly and signal-driven (the intent tasks through UMars_SmTask_IntentEdges' matcher edges);
+// |           the view needs no sync task - the interaction trace rides the camera director's view anchor (PlayerViewpoint)
 // |    |- Alive sub-SM (initial = Locomotion)
 // |    |    `- Locomotion   tasks: LocomotionSubSm
 // |    |         `- Loco sub-SM (initial = Idle): Idle / Walk / Sprint / Crouch / Jump / Airborne
@@ -45,7 +45,6 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         auto ToDowned = AddTransition(InHandle, UMars_SmState_Downed);
         AddCondition(ToDowned, UMars_SmCondition_IsDowned);
 
-        AddTask(InHandle, UMars_SmTask_ViewpointSync);
         AddTask(InHandle, UMars_SmTask_InteractionFocus);
         AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);

@@ -1,33 +1,3 @@
-class UMars_SmTask_ViewpointSync : UCk_SmTask_EntityScript
-{
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private APawn CachedPawn;
-    private FCk_Handle_PlayerViewpoint CachedViewpoint;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        auto Player = ck::Ctx(InHandle);
-        CachedPawn = Cast<APawn>(ck::ToActor(Player));
-        CachedViewpoint = Player.As_PlayerViewpoint();
-    }
-
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::Is_NOT_Valid(CachedPawn) || ck::Is_NOT_Valid(CachedPawn.Controller))
-        { return ECk_SmTaskResult::Running; }
-
-        FVector ViewLocation;
-        FRotator ViewRotation;
-        CachedPawn.Controller.GetPlayerViewPoint(ViewLocation, ViewRotation);
-        CachedViewpoint.Request_SetView(ViewLocation, ViewRotation);
-
-        return ECk_SmTaskResult::Running;
-    }
-}
-
 // View trace -> focus. The nearest overlapped interactable wins; its targets are offered to the
 // player's resolver, it is told who focuses it (which drives its prompt) and the first-person gloves lean toward it.
 class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
@@ -182,6 +152,7 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
             if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext))
             { return Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner; }
         }
+
         return FCk_Handle();
     }
 

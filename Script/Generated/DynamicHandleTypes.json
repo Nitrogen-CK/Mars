@@ -246,7 +246,7 @@
 		{
 			"TypeName": "FCk_Handle_PlayerViewpoint",
 			"ShortName": "PlayerViewpoint",
-			"Description": "A player's view in ECS: a transform that follows the camera, and the interaction trace cast from it",
+			"Description": "A player's view: the CkCamera director, its view anchor (the rendered view's transform) and the interaction trace cast from it",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlayerViewpointHandle",
 			"RequiredFragments": [
 				"Mars_Feature_PlayerViewpoint"
