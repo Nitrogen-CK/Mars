@@ -1,16 +1,31 @@
 // Preconfigured mechanisms for the sandbox map's rooms 2 and 3 (Script/Editor/Mars_SandboxMapBuilder.as). ACk_EntitySpawner_UE's
 // script slot is not script-writable, so the builder places these through the spawner's actor factory, which
 // instances the class with these defaults. Not under Script/Editor: the saved map references them at runtime.
+// Every sandbox lever is pulled (UMars_Sandbox_PulledLever_EntityScript); SwitchC, the seals and WheelJ stay pressed or held.
 
-class UMars_Sandbox_LeverA_EntityScript : UMars_Lever_EntityScript
+// The sandbox levers are pulled: Use grips the handle and the look input swings it over. Control fields are set in
+// DoConstruct, like SwitchC and WheelJ, rather than as subclass defaults on the nested struct.
+UCLASS(Abstract)
+class UMars_Sandbox_PulledLever_EntityScript : UMars_Lever_EntityScript
 {
     default _ShowInPlaceActors = false;
+    default PromptText = NSLOCTEXT("MarsInteraction", "PullLeverHoldPrompt", "Grip lever");
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Control.Interaction = ECk_Interaction_CompletionPolicy::ManuallyCompleted;
+        return Super::DoConstruct(InHandle);
+    }
+}
+
+class UMars_Sandbox_LeverA_EntityScript : UMars_Sandbox_PulledLever_EntityScript
+{
     default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.A");
 }
 
-class UMars_Sandbox_LeverB_EntityScript : UMars_Lever_EntityScript
+class UMars_Sandbox_LeverB_EntityScript : UMars_Sandbox_PulledLever_EntityScript
 {
-    default _ShowInPlaceActors = false;
     default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.B");
 }
 
@@ -127,9 +142,8 @@ class UMars_Sandbox_VentJ_EntityScript : UMars_Vent_EntityScript
     default Trap.Powered = EMars_PoweredBehavior::SuppressWhilePowered;
 }
 
-class UMars_Sandbox_LeverK_EntityScript : UMars_Lever_EntityScript
+class UMars_Sandbox_LeverK_EntityScript : UMars_Sandbox_PulledLever_EntityScript
 {
-    default _ShowInPlaceActors = false;
     default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.K");
 }
 

@@ -14,7 +14,8 @@ struct FMars_Gameplay_IntentRow
     }
 }
 
-// Move and look stay on Enhanced Input (analog, not graded). Every button is a CkIntent LEVEL row
+// Move and look stay on Enhanced Input (analog, not graded); both also reach the pawn's InputIntents (the look delta for
+// a gripped control, which reads it while the camera holds still). Every button is a CkIntent LEVEL row
 // on this profile's own input layer: Active while held, Idle on release. The matcher is handed to
 // the pawn's InputIntents feature, and the player HFSM polls it - nothing here decides what a
 // press does.
@@ -225,17 +226,22 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
 
     // CkCamera consumes the intention as a per-frame delta: degrees of view rotation = intention x the profile's LookSpeed.
     // A positive Y pitches DOWN, so mouse/stick up is negated here. The stick mapping is already dt-scaled (SetupGamepadBindings).
+    // The same intention goes to InputIntents, independently of the camera, so a gripped control can read it.
     UFUNCTION()
     private void OnLook(FInputActionValue ActionValue, float32 ElapsedTime,
         float32 TriggeredTime, const UInputAction SourceAction)
     {
-        auto Camera = TryGet_PawnCamera();
-        if (ck::Is_NOT_Valid(Camera))
-        { return; }
-
         const auto LookDelta = ActionValue.GetAxis2D();
         const auto Scale = MouseLookScale * LegacyLookScale;
-        Camera.Request_SetOrientationIntention(FVector(LookDelta.X * Scale, -LookDelta.Y * Scale, 0.0));
+        const auto Intention = FVector(LookDelta.X * Scale, -LookDelta.Y * Scale, 0.0);
+
+        auto Intents = TryGet_PawnIntents();
+        if (ck::IsValid(Intents))
+        { Intents.Request_AddLookDelta(FMars_Request_InputIntents_AddLookDelta(Intention)); }
+
+        auto Camera = TryGet_PawnCamera();
+        if (ck::IsValid(Camera))
+        { Camera.Request_SetOrientationIntention(Intention); }
     }
 
     private FCk_Handle_Camera TryGet_PawnCamera() const

@@ -219,6 +219,211 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
     }
 }
 
+// Resolver -> a gripped control. When the Use intent's best target is a ManuallyCompleted interact target whose owner is
+// a Control, this task begins the control's manipulation on the target's OnNewInteraction, feeds it the look delta every
+// tick (projected onto the control's on-screen pull direction), ends it on OnInteractionFinished, and holds the
+// camera's orientation still in between (the same motion would otherwise turn the view off the lever and unfocus it).
+// Stateful like UMars_SmTask_InteractionFocus; leaving Alive ends any manipulation and restores the camera.
+class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    private FCk_Handle _Player;
+    private FCk_Handle_InteractionResolver _Resolver;
+    private FCk_Handle_InputIntents _Intents;
+    // Both invalid without a PlayerViewpoint (headless tests): no camera freeze, and the pull falls back to raw pitch.
+    private FCk_Handle_Camera _Camera;
+    private FCk_Handle_Transform _View;
+    // The watched ManuallyCompleted target and the Control that owns it.
+    private FCk_Handle_InteractTarget _Target;
+    private FCk_Handle_Control _Control;
+    private bool _IsManipulating = false;
+    private bool _CameraFrozen = false;
+    private int32 _SeenLookSequence = 0;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        _Player = ck::Ctx(InHandle);
+        _Resolver = _Player.As_InteractionResolver();
+        _Intents = _Player.As_InputIntents(ECk_SanityCheck::UnChecked);
+
+        auto Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Viewpoint))
+        {
+            _Camera = Viewpoint.Get_Camera();
+            _View = Viewpoint.Get_Viewpoint();
+        }
+
+        _Resolver.BindTo_OnBestTargetsChanged(
+            FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        EndManipulation();
+        StopWatching();
+
+        if (ck::IsValid(_Resolver))
+        {
+            _Resolver.UnbindFrom_OnBestTargetsChanged(
+                FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
+        }
+
+        _Player = FCk_Handle();
+        _Resolver = FCk_Handle_InteractionResolver();
+        _Intents = FCk_Handle_InputIntents();
+        _Camera = FCk_Handle_Camera();
+        _View = FCk_Handle_Transform();
+    }
+
+    // Must return Running every frame: a Succeeded/Failed result would end the task while Alive is still active.
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (_IsManipulating == false)
+        { return ECk_SmTaskResult::Running; }
+
+        // The lever died under the hand.
+        if (ck::Is_NOT_Valid(_Control))
+        {
+            EndManipulation();
+            return ECk_SmTaskResult::Running;
+        }
+
+        if (ck::Is_NOT_Valid(_Intents))
+        { return ECk_SmTaskResult::Running; }
+
+        // One nudge per drained delta, whatever the processor order; a still frame advances nothing.
+        const auto Sequence = _Intents.Get_LookDeltaSequence();
+        if (Sequence == _SeenLookSequence)
+        { return ECk_SmTaskResult::Running; }
+
+        _SeenLookSequence = Sequence;
+
+        // No view: a zero pull axis makes Get_PullDegrees fall back to raw pitch.
+        auto View = FTransform::Identity;
+        auto PullWorld = FVector::ZeroVector;
+        if (ck::IsValid(_View))
+        {
+            View = utils_transform::Get_EntityCurrentTransform(_View);
+            PullWorld = _Control.Get_PullDirectionWorld();
+        }
+
+        const auto PullDegrees = utils_control::Get_PullDegrees(PullWorld, View, _Intents.Get_LookDelta());
+        _Control.Request_Nudge(FMars_Request_Control_Nudge(PullDegrees));
+        return ECk_SmTaskResult::Running;
+    }
+
+    UFUNCTION()
+    private void OnBestTargetsChanged(FCk_Handle_InteractionResolver InResolver, FGameplayTag InIntent,
+                                      const TArray<FCk_Handle_InteractTarget>&in InPreviousTargets,
+                                      const TArray<FCk_Handle_InteractTarget>&in InNewTargets,
+                                      const TArray<FCk_Handle_InteractTarget>&in InRemovedTargets)
+    {
+        if (InIntent != GameplayTags::InteractionIntent_Mars_Use)
+        { return; }
+
+        for (auto RemovedTarget : InRemovedTargets)
+        {
+            if (ck::IsValid(_Target) && FCk_Handle(RemovedTarget) == FCk_Handle(_Target))
+            {
+                EndManipulation();
+                StopWatching();
+            }
+        }
+
+        for (auto NewTarget : InNewTargets)
+        {
+            auto Control = Get_ManipulatedControl(NewTarget);
+            if (ck::Is_NOT_Valid(Control))
+            { continue; }
+
+            EndManipulation();
+            StopWatching();
+            _Target = NewTarget;
+            _Control = Control;
+            _Target.BindTo_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
+            _Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnInteractionFinished"));
+            return;
+        }
+    }
+
+    UFUNCTION()
+    private void OnNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
+    {
+        if ((FCk_Handle(InTarget) == FCk_Handle(_Target)) == false || ck::Is_NOT_Valid(_Control))
+        { return; }
+
+        // The delta that was drained before the grip is not a pull.
+        _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
+        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(InInteraction, _Player));
+        _IsManipulating = true;
+        SetCameraFrozen(true);
+    }
+
+    // After a threshold engage the Control has already ended the manipulation, so its EndManipulation is a no-op.
+    UFUNCTION()
+    private void OnInteractionFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
+    {
+        if (FCk_Handle(InTarget) == FCk_Handle(_Target))
+        { EndManipulation(); }
+    }
+
+    // The Control behind a ManuallyCompleted interact target; invalid for any other target.
+    private FCk_Handle_Control Get_ManipulatedControl(FCk_Handle_InteractTarget InTarget) const
+    {
+        if (ck::Is_NOT_Valid(InTarget) || InTarget.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        { return FCk_Handle_Control(); }
+
+        if (InTarget.Get_InteractionCompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+        { return FCk_Handle_Control(); }
+
+        auto Control = InTarget.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Control) || Control.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+        { return FCk_Handle_Control(); }
+
+        return Control;
+    }
+
+    private void EndManipulation()
+    {
+        if (_IsManipulating == false)
+        { return; }
+
+        _IsManipulating = false;
+
+        if (ck::IsValid(_Control))
+        { _Control.Request_EndManipulation(); }
+
+        SetCameraFrozen(false);
+    }
+
+    private void StopWatching()
+    {
+        if (ck::IsValid(_Target))
+        {
+            _Target.UnbindFrom_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
+            _Target.UnbindFrom_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnInteractionFinished"));
+        }
+
+        _Target = FCk_Handle_InteractTarget();
+        _Control = FCk_Handle_Control();
+    }
+
+    private void SetCameraFrozen(bool InFrozen)
+    {
+        if (InFrozen == _CameraFrozen)
+        { return; }
+
+        _CameraFrozen = InFrozen;
+
+        if (ck::IsValid(_Camera))
+        { _Camera.Request_Set_HasOrientationControl(InFrozen == false); }
+    }
+}
+
 // Owns the player's intent-matcher subscription: binds on enter, follows every matcher swap (the matcher usually arrives
 // after enter, and Deactivate/Repoint swap it to INVALID), unbinds on exit. Subclasses override the hooks and filter on
 // their own intent tags; they cache their handles BEFORE Super::DoEnterTask, because the first OnMatcherRebound runs
