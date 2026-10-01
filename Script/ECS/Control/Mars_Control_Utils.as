@@ -45,10 +45,10 @@ namespace utils_control
         return float32(InLookDelta.X * Screen.X + InLookDelta.Y * Screen.Y);
     }
 
-    // 0..1 toward EngageAlpha in the pull's direction: from inactive the pull runs toward alpha 1, from active toward 0.
-    float32 Get_ProgressTowardEngage(bool InFromActive, float32 InAlpha, float32 InEngageAlpha)
+    // 0..1 toward EngageAlpha in the pull's direction: toward alpha 1, or toward 0 when InTowardStart.
+    float32 Get_ProgressTowardEngage(bool InTowardStart, float32 InAlpha, float32 InEngageAlpha)
     {
-        const auto Travelled = InFromActive ? 1.0f - InAlpha : InAlpha;
+        const auto Travelled = InTowardStart ? 1.0f - InAlpha : InAlpha;
         return Math::Clamp(Travelled / InEngageAlpha, 0.0f, 1.0f);
     }
 }
@@ -116,7 +116,21 @@ mixin float32 Get_ManipulationProgress(const FCk_Handle_Control& Self)
     { return 0.0f; }
 
     const auto EngageAlpha = Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.EngageAlpha;
-    return utils_control::Get_ProgressTowardEngage(State.IsActive, State.Manipulation.Alpha, EngageAlpha);
+    return utils_control::Get_ProgressTowardEngage(Self.Get_PullsTowardStart(), State.Manipulation.Alpha, EngageAlpha);
+}
+
+// A ManuallyCompleted control whose handle springs back to rest after every pull instead of following IsActive (a pull
+// chain). Every pull then runs toward the end pose.
+mixin bool Get_ReturnsToRest(const FCk_Handle_Control& Self)
+{
+    const auto& Params = Self.Get_Fragment(FMars_Fragment_Control_Params);
+    return Params.CompletionPolicy == ECk_Interaction_CompletionPolicy::ManuallyCompleted && Params.Manipulation.ReturnsToRest;
+}
+
+// The next pull runs toward the start pose: an active control whose handle stayed where it was pulled (a lever that is on).
+mixin bool Get_PullsTowardStart(const FCk_Handle_Control& Self)
+{
+    return Self.Get_IsActive() && Self.Get_ReturnsToRest() == false;
 }
 
 // PullAxis rotated into world space; zero when the axis is zero or the control entity has no Transform.

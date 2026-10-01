@@ -44,18 +44,24 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Mover))
         { Mover.Request_Scrub(FMars_Request_Mover_Scrub(Alpha)); }
 
-        const auto Progress = utils_control::Get_ProgressTowardEngage(InState.IsActive, Alpha, Tuning.EngageAlpha);
+        const auto ReturnsToRest = Self.Get_ReturnsToRest();
+        const auto TowardStart = Self.Get_PullsTowardStart();
+        const auto Progress = utils_control::Get_ProgressTowardEngage(TowardStart, Alpha, Tuning.EngageAlpha);
         if (Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Broadcast(Self, Progress); }
 
-        const auto Crossed = InState.IsActive ? Alpha <= 1.0f - Tuning.EngageAlpha : Alpha >= Tuning.EngageAlpha;
+        const auto Crossed = TowardStart ? Alpha <= 1.0f - Tuning.EngageAlpha : Alpha >= Tuning.EngageAlpha;
         if (Crossed == false)
         { return; }
 
-        // No Settle: the Engage's MoveTo carries the handle the rest of the way from here.
+        // A lever's handle is carried the rest of the way by the Engage's MoveTo; a returns-to-rest handle springs back now
+        // (the Mover drains Scrub before Settle, so the tween starts from this frame's alpha).
         auto Interaction = InState.Manipulation.Interaction;
         InState.Manipulation = FMars_Control_Manipulation();
         Self.Request_TryRemove(FMars_Tag_Control_Manipulating);
+
+        if (ReturnsToRest && ck::IsValid(Mover))
+        { Mover.Request_Settle(); }
 
         if (Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, false); }

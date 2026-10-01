@@ -46,6 +46,11 @@ struct FMars_Control_Manipulation_Spec
     UPROPERTY()
     float32 Damping = 12.0f;
 
+    // On: the handle springs back to rest after every pull and every pull past EngageAlpha engages (a pull chain).
+    // Off: the handle stays where the pull leaves it and follows IsActive, so the next pull runs the other way (a lever).
+    UPROPERTY()
+    bool ReturnsToRest = false;
+
     FMars_Control_Manipulation_Spec() {}
 
     FMars_Control_Manipulation_Spec(
@@ -53,13 +58,15 @@ struct FMars_Control_Manipulation_Spec
         float32 InAlphaPerDegree,
         float32 InEngageAlpha,
         float32 InStiffness,
-        float32 InDamping)
+        float32 InDamping,
+        bool InReturnsToRest)
     {
         PullAxis = InPullAxis;
         AlphaPerDegree = InAlphaPerDegree;
         EngageAlpha = InEngageAlpha;
         Stiffness = InStiffness;
         Damping = InDamping;
+        ReturnsToRest = InReturnsToRest;
     }
 }
 
