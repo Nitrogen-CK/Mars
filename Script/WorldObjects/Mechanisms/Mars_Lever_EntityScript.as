@@ -52,7 +52,6 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
 
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InHandleNode)
     {
-        auto CubeMesh = engine::load::Cube();
         auto CylinderMesh = engine::load::Cylinder();
 
         auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
@@ -63,10 +62,14 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
 
         // On a child of the handle node so the node's offset stays a pure pull rotation about the pivot.
         // A cube with a Grip socket near the top of the bar: the first-person gloves reach for it.
-        auto HandleMesh = Cast<UStaticMesh>(LoadObject(this, "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM"));
+        const auto HandleMeshPath = "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM";
+        auto HandleMesh = Cast<UStaticMesh>(LoadObject(this, HandleMeshPath));
+        if (ck::EnsureIfNot(ck::IsValid(HandleMesh), f"[Lever] Handle mesh [{HandleMeshPath}] did not load - the lever has no handle to see or grip"))
+        { return; }
+
         auto HandleTransform = InHandleNode.As_Transform();
         AddMesh(HandleTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0), FVector(0.08, 0.08, 0.9)),
-            ck::IsValid(HandleMesh) ? HandleMesh : CubeMesh, Material, collision::profile::NoCollision, n"Lever_Handle");
+            HandleMesh, Material, collision::profile::NoCollision, n"Lever_Handle");
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot)
