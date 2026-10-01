@@ -136,5 +136,12 @@ namespace mars
         FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Point.AM_FPHands_Emote_Point")));
         FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Clap.AM_FPHands_Emote_Clap")));
         FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_FlipOff.AM_FPHands_Emote_FlipOff")));
+
+        // The hands' bob keeps the landing dip but adds no airborne lift: CkSway on the parent Hand node already lags
+        // the hands while the body rises and falls (HandSway LocationFromLinearVelocity.Z). One owner per effect.
+        auto HandBobAir = FPHands.Bob.Get_Air();
+        HandBobAir.Set_LiftCmPerFallSpeed(0.0f);
+        HandBobAir.Set_MaxLiftCm(0.0f);
+        FPHands.Bob.Set_Air(HandBobAir);
     }
 }
