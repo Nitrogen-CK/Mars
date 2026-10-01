@@ -1,0 +1,33 @@
+Begin Object Class=/Script/UMG.Overlay Name="Root" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Root'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Root.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Root.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'Root'"
+      Content="/Script/UMG.Border'Background'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_5" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_5'"
+   WidgetName="Root"
+End Object
+Begin Object Class=/Script/UMG.Border Name="Background" ExportPath="/Script/UMG.Border'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Background'"
+   Begin Object Class=/Script/UMG.BorderSlot Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Background.BorderSlot_0'"
+   End Object
+   Begin Object Name="BorderSlot_0" ExportPath="/Script/UMG.BorderSlot'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Background.BorderSlot_0'"
+      Padding=(Left=12.000000,Top=12.000000,Right=12.000000,Bottom=12.000000)
+      HorizontalAlignment=HAlign_Center
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Border'Background'"
+      Content="/Script/CommonUI.CommonTextBlock'Text'"
+   End Object
+   HorizontalAlignment=HAlign_Center
+   VerticalAlignment=VAlign_Center
+   Padding=(Left=12.000000,Top=12.000000,Right=12.000000,Bottom=12.000000)
+   BrushColor=(R=0.006995,G=0.006995,B=0.006995,A=0.901961)
+   Slots(0)="/Script/UMG.BorderSlot'BorderSlot_0'"
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="Text" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP:WidgetTree.Text'"
+   Font=(Size=18.000000)
+End Object
