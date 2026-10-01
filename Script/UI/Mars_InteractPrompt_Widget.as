@@ -18,6 +18,8 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
 
     private UMaterialInstanceDynamic _ProgressDMI;
     private FCk_Handle_FloatAttribute _HoldAttribute;
+    // The Control behind a ManuallyCompleted prompt: its manipulation progress fills the bar (no time attribute exists).
+    private FCk_Handle_Control _ManipulatedControl;
 
     UFUNCTION(BlueprintOverride)
     void Construct()
@@ -29,6 +31,7 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
     void Destruct()
     {
         StopHoldProgress();
+        StopManipulation();
     }
 
     void OnVisualUpdate(FCk_Handle_InteractPrompt InPrompt)
@@ -50,6 +53,17 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
         { ListenForHoldProgress(TimeAttribute); }
         else
         { StopHoldProgress(); }
+
+        auto Control = FCk_Handle_Control();
+        auto Target = FCk_Handle(InPrompt).As_InteractTarget(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext)
+            && Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+        { Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked); }
+
+        if (ck::IsValid(Control))
+        { ListenForManipulation(Control); }
+        else
+        { StopManipulation(); }
     }
 
     void Set_Prompt(FText InText, UInputAction InAction, FLinearColor InColor)
@@ -108,6 +122,49 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
 
         _HoldAttribute = FCk_Handle_FloatAttribute();
         Set_ProgressPercent(0.0f);
+    }
+
+    // Idempotent on the same control; a repeat re-seeds the bar, which the hold-attribute path above has just zeroed.
+    private void ListenForManipulation(FCk_Handle_Control InControl)
+    {
+        if (_ManipulatedControl == InControl)
+        {
+            Set_ProgressPercent(_ManipulatedControl.Get_ManipulationProgress());
+            return;
+        }
+
+        StopManipulation();
+        _ManipulatedControl = InControl;
+        _ManipulatedControl.BindTo_OnManipulationProgress(FMars_Delegate_Control_OnManipulationProgress(this, n"OnManipulationProgress"));
+        _ManipulatedControl.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnManipulationChanged"));
+        Set_ProgressPercent(_ManipulatedControl.Get_ManipulationProgress());
+    }
+
+    private void StopManipulation()
+    {
+        if (ck::IsValid(_ManipulatedControl))
+        {
+            _ManipulatedControl.UnbindFrom_OnManipulationProgress(FMars_Delegate_Control_OnManipulationProgress(this, n"OnManipulationProgress"));
+            _ManipulatedControl.UnbindFrom_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnManipulationChanged"));
+        }
+
+        _ManipulatedControl = FCk_Handle_Control();
+
+        if (ck::Is_NOT_Valid(_HoldAttribute))
+        { Set_ProgressPercent(0.0f); }
+    }
+
+    UFUNCTION()
+    private void OnManipulationProgress(FCk_Handle_Control InControl, float32 InProgress)
+    {
+        Set_ProgressPercent(InProgress);
+    }
+
+    UFUNCTION()
+    private void OnManipulationChanged(FCk_Handle_Control InControl, bool InManipulating)
+    {
+        if (InManipulating == false)
+        { Set_ProgressPercent(0.0f); }
     }
 
     UFUNCTION()

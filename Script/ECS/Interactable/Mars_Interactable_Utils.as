@@ -58,7 +58,7 @@ namespace utils_interactable
                 auto PromptSpec = Entry.InteractPromptSpec.GetValue();
                 PromptSpec.SortOrder = Get_SortOrderFromChannel(Entry.InteractTargetSpec.Get_InteractionChannel());
                 PromptSpec.IsTimedInteraction =
-                    Entry.InteractTargetSpec.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed;
+                    Entry.InteractTargetSpec.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::Instant;
                 utils_interact_prompt::Add(TargetHandle, PromptSpec);
             }
 

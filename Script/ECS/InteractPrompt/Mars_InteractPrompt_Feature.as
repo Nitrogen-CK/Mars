@@ -28,7 +28,8 @@ struct FMars_InteractPrompt_Spec
     UPROPERTY()
     int32 SortOrder = 999;
 
-    // Stamped at composition from the target's completion policy; the widget shows a hold bar.
+    // Stamped at composition from the target's completion policy; the widget shows a hold bar: Timed (interaction time)
+    // or ManuallyCompleted (the control's manipulation progress).
     UPROPERTY()
     bool IsTimedInteraction = false;
 }
