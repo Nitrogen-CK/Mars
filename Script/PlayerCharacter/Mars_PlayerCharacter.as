@@ -152,6 +152,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
         auto HeldItem = utils_held_item::Add(Player);
         HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
         utils_held_item_use::Add(Player);
+        utils_emote_wheel::Add(Player, Config.EmoteWheel);
 
         utils_state_machine::Add(Player, FCk_StateMachine_Spec(UMars_SmState_Alive));
     }

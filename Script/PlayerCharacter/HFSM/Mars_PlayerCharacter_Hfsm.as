@@ -1,9 +1,11 @@
 // Root (on the player entity, initial = Alive)
 // |- Alive       ->Downed [IsDowned]
 // |    tasks: InteractionFocus, InteractionResolverBinds, Use/PrimaryIntentToResolver, ManipulateControl,
-// |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), AliveSubSm, HandsSubSm
+// |           the five inventory links (Mars_PlayerCharacter_Hfsm_Inventory.as), EmoteIntents, EmoteWheelIntent,
+// |           AliveSubSm, HandsSubSm
 // |    modes: every task is EnterExitOnly and signal-driven (the intent tasks through UMars_SmTask_IntentEdges' matcher edges),
-// |           except ManipulateControl, a Tick task that reads the look delta while a control is gripped;
+// |           except ManipulateControl and EmoteWheelIntent, Tick tasks that read the look delta while a control is
+// |           gripped / the emote wheel is open;
 // |           the view needs no sync task - the interaction trace rides the camera director's view anchor (PlayerViewpoint)
 // |    |- Alive sub-SM (initial = Locomotion)
 // |    |    `- Locomotion   tasks: LocomotionSubSm
@@ -53,6 +55,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_ManipulateControl);
         AddTask(InHandle, UMars_SmTask_HotbarIntents);
         AddTask(InHandle, UMars_SmTask_EmoteIntents);
+        AddTask(InHandle, UMars_SmTask_EmoteWheelIntent);
         AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
         AddTask(InHandle, UMars_SmTask_HeldItemDrivesUse);
         AddTask(InHandle, UMars_SmTask_DropThrowIntent);
