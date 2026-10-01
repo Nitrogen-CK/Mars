@@ -14,6 +14,11 @@
 // suppressed while WheelJ is held on (8s), two spike tiles suppressed while LeverK is pulled, an unwired pendulum. To
 // add room 3 to an already-built sandbox map, open it and run: Mars.Sandbox.BuildRoom3
 //
+// Room 4 (beat the lamps) sits south of room 2, entered from the main floor through a doorway in its west wall. Pulling
+// either chain lights the lamp bank over GateM; the gate stays open while any lamp is lit, and the lamps go dark one at a
+// time. A second chain past the gate lets the player back out. To add room 4 to an already-built sandbox map, open it
+// and run: Mars.Sandbox.BuildRoom4
+//
 // Sandbox items (2x Rock, Ration, Cog - World-mode WorldItem presets) sit in front of the player starts. To place them in
 // an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
 // The sandbox backpack (a World-mode Backpack preset with four cargo slots) sits beside them. To place it in an
@@ -64,6 +69,14 @@ void Mars_BuildSandboxRoom3Func(const TArray<FString>& Args)
 const FConsoleCommand Mars_BuildSandboxRoom3Command("Mars.Sandbox.BuildRoom3", n"Mars_BuildSandboxRoom3Func");
 
 UFUNCTION()
+void Mars_BuildSandboxRoom4Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildRoom4();
+}
+
+const FConsoleCommand Mars_BuildSandboxRoom4Command("Mars.Sandbox.BuildRoom4", n"Mars_BuildSandboxRoom4Func");
+
+UFUNCTION()
 void Mars_PlaceSandboxItemsFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceItems();
@@ -84,6 +97,7 @@ namespace utils_mars_sandbox
     const FString k_MapPath = "/Game/Mars/Maps/Sandbox_Mars_MAP";
     const FString k_Room2FloorLabel = "Room2_Floor";
     const FString k_Room3FloorLabel = "Room3_Floor";
+    const FString k_Room4FloorLabel = "Room4_Floor";
     const FString k_ItemLabelPrefix = "Item_";
 
     void Build()
@@ -137,6 +151,7 @@ namespace utils_mars_sandbox
 
         Spawn_Room2(Cube);
         Spawn_Room3(Cube);
+        Spawn_Room4(Cube);
 
         Apply_ProtoGridMaterials();
 
@@ -207,6 +222,31 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.BuildRoom3] built, saved={Saved}");
+    }
+
+    void BuildRoom4()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.BuildRoom4] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_Room4FloorLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.BuildRoom4] [{k_Room4FloorLabel}] already exists. Delete the Room4_ and Mech4_ actors first to rebuild.");
+                return;
+            }
+        }
+
+        Spawn_Room4(engine::load::Cube());
+        Apply_ProtoGridMaterials();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.BuildRoom4] built, saved={Saved}");
     }
 
     // Four World-mode items on a line 150uu in front of the room-1 player starts (X=-600, facing +X, Y -225..225):
@@ -371,6 +411,38 @@ namespace utils_mars_sandbox
         Spawn_Mechanism(UMars_Sandbox_Pendulum_EntityScript, "Mech3_Pendulum", FVector(3600.0, 1430.0, 0.0), NorthRotation);
     }
 
+    // Room 4 spans X 2000..4000, Y -2100..-700 (room 2's south wall is its north wall), entered from the main floor through
+    // a 300uu doorway centred on Y=-1400 in its west wall. A partition at X=3200 holds GateM, with the lamp bank on the
+    // header over it and a chain on each side of the partition.
+    void Spawn_Room4(UStaticMesh InCube)
+    {
+        utils_mars_map_builder::Spawn_Block(InCube, k_Room4FloorLabel, FVector(3000.0, -1400.0, -10.0), FVector(20.0, 14.0, 0.2));
+
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_WallWest_South", FVector(2000.0, -1825.0, 150.0), FVector(0.2, 5.5, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_WallWest_North", FVector(2000.0, -975.0, 150.0), FVector(0.2, 5.5, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_WallSouth", FVector(3000.0, -2100.0, 150.0), FVector(20.2, 0.2, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_WallEast", FVector(4000.0, -1400.0, 150.0), FVector(0.2, 14.0, 3.0));
+
+        // Partition around a 240uu gate frame centred on Y=-1400; the header closes the gap to the 300uu wall top.
+        const float64 PartitionX = 3200.0;
+        const float64 GateY = -1400.0;
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_Partition_South", FVector(PartitionX, -1810.0, 150.0), FVector(0.2, 5.8, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_Partition_North", FVector(PartitionX, -990.0, 150.0), FVector(0.2, 5.8, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_GateHeader_M", FVector(PartitionX, GateY, 270.0), FVector(0.2, 2.4, 0.6));
+        Spawn_Mechanism(UMars_Sandbox_GateM_EntityScript, "Mech4_GateM", FVector(PartitionX, GateY, 0.0));
+
+        // Lamps on the header's west face, facing the player (yaw 180 turns their local +X to -X).
+        const auto WestFacing = FRotator(0.0, 180.0, 0.0);
+        Spawn_Mechanism(UMars_Sandbox_LampsL_EntityScript, "Mech4_Lamps", FVector(PartitionX - 10.0, GateY, 270.0), WestFacing);
+
+        // A chain beside the gate on each face of the partition, grip bar at about chest height.
+        Spawn_Mechanism(UMars_Sandbox_ChainL_EntityScript, "Mech4_ChainOutside", FVector(PartitionX - 10.0, -1650.0, 260.0), WestFacing);
+        Spawn_Mechanism(UMars_Sandbox_ChainL_EntityScript, "Mech4_ChainInside", FVector(PartitionX + 10.0, -1150.0, 260.0));
+
+        // Something to run to.
+        utils_mars_map_builder::Spawn_Block(InCube, "Room4_Plinth", FVector(3700.0, GateY, 40.0), FVector(1.0, 1.0, 0.8));
+    }
+
     // Goes through the spawner's actor factory (the Place Actors path): it instances the script class on a new
     // ACk_EntitySpawner_UE, and the spawner injects its actor transform into SpawnTransform at spawn.
     void Spawn_Mechanism(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InLabel, FVector InLocation,
@@ -421,6 +493,12 @@ namespace utils_mars_sandbox
             else if (Label == k_Room3FloorLabel)
             { Block.StaticMeshComponent.SetMaterial(0, Floor); }
             else if (Label.StartsWith("Room3_"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label == k_Room4FloorLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label == "Room4_Plinth")
+            { Block.StaticMeshComponent.SetMaterial(0, Platform); }
+            else if (Label.StartsWith("Room4_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
         }
     }

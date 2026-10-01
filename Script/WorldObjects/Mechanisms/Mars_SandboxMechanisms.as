@@ -166,3 +166,32 @@ class UMars_Sandbox_Pendulum_EntityScript : UMars_Pendulum_EntityScript
         return Super::DoConstruct(InHandle);
     }
 }
+
+// Room 4: either chain charges the lamp bank over the gate (channel L); the bank asserts channel M while any lamp is lit,
+// which holds the gate open. Five lamps, one going dark every 1.5 s: 7.5 s to get through after the last pull.
+class UMars_Sandbox_ChainL_EntityScript : UMars_PullChain_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.L");
+}
+
+class UMars_Sandbox_LampsL_EntityScript : UMars_LampBank_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.L"));
+    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.M");
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Countdown.Steps = 5;
+        Countdown.SecondsPerStep = 1.5f;
+        return Super::DoConstruct(InHandle);
+    }
+}
+
+class UMars_Sandbox_GateM_EntityScript : UMars_Gate_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.M"));
+}

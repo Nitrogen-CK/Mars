@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "91274bc6c0b69a90487da244652517a8",
+		"sourceHash": "516825aa1514962161b1a986059361bd",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -77,12 +77,12 @@
 						"Min":
 						{
 							"X": 0,
-							"Y": -700,
-							"Z": 0
+							"Y": -2100,
+							"Z": -10
 						},
 						"Max":
 						{
-							"X": 3750,
+							"X": 4000,
 							"Y": -80,
 							"Z": 270
 						},
