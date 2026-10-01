@@ -114,12 +114,12 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_action_hint_display::Add(Player);
 
         // Silent: volumes that filter on Probe.Mars.Player detect the player; the player detects nothing through it.
+        // Resizes with the capsule, so a crouched player is a crouched-height body to those volumes.
         auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
         BodyProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
                      .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
-        auto BodyProbeNode = utils_prefab::Create_ProbeNode_Capsule(
-            PlayerTransform, CapsuleComponent.CapsuleHalfHeight, CapsuleComponent.CapsuleRadius, BodyProbeSpec);
-        utils_handle::Set_DebugName(FCk_Handle(BodyProbeNode), n"Player.Probe.Body");
+        auto BodyProbe = utils_body_probe::Create(PlayerTransform, BodyProbeSpec, this);
+        utils_handle::Set_DebugName(FCk_Handle(BodyProbe), n"Player.Probe.Body");
 
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);

@@ -27,6 +27,29 @@ class UMars_Processor_ActionHintDisplay_HandleRequests_Driver : UMars_Processor_
     }
 }
 
+class UMars_Processor_BodyProbe_Tick_Driver : UMars_Processor_BodyProbe_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_BodyProbe);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_BodyProbe_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_BodyProbe& P0 = Batch.Get(i, FMars_Fragment_BodyProbe);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_CampSession_HandleRequests_Driver : UMars_Processor_CampSession_HandleRequests
 {
     UFUNCTION(BlueprintOverride)
