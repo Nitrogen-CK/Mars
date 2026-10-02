@@ -78,9 +78,9 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleSetFocus(const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState,
                                 const FMars_Request_FPHands_SetFocus& InRequest)
     {
+        // Unfocus keeps FocusTarget: the gloves lean back out from it, and the Tick clears it once the lean is gone.
         if (ck::Is_NOT_Valid(InRequest.Interactable))
         {
-            InState.FocusTarget = FMars_FPHands_ReachTarget();
             InState.FocusedFor = FCk_Handle_Interactable();
             return;
         }
