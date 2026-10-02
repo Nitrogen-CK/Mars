@@ -61,6 +61,10 @@ struct FMars_Fragment_FPHands
     UPROPERTY()
     float32 ReleaseFromAlpha = 1.0f;
 
+    // The reach alpha when Reach or Hold began (a reach that interrupts a release continues from where the gloves are).
+    UPROPERTY()
+    float32 ReachFromAlpha = 0.0f;
+
     UPROPERTY()
     FMars_FPHands_ReachTarget Target;
 
@@ -144,8 +148,8 @@ struct FMars_Request_FPHands_SetPhase
     }
 }
 
-// Reach for an interact target. The last one in a drain wins; ignored unless the gloves are at rest (Phase None) and
-// when the target is unresolvable.
+// Reach for an interact target. The last one in a drain wins; ignored unless the gloves are at rest (Phase None) or
+// letting go (Release, Return), and when the target is unresolvable.
 struct FMars_Request_FPHands_StartReach
 {
     UPROPERTY()

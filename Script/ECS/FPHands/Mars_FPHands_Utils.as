@@ -54,7 +54,7 @@ mixin float32 Get_ReleaseFromAlpha(const FCk_Handle_FPHands& Self)
 mixin FMars_FPHands_PhaseState Get_PhaseState(const FCk_Handle_FPHands& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_FPHands);
-    return FMars_FPHands_PhaseState(State.Phase, State.PhaseTime, State.ReleaseFromAlpha);
+    return FMars_FPHands_PhaseState(State.Phase, State.PhaseTime, State.ReleaseFromAlpha, State.ReachFromAlpha);
 }
 
 mixin FMars_FPHands_ReachTarget Get_Target(const FCk_Handle_FPHands& Self)

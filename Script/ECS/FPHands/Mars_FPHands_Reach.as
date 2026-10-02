@@ -95,6 +95,10 @@ struct FMars_FPHands_PhaseState
     UPROPERTY()
     float32 ReleaseFromAlpha = 1.0f;
 
+    // The reach alpha when Reach or Hold began (0 from rest; where a release or return was when a reach interrupted it).
+    UPROPERTY()
+    float32 ReachFromAlpha = 0.0f;
+
     FMars_FPHands_PhaseState() {}
 
     FMars_FPHands_PhaseState(EMars_FPHands_Phase InPhase, float32 InPhaseTime, float32 InReleaseFromAlpha)
@@ -102,6 +106,14 @@ struct FMars_FPHands_PhaseState
         Phase = InPhase;
         PhaseTime = InPhaseTime;
         ReleaseFromAlpha = InReleaseFromAlpha;
+    }
+
+    FMars_FPHands_PhaseState(EMars_FPHands_Phase InPhase, float32 InPhaseTime, float32 InReleaseFromAlpha, float32 InReachFromAlpha)
+    {
+        Phase = InPhase;
+        PhaseTime = InPhaseTime;
+        ReleaseFromAlpha = InReleaseFromAlpha;
+        ReachFromAlpha = InReachFromAlpha;
     }
 }
 
@@ -113,12 +125,13 @@ namespace utils_fphands
         return utils_tween::Get_EasedProgress(InEasing, FCk_FloatRange_0to1(InT));
     }
 
-    // 0 = gloves at rest, 1 = fully reached. Reach, Grip and Return are the grab's three time slices.
+    // 0 = gloves at rest, 1 = fully reached. Reach, Grip and Return are the grab's three time slices. Reach and Hold
+    // ease out from ReachFromAlpha (0 from rest), so a reach that interrupts a release continues from where the gloves are.
     float32 Get_PhaseAlpha(const FMars_FPHands_PhaseState& InState, const FMars_FPHands_ReachSpec& InSpec)
     {
         const auto T = InState.PhaseTime;
         if (InState.Phase == EMars_FPHands_Phase::Reach)
-        { return Ease(InSpec.GrabOutEasing, T / Math::Max(InSpec.GrabOutSeconds, 0.01f)); }
+        { return Math::Lerp(InState.ReachFromAlpha, 1.0f, Ease(InSpec.GrabOutEasing, T / Math::Max(InSpec.GrabOutSeconds, 0.01f))); }
 
         if (InState.Phase == EMars_FPHands_Phase::Grip)
         { return 1.0f; }
@@ -127,7 +140,7 @@ namespace utils_fphands
         { return 1.0f - Ease(InSpec.GrabBackEasing, T / Math::Max(InSpec.GrabBackSeconds, 0.01f)); }
 
         if (InState.Phase == EMars_FPHands_Phase::Hold)
-        { return Ease(InSpec.HoldReachEasing, T / Math::Max(InSpec.HoldReachSeconds, 0.01f)); }
+        { return Math::Lerp(InState.ReachFromAlpha, 1.0f, Ease(InSpec.HoldReachEasing, T / Math::Max(InSpec.HoldReachSeconds, 0.01f))); }
 
         if (InState.Phase == EMars_FPHands_Phase::Release)
         { return InState.ReleaseFromAlpha * (1.0f - Ease(InSpec.ReleaseEasing, T / Math::Max(InSpec.ReleaseSeconds, 0.01f))); }
@@ -204,6 +217,14 @@ namespace utils_fphands
 mixin float32 Get_ReachAlpha(const FCk_Handle_FPHands& Self)
 {
     return utils_fphands::Get_PhaseAlpha(Self.Get_PhaseState(), Self.Get_Spec().Reach);
+}
+
+// The gloves are on this target and the reach has completed: a device may move with them.
+mixin bool Get_IsGrippingTarget(const FCk_Handle_FPHands& Self, FCk_Handle_InteractTarget InTarget)
+{
+    return Self.Get_Phase() == EMars_FPHands_Phase::Hold
+        && Self.Get_InteractTarget() == InTarget
+        && Self.Get_ReachAlpha() >= 0.999f;
 }
 
 // 1 = a picked-up item is where it lay, 0 = at its hold offset. Follows the grab.
