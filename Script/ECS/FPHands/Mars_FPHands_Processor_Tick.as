@@ -70,7 +70,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         }
 
         const auto& ReachSpec = InParams.Spec.Reach;
-        const auto PhaseState = FMars_FPHands_PhaseState(InState.Phase, InState.PhaseTime, InState.ReleaseFromAlpha);
+        const auto PhaseState = FMars_FPHands_PhaseState(InState.Phase, InState.PhaseTime, InState.ReleaseFromAlpha, InState.ReachFromAlpha);
         const auto Weight = utils_fphands::Get_PhaseCarryWeight(PhaseState, ReachSpec);
         auto Offset = InState.Carry.HeldOffset;
         if (Weight > 0.0f)

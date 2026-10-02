@@ -1,9 +1,13 @@
 // Drains SetHold, then SetFocus, then Release, then SetPhase, then StartPush, then StartReach. The phase itself only moves
 // through SetPhase (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the
-// sub-SM's conditions turn those broadcasts into transitions. Release is honoured only while holding; StartPush and
-// StartReach only at rest (Phase None), the one phase whose state listens for them - a reach requested mid-phase leaves
-// the current target alone, so a same-drain release still eases back from the target it was holding. SetPhase drains
-// before both so a request arriving in the same drain as Rest's SetPhase(None) is honoured.
+// sub-SM's conditions turn those broadcasts into transitions. Release is honoured only while holding; StartPush only at
+// rest (Phase None); StartReach at rest and while letting go (Release, Return), the phases whose states listen for it -
+// a reach requested mid-grab, mid-hold or mid-push leaves the current target alone, so a same-drain release still eases
+// back from the target it was holding. SetPhase drains before both so a request arriving in the same drain as Rest's
+// SetPhase(None) is honoured. A reach that interrupts a release or return starts from the alpha the gloves were at
+// (ReachFromAlpha, recorded by SetPhase). A Return with a picked-up item still riding in (Carry active) is not
+// interrupted - the carry would snap back to where the item lay; a timed target that arrives then is caught by Rest's
+// re-sync once the return ends.
 //
 // A StartReach with no Interactable is a bare reach: one glove (the right) toward the hand node itself. Headless tests
 // drive the phase machine this way, without an interactable to resolve.
@@ -91,9 +95,17 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
     private void HandleStartReach(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartReach& InRequest)
     {
-        if (InState.Phase != EMars_FPHands_Phase::None)
+        const auto CanReach = InState.Phase == EMars_FPHands_Phase::None || InState.Phase == EMars_FPHands_Phase::Release
+            || InState.Phase == EMars_FPHands_Phase::Return;
+        if (CanReach == false)
         {
             Log(f"[FPHands] StartReach ignored: the gloves are busy (phase {InState.Phase :n})");
+            return;
+        }
+
+        if (InState.Phase == EMars_FPHands_Phase::Return && InState.Carry.IsActive)
+        {
+            Log("[FPHands] StartReach ignored: a picked-up item is still riding in (phase Return)");
             return;
         }
 
@@ -163,17 +175,20 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachTargetLost.Broadcast(InHandle.As_FPHands()); }
     }
 
-    // Phase and PhaseTime are written only here; PhaseTime also advances in UMars_Processor_FPHands_Tick.
+    // Phase and PhaseTime are written only here; PhaseTime also advances in UMars_Processor_FPHands_Tick. Release records
+    // the alpha it eases back from; Reach and Hold record the alpha they ease out from (0 from rest, the current release
+    // or return alpha when they interrupt one).
     private void HandleSetPhase(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, EMars_FPHands_Phase InNewPhase)
     {
         const auto Previous = InState.Phase;
+        const auto& Params = InHandle.Get_Fragment(FMars_Fragment_FPHands_Params);
+        const auto PhaseState = FMars_FPHands_PhaseState(Previous, InState.PhaseTime, InState.ReleaseFromAlpha, InState.ReachFromAlpha);
 
         if (InNewPhase == EMars_FPHands_Phase::Release)
-        {
-            const auto& Params = InHandle.Get_Fragment(FMars_Fragment_FPHands_Params);
-            const auto PhaseState = FMars_FPHands_PhaseState(Previous, InState.PhaseTime, InState.ReleaseFromAlpha);
-            InState.ReleaseFromAlpha = utils_fphands::Get_PhaseAlpha(PhaseState, Params.Spec.Reach);
-        }
+        { InState.ReleaseFromAlpha = utils_fphands::Get_PhaseAlpha(PhaseState, Params.Spec.Reach); }
+
+        if (InNewPhase == EMars_FPHands_Phase::Reach || InNewPhase == EMars_FPHands_Phase::Hold)
+        { InState.ReachFromAlpha = utils_fphands::Get_PhaseAlpha(PhaseState, Params.Spec.Reach); }
 
         if (InNewPhase == EMars_FPHands_Phase::None)
         {

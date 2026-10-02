@@ -6,14 +6,17 @@
 //   Rest    ->Push    [HandsPushRequested]   ->Reach [HandsReachRequested instant]   ->Hold [HandsReachRequested timed]
 //   Reach   ->Grip    [HandsPhaseElapsed Reach]
 //   Grip    ->Return  [HandsPhaseElapsed Grip]
-//   Return  ->Rest    [HandsPhaseElapsed Return]
+//   Return  ->Reach   [HandsReachRequested instant]   ->Hold [HandsReachRequested timed]   ->Rest [HandsPhaseElapsed Return]
 //   Hold    ->Release [HandsTargetLost]
-//   Release ->Rest    [HandsPhaseElapsed Release]
+//   Release ->Reach   [HandsReachRequested instant]   ->Hold [HandsReachRequested timed]   ->Rest [HandsPhaseElapsed Release]
 //   Push    ->Rest    [HandsPhaseElapsed Push]
 //
-// The resolver is listened to only in Rest and Hold, so a new target arriving mid-grab is ignored rather than restarting
-// the grab - the one deliberate difference from the gloves' behaviour on the character. Tasks and conditions only issue
-// FPHands requests and read its getters; ck::Ctx is the player entity (the sub-SM inherits its parent's context).
+// The resolver is listened to in Rest, Hold, Release and Return: a new target interrupts a release or return (the reach
+// continues from the gloves' current alpha) but is ignored mid-grab, mid-hold and mid-push rather than restarting them.
+// Entering Rest, Release or Return re-reads the resolver (Hold does not), so a timed target that became best while the
+// gloves were busy and whose interaction is still live is reached for then - the gloves always end up on the device
+// they are using. Tasks and conditions only issue FPHands requests and read its getters; ck::Ctx is the player entity
+// (the sub-SM inherits its parent's context).
 
 class UMars_SmTask_HandsSubSm : UCk_SmTask_SubStateMachine
 {
@@ -135,19 +138,26 @@ class UMars_SmTask_Hands_StopEmote : UCk_SmTask_EntityScript
     }
 }
 
-// Resolver -> feature requests, in the states that can start or lose a target (Rest, Hold). A new Use-intent target
-// starts a reach (instant when its interaction completes instantly); a removed one that is the current reach target
-// releases. An entity without a resolver (tests) binds nothing.
+// Resolver -> feature requests, in the states that can start or lose a target (Rest, Hold, Release, Return). A new
+// Use- or Operate-intent target (Operate: a station's grip, opened only by the player's Operating state) starts a reach
+// (instant when its interaction completes instantly); a removed one that is the current reach target releases. On enter
+// it also re-syncs to the resolver's current best targets (see DoEnterTask) unless ResyncOnEnter is off (Hold: the gloves
+// are already on the target they reached for). An entity without a resolver (tests) binds nothing.
 class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
+    protected bool ResyncOnEnter = true;
+
     private FCk_Handle_FPHands _Hands;
     private FCk_Handle_InteractionResolver _Resolver;
+    private FGameplayTag _OperateIntent;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        _OperateIntent = GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate");
+
         auto Player = ck::Ctx(InHandle);
         _Hands = Player.As_FPHands(ECk_SanityCheck::UnChecked);
         _Resolver = Player.As_InteractionResolver(ECk_SanityCheck::UnChecked);
@@ -156,6 +166,39 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
 
         _Resolver.BindTo_OnBestTargetsChanged(
             FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
+
+        if (ResyncOnEnter == false)
+        { return; }
+
+        // A target that became best while the gloves were busy (Push, a grab, a release): if its non-instant interaction
+        // is still live, reach for it now. Instant targets are never re-reached - a grab always finishes on its own. Use
+        // first, then Operate (same rules).
+        if (TryResync(Player, GameplayTags::InteractionIntent_Mars_Use))
+        { return; }
+
+        TryResync(Player, _OperateIntent);
+    }
+
+    private bool TryResync(FCk_Handle InPlayer, FGameplayTag InIntent)
+    {
+        auto BestTargets = _Resolver.Get_BestInteractTargets(InIntent);
+        for (auto Target : BestTargets)
+        {
+            if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+            { continue; }
+
+            if (Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::Instant)
+            { continue; }
+
+            if (ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, InPlayer)))
+            { continue; }
+
+            const auto& Context = Target.Get_Fragment(FMars_Fragment_InteractionContext);
+            _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Target, Context.Interactable, Context.InteractableOwner, false));
+            return true;
+        }
+
+        return false;
     }
 
     UFUNCTION(BlueprintOverride)
@@ -177,7 +220,8 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
                                       const TArray<FCk_Handle_InteractTarget>&in InNewTargets,
                                       const TArray<FCk_Handle_InteractTarget>&in InRemovedTargets)
     {
-        if (InIntent != GameplayTags::InteractionIntent_Mars_Use || ck::Is_NOT_Valid(_Hands))
+        const auto IsHandsIntent = InIntent == GameplayTags::InteractionIntent_Mars_Use || InIntent == _OperateIntent;
+        if (IsHandsIntent == false || ck::Is_NOT_Valid(_Hands))
         { return; }
 
         for (auto Removed : InRemovedTargets)
@@ -197,6 +241,13 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             return;
         }
     }
+}
+
+// Hold's resolver binds: no re-sync on enter (the reach that entered Hold already chose the target; re-syncing would
+// only re-request it, and the drain would reject it as busy).
+class UMars_SmTask_HandsResolverBinds_NoResync : UMars_SmTask_HandsResolverBinds
+{
+    default ResyncOnEnter = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -423,10 +474,17 @@ class UMars_SmState_Hands_Return : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToReach = AddTransition(InHandle, UMars_SmState_Hands_Reach);
+        AddCondition(ToReach, UMars_SmCondition_HandsReachRequested_Instant);
+
+        auto ToHold = AddTransition(InHandle, UMars_SmState_Hands_Hold);
+        AddCondition(ToHold, UMars_SmCondition_HandsReachRequested_Timed);
+
         auto ToRest = AddTransition(InHandle, UMars_SmState_Hands_Rest);
         AddCondition(ToRest, UMars_SmCondition_HandsPhaseElapsed_Return);
 
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Return);
+        AddTask(InHandle, UMars_SmTask_HandsResolverBinds);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -446,7 +504,7 @@ class UMars_SmState_Hands_Hold : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Hold);
         AddTask(InHandle, UMars_SmTask_Hands_StopEmote);
-        AddTask(InHandle, UMars_SmTask_HandsResolverBinds);
+        AddTask(InHandle, UMars_SmTask_HandsResolverBinds_NoResync);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -461,10 +519,17 @@ class UMars_SmState_Hands_Release : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToReach = AddTransition(InHandle, UMars_SmState_Hands_Reach);
+        AddCondition(ToReach, UMars_SmCondition_HandsReachRequested_Instant);
+
+        auto ToHold = AddTransition(InHandle, UMars_SmState_Hands_Hold);
+        AddCondition(ToHold, UMars_SmCondition_HandsReachRequested_Timed);
+
         auto ToRest = AddTransition(InHandle, UMars_SmState_Hands_Rest);
         AddCondition(ToRest, UMars_SmCondition_HandsPhaseElapsed_Release);
 
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Release);
+        AddTask(InHandle, UMars_SmTask_HandsResolverBinds);
     }
 
     UFUNCTION(BlueprintOverride)

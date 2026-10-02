@@ -220,23 +220,34 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
 }
 
 // Resolver -> a gripped control. When the Use intent's best target is a ManuallyCompleted interact target whose owner is
-// a Control, this task begins the control's manipulation on the target's OnNewInteraction, feeds it the look delta every
-// tick (projected onto the control's on-screen pull direction), ends it on OnInteractionFinished, and holds the
-// camera's orientation still in between (the same motion would otherwise turn the view off the lever and unfocus it).
-// Stateful like UMars_SmTask_InteractionFocus; leaving Alive ends any manipulation and restores the camera.
+// a Control, this task watches the target's OnNewInteraction and begins the control's manipulation once the gloves grip
+// the target (the control only moves while the hand is on it) - or straight away without gloves (headless), or after
+// GripWaitSeconds if the gloves never get there (an unreachable target must not deadlock the lever). It then feeds the
+// control the look delta every tick (projected onto the control's on-screen pull direction), ends it on
+// OnInteractionFinished, and holds the camera's orientation still in between (the same motion would otherwise turn the
+// view off the lever and unfocus it). Stateful like UMars_SmTask_InteractionFocus; leaving Alive ends any manipulation
+// and restores the camera.
 class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
+    // Longest the manipulation waits for the gloves to grip after the interaction started (seconds).
+    protected float32 GripWaitSeconds = 1.0f;
+
     private FCk_Handle _Player;
     private FCk_Handle_InteractionResolver _Resolver;
     private FCk_Handle_InputIntents _Intents;
+    // Invalid without gloves (headless tests): the manipulation then begins with the interaction.
+    private FCk_Handle_FPHands _Hands;
     // Both invalid without a PlayerViewpoint (headless tests): no camera freeze, and the pull falls back to raw pitch.
     private FCk_Handle_Camera _Camera;
     private FCk_Handle_Transform _View;
     // The watched ManuallyCompleted target and the Control that owns it.
     private FCk_Handle_InteractTarget _Target;
     private FCk_Handle_Control _Control;
+    // The interaction that started on _Target, waiting for the gloves' grip before the manipulation begins.
+    private FCk_Handle_Interaction _PendingInteraction;
+    private float32 _PendingSeconds = 0.0f;
     private bool _IsManipulating = false;
     private bool _CameraFrozen = false;
     private int32 _SeenLookSequence = 0;
@@ -247,6 +258,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Player = ck::Ctx(InHandle);
         _Resolver = _Player.As_InteractionResolver();
         _Intents = _Player.As_InputIntents(ECk_SanityCheck::UnChecked);
+        _Hands = _Player.As_FPHands(ECk_SanityCheck::UnChecked);
 
         auto Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Viewpoint))
@@ -274,6 +286,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Player = FCk_Handle();
         _Resolver = FCk_Handle_InteractionResolver();
         _Intents = FCk_Handle_InputIntents();
+        _Hands = FCk_Handle_FPHands();
         _Camera = FCk_Handle_Camera();
         _View = FCk_Handle_Transform();
     }
@@ -282,6 +295,8 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
+        Tick_PendingInteraction(float32(InDeltaT.Get_Seconds()));
+
         if (_IsManipulating == false)
         { return ECk_SmTaskResult::Running; }
 
@@ -356,11 +371,9 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         if ((FCk_Handle(InTarget) == FCk_Handle(_Target)) == false || ck::Is_NOT_Valid(_Control))
         { return; }
 
-        // The delta that was drained before the grip is not a pull.
-        _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
-        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(InInteraction, _Player));
-        _IsManipulating = true;
-        SetCameraFrozen(true);
+        // Begins in DoTick once the gloves grip the target.
+        _PendingInteraction = InInteraction;
+        _PendingSeconds = 0.0f;
     }
 
     // After a threshold engage the Control has already ended the manipulation, so its EndManipulation is a no-op.
@@ -368,7 +381,52 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     private void OnInteractionFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
     {
         if (FCk_Handle(InTarget) == FCk_Handle(_Target))
-        { EndManipulation(); }
+        {
+            ClearPendingInteraction();
+            EndManipulation();
+        }
+    }
+
+    // A started interaction waits for the gloves' grip (none = no wait), capped at GripWaitSeconds.
+    private void Tick_PendingInteraction(float32 InDeltaSeconds)
+    {
+        if (ck::Is_NOT_Valid(_PendingInteraction))
+        {
+            ClearPendingInteraction();
+            return;
+        }
+
+        if (ck::Is_NOT_Valid(_Control))
+        { return; }
+
+        _PendingSeconds += InDeltaSeconds;
+        const auto Gripping = ck::Is_NOT_Valid(_Hands) || _Hands.Get_IsGrippingTarget(_Target);
+        if (Gripping == false && _PendingSeconds < GripWaitSeconds)
+        { return; }
+
+        if (Gripping == false)
+        { ck::Trace(f"[ManipulateControl] gloves never gripped [{_Target.ToString()}] within {GripWaitSeconds}s; manipulating anyway"); }
+
+        BeginManipulation(_PendingInteraction);
+    }
+
+    private void BeginManipulation(FCk_Handle_Interaction InInteraction)
+    {
+        // Copied before the pending slot is cleared: the caller passes that very member.
+        const auto Interaction = InInteraction;
+        ClearPendingInteraction();
+
+        // The delta that was drained before the grip is not a pull.
+        _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
+        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction, _Player));
+        _IsManipulating = true;
+        SetCameraFrozen(true);
+    }
+
+    private void ClearPendingInteraction()
+    {
+        _PendingInteraction = FCk_Handle_Interaction();
+        _PendingSeconds = 0.0f;
     }
 
     // The Control behind a ManuallyCompleted interact target; invalid for any other target.
@@ -402,6 +460,8 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 
     private void StopWatching()
     {
+        ClearPendingInteraction();
+
         if (ck::IsValid(_Target))
         {
             _Target.UnbindFrom_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
