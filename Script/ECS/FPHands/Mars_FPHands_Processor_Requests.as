@@ -70,7 +70,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         if (IsGrabbing && ck::IsValid(InState.Target.ShapeMesh.Get()) && ck::IsValid(Item) && Item.Has_Presentation())
         {
             InState.Carry.IsActive = true;
-            InState.Carry.StartWorld = InState.Target.AnchorWorld;
+            InState.Carry.StartWorld = InState.Target.Get_HandGrip(InState.Target.Right.IsUsed).AnchorWorld;
             InState.Carry.HeldOffset = Item.Get_Presentation().HeldOffset;
         }
     }
@@ -116,8 +116,8 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         {
             Target.IsValid = true;
             Target.Layout = EMars_FPHands_GripLayout::Point;
-            Target.UsesRight = true;
-            Target.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Params.HandNode);
+            Target.Right.IsUsed = true;
+            Target.Right.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Params.HandNode);
         }
         else
         {
@@ -140,7 +140,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         {
             auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
             if (ck::IsValid(HeldItem))
-            { HeldItem.Set_NextSpawnFrom(Target.AnchorWorld); }
+            { HeldItem.Set_NextSpawnFrom(Target.Get_HandGrip(Target.Right.IsUsed).AnchorWorld); }
         }
 
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
@@ -220,8 +220,8 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         const auto HandWorld = utils_transform::Get_EntityCurrentTransform(InParams.HandNode);
         const auto Hand = FMars_FPHands_HandState(InState.Hold, HandWorld, InState.PreferRightHand);
         auto Target = utils_fphands::Resolve_ReachTarget(InParams.Spec.Reach, FMars_FPHands_ReachQuery(InSubject, Hand));
-        if (Target.IsValid && Target.UsesRight != Target.UsesLeft)
-        { InState.PreferRightHand = Target.UsesRight; }
+        if (Target.IsValid && Target.Right.IsUsed != Target.Left.IsUsed)
+        { InState.PreferRightHand = Target.Right.IsUsed; }
 
         return Target;
     }

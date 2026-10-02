@@ -41,8 +41,8 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         // A reach takes the larger of lean and reach, so it launches from and settles back into the lean.
         const auto HasFocus = InState.FocusTarget.IsValid;
         const auto LeanAlpha = float32(1.0 - Math::Exp(-ReachSpec.FocusInterpSpeed * DeltaSeconds));
-        const auto LeanR = HasFocus && InState.FocusTarget.UsesRight ? ReachSpec.FocusLean : 0.0f;
-        const auto LeanL = HasFocus && InState.FocusTarget.UsesLeft ? ReachSpec.FocusLean : 0.0f;
+        const auto LeanR = HasFocus && InState.FocusTarget.Right.IsUsed ? ReachSpec.FocusLean : 0.0f;
+        const auto LeanL = HasFocus && InState.FocusTarget.Left.IsUsed ? ReachSpec.FocusLean : 0.0f;
         InState.FocusAlpha_R += (LeanR - InState.FocusAlpha_R) * LeanAlpha;
         InState.FocusAlpha_L += (LeanL - InState.FocusAlpha_L) * LeanAlpha;
 

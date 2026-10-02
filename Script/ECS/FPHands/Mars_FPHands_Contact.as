@@ -339,13 +339,14 @@ mixin FMars_FPHands_ContactShape Get_ContactShape(const FCk_Handle_FPHands& Self
     if (Self.Get_IsReaching(InIsRightHand) && Self.Get_ReachAlpha() > 0.6f)
     {
         const auto Target = Self.Get_Target();
+        const auto HandGrip = Target.Get_HandGrip(InIsRightHand);
         if (ck::IsValid(Target.ShapeMesh.Get()))
         {
             return utils_fphands::Make_BoundsShape(
-                FMars_FPHands_BoundsQuery(Target.ShapeMesh.Get(), Target.ShapeScale, Target.ShapeType, Target.AnchorWorld));
+                FMars_FPHands_BoundsQuery(Target.ShapeMesh.Get(), Target.ShapeScale, Target.ShapeType, HandGrip.AnchorWorld));
         }
 
-        if (Target.Layout == EMars_FPHands_GripLayout::Authored)
+        if (HandGrip.IsAuthored)
         {
             auto Grip = FMars_FPHands_GripQuery(InHandWorld, InIsRightHand, FTransform());
             utils_fphands::Resolve_WorldGrip(Spec, Target, Grip);
