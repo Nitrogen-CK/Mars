@@ -114,6 +114,16 @@ namespace mars
         Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
     }
 
+    // Leaves a station (and later: backs out of other gameplay modes).
+    asset Mars_IA_Back of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_Back, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_Back";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindBack", "Back / Leave");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryGameplay", "Gameplay");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Input.Scope.Gameplay")));
+    }
+
     // Held: the wheel stays open while the key is down; the release chooses.
     asset Mars_IA_EmoteWheel of UCk_Boolean_InputAction
     {

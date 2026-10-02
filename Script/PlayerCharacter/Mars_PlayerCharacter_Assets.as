@@ -9,6 +9,10 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Movement")
     float32 CrouchSpeed = 220.0f;
 
+    // Along a ladder's climb line (the Climber's spec).
+    UPROPERTY(Category = "Movement")
+    float32 ClimbSpeed = 220.0f;
+
     UPROPERTY(Category = "Movement")
     float32 MaxAcceleration = 2400.0f;
 
@@ -91,6 +95,12 @@ namespace mars
         PrimaryChannels.Add(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Primary.UsableItem"));
         Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(
             GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Primary"), PrimaryChannels));
+
+        // A station's grip: opened and closed only by the Operating state (UMars_SmTask_Operating_Grip), never by a key.
+        TArray<FGameplayTag> OperateChannels;
+        OperateChannels.Add(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Operate"));
+        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(
+            GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate"), OperateChannels));
 
         InteractionResolver = FCk_InteractionResolver_Spec(Mappings);
 

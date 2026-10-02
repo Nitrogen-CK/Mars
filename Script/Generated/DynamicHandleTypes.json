@@ -64,6 +64,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Climber",
+			"ShortName": "Climber",
+			"Description": "An entity that can climb ladders: the ladders on offer, the one being climbed and how far up (lives on the player)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_ClimberHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Climber"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Control",
 			"ShortName": "Control",
 			"Description": "An entity whose interaction toggles or pulses an active state (lever, switch, hand wheel, seal)",
@@ -88,6 +97,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_CycleHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Cycle"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Dicing",
+			"ShortName": "Dicing",
+			"Description": "A dicing minigame on a station: the pile's material state, the highlighted band on the board and the cleaver the operator's hand slides and chops with",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_DicingHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Dicing"
 			]
 		},
 		{
@@ -217,6 +235,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Ladder",
+			"ShortName": "Ladder",
+			"Description": "A climbable ladder: its climb line and the two trigger zones that offer it to climbers",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_LadderHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Ladder"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_MechanismDriver",
 			"ShortName": "MechanismDriver",
 			"Description": "Per-world singleton that tracks every mechanism source and sink and pushes per-channel input counts to sinks",
@@ -262,6 +289,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Operator",
+			"ShortName": "Operator",
+			"Description": "An entity that can operate a station: the station it holds, kept by the station arbiter (lives on the player)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_OperatorHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Operator"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Oscillator",
 			"ShortName": "Oscillator",
 			"Description": "A scene node that swings sinusoidally about one rotation axis, easing in on start and settling on stop",
@@ -295,6 +331,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_SequenceHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Sequence"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Station",
+			"ShortName": "Station",
+			"Description": "An operator point: where its one operator stands, the Use interaction that reserves it, the grip the gloves hold and an optional minigame state machine",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_StationHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Station"
 			]
 		},
 		{
