@@ -255,6 +255,19 @@ namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
 }
 
 USTRUCT()
+struct FMars_AutoTest_Climber_LocomotionExitDismounts_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Climber_LocomotionExitDismounts
+{
+    FMars_AutoTest_Climber_LocomotionExitDismounts_SpawnParams Params()
+    {
+        return FMars_AutoTest_Climber_LocomotionExitDismounts_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Climber_MountClimbsAndTopsOut_SpawnParams
 {
 }
@@ -303,6 +316,19 @@ namespace UMars_AutoTest_Control_ManipulationWaitsForTheGrip
     FMars_AutoTest_Control_ManipulationWaitsForTheGrip_SpawnParams Params()
     {
         return FMars_AutoTest_Control_ManipulationWaitsForTheGrip_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_PendingGripFreezesCamera_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_PendingGripFreezesCamera
+{
+    FMars_AutoTest_Control_PendingGripFreezesCamera_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_PendingGripFreezesCamera_SpawnParams();
     }
 }
 
@@ -502,6 +528,19 @@ namespace UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses
 }
 
 USTRUCT()
+struct FMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest
+{
+    FMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams
 {
 }
@@ -541,6 +580,19 @@ namespace UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor
+{
+    FMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_SpawnParams
 {
 }
@@ -576,6 +628,19 @@ namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
     FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams Params()
     {
         return FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach
+{
+    FMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach_SpawnParams();
     }
 }
 
@@ -801,6 +866,19 @@ namespace UMars_AutoTest_Smoke_Boots
 }
 
 USTRUCT()
+struct FMars_AutoTest_Station_GripsResolveToRegisteredNodes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_GripsResolveToRegisteredNodes
+{
+    FMars_AutoTest_Station_GripsResolveToRegisteredNodes_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_GripsResolveToRegisteredNodes_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Station_OperatorDestroyedReleases_SpawnParams
 {
 }
@@ -985,7 +1063,7 @@ struct FMars_DicingStation_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Station_Spec Station = FMars_Station_Spec();
+    FMars_Station_Spec Station;
 
     UPROPERTY()
     FMars_Dicing_Spec Dicing = FMars_Dicing_Spec();
@@ -4148,7 +4226,7 @@ struct FMars_WorkbenchStation_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Station_Spec Station = FMars_Station_Spec();
+    FMars_Station_Spec Station;
 
     FMars_WorkbenchStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
     {
