@@ -73,7 +73,7 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
 
         Assert_True(_Target.IsValid, "the reach resolves");
         Assert_True(_Target.Layout == EMars_FPHands_GripLayout::Authored, "the grip comes from the socket");
-        Assert_True(FCk_Handle(_Target.Anchor) == _MeshNode, "the reach anchors to the mesh node that carries the socket, not the root");
+        Assert_True(FCk_Handle(_Target.Right.Anchor) == _MeshNode, "the reach anchors the right glove to the mesh node that carries the socket, not the root");
 
         _GripBeforeMove = Get_ResolvedGrip();
         const auto Live = Get_LiveSocket();

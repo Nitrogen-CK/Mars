@@ -1,6 +1,6 @@
 // A destroyed operator releases: the reserve arms a destroy watch on the operator, so destroying the operator entity (no
 // release request anywhere) frees the station with OnReleased(A, OperatorLost), and the Use prompt goes back from
-// OccupiedText to PromptText with the Use target enabled again. Uses the real reserve path (a direct Operator stamp would
+// Prompt.OccupiedText to Prompt.Text with the Use target enabled again. Uses the real reserve path (a direct Operator stamp would
 // bypass the watch under test).
 class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
 {
@@ -16,12 +16,11 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
     void DoBeginPlay(FCk_Handle InHandle)
     {
         _Spec = FMars_Station_Spec();
-        _Spec.PromptText = FText::FromString("Use test station");
-        _Spec.OccupiedText = FText::FromString("Test station in use");
+        _Spec.Prompt = FMars_Station_PromptSpec(FText::FromString("Use test station"), FText::FromString("Test station in use"));
 
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _Station = utils_station::Add(Root, _Spec, TOptional<FMars_Interactable_ProbeInfo>());
+        _Station = utils_station::Add(Root, _Spec, FMars_Station_Setup());
 
         _Operator = utils_entity_lifetime::Request_CreateEntity(InHandle);
         utils_operator::Add(_Operator);
@@ -77,7 +76,7 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
     private void Check_ReservedAndOccupied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_ReservedCount > 0 && Get_PromptText() == _Spec.OccupiedText.ToString());
+        Res.Set(_ReservedCount > 0 && Get_PromptText() == _Spec.Prompt.OccupiedText.ToString());
     }
 
     UFUNCTION()
@@ -111,7 +110,7 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
     private void Check_PromptRestored(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_PromptText() == _Spec.PromptText.ToString());
+        Res.Set(Get_PromptText() == _Spec.Prompt.Text.ToString());
     }
 
     UFUNCTION()
