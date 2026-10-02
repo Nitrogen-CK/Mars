@@ -16,7 +16,7 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
     {
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _Station = utils_station::Add(Root, FMars_Station_Spec(), TOptional<FMars_Interactable_ProbeInfo>());
+        _Station = utils_station::Add(Root, FMars_Station_Spec(), FMars_Station_Setup());
 
         auto OperatorAEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _OperatorA = utils_operator::Add(OperatorAEntity);

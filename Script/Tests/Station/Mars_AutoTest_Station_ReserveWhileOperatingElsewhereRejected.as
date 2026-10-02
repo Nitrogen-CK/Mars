@@ -17,11 +17,11 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTe
         // Each station on its own child entity: composing both on one entity would alias them.
         auto OneEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto OneRoot = utils_transform::Add(OneEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _StationOne = utils_station::Add(OneRoot, FMars_Station_Spec(), TOptional<FMars_Interactable_ProbeInfo>());
+        _StationOne = utils_station::Add(OneRoot, FMars_Station_Spec(), FMars_Station_Setup());
 
         auto TwoEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto TwoRoot = utils_transform::Add(TwoEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _StationTwo = utils_station::Add(TwoRoot, FMars_Station_Spec(), TOptional<FMars_Interactable_ProbeInfo>());
+        _StationTwo = utils_station::Add(TwoRoot, FMars_Station_Spec(), FMars_Station_Setup());
 
         auto OperatorEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Operator = utils_operator::Add(OperatorEntity);
