@@ -1,5 +1,5 @@
-// MaxReachCm is a look cap, and a grip may carry its own: a grip 90 cm from the glove's rest stretches 60 under the spec's
-// MaxReachCm 60, and all 90 under the grip's ReachOverrideCm 100. An authored grip matches the socket's rotation either
+// MaxReachCm 0 (the default) is uncapped: a grip 90 cm from the glove's rest is reached. A positive MaxReachCm is a look
+// cap, and a grip may carry its own: the same grip stretches 60 under MaxReachCm 60, and all 90 under ReachOverrideCm 100. An authored grip matches the socket's rotation either
 // way, even past the cap. Pure: Make_ReachedGrip on hand-built grip queries.
 class UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach : UCk_AutoTest_Base
 {
@@ -21,6 +21,13 @@ class UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach : UCk_AutoTest_Bas
         Grip.WorldGrip = FTransform(SocketRotation, FVector(90.0, 0.0, 0.0), FVector::OneVector);
         Grip.IsAuthored = true;
         Grip.Standoff = 0.0;
+
+        auto Uncapped = FMars_FPHands_ReachSpec();
+        const auto Reached = utils_fphands::Make_ReachedGrip(Uncapped, Grip);
+        const auto ReachedLength = Reached.GetLocation().Size();
+        Assert_True(Uncapped.MaxReachCm <= 0.0f, "the default spec is uncapped");
+        Assert_True(Math::Abs(ReachedLength - 90.0) <= 0.01, f"uncapped: the glove reaches the grip (got {ReachedLength})");
+        AssertRotationMatches(Reached, SocketRotation, "uncapped");
 
         const auto Capped = utils_fphands::Make_ReachedGrip(Spec, Grip);
         const auto CappedLength = Capped.GetLocation().Size();
