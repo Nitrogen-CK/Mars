@@ -6,13 +6,13 @@ asset Mars_FPHandsHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_FPHands";
     RequiredFragments.Add(FMars_Feature_FPHands);
-    Description = "The first-person gloves: reach/grip/return/hold/release phase owned by the Hands sub-HFSM, focus lean, hold and carry";
+    Description = "The first-person gloves: reach/grip/return/hold/release/push phase owned by the Hands sub-HFSM, focus lean, hold and carry";
 }
 
 struct FMars_Feature_FPHands {}
 
 // Phase of the gloves. Set ONLY by the Hands sub-SM's state enter tasks through Request_SetPhase. Reach/Grip/Return is
-// the instant grab; Hold/Release is the timed interaction.
+// the instant grab; Hold/Release is the timed interaction; Push follows through a drop or throw.
 enum EMars_FPHands_Phase
 {
     None,
@@ -20,7 +20,8 @@ enum EMars_FPHands_Phase
     Grip,
     Return,
     Hold,
-    Release
+    Release,
+    Push
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -92,6 +93,13 @@ struct FMars_Fragment_FPHands
 
     UPROPERTY()
     FMars_FPHands_Carry Carry;
+
+    // The hold the gloves had when the item launched: Hold empties a few frames later, the push keeps this grip shape.
+    UPROPERTY()
+    FMars_FPHands_Hold PushHold;
+
+    UPROPERTY()
+    bool PushIsThrow = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -107,11 +115,15 @@ event void FMars_Delegate_FPHands_OnReachTargetLost_MC(FCk_Handle_FPHands InHand
 delegate void FMars_Delegate_FPHands_OnPhaseChanged(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew);
 event void FMars_Delegate_FPHands_OnPhaseChanged_MC(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew);
 
+delegate void FMars_Delegate_FPHands_OnPushRequested(FCk_Handle_FPHands InHands);
+event void FMars_Delegate_FPHands_OnPushRequested_MC(FCk_Handle_FPHands InHands);
+
 struct FMars_Fragment_FPHands_Signals
 {
     FMars_Delegate_FPHands_OnReachRequested_MC OnReachRequested;
     FMars_Delegate_FPHands_OnReachTargetLost_MC OnReachTargetLost;
     FMars_Delegate_FPHands_OnPhaseChanged_MC OnPhaseChanged;
+    FMars_Delegate_FPHands_OnPushRequested_MC OnPushRequested;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -201,6 +213,25 @@ struct FMars_Request_FPHands_SetHold
     }
 }
 
+// Follow through a launch with the gloves that held the item. Hold is the gloves' hold at launch (read before the item
+// leaves the hands). The last one in a drain wins; ignored unless the gloves are at rest (Phase None).
+struct FMars_Request_FPHands_StartPush
+{
+    UPROPERTY()
+    FMars_FPHands_Hold Hold;
+
+    UPROPERTY()
+    bool IsThrow = false;
+
+    FMars_Request_FPHands_StartPush() {}
+
+    FMars_Request_FPHands_StartPush(FMars_FPHands_Hold InHold, bool InIsThrow)
+    {
+        Hold = InHold;
+        IsThrow = InIsThrow;
+    }
+}
+
 struct FMars_Fragment_FPHands_Requests
 {
     UPROPERTY()
@@ -217,4 +248,7 @@ struct FMars_Fragment_FPHands_Requests
 
     UPROPERTY()
     TArray<FMars_Request_FPHands_StartReach> StartReachRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_FPHands_StartPush> StartPushRequests;
 }

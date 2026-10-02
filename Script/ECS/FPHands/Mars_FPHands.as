@@ -75,6 +75,10 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_ReachSpec Reach;
 
+    // Following through a drop or throw.
+    UPROPERTY()
+    FMars_FPHands_PushSpec Push;
+
     // Fingers stop on the surface of what the gloves hold or grab (CR_FPHands_Contact).
     UPROPERTY()
     FMars_FPHands_ContactSpec Contact;
@@ -313,9 +317,16 @@ namespace utils_fphands
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Where the two gloves go this frame, in the hand node's space: the rest targets for the hold, then a reach (or the
-// focus lean) on each glove.
+// focus lean) on each glove. A push follows through from the hold the item launched from instead.
 mixin void Get_HandTargets(const FCk_Handle_FPHands& Self, const FMars_FPHands_TargetFrame& InFrame, FMars_FPHands_HandTargets& OutTargets)
 {
+    if (Self.Get_Phase() == EMars_FPHands_Phase::Push)
+    {
+        OutTargets = utils_fphands::Get_RestTargets(Self.Get_Spec(), Self.Get_PushHold(), InFrame);
+        Self.Apply_HandPush(OutTargets);
+        return;
+    }
+
     OutTargets = utils_fphands::Get_RestTargets(Self.Get_Spec(), Self.Get_Hold(), InFrame);
     Self.Apply_HandReach(InFrame.HandWorld, true, OutTargets.Right);
     Self.Apply_HandReach(InFrame.HandWorld, false, OutTargets.Left);

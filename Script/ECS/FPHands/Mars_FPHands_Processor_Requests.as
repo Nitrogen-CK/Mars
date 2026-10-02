@@ -1,9 +1,9 @@
-// Drains SetHold, then SetFocus, then Release, then SetPhase, then StartReach. The phase itself only moves through
-// SetPhase (the Hands sub-SM's state enter tasks); StartReach and Release only broadcast, and the sub-SM's conditions turn
-// those broadcasts into transitions. Release is honoured only while holding; StartReach only at rest (Phase None), the
-// one phase whose state listens for it - a reach requested mid-phase leaves the current target alone, so a same-drain
-// release still eases back from the target it was holding. SetPhase drains before StartReach so a target arriving in
-// the same drain as Rest's SetPhase(None) is honoured.
+// Drains SetHold, then SetFocus, then Release, then SetPhase, then StartPush, then StartReach. The phase itself only moves
+// through SetPhase (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the
+// sub-SM's conditions turn those broadcasts into transitions. Release is honoured only while holding; StartPush and
+// StartReach only at rest (Phase None), the one phase whose state listens for them - a reach requested mid-phase leaves
+// the current target alone, so a same-drain release still eases back from the target it was holding. SetPhase drains
+// before both so a request arriving in the same drain as Rest's SetPhase(None) is honoured.
 //
 // A StartReach with no Interactable is a bare reach: one glove (the right) toward the hand node itself. Headless tests
 // drive the phase machine this way, without an interactable to resolve.
@@ -30,6 +30,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_FPHands_StartReach> StartReachRequests = InRequests.StartReachRequests;
         TArray<FMars_Request_FPHands_Release> ReleaseRequests = InRequests.ReleaseRequests;
         TArray<FMars_Request_FPHands_SetPhase> SetPhaseRequests = InRequests.SetPhaseRequests;
+        TArray<FMars_Request_FPHands_StartPush> StartPushRequests = InRequests.StartPushRequests;
 
         // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_FPHands_Requests);
@@ -45,6 +46,9 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (SetPhaseRequests.Num() > 0)
         { HandleSetPhase(InHandle, InState, SetPhaseRequests.Last().Phase); }
+
+        if (StartPushRequests.Num() > 0)
+        { HandleStartPush(InHandle, InState, StartPushRequests.Last()); }
 
         if (StartReachRequests.Num() > 0)
         { HandleStartReach(InHandle, InState, StartReachRequests.Last()); }
@@ -129,6 +133,21 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Broadcast(InHandle.As_FPHands(), InRequest.IsInstant); }
+    }
+
+    private void HandleStartPush(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartPush& InRequest)
+    {
+        if (InState.Phase != EMars_FPHands_Phase::None)
+        {
+            Log(f"[FPHands] StartPush ignored: the gloves are busy (phase {InState.Phase :n})");
+            return;
+        }
+
+        InState.PushHold = InRequest.Hold;
+        InState.PushIsThrow = InRequest.IsThrow;
+
+        if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
+        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPushRequested.Broadcast(InHandle.As_FPHands()); }
     }
 
     // Only a hold lets go early; a grab always finishes on its own (a picked-up item removes its own target mid-grab).

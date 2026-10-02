@@ -92,6 +92,16 @@ mixin FMars_FPHands_Hold Get_Hold(const FCk_Handle_FPHands& Self)
     return Self.Get_Fragment(FMars_Fragment_FPHands).Hold;
 }
 
+mixin FMars_FPHands_Hold Get_PushHold(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PushHold;
+}
+
+mixin bool Get_PushIsThrow(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PushIsThrow;
+}
+
 mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_FPHands& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).HandNode;
@@ -127,6 +137,12 @@ mixin void Request_StartReach(FCk_Handle_FPHands& Self, const FMars_Request_FPHa
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
     Requests.StartReachRequests.Add(InRequest);
+}
+
+mixin void Request_StartPush(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_StartPush& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.StartPushRequests.Add(InRequest);
 }
 
 mixin void Request_Release(FCk_Handle_FPHands& Self)
@@ -177,6 +193,20 @@ mixin void UnbindFrom_OnReachTargetLost(FCk_Handle_FPHands& Self, FMars_Delegate
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachTargetLost.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnPushRequested(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnPushRequested InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Signals);
+    Fragment.OnPushRequested.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPushRequested(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnPushRequested InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FPHands_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPushRequested.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnPhaseChanged(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnPhaseChanged InDelegate)

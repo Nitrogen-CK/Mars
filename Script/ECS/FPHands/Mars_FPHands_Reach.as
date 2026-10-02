@@ -148,19 +148,22 @@ namespace utils_fphands
     }
 
     // Seconds the phase lasts before the sub-SM moves on; Hold and None never time out (0).
-    float32 Get_PhaseSeconds(EMars_FPHands_Phase InPhase, const FMars_FPHands_ReachSpec& InSpec)
+    float32 Get_PhaseSeconds(EMars_FPHands_Phase InPhase, const FMars_FPHands_Spec& InSpec)
     {
         if (InPhase == EMars_FPHands_Phase::Reach)
-        { return InSpec.GrabOutSeconds; }
+        { return InSpec.Reach.GrabOutSeconds; }
 
         if (InPhase == EMars_FPHands_Phase::Grip)
-        { return InSpec.GrabGripSeconds; }
+        { return InSpec.Reach.GrabGripSeconds; }
 
         if (InPhase == EMars_FPHands_Phase::Return)
-        { return InSpec.GrabBackSeconds; }
+        { return InSpec.Reach.GrabBackSeconds; }
 
         if (InPhase == EMars_FPHands_Phase::Release)
-        { return InSpec.ReleaseSeconds; }
+        { return InSpec.Reach.ReleaseSeconds; }
+
+        if (InPhase == EMars_FPHands_Phase::Push)
+        { return Get_PushSeconds(InSpec.Push); }
 
         return 0.0f;
     }
