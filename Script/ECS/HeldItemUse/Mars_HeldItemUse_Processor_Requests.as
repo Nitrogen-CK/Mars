@@ -192,6 +192,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
                 Item, HeldItem.Get_CurrentInventory(), Forward * Speed + PawnVelocity, AngularVelocityDeg));
 
             InState.LaunchedItem = Item;
+            Broadcast_ItemLaunched(InPlayer, Item, InIsThrow);
             return;
         }
 
@@ -213,6 +214,13 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
 
         InState.LaunchedItem = Item;
+        Broadcast_ItemLaunched(InPlayer, Item, InIsThrow);
+    }
+
+    private void Broadcast_ItemLaunched(FCk_Handle& InPlayer, FCk_Handle_Item InItem, bool InIsThrow)
+    {
+        if (InPlayer.Has_Fragment(FMars_Fragment_HeldItemUse_Signals))
+        { InPlayer.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnItemLaunched.Broadcast(InPlayer.As_HeldItemUse(), InItem, InIsThrow); }
     }
 
     private FTransform Get_ViewTransform(FCk_Handle& InPlayer) const

@@ -70,3 +70,17 @@ mixin void UnbindFrom_OnThrowArmedChanged(FCk_Handle_HeldItemUse& Self, FMars_De
 
     Self.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnThrowArmedChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
+
+mixin void BindTo_OnItemLaunched(FCk_Handle_HeldItemUse& Self, FMars_Delegate_HeldItemUse_OnItemLaunched InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Signals);
+    Fragment.OnItemLaunched.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnItemLaunched(FCk_Handle_HeldItemUse& Self, FMars_Delegate_HeldItemUse_OnItemLaunched InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_HeldItemUse_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnItemLaunched.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}

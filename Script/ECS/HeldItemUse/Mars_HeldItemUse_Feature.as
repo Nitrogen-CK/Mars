@@ -53,9 +53,15 @@ struct FMars_Fragment_HeldItemUse
 delegate void FMars_Delegate_HeldItemUse_OnThrowArmedChanged(FCk_Handle_HeldItemUse InUse, bool InArmed);
 event void FMars_Delegate_HeldItemUse_OnThrowArmedChanged_MC(FCk_Handle_HeldItemUse InUse, bool InArmed);
 
+// The held item has just been dropped or thrown. It is still the held item (and the hands' hold) when this fires; the
+// world item adopts it a frame or more later.
+delegate void FMars_Delegate_HeldItemUse_OnItemLaunched(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, bool InIsThrow);
+event void FMars_Delegate_HeldItemUse_OnItemLaunched_MC(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, bool InIsThrow);
+
 struct FMars_Fragment_HeldItemUse_Signals
 {
     FMars_Delegate_HeldItemUse_OnThrowArmedChanged_MC OnThrowArmedChanged;
+    FMars_Delegate_HeldItemUse_OnItemLaunched_MC OnItemLaunched;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
