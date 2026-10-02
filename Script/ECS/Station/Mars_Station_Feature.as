@@ -63,15 +63,26 @@ struct FMars_Station_Grip
     UPROPERTY()
     float32 ReachOverrideCm = 0.0f;
 
+    // Socketless grips only: Aimed = a point grip at the node; Node = the node's own axes are the grip.
+    UPROPERTY()
+    EMars_FPHands_GripFrame Frame = EMars_FPHands_GripFrame::Aimed;
+
+    // Authored grips: Fixed keeps the rotation (a tool held one way); FaceViewer takes the bar from the player's side.
+    UPROPERTY()
+    EMars_FPHands_GripRoll Roll = EMars_FPHands_GripRoll::Fixed;
+
     FMars_Station_Grip() {}
 
-    FMars_Station_Grip(EMars_Hand InHand, FGameplayTag InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm)
+    FMars_Station_Grip(EMars_Hand InHand, FGameplayTag InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm,
+                       EMars_FPHands_GripFrame InFrame, EMars_FPHands_GripRoll InRoll)
     {
         Hand = InHand;
         Node = InNode;
         Socket = InSocket;
         Pose = InPose;
         ReachOverrideCm = InReachOverrideCm;
+        Frame = InFrame;
+        Roll = InRoll;
     }
 }
 

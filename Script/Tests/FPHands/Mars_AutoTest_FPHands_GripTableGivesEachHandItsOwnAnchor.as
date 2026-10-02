@@ -56,8 +56,8 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
         _NodeL = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, -15.0, 0.0))).As_Transform();
 
         auto Entries = TArray<FMars_FPHands_GripEntry>();
-        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Right, _NodeR, NAME_None, EMars_HandGripPose::Power, 0.0f));
-        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Left, _NodeL, NAME_None, EMars_HandGripPose::Open, 0.0f));
+        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Right, _NodeR, NAME_None, EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
+        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Left, _NodeL, NAME_None, EMars_HandGripPose::Open, 0.0f, EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         utils_fphands::Add_Grips(_Owner, Entries);
 
         _Interactable = utils_interactable::Create(Root, FMars_Interactable_Spec());
@@ -96,6 +96,8 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
         Assert_True(FCk_Handle(Target.Left.Anchor) == FCk_Handle(_NodeL), "the left glove anchors to node L");
         Assert_True(Target.Left.HasPose && Target.Left.Pose == EMars_HandGripPose::Open, "the left glove takes its entry's Open pose");
         Assert_True(Target.Right.HasPose && Target.Right.Pose == EMars_HandGripPose::Power, "the right glove takes its entry's Power pose");
+        Assert_True(Target.Left.IsAuthored, "a socketless entry that uses its node frame is an authored grip");
+        Assert_False(Target.Right.IsAuthored, "a socketless entry without it stays a point grip");
 
         _RightBeforeMove = Target.Right.AnchorWorld;
         _LeftBeforeMove = Target.Left.AnchorWorld;
