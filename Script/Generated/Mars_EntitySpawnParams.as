@@ -710,6 +710,32 @@ namespace UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_UnfocusEasesTheLeanOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut
+{
+    FMars_AutoTest_FPHands_UnfocusEasesTheLeanOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_UnfocusEasesTheLeanOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide
+{
+    FMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams
 {
 }
