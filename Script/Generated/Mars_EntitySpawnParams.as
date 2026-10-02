@@ -255,6 +255,58 @@ namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
 }
 
 USTRUCT()
+struct FMars_AutoTest_Climber_MountClimbsAndTopsOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Climber_MountClimbsAndTopsOut
+{
+    FMars_AutoTest_Climber_MountClimbsAndTopsOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_Climber_MountClimbsAndTopsOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut
+{
+    FMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold
+{
+    FMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_ManipulationWaitsForTheGrip_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_ManipulationWaitsForTheGrip
+{
+    FMars_AutoTest_Control_ManipulationWaitsForTheGrip_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_ManipulationWaitsForTheGrip_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Control_PullDegreesFollowTheScreenTangent_SpawnParams
 {
 }
@@ -398,6 +450,58 @@ namespace UMars_AutoTest_Countdown_SpecValidateRejectsEmptyOrTimeless
 }
 
 USTRUCT()
+struct FMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand
+{
+    FMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored
+{
+    FMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance
+{
+    FMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses
+{
+    FMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses_SpawnParams Params()
+    {
+        return FMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams
 {
 }
@@ -459,6 +563,32 @@ namespace UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold
     FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams Params()
     {
         return FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
+{
+    FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction
+{
+    FMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction_SpawnParams();
     }
 }
 
@@ -632,6 +762,19 @@ namespace UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain
 }
 
 USTRUCT()
+struct FMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions
+{
+    FMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions_SpawnParams Params()
+    {
+        return FMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns_SpawnParams
 {
 }
@@ -654,6 +797,58 @@ namespace UMars_AutoTest_Smoke_Boots
     FMars_AutoTest_Smoke_Boots_SpawnParams Params()
     {
         return FMars_AutoTest_Smoke_Boots_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Station_OperatorDestroyedReleases_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_OperatorDestroyedReleases
+{
+    FMars_AutoTest_Station_OperatorDestroyedReleases_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_OperatorDestroyedReleases_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Station_ReserveRejectsSecondOperator_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_ReserveRejectsSecondOperator
+{
+    FMars_AutoTest_Station_ReserveRejectsSecondOperator_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_ReserveRejectsSecondOperator_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected
+{
+    FMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Station_ScopedReleaseKeepsHolder_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_ScopedReleaseKeepsHolder
+{
+    FMars_AutoTest_Station_ScopedReleaseKeepsHolder_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_ScopedReleaseKeepsHolder_SpawnParams();
     }
 }
 
@@ -693,6 +888,32 @@ namespace UMars_AutoTest_WorldItem_PickupStows
     FMars_AutoTest_WorldItem_PickupStows_SpawnParams Params()
     {
         return FMars_AutoTest_WorldItem_PickupStows_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTestState_GripEngageRig_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_GripEngageRig
+{
+    FMars_AutoTestState_GripEngageRig_SpawnParams Params()
+    {
+        return FMars_AutoTestState_GripEngageRig_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTestState_ManipulateControlRig_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_ManipulateControlRig
+{
+    FMars_AutoTestState_ManipulateControlRig_SpawnParams Params()
+    {
+        return FMars_AutoTestState_ManipulateControlRig_SpawnParams();
     }
 }
 
@@ -754,6 +975,39 @@ namespace UMars_Backpack_EntityScript
     FMars_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_DicingStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station = FMars_Station_Spec();
+
+    UPROPERTY()
+    FMars_Dicing_Spec Dicing = FMars_Dicing_Spec();
+
+    FMars_DicingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+        Dicing = InDicing;
+    }
+}
+
+namespace UMars_DicingStation_EntityScript
+{
+    FMars_DicingStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_DicingStation_EntityScript_SpawnParams();
+    }
+
+    FMars_DicingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+    {
+        return FMars_DicingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InDicing);
     }
 }
 
@@ -836,6 +1090,35 @@ namespace UMars_HandWheel_EntityScript
     FMars_HandWheel_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InTurnDegrees, float32 InMoveDuration, FText InPromptText)
     {
         return FMars_HandWheel_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InTurnDegrees, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Ladder_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Ladder_Spec Ladder = FMars_Ladder_Spec();
+
+    FMars_Ladder_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Ladder_Spec InLadder)
+    {
+        SpawnTransform = InSpawnTransform;
+        Ladder = InLadder;
+    }
+}
+
+namespace UMars_Ladder_EntityScript
+{
+    FMars_Ladder_EntityScript_SpawnParams Params()
+    {
+        return FMars_Ladder_EntityScript_SpawnParams();
+    }
+
+    FMars_Ladder_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Ladder_Spec InLadder)
+    {
+        return FMars_Ladder_EntityScript_SpawnParams(InSpawnTransform, InLadder);
     }
 }
 
@@ -2255,6 +2538,19 @@ namespace UMars_SmCondition_InteractedWith
 }
 
 USTRUCT()
+struct FMars_SmCondition_IsClimbing_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsClimbing
+{
+    FMars_SmCondition_IsClimbing_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsClimbing_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_IsDowned_SpawnParams
 {
 }
@@ -2294,6 +2590,19 @@ namespace UMars_SmCondition_IsGrounded
 }
 
 USTRUCT()
+struct FMars_SmCondition_IsNotClimbing_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsNotClimbing
+{
+    FMars_SmCondition_IsNotClimbing_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsNotClimbing_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_IsNotDowned_SpawnParams
 {
 }
@@ -2303,6 +2612,32 @@ namespace UMars_SmCondition_IsNotDowned
     FMars_SmCondition_IsNotDowned_SpawnParams Params()
     {
         return FMars_SmCondition_IsNotDowned_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsNotOperating_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsNotOperating
+{
+    FMars_SmCondition_IsNotOperating_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsNotOperating_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsOperating_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsOperating
+{
+    FMars_SmCondition_IsOperating_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsOperating_SpawnParams();
     }
 }
 
@@ -2398,6 +2733,71 @@ namespace UMars_SmCondition_SprintReleased
 }
 
 USTRUCT()
+struct FMars_SmCondition_Station_ReserveConfirmed_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Station_ReserveConfirmed
+{
+    FMars_SmCondition_Station_ReserveConfirmed_SpawnParams Params()
+    {
+        return FMars_SmCondition_Station_ReserveConfirmed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Station_ReserveRejected_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Station_ReserveRejected
+{
+    FMars_SmCondition_Station_ReserveRejected_SpawnParams Params()
+    {
+        return FMars_SmCondition_Station_ReserveRejected_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Station_ReserveTimeout_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Station_ReserveTimeout
+{
+    FMars_SmCondition_Station_ReserveTimeout_SpawnParams Params()
+    {
+        return FMars_SmCondition_Station_ReserveTimeout_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_StationIsNotOperated_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_StationIsNotOperated
+{
+    FMars_SmCondition_StationIsNotOperated_SpawnParams Params()
+    {
+        return FMars_SmCondition_StationIsNotOperated_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_StationIsOperated_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_StationIsOperated
+{
+    FMars_SmCondition_StationIsOperated_SpawnParams Params()
+    {
+        return FMars_SmCondition_StationIsOperated_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Alive_SpawnParams
 {
 }
@@ -2459,6 +2859,32 @@ namespace UMars_SmState_Control_Engage
     FMars_SmState_Control_Engage_SpawnParams Params()
     {
         return FMars_SmState_Control_Engage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Dicing_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Dicing_Idle
+{
+    FMars_SmState_Dicing_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Dicing_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Dicing_Operated_SpawnParams
+{
+}
+
+namespace UMars_SmState_Dicing_Operated
+{
+    FMars_SmState_Dicing_Operated_SpawnParams Params()
+    {
+        return FMars_SmState_Dicing_Operated_SpawnParams();
     }
 }
 
@@ -2684,6 +3110,19 @@ namespace UMars_SmState_Loco_Airborne
 }
 
 USTRUCT()
+struct FMars_SmState_Loco_Climb_SpawnParams
+{
+}
+
+namespace UMars_SmState_Loco_Climb
+{
+    FMars_SmState_Loco_Climb_SpawnParams Params()
+    {
+        return FMars_SmState_Loco_Climb_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Loco_Crouch_SpawnParams
 {
 }
@@ -2762,6 +3201,45 @@ namespace UMars_SmState_Locomotion
 }
 
 USTRUCT()
+struct FMars_SmState_Operating_SpawnParams
+{
+}
+
+namespace UMars_SmState_Operating
+{
+    FMars_SmState_Operating_SpawnParams Params()
+    {
+        return FMars_SmState_Operating_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Station_Grip_SpawnParams
+{
+}
+
+namespace UMars_SmState_Station_Grip
+{
+    FMars_SmState_Station_Grip_SpawnParams Params()
+    {
+        return FMars_SmState_Station_Grip_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Station_Use_SpawnParams
+{
+}
+
+namespace UMars_SmState_Station_Use
+{
+    FMars_SmState_Station_Use_SpawnParams Params()
+    {
+        return FMars_SmState_Station_Use_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_TestLamp_Toggle_SpawnParams
 {
 }
@@ -2814,6 +3292,32 @@ namespace UMars_SmTask_CargoSlot_StowOrTake
 }
 
 USTRUCT()
+struct FMars_SmTask_ClimberMountIntent_SpawnParams
+{
+}
+
+namespace UMars_SmTask_ClimberMountIntent
+{
+    FMars_SmTask_ClimberMountIntent_SpawnParams Params()
+    {
+        return FMars_SmTask_ClimberMountIntent_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_ClimbInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_ClimbInput
+{
+    FMars_SmTask_ClimbInput_SpawnParams Params()
+    {
+        return FMars_SmTask_ClimbInput_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_Control_Engage_SpawnParams
 {
 }
@@ -2836,6 +3340,45 @@ namespace UMars_SmTask_Crouch
     FMars_SmTask_Crouch_SpawnParams Params()
     {
         return FMars_SmTask_Crouch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Dicing_OperatorHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Dicing_OperatorHints
+{
+    FMars_SmTask_Dicing_OperatorHints_SpawnParams Params()
+    {
+        return FMars_SmTask_Dicing_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Dicing_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Dicing_OperatorInput
+{
+    FMars_SmTask_Dicing_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_Dicing_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Dicing_ResetOnEnter_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Dicing_ResetOnEnter
+{
+    FMars_SmTask_Dicing_ResetOnEnter_SpawnParams Params()
+    {
+        return FMars_SmTask_Dicing_ResetOnEnter_SpawnParams();
     }
 }
 
@@ -3018,6 +3561,19 @@ namespace UMars_SmTask_HandsResolverBinds
     FMars_SmTask_HandsResolverBinds_SpawnParams Params()
     {
         return FMars_SmTask_HandsResolverBinds_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HandsResolverBinds_NoResync_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HandsResolverBinds_NoResync
+{
+    FMars_SmTask_HandsResolverBinds_NoResync_SpawnParams Params()
+    {
+        return FMars_SmTask_HandsResolverBinds_NoResync_SpawnParams();
     }
 }
 
@@ -3282,6 +3838,71 @@ namespace UMars_SmTask_Movement
 }
 
 USTRUCT()
+struct FMars_SmTask_Operating_Camera_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Operating_Camera
+{
+    FMars_SmTask_Operating_Camera_SpawnParams Params()
+    {
+        return FMars_SmTask_Operating_Camera_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Operating_Grip_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Operating_Grip
+{
+    FMars_SmTask_Operating_Grip_SpawnParams Params()
+    {
+        return FMars_SmTask_Operating_Grip_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Operating_Hints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Operating_Hints
+{
+    FMars_SmTask_Operating_Hints_SpawnParams Params()
+    {
+        return FMars_SmTask_Operating_Hints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Operating_LeaveIntent_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Operating_LeaveIntent
+{
+    FMars_SmTask_Operating_LeaveIntent_SpawnParams Params()
+    {
+        return FMars_SmTask_Operating_LeaveIntent_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Operating_PoseLock_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Operating_PoseLock
+{
+    FMars_SmTask_Operating_PoseLock_SpawnParams Params()
+    {
+        return FMars_SmTask_Operating_PoseLock_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_PerformInteractionSubSm_SpawnParams
 {
 }
@@ -3304,6 +3925,19 @@ namespace UMars_SmTask_PrimaryIntentToResolver
     FMars_SmTask_PrimaryIntentToResolver_SpawnParams Params()
     {
         return FMars_SmTask_PrimaryIntentToResolver_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Station_RequestReserve_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Station_RequestReserve
+{
+    FMars_SmTask_Station_RequestReserve_SpawnParams Params()
+    {
+        return FMars_SmTask_Station_RequestReserve_SpawnParams();
     }
 }
 
@@ -3504,6 +4138,35 @@ namespace UMars_Vent_EntityScript
     FMars_Vent_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trap_Spec InTrap, FMars_MechanismSink_Spec InSink, FMars_Hazard_Spec InHazard)
     {
         return FMars_Vent_EntityScript_SpawnParams(InSpawnTransform, InTrap, InSink, InHazard);
+    }
+}
+
+USTRUCT()
+struct FMars_WorkbenchStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station = FMars_Station_Spec();
+
+    FMars_WorkbenchStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+    }
+}
+
+namespace UMars_WorkbenchStation_EntityScript
+{
+    FMars_WorkbenchStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorkbenchStation_EntityScript_SpawnParams();
+    }
+
+    FMars_WorkbenchStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        return FMars_WorkbenchStation_EntityScript_SpawnParams(InSpawnTransform, InStation);
     }
 }
 
