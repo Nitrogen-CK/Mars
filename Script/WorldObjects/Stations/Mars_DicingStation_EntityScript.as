@@ -4,6 +4,8 @@
 // view is Captured (the look delta slides the hand). The Dicing feature lives on the station entity and its own state
 // machine (UMars_SmState_Dicing_Idle) reads the operator; this script only builds the nodes and moves VISUALS from the
 // Dicing signals: the pile's size and colour per state, the band, the state label and a burst on every aligned chop.
+// While operating, the right glove holds the cleaver handle (riding the slide and the chop) and the left rests flat near the
+// board's left edge, outside the cleaver's travel (the script sets the Dicing spec's BoardHalfWidth to HandHalfTravel).
 class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
 {
     default _ShowInPlaceActors = true;
@@ -23,6 +25,13 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     private const float64 BoardThickness = 4.0;
     private const float64 BoardX = -5.0;
 
+    // The hand's (and the cleaver's) lateral travel each side of the board centre: the Dicing spec's BoardHalfWidth, set
+    // here because it is bound to the geometry - the cleaver (and the band table's extreme, 0.6 x 28 = 17) must stop short
+    // of the left glove at -(BoardWidth / 2) + LeftGripEdgeInset = -39.
+    private const float32 HandHalfTravel = 28.0f;
+    // The left glove's grip, in from the board's left (-Y) edge.
+    private const float64 LeftGripEdgeInset = 6.0;
+
     // The pile and the cleaver sit over the board's middle; the band marks the strip in front of the pile (operator side).
     private const float64 PileX = 0.0;
     private const float64 BandX = -24.0;
@@ -38,52 +47,39 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     private const int32 k_ChopBurstBehavior = 13; // SparksBurst
 
     private FCk_Handle_Transform _Root;
+    // Dicing with the geometry-bound fields set (DoConstruct); what the feature and the visuals read.
+    private FMars_Dicing_Spec _DicingSpec;
     private FCk_Handle_Dicing _DicingHandle;
     private FCk_Handle_SceneNode _PileNode;
     private FCk_Handle_SceneNode _BandNode;
+    private FCk_Handle_SceneNode _LateralNode;
+    private FCk_Handle_Mover _ChopMover;
+    // The right glove's grip: the cleaver handle, under the Mover node so it rides the chop and the lateral slide.
+    private FCk_Handle_Transform _HandleGripNode;
+    // The left glove's grip: flat near the board's left edge, outside the cleaver's travel.
+    private FCk_Handle_Transform _BoardGripNode;
     private FCk_Handle_UnrealComponent _PileMesh;
     private FCk_Handle_UnrealComponent _Label;
     private UNiagaraComponent _ChopBurst;
     private bool _OutlineClaimed = false;
 
-    // The base composes the transform, the Station (Configure_Spec) and the static visuals (AddVisuals); the minigame
-    // needs the station root, so it is composed after.
+    // The base composes the transform, the visuals and nodes (AddVisuals) and the Station (Configure_Spec, grips on the
+    // registered nodes); the minigame needs the station, so it is composed after.
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
+        // Before the base: its AddVisuals reads the band and the strike from it.
+        _DicingSpec = Dicing;
+        _DicingSpec.BoardHalfWidth = HandHalfTravel;
+
         const auto Flow = Super::DoConstruct(InHandle);
 
         auto StationHandle = InHandle.As_Station(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(StationHandle))
         { return Flow; }
 
-        _Root = InHandle.As_Transform();
-
-        const auto BoardTop = Get_BoardTop();
-        auto LateralNode = utils_scene_node::Create(_Root, FTransform(FRotator::ZeroRotator, FVector(CleaverX, 0.0, BoardTop)));
-        auto LateralTransform = LateralNode.As_Transform();
-        auto CleaverNode = utils_scene_node::Create(LateralTransform,
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, BladeHalfHeight + CleaverRaise)));
-
-        // One Duration for both directions: the recover takes ChopDownSeconds too.
-        auto MoverSpec = FMars_Mover_Spec();
-        MoverSpec.StartLocation = FVector(0.0, 0.0, BladeHalfHeight + CleaverRaise);
-        MoverSpec.EndLocation = FVector(0.0, 0.0, BladeHalfHeight);
-        MoverSpec.Duration = Dicing.ChopDownSeconds;
-        MoverSpec.Easing = ECk_TweenEasing::InQuad;
-        auto ChopMover = utils_mover::Add(CleaverNode, MoverSpec);
-
         // A rejected Dicing spec already ensured in utils_dicing::Add.
-        _DicingHandle = utils_dicing::Add(InHandle, Dicing, FMars_Dicing_Nodes(LateralNode, ChopMover));
-
-        auto CubeMesh = engine::load::Cube();
-        auto CleaverTransform = CleaverNode.As_Transform();
-        auto ToolMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
-        AddPart(CleaverTransform, FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(0.3, 0.02, 0.12)),
-            CubeMesh, ToolMaterial, collision::profile::NoCollision, n"DicingStation_Blade");
-        AddPart(CleaverTransform, FTransform(FRotator::ZeroRotator, HandleOffset, FVector(0.12, 0.025, 0.025)),
-            CubeMesh, ToolMaterial, collision::profile::NoCollision, n"DicingStation_Handle");
-
+        _DicingHandle = utils_dicing::Add(InHandle, _DicingSpec, FMars_Dicing_Nodes(_LateralNode, _ChopMover));
         return Flow;
     }
 
@@ -148,13 +144,19 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     protected void Configure_Spec(FMars_Station_Spec& InOutSpec) override
     {
         InOutSpec.StandLocal = FTransform(FRotator::ZeroRotator, FVector(-(TableDepth * 0.5 + StandGap), 0.0, 0.0));
-        // The cleaver's handle at the board centre, raised (the grip node is the station's and does not follow the hand).
-        InOutSpec.GripLocal = FTransform(FRotator::ZeroRotator,
-            FVector(CleaverX, 0.0, Get_BoardTop() + BladeHalfHeight + CleaverRaise) + HandleOffset);
-        InOutSpec.LookControl = EMars_Station_LookControl::Captured;
-        InOutSpec.CameraPitchOffset = CameraPitch;
-        InOutSpec.PromptText = NSLOCTEXT("MarsInteraction", "DiceHerbsPrompt", "Dice herbs");
-        InOutSpec.OccupiedText = NSLOCTEXT("MarsInteraction", "DicingStationInUsePrompt", "In use");
+
+        auto Grips = TArray<FMars_Station_Grip>();
+        Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::ResolveGameplayTag(n"Station.Node.Tool"), NAME_None,
+            EMars_HandGripPose::Power, 0.0f));
+        Grips.Add(FMars_Station_Grip(EMars_Hand::Left, GameplayTags::ResolveGameplayTag(n"Station.Node.Surface"), NAME_None,
+            EMars_HandGripPose::Open, 0.0f));
+        InOutSpec.Grips = Grips;
+
+        InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
+        InOutSpec.Camera.PitchOffset = CameraPitch;
+        InOutSpec.Prompt = FMars_Station_PromptSpec(
+            NSLOCTEXT("MarsInteraction", "DiceHerbsPrompt", "Dice herbs"),
+            NSLOCTEXT("MarsInteraction", "DicingStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Dicing_Idle;
     }
 
@@ -171,6 +173,7 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     // Engine cube and sphere are 100 uu with the pivot at the centre.
     protected void AddVisuals(FCk_Handle_Transform& InRoot) override
     {
+        _Root = InRoot;
         auto CubeMesh = engine::load::Cube();
         const auto BoardTop = Get_BoardTop();
 
@@ -191,12 +194,51 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
 
         // The band: a flat slab across the strip in front of the pile, centred on the band; outlined in DoBeginPlay.
         _BandNode = utils_scene_node::Create(InRoot,
-            FTransform(FRotator::ZeroRotator, FVector(BandX, utils_dicing::Get_BandCenterAt(Dicing, 0), BoardTop + 0.5)));
+            FTransform(FRotator::ZeroRotator, FVector(BandX, utils_dicing::Get_BandCenterAt(_DicingSpec, 0), BoardTop + 0.5)));
         auto BandTransform = _BandNode.As_Transform();
-        AddPart(BandTransform, FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(BandDepth * 0.01, Dicing.BandHalfWidth * 0.02, 0.01)),
+        AddPart(BandTransform, FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(BandDepth * 0.01, _DicingSpec.BandHalfWidth * 0.02, 0.01)),
             CubeMesh, assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"DicingStation_Band");
 
         _Label = AddLabel(InRoot, FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - 5.0, 0.0, BoardTop + 40.0)));
+
+        _BoardGripNode = utils_scene_node::Create(InRoot,
+            FTransform(FRotator::ZeroRotator, FVector(BoardX, -BoardWidth * 0.5 + LeftGripEdgeInset, BoardTop))).As_Transform();
+
+        AddCleaver(InRoot);
+    }
+
+    protected void Register_GripNodes(TArray<FMars_Station_GripNode>& OutNodes) override
+    {
+        OutNodes.Add(FMars_Station_GripNode(GameplayTags::ResolveGameplayTag(n"Station.Node.Tool"), _HandleGripNode));
+        OutNodes.Add(FMars_Station_GripNode(GameplayTags::ResolveGameplayTag(n"Station.Node.Surface"), _BoardGripNode));
+    }
+
+    // The cleaver: a lateral node the hand slides along the board (Y), a Mover node under it for the chop (Z), the blade
+    // and handle parts, and the handle's grip node, all under the Mover node so they ride both.
+    private void AddCleaver(FCk_Handle_Transform& InRoot)
+    {
+        _LateralNode = utils_scene_node::Create(InRoot, FTransform(FRotator::ZeroRotator, FVector(CleaverX, 0.0, Get_BoardTop())));
+        auto LateralTransform = _LateralNode.As_Transform();
+        auto CleaverNode = utils_scene_node::Create(LateralTransform,
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, BladeHalfHeight + CleaverRaise)));
+
+        // One Duration for both directions: the recover takes ChopDownSeconds too.
+        auto MoverSpec = FMars_Mover_Spec();
+        MoverSpec.StartLocation = FVector(0.0, 0.0, BladeHalfHeight + CleaverRaise);
+        MoverSpec.EndLocation = FVector(0.0, 0.0, BladeHalfHeight);
+        MoverSpec.Duration = _DicingSpec.ChopDownSeconds;
+        MoverSpec.Easing = ECk_TweenEasing::InQuad;
+        _ChopMover = utils_mover::Add(CleaverNode, MoverSpec);
+
+        auto CubeMesh = engine::load::Cube();
+        auto CleaverTransform = CleaverNode.As_Transform();
+        auto ToolMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
+        AddPart(CleaverTransform, FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(0.3, 0.02, 0.12)),
+            CubeMesh, ToolMaterial, collision::profile::NoCollision, n"DicingStation_Blade");
+        AddPart(CleaverTransform, FTransform(FRotator::ZeroRotator, HandleOffset, FVector(0.12, 0.025, 0.025)),
+            CubeMesh, ToolMaterial, collision::profile::NoCollision, n"DicingStation_Handle");
+
+        _HandleGripNode = utils_scene_node::Create(CleaverTransform, FTransform(FRotator::ZeroRotator, HandleOffset)).As_Transform();
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -347,7 +389,7 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         Archetype.SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
         Archetype.SetWorldSize(10.0f);
         Archetype.SetTextRenderColor(FColor(255, 238, 0, 255));
-        Archetype.SetText(utils_dicing::Get_StateLabel(EMars_Dicing_State::WholeLeaves, Dicing.RequestedState));
+        Archetype.SetText(utils_dicing::Get_StateLabel(EMars_Dicing_State::WholeLeaves, _DicingSpec.RequestedState));
 
         auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
             Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"DicingStation_Label");

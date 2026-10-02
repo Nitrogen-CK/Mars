@@ -1,6 +1,6 @@
 // One-shot per station: keeps the Use target in step with the reservation. While an operator holds the station its Use
 // target is disabled for everyone (the resolver skips it, so nobody can start a second reserve) and its prompt reads
-// OccupiedText; on release it is enabled again and reads PromptText. A reservation that landed before this setup ran
+// Prompt.OccupiedText; on release it is enabled again and reads Prompt.Text. A reservation that landed before this setup ran
 // (same-frame reserve) is applied here at once.
 class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
 {
@@ -53,7 +53,7 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Prompt))
         { return; }
 
-        const auto Spec = InStation.Get_Spec();
-        Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(InOccupied ? Spec.OccupiedText : Spec.PromptText));
+        const auto PromptSpec = InStation.Get_Spec().Prompt;
+        Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(InOccupied ? PromptSpec.OccupiedText : PromptSpec.Text));
     }
 }

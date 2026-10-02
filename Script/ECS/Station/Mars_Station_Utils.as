@@ -7,14 +7,33 @@ namespace utils_station
     const float32 k_EngageMaxTurnRate = 220.0f;
     const float32 k_EngageMinSeconds = 0.15f;
 
-    // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand and Grip child
-    // nodes, the Use interactable (probe-driven focus when InProbe is set, else a transform-only child) with its one
-    // reserving target, the grip interactable on the Grip node, and the minigame state machine when the spec names one. A
-    // rejected spec ensures and returns an invalid handle.
-    FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec, TOptional<FMars_Interactable_ProbeInfo> InProbe)
+    // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
+    // Use interactable (probe-driven focus when InSetup.Probe is set, else a transform-only child) with its one reserving
+    // target, the grip table on the root (each spec grip on the node InSetup.GripNodes registers under its tag), the grip
+    // interactable on the root, and the minigame state machine when the spec names one. A rejected spec, or a grip naming a
+    // node tag nothing registers, ensures and returns an invalid handle with nothing composed.
+    FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec, FMars_Station_Setup InSetup)
     {
         const auto Validation = InSpec.Validate();
         if (ck::EnsureIfNot(Validation.IsValid, f"[Station] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_Station(); }
+
+        FString GripError;
+        auto GripEntries = TArray<FMars_FPHands_GripEntry>();
+        for (int32 Index = 0; Index < InSpec.Grips.Num() && GripError.IsEmpty(); ++Index)
+        {
+            const auto& Grip = InSpec.Grips[Index];
+            const auto Node = Find_GripNode(InSetup, Grip.Node);
+            if (ck::Is_NOT_Valid(Node))
+            {
+                GripError = f"grip [{Index}] names the node [{Grip.Node.ToString()}] that no grip node registers";
+                continue;
+            }
+
+            GripEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Grip.Socket, Grip.Pose, Grip.ReachOverrideCm));
+        }
+
+        if (ck::EnsureIfNot(GripError.IsEmpty(), f"[Station] [{InRoot.ToString()}] rejected the grips: {GripError}"))
         { return FCk_Handle_Station(); }
 
         auto Params = FMars_Fragment_Station_Params();
@@ -23,7 +42,6 @@ namespace utils_station
         auto State = FMars_Fragment_Station();
         State.IsEngagementEnabled = InSpec.AllowEngagement;
         State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
-        State.GripNode = utils_scene_node::Create(InRoot, InSpec.GripLocal).As_Transform();
 
         InRoot.Add_Fragment(FMars_Feature_Station());
         InRoot.Add_Fragment(Params);
@@ -31,15 +49,20 @@ namespace utils_station
         InRoot.Add_Fragment(FMars_Tag_Station_NeedsSetup());
         auto Station = InRoot.As_Station();
 
+        if (GripEntries.Num() > 0)
+        {
+            auto RootEntity = FCk_Handle(InRoot);
+            utils_fphands::Add_Grips(RootEntity, GripEntries);
+        }
+
         auto UseSpec = FMars_Interactable_Spec();
-        UseSpec.ProbeInfo = InProbe;
+        UseSpec.ProbeInfo = InSetup.Probe;
         UseSpec.Targets.Add(Station.Make_UseTarget());
         auto Interactable = utils_interactable::Create(InRoot, UseSpec);
 
         auto GripSpec = FMars_Interactable_Spec();
         GripSpec.Targets.Add(Station.Make_GripTarget());
-        auto GripNode = State.GripNode;
-        auto GripInteractable = utils_interactable::Create(GripNode, GripSpec);
+        auto GripInteractable = utils_interactable::Create(InRoot, GripSpec);
 
         auto MinigameSm = FCk_Handle_StateMachine();
         auto MinigameClass = InSpec.MinigameStateClass.Get();
@@ -51,6 +74,18 @@ namespace utils_station
         StoredState.GripInteractable = GripInteractable;
         StoredState.MinigameSm = MinigameSm;
         return Station;
+    }
+
+    // The node InSetup registers under InTag; invalid when none does.
+    FCk_Handle_Transform Find_GripNode(const FMars_Station_Setup& InSetup, FGameplayTag InTag)
+    {
+        for (const auto& Entry : InSetup.GripNodes)
+        {
+            if (Entry.Tag == InTag)
+            { return Entry.Node; }
+        }
+
+        return FCk_Handle_Transform();
     }
 
     // Seconds the operator glides to the stand: as long as walking InDistance (uu) or turning InTurnDegrees would take,
@@ -102,7 +137,7 @@ mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Se
 
     auto Prompt = FMars_InteractPrompt_Spec();
     Prompt.InputAction = mars::Mars_IA_Interact_Use;
-    Prompt.PromptText = Spec.PromptText;
+    Prompt.PromptText = Spec.Prompt.Text;
 
     auto Target = FMars_Interactable_TargetEntry();
     Target.InteractTargetSpec = TargetSpec;
