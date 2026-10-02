@@ -1,4 +1,4 @@
-// Validate() accepts the default ladder and rejects one with no height, no standoff or no top exit.
+// Validate() accepts the default ladder and rejects one with no height, no standoff, no top exit or no zone height padding.
 class UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -24,6 +24,10 @@ class UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions : UCk_AutoTest_Base
         auto NoTopExit = FMars_Ladder_Spec();
         NoTopExit.TopExitDepth = 0.0f;
         AssertInvalid(NoTopExit, "TopExitDepth 0");
+
+        auto NoZonePadding = FMars_Ladder_Spec();
+        NoZonePadding.ZoneHeightPadding = 0.0f;
+        AssertInvalid(NoZonePadding, "ZoneHeightPadding 0");
     }
 
     private void AssertValid(const FMars_Ladder_Spec& InSpec, const FString& InCase)
