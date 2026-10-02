@@ -348,7 +348,7 @@ mixin void Apply_HandReach(const FCk_Handle_FPHands& Self, const FTransform& InH
     { return; }
 
     auto Pose = Spec.Reach.ApproachPose;
-    auto HasPose = IsReaching && Self.Get_ReachPose(Pose);
+    auto HasPose = IsReaching && Self.Get_ReachPose(InIsRightHand, Pose);
     if (HasPose == false)
     {
         Pose = Spec.Reach.ApproachPose;

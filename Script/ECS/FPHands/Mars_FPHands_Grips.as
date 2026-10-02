@@ -34,11 +34,17 @@ struct FMars_FPHands_MeshGrips
     FCk_Handle_Transform Host;
 }
 
-// What a reach (or the focus lean) goes for. Grips are in the anchor's space so the gloves follow it if it moves.
-struct FMars_FPHands_ReachTarget
+enum EMars_Hand
+{
+    Right,
+    Left
+}
+
+// One glove's grip on a reach target: its own anchor (a part that may move on its own) and the grip in that anchor's space.
+struct FMars_FPHands_HandGrip
 {
     UPROPERTY()
-    bool IsValid = false;
+    bool IsUsed = false;
 
     UPROPERTY()
     FCk_Handle_Transform Anchor;
@@ -47,21 +53,83 @@ struct FMars_FPHands_ReachTarget
     UPROPERTY()
     FTransform AnchorWorld;
 
+    // Anchor space. A point grip uses only the location.
+    UPROPERTY()
+    FTransform Grip;
+
+    // The grip's rotation is matched, not just its location.
+    UPROPERTY()
+    bool IsAuthored = false;
+
+    // > 0 replaces the spec's MaxReachCm for this grip (cm).
+    UPROPERTY()
+    float32 ReachOverrideCm = 0.0f;
+
+    // The glove's contact pose on this grip; unset = the target's contact pose, else the spec's.
+    UPROPERTY()
+    bool HasPose = false;
+
+    UPROPERTY()
+    EMars_HandGripPose Pose = EMars_HandGripPose::Power;
+}
+
+// One row of a grip table: which glove, the part it rides (the part's Mover moves it, the glove follows) and where on it.
+struct FMars_FPHands_GripEntry
+{
+    UPROPERTY()
+    EMars_Hand Hand = EMars_Hand::Right;
+
+    UPROPERTY()
+    FCk_Handle_Transform Node;
+
+    // A socket on a static mesh the node (or a part under it) carries; NAME_None = the node itself, a point grip.
+    UPROPERTY()
+    FName Socket;
+
+    UPROPERTY()
+    EMars_HandGripPose Pose = EMars_HandGripPose::Power;
+
+    // > 0 replaces the spec's MaxReachCm for this grip (cm).
+    UPROPERTY()
+    float32 ReachOverrideCm = 0.0f;
+
+    FMars_FPHands_GripEntry() {}
+
+    FMars_FPHands_GripEntry(EMars_Hand InHand, FCk_Handle_Transform InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm)
+    {
+        Hand = InHand;
+        Node = InNode;
+        Socket = InSocket;
+        Pose = InPose;
+        ReachOverrideCm = InReachOverrideCm;
+    }
+}
+
+// The grips an interactable's owner declares for the gloves, at most one per hand (utils_fphands::Add_Grips). A reach for
+// an owner that carries it takes these grips instead of the socket / sides / point resolution.
+struct FMars_Fragment_FPHands_Grips
+{
+    UPROPERTY()
+    TArray<FMars_FPHands_GripEntry> Entries;
+}
+
+// What a reach (or the focus lean) goes for: one grip per glove, each in its own anchor's space so the glove follows
+// that anchor if it moves. A grip table gives each glove its own anchor; every other path anchors both gloves to the same
+// part.
+struct FMars_FPHands_ReachTarget
+{
+    UPROPERTY()
+    bool IsValid = false;
+
+    // Authored when any glove's grip is a socket; Sides is resolved per glove from SidesCenter / SidesHalfWidth.
     UPROPERTY()
     EMars_FPHands_GripLayout Layout = EMars_FPHands_GripLayout::Point;
 
     UPROPERTY()
-    bool UsesRight = false;
+    FMars_FPHands_HandGrip Right;
 
     UPROPERTY()
-    bool UsesLeft = false;
-
-    // Authored: full grip transforms. Point: only the location is used.
-    UPROPERTY()
-    FTransform Grip_R;
-
-    UPROPERTY()
-    FTransform Grip_L;
+    FMars_FPHands_HandGrip Left;
 
     // Sides: the object's centre (anchor space) and half-width; the gloves take it either side of the view's right axis.
     UPROPERTY()
@@ -175,6 +243,10 @@ struct FMars_FPHands_GripQuery
     UPROPERTY()
     float Standoff = 0.0;
 
+    // > 0 replaces the spec's MaxReachCm for this grip (cm).
+    UPROPERTY()
+    float32 ReachOverrideCm = 0.0f;
+
     FMars_FPHands_GripQuery() {}
 
     FMars_FPHands_GripQuery(FTransform InHandWorld, bool InIsRightHand, FTransform InRestGrip)
@@ -187,6 +259,37 @@ struct FMars_FPHands_GripQuery
 
 namespace utils_fphands
 {
+    // Declares InOwner's grip table (construction time). All-or-nothing: at least one entry, every node valid, at most one
+    // entry per hand; a rejected table ensures and adds nothing.
+    void Add_Grips(FCk_Handle& InOwner, const TArray<FMars_FPHands_GripEntry>& InEntries)
+    {
+        FString Error;
+        if (InEntries.Num() == 0)
+        { Error = "no entries"; }
+
+        for (int32 Index = 0; Index < InEntries.Num() && Error.IsEmpty(); ++Index)
+        {
+            if (ck::Is_NOT_Valid(InEntries[Index].Node))
+            {
+                Error = f"entry [{Index}] has an invalid node";
+                continue;
+            }
+
+            for (int32 Earlier = 0; Earlier < Index; ++Earlier)
+            {
+                if (InEntries[Earlier].Hand == InEntries[Index].Hand)
+                { Error = f"entry [{Index}] repeats the hand [{InEntries[Index].Hand :n}] of entry [{Earlier}]"; }
+            }
+        }
+
+        if (ck::EnsureIfNot(Error.IsEmpty(), f"[FPHands] [{InOwner.ToString()}] rejected the grip table: {Error}"))
+        { return; }
+
+        auto Grips = FMars_Fragment_FPHands_Grips();
+        Grips.Entries = InEntries;
+        InOwner.Add_Fragment(Grips);
+    }
+
     FMars_FPHands_MeshGrips Find_MeshSockets(UStaticMesh InMesh, const FVector& InMeshScale)
     {
         auto Grips = FMars_FPHands_MeshGrips();
@@ -274,8 +377,93 @@ namespace utils_fphands
         return Find_ComponentSockets(InActor.GetComponentsByClass(UStaticMeshComponent));
     }
 
+    // The first static mesh component on InRoot or its descendants that carries InSocket (entity tree scope, as
+    // Find_EntitySockets), or null.
+    UStaticMeshComponent Find_EntitySocketComponent(const FCk_Handle& InRoot, FName InSocket)
+    {
+        TArray<FCk_Handle> Queue;
+        Queue.Add(InRoot);
+        for (int32 Index = 0; Index < Queue.Num() && Index < 64; ++Index)
+        {
+            auto Entity = Queue[Index];
+            if (ck::Is_NOT_Valid(Entity))
+            { continue; }
+
+            for (auto Candidate : utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent))
+            {
+                auto Component = Cast<UStaticMeshComponent>(Candidate);
+                if (ck::IsValid(Component) && Component.DoesSocketExist(InSocket))
+                { return Component; }
+            }
+
+            for (auto Dependent : Entity.Get_LifetimeDependents())
+            { Queue.Add(Dependent); }
+        }
+        return nullptr;
+    }
+
+    // One grip-table row as a glove's grip: anchored to the row's node, on the named socket when the node (or a part
+    // under it) carries one, else at the node itself (a point grip).
+    FMars_FPHands_HandGrip Make_EntryGrip(const FMars_FPHands_GripEntry& InEntry)
+    {
+        auto Grip = FMars_FPHands_HandGrip();
+        Grip.IsUsed = true;
+        Grip.Anchor = InEntry.Node;
+        Grip.AnchorWorld = utils_transform::Get_EntityCurrentTransform(InEntry.Node);
+        Grip.ReachOverrideCm = InEntry.ReachOverrideCm;
+        Grip.HasPose = true;
+        Grip.Pose = InEntry.Pose;
+        if (InEntry.Socket == NAME_None)
+        { return Grip; }
+
+        auto Component = Find_EntitySocketComponent(InEntry.Node, InEntry.Socket);
+        if (ck::Is_NOT_Valid(Component))
+        {
+            ck::Trace(f"[FPHands] grip node [{InEntry.Node.ToString()}] carries no socket [{InEntry.Socket}]; the glove takes the node itself");
+            return Grip;
+        }
+
+        Grip.Grip = Component.GetSocketTransform(InEntry.Socket, ERelativeTransformSpace::RTS_World).GetRelativeTransform(Grip.AnchorWorld);
+        Grip.IsAuthored = true;
+        return Grip;
+    }
+
+    // A grip table: each glove to its own row. A busy right glove hands its row to the free left glove (whose own row is
+    // then dropped), as the socket paths do.
+    FMars_FPHands_ReachTarget Resolve_GripTable(const TArray<FMars_FPHands_GripEntry>& InEntries, bool InRightIsFree)
+    {
+        auto Target = FMars_FPHands_ReachTarget();
+        Target.IsValid = true;
+
+        auto RightGrip = FMars_FPHands_HandGrip();
+        auto LeftGrip = FMars_FPHands_HandGrip();
+        for (const auto& Entry : InEntries)
+        {
+            if (Entry.Hand == EMars_Hand::Right)
+            { RightGrip = Make_EntryGrip(Entry); }
+            else
+            { LeftGrip = Make_EntryGrip(Entry); }
+        }
+
+        if (InRightIsFree)
+        {
+            Target.Right = RightGrip;
+            Target.Left = LeftGrip;
+        }
+        else if (RightGrip.IsUsed)
+        { Target.Left = RightGrip; }
+        else
+        { Target.Left = LeftGrip; }
+
+        Target.Layout = Target.Right.IsAuthored || Target.Left.IsAuthored
+            ? EMars_FPHands_GripLayout::Authored
+            : EMars_FPHands_GripLayout::Point;
+        return Target;
+    }
+
     // Resolves what the gloves go for when reaching for InQuery's subject. The hold decides which gloves are free;
-    // PreferRightHand picks the glove for single-handed reaches near the centre line.
+    // PreferRightHand picks the glove for single-handed reaches near the centre line. An owner with a grip table
+    // (FMars_Fragment_FPHands_Grips) decides each glove's grip itself; every other path anchors both gloves to one part.
     FMars_FPHands_ReachTarget Resolve_ReachTarget(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_ReachQuery& InQuery)
     {
         const auto& Subject = InQuery.Subject;
@@ -285,6 +473,10 @@ namespace utils_fphands
         if (Hand.Hold.IsHolding && Hand.Hold.IsTwoHanded)
         { return Target; }
 
+        const auto BothFree = Hand.Hold.IsHolding == false;
+        if (ck::IsValid(Subject.Owner) && Subject.Owner.Has_Fragment(FMars_Fragment_FPHands_Grips))
+        { return Resolve_GripTable(Subject.Owner.Get_Fragment(FMars_Fragment_FPHands_Grips).Entries, BothFree); }
+
         auto Anchor = Subject.Owner.As_Transform(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Anchor))
         { Anchor = Subject.Interactable.As_Transform(ECk_SanityCheck::UnChecked); }
@@ -292,9 +484,9 @@ namespace utils_fphands
         { return Target; }
 
         Target.IsValid = true;
-        Target.Anchor = Anchor;
-        Target.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Anchor);
-        const auto BothFree = Hand.Hold.IsHolding == false;
+        auto Shared = FMars_FPHands_HandGrip();
+        Shared.Anchor = Anchor;
+        Shared.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Anchor);
 
         // Pickups: the item's own mesh, grip pose and handedness.
         if (Subject.Owner.Has_Fragment(FMars_Fragment_WorldItem_Params))
@@ -319,16 +511,19 @@ namespace utils_fphands
                 const auto Sockets = Find_MeshSockets(Mesh, Presentation.MeshScale);
                 if (Sockets.HasRight)
                 {
+                    Shared.IsAuthored = true;
                     Target.Layout = EMars_FPHands_GripLayout::Authored;
-                    Target.Grip_R = Sockets.Right;
-                    Target.Grip_L = Sockets.Left;
-                    Target.UsesRight = BothFree;
-                    Target.UsesLeft = Sockets.HasLeft && BothFree;
+                    Target.Right = Shared;
+                    Target.Left = Shared;
+                    Target.Right.Grip = Sockets.Right;
+                    Target.Left.Grip = Sockets.Left;
+                    Target.Right.IsUsed = BothFree;
+                    Target.Left.IsUsed = Sockets.HasLeft && BothFree;
                     if (BothFree == false)
                     {
                         // Right glove busy: the free left glove takes the right grip.
-                        Target.Grip_L = Sockets.Right;
-                        Target.UsesLeft = true;
+                        Target.Left.Grip = Sockets.Right;
+                        Target.Left.IsUsed = true;
                     }
                     return Target;
                 }
@@ -342,8 +537,10 @@ namespace utils_fphands
                     Target.SidesHalfWidth = Presentation.GripHalfWidth > 0.0f
                         ? Presentation.GripHalfWidth
                         : float32(Math::Max(Extent.X, Extent.Y));
-                    Target.UsesRight = true;
-                    Target.UsesLeft = true;
+                    Target.Right = Shared;
+                    Target.Left = Shared;
+                    Target.Right.IsUsed = true;
+                    Target.Left.IsUsed = true;
                     return Target;
                 }
             }
@@ -358,15 +555,18 @@ namespace utils_fphands
             // The part carrying the sockets may move on its own (a lever's handle under its Mover node): anchor to it.
             if (ck::IsValid(ActorSockets.Host))
             {
-                Target.Anchor = ActorSockets.Host;
-                Target.AnchorWorld = utils_transform::Get_EntityCurrentTransform(ActorSockets.Host);
+                Shared.Anchor = ActorSockets.Host;
+                Shared.AnchorWorld = utils_transform::Get_EntityCurrentTransform(ActorSockets.Host);
             }
 
+            Shared.IsAuthored = true;
             Target.Layout = EMars_FPHands_GripLayout::Authored;
-            Target.Grip_R = ActorSockets.Right.GetRelativeTransform(Target.AnchorWorld);
-            Target.Grip_L = ActorSockets.HasLeft ? ActorSockets.Left.GetRelativeTransform(Target.AnchorWorld) : Target.Grip_R;
-            Target.UsesRight = BothFree;
-            Target.UsesLeft = (ActorSockets.HasLeft && BothFree) || BothFree == false;
+            Target.Right = Shared;
+            Target.Left = Shared;
+            Target.Right.Grip = ActorSockets.Right.GetRelativeTransform(Shared.AnchorWorld);
+            Target.Left.Grip = ActorSockets.HasLeft ? ActorSockets.Left.GetRelativeTransform(Shared.AnchorWorld) : Target.Right.Grip;
+            Target.Right.IsUsed = BothFree;
+            Target.Left.IsUsed = (ActorSockets.HasLeft && BothFree) || BothFree == false;
             return Target;
         }
 
@@ -374,11 +574,10 @@ namespace utils_fphands
         auto PointEntity = Subject.Interactable.As_Transform(ECk_SanityCheck::UnChecked);
         const auto PointWorld = ck::IsValid(PointEntity)
             ? utils_transform::Get_EntityCurrentTransform(PointEntity).GetLocation()
-            : Target.AnchorWorld.GetLocation();
+            : Shared.AnchorWorld.GetLocation();
 
         Target.Layout = EMars_FPHands_GripLayout::Point;
-        Target.Grip_R = FTransform(FRotator::ZeroRotator, Target.AnchorWorld.InverseTransformPosition(PointWorld), FVector::OneVector);
-        Target.Grip_L = Target.Grip_R;
+        Shared.Grip = FTransform(FRotator::ZeroRotator, Shared.AnchorWorld.InverseTransformPosition(PointWorld), FVector::OneVector);
 
         auto IsRight = Hand.PreferRightHand;
         if (BothFree)
@@ -390,38 +589,57 @@ namespace utils_fphands
         else
         { IsRight = false; }
 
-        Target.UsesRight = IsRight;
-        Target.UsesLeft = IsRight == false;
+        Target.Right = Shared;
+        Target.Left = Shared;
+        Target.Right.IsUsed = IsRight;
+        Target.Left.IsUsed = IsRight == false;
         return Target;
     }
 
-    // Refreshes the anchor while it lives.
+    // Refreshes each used glove's anchor while it lives.
     void Update_ReachTarget(FMars_FPHands_ReachTarget& InOutTarget)
     {
-        if (InOutTarget.IsValid && ck::IsValid(InOutTarget.Anchor))
-        { InOutTarget.AnchorWorld = utils_transform::Get_EntityCurrentTransform(InOutTarget.Anchor); }
+        if (InOutTarget.IsValid == false)
+        { return; }
+
+        if (InOutTarget.Right.IsUsed && ck::IsValid(InOutTarget.Right.Anchor))
+        { InOutTarget.Right.AnchorWorld = utils_transform::Get_EntityCurrentTransform(InOutTarget.Right.Anchor); }
+
+        if (InOutTarget.Left.IsUsed && ck::IsValid(InOutTarget.Left.Anchor))
+        { InOutTarget.Left.AnchorWorld = utils_transform::Get_EntityCurrentTransform(InOutTarget.Left.Anchor); }
     }
 
-    // World-space grip on InTarget for InOutGrip's glove, whether its rotation is meant to be matched, and the standoff
-    // a point grip keeps.
+    // World-space grip on InTarget for InOutGrip's glove, whether its rotation is meant to be matched, the standoff a
+    // point grip keeps and the glove's reach override.
     void Resolve_WorldGrip(const FMars_FPHands_Spec& InSpec, const FMars_FPHands_ReachTarget& InTarget, FMars_FPHands_GripQuery& InOutGrip)
     {
-        InOutGrip.IsAuthored = InTarget.Layout == EMars_FPHands_GripLayout::Authored;
-        InOutGrip.Standoff = InTarget.Layout == EMars_FPHands_GripLayout::Point ? InSpec.Reach.StandoffCm : 0.0f;
-        if (InTarget.Layout == EMars_FPHands_GripLayout::Sides)
+        const auto Hand = InTarget.Get_HandGrip(InOutGrip.IsRightHand);
+        const auto IsSides = InTarget.Layout == EMars_FPHands_GripLayout::Sides;
+        InOutGrip.IsAuthored = Hand.IsAuthored;
+        InOutGrip.Standoff = IsSides || Hand.IsAuthored ? 0.0f : InSpec.Reach.StandoffCm;
+        InOutGrip.ReachOverrideCm = Hand.ReachOverrideCm;
+        if (IsSides)
         {
-            const auto Center = InTarget.AnchorWorld.TransformPosition(InTarget.SidesCenter);
+            const auto Center = Hand.AnchorWorld.TransformPosition(InTarget.SidesCenter);
             const auto Side = InOutGrip.HandWorld.GetRotation().GetRightVector() * (InTarget.SidesHalfWidth + InSpec.PalmSurfaceOffset);
             InOutGrip.WorldGrip = FTransform(FRotator::ZeroRotator, InOutGrip.IsRightHand ? Center + Side : Center - Side, FVector::OneVector);
             return;
         }
 
-        const auto Grip = InOutGrip.IsRightHand ? InTarget.Grip_R : InTarget.Grip_L;
-        InOutGrip.WorldGrip = Grip * InTarget.AnchorWorld;
+        InOutGrip.WorldGrip = Hand.Grip * Hand.AnchorWorld;
     }
 
     bool Get_UsesHand(const FMars_FPHands_ReachTarget& InTarget, bool InIsRightHand)
     {
-        return InTarget.IsValid && (InIsRightHand ? InTarget.UsesRight : InTarget.UsesLeft);
+        return InTarget.IsValid && InTarget.Get_HandGrip(InIsRightHand).IsUsed;
     }
+}
+
+// One glove's grip on the target. Get_HandGrip(Target.Right.IsUsed) is the glove that leads (the right when both are used).
+mixin FMars_FPHands_HandGrip Get_HandGrip(const FMars_FPHands_ReachTarget& Self, bool InIsRightHand)
+{
+    if (InIsRightHand)
+    { return Self.Right; }
+
+    return Self.Left;
 }

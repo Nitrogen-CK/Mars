@@ -16,7 +16,10 @@ struct FMars_FPHands_ReachSpec
     UPROPERTY(Category = "Focus")
     float32 SideSwitchMarginCm = 10.0f;
 
-    // Longest a glove stretches from its rest toward a grip (cm). Stylised long reach.
+    // Longest a glove stretches from its rest toward a grip (cm): a look cap that keeps the arms stylised, not a gate on
+    // what can be gripped (out of reach, the glove stretches this far toward the grip). It is not tied to the
+    // interaction trace distance, which answers a different question (what can be used). Exceptions live on the grip:
+    // FMars_FPHands_GripEntry.ReachOverrideCm.
     UPROPERTY(Category = "Reach")
     float32 MaxReachCm = 60.0f;
 
@@ -181,8 +184,9 @@ namespace utils_fphands
         return 0.0f;
     }
 
-    // The glove's grip (hand node space) when fully reached from InGrip.RestGrip toward InGrip.WorldGrip. Authored
-    // grips are matched exactly when in reach; out of reach the glove stretches its maximum toward them.
+    // The glove's grip (hand node space) when fully reached from InGrip.RestGrip toward InGrip.WorldGrip. The stretch is
+    // capped by the grip's ReachOverrideCm when it has one, else by the spec's MaxReachCm (a look cap); an authored grip's
+    // rotation is always matched, even when the cap leaves the glove short of it.
     FTransform Make_ReachedGrip(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_GripQuery& InGrip)
     {
         const auto TargetInHand = InGrip.HandWorld.InverseTransformPosition(InGrip.WorldGrip.GetLocation());
@@ -193,12 +197,13 @@ namespace utils_fphands
 
         const auto Direction = ToTarget / Distance;
         const auto Wanted = Math::Max(Distance - InGrip.Standoff, 0.0);
-        const auto Length = Math::Min(Wanted, float(InSpec.MaxReachCm));
+        const auto Cap = InGrip.ReachOverrideCm > 0.0f ? InGrip.ReachOverrideCm : InSpec.MaxReachCm;
+        const auto Length = Math::Min(Wanted, float(Cap));
 
         auto Result = InGrip.RestGrip;
         Result.SetLocation(InGrip.RestGrip.GetLocation() + Direction * Length);
 
-        if (InGrip.IsAuthored && Wanted <= InSpec.MaxReachCm + 1.0)
+        if (InGrip.IsAuthored)
         { Result.SetRotation(InGrip.HandWorld.InverseTransformRotation(InGrip.WorldGrip.GetRotation())); }
         else
         {
@@ -238,14 +243,19 @@ mixin bool Get_IsReaching(const FCk_Handle_FPHands& Self, bool InIsRightHand)
     return Self.Get_Phase() != EMars_FPHands_Phase::None && utils_fphands::Get_UsesHand(Self.Get_Target(), InIsRightHand);
 }
 
-// Finger pose while reaching; false = keep the glove's own pose.
-mixin bool Get_ReachPose(const FCk_Handle_FPHands& Self, EMars_HandGripPose& OutPose)
+// One glove's finger pose while reaching; false = keep the glove's own pose. The contact pose is the glove's grip's
+// (a grip-table row), else the target's (a pickup's), else the spec's.
+mixin bool Get_ReachPose(const FCk_Handle_FPHands& Self, bool InIsRightHand, EMars_HandGripPose& OutPose)
 {
     const auto& Spec = Self.Get_Spec();
     const auto Target = Self.Get_Target();
     const auto Phase = Self.Get_Phase();
     const auto T = Self.Get_PhaseTime();
-    const auto Contact = Target.HasContactPose ? Target.ContactPose : Spec.Reach.ContactPose;
+    const auto HandGrip = Target.Get_HandGrip(InIsRightHand);
+    auto Contact = Target.HasContactPose ? Target.ContactPose : Spec.Reach.ContactPose;
+    if (HandGrip.HasPose)
+    { Contact = HandGrip.Pose; }
+
     if (Phase == EMars_FPHands_Phase::Reach)
     {
         OutPose = T < Spec.Reach.GrabOutSeconds * 0.7f ? Spec.Reach.ApproachPose : Contact;
