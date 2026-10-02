@@ -16,12 +16,12 @@ struct FMars_FPHands_ReachSpec
     UPROPERTY(Category = "Focus")
     float32 SideSwitchMarginCm = 10.0f;
 
-    // Longest a glove stretches from its rest toward a grip (cm): a look cap that keeps the arms stylised, not a gate on
-    // what can be gripped (out of reach, the glove stretches this far toward the grip). It is not tied to the
-    // interaction trace distance, which answers a different question (what can be used). Exceptions live on the grip:
+    // Longest a glove stretches from its rest toward a grip (cm). 0 = uncapped: the first-person gloves reach whatever
+    // the player can interact with, so the interaction trace distance is what bounds the reach. A positive value is a
+    // stylised look cap (out of reach, the glove stretches this far toward the grip). A grip may carry its own cap:
     // FMars_FPHands_GripEntry.ReachOverrideCm.
     UPROPERTY(Category = "Reach")
-    float32 MaxReachCm = 60.0f;
+    float32 MaxReachCm = 0.0f;
 
     // Point grips (no socket): the glove stops this far short of the interaction point (cm).
     UPROPERTY(Category = "Reach")
@@ -185,8 +185,8 @@ namespace utils_fphands
     }
 
     // The glove's grip (hand node space) when fully reached from InGrip.RestGrip toward InGrip.WorldGrip. The stretch is
-    // capped by the grip's ReachOverrideCm when it has one, else by the spec's MaxReachCm (a look cap); an authored grip's
-    // rotation is always matched, even when the cap leaves the glove short of it.
+    // capped by the grip's ReachOverrideCm when it has one, else by the spec's MaxReachCm; no positive cap = the glove
+    // reaches the grip. An authored grip's rotation is always matched, even when a cap leaves the glove short of it.
     FTransform Make_ReachedGrip(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_GripQuery& InGrip)
     {
         const auto TargetInHand = InGrip.HandWorld.InverseTransformPosition(InGrip.WorldGrip.GetLocation());
@@ -198,7 +198,7 @@ namespace utils_fphands
         const auto Direction = ToTarget / Distance;
         const auto Wanted = Math::Max(Distance - InGrip.Standoff, 0.0);
         const auto Cap = InGrip.ReachOverrideCm > 0.0f ? InGrip.ReachOverrideCm : InSpec.MaxReachCm;
-        const auto Length = Math::Min(Wanted, float(Cap));
+        const auto Length = Cap > 0.0f ? Math::Min(Wanted, float(Cap)) : Wanted;
 
         auto Result = InGrip.RestGrip;
         Result.SetLocation(InGrip.RestGrip.GetLocation() + Direction * Length);
