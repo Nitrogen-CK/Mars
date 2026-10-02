@@ -2,9 +2,11 @@
 //   Locomotion ->Operating [IsOperating]       (the station's Use interaction reserved it for this player)
 //   Operating  ->Locomotion [IsNotOperating]   (the station released this player: Leave, the station's own SM, or a
 //                                               destroyed station)
-// Entering Operating tears Locomotion (and its movement task) down, which is what locks the body in place. Tasks, in order:
+// Entering Operating tears Locomotion down - its movement and every free-roam interaction task (view-trace focus, resolver
+// intents, levers, hotbar keys, emotes, held-item use / drop / hints) - which is what locks the body in place and leaves
+// the keys to the station. Tasks, in order:
 //   PoseLock     glide the capsule to the stand and decouple body yaw from the view
-//   Camera       snap the view to the stand's facing at CameraPitchOffset; Free fences the yaw, Captured freezes it
+//   Camera       snap the view to the stand's facing at Camera.PitchOffset; Free fences the yaw, Captured freezes it
 //   Grip         start the station's grip interaction under its own Operate intent so the gloves Hold on the station
 //                (the grip never touches the Use intent: E while operating cannot disturb the gloves)
 //   LeaveIntent  Mars.Intent.Back pressed -> Operator.Request_Leave()
@@ -170,7 +172,7 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
 // Camera
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Snaps the view to the stand's facing pitched by CameraPitchOffset. Free: the yaw is fenced to CameraYawHalfAngle each
+// Snaps the view to the stand's facing pitched by Camera.PitchOffset. Free: the yaw is fenced to Camera.YawHalfAngle each
 // side of the stand's facing. Captured: the orientation control is frozen (the station reads the look delta). Exit restores
 // the full yaw range and the orientation control. No PlayerViewpoint (headless) = nothing to do.
 class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
@@ -202,14 +204,14 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(Station))
         { return; }
 
-        const auto Spec = Station.Get_Spec();
+        const auto CameraSpec = Station.Get_Spec().Camera;
         const auto StandYaw = Station.Get_StandWorld().Rotator().Yaw;
-        _Camera.Request_SnapBoomRotation(FRotator(Spec.CameraPitchOffset, StandYaw, 0.0));
+        _Camera.Request_SnapBoomRotation(FRotator(CameraSpec.PitchOffset, StandYaw, 0.0));
 
-        if (Spec.LookControl == EMars_Station_LookControl::Free)
+        if (CameraSpec.LookControl == EMars_Station_LookControl::Free)
         {
             _Camera.Request_Set_OrientationYawLimits(
-                float32(StandYaw - Spec.CameraYawHalfAngle), float32(StandYaw + Spec.CameraYawHalfAngle));
+                float32(StandYaw - CameraSpec.YawHalfAngle), float32(StandYaw + CameraSpec.YawHalfAngle));
         }
         else
         {
@@ -245,7 +247,8 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
 // the resolver only resolves best targets for an OPEN intent (CkInteractionResolver_Processor.cpp DoUpdateCachedTargets
 // loops the active intents), and this task is the only thing that opens and closes Operate. The grip never touches the
 // Use intent, so E while operating (UMars_SmTask_UseIntentToResolver opening / closing Use) cannot disturb the gloves.
-// Exit cancels the interaction, removes the target and closes Operate.
+// Exit cancels the interaction, removes the target and closes Operate. The close needs only the resolver: the grip target
+// dies with its station, and a station destroyed under the operator must not leave Operate open.
 class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -284,9 +287,11 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
         if (ck::IsValid(_Target))
         { _Target.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Player)); }
 
-        if (ck::IsValid(_Resolver) && ck::IsValid(_Target))
+        if (ck::IsValid(_Resolver))
         {
-            _Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(_Target));
+            if (ck::IsValid(_Target))
+            { _Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(_Target)); }
+
             _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(
                 GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate")));
         }
