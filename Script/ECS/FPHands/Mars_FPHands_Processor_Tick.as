@@ -29,22 +29,24 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         utils_fphands::Update_ReachTarget(InState.Target);
         utils_fphands::Update_ReachTarget(InState.FocusTarget);
 
-        // A focused interactable can die without an unfocus (a pickup destroys the item under the view trace). A dead
-        // focus is no focus: its anchor is frozen where the item lay, so a glove would otherwise keep leaning toward that
-        // world spot, a fixed offset from its hold, until something else is looked at.
-        if (InState.FocusTarget.IsValid && ck::Is_NOT_Valid(InState.FocusedFor))
-        {
-            InState.FocusTarget = FMars_FPHands_ReachTarget();
-            InState.FocusedFor = FCk_Handle_Interactable();
-        }
+        // Focus is the interactable being looked at; FocusTarget outlives it while the gloves lean back out (an unfocus,
+        // or a focused pickup destroyed under the view trace), and is cleared once both leans have eased to zero - so the
+        // gloves ease back to rest instead of snapping, and never keep leaning toward a dead item's frozen spot.
+        const auto HasFocus = InState.FocusTarget.IsValid && ck::IsValid(InState.FocusedFor);
 
         // A reach takes the larger of lean and reach, so it launches from and settles back into the lean.
-        const auto HasFocus = InState.FocusTarget.IsValid;
         const auto LeanAlpha = float32(1.0 - Math::Exp(-ReachSpec.FocusInterpSpeed * DeltaSeconds));
         const auto LeanR = HasFocus && InState.FocusTarget.Right.IsUsed ? ReachSpec.FocusLean : 0.0f;
         const auto LeanL = HasFocus && InState.FocusTarget.Left.IsUsed ? ReachSpec.FocusLean : 0.0f;
         InState.FocusAlpha_R += (LeanR - InState.FocusAlpha_R) * LeanAlpha;
         InState.FocusAlpha_L += (LeanL - InState.FocusAlpha_L) * LeanAlpha;
+
+        if (HasFocus == false && InState.FocusTarget.IsValid && InState.FocusAlpha_R < 0.001f && InState.FocusAlpha_L < 0.001f)
+        {
+            InState.FocusTarget = FMars_FPHands_ReachTarget();
+            InState.FocusAlpha_R = 0.0f;
+            InState.FocusAlpha_L = 0.0f;
+        }
 
         Tick_Carry(InHandle, Params, InState);
     }
