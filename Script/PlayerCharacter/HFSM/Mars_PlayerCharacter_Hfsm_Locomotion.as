@@ -1,13 +1,17 @@
-// Transitions are evaluated in declaration order:
-//   Idle     ->Airborne[IsFalling] ->Jump[JumpPressed] ->Crouch[CrouchPressed] ->Walk[HasMoveIntent]
-//   Walk     ->Airborne ->Jump ->Crouch ->Idle[NoMoveIntent] ->Sprint[SprintHeld]
-//   Sprint   ->Airborne ->Jump ->Crouch ->Idle[NoMoveIntent] ->Walk[SprintReleased]
-//   Crouch   ->Airborne ->Jump[JumpPressed] ->Sprint[SprintPressed + HasMoveIntent] ->Idle[CrouchPressed]
+// Transitions are evaluated in declaration order. Every state but Climb checks ->Climb[IsClimbing] FIRST (Airborne
+// included: catching a ladder mid-fall is allowed); the mount itself is UMars_SmTask_ClimberMountIntent on Locomotion.
+//   Idle     ->Climb ->Airborne[IsFalling] ->Jump[JumpPressed] ->Crouch[CrouchPressed] ->Walk[HasMoveIntent]
+//   Walk     ->Climb ->Airborne ->Jump ->Crouch ->Idle[NoMoveIntent] ->Sprint[SprintHeld]
+//   Sprint   ->Climb ->Airborne ->Jump ->Crouch ->Idle[NoMoveIntent] ->Walk[SprintReleased]
+//   Crouch   ->Climb ->Airborne ->Jump[JumpPressed] ->Sprint[SprintPressed + HasMoveIntent] ->Idle[CrouchPressed]
 //            (toggle: a fresh crouch press stands up; a fresh sprint press stands up and runs - a fresh press, not a
 //            hold, so crouching mid-sprint with sprint still held does not bounce straight back to Sprint)
-//   Jump     ->Airborne[IsFalling] ->Idle[JumpReleased + IsGrounded]   (jump refused)
-//   Airborne ->Sprint[IsGrounded + HasMoveIntent + SprintHeld] ->Walk[IsGrounded + HasMoveIntent] ->Idle[IsGrounded]
+//   Jump     ->Climb ->Airborne[IsFalling] ->Idle[JumpReleased + IsGrounded]   (jump refused)
+//   Airborne ->Climb ->Sprint[IsGrounded + HasMoveIntent + SprintHeld] ->Walk[IsGrounded + HasMoveIntent] ->Idle[IsGrounded]
 //            (landing goes straight to the moving state: a frame in Idle drops MaxWalkSpeed and input, braking the run)
+//   Climb    ->Airborne[IsFalling] ->Idle[IsNotClimbing]
+//            (W/S climb through the Climber; Jump jumps off away from the ladder; the Climber ends the climb at the top or
+//            the bottom and restores walking)
 
 class UMars_SmCondition_JumpPressed : UMars_SmCondition_IntentPressed
 {
@@ -42,6 +46,25 @@ class UMars_SmCondition_SprintPressed : UMars_SmCondition_IntentPressed
 class UMars_SmCondition_CrouchPressed : UMars_SmCondition_IntentPressed
 {
     default IntentTag = GameplayTags::Mars_Intent_Crouch;
+}
+
+// Polled on the context entity's Climber; false without one.
+class UMars_SmCondition_IsClimbing : UCk_SmCondition_Polled
+{
+    UFUNCTION(BlueprintOverride)
+    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
+    {
+        auto Climber = ck::Ctx(InHandle).As_Climber(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Climber))
+        { return false; }
+
+        return Climber.Get_IsClimbing();
+    }
+}
+
+class UMars_SmCondition_IsNotClimbing : UMars_SmCondition_IsClimbing
+{
+    default _NegateResult = true;
 }
 
 enum EMars_LocomotionSpeed
@@ -84,6 +107,9 @@ class UMars_SmState_Loco_Idle : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToClimb = AddTransition(InHandle, UMars_SmState_Loco_Climb);
+        AddCondition(ToClimb, UMars_SmCondition_IsClimbing);
+
         auto ToAirborne = AddTransition(InHandle, UMars_SmState_Loco_Airborne);
         AddCondition(ToAirborne, UMars_SmCondition_IsFalling);
 
@@ -111,6 +137,9 @@ class UMars_SmState_Loco_Walk : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToClimb = AddTransition(InHandle, UMars_SmState_Loco_Climb);
+        AddCondition(ToClimb, UMars_SmCondition_IsClimbing);
+
         auto ToAirborne = AddTransition(InHandle, UMars_SmState_Loco_Airborne);
         AddCondition(ToAirborne, UMars_SmCondition_IsFalling);
 
@@ -142,6 +171,9 @@ class UMars_SmState_Loco_Sprint : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToClimb = AddTransition(InHandle, UMars_SmState_Loco_Climb);
+        AddCondition(ToClimb, UMars_SmCondition_IsClimbing);
+
         auto ToAirborne = AddTransition(InHandle, UMars_SmState_Loco_Airborne);
         AddCondition(ToAirborne, UMars_SmCondition_IsFalling);
 
@@ -174,6 +206,9 @@ class UMars_SmState_Loco_Crouch : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToClimb = AddTransition(InHandle, UMars_SmState_Loco_Climb);
+        AddCondition(ToClimb, UMars_SmCondition_IsClimbing);
+
         auto ToAirborne = AddTransition(InHandle, UMars_SmState_Loco_Airborne);
         AddCondition(ToAirborne, UMars_SmCondition_IsFalling);
 
@@ -204,6 +239,9 @@ class UMars_SmState_Loco_Jump : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToClimb = AddTransition(InHandle, UMars_SmState_Loco_Climb);
+        AddCondition(ToClimb, UMars_SmCondition_IsClimbing);
+
         auto ToAirborne = AddTransition(InHandle, UMars_SmState_Loco_Airborne);
         AddCondition(ToAirborne, UMars_SmCondition_IsFalling);
 
@@ -228,6 +266,9 @@ class UMars_SmState_Loco_Airborne : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
+        auto ToClimb = AddTransition(InHandle, UMars_SmState_Loco_Climb);
+        AddCondition(ToClimb, UMars_SmCondition_IsClimbing);
+
         auto ToSprint = AddTransition(InHandle, UMars_SmState_Loco_Sprint);
         AddCondition(ToSprint, UMars_SmCondition_IsGrounded);
         AddCondition(ToSprint, UMars_SmCondition_HasMoveIntent);
@@ -247,5 +288,183 @@ class UMars_SmState_Loco_Airborne : UCk_SmState_EntityScript
     void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
     {
         ck::Trace("Player SM: Locomotion > Airborne", n"PlayerSM", 2.0f, FLinearColor(0.9f, 0.9f, 0.9f, 1.0f));
+    }
+}
+
+// On a ladder: the Climber holds the character on the climb line in MOVE_Flying, so no movement or speed task runs here.
+// Topping out or stepping off at the bottom ends the climb (->Idle); jumping off makes the character fall (->Airborne).
+class UMars_SmState_Loco_Climb : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        auto ToAirborne = AddTransition(InHandle, UMars_SmState_Loco_Airborne);
+        AddCondition(ToAirborne, UMars_SmCondition_IsFalling);
+
+        auto ToIdle = AddTransition(InHandle, UMars_SmState_Loco_Idle);
+        AddCondition(ToIdle, UMars_SmCondition_IsNotClimbing);
+
+        AddTask(InHandle, UMars_SmTask_ClimbInput);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        ck::Trace("Player SM: Locomotion > Climb", n"PlayerSM", 2.0f, FLinearColor(0.4f, 0.9f, 0.9f, 1.0f));
+    }
+}
+
+// The Climb state's input: every tick the move intent is non-zero, its forward axis (W/S) climbs the ladder; a fresh Jump
+// press jumps off. Ticks, unlike its EnterExitOnly base, whose enter/exit still run through Super; handles are cached
+// BEFORE Super::DoEnterTask (the base's first OnMatcherRebound runs inside it).
+class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    private FCk_Handle_Climber _Climber;
+    private FCk_Handle_InputIntents _MoveIntents;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        auto Player = ck::Ctx(InHandle);
+        _Climber = Player.As_Climber(ECk_SanityCheck::UnChecked);
+        _MoveIntents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
+
+        auto Character = Cast<ACharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
+        if (ck::IsValid(Character) && Character.bIsCrouched)
+        { Character.UnCrouch(); }
+
+        Super::DoEnterTask(InHandle, InNetContext);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Super::DoExitTask(InHandle, InNetContext);
+
+        _Climber = FCk_Handle_Climber();
+        _MoveIntents = FCk_Handle_InputIntents();
+    }
+
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::Is_NOT_Valid(_Climber) || ck::Is_NOT_Valid(_MoveIntents))
+        { return ECk_SmTaskResult::Running; }
+
+        const auto MoveDirection = _MoveIntents.Get_MoveDirection();
+        if (MoveDirection.SizeSquared() <= 0.0001)
+        { return ECk_SmTaskResult::Running; }
+
+        _Climber.Request_Climb(FMars_Request_Climber_Climb(float32(MoveDirection.X)));
+        return ECk_SmTaskResult::Running;
+    }
+
+    protected void OnIntentPressed(FGameplayTag InIntent) override
+    {
+        if (InIntent != GameplayTags::Mars_Intent_Jump || ck::Is_NOT_Valid(_Climber))
+        { return; }
+
+        _Climber.Request_Dismount(FMars_Request_Climber_Dismount(EMars_Climber_Dismount::Jump));
+    }
+}
+
+// On Locomotion: steps the player onto a ladder whose zone they stand in when they walk toward it - the move direction
+// rotated by control yaw (as UMars_SmTask_Movement applies it) points at the ladder (dot > 0.5 with the zone's toward-plane
+// direction). A Top candidate also needs the feet on the platform (above Height - 20 over the ladder's foot), so reaching
+// the top zone from the front does not mount at the top. Without a character the yaw is 0 and the feet check is skipped.
+// After any dismount it waits RemountCooldownSeconds before mounting again: a top-out leaves the player in the TopZone and
+// a jump-off leaves them in the FrontZone, often still holding a direction that points at the ladder, and the next tick
+// would otherwise put them straight back on it.
+class UMars_SmTask_ClimberMountIntent : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    protected float32 RemountCooldownSeconds = 0.4f;
+
+    private ACharacter _Character;
+    private FCk_Handle_Climber _Climber;
+    private FCk_Handle_InputIntents _Intents;
+    private float32 _SinceDismount = 1.0e6;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        auto Player = ck::Ctx(InHandle);
+        _Character = Cast<ACharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
+        _Climber = Player.As_Climber(ECk_SanityCheck::UnChecked);
+        _Intents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
+        _SinceDismount = 1.0e6;
+
+        if (ck::IsValid(_Climber))
+        { _Climber.BindTo_OnClimbingChanged(FMars_Delegate_Climber_OnClimbingChanged(this, n"OnClimbingChanged")); }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_Climber))
+        { _Climber.UnbindFrom_OnClimbingChanged(FMars_Delegate_Climber_OnClimbingChanged(this, n"OnClimbingChanged")); }
+
+        _Character = nullptr;
+        _Climber = FCk_Handle_Climber();
+        _Intents = FCk_Handle_InputIntents();
+    }
+
+    UFUNCTION()
+    private void OnClimbingChanged(FCk_Handle_Climber InClimber, bool InClimbing)
+    {
+        if (InClimbing == false)
+        { _SinceDismount = 0.0f; }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::Is_NOT_Valid(_Climber) || ck::Is_NOT_Valid(_Intents))
+        { return ECk_SmTaskResult::Running; }
+
+        _SinceDismount += float32(InDeltaT.Get_Seconds());
+        if (_SinceDismount < RemountCooldownSeconds)
+        { return ECk_SmTaskResult::Running; }
+
+        if (_Climber.Get_IsClimbing() || _Climber.Get_HasCandidate() == false)
+        { return ECk_SmTaskResult::Running; }
+
+        const auto Move = _Intents.Get_MoveDirection();
+        if (Move.SizeSquared() <= 0.0001)
+        { return ECk_SmTaskResult::Running; }
+
+        const auto Yaw = ck::IsValid(_Character) ? _Character.GetControlRotation().Yaw : 0.0;
+        const auto YawRotation = FRotator(0.0, Yaw, 0.0);
+        const auto MoveWorld = (YawRotation.GetForwardVector() * Move.X + YawRotation.GetRightVector() * Move.Y).GetSafeNormal();
+
+        for (auto Candidate : _Climber.Get_Candidates())
+        {
+            auto Ladder = Candidate.Ladder;
+            if (ck::Is_NOT_Valid(Ladder))
+            { continue; }
+
+            if (MoveWorld.DotProduct(Ladder.Get_TowardPlaneWorld(Candidate.Zone)) <= 0.5)
+            { continue; }
+
+            if (Candidate.Zone == EMars_Ladder_Zone::Top && Get_IsOnPlatform(Ladder) == false)
+            { continue; }
+
+            _Climber.Request_Mount(FMars_Request_Climber_Mount(Ladder, Candidate.Zone));
+            return ECk_SmTaskResult::Running;
+        }
+
+        return ECk_SmTaskResult::Running;
+    }
+
+    private bool Get_IsOnPlatform(const FCk_Handle_Ladder& InLadder)
+    {
+        if (ck::Is_NOT_Valid(_Character))
+        { return true; }
+
+        const auto FeetZ = _Character.GetActorLocation().Z - _Character.CapsuleComponent.GetScaledCapsuleHalfHeight();
+        return FeetZ - InLadder.Get_FrameWorld().GetLocation().Z > float64(InLadder.Get_Height()) - 20.0;
     }
 }
