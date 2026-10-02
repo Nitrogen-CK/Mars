@@ -1,6 +1,7 @@
 // Placeable steam vent. The origin is the base of the nozzle block; the jet fires along local +X from the nozzle mouth.
-// A looping Trap cycle (Idle / Telegraph / Fire) arms the push hazard in front of the nozzle on Fire. The steam cube is
-// visual only: small on Telegraph, full length on Fire, hidden otherwise. An optional MechanismSink gates the cycle
+// A looping Trap cycle (Idle / Telegraph / Fire) arms the push hazard in front of the nozzle on Fire. The jet is the
+// CkParticles SteamJet behavior (47), one component at the nozzle mouth aimed along the vent's +X: Telegraph plays it
+// small and faint, Fire at full tuning, Idle or a stopped cycle deactivates it. An optional MechanismSink gates the cycle
 // per Trap.Powered.
 class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
 {
@@ -22,26 +23,26 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_Hazard_Spec Hazard;
 
-    private FCk_Handle_SceneNode SteamPivot;
+    private FCk_Handle_Transform VentRoot;
+
+    // Spawned at the first Telegraph or Fire whose template is ready, so a cold template never stalls the game thread;
+    // null under nullrhi, where Niagara spawns nothing. The entity script is a UObject, not a fragment, so it may hold it.
+    private UNiagaraComponent Steam;
+    private bool _SteamActive = false;
 
     private const FVector NozzleMouth = FVector(30.0, 0.0, 60.0);
     private const float64 JetLength = 300.0;
     private const float64 JetWidth = 80.0;
 
-    // Scale of the steam pivot, whose child is a 100 uu cube: X is length, Y/Z the cross-section (in hundreds of uu).
-    private const FVector SteamScale_Hidden = FVector(0.01, 0.01, 0.01);
-    private const FVector SteamScale_Telegraph = FVector(0.6, 0.35, 0.35);
-    private const FVector SteamScale_Fire = FVector(3.0, 0.8, 0.8);
+    private const int32 k_SteamJetBehaviorId = 47;
+    private const float32 k_TelegraphSize = 0.45f;
+    private const float32 k_TelegraphAlpha = 0.5f;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        auto VentRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        VentRoot = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InHandle, n"TAG_MarsVent");
-
-        // Scaling the pivot scales the steam cube hung in front of it, so the jet always grows out of the nozzle mouth.
-        SteamPivot = utils_scene_node::Create(VentRoot,
-            FTransform(FRotator::ZeroRotator, NozzleMouth, SteamScale_Hidden));
 
         auto TriggerSpec = FMars_Trigger_Spec();
         TriggerSpec.Shape = EMars_Trigger_Shape::Box;
@@ -77,45 +78,87 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
         Cycle.BindTo_OnRunningChanged(FMars_Delegate_Cycle_OnRunningChanged(this, n"OnCycleRunningChanged"));
 
         if (Cycle.Get_IsRunning())
-        { ShowSteamForPhase(Cycle.Get_CurrentPhase()); }
+        { Apply_SteamForPhase(Cycle.Get_CurrentPhase()); }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoEndPlay(FCk_Handle InHandle)
+    {
+        if (ck::IsValid(Steam))
+        { Steam.DestroyComponent(); }
+
+        Steam = nullptr;
+        _SteamActive = false;
     }
 
     UFUNCTION()
     private void OnCyclePhaseChanged(FCk_Handle_Cycle InCycle, FGameplayTag InPhase, int32 InIndex)
     {
-        ShowSteamForPhase(InPhase);
+        Apply_SteamForPhase(InPhase);
     }
 
     UFUNCTION()
     private void OnCycleRunningChanged(FCk_Handle_Cycle InCycle, bool InRunning)
     {
         if (InRunning == false)
-        { SetSteamScale(SteamScale_Hidden); }
+        { Set_SteamActive(false); }
     }
 
-    private void ShowSteamForPhase(FGameplayTag InPhase)
+    private void Apply_SteamForPhase(FGameplayTag InPhase)
     {
-        if (InPhase == GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Fire"))
+        const auto IsFire = InPhase == GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Fire");
+        const auto IsTelegraph = InPhase == GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Telegraph");
+        if (IsFire == false && IsTelegraph == false)
         {
-            SetSteamScale(SteamScale_Fire);
+            Set_SteamActive(false);
             return;
         }
 
-        if (InPhase == GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Telegraph"))
-        {
-            SetSteamScale(SteamScale_Telegraph);
-            return;
-        }
-
-        SetSteamScale(SteamScale_Hidden);
-    }
-
-    private void SetSteamScale(FVector InScale)
-    {
-        if (ck::Is_NOT_Valid(SteamPivot))
+        if (Ensure_Steam() == false)
         { return; }
 
-        utils_scene_node::Request_UpdateOffset_Scale(SteamPivot, InScale, ECk_RelativeAbsolute::Absolute);
+        Set_SteamActive(true);
+        if (IsTelegraph)
+        { utils_particles::Request_ApplyTuningValues(Steam, k_TelegraphSize, 1.0f, k_TelegraphAlpha, 1.0f); }
+        else
+        { utils_particles::Request_ApplyTuningValues(Steam, 1.0f, 1.0f, 1.0f, 1.0f); }
+    }
+
+    private bool Ensure_Steam()
+    {
+        if (ck::IsValid(Steam))
+        { return true; }
+
+        if (utils_particles::Get_IsBehaviorTemplateReady(k_SteamJetBehaviorId) == false)
+        {
+            ck::Trace("[Vent] steam template compiling; the jet joins at the next phase");
+            return false;
+        }
+
+        const auto Root = utils_transform::Get_EntityCurrentTransform(VentRoot);
+        Steam = utils_particles::Spawn_BehaviorAtLocation(k_SteamJetBehaviorId,
+            Root.TransformPosition(NozzleMouth), Root.Rotator(), FVector::OneVector, NAME_None);
+
+        _SteamActive = false;
+        return ck::IsValid(Steam);
+    }
+
+    // Activate(true) RESETS the system, so it only runs on an off -> on edge; a Telegraph -> Fire step keeps the jet's
+    // particles and only retunes it.
+    private void Set_SteamActive(bool InActive)
+    {
+        if (ck::Is_NOT_Valid(Steam))
+        { return; }
+
+        if (InActive == _SteamActive)
+        { return; }
+
+        _SteamActive = InActive;
+
+        if (InActive)
+        { Steam.Activate(true); }
+        else
+        { Steam.Deactivate(); }
     }
 
     private void AddVisuals(FCk_Handle_Transform& InRoot)
@@ -131,11 +174,6 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
         const auto NozzleHeight = NozzleMouth.Z + JetWidth;
         AddBox(InRoot, FVector(0.0, 0.0, NozzleHeight * 0.5), FVector(NozzleDepth, JetWidth * 1.4, NozzleHeight) * 0.01,
             CubeMesh, WallMaterial, collision::profile::BlockAll, n"Vent_Nozzle");
-
-        // A unit cube half a length in front of the pivot: the pivot's scale is the jet's length and cross-section.
-        auto SteamTransform = SteamPivot.As_Transform();
-        AddBox(SteamTransform, FVector(50.0, 0.0, 0.0), FVector::OneVector,
-            CubeMesh, WallMaterial, collision::profile::NoCollision, n"Vent_Steam");
     }
 
     // NewObject needs a UObject outer, hence a private method on the entity script.
