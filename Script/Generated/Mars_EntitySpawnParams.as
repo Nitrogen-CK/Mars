@@ -450,6 +450,19 @@ namespace UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold
+{
+    FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_SocketGripFollowsMovingPart_SpawnParams
 {
 }
@@ -2021,6 +2034,19 @@ namespace UMars_SmCondition_HandsPhaseElapsed_Grip
 }
 
 USTRUCT()
+struct FMars_SmCondition_HandsPhaseElapsed_Push_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPhaseElapsed_Push
+{
+    FMars_SmCondition_HandsPhaseElapsed_Push_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPhaseElapsed_Push_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_HandsPhaseElapsed_Reach_SpawnParams
 {
 }
@@ -2056,6 +2082,19 @@ namespace UMars_SmCondition_HandsPhaseElapsed_Return
     FMars_SmCondition_HandsPhaseElapsed_Return_SpawnParams Params()
     {
         return FMars_SmCondition_HandsPhaseElapsed_Return_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_HandsPushRequested_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_HandsPushRequested
+{
+    FMars_SmCondition_HandsPushRequested_SpawnParams Params()
+    {
+        return FMars_SmCondition_HandsPushRequested_SpawnParams();
     }
 }
 
@@ -2476,6 +2515,19 @@ namespace UMars_SmState_Hands_Hold
 }
 
 USTRUCT()
+struct FMars_SmState_Hands_Push_SpawnParams
+{
+}
+
+namespace UMars_SmState_Hands_Push
+{
+    FMars_SmState_Hands_Push_SpawnParams Params()
+    {
+        return FMars_SmState_Hands_Push_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Hands_Reach_SpawnParams
 {
 }
@@ -2879,6 +2931,19 @@ namespace UMars_SmTask_Hands_SetPhase_None
 }
 
 USTRUCT()
+struct FMars_SmTask_Hands_SetPhase_Push_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Hands_SetPhase_Push
+{
+    FMars_SmTask_Hands_SetPhase_Push_SpawnParams Params()
+    {
+        return FMars_SmTask_Hands_SetPhase_Push_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_Hands_SetPhase_Reach_SpawnParams
 {
 }
@@ -2927,6 +2992,19 @@ namespace UMars_SmTask_Hands_StopEmote
     FMars_SmTask_Hands_StopEmote_SpawnParams Params()
     {
         return FMars_SmTask_Hands_StopEmote_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_HandsLaunchBinds_SpawnParams
+{
+}
+
+namespace UMars_SmTask_HandsLaunchBinds
+{
+    FMars_SmTask_HandsLaunchBinds_SpawnParams Params()
+    {
+        return FMars_SmTask_HandsLaunchBinds_SpawnParams();
     }
 }
 

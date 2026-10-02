@@ -339,6 +339,18 @@ class AMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone_Actor : ACk_A
     }
 }
 
+class AMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FPHands_SocketGripFollowsMovingPart_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

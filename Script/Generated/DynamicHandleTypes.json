@@ -111,7 +111,7 @@
 		{
 			"TypeName": "FCk_Handle_FPHands",
 			"ShortName": "FPHands",
-			"Description": "The first-person gloves: reach/grip/return/hold/release phase owned by the Hands sub-HFSM, focus lean, hold and carry",
+			"Description": "The first-person gloves: reach/grip/return/hold/release/push phase owned by the Hands sub-HFSM, focus lean, hold and carry",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_FPHandsHandle",
 			"RequiredFragments": [
 				"Mars_Feature_FPHands"
