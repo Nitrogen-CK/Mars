@@ -155,6 +155,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Slot3, EKeys::Three);
         Context.MapKey(mars::Mars_IA_Slot4, EKeys::Four);
         Context.MapKey(mars::Mars_IA_Drop, EKeys::R);
+        Context.MapKey(mars::Mars_IA_Back, EKeys::Tab);
         Context.MapKey(mars::Mars_IA_EmoteWheel, EKeys::Q);
         Context.MapKey(mars::Mars_IA_Emote_Wave, EKeys::Five);
         Context.MapKey(mars::Mars_IA_Emote_ThumbsUp, EKeys::Six);
@@ -200,6 +201,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Slot3, EKeys::Gamepad_DPad_Right);
         Context.MapKey(mars::Mars_IA_Slot4, EKeys::Gamepad_DPad_Down);
         Context.MapKey(mars::Mars_IA_Drop, EKeys::Gamepad_FaceButton_Top);
+        // Shares B with Crouch: Back is read only while operating a station, where Locomotion (and crouch) is down.
+        Context.MapKey(mars::Mars_IA_Back, EKeys::Gamepad_FaceButton_Right);
         Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::Gamepad_RightShoulder);
         auto& MappingCyclePrevious = Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::Gamepad_LeftShoulder);
         MappingCyclePrevious.Modifiers.Add(NewObject(Context, UInputModifierNegate));
@@ -300,6 +303,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("SC", n"IA_Slot3", GameplayTags::Mars_Intent_Slot3));
         Rows.Add(FMars_Gameplay_IntentRow("SD", n"IA_Slot4", GameplayTags::Mars_Intent_Slot4));
         Rows.Add(FMars_Gameplay_IntentRow("DR", n"IA_Drop", GameplayTags::Mars_Intent_Drop));
+        Rows.Add(FMars_Gameplay_IntentRow("BK", n"IA_Back", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Back")));
         Rows.Add(FMars_Gameplay_IntentRow("EM", n"IA_EmoteWheel", GameplayTags::ResolveGameplayTag(n"Mars.Intent.EmoteWheel")));
         Rows.Add(FMars_Gameplay_IntentRow("EW", n"IA_Emote_Wave", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Wave")));
         Rows.Add(FMars_Gameplay_IntentRow("ET", n"IA_Emote_ThumbsUp", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.ThumbsUp")));
