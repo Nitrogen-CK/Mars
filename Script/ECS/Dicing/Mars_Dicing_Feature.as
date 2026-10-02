@@ -73,7 +73,8 @@ struct FMars_Dicing_Spec
 }
 
 // A board or band with no width has nowhere to aim, a band as wide as the board is always aligned, zero chops per state
-// would advance without chopping, and a zero-length strike is no motion at all.
+// would advance without chopping, a zero-length strike is no motion at all, and the pile starts as whole leaves, so the
+// requested texture must take at least one chop.
 mixin FMars_Validation Validate(const FMars_Dicing_Spec& Self)
 {
     if (Self.BoardHalfWidth <= 0.0f)
@@ -93,6 +94,9 @@ mixin FMars_Validation Validate(const FMars_Dicing_Spec& Self)
 
     if (Self.ChopDownSeconds <= 0.0f)
     { return FMars_Validation(f"Dicing has a non-positive ChopDownSeconds [{Self.ChopDownSeconds}]"); }
+
+    if (Self.RequestedState == EMars_Dicing_State::WholeLeaves)
+    { return FMars_Validation("Dicing has RequestedState WholeLeaves: the requested texture must take at least one chop"); }
 
     return FMars_Validation();
 }

@@ -62,8 +62,9 @@ struct FMars_Ladder_Spec
     }
 }
 
-// Every length must be positive: a zero height has no line to climb, a zero standoff puts the capsule in the rungs, and
-// zero-depth zones or exit detect nothing / drop the climber on the edge. The climb speed is the climber's (FMars_Climber_Spec).
+// Every length must be positive: a zero height has no line to climb, a zero standoff puts the capsule in the rungs,
+// zero-depth zones or exit detect nothing / drop the climber on the edge, and zones with no height padding stop at their
+// edge, below a standing capsule. The climb speed is the climber's (FMars_Climber_Spec).
 mixin FMars_Validation Validate(const FMars_Ladder_Spec& Self)
 {
     if (Self.Height <= 0.0f)
@@ -80,6 +81,9 @@ mixin FMars_Validation Validate(const FMars_Ladder_Spec& Self)
 
     if (Self.TopExitDepth <= 0.0f)
     { return FMars_Validation(f"Ladder has a non-positive TopExitDepth [{Self.TopExitDepth}]"); }
+
+    if (Self.ZoneHeightPadding <= 0.0f)
+    { return FMars_Validation(f"Ladder has a non-positive ZoneHeightPadding [{Self.ZoneHeightPadding}]"); }
 
     return FMars_Validation();
 }
