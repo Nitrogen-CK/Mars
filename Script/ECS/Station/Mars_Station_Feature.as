@@ -36,22 +36,127 @@ enum EMars_Station_ReleaseReason
 
 enum EMars_Station_LookControl
 {
-    // The view turns freely inside CameraYawHalfAngle of the stand's facing.
+    // The view turns freely inside Camera.YawHalfAngle of the stand's facing.
     Free,
     // The view is frozen at the engage framing; the station reads the look delta itself.
     Captured
 }
 
+// One glove's grip while operating: the station node the glove rides, named by its role tag (the entity script registers
+// the node under that tag, FMars_Station_GripNode), and where on it.
+struct FMars_Station_Grip
+{
+    UPROPERTY()
+    EMars_Hand Hand = EMars_Hand::Right;
+
+    UPROPERTY(meta = (Categories = "Station.Node"))
+    FGameplayTag Node;
+
+    // A socket on a static mesh the node (or a part under it) carries; NAME_None = the node itself.
+    UPROPERTY()
+    FName Socket;
+
+    UPROPERTY()
+    EMars_HandGripPose Pose = EMars_HandGripPose::Power;
+
+    // > 0 replaces the gloves' MaxReachCm for this grip (cm).
+    UPROPERTY()
+    float32 ReachOverrideCm = 0.0f;
+
+    FMars_Station_Grip() {}
+
+    FMars_Station_Grip(EMars_Hand InHand, FGameplayTag InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm)
+    {
+        Hand = InHand;
+        Node = InNode;
+        Socket = InSocket;
+        Pose = InPose;
+        ReachOverrideCm = InReachOverrideCm;
+    }
+}
+
+// A station node published under a role tag, for the spec's grips to name.
+struct FMars_Station_GripNode
+{
+    UPROPERTY()
+    FGameplayTag Tag;
+
+    UPROPERTY()
+    FCk_Handle_Transform Node;
+
+    FMars_Station_GripNode() {}
+
+    FMars_Station_GripNode(FGameplayTag InTag, FCk_Handle_Transform InNode)
+    {
+        Tag = InTag;
+        Node = InNode;
+    }
+}
+
+// What the placing script hands utils_station::Add beside the spec: the Use probe (unset = a transform-only Use
+// interactable) and the nodes its grips name.
+struct FMars_Station_Setup
+{
+    // Not a UPROPERTY, as FMars_Interactable_Spec.ProbeInfo.
+    TOptional<FMars_Interactable_ProbeInfo> Probe;
+
+    UPROPERTY()
+    TArray<FMars_Station_GripNode> GripNodes;
+}
+
+// The operator's view while operating. Field order is the positional constructor's order.
+struct FMars_Station_CameraSpec
+{
+    UPROPERTY()
+    EMars_Station_LookControl LookControl = EMars_Station_LookControl::Free;
+
+    // Free only: how far the view may turn each side of the stand's facing (degrees).
+    UPROPERTY()
+    float32 YawHalfAngle = 60.0f;
+
+    // The view pitch snapped at engage (degrees; negative looks down).
+    UPROPERTY()
+    float32 PitchOffset = -25.0f;
+
+    FMars_Station_CameraSpec() {}
+
+    FMars_Station_CameraSpec(EMars_Station_LookControl InLookControl, float32 InYawHalfAngle, float32 InPitchOffset)
+    {
+        LookControl = InLookControl;
+        YawHalfAngle = InYawHalfAngle;
+        PitchOffset = InPitchOffset;
+    }
+}
+
+// What the Use prompt reads. Field order is the positional constructor's order.
+struct FMars_Station_PromptSpec
+{
+    UPROPERTY()
+    FText Text = NSLOCTEXT("MarsInteraction", "UseStationPrompt", "Use station");
+
+    // While an operator holds the station.
+    UPROPERTY()
+    FText OccupiedText = NSLOCTEXT("MarsInteraction", "StationInUsePrompt", "In use");
+
+    FMars_Station_PromptSpec() {}
+
+    FMars_Station_PromptSpec(FText InText, FText InOccupiedText)
+    {
+        Text = InText;
+        OccupiedText = InOccupiedText;
+    }
+}
+
 // Station frame: the root is the station's origin on the floor. StandLocal is where the operator stands (Z at the floor,
-// +X facing the station); GripLocal is where the gloves hold while operating. Field order is the positional constructor's
-// order (the spawn-params generator emits it when a subclass changes a default).
+// +X facing the station); Grips are where the gloves hold while operating, at most one per hand. Field order is the
+// positional constructor's order (the spawn-params generator emits it when a subclass changes a default).
 struct FMars_Station_Spec
 {
     UPROPERTY()
     FTransform StandLocal = FTransform::Identity;
 
     UPROPERTY()
-    FTransform GripLocal = FTransform::Identity;
+    TArray<FMars_Station_Grip> Grips;
 
     // Ceiling for the glide to the stand (seconds); the glide itself is derived from the distance and the turn
     // (utils_station::Get_EngageSeconds). 0 snaps.
@@ -63,22 +168,10 @@ struct FMars_Station_Spec
     bool AllowEngagement = true;
 
     UPROPERTY()
-    EMars_Station_LookControl LookControl = EMars_Station_LookControl::Free;
-
-    // Free only: how far the view may turn each side of the stand's facing (degrees).
-    UPROPERTY()
-    float32 CameraYawHalfAngle = 60.0f;
-
-    // The view pitch snapped at engage (degrees; negative looks down).
-    UPROPERTY()
-    float32 CameraPitchOffset = -25.0f;
+    FMars_Station_CameraSpec Camera;
 
     UPROPERTY()
-    FText PromptText = NSLOCTEXT("MarsInteraction", "UseStationPrompt", "Use station");
-
-    // What the Use prompt reads while an operator holds the station.
-    UPROPERTY()
-    FText OccupiedText = NSLOCTEXT("MarsInteraction", "StationInUsePrompt", "In use");
+    FMars_Station_PromptSpec Prompt;
 
     // Root state of the station's own state machine (context = the station); unset = no minigame.
     UPROPERTY()
@@ -88,44 +181,50 @@ struct FMars_Station_Spec
 
     FMars_Station_Spec(
         FTransform InStandLocal,
-        FTransform InGripLocal,
+        TArray<FMars_Station_Grip> InGrips,
         float32 InEngageMaxSeconds,
         bool InAllowEngagement,
-        EMars_Station_LookControl InLookControl,
-        float32 InCameraYawHalfAngle,
-        float32 InCameraPitchOffset,
-        FText InPromptText,
-        FText InOccupiedText,
+        FMars_Station_CameraSpec InCamera,
+        FMars_Station_PromptSpec InPrompt,
         TSoftClassPtr<UCk_SmState_EntityScript> InMinigameStateClass)
     {
         StandLocal = InStandLocal;
-        GripLocal = InGripLocal;
+        Grips = InGrips;
         EngageMaxSeconds = InEngageMaxSeconds;
         AllowEngagement = InAllowEngagement;
-        LookControl = InLookControl;
-        CameraYawHalfAngle = InCameraYawHalfAngle;
-        CameraPitchOffset = InCameraPitchOffset;
-        PromptText = InPromptText;
-        OccupiedText = InOccupiedText;
+        Camera = InCamera;
+        Prompt = InPrompt;
         MinigameStateClass = InMinigameStateClass;
     }
 }
 
-// A negative glide ceiling has no meaning, a yaw half angle outside (0, 180] fences nothing or everything, and an empty
-// prompt text leaves the player a glyph with no verb.
+// A negative glide ceiling has no meaning, a yaw half angle outside (0, 180] fences nothing or everything, an empty
+// prompt text leaves the player a glyph with no verb, a grip without a node tag names nothing, and a glove holds one grip.
 mixin FMars_Validation Validate(const FMars_Station_Spec& Self)
 {
+    for (int32 Index = 0; Index < Self.Grips.Num(); ++Index)
+    {
+        if (Self.Grips[Index].Node.IsValid() == false)
+        { return FMars_Validation(f"Station grip [{Index}] has no node tag"); }
+
+        for (int32 Earlier = 0; Earlier < Index; ++Earlier)
+        {
+            if (Self.Grips[Earlier].Hand == Self.Grips[Index].Hand)
+            { return FMars_Validation(f"Station grip [{Index}] repeats the hand [{Self.Grips[Index].Hand :n}] of grip [{Earlier}]"); }
+        }
+    }
+
     if (Self.EngageMaxSeconds < 0.0f)
     { return FMars_Validation(f"Station has a negative EngageMaxSeconds [{Self.EngageMaxSeconds}]"); }
 
-    if (Self.CameraYawHalfAngle <= 0.0f || Self.CameraYawHalfAngle > 180.0f)
-    { return FMars_Validation(f"Station has CameraYawHalfAngle [{Self.CameraYawHalfAngle}] outside (0, 180]"); }
+    if (Self.Camera.YawHalfAngle <= 0.0f || Self.Camera.YawHalfAngle > 180.0f)
+    { return FMars_Validation(f"Station has Camera.YawHalfAngle [{Self.Camera.YawHalfAngle}] outside (0, 180]"); }
 
-    if (Self.PromptText.IsEmpty())
-    { return FMars_Validation("Station has an empty PromptText"); }
+    if (Self.Prompt.Text.IsEmpty())
+    { return FMars_Validation("Station has an empty Prompt.Text"); }
 
-    if (Self.OccupiedText.IsEmpty())
-    { return FMars_Validation("Station has an empty OccupiedText"); }
+    if (Self.Prompt.OccupiedText.IsEmpty())
+    { return FMars_Validation("Station has an empty Prompt.OccupiedText"); }
 
     return FMars_Validation();
 }
@@ -162,15 +261,12 @@ struct FMars_Fragment_Station
     UPROPERTY()
     FCk_Handle_Transform Stand;
 
-    // Child scene node at GripLocal: hosts the grip interactable the gloves hold.
-    UPROPERTY()
-    FCk_Handle_Transform GripNode;
-
     // The Use interactable (one Instant target that reserves the station).
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
 
-    // Transform-only, prompt-less: one ManuallyCompleted Use target the Operating state starts so the gloves hold.
+    // Transform-only, prompt-less, on the root (its owner carries the grip table the gloves read): one ManuallyCompleted
+    // Operate target the Operating state starts so the gloves hold.
     UPROPERTY()
     FCk_Handle_Interactable GripInteractable;
 
