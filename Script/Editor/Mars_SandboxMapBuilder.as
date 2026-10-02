@@ -23,6 +23,12 @@
 // an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
 // The sandbox backpack (a World-mode Backpack preset with four cargo slots) sits beside them. To place it in an
 // already-built sandbox map, open it and run: Mars.Sandbox.PlaceBackpack
+// The sandbox ladder (a 400x400x300 platform block on the main floor with a ladder on its south face) sits north-west of
+// the player starts. To place it in an already-built sandbox map, open it and run: Mars.Sandbox.PlaceLadder
+// The sandbox workbench (a plain station: a table the player operates, standing in front of it) sits south-west of the
+// player starts. To place it in an already-built sandbox map, open it and run: Mars.Sandbox.PlaceWorkbench
+// The sandbox dicing station (a table with a cutting board, an herb pile and a cleaver the operator chops with) sits 400uu
+// toward -Y of the workbench. To place it in an already-built sandbox map, open it and run: Mars.Sandbox.PlaceDicingStation
 //
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
@@ -92,6 +98,30 @@ void Mars_PlaceSandboxBackpackFunc(const TArray<FString>& Args)
 
 const FConsoleCommand Mars_PlaceSandboxBackpackCommand("Mars.Sandbox.PlaceBackpack", n"Mars_PlaceSandboxBackpackFunc");
 
+UFUNCTION()
+void Mars_PlaceSandboxLadderFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceLadder();
+}
+
+const FConsoleCommand Mars_PlaceSandboxLadderCommand("Mars.Sandbox.PlaceLadder", n"Mars_PlaceSandboxLadderFunc");
+
+UFUNCTION()
+void Mars_PlaceSandboxWorkbenchFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceWorkbench();
+}
+
+const FConsoleCommand Mars_PlaceSandboxWorkbenchCommand("Mars.Sandbox.PlaceWorkbench", n"Mars_PlaceSandboxWorkbenchFunc");
+
+UFUNCTION()
+void Mars_PlaceSandboxDicingStationFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceDicingStation();
+}
+
+const FConsoleCommand Mars_PlaceSandboxDicingStationCommand("Mars.Sandbox.PlaceDicingStation", n"Mars_PlaceSandboxDicingStationFunc");
+
 namespace utils_mars_sandbox
 {
     const FString k_MapPath = "/Game/Mars/Maps/Sandbox_Mars_MAP";
@@ -99,6 +129,9 @@ namespace utils_mars_sandbox
     const FString k_Room3FloorLabel = "Room3_Floor";
     const FString k_Room4FloorLabel = "Room4_Floor";
     const FString k_ItemLabelPrefix = "Item_";
+    const FString k_LadderPlatformLabel = "Sandbox_LadderPlatform";
+    const FString k_WorkbenchLabel = "Sandbox_Workbench";
+    const FString k_DicingStationLabel = "Sandbox_DicingStation";
 
     void Build()
     {
@@ -152,6 +185,9 @@ namespace utils_mars_sandbox
         Spawn_Room2(Cube);
         Spawn_Room3(Cube);
         Spawn_Room4(Cube);
+        Spawn_Ladder(Cube);
+        Spawn_Workbench();
+        Spawn_DicingStation();
 
         Apply_ProtoGridMaterials();
 
@@ -304,6 +340,101 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.PlaceBackpack] placed, saved={Saved}");
+    }
+
+    void PlaceLadder()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceLadder] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_LadderPlatformLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceLadder] [{k_LadderPlatformLabel}] already exists. Delete it and Sandbox_Ladder first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Ladder(engine::load::Cube());
+        Apply_ProtoGridMaterials();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceLadder] placed, saved={Saved}");
+    }
+
+    void PlaceWorkbench()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceWorkbench] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_WorkbenchLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceWorkbench] [{k_WorkbenchLabel}] already exists. Delete it first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Workbench();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceWorkbench] placed, saved={Saved}");
+    }
+
+    // The workbench station at (-1200, -1200) on the main floor, facing +X: the player walks up from -X and stands 70uu in
+    // front of the table.
+    void Spawn_Workbench()
+    {
+        Spawn_Mechanism(UMars_WorkbenchStation_EntityScript, k_WorkbenchLabel, FVector(-1200.0, -1200.0, 0.0));
+    }
+
+    void PlaceDicingStation()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceDicingStation] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_DicingStationLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceDicingStation] [{k_DicingStationLabel}] already exists. Delete it first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_DicingStation();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceDicingStation] placed, saved={Saved}");
+    }
+
+    // The dicing station at (-1200, -1600) on the main floor, next to the workbench, facing +X: the player walks up from -X
+    // and stands 75uu in front of the table.
+    void Spawn_DicingStation()
+    {
+        Spawn_Mechanism(UMars_DicingStation_EntityScript, k_DicingStationLabel, FVector(-1200.0, -1600.0, 0.0));
+    }
+
+    // A 400x400x300 platform centred on (-1200, 1200) (top at Z=300) with the ladder at the middle of its south face
+    // (Y=1000), yawed so the ladder's local +X points -Y, away from the platform. Its default 300uu height meets the top.
+    void Spawn_Ladder(UStaticMesh InCube)
+    {
+        utils_mars_map_builder::Spawn_Block(InCube, k_LadderPlatformLabel, FVector(-1200.0, 1200.0, 150.0), FVector(4.0, 4.0, 3.0));
+        Spawn_Mechanism(UMars_Ladder_EntityScript, "Sandbox_Ladder", FVector(-1200.0, 1000.0, 0.0), FRotator(0.0, -90.0, 0.0));
     }
 
     // Room 2 spans X 2000..4000, Y -700..700 (the main floor ends at X=2000). The gated bays sit in a partition at
@@ -482,6 +613,8 @@ namespace utils_mars_sandbox
 
             if (Label == "Floor")
             { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label == k_LadderPlatformLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Ledge_"))
             { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Tunnel_"))
