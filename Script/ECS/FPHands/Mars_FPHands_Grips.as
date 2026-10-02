@@ -3,8 +3,9 @@
 // Authored grips are static mesh sockets:
 //   Grip_R + Grip_L   both gloves (two-handed)
 //   Grip (or Grip_R)  the right glove alone
-// A socket's transform is where that glove's grip bone goes: X along the handle toward the index finger, Z out of the
-// palm - the grip_r / grip_l bone axes of SK_FPHands. Without sockets, pickups are taken by their sides (fitted to the
+// A socket's transform is where that glove's grip bone goes: X along the handle, ACROSS the palm from the little finger
+// toward the index finger (not along the fingers), Z out of the palm - the grip_r / grip_l bone axes of SK_FPHands.
+// A flat hand with its fingers pointing forward therefore has X pointing to its thumb side. Without sockets, pickups are taken by their sides (fitted to the
 // mesh bounds) and other interactables are reached at their interaction point.
 enum EMars_FPHands_GripLayout
 {
@@ -40,6 +41,26 @@ enum EMars_Hand
     Left
 }
 
+// Whether an authored grip keeps its exact rotation or only its bar. FaceViewer: the grip names a bar (its X axis through
+// its location) and the glove takes it the way it would from where the player stands - which end the index finger points
+// to and the roll around the bar are chosen at reach time, closest to the glove's rest pose. Mechanism sockets (levers,
+// chains, wheels) face the viewer; item sockets and grip-table entries are Fixed unless they ask.
+enum EMars_FPHands_GripRoll
+{
+    Fixed,
+    FaceViewer
+}
+
+// How a socketless grip entry orients the glove (an entry with a socket always matches the socket).
+enum EMars_FPHands_GripFrame
+{
+    // A point grip at the node: the glove keeps its own rotation, turned partly toward the grip (ReachSpec.AimFraction).
+    Aimed,
+    // The node's own axes are the grip, authored like a socket (X across the palm toward the index finger, Z out of the
+    // palm): rotate the node to pose the glove.
+    Node
+}
+
 // One glove's grip on a reach target: its own anchor (a part that may move on its own) and the grip in that anchor's space.
 struct FMars_FPHands_HandGrip
 {
@@ -64,6 +85,10 @@ struct FMars_FPHands_HandGrip
     // > 0 replaces the spec's MaxReachCm for this grip (cm).
     UPROPERTY()
     float32 ReachOverrideCm = 0.0f;
+
+    // Authored grips only: Fixed keeps the grip's rotation; FaceViewer re-rolls it around its bar at reach time.
+    UPROPERTY()
+    EMars_FPHands_GripRoll Roll = EMars_FPHands_GripRoll::Fixed;
 
     // The glove's contact pose on this grip; unset = the target's contact pose, else the spec's.
     UPROPERTY()
@@ -93,15 +118,26 @@ struct FMars_FPHands_GripEntry
     UPROPERTY()
     float32 ReachOverrideCm = 0.0f;
 
+    // Socketless entries only: Aimed = a point grip at the node; Node = the node's own axes are the grip.
+    UPROPERTY()
+    EMars_FPHands_GripFrame Frame = EMars_FPHands_GripFrame::Aimed;
+
+    // Authored grips (a socket, or Frame Node): Fixed keeps the rotation; FaceViewer takes the bar from the player's side.
+    UPROPERTY()
+    EMars_FPHands_GripRoll Roll = EMars_FPHands_GripRoll::Fixed;
+
     FMars_FPHands_GripEntry() {}
 
-    FMars_FPHands_GripEntry(EMars_Hand InHand, FCk_Handle_Transform InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm)
+    FMars_FPHands_GripEntry(EMars_Hand InHand, FCk_Handle_Transform InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm,
+                            EMars_FPHands_GripFrame InFrame, EMars_FPHands_GripRoll InRoll)
     {
         Hand = InHand;
         Node = InNode;
         Socket = InSocket;
         Pose = InPose;
         ReachOverrideCm = InReachOverrideCm;
+        Frame = InFrame;
+        Roll = InRoll;
     }
 }
 
@@ -190,6 +226,15 @@ struct FMars_FPHands_HandState
 
     UPROPERTY()
     bool PreferRightHand = true;
+
+    // Each glove's rest grip rotation in world (the pose the gloves present from where the player stands); FaceViewer
+    // grips are rolled toward it. Identity = unknown (tests that build a hand state by hand): FaceViewer grips stay as
+    // authored.
+    UPROPERTY()
+    FQuat RestGripWorld_R = FQuat::Identity;
+
+    UPROPERTY()
+    FQuat RestGripWorld_L = FQuat::Identity;
 
     FMars_FPHands_HandState() {}
 
@@ -413,8 +458,13 @@ namespace utils_fphands
         Grip.ReachOverrideCm = InEntry.ReachOverrideCm;
         Grip.HasPose = true;
         Grip.Pose = InEntry.Pose;
+        Grip.Roll = InEntry.Roll;
         if (InEntry.Socket == NAME_None)
-        { return Grip; }
+        {
+            // Grip stays identity: the node itself is the grip bone's target, its rotation included under Node.
+            Grip.IsAuthored = InEntry.Frame == EMars_FPHands_GripFrame::Node;
+            return Grip;
+        }
 
         auto Component = Find_EntitySocketComponent(InEntry.Node, InEntry.Socket);
         if (ck::Is_NOT_Valid(Component))
@@ -465,6 +515,68 @@ namespace utils_fphands
     // PreferRightHand picks the glove for single-handed reaches near the centre line. An owner with a grip table
     // (FMars_Fragment_FPHands_Grips) decides each glove's grip itself; every other path anchors both gloves to one part.
     FMars_FPHands_ReachTarget Resolve_ReachTarget(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_ReachQuery& InQuery)
+    {
+        auto Target = Resolve_ReachTarget_AsAuthored(InSpec, InQuery);
+        Apply_ViewerFacingRoll(Target, InQuery.Hand);
+        return Target;
+    }
+
+    // Each used, authored FaceViewer grip re-rolled around its bar toward that glove's rest pose (anchor space, so a moving
+    // part carries the chosen grip with it).
+    void Apply_ViewerFacingRoll(FMars_FPHands_ReachTarget& InOutTarget, const FMars_FPHands_HandState& InHand)
+    {
+        if (InOutTarget.IsValid == false)
+        { return; }
+
+        Roll_HandGrip(InOutTarget.Right, InHand.RestGripWorld_R);
+        Roll_HandGrip(InOutTarget.Left, InHand.RestGripWorld_L);
+    }
+
+    void Roll_HandGrip(FMars_FPHands_HandGrip& InOutGrip, const FQuat& InRestWorld)
+    {
+        if (InOutGrip.IsUsed == false || InOutGrip.IsAuthored == false || InOutGrip.Roll != EMars_FPHands_GripRoll::FaceViewer)
+        { return; }
+
+        if (InRestWorld.Equals(FQuat::Identity, 0.0001))
+        { return; }
+
+        const auto GripWorld = InOutGrip.Grip * InOutGrip.AnchorWorld;
+        const auto Rolled = Make_ViewerFacingGrip(GripWorld.GetRotation(), InRestWorld);
+        InOutGrip.Grip.SetRotation(InOutGrip.AnchorWorld.InverseTransformRotation(Rolled));
+    }
+
+    // The rotation that keeps InGripWorld's bar (its X axis, either way along it) and is otherwise closest to InRestWorld:
+    // for each end the index finger may point to, the palm (Z) turns as near the rest palm direction as the bar allows,
+    // and the nearer of the two wins. A rest palm along the bar keeps the authored roll.
+    FQuat Make_ViewerFacingGrip(const FQuat& InGripWorld, const FQuat& InRestWorld)
+    {
+        const auto Bar = InGripWorld.GetForwardVector();
+        const auto RestPalm = InRestWorld.GetUpVector();
+
+        auto Best = InGripWorld;
+        auto BestDot = -1.0;
+        for (int32 Index = 0; Index < 2; ++Index)
+        {
+            const auto X = Index == 0 ? Bar : -Bar;
+            auto Palm = RestPalm - X * RestPalm.DotProduct(X);
+            if (Palm.SizeSquared() < 0.000001)
+            { Palm = InGripWorld.GetUpVector() - X * InGripWorld.GetUpVector().DotProduct(X); }
+
+            const auto Candidate = FQuat(FRotator::MakeFromXZ(X, Palm.GetSafeNormal()));
+            const auto Dot = Math::Abs(Candidate.X * InRestWorld.X + Candidate.Y * InRestWorld.Y
+                + Candidate.Z * InRestWorld.Z + Candidate.W * InRestWorld.W);
+            if (Dot > BestDot)
+            {
+                BestDot = Dot;
+                Best = Candidate;
+            }
+        }
+
+        return Best;
+    }
+
+    // What the gloves go for, with every authored grip exactly as authored (Resolve_ReachTarget then rolls FaceViewer grips).
+    FMars_FPHands_ReachTarget Resolve_ReachTarget_AsAuthored(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_ReachQuery& InQuery)
     {
         const auto& Subject = InQuery.Subject;
         const auto& Hand = InQuery.Hand;
@@ -560,6 +672,7 @@ namespace utils_fphands
             }
 
             Shared.IsAuthored = true;
+            Shared.Roll = EMars_FPHands_GripRoll::FaceViewer;
             Target.Layout = EMars_FPHands_GripLayout::Authored;
             Target.Right = Shared;
             Target.Left = Shared;

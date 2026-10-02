@@ -32,6 +32,9 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     // The left glove's grip, in from the board's left (-Y) edge.
     private const float64 LeftGripEdgeInset = 6.0;
 
+    // The left glove's grip bone above the board (the palm's thickness, FMars_FPHands_Spec.PalmSurfaceOffset).
+    private const float64 PalmLift = 2.5;
+
     // The pile and the cleaver sit over the board's middle; the band marks the strip in front of the pile (operator side).
     private const float64 PileX = 0.0;
     private const float64 BandX = -24.0;
@@ -146,10 +149,12 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         InOutSpec.StandLocal = FTransform(FRotator::ZeroRotator, FVector(-(TableDepth * 0.5 + StandGap), 0.0, 0.0));
 
         auto Grips = TArray<FMars_Station_Grip>();
+        // Both grips take their node's frame: the handle node wraps the right glove around the horizontal handle, the
+        // board node lays the left glove flat on the board.
         Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::ResolveGameplayTag(n"Station.Node.Tool"), NAME_None,
-            EMars_HandGripPose::Power, 0.0f));
+            EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         Grips.Add(FMars_Station_Grip(EMars_Hand::Left, GameplayTags::ResolveGameplayTag(n"Station.Node.Surface"), NAME_None,
-            EMars_HandGripPose::Open, 0.0f));
+            EMars_HandGripPose::Open, 0.0f, EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         InOutSpec.Grips = Grips;
 
         InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
@@ -201,8 +206,12 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
 
         _Label = AddLabel(InRoot, FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - 5.0, 0.0, BoardTop + 40.0)));
 
+        // Grip frame (X across the palm toward the index finger, Z out of the palm): a left hand flat on the board with its
+        // fingers forward has its index side to the right (+Y) and its palm down (-Z); the grip bone sits a palm's
+        // thickness above the surface.
         _BoardGripNode = utils_scene_node::Create(InRoot,
-            FTransform(FRotator::ZeroRotator, FVector(BoardX, -BoardWidth * 0.5 + LeftGripEdgeInset, BoardTop))).As_Transform();
+            FTransform(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector),
+                FVector(BoardX, -BoardWidth * 0.5 + LeftGripEdgeInset, BoardTop + PalmLift))).As_Transform();
 
         AddCleaver(InRoot);
     }
@@ -238,7 +247,10 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         AddPart(CleaverTransform, FTransform(FRotator::ZeroRotator, HandleOffset, FVector(0.12, 0.025, 0.025)),
             CubeMesh, ToolMaterial, collision::profile::NoCollision, n"DicingStation_Handle");
 
-        _HandleGripNode = utils_scene_node::Create(CleaverTransform, FTransform(FRotator::ZeroRotator, HandleOffset)).As_Transform();
+        // Grip frame (X across the palm toward the index finger, Z out of the palm): along the handle toward the blade
+        // (+X), palm facing the operator's left (-Y) - a handshake grip on a horizontal handle, blade edge down.
+        _HandleGripNode = utils_scene_node::Create(CleaverTransform,
+            FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), HandleOffset)).As_Transform();
     }
 
     //----------------------------------------------------------------------------------------------------------------------

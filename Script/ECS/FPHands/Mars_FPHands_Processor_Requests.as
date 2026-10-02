@@ -218,7 +218,13 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
                                                      const FMars_FPHands_ReachSubject& InSubject)
     {
         const auto HandWorld = utils_transform::Get_EntityCurrentTransform(InParams.HandNode);
-        const auto Hand = FMars_FPHands_HandState(InState.Hold, HandWorld, InState.PreferRightHand);
+        auto Hand = FMars_FPHands_HandState(InState.Hold, HandWorld, InState.PreferRightHand);
+
+        // The rest pose seen from where the player stands: FaceViewer grips (levers, chains) are taken from this side.
+        const auto Rest = utils_fphands::Get_RestTargets(InParams.Spec, InState.Hold,
+            FMars_FPHands_TargetFrame(HandWorld, FVector::ZeroVector, FVector::ZeroVector));
+        Hand.RestGripWorld_R = (Rest.Right.GripInHand * HandWorld).GetRotation();
+        Hand.RestGripWorld_L = (Rest.Left.GripInHand * HandWorld).GetRotation();
         auto Target = utils_fphands::Resolve_ReachTarget(InParams.Spec.Reach, FMars_FPHands_ReachQuery(InSubject, Hand));
         if (Target.IsValid && Target.Right.IsUsed != Target.Left.IsUsed)
         { InState.PreferRightHand = Target.Right.IsUsed; }

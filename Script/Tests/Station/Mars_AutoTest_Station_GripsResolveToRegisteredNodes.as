@@ -19,8 +19,8 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
         _SurfaceNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(10.0, -20.0, 90.0))).As_Transform();
 
         auto Spec = FMars_Station_Spec();
-        Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, 0.0f));
-        Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Left, Get_SurfaceTag(), NAME_None, EMars_HandGripPose::Open, 80.0f));
+        Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
+        Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Left, Get_SurfaceTag(), NAME_None, EMars_HandGripPose::Open, 80.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
 
         auto Setup = FMars_Station_Setup();
         Setup.GripNodes.Add(FMars_Station_GripNode(Get_SurfaceTag(), _SurfaceNode));
@@ -90,14 +90,14 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
     private void Step_AssertValidate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto TwoRight = FMars_Station_Spec();
-        TwoRight.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, 0.0f));
-        TwoRight.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_SurfaceTag(), NAME_None, EMars_HandGripPose::Open, 0.0f));
+        TwoRight.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
+        TwoRight.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_SurfaceTag(), NAME_None, EMars_HandGripPose::Open, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         const auto TwoRightResult = TwoRight.Validate();
         Assert_False(TwoRightResult.IsValid, "Validate() on two grips for the right hand");
         Assert_True(TwoRightResult.Get_Error().Contains("repeats the hand"), f"Validate() names the repeated hand (got [{TwoRightResult.Get_Error()}])");
 
         auto NoTag = FMars_Station_Spec();
-        NoTag.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, FGameplayTag(), NAME_None, EMars_HandGripPose::Power, 0.0f));
+        NoTag.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, FGameplayTag(), NAME_None, EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         const auto NoTagResult = NoTag.Validate();
         Assert_False(NoTagResult.IsValid, "Validate() on a grip without a node tag");
         Assert_True(NoTagResult.Get_Error().Contains("has no node tag"), f"Validate() names the missing tag (got [{NoTagResult.Get_Error()}])");
@@ -111,7 +111,7 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
         auto SurfaceNode = utils_scene_node::Create(Root, FTransform::Identity).As_Transform();
 
         auto Spec = FMars_Station_Spec();
-        Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, 0.0f));
+        Spec.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         auto Setup = FMars_Station_Setup();
         Setup.GripNodes.Add(FMars_Station_GripNode(Get_SurfaceTag(), SurfaceNode));
 

@@ -20,7 +20,7 @@ class UMars_WorkbenchStation_EntityScript : UMars_Station_EntityScript
 
         auto Grips = TArray<FMars_Station_Grip>();
         Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::ResolveGameplayTag(n"Station.Node.Surface"), NAME_None,
-            EMars_HandGripPose::Open, 0.0f));
+            EMars_HandGripPose::Open, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         InOutSpec.Grips = Grips;
     }
 

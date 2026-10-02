@@ -30,7 +30,7 @@ namespace utils_station
                 continue;
             }
 
-            GripEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Grip.Socket, Grip.Pose, Grip.ReachOverrideCm));
+            GripEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Grip.Socket, Grip.Pose, Grip.ReachOverrideCm, Grip.Frame, Grip.Roll));
         }
 
         if (ck::EnsureIfNot(GripError.IsEmpty(), f"[Station] [{InRoot.ToString()}] rejected the grips: {GripError}"))
