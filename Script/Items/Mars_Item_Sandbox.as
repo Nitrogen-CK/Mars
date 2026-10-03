@@ -51,20 +51,19 @@ asset Mars_ItemDef_Cog of UCk_InventoryItem_Definition
     _ItemTraits.Add(Throwable);
 }
 
-// The engine cube has no sockets, so the cargo mounts are root-relative offsets on one face (a 2x2 grid). A socketed
-// mesh names its sockets in the mounts instead.
+// One cargo mount per pocket socket on the mesh (Pocket1..3); stowed items sit on the socket itself.
 asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Backpack"));
+    _CoreInfo.Set_Icon(assets::Backpack_T());
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = engine::Cube();
-    Presentation.MeshScale = FVector(0.45, 0.35, 0.6);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Mesh = assets::SM_PlayerBackpack();
     Presentation.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -10.0));
     Presentation.Persistence = EMars_WorldItem_Persistence::Persistent;
     Presentation.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
-    Presentation.CarryOffset = FTransform::Identity;
+    // Pushed back off the Back attach point so the worn pack stays out of the camera when looking down.
+    Presentation.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(-20.0, 0.0, 0.0));
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -76,13 +75,11 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     auto Backpack = Cast<UMars_ItemTrait_Backpack>(NewObject(this, UMars_ItemTrait_Backpack));
     auto Mount = FMars_CargoSlot_Mount();
     Mount.ProbeRadius = 10.0f;
-    Mount.Offset = FTransform(FRotator::ZeroRotator, FVector(-25.0, -12.0, 14.0));
+    Mount.Socket = n"Pocket1";
     Backpack.CargoSlots.Add(Mount);
-    Mount.Offset = FTransform(FRotator::ZeroRotator, FVector(-25.0, 12.0, 14.0));
+    Mount.Socket = n"Pocket2";
     Backpack.CargoSlots.Add(Mount);
-    Mount.Offset = FTransform(FRotator::ZeroRotator, FVector(-25.0, -12.0, -14.0));
-    Backpack.CargoSlots.Add(Mount);
-    Mount.Offset = FTransform(FRotator::ZeroRotator, FVector(-25.0, 12.0, -14.0));
+    Mount.Socket = n"Pocket3";
     Backpack.CargoSlots.Add(Mount);
     _ItemTraits.Add(Backpack);
 }

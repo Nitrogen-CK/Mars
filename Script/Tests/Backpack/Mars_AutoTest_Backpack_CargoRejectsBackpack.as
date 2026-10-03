@@ -53,7 +53,7 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Cog()));
 
-        Add_Step_WaitUntil("the backpack is constructed with 4 cargo slots and every holder is seeded", n"Check_Ready");
+        Add_Step_WaitUntil("the backpack is constructed with one cargo slot per mount and every holder is seeded", n"Check_Ready");
         Add_Step("force the second backpack into empty cargo slot 0", n"Step_ForceBackpack2IntoSlot0");
         Add_Step_WaitUntil("the forced transfer reported", n"Check_Backpack2TransferRecorded");
         Add_Step("cargo slot 0's policy refused the backpack", n"Step_AssertBackpack2Refused");
@@ -99,7 +99,8 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
         for (const auto& Holder : _Holders)
         { AllSeeded = AllSeeded && Holder.Get_NumItems() == 1; }
 
-        const auto Ready = AllSeeded && ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == 4;
+        const UMars_ItemTrait_Backpack Trait = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Backpack);
+        const auto Ready = AllSeeded && ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num();
         if (Ready && _Items.Num() == 0)
         {
             for (const auto& Holder : _Holders)

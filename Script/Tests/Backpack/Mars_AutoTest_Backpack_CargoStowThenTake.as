@@ -49,7 +49,7 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
 
         _RockHolder = MakeSeededHolder(InHandle, mars_items::Rock());
 
-        Add_Step_WaitUntil("the backpack is constructed with 4 cargo slots and the rock holder is seeded", n"Check_Ready");
+        Add_Step_WaitUntil("the backpack is constructed with one cargo slot per mount and the rock holder is seeded", n"Check_Ready");
         Add_Step("stow the rock into the carrier's hotbar", n"Step_StowRockIntoHotbar");
         Add_Step_WaitUntil("the rock is auto-held with a held visual", n"Check_RockHeld");
         Add_Step("an empty slot offers Stow to a carrier holding a rock", n"Step_AssertStowOffered");
@@ -92,7 +92,9 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     UFUNCTION()
     private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Ready = ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == 4 && _RockHolder.Get_NumItems() == 1;
+        const UMars_ItemTrait_Backpack Trait = mars_items::Backpack().Get_ItemTraitByClass(UMars_ItemTrait_Backpack);
+        const auto Ready = ck::IsValid(_Backpack) && _Backpack.Get_CargoSlotCount() == Trait.CargoSlots.Num() &&
+            _RockHolder.Get_NumItems() == 1;
         if (Ready && ck::Is_NOT_Valid(_Rock))
         {
             auto Items = _RockHolder.Get_Items();
