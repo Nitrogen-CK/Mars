@@ -1,6 +1,6 @@
 // What "use" means while this item is held: the state class activates on the Primary channel through a
 // no-probe Interactable on the player.
-UCLASS()
+UCLASS(Meta = (DisplayName = "🖐️ Use Action"))
 class UMars_ItemTrait_UseAction : UCk_ItemTrait
 {
     // Overrides InteractTarget_Enter on the use interaction.

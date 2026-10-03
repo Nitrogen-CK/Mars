@@ -1,5 +1,5 @@
 // How the item leaves the hand: a tap of Drop launches it at DropSpeed, a held-then-released Drop at ThrowSpeed.
-UCLASS()
+UCLASS(Meta = (DisplayName = "⚾💨 Throwable"))
 class UMars_ItemTrait_Throwable : UCk_ItemTrait
 {
     UPROPERTY()

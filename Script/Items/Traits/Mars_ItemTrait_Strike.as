@@ -2,7 +2,7 @@
 // sweep of Radius from the player's viewpoint out to Reach, filtered on Probe.Mars.HitZone with a Blocking world policy
 // (a wall stops the swing); the first hurtbox hit takes Damage of DamageType through the player's DamageDealer. The use
 // completes RecoverySeconds after the sweep.
-UCLASS()
+UCLASS(Meta = (DisplayName = "🗡️ Strike"))
 class UMars_ItemTrait_Strike : UCk_ItemTrait
 {
     UPROPERTY()

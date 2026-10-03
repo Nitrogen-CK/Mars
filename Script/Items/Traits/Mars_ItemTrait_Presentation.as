@@ -1,5 +1,5 @@
 // What an item looks like when it needs a physical representation - dropped in the world or held in the hand.
-UCLASS()
+UCLASS(Meta = (DisplayName = "🎭 Presentation"))
 class UMars_ItemTrait_Presentation : UCk_ItemTrait
 {
     // Null = the item renders nothing.

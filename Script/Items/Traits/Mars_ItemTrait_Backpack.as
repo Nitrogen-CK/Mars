@@ -13,7 +13,7 @@ struct FMars_CargoSlot_Mount
 }
 
 // A wearable pack: fits only the hotbar's backpack slot, and carries one cargo slot per mount.
-UCLASS()
+UCLASS(Meta = (DisplayName = "🎒 Backpack"))
 class UMars_ItemTrait_Backpack : UCk_ItemTrait
 {
     // 1..8 (Inventory.Mars.Cargo.0..7).
