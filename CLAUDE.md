@@ -194,6 +194,9 @@ These are maintainer rulings; they override defaults from the framework skills w
   that, pack inputs into a struct (`FMars_<Feature>_<Thing>Query` / `_Frame` / `_State`). A struct that grows past
   roughly seven fields nests related fields into sub-structs instead of staying flat. Request mixins take the request
   struct (`Request_X(const FMars_Request_<Feature>_X&)`) with full positional ctors so call sites stay one line.
+- **`Add` takes the handle and the Spec, nothing else** (`utils_<feature>::Add(Handle, FMars_<Feature>_Spec)`), as the C++
+  features do: setup handles, child nodes, action lists and other construction inputs are Spec fields (C++ specs carry
+  handles too, e.g. `FCk_ProceduralRig_Spec._Segments`). A class reference a retained Spec must hold is a `TSoftClassPtr`.
 - **Spec validity** is a `mixin FMars_Validation Validate(const FMars_X_Spec& Self)` on the Spec
   (`Script/Common/Mars_Validation.as`); `Add` wraps it in `ck::EnsureIfNot`. No `DoGet_SpecError`-style helpers.
 - **Fragments hold no strong `UObject`/`UClass` refs** (`Schema.IsSafe` rejects the fragment): use
