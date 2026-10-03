@@ -10,14 +10,22 @@ enum EMars_HandGripPose
     Open
 }
 
-// First-person glove emotes. The order indexes FMars_FPHands_Spec::EmoteMontages - append only.
+// Player emotes, played on the first-person gloves and the third-person body. The order indexes
+// FMars_FPHands_Spec::EmoteMontages and FMars_TPBody_Montages::EmoteMontages - append only. Each value's wheel tag is
+// Mars.Emote.<value name> (utils_fphands::Get_EmoteTag / TryGet_Emote).
 enum EMars_FPEmote
 {
     Wave,
     ThumbsUp,
     Point,
     Clap,
-    FlipOff
+    FlipOff,
+    Cheer,
+    Laugh,
+    Bow,
+    Dance,
+    Shrug,
+    Rest
 }
 
 // The local player's first-person gloves (floating hands). Remote players never see them (owner-only component).
@@ -79,6 +87,10 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_PushSpec Push;
 
+    // How much of the view's pitch the gloves follow.
+    UPROPERTY()
+    FMars_FPHands_PitchSpec Pitch;
+
     // Fingers stop on the surface of what the gloves hold or grab (CR_FPHands_Contact).
     UPROPERTY()
     FMars_FPHands_ContactSpec Contact;
@@ -86,10 +98,6 @@ struct FMars_FPHands_Spec
     // First-person rendering of the gloves and what they hold.
     UPROPERTY()
     FMars_FPHands_ViewSpec View;
-
-    // How much of the view's pitch the gloves follow.
-    UPROPERTY()
-    FMars_FPHands_PitchSpec Pitch;
 
     // Indexed by EMars_FPEmote. An emote montage drives both gloves (placement and fingers) through EmoteSlot; the
     // procedural placement fades out under it.
@@ -205,6 +213,45 @@ struct FMars_FPHands_Hold
 
 namespace utils_fphands
 {
+    // How many EMars_FPEmote values there are: the enum's reflected names run out (or reach the generated _MAX entry)
+    // past the last one.
+    int32 Get_EmoteCount()
+    {
+        for (int32 Value = 0; Value < 255; ++Value)
+        {
+            const FString Name = f"{EMars_FPEmote(Value) :n}";
+            if (Name.IsEmpty() || Name.EndsWith("_MAX"))
+            { return Value; }
+        }
+
+        return 255;
+    }
+
+    // Mars.Emote.<the value's name>; invalid when that tag is not registered.
+    FGameplayTag Get_EmoteTag(EMars_FPEmote InEmote)
+    {
+        return FGameplayTag::RequestGameplayTag(FName(f"Mars.Emote.{InEmote :n}"), false);
+    }
+
+    // The emote a Mars.Emote.* tag names (an emote wheel entry's Emote). False for any other tag.
+    bool TryGet_Emote(FGameplayTag InTag, EMars_FPEmote& OutEmote)
+    {
+        if (InTag.IsValid() == false)
+        { return false; }
+
+        const auto Count = Get_EmoteCount();
+        for (int32 Value = 0; Value < Count; ++Value)
+        {
+            if (Get_EmoteTag(EMars_FPEmote(Value)) != InTag)
+            { continue; }
+
+            OutEmote = EMars_FPEmote(Value);
+            return true;
+        }
+
+        return false;
+    }
+
     // Where the two gloves rest for a hold, in the hand node's space, before any reach or lean. Free hands take the
     // arm swing.
     FMars_FPHands_HandTargets Get_RestTargets(const FMars_FPHands_Spec& InSpec, const FMars_FPHands_Hold& InHold,

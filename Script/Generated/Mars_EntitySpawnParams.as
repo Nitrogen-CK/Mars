@@ -723,6 +723,32 @@ namespace UMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest
 }
 
 USTRUCT()
+struct FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack
+{
+    FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams Params()
+    {
+        return FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Emote_WheelEntryNChoosesEmoteN_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Emote_WheelEntryNChoosesEmoteN
+{
+    FMars_AutoTest_Emote_WheelEntryNChoosesEmoteN_SpawnParams Params()
+    {
+        return FMars_AutoTest_Emote_WheelEntryNChoosesEmoteN_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams
 {
 }
@@ -983,32 +1009,6 @@ namespace UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone
 }
 
 USTRUCT()
-struct FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold
-{
-    FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams Params()
-    {
-        return FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
-{
-    FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams Params()
-    {
-        return FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams();
-    }
-}
-
-USTRUCT()
 struct FMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow_SpawnParams
 {
 }
@@ -1031,6 +1031,32 @@ namespace UMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne
     FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams Params()
     {
         return FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold
+{
+    FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
+{
+    FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams();
     }
 }
 
