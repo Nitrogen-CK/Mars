@@ -58,7 +58,9 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         { HandleStartReach(InHandle, InState, StartReachRequests.Last()); }
     }
 
-    // A pickup that lands while the gloves are still on it rides in with them (see the Tick processor's carry).
+    // A pickup that lands while the gloves are still on it rides in with them (see the Tick processor's carry). Not a
+    // Persistent item: its own world item lerps itself onto the hand (the mount Arrival), and a carry would fight that
+    // for the same scene node offset.
     private void HandleSetHold(FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_SetHold& InRequest)
     {
         const auto& Item = InRequest.Item;
@@ -67,7 +69,8 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         InState.Carry = FMars_FPHands_Carry();
         const auto IsGrabbing = InState.Phase == EMars_FPHands_Phase::Reach || InState.Phase == EMars_FPHands_Phase::Grip
             || InState.Phase == EMars_FPHands_Phase::Return;
-        if (IsGrabbing && ck::IsValid(InState.Target.ShapeMesh.Get()) && ck::IsValid(Item) && Item.Has_Presentation())
+        const auto IsSpawnedVisual = ck::IsValid(Item) && Item.Has_Presentation() && Item.Has_PersistentWorldItem() == false;
+        if (IsGrabbing && ck::IsValid(InState.Target.ShapeMesh.Get()) && IsSpawnedVisual)
         {
             InState.Carry.IsActive = true;
             InState.Carry.StartWorld = InState.Target.Get_HandGrip(InState.Target.Right.IsUsed).AnchorWorld;

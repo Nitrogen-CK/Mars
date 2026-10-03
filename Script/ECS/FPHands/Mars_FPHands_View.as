@@ -25,7 +25,7 @@ namespace constants_fphands_view
     // Deepest attach chain looked through for a hand node (visual -> cargo slot -> pack -> hand is 4).
     const int32 k_MaxAttachDepth = 16;
 
-    // Most entities under one held item (a pack and its cargo visuals).
+    // Most transform entities under one held item (a pack, its probe nodes, cargo slots and their visuals).
     const int32 k_MaxHeldEntities = 64;
 }
 
@@ -95,8 +95,13 @@ namespace utils_fphands
                 { Primitive.SetFirstPersonPrimitiveType(Type); }
             }
 
+            // Only the transform tree: primitives hang off scene nodes (their component entities are found through the
+            // owner above). Interactables' state machines, inventories, items and timers would otherwise fill the cap.
             for (auto Dependent : Entity.Get_LifetimeDependents())
-            { Queue.Add(Dependent); }
+            {
+                if (ck::IsValid(Dependent.As_Transform(ECk_SanityCheck::UnChecked)))
+                { Queue.Add(Dependent); }
+            }
         }
     }
 }
