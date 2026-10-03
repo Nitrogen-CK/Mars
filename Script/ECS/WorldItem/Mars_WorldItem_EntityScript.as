@@ -142,6 +142,8 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(WorldItem) || WorldItem.Get_Mode() != EMars_WorldItem_Mode::World)
         { return; }
 
+        WorldItem.BindTo_OnMountChanged(FMars_Delegate_WorldItem_OnMountChanged(this, n"OnMountChanged_FirstPerson"));
+
         auto Holder = WorldItem.Get_Holder();
         Holder.BindTo_OnItemsChanged(FCk_Delegate_Inventory_OnItemsChanged(this, n"OnHolderItemsChanged"));
 
@@ -288,6 +290,16 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         if (_MaterialOverride.IsNull() == false)
         { MeshComponent.SetMaterial(0, System::LoadAsset_Blocking(_MaterialOverride)); }
+
+        // A visual attached under the local player's hand is drawn with the first-person gloves holding it.
+        MeshComponent.SetFirstPersonPrimitiveType(utils_fphands::Get_FirstPersonType(FCk_Handle(InHandle)));
+    }
+
+    // A persistent item moving into or out of the local player's hand switches how it, and what it carries, is drawn.
+    UFUNCTION()
+    private void OnMountChanged_FirstPerson(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
+    {
+        utils_fphands::Apply_FirstPersonType(FCk_Handle(InWorldItem));
     }
 
     UFUNCTION()

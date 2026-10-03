@@ -83,6 +83,10 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_ContactSpec Contact;
 
+    // First-person rendering of the gloves and what they hold.
+    UPROPERTY()
+    FMars_FPHands_ViewSpec View;
+
     // Indexed by EMars_FPEmote. An emote montage drives both gloves (placement and fingers) through EmoteSlot; the
     // procedural placement fades out under it.
     UPROPERTY()

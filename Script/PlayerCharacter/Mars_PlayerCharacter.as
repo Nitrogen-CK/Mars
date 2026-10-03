@@ -58,6 +58,13 @@ class AMars_PlayerCharacter : ACk_Character_UE
         CharacterMovement.AirControl = Config.AirControl;
         CharacterMovement.SetCrouchedHalfHeight(Config.CrouchedHalfHeight);
 
+        // The gloves render first-person; held items tag themselves as they attach under the hand (Mars_FPHands_View).
+        const auto& View = Config.FPHands.View;
+        const auto IsFirstPerson = View.FirstPersonRendering == ECk_EnableDisable::Enable;
+        FPHands.SetFirstPersonPrimitiveType(IsFirstPerson ? EFirstPersonPrimitiveType::FirstPerson : EFirstPersonPrimitiveType::None);
+        FirstPersonCamera.SetEnableFirstPersonScale(IsFirstPerson);
+        FirstPersonCamera.SetFirstPersonScale(View.FirstPersonScale);
+
         if (Config.FPHands.Mesh.IsNull() == false)
         { FPHands.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Config.FPHands.Mesh)); }
 
