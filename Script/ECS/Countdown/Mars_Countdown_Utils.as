@@ -10,6 +10,7 @@ namespace utils_countdown
         auto Params = FMars_Fragment_Countdown_Params();
         Params.Steps = InParams.Steps;
         Params.SecondsPerStep = InParams.SecondsPerStep;
+        Params.HoldWhilePowered = InParams.HoldWhilePowered;
 
         auto State = FMars_Fragment_Countdown();
         State.Remaining = InParams.StartCharged ? InParams.Steps : 0;
@@ -44,6 +45,16 @@ mixin bool Get_IsCharged(const FCk_Handle_Countdown& Self)
     return Self.Get_Remaining() > 0;
 }
 
+mixin bool Get_IsHeld(const FCk_Handle_Countdown& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Countdown).IsHeld;
+}
+
+mixin bool Get_HoldWhilePowered(const FCk_Handle_Countdown& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Countdown_Params).HoldWhilePowered;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -52,6 +63,12 @@ mixin void Request_Charge(FCk_Handle_Countdown& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Countdown_Requests);
     Requests.ChargeRequests.Add(FMars_Request_Countdown_Charge());
+}
+
+mixin void Request_SetHeld(FCk_Handle_Countdown& Self, const FMars_Request_Countdown_SetHeld& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Countdown_Requests);
+    Requests.SetHeldRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

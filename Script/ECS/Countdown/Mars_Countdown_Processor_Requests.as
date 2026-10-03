@@ -1,4 +1,5 @@
-// A charge refills every step and restarts the current one, however many arrive in one drain.
+// The latest SetHeld applies first, then a charge: a charge refills every step and restarts the current one, however many
+// arrive in one drain. A held countdown stays full and does not drain; releasing it drains from where it stands.
 class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -16,19 +17,33 @@ class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Countdown();
         const auto HasCharge = InRequests.ChargeRequests.Num() > 0;
+        const auto HasSetHeld = InRequests.SetHeldRequests.Num() > 0;
+
+        auto Held = InState.IsHeld;
+        if (HasSetHeld)
+        { Held = InRequests.SetHeldRequests.Last().Held; }
 
         // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Countdown_Requests);
 
-        if (HasCharge == false)
+        if (HasCharge == false && HasSetHeld == false)
         { return; }
 
         const auto Previous = InState.Remaining;
-        InState.Remaining = Self.Get_Steps();
-        InState.StepElapsed = 0.0f;
+        InState.IsHeld = Held;
 
-        if (Self.Has_Fragment(FMars_Tag_Countdown_Running) == false)
+        if (Held || HasCharge)
+        {
+            InState.Remaining = Self.Get_Steps();
+            InState.StepElapsed = 0.0f;
+        }
+
+        const auto ShouldDrain = InState.Remaining > 0 && Held == false;
+        const auto IsDraining = Self.Has_Fragment(FMars_Tag_Countdown_Running);
+        if (ShouldDrain && IsDraining == false)
         { Self.Add_Fragment(FMars_Tag_Countdown_Running()); }
+        else if (ShouldDrain == false && IsDraining)
+        { Self.Request_TryRemove(FMars_Tag_Countdown_Running); }
 
         if (InState.Remaining == Previous || Self.Has_Fragment(FMars_Fragment_Countdown_Signals) == false)
         { return; }

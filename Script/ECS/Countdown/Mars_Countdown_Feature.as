@@ -26,14 +26,20 @@ struct FMars_Countdown_Spec
     UPROPERTY()
     bool StartCharged = false;
 
+    // Set: while the MechanismSink on the countdown's entity is powered the countdown stays full and does not drain; it
+    // drains once the sink loses power. Rising edges still charge it either way.
+    UPROPERTY()
+    bool HoldWhilePowered = false;
+
     FMars_Countdown_Spec() {}
 
     // Field order: the spawn-params generator emits a subclass's changed `default Countdown.*` as this positional call.
-    FMars_Countdown_Spec(int32 InSteps, float32 InSecondsPerStep, bool InStartCharged)
+    FMars_Countdown_Spec(int32 InSteps, float32 InSecondsPerStep, bool InStartCharged, bool InHoldWhilePowered = false)
     {
         Steps = InSteps;
         SecondsPerStep = InSecondsPerStep;
         StartCharged = InStartCharged;
+        HoldWhilePowered = InHoldWhilePowered;
     }
 }
 
@@ -60,6 +66,9 @@ struct FMars_Fragment_Countdown_Params
 
     UPROPERTY()
     float32 SecondsPerStep = 2.0f;
+
+    UPROPERTY()
+    bool HoldWhilePowered = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -76,9 +85,13 @@ struct FMars_Fragment_Countdown
     // Seconds into the current step.
     UPROPERTY()
     float32 StepElapsed = 0.0f;
+
+    // Held full by its powered sink (HoldWhilePowered): it does not drain.
+    UPROPERTY()
+    bool IsHeld = false;
 }
 
-// Present while Remaining > 0; gates UMars_Processor_Countdown_Tick.
+// Present while Remaining > 0 and not held; gates UMars_Processor_Countdown_Tick.
 struct FMars_Tag_Countdown_Running {}
 
 struct FMars_Tag_Countdown_NeedsSetup {}
@@ -109,8 +122,26 @@ struct FMars_Request_Countdown_Charge
     FMars_Request_Countdown_Charge() {}
 }
 
+// Absolute: holds the countdown full (Held) or lets it drain.
+struct FMars_Request_Countdown_SetHeld
+{
+    UPROPERTY()
+    bool Held = false;
+
+    FMars_Request_Countdown_SetHeld() {}
+
+    FMars_Request_Countdown_SetHeld(bool InHeld)
+    {
+        Held = InHeld;
+    }
+}
+
+// The latest SetHeld wins and applies first; a charge then refills.
 struct FMars_Fragment_Countdown_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_Countdown_Charge> ChargeRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Countdown_SetHeld> SetHeldRequests;
 }

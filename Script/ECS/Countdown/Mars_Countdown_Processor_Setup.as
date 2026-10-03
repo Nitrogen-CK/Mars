@@ -1,5 +1,5 @@
 // The link: a countdown consumes rising edges from the MechanismSink on its own entity (each one charges it) and drives the
-// MechanismSource on that entity (asserted while charged).
+// MechanismSource on that entity (asserted while charged). With HoldWhilePowered the sink's power also holds it full.
 class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -18,7 +18,16 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
 
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Sink))
-        { Sink.BindTo_OnInputEdge(FMars_Delegate_MechanismSink_OnInputEdge(this, n"OnSinkInputEdge")); }
+        {
+            Sink.BindTo_OnInputEdge(FMars_Delegate_MechanismSink_OnInputEdge(this, n"OnSinkInputEdge"));
+
+            if (Countdown.Get_HoldWhilePowered())
+            {
+                Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"));
+                if (Sink.Get_HasEvaluated())
+                { Countdown.Request_SetHeld(FMars_Request_Countdown_SetHeld(Sink.Get_IsPowered())); }
+            }
+        }
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
@@ -39,6 +48,14 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
         auto Countdown = InSink.As_Countdown(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Countdown))
         { Countdown.Request_Charge(); }
+    }
+
+    UFUNCTION()
+    private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, bool InPowered)
+    {
+        auto Countdown = InSink.As_Countdown(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Countdown))
+        { Countdown.Request_SetHeld(FMars_Request_Countdown_SetHeld(InPowered)); }
     }
 
     UFUNCTION()
