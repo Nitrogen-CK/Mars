@@ -49,6 +49,62 @@ because skills inside submodules aren't auto-discovered). Never invoke
 directly for build/test automation — the toolbox owns engine resolution, the
 machine-wide build lock, watchdogs, and structured results.
 
+### The automation gate (`AutomationGate.json`)
+
+A plain `./CkAuto/UnrealToolbox.exe --test --no-live --discover-fresh` is the full gate. Its population is declared by
+[`AutomationGate.json`](AutomationGate.json) at the project root (toolbox v1.49+): the `roots` listed there (`Ck`,
+`CkAngelscriptGenerator`, `CkGrid`, `CkSubsystemBrowser`, `CkGoapDebugger` - naming roots, not plugin names), plus functional
+tests and tests named after an enabled plugin/module. Read the `[population]` block every run; `--test --print-population`
+prints it without running anything.
+
+**Size and time (measured twice 2026-10-03, 8 cores, 3 lanes): 4243 tests in about 44 min (43m 45s, 43m 10s).** About 3700 tests run in the three
+lanes (~35 min); the 326 `.Net.`/snapshot tests run in 28 serial groups, one editor at a time, alongside the lanes (~38 min);
+the 201 renderer-only tests run last in one real-renderer editor (~6 min). The serial groups finish last and are not a hang.
+If the gate grows past an agent's 2 h background-command limit, launch it as a detached process and wait on its exit.
+A `--build --test` adds 5-30 min of editor build on top, so batch the edits, iterate with `--test-pattern <Feature>`, and
+run the full gate once at the end. Say which pattern produced a result; a focused green is not the full gate.
+
+**The baseline is `knownReds` in `AutomationGate.json`** (toolbox v1.50+). This project carries pre-existing failures, and
+that list names them, each with a reason and the gate that proved it. With the list current, a full gate exits 0 only when
+every failure is listed, and it names any **new** failure for you - no pre-change baseline run needed. Read the
+`=== Known reds ===` block. Rules for the list (full detail in the `/build-test` skill):
+
+- **Never add an entry to make your own change's red go away.** An entry is for a failure that is red *before* your change,
+  proven by a full gate; it goes in its own commit with `reason` and `evidence`.
+- **`red` = red in two full gates on one build AND red again when run on its own; `flaky` = red in at least one full gate
+  but green on its own.** A test that passes alone sometimes and fails alone other times is listed `red`. A listed `flaky`
+  that fails is re-run alone once; it counts only if it fails again. A passing `flaky` is reported (`Listed flaky, passed`,
+  toolbox v1.52+) but never prunes itself, so remove a `flaky` entry by hand once its cause is fixed.
+- **A listed `red` test that passes is reported `Now passing`** - prune it (`--known-reds prune` on a fresh-boot
+  `--test --no-live`) and commit the file. A renamed or deleted listed test exits 80.
+- **A Ck plugin's reds live in that plugin's own list** (toolbox v1.52+): `Plugins/CkTests`, `Plugins/CkGameplayDebugger` and
+  `Plugins/CkFoundation` each carry an `AutomationGate.json` seeded in the Ck home project (CkPlugins), changed there by PR -
+  never from here, and `--known-reds prune` never edits them. The root file keeps Mars's own tests, the Monolith plugin's
+  tests, and Ck tests that are red *only here* (`reason` starts `HOST-COUPLED` and names the coupling). A test listed in both
+  exits 80, so a pin bump that moves an entry into a plugin list drops it from the root file in the same change.
+- **The entries are bugs to fix, not a baseline to keep.** Most of the root list is one cause: in Mars the multi-client PIE
+  tests trip the engine fork's Iris ensure `Disallowed to write first packet in batch` (`DataStreamChannel.cpp`), which
+  never fires in CkPlugins or BusterBlock. `Ck.Snapshot.Meta.FragmentPostureCoverage` needs Mars's `_FragmentNamePrefixes`
+  set in `[/Script/CkSnapshot.Ck_Snapshot_PostureRatchet_Settings]`.
+- **Known gap (2026-10-03): the gate does not exit 0 yet.** `Ck.ProceduralAnimation.Gait.LandingProbeLiftsASwingOntoAStep`
+  is listed `flaky` in `Plugins/CkTests/AutomationGate.json`, but in Mars it is red in both full gates and in 3 of 3 runs
+  alone, so its solo re-run fails and the gate fails on it alone. It cannot be listed in the root file (a test in two files
+  exits 80); the fix is a CkTests PR that lists it `red`, then a pin bump here. Until then a gate whose only failure line is
+  that test's failed flaky re-run is the expected result; remove this bullet when the pin moves.
+
+Without a current list (an older toolbox, or `--known-reds off`), capture the baseline before the first change: record the
+starting pass/fail counts and the *names* of the tests already red, and diff names, not counts.
+
+**Renderer-only tests (toolbox v1.51+).** A test flagged `EAutomationTestFlags::NonNullRHI` needs a real renderer; a
+`-nullrhi` editor does not even list it. The gate runs those in one off-screen real-renderer editor after the headless lanes
+(`renderer-only: N` in the `[population]` block). Flag a test that genuinely renders (layout capture, render targets, real
+Slate windows, shader compiles) - never guard it with `if (!FApp::CanEverRender()) { return true; }`, which passes every
+headless gate while testing nothing. Exit `81` means those tests did not run (no GPU, or the list could not be discovered);
+on a machine that cannot render, pass `--skip-renderer-tests` and say so.
+
+**A full gate dirties the tree.** It rewrites `Config/DefaultGameplayTags.ini` (fixture tags) and can leave generated
+assets under `Content/`. Never stage those; commit with explicit pathspecs.
+
 ### Setup and building
 
 ```bash
