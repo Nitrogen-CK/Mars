@@ -1,5 +1,6 @@
 // Every frame: advances PhaseTime, follows moving reach/focus anchors, eases the focus lean (dropping a focus whose
-// interactable has died) and rides a picked-up item in with the gloves. The phase itself is the Hands sub-SM's.
+// interactable has died), rides a picked-up item in with the gloves and turns the pitch node for the view's pitch. The
+// phase itself is the Hands sub-SM's.
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,6 +30,32 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 
         Tick_FocusLean(Params.Spec.Reach.Focus, InState.Focus, DeltaSeconds);
         Tick_Carry(InHandle, Params, InState);
+        Tick_Pitch(Params.Spec.Pitch, InState, DeltaSeconds);
+    }
+
+    // Turns the pitch node back by the part of the view's pitch the gloves do not follow. The view is the node's parent;
+    // its pitch here is last frame's render, so it is eased before it is used.
+    private void Tick_Pitch(const FMars_FPHands_PitchSpec& InSpec, FMars_Fragment_FPHands& InState, float32 InDeltaSeconds)
+    {
+        auto Node = InSpec.Node;
+        if (ck::Is_NOT_Valid(Node))
+        { return; }
+
+        const auto ViewPitch = float32(utils_scene_node::Get_DriverWorldTransform(Node).Rotator().Pitch);
+        if (InState.ViewPitchDeg.IsSet() == false || InSpec.InterpSpeed <= 0.0f)
+        { InState.ViewPitchDeg = TOptional<float32>(ViewPitch); }
+        else
+        {
+            const auto Previous = InState.ViewPitchDeg.GetValue();
+            const auto Alpha = float32(1.0 - Math::Exp(-InSpec.InterpSpeed * InDeltaSeconds));
+            InState.ViewPitchDeg = TOptional<float32>(Previous + (ViewPitch - Previous) * Alpha);
+        }
+
+        const auto Offset = utils_fphands::Make_PitchOffset(InSpec, InState.ViewPitchDeg.GetValue());
+        if (Offset.Equals(utils_scene_node::Get_Offset(Node)))
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
     }
 
     // The focus target outlives the focus while the gloves lean back out (an unfocus, or a focused pickup destroyed under

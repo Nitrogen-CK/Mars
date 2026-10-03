@@ -1022,6 +1022,32 @@ namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow
+{
+    FMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne
+{
+    FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach_SpawnParams
 {
 }

@@ -121,6 +121,11 @@ struct FMars_Fragment_FPHands
 
     UPROPERTY()
     FMars_FPHands_PushState Push;
+
+    // The view pitch the pitch node is set from, eased (degrees, up is positive). Unset until the first tick with a
+    // pitch node.
+    UPROPERTY()
+    TOptional<float32> ViewPitchDeg;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

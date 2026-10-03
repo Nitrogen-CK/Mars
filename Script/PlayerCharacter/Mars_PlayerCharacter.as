@@ -145,10 +145,15 @@ class AMars_PlayerCharacter : ACk_Character_UE
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
         utils_byte_attribute::Add(Player, DownedSpec, ECk_Replication::DoesNotReplicate);
 
-        // Hangs off the rendered view (the director's view anchor), so it carries the view's pitch in the same frame.
+        // Hangs off the rendered view (the director's view anchor), so it carries the view's yaw in the same frame. The
+        // pitch node in between is turned by the FPHands feature: the gloves take only part of the view's pitch
+        // (Config.FPHands.Pitch) and stay low when the player looks up.
         auto ViewAnchor = Camera.Get_ViewAnchor();
+        auto HandPitch = utils_scene_node::Create(ViewAnchor, FTransform::Identity);
+        utils_handle::Set_DebugName(HandPitch.H(), n"Player.HandPitch");
+        auto HandPitchTransform = HandPitch.As_Transform();
         _HandRestOffset = utils_fphands::Get_HandRestOffset(Config.FPHands.Rest, FMars_FPHands_Hold());
-        auto Hand = utils_scene_node::Create(ViewAnchor, _HandRestOffset);
+        auto Hand = utils_scene_node::Create(HandPitchTransform, _HandRestOffset);
         utils_handle::Set_DebugName(Hand.H(), n"Player.Hand");
 
         // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; _HandRestOffset is its rest.
@@ -163,6 +168,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
         _HandNode = HandBob.As_Transform();
         auto HandsSpec = Config.FPHands;
         HandsSpec.HandNode = _HandNode;
+        HandsSpec.Pitch.Node = HandPitch;
         _Hands = utils_fphands::Add(Player, HandsSpec);
 
         auto Back = utils_scene_node::Create(PlayerTransform, Config.Inventory.BackOffset);

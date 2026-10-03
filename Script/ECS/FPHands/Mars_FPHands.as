@@ -137,6 +137,12 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_ViewSpec View;
 
+    // How much of the view's pitch the gloves follow.
+    UPROPERTY()
+    FMars_FPHands_PitchSpec Pitch;
+
+    // Indexed by EMars_FPEmote. An emote montage drives both gloves (placement and fingers) through EmoteSlot; the
+    // procedural placement fades out under it.
     UPROPERTY()
     FMars_FPHands_EmoteSpec Emotes;
 }
@@ -168,6 +174,10 @@ mixin FMars_Validation Validate(const FMars_FPHands_Spec& Self)
 
     if (Self.Push.OutSeconds <= 0.0f || Self.Push.BackSeconds <= 0.0f)
     { return FMars_Validation("Push needs positive Out/Back seconds"); }
+
+    const auto Pitch = Self.Pitch.Validate();
+    if (Pitch.IsValid() == false)
+    { return Pitch; }
 
     return FMars_Validation();
 }
