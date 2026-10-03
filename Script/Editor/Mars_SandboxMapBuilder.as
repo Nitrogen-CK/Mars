@@ -10,9 +10,11 @@
 // open it and run: Mars.Sandbox.BuildRoom2
 //
 // Room 3 (phase-2 mechanisms) sits north of room 2, entered through a doorway at X=3000 in their shared wall. West
-// half: PlateF -> GateF, SealH then SealG -> SequenceI -> GateI (latched). East half, three dead-end corridors: a vent
-// suppressed while WheelJ is held on (8s), two spike tiles suppressed while LeverK is pulled, an unwired pendulum. To
-// add room 3 to an already-built sandbox map, open it and run: Mars.Sandbox.BuildRoom3
+// half: PlateF or the backpack plate (pressed only by a dropped backpack) -> GateF, SealH then SealG -> SequenceI -> GateI
+// (latched). East half, three dead-end corridors: a vent suppressed while WheelJ is held on (8s), two spike tiles
+// suppressed while LeverK is pulled, an unwired pendulum. To add room 3 to an already-built sandbox map, open it and run:
+// Mars.Sandbox.BuildRoom3
+// To place just the backpack plate in a map whose room 3 was built before it existed, run: Mars.Sandbox.PlaceBackpackPlate
 //
 // Room 4 (beat the lamps) sits south of room 2, entered from the main floor through a doorway in its west wall. Pulling
 // either chain lights the lamp bank over GateM; the gate stays open while any lamp is lit, and the lamps go dark one at a
@@ -28,7 +30,7 @@
 //
 // Sandbox items (2x Rock, Ration, Cog - World-mode WorldItem presets) sit in front of the player starts. To place them in
 // an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
-// The sandbox backpack (a World-mode Backpack preset with four cargo slots) sits beside them. To place it in an
+// The sandbox backpack (a World-mode Backpack preset with three cargo slots) sits beside them. To place it in an
 // already-built sandbox map, open it and run: Mars.Sandbox.PlaceBackpack
 // The eyes dummy faces the player starts. To place it in an already-built sandbox map, run: Mars.Sandbox.PlaceEyesDummy
 // The sandbox ladder (a 400x400x300 platform block on the main floor with a ladder on its south face) sits north-west of
@@ -131,6 +133,14 @@ void Mars_PlaceSandboxBackpackFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxBackpackCommand("Mars.Sandbox.PlaceBackpack", n"Mars_PlaceSandboxBackpackFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxBackpackPlateFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceBackpackPlate();
+}
+
+const FConsoleCommand Mars_PlaceSandboxBackpackPlateCommand("Mars.Sandbox.PlaceBackpackPlate", n"Mars_PlaceSandboxBackpackPlateFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxEyesDummyFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceEyesDummy();
@@ -171,6 +181,7 @@ namespace utils_mars_sandbox
     const FString k_Room5FloorLabel = "Room5_Floor";
     const FString k_Room5CrawlerLabelPrefix = "Mech5_Crawler";
     const FString k_Room5NavFieldLabel = "Mech5_NavField";
+    const FString k_Room3BackpackPlateLabel = "Mech3_BackpackPlate";
     const FString k_ItemLabelPrefix = "Item_";
     const FString k_LadderPlatformLabel = "Sandbox_LadderPlatform";
     const FString k_WorkbenchLabel = "Sandbox_Workbench";
@@ -409,6 +420,36 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.PlaceBackpack] placed, saved={Saved}");
+    }
+
+    void PlaceBackpackPlate()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceBackpackPlate] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_Room3BackpackPlateLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceBackpackPlate] [{k_Room3BackpackPlateLabel}] already exists. Delete it first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Room3BackpackPlate();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceBackpackPlate] placed, saved={Saved}");
+    }
+
+    // 300uu south of PlateF, between it and room 3's south wall, on the same channel: dropping the pack on it opens GateF.
+    void Spawn_Room3BackpackPlate()
+    {
+        Spawn_Mechanism(UMars_Sandbox_BackpackPlateF_EntityScript, k_Room3BackpackPlateLabel, FVector(2600.0, 950.0, 0.0));
     }
 
     void PlaceLadder()
@@ -666,10 +707,12 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::Spawn_Block(InCube, "Room3_AlcoveDivider", FVector(2425.0, 1850.0, 150.0), FVector(0.2, 5.0, 3.0));
         utils_mars_map_builder::Spawn_Block(InCube, "Room3_AlcoveWall_East", FVector(2850.0, 1850.0, 150.0), FVector(0.2, 5.0, 3.0));
 
-        // Bay 1: standing on the plate opens GateF; it closes 1.5s after stepping off.
+        // Bay 1: standing on the plate opens GateF; it closes 1.5s after stepping off. The backpack plate south of it
+        // holds GateF open while a dropped backpack lies on it.
         utils_mars_map_builder::Spawn_Block(InCube, "Room3_GateHeader_F", FVector(2600.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
         Spawn_Mechanism(UMars_Sandbox_GateF_EntityScript, "Mech3_GateF", FVector(2600.0, PartitionY, 0.0), GateRotation);
         Spawn_Mechanism(UMars_Sandbox_PlateF_EntityScript, "Mech3_Plate", FVector(2600.0, 1250.0, 0.0));
+        Spawn_Room3BackpackPlate();
 
         // Bay 2: seals face +X off the west wall (pitch -90); pressing H then G completes the sequence and latches GateI.
         const auto SealRotation = FRotator(-90.0, 0.0, 0.0);

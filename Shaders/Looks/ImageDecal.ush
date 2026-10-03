@@ -1,0 +1,26 @@
+// /Project/Looks/ImageDecal.ush
+//
+// A texture stamped onto whatever surface a UDecalComponent's box intersects - a painted marking. UV is the decal's
+// projection face (0-1). Emissive-only, like CkUsf's GlowDecal: the image reads the same in any light, and BaseColor is
+// zeroed so a lit decal path cannot tint it. Coverage is the texture's alpha, so an icon with a transparent background
+// stamps only its shape.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+FCkUsf_SurfaceOutput Mars_Look_ImageDecal(
+    FCkUsf_SurfaceInput In,
+    Texture2D           Image,
+    SamplerState        ImageSampler,
+    float3              Tint,
+    float               Brightness,
+    float               Coverage)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const float4 Texel = CkUsf_SampleTexture2D(Image, ImageSampler, In.UV);
+
+    O.BaseColor     = float3(0.0f, 0.0f, 0.0f);
+    O.EmissiveColor = Texel.rgb * Tint * Brightness;
+    O.Opacity       = Texel.a * Coverage;
+    return O;
+}

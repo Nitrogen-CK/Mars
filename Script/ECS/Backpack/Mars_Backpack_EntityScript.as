@@ -7,9 +7,13 @@
 //
 // While the pack is Held (in its carrier's hands) its cargo interactables are Mars-disabled: nobody can reach them
 // (design D-B5). Every other mount re-enables them.
+//
+// The weight probe (Probe.Mars.Backpack) is what backpack pressure plates feel. It is enabled only while the pack lies in
+// the world (Mount World): a carried or held pack weighs on nothing.
 class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
 {
     private TArray<FCk_Handle_Interactable> _CargoInteractables;
+    private FCk_Handle_Probe _WeightProbe;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -54,6 +58,8 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         const auto CargoSlots = Backpack.Get_CargoSlots();
         for (const auto& Slot : CargoSlots)
         { _CargoInteractables.Add(Slot.Get_Interactable()); }
+
+        _WeightProbe = AddWeightProbe(InHandle, Presentation);
 
         WorldItem.BindTo_OnMountChanged(FMars_Delegate_WorldItem_OnMountChanged(this, n"OnMountChanged"));
 
@@ -102,7 +108,25 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         return true;
     }
 
+    // The same shape as the pickup probe (utils_world_item::Make_ProbeFit), as a separate probe: the pickup is a QueryOnly
+    // trace target, and a plate needs a physical contact. Kinematic because the body moves the pack, Silent because nothing
+    // listens on the pack's side: the plates filter on its name. The pack is constructed lying in the world, so it starts
+    // enabled.
+    private FCk_Handle_Probe AddWeightProbe(FCk_Handle& InHandle, const UMars_ItemTrait_Presentation InPresentation)
+    {
+        auto ProbeSpec = FCk_Probe_Spec(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Backpack"));
+        ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
+                 .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
+
+        const auto Fit = utils_world_item::Make_ProbeFit(InPresentation);
+        auto Node = utils_prefab::Create_ProbeNode(InHandle.As_Transform(), Fit.Shape, ProbeSpec, Fit.Offset);
+
+        utils_handle::Set_DebugName(FCk_Handle(Node), n"Backpack.Probe.Weight");
+        return FCk_Handle(Node).As_Probe();
+    }
+
     // Held = in the carrier's own hands: the cargo is out of anyone's reach until the pack is carried or released.
+    // Only a pack lying in the world (World) weighs on a plate.
     UFUNCTION()
     private void OnMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
     {
@@ -111,6 +135,12 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         {
             if (ck::IsValid(Interactable))
             { Interactable.Request_SetEnableDisable(EnableDisable); }
+        }
+
+        if (ck::IsValid(_WeightProbe))
+        {
+            const auto WeightEnableDisable = InNew == EMars_WorldItem_Mount::World ? ECk_EnableDisable::Enable : ECk_EnableDisable::Disable;
+            utils_probe::Request_EnableDisable(_WeightProbe, FCk_Request_Probe_EnableDisable(WeightEnableDisable));
         }
     }
 }

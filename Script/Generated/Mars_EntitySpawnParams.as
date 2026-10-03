@@ -2161,13 +2161,17 @@ struct FMars_PressurePlate_EntityScript_SpawnParams
     UPROPERTY()
     FVector PlateSize = FVector(120.0, 120.0, 8.0);
 
-    FMars_PressurePlate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize)
+    UPROPERTY()
+    TSoftObjectPtr<UTexture2D> DecalTexture = nullptr;
+
+    FMars_PressurePlate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
     {
         SpawnTransform = InSpawnTransform;
         Trigger = InTrigger;
         Occupancy = InOccupancy;
         Source = InSource;
         PlateSize = InPlateSize;
+        DecalTexture = InDecalTexture;
     }
 }
 
@@ -2178,9 +2182,9 @@ namespace UMars_PressurePlate_EntityScript
         return FMars_PressurePlate_EntityScript_SpawnParams();
     }
 
-    FMars_PressurePlate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize)
+    FMars_PressurePlate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
     {
-        return FMars_PressurePlate_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize);
+        return FMars_PressurePlate_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize, InDecalTexture);
     }
 }
 
@@ -2230,6 +2234,51 @@ namespace UMars_PullChain_EntityScript
     FMars_PullChain_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
     {
         return FMars_PullChain_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPullDistance, InChainLength, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Trigger_Spec Trigger;
+
+    UPROPERTY()
+    FMars_Occupancy_Spec Occupancy = FMars_Occupancy_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FVector PlateSize = FVector(120.0, 120.0, 8.0);
+
+    UPROPERTY()
+    TSoftObjectPtr<UTexture2D> DecalTexture = nullptr;
+
+    FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        SpawnTransform = InSpawnTransform;
+        Trigger = InTrigger;
+        Occupancy = InOccupancy;
+        Source = InSource;
+        PlateSize = InPlateSize;
+        DecalTexture = InDecalTexture;
+    }
+}
+
+namespace UMars_Sandbox_BackpackPlateF_EntityScript
+{
+    FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        return FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize, InDecalTexture);
     }
 }
 
@@ -2903,13 +2952,17 @@ struct FMars_Sandbox_PlateF_EntityScript_SpawnParams
     UPROPERTY()
     FVector PlateSize = FVector(120.0, 120.0, 8.0);
 
-    FMars_Sandbox_PlateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize)
+    UPROPERTY()
+    TSoftObjectPtr<UTexture2D> DecalTexture = nullptr;
+
+    FMars_Sandbox_PlateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
     {
         SpawnTransform = InSpawnTransform;
         Trigger = InTrigger;
         Occupancy = InOccupancy;
         Source = InSource;
         PlateSize = InPlateSize;
+        DecalTexture = InDecalTexture;
     }
 }
 
@@ -2920,9 +2973,9 @@ namespace UMars_Sandbox_PlateF_EntityScript
         return FMars_Sandbox_PlateF_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_PlateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize)
+    FMars_Sandbox_PlateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
     {
-        return FMars_Sandbox_PlateF_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize);
+        return FMars_Sandbox_PlateF_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize, InDecalTexture);
     }
 }
 

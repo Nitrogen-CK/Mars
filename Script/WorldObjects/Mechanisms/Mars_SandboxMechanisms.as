@@ -83,6 +83,25 @@ class UMars_Sandbox_PlateF_EntityScript : UMars_PressurePlate_EntityScript
     }
 }
 
+// A second source on channel F that only a dropped backpack presses (the pack's weight probe is on only while it lies in
+// the world): leave the pack on it and GateF opens. Marked with the backpack icon.
+class UMars_Sandbox_BackpackPlateF_EntityScript : UMars_PressurePlate_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.F");
+    default DecalTexture = assets::Backpack_T();
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Trigger.DetectionFilter = GameplayTag::MakeGameplayTagContainerFromTag(
+            GameplayTags::ResolveGameplayTag(n"Probe.Mars.Backpack"));
+        Occupancy.RequiredCount = 1;
+        Occupancy.ReleaseDelaySeconds = 0.5f;
+        return Super::DoConstruct(InHandle);
+    }
+}
+
 class UMars_Sandbox_GateF_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
