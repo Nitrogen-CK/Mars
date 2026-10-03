@@ -21,7 +21,7 @@
 	url = https://github.com/chainkemists/NodeGraphAssistant.git
 [submodule "CkAuto"]
 	path = CkAuto
-	url = https://github.com/chainkemists/CkAuto.git
+	url = https://github.com/CommitAndChill/CkAuto.git
 [submodule "Plugins/ZenMode"]
 	path = Plugins/ZenMode
 	url = https://github.com/chainkemists/ZenMode.git
