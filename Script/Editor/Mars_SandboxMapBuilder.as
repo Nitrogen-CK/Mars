@@ -19,6 +19,13 @@
 // time. A second chain past the gate lets the player back out. To add room 4 to an already-built sandbox map, open it
 // and run: Mars.Sandbox.BuildRoom4
 //
+// Room 5 (the crawler room) sits west of the main floor, entered through a 300uu doorway centred on Y=0 in its east wall.
+// It holds a pillar, a 40uu step, the target dummy, the two melee items (cleaver, tenderizer) just inside the doorway and
+// two crawlers (4 and 6 legs) at the west end, and a ground-nav field over the whole room (the crawlers' paths). To add
+// room 5 to an already-built sandbox map, open it and run: Mars.Sandbox.BuildRoom5
+// To place just the two crawlers in a map whose room 5 was built before they existed, run: Mars.Sandbox.PlaceCrawlers
+// To place just the nav field in a map whose room 5 was built before it existed, run: Mars.Sandbox.PlaceNavField
+//
 // Sandbox items (2x Rock, Ration, Cog - World-mode WorldItem presets) sit in front of the player starts. To place them in
 // an already-built sandbox map, open it and run: Mars.Sandbox.PlaceItems
 // The sandbox backpack (a World-mode Backpack preset with four cargo slots) sits beside them. To place it in an
@@ -84,6 +91,30 @@ void Mars_BuildSandboxRoom4Func(const TArray<FString>& Args)
 const FConsoleCommand Mars_BuildSandboxRoom4Command("Mars.Sandbox.BuildRoom4", n"Mars_BuildSandboxRoom4Func");
 
 UFUNCTION()
+void Mars_BuildSandboxRoom5Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildRoom5();
+}
+
+const FConsoleCommand Mars_BuildSandboxRoom5Command("Mars.Sandbox.BuildRoom5", n"Mars_BuildSandboxRoom5Func");
+
+UFUNCTION()
+void Mars_PlaceSandboxCrawlersFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceCrawlers();
+}
+
+const FConsoleCommand Mars_PlaceSandboxCrawlersCommand("Mars.Sandbox.PlaceCrawlers", n"Mars_PlaceSandboxCrawlersFunc");
+
+UFUNCTION()
+void Mars_PlaceSandboxNavFieldFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceNavField();
+}
+
+const FConsoleCommand Mars_PlaceSandboxNavFieldCommand("Mars.Sandbox.PlaceNavField", n"Mars_PlaceSandboxNavFieldFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxItemsFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceItems();
@@ -137,6 +168,9 @@ namespace utils_mars_sandbox
     const FString k_Room2FloorLabel = "Room2_Floor";
     const FString k_Room3FloorLabel = "Room3_Floor";
     const FString k_Room4FloorLabel = "Room4_Floor";
+    const FString k_Room5FloorLabel = "Room5_Floor";
+    const FString k_Room5CrawlerLabelPrefix = "Mech5_Crawler";
+    const FString k_Room5NavFieldLabel = "Mech5_NavField";
     const FString k_ItemLabelPrefix = "Item_";
     const FString k_LadderPlatformLabel = "Sandbox_LadderPlatform";
     const FString k_WorkbenchLabel = "Sandbox_Workbench";
@@ -194,6 +228,7 @@ namespace utils_mars_sandbox
         Spawn_Room2(Cube);
         Spawn_Room3(Cube);
         Spawn_Room4(Cube);
+        Spawn_Room5(Cube);
         Spawn_Ladder(Cube);
         Spawn_Workbench();
         Spawn_DicingStation();
@@ -292,6 +327,31 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.BuildRoom4] built, saved={Saved}");
+    }
+
+    void BuildRoom5()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.BuildRoom5] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_Room5FloorLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.BuildRoom5] [{k_Room5FloorLabel}] already exists. Delete the Room5_, Mech5_ and Item_Cleaver/Item_Tenderizer actors first to rebuild.");
+                return;
+            }
+        }
+
+        Spawn_Room5(engine::load::Cube());
+        Apply_ProtoGridMaterials();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.BuildRoom5] built, saved={Saved}");
     }
 
     // Four World-mode items on a line 150uu in front of the room-1 player starts (X=-600, facing +X, Y -225..225):
@@ -398,6 +458,67 @@ namespace utils_mars_sandbox
 
         const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
         ck::Trace(f"[Mars.Sandbox.PlaceWorkbench] placed, saved={Saved}");
+    }
+
+    void PlaceCrawlers()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceCrawlers] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel().StartsWith(k_Room5CrawlerLabelPrefix))
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceCrawlers] [{Actor.GetActorLabel()}] already exists. Delete the {k_Room5CrawlerLabelPrefix}* actors first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Room5Crawlers();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceCrawlers] placed, saved={Saved}");
+    }
+
+    void PlaceNavField()
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
+        {
+            ck::Warning(f"[Mars.Sandbox.PlaceNavField] Open [{k_MapPath}] first.");
+            return;
+        }
+
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            if (Actor.GetActorLabel() == k_Room5NavFieldLabel)
+            {
+                ck::Warning(f"[Mars.Sandbox.PlaceNavField] [{k_Room5NavFieldLabel}] already exists. Delete it first to re-place.");
+                return;
+            }
+        }
+
+        Spawn_Room5NavField();
+
+        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
+        ck::Trace(f"[Mars.Sandbox.PlaceNavField] placed, saved={Saved}");
+    }
+
+    // The room's ground-nav field: the preset's bounds are local to this placement, so (-3000, 0, 0) covers the room.
+    void Spawn_Room5NavField()
+    {
+        Spawn_Mechanism(UMars_Sandbox_NavField_EntityScript, k_Room5NavFieldLabel, FVector(-3000.0, 0.0, 0.0));
+    }
+
+    // The two crawlers at the room's west end, either side of the centre line, 80uu up so they settle onto their feet.
+    void Spawn_Room5Crawlers()
+    {
+        Spawn_Mechanism(UMars_Sandbox_Crawler4_EntityScript, f"{k_Room5CrawlerLabelPrefix}4", FVector(-3400.0, -300.0, 80.0));
+        Spawn_Mechanism(UMars_Sandbox_Crawler6_EntityScript, f"{k_Room5CrawlerLabelPrefix}6", FVector(-3400.0, 300.0, 80.0));
     }
 
     // The workbench station at (-1200, -1200) on the main floor, facing +X: the player walks up from -X and stands 70uu in
@@ -610,6 +731,35 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::Spawn_Block(InCube, "Room4_Plinth", FVector(3700.0, GateY, 40.0), FVector(1.0, 1.0, 0.8));
     }
 
+    // Room 5 spans X -4000..-2000, Y -700..700 (the main floor ends at X=-2000), entered from the main floor through a
+    // 300uu doorway centred on Y=0 in its east wall. A pillar and a 40uu step break up the floor for the crawlers; the
+    // target dummy stands 400uu in from the doorway, and the cleaver and tenderizer lie just inside it. A ground-nav field
+    // covers the room.
+    void Spawn_Room5(UStaticMesh InCube)
+    {
+        utils_mars_map_builder::Spawn_Block(InCube, k_Room5FloorLabel, FVector(-3000.0, 0.0, -10.0), FVector(20.0, 14.0, 0.2));
+
+        // East wall shared with the main floor, with a 300uu doorway centred on Y=0.
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_WallEast_South", FVector(-2000.0, -425.0, 150.0), FVector(0.2, 5.5, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_WallEast_North", FVector(-2000.0, 425.0, 150.0), FVector(0.2, 5.5, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_WallWest", FVector(-4000.0, 0.0, 150.0), FVector(0.2, 14.2, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_WallSouth", FVector(-3000.0, -700.0, 150.0), FVector(20.0, 0.2, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_WallNorth", FVector(-3000.0, 700.0, 150.0), FVector(20.0, 0.2, 3.0));
+
+        // A 60x60x300 pillar and a 200x200x40 step.
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_Pillar", FVector(-3300.0, 250.0, 150.0), FVector(0.6, 0.6, 3.0));
+        utils_mars_map_builder::Spawn_Block(InCube, "Room5_Step", FVector(-2700.0, -300.0, 20.0), FVector(2.0, 2.0, 0.4));
+
+        Spawn_Mechanism(UMars_TargetDummy_EntityScript, "Mech5_Dummy", FVector(-2400.0, 0.0, 0.0));
+
+        // The melee items drop the 30uu onto the floor.
+        Spawn_Mechanism(UMars_Sandbox_Cleaver_EntityScript, f"{k_ItemLabelPrefix}Cleaver", FVector(-2250.0, -120.0, 30.0));
+        Spawn_Mechanism(UMars_Sandbox_Tenderizer_EntityScript, f"{k_ItemLabelPrefix}Tenderizer", FVector(-2250.0, 120.0, 30.0));
+
+        Spawn_Room5Crawlers();
+        Spawn_Room5NavField();
+    }
+
     // Goes through the spawner's actor factory (the Place Actors path): it instances the script class on a new
     // ACk_EntitySpawner_UE, and the spawner injects its actor transform into SpawnTransform at spawn.
     void Spawn_Mechanism(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InLabel, FVector InLocation,
@@ -668,6 +818,12 @@ namespace utils_mars_sandbox
             else if (Label == "Room4_Plinth")
             { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Room4_"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label == k_Room5FloorLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label == "Room5_Pillar" || Label == "Room5_Step")
+            { Block.StaticMeshComponent.SetMaterial(0, Platform); }
+            else if (Label.StartsWith("Room5_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
         }
     }
