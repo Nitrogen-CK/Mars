@@ -2,6 +2,8 @@
 
 #include "CkHands/CkHands_Contact_Data.h"
 
+#include "CkCore/Enums/CkEnums.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ck::hands
@@ -24,6 +26,30 @@ namespace ck::hands
      * Get_SignedDistance(InShape, P) == Get_SignedDistance(Get_ShapeInSpace(InShape, InSpace), InSpace.InverseTransformPositionNoScale(P)).
      */
     CKHANDS_API auto Get_ShapeInSpace(const FCk_Hands_ContactShape& InShape, const FTransform& InSpace) -> FCk_Hands_ContactShape;
+
+    /**
+     * A capsule whose cylinder section runs along InTransform's local InAxis instead of its local Z (a grip socket
+     * points X along its handle). The shape keeps InTransform's location; its rotation is InTransform's turned so that
+     * local Z lies on that axis. InAxis must name exactly one axis: anything else returns a None shape.
+     */
+    CKHANDS_API auto Make_CapsuleAlongAxis(
+        const FTransform& InTransform,
+        ECk_Vector_Axis InAxis,
+        float InHalfHeight,
+        float InRadius) -> FCk_Hands_ContactShape;
+
+    /**
+     * The primitive of InType fitted to an axis-aligned box given in InTransform's space, in cm (apply any mesh scale to
+     * the box first; InTransform's scale is ignored, as for every shape). Box: the box itself. Sphere: centred on the
+     * box, radius = its largest half extent. Capsule: along the box's longest axis (a tie goes to Y, then Z, then X),
+     * radius = the larger of the other two half extents, the cylinder section shortened by that radius so the caps end
+     * on the box's faces (a box no longer than it is wide becomes a sphere). A None type or an invalid box returns a
+     * None shape.
+     */
+    CKHANDS_API auto Make_ShapeFromBounds(
+        const FTransform& InTransform,
+        const FBox& InBounds,
+        ECk_Hands_ContactShapeType InType) -> FCk_Hands_ContactShape;
 
     /**
      * How far (0..1) a digit can curl from its rest pose toward its target pose before it NEWLY touches the shape.
@@ -68,6 +94,9 @@ namespace ck::hands
         const FTransform& InPlacedBone,
         const FTransform& InTargetBone,
         const FTransform& InTarget) -> FTransform;
+
+    /** A placement target Get_GlovePlacement can use: finite, with a normalized rotation. */
+    CKHANDS_API auto Get_IsPlacementTargetValid(const FTransform& InTarget) -> bool;
 }
 
 // --------------------------------------------------------------------------------------------------------------------

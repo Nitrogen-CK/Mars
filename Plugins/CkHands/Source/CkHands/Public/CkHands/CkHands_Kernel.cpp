@@ -58,6 +58,36 @@ namespace ck_hands_kernel
         return FTransform{InTransform.GetRotation(), InTransform.GetTranslation()};
     }
 
+    // The rotation that carries local Z onto the one axis InAxis names; unset when it names none or several.
+    auto
+        DoGet_RotationFromZTo(
+            ECk_Vector_Axis InAxis)
+        -> TOptional<FQuat>
+    {
+        switch (InAxis)
+        {
+            case ECk_Vector_Axis::X: return FQuat::FindBetweenNormals(FVector::UpVector, FVector::ForwardVector);
+            case ECk_Vector_Axis::Y: return FQuat::FindBetweenNormals(FVector::UpVector, FVector::RightVector);
+            case ECk_Vector_Axis::Z: return FQuat::Identity;
+            default: return {};
+        }
+    }
+
+    // A tie goes to Y, then Z, then X.
+    auto
+        DoGet_LongestAxis(
+            const FVector& InExtent)
+        -> ECk_Vector_Axis
+    {
+        if (InExtent.Y >= InExtent.X && InExtent.Y >= InExtent.Z)
+        { return ECk_Vector_Axis::Y; }
+
+        if (InExtent.Z >= InExtent.X)
+        { return ECk_Vector_Axis::Z; }
+
+        return ECk_Vector_Axis::X;
+    }
+
     auto
         DoGet_TipOffset(
             TConstArrayView<FTransform> InPose,
@@ -320,6 +350,71 @@ auto
 // --------------------------------------------------------------------------------------------------------------------
 
 auto
+    ck::hands::Make_CapsuleAlongAxis(
+        const FTransform& InTransform,
+        ECk_Vector_Axis InAxis,
+        float InHalfHeight,
+        float InRadius)
+    -> FCk_Hands_ContactShape
+{
+    const auto ZToAxis = ck_hands_kernel::DoGet_RotationFromZTo(InAxis);
+    if (NOT ZToAxis.IsSet())
+    { return FCk_Hands_ContactShape{}; }
+
+    const auto Transform = FTransform{InTransform.GetRotation() * ZToAxis.GetValue(), InTransform.GetTranslation()};
+    return FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Capsule, Transform}
+        .Set_HalfHeight(InHalfHeight)
+        .Set_Radius(InRadius);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+auto
+    ck::hands::Make_ShapeFromBounds(
+        const FTransform& InTransform,
+        const FBox& InBounds,
+        ECk_Hands_ContactShapeType InType)
+    -> FCk_Hands_ContactShape
+{
+    if (InType == ECk_Hands_ContactShapeType::None || NOT InBounds.IsValid)
+    { return FCk_Hands_ContactShape{}; }
+
+    const auto Centered = FTransform{InTransform.GetRotation(), InTransform.TransformPositionNoScale(InBounds.GetCenter())};
+    const auto Extent = InBounds.GetExtent();
+
+    switch (InType)
+    {
+        case ECk_Hands_ContactShapeType::Box:
+        {
+            return FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Box, Centered}.Set_HalfExtents(Extent);
+        }
+        case ECk_Hands_ContactShapeType::Sphere:
+        {
+            return FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Sphere, Centered}
+                .Set_Radius(static_cast<float>(Extent.GetMax()));
+        }
+        case ECk_Hands_ContactShapeType::Capsule:
+        {
+            const auto Axis = ck_hands_kernel::DoGet_LongestAxis(Extent);
+            const auto Length = Axis == ECk_Vector_Axis::X ? Extent.X : Axis == ECk_Vector_Axis::Y ? Extent.Y : Extent.Z;
+            const auto Radius = Axis == ECk_Vector_Axis::X ? FMath::Max(Extent.Y, Extent.Z)
+                : Axis == ECk_Vector_Axis::Y ? FMath::Max(Extent.X, Extent.Z)
+                : FMath::Max(Extent.X, Extent.Y);
+
+            return Make_CapsuleAlongAxis(Centered, Axis,
+                static_cast<float>(FMath::Max(Length - Radius, 0.0)), static_cast<float>(Radius));
+        }
+        default:
+        {
+            CK_INVALID_ENUM(InType);
+            return FCk_Hands_ContactShape{};
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+auto
     ck::hands::Solve_DigitCurl(
         const FCk_Hands_ContactShape& InShape,
         const FTransform& InParent,
@@ -416,6 +511,16 @@ auto
     auto Placed = PlacedInTargetBone * ck_hands_kernel::DoGet_RigidTransform(InTarget);
     Placed.SetScale3D(InPlacedBone.GetScale3D());
     return Placed;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+auto
+    ck::hands::Get_IsPlacementTargetValid(
+        const FTransform& InTarget)
+    -> bool
+{
+    return NOT InTarget.ContainsNaN() && InTarget.IsRotationNormalized();
 }
 
 // --------------------------------------------------------------------------------------------------------------------

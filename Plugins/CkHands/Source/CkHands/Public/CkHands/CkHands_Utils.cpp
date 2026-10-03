@@ -60,6 +60,40 @@ auto
 
 auto
     UCk_Utils_Hands_ContactShape_UE::
+    Make_CapsuleAlongAxis(
+        const FTransform& InTransform,
+        ECk_Vector_Axis InAxis,
+        float InHalfHeight,
+        float InRadius)
+    -> FCk_Hands_ContactShape
+{
+    const auto IsSingleAxis = InAxis == ECk_Vector_Axis::X || InAxis == ECk_Vector_Axis::Y || InAxis == ECk_Vector_Axis::Z;
+    CK_ENSURE_IF_NOT(IsSingleAxis, TEXT("Hands Utils Make rejected a capsule along [{}]: it needs exactly one axis"), InAxis)
+    { return FCk_Hands_ContactShape{}; }
+
+    return ck_hands_utils::DoMake_Shape(ck::hands::Make_CapsuleAlongAxis(InTransform, InAxis, InHalfHeight, InRadius));
+}
+
+auto
+    UCk_Utils_Hands_ContactShape_UE::
+    Make_FromBounds(
+        const FTransform& InTransform,
+        const FBox& InBounds,
+        ECk_Hands_ContactShapeType InType)
+    -> FCk_Hands_ContactShape
+{
+    if (InType == ECk_Hands_ContactShapeType::None)
+    { return FCk_Hands_ContactShape{}; }
+
+    const auto IsBoundsValid = static_cast<bool>(InBounds.IsValid);
+    CK_ENSURE_IF_NOT(IsBoundsValid, TEXT("Hands Utils Make rejected a [{}] contact shape from an invalid bounds box"), InType)
+    { return FCk_Hands_ContactShape{}; }
+
+    return ck_hands_utils::DoMake_Shape(ck::hands::Make_ShapeFromBounds(InTransform, InBounds, InType));
+}
+
+auto
+    UCk_Utils_Hands_ContactShape_UE::
     Get_IsValid(
         const FCk_Hands_ContactShape& InShape)
     -> bool

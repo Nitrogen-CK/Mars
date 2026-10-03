@@ -168,4 +168,87 @@ bool FCkTest_Hands_Utils_InSpaceRejectsInvalidShape::RunTest(const FString&)
 
 // --------------------------------------------------------------------------------------------------------------------
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkTest_Hands_Utils_AxisAndBoundsMakersMatchTheKernel,
+    "CkHands.Utils.AxisAndBoundsMakersMatchTheKernel",
+    kCkUnitTestFlags)
+
+bool FCkTest_Hands_Utils_AxisAndBoundsMakersMatchTheKernel::RunTest(const FString&)
+{
+    const auto Transform = FTransform{FRotator{10.0, 20.0, 30.0}, FVector{1.0, 2.0, 3.0}};
+    const auto Bounds = FBox{FVector{-2.0, -10.0, -4.0}, FVector{2.0, 10.0, 4.0}};
+    const auto Probe = FVector{12.0, -7.0, 5.0};
+    const auto EnsureCountBefore = UCk_Utils_Ensure_UE::Get_EnsureCount();
+
+    const auto Capsule = UCk_Utils_Hands_ContactShape_UE::Make_CapsuleAlongAxis(Transform, ECk_Vector_Axis::X, 6.0f, 3.0f);
+    TestTrue(TEXT("capsule along X: type"), Capsule.Get_Type() == ECk_Hands_ContactShapeType::Capsule);
+    TestEqual(TEXT("capsule along X: the kernel's shape"),
+        ck::hands::Get_SignedDistance(Capsule, Probe),
+        ck::hands::Get_SignedDistance(ck::hands::Make_CapsuleAlongAxis(Transform, ECk_Vector_Axis::X, 6.0f, 3.0f), Probe));
+
+    for (const auto Type : {ECk_Hands_ContactShapeType::Box, ECk_Hands_ContactShapeType::Sphere, ECk_Hands_ContactShapeType::Capsule})
+    {
+        const auto Shape = UCk_Utils_Hands_ContactShape_UE::Make_FromBounds(Transform, Bounds, Type);
+        TestTrue(*ck::Format_UE(TEXT("from bounds [{}]: type"), Type), Shape.Get_Type() == Type);
+        TestEqual(*ck::Format_UE(TEXT("from bounds [{}]: the kernel's shape"), Type),
+            ck::hands::Get_SignedDistance(Shape, Probe),
+            ck::hands::Get_SignedDistance(ck::hands::Make_ShapeFromBounds(Transform, Bounds, Type), Probe));
+    }
+
+    TestTrue(TEXT("a None type is a None shape"),
+        UCk_Utils_Hands_ContactShape_UE::Make_FromBounds(Transform, Bounds, ECk_Hands_ContactShapeType::None).Get_Type()
+            == ECk_Hands_ContactShapeType::None);
+
+    TestEqual(TEXT("valid input does not ensure"), UCk_Utils_Ensure_UE::Get_EnsureCount(), EnsureCountBefore);
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkTest_Hands_Utils_AxisAndBoundsMakersRejectInvalidInput,
+    "CkHands.Utils.AxisAndBoundsMakersRejectInvalidInput",
+    kCkUnitTestFlags)
+
+bool FCkTest_Hands_Utils_AxisAndBoundsMakersRejectInvalidInput::RunTest(const FString&)
+{
+    using namespace ck_hands_utils_spec;
+
+    auto TwoAxes = FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Capsule, FTransform::Identity};
+    Expect_EnsuredOnce(*this, TEXT("capsule along two axes"), [&]()
+    {
+        TwoAxes = UCk_Utils_Hands_ContactShape_UE::Make_CapsuleAlongAxis(
+            FTransform::Identity, ECk_Vector_Axis::X | ECk_Vector_Axis::Z, 5.0f, 1.0f);
+    });
+    TestTrue(TEXT("the rejected two-axis capsule is a None shape"), TwoAxes.Get_Type() == ECk_Hands_ContactShapeType::None);
+
+    auto NegativeRadius = FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Capsule, FTransform::Identity};
+    Expect_EnsuredOnce(*this, TEXT("capsule along X with a negative radius"), [&]()
+    {
+        NegativeRadius = UCk_Utils_Hands_ContactShape_UE::Make_CapsuleAlongAxis(FTransform::Identity, ECk_Vector_Axis::X, 5.0f, -1.0f);
+    });
+    TestTrue(TEXT("the rejected negative-radius capsule is a None shape"), NegativeRadius.Get_Type() == ECk_Hands_ContactShapeType::None);
+
+    auto FromInvalidBox = FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Box, FTransform::Identity};
+    Expect_EnsuredOnce(*this, TEXT("shape from an invalid box"), [&]()
+    {
+        FromInvalidBox = UCk_Utils_Hands_ContactShape_UE::Make_FromBounds(
+            FTransform::Identity, FBox{ForceInit}, ECk_Hands_ContactShapeType::Box);
+    });
+    TestTrue(TEXT("the shape from an invalid box is a None shape"), FromInvalidBox.Get_Type() == ECk_Hands_ContactShapeType::None);
+
+    auto FromInsideOutBox = FCk_Hands_ContactShape{ECk_Hands_ContactShapeType::Box, FTransform::Identity};
+    Expect_EnsuredOnce(*this, TEXT("shape from an inside-out box"), [&]()
+    {
+        FromInsideOutBox = UCk_Utils_Hands_ContactShape_UE::Make_FromBounds(
+            FTransform::Identity, FBox{FVector{1.0}, FVector{-1.0}}, ECk_Hands_ContactShapeType::Box);
+    });
+    TestTrue(TEXT("the shape from an inside-out box is a None shape"), FromInsideOutBox.Get_Type() == ECk_Hands_ContactShapeType::None);
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 #endif

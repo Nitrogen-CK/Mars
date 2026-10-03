@@ -20,14 +20,19 @@ characters or ECS entities.
     the hot path: they take a valid shape as a precondition and do not validate it.
   - `Solve_DigitCurl` — how far (0..1) a digit can curl from rest toward its target pose before it newly touches the
     shape. The header documents the sampling, the adaptive step count and the exact no-tunnelling guarantee.
-  - `Get_GlovePlacement` — the placement math of the anim node.
+  - `Make_CapsuleAlongAxis` — a capsule whose cylinder section runs along one named local axis of a transform (a grip
+    socket points X along its handle) instead of local Z. `Make_ShapeFromBounds` — the Box, Sphere or Capsule (along
+    the longest axis) fitted to an axis-aligned box given in a transform's space, in cm.
+  - `Get_GlovePlacement` — the placement math of the anim node. `Get_IsPlacementTargetValid` — the target it accepts
+    (finite, normalized rotation).
 - **Utils** (`CkHands_Utils.h`; Blueprint and AngelScript): `UCk_Utils_Hands_ContactShape_UE` (`ScriptMixin` on
-  `FCk_Hands_ContactShape`: `Make_Box` / `Make_Sphere` / `Make_Capsule`, `Get_IsValid`, `Get_SignedDistance`,
-  `Get_InSpace`) and `UCk_Utils_Hands_UE` (`ScriptMixin` on `FCk_Hands_DigitContactSettings`: `Get_IsSettingsValid`;
-  plus `Solve_DigitCurl`). Wrappers over the kernel, and the Blueprint/AngelScript validation boundary: an invalid
-  shape ensures in every wrapper. A maker that would build an invalid shape returns a None shape; `Get_SignedDistance`
-  returns `TNumericLimits<double>::Max()` (as for None); `Get_InSpace` returns the input unchanged; `Solve_DigitCurl`
-  ensures in the kernel and returns 1.
+  `FCk_Hands_ContactShape`: `Make_Box` / `Make_Sphere` / `Make_Capsule` / `Make_CapsuleAlongAxis` / `Make_FromBounds`,
+  `Get_IsValid`, `Get_SignedDistance`, `Get_InSpace`) and `UCk_Utils_Hands_UE` (`ScriptMixin` on
+  `FCk_Hands_DigitContactSettings`: `Get_IsSettingsValid`; plus `Solve_DigitCurl`). Wrappers over the kernel, and the
+  Blueprint/AngelScript validation boundary: an invalid shape ensures in every wrapper. A maker that would build an
+  invalid shape (or is given several axes, or an invalid bounds box) returns a None shape; `Make_FromBounds` with a
+  None type returns a None shape without ensuring; `Get_SignedDistance` returns `TNumericLimits<double>::Max()` (as
+  for None); `Get_InSpace` returns the input unchanged; `Solve_DigitCurl` ensures in the kernel and returns 1.
 - **Contact Curl (Ck Hands)** — `FCk_RigUnit_Hands_ContactCurl` (`Rig/`), Control Rig. One node per digit: `Items` is
   the digit's bone chain, root first; the root's parent is the hand. Curls the digit from its initial (rest) pose
   toward the pose it came in with and stops where it first newly touches `Shape` (rig global space). A None shape skips
@@ -37,7 +42,8 @@ characters or ECS entities.
   evaluation, and any with a zero delta time, snaps).
 - **Glove Placement (Ck Hands)** — `FCk_AnimNode_Hands_GlovePlacement` (`AnimNode/`), anim graph, component space.
   Moves a floating hand rigidly by `PlacedBone` so that `TargetBone` (a descendant) lands exactly on `Target`. The
-  offset comes from the incoming pose; `Target`'s scale is ignored and `PlacedBone` keeps its own scale.
+  offset comes from the incoming pose; `Target`'s scale is ignored and `PlacedBone` keeps its own scale. A non-finite
+  or unnormalized `Target` is runtime data from the game: it ensures and the glove keeps its incoming pose.
 
 ## Anti-patterns
 
@@ -45,7 +51,8 @@ characters or ECS entities.
   component's world transform).
 - Expecting the curl to push a digit out of something it already touches at rest: contact that existed at rest is
   ignored by design (a handle through the palm must not stop the fingers).
-- Reading the capsule axis as local X (the pre-rename convention). It is local Z.
+- Reading the capsule axis as local X (the pre-rename convention). It is local Z; for a handle along another axis use
+  `Make_CapsuleAlongAxis` rather than rotating the transform by hand.
 - Relying on the tunnelling guarantee with a clamped step count: with a fast, long digit and a small `_Radius`,
   raise `_MaxSearchSteps` or accept a coarser search.
 - Wrapping kernel calls in `ensure`/early-outs: invalid kernel input already ensures once and recovers with 1.
