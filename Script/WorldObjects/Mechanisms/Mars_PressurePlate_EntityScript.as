@@ -66,9 +66,11 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FVector PlateSize = FVector(120.0, 120.0, 8.0);
 
-    // Drawn with the MarsImageDecal look. Null = no decal.
+    // Drawn with the MarsImageDecal look. Null = no decal. Defaults to the player icon, matching the default filter; a
+    // plate that detects something else marks itself with that thing's icon (the backpack plate uses Backpack_T).
     UPROPERTY(ExposeOnSpawn)
     TSoftObjectPtr<UTexture2D> DecalTexture;
+    default DecalTexture = assets::ChefCharacter_T();
 
     // The decal's square, as a fraction of the slab's shorter side.
     private const float64 k_DecalCoverage = 0.8;
@@ -130,9 +132,10 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
             CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameFront");
     }
 
-    // A decal projects along its local +X, so pitch -90 aims it down at the slab's top face. DecalSize is read-only to
-    // script, so the node's scale carries the box size: it multiplies the component's default DecalSize (128, 256, 256
-    // half extents). No decal until the MarsImageDecal master is generated (Create_MID_ForLook warns and returns null).
+    // A decal projects along its local +X, so pitch -90 aims it down at the slab's top face, and yaw 90 turns the image's
+    // top toward the plate's +X (its forward). DecalSize is read-only to script, so the node's scale carries the box size:
+    // it multiplies the component's default DecalSize (128, 256, 256 half extents). No decal until the MarsImageDecal
+    // master is generated (Create_MID_ForLook warns and returns null).
     private void AddDecal(FCk_Handle_Transform& InPlateNode)
     {
         auto Material = utils_usf::Create_MID_ForLook(MarsImageDecal, this);
@@ -146,7 +149,7 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
         const auto HalfSize = Math::Min(PlateSize.X, PlateSize.Y) * k_DecalCoverage * 0.5;
         const auto BoxScale = FVector(k_DecalHalfDepth / 128.0, HalfSize / 256.0, HalfSize / 256.0);
         auto Node = utils_scene_node::Create(InPlateNode,
-            FTransform(FRotator(-90.0, 0.0, 0.0), FVector(0.0, 0.0, PlateSize.Z), BoxScale));
+            FTransform(FRotator(-90.0, 90.0, 0.0), FVector(0.0, 0.0, PlateSize.Z), BoxScale));
 
         auto Archetype = NewObject(this, UDecalComponent);
         Archetype.SetMobility(EComponentMobility::Movable);

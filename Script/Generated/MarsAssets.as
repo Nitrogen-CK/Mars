@@ -502,6 +502,7 @@ namespace assets
     TSoftObjectPtr<UStaticMesh> SM_FPHands_GripTestCube() { return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Test/SM_FPHands_GripTestCube.SM_FPHands_GripTestCube")); }
     TSoftObjectPtr<UStaticMesh> SM_PlayerBackpack() { return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerBackpack/Meshes/SM_PlayerBackpack.SM_PlayerBackpack")); }
     TSoftObjectPtr<UTexture2D> Backpack_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Backpack_T.Backpack_T")); }
+    TSoftObjectPtr<UTexture2D> ChefCharacter_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChefCharacter_T.ChefCharacter_T")); }
     TSoftObjectPtr<UTexture2D> Cursor_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Cursor_T.Cursor_T")); }
     TSoftObjectPtr<UTexture2D> Emote_Bow_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/Emote_Bow_Mars_T.Emote_Bow_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Emote_Cheer_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/Emote_Cheer_Mars_T.Emote_Cheer_Mars_T")); }
@@ -5152,6 +5153,15 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Backpack_T());
+    }
+    UTexture2D ChefCharacter_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ChefCharacter_T() called before engine init. Use assets::ChefCharacter_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ChefCharacter_T());
     }
     UTexture2D Cursor_T()
     {
