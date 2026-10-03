@@ -1,0 +1,275 @@
+{
+  "_about": [
+    "The automation gate for Mars: a plain `--test` runs every test under these roots, plus functional tests and tests named after an enabled plugin/module (UnrealToolbox v1.49+).",
+    "Without this file a bare --test skips every Ck.* test: Ck, CkAngelscriptGenerator, CkGrid, CkSubsystemBrowser and CkGoapDebugger are naming roots, not plugin names.",
+    "Known reds for a Ck plugin's own tests live in THAT plugin's AutomationGate.json (UnrealToolbox v1.52+), so every project that pulls the plugin judges them alike. This file lists only a plugin test that is red BECAUSE of this project (its content or config, marked HOST-COUPLED), plus reds of tests this project defines."
+  ],
+  "roots": [
+    "Ck",
+    "CkAngelscriptGenerator",
+    "CkGrid",
+    "CkSubsystemBrowser",
+    "CkGoapDebugger"
+  ],
+  "knownReds": [
+    {
+      "test": "Ck.EcsDebugger.AuthoredWindow",
+      "status": "flaky",
+      "reason": "HOST-COUPLED by observation only: a suite-only failure of this renderer-only test seen in Mars (1 of 3 gates), green alone, and green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02). No coupling identified; if it also shows in CkPlugins it belongs in the plugin's list instead. Seen: Expected 'physical Graph-tab selection replaces only the page body' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates GREEN GREEN RED, solo GREEN. The only change under test was adding this file (and docs), so the failure predates it. That change touches no shared state, so green alone here means suite-only.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.PathNetworkEditor.Designer.FitLoadedWorldIgnoresLevelBoundsActor",
+      "status": "red",
+      "reason": "HOST-COUPLED (coupling not diagnosed). Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Seen: Expected 'loaded-world fit uses the relevant content center' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.ProceduralAnimation.SurfaceMotion.SnapshotShowsThePendingContact",
+      "status": "red",
+      "reason": "HOST-COUPLED (coupling not diagnosed). Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Seen: FCk_Latent_WaitUntil: timed out after [15]s waiting for: The body walks into the wall and adopts it",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.HeaderProvenance.CaptureStampsTheWritingBuild",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Idempotency.RepeatedLoadSameSlot",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Idempotency.SaveAfterLoadThenLoad",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Meta.FragmentPostureCoverage",
+      "status": "red",
+      "reason": "HOST-COUPLED: Mars sets no [/Script/CkSnapshot.Ck_Snapshot_PostureRatchet_Settings] _FragmentNamePrefixes, so the fence refuses to enumerate nothing. Follow-up: give Mars its prefixes (e.g. Mars_Fragment_). Seen: _FragmentNamePrefixes is empty, so this fence would enumerate nothing. Set it in the project's [/Script/CkSnapshot.Ck_Snapshot_PostureRatchet_Settings] config section to the reflected-name prefixes of its script-declared fragments (e.g. Bb_Fragment_, Bb_Tag_).",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.BeginPlayObservesConstructDefaults",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.CrossEntityLiftIsAtomic",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.DestroyWhileQuarantinedRunsEndPlay",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.MarkerClearCannotSkipSetup",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.NoProcessorSeesHalfHydrated",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.OnHydratedFiresAfterAllPayloads",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.QuarantineAlwaysLiftsAtFinish",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Ordering.SetupRunsOncePostHydration",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Parity.FogOfWar_RoundTrip",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Parity.LocalCoordinateConversion_RoundTrip",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Promise.OneShotAcrossTwoLoads",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Promise.SurvivesTravel",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Report.NoHandlerPayloadIsCountedAndNamed",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Report.UnappliedPayloadDowngradesResult",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.Snapshot.Restore.NoDanglingStoredHandles",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.UiAuthoring.Button.VisualStyle",
+      "status": "flaky",
+      "reason": "HOST-COUPLED by observation only: a suite-only failure of this renderer-only test seen in Mars (2 of 3 gates), green alone, and green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02). No coupling identified; if it also shows in CkPlugins it belongs in the plugin's list instead. Seen: Expected 'Normal state exposes the authored rounded brush' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates GREEN RED RED, solo GREEN (twice). The only change under test was adding this file (and docs), so the failure predates it. That change touches no shared state, so green alone here means suite-only.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.VoiceChat.Net.HybridRenderMode",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.VoiceChat.Net.ModerationMatrix",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Ck.VoiceChat.Net.PlaybackConfig",
+      "status": "red",
+      "reason": "HOST-COUPLED: in Mars this multi-client PIE test trips the engine fork's ensure 'Disallowed to write first packet in batch, with Iris this is not good!' (DataStreamChannel.cpp:244, the connection is not NetReady after the handshake) more than once. That ensure fires about 230 times in a Mars gate and never in a CkPlugins or BusterBlock gate. Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Cause in Mars not diagnosed (bandwidth config is identical in all three). Follow-up: find what saturates the connection in Mars.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.CursorPagination.QueryMismatchRejection",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. Seen: Expected 'Error carries ErrorData' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.ReflectionIntel.CppReflect.FindSpecifier",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'ASampleActor surfaces under specifier 'Abstract'' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.ReflectionIntel.CppReflect.UHTArtefactParse",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least 2 UClasses parsed (ASampleActor + USampleInterface)' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.ReflectionIntel.Decision.HeuristicAccuracy",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least 4 decision rows from fixture corpus' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.ReflectionIntel.Decision.StalenessFlag",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one stale row past 30-day cutoff' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.ReflectionIntel.Decision.SupersessionChain",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one supersession edge resolved from corpus' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Monolith.ReflectionIntel.Risk.ConditionalGateSweep",
+      "status": "red",
+      "reason": "Monolith plugin test (third-party submodule with no list of its own), red in this project. The fixture root resolves to 'D:/Saved/Automation/Tmp/...' (outside the project), so the staged fixtures are not found. Seen: Expected 'At least one gate row detected' to be true.",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Project.Functional Tests.CkTests.AutoTests.AutoTests_CkTests_Level.Ck_AutoTest_Queue_ReserveDistanceRefreshPerf",
+      "status": "red",
+      "reason": "HOST-COUPLED (coupling not diagnosed). Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Seen: Failed: timed out after 40.50s (90% of _TimeoutSeconds). Raise `default _TimeoutSeconds` if the test is merely slow. (1/0 assertions failed)",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Project.Functional Tests.CkTests.AutoTests.AutoTests_CkTests_Level.Ck_AutoTest_Sway_ChildSceneNodeFollowsSwayedPose",
+      "status": "red",
+      "reason": "HOST-COUPLED (coupling not diagnosed). Green in the CkPlugins gates (2026-10-01/02) and the BusterBlock gate (2026-10-02, same CkFoundation 9366c2a34, same engine). Seen: Failed: step 5/5 'assert the child composes from the swayed pose': child composes from the swayed node pose in the same frame (1/3 assertions failed)",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_EyesDummy_ComposesAndWrites",
+      "status": "red",
+      "reason": "Mars test. Seen: CkUsf: Look [MarsEyePlate] master material has shader compile errors (or is still compiling) - it will render as the checkered DefaultMaterial. See LogShaderCompilers for the HLSL error, then re-run Generate Look Materials or 'RecompileShaders Material M_CkUsf_Look_MarsEyePlate'. [log]",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    },
+    {
+      "test": "Project.Functional Tests.Mars.Maps.AutoTests_Mars_MAP.Mars_AutoTest_Eyes_LookMasterResolves",
+      "status": "red",
+      "reason": "Mars test. Seen: CkUsf: Look [MarsEyePlate] master material has shader compile errors (or is still compiling) - it will render as the checkered DefaultMaterial. See LogShaderCompilers for the HLSL error, then re-run Generate Look Materials or 'RecompileShaders Material M_CkUsf_Look_MarsEyePlate'. [log]",
+      "evidence": "Mars dev f4d3c25 (CkFoundation 9366c2a34, CkTests 771c2a98, CkGameplayDebugger 5af581da), UnrealToolbox v1.52, 3 full gates on one build 2026-10-03 (G1 raw 4243 run/62 red; G2 judged 4243/62; G3 judged 4243/63) + solo fresh-boot runs: gates RED RED RED, solo RED. The only change under test was adding this file (and docs), so the failure predates it.",
+      "added": "2026-10-03"
+    }
+  ]
+}
