@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "1ef531d3f58bc4444198370449b997fe",
+		"sourceHash": "f3e451964f9f3de0173eccd952873329",
 		"exporterVersion": 3
 	},
 	"blueprintType": "ControlRigBlueprint",
@@ -13,65 +13,17 @@
 	"implementedInterfaces": [],
 	"variables": [
 		{
-			"varName": "Curl_L_Thumb",
-			"friendlyName": "Curl L Thumb",
-			"varType": "float",
+			"varName": "Shape_L",
+			"friendlyName": "Shape L",
+			"varType": "Ck_Hands_ContactShape",
 			"category": "Default",
 			"defaultValue": "",
 			"isReplicated": false
 		},
 		{
-			"varName": "Curl_L_Index",
-			"friendlyName": "Curl L Index",
-			"varType": "float",
-			"category": "Default",
-			"defaultValue": "",
-			"isReplicated": false
-		},
-		{
-			"varName": "Curl_L_Middle",
-			"friendlyName": "Curl L Middle",
-			"varType": "float",
-			"category": "Default",
-			"defaultValue": "",
-			"isReplicated": false
-		},
-		{
-			"varName": "Curl_L_Pinky",
-			"friendlyName": "Curl L Pinky",
-			"varType": "float",
-			"category": "Default",
-			"defaultValue": "",
-			"isReplicated": false
-		},
-		{
-			"varName": "Curl_R_Thumb",
-			"friendlyName": "Curl R Thumb",
-			"varType": "float",
-			"category": "Default",
-			"defaultValue": "",
-			"isReplicated": false
-		},
-		{
-			"varName": "Curl_R_Index",
-			"friendlyName": "Curl R Index",
-			"varType": "float",
-			"category": "Default",
-			"defaultValue": "",
-			"isReplicated": false
-		},
-		{
-			"varName": "Curl_R_Middle",
-			"friendlyName": "Curl R Middle",
-			"varType": "float",
-			"category": "Default",
-			"defaultValue": "",
-			"isReplicated": false
-		},
-		{
-			"varName": "Curl_R_Pinky",
-			"friendlyName": "Curl R Pinky",
-			"varType": "float",
+			"varName": "Shape_R",
+			"friendlyName": "Shape R",
+			"varType": "Ck_Hands_ContactShape",
 			"category": "Default",
 			"defaultValue": "",
 			"isReplicated": false
@@ -79,52 +31,82 @@
 	],
 	"classDefaults": [
 		{
-			"name": "Curl_L_Thumb",
-			"type": "float",
+			"name": "Shape_L",
+			"type": "FCk_Hands_ContactShape",
 			"category": "Default",
-			"value": 1
+			"value":
+			{
+				"_Type": "None",
+				"_Transform":
+				{
+					"Rotation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 1
+					},
+					"Translation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0
+					},
+					"Scale3D":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				"_HalfExtents":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"_Radius": 0,
+				"_HalfHeight": 0
+			}
 		},
 		{
-			"name": "Curl_L_Index",
-			"type": "float",
+			"name": "Shape_R",
+			"type": "FCk_Hands_ContactShape",
 			"category": "Default",
-			"value": 1
-		},
-		{
-			"name": "Curl_L_Middle",
-			"type": "float",
-			"category": "Default",
-			"value": 1
-		},
-		{
-			"name": "Curl_L_Pinky",
-			"type": "float",
-			"category": "Default",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Thumb",
-			"type": "float",
-			"category": "Default",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Index",
-			"type": "float",
-			"category": "Default",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Middle",
-			"type": "float",
-			"category": "Default",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Pinky",
-			"type": "float",
-			"category": "Default",
-			"value": 1
+			"value":
+			{
+				"_Type": "None",
+				"_Transform":
+				{
+					"Rotation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 1
+					},
+					"Translation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0
+					},
+					"Scale3D":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				"_HalfExtents":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"_Radius": 0,
+				"_HalfHeight": 0
+			}
 		},
 		{
 			"name": "AssetUserData",
@@ -147,7 +129,2013 @@
 			"graphName": "Rig",
 			"graphCategory": "EventGraph",
 			"executionFlows": [],
-			"nodes": []
+			"nodes": [
+				{
+					"nodeId": "Node__bk_FUNjMKRTj7mHI8ZDqw",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Forwards Solve",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "ForwardSolve.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_xb33l0nPNiHMufi8eItSWg.Curl_thumb_l.ExecutePin"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_AzpkzUSoz9d5q4a7dFJ87Q",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Get Shape_L\nVariable",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Get_Shape_L.Value",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Output",
+							"connections": [
+								"Node_xb33l0nPNiHMufi8eItSWg.Curl_thumb_l.Shape",
+								"Node_bf5cyEVKllJDZFyjHL2Oug.Curl_index_l.Shape",
+								"Node_I-AB10zuesXrNR629T0vQw.Curl_middle_l.Shape",
+								"Node_DBua4Ur14tmKxtuDdVH7EA.Curl_pinky_l.Shape"
+							]
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Type",
+							"pinType": "Byte",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform",
+							"pinType": "Transform",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._Radius",
+							"pinType": "float",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_L.Value._HalfHeight",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_xb33l0nPNiHMufi8eItSWg",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_thumb_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node__bk_FUNjMKRTj7mHI8ZDqw.ForwardSolve.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_thumb_l.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AzpkzUSoz9d5q4a7dFJ87Q.Get_Shape_L.Value"
+							]
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.500000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_thumb_l.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_thumb_l.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "thumb_01_l"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "thumb_02_l"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_thumb_l.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "thumb_03_l"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_thumb_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_bf5cyEVKllJDZFyjHL2Oug.Curl_index_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_thumb_l.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_bf5cyEVKllJDZFyjHL2Oug",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_index_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_xb33l0nPNiHMufi8eItSWg.Curl_thumb_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_index_l.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_index_l.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AzpkzUSoz9d5q4a7dFJ87Q.Get_Shape_L.Value"
+							]
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.300000"
+						},
+						{
+							"pinName": "Curl_index_l.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_index_l.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_index_l.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_index_l.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_index_l.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "index_01_l"
+						},
+						{
+							"pinName": "Curl_index_l.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_index_l.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "index_02_l"
+						},
+						{
+							"pinName": "Curl_index_l.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_l.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_index_l.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "index_03_l"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_index_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_I-AB10zuesXrNR629T0vQw.Curl_middle_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_index_l.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_I-AB10zuesXrNR629T0vQw",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_middle_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_bf5cyEVKllJDZFyjHL2Oug.Curl_index_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_middle_l.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AzpkzUSoz9d5q4a7dFJ87Q.Get_Shape_L.Value"
+							]
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.300000"
+						},
+						{
+							"pinName": "Curl_middle_l.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_middle_l.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_middle_l.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "middle_01_l"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "middle_02_l"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_middle_l.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "middle_03_l"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_middle_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_DBua4Ur14tmKxtuDdVH7EA.Curl_pinky_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_middle_l.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_DBua4Ur14tmKxtuDdVH7EA",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_pinky_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_I-AB10zuesXrNR629T0vQw.Curl_middle_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_pinky_l.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AzpkzUSoz9d5q4a7dFJ87Q.Get_Shape_L.Value"
+							]
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.300000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_pinky_l.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_pinky_l.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "pinky_01_l"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "pinky_02_l"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_pinky_l.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "pinky_03_l"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_pinky_l.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_b0sjXUOzuvdQISGpdb_3Iw.Curl_thumb_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_pinky_l.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_AJwW3UE6jIi8dDq3iaUJNA",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Get Shape_R\nVariable",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Get_Shape_R.Value",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Output",
+							"connections": [
+								"Node_b0sjXUOzuvdQISGpdb_3Iw.Curl_thumb_r.Shape",
+								"Node_pXD-ykthaZMmJiOJy9D7yA.Curl_index_r.Shape",
+								"Node_YqE9hUJ1mAzOybG_pM-__g.Curl_middle_r.Shape",
+								"Node_co_VmE1kxKVVutSRK7ClXA.Curl_pinky_r.Shape"
+							]
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Type",
+							"pinType": "Byte",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform",
+							"pinType": "Transform",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._Radius",
+							"pinType": "float",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Get_Shape_R.Value._HalfHeight",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_b0sjXUOzuvdQISGpdb_3Iw",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_thumb_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_DBua4Ur14tmKxtuDdVH7EA.Curl_pinky_l.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_thumb_r.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AJwW3UE6jIi8dDq3iaUJNA.Get_Shape_R.Value"
+							]
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.500000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_thumb_r.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_thumb_r.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "thumb_01_r"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "thumb_02_r"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_thumb_r.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "thumb_03_r"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_thumb_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_pXD-ykthaZMmJiOJy9D7yA.Curl_index_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_thumb_r.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_pXD-ykthaZMmJiOJy9D7yA",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_index_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_b0sjXUOzuvdQISGpdb_3Iw.Curl_thumb_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_index_r.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_index_r.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AJwW3UE6jIi8dDq3iaUJNA.Get_Shape_R.Value"
+							]
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.300000"
+						},
+						{
+							"pinName": "Curl_index_r.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_index_r.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_index_r.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_index_r.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_index_r.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "index_01_r"
+						},
+						{
+							"pinName": "Curl_index_r.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_index_r.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "index_02_r"
+						},
+						{
+							"pinName": "Curl_index_r.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_index_r.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_index_r.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "index_03_r"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_index_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_YqE9hUJ1mAzOybG_pM-__g.Curl_middle_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_index_r.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_YqE9hUJ1mAzOybG_pM-__g",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_middle_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_pXD-ykthaZMmJiOJy9D7yA.Curl_index_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_middle_r.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AJwW3UE6jIi8dDq3iaUJNA.Get_Shape_R.Value"
+							]
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.300000"
+						},
+						{
+							"pinName": "Curl_middle_r.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_middle_r.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_middle_r.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "middle_01_r"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "middle_02_r"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_middle_r.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "middle_03_r"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_middle_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output",
+							"connections": [
+								"Node_co_VmE1kxKVVutSRK7ClXA.Curl_pinky_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_middle_r.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_co_VmE1kxKVVutSRK7ClXA",
+					"nodeClass": "ControlRigGraphNode",
+					"nodeTitle": "Contact Curl (Ck Hands)",
+					"inputPins": [
+						{
+							"pinName": "Curl_pinky_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Input",
+							"defaultValue": "()",
+							"connections": [
+								"Node_YqE9hUJ1mAzOybG_pM-__g.Curl_middle_r.ExecutePin"
+							]
+						},
+						{
+							"pinName": "Curl_pinky_r.Items",
+							"pinType": "TArray<RigElementKey>",
+							"direction": "Input",
+							"defaultValue": "()"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"connections": [
+								"Node_AJwW3UE6jIi8dDq3iaUJNA.Get_Shape_R.Value"
+							]
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "None"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform",
+							"pinType": "Transform",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Rotation",
+							"pinType": "Quat",
+							"direction": "Input",
+							"defaultValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000)"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Translation",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Translation.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Translation.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Translation.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Scale3D",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Scale3D.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Scale3D.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Transform.Scale3D.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._HalfExtents",
+							"pinType": "Vector",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._HalfExtents.X",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._HalfExtents.Y",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._HalfExtents.Z",
+							"pinType": "double",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Shape._HalfHeight",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Settings",
+							"pinType": "Ck_Hands_DigitContactSettings",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Settings._Radius",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.300000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Settings._MaxSearchSteps",
+							"pinType": "Integer",
+							"direction": "Input",
+							"defaultValue": "32"
+						},
+						{
+							"pinName": "Curl_pinky_r.Settings._TipLengthRatio",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.900000"
+						},
+						{
+							"pinName": "Curl_pinky_r.InterpSpeed",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "18.000000"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.0",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.0.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.0.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "pinky_01_r"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.1",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.1.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.1.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "pinky_02_r"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.2",
+							"pinType": "RigElementKey",
+							"direction": "Input"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.2.Type",
+							"pinType": "Byte",
+							"direction": "Input",
+							"defaultValue": "Bone"
+						},
+						{
+							"pinName": "Curl_pinky_r.Items.2.Name",
+							"pinType": "Name",
+							"direction": "Input",
+							"defaultValue": "pinky_03_r"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Curl_pinky_r.ExecutePin",
+							"pinType": "RigVMExecuteContext",
+							"direction": "Output"
+						},
+						{
+							"pinName": "Curl_pinky_r.Curl",
+							"pinType": "float",
+							"direction": "Output"
+						}
+					]
+				}
+			]
 		}
 	],
 	"functionGraphs": [],

@@ -1,8 +1,9 @@
 # CkHands
 
 Procedural hands: Control Rig and anim graph nodes that make hands close on what they hold and place floating hands on
-grip targets. Game-agnostic; Mars's first-person gloves (`Script/PlayerCharacter/FPHands`) are the first consumer, and
-the same nodes are meant for full-body characters with the same hand rig.
+grip targets. Game-agnostic; Mars's first-person gloves are the first consumer (the `Script/ECS/FPHands` feature builds
+the contact shapes, `Script/PlayerCharacter/FPHands/Mars_FPHands_AnimInstance.as` hands them and the grip targets to
+`ABP_FPHands` / `CR_FPHands_Contact`), and the same nodes are meant for full-body characters with the same hand rig.
 
 Follows the CkFoundation doctrine (`Plugins/CkFoundation/CLAUDE.md`). Reflected rig-unit and anim-node members keep
 plain engine-style names (they are the pin names and the `StaticExecute` parameter names), not `_PascalCase`.
