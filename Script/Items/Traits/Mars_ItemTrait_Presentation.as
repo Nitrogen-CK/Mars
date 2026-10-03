@@ -33,7 +33,8 @@ class UMars_ItemTrait_Presentation : UCk_ItemTrait
     UPROPERTY()
     EMars_FPHands_GripShape GripShape = EMars_FPHands_GripShape::Auto;
 
-    // World-mode pickup probe radius.
+    // World-mode pickup probe radius for an item without a Mesh. An item with one is picked up (and a backpack weighs on
+    // plates) through a box fitted to the Mesh bounds.
     UPROPERTY()
     float32 PickupProbeRadius = 40.0f;
 

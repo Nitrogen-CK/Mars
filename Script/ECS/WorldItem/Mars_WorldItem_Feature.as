@@ -75,6 +75,28 @@ struct FMars_WorldItem_Arrival
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Probe fit
+//--------------------------------------------------------------------------------------------------------------------------
+
+// A probe shape and its offset from the world item root (utils_world_item::Make_ProbeFit).
+struct FMars_WorldItem_ProbeFit
+{
+    UPROPERTY()
+    FCk_AnyShape Shape;
+
+    UPROPERTY()
+    FTransform Offset;
+
+    FMars_WorldItem_ProbeFit() {}
+
+    FMars_WorldItem_ProbeFit(FCk_AnyShape InShape, FTransform InOffset)
+    {
+        Shape = InShape;
+        Offset = InOffset;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 

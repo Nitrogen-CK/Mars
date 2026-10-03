@@ -93,10 +93,13 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             if (ck::IsValid(Presentation))
             {
                 State.Body = AddBody(InHandle, Presentation.MeshScale);
-                State.Pickup = AddPickup(Root, Presentation.PickupProbeRadius);
+                State.Pickup = AddPickup(Root, utils_world_item::Make_ProbeFit(Presentation));
             }
             else
-            { State.Pickup = AddPickup(Root, 40.0f); }
+            {
+                State.Pickup = AddPickup(Root, FMars_WorldItem_ProbeFit(
+                    utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(40.0f)), FTransform::Identity));
+            }
 
             _Pickup = State.Pickup;
         }
@@ -242,13 +245,13 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
     // The probe carries Probe.Mars.Interact: the player's interaction trace only sees probes under that tag. It is
     // Kinematic because the body moves the item.
-    private FCk_Handle_Interactable AddPickup(FCk_Handle_Transform& InRoot, float32 InProbeRadius)
+    private FCk_Handle_Interactable AddPickup(FCk_Handle_Transform& InRoot, FMars_WorldItem_ProbeFit InFit)
     {
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
         Probe.ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic);
-        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InProbeRadius));
-        Probe.ProbeOffset = FTransform::Identity;
+        Probe.ProbeShape = InFit.Shape;
+        Probe.ProbeOffset = InFit.Offset;
 
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
         TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);

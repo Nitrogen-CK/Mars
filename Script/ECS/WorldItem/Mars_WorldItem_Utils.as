@@ -34,6 +34,29 @@ namespace utils_world_item
         return ScriptClass;
     }
 
+    // The shape every probe on the item's body uses (the pickup, a backpack's weight probe): a box over the Mesh bounds
+    // (x MeshScale, matching the body), centred on them since a mesh's pivot need not be its centre; a sphere of
+    // PickupProbeRadius at the root when there is no Mesh.
+    FMars_WorldItem_ProbeFit Make_ProbeFit(const UMars_ItemTrait_Presentation InPresentation)
+    {
+        UStaticMesh Mesh = nullptr;
+        if (InPresentation.Mesh.IsNull() == false)
+        { Mesh = System::LoadAsset_Blocking(InPresentation.Mesh); }
+
+        if (ck::Is_NOT_Valid(Mesh))
+        {
+            return FMars_WorldItem_ProbeFit(
+                utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InPresentation.PickupProbeRadius)), FTransform::Identity);
+        }
+
+        const auto Bounds = Mesh.GetBounds();
+        const auto Scale = InPresentation.MeshScale;
+        const auto HalfExtents = FVector(Math::Abs(Bounds.BoxExtent.X * Scale.X), Math::Abs(Bounds.BoxExtent.Y * Scale.Y),
+                                         Math::Abs(Bounds.BoxExtent.Z * Scale.Z));
+        return FMars_WorldItem_ProbeFit(utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(HalfExtents)),
+            FTransform(FRotator::ZeroRotator, Bounds.Origin * Scale));
+    }
+
     // Per-channel blend, slerp on rotation so a >180 degree turn takes the short way (BB bb_scene_node_focus::Blend).
     FTransform Blend(FTransform InFrom, FTransform InTo, float32 InAlpha)
     {

@@ -62,7 +62,6 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     Presentation.MeshScale = FVector(0.45, 0.35, 0.6);
     Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -10.0));
-    Presentation.PickupProbeRadius = 45.0f;
     Presentation.Persistence = EMars_WorldItem_Persistence::Persistent;
     Presentation.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
     Presentation.CarryOffset = FTransform::Identity;
