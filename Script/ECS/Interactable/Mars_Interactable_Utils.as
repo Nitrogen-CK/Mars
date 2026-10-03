@@ -1,3 +1,13 @@
+// Stateless CanInteractWith predicate for every RequiresFreeHands target, bound from the CDO (the CargoSlot accept
+// policy's shape). The source is the player whose resolver or StartInteraction asks.
+UCLASS()
+class UMars_Interactable_FreeHandsPolicy : UObject
+{
+    UFUNCTION()
+    void OnCanInteractWith(FCk_Handle_InteractTarget InTarget, FCk_Handle InInteractSource, FCk_Handle InInteractInstigator, bool& OutResult)
+    { OutResult = utils_interactable::Get_HandsAreFree(InInteractSource); }
+}
+
 namespace utils_interactable
 {
     int32 Get_SortOrderFromChannel(FGameplayTag InChannel)
@@ -6,6 +16,13 @@ namespace utils_interactable
         { return 0; }
 
         return 999;
+    }
+
+    // Nothing in hand. An entity without HeldItem (tests, an NPC) has free hands.
+    bool Get_HandsAreFree(const FCk_Handle& InEntity)
+    {
+        const auto HeldItem = InEntity.As_HeldItem(ECk_SanityCheck::UnChecked);
+        return ck::Is_NOT_Valid(HeldItem) || ck::Is_NOT_Valid(HeldItem.Get_CurrentItem());
     }
 
     FCk_Handle_Interactable Create(FCk_Handle_Transform& InOwner, FMars_Interactable_Spec InParams)
@@ -46,12 +63,22 @@ namespace utils_interactable
         Context.Interactable = Interactable;
         Context.InteractableOwner = InOwner;
 
+        TSubclassOf<UMars_Interactable_FreeHandsPolicy> FreeHandsPolicyClass = UMars_Interactable_FreeHandsPolicy;
+        auto FreeHandsPolicy = FreeHandsPolicyClass.GetDefaultObject();
+
         for (const auto& Entry : InParams.Targets)
         {
-            auto InteractTarget = utils_interact_target::Add(InteractableHandle, Entry.InteractTargetSpec);
+            auto TargetSpec = Entry.InteractTargetSpec;
+            if (Entry.RequiresFreeHands)
+            { TargetSpec.Set_CustomCanInteractWithDynamic(FCk_Delegate_InteractTarget_CanInteractWith(FreeHandsPolicy, n"OnCanInteractWith")); }
+
+            auto InteractTarget = utils_interact_target::Add(InteractableHandle, TargetSpec);
             auto TargetHandle = InteractTarget.H();
             InteractTarget.Request_OverrideToSelf();
             TargetHandle.Add_Fragment(Context);
+
+            if (Entry.RequiresFreeHands)
+            { TargetHandle.Add_Fragment(FMars_Tag_InteractTarget_RequiresFreeHands()); }
 
             if (Entry.InteractPromptSpec.IsSet())
             {

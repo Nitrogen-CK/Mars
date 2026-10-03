@@ -128,6 +128,7 @@ namespace utils_station
 //--------------------------------------------------------------------------------------------------------------------------
 
 // The Use target: Instant, routed to UMars_SmState_Station_Use, which only reserves the station for the initiator.
+// Operating takes both hands (RequiresFreeHands).
 mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Self)
 {
     const auto& Spec = Self.Get_Fragment(FMars_Fragment_Station_Params).Spec;
@@ -143,6 +144,7 @@ mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Se
     Target.InteractTargetSpec = TargetSpec;
     Target.InteractPromptSpec = Prompt;
     Target.InteractionStateClass = UMars_SmState_Station_Use;
+    Target.RequiresFreeHands = true;
     return Target;
 }
 

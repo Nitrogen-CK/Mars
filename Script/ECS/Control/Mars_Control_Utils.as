@@ -59,6 +59,7 @@ namespace utils_control
 
 // The interactable target a control's entity script mounts on the Use channel, routed to UMars_SmState_Control_Engage:
 // Instant, Timed(HoldSeconds), or ManuallyCompleted (pulled; the Control's tick ends the interaction at EngageAlpha).
+// Working a control takes both hands (RequiresFreeHands).
 mixin FMars_Interactable_TargetEntry Make_InteractTarget(const FCk_Handle_Control& Self, FText InPromptText)
 {
     const auto& Params = Self.Get_Fragment(FMars_Fragment_Control_Params);
@@ -76,6 +77,7 @@ mixin FMars_Interactable_TargetEntry Make_InteractTarget(const FCk_Handle_Contro
     Target.InteractTargetSpec = TargetSpec;
     Target.InteractPromptSpec = Prompt;
     Target.InteractionStateClass = UMars_SmState_Control_Engage;
+    Target.RequiresFreeHands = true;
     return Target;
 }
 

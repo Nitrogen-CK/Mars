@@ -56,6 +56,9 @@ struct FMars_Fragment_Interactable_Signals
 
 struct FMars_Tag_Interactable_NeedsSetup {}
 
+// On an InteractTarget whose entry set RequiresFreeHands.
+struct FMars_Tag_InteractTarget_RequiresFreeHands {}
+
 struct FMars_Interactable_ProbeInfo
 {
     UPROPERTY()
@@ -76,6 +79,11 @@ struct FMars_Interactable_TargetEntry
     // Overrides UMars_SmState_InteractTarget_Enter in the per-interaction sub-SM: what the
     // interaction DOES. Route it to UMars_SmState_ExitAndTerminate when done.
     TSoftClassPtr<UCk_SmState_EntityScript> InteractionStateClass;
+
+    // The action needs both hands: nobody holding an item can start it (UMars_Interactable_FreeHandsPolicy); while the
+    // focuser holds one its prompt reads blocked, and filling the hands mid-interaction lets go
+    // (UMars_SmTask_Interactable_HandsGate).
+    bool RequiresFreeHands = false;
 }
 
 struct FMars_Interactable_Spec
@@ -88,6 +96,19 @@ struct FMars_Interactable_Spec
 
     // Higher wins focus when several interactables sit under the view ray; ties fall back to distance. Cargo slots use 10.
     int32 FocusPriority = 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Constants
+//--------------------------------------------------------------------------------------------------------------------------
+
+namespace constants_interactable
+{
+    // The blocked reason a RequiresFreeHands prompt shows while the focuser holds an item.
+    FText k_HandsFullText()
+    {
+        return FText::FromString("Hands full");
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -39,6 +39,7 @@ class UMars_SmState_Interactable_Focused : UCk_SmState_EntityScript
         AddCondition(ToInteracting, UMars_SmCondition_InteractedWith);
 
         AddTask(InHandle, UMars_SmTask_Interactable_ShowPrompt);
+        AddTask(InHandle, UMars_SmTask_Interactable_HandsGate);
         AddTask(InHandle, UMars_SmTask_Interactable_Outline);
     }
 }

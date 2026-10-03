@@ -106,6 +106,94 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
     }
 }
 
+// A RequiresFreeHands target while focused: its prompt reads constants_interactable::k_HandsFullText while the
+// focuser's hands are full. Starting an interaction is refused by UMars_Interactable_FreeHandsPolicy, but the resolver
+// only re-checks it when dirtied, so when the hands fill this task re-offers the target to the focuser's resolver
+// (remove + add, drained in order): the re-resolve drops it from the best targets, and the resolver's consumers let go -
+// the player's bridge cancels a live pull and the gloves release. A focuser without HeldItem binds nothing.
+class UMars_SmTask_Interactable_HandsGate : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
+
+    private FCk_Handle_InteractTarget _Target;
+    private FCk_Handle _Focuser;
+    private FCk_Handle_HeldItem _HeldItem;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        auto Context = Get_StateMachineContext();
+        if (Context.Has_Fragment(FMars_Tag_InteractTarget_RequiresFreeHands) == false)
+        { return; }
+
+        auto Interactable = Context.Get_Fragment(FMars_Fragment_InteractionContext).Interactable;
+        if (ck::Is_NOT_Valid(Interactable))
+        { return; }
+
+        _Focuser = Interactable.Get_CurrentFocuser();
+        _HeldItem = _Focuser.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(_HeldItem))
+        { return; }
+
+        _Target = Context.As_InteractTarget();
+        _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
+        Apply_Prompt();
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_HeldItem))
+        { _HeldItem.UnbindFrom_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged")); }
+
+        if (ck::IsValid(_Target))
+        {
+            auto Prompt = FCk_Handle(_Target).As_InteractPrompt(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Prompt))
+            { Prompt.Request_SetBlocked(FMars_Request_InteractPrompt_SetBlocked()); }
+        }
+
+        _Target = FCk_Handle_InteractTarget();
+        _Focuser = FCk_Handle();
+        _HeldItem = FCk_Handle_HeldItem();
+    }
+
+    UFUNCTION()
+    private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
+    {
+        Apply_Prompt();
+
+        if (ck::IsValid(_Target) && ck::IsValid(_Focuser) && utils_interactable::Get_HandsAreFree(_Focuser) == false)
+        { Reoffer_ToResolver(); }
+    }
+
+    private void Apply_Prompt()
+    {
+        if (ck::Is_NOT_Valid(_Target) || ck::Is_NOT_Valid(_Focuser))
+        { return; }
+
+        auto Prompt = FCk_Handle(_Target).As_InteractPrompt(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Prompt))
+        { return; }
+
+        auto Request = FMars_Request_InteractPrompt_SetBlocked();
+        if (utils_interactable::Get_HandsAreFree(_Focuser) == false)
+        { Request = FMars_Request_InteractPrompt_SetBlocked(constants_interactable::k_HandsFullText()); }
+
+        Prompt.Request_SetBlocked(Request);
+    }
+
+    private void Reoffer_ToResolver()
+    {
+        auto Resolver = _Focuser.As_InteractionResolver(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Resolver))
+        { return; }
+
+        Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(_Target));
+        Resolver.Request_AddInteractTarget(FCk_Request_InteractionResolver_AddInteractTarget(_Target));
+    }
+}
+
 // Claims an outline on the interactable's owner and its live entity subtree while focused. The source is the
 // owning state machine, so concurrent focus tasks clear only the claim they own. Only components hosted by the
 // entity (utils_unreal_component) are outlined - see AMars_TestLamp.

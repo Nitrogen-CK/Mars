@@ -1183,6 +1183,30 @@ class AMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain_Actor : ACk_
     }
 }
 
+class AMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
