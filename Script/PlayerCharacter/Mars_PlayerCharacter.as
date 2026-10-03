@@ -134,9 +134,14 @@ class AMars_PlayerCharacter : ACk_Character_UE
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
         utils_byte_attribute::Add(Player, DownedSpec, ECk_Replication::DoesNotReplicate);
 
-        // Hangs off the rendered view (the director's view anchor), so it carries the view's pitch in the same frame.
+        // Hangs off the rendered view (the director's view anchor), so it carries the view's yaw in the same frame. The
+        // pitch node in between is turned by the FPHands feature: the gloves take only part of the view's pitch
+        // (Config.FPHands.Pitch) and stay low when the player looks up.
         auto ViewAnchor = Camera.Get_ViewAnchor();
-        auto Hand = utils_scene_node::Create(ViewAnchor, utils_fphands::Get_HandRestOffset(Config.FPHands, FMars_FPHands_Hold(), Config.HandOffset));
+        auto HandPitch = utils_scene_node::Create(ViewAnchor, FTransform::Identity);
+        utils_handle::Set_DebugName(FCk_Handle(HandPitch), n"Player.HandPitch");
+        auto HandPitchTransform = HandPitch.As_Transform();
+        auto Hand = utils_scene_node::Create(HandPitchTransform, utils_fphands::Get_HandRestOffset(Config.FPHands, FMars_FPHands_Hold(), Config.HandOffset));
         utils_handle::Set_DebugName(FCk_Handle(Hand), n"Player.Hand");
 
         // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; HandOffset is its rest.
@@ -149,7 +154,9 @@ class AMars_PlayerCharacter : ACk_Character_UE
         auto HandBob = utils_bob::Create(HandTransform, FTransform::Identity, HandBobSpec);
         utils_handle::Set_DebugName(FCk_Handle(HandBob), n"Player.HandBob");
         _HandNode = HandBob.As_Transform();
-        _Hands = utils_fphands::Add(Player, Config.FPHands, _HandNode);
+        auto HandsSpec = Config.FPHands;
+        HandsSpec.Pitch.Node = HandPitch;
+        _Hands = utils_fphands::Add(Player, HandsSpec, _HandNode);
 
         auto Back = utils_scene_node::Create(PlayerTransform, Config.BackOffset);
         utils_handle::Set_DebugName(FCk_Handle(Back), n"Player.Back");

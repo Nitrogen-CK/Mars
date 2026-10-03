@@ -1,6 +1,6 @@
 // Every frame: advances PhaseTime, follows moving reach/focus anchors, drops a focus whose interactable has died, eases
-// the focus lean and rides a picked-up item in with the gloves. The phase itself is not moved here (the Hands sub-SM
-// owns it).
+// the focus lean, rides a picked-up item in with the gloves and turns the pitch node for the view's pitch. The phase
+// itself is not moved here (the Hands sub-SM owns it).
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -49,6 +49,31 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         }
 
         Tick_Carry(InHandle, Params, InState);
+        Tick_Pitch(Params.Spec.Pitch, InState, DeltaSeconds);
+    }
+
+    // Turns the pitch node back by the part of the view's pitch the gloves do not follow. The view is the node's parent;
+    // its pitch here is last frame's render, so it is eased before it is used.
+    private void Tick_Pitch(const FMars_FPHands_PitchSpec& InSpec, FMars_Fragment_FPHands& InState, float32 InDeltaSeconds)
+    {
+        auto Node = InSpec.Node;
+        if (ck::Is_NOT_Valid(Node))
+        { return; }
+
+        const auto ViewPitch = float32(utils_scene_node::Get_DriverWorldTransform(Node).Rotator().Pitch);
+        if (InState.HasViewPitch == false || InSpec.InterpSpeed <= 0.0f)
+        {
+            InState.ViewPitchDeg = ViewPitch;
+            InState.HasViewPitch = true;
+        }
+        else
+        { InState.ViewPitchDeg += (ViewPitch - InState.ViewPitchDeg) * float32(1.0 - Math::Exp(-InSpec.InterpSpeed * InDeltaSeconds)); }
+
+        const auto Offset = utils_fphands::Make_PitchOffset(InSpec, InState.ViewPitchDeg);
+        if (Offset.Equals(utils_scene_node::Get_Offset(Node)))
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
     }
 
     // The item stays where it lay while the gloves reach and close on it, then travels back to its hold offset with them.

@@ -87,6 +87,10 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_ViewSpec View;
 
+    // How much of the view's pitch the gloves follow.
+    UPROPERTY()
+    FMars_FPHands_PitchSpec Pitch;
+
     // Indexed by EMars_FPEmote. An emote montage drives both gloves (placement and fingers) through EmoteSlot; the
     // procedural placement fades out under it.
     UPROPERTY()

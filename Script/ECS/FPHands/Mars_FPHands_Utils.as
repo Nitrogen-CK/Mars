@@ -1,10 +1,15 @@
 namespace utils_fphands
 {
     // The gloves of InPlayer. The phase is driven by a Hands state machine (UMars_SmState_Hands_Rest as its initial state)
-    // whose context is InPlayer; InHandNode is what the gloves hang off and what reaches are measured from.
+    // whose context is InPlayer; InHandNode is what the gloves hang off and what reaches are measured from. A spec whose
+    // Pitch fails Validate() adds nothing.
     FCk_Handle_FPHands Add(FCk_Handle& InPlayer, FMars_FPHands_Spec InSpec, FCk_Handle_Transform InHandNode)
     {
         if (ck::EnsureIfNot(ck::IsValid(InHandNode), f"[FPHands] [{InPlayer.ToString()}] needs a valid hand node"))
+        { return FCk_Handle_FPHands(); }
+
+        const auto PitchValidation = InSpec.Pitch.Validate();
+        if (ck::EnsureIfNot(PitchValidation.IsValid, f"[FPHands] [{InPlayer.ToString()}] rejected the spec: {PitchValidation.Get_Error()}"))
         { return FCk_Handle_FPHands(); }
 
         auto Params = FMars_Fragment_FPHands_Params();
