@@ -40,6 +40,10 @@
 // The sandbox dicing station (a table with a cutting board, an herb pile and a cleaver the operator chops with) sits 400uu
 // toward -Y of the workbench. To place it in an already-built sandbox map, open it and run: Mars.Sandbox.PlaceDicingStation
 //
+// The gauntlets (five cells combining several mechanisms each, off a hall along the main floor's north edge) are built by
+// Script/Editor/Mars_SandboxGauntletBuilder.as. To add them to an already-built sandbox map, open it and run:
+// Mars.Sandbox.BuildGauntlets
+//
 // Surfaces use CkUsf ProtoGrid color variants: MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid,
 // parented to the generated M_CkUsf_Look_ProtoGrid master (created on first use). To (re)apply them to an existing
 // sandbox map, open it and run: Mars.Sandbox.ApplyMaterials
@@ -243,6 +247,7 @@ namespace utils_mars_sandbox
         Spawn_Ladder(Cube);
         Spawn_Workbench();
         Spawn_DicingStation();
+        Spawn_Gauntlets();
 
         Apply_ProtoGridMaterials();
 
@@ -868,6 +873,8 @@ namespace utils_mars_sandbox
             { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Room5_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label.StartsWith(k_GauntletLabelPrefix))
+            { Apply_GauntletMaterial(Block, Label); }
         }
     }
 }
