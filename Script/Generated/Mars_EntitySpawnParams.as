@@ -502,6 +502,19 @@ namespace UMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime
 }
 
 USTRUCT()
+struct FMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains
+{
+    FMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains_SpawnParams Params()
+    {
+        return FMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Countdown_RechargeWhileDrainingRefills_SpawnParams
 {
 }
@@ -1113,6 +1126,19 @@ namespace UMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide
 }
 
 USTRUCT()
+struct FMars_AutoTest_Gate_ThresholdDefersCloseUntilClear_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear
+{
+    FMars_AutoTest_Gate_ThresholdDefersCloseUntilClear_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gate_ThresholdDefersCloseUntilClear_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Gaze_HysteresisHoldsTarget_SpawnParams
 {
 }
@@ -1412,6 +1438,32 @@ namespace UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain
 }
 
 USTRUCT()
+struct FMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand
+{
+    FMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand_SpawnParams Params()
+    {
+        return FMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo
+{
+    FMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo_SpawnParams Params()
+    {
+        return FMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions_SpawnParams
 {
 }
@@ -1447,6 +1499,19 @@ namespace UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns
     FMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns_SpawnParams Params()
     {
         return FMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle
+{
+    FMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_SpawnParams Params()
+    {
+        return FMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_SpawnParams();
     }
 }
 
@@ -1899,7 +1964,7 @@ struct FMars_Gate_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -1907,12 +1972,20 @@ struct FMars_Gate_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -1923,9 +1996,1293 @@ namespace UMars_Gate_EntityScript
         return FMars_Gate_EntityScript_SpawnParams();
     }
 
-    FMars_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Bell_CircleSeal_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FLinearColor GlyphColor = FLinearColor(1.0f, 0.6000000238418579f, 0.15000000596046448f, 1.0f);
+
+    UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Circle;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Press seal");
+
+    FMars_Gauntlet_Bell_CircleSeal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Bell_CircleSeal_EntityScript
+{
+    FMars_Gauntlet_Bell_CircleSeal_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Bell_CircleSeal_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Bell_CircleSeal_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        return FMars_Gauntlet_Bell_CircleSeal_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Bars;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Bell_ReliquaryGate_EntityScript
+{
+    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Bell_ReliquaryGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Bell_ReturnDoor_EntityScript
+{
+    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Bell_ReturnDoor_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Bell_ReturnWheel_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Timed, 2.0f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    float32 TurnDegrees = 720.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 1.2000000476837158f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Turn wheel");
+
+    FMars_Gauntlet_Bell_ReturnWheel_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InTurnDegrees, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        TurnDegrees = InTurnDegrees;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Bell_ReturnWheel_EntityScript
+{
+    FMars_Gauntlet_Bell_ReturnWheel_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Bell_ReturnWheel_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Bell_ReturnWheel_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InTurnDegrees, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Gauntlet_Bell_ReturnWheel_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InTurnDegrees, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Bell_Sequence_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Sequence_Spec Sequence;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    FMars_Gauntlet_Bell_Sequence_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Sequence_Spec InSequence, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Sequence = InSequence;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Gauntlet_Bell_Sequence_EntityScript
+{
+    FMars_Gauntlet_Bell_Sequence_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Bell_Sequence_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Bell_Sequence_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Sequence_Spec InSequence, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Gauntlet_Bell_Sequence_EntityScript_SpawnParams(InSpawnTransform, InSequence, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Bell_TriangleSeal_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FLinearColor GlyphColor = FLinearColor(1.0f, 0.6000000238418579f, 0.15000000596046448f, 1.0f);
+
+    UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Triangle;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Press seal");
+
+    FMars_Gauntlet_Bell_TriangleSeal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Bell_TriangleSeal_EntityScript
+{
+    FMars_Gauntlet_Bell_TriangleSeal_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Bell_TriangleSeal_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Bell_TriangleSeal_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        return FMars_Gauntlet_Bell_TriangleSeal_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    float32 PullDistance = 40.0f;
+
+    UPROPERTY()
+    float32 ChainLength = 110.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 0.30000001192092896f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull chain");
+
+    FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        PullDistance = InPullDistance;
+        ChainLength = InChainLength;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Censer_Chain_EntityScript
+{
+    FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Gauntlet_Censer_Chain_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPullDistance, InChainLength, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Censer_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Oscillator_Spec Oscillator;
+
+    UPROPERTY()
+    FMars_Hazard_Spec Hazard = FMars_Hazard_Spec();
+
+    UPROPERTY()
+    FMars_Pendulum_Spec Pendulum = FMars_Pendulum_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    float32 ArmLength = 250.0f;
+
+    FMars_Gauntlet_Censer_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Oscillator_Spec InOscillator, FMars_Hazard_Spec InHazard, FMars_Pendulum_Spec InPendulum, FMars_MechanismSink_Spec InSink, float32 InArmLength)
+    {
+        SpawnTransform = InSpawnTransform;
+        Oscillator = InOscillator;
+        Hazard = InHazard;
+        Pendulum = InPendulum;
+        Sink = InSink;
+        ArmLength = InArmLength;
+    }
+}
+
+namespace UMars_Gauntlet_Censer_EntityScript
+{
+    FMars_Gauntlet_Censer_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Censer_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Censer_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Oscillator_Spec InOscillator, FMars_Hazard_Spec InHazard, FMars_Pendulum_Spec InPendulum, FMars_MechanismSink_Spec InSink, float32 InArmLength)
+    {
+        return FMars_Gauntlet_Censer_EntityScript_SpawnParams(InSpawnTransform, InOscillator, InHazard, InPendulum, InSink, InArmLength);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Censer_Lamps_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Countdown_Spec Countdown = FMars_Countdown_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    FMars_Gauntlet_Censer_Lamps_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Countdown = InCountdown;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Gauntlet_Censer_Lamps_EntityScript
+{
+    FMars_Gauntlet_Censer_Lamps_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Censer_Lamps_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Censer_Lamps_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Gauntlet_Censer_Lamps_EntityScript_SpawnParams(InSpawnTransform, InCountdown, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = true;
+
+    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Censer_Shutter_EntityScript
+{
+    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Censer_Shutter_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FLinearColor GlyphColor = FLinearColor(1.0f, 0.6000000238418579f, 0.15000000596046448f, 1.0f);
+
+    UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Circle;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Press seal");
+
+    FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Choir_CircleSeal_EntityScript
+{
+    FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        return FMars_Gauntlet_Choir_CircleSeal_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Choir_Sequence_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Sequence_Spec Sequence;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    FMars_Gauntlet_Choir_Sequence_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Sequence_Spec InSequence, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Sequence = InSequence;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Gauntlet_Choir_Sequence_EntityScript
+{
+    FMars_Gauntlet_Choir_Sequence_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Choir_Sequence_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Choir_Sequence_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Sequence_Spec InSequence, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Gauntlet_Choir_Sequence_EntityScript_SpawnParams(InSpawnTransform, InSequence, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Choir_Shutter_EntityScript
+{
+    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Choir_Shutter_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 0.4000000059604645f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FLinearColor GlyphColor = FLinearColor(1.0f, 0.6000000238418579f, 0.15000000596046448f, 1.0f);
+
+    UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Triangle;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Press seal");
+
+    FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Choir_TriangleSeal_EntityScript
+{
+    FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
+    {
+        return FMars_Gauntlet_Choir_TriangleSeal_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Bars;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Choir_VaultGate_EntityScript
+{
+    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Choir_VaultGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Choir_Wheel_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Timed, 2.0f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    float32 TurnDegrees = 720.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 1.2000000476837158f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Turn wheel");
+
+    FMars_Gauntlet_Choir_Wheel_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InTurnDegrees, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        TurnDegrees = InTurnDegrees;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Choir_Wheel_EntityScript
+{
+    FMars_Gauntlet_Choir_Wheel_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Choir_Wheel_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Choir_Wheel_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InTurnDegrees, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Gauntlet_Choir_Wheel_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InTurnDegrees, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Fungus_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_Gauntlet_Fungus_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_Gauntlet_Fungus_EntityScript
+{
+    FMars_Gauntlet_Fungus_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Fungus_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Fungus_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_Gauntlet_Fungus_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Bars;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Mourner_AlcoveGate_EntityScript
+{
+    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Mourner_AlcoveGate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Mourner_ChefPlate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Trigger_Spec Trigger;
+
+    UPROPERTY()
+    FMars_Occupancy_Spec Occupancy = FMars_Occupancy_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FVector PlateSize = FVector(120.0, 120.0, 8.0);
+
+    UPROPERTY()
+    TSoftObjectPtr<UTexture2D> DecalTexture = nullptr;
+
+    FMars_Gauntlet_Mourner_ChefPlate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        SpawnTransform = InSpawnTransform;
+        Trigger = InTrigger;
+        Occupancy = InOccupancy;
+        Source = InSource;
+        PlateSize = InPlateSize;
+        DecalTexture = InDecalTexture;
+    }
+}
+
+namespace UMars_Gauntlet_Mourner_ChefPlate_EntityScript
+{
+    FMars_Gauntlet_Mourner_ChefPlate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Mourner_ChefPlate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Mourner_ChefPlate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        return FMars_Gauntlet_Mourner_ChefPlate_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize, InDecalTexture);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Mourner_PackPlate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Trigger_Spec Trigger;
+
+    UPROPERTY()
+    FMars_Occupancy_Spec Occupancy = FMars_Occupancy_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FVector PlateSize = FVector(120.0, 120.0, 8.0);
+
+    UPROPERTY()
+    TSoftObjectPtr<UTexture2D> DecalTexture = nullptr;
+
+    FMars_Gauntlet_Mourner_PackPlate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        SpawnTransform = InSpawnTransform;
+        Trigger = InTrigger;
+        Occupancy = InOccupancy;
+        Source = InSource;
+        PlateSize = InPlateSize;
+        DecalTexture = InDecalTexture;
+    }
+}
+
+namespace UMars_Gauntlet_Mourner_PackPlate_EntityScript
+{
+    FMars_Gauntlet_Mourner_PackPlate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Mourner_PackPlate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Mourner_PackPlate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        return FMars_Gauntlet_Mourner_PackPlate_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize, InDecalTexture);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Momentary, 0.25f, false, FMars_Control_Manipulation_Spec(FVector(0.0, 0.0, -1.0), 0.029999999329447746f, 0.8500000238418579f, 60.0f, 12.0f, true));
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    float32 PullDistance = 40.0f;
+
+    UPROPERTY()
+    float32 ChainLength = 110.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 0.30000001192092896f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Pull chain");
+
+    FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        PullDistance = InPullDistance;
+        ChainLength = InChainLength;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Gauntlet_Porter_Chain_EntityScript
+{
+    FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPullDistance, float32 InChainLength, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Gauntlet_Porter_Chain_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPullDistance, InChainLength, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Gate_Spec Gate;
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Bars;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = true;
+
+    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        SpawnTransform = InSpawnTransform;
+        Gate = InGate;
+        Sink = InSink;
+        Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
+    }
+}
+
+namespace UMars_Gauntlet_Porter_Gate_EntityScript
+{
+    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
+    {
+        return FMars_Gauntlet_Porter_Gate_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Porter_Lamps_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Countdown_Spec Countdown = FMars_Countdown_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSink_Spec Sink;
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    FMars_Gauntlet_Porter_Lamps_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Countdown = InCountdown;
+        Sink = InSink;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Gauntlet_Porter_Lamps_EntityScript
+{
+    FMars_Gauntlet_Porter_Lamps_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Porter_Lamps_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Porter_Lamps_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Countdown_Spec InCountdown, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Gauntlet_Porter_Lamps_EntityScript_SpawnParams(InSpawnTransform, InCountdown, InSink, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Porter_PackInside_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Trigger_Spec Trigger;
+
+    UPROPERTY()
+    FMars_Occupancy_Spec Occupancy = FMars_Occupancy_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    FMars_Gauntlet_Porter_PackInside_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Trigger = InTrigger;
+        Occupancy = InOccupancy;
+        Source = InSource;
+    }
+}
+
+namespace UMars_Gauntlet_Porter_PackInside_EntityScript
+{
+    FMars_Gauntlet_Porter_PackInside_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Porter_PackInside_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Porter_PackInside_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_Gauntlet_Porter_PackInside_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Porter_Slab_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Trigger_Spec Trigger;
+
+    UPROPERTY()
+    FMars_Occupancy_Spec Occupancy = FMars_Occupancy_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FVector PlateSize = FVector(120.0, 120.0, 8.0);
+
+    UPROPERTY()
+    TSoftObjectPtr<UTexture2D> DecalTexture = nullptr;
+
+    FMars_Gauntlet_Porter_Slab_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        SpawnTransform = InSpawnTransform;
+        Trigger = InTrigger;
+        Occupancy = InOccupancy;
+        Source = InSource;
+        PlateSize = InPlateSize;
+        DecalTexture = InDecalTexture;
+    }
+}
+
+namespace UMars_Gauntlet_Porter_Slab_EntityScript
+{
+    FMars_Gauntlet_Porter_Slab_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Porter_Slab_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Porter_Slab_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource, FVector InPlateSize, TSoftObjectPtr<UTexture2D> InDecalTexture)
+    {
+        return FMars_Gauntlet_Porter_Slab_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource, InPlateSize, InDecalTexture);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Root_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_Gauntlet_Root_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_Gauntlet_Root_EntityScript
+{
+    FMars_Gauntlet_Root_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Root_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Root_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_Gauntlet_Root_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Salt_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_Gauntlet_Salt_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_Gauntlet_Salt_EntityScript
+{
+    FMars_Gauntlet_Salt_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Salt_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Salt_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_Gauntlet_Salt_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_Gauntlet_Truffle_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_Gauntlet_Truffle_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_Gauntlet_Truffle_EntityScript
+{
+    FMars_Gauntlet_Truffle_EntityScript_SpawnParams Params()
+    {
+        return FMars_Gauntlet_Truffle_EntityScript_SpawnParams();
+    }
+
+    FMars_Gauntlet_Truffle_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_Gauntlet_Truffle_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -2099,13 +3456,50 @@ namespace UMars_MechanismDriver_EntityScript
 }
 
 USTRUCT()
+struct FMars_OccupancyVolume_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Trigger_Spec Trigger;
+
+    UPROPERTY()
+    FMars_Occupancy_Spec Occupancy = FMars_Occupancy_Spec();
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
+
+    FMars_OccupancyVolume_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource)
+    {
+        SpawnTransform = InSpawnTransform;
+        Trigger = InTrigger;
+        Occupancy = InOccupancy;
+        Source = InSource;
+    }
+}
+
+namespace UMars_OccupancyVolume_EntityScript
+{
+    FMars_OccupancyVolume_EntityScript_SpawnParams Params()
+    {
+        return FMars_OccupancyVolume_EntityScript_SpawnParams();
+    }
+
+    FMars_OccupancyVolume_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Trigger_Spec InTrigger, FMars_Occupancy_Spec InOccupancy, FMars_MechanismSource_Spec InSource)
+    {
+        return FMars_OccupancyVolume_EntityScript_SpawnParams(InSpawnTransform, InTrigger, InOccupancy, InSource);
+    }
+}
+
+USTRUCT()
 struct FMars_Pendulum_EntityScript_SpawnParams
 {
     UPROPERTY()
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Oscillator_Spec Oscillator = FMars_Oscillator_Spec();
+    FMars_Oscillator_Spec Oscillator;
 
     UPROPERTY()
     FMars_Hazard_Spec Hazard = FMars_Hazard_Spec();
@@ -2473,7 +3867,7 @@ struct FMars_Sandbox_GateA_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -2481,12 +3875,20 @@ struct FMars_Sandbox_GateA_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Sandbox_GateA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Sandbox_GateA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -2497,9 +3899,9 @@ namespace UMars_Sandbox_GateA_EntityScript
         return FMars_Sandbox_GateA_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateA_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Sandbox_GateA_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Sandbox_GateA_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Sandbox_GateA_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
     }
 }
 
@@ -2510,7 +3912,7 @@ struct FMars_Sandbox_GateB_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -2518,12 +3920,20 @@ struct FMars_Sandbox_GateB_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Sandbox_GateB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Sandbox_GateB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -2534,9 +3944,9 @@ namespace UMars_Sandbox_GateB_EntityScript
         return FMars_Sandbox_GateB_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateB_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Sandbox_GateB_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Sandbox_GateB_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Sandbox_GateB_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
     }
 }
 
@@ -2547,7 +3957,7 @@ struct FMars_Sandbox_GateC_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -2555,12 +3965,20 @@ struct FMars_Sandbox_GateC_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Sandbox_GateC_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Sandbox_GateC_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -2571,9 +3989,9 @@ namespace UMars_Sandbox_GateC_EntityScript
         return FMars_Sandbox_GateC_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateC_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Sandbox_GateC_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Sandbox_GateC_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Sandbox_GateC_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
     }
 }
 
@@ -2584,7 +4002,7 @@ struct FMars_Sandbox_GateF_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -2592,12 +4010,20 @@ struct FMars_Sandbox_GateF_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Sandbox_GateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Sandbox_GateF_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -2608,9 +4034,9 @@ namespace UMars_Sandbox_GateF_EntityScript
         return FMars_Sandbox_GateF_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Sandbox_GateF_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Sandbox_GateF_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Sandbox_GateF_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
     }
 }
 
@@ -2621,7 +4047,7 @@ struct FMars_Sandbox_GateI_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -2629,12 +4055,20 @@ struct FMars_Sandbox_GateI_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Sandbox_GateI_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Sandbox_GateI_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -2645,9 +4079,9 @@ namespace UMars_Sandbox_GateI_EntityScript
         return FMars_Sandbox_GateI_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateI_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Sandbox_GateI_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Sandbox_GateI_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Sandbox_GateI_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
     }
 }
 
@@ -2658,7 +4092,7 @@ struct FMars_Sandbox_GateM_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Gate_Spec Gate = FMars_Gate_Spec();
+    FMars_Gate_Spec Gate;
 
     UPROPERTY()
     FMars_MechanismSink_Spec Sink;
@@ -2666,12 +4100,20 @@ struct FMars_Sandbox_GateM_EntityScript_SpawnParams
     UPROPERTY()
     FMars_MechanismSource_Spec Source = FMars_MechanismSource_Spec();
 
-    FMars_Sandbox_GateM_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    UPROPERTY()
+    EMars_Gate_Leaf Leaf = EMars_Gate_Leaf::Solid;
+
+    UPROPERTY()
+    bool WaitsForClearThreshold = false;
+
+    FMars_Sandbox_GateM_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
         SpawnTransform = InSpawnTransform;
         Gate = InGate;
         Sink = InSink;
         Source = InSource;
+        Leaf = InLeaf;
+        WaitsForClearThreshold = InWaitsForClearThreshold;
     }
 }
 
@@ -2682,9 +4124,9 @@ namespace UMars_Sandbox_GateM_EntityScript
         return FMars_Sandbox_GateM_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_GateM_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource)
+    FMars_Sandbox_GateM_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Gate_Spec InGate, FMars_MechanismSink_Spec InSink, FMars_MechanismSource_Spec InSource, EMars_Gate_Leaf InLeaf, bool InWaitsForClearThreshold)
     {
-        return FMars_Sandbox_GateM_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource);
+        return FMars_Sandbox_GateM_EntityScript_SpawnParams(InSpawnTransform, InGate, InSink, InSource, InLeaf, InWaitsForClearThreshold);
     }
 }
 
@@ -2896,7 +4338,7 @@ struct FMars_Sandbox_Pendulum_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Oscillator_Spec Oscillator = FMars_Oscillator_Spec();
+    FMars_Oscillator_Spec Oscillator;
 
     UPROPERTY()
     FMars_Hazard_Spec Hazard = FMars_Hazard_Spec();
@@ -2995,14 +4437,18 @@ struct FMars_Sandbox_SealG_EntityScript_SpawnParams
     FLinearColor GlyphColor = FLinearColor(0.10000000149011612f, 0.3499999940395355f, 1.0f, 1.0f);
 
     UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Square;
+
+    UPROPERTY()
     FText PromptText = FText::FromString("Press seal");
 
-    FMars_Sandbox_SealG_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, FText InPromptText)
+    FMars_Sandbox_SealG_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
         SpawnTransform = InSpawnTransform;
         Control = InControl;
         Source = InSource;
         GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
         PromptText = InPromptText;
     }
 }
@@ -3014,9 +4460,9 @@ namespace UMars_Sandbox_SealG_EntityScript
         return FMars_Sandbox_SealG_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_SealG_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, FText InPromptText)
+    FMars_Sandbox_SealG_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
-        return FMars_Sandbox_SealG_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InPromptText);
+        return FMars_Sandbox_SealG_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
     }
 }
 
@@ -3036,14 +4482,18 @@ struct FMars_Sandbox_SealH_EntityScript_SpawnParams
     FLinearColor GlyphColor = FLinearColor(1.0f, 0.44999998807907104f, 0.05000000074505806f, 1.0f);
 
     UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Square;
+
+    UPROPERTY()
     FText PromptText = FText::FromString("Press seal");
 
-    FMars_Sandbox_SealH_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, FText InPromptText)
+    FMars_Sandbox_SealH_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
         SpawnTransform = InSpawnTransform;
         Control = InControl;
         Source = InSource;
         GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
         PromptText = InPromptText;
     }
 }
@@ -3055,9 +4505,9 @@ namespace UMars_Sandbox_SealH_EntityScript
         return FMars_Sandbox_SealH_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_SealH_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, FText InPromptText)
+    FMars_Sandbox_SealH_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
-        return FMars_Sandbox_SealH_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InPromptText);
+        return FMars_Sandbox_SealH_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
     }
 }
 
@@ -3339,14 +4789,18 @@ struct FMars_Seal_EntityScript_SpawnParams
     FLinearColor GlyphColor = FLinearColor(0.20000000298023224f, 0.800000011920929f, 1.0f, 1.0f);
 
     UPROPERTY()
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Square;
+
+    UPROPERTY()
     FText PromptText = FText::FromString("Press seal");
 
-    FMars_Seal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, FText InPromptText)
+    FMars_Seal_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
         SpawnTransform = InSpawnTransform;
         Control = InControl;
         Source = InSource;
         GlyphColor = InGlyphColor;
+        Glyph = InGlyph;
         PromptText = InPromptText;
     }
 }
@@ -3358,9 +4812,9 @@ namespace UMars_Seal_EntityScript
         return FMars_Seal_EntityScript_SpawnParams();
     }
 
-    FMars_Seal_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, FText InPromptText)
+    FMars_Seal_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FLinearColor InGlyphColor, EMars_Seal_Glyph InGlyph, FText InPromptText)
     {
-        return FMars_Seal_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InPromptText);
+        return FMars_Seal_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InGlyphColor, InGlyph, InPromptText);
     }
 }
 
@@ -5084,6 +6538,19 @@ namespace UMars_SmTask_IntentToResolver
     FMars_SmTask_IntentToResolver_SpawnParams Params()
     {
         return FMars_SmTask_IntentToResolver_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Interactable_HandsGate_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Interactable_HandsGate
+{
+    FMars_SmTask_Interactable_HandsGate_SpawnParams Params()
+    {
+        return FMars_SmTask_Interactable_HandsGate_SpawnParams();
     }
 }
 

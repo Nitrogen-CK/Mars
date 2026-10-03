@@ -392,6 +392,18 @@ class AMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime_Actor : ACk_AutoTestRu
     }
 }
 
+class AMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Countdown_RechargeWhileDrainingRefills_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -943,6 +955,18 @@ class AMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide_Actor
     }
 }
 
+class AMars_AutoTest_Gate_ThresholdDefersCloseUntilClear_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Gate_ThresholdDefersCloseUntilClear");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Gaze_HysteresisHoldsTarget_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -1238,6 +1262,18 @@ class AMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns_Actor : ACk_AutoTe
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
