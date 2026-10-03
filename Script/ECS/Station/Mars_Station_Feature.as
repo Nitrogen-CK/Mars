@@ -59,9 +59,9 @@ struct FMars_Station_Grip
     UPROPERTY()
     EMars_HandGripPose Pose = EMars_HandGripPose::Power;
 
-    // > 0 replaces the gloves' MaxReachCm for this grip (cm).
+    // Set, replaces the gloves' MaxReachCm for this grip (cm).
     UPROPERTY()
-    float32 ReachOverrideCm = 0.0f;
+    TOptional<float32> ReachOverrideCm;
 
     // Socketless grips only: Aimed = a point grip at the node; Node = the node's own axes are the grip.
     UPROPERTY()
@@ -73,7 +73,7 @@ struct FMars_Station_Grip
 
     FMars_Station_Grip() {}
 
-    FMars_Station_Grip(EMars_Hand InHand, FGameplayTag InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm,
+    FMars_Station_Grip(EMars_Hand InHand, FGameplayTag InNode, FName InSocket, EMars_HandGripPose InPose, TOptional<float32> InReachOverrideCm,
                        EMars_FPHands_GripFrame InFrame, EMars_FPHands_GripRoll InRoll)
     {
         Hand = InHand;

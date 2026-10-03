@@ -75,8 +75,8 @@ class UMars_Processor_Sequence_Setup : UCk_Processor_Script_Base_UE
                 State.StepTimer = ArmTimer(Sequence, OutputPulseSeconds > 0.0f ? OutputPulseSeconds : FallbackPulseSeconds);
             }
         }
-        else if (StepTimeoutSeconds > 0.0f)
-        { State.StepTimer = ArmTimer(Sequence, StepTimeoutSeconds); }
+        else if (StepTimeoutSeconds.IsSet())
+        { State.StepTimer = ArmTimer(Sequence, StepTimeoutSeconds.GetValue()); }
 
         if (Sequence.Has_Fragment(FMars_Fragment_Sequence_Signals))
         { Sequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnStepAccepted.Broadcast(Sequence, AcceptedIndex); }

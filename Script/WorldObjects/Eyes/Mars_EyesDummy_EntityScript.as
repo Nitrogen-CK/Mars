@@ -189,7 +189,7 @@ class UMars_EyesDummy_EntityScript : UCk_GenericEntityScript_UE
             }
 
             const auto Expression = Catalog.Expressions[_ExpressionIndex].Def;
-            if (Expression.DurationSeconds <= 0.0f)
+            if (Expression.DurationSeconds.IsSet() == false)
             { continue; }
 
             _Eyes.Request_PlayExpression(FMars_Request_Eyes_PlayExpression(Expression));

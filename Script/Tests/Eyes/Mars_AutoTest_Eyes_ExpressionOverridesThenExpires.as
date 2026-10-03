@@ -50,14 +50,15 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
 
         Assert_Equals_Int(_Eyes.Get_ResolvedLeftCell(), 3, "the left cell after Add");
         Assert_Equals_Int(_Eyes.Get_ResolvedRightCell(), 3, "the right cell after Add");
-        Assert_True(_Happy.DurationSeconds >= 1.0f, f"the catalog's Happy is timed for at least 1 s (got [{_Happy.DurationSeconds}])");
+        Assert_True(_Happy.DurationSeconds.IsSet() && _Happy.DurationSeconds.GetValue() >= 1.0f,
+            f"the catalog's Happy is timed for at least 1 s (set [{_Happy.DurationSeconds.IsSet()}], got [{_Happy.DurationSeconds.Get(0.0f)}])");
     }
 
     UFUNCTION()
     private void Step_PlayHappyUntilCleared(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto UntilCleared = _Happy;
-        UntilCleared.DurationSeconds = 0.0f;
+        UntilCleared.DurationSeconds.Reset();
         _Eyes.Request_PlayExpression(FMars_Request_Eyes_PlayExpression(UntilCleared));
     }
 

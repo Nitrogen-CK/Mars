@@ -152,9 +152,9 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         // Both grips take their node's frame: the handle node wraps the right glove around the horizontal handle, the
         // board node lays the left glove flat on the board.
         Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::ResolveGameplayTag(n"Station.Node.Tool"), NAME_None,
-            EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+            EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         Grips.Add(FMars_Station_Grip(EMars_Hand::Left, GameplayTags::ResolveGameplayTag(n"Station.Node.Surface"), NAME_None,
-            EMars_HandGripPose::Open, 0.0f, EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+            EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         InOutSpec.Grips = Grips;
 
         InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;

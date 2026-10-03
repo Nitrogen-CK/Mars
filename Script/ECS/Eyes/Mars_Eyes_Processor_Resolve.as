@@ -18,15 +18,17 @@ class UMars_Processor_Eyes_Resolve : UCk_Processor_Script_Base_UE
     {
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
-        if (InState.HasEmote && InState.EmoteExpression.DurationSeconds > 0.0f)
+        if (InState.HasEmote && InState.EmoteRemainingSeconds.IsSet())
         {
-            InState.EmoteRemainingSeconds -= DeltaSeconds;
-            if (InState.EmoteRemainingSeconds <= 0.0f)
+            const auto RemainingSeconds = InState.EmoteRemainingSeconds.GetValue() - DeltaSeconds;
+            if (RemainingSeconds <= 0.0f)
             {
                 InState.HasEmote = false;
                 InState.EmoteExpression = FMars_Eyes_ExpressionDef();
-                InState.EmoteRemainingSeconds = 0.0f;
+                InState.EmoteRemainingSeconds.Reset();
             }
+            else
+            { InState.EmoteRemainingSeconds = RemainingSeconds; }
         }
 
         if (InHandle.Has_Fragment(FMars_Fragment_Eyes_Presentation) == false)

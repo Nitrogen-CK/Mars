@@ -180,7 +180,6 @@ asset Mars_EyeExpression_Downed of UMars_EyeExpression
     Def.RightCell = 20;
     Def.AllowBlink = false;
     Def.AllowLook = false;
-    Def.DurationSeconds = 0.0f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

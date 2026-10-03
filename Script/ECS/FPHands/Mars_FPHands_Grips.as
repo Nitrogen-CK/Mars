@@ -82,9 +82,9 @@ struct FMars_FPHands_HandGrip
     UPROPERTY()
     bool IsAuthored = false;
 
-    // > 0 replaces the spec's MaxReachCm for this grip (cm).
+    // Set, replaces the spec's MaxReachCm for this grip (cm).
     UPROPERTY()
-    float32 ReachOverrideCm = 0.0f;
+    TOptional<float32> ReachOverrideCm;
 
     // Authored grips only: Fixed keeps the grip's rotation; FaceViewer re-rolls it around its bar at reach time.
     UPROPERTY()
@@ -114,9 +114,9 @@ struct FMars_FPHands_GripEntry
     UPROPERTY()
     EMars_HandGripPose Pose = EMars_HandGripPose::Power;
 
-    // > 0 replaces the spec's MaxReachCm for this grip (cm).
+    // Set, replaces the spec's MaxReachCm for this grip (cm).
     UPROPERTY()
-    float32 ReachOverrideCm = 0.0f;
+    TOptional<float32> ReachOverrideCm;
 
     // Socketless entries only: Aimed = a point grip at the node; Node = the node's own axes are the grip.
     UPROPERTY()
@@ -128,7 +128,7 @@ struct FMars_FPHands_GripEntry
 
     FMars_FPHands_GripEntry() {}
 
-    FMars_FPHands_GripEntry(EMars_Hand InHand, FCk_Handle_Transform InNode, FName InSocket, EMars_HandGripPose InPose, float32 InReachOverrideCm,
+    FMars_FPHands_GripEntry(EMars_Hand InHand, FCk_Handle_Transform InNode, FName InSocket, EMars_HandGripPose InPose, TOptional<float32> InReachOverrideCm,
                             EMars_FPHands_GripFrame InFrame, EMars_FPHands_GripRoll InRoll)
     {
         Hand = InHand;
@@ -288,9 +288,9 @@ struct FMars_FPHands_GripQuery
     UPROPERTY()
     float Standoff = 0.0;
 
-    // > 0 replaces the spec's MaxReachCm for this grip (cm).
+    // Set, replaces the spec's MaxReachCm for this grip (cm).
     UPROPERTY()
-    float32 ReachOverrideCm = 0.0f;
+    TOptional<float32> ReachOverrideCm;
 
     FMars_FPHands_GripQuery() {}
 

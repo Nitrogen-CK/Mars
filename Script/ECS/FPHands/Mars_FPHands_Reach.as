@@ -16,12 +16,12 @@ struct FMars_FPHands_ReachSpec
     UPROPERTY(Category = "Focus")
     float32 SideSwitchMarginCm = 10.0f;
 
-    // Longest a glove stretches from its rest toward a grip (cm). 0 = uncapped: the first-person gloves reach whatever
-    // the player can interact with, so the interaction trace distance is what bounds the reach. A positive value is a
-    // stylised look cap (out of reach, the glove stretches this far toward the grip). A grip may carry its own cap:
+    // Longest a glove stretches from its rest toward a grip (cm). Unset = uncapped: the first-person gloves reach whatever
+    // the player can interact with, so the interaction trace distance is what bounds the reach. Set, it is a stylised look
+    // cap (out of reach, the glove stretches this far toward the grip). A grip may carry its own cap:
     // FMars_FPHands_GripEntry.ReachOverrideCm.
     UPROPERTY(Category = "Reach")
-    float32 MaxReachCm = 0.0f;
+    TOptional<float32> MaxReachCm;
 
     // Point grips (no socket): the glove stops this far short of the interaction point (cm).
     UPROPERTY(Category = "Reach")
@@ -163,30 +163,30 @@ namespace utils_fphands
         return 0.0f;
     }
 
-    // Seconds the phase lasts before the sub-SM moves on; Hold and None never time out (0).
-    float32 Get_PhaseSeconds(EMars_FPHands_Phase InPhase, const FMars_FPHands_Spec& InSpec)
+    // Seconds the phase lasts before the sub-SM moves on. Unset for Hold and None: they never time out.
+    TOptional<float32> Get_PhaseSeconds(EMars_FPHands_Phase InPhase, const FMars_FPHands_Spec& InSpec)
     {
         if (InPhase == EMars_FPHands_Phase::Reach)
-        { return InSpec.Reach.GrabOutSeconds; }
+        { return TOptional<float32>(InSpec.Reach.GrabOutSeconds); }
 
         if (InPhase == EMars_FPHands_Phase::Grip)
-        { return InSpec.Reach.GrabGripSeconds; }
+        { return TOptional<float32>(InSpec.Reach.GrabGripSeconds); }
 
         if (InPhase == EMars_FPHands_Phase::Return)
-        { return InSpec.Reach.GrabBackSeconds; }
+        { return TOptional<float32>(InSpec.Reach.GrabBackSeconds); }
 
         if (InPhase == EMars_FPHands_Phase::Release)
-        { return InSpec.Reach.ReleaseSeconds; }
+        { return TOptional<float32>(InSpec.Reach.ReleaseSeconds); }
 
         if (InPhase == EMars_FPHands_Phase::Push)
-        { return Get_PushSeconds(InSpec.Push); }
+        { return TOptional<float32>(Get_PushSeconds(InSpec.Push)); }
 
-        return 0.0f;
+        return TOptional<float32>();
     }
 
     // The glove's grip (hand node space) when fully reached from InGrip.RestGrip toward InGrip.WorldGrip. The stretch is
-    // capped by the grip's ReachOverrideCm when it has one, else by the spec's MaxReachCm; no positive cap = the glove
-    // reaches the grip. An authored grip's rotation is always matched, even when a cap leaves the glove short of it.
+    // capped by the grip's ReachOverrideCm when it has one, else by the spec's MaxReachCm; neither set = the glove reaches
+    // the grip. An authored grip's rotation is always matched, even when a cap leaves the glove short of it.
     FTransform Make_ReachedGrip(const FMars_FPHands_ReachSpec& InSpec, const FMars_FPHands_GripQuery& InGrip)
     {
         const auto TargetInHand = InGrip.HandWorld.InverseTransformPosition(InGrip.WorldGrip.GetLocation());
@@ -197,8 +197,11 @@ namespace utils_fphands
 
         const auto Direction = ToTarget / Distance;
         const auto Wanted = Math::Max(Distance - InGrip.Standoff, 0.0);
-        const auto Cap = InGrip.ReachOverrideCm > 0.0f ? InGrip.ReachOverrideCm : InSpec.MaxReachCm;
-        const auto Length = Cap > 0.0f ? Math::Min(Wanted, float(Cap)) : Wanted;
+        auto Cap = InSpec.MaxReachCm;
+        if (InGrip.ReachOverrideCm.IsSet())
+        { Cap = InGrip.ReachOverrideCm; }
+
+        const auto Length = Cap.IsSet() ? Math::Min(Wanted, float(Cap.GetValue())) : Wanted;
 
         auto Result = InGrip.RestGrip;
         Result.SetLocation(InGrip.RestGrip.GetLocation() + Direction * Length);

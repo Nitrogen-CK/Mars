@@ -23,9 +23,9 @@ struct FMars_Sequence_Spec
     UPROPERTY()
     bool ResetOnWrongInput = true;
 
-    // 0 = no timeout. Otherwise the next step must arrive within this many seconds of the previous one.
+    // Unset = no timeout. Set, the next step must arrive within this many seconds of the previous one.
     UPROPERTY()
-    float32 StepTimeoutSeconds = 0.0f;
+    TOptional<float32> StepTimeoutSeconds;
 
     // Latched: stays complete (and asserted) until Reset. Unlatched: resets after OutputPulseSeconds.
     UPROPERTY()
@@ -49,7 +49,7 @@ struct FMars_Fragment_Sequence_Params
     bool ResetOnWrongInput = true;
 
     UPROPERTY()
-    float32 StepTimeoutSeconds = 0.0f;
+    TOptional<float32> StepTimeoutSeconds;
 
     UPROPERTY()
     bool Latch = true;

@@ -104,8 +104,8 @@ namespace mars
 
         InteractionResolver = FCk_InteractionResolver_Spec(Mappings);
 
-        // The view trace reaches 150 uu; the gloves reach anything it hits (FPHands MaxReachCm 0 = uncapped).
-        Viewpoint.InteractionTraceDistance = 150.0f;
+        // The view trace reaches 150 uu; the gloves reach anything it hits (FPHands MaxReachCm unset = uncapped).
+        Viewpoint.InteractionTraceDistance = 250.0f;
 
         HandSway = FCk_Sway_Spec();
         HandSway.Set_Location(FCk_Sway_Response(FVector(12.0, 16.0, 12.0), 3.5f, 0.7f));

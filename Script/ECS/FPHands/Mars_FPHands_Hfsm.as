@@ -266,8 +266,8 @@ class UMars_SmCondition_HandsPhaseElapsed : UCk_SmCondition_Polled
         if (ck::Is_NOT_Valid(Hands))
         { return false; }
 
-        return Hands.Get_Phase() == Phase
-            && Hands.Get_PhaseTime() >= utils_fphands::Get_PhaseSeconds(Phase, Hands.Get_Spec());
+        const auto PhaseSeconds = utils_fphands::Get_PhaseSeconds(Phase, Hands.Get_Spec());
+        return Hands.Get_Phase() == Phase && PhaseSeconds.IsSet() && Hands.Get_PhaseTime() >= PhaseSeconds.GetValue();
     }
 }
 

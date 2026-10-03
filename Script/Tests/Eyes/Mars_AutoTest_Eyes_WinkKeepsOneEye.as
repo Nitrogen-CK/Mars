@@ -48,7 +48,7 @@ class UMars_AutoTest_Eyes_WinkKeepsOneEye : UCk_AutoTest_Base
     private void Step_PlayWink(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto UntilCleared = _Wink;
-        UntilCleared.DurationSeconds = 0.0f;
+        UntilCleared.DurationSeconds.Reset();
         _Eyes.Request_PlayExpression(FMars_Request_Eyes_PlayExpression(UntilCleared));
     }
 

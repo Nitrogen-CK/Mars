@@ -58,7 +58,7 @@ class UMars_Processor_Eyes_Requests : UCk_Processor_Script_Base_UE
         {
             InState.HasEmote = false;
             InState.EmoteExpression = FMars_Eyes_ExpressionDef();
-            InState.EmoteRemainingSeconds = 0.0f;
+            InState.EmoteRemainingSeconds.Reset();
             return;
         }
 

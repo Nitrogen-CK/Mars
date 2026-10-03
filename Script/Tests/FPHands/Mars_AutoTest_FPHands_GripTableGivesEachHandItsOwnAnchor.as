@@ -56,8 +56,8 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
         _NodeL = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, -15.0, 0.0))).As_Transform();
 
         auto Entries = TArray<FMars_FPHands_GripEntry>();
-        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Right, _NodeR, NAME_None, EMars_HandGripPose::Power, 0.0f, EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
-        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Left, _NodeL, NAME_None, EMars_HandGripPose::Open, 0.0f, EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Right, _NodeR, NAME_None, EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
+        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Left, _NodeL, NAME_None, EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         utils_fphands::Add_Grips(_Owner, Entries);
 
         _Interactable = utils_interactable::Create(Root, FMars_Interactable_Spec());

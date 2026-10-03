@@ -101,9 +101,9 @@ struct FMars_Eyes_ExpressionDef
     UPROPERTY()
     bool AllowLook = true;
 
-    // 0 = until cleared.
+    // Unset = until cleared.
     UPROPERTY()
-    float32 DurationSeconds = 0.0f;
+    TOptional<float32> DurationSeconds;
 
     UPROPERTY()
     float32 BlendSeconds = 0.08f;
@@ -119,14 +119,14 @@ mixin FMars_Validation Validate(const FMars_Eyes_ExpressionDef& Self)
     if (Self.RightCell < 0 || Self.RightCell > MaxCell)
     { return FMars_Validation(f"RightCell [{Self.RightCell}] is outside [0, {MaxCell}]"); }
 
-    if (Math::IsFinite(Self.DurationSeconds) == false)
-    { return FMars_Validation(f"DurationSeconds [{Self.DurationSeconds}] is not finite"); }
+    if (Self.DurationSeconds.IsSet() && Math::IsFinite(Self.DurationSeconds.GetValue()) == false)
+    { return FMars_Validation(f"DurationSeconds [{Self.DurationSeconds.GetValue()}] is not finite"); }
 
     if (Math::IsFinite(Self.BlendSeconds) == false)
     { return FMars_Validation(f"BlendSeconds [{Self.BlendSeconds}] is not finite"); }
 
-    if (Self.DurationSeconds < 0.0f)
-    { return FMars_Validation(f"DurationSeconds [{Self.DurationSeconds}] is negative"); }
+    if (Self.DurationSeconds.IsSet() && Self.DurationSeconds.GetValue() < 0.0f)
+    { return FMars_Validation(f"DurationSeconds [{Self.DurationSeconds.GetValue()}] is negative"); }
 
     if (Self.BlendSeconds < 0.0f)
     { return FMars_Validation(f"BlendSeconds [{Self.BlendSeconds}] is negative"); }
@@ -331,8 +331,9 @@ struct FMars_Fragment_Eyes
     UPROPERTY()
     FMars_Eyes_ExpressionDef EmoteExpression;
 
+    // Unset while the emote plays until cleared.
     UPROPERTY()
-    float32 EmoteRemainingSeconds = 0.0f;
+    TOptional<float32> EmoteRemainingSeconds;
 }
 
 // Presentation: only where cosmetics can run (utils_net::Get_CanExecuteCosmeticEvents at Add).
@@ -415,7 +416,7 @@ struct FMars_Request_Eyes_SetStyle
     }
 }
 
-// Plays on the Emote layer; DurationSeconds 0 keeps it until cleared.
+// Plays on the Emote layer; an unset DurationSeconds keeps it until cleared.
 struct FMars_Request_Eyes_PlayExpression
 {
     UPROPERTY()

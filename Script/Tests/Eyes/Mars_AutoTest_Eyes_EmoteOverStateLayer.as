@@ -56,8 +56,9 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
             return;
         }
 
-        Assert_True(_Downed.DurationSeconds <= 0.0f, "the catalog's Downed stays until cleared");
-        Assert_True(_Happy.DurationSeconds >= 1.0f, f"the catalog's Happy is timed for at least 1 s (got [{_Happy.DurationSeconds}])");
+        Assert_True(_Downed.DurationSeconds.IsSet() == false, "the catalog's Downed stays until cleared");
+        Assert_True(_Happy.DurationSeconds.IsSet() && _Happy.DurationSeconds.GetValue() >= 1.0f,
+            f"the catalog's Happy is timed for at least 1 s (set [{_Happy.DurationSeconds.IsSet()}], got [{_Happy.DurationSeconds.Get(0.0f)}])");
         Assert_True(_Downed.LeftCell != 3 && _Downed.RightCell != 3, "Downed differs from the style on both eyes");
         Assert_True(_Happy.LeftCell != _Downed.LeftCell && _Happy.RightCell != _Downed.RightCell, "Happy differs from Downed on both eyes");
     }
@@ -81,7 +82,7 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
     private void Step_PlayHappyUntilCleared(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto UntilCleared = _Happy;
-        UntilCleared.DurationSeconds = 0.0f;
+        UntilCleared.DurationSeconds.Reset();
         _Eyes.Request_PlayExpression(FMars_Request_Eyes_PlayExpression(UntilCleared));
     }
 
