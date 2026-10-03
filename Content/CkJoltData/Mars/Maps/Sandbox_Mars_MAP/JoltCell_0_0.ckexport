@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "d7dc93be73b87a9c4ed106668a893c2f",
+		"sourceHash": "75b74d6773547dd432b4f9e61154416b",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -16,7 +16,7 @@
 			"name": "_CookVersion",
 			"type": "uint32",
 			"category": "Ck_Jolt_CookedCell_UE",
-			"value": 6
+			"value": 7
 		},
 		{
 			"name": "_JoltVersionId",
@@ -1366,7 +1366,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_9",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_12",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1375,7 +1375,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_9"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_12"
 					},
 					"_SourceHash": 6.6740181481509437e+18,
 					"_RuntimeCheckHash": -5.4129973055710433e+18,
@@ -1410,7 +1410,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_10",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_13",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1419,7 +1419,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_10"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_13"
 					},
 					"_SourceHash": 7.0013987805089536e+18,
 					"_RuntimeCheckHash": -6.7337100671174543e+18,
@@ -1454,7 +1454,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_11",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_14",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1463,7 +1463,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_11"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_14"
 					},
 					"_SourceHash": -1.4065378276136507e+18,
 					"_RuntimeCheckHash": -9.0563501272483031e+18,
@@ -1498,7 +1498,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_12",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_15",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1507,7 +1507,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_12"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_15"
 					},
 					"_SourceHash": 8.5920258550528983e+18,
 					"_RuntimeCheckHash": -7.9642108656548209e+18,
@@ -1542,7 +1542,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_13",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_16",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1551,7 +1551,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_13"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_16"
 					},
 					"_SourceHash": 9.1466452313428869e+18,
 					"_RuntimeCheckHash": -5.6806774170600776e+18,
@@ -1586,7 +1586,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_14",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_17",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1595,7 +1595,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_14"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_17"
 					},
 					"_SourceHash": 7.7110563138517391e+18,
 					"_RuntimeCheckHash": 1.398861675137833e+18,
@@ -1630,7 +1630,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_15",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_18",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1639,7 +1639,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_15"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_18"
 					},
 					"_SourceHash": -4.7993371388805509e+18,
 					"_RuntimeCheckHash": 4.0551671411572562e+18,
@@ -1649,9 +1649,9 @@
 							"_ShapeIndex": 24,
 							"_Position":
 							{
-								"X": 2140,
+								"X": 2250,
 								"Y": 1600,
-								"Z": 120
+								"Z": 110
 							},
 							"_Rotation":
 							{
@@ -1662,7 +1662,7 @@
 							},
 							"_Signature":
 							{
-								"_ObjectChannel": "ECC_WorldStatic",
+								"_ObjectChannel": "ECC_WorldDynamic",
 								"_ResponseMask": -6.1489148630353398e+18,
 								"_CollisionEnabled": "QueryAndPhysics",
 								"_Domain": "Static"
@@ -1698,10 +1698,10 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 24,
+							"_ShapeIndex": 26,
 							"_Position":
 							{
-								"X": 2360,
+								"X": 2140,
 								"Y": 1600,
 								"Z": 120
 							},
@@ -1727,9 +1727,9 @@
 							"_ShapeIndex": 26,
 							"_Position":
 							{
-								"X": 2250,
+								"X": 2360,
 								"Y": 1600,
-								"Z": 110
+								"Z": 120
 							},
 							"_Rotation":
 							{
@@ -1740,7 +1740,7 @@
 							},
 							"_Signature":
 							{
-								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ObjectChannel": "ECC_WorldStatic",
 								"_ResponseMask": -6.1489148630353398e+18,
 								"_CollisionEnabled": "QueryAndPhysics",
 								"_Domain": "Static"
@@ -1752,7 +1752,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_16",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_19",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1761,7 +1761,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_16"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_19"
 					},
 					"_SourceHash": 3.4608829975876931e+18,
 					"_RuntimeCheckHash": -8.9056811838368686e+18,
@@ -1796,7 +1796,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_17",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_20",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1805,7 +1805,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_17"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_20"
 					},
 					"_SourceHash": 3.1411505452208594e+18,
 					"_RuntimeCheckHash": -2.6356783647870116e+18,
@@ -1840,7 +1840,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_18",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_21",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1849,7 +1849,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_18"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_21"
 					},
 					"_SourceHash": -8.7374167994361774e+18,
 					"_RuntimeCheckHash": -8.9225950955807859e+17,
@@ -1884,7 +1884,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_19",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_22",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1893,7 +1893,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_19"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_22"
 					},
 					"_SourceHash": 6.6398302666668165e+18,
 					"_RuntimeCheckHash": 4.0310984408268744e+18,
@@ -1903,9 +1903,9 @@
 							"_ShapeIndex": 29,
 							"_Position":
 							{
-								"X": 2600,
+								"X": 2665,
 								"Y": 1250,
-								"Z": 4
+								"Z": 2
 							},
 							"_Rotation":
 							{
@@ -1926,11 +1926,11 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 30,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
-								"X": 2600,
-								"Y": 1185,
+								"X": 2535,
+								"Y": 1250,
 								"Z": 2
 							},
 							"_Rotation":
@@ -1978,11 +1978,11 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 31,
+							"_ShapeIndex": 30,
 							"_Position":
 							{
-								"X": 2665,
-								"Y": 1250,
+								"X": 2600,
+								"Y": 1185,
 								"Z": 2
 							},
 							"_Rotation":
@@ -2007,9 +2007,9 @@
 							"_ShapeIndex": 31,
 							"_Position":
 							{
-								"X": 2535,
+								"X": 2600,
 								"Y": 1250,
-								"Z": 2
+								"Z": 4
 							},
 							"_Rotation":
 							{
@@ -2032,7 +2032,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_20",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_23",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -2041,14 +2041,14 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_20"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_23"
 					},
 					"_SourceHash": -8.5353662235638405e+18,
 					"_RuntimeCheckHash": 2.5796755034838231e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 26,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 2600,
@@ -2100,10 +2100,10 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 24,
+							"_ShapeIndex": 26,
 							"_Position":
 							{
-								"X": 2710,
+								"X": 2490,
 								"Y": 1600,
 								"Z": 120
 							},
@@ -2126,10 +2126,10 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 24,
+							"_ShapeIndex": 26,
 							"_Position":
 							{
-								"X": 2490,
+								"X": 2710,
 								"Y": 1600,
 								"Z": 120
 							},
@@ -2154,7 +2154,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_21",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_24",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -2163,7 +2163,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_21"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_24"
 					},
 					"_SourceHash": 5.2887312443908639e+18,
 					"_RuntimeCheckHash": 6.5227021200883384e+18,
@@ -2198,7 +2198,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_22",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_25",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -2207,12 +2207,38 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_22"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_25"
 					},
 					"_SourceHash": 5.039877379772586e+18,
 					"_RuntimeCheckHash": -4.2038346581118193e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
+						{
+							"_ShapeIndex": 24,
+							"_Position":
+							{
+								"X": 3500,
+								"Y": 460,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
 						{
 							"_ShapeIndex": 25,
 							"_Position":
@@ -2241,32 +2267,6 @@
 						},
 						{
 							"_ShapeIndex": 26,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": 460,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 3500,
@@ -2292,133 +2292,11 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 24,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": 350,
-								"Z": 120
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						}
-					]
-				},
-				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_24",
-					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
-					"_SourceActorPath":
-					{
-						"AssetPath":
-						{
-							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
-							"AssetName": "Sandbox_Mars_MAP"
-						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_24"
-					},
-					"_SourceHash": -7.0562687396630948e+18,
-					"_RuntimeCheckHash": 7.3213701045096069e+18,
-					"_DataLayerNames": [],
-					"_Bodies": [
-						{
-							"_ShapeIndex": 25,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": 0,
-								"Z": 230
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 24,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": 110,
-								"Z": 120
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
 							"_ShapeIndex": 26,
 							"_Position":
 							{
 								"X": 3500,
-								"Y": 0,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 24,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": -110,
+								"Y": 350,
 								"Z": 120
 							},
 							"_Rotation":
@@ -2452,6 +2330,128 @@
 							"AssetName": "Sandbox_Mars_MAP"
 						},
 						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_27"
+					},
+					"_SourceHash": -7.0562687396630948e+18,
+					"_RuntimeCheckHash": 7.3213701045096069e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 24,
+							"_Position":
+							{
+								"X": 3500,
+								"Y": 0,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 25,
+							"_Position":
+							{
+								"X": 3500,
+								"Y": 0,
+								"Z": 230
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 26,
+							"_Position":
+							{
+								"X": 3500,
+								"Y": 110,
+								"Z": 120
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 26,
+							"_Position":
+							{
+								"X": 3500,
+								"Y": -110,
+								"Z": 120
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_30",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
+							"AssetName": "Sandbox_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_30"
 					},
 					"_SourceHash": -5.3192816561296005e+18,
 					"_RuntimeCheckHash": -4.5718010509982034e+18,
