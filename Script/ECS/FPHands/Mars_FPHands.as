@@ -10,14 +10,22 @@ enum EMars_HandGripPose
     Open
 }
 
-// First-person glove emotes; FMars_FPHands_EmoteSpec::Montages maps each to its montage.
+// Player emotes, played on the first-person gloves (FMars_FPHands_EmoteSpec::Montages maps each to its montage) and the
+// third-person body - append only. Each value's wheel tag is Mars.Emote.<value name> (utils_fphands::Get_EmoteTag /
+// TryGet_Emote).
 enum EMars_FPEmote
 {
     Wave,
     ThumbsUp,
     Point,
     Clap,
-    FlipOff
+    FlipOff,
+    Cheer,
+    Laugh,
+    Bow,
+    Dance,
+    Shrug,
+    Rest
 }
 
 // What the gloves hold: nothing, an item in the right glove, or an item in both.
@@ -300,6 +308,45 @@ mixin bool Get_HoldsWith(const FMars_FPHands_Hold& Self, EMars_Hand InHand)
 
 namespace utils_fphands
 {
+    // How many EMars_FPEmote values there are: the enum's reflected names run out (or reach the generated _MAX entry)
+    // past the last one.
+    int32 Get_EmoteCount()
+    {
+        for (int32 Value = 0; Value < 255; ++Value)
+        {
+            const FString Name = f"{EMars_FPEmote(Value) :n}";
+            if (Name.IsEmpty() || Name.EndsWith("_MAX"))
+            { return Value; }
+        }
+
+        return 255;
+    }
+
+    // Mars.Emote.<the value's name>; invalid when that tag is not registered.
+    FGameplayTag Get_EmoteTag(EMars_FPEmote InEmote)
+    {
+        return FGameplayTag::RequestGameplayTag(FName(f"Mars.Emote.{InEmote :n}"), false);
+    }
+
+    // The emote a Mars.Emote.* tag names (an emote wheel entry's Emote). False for any other tag.
+    bool TryGet_Emote(FGameplayTag InTag, EMars_FPEmote& OutEmote)
+    {
+        if (InTag.IsValid() == false)
+        { return false; }
+
+        const auto Count = Get_EmoteCount();
+        for (int32 Value = 0; Value < Count; ++Value)
+        {
+            if (Get_EmoteTag(EMars_FPEmote(Value)) != InTag)
+            { continue; }
+
+            OutEmote = EMars_FPEmote(Value);
+            return true;
+        }
+
+        return false;
+    }
+
     // Where the two gloves rest for a hold, in the hand node's space, before any reach or lean. Free hands take the
     // arm swing.
     FMars_FPHands_HandTargets Get_RestTargets(const FMars_FPHands_RestSpec& InRest, const FMars_FPHands_Hold& InHold,

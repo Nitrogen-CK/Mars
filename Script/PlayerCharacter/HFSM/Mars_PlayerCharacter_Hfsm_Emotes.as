@@ -1,15 +1,13 @@
-// Emote keys -> the first-person gloves. A press plays its emote while the gloves are at rest with empty hands.
+// Emote keys -> the first-person gloves. A press plays its emote while the gloves are at rest with empty hands. Only
+// the first five emotes have keys; the rest are wheel-only.
 class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
 {
-    private AMars_PlayerCharacter _Character;
     private FCk_Handle_FPHands _Hands;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Player = ck::Ctx(InHandle);
-        _Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
-        _Hands = Player.As_FPHands();
+        _Hands = ck::Ctx(InHandle).As_FPHands();
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -19,18 +17,17 @@ class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
     {
         Super::DoExitTask(InHandle, InNetContext);
 
-        _Character = nullptr;
         _Hands = FCk_Handle_FPHands();
     }
 
-    // No character (headless): no gloves mesh to play on.
+    // No character (headless): utils_fphands::Play_Emote plays nothing.
     protected void OnIntentPressed(FGameplayTag InIntent) override
     {
         const auto Emote = TryGet_Emote(InIntent);
-        if (Emote.IsSet() == false || ck::Is_NOT_Valid(_Character))
+        if (Emote.IsSet() == false)
         { return; }
 
-        Play_Emote(Emote.GetValue());
+        utils_fphands::Play_Emote(_Hands, Emote.GetValue());
     }
 
     private TOptional<EMars_FPEmote> TryGet_Emote(FGameplayTag InIntent) const
@@ -52,31 +49,12 @@ class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
 
         return TOptional<EMars_FPEmote>();
     }
-
-    // The montage drives both gloves through the spec's emote slot. Refused while the gloves are busy: holding an item,
-    // or out of Rest (reaching, holding, pushing).
-    private void Play_Emote(EMars_FPEmote InEmote)
-    {
-        if (_Hands.Get_Hold().Kind != EMars_FPHands_HoldKind::Empty || _Hands.Get_Phase() != EMars_FPHands_Phase::None)
-        { return; }
-
-        auto Montages = _Hands.Get_Spec().Emotes.Montages;
-        if (ck::EnsureIfNot(Montages.Contains(InEmote), f"[Emotes] the gloves have no montage for [{InEmote :n}]"))
-        { return; }
-
-        auto Montage = System::LoadAsset_Blocking(Montages[InEmote]);
-        auto AnimInstance = _Character.FPHands.GetAnimInstance();
-        if (ck::EnsureIfNot(ck::IsValid(Montage) && ck::IsValid(AnimInstance),
-            f"[Emotes] [{InEmote :n}] cannot play: its montage does not load or the gloves have no anim instance"))
-        { return; }
-
-        AnimInstance.Montage_Play(Montage);
-    }
 }
 
 // EmoteWheel held -> the wheel is open. The view holds still and the look input steers the wheel's pointer instead
 // (one MovePointer per drained look delta, hence Tick); the release chooses the hovered emote, the centre cancels.
-// Leaving Alive, or a matcher swap that reads the row Idle, cancels.
+// Leaving Alive, or a matcher swap that reads the row Idle, cancels. A chosen entry's Mars.Emote.* tag plays that
+// emote on the gloves (utils_fphands::TryGet_Emote, Play_Emote); an entity without a character (tests) plays nothing.
 //
 // The wheel does not open while a gripped control holds the view (UMars_SmTask_ManipulateControl freezes it from the
 // interaction's start): both toggle the camera's orientation control and both read the look delta, so closing the
@@ -86,6 +64,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     private FCk_Handle _Player;
+    private FCk_Handle_FPHands _Hands;
     private FCk_Handle_EmoteWheel _Wheel;
     private FCk_Handle_InputIntents _InputIntents;
     private FCk_Handle_InteractionResolver _Resolver;
@@ -98,9 +77,11 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Player = ck::Ctx(InHandle);
+        _Hands = _Player.As_FPHands(ECk_SanityCheck::UnChecked);
         _Wheel = _Player.As_EmoteWheel();
         _InputIntents = _Player.As_InputIntents();
         _Resolver = _Player.As_InteractionResolver();
+        _Wheel.BindTo_OnEmoteChosen(FMars_Delegate_EmoteWheel_OnEmoteChosen(this, n"OnEmoteChosen"));
 
         auto Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Viewpoint))
@@ -116,7 +97,11 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
 
         Close(EMars_EmoteWheel_CloseAction::Cancel);
 
+        if (ck::IsValid(_Wheel))
+        { _Wheel.UnbindFrom_OnEmoteChosen(FMars_Delegate_EmoteWheel_OnEmoteChosen(this, n"OnEmoteChosen")); }
+
         _Player = FCk_Handle();
+        _Hands = FCk_Handle_FPHands();
         _Wheel = FCk_Handle_EmoteWheel();
         _InputIntents = FCk_Handle_InputIntents();
         _Resolver = FCk_Handle_InteractionResolver();
@@ -140,6 +125,16 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         const auto LookDelta = _InputIntents.Get_LookDelta();
         _Wheel.Request_MovePointer(FMars_Request_EmoteWheel_MovePointer(FVector2D(LookDelta.X, LookDelta.Y)));
         return ECk_SmTaskResult::Running;
+    }
+
+    UFUNCTION()
+    private void OnEmoteChosen(FCk_Handle_EmoteWheel InWheel, int32 InIndex, FGameplayTag InEmote)
+    {
+        auto Emote = EMars_FPEmote::Wave;
+        if (utils_fphands::TryGet_Emote(InEmote, Emote) == false)
+        { return; }
+
+        utils_fphands::Play_Emote(_Hands, Emote);
     }
 
     protected void OnMatcherRebound() override

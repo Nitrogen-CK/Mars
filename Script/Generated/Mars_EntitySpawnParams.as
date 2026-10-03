@@ -736,6 +736,32 @@ namespace UMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest
 }
 
 USTRUCT()
+struct FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack
+{
+    FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams Params()
+    {
+        return FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Emote_WheelEntryNChoosesEmoteN_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Emote_WheelEntryNChoosesEmoteN
+{
+    FMars_AutoTest_Emote_WheelEntryNChoosesEmoteN_SpawnParams Params()
+    {
+        return FMars_AutoTest_Emote_WheelEntryNChoosesEmoteN_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_EmoteWheel_OpenHoverChooseClose_SpawnParams
 {
 }

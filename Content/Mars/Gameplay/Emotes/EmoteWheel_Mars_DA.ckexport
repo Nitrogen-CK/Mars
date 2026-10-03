@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "7028f44d58c4e1a78591329b77db4ad0",
+		"sourceHash": "32880a11d5ad0bec2ff9c73b042dc1e0",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -21,6 +21,30 @@
 					"Emote": "Mars.Emote.Wave",
 					"DisplayName": "Wave",
 					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Wave_Mars_T.Emote_Wave_Mars_T",
+					"IsEnabled": true
+				},
+				{
+					"Emote": "Mars.Emote.ThumbsUp",
+					"DisplayName": "Thumbs Up",
+					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_ThumbsUp_Mars_T.Emote_ThumbsUp_Mars_T",
+					"IsEnabled": true
+				},
+				{
+					"Emote": "Mars.Emote.Point",
+					"DisplayName": "Point",
+					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Point_Mars_T.Emote_Point_Mars_T",
+					"IsEnabled": true
+				},
+				{
+					"Emote": "Mars.Emote.Clap",
+					"DisplayName": "Clap",
+					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Clap_Mars_T.Emote_Clap_Mars_T",
+					"IsEnabled": true
+				},
+				{
+					"Emote": "Mars.Emote.FlipOff",
+					"DisplayName": "Flip Off",
+					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_FlipOff_Mars_T.Emote_FlipOff_Mars_T",
 					"IsEnabled": true
 				},
 				{
@@ -51,12 +75,6 @@
 					"Emote": "Mars.Emote.Shrug",
 					"DisplayName": "Shrug",
 					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Shrug_Mars_T.Emote_Shrug_Mars_T",
-					"IsEnabled": true
-				},
-				{
-					"Emote": "Mars.Emote.Point",
-					"DisplayName": "Point",
-					"Icon": "/Game/Mars/UI/Textures/EmoteWheel/Emote_Point_Mars_T.Emote_Point_Mars_T",
 					"IsEnabled": true
 				},
 				{
