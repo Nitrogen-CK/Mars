@@ -42,11 +42,6 @@ namespace constants_cargo_slot
     // Beats the pack's own pickup (0), whose probe sphere encloses the cargo probes under the same view ray.
     const int32 k_FocusPriority = 10;
 
-    const FLinearColor k_ActionColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-    // Muted grey for the Blocked_ reasons.
-    const FLinearColor k_BlockedColor = FLinearColor(0.6f, 0.6f, 0.6f, 1.0f);
-
     // InItemName is the held item for Stow and the slot's item for Take; the Blocked_ texts ignore it.
     FText k_PromptTextFor(EMars_CargoSlot_Action InAction, FText InItemName)
     {

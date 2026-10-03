@@ -31,7 +31,7 @@ class UMars_Processor_CargoSlot_Prompt : UCk_Processor_Script_Base_UE
         const auto IsAction = Action == EMars_CargoSlot_Action::Stow || Action == EMars_CargoSlot_Action::Take;
 
         const auto Text = constants_cargo_slot::k_PromptTextFor(Action, DoGet_ItemName(Slot, Focuser, Action));
-        const auto Color = IsAction ? constants_cargo_slot::k_ActionColor : constants_cargo_slot::k_BlockedColor;
+        const auto Color = IsAction ? constants_ui_colors::k_PromptText : constants_ui_colors::k_PromptText_Blocked;
 
         const auto ActionChanged = Action != InState.LastPromptAction;
         InState.LastPromptAction = Action;
