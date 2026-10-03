@@ -43,7 +43,7 @@ struct FMars_FPHands_ReachSpec
     float32 GrabOutSeconds = 0.14f;
 
     UPROPERTY(Category = "Grab")
-    float32 GrabGripSeconds = 0.12f;
+    float32 GrabGripSeconds = 0.05f;
 
     UPROPERTY(Category = "Grab")
     float32 GrabBackSeconds = 0.25f;
