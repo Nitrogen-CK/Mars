@@ -28,16 +28,19 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Movement")
     float32 AirControl = 0.35f;
 
+    // The capsule is the chef's size: 1 m tall (Config.TPBody.Scale stands the chef 1 m), ~52 cm across (the scaled
+    // chef's torso is about +-25 cm wide).
     UPROPERTY(Category = "Body")
-    float32 CapsuleHalfHeight = 88.0f;
+    float32 CapsuleHalfHeight = 50.0f;
 
     UPROPERTY(Category = "Body")
-    float32 CapsuleRadius = 34.0f;
+    float32 CapsuleRadius = 26.0f;
 
     UPROPERTY(Category = "Body")
-    float32 CrouchedHalfHeight = 52.0f;
+    float32 CrouchedHalfHeight = 35.0f;
 
-    // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch.
+    // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch. The config
+    // asset puts it at the chef's face (see FMars_TPBody_Spec::Scale for the formula).
     UPROPERTY(Category = "Camera")
     FMars_EyeHeight_Spec EyeHeight;
 
@@ -66,15 +69,23 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Inventory")
     FCk_Sway_Spec HandSway;
 
-    // Worn-backpack mount relative to the capsule root (X forward).
+    // Worn-backpack mount relative to the capsule root (X forward): the 1 m chef's upper back, 50 cm above its feet.
     UPROPERTY(Category = "Inventory")
-    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0), FVector::OneVector);
+    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 0.0), FVector::OneVector);
 
     UPROPERTY(Category = "Inventory")
     float32 ThrowHoldSeconds = 0.35f;
 
     UPROPERTY(Category = "Hands")
     FMars_FPHands_Spec FPHands;
+
+    // The third-person chef body other players see (the character's Mesh), its hat and where its eyes sit.
+    UPROPERTY(Category = "Body")
+    FMars_TPBody_Spec TPBody;
+
+    // The chef's eyes, which other players see on its face (TPBody.Face); its owner never has them.
+    UPROPERTY(Category = "Body")
+    FMars_Eyes_Spec Eyes;
 
     // The wheel's entries live in its Definition asset; only the pointer feel is tuned here.
     UPROPERTY(Category = "Emotes")
@@ -153,6 +164,12 @@ namespace mars
         FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Point.AM_FPHands_Emote_Point")));
         FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Clap.AM_FPHands_Emote_Clap")));
         FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_FlipOff.AM_FPHands_Emote_FlipOff")));
+        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Cheer.AM_FPHands_Emote_Cheer")));
+        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Laugh.AM_FPHands_Emote_Laugh")));
+        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Bow.AM_FPHands_Emote_Bow")));
+        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Dance.AM_FPHands_Emote_Dance")));
+        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Shrug.AM_FPHands_Emote_Shrug")));
+        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Rest.AM_FPHands_Emote_Rest")));
 
         // The hands' bob keeps the landing dip but adds no airborne lift: CkSway on the parent Hand node already lags
         // the hands while the body rises and falls (HandSway LocationFromLinearVelocity.Z). One owner per effect.
@@ -160,6 +177,26 @@ namespace mars
         HandBobAir.Set_LiftCmPerFallSpeed(0.0f);
         HandBobAir.Set_MaxLiftCm(0.0f);
         FPHands.Bob.Set_Air(HandBobAir);
+
+        // The view at the chef's face: 71.1 cm (unscaled) * TPBody.Scale 1.0969 = 78.0 cm above the feet, less
+        // CapsuleHalfHeight 50 (FMars_TPBody_Spec::Scale).
+        EyeHeight.Height = 28.0f;
+
+        TPBody.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SK_Chef.SK_Chef"));
+        TPBody.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C"));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Wave.AM_Chef_Emote_Wave")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_ThumbsUp.AM_Chef_Emote_ThumbsUp")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Point.AM_Chef_Emote_Point")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Clap.AM_Chef_Emote_Clap")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_FlipOff.AM_Chef_Emote_FlipOff")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Cheer.AM_Chef_Emote_Cheer")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Laugh.AM_Chef_Emote_Laugh")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Bow.AM_Chef_Emote_Bow")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Dance.AM_Chef_Emote_Dance")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Shrug.AM_Chef_Emote_Shrug")));
+        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Rest.AM_Chef_Emote_Rest")));
+        TPBody.Montages.StrikeMontage = TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/AM_Chef_Strike.AM_Chef_Strike"));
+        TPBody.Hat.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SM_Chef_Hat.SM_Chef_Hat"));
 
         EmoteWheel.Definition = TSoftObjectPtr<UMars_EmoteWheel_Definition>(FSoftObjectPath("/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA"));
     }

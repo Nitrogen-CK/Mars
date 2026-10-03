@@ -144,7 +144,9 @@ class UMars_SmState_ItemUse_Strike : UCk_SmState_EntityScript
     }
 }
 
-// After the trait's WindupSeconds, one sphere sweep from the player's viewpoint along its forward out to Reach through
+// On enter the player's third-person body starts its strike montage (AMars_PlayerCharacter::Request_Strike; an entity
+// with no character, as in tests, has no body). After the trait's WindupSeconds, one sphere sweep from the player's
+// viewpoint along its forward out to Reach through
 // utils_damage_dealer::Request_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
 // hurtbox stops the swing; Silent overlap notify). The first hurtbox hit is dealt through the player's DamageDealer,
 // which resolves it to its zone; a debug sphere marks the hit. Succeeds RecoverySeconds after
@@ -216,6 +218,10 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         _Player = Player;
         _Dealer = Dealer;
         _Item = Item;
+
+        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
+        if (ck::IsValid(Character))
+        { Character.Request_Strike(); }
     }
 
     UFUNCTION(BlueprintOverride)
