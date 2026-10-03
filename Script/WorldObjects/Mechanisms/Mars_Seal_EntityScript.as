@@ -1,4 +1,12 @@
-// Placeable seal: a wall plate with a push button carrying a glyph tile tinted GlyphColor. The origin is the mounting
+enum EMars_Seal_Glyph
+{
+    Square,
+    Circle,
+    // Apex toward the seal's local -X: up when the seal is pitched -90 onto a wall.
+    Triangle
+}
+
+// Placeable seal: a wall plate with a push button carrying a glyph tinted GlyphColor, shaped by Glyph. The origin is the mounting
 // surface and the button faces local +Z (pitch -90 to face +X on a wall). Momentary by default: pressing pulses the
 // active state for Control.ActiveSeconds. Asserts an optional MechanismSource while active.
 class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
@@ -20,6 +28,9 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
 
     UPROPERTY(ExposeOnSpawn)
     FLinearColor GlyphColor = FLinearColor(0.2f, 0.8f, 1.0f, 1.0f);
+
+    UPROPERTY(ExposeOnSpawn)
+    EMars_Seal_Glyph Glyph = EMars_Seal_Glyph::Square;
 
     UPROPERTY(ExposeOnSpawn)
     FText PromptText = NSLOCTEXT("MarsInteraction", "PressSealPrompt", "Press seal");
@@ -53,11 +64,12 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
     {
         auto CubeMesh = engine::load::Cube();
         auto CylinderMesh = engine::load::Cylinder();
+        auto ConeMesh = engine::load::Cone();
 
         auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine shapes are 100 uu with a centered pivot. Plate: 40 x 40 x 6; button: 20 across, 8 tall, on top of it;
-        // glyph: a 12 x 12 tile on the button face.
+        // glyph: about 12 across, 1 thick, on the button face.
         AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 3.0), FVector(0.4, 0.4, 0.06)),
             MakeArchetype(CubeMesh, Material, collision::profile::BlockAll), n"Seal_Plate");
 
@@ -66,7 +78,22 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
         AddMesh(ButtonTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 10.0), FVector(0.2, 0.2, 0.08)),
             MakeArchetype(CylinderMesh, Material, collision::profile::NoCollision), n"Seal_Button");
 
-        auto GlyphArchetype = MakeArchetype(CubeMesh, Material, collision::profile::NoCollision);
+        auto GlyphMesh = CubeMesh;
+        auto GlyphTransform = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 14.5), FVector(0.12, 0.12, 0.01));
+        if (Glyph == EMars_Seal_Glyph::Circle)
+        {
+            GlyphMesh = CylinderMesh;
+            GlyphTransform.SetScale3D(FVector(0.13, 0.13, 0.01));
+        }
+        else if (Glyph == EMars_Seal_Glyph::Triangle)
+        {
+            // Pitch 90 lays the cone's axis (its +Z, apex) along the button's -X and its local X along the button's face
+            // normal, which the 0.01 flattens.
+            GlyphMesh = ConeMesh;
+            GlyphTransform = FTransform(FRotator(90.0, 0.0, 0.0), FVector(0.0, 0.0, 14.5), FVector(0.01, 0.15, 0.13));
+        }
+
+        auto GlyphArchetype = MakeArchetype(GlyphMesh, Material, collision::profile::NoCollision);
         if (ck::IsValid(GlyphArchetype))
         {
             // On the archetype: the hosted component is instanced from it later and shares its override material.
@@ -74,8 +101,7 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
             if (ck::IsValid(GlyphMaterial))
             { GlyphMaterial.SetVectorParameterValue(n"PrimaryColor", GlyphColor); }
         }
-        AddMesh(ButtonTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 14.5), FVector(0.12, 0.12, 0.01)),
-            GlyphArchetype, n"Seal_Glyph");
+        AddMesh(ButtonTransform, GlyphTransform, GlyphArchetype, n"Seal_Glyph");
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
