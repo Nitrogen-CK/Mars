@@ -1,0 +1,250 @@
+{
+	"assetName": "ABP_Chef",
+	"assetPath": "/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "ac801f15238ac1eaa49f64d179bc0686",
+		"exporterVersion": 3
+	},
+	"blueprintType": "AnimBlueprint",
+	"parentClass": "Mars_Chef_AnimInstance",
+	"parentClassPath": "/Script/Angelscript.Mars_Chef_AnimInstance",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "Speed",
+			"type": "float",
+			"category": "Chef",
+			"value": 0,
+			"tooltip": "Horizontal speed, uu/s (blend space Y)."
+		},
+		{
+			"name": "Direction",
+			"type": "float",
+			"category": "Chef",
+			"value": 0,
+			"tooltip": "+90 = right, -90 = left, +-180 = backward. Holds its last value while stationary so the blend does not snap."
+		},
+		{
+			"name": "IsInAir",
+			"type": "bool",
+			"category": "Chef",
+			"value": false,
+			"tooltip": "Character movement reports falling (jump or drop)."
+		},
+		{
+			"name": "MovingSpeedThreshold",
+			"type": "float",
+			"category": "Chef",
+			"value": 10,
+			"tooltip": "Speed above this counts as moving (hysteresis-free; the blend space handles the idle blend)."
+		},
+		{
+			"name": "RootMotionMode",
+			"type": "TEnumAsByte<ERootMotionMode::Type>",
+			"category": "RootMotion",
+			"value": "RootMotionFromMontagesOnly",
+			"tooltip": "Sets where this blueprint pulls Root Motion from"
+		},
+		{
+			"name": "bReceiveNotifiesFromLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to process notifies from any linked anim instances"
+		},
+		{
+			"name": "bPropagateNotifiesToLinkedInstances",
+			"type": "uint8",
+			"category": "Notifies",
+			"value": false,
+			"tooltip": "Whether to propagate notifies to any linked anim instances"
+		},
+		{
+			"name": "bUseMainInstanceMontageEvaluationData",
+			"type": "uint8",
+			"category": "Montage",
+			"value": false,
+			"tooltip": "If true, linked instances will use the main instance's montage data. (i.e. playing a montage on a main instance will play it on the linked layer too.)"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event BlueprintUpdateAnimation",
+					"entryNodeId": "Node_KghzikMbQthTtEe9WX3G5A",
+					"steps": [
+						{
+							"nodeId": "Node_KghzikMbQthTtEe9WX3G5A",
+							"title": "Event BlueprintUpdateAnimation"
+						},
+						{
+							"nodeId": "Node_WgqrNEmPh2cJ9mKwSphsLA",
+							"title": "Parent: BlueprintUpdateAnimation"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_KghzikMbQthTtEe9WX3G5A",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output",
+							"connections": [
+								"Node_WgqrNEmPh2cJ9mKwSphsLA.execute"
+							]
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_WgqrNEmPh2cJ9mKwSphsLA.DeltaTimeX"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_WgqrNEmPh2cJ9mKwSphsLA",
+					"nodeClass": "K2Node_CallParentFunction",
+					"nodeTitle": "Parent: BlueprintUpdateAnimation",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "execute",
+							"pinType": "exec",
+							"direction": "Input",
+							"connections": [
+								"Node_KghzikMbQthTtEe9WX3G5A.then"
+							]
+						},
+						{
+							"pinName": "DeltaTimeX",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_KghzikMbQthTtEe9WX3G5A.DeltaTimeX"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_KKpA1EHp01ouqp2NDaYANw",
+					"nodeClass": "K2Node_CallFunction",
+					"nodeTitle": "Try Get Pawn Owner\nTarget is Anim Instance",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "self",
+							"pinType": "AnimInstance",
+							"direction": "Input"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ReturnValue",
+							"pinType": "Pawn",
+							"direction": "Output"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [
+		{
+			"graphName": "AnimGraph",
+			"graphCategory": "Function",
+			"executionFlows": [],
+			"nodes": [
+				{
+					"nodeId": "Node_tR6uWE6_LBb8OmKCoVUiog",
+					"nodeClass": "AnimGraphNode_Root",
+					"nodeTitle": "Output Pose\nAnimGraph",
+					"inputPins": [
+						{
+							"pinName": "Result",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_G-X5AE-sE-lO1e2KUybahw.Pose"
+							]
+						}
+					],
+					"outputPins": []
+				},
+				{
+					"nodeId": "Node_EDcVZEYKCwPFThOMQ6cbQg",
+					"nodeClass": "AnimGraphNode_StateMachine",
+					"nodeTitle": "Locomotion\nState Machine",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_G-X5AE-sE-lO1e2KUybahw.Source"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_G-X5AE-sE-lO1e2KUybahw",
+					"nodeClass": "AnimGraphNode_Slot",
+					"nodeTitle": "Slot 'DefaultSlot'\nGroup 'DefaultGroup'",
+					"inputPins": [
+						{
+							"pinName": "Source",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_EDcVZEYKCwPFThOMQ6cbQg.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_tR6uWE6_LBb8OmKCoVUiog.Result"
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"macroGraphs": []
+}

@@ -1,0 +1,61 @@
+{
+	"material": "RedCloak",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/RedCloak",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "ac84287a799f001460a6a0ef6a9b431a",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.255767,G=0.000000,B=0.004676,A=0.000000)"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [
+		{
+			"name": "Param",
+			"value": "RGBA(0.255767, 0, 0.00467558, 0)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
