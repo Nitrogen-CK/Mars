@@ -88,10 +88,64 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     _ItemTraits.Add(Backpack);
 }
 
+// Melee items for the crawler room (Room 5). Use swings them (UMars_SmState_ItemUse_Strike); the Strike trait holds the
+// damage knobs. The cleaver severs (preserves parts), the tenderizer crushes (ruins soft parts).
+asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
+{
+    _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cleaver"));
+
+    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
+    Presentation.Mesh = engine::Cube();
+    Presentation.MeshScale = FVector(0.08, 0.5, 0.25);
+    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    _ItemTraits.Add(Presentation);
+
+    auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
+    UseAction.UseStateClass = UMars_SmState_ItemUse_Strike;
+    UseAction.HintText = FText::FromString("swing");
+    UseAction.CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
+    _ItemTraits.Add(UseAction);
+
+    auto Strike = Cast<UMars_ItemTrait_Strike>(NewObject(this, UMars_ItemTrait_Strike));
+    Strike.Damage = 20.0f;
+    Strike.DamageType = GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever");
+    _ItemTraits.Add(Strike);
+
+    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
+    _ItemTraits.Add(Throwable);
+}
+
+asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
+{
+    _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Tenderizer"));
+
+    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
+    Presentation.Mesh = engine::Cylinder();
+    Presentation.MeshScale = FVector(0.25, 0.25, 0.5);
+    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    _ItemTraits.Add(Presentation);
+
+    auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
+    UseAction.UseStateClass = UMars_SmState_ItemUse_Strike;
+    UseAction.HintText = FText::FromString("swing");
+    UseAction.CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
+    _ItemTraits.Add(UseAction);
+
+    auto Strike = Cast<UMars_ItemTrait_Strike>(NewObject(this, UMars_ItemTrait_Strike));
+    Strike.Damage = 35.0f;
+    Strike.DamageType = GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Crush");
+    _ItemTraits.Add(Strike);
+
+    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
+    _ItemTraits.Add(Throwable);
+}
+
 namespace mars_items
 {
-    UCk_InventoryItem_Definition Rock()     { return Mars_ItemDef_Rock;     }
-    UCk_InventoryItem_Definition Ration()   { return Mars_ItemDef_Ration;   }
-    UCk_InventoryItem_Definition Cog()      { return Mars_ItemDef_Cog;      }
-    UCk_InventoryItem_Definition Backpack() { return Mars_ItemDef_Backpack; }
+    UCk_InventoryItem_Definition Rock()       { return Mars_ItemDef_Rock;       }
+    UCk_InventoryItem_Definition Ration()     { return Mars_ItemDef_Ration;     }
+    UCk_InventoryItem_Definition Cog()        { return Mars_ItemDef_Cog;        }
+    UCk_InventoryItem_Definition Backpack()   { return Mars_ItemDef_Backpack;   }
+    UCk_InventoryItem_Definition Cleaver()    { return Mars_ItemDef_Cleaver;    }
+    UCk_InventoryItem_Definition Tenderizer() { return Mars_ItemDef_Tenderizer; }
 }

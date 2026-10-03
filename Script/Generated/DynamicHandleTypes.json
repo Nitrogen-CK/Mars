@@ -37,12 +37,30 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_BodyPart",
+			"ShortName": "BodyPart",
+			"Description": "A monster part with its own Health and HitZone, a condition ledger, spill to the body, and a depletion policy (detach a leg, break, none)",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_BodyPartHandle",
+			"RequiredFragments": [
+				"Mars_Feature_BodyPart"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_BodyProbe",
 			"ShortName": "BodyProbe",
 			"Description": "A character's body probe: a capsule probe at the capsule centre that resizes with the character's capsule (crouch, uncrouch)",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_BodyProbeHandle",
 			"RequiredFragments": [
 				"Mars_Feature_BodyProbe"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Brain",
+			"ShortName": "Brain",
+			"Description": "A creature's decision layer: a CkGoap world state and planner, facts written only by request, and the current leaf action",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_BrainHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Brain"
 			]
 		},
 		{
@@ -91,12 +109,30 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Crawler",
+			"ShortName": "Crawler",
+			"Description": "The legged crawler archetype: a procedural walker, one body part per leg with hurtboxes, a monster root, a navigator and a brain",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CrawlerHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Crawler"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Cycle",
 			"ShortName": "Cycle",
 			"Description": "An entity that steps through a timed table of gameplay-tagged phases, optionally looping",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_CycleHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Cycle"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_DamageDealer",
+			"ShortName": "DamageDealer",
+			"Description": "The attacker side of damage: resolves a hit probe to its zone, applies the team attitude gate and scale, and forwards the hit",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_DamageDealerHandle",
+			"RequiredFragments": [
+				"Mars_Feature_DamageDealer"
 			]
 		},
 		{
@@ -172,6 +208,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Health",
+			"ShortName": "Health",
+			"Description": "An entity with hit points: a clamped float attribute, damage and heal requests drained by one processor, per-request signals and a once-only depletion",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HealthHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Health"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_HeldItem",
 			"ShortName": "HeldItem",
 			"Description": "The item in the player's hands, derived from the selected hotbar slot, and its first-person held visual",
@@ -187,6 +232,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_HeldItemUseHandle",
 			"RequiredFragments": [
 				"Mars_Feature_HeldItemUse"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_HitZone",
+			"ShortName": "HitZone",
+			"Description": "A damageable zone: a zone tag, a damage-type reaction table, the Health it feeds and the hurtbox probes that link back to it",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HitZoneHandle",
+			"RequiredFragments": [
+				"Mars_Feature_HitZone"
 			]
 		},
 		{
@@ -271,6 +325,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Monster",
+			"ShortName": "Monster",
+			"Description": "A creature root: team, body Health and zone, the parts roster, the Dead attribute and the death request",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_MonsterHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Monster"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Mover",
 			"ShortName": "Mover",
 			"Description": "A scene-node entity that tweens its own offset between a start and an end pose",
@@ -340,6 +403,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_StationHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Station"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_SurfaceNavigator",
+			"ShortName": "SurfaceNavigator",
+			"Description": "Goal-to-steering navigation for a SurfaceMotion body: a path from the nav surface or a straight line, waypoint following and a stuck watchdog",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_SurfaceNavigatorHandle",
+			"RequiredFragments": [
+				"Mars_Feature_SurfaceNavigator"
 			]
 		},
 		{

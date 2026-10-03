@@ -83,6 +83,8 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_handle::Set_DebugName(Player, n"Player");
 
         utils_input_intents::Add(Player);
+        utils_team::Add(Player, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
+        utils_damage_dealer::Add(Player, FMars_DamageDealer_Spec());
 
         // The character's stride clock; the head and hand bobs below read it. The spec's tunables come from the config,
         // its motion source is this pawn's movement component.
