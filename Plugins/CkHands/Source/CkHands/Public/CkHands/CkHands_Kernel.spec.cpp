@@ -778,4 +778,137 @@ bool FCkTest_Hands_Kernel_GlovePlacement_LandsTargetBoneOnTarget::RunTest(const 
 
 // --------------------------------------------------------------------------------------------------------------------
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkTest_Hands_Kernel_PlacementTarget_RejectsNonFiniteAndUnnormalized,
+    "CkHands.Kernel.PlacementTarget_RejectsNonFiniteAndUnnormalized",
+    kCkUnitTestFlags)
+
+bool FCkTest_Hands_Kernel_PlacementTarget_RejectsNonFiniteAndUnnormalized::RunTest(const FString&)
+{
+    const auto NaN = std::numeric_limits<double>::quiet_NaN();
+
+    TestTrue(TEXT("identity is valid"), ck::hands::Get_IsPlacementTargetValid(FTransform::Identity));
+    TestTrue(TEXT("a scaled, rotated target is valid (the placement ignores its scale)"),
+        ck::hands::Get_IsPlacementTargetValid(FTransform{FRotator{-30.0, 60.0, 15.0}, FVector{100.0, 200.0, 300.0}, FVector{3.0}}));
+
+    TestFalse(TEXT("a NaN location is rejected"),
+        ck::hands::Get_IsPlacementTargetValid(FTransform{FQuat::Identity, FVector{NaN, 0.0, 0.0}}));
+
+    auto Unnormalized = FTransform::Identity;
+    Unnormalized.SetRotation(FQuat{0.0, 0.0, 0.0, 2.0});
+    TestFalse(TEXT("an unnormalized rotation is rejected"), ck::hands::Get_IsPlacementTargetValid(Unnormalized));
+
+    auto ZeroRotation = FTransform::Identity;
+    ZeroRotation.SetRotation(FQuat{0.0, 0.0, 0.0, 0.0});
+    TestFalse(TEXT("an all-zero rotation is rejected"), ck::hands::Get_IsPlacementTargetValid(ZeroRotation));
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkTest_Hands_Kernel_CapsuleAlongAxis_RunsAlongTheNamedAxis,
+    "CkHands.Kernel.CapsuleAlongAxis_RunsAlongTheNamedAxis",
+    kCkUnitTestFlags)
+
+bool FCkTest_Hands_Kernel_CapsuleAlongAxis_RunsAlongTheNamedAxis::RunTest(const FString&)
+{
+    using namespace ck_hands_kernel_spec;
+
+    constexpr auto HalfHeight = 6.0f;
+    constexpr auto Radius = 3.0f;
+    constexpr auto Reach = 20.0;
+    const auto Transform = FTransform{FRotator{10.0, 20.0, 30.0}, FVector{5.0, 6.0, 7.0}, FVector{2.0}};
+
+    const auto TestAxis = [&](const TCHAR* InName, ECk_Vector_Axis InAxis, const FVector& InLocalAxis, const FVector& InLocalAcross)
+    {
+        const auto Capsule = ck::hands::Make_CapsuleAlongAxis(Transform, InAxis, HalfHeight, Radius);
+        TestTrue(*ck::Format_UE(TEXT("{}: the capsule is valid"), InName), ck::hands::Get_IsShapeValid(Capsule));
+        TestTrue(*ck::Format_UE(TEXT("{}: it keeps the transform's location"), InName),
+            Capsule.Get_Transform().GetLocation().Equals(Transform.GetLocation(), kDistanceTolerance));
+
+        // Along the axis the surface is HalfHeight + Radius away; across it, Radius.
+        const auto Along = Transform.TransformPositionNoScale(InLocalAxis * Reach);
+        const auto Across = Transform.TransformPositionNoScale(InLocalAcross * Reach);
+        TestEqual(*ck::Format_UE(TEXT("{}: distance along the axis"), InName),
+            ck::hands::Get_SignedDistance(Capsule, Along), Reach - HalfHeight - Radius, 1.0e-4);
+        TestEqual(*ck::Format_UE(TEXT("{}: distance across the axis"), InName),
+            ck::hands::Get_SignedDistance(Capsule, Across), Reach - Radius, 1.0e-4);
+    };
+
+    TestAxis(TEXT("X"), ECk_Vector_Axis::X, FVector::ForwardVector, FVector::UpVector);
+    TestAxis(TEXT("Y"), ECk_Vector_Axis::Y, FVector::RightVector, FVector::ForwardVector);
+    TestAxis(TEXT("Z"), ECk_Vector_Axis::Z, FVector::UpVector, FVector::RightVector);
+
+    TestTrue(TEXT("no axis gives a None shape"),
+        ck::hands::Make_CapsuleAlongAxis(Transform, ECk_Vector_Axis::None, HalfHeight, Radius).Get_Type()
+            == ECk_Hands_ContactShapeType::None);
+    TestTrue(TEXT("two axes give a None shape"),
+        ck::hands::Make_CapsuleAlongAxis(Transform, ECk_Vector_Axis::X | ECk_Vector_Axis::Y, HalfHeight, Radius).Get_Type()
+            == ECk_Hands_ContactShapeType::None);
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FCkTest_Hands_Kernel_ShapeFromBounds_FitsEachPrimitiveToTheBox,
+    "CkHands.Kernel.ShapeFromBounds_FitsEachPrimitiveToTheBox",
+    kCkUnitTestFlags)
+
+bool FCkTest_Hands_Kernel_ShapeFromBounds_FitsEachPrimitiveToTheBox::RunTest(const FString&)
+{
+    using namespace ck_hands_kernel_spec;
+
+    // The transform's scale must not reach the shape: the box is already in cm.
+    const auto Transform = FTransform{FRotator{10.0, 20.0, 30.0}, FVector{5.0, 6.0, 7.0}, FVector{3.0}};
+    const auto LocalCenter = FVector{1.0, 2.0, 3.0};
+    const auto Extent = FVector{2.0, 10.0, 4.0};
+    const auto Bounds = FBox{LocalCenter - Extent, LocalCenter + Extent};
+    const auto Center = Transform.TransformPositionNoScale(LocalCenter);
+    const auto ToWorld = [&](const FVector& InLocalOffset) { return Center + Transform.GetRotation().RotateVector(InLocalOffset); };
+
+    const auto Box = ck::hands::Make_ShapeFromBounds(Transform, Bounds, ECk_Hands_ContactShapeType::Box);
+    TestTrue(TEXT("box: type"), Box.Get_Type() == ECk_Hands_ContactShapeType::Box);
+    TestTrue(TEXT("box: half extents are the box's"), Box.Get_HalfExtents().Equals(Extent, kDistanceTolerance));
+    TestTrue(TEXT("box: centred on the box"), Box.Get_Transform().GetLocation().Equals(Center, kDistanceTolerance));
+    TestEqual(TEXT("box: a point 1 cm outside its +X face"),
+        ck::hands::Get_SignedDistance(Box, ToWorld(FVector{Extent.X + 1.0, 0.0, 0.0})), 1.0, 1.0e-4);
+
+    const auto Sphere = ck::hands::Make_ShapeFromBounds(Transform, Bounds, ECk_Hands_ContactShapeType::Sphere);
+    TestTrue(TEXT("sphere: type"), Sphere.Get_Type() == ECk_Hands_ContactShapeType::Sphere);
+    TestEqual(TEXT("sphere: radius is the largest half extent"), Sphere.Get_Radius(), 10.0f);
+    TestTrue(TEXT("sphere: centred on the box"), Sphere.Get_Transform().GetLocation().Equals(Center, kDistanceTolerance));
+
+    // Longest axis Y (10): radius = max(2, 4) = 4, cylinder half height = 10 - 4 = 6, so the caps end on the Y faces.
+    const auto Capsule = ck::hands::Make_ShapeFromBounds(Transform, Bounds, ECk_Hands_ContactShapeType::Capsule);
+    TestTrue(TEXT("capsule: type"), Capsule.Get_Type() == ECk_Hands_ContactShapeType::Capsule);
+    TestEqual(TEXT("capsule: radius is the larger cross half extent"), Capsule.Get_Radius(), 4.0f);
+    TestEqual(TEXT("capsule: half height leaves room for the caps"), Capsule.Get_HalfHeight(), 6.0f);
+    TestEqual(TEXT("capsule: its cap ends on the box's +Y face"),
+        ck::hands::Get_SignedDistance(Capsule, ToWorld(FVector{0.0, Extent.Y, 0.0})), 0.0, 1.0e-4);
+    TestEqual(TEXT("capsule: its side is Radius from the axis"),
+        ck::hands::Get_SignedDistance(Capsule, ToWorld(FVector{9.0, 0.0, 0.0})), 5.0, 1.0e-4);
+
+    // No longer than it is wide: the cylinder section vanishes rather than going negative.
+    const auto Cube = FBox{FVector{-3.0}, FVector{3.0}};
+    const auto Ball = ck::hands::Make_ShapeFromBounds(Transform, Cube, ECk_Hands_ContactShapeType::Capsule);
+    TestEqual(TEXT("cube capsule: no cylinder section"), Ball.Get_HalfHeight(), 0.0f);
+    TestEqual(TEXT("cube capsule: radius"), Ball.Get_Radius(), 3.0f);
+    TestTrue(TEXT("cube capsule: valid"), ck::hands::Get_IsShapeValid(Ball));
+
+    TestTrue(TEXT("a None type gives a None shape"),
+        ck::hands::Make_ShapeFromBounds(Transform, Bounds, ECk_Hands_ContactShapeType::None).Get_Type()
+            == ECk_Hands_ContactShapeType::None);
+    TestTrue(TEXT("an invalid box gives a None shape"),
+        ck::hands::Make_ShapeFromBounds(Transform, FBox{ForceInit}, ECk_Hands_ContactShapeType::Box).Get_Type()
+            == ECk_Hands_ContactShapeType::None);
+
+    return true;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 #endif

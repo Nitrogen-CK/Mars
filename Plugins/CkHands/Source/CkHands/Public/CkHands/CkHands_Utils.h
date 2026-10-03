@@ -2,6 +2,8 @@
 
 #include "CkHands/CkHands_Contact_Data.h"
 
+#include "CkCore/Enums/CkEnums.h"
+
 #include <Kismet/BlueprintFunctionLibrary.h>
 
 #include "CkHands_Utils.generated.h"
@@ -41,6 +43,28 @@ public:
         const FTransform& InTransform,
         float InHalfHeight,
         float InRadius);
+
+    // The cylinder section runs along InTransform's local InAxis (exactly one axis; a grip socket points X along its
+    // handle), InHalfHeight on each side of the origin.
+    UFUNCTION(BlueprintPure, Category = "Ck|Utils|Hands|ContactShape",
+        DisplayName="[Ck][Hands] Make Capsule Contact Shape (Along Axis)")
+    static FCk_Hands_ContactShape
+    Make_CapsuleAlongAxis(
+        const FTransform& InTransform,
+        ECk_Vector_Axis InAxis,
+        float InHalfHeight,
+        float InRadius);
+
+    // The primitive of InType fitted to an axis-aligned box in InTransform's space, in cm (apply any mesh scale to the
+    // box first; InTransform's scale is ignored). Sphere: radius = the largest half extent. Capsule: along the longest
+    // axis. A None type returns a None shape without ensuring.
+    UFUNCTION(BlueprintPure, Category = "Ck|Utils|Hands|ContactShape",
+        DisplayName="[Ck][Hands] Make Contact Shape From Bounds")
+    static FCk_Hands_ContactShape
+    Make_FromBounds(
+        const FTransform& InTransform,
+        const FBox& InBounds,
+        ECk_Hands_ContactShapeType InType);
 
     UFUNCTION(BlueprintPure, Category = "Ck|Utils|Hands|ContactShape",
         DisplayName="[Ck][Hands] Get Is Valid")

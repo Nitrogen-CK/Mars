@@ -2,6 +2,7 @@
 
 #include "CkHands/CkHands_Kernel.h"
 
+#include "CkCore/Ensure/CkEnsure.h"
 #include "CkCore/Format/CkFormat.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -28,6 +29,12 @@ auto
         TArray<FBoneTransform>& OutBoneTransforms)
     -> void
 {
+    // Target is runtime data from the game: a bad one leaves the glove on its incoming pose.
+    const auto IsTargetValid = ck::hands::Get_IsPlacementTargetValid(Target);
+    CK_ENSURE_IF_NOT(IsTargetValid, TEXT("Glove Placement rejected a non-finite or unnormalized Target [{}] for [{}]"),
+        Target, TargetBone.BoneName)
+    { return; }
+
     const auto& BoneContainer = Output.Pose.GetPose().GetBoneContainer();
     const auto PlacedIndex = PlacedBone.GetCompactPoseIndex(BoneContainer);
     const auto TargetIndex = TargetBone.GetCompactPoseIndex(BoneContainer);
