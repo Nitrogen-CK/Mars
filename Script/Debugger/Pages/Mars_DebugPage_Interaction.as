@@ -18,7 +18,7 @@ class UMars_DebugPage_Interaction : UMars_DebugPage_Base
             for (const auto& PromptSlot : Slots)
             {
                 if (PromptSlot.Stack.IsEmpty() == false && ck::IsValid(PromptSlot.Stack.Last().PromptHandle))
-                { DrawKvRow(PromptSlot.SlotKey.ToString(), PromptSlot.Stack.Last().PromptHandle.Get_PromptText().ToString()); }
+                { DrawKvRow(PromptSlot.SlotKey.ToString(), PromptSlot.Stack.Last().PromptHandle.Get_DisplayText().ToString()); }
             }
         }
         mm::Spacer(0, 6);

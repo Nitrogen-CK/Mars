@@ -23,7 +23,7 @@ struct FMars_InteractPrompt_Spec
     FText PromptText;
 
     UPROPERTY()
-    FLinearColor TextColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    FLinearColor TextColor = constants_ui_colors::k_PromptText;
 
     UPROPERTY()
     int32 SortOrder = 999;
@@ -62,7 +62,11 @@ struct FMars_Fragment_InteractPrompt
     FText PromptText;
 
     UPROPERTY()
-    FLinearColor TextColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    FLinearColor TextColor = constants_ui_colors::k_PromptText;
+
+    // Set while the action can't be taken: the reason shows instead of PromptText, which keeps following UpdateText.
+    UPROPERTY()
+    TOptional<FText> BlockedText;
 
     // The in-progress interaction on this prompt's target, tracked while the prompt is displayed.
     UPROPERTY()
@@ -119,10 +123,27 @@ struct FMars_Request_InteractPrompt_SetInteraction
     }
 }
 
+// The reason the action can't be taken right now; the default-constructed request clears it.
+struct FMars_Request_InteractPrompt_SetBlocked
+{
+    UPROPERTY()
+    TOptional<FText> BlockedText;
+
+    FMars_Request_InteractPrompt_SetBlocked() {}
+
+    FMars_Request_InteractPrompt_SetBlocked(const FText& InBlockedText)
+    {
+        BlockedText = TOptional<FText>(InBlockedText);
+    }
+}
+
 struct FMars_Fragment_InteractPrompt_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_InteractPrompt_UpdateText> UpdateRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_InteractPrompt_SetBlocked> SetBlockedRequests;
 
     UPROPERTY()
     TArray<FMars_Request_InteractPrompt_SetInteraction> SetInteractionRequests;

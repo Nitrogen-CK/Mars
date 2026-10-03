@@ -40,7 +40,7 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
         if (ck::EnsureIfNot(ck::IsValid(InputAction), "[Mars_InteractPrompt] Prompt has no resolvable InputAction"))
         { return; }
 
-        Set_Prompt(InPrompt.Get_PromptText(), InputAction, InPrompt.Get_PromptTextColor());
+        Set_Prompt(InPrompt.Get_DisplayText(), InputAction, InPrompt.Get_DisplayTextColor());
         Report_MissingIcon(InputAction);
         Show_Progress(InPrompt.Get_IsTimedInteraction());
 

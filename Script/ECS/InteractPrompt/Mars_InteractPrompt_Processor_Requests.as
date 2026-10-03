@@ -1,5 +1,6 @@
-// Drains UpdateText, then SetInteraction, then broadcasts OnChanged once if anything was applied. Every SetInteraction
-// counts as a change (its consumer re-renders the hold bar from it).
+// Drains UpdateText, then SetBlocked, then SetInteraction, then broadcasts OnChanged once if anything was applied. A
+// SetBlocked matching the current blocked state is dropped; every SetInteraction counts as a change (its consumer
+// re-renders the hold bar from it).
 class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -18,6 +19,7 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
         auto Self = InHandle.As_InteractPrompt();
 
         TArray<FMars_Request_InteractPrompt_UpdateText> UpdateRequests = InRequests.UpdateRequests;
+        TArray<FMars_Request_InteractPrompt_SetBlocked> SetBlockedRequests = InRequests.SetBlockedRequests;
         TArray<FMars_Request_InteractPrompt_SetInteraction> SetInteractionRequests = InRequests.SetInteractionRequests;
 
         // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
@@ -37,6 +39,19 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
                 InPromptComp.TextColor = UpdateRequest.NewColor.GetValue();
                 Changed = true;
             }
+        }
+
+        for (const auto& SetBlockedRequest : SetBlockedRequests)
+        {
+            const auto WasBlocked = InPromptComp.BlockedText.IsSet();
+            const auto IsBlocked = SetBlockedRequest.BlockedText.IsSet();
+            const auto Unchanged = WasBlocked == IsBlocked &&
+                (IsBlocked == false || InPromptComp.BlockedText.GetValue().ToString() == SetBlockedRequest.BlockedText.GetValue().ToString());
+            if (Unchanged)
+            { continue; }
+
+            InPromptComp.BlockedText = SetBlockedRequest.BlockedText;
+            Changed = true;
         }
 
         for (const auto& SetInteractionRequest : SetInteractionRequests)

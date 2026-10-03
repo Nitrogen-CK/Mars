@@ -37,6 +37,30 @@ mixin FLinearColor Get_PromptTextColor(const FCk_Handle_InteractPrompt& Self)
     return Self.Get_Fragment(FMars_Fragment_InteractPrompt).TextColor;
 }
 
+mixin bool Get_IsBlocked(const FCk_Handle_InteractPrompt& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).BlockedText.IsSet();
+}
+
+// What the widget shows: the blocked reason while set, else the prompt text.
+mixin FText Get_DisplayText(const FCk_Handle_InteractPrompt& Self)
+{
+    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt);
+    if (Fragment.BlockedText.IsSet())
+    { return Fragment.BlockedText.GetValue(); }
+
+    return Fragment.PromptText;
+}
+
+mixin FLinearColor Get_DisplayTextColor(const FCk_Handle_InteractPrompt& Self)
+{
+    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt);
+    if (Fragment.BlockedText.IsSet())
+    { return constants_ui_colors::k_PromptText_Blocked; }
+
+    return Fragment.TextColor;
+}
+
 mixin bool Get_IsTimedInteraction(const FCk_Handle_InteractPrompt& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).IsTimedInteraction;
@@ -61,6 +85,13 @@ mixin void Request_UpdateText(FCk_Handle_InteractPrompt& Self, const FMars_Reque
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Requests);
     Requests.UpdateRequests.Add(InRequest);
+}
+
+// The drain drops a request that matches the current blocked state.
+mixin void Request_SetBlocked(FCk_Handle_InteractPrompt& Self, const FMars_Request_InteractPrompt_SetBlocked& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Requests);
+    Requests.SetBlockedRequests.Add(InRequest);
 }
 
 mixin void Request_SetInteraction(FCk_Handle_InteractPrompt& Self, const FMars_Request_InteractPrompt_SetInteraction& InRequest)
