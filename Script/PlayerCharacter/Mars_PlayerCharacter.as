@@ -62,8 +62,8 @@ class AMars_PlayerCharacter : ACk_Character_UE
         const auto& View = Config.FPHands.View;
         const auto IsFirstPerson = View.FirstPersonRendering == ECk_EnableDisable::Enable;
         FPHands.SetFirstPersonPrimitiveType(IsFirstPerson ? EFirstPersonPrimitiveType::FirstPerson : EFirstPersonPrimitiveType::None);
-        FirstPersonCamera.SetEnableFirstPersonScale(IsFirstPerson);
-        FirstPersonCamera.SetFirstPersonScale(View.FirstPersonScale);
+        CameraComponent.SetEnableFirstPersonScale(IsFirstPerson);
+        CameraComponent.SetFirstPersonScale(View.FirstPersonScale);
 
         if (Config.FPHands.Mesh.IsNull() == false)
         { FPHands.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Config.FPHands.Mesh)); }
