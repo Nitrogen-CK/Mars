@@ -1,0 +1,84 @@
+{
+	"material": "M_PlayerBackpack",
+	"packagePath": "/Game/Mars/Gameplay/PlayerBackpack/Meshes/M_PlayerBackpack",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "6445de0c225cafd811429724b67bda34",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor",
+		"Normal"
+	],
+	"expressions":
+	{
+		"TextureSample": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Gameplay/PlayerBackpack/Meshes/T_PlayerBackPack_D.T_PlayerBackPack_D"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Gameplay/PlayerBackpack/Meshes/T_PlayerBackPack_N.T_PlayerBackPack_N",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Normal",
+				"node": 1,
+				"output": 0,
+				"mask": "rgb"
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/PlayerBackpack/Meshes/T_PlayerBackPack_N.T_PlayerBackPack_N",
+		"/Game/Mars/Gameplay/PlayerBackpack/Meshes/T_PlayerBackPack_D.T_PlayerBackPack_D"
+	]
+}
