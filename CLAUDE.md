@@ -86,11 +86,6 @@ every failure is listed, and it names any **new** failure for you - no pre-chang
   tests trip the engine fork's Iris ensure `Disallowed to write first packet in batch` (`DataStreamChannel.cpp`), which
   never fires in CkPlugins or BusterBlock. `Ck.Snapshot.Meta.FragmentPostureCoverage` needs Mars's `_FragmentNamePrefixes`
   set in `[/Script/CkSnapshot.Ck_Snapshot_PostureRatchet_Settings]`.
-- **Known gap (2026-10-03): the gate does not exit 0 yet.** `Ck.ProceduralAnimation.Gait.LandingProbeLiftsASwingOntoAStep`
-  is listed `flaky` in `Plugins/CkTests/AutomationGate.json`, but in Mars it is red in both full gates and in 3 of 3 runs
-  alone, so its solo re-run fails and the gate fails on it alone. It cannot be listed in the root file (a test in two files
-  exits 80); the fix is a CkTests PR that lists it `red`, then a pin bump here. Until then a gate whose only failure line is
-  that test's failed flaky re-run is the expected result; remove this bullet when the pin moves.
 
 Without a current list (an older toolbox, or `--known-reds off`), capture the baseline before the first change: record the
 starting pass/fail counts and the *names* of the tests already red, and diff names, not counts.
