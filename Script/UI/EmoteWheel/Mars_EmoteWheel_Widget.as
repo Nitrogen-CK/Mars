@@ -105,7 +105,8 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
     private TArray<FMars_EmoteWheel_Entry> _Entries;
     private TArray<UMars_EmoteWheelSegment_Widget> _Segments;
     private UMaterialInstanceDynamic _DiskDMI;
-    private int32 _HoveredIndex = -1;
+    // Unset while the centre (cancel) is hovered.
+    private TOptional<int32> _HoveredIndex;
     // Set by OnEmoteChosen, which fires right before OnClosed.
     private bool _ChoseOnClose = false;
 
@@ -120,7 +121,7 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
         { return; }
 
         Build(Definition.Entries, FMars_EmoteWheel_Spec().DeadZoneRatio);
-        Show_Hovered(PreviewHoveredIndex);
+        Show_Hovered(TOptional<int32>(PreviewHoveredIndex));
     }
 
     UFUNCTION(BlueprintOverride)
@@ -169,7 +170,7 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
     private void OnOpened(FCk_Handle_EmoteWheel InWheel)
     {
         _ChoseOnClose = false;
-        Show_Hovered(-1);
+        Show_Hovered(TOptional<int32>());
         SetVisibility(ESlateVisibility::HitTestInvisible);
         PlayUISound(OpenSound);
     }
@@ -186,11 +187,12 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
     }
 
     UFUNCTION()
-    private void OnHoveredChanged(FCk_Handle_EmoteWheel InWheel, int32 InPrevIndex, int32 InNewIndex)
+    private void OnHoveredChanged(FCk_Handle_EmoteWheel InWheel)
     {
-        Show_Hovered(InNewIndex);
+        const auto Hovered = InWheel.Get_HoveredIndex();
+        Show_Hovered(Hovered);
 
-        if (InNewIndex >= 0)
+        if (Hovered.IsSet())
         { PlayUISound(HoverSound); }
     }
 
@@ -208,6 +210,8 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
         _Entries = InEntries;
 
         _DiskDMI = Disk.GetDynamicMaterial();
+        ck::EnsureIfNot(ck::IsValid(_DiskDMI),
+            "[Mars_EmoteWheel] the Disk brush is not a material; set it to EmoteWheelDisk_Mars_M in the widget blueprint");
         if (ck::IsValid(_DiskDMI))
         {
             _DiskDMI.SetScalarParameterValue(SectorCountParameter, float32(_Entries.Num()));
@@ -247,24 +251,29 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
 
         _Segments.Empty();
         _Entries.Empty();
-        _HoveredIndex = -1;
+        _HoveredIndex.Reset();
     }
 
-    private void Show_Hovered(int32 InIndex)
+    // An unset or out-of-range index hovers the centre (cancel).
+    private void Show_Hovered(TOptional<int32> InIndex)
     {
-        if (_Segments.IsValidIndex(_HoveredIndex))
-        { _Segments[_HoveredIndex].Set_Hovered(false); }
+        if (_HoveredIndex.IsSet() && _Segments.IsValidIndex(_HoveredIndex.GetValue()))
+        { _Segments[_HoveredIndex.GetValue()].Set_Hovered(false); }
 
-        _HoveredIndex = _Entries.IsValidIndex(InIndex) ? InIndex : -1;
-        const auto IsHovering = _HoveredIndex >= 0;
-        const auto IsHoveredEnabled = IsHovering && _Entries[_HoveredIndex].IsEnabled;
+        _HoveredIndex.Reset();
+        if (InIndex.IsSet() && _Entries.IsValidIndex(InIndex.GetValue()))
+        { _HoveredIndex = InIndex; }
 
-        if (_Segments.IsValidIndex(_HoveredIndex))
-        { _Segments[_HoveredIndex].Set_Hovered(true); }
+        const auto IsHovering = _HoveredIndex.IsSet();
+        const auto IsHoveredEnabled = IsHovering && _Entries[_HoveredIndex.GetValue()].IsEnabled;
+
+        if (IsHovering && _Segments.IsValidIndex(_HoveredIndex.GetValue()))
+        { _Segments[_HoveredIndex.GetValue()].Set_Hovered(true); }
 
         if (ck::IsValid(_DiskDMI))
         {
-            _DiskDMI.SetScalarParameterValue(HoveredIndexParameter, float32(_HoveredIndex));
+            // The Disk material reads -1 as no hovered sector.
+            _DiskDMI.SetScalarParameterValue(HoveredIndexParameter, float32(_HoveredIndex.Get(-1)));
             _DiskDMI.SetVectorParameterValue(HoveredColorParameter, IsHoveredEnabled || IsHovering == false ? HoveredColor : DisabledHoveredColor);
         }
 
@@ -273,8 +282,8 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
             Selector.SetVisibility(IsHovering ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Hidden);
             if (IsHovering)
             {
-                Selector.SetRenderTranslation(utils_emote_wheel::Get_SectorPoint(_HoveredIndex, _Entries.Num(), SelectorRadius));
-                Selector.SetRenderTransformAngle(utils_emote_wheel::Get_SectorAngleDegrees(_HoveredIndex, _Entries.Num()));
+                Selector.SetRenderTranslation(utils_emote_wheel::Get_SectorPoint(_HoveredIndex.GetValue(), _Entries.Num(), SelectorRadius));
+                Selector.SetRenderTransformAngle(utils_emote_wheel::Get_SectorAngleDegrees(_HoveredIndex.GetValue(), _Entries.Num()));
             }
         }
 
@@ -282,7 +291,7 @@ class UMars_EmoteWheel_Widget : UCk_UserWidget_UE
         { CenterCancel.SetRenderOpacity(IsHovering ? CenterIdleOpacity : 1.0f); }
 
         if (ck::IsValid(HoveredName))
-        { HoveredName.SetText(IsHovering ? _Entries[_HoveredIndex].DisplayName : CancelName); }
+        { HoveredName.SetText(IsHovering ? _Entries[_HoveredIndex.GetValue()].DisplayName : CancelName); }
 
         if (ck::IsValid(Instruction))
         {

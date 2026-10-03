@@ -1,12 +1,65 @@
 namespace utils_world_item
 {
-    // The entity script composes the holder, body, pickup and visual first and hands their handles in here.
-    FCk_Handle_WorldItem Add(FCk_Handle& InHandle, FMars_Fragment_WorldItem_Params InParams, FMars_Fragment_WorldItem InState)
+    // The entity script composes the holder, body, pickup and visual first and hands their handles in through the Spec.
+    FCk_Handle_WorldItem Add(FCk_Handle& InHandle, FMars_WorldItem_Spec InSpec)
     {
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[WorldItem] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_WorldItem(); }
+
+        auto Params = FMars_Fragment_WorldItem_Params();
+        Params.Mode = InSpec.Mode;
+        Params.Definition = InSpec.Definition;
+
+        auto State = FMars_Fragment_WorldItem();
+        State.Holder = InSpec.Holder;
+        State.Pickup = InSpec.Pickup;
+        State.Body = InSpec.Body;
+
         InHandle.Add_Fragment(FMars_Feature_WorldItem());
-        InHandle.Add_Fragment(InParams);
-        InHandle.Add_Fragment(InState);
+        InHandle.Add_Fragment(Params);
+        InHandle.Add_Fragment(State);
+
+        // Never applied here: the body is not added for at least one frame. The launch processor drains it.
+        if (InSpec.Launch.IsSet())
+        { InHandle.Add_Fragment(InSpec.Launch.GetValue()); }
+
+        if (InSpec.Arrival.IsSet())
+        { InHandle.Add_Fragment(InSpec.Arrival.GetValue()); }
+
         return InHandle.As_WorldItem();
+    }
+
+    // A Visual-mode world item of InSpec.Item, owned by InOwner (it dies with it). It spawns where it starts - at
+    // ArriveFrom when set (then lerps in), else at rest - so the first rendered frame is already there.
+    FCk_Handle Request_SpawnVisual(FCk_Handle& InOwner, const FMars_WorldItem_VisualSpec& InSpec)
+    {
+        auto Item = InSpec.Item;
+        const auto AttachWorld = utils_transform::Get_EntityCurrentTransform(InSpec.AttachTo);
+
+        auto SpawnParams = UMars_WorldItem_EntityScript::Params();
+        SpawnParams.SpawnTransform = InSpec.AttachOffset * AttachWorld;
+        if (InSpec.ArriveFrom.IsSet)
+        { SpawnParams.SpawnTransform = InSpec.ArriveFrom.World; }
+
+        SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(Item.Get_Definition());
+        SpawnParams.Mode = EMars_WorldItem_Mode::Visual;
+        SpawnParams.AttachTo = InSpec.AttachTo;
+        SpawnParams.AttachOffset = InSpec.AttachOffset;
+        SpawnParams.ArriveFrom = InSpec.ArriveFrom;
+
+        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, Get_WorldItemScriptClass(Item), SpawnParams);
+        return Pending.Get_EntityUnderConstruction();
+    }
+
+    // Unset when InPending is older than constants_world_item::k_ArriveFromMaxAgeSeconds.
+    FMars_WorldItem_Arrival Get_FreshArrival(const FMars_WorldItem_PendingArrival& InPending)
+    {
+        const auto AgeSeconds = System::GetGameTimeInSeconds() - InPending.StampedAtSeconds;
+        if (AgeSeconds > constants_world_item::k_ArriveFromMaxAgeSeconds)
+        { return FMars_WorldItem_Arrival(); }
+
+        return FMars_WorldItem_Arrival(InPending.World);
     }
 
     // Null when the definition does not resolve or carries no Presentation trait.
@@ -20,7 +73,7 @@ namespace utils_world_item
         return Presentation;
     }
 
-    // The item's Presentation.WorldItemScriptClass, else the base WorldItem entity script.
+    // The item's Presentation.WorldItem.ScriptClass, else the base WorldItem entity script.
     TSubclassOf<UMars_WorldItem_EntityScript> Get_WorldItemScriptClass(const FCk_Handle_Item& InItem)
     {
         TSubclassOf<UMars_WorldItem_EntityScript> ScriptClass = UMars_WorldItem_EntityScript;
@@ -28,36 +81,36 @@ namespace utils_world_item
         { return ScriptClass; }
 
         const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
-        if (ck::IsValid(Presentation.WorldItemScriptClass))
-        { ScriptClass = Presentation.WorldItemScriptClass; }
+        if (ck::IsValid(Presentation.WorldItem.ScriptClass))
+        { ScriptClass = Presentation.WorldItem.ScriptClass; }
 
         return ScriptClass;
     }
 
     // The shape every probe on the item's body uses (the pickup, a backpack's weight probe): a box over the Mesh bounds
     // (x MeshScale, matching the body), centred on them since a mesh's pivot need not be its centre; a sphere of
-    // PickupProbeRadius at the root when there is no Mesh.
+    // WorldItem.PickupProbeRadius at the root when there is no Mesh.
     FMars_WorldItem_ProbeFit Make_ProbeFit(const UMars_ItemTrait_Presentation InPresentation)
     {
         UStaticMesh Mesh = nullptr;
-        if (InPresentation.Mesh.IsNull() == false)
-        { Mesh = System::LoadAsset_Blocking(InPresentation.Mesh); }
+        if (InPresentation.Visual.Mesh.IsNull() == false)
+        { Mesh = System::LoadAsset_Blocking(InPresentation.Visual.Mesh); }
 
         if (ck::Is_NOT_Valid(Mesh))
         {
             return FMars_WorldItem_ProbeFit(
-                utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InPresentation.PickupProbeRadius)), FTransform::Identity);
+                utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InPresentation.WorldItem.PickupProbeRadius)), FTransform::Identity);
         }
 
         const auto Bounds = Mesh.GetBounds();
-        const auto Scale = InPresentation.MeshScale;
+        const auto Scale = InPresentation.Visual.MeshScale;
         const auto HalfExtents = FVector(Math::Abs(Bounds.BoxExtent.X * Scale.X), Math::Abs(Bounds.BoxExtent.Y * Scale.Y),
                                          Math::Abs(Bounds.BoxExtent.Z * Scale.Z));
         return FMars_WorldItem_ProbeFit(utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(HalfExtents)),
             FTransform(FRotator::ZeroRotator, Bounds.Origin * Scale));
     }
 
-    // Per-channel blend, slerp on rotation so a >180 degree turn takes the short way (BB bb_scene_node_focus::Blend).
+    // Per-channel blend, slerp on rotation so a >180 degree turn takes the short way.
     FTransform Blend(FTransform InFrom, FTransform InTo, float32 InAlpha)
     {
         const auto Loc   = Math::Lerp(InFrom.GetLocation(), InTo.GetLocation(), InAlpha);
@@ -91,30 +144,14 @@ mixin FCk_Handle_Inventory_DataOnly Get_Holder(const FCk_Handle_WorldItem& Self)
 // Invalid in Visual mode, and while the holder is empty.
 mixin FCk_Handle_Item Get_HeldItem(const FCk_Handle_WorldItem& Self)
 {
-    auto Holder = Self.Get_Holder();
-    if (ck::Is_NOT_Valid(Holder) || Holder.Get_NumItems() == 0)
-    { return FCk_Handle_Item(); }
-
-    auto Items = Holder.Get_Items();
-    return Items[0];
-}
-
-// Invalid in Visual mode.
-mixin FCk_Handle_Interactable Get_Pickup(const FCk_Handle_WorldItem& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_WorldItem).Pickup;
+    const auto Holder = Self.Get_Holder();
+    return Holder.Get_SoleItem();
 }
 
 // Invalid in Visual mode, and when the item has no mesh.
 mixin FCk_Handle_JoltBody Get_Body(const FCk_Handle_WorldItem& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_WorldItem).Body;
-}
-
-// The unit-scale-parent node that carries the mesh (and the display scale). Invalid when the item has no Presentation.
-mixin FCk_Handle_Transform Get_VisualRoot(const FCk_Handle_WorldItem& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_WorldItem).VisualRoot;
 }
 
 // From the definition's Presentation trait; Transient when there is none.
@@ -124,7 +161,7 @@ mixin EMars_WorldItem_Persistence Get_Persistence(const FCk_Handle_WorldItem& Se
     if (ck::Is_NOT_Valid(Presentation))
     { return EMars_WorldItem_Persistence::Transient; }
 
-    return Presentation.Persistence;
+    return Presentation.Mounting.Persistence;
 }
 
 // The committed mount. Always World for a Transient item.
@@ -167,32 +204,19 @@ mixin FCk_Handle_WorldItem Get_PersistentWorldItem(const FCk_Handle_Item& Self)
     return Self.Get_Fragment(FMars_Fragment_Item_PersistentWorldItem).WorldItem;
 }
 
-// Sanctioned one-shot marker (design 7.3): whoever starts moving an item stamps where it visually was; the next visual
-// spawned for it consumes the stamp. Overwrites an older stamp.
-mixin void Request_SetArriveFrom(FCk_Handle_Item& Self, FTransform InWorld)
+//--------------------------------------------------------------------------------------------------------------------------
+// Capacity-1 inventories (a world item's holder, a hotbar slot, a cargo slot)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Invalid while the inventory is empty (or invalid).
+mixin FCk_Handle_Item Get_SoleItem(const FCk_Handle_Inventory_DataOnly& Self)
 {
-    auto& ArriveFrom = Self.AddOrGet_Fragment(FMars_Fragment_Item_ArriveFrom);
-    ArriveFrom.World = InWorld;
-    ArriveFrom.StampedAtSeconds = System::GetGameTimeInSeconds();
-}
+    auto Inventory = Self;
+    if (ck::Is_NOT_Valid(Inventory) || Inventory.Get_NumItems() == 0)
+    { return FCk_Handle_Item(); }
 
-// Removes the stamp. Unset when there is none, or it is older than constants_world_item::k_ArriveFromMaxAgeSeconds.
-mixin FMars_WorldItem_Arrival TryConsume_ArriveFrom(FCk_Handle_Item& Self)
-{
-    if (ck::Is_NOT_Valid(Self) || Self.Has_Fragment(FMars_Fragment_Item_ArriveFrom) == false)
-    { return FMars_WorldItem_Arrival(); }
-
-    // Snapshot before the remove: Request_TryRemove is immediate (entt swap-and-pop).
-    const auto World = Self.Get_Fragment(FMars_Fragment_Item_ArriveFrom).World;
-    const auto StampedAtSeconds = Self.Get_Fragment(FMars_Fragment_Item_ArriveFrom).StampedAtSeconds;
-
-    Self.Request_TryRemove(FMars_Fragment_Item_ArriveFrom);
-
-    const auto AgeSeconds = System::GetGameTimeInSeconds() - StampedAtSeconds;
-    if (AgeSeconds > constants_world_item::k_ArriveFromMaxAgeSeconds)
-    { return FMars_WorldItem_Arrival(); }
-
-    return FMars_WorldItem_Arrival(World);
+    auto Items = Inventory.Get_Items();
+    return Items[0];
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -24,7 +24,13 @@ enum EMars_DamageDealer_RejectReason
     ZoneDisabled
 }
 
-// Field order is the positional constructor's order.
+// What the dealer does with a hit on a zone of its own team (or on itself).
+enum EMars_DamageDealer_FriendlyFire
+{
+    Reject,
+    Allow
+}
+
 struct FMars_DamageDealer_Spec
 {
     // Multiplies every dealt event's Amount.
@@ -32,7 +38,7 @@ struct FMars_DamageDealer_Spec
     float32 DamageScale = 1.0f;
 
     UPROPERTY()
-    bool AllowFriendlyFire = false;
+    EMars_DamageDealer_FriendlyFire FriendlyFire = EMars_DamageDealer_FriendlyFire::Reject;
 
     FMars_DamageDealer_Spec() {}
 
@@ -41,15 +47,14 @@ struct FMars_DamageDealer_Spec
         DamageScale = InDamageScale;
     }
 
-    FMars_DamageDealer_Spec(float32 InDamageScale, bool InAllowFriendlyFire)
+    FMars_DamageDealer_Spec(float32 InDamageScale, EMars_DamageDealer_FriendlyFire InFriendlyFire)
     {
         DamageScale = InDamageScale;
-        AllowFriendlyFire = InAllowFriendlyFire;
+        FriendlyFire = InFriendlyFire;
     }
 }
 
-// A melee swing's sphere sweep (utils_damage_dealer::Request_StrikeSweep), world space. Field order is the positional
-// constructor's order.
+// A melee swing's sphere sweep (utils_damage_dealer::Try_StrikeSweep), world space.
 struct FMars_DamageDealer_Sweep
 {
     UPROPERTY()
@@ -102,9 +107,9 @@ struct FMars_Fragment_DamageDealer
     UPROPERTY()
     int32 HitsRejected = 0;
 
-    // The last forwarded (scaled) event; meaningful only when HitsDealt > 0.
+    // The last forwarded (scaled) event; unset until a hit is dealt.
     UPROPERTY()
-    FMars_DamageEvent LastDealt;
+    TOptional<FMars_DamageEvent> LastDealt;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

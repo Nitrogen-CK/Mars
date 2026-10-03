@@ -1,7 +1,7 @@
 // The shared BrainLeaf condition drives a state machine through an Idle hub with no request: a brain (the crawler's
 // catalog) and a test-local machine on one entity that overrides its context to itself first. The machine settles in
 // BrainRoam; IsHurt true -> it leaves Roam for Idle and Idle dispatches to BrainFlinch; IsHurt false -> back to BrainRoam
-// through Idle. Each leaf state's exit condition is the RequirePresent = false variant, not _NegateResult.
+// through Idle. Each leaf state's exit condition is the LeafMatch = Absent variant, not _NegateResult.
 
 class UMars_AutoTestCondition_LeafIsRoam : UMars_SmCondition_BrainLeaf
 {
@@ -11,7 +11,7 @@ class UMars_AutoTestCondition_LeafIsRoam : UMars_SmCondition_BrainLeaf
 class UMars_AutoTestCondition_LeafIsNotRoam : UMars_SmCondition_BrainLeaf
 {
     default LeafClass = UMars_GoapAction_Crawler_Roam;
-    default RequirePresent = false;
+    default LeafMatch = EMars_BrainLeaf_Match::Absent;
 }
 
 class UMars_AutoTestCondition_LeafIsFlinch : UMars_SmCondition_BrainLeaf
@@ -22,7 +22,7 @@ class UMars_AutoTestCondition_LeafIsFlinch : UMars_SmCondition_BrainLeaf
 class UMars_AutoTestCondition_LeafIsNotFlinch : UMars_SmCondition_BrainLeaf
 {
     default LeafClass = UMars_GoapAction_Crawler_Flinch;
-    default RequirePresent = false;
+    default LeafMatch = EMars_BrainLeaf_Match::Absent;
 }
 
 class UMars_AutoTestState_BrainIdle : UCk_SmState_EntityScript
@@ -86,28 +86,24 @@ class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UCk_AutoTest_Base
         Run_Steps(InHandle);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
-
     private FGameplayTag IsHurt() const
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.IsHurt");
+        return GameplayTags::Mars_WS_Crawler_IsHurt;
     }
 
     private FMars_Brain_Spec Make_Spec() const
     {
-        const auto Settled = GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.Settled");
+        const auto Settled = GameplayTags::Mars_WS_Crawler_Settled;
 
         auto Facts = TArray<FMars_Brain_Fact>();
         Facts.Add(FMars_Brain_Fact(IsHurt(), false));
-        Facts.Add(FMars_Brain_Fact(GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.CanWalk"), true));
+        Facts.Add(FMars_Brain_Fact(GameplayTags::Mars_WS_Crawler_CanWalk, true));
         Facts.Add(FMars_Brain_Fact(Settled, false));
 
         auto Goal = TArray<FCk_GoapWS_Condition_Authored>();
         Goal.Add(FCk_GoapWS_Condition_Authored(Settled, true));
 
-        auto Spec = FMars_Brain_Spec(GameplayTags::ResolveGameplayTag(n"Mars.Goap.Crawler"), GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler"),
+        auto Spec = FMars_Brain_Spec(GameplayTags::Mars_Goap_Crawler, GameplayTags::Mars_WS_Crawler,
             Facts, Goal, 0.0f);
         Spec.AddAction(UMars_GoapAction_Crawler_Roam);
         Spec.AddAction(UMars_GoapAction_Crawler_Flinch);
@@ -140,7 +136,7 @@ class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UCk_AutoTest_Base
     {
         Assert_True(ck::IsValid(_Brain), "the brain composed");
         Assert_True(ck::IsValid(_Machine), "the machine composed");
-        Assert_True(FCk_Handle(_Brain) == FCk_Handle(_Machine), "brain and machine share the entity");
+        Assert_True(_Brain == _Machine, "brain and machine share the entity");
     }
 
     UFUNCTION()

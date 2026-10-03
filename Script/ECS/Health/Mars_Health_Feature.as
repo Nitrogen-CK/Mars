@@ -15,6 +15,32 @@ struct FMars_Feature_Health {}
 // Damage Event
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Who dealt a hit.
+struct FMars_DamageEvent_Source
+{
+    // The dealer (the player entity).
+    UPROPERTY()
+    FCk_Handle Instigator;
+
+    // What it dealt the hit with (the item or hazard entity).
+    UPROPERTY()
+    FCk_Handle Causer;
+}
+
+// Where a hit landed.
+struct FMars_DamageEvent_Hit
+{
+    UPROPERTY()
+    FVector Location = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector Normal = FVector::UpVector;
+
+    // Debris push; a zero impulse pushes nothing.
+    UPROPERTY()
+    FVector Impulse = FVector::ZeroVector;
+}
+
 // One hit, as every combat feature passes it along: the dealer stamps who and what, the zone stamps itself, and Health
 // records the one that lands as LastHit.
 struct FMars_DamageEvent
@@ -26,23 +52,11 @@ struct FMars_DamageEvent
     UPROPERTY(meta = (Categories = "DamageType"))
     FGameplayTag DamageType;
 
-    // Who dealt it (the player entity).
     UPROPERTY()
-    FCk_Handle Instigator;
-
-    // What dealt it (the item or hazard entity).
-    UPROPERTY()
-    FCk_Handle Causer;
+    FMars_DamageEvent_Source Source;
 
     UPROPERTY()
-    FVector HitLocation = FVector::ZeroVector;
-
-    UPROPERTY()
-    FVector HitNormal = FVector::UpVector;
-
-    // Debris push; zero = none.
-    UPROPERTY()
-    FVector Impulse = FVector::ZeroVector;
+    FMars_DamageEvent_Hit Hit;
 
     // Stamped by the zone that routed the hit; invalid for damage applied straight to a Health.
     UPROPERTY()
@@ -61,18 +75,18 @@ struct FMars_DamageEvent
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Field order is the positional constructor's order.
 struct FMars_Health_Spec
 {
     UPROPERTY()
     float32 Max = 100.0f;
 
-    // <= 0 starts at Max.
+    // Unset starts at Max.
     UPROPERTY()
-    float32 Start = 0.0f;
+    TOptional<float32> Start;
 
+    // At Add; Request_SetInvulnerable changes it later.
     UPROPERTY()
-    bool StartInvulnerable = false;
+    ECk_EnableDisable Invulnerability = ECk_EnableDisable::Disable;
 
     FMars_Health_Spec() {}
 
@@ -84,25 +98,26 @@ struct FMars_Health_Spec
     FMars_Health_Spec(float32 InMax, float32 InStart)
     {
         Max = InMax;
-        Start = InStart;
+        Start = TOptional<float32>(InStart);
     }
 
-    FMars_Health_Spec(float32 InMax, float32 InStart, bool InStartInvulnerable)
+    FMars_Health_Spec(float32 InMax, float32 InStart, ECk_EnableDisable InInvulnerability)
     {
         Max = InMax;
-        Start = InStart;
-        StartInvulnerable = InStartInvulnerable;
+        Start = TOptional<float32>(InStart);
+        Invulnerability = InInvulnerability;
     }
 }
 
-// A non-positive Max has no hit points to lose, and a Start above Max would be clamped on the first write.
+// A non-positive Max has no hit points to lose; a non-positive Start would be depleted without a hit, and one above Max
+// would be clamped on the first write.
 mixin FMars_Validation Validate(const FMars_Health_Spec& Self)
 {
     if (Self.Max <= 0.0f)
     { return FMars_Validation(f"Health has a non-positive Max [{Self.Max}]"); }
 
-    if (Self.Start > Self.Max)
-    { return FMars_Validation(f"Health has Start [{Self.Start}] above Max [{Self.Max}]"); }
+    if (Self.Start.IsSet() && (Self.Start.GetValue() <= 0.0f || Self.Start.GetValue() > Self.Max))
+    { return FMars_Validation(f"Health has Start [{Self.Start.GetValue()}] outside (0, Max = {Self.Max}]"); }
 
     return FMars_Validation();
 }
@@ -135,12 +150,9 @@ struct FMars_Fragment_Health
     UPROPERTY()
     bool IsDepleted = false;
 
-    // The last hit that applied damage; meaningful only when HasLastHit.
+    // The last hit that applied damage; unset until one does.
     UPROPERTY()
-    FMars_DamageEvent LastHit;
-
-    UPROPERTY()
-    bool HasLastHit = false;
+    TOptional<FMars_DamageEvent> LastHit;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -174,13 +186,13 @@ struct FMars_Fragment_Health_Signals
 struct FMars_Request_Health_SetInvulnerable
 {
     UPROPERTY()
-    bool Invulnerable = true;
+    ECk_EnableDisable Invulnerability = ECk_EnableDisable::Enable;
 
     FMars_Request_Health_SetInvulnerable() {}
 
-    FMars_Request_Health_SetInvulnerable(bool InInvulnerable)
+    FMars_Request_Health_SetInvulnerable(ECk_EnableDisable InInvulnerability)
     {
-        Invulnerable = InInvulnerable;
+        Invulnerability = InInvulnerability;
     }
 }
 

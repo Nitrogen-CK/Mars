@@ -1,7 +1,19 @@
-// A RequiresFreeHands lever focused by a carrier (AttachPoints + Hotbar + HeldItem + a Use resolver, the test entity).
-// With empty hands the prompt shows "Pull", the lever is the best Use target and the carrier's interaction starts.
+// The carrier's SM root state: the player HFSM's real Hotbar -> HeldItem and resolver -> interaction glue.
+class UMars_AutoTestState_FullHandsCarrierRig : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
+        AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
+    }
+}
+
+// A RequiresFreeHands lever focused by a carrier (AttachPoints + Hotbar + HeldItem + HeldItemUse + a Use resolver, the
+// test entity) whose SM runs the player HFSM's HotbarDrivesHeldItem and InteractionResolverBinds tasks. With empty hands
+// the prompt shows "Pull", the lever becomes the best Use target and the resolver glue starts the carrier's interaction.
 // Selecting the rock's slot blocks the prompt (the hands-full reason in the blocked colour, "Pull" kept underneath) and
-// the re-resolve drops the lever from the best Use targets, so the bridge cancels the live interaction. Selecting the
+// the re-resolve drops the lever from the best Use targets, so the glue cancels the live interaction. Selecting the
 // empty slot again clears the block. Isolated Z band: -82000.
 class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_AutoTest_Base
 {
@@ -9,6 +21,7 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     private FCk_Handle_Hotbar _Hotbar;
     private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_InteractionResolver _Resolver;
+    private FCk_Handle_StateMachine _Sm;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
     private FCk_Handle_Item _Rock;
     private FCk_Handle_Interactable _Interactable;
@@ -32,27 +45,22 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
         HotbarSpec.BagSlotCount = 2;
         _Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
         _HeldItem = utils_held_item::Add(_Carrier);
+        utils_held_item_use::Add(_Carrier);
         _Resolver = utils_interaction_resolver::Add(_Carrier, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
-
-        // What the player HFSM's HotbarDrivesHeldItem task does: push the selection into HeldItem on every change.
-        _Hotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
-        _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
-
-        // What the player HFSM's InteractionResolverBinds task does: a target that stops being best has its interaction cancelled.
-        _Resolver.BindTo_OnBestTargetsChanged(FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
 
         _RockHolder = MakeSeededHolder(InHandle, mars_items::Rock());
         BuildLever(InHandle);
 
-        Add_Step_WaitUntil("the rock holder is seeded", n"Check_Ready");
+        _Sm = utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_FullHandsCarrierRig));
+
+        Add_Step_WaitUntil("the carrier's SM runs the glue and the rock holder is seeded", n"Check_Ready");
         Add_Step("stow the rock into bag slot 0", n"Step_StowRockIntoHotbar");
         Add_Step_WaitUntil("the rock is held", n"Check_RockHeld");
         Add_Step("select the empty bag slot 1", n"Step_SelectEmptySlot");
         Add_Step_WaitUntil("the carrier's hands are empty", n"Check_HandsEmpty");
         Add_Step("the carrier focuses the lever, offers it to the resolver and opens Use", n"Step_FocusAndUse");
         Add_Step_WaitUntil("the lever is focused and the best Use target", n"Check_FocusedAndBest", 0, 5.0f);
-        Add_Step("start the carrier's interaction", n"Step_StartInteraction");
-        Add_Step_WaitUntil("the lever has the carrier's interaction", n"Check_HasInteraction", 0, 5.0f);
+        Add_Step_WaitUntil("the resolver glue started the carrier's interaction on the lever", n"Check_HasInteraction", 0, 5.0f);
         Add_Step("empty hands: the prompt shows Pull, unblocked", n"Step_AssertUnblocked");
         Add_Step("select the rock's slot 0", n"Step_SelectRockSlot");
         Add_Step_WaitUntil("the prompt is blocked, the lever left the best Use targets and the interaction is gone", n"Check_BlockedAndLetGo", 0, 5.0f);
@@ -78,42 +86,6 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     }
 
     UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar, int32 InPrevIndex, int32 InNewIndex)
-    {
-        PushSelection();
-    }
-
-    UFUNCTION()
-    private void OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        PushSelection();
-    }
-
-    private void PushSelection()
-    {
-        if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
-        { return; }
-
-        _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
-    }
-
-    UFUNCTION()
-    private void OnBestTargetsChanged(FCk_Handle_InteractionResolver InResolver, FGameplayTag InIntent,
-                                      const TArray<FCk_Handle_InteractTarget>&in InPreviousTargets,
-                                      const TArray<FCk_Handle_InteractTarget>&in InNewTargets,
-                                      const TArray<FCk_Handle_InteractTarget>&in InRemovedTargets)
-    {
-        for (auto RemovedTarget : InRemovedTargets)
-        {
-            if (ck::Is_NOT_Valid(RemovedTarget))
-            { continue; }
-
-            auto MutableTarget = RemovedTarget;
-            MutableTarget.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Carrier));
-        }
-    }
-
-    UFUNCTION()
     private void OnFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
     {
         _FinishedResults.Add(InResult);
@@ -122,15 +94,15 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     UFUNCTION()
     private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Ready = _RockHolder.Get_NumItems() == 1;
-        if (Ready && ck::Is_NOT_Valid(_Rock))
+        const auto Seeded = _RockHolder.Get_NumItems() == 1;
+        if (Seeded && ck::Is_NOT_Valid(_Rock))
         {
             auto Items = _RockHolder.Get_Items();
             _Rock = Items[0];
         }
 
         auto Res = OutResult;
-        Res.Set(Ready);
+        Res.Set(Seeded && utils_state_machine::IsInState(_Sm, UMars_AutoTestState_FullHandsCarrierRig));
     }
 
     UFUNCTION()
@@ -151,7 +123,7 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     private void Check_RockHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == 0 && _HeldItem.Get_CurrentItem() == _Rock);
+        Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0) && _HeldItem.Get_CurrentItem() == _Rock);
     }
 
     UFUNCTION()
@@ -184,12 +156,6 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     }
 
     UFUNCTION()
-    private void Step_StartInteraction(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
-    }
-
-    UFUNCTION()
     private void Check_HasInteraction(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
@@ -200,8 +166,9 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     private void Step_AssertUnblocked(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_False(_Prompt.Get_IsBlocked(), "empty hands leave the prompt unblocked");
-        Assert_True(_Prompt.Get_DisplayText().ToString() == "Pull", f"the prompt shows its text (got [{_Prompt.Get_DisplayText().ToString()}])");
-        Assert_True(_Prompt.Get_DisplayTextColor() == constants_ui_colors::k_PromptText, "the prompt shows the action colour");
+        Assert_Equals_String(_Prompt.Get_DisplayText().ToString(), "Pull", "the prompt shows its text");
+        Assert_True(_Prompt.Get_DisplayTextColor() == constants_ui_colors::k_PromptText,
+            f"the prompt shows the action colour (got {DoFormat_Color(_Prompt.Get_DisplayTextColor())})");
     }
 
     UFUNCTION()
@@ -222,15 +189,18 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     UFUNCTION()
     private void Step_AssertBlocked(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Expected = constants_interactable::k_HandsFullText().ToString();
-        Assert_True(_Prompt.Get_DisplayText().ToString() == Expected,
-            f"the prompt shows the hands-full reason (got [{_Prompt.Get_DisplayText().ToString()}])");
-        Assert_True(_Prompt.Get_DisplayTextColor() == constants_ui_colors::k_PromptText_Blocked, "the prompt shows the blocked colour");
-        Assert_True(_Prompt.Get_PromptText().ToString() == "Pull", "the prompt text underneath is kept");
+        Assert_Equals_String(_Prompt.Get_DisplayText().ToString(), utils_interactable::Get_HandsFullText().ToString(),
+            "the prompt shows the hands-full reason");
+        Assert_True(_Prompt.Get_DisplayTextColor() == constants_ui_colors::k_PromptText_Blocked,
+            f"the prompt shows the blocked colour (got {DoFormat_Color(_Prompt.Get_DisplayTextColor())})");
+        Assert_Equals_String(_Prompt.Get_PromptText().ToString(), "Pull", "the prompt text underneath is kept");
 
         Assert_Equals_Int(_FinishedResults.Num(), 1, "the cancelled interaction finished once");
         if (_FinishedResults.Num() == 1)
-        { Assert_True(_FinishedResults[0] != ECk_SucceededFailed::Succeeded, "a cancelled interaction does not succeed"); }
+        {
+            Assert_True(_FinishedResults[0] != ECk_SucceededFailed::Succeeded,
+                f"a cancelled interaction does not succeed (got [{_FinishedResults[0] :n}])");
+        }
     }
 
     UFUNCTION()
@@ -243,6 +213,11 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     private bool Get_IsBestUseTarget()
     {
         return _Resolver.Get_BestInteractTargets(GameplayTags::InteractionIntent_Mars_Use).Contains(_Target);
+    }
+
+    private FString DoFormat_Color(const FLinearColor& InColor) const
+    {
+        return f"[{InColor.R}, {InColor.G}, {InColor.B}, {InColor.A}]";
     }
 
     // A ManuallyCompleted lever (no mover): nothing completes its interaction in this test, so a started one stays live.
@@ -262,8 +237,16 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
         auto Spec = FMars_Interactable_Spec();
         Spec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Pull")));
         _Interactable = utils_interactable::Create(Root, Spec);
-        _Target = _Interactable.Get_AllInteractTargets()[0];
-        _Prompt = FCk_Handle(_Target).As_InteractPrompt();
+
+        const auto Targets = _Interactable.Get_AllInteractTargets();
+        if (Targets.Num() != 1)
+        {
+            FinishFailure(f"the lever interactable has {Targets.Num()} interact targets, expected 1");
+            return;
+        }
+
+        _Target = Targets[0];
+        _Prompt = _Target.As_InteractPrompt();
         _Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnFinished"));
     }
 
@@ -271,7 +254,7 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

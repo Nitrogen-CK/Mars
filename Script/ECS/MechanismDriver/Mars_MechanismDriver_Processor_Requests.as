@@ -19,19 +19,20 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
         auto Self = InHandle.As_MechanismDriver();
         _Driver = Self;
 
-        const auto UntrackSources = InRequests.UntrackSources;
-        const auto UntrackSinks = InRequests.UntrackSinks;
-        const auto TrackSources = InRequests.TrackSources;
-        const auto TrackSinks = InRequests.TrackSinks;
-        const auto Recompute = InRequests.Recompute;
+        const auto UntrackSourceRequests = InRequests.UntrackSourceRequests;
+        const auto UntrackSinkRequests = InRequests.UntrackSinkRequests;
+        const auto TrackSourceRequests = InRequests.TrackSourceRequests;
+        const auto TrackSinkRequests = InRequests.TrackSinkRequests;
+        const auto HasRecompute = InRequests.RecomputeRequests.Num() > 0;
 
-        // Swap-and-pop - InRequests is dead past this line; a request enqueued during the drain survives to next pass.
+        // InRequests is invalid past this line; a request enqueued during the drain survives to the next pass.
         Self.Request_TryRemove(FMars_Fragment_MechanismDriver_Requests);
 
         auto Changed = false;
 
-        for (const auto& Source : UntrackSources)
+        for (const auto& Request : UntrackSourceRequests)
         {
+            const auto Source = Request.Source;
             if (InDriverComp.Sources.Contains(Source) == false)
             { continue; }
 
@@ -46,17 +47,19 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
             }
         }
 
-        for (const auto& Sink : UntrackSinks)
+        for (const auto& Request : UntrackSinkRequests)
         {
-            if (InDriverComp.Sinks.Contains(Sink) == false)
+            if (InDriverComp.Sinks.Contains(Request.Sink) == false)
             { continue; }
 
-            InDriverComp.Sinks.Remove(Sink);
+            InDriverComp.Sinks.Remove(Request.Sink);
             Changed = true;
         }
 
-        for (const auto& Source : TrackSources)
+        // A source or sink destroyed between its track request and this drain is skipped.
+        for (const auto& Request : TrackSourceRequests)
         {
+            const auto Source = Request.Source;
             if (ck::Is_NOT_Valid(Source) || InDriverComp.Sources.Contains(Source))
             { continue; }
 
@@ -68,16 +71,16 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
                 FMars_Delegate_MechanismSource_OnAssertedChanged(this, n"OnSourceAssertedChanged"));
         }
 
-        for (const auto& Sink : TrackSinks)
+        for (const auto& Request : TrackSinkRequests)
         {
-            if (ck::Is_NOT_Valid(Sink) || InDriverComp.Sinks.Contains(Sink))
+            if (ck::Is_NOT_Valid(Request.Sink) || InDriverComp.Sinks.Contains(Request.Sink))
             { continue; }
 
-            InDriverComp.Sinks.Add(Sink);
+            InDriverComp.Sinks.Add(Request.Sink);
             Changed = true;
         }
 
-        if (Changed || Recompute)
+        if (Changed || HasRecompute)
         { RecomputeAllChannels(InDriverComp); }
     }
 
@@ -131,7 +134,7 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
     // Edges go out immediately so their order across sources is the signal order; counts only flag a recompute, so
     // several same-frame flips coalesce into one pass.
     UFUNCTION()
-    private void OnSourceAssertedChanged(FCk_Handle_MechanismSource InSource, bool InAsserted)
+    private void OnSourceAssertedChanged(FCk_Handle_MechanismSource InSource, EMars_MechanismSource_Output InOutput)
     {
         if (ck::Is_NOT_Valid(_Driver))
         { return; }
@@ -149,7 +152,7 @@ class UMars_Processor_MechanismDriver_HandleRequests : UCk_Processor_Script_Base
                 { continue; }
 
                 auto MutableSink = Sink;
-                MutableSink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(Channel, InAsserted));
+                MutableSink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(Channel, InOutput));
             }
         }
 

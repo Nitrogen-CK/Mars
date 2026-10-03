@@ -6,9 +6,6 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
     // The timed Happy lasts 2 s.
     default _TimeoutSeconds = 8.0f;
 
-    // Catalog indices are append-only (Mars_Eyes_Assets.as).
-    private const int32 HappyIndex = 0;
-
     private FCk_Handle_Eyes _Eyes;
     private FMars_Eyes_ExpressionDef _Happy;
 
@@ -22,10 +19,9 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
         Spec.Style.RightCell = 3;
-        Spec.BlinkEnabled = false;
         _Eyes = utils_eyes::Add(FaceNode, Spec);
 
-        _Happy = mars_eyes::Catalog().Expressions[HappyIndex].Def;
+        _Happy = utils_eyes::Expression_Happy().Def;
 
         Add_Step("the eyes have a presentation and show the style", n"Step_AssertComposed");
         Add_Step("play Happy until cleared", n"Step_PlayHappyUntilCleared");
@@ -67,8 +63,8 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Eyes.Get_HasEmote()
-            && _Eyes.Get_ResolvedLeftCell() == _Happy.LeftCell
-            && _Eyes.Get_ResolvedRightCell() == _Happy.RightCell
+            && _Eyes.Get_ResolvedLeftCell() == _Happy.LeftCell.Get(-1)
+            && _Eyes.Get_ResolvedRightCell() == _Happy.RightCell.Get(-1)
             && _Eyes.Get_Blend() >= 1.0f);
     }
 

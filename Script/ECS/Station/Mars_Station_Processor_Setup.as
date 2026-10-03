@@ -20,7 +20,7 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
 
         Station.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnReserved"));
         Station.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnReleased"));
-        Apply_Occupied(Station, Station.Get_IsOperated());
+        Sync_UseTarget(Station);
 
         Station.Request_TryRemove(FMars_Tag_Station_NeedsSetup);
     }
@@ -28,32 +28,33 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
     UFUNCTION()
     private void OnReserved(FCk_Handle_Station InStation, FCk_Handle InOperator)
     {
-        Apply_Occupied(InStation, true);
+        Sync_UseTarget(InStation);
     }
 
-    // A same-drain re-seat broadcasts Released then Reserved; reading the station keeps the prompt right either way.
+    // A same-drain re-seat broadcasts Released then Reserved; reading the station keeps the prompt right either way. A
+    // station released by its own destruction has nothing left to update.
     UFUNCTION()
     private void OnReleased(FCk_Handle_Station InStation, FCk_Handle InOperator, EMars_Station_ReleaseReason InReason)
     {
         if (ck::Is_NOT_Valid(InStation))
         { return; }
 
-        Apply_Occupied(InStation, InStation.Get_IsOperated());
+        Sync_UseTarget(InStation);
     }
 
-    private void Apply_Occupied(FCk_Handle_Station InStation, bool InOccupied)
+    // The Use target follows the reservation. Its target is missing only when its interactable was rejected (ensured
+    // there).
+    private void Sync_UseTarget(FCk_Handle_Station InStation)
     {
         auto Target = InStation.Get_UseTarget();
         if (ck::Is_NOT_Valid(Target))
         { return; }
 
-        utils_interact_target::Set_Enabled(Target, InOccupied ? ECk_EnableDisable::Disable : ECk_EnableDisable::Enable);
-
-        auto Prompt = FCk_Handle(Target).As_InteractPrompt(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Prompt))
-        { return; }
+        const auto Occupied = InStation.Get_IsOperated();
+        utils_interact_target::Set_Enabled(Target, Occupied ? ECk_EnableDisable::Disable : ECk_EnableDisable::Enable);
 
         const auto PromptSpec = InStation.Get_Spec().Prompt;
-        Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(InOccupied ? PromptSpec.OccupiedText : PromptSpec.Text));
+        auto Prompt = Target.As_InteractPrompt();
+        Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(Occupied ? PromptSpec.OccupiedText : PromptSpec.Text));
     }
 }

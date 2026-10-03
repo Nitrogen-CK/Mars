@@ -16,12 +16,13 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UCk_AutoTest_Base
         auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.GrabOutSeconds = 0.2f;
-        Spec.Reach.GrabGripSeconds = 0.2f;
-        Spec.Reach.GrabBackSeconds = 0.2f;
-        Spec.Reach.ReleaseSeconds = 0.2f;
+        Spec.Reach.Grab.OutSeconds = 0.2f;
+        Spec.Reach.Grab.GripSeconds = 0.2f;
+        Spec.Reach.Grab.BackSeconds = 0.2f;
+        Spec.Reach.Hold.ReleaseSeconds = 0.2f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -58,7 +59,7 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Player, false));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Timed));
     }
 
     UFUNCTION()
@@ -71,14 +72,14 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertStillHold(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, "the phase is still Hold after 0.6s");
+        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the phase is still Hold after 0.6s (got {_Hands.Get_Phase() :n})");
         Assert_True(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Hold, "the Hands SM is still in Hold");
     }
 
     UFUNCTION()
     private void Step_AssertHoldIgnoresReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, "the phase is still Hold after a second reach request");
+        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the phase is still Hold after a second reach request (got {_Hands.Get_Phase() :n})");
     }
 
     UFUNCTION()
@@ -109,8 +110,8 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UCk_AutoTest_Base
         if (_Phases.Num() != 3)
         { return; }
 
-        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, "first change is to Hold");
-        Assert_True(_Phases[1] == EMars_FPHands_Phase::Release, "second change is to Release");
-        Assert_True(_Phases[2] == EMars_FPHands_Phase::None, "third change is back to None");
+        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, f"first change is to Hold (got {_Phases[0] :n})");
+        Assert_True(_Phases[1] == EMars_FPHands_Phase::Release, f"second change is to Release (got {_Phases[1] :n})");
+        Assert_True(_Phases[2] == EMars_FPHands_Phase::None, f"third change is back to None (got {_Phases[2] :n})");
     }
 }

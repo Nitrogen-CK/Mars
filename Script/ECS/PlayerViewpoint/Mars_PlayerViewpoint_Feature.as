@@ -15,9 +15,15 @@ struct FMars_Feature_PlayerViewpoint {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// InteractionTraceDistance is consumed at Add (it shapes the trace); the Camera block builds the director's resting profile.
+// Camera and InteractionTraceDistance are consumed at Add; the Camera block builds the director's resting profile
+// (utils_player_viewpoint::Make_CameraProfile), which exists before the director and so before Add.
 struct FMars_PlayerViewpoint_Spec
 {
+    // The player's camera director; its view anchor becomes the viewpoint. Set at composition (a config asset leaves it
+    // empty).
+    UPROPERTY()
+    FCk_Handle_Camera Camera;
+
     UPROPERTY()
     float32 InteractionTraceDistance = 250.0f;
 
@@ -32,11 +38,41 @@ struct FMars_PlayerViewpoint_Spec
     float32 LookSpeed = 1.0f;
 }
 
+mixin FMars_Validation Validate(const FMars_PlayerViewpoint_Spec& Self)
+{
+    if (ck::Is_NOT_Valid(Self.Camera))
+    { return FMars_Validation("Camera is not set"); }
+
+    // A NaN passes every comparison below, so finiteness is checked first.
+    if (Math::IsFinite(Self.InteractionTraceDistance) == false)
+    { return FMars_Validation(f"InteractionTraceDistance [{Self.InteractionTraceDistance}] is not finite"); }
+
+    if (Math::IsFinite(Self.FieldOfView) == false)
+    { return FMars_Validation(f"FieldOfView [{Self.FieldOfView}] is not finite"); }
+
+    if (Math::IsFinite(Self.LookSpeed) == false)
+    { return FMars_Validation(f"LookSpeed [{Self.LookSpeed}] is not finite"); }
+
+    if (Self.InteractionTraceDistance <= 0.0f)
+    { return FMars_Validation(f"InteractionTraceDistance [{Self.InteractionTraceDistance}] must be > 0"); }
+
+    if (Self.FieldOfView <= 0.0f || Self.FieldOfView >= 180.0f)
+    { return FMars_Validation(f"FieldOfView [{Self.FieldOfView}] is outside (0, 180)"); }
+
+    if (Self.PitchLimits._Min > Self.PitchLimits._Max)
+    { return FMars_Validation(f"PitchLimits min [{Self.PitchLimits._Min}] exceeds max [{Self.PitchLimits._Max}]"); }
+
+    if (Self.LookSpeed <= 0.0f)
+    { return FMars_Validation(f"LookSpeed [{Self.LookSpeed}] must be > 0"); }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Loose fragment - no processor. Camera and Viewpoint are set once at Add; the trace rides the anchor every frame.
+// No processor: Camera and Viewpoint are set once at Add; the trace rides the anchor every frame.
 struct FMars_Fragment_PlayerViewpoint
 {
     UPROPERTY()

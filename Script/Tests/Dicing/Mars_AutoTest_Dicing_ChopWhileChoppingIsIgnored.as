@@ -1,13 +1,11 @@
-// One press = one chop: two chop requests in the same step resolve exactly one chop. Rig as
-// AlignedChopsAdvanceStateAndMoveBand; the hand is on the band, then the run settles a few frames past the strike so a
-// late second resolution would be seen.
+// One press = one chop: two chop requests in the same step, with the hand on the band, resolve exactly one chop. The run
+// then waits a wall-clock window longer than a whole chop past the first, so a late second resolution would be seen.
 class UMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored : UCk_AutoTest_Base
 {
     private FCk_Handle_Dicing _Dicing;
     private FMars_Dicing_Spec _Spec;
 
     private TArray<bool> _Resolved;
-    private int32 _SettleFrames = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -26,7 +24,8 @@ class UMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored : UCk_AutoTest_Base
         MoverSpec.Duration = 0.05f;
         auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
 
-        _Dicing = utils_dicing::Add(StationEntity, _Spec, FMars_Dicing_Nodes(LateralNode, Mover));
+        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
+        _Dicing = utils_dicing::Add(StationEntity, _Spec);
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
 
@@ -34,15 +33,15 @@ class UMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored : UCk_AutoTest_Base
         Add_Step_WaitUntil("the hand is on the band", n"Check_HandOnBand", 0, 2.0f);
         Add_Step("chop twice in one step", n"Step_ChopTwice");
         Add_Step_WaitUntil("the chop resolved and the cleaver is back up", n"Check_ChopDone", 0, 2.0f);
-        Add_Step_WaitUntil("a few more frames pass", n"Check_Settled", 0, 2.0f);
+        Add_Step_WaitSeconds("a second chop would resolve in this window", 0.3f);
         Add_Step("exactly one chop resolved", n"Step_AssertOneChop");
         Run_Steps(InHandle);
     }
 
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, bool InAligned)
+    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
     {
-        _Resolved.Add(InAligned);
+        _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
     }
 
     UFUNCTION()
@@ -71,14 +70,6 @@ class UMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Resolved.Num() > 0 && _Dicing.Get_IsChopping() == false);
-    }
-
-    UFUNCTION()
-    private void Check_Settled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        _SettleFrames += 1;
-        auto Res = OutResult;
-        Res.Set(_SettleFrames >= 10);
     }
 
     UFUNCTION()

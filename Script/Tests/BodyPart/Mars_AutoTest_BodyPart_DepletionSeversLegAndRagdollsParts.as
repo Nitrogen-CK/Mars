@@ -1,5 +1,5 @@
-// Depleting a leg part severs the leg: after the crawler walks for 1 s, 30 Sever damage on leg 1's Health depletes it, the
-// part reads Severed, OnSevered fires once with the 3 released parts (2 segments + foot), the leg reads Detached but stays
+// Depleting a leg part severs the leg: after the crawler walks for 1 s (and has moved), 30 Sever damage on leg 1's Health
+// depletes it, the part reads Severed, OnSevered fires once with the 3 released parts (2 segments + foot), the leg reads Detached but stays
 // in the body's record, the gait runs on 3 enabled legs (OnLegSetChanged 3 of 4) and stays Ready, the leg's hurtboxes are
 // destroyed, the released parts are the leg's lifetime children and the leg is world-owned. Every released part gets a
 // dynamic Jolt body that Jolt adds; the segments fall to the floor; one debris timer on the leg then destroys the leg and
@@ -19,6 +19,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     private TArray<FCk_Handle> _Hurtboxes;
     private TArray<FCk_Handle_Transform> _Segments;
     private float64 _WalkStart = 0.0;
+    private FVector _WalkStartLocation;
 
     private int32 _SeveredCount = 0;
     private FMars_DamageEvent _SeveredCause;
@@ -44,10 +45,6 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
         Add_Step("the crawler lives on with 3 legs", n"Step_AssertAfterDebris");
         Run_Steps(InHandle);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
 
     private FMars_Crawler_Spec Make_Spec()
     {
@@ -80,7 +77,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     UFUNCTION()
     private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _Crawler = FCk_Handle(InEntityScriptHandle).As_Crawler(ECk_SanityCheck::UnChecked);
+        _Crawler = InEntityScriptHandle.As_Crawler();
     }
 
     UFUNCTION()
@@ -135,6 +132,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
         _Part.BindTo_OnSevered(FMars_Delegate_BodyPart_OnSevered(this, n"OnSevered"));
         utils_procedural_gait::BindTo_OnLegSetChanged(_Crawler.Get_Gait(), FCk_Delegate_ProceduralGait_OnLegSetChanged(this, n"OnLegSetChanged"));
         _WalkStart = System::GetGameTimeInSeconds();
+        _WalkStartLocation = utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform());
     }
 
     UFUNCTION()
@@ -149,13 +147,16 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     UFUNCTION()
     private void Step_Deplete(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        const auto Walked = (utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform()) - _WalkStartLocation).Size2D();
+        Assert_True(Walked > 30.0, f"the crawler walked before the sever (moved {Walked} uu in the 1 s walk)");
+
         _Hurtboxes = _Part.Get_Zone().Get_Hurtboxes();
         _Segments = _Crawler.Get_LegRig(1).Segments;
         Assert_Equals_Int(_Hurtboxes.Num(), 3, "leg 1 has 3 hurtboxes before the sever");
         Assert_Equals_Int(_Segments.Num(), 2, "leg 1 has 2 segments");
 
         auto Health = _Part.Get_Health();
-        Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(30.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"))));
+        Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(30.0f, GameplayTags::DamageType_Mars_Sever)));
     }
 
     UFUNCTION()
@@ -173,7 +174,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     UFUNCTION()
     private void Step_AssertSevered(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Root = FCk_Handle(_Crawler);
+        FCk_Handle Root = _Crawler;
         const auto Gait = _Crawler.Get_Gait();
 
         Assert_Equals_Int(_SeveredCount, 1, "OnSevered fired once");
@@ -186,7 +187,8 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
         Assert_Equals_Int(utils_procedural_leg::Get_Legs(Root, ECk_ProceduralLeg_Filter::OnlyAttached).Num(), 3, "3 legs stay attached");
         Assert_Equals_Int(utils_procedural_leg::Get_Legs(Root, ECk_ProceduralLeg_Filter::NoFilter).Num(), 4, "the record keeps the detached leg");
         Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(Gait), 3, "the gait runs on 3 enabled legs");
-        Assert_True(utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Ready, "the gait stays Ready");
+        const auto GaitStatus = utils_procedural_gait::Get_Status(Gait);
+        Assert_True(GaitStatus == ECk_ProceduralAnimation_Status::Ready, f"the gait stays Ready (got {GaitStatus :n})");
 
         Assert_Equals_Int(_LegSetEnabled.Num(), 1, "OnLegSetChanged fired once");
         if (_LegSetEnabled.Num() > 0)
@@ -195,15 +197,14 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
             Assert_Equals_Int(_LegSetTotal[0], 4, "OnLegSetChanged reports 4 total");
         }
 
-        const auto LegEntity = FCk_Handle(_Leg);
         for (int32 Index = 0; Index < _Released.Num(); ++Index)
         {
-            const auto PartEntity = FCk_Handle(_Released[Index]);
-            Assert_True(utils_entity_lifetime::Get_LifetimeOwner(PartEntity) == LegEntity, f"released part {Index} is owned by the leg");
-            Assert_True(utils_jolt_body::DoCast(PartEntity).IsSet(), f"released part {Index} has a Jolt body");
+            const auto Released = _Released[Index];
+            Assert_True(utils_entity_lifetime::Get_LifetimeOwner(Released) == _Leg, f"released part {Index} is owned by the leg");
+            Assert_True(Released.Is_JoltBody(), f"released part {Index} has a Jolt body");
         }
 
-        const auto LegOwner = utils_entity_lifetime::Get_LifetimeOwner(LegEntity);
+        const auto LegOwner = utils_entity_lifetime::Get_LifetimeOwner(_Leg);
         Assert_True(LegOwner != Root, "the severed leg is no longer body-owned");
         Assert_True(ck::IsValid(LegOwner) && utils_entity_lifetime::Get_IsTransientEntity(LegOwner), "the severed leg is world-owned");
 
@@ -219,8 +220,8 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
         auto AllAdded = true;
         for (auto Released : _Released)
         {
-            auto MaybeBody = utils_jolt_body::DoCast(FCk_Handle(Released));
-            AllAdded = AllAdded && MaybeBody.IsSet() && utils_jolt_body::Get_IsBodyAdded(MaybeBody.GetValue());
+            const auto Body = Released.As_JoltBody(ECk_SanityCheck::UnChecked);
+            AllAdded = AllAdded && ck::IsValid(Body) && utils_jolt_body::Get_IsBodyAdded(Body);
         }
 
         auto Res = OutResult;
@@ -261,7 +262,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     private void Check_RecordDropped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Crawler) && utils_procedural_leg::Get_Legs(FCk_Handle(_Crawler), ECk_ProceduralLeg_Filter::NoFilter).Num() == 3);
+        Res.Set(ck::IsValid(_Crawler) && utils_procedural_leg::Get_Legs(_Crawler, ECk_ProceduralLeg_Filter::NoFilter).Num() == 3);
     }
 
     UFUNCTION()
@@ -269,7 +270,8 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     {
         Assert_True(ck::IsValid(_Crawler), "the crawler outlives its severed leg");
         Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(_Crawler.Get_Gait()), 3, "the gait still runs on 3 legs");
-        Assert_True(utils_procedural_gait::Get_Status(_Crawler.Get_Gait()) == ECk_ProceduralAnimation_Status::Ready, "the gait is still Ready");
+        const auto GaitStatus = utils_procedural_gait::Get_Status(_Crawler.Get_Gait());
+        Assert_True(GaitStatus == ECk_ProceduralAnimation_Status::Ready, f"the gait is still Ready (got {GaitStatus :n})");
         Assert_Equals_Int(_Crawler.Get_Monster().Get_AttachedPartCount(), 3, "3 parts are attached");
     }
 }

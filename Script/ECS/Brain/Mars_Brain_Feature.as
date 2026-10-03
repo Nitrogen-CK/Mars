@@ -15,7 +15,7 @@ struct FMars_Feature_Brain {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One bool world-state key the brain owns, and the value it starts at. Field order is the positional constructor's order.
+// One bool world-state key the brain owns, and the value it starts at.
 struct FMars_Brain_Fact
 {
     UPROPERTY()
@@ -33,7 +33,6 @@ struct FMars_Brain_Fact
     }
 }
 
-// Field order is the positional constructor's order.
 struct FMars_Brain_Spec
 {
     // The planner child's tag (utils_goap_planner::Create).
@@ -118,7 +117,7 @@ mixin void AddAction(FMars_Brain_Spec& Self, TSubclassOf<UCk_GoapAction_EntitySc
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The action classes are not retained (a strong class reference would trip Schema.IsSafe); the planner's catalog holds them.
+// The spec is retained whole: its action classes are soft references (a strong class reference would trip Schema.IsSafe).
 struct FMars_Fragment_Brain_Params
 {
     UPROPERTY()
@@ -170,13 +169,13 @@ struct FMars_Fragment_Brain_Signals
 struct FMars_Request_Brain_SetEnabled
 {
     UPROPERTY()
-    bool Enabled = true;
+    ECk_EnableDisable EnableDisable = ECk_EnableDisable::Enable;
 
     FMars_Request_Brain_SetEnabled() {}
 
-    FMars_Request_Brain_SetEnabled(bool InEnabled)
+    FMars_Request_Brain_SetEnabled(ECk_EnableDisable InEnableDisable)
     {
-        Enabled = InEnabled;
+        EnableDisable = InEnableDisable;
     }
 }
 

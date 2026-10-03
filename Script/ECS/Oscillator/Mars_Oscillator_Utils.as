@@ -4,7 +4,7 @@ namespace utils_oscillator
     FCk_Handle_Oscillator Add(FCk_Handle_SceneNode& InNode, FMars_Oscillator_Spec InParams)
     {
         const auto Validation = InParams.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Oscillator] [{InNode.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Oscillator] [{InNode.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Oscillator(); }
 
         auto Params = FMars_Fragment_Oscillator_Params();
@@ -16,7 +16,7 @@ namespace utils_oscillator
         Params.CatchAngleDegrees = InParams.CatchAngleDegrees;
 
         auto State = FMars_Fragment_Oscillator();
-        State.IsRunning = InParams.StartRunning;
+        State.State = InParams.StartRunning ? EMars_Oscillator_State::Running : EMars_Oscillator_State::Stopped;
         State.Envelope = InParams.StartRunning ? 1.0f : 0.0f;
 
         // A braked swing that starts stopped starts caught, on the way out to its catch angle.
@@ -25,12 +25,12 @@ namespace utils_oscillator
             const auto CatchAngle = InParams.CatchAngleDegrees.GetValue();
             const auto Ratio = InParams.AmplitudeDegrees > KINDA_SMALL_NUMBER ? CatchAngle / InParams.AmplitudeDegrees : 0.0f;
             const float64 Phase = Math::Asin(Math::Clamp(Ratio, -1.0f, 1.0f));
-            State.IsCaught = true;
+            State.State = EMars_Oscillator_State::Caught;
             State.Envelope = 1.0f;
             State.Time = float32(Get_FirstPhaseAfter(Phase, -1.0) / (2.0 * PI) * InParams.PeriodSeconds);
 
             utils_scene_node::Request_UpdateOffset_Rotation(InNode,
-                Params.RestRotation + Make_SwingRotation(Params.Axis, CatchAngle), ECk_RelativeAbsolute::Absolute);
+                Make_NodeRotation(Params.RestRotation, Params.Axis, CatchAngle), ECk_RelativeAbsolute::Absolute);
         }
 
         InNode.Add_Fragment(FMars_Feature_Oscillator());
@@ -71,6 +71,13 @@ namespace utils_oscillator
         return Phase;
     }
 
+    // The node's offset rotation for a swing angle: the swing turns about the axis of the rest frame, so the rest
+    // rotation is composed with it (rest x swing), not added to it per component.
+    FRotator Make_NodeRotation(FRotator InRestRotation, EMars_Oscillator_Axis InAxis, float32 InAngleDegrees)
+    {
+        return (FQuat(InRestRotation) * FQuat(Make_SwingRotation(InAxis, InAngleDegrees))).Rotator();
+    }
+
     FRotator Make_SwingRotation(EMars_Oscillator_Axis InAxis, float32 InAngleDegrees)
     {
         if (InAxis == EMars_Oscillator_Axis::Pitch)
@@ -89,17 +96,12 @@ namespace utils_oscillator
 
 mixin bool Get_IsRunning(const FCk_Handle_Oscillator& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Oscillator).IsRunning;
-}
-
-mixin float32 Get_Envelope(const FCk_Handle_Oscillator& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Oscillator).Envelope;
+    return Self.Get_Fragment(FMars_Fragment_Oscillator).State == EMars_Oscillator_State::Running;
 }
 
 mixin bool Get_IsCaught(const FCk_Handle_Oscillator& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Oscillator).IsCaught;
+    return Self.Get_Fragment(FMars_Fragment_Oscillator).State == EMars_Oscillator_State::Caught;
 }
 
 // The swing angle the node shows now, on top of its rest rotation.
@@ -107,9 +109,6 @@ mixin float32 Get_Angle(const FCk_Handle_Oscillator& Self)
 {
     const auto& Params = Self.Get_Fragment(FMars_Fragment_Oscillator_Params);
     const auto& State = Self.Get_Fragment(FMars_Fragment_Oscillator);
-    if (Params.PeriodSeconds <= KINDA_SMALL_NUMBER)
-    { return 0.0f; }
-
     return Params.AmplitudeDegrees * State.Envelope * float32(Math::Sin(2.0 * PI * State.Time / Params.PeriodSeconds));
 }
 
@@ -117,10 +116,10 @@ mixin float32 Get_Angle(const FCk_Handle_Oscillator& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_SetRunning(FCk_Handle_Oscillator& Self, bool InRunning)
+mixin void Request_SetRunning(FCk_Handle_Oscillator& Self, const FMars_Request_Oscillator_SetRunning& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Oscillator_Requests);
-    Requests.SetRunningRequest = FMars_Request_Oscillator_SetRunning(InRunning);
+    Requests.SetRunningRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

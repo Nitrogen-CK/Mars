@@ -81,14 +81,14 @@ class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
     private void Step_AssertEdgesValid(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Defaults = MakeSpec().Validate();
-        Assert_True(Defaults.IsValid, f"Validate() on the default spec with a filter and an aim point (got [{Defaults.Get_Error()}])");
+        Assert_True(Defaults.IsValid(), f"Validate() on the default spec with a filter and an aim point (got [{Defaults.Get_Error()}])");
 
         auto Edges = MakeSpec();
         Edges.MinRangeCm = 0.0f;
         Edges.ConeHalfAngleDeg = 180.0f;
         Edges.SwitchCloserRatio = 0.0f;
         const auto EdgesValidation = Edges.Validate();
-        Assert_True(EdgesValidation.IsValid,
+        Assert_True(EdgesValidation.IsValid(),
             f"Validate() on MinRangeCm 0, ConeHalfAngleDeg 180, SwitchCloserRatio 0 (got [{EdgesValidation.Get_Error()}])");
     }
 
@@ -106,7 +106,7 @@ class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
     private void Step_AssertNothingAdded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Invalid(_Rejected, "Add with an empty DetectionFilter returns an invalid handle");
-        Assert_False(utils_gaze::Has(_EyeNode), "a rejected spec adds no feature fragment");
+        Assert_False(_EyeNode.Is_Gaze(), "a rejected spec adds no feature fragment");
         Assert_False(_EyeNode.Has_Fragment(FMars_Fragment_Gaze_Params), "a rejected spec adds no params fragment");
         Assert_False(_EyeNode.Has_Fragment(FMars_Fragment_Gaze), "a rejected spec adds no state fragment");
         Assert_Equals_Int(utils_entity_lifetime::Get_LifetimeDependents(_EyeNode).Num(), _DependentsBeforeAdd,
@@ -116,7 +116,7 @@ class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
     private void AssertRejected(const FMars_Gaze_Spec& InSpec, const FString& InExpectedError, const FString& InWhat)
     {
         const auto Validation = InSpec.Validate();
-        Assert_False(Validation.IsValid, f"Validate() on {InWhat}");
+        Assert_False(Validation.IsValid(), f"Validate() rejects {InWhat}");
         Assert_True(Validation.Get_Error().Contains(InExpectedError),
             f"Validate() on {InWhat} says [{InExpectedError}] (got [{Validation.Get_Error()}])");
     }
@@ -126,7 +126,7 @@ class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
     {
         const auto Validation = InSpec.Validate();
         const auto Error = Validation.Get_Error();
-        Assert_False(Validation.IsValid, f"Validate() on {InWhat}");
+        Assert_False(Validation.IsValid(), f"Validate() rejects {InWhat}");
         Assert_True(Error.StartsWith(InField, ESearchCase::CaseSensitive) && Error.Contains("is not finite"),
             f"Validate() on {InWhat} reports [{InField} ... is not finite] (got [{Error}])");
     }

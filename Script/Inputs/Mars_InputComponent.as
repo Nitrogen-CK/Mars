@@ -6,24 +6,27 @@ class UMars_InputComponent : UEnhancedInputComponent
     private TArray<FMars_InputProfileEntry> ProfileStack;
     private APlayerController OwningController;
 
+    // The owning actor is the controller every profile is activated on.
     UFUNCTION()
-    UMars_InputProfile PushProfile(TSubclassOf<UMars_InputProfile> InProfileClass, APlayerController InController,
-        APawn InPawn, EMars_InputActivationMode InMode = EMars_InputActivationMode::Stack)
+    UMars_InputProfile PushProfile(TSubclassOf<UMars_InputProfile> InProfileClass, APawn InPawn,
+        EMars_InputActivationMode InMode = EMars_InputActivationMode::Stack)
     {
-        OwningController = InController;
+        OwningController = Cast<APlayerController>(GetOwner());
+        if (ck::EnsureIfNot(ck::IsValid(OwningController), f"[InputComponent] [{GetName()}] is not owned by a PlayerController"))
+        { return nullptr; }
 
         if (ProfileStack.Num() > 0 && InMode == EMars_InputActivationMode::Replace)
         {
             auto& TopEntry = ProfileStack.Last();
-            TopEntry.IsSuspended = true;
-            TopEntry.Profile.Deactivate(InController);
+            TopEntry.State = EMars_InputProfile_State::Suspended;
+            TopEntry.Profile.Deactivate(OwningController);
         }
 
         auto NewProfile = NewObject(this, InProfileClass);
         NewProfile.Setup(this);
-        NewProfile.Activate(InController, InPawn);
+        NewProfile.Activate(OwningController, InPawn);
 
-        ProfileStack.Add(FMars_InputProfileEntry(NewProfile, InPawn, false));
+        ProfileStack.Add(FMars_InputProfileEntry(NewProfile, InPawn, EMars_InputProfile_State::Active));
         return NewProfile;
     }
 
@@ -38,7 +41,7 @@ class UMars_InputComponent : UEnhancedInputComponent
             for (int32 Index = ProfileStack.Num() - 1; Index >= 0; --Index)
             {
                 auto& Entry = ProfileStack[Index];
-                if (Entry.IsSuspended == false)
+                if (Entry.State == EMars_InputProfile_State::Active)
                 { Entry.Profile.Deactivate(OwningController); }
             }
             ProfileStack.Empty();
@@ -52,9 +55,9 @@ class UMars_InputComponent : UEnhancedInputComponent
         if (ProfileStack.Num() > 0)
         {
             auto& NewTopEntry = ProfileStack.Last();
-            if (NewTopEntry.IsSuspended)
+            if (NewTopEntry.State == EMars_InputProfile_State::Suspended)
             {
-                NewTopEntry.IsSuspended = false;
+                NewTopEntry.State = EMars_InputProfile_State::Active;
                 NewTopEntry.Profile.Activate(OwningController, NewTopEntry.Pawn);
             }
         }

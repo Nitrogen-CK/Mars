@@ -1,13 +1,5 @@
-// Alive-scoped inventory links. The features stay pure data + request processors; these tasks decide when they talk:
-//
-//   HotbarIntents          : Slot1..4 presses                             -> Hotbar::Select
-//   HotbarDrivesHeldItem   : Hotbar selection / slot contents / eject     -> HeldItem::SetSlot, HeldItemUse::Drop
-//   HeldItemDrivesUse      : HeldItem::OnHeldItemChanged                  -> HeldItemUse::RefreshFromHeldItem
-//   DropThrowIntent        : Drop press / hold timer / release            -> HeldItemUse::Drop / Throw / SetThrowArmed
-//   HeldItemHints          : OnHeldItemChanged + OnThrowArmedChanged      -> ActionHintDisplay rows
-//
-// Every task is EnterExitOnly and signal-driven; the two intent tasks derive from UMars_SmTask_IntentEdges.
-// Tasks never call into each other; they meet only through the features' fragments and signals.
+// Inventory links. The features stay pure data + request processors; these tasks decide when they talk, and never call
+// into each other - they meet only through the features' fragments and signals.
 // Single-player: these run on the local pawn only. Multiplayer needs a local-controller gate on the hint and input tasks.
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -58,8 +50,9 @@ class UMars_SmTask_HotbarIntents : UMars_SmTask_IntentEdges
             return;
         }
 
-        if (Index == BagSlotCount && _Hotbar.Get_HasBackpackSlot())
-        { _Hotbar.Request_Select(FMars_Request_Hotbar_Select(_Hotbar.Get_BackpackIndex())); }
+        const auto BackpackIndex = _Hotbar.Get_BackpackIndex();
+        if (Index == BagSlotCount && BackpackIndex.IsSet())
+        { _Hotbar.Request_Select(FMars_Request_Hotbar_Select(BackpackIndex.GetValue())); }
     }
 }
 
@@ -108,7 +101,7 @@ class UMars_SmTask_HotbarDrivesHeldItem : UCk_SmTask_EntityScript
     }
 
     UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar, int32 InPrevIndex, int32 InNewIndex)
+    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
     {
         PushSelection();
     }
@@ -120,7 +113,7 @@ class UMars_SmTask_HotbarDrivesHeldItem : UCk_SmTask_EntityScript
     }
 
     UFUNCTION()
-    private void OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem, int32 InPendingIndex)
+    private void OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem)
     {
         if (ck::IsValid(_Use))
         { _Use.Request_Drop(); }
@@ -208,7 +201,7 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
 
         auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(_Player, ECk_SanityCheck::UnChecked));
         if (ck::IsValid(Character) && ck::IsValid(Character.Config))
-        { _ThrowHoldSeconds = Character.Config.ThrowHoldSeconds; }
+        { _ThrowHoldSeconds = Character.Config.Inventory.ThrowHoldSeconds; }
 
         _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
 
@@ -272,7 +265,7 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
     private void OnHoldTimerDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
         // A cancelled timer can still finish in the frame it was destroyed.
-        if ((FCk_Handle(_HoldTimer) == FCk_Handle(InTimer)) == false)
+        if (_HoldTimer != InTimer)
         { return; }
 
         _Armed = true;
@@ -303,7 +296,7 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
         {
             _HoldTimer.UnbindFrom_OnDone(FCk_Delegate_Timer(this, n"OnHoldTimerDone"));
             utils_timer::Request_Stop(_HoldTimer);
-            utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(_HoldTimer));
+            utils_entity_lifetime::Request_DestroyEntity(_HoldTimer.H());
         }
 
         _HoldTimer = FCk_Handle_Timer();

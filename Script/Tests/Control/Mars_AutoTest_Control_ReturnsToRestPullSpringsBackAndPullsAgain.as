@@ -150,14 +150,19 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
     private void Step_AssertFirstPull(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_FinishedResults.Num(), 1, "one finish for the first pull");
-        Assert_True(_FinishedResults.Num() == 1 && _FinishedResults[0] == ECk_SucceededFailed::Succeeded, "the first pull ends the interaction Succeeded");
-        Assert_False(_Mover.Get_AtEnd(), "springing back never moves the Mover's target");
+        if (_FinishedResults.Num() == 1)
+        {
+            Assert_True(_FinishedResults[0] == ECk_SucceededFailed::Succeeded,
+                f"the first pull ends the interaction Succeeded (got {_FinishedResults[0] :n})");
+        }
+
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "springing back never moves the Mover's target");
     }
 
     UFUNCTION()
     private void Step_SetActive(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Control.Request_SetActive(true);
+        _Control.Request_SetActive(FMars_Request_Control_SetActive(EMars_Control_Activation::Active));
     }
 
     UFUNCTION()
@@ -172,9 +177,9 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
     {
         const auto Alpha = _Mover.Get_Alpha();
         Assert_True(Alpha < 0.01f, f"an active returns-to-rest control leaves the handle at rest (alpha {Alpha})");
-        Assert_False(_Mover.Get_AtEnd(), "an active returns-to-rest control does not move the Mover's target");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "an active returns-to-rest control does not move the Mover's target");
         Assert_True(_Control.Get_ReturnsToRest(), "the control reports ReturnsToRest");
-        Assert_False(_Control.Get_PullsTowardStart(), "the next pull runs toward the end pose even while active");
+        Assert_True(_Control.Get_PullDirection() == EMars_Control_PullDirection::TowardEnd, "the next pull runs toward the end pose even while active");
     }
 
     UFUNCTION()
@@ -188,7 +193,12 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
     private void Step_AssertSecondPull(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_FinishedResults.Num(), 2, "one finish per pull");
-        Assert_True(_FinishedResults.Num() == 2 && _FinishedResults[1] == ECk_SucceededFailed::Succeeded, "the second pull ends its interaction Succeeded");
-        Assert_False(_Mover.Get_AtEnd(), "the target is still at rest");
+        if (_FinishedResults.Num() == 2)
+        {
+            Assert_True(_FinishedResults[1] == ECk_SucceededFailed::Succeeded,
+                f"the second pull ends its interaction Succeeded (got {_FinishedResults[1] :n})");
+        }
+
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "the target is still at rest");
     }
 }

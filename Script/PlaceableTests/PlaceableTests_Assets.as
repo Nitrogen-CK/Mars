@@ -1,11 +1,5 @@
 // Language=angelscript
-//============================================================================
-// PLACEABLE TEST — VISUAL MESH ASSETS
-//============================================================================
-// Heavyweight `asset ... of ...` declarations live in a *_Assets.as file (per
-// the AngelScript authoring guide). These IsmRenderer data assets give the
-// placeable test EntityScripts a visible mesh when dropped into a level.
-//============================================================================
+// The IsmRenderer data assets that give the placeable test EntityScripts a visible mesh when dropped into a level.
 
 namespace ck
 {

@@ -20,14 +20,10 @@ class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
         auto Oscillator = State.Oscillator;
         auto Hazard = State.Hazard;
 
-        if (ck::IsValid(Oscillator))
-        { Oscillator.BindTo_OnRunningChanged(FMars_Delegate_Oscillator_OnRunningChanged(this, n"OnOscillatorRunningChanged")); }
+        Oscillator.BindTo_OnRunningChanged(FMars_Delegate_Oscillator_OnRunningChanged(this, n"OnOscillatorRunningChanged"));
 
-        if (ck::IsValid(Hazard))
-        {
-            Hazard.BindTo_OnHit(FMars_Delegate_Hazard_OnHit(this, n"OnHazardHit"));
-            Hazard.Request_SetArmed(ck::IsValid(Oscillator) && Oscillator.Get_IsRunning());
-        }
+        Hazard.BindTo_OnHit(FMars_Delegate_Hazard_OnHit(this, n"OnHazardHit"));
+        Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(Oscillator.Get_IsRunning() ? EMars_Hazard_Arming::Armed : EMars_Hazard_Arming::Disarmed));
 
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Sink))
@@ -46,52 +42,39 @@ class UMars_Processor_Pendulum_Setup : UCk_Processor_Script_Base_UE
         const auto Running = Params.Powered == EMars_PoweredBehavior::RunWhilePowered ? InPowered : (InPowered == false);
 
         auto Oscillator = InPendulum.Get_Fragment(FMars_Fragment_Pendulum).Oscillator;
-        if (ck::IsValid(Oscillator))
-        { Oscillator.Request_SetRunning(Running); }
+        Oscillator.Request_SetRunning(FMars_Request_Oscillator_SetRunning(
+            Running ? EMars_Oscillator_RunState::Running : EMars_Oscillator_RunState::Stopped));
     }
 
+    // The oscillator lives on the pendulum's entity or on a scene node directly under it (utils_pendulum::Add).
     private FCk_Handle_Pendulum Find_Pendulum(FCk_Handle_Oscillator InOscillator)
     {
-        auto Pendulum = InOscillator.As_Pendulum(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Pendulum))
-        { return Pendulum; }
+        if (InOscillator.Is_Pendulum())
+        { return InOscillator.As_Pendulum(); }
 
-        auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InOscillator);
-        if (ck::Is_NOT_Valid(Owner))
-        { return FCk_Handle_Pendulum(); }
-
-        return Owner.As_Pendulum(ECk_SanityCheck::UnChecked);
+        return utils_entity_lifetime::Get_LifetimeOwner(InOscillator).As_Pendulum();
     }
 
     UFUNCTION()
-    private void OnOscillatorRunningChanged(FCk_Handle_Oscillator InOscillator, bool InRunning)
+    private void OnOscillatorRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState)
     {
         auto Pendulum = Find_Pendulum(InOscillator);
-        if (ck::Is_NOT_Valid(Pendulum))
-        { return; }
-
         auto Hazard = Pendulum.Get_Fragment(FMars_Fragment_Pendulum).Hazard;
-        if (ck::IsValid(Hazard))
-        { Hazard.Request_SetArmed(InRunning); }
+        Hazard.Request_SetArmed(FMars_Request_Hazard_SetArmed(
+            InRunState == EMars_Oscillator_RunState::Running ? EMars_Hazard_Arming::Armed : EMars_Hazard_Arming::Disarmed));
     }
 
     UFUNCTION()
-    private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, bool InPowered)
+    private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower)
     {
-        auto Pendulum = InSink.As_Pendulum(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Pendulum))
-        { return; }
-
-        ApplyPowered(Pendulum, InPowered);
+        auto Pendulum = InSink.As_Pendulum();
+        ApplyPowered(Pendulum, InPower == EMars_MechanismSink_Power::Powered);
     }
 
     UFUNCTION()
     private void OnHazardHit(FCk_Handle_Hazard InHazard, FCk_Handle InEntity)
     {
-        auto Pendulum = InHazard.As_Pendulum(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Pendulum))
-        { return; }
-
+        auto Pendulum = InHazard.As_Pendulum();
         if (Pendulum.Has_Fragment(FMars_Fragment_Pendulum_Signals))
         { Pendulum.Get_Fragment(FMars_Fragment_Pendulum_Signals).OnTriggered.Broadcast(Pendulum, InEntity); }
     }

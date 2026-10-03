@@ -19,10 +19,6 @@ class UMars_Ladder_EntityScript : UCk_GenericEntityScript_UE
     private const float64 RailThickness = 8.0;
     private const float64 RungThickness = 6.0;
 
-    // Set by AddVisuals for its AddBox calls.
-    private UStaticMesh _CubeMesh;
-    private UMaterialInterface _Material;
-
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
@@ -36,44 +32,23 @@ class UMars_Ladder_EntityScript : UCk_GenericEntityScript_UE
 
     private void AddVisuals(FCk_Handle_Transform& InRoot)
     {
-        _CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(_CubeMesh))
-        { return; }
-
-        _Material = assets::load::ProtoGrid_Interactable_Mars_MI();
+        auto CubeMesh = engine::load::Cube();
+        auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine cube is 100 uu with its pivot at the centre.
         const auto Height = float64(Ladder.Height);
         const auto HalfWidth = float64(Ladder.Width) * 0.5;
         const auto RailScale = FVector(RailThickness, RailThickness, Height) * 0.01;
-        AddBox(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, -HalfWidth, Height * 0.5), RailScale),
-            collision::profile::BlockAll);
-        AddBox(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, HalfWidth, Height * 0.5), RailScale),
-            collision::profile::BlockAll);
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, -HalfWidth, Height * 0.5), RailScale),
+            CubeMesh, Material, collision::profile::BlockAll, n"Ladder_Part"));
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, HalfWidth, Height * 0.5), RailScale),
+            CubeMesh, Material, collision::profile::BlockAll, n"Ladder_Part"));
 
         const auto RungScale = FVector(RungThickness, Ladder.Width, RungThickness) * 0.01;
         for (float64 RungZ = RungSpacing; RungZ <= Height; RungZ += RungSpacing)
-        { AddBox(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, RungZ), RungScale), collision::profile::NoCollision); }
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script. InOffset carries the box's location
-    // and scale relative to the ladder root; the mesh and material are AddVisuals'.
-    private void AddBox(FCk_Handle_Transform& InAttachTo, FTransform InOffset, FName InCollisionProfile)
-    {
-        auto Node = utils_scene_node::Create(InAttachTo, InOffset);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable even when static: the component is registered first and then receives the entity transform,
-        // which a Static component refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(_CubeMesh);
-        if (ck::IsValid(_Material))
-        { Archetype.SetMaterial(0, _Material); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"Ladder_Part");
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
+        {
+            InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, RungZ), RungScale),
+                CubeMesh, Material, collision::profile::NoCollision, n"Ladder_Part"));
+        }
     }
 }

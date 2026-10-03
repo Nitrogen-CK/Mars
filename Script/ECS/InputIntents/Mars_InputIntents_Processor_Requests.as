@@ -1,7 +1,7 @@
 // Drains SetMatcher, then SetMoveDirection, each in submission order, then AddLookDelta. Every SetMatcher that changes
-// the matcher broadcasts OnMatcherChanged(Prev, New) - a swap to INVALID and back inside one frame broadcasts twice, as
-// the old immediate setter did - so matcher-signal consumers rebind inside the handler. The AddLookDelta requests of one
-// drain are summed into LookDelta (replacing the last one) and advance LookDeltaSequence once.
+// the matcher broadcasts OnMatcherChanged(Prev, New) - a swap to INVALID and back inside one frame broadcasts twice - so
+// matcher-signal consumers rebind inside the handler. The AddLookDelta requests of one drain are summed into LookDelta
+// (replacing the last one) and advance LookDeltaSequence once.
 class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -23,7 +23,7 @@ class UMars_Processor_InputIntents_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_InputIntents_SetMoveDirection> SetMoveDirectionRequests = InRequests.SetMoveDirectionRequests;
         TArray<FMars_Request_InputIntents_AddLookDelta> AddLookDeltaRequests = InRequests.AddLookDeltaRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_InputIntents_Requests);
 
         for (const auto& Request : SetMatcherRequests)

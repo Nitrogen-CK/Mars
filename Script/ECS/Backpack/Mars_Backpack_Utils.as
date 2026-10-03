@@ -9,15 +9,19 @@ namespace utils_backpack
         { return FCk_Handle_Backpack(); }
 
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Backpack] [{InPack.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Backpack] [{InPack.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Backpack(); }
 
         FCk_Handle PackEntity = InPack;
         auto PackRoot = PackEntity.As_Transform();
 
         auto State = FMars_Fragment_Backpack();
-        for (const auto& SlotSpec : InSpec.CargoSlots)
-        { State.CargoSlots.Add(utils_cargo_slot::Create(PackRoot, SlotSpec, InPack)); }
+        for (const auto& Entry : InSpec.CargoSlots)
+        {
+            auto SlotSpec = Entry;
+            SlotSpec.Backpack = InPack;
+            State.CargoSlots.Add(utils_cargo_slot::Create(PackRoot, SlotSpec));
+        }
 
         PackEntity.Add_Fragment(FMars_Feature_Backpack());
         PackEntity.Add_Fragment(State);
@@ -28,11 +32,6 @@ namespace utils_backpack
 //--------------------------------------------------------------------------------------------------------------------------
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
-
-mixin FCk_Handle_WorldItem Get_WorldItem(const FCk_Handle_Backpack& Self)
-{
-    return FCk_Handle(Self).As_WorldItem();
-}
 
 mixin TArray<FCk_Handle_CargoSlot> Get_CargoSlots(const FCk_Handle_Backpack& Self)
 {
@@ -52,22 +51,4 @@ mixin FCk_Handle_CargoSlot Get_CargoSlot(const FCk_Handle_Backpack& Self, int32 
     { return FCk_Handle_CargoSlot(); }
 
     return State.CargoSlots[InIndex];
-}
-
-// Invalid when every cargo slot holds an item.
-mixin FCk_Handle_CargoSlot TryGet_FirstEmptyCargoSlot(const FCk_Handle_Backpack& Self)
-{
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Backpack);
-    for (const auto& Slot : State.CargoSlots)
-    {
-        if (ck::IsValid(Slot) && Slot.Get_IsOccupied() == false)
-        { return Slot; }
-    }
-
-    return FCk_Handle_CargoSlot();
-}
-
-mixin bool Get_IsCargoFull(const FCk_Handle_Backpack& Self)
-{
-    return ck::Is_NOT_Valid(Self.TryGet_FirstEmptyCargoSlot());
 }

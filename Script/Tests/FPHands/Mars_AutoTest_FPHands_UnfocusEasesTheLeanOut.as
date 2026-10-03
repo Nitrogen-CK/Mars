@@ -16,7 +16,8 @@ class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UCk_AutoTest_Base
         auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
         auto Player = InHandle;
         auto Spec = FMars_FPHands_Spec();
-        _Hands = utils_fphands::Add(Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(Player, Spec);
 
         // A plain interactable ahead and to the right: a point grip, one glove.
         _Owner = utils_entity_lifetime::Request_CreateEntity(InHandle);
@@ -41,14 +42,14 @@ class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UCk_AutoTest_Base
     private void Check_LeanedIn(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        const auto Lean = Math::Max(_Hands.Get_FocusAlpha_R(), _Hands.Get_FocusAlpha_L());
-        Res.Set(_Hands.Get_FocusTarget().IsValid && Lean > _Hands.Get_Spec().Reach.FocusLean * 0.9f);
+        const auto Lean = Math::Max(_Hands.Get_FocusAlpha(EMars_Hand::Right), _Hands.Get_FocusAlpha(EMars_Hand::Left));
+        Res.Set(_Hands.Get_FocusTarget().IsSet() && Lean > _Hands.Get_Spec().Reach.Focus.Lean * 0.9f);
     }
 
     UFUNCTION()
     private void Step_Unfocus(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _LeanAtUnfocus = Math::Max(_Hands.Get_FocusAlpha_R(), _Hands.Get_FocusAlpha_L());
+        _LeanAtUnfocus = Math::Max(_Hands.Get_FocusAlpha(EMars_Hand::Right), _Hands.Get_FocusAlpha(EMars_Hand::Left));
         _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus());
     }
 
@@ -56,8 +57,8 @@ class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UCk_AutoTest_Base
     private void Check_EasedOut(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        const auto Lean = Math::Max(_Hands.Get_FocusAlpha_R(), _Hands.Get_FocusAlpha_L());
-        const auto HasTarget = _Hands.Get_FocusTarget().IsValid;
+        const auto Lean = Math::Max(_Hands.Get_FocusAlpha(EMars_Hand::Right), _Hands.Get_FocusAlpha(EMars_Hand::Left));
+        const auto HasTarget = _Hands.Get_FocusTarget().IsSet();
 
         // The snap bug: the target vanished the frame the focus did, taking the lean pose with it.
         if (HasTarget && Lean > 0.01f && Lean < _LeanAtUnfocus)
@@ -71,6 +72,6 @@ class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UCk_AutoTest_Base
     {
         Assert_True(_LeanAtUnfocus > 0.1f, f"the glove had leaned in before the unfocus (lean {_LeanAtUnfocus})");
         Assert_True(_SawEaseOut, "after the unfocus the focus target stayed while the lean decayed (no snap)");
-        Assert_True(_Hands.Get_FocusAlpha_R() == 0.0f && _Hands.Get_FocusAlpha_L() == 0.0f, "the lean is fully out once the target clears");
+        Assert_True(_Hands.Get_FocusAlpha(EMars_Hand::Right) == 0.0f && _Hands.Get_FocusAlpha(EMars_Hand::Left) == 0.0f, "the lean is fully out once the target clears");
     }
 }

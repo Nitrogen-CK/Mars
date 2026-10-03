@@ -30,10 +30,10 @@ class UMars_DebuggerEditorTab : UMMEditorUtilityTab
         mm::BeginVerticalBox();
 
         mm::HAlign_Center();
-        utils_mars_debugger::Text("Mars Game Debugger", 20, FLinearColor::White, false, true);
+        utils_mars_debugger::Text("Mars Game Debugger", FMars_Debugger_TextStyle(20, FLinearColor::White, EMars_Debugger_TextWeight::Bold));
         mm::Spacer(0, 10);
         mm::HAlign_Center();
-        utils_mars_debugger::Text("Start Play-In-Editor to use the debugger.", 14, FLinearColor(0.6f, 0.6f, 0.6f));
+        utils_mars_debugger::Text("Start Play-In-Editor to use the debugger.", FMars_Debugger_TextStyle(14, FLinearColor(0.6f, 0.6f, 0.6f)));
 
         mm::EndVerticalBox();
         mm::EndVerticalBox();

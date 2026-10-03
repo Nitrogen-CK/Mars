@@ -21,6 +21,7 @@ enum EMars_PoweredBehavior
     SuppressWhilePowered
 }
 
+// What the trap does as its cycle enters Phase; an unset field leaves that part alone.
 struct FMars_Trap_PhaseAction
 {
     UPROPERTY(meta = (Categories = "Mechanism.Phase"))
@@ -33,6 +34,7 @@ struct FMars_Trap_PhaseAction
     TOptional<bool> HazardArmed;
 }
 
+// Spawn params of the placeable trap scripts: per-instance values live in saved maps.
 struct FMars_Trap_Spec
 {
     UPROPERTY()
@@ -45,6 +47,31 @@ struct FMars_Trap_Spec
     EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
 }
 
+// The cycle's own rules, and every action names one of its phases (an action on a missing phase would never run).
+mixin FMars_Validation Validate(const FMars_Trap_Spec& Self)
+{
+    const auto CycleValidation = Self.Cycle.Validate();
+    if (CycleValidation.IsValid() == false)
+    { return CycleValidation; }
+
+    for (int32 Index = 0; Index < Self.Actions.Num(); ++Index)
+    {
+        const auto& Action = Self.Actions[Index];
+
+        auto IsCyclePhase = false;
+        for (const auto& Phase : Self.Cycle.Phases)
+        {
+            if (Phase.Phase == Action.Phase)
+            { IsCyclePhase = true; }
+        }
+
+        if (IsCyclePhase == false)
+        { return FMars_Validation(f"Trap action [{Index}] names phase [{Action.Phase.ToString()}], which the cycle does not have"); }
+    }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
@@ -52,10 +79,7 @@ struct FMars_Trap_Spec
 struct FMars_Fragment_Trap_Params
 {
     UPROPERTY()
-    TArray<FMars_Trap_PhaseAction> Actions;
-
-    UPROPERTY()
-    EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
+    FMars_Trap_Spec Spec;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

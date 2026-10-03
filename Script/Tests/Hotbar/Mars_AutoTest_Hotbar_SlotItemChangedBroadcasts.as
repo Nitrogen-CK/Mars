@@ -4,7 +4,8 @@ class UMars_AutoTest_Hotbar_SlotItemChangedBroadcasts : UCk_AutoTest_Base
     private FCk_Handle_Hotbar _Hotbar;
     private TArray<FCk_Handle_Inventory_DataOnly> _Holders;
     private int32 _ChangedCount = 0;
-    private int32 _LastIndex = -1;
+    // The latest change's slot index; unset until one fires.
+    private TOptional<int32> _LastIndex;
     private FCk_Handle_Item _LastItem;
 
     UFUNCTION(BlueprintOverride)
@@ -30,7 +31,7 @@ class UMars_AutoTest_Hotbar_SlotItemChangedBroadcasts : UCk_AutoTest_Base
     private void OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
     {
         _ChangedCount += 1;
-        _LastIndex = InIndex;
+        _LastIndex = TOptional<int32>(InIndex);
         _LastItem = InMaybeItem;
     }
 
@@ -51,7 +52,7 @@ class UMars_AutoTest_Hotbar_SlotItemChangedBroadcasts : UCk_AutoTest_Base
     private void Check_ArrivalBroadcast(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_ChangedCount == 1 && _LastIndex == 0 && ck::IsValid(_LastItem));
+        Res.Set(_ChangedCount == 1 && Get_LastIndexIs(0) && ck::IsValid(_LastItem));
     }
 
     UFUNCTION()
@@ -67,14 +68,19 @@ class UMars_AutoTest_Hotbar_SlotItemChangedBroadcasts : UCk_AutoTest_Base
     private void Check_RemovalBroadcast(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_ChangedCount == 2 && _LastIndex == 0 && ck::Is_NOT_Valid(_LastItem));
+        Res.Set(_ChangedCount == 2 && Get_LastIndexIs(0) && ck::Is_NOT_Valid(_LastItem));
+    }
+
+    private bool Get_LastIndexIs(int32 InIndex) const
+    {
+        return _LastIndex.IsSet() && _LastIndex.GetValue() == InIndex;
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

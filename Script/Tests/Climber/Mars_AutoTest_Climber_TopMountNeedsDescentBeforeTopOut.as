@@ -96,7 +96,7 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_AssertStillClimbing(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Climber.Get_IsClimbing(), f"still climbing after holding up at the top (dismount {_Climber.Get_LastDismount() :n})");
+        Assert_True(_Climber.Get_IsClimbing(), f"still climbing after holding up at the top (a dismount recorded: {_Climber.Get_LastDismount().IsSet()})");
     }
 
     UFUNCTION()
@@ -133,7 +133,12 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     private void Step_AssertTop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount == EMars_Climber_Dismount::Top, f"the climb ended at the top (dismount {LastDismount :n})");
+        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
+        if (LastDismount.IsSet())
+        {
+            const auto Reason = LastDismount.GetValue();
+            Assert_True(Reason == EMars_Climber_Dismount::Top, f"the climb ended at the top (dismount {Reason :n})");
+        }
     }
 
     UFUNCTION()
@@ -146,7 +151,12 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     private void Step_AssertBottom(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount == EMars_Climber_Dismount::Bottom, f"the climb ended at the bottom (dismount {LastDismount :n})");
+        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
+        if (LastDismount.IsSet())
+        {
+            const auto Reason = LastDismount.GetValue();
+            Assert_True(Reason == EMars_Climber_Dismount::Bottom, f"the climb ended at the bottom (dismount {Reason :n})");
+        }
     }
 
     UFUNCTION()
@@ -160,6 +170,11 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     private void Step_AssertJump(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount == EMars_Climber_Dismount::Jump, f"the climb ended in a jump (dismount {LastDismount :n})");
+        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
+        if (LastDismount.IsSet())
+        {
+            const auto Reason = LastDismount.GetValue();
+            Assert_True(Reason == EMars_Climber_Dismount::Jump, f"the climb ended in a jump (dismount {Reason :n})");
+        }
     }
 }

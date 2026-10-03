@@ -12,15 +12,17 @@ class UMars_Processor_CampSession_Sync : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_CampSession& InState)
     {
+        // Null until the state machine enters its first state.
         auto Current = utils_state_machine::Get_CurrentStateClass(InState.StateMachine);
         if (ck::Is_NOT_Valid(Current))
-        { return; }   // not started yet (trap 28)
+        { return; }
 
         auto Mapped = EMars_CampPhase::Lobby;
         if (Current == UMars_SmState_Camp_Live)
         { Mapped = EMars_CampPhase::Live; }
-        else if (Current != UMars_SmState_Camp_Lobby)
-        { return; }   // a foreign state class: never ours, never mirrored
+        else if (ck::EnsureIfNot(Current == UMars_SmState_Camp_Lobby,
+            f"[CampSession] [{InHandle.ToString()}] state machine is in [{Current.Get().GetName()}], which is neither camp phase"))
+        { return; }
 
         if (Mapped == InState.Phase)
         { return; }

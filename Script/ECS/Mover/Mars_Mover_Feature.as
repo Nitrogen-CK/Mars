@@ -10,6 +10,12 @@ asset Mars_MoverHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_Mover {}
 
+enum EMars_Mover_Pose
+{
+    Start,
+    End
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -37,8 +43,17 @@ struct FMars_Mover_Spec
     UPROPERTY()
     ECk_TweenEasing Easing = ECk_TweenEasing::InOutSine;
 
+    // The pose the mover starts at, and its first target.
     UPROPERTY()
-    bool StartAtEnd = false;
+    EMars_Mover_Pose StartPose = EMars_Mover_Pose::Start;
+}
+
+mixin FMars_Validation Validate(const FMars_Mover_Spec& Self)
+{
+    if (Self.Duration < 0.0f)
+    { return FMars_Validation(f"Duration [{Self.Duration}] must not be negative"); }
+
+    return FMars_Validation();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -72,9 +87,9 @@ struct FMars_Fragment_Mover_Params
 
 struct FMars_Fragment_Mover
 {
-    // The target end, not the current pose.
+    // The pose the mover is going to (or is at), not the current pose.
     UPROPERTY()
-    bool AtEnd = false;
+    EMars_Mover_Pose Target = EMars_Mover_Pose::Start;
 
     // 0 at the start pose, 1 at the end pose.
     UPROPERTY()
@@ -88,11 +103,11 @@ struct FMars_Fragment_Mover
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_Mover_OnTargetChanged(FCk_Handle_Mover InMover, bool InAtEnd);
-event void FMars_Delegate_Mover_OnTargetChanged_MC(FCk_Handle_Mover InMover, bool InAtEnd);
+delegate void FMars_Delegate_Mover_OnTargetChanged(FCk_Handle_Mover InMover, EMars_Mover_Pose InTarget);
+event void FMars_Delegate_Mover_OnTargetChanged_MC(FCk_Handle_Mover InMover, EMars_Mover_Pose InTarget);
 
-delegate void FMars_Delegate_Mover_OnArrived(FCk_Handle_Mover InMover, bool InAtEnd);
-event void FMars_Delegate_Mover_OnArrived_MC(FCk_Handle_Mover InMover, bool InAtEnd);
+delegate void FMars_Delegate_Mover_OnArrived(FCk_Handle_Mover InMover, EMars_Mover_Pose InPose);
+event void FMars_Delegate_Mover_OnArrived_MC(FCk_Handle_Mover InMover, EMars_Mover_Pose InPose);
 
 struct FMars_Fragment_Mover_Signals
 {
@@ -104,19 +119,22 @@ struct FMars_Fragment_Mover_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+// To the current target, it acts as a Settle: it tweens back to that pose when a scrub left the handle part way.
 struct FMars_Request_Mover_MoveTo
 {
     UPROPERTY()
-    bool AtEnd = false;
+    EMars_Mover_Pose Target = EMars_Mover_Pose::Start;
 
-    FMars_Request_Mover_MoveTo(bool InAtEnd)
+    FMars_Request_Mover_MoveTo() {}
+
+    FMars_Request_Mover_MoveTo(EMars_Mover_Pose InTarget)
     {
-        AtEnd = InAtEnd;
+        Target = InTarget;
     }
 }
 
-// Puts the handle at an alpha right now, stopping any tween. AtEnd (the target) is untouched; a later MoveTo or
-// Settle tweens from here.
+// Puts the handle at an alpha right now, stopping any tween. The target is untouched; a later Settle (or a MoveTo, to
+// either pose) tweens from here.
 struct FMars_Request_Mover_Scrub
 {
     UPROPERTY()
@@ -130,8 +148,8 @@ struct FMars_Request_Mover_Scrub
     }
 }
 
-// Tweens from the current alpha back to the AtEnd pose (after a scrub left the handle part way). AngelScript rejects
-// an empty struct in a TOptional/TArray, so it carries one placeholder field.
+// Tweens from the current alpha back to the target pose (after a scrub left the handle part way); nothing when the
+// handle already rests there.
 struct FMars_Request_Mover_Settle
 {
     UPROPERTY()
@@ -140,16 +158,16 @@ struct FMars_Request_Mover_Settle
     FMars_Request_Mover_Settle() {}
 }
 
-// Absolute and latest-wins: one pending value per kind, overwritten by each new request. Drained Scrub -> MoveTo ->
-// Settle, so a tween requested in the same frame as a scrub starts from the scrubbed alpha.
+// MoveTo and Scrub are absolute: the latest of each kind wins. Drained Scrub -> MoveTo -> Settle, so a tween requested in
+// the same frame as a scrub starts from the scrubbed alpha.
 struct FMars_Fragment_Mover_Requests
 {
     UPROPERTY()
-    TOptional<FMars_Request_Mover_MoveTo> MoveToRequest;
+    TArray<FMars_Request_Mover_MoveTo> MoveToRequests;
 
     UPROPERTY()
-    TOptional<FMars_Request_Mover_Scrub> ScrubRequest;
+    TArray<FMars_Request_Mover_Scrub> ScrubRequests;
 
     UPROPERTY()
-    TOptional<FMars_Request_Mover_Settle> SettleRequest;
+    TArray<FMars_Request_Mover_Settle> SettleRequests;
 }

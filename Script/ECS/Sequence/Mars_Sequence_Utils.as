@@ -1,9 +1,13 @@
 namespace utils_sequence
 {
-    // Expects the entity to also carry a MechanismSink whose input channels cover every step (edges in) and a
-    // MechanismSource (output); the setup processor links them.
+    // Expects the entity to also carry a MechanismSink whose input channels cover every step (edges in) and, optionally, a
+    // MechanismSource (output); the setup processor links them. A spec that fails Validate() ensures and adds nothing.
     FCk_Handle_Sequence Add(FCk_Handle& InHandle, FMars_Sequence_Spec InParams)
     {
+        const auto Validation = InParams.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Sequence] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_Sequence(); }
+
         auto Params = FMars_Fragment_Sequence_Params();
         Params.Steps = InParams.Steps;
         Params.ResetOnWrongInput = InParams.ResetOnWrongInput;
@@ -17,45 +21,11 @@ namespace utils_sequence
         InHandle.Add_Fragment(FMars_Tag_Sequence_NeedsSetup());
         return InHandle.As_Sequence();
     }
-
-    // Immediate, not through Request_Reset: after a wrong input, a later edge in the same sink drain must be judged
-    // against Progress 0. Shared by the sequence's request and setup processors.
-    void Reset(FCk_Handle_Sequence& InSequence)
-    {
-        auto& State = InSequence.Get_Fragment(FMars_Fragment_Sequence);
-        DestroyStepTimer(State);
-
-        if (State.Progress == 0 && State.IsComplete == false)
-        { return; }
-
-        State.Progress = 0;
-        State.IsComplete = false;
-
-        auto Source = InSequence.As_MechanismSource(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Source))
-        { Source.Request_SetAsserted(false); }
-
-        if (InSequence.Has_Fragment(FMars_Fragment_Sequence_Signals))
-        { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnReset.Broadcast(InSequence); }
-    }
-
-    void DestroyStepTimer(FMars_Fragment_Sequence& InState)
-    {
-        if (ck::IsValid(InState.StepTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(InState.StepTimer)); }
-
-        InState.StepTimer = FCk_Handle_Timer();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
-
-mixin TArray<FGameplayTag> Get_Steps(const FCk_Handle_Sequence& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Sequence_Params).Steps;
-}
 
 mixin int32 Get_Progress(const FCk_Handle_Sequence& Self)
 {
@@ -74,7 +44,13 @@ mixin bool Get_IsComplete(const FCk_Handle_Sequence& Self)
 mixin void Request_Reset(FCk_Handle_Sequence& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Sequence_Requests);
-    Requests.ResetRequest = FMars_Request_Sequence_Reset();
+    Requests.ResetRequests.Add(FMars_Request_Sequence_Reset());
+}
+
+mixin void Request_Input(FCk_Handle_Sequence& Self, const FMars_Request_Sequence_Input& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Sequence_Requests);
+    Requests.InputRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,15 +1,15 @@
 namespace utils_camp_session
 {
-    // The state machine is DoesNotReplicate for now; the joining campaign flips the spec to Replicates (server
-    // authority) - the whole point of building the phase on CkStateMachine (design D1).
+    // The phase lives on a CkStateMachine so it can replicate with server authority; the machine does not replicate yet.
     FCk_Handle_CampSession Add(FCk_Handle& InOwner, FMars_CampSession_Spec InSpec)
     {
+        const auto StartsLive = InSpec.StartPhase == EMars_CampPhase::Live;
         auto SmSpec = FCk_StateMachine_Spec(UMars_SmState_Camp_Lobby);
-        if (InSpec.StartLive)
+        if (StartsLive)
         { SmSpec = FCk_StateMachine_Spec(UMars_SmState_Camp_Live); }
 
         auto State = FMars_Fragment_CampSession();
-        State.Phase = InSpec.StartLive ? EMars_CampPhase::Live : EMars_CampPhase::Lobby;
+        State.Phase = InSpec.StartPhase;
         State.StateMachine = utils_state_machine::Add(InOwner, SmSpec);
 
         InOwner.Add_Fragment(FMars_Feature_CampSession());

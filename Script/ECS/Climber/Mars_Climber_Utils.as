@@ -4,11 +4,11 @@ namespace utils_climber
     FCk_Handle_Climber Add(FCk_Handle& InHandle, FMars_Climber_Spec InParams)
     {
         const auto Validation = InParams.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Climber] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Climber] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Climber(); }
 
         auto Params = FMars_Fragment_Climber_Params();
-        Params.ClimbSpeed = InParams.ClimbSpeed;
+        Params.Spec = InParams;
 
         InHandle.Add_Fragment(FMars_Feature_Climber());
         InHandle.Add_Fragment(Params);
@@ -21,44 +21,6 @@ namespace utils_climber
     {
         return Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InHandle));
     }
-
-    // Shared by the Climber processors only (the request drain's Dismount, the tick's top-out / bottom / lost): ends the
-    // climb in InState and puts InCharacter (may be null) where InReason leaves it. The caller removes the Climbing tag and
-    // broadcasts. Top: onto the platform at the ladder's top exit, walking. Bottom / Lost: walking in place. Jump: falling,
-    // launched away from the plane.
-    void Apply_Dismount(FMars_Fragment_Climber& InState, ACharacter InCharacter, EMars_Climber_Dismount InReason)
-    {
-        auto Ladder = InState.Ladder;
-
-        InState.Ladder = FCk_Handle_Ladder();
-        InState.IsClimbing = false;
-        InState.PendingAxis = 0.0f;
-        InState.LastDismount = InReason;
-
-        if (ck::Is_NOT_Valid(InCharacter))
-        { return; }
-
-        auto Movement = InCharacter.CharacterMovement;
-
-        if (InReason == EMars_Climber_Dismount::Top && ck::IsValid(Ladder))
-        {
-            const auto HalfHeight = InCharacter.CapsuleComponent.GetScaledCapsuleHalfHeight();
-            const auto Exit = Ladder.Get_TopExitWorld().GetLocation() + FVector(0.0, 0.0, HalfHeight + 2.0);
-            InCharacter.SetActorLocationAndRotation(Exit, InCharacter.GetActorRotation(), true);
-            Movement.SetMovementMode(EMovementMode::MOVE_Walking);
-            return;
-        }
-
-        if (InReason == EMars_Climber_Dismount::Jump)
-        {
-            Movement.SetMovementMode(EMovementMode::MOVE_Falling);
-            const auto Away = ck::IsValid(Ladder) ? Ladder.Get_TowardPlaneWorld(EMars_Ladder_Zone::Front) * -300.0 : FVector::ZeroVector;
-            InCharacter.LaunchCharacter(Away + FVector(0.0, 0.0, 250.0), true, true);
-            return;
-        }
-
-        Movement.SetMovementMode(EMovementMode::MOVE_Walking);
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -67,22 +29,32 @@ namespace utils_climber
 
 mixin float32 Get_ClimbSpeed(const FCk_Handle_Climber& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Climber_Params).ClimbSpeed;
+    return Self.Get_Fragment(FMars_Fragment_Climber_Params).Spec.ClimbSpeed;
 }
 
 mixin bool Get_IsClimbing(const FCk_Handle_Climber& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Climber).IsClimbing;
+    return Self.Get_Fragment(FMars_Fragment_Climber).Climb.IsSet();
 }
 
+// 0 when not climbing.
 mixin float32 Get_Alpha(const FCk_Handle_Climber& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Climber).Alpha;
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Climber);
+    if (State.Climb.IsSet() == false)
+    { return 0.0f; }
+
+    return State.Climb.GetValue().Alpha;
 }
 
+// Invalid when not climbing.
 mixin FCk_Handle_Ladder Get_Ladder(const FCk_Handle_Climber& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Climber).Ladder;
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Climber);
+    if (State.Climb.IsSet() == false)
+    { return FCk_Handle_Ladder(); }
+
+    return State.Climb.GetValue().Ladder;
 }
 
 mixin TArray<FMars_Climber_Candidate> Get_Candidates(const FCk_Handle_Climber& Self)
@@ -90,7 +62,8 @@ mixin TArray<FMars_Climber_Candidate> Get_Candidates(const FCk_Handle_Climber& S
     return Self.Get_Fragment(FMars_Fragment_Climber).Candidates;
 }
 
-mixin EMars_Climber_Dismount Get_LastDismount(const FCk_Handle_Climber& Self)
+// Unset before the first climb ends.
+mixin TOptional<EMars_Climber_Dismount> Get_LastDismount(const FCk_Handle_Climber& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Climber).LastDismount;
 }

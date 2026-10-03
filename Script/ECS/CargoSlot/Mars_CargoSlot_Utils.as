@@ -9,13 +9,13 @@ class UMars_CargoSlot_AcceptPolicy : UObject
 
 namespace utils_cargo_slot
 {
-    // A scene-node child of InPackRoot at MountOffset carrying the slot: a capacity-1 Inventory.Mars.Cargo.<Index>
-    // inventory (accept policy CDO) and a probe interactable (FocusPriority 10, one Use target running
-    // UMars_SmState_CargoSlot_Interact). The slot entity is owned by the pack, so it dies with it.
-    FCk_Handle_CargoSlot Create(FCk_Handle_Transform& InPackRoot, FMars_CargoSlot_Spec InSpec, FCk_Handle_WorldItem InBackpack)
+    // A scene-node child of the pack root at MountOffset carrying the slot: a capacity-1 Inventory.Mars.Cargo.<Index>
+    // inventory (accept policy CDO) and a probe interactable with one Use target running UMars_SmState_CargoSlot_Interact.
+    // The slot entity is owned by the pack, so it dies with it.
+    FCk_Handle_CargoSlot Create(FCk_Handle_Transform& InPackRoot, FMars_CargoSlot_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[CargoSlot] [{InPackRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[CargoSlot] [{InPackRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_CargoSlot(); }
 
         auto SlotNode = utils_scene_node::Create(InPackRoot, InSpec.MountOffset).As_Transform();
@@ -34,8 +34,7 @@ namespace utils_cargo_slot
         auto Inventory = utils_inventory_data_only::Add(SlotEntity, InventoryParams, ECk_Replication::DoesNotReplicate);
 
         auto Params = FMars_Fragment_CargoSlot_Params();
-        Params.Index = InSpec.Index;
-        Params.Backpack = InBackpack;
+        Params.Backpack = InSpec.Backpack;
 
         auto State = FMars_Fragment_CargoSlot();
         State.Inventory = Inventory;
@@ -56,13 +55,28 @@ namespace utils_cargo_slot
         return InItem.Has_Backpack() == false && InItem.Has_PersistentWorldItem() == false;
     }
 
-    FCk_Handle_Item DoGet_FirstItem(FCk_Handle_Inventory_DataOnly InInventory)
+    // InItemName is the held item for Stow and the slot's item for Take; the Blocked_ texts ignore it.
+    FText Get_PromptText(EMars_CargoSlot_Action InAction, FText InItemName)
     {
-        if (ck::Is_NOT_Valid(InInventory) || InInventory.Get_NumItems() == 0)
-        { return FCk_Handle_Item(); }
+        if (InAction == EMars_CargoSlot_Action::Stow)
+        { return FText::FromString(f"Stow {InItemName.ToString()}"); }
 
-        auto Items = InInventory.Get_Items();
-        return Items[0];
+        if (InAction == EMars_CargoSlot_Action::Take)
+        { return FText::FromString(f"Take {InItemName.ToString()}"); }
+
+        if (InAction == EMars_CargoSlot_Action::Blocked_NothingHeld)
+        { return FText::FromString("Nothing to stow"); }
+
+        if (InAction == EMars_CargoSlot_Action::Blocked_NotStowable)
+        { return FText::FromString("Can't stow that"); }
+
+        if (InAction == EMars_CargoSlot_Action::Blocked_SlotOccupied)
+        { return FText::FromString("Slot occupied"); }
+
+        if (InAction == EMars_CargoSlot_Action::Blocked_NoRoom)
+        { return FText::FromString("No room"); }
+
+        return FText::FromString("Put the pack down");
     }
 
     // The probe carries Probe.Mars.Interact (the player's interaction trace only sees probes under that tag) and is
@@ -81,7 +95,7 @@ namespace utils_cargo_slot
 
         auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = constants_cargo_slot::k_PromptTextFor(EMars_CargoSlot_Action::Unset, FText());
+        Prompt.PromptText = FText::FromString("Cargo");
 
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
@@ -101,11 +115,6 @@ namespace utils_cargo_slot
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin int32 Get_Index(const FCk_Handle_CargoSlot& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_CargoSlot_Params).Index;
-}
-
 mixin FCk_Handle_WorldItem Get_Backpack(const FCk_Handle_CargoSlot& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CargoSlot_Params).Backpack;
@@ -119,7 +128,8 @@ mixin FCk_Handle_Inventory_DataOnly Get_Inventory(const FCk_Handle_CargoSlot& Se
 // Invalid while the slot is empty.
 mixin FCk_Handle_Item Get_Item(const FCk_Handle_CargoSlot& Self)
 {
-    return utils_cargo_slot::DoGet_FirstItem(Self.Get_Inventory());
+    const auto Inventory = Self.Get_Inventory();
+    return Inventory.Get_SoleItem();
 }
 
 mixin bool Get_IsOccupied(const FCk_Handle_CargoSlot& Self)
@@ -207,4 +217,18 @@ mixin void UnbindFrom_OnItemChanged(FCk_Handle_CargoSlot& Self, FMars_Delegate_C
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_CargoSlot_Signals).OnItemChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTransferFailed(FCk_Handle_CargoSlot& Self, FMars_Delegate_CargoSlot_OnTransferFailed InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_CargoSlot_Signals);
+    Fragment.OnTransferFailed.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTransferFailed(FCk_Handle_CargoSlot& Self, FMars_Delegate_CargoSlot_OnTransferFailed InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_CargoSlot_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_CargoSlot_Signals).OnTransferFailed.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

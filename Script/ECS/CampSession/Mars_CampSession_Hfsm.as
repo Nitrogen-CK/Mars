@@ -1,9 +1,6 @@
-// Camp phase machine (composed on the camp-session entity by utils_camp_session::Add).
-//   Lobby : menu up, viewer pawns          (initial unless the spec says StartLive)
-//   Live  : chefs spawned, camp playable
-// Both states are sinks: no declared transitions and no conditions. The ONLY way between them is the explicit
-// utils_state_machine::Request_Transition issued by UMars_Processor_CampSession_HandleRequests when a Play request
-// drains (Request_Transition validates only the target class - CkStateMachine_Utils.cpp:152-170).
+// Camp phase machine. Both states are sinks with no declared transitions or conditions: the only way between them is the
+// explicit Request_Transition that UMars_Processor_CampSession_HandleRequests issues when a Play request drains, which
+// validates only the target class.
 
 class UMars_SmState_Camp_Lobby : UCk_SmState_EntityScript
 {

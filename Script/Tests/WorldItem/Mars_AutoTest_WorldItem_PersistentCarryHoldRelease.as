@@ -57,8 +57,7 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UCk_AutoTest_Base
     UFUNCTION()
     private void OnWorldItemConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        auto Entity = FCk_Handle(InEntityScriptHandle);
-        _WorldItem = Entity.As_WorldItem(ECk_SanityCheck::UnChecked);
+        _WorldItem = InEntityScriptHandle.As_WorldItem();
     }
 
     UFUNCTION()
@@ -103,7 +102,7 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSurvivedStow(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Valid(_WorldItem, "the persistent world item after its holder emptied");
+        Assert_Valid(_WorldItem, "the persistent world item survives its holder emptying");
         Assert_True(_Hotbar.Get_BackpackItem() == _Item, "the backpack slot holds the backpack item");
     }
 
@@ -156,7 +155,7 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UCk_AutoTest_Base
                 ck::Is_NOT_Valid(_WorldItem.Get_Carrier()) &&
                 _WorldItem.Get_HeldItem() == _Item &&
                 _Hotbar.Get_BackpackSlot().Get_NumItems() == 0 &&
-                ck::Is_NOT_Valid(FCk_Handle(_WorldItem).As_SceneNode(ECk_SanityCheck::UnChecked)) &&
+                _WorldItem.Is_SceneNode() == false &&
                 DoGet_MotionType() == ECk_MotionType::Dynamic &&
                 _WorldItem.Has_Fragment(FMars_Fragment_WorldItem_PendingLaunch) == false);
     }
@@ -164,19 +163,22 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UCk_AutoTest_Base
     // Invalid while the world item is not scene-node attached.
     private FCk_Handle_Transform DoGet_MountParent() const
     {
-        auto Node = FCk_Handle(_WorldItem).As_SceneNode(ECk_SanityCheck::UnChecked);
+        auto Node = _WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Node))
         { return FCk_Handle_Transform(); }
 
         return utils_scene_node::Get_Parent(Node);
     }
 
-    // Static stands in for "no body" (the backpack always has one: its mesh is the engine cube).
-    private ECk_MotionType DoGet_MotionType() const
+    // A World-mode backpack always has a body (its mesh is the engine cube), so a missing one fails the test.
+    private ECk_MotionType DoGet_MotionType()
     {
         auto Body = _WorldItem.Get_Body();
         if (ck::Is_NOT_Valid(Body))
-        { return ECk_MotionType::Static; }
+        {
+            FinishFailure("the backpack world item has no body");
+            return ECk_MotionType::Static;
+        }
 
         return utils_jolt_body::Get_MotionType(Body);
     }

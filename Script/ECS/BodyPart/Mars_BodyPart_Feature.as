@@ -15,7 +15,7 @@ struct FMars_Feature_BodyPart {}
 // Enums
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What the part does for its creature (the GDD's part contract; read by later behaviour, not by this feature).
+// What the part does for its creature (read by behaviour, not by this feature).
 enum EMars_BodyPart_Function
 {
     Movement,
@@ -56,7 +56,7 @@ enum EMars_BodyPart_State
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// How a severed limb's released parts fall. Field order is the positional constructor's order.
+// How a severed limb's released parts fall.
 struct FMars_BodyPart_Debris
 {
     UPROPERTY()
@@ -105,7 +105,6 @@ mixin FMars_Validation Validate(const FMars_BodyPart_Debris& Self)
     return FMars_Validation();
 }
 
-// Field order is the positional constructor's order.
 struct FMars_BodyPart_Severance
 {
     UPROPERTY()
@@ -133,7 +132,6 @@ struct FMars_BodyPart_Severance
     }
 }
 
-// Field order is the positional constructor's order.
 struct FMars_BodyPart_Spec
 {
     // BodyPart.Mars.*; a leg's id is its FName, not a tag.
@@ -146,7 +144,7 @@ struct FMars_BodyPart_Spec
     UPROPERTY()
     FMars_Health_Spec Health;
 
-    // Its Health is ignored: the zone always feeds the part's own Health.
+    // Composed on the part entity beside the part's Health, which it feeds.
     UPROPERTY()
     FMars_HitZone_Spec Zone;
 
@@ -180,11 +178,11 @@ mixin FMars_Validation Validate(const FMars_BodyPart_Spec& Self)
     { return FMars_Validation("BodyPart has no PartTag"); }
 
     const auto HealthValidation = Self.Health.Validate();
-    if (HealthValidation.IsValid == false)
+    if (HealthValidation.IsValid() == false)
     { return HealthValidation; }
 
     const auto ZoneValidation = Self.Zone.Validate();
-    if (ZoneValidation.IsValid == false)
+    if (ZoneValidation.IsValid() == false)
     { return ZoneValidation; }
 
     const auto& Severance = Self.Severance;
@@ -254,15 +252,30 @@ struct FMars_Fragment_BodyPart_PendingSever
     FMars_DamageEvent Cause;
 }
 
+// One debris body and the impulse it takes once Jolt has added it.
+struct FMars_BodyPart_PendingImpulse
+{
+    UPROPERTY()
+    FCk_Handle_JoltBody Body;
+
+    UPROPERTY()
+    FVector Impulse = FVector::ZeroVector;
+
+    FMars_BodyPart_PendingImpulse() {}
+
+    FMars_BodyPart_PendingImpulse(FCk_Handle_JoltBody InBody, FVector InImpulse)
+    {
+        Body = InBody;
+        Impulse = InImpulse;
+    }
+}
+
 // Debris bodies waiting for Jolt to add them; an impulse before Get_IsBodyAdded is dropped (UMars_Processor_BodyPart_Debris
-// applies each once its body is in, then removes the fragment when empty). Bodies[i] takes Impulses[i].
+// applies each once its body is in, then removes the fragment when empty).
 struct FMars_Fragment_BodyPart_PendingDebris
 {
     UPROPERTY()
-    TArray<FCk_Handle_JoltBody> Bodies;
-
-    UPROPERTY()
-    TArray<FVector> Impulses;
+    TArray<FMars_BodyPart_PendingImpulse> Impulses;
 }
 
 struct FMars_Tag_BodyPart_NeedsSetup {}

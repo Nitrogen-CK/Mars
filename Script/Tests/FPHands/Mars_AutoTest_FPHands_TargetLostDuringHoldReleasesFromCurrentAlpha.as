@@ -17,13 +17,14 @@ class UMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha : UCk_
         auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.GrabOutSeconds = 0.2f;
-        Spec.Reach.GrabGripSeconds = 0.2f;
-        Spec.Reach.GrabBackSeconds = 0.2f;
-        Spec.Reach.HoldReachSeconds = 1.0f;
-        Spec.Reach.ReleaseSeconds = 0.2f;
+        Spec.Reach.Grab.OutSeconds = 0.2f;
+        Spec.Reach.Grab.GripSeconds = 0.2f;
+        Spec.Reach.Grab.BackSeconds = 0.2f;
+        Spec.Reach.Hold.ReachSeconds = 1.0f;
+        Spec.Reach.Hold.ReleaseSeconds = 0.2f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -56,7 +57,7 @@ class UMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha : UCk_
     UFUNCTION()
     private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Player, false));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Timed));
     }
 
     UFUNCTION()
@@ -92,8 +93,8 @@ class UMars_AutoTest_FPHands_TargetLostDuringHoldReleasesFromCurrentAlpha : UCk_
         if (_Phases.Num() != 2)
         { return; }
 
-        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, "first change is to Hold");
-        Assert_True(_Phases[1] == EMars_FPHands_Phase::Release, "second change is to Release");
+        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, f"first change is to Hold (got {_Phases[0] :n})");
+        Assert_True(_Phases[1] == EMars_FPHands_Phase::Release, f"second change is to Release (got {_Phases[1] :n})");
     }
 
     UFUNCTION()

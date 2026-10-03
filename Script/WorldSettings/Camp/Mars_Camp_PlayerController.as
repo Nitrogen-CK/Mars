@@ -1,53 +1,31 @@
 class UMars_Camp_CheatManager : UMars_Gameplay_CheatManager
 {
-    // Console: Mars_Camp_Play - the Play button's path, for smoke tests before the menu exists.
+    // Console: Mars_Camp_Play - the Play button's path, for smoke tests.
     UFUNCTION(Exec)
     void Mars_Camp_Play()
     {
         auto PC = Cast<AMars_Camp_PlayerController>(GetPlayerController());
-        if (ck::IsValid(PC))
-        { PC.Server_RequestPlay(); }
+        if (ck::EnsureIfNot(ck::IsValid(PC), "[Mars_Camp_CheatManager] its PlayerController is not an AMars_Camp_PlayerController"))
+        { return; }
+
+        PC.Server_RequestPlay();
     }
 }
 
-// Camp front-end controller. Client-local: the menu camera tour (Request_FocusStation) and the gameplay input
-// profile once a chef is possessed. Server: Server_RequestPlay. Input MODE is owned by the CkUI layout (the Menu
-// layer is UIOnly while the menu is up) - no SetInputMode here (design section 4).
+// Camp front-end controller. Client-local: the menu camera tour (FocusStation) and the gameplay input profile once a chef
+// is possessed. Server: Server_RequestPlay. Input MODE is owned by the CkUI layout (the Menu layer is UIOnly while the
+// menu is up), so there is no SetInputMode here.
 class AMars_Camp_PlayerController : AMars_Master_PlayerController
 {
     default CheatClass = UMars_Camp_CheatManager;
 
-    UPROPERTY(DefaultComponent)
-    UMars_InputComponent InputComp;
-
     private TArray<AMars_CampStationCamera> _StationCameras;
 
-    UFUNCTION(BlueprintOverride)
-    void BeginPlay()
-    {
-        Super::BeginPlay();
-
-        if (IsLocalController() == false)
-        { return; }
-
-        // The first focus happens on possession, never before a pawn exists: the handler covers a possession that
-        // comes after BeginPlay (standalone LoadMap), the direct call below one that came before it.
-        OnPossessedPawnChanged.AddUFunction(this, n"HandlePossessedPawnChanged");
-
-        // PIE possesses the local pawn before BeginPlay; standalone possesses after. Cover the first case here, the second in the handler.
-        if (ck::IsValid(ControlledPawn))
-        { HandlePossessedPawnChanged(nullptr, ControlledPawn); }
-    }
-
+    // Blends the local view to a station camera, starting now. Cameras are level content, gathered once.
     UFUNCTION()
-    UMars_InputComponent Get_InputStack() const
-    { return InputComp; }
-
-    // Blends the local view to a station camera. Cameras are gathered once (level content, static).
-    UFUNCTION()
-    void Request_FocusStation(EMars_CampStation InStation, float32 InBlendSeconds = 0.6f)
+    void FocusStation(EMars_CampStation InStation, float32 InBlendSeconds = 0.6f)
     {
-        if (IsLocalController() == false)
+        if (ck::EnsureIfNot(IsLocalController(), f"[Mars_Camp_PlayerController] FocusStation [{InStation}] drives the local view; call it on the local controller"))
         { return; }
 
         if (_StationCameras.IsEmpty())
@@ -57,33 +35,35 @@ class AMars_Camp_PlayerController : AMars_Master_PlayerController
         if (ck::EnsureIfNot(ck::IsValid(Camera), f"[Mars_Camp_PlayerController] no AMars_CampStationCamera for station [{InStation}] in this map"))
         { return; }
 
-        SetViewTargetWithBlend(Camera, InBlendSeconds, EViewTargetBlendFunction::VTBlend_EaseInOut, 2.0f, false);
+        const float32 BlendExponent = 2.0f;
+        const bool LockOutgoing = false;
+        SetViewTargetWithBlend(Camera, InBlendSeconds, EViewTargetBlendFunction::VTBlend_EaseInOut, BlendExponent, LockOutgoing);
     }
 
     UFUNCTION(Server)
     void Server_RequestPlay()
     {
         auto CampState = Cast<AMars_Camp_GameState>(Gameplay::GetGameState());
-        if (ck::Is_NOT_Valid(CampState) || ck::Is_NOT_Valid(CampState.Get_CampSession()))
+        if (ck::EnsureIfNot(ck::IsValid(CampState), "[Mars_Camp_PlayerController] the GameState is not an AMars_Camp_GameState"))
         { return; }
 
+        // Before the GameState's entity is composed there is no session to start yet.
         auto Session = CampState.Get_CampSession();
+        if (ck::Is_NOT_Valid(Session))
+        { return; }
+
         Session.Request_Play();
     }
 
-    UFUNCTION()
-    private void HandlePossessedPawnChanged(APawn OldPawn, APawn NewPawn)
+    protected void OnLocalPawnPossessed(APawn InPawn) override
     {
-        if (ck::Is_NOT_Valid(NewPawn))
-        { return; }
-
-        if (ck::IsValid(Cast<AMars_Camp_ViewerPawn>(NewPawn)))
+        if (ck::IsValid(Cast<AMars_Camp_ViewerPawn>(InPawn)))
         {
-            Request_FocusStation(EMars_CampStation::Title, 0.0f);
+            FocusStation(EMars_CampStation::Title, 0.0f);
             return;
         }
 
-        if (ck::IsValid(Cast<AMars_PlayerCharacter>(NewPawn)))
-        { TryActivateGameplayInputs(InputComp, NewPawn); }
+        if (ck::IsValid(Cast<AMars_PlayerCharacter>(InPawn)))
+        { TryActivateGameplayInputs(InPawn); }
     }
 }

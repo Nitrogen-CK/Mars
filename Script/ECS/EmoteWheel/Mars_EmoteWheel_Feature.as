@@ -11,6 +11,18 @@ asset Mars_EmoteWheelHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_EmoteWheel {}
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Enums
+//--------------------------------------------------------------------------------------------------------------------------
+
+// How a close ends the wheel.
+enum EMars_EmoteWheel_CloseAction
+{
+    // Chooses the hovered entry when it is enabled; nothing otherwise.
+    Choose,
+    Cancel
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Definition
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -79,17 +91,14 @@ mixin FMars_Validation Validate(const FMars_EmoteWheel_Spec& Self)
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Entries are copied out of the Definition at Add, so the wheel never holds the asset.
+// Entries are copied out of the Definition at Add, so the wheel never loads the asset again.
 struct FMars_Fragment_EmoteWheel_Params
 {
     UPROPERTY()
+    FMars_EmoteWheel_Spec Spec;
+
+    UPROPERTY()
     TArray<FMars_EmoteWheel_Entry> Entries;
-
-    UPROPERTY()
-    float32 PointerTravel = 40.0f;
-
-    UPROPERTY()
-    float32 DeadZoneRatio = 0.25f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -105,9 +114,9 @@ struct FMars_Fragment_EmoteWheel
     UPROPERTY()
     FVector2D Pointer;
 
-    // -1 = the pointer is in the dead zone (or the wheel is closed).
+    // Unset while the pointer is in the dead zone (or the wheel is closed).
     UPROPERTY()
-    int32 HoveredIndex = -1;
+    TOptional<int32> HoveredIndex;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -117,13 +126,13 @@ struct FMars_Fragment_EmoteWheel
 delegate void FMars_Delegate_EmoteWheel_OnOpened(FCk_Handle_EmoteWheel InWheel);
 event void FMars_Delegate_EmoteWheel_OnOpened_MC(FCk_Handle_EmoteWheel InWheel);
 
-// Fires after OnEmoteChosen when the close chose one. HoveredIndex is already back to -1.
+// Fires after OnEmoteChosen when the close chose one. HoveredIndex is already unset.
 delegate void FMars_Delegate_EmoteWheel_OnClosed(FCk_Handle_EmoteWheel InWheel);
 event void FMars_Delegate_EmoteWheel_OnClosed_MC(FCk_Handle_EmoteWheel InWheel);
 
-// Only while open; a close resets the hover silently (OnClosed covers it).
-delegate void FMars_Delegate_EmoteWheel_OnHoveredChanged(FCk_Handle_EmoteWheel InWheel, int32 InPrevIndex, int32 InNewIndex);
-event void FMars_Delegate_EmoteWheel_OnHoveredChanged_MC(FCk_Handle_EmoteWheel InWheel, int32 InPrevIndex, int32 InNewIndex);
+// Only while open; a close resets the hover silently (OnClosed covers it). Read the new hover with Get_HoveredIndex.
+delegate void FMars_Delegate_EmoteWheel_OnHoveredChanged(FCk_Handle_EmoteWheel InWheel);
+event void FMars_Delegate_EmoteWheel_OnHoveredChanged_MC(FCk_Handle_EmoteWheel InWheel);
 
 delegate void FMars_Delegate_EmoteWheel_OnEmoteChosen(FCk_Handle_EmoteWheel InWheel, int32 InIndex, FGameplayTag InEmote);
 event void FMars_Delegate_EmoteWheel_OnEmoteChosen_MC(FCk_Handle_EmoteWheel InWheel, int32 InIndex, FGameplayTag InEmote);
@@ -166,15 +175,14 @@ struct FMars_Request_EmoteWheel_MovePointer
 
 struct FMars_Request_EmoteWheel_Close
 {
-    // True chooses the hovered entry (when it is enabled); false cancels.
     UPROPERTY()
-    bool Confirm = false;
+    EMars_EmoteWheel_CloseAction Action = EMars_EmoteWheel_CloseAction::Cancel;
 
     FMars_Request_EmoteWheel_Close() {}
 
-    FMars_Request_EmoteWheel_Close(bool InConfirm)
+    FMars_Request_EmoteWheel_Close(EMars_EmoteWheel_CloseAction InAction)
     {
-        Confirm = InConfirm;
+        Action = InAction;
     }
 }
 

@@ -8,7 +8,6 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
     TSubclassOf<UMars_InteractPrompt_Widget> PromptWidgetClass;
 
     private TMap<FName, UMars_InteractPrompt_Widget> _ActivePrompts;
-    private TMap<FName, int32> _SortOrders;
     private FCk_Handle_InteractPromptDisplay _Display;
 
     UFUNCTION(BlueprintOverride)
@@ -33,7 +32,6 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
         { PromptContainer.ClearChildren(); }
 
         _ActivePrompts.Empty();
-        _SortOrders.Empty();
     }
 
     UFUNCTION(BlueprintOverride)
@@ -73,7 +71,6 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
         { PromptContainer.ClearChildren(); }
 
         _ActivePrompts.Empty();
-        _SortOrders.Empty();
     }
 
     UFUNCTION()
@@ -86,14 +83,13 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
         { return; }
 
         auto NewWidget = Cast<UMars_InteractPrompt_Widget>(WidgetBlueprint::CreateWidget(PromptWidgetClass, GetOwningPlayer()));
-        if (ck::Is_NOT_Valid(NewWidget))
+        if (ck::EnsureIfNot(ck::IsValid(NewWidget), f"[Mars_InteractPromptBox] Could not create the prompt widget for slot [{InSlotKey.ToString()}]"))
         { return; }
 
         _ActivePrompts.Add(InSlotKey, NewWidget);
-        _SortOrders.Add(InSlotKey, InSortOrder);
         NewWidget.OnVisualUpdate(InPrompt);
 
-        RebuildContainer();
+        RebuildContainer(InDisplay);
     }
 
     UFUNCTION()
@@ -104,7 +100,6 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
 
         _ActivePrompts[InSlotKey].RemoveFromParent();
         _ActivePrompts.Remove(InSlotKey);
-        _SortOrders.Remove(InSlotKey);
     }
 
     UFUNCTION()
@@ -114,29 +109,17 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
         { _ActivePrompts[InSlotKey].OnVisualUpdate(InPrompt); }
     }
 
-    private void RebuildContainer()
+    // In the display's own slot order: SortOrder, ties in arrival order, so equal-priority prompts never swap between
+    // rebuilds.
+    private void RebuildContainer(const FCk_Handle_InteractPromptDisplay& InDisplay)
     {
-        if (ck::Is_NOT_Valid(PromptContainer))
-        { return; }
-
-        TArray<FName> SortedKeys;
-        _ActivePrompts.GetKeys(SortedKeys);
-
-        for (int32 First = 0; First < SortedKeys.Num(); ++First)
-        {
-            for (int32 Second = First + 1; Second < SortedKeys.Num(); ++Second)
-            {
-                if (_SortOrders[SortedKeys[Second]] < _SortOrders[SortedKeys[First]])
-                {
-                    auto Swap = SortedKeys[First];
-                    SortedKeys[First] = SortedKeys[Second];
-                    SortedKeys[Second] = Swap;
-                }
-            }
-        }
-
         PromptContainer.ClearChildren();
-        for (auto Key : SortedKeys)
-        { PromptContainer.AddChild(_ActivePrompts[Key]); }
+
+        auto Slots = InDisplay.Get_Slots();
+        for (const auto& PromptSlot : Slots)
+        {
+            if (_ActivePrompts.Contains(PromptSlot.SlotKey))
+            { PromptContainer.AddChild(_ActivePrompts[PromptSlot.SlotKey]); }
+        }
     }
 }

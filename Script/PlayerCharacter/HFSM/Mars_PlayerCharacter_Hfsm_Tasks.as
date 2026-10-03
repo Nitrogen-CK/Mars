@@ -41,7 +41,6 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
 
         _Candidates.Empty();
         _Focused = FCk_Handle_Interactable();
-        mars_interaction_focus::Set(_Player, _Focused);
     }
 
     UFUNCTION()
@@ -112,7 +111,6 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
         { DoUnfocus(_Focused); }
 
         _Focused = Best;
-        mars_interaction_focus::Set(_Player, _Focused);
 
         if (ck::IsValid(_Focused))
         { DoFocus(_Focused); }
@@ -144,7 +142,8 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
         { _Hands.Request_SetFocus(FMars_Request_FPHands_SetFocus()); }
     }
 
-    // The entity an interactable belongs to (world item, lever root), via the context stamped on its targets.
+    // The entity an interactable belongs to (world item, lever root), via the context utils_interactable::Create stamps
+    // on every target.
     private FCk_Handle Get_InteractableOwner(const FCk_Handle_Interactable& InInteractable) const
     {
         for (auto Target : InInteractable.Get_AllInteractTargets())
@@ -153,16 +152,14 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
             { return Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner; }
         }
 
+        ck::EnsureIfNot(false, f"[InteractionFocus] [{InInteractable.ToString()}] has no target carrying its interaction context");
         return FCk_Handle();
     }
 
+    // The player and every interactable (a scene node) carry a transform.
     private FVector Get_Location(FCk_Handle InEntity) const
     {
-        auto AsTransform = InEntity.As_Transform(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(AsTransform))
-        { return FVector::ZeroVector; }
-
-        return utils_transform::Get_EntityCurrentTransform(AsTransform).GetLocation();
+        return utils_transform::Get_EntityCurrentTransform(InEntity.As_Transform()).GetLocation();
     }
 }
 
@@ -370,7 +367,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 
         for (auto RemovedTarget : InRemovedTargets)
         {
-            if (ck::IsValid(_Target) && FCk_Handle(RemovedTarget) == FCk_Handle(_Target))
+            if (ck::IsValid(_Target) && RemovedTarget == _Target)
             {
                 EndManipulation();
                 StopWatching();
@@ -396,20 +393,20 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     UFUNCTION()
     private void OnNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
     {
-        if ((FCk_Handle(InTarget) == FCk_Handle(_Target)) == false || ck::Is_NOT_Valid(_Control))
+        if (InTarget != _Target || ck::Is_NOT_Valid(_Control))
         { return; }
 
         // Begins in DoTick once the gloves grip the target; the view holds still from here.
         _PendingInteraction = InInteraction;
         _PendingSeconds = 0.0f;
-        SetCameraFrozen(true);
+        HoldView();
     }
 
     // After a threshold engage the Control has already ended the manipulation, so its EndManipulation is a no-op.
     UFUNCTION()
     private void OnInteractionFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
     {
-        if (FCk_Handle(InTarget) == FCk_Handle(_Target))
+        if (InTarget == _Target)
         {
             ClearPendingInteraction();
             EndManipulation();
@@ -450,7 +447,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         // The delta that was drained before the grip is not a pull.
         _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
         _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction, _Player));
-        SetCameraFrozen(true);
+        HoldView();
     }
 
     // A pending interaction that never began gives the view back; a begun manipulation keeps it until EndManipulation.
@@ -460,7 +457,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _PendingSeconds = 0.0f;
 
         if (_IsManipulating == false)
-        { SetCameraFrozen(false); }
+        { ReleaseView(); }
     }
 
     // The Control behind a ManuallyCompleted interact target; invalid for any other target.
@@ -489,7 +486,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         if (ck::IsValid(_Control))
         { _Control.Request_EndManipulation(); }
 
-        SetCameraFrozen(false);
+        ReleaseView();
     }
 
     private void StopWatching()
@@ -506,15 +503,27 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Control = FCk_Handle_Control();
     }
 
-    private void SetCameraFrozen(bool InFrozen)
+    // The camera's orientation stops following the look input.
+    private void HoldView()
     {
-        if (InFrozen == _CameraFrozen)
+        if (_CameraFrozen)
         { return; }
 
-        _CameraFrozen = InFrozen;
+        _CameraFrozen = true;
 
         if (ck::IsValid(_Camera))
-        { _Camera.Request_Set_HasOrientationControl(InFrozen == false); }
+        { _Camera.Request_Set_HasOrientationControl(false); }
+    }
+
+    private void ReleaseView()
+    {
+        if (_CameraFrozen == false)
+        { return; }
+
+        _CameraFrozen = false;
+
+        if (ck::IsValid(_Camera))
+        { _Camera.Request_Set_HasOrientationControl(true); }
     }
 }
 
@@ -635,37 +644,48 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
     {
         Super::DoExitTask(InHandle, InNetContext);
 
-        Set_IntentOpen(false);
-        _IntentOpen = false;
+        Close_Intent();
         _Resolver = FCk_Handle_InteractionResolver();
     }
 
     protected void OnMatcherRebound() override
     {
-        Set_IntentOpen(Get_IsRowActive(InputIntent));
+        if (Get_IsRowActive(InputIntent))
+        { Open_Intent(); }
+        else
+        { Close_Intent(); }
     }
 
     protected void OnIntentPressed(FGameplayTag InIntent) override
     {
         if (InIntent == InputIntent)
-        { Set_IntentOpen(true); }
+        { Open_Intent(); }
     }
 
     protected void OnIntentReleased(FGameplayTag InIntent) override
     {
         if (InIntent == InputIntent)
-        { Set_IntentOpen(false); }
+        { Close_Intent(); }
     }
 
-    private void Set_IntentOpen(bool InOpen)
+    private void Open_Intent()
     {
-        if (InOpen == _IntentOpen || ck::Is_NOT_Valid(_Resolver))
+        if (_IntentOpen)
         { return; }
 
-        _IntentOpen = InOpen;
-        if (InOpen)
-        { _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(ResolverIntent)); }
-        else
+        _IntentOpen = true;
+        _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(ResolverIntent));
+    }
+
+    private void Close_Intent()
+    {
+        if (_IntentOpen == false)
+        { return; }
+
+        _IntentOpen = false;
+
+        // The exit of a player being torn down.
+        if (ck::IsValid(_Resolver))
         { _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(ResolverIntent)); }
     }
 }

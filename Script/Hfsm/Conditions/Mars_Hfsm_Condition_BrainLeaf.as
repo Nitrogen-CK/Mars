@@ -1,13 +1,21 @@
+enum EMars_BrainLeaf_Match
+{
+    // Passes while the brain's leaf is LeafClass.
+    Present,
+    // Passes while it is anything else.
+    Absent
+}
+
 // Event-driven: binds the context entity's Brain.OnLeafChanged on enter and evaluates the current leaf at once (so a
-// leaf that already matches passes on the state's first frame). Derive and set LeafClass, plus RequirePresent = false for
-// the "leaf left" exit conditions; never _NegateResult (it does not invert an event-driven condition's resting Fail).
+// leaf that already matches passes on the state's first frame). Derive and set LeafClass, plus LeafMatch = Absent for the
+// "leaf left" exit conditions; never _NegateResult (it does not invert an event-driven condition's resting Fail).
 //
 // The context entity is the brain's owner: ck::Ctx resolves to it only if the owner called Request_OverrideToSelf()
 // before any SM child was created.
 class UMars_SmCondition_BrainLeaf : UCk_SmCondition_EventDriven
 {
     protected TSubclassOf<UCk_GoapAction_EntityScript> LeafClass;
-    protected bool RequirePresent = true;
+    protected EMars_BrainLeaf_Match LeafMatch = EMars_BrainLeaf_Match::Present;
 
     private FCk_Handle_Brain CachedBrain;
 
@@ -47,8 +55,8 @@ class UMars_SmCondition_BrainLeaf : UCk_SmCondition_EventDriven
         if (ck::Is_NOT_Valid(CachedBrain))
         { return; }
 
-        const auto Matches = CachedBrain.Get_LeafClass() == LeafClass;
-        if (RequirePresent ? Matches : Matches == false)
+        const auto IsLeaf = CachedBrain.Get_LeafClass() == LeafClass;
+        if (LeafMatch == EMars_BrainLeaf_Match::Present ? IsLeaf : IsLeaf == false)
         { MarkSatisfied(); }
         else
         { MarkUnsatisfied(); }

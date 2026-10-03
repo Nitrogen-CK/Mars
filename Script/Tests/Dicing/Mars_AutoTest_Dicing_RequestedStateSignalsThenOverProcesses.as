@@ -1,6 +1,6 @@
 // RequestedState = CoarseChop with one chop per state: the first aligned chop reaches the requested texture
 // (OnRequestedStateReached, Get_HasReachedRequested), two more over-process it to FineFlecks then GreenPaste, and a fourth
-// leaves the pile at GreenPaste while still resolving aligned. Rig as AlignedChopsAdvanceStateAndMoveBand.
+// leaves the pile at GreenPaste while still resolving aligned.
 class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTest_Base
 {
     private FCk_Handle_Dicing _Dicing;
@@ -31,7 +31,8 @@ class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTes
         MoverSpec.Duration = 0.05f;
         auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
 
-        _Dicing = utils_dicing::Add(StationEntity, _Spec, FMars_Dicing_Nodes(LateralNode, Mover));
+        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
+        _Dicing = utils_dicing::Add(StationEntity, _Spec);
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
         _Dicing.BindTo_OnStateChanged(FMars_Delegate_Dicing_OnStateChanged(this, n"OnStateChanged"));
@@ -50,9 +51,9 @@ class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTes
     }
 
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, bool InAligned)
+    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
     {
-        _Resolved.Add(InAligned);
+        _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
         if (_Resolved.Num() == 1)
         { _HasReachedAfterFirst = _Dicing.Get_HasReachedRequested(); }
     }
@@ -121,7 +122,9 @@ class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTes
             Assert_True(_States[2] == EMars_Dicing_State::GreenPaste, f"third change is green paste (got {_States[2] :n})");
         }
 
-        Assert_True(_Dicing.Get_MaterialState() == EMars_Dicing_State::GreenPaste, "the pile stays green paste after the fourth chop");
+        const auto MaterialState = _Dicing.Get_MaterialState();
+        Assert_True(MaterialState == EMars_Dicing_State::GreenPaste,
+            f"the pile stays green paste after the fourth chop (got {MaterialState :n})");
         Assert_True(_Dicing.Get_HasReachedRequested(), "an over-processed pile still counts as having reached the request");
         Assert_Equals_Int(_Dicing.Get_UsefulChops(), 4, "all four chops were useful");
     }

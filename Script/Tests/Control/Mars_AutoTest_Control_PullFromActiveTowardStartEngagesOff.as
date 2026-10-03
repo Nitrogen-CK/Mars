@@ -43,7 +43,7 @@ class UMars_AutoTest_Control_PullFromActiveTowardStartEngagesOff : UCk_AutoTest_
         auto MoverSpec = FMars_Mover_Spec();
         MoverSpec.EndRotation = FRotator(70.0, 0.0, 0.0);
         MoverSpec.Duration = 0.3f;
-        MoverSpec.StartAtEnd = InStartActive;
+        MoverSpec.StartPose = InStartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         _Mover = utils_mover::Add(HandleNode, MoverSpec);
 
         auto ControlSpec = FMars_Control_Spec();
@@ -137,12 +137,16 @@ class UMars_AutoTest_Control_PullFromActiveTowardStartEngagesOff : UCk_AutoTest_
         Res.Set(false);
     }
 
+    // The pull, not the alpha: the spring clamps Alpha at the stop on its own, so only Pull shows the nudges were clamped.
     UFUNCTION()
     private void Step_AssertClamped(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Alpha = _Control.Get_ManipulationAlpha();
-        Assert_True(Alpha >= 0.999f, f"the end stop clamps (manipulation alpha {Alpha})");
         Assert_True(_Control.Get_IsManipulating(), "pushing into the stop does not end the grip");
+        if (_Control.Get_IsManipulating())
+        {
+            const auto Pull = _Control.Get_Fragment(FMars_Fragment_Control).Manipulation.GetValue().Pull;
+            Assert_Equals_Float(Pull, 1.0, 0.0001, "three pushes into the far stop leave the pull clamped at 1");
+        }
     }
 
     UFUNCTION()
@@ -164,11 +168,13 @@ class UMars_AutoTest_Control_PullFromActiveTowardStartEngagesOff : UCk_AutoTest_
     UFUNCTION()
     private void Step_AssertEnded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_FinishedResults[0] == ECk_SucceededFailed::Succeeded, "pulling past EngageAlpha toward the start ends the interaction Succeeded");
+        const auto Result = _FinishedResults[0];
+        Assert_True(Result == ECk_SucceededFailed::Succeeded,
+            f"pulling past EngageAlpha toward the start ends the interaction Succeeded (got {Result :n})");
         Assert_Equals_Int(_EngagedCount, 0, "no focus, so no Engage chain");
 
-        const auto Alpha = _Mover.Get_Alpha();
-        Assert_True(Alpha <= 0.15f + 0.02f, f"the handle is at the threshold when the interaction ends (alpha {Alpha})");
-        Assert_True(_Mover.Get_AtEnd(), "the Control never moved the target itself");
+        // Two-sided: the spring overshoots the threshold by one frame's travel, a snap to the start stop is 0.15 off.
+        Assert_Equals_Float(_Mover.Get_Alpha(), 0.15, 0.05, "the handle is at the threshold when the interaction ends");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::End, "the Control never moved the target itself");
     }
 }

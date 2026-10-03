@@ -25,8 +25,7 @@ enum EMars_Dicing_State
 
 // Board frame: the hand (and the cleaver under it) slides along the station's local Y about the board centre. A chop is
 // aligned when the hand is within BandHalfWidth of the band's centre. The cleaver's Mover has one Duration for both
-// directions (the entity script sets it to ChopDownSeconds), so the recover takes as long as the strike. Field order is
-// the positional constructor's order.
+// directions (the entity script sets it to ChopDownSeconds), so the recover takes as long as the strike.
 struct FMars_Dicing_Spec
 {
     // The hand's lateral travel each side of the board centre (uu).
@@ -52,6 +51,9 @@ struct FMars_Dicing_Spec
     // The cleaver's strike (and, through the Mover's single Duration, its recover) in seconds.
     UPROPERTY()
     float32 ChopDownSeconds = 0.10f;
+
+    // Built by the placing script before Add. Not a UPROPERTY: the spawn params never carry handles.
+    FMars_Dicing_Nodes Nodes;
 
     FMars_Dicing_Spec() {}
 
@@ -101,7 +103,7 @@ mixin FMars_Validation Validate(const FMars_Dicing_Spec& Self)
     return FMars_Validation();
 }
 
-// The nodes the entity script builds for the feature: the lateral node the hand slides (its offset Y is the hand), and
+// The nodes the placing script builds for the feature: the lateral node the hand slides (its offset Y is the hand), and
 // the Mover on the cleaver node under it (start = raised, end = contact with the board).
 struct FMars_Dicing_Nodes
 {
@@ -136,8 +138,8 @@ struct FMars_Fragment_Dicing_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Dicing processors (and Add). The station SM and the operator only issue requests.
-struct FMars_Fragment_Dicing
+// The pile's material: a reset restores the default.
+struct FMars_Dicing_Pile
 {
     UPROPERTY()
     EMars_Dicing_State MaterialState = EMars_Dicing_State::WholeLeaves;
@@ -149,28 +151,25 @@ struct FMars_Fragment_Dicing
     // Useful chops since the last reset.
     UPROPERTY()
     int32 UsefulChops = 0;
+}
+
+// Written only by the Dicing processors (and Add). The station SM and the operator only issue requests.
+struct FMars_Fragment_Dicing
+{
+    UPROPERTY()
+    FMars_Dicing_Pile Pile;
 
     // uu, clamped to +-BoardHalfWidth.
     UPROPERTY()
     float32 HandLateral = 0.0f;
 
-    // uu; utils_dicing::Get_BandCenterAt(Spec, BandIndex).
-    UPROPERTY()
-    float32 BandCenter = 0.0f;
-
-    // The band table entry the band sits on.
+    // The band table entry the band sits on; its centre is utils_dicing::Get_BandCenterAt(Spec, BandIndex).
     UPROPERTY()
     int32 BandIndex = 0;
 
     // One press = one chop: true from the chop request until the cleaver is back up; chops meanwhile are ignored.
     UPROPERTY()
     bool IsChopping = false;
-
-    UPROPERTY()
-    FCk_Handle_SceneNode LateralNode;
-
-    UPROPERTY()
-    FCk_Handle_Mover ChopMover;
 }
 
 // On the cleaver's Mover entity: the Dicing feature it strikes for (its OnArrived handler resolves the chop through it).
@@ -185,9 +184,16 @@ struct FMars_Fragment_Dicing_ChopLink
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+enum EMars_Dicing_ChopResult
+{
+    // The hand was within BandHalfWidth of the band: the chop counts.
+    Aligned,
+    OffTheBand
+}
+
 // Broadcast at the cleaver's contact with the board, after the chop's state, chop counts and band moved.
-delegate void FMars_Delegate_Dicing_OnChopResolved(FCk_Handle_Dicing InDicing, bool InAligned);
-event void FMars_Delegate_Dicing_OnChopResolved_MC(FCk_Handle_Dicing InDicing, bool InAligned);
+delegate void FMars_Delegate_Dicing_OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult);
+event void FMars_Delegate_Dicing_OnChopResolved_MC(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult);
 
 delegate void FMars_Delegate_Dicing_OnStateChanged(FCk_Handle_Dicing InDicing, EMars_Dicing_State InState);
 event void FMars_Delegate_Dicing_OnStateChanged_MC(FCk_Handle_Dicing InDicing, EMars_Dicing_State InState);
@@ -229,7 +235,7 @@ struct FMars_Request_Dicing_Nudge
     }
 }
 
-// AngelScript rejects an empty struct in a TOptional/TArray, so it carries one placeholder field.
+// Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Dicing_Chop
 {
     UPROPERTY()
@@ -239,7 +245,7 @@ struct FMars_Request_Dicing_Chop
 }
 
 // A fresh pile: WholeLeaves, no chops, the band back on table entry 0 and the hand at the board centre. A chop in flight
-// still resolves (against the fresh pile).
+// still resolves (against the fresh pile). Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Dicing_Reset
 {
     UPROPERTY()

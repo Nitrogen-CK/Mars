@@ -36,13 +36,13 @@ class UMars_AutoTest_Gaze_PicksNearestInCone : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertAimAtA(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Gaze.Get_HasTarget(), "Get_HasTarget() while looking at A");
+        Assert_True(_Gaze.Get_HasTarget(), "Get_HasTarget() is true while looking at A");
 
         const auto Aim = _Gaze.Get_AimYawPitchDeg();
         Assert_True(Aim.X > 0.0, f"yaw toward a target on the right is positive (got [{Aim.X}])");
         Assert_True(Aim.Y > 0.0, f"pitch toward a target above is positive (got [{Aim.Y}])");
-        Assert_Equals_Float(Aim.X, Math::RadiansToDegrees(Math::Atan2(80.0, 150.0)), 0.1, "yaw toward A");
-        Assert_Equals_Float(Aim.Y, Math::RadiansToDegrees(Math::Atan2(60.0, 170.0)), 0.1, "pitch toward A");
+        Assert_Equals_Float(Aim.X, Math::RadiansToDegrees(Math::Atan2(80.0, 150.0)), 0.1, "the yaw points at A");
+        Assert_Equals_Float(Aim.Y, Math::RadiansToDegrees(Math::Atan2(60.0, Math::Sqrt(150.0 * 150.0 + 80.0 * 80.0))), 0.1, "the pitch points at A");
     }
 
     UFUNCTION()
@@ -64,8 +64,8 @@ class UMars_AutoTest_Gaze_PicksNearestInCone : UCk_AutoTest_Base
         const auto Aim = _Gaze.Get_AimYawPitchDeg();
         Assert_True(Aim.X < 0.0, f"yaw toward a target on the left is negative (got [{Aim.X}])");
         Assert_True(Aim.Y < 0.0, f"pitch toward a target below is negative (got [{Aim.Y}])");
-        Assert_Equals_Float(Aim.X, Math::RadiansToDegrees(Math::Atan2(-80.0, 250.0)), 0.1, "yaw toward B");
-        Assert_Equals_Float(Aim.Y, Math::RadiansToDegrees(Math::Atan2(-60.0, Math::Sqrt(250.0 * 250.0 + 80.0 * 80.0))), 0.1, "pitch toward B");
+        Assert_Equals_Float(Aim.X, Math::RadiansToDegrees(Math::Atan2(-80.0, 250.0)), 0.1, "the yaw points at B");
+        Assert_Equals_Float(Aim.Y, Math::RadiansToDegrees(Math::Atan2(-60.0, Math::Sqrt(250.0 * 250.0 + 80.0 * 80.0))), 0.1, "the pitch points at B");
     }
 
     // Its own owner and context (so the gaze's probe may overlap it), a kinematic Silent Probe.Mars.Player sphere like the

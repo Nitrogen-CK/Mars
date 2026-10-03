@@ -1,9 +1,18 @@
-// Once a plate is set, the apply pass writes every group into its custom primitive data (slots 0/1 cells, 7 strength,
-// 8/9 look, 10..12 colour); a played expression rewrites the cell slots, keeping the previous cells for the crossfade;
-// a new style's colour rewrites the colour slots; and a second plate set later receives every group. The plates are
-// bare engine planes; no material is needed to read the data back. Isolated Z band: -68000.
+// Once a plate is set, the apply pass writes every group into its custom primitive data (cells, strength, look and
+// colour, at the constants_eyes::k_Slot_* slots); a played expression rewrites the cell slots, keeping the previous
+// cells for the crossfade; a new style's colour rewrites the colour slots; and a second plate set later receives every
+// group. The plates are bare engine planes; no material is needed to read the data back. Isolated Z band: -68000.
 class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
 {
+    private const int32 LeftCellSlot = constants_eyes::k_Slot_Cells;
+    private const int32 RightCellSlot = constants_eyes::k_Slot_Cells + 1;
+    private const int32 PrevLeftCellSlot = constants_eyes::k_Slot_Cells + 2;
+    private const int32 PrevRightCellSlot = constants_eyes::k_Slot_Cells + 3;
+    private const int32 BlendSlot = constants_eyes::k_Slot_Anim;
+    private const int32 StrengthSlot = constants_eyes::k_Slot_Anim + 3;
+    private const int32 LookXSlot = constants_eyes::k_Slot_Look;
+    private const int32 LookYSlot = constants_eyes::k_Slot_Look + 1;
+
     private FCk_Handle_Eyes _Eyes;
     private FCk_Handle_Transform _FaceNode;
     private FCk_Handle_UnrealComponent _Plate;
@@ -24,11 +33,9 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
         Spec.Style.RightCell = 4;
         Spec.Style.EmissiveStrength = 6.0f;
         Spec.Style.Color = _StyleColor;
-        Spec.BlinkEnabled = false;
-        _Eyes = utils_eyes::Add(_FaceNode, Spec);
-
         _Plate = MakePlate(_FaceNode, n"EyesTest_Plate");
-        _Eyes.Set_Plate(_Plate);
+        Spec.Plate = _Plate;
+        _Eyes = utils_eyes::Add(_FaceNode, Spec);
 
         Add_Step("the eyes have a presentation and a plate", n"Step_AssertComposed");
         Add_Step_WaitUntil("the plate holds left 3, right 4, strength 6", n"Check_StyleWritten");
@@ -56,15 +63,15 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
     private void Check_StyleWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_Plate, 0, 3.0f) && Get_IsSlot(_Plate, 1, 4.0f) && Get_IsSlot(_Plate, 7, 6.0f));
+        Res.Set(Get_IsSlot(_Plate, LeftCellSlot, 3.0f) && Get_IsSlot(_Plate, RightCellSlot, 4.0f) && Get_IsSlot(_Plate, StrengthSlot, 6.0f));
     }
 
     UFUNCTION()
     private void Step_AssertLookAndColor(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Get_IsSlot(_Plate, 8, 0.0f), f"slot 8 holds LookX 0 (got [{Get_Slot(_Plate, 8)}])");
-        Assert_True(Get_IsSlot(_Plate, 9, 0.0f), f"slot 9 holds LookY 0 (got [{Get_Slot(_Plate, 9)}])");
-        Assert_True(Get_IsColor(_Plate, _StyleColor), f"slots 10..12 hold the style's colour (got [{Get_ColorText(_Plate)}])");
+        Assert_True(Get_IsSlot(_Plate, LookXSlot, 0.0f), f"the LookX slot holds 0 (got [{Get_Slot(_Plate, LookXSlot)}])");
+        Assert_True(Get_IsSlot(_Plate, LookYSlot, 0.0f), f"the LookY slot holds 0 (got [{Get_Slot(_Plate, LookYSlot)}])");
+        Assert_True(Get_IsColor(_Plate, _StyleColor), f"the colour slots hold the style's colour (got [{Get_ColorText(_Plate)}])");
     }
 
     UFUNCTION()
@@ -81,15 +88,17 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
     private void Check_AngryWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_Plate, 0, 16.0f) && Get_IsSlot(_Plate, 1, 16.0f));
+        Res.Set(Get_IsSlot(_Plate, LeftCellSlot, 16.0f) && Get_IsSlot(_Plate, RightCellSlot, 16.0f));
     }
 
     UFUNCTION()
     private void Step_AssertPrevAndStrength(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Get_IsSlot(_Plate, 2, 3.0f), f"slot 2 holds the previous left cell 3 (got [{Get_Slot(_Plate, 2)}])");
-        Assert_True(Get_IsSlot(_Plate, 3, 4.0f), f"slot 3 holds the previous right cell 4 (got [{Get_Slot(_Plate, 3)}])");
-        Assert_True(Get_IsSlot(_Plate, 7, 6.0f), f"slot 7 still holds the strength 6 (got [{Get_Slot(_Plate, 7)}])");
+        Assert_True(Get_IsSlot(_Plate, PrevLeftCellSlot, 3.0f),
+            f"the previous left cell slot holds 3 (got [{Get_Slot(_Plate, PrevLeftCellSlot)}])");
+        Assert_True(Get_IsSlot(_Plate, PrevRightCellSlot, 4.0f),
+            f"the previous right cell slot holds 4 (got [{Get_Slot(_Plate, PrevRightCellSlot)}])");
+        Assert_True(Get_IsSlot(_Plate, StrengthSlot, 6.0f), f"the strength slot still holds 6 (got [{Get_Slot(_Plate, StrengthSlot)}])");
     }
 
     UFUNCTION()
@@ -112,7 +121,7 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
     {
         _SecondPlate = MakePlate(_FaceNode, n"EyesTest_SecondPlate");
         Assert_Valid(_SecondPlate, "the second plate component handle");
-        _Eyes.Set_Plate(_SecondPlate);
+        _Eyes.Request_SetPlate(FMars_Request_Eyes_SetPlate(_SecondPlate));
     }
 
     // Look stays (0, 0) here, which an unwritten plate also reads; the other groups carry non-zero values.
@@ -120,10 +129,10 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
     private void Check_SecondPlateWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_SecondPlate, 0, 16.0f) && Get_IsSlot(_SecondPlate, 1, 16.0f)
-            && Get_IsSlot(_SecondPlate, 2, 3.0f) && Get_IsSlot(_SecondPlate, 3, 4.0f)
-            && Get_IsSlot(_SecondPlate, 4, 1.0f) && Get_IsSlot(_SecondPlate, 7, 6.0f)
-            && Get_IsSlot(_SecondPlate, 8, 0.0f) && Get_IsSlot(_SecondPlate, 9, 0.0f)
+        Res.Set(Get_IsSlot(_SecondPlate, LeftCellSlot, 16.0f) && Get_IsSlot(_SecondPlate, RightCellSlot, 16.0f)
+            && Get_IsSlot(_SecondPlate, PrevLeftCellSlot, 3.0f) && Get_IsSlot(_SecondPlate, PrevRightCellSlot, 4.0f)
+            && Get_IsSlot(_SecondPlate, BlendSlot, 1.0f) && Get_IsSlot(_SecondPlate, StrengthSlot, 6.0f)
+            && Get_IsSlot(_SecondPlate, LookXSlot, 0.0f) && Get_IsSlot(_SecondPlate, LookYSlot, 0.0f)
             && Get_IsColor(_SecondPlate, _NewStyleColor));
     }
 
@@ -139,12 +148,14 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
 
     private bool Get_IsColor(const FCk_Handle_UnrealComponent& InPlate, const FLinearColor& InColor) const
     {
-        return Get_IsSlot(InPlate, 10, InColor.R) && Get_IsSlot(InPlate, 11, InColor.G) && Get_IsSlot(InPlate, 12, InColor.B);
+        return Get_IsSlot(InPlate, constants_eyes::k_Slot_Color, InColor.R)
+            && Get_IsSlot(InPlate, constants_eyes::k_Slot_Color + 1, InColor.G)
+            && Get_IsSlot(InPlate, constants_eyes::k_Slot_Color + 2, InColor.B);
     }
 
     private FString Get_ColorText(const FCk_Handle_UnrealComponent& InPlate) const
     {
-        return f"{Get_Slot(InPlate, 10)}, {Get_Slot(InPlate, 11)}, {Get_Slot(InPlate, 12)}";
+        return f"{Get_Slot(InPlate, constants_eyes::k_Slot_Color)}, {Get_Slot(InPlate, constants_eyes::k_Slot_Color + 1)}, {Get_Slot(InPlate, constants_eyes::k_Slot_Color + 2)}";
     }
 
     // An engine plane under the face node, without collision so nothing bakes it into the static world.
@@ -161,6 +172,6 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
 
         auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
             Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        return utils_unreal_component::Add(FCk_Handle(PlateNode), ComponentParams);
+        return utils_unreal_component::Add(PlateNode, ComponentParams);
     }
 }

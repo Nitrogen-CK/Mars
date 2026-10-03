@@ -12,8 +12,7 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
     private TArray<FCk_Handle_Inventory_DataOnly> _Holders;
     private TArray<FCk_Handle_Item> _Items;
 
-    private bool _Backpack2TransferRecorded = false;
-    private ECk_Inventory_OperationResult_Transfer _Backpack2TransferResult = ECk_Inventory_OperationResult_Transfer::Success;
+    private TOptional<ECk_Inventory_OperationResult_Transfer> _Backpack2TransferResult;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -68,12 +67,11 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
     UFUNCTION()
     private void OnBackpackConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        auto Entity = FCk_Handle(InEntityScriptHandle);
-        _Backpack = Entity.As_Backpack(ECk_SanityCheck::UnChecked);
+        _Backpack = InEntityScriptHandle.As_Backpack();
     }
 
     UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar, int32 InPrevIndex, int32 InNewIndex)
+    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
     {
         PushSelection();
     }
@@ -87,7 +85,10 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
     private void PushSelection()
     {
         if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
-        { return; }
+        {
+            FinishFailure("the carrier's Hotbar or HeldItem did not compose");
+            return;
+        }
 
         _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
     }
@@ -133,22 +134,22 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
                                            FCk_Handle_Item InNewItemInTarget,
                                            ECk_Inventory_OperationResult_Transfer InResult)
     {
-        _Backpack2TransferRecorded = true;
-        _Backpack2TransferResult = InResult;
+        _Backpack2TransferResult = TOptional<ECk_Inventory_OperationResult_Transfer>(InResult);
     }
 
     UFUNCTION()
     private void Check_Backpack2TransferRecorded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Backpack2TransferRecorded);
+        Res.Set(_Backpack2TransferResult.IsSet());
     }
 
     UFUNCTION()
     private void Step_AssertBackpack2Refused(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Backpack2TransferResult != ECk_Inventory_OperationResult_Transfer::Success,
-            f"a backpack forced into an empty cargo slot reports a non-Success result (got [{_Backpack2TransferResult :n}])");
+        const auto Backpack2Result = _Backpack2TransferResult.GetValue();
+        Assert_True(Backpack2Result != ECk_Inventory_OperationResult_Transfer::Success,
+            f"a backpack forced into an empty cargo slot reports a non-Success result (got [{Backpack2Result :n}])");
         Assert_False(_Slot0.Get_IsOccupied(), "cargo slot 0 after the refused backpack");
         Assert_Equals_Int(_Holders[0].Get_NumItems(), 1, "the second backpack's holder after the refused transfer");
     }
@@ -200,7 +201,7 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
@@ -213,8 +214,8 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UCk_AutoTest_Base
 }
 
 // Hand-authored so CkInventory's rollback Warning for the deliberately refused transfer is expected rather than a failure
-// (the automation controller elevates Warnings to test errors; P1 precedent). Pinned to the item definition and the
-// refusal reason so an unrelated refusal still fails the test.
+// (the automation controller elevates Warnings to test errors). Pinned to the item definition and the refusal reason so
+// an unrelated refusal still fails the test.
 class AMars_AutoTest_Backpack_CargoRejectsBackpack_Actor : ACk_AutoTestRunner
 {
     default _TestEntityScriptClass = UMars_AutoTest_Backpack_CargoRejectsBackpack;

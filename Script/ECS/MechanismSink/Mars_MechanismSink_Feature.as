@@ -37,6 +37,25 @@ struct FMars_MechanismSink_Spec
     bool Latch = false;
 }
 
+// At least one input channel, each set and listed once.
+mixin FMars_Validation Validate(const FMars_MechanismSink_Spec& Self)
+{
+    if (Self.InputChannels.Num() == 0)
+    { return FMars_Validation("InputChannels must list at least one channel"); }
+
+    for (int32 Index = 0; Index < Self.InputChannels.Num(); ++Index)
+    {
+        const auto Channel = Self.InputChannels[Index];
+        if (Channel.IsValid() == false)
+        { return FMars_Validation(f"InputChannels[{Index}] is not set"); }
+
+        if (Self.InputChannels.FindIndex(Channel) != Index)
+        { return FMars_Validation(f"InputChannels lists [{Channel.ToString()}] more than once"); }
+    }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
@@ -57,6 +76,14 @@ struct FMars_Fragment_MechanismSink_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+enum EMars_MechanismSink_Power
+{
+    // Before the driver's first push; link setups wait for the first OnPoweredChanged instead of reading a default.
+    Unevaluated,
+    Unpowered,
+    Powered
+}
+
 struct FMars_MechanismSink_ChannelInput
 {
     UPROPERTY()
@@ -76,22 +103,20 @@ struct FMars_Fragment_MechanismSink
     TArray<FMars_MechanismSink_ChannelInput> Inputs;
 
     UPROPERTY()
-    bool IsPowered = false;
-
-    // False until the driver's first push; link setups wait for the first OnPoweredChanged instead of reading a default.
-    UPROPERTY()
-    bool HasEvaluated = false;
+    EMars_MechanismSink_Power Power = EMars_MechanismSink_Power::Unevaluated;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_MechanismSink_OnPoweredChanged(FCk_Handle_MechanismSink InSink, bool InPowered);
-event void FMars_Delegate_MechanismSink_OnPoweredChanged_MC(FCk_Handle_MechanismSink InSink, bool InPowered);
+// Never broadcasts Unevaluated.
+delegate void FMars_Delegate_MechanismSink_OnPoweredChanged(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower);
+event void FMars_Delegate_MechanismSink_OnPoweredChanged_MC(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower);
 
-delegate void FMars_Delegate_MechanismSink_OnInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, bool InAsserted);
-event void FMars_Delegate_MechanismSink_OnInputEdge_MC(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, bool InAsserted);
+// InOutput is the flipped source's new output.
+delegate void FMars_Delegate_MechanismSink_OnInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, EMars_MechanismSource_Output InOutput);
+event void FMars_Delegate_MechanismSink_OnInputEdge_MC(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, EMars_MechanismSource_Output InOutput);
 
 struct FMars_Fragment_MechanismSink_Signals
 {
@@ -129,12 +154,12 @@ struct FMars_Request_MechanismSink_NotifyInputEdge
     FGameplayTag Channel;
 
     UPROPERTY()
-    bool Asserted = false;
+    EMars_MechanismSource_Output Output = EMars_MechanismSource_Output::Deasserted;
 
-    FMars_Request_MechanismSink_NotifyInputEdge(FGameplayTag InChannel, bool InAsserted)
+    FMars_Request_MechanismSink_NotifyInputEdge(FGameplayTag InChannel, EMars_MechanismSource_Output InOutput)
     {
         Channel = InChannel;
-        Asserted = InAsserted;
+        Output = InOutput;
     }
 }
 

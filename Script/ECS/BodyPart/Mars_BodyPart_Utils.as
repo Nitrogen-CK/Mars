@@ -7,7 +7,7 @@ namespace utils_body_part
     FCk_Handle_BodyPart Add(FCk_Handle& InPartEntity, FMars_BodyPart_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[BodyPart] [{InPartEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[BodyPart] [{InPartEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_BodyPart(); }
 
         auto Leg = FCk_Handle_ProceduralLeg();
@@ -19,14 +19,12 @@ namespace utils_body_part
             { return FCk_Handle_BodyPart(); }
         }
 
+        // Each Add ensures on its own rejection; the zone feeds the Health beside it.
         auto Health = utils_health::Add(InPartEntity, InSpec.Health);
         if (ck::Is_NOT_Valid(Health))
         { return FCk_Handle_BodyPart(); }
 
-        // The part's zone always feeds the part's own Health.
-        auto ZoneSpec = InSpec.Zone;
-        ZoneSpec.Health = Health;
-        auto Zone = utils_hit_zone::Add(InPartEntity, ZoneSpec);
+        auto Zone = utils_hit_zone::Add(InPartEntity, InSpec.Zone);
         if (ck::Is_NOT_Valid(Zone))
         { return FCk_Handle_BodyPart(); }
 

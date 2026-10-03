@@ -60,4 +60,16 @@ namespace utils_crawler
         _Step.Set_Height(24.0f);
         _Step.Set_Threshold(30.0f);
     }
+
+    // The rig asset for a leg count; null for a count with no rig (only 4 and 6 have one).
+    UCk_ProceduralRig_Data Get_RigData(int32 InLegCount)
+    {
+        if (InLegCount == 4)
+        { return utils_crawler::Mars_CrawlerRig4; }
+
+        if (InLegCount == 6)
+        { return utils_crawler::Mars_CrawlerRig6; }
+
+        return nullptr;
+    }
 }

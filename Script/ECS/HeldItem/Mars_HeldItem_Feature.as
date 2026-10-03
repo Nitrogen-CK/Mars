@@ -11,12 +11,25 @@ asset Mars_HeldItemHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_HeldItem {}
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Enums
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Who owns the held item's presentation entity.
+enum EMars_HeldItem_PresentationOwnership
+{
+    // The Visual-mode world item HeldItem spawned: destroyed when the held item changes.
+    Owned,
+    // A Persistent item's own World-mode world item: asked to Carry when the held item changes, never destroyed.
+    Borrowed
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Derived, never authored: the hotbar's selected slot and its item. PresentationEntity is the Visual-mode world item,
-// recorded synchronously at spawn so a faster re-equip can still destroy it - or, for a Persistent item, the item's own
-// World-mode world item (not owned: never destroyed by HeldItem).
+// Derived, never authored: the hotbar's selected slot and its item. PresentationEntity is recorded synchronously at spawn
+// so a faster re-equip can still destroy it; its ownership is recorded with it, because the item it was spawned for may
+// be gone by the time it is replaced.
 struct FMars_Fragment_HeldItem
 {
     UPROPERTY()
@@ -27,14 +40,19 @@ struct FMars_Fragment_HeldItem
 
     UPROPERTY()
     FCk_Handle PresentationEntity;
-}
 
-// One-shot: the next held visual spawns at this world transform (instead of at its hold offset) and keeps that offset
-// from the hand, e.g. an item picked up by the first-person gloves starts where it lay and rides in with them.
-struct FMars_Fragment_HeldItem_SpawnFrom
-{
     UPROPERTY()
-    FTransform WorldTransform;
+    EMars_HeldItem_PresentationOwnership PresentationOwnership = EMars_HeldItem_PresentationOwnership::Owned;
+
+    // One-shot: the next held visual spawns at this world pose and keeps that offset from the hand (an item picked up by
+    // the first-person gloves starts where it lay and rides in with them). Wins over NextArrival.
+    UPROPERTY()
+    TOptional<FTransform> NextSpawnFrom;
+
+    // One-shot: the next held visual of this item starts at this world pose and lerps to its hold offset (an item taken
+    // out of a cargo slot).
+    UPROPERTY()
+    TOptional<FMars_WorldItem_PendingArrival> NextArrival;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -70,9 +88,59 @@ struct FMars_Request_HeldItem_SetSlot
     }
 }
 
-// Latest wins: back-to-back slot changes inside one frame collapse to the last one (see the processor).
+struct FMars_Request_HeldItem_SetNextSpawnFrom
+{
+    UPROPERTY()
+    FTransform WorldTransform;
+
+    FMars_Request_HeldItem_SetNextSpawnFrom() {}
+
+    FMars_Request_HeldItem_SetNextSpawnFrom(const FTransform& InWorldTransform)
+    {
+        WorldTransform = InWorldTransform;
+    }
+}
+
+// AngelScript rejects a TArray of an empty struct, so it carries one placeholder field.
+struct FMars_Request_HeldItem_ClearNextSpawnFrom
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_HeldItem_ClearNextSpawnFrom() {}
+}
+
+struct FMars_Request_HeldItem_SetNextArrival
+{
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    UPROPERTY()
+    FTransform World;
+
+    FMars_Request_HeldItem_SetNextArrival() {}
+
+    FMars_Request_HeldItem_SetNextArrival(const FCk_Handle_Item& InItem, const FTransform& InWorld)
+    {
+        Item = InItem;
+        World = InWorld;
+    }
+}
+
+// Drained ClearNextSpawnFrom -> SetNextSpawnFrom -> SetNextArrival -> SetSlot, the latest of each kind winning. A start pose
+// is always requested before the slot change it animates, and Request_ClearNextSpawnFrom drops a not-yet-drained
+// SetNextSpawnFrom, so arrival order survives the per-kind drain.
 struct FMars_Fragment_HeldItem_Requests
 {
+    UPROPERTY()
+    TArray<FMars_Request_HeldItem_ClearNextSpawnFrom> ClearNextSpawnFromRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_HeldItem_SetNextSpawnFrom> SetNextSpawnFromRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_HeldItem_SetNextArrival> SetNextArrivalRequests;
+
     UPROPERTY()
     TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests;
 }

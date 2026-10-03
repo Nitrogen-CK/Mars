@@ -34,8 +34,8 @@ class UMars_AutoTest_Health_HealRaisesCurrentAndClampsAtMax : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Hit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Health), "the Health composed");
-        auto Event = FMars_DamageEvent(60.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Crush"));
+        Assert_Valid(_Health, "utils_health::Add composed the Health");
+        auto Event = FMars_DamageEvent(60.0f, GameplayTags::DamageType_Mars_Crush);
         _Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Event));
     }
 
@@ -64,8 +64,11 @@ class UMars_AutoTest_Health_HealRaisesCurrentAndClampsAtMax : UCk_AutoTest_Base
     private void Step_AssertSmallAndHealHuge(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_HealedApplied.Num(), 1, "OnHealed fired once");
-        Assert_Equals_Float(_HealedApplied[0], 25.0f, 0.001f, "the heal applied 25");
-        Assert_Equals_Float(_HealedRemaining[0], 65.0f, 0.001f, "the heal left 65");
+        if (_HealedApplied.Num() == 1)
+        {
+            Assert_Equals_Float(_HealedApplied[0], 25.0f, 0.001f, "the heal applied 25");
+            Assert_Equals_Float(_HealedRemaining[0], 65.0f, 0.001f, "the heal left 65");
+        }
 
         _Health.Request_Heal(FMars_Request_Health_Heal(1000.0f));
     }
@@ -81,8 +84,11 @@ class UMars_AutoTest_Health_HealRaisesCurrentAndClampsAtMax : UCk_AutoTest_Base
     private void Step_AssertClamped(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_HealedApplied.Num(), 2, "OnHealed fired once per heal");
-        Assert_Equals_Float(_HealedApplied[1], 35.0f, 0.001f, "the huge heal reports only the 35 it added");
-        Assert_Equals_Float(_HealedRemaining[1], 100.0f, 0.001f, "the huge heal left Max");
+        if (_HealedApplied.Num() == 2)
+        {
+            Assert_Equals_Float(_HealedApplied[1], 35.0f, 0.001f, "the huge heal reports only the 35 it added");
+            Assert_Equals_Float(_HealedRemaining[1], 100.0f, 0.001f, "the huge heal left Max");
+        }
         Assert_Equals_Float(_Health.Get_Current(), 100.0f, 0.001f, "Health reads Max");
     }
 }

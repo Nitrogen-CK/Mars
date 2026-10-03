@@ -73,7 +73,7 @@ class UMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull : UCk_AutoTest_Base
     private void Check_OverflowFilled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_Slot(2).Get_NumItems() == 1 && _Hotbar.Get_SelectedIndex() == 2);
+        Res.Set(_Hotbar.Get_Slot(2).Get_NumItems() == 1 && _Hotbar.Get_SelectedIndex() == TOptional<int32>(2));
     }
 
     UFUNCTION()
@@ -81,15 +81,15 @@ class UMars_AutoTest_Hotbar_StowTargetIsNoneWhenFull : UCk_AutoTest_Base
     {
         // Any non-backpack item asks the same question; the stowed rock in slot 0 is one at hand.
         const auto Rock = _Hotbar.Get_ItemAt(0);
-        Assert_False(ck::IsValid(_Hotbar.TryGet_StowTarget(Rock)), "TryGet_StowTarget(rock) with every slot full");
-        Assert_False(_Hotbar.Get_CanStow(Rock), "Get_CanStow(rock) with every slot full");
+        Assert_Invalid(_Hotbar.TryGet_StowTarget(Rock), "a rock has no stow target with every slot full");
+        Assert_False(_Hotbar.Get_CanStow(Rock), "Get_CanStow(rock) is false with every slot full");
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

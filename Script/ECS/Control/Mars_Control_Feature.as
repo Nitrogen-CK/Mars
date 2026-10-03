@@ -21,9 +21,21 @@ enum EMars_Control_Behavior
     Momentary
 }
 
-// How a ManuallyCompleted control is pulled: the player grips it (Use) and swings the look input along PullAxis.
-// Field order is the positional constructor's order (the spawn-params generator emits it when a subclass changes
-// a default).
+enum EMars_Control_Activation
+{
+    Inactive,
+    Active
+}
+
+// Which way the next pull runs: toward the end pose (alpha 1), or back toward the start pose (alpha 0).
+enum EMars_Control_PullDirection
+{
+    TowardEnd,
+    TowardStart
+}
+
+// How a ManuallyCompleted control is pulled: the player grips it (Use) and swings the look input along PullAxis. The
+// spawn-params generator emits a non-default value as the positional constructor call.
 struct FMars_Control_Manipulation_Spec
 {
     // Direction the grip travels toward the end pose, in the control entity's own space (lever: local -X, the
@@ -94,8 +106,7 @@ struct FMars_Control_Spec
     UPROPERTY()
     FMars_Control_Manipulation_Spec Manipulation;
 
-    // Field order: the spawn-params generator emits a class whose `default Control.*` differs from these defaults as
-    // this positional call (Switch, Seal, HandWheel, Lever), Manipulation as a nested positional call.
+    // The spawn-params generator emits a non-default value as this positional call, Manipulation as a nested one.
     FMars_Control_Spec(
         ECk_Interaction_CompletionPolicy InInteraction,
         float32 InHoldSeconds,
@@ -171,20 +182,17 @@ struct FMars_Fragment_Control_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Live only between BeginManipulation and the end (threshold or EndManipulation). Written by the two Control processors.
+// A grip in progress, from BeginManipulation to the end (threshold or EndManipulation).
 struct FMars_Control_Manipulation
 {
-    UPROPERTY()
-    bool IsActive = false;
-
-    // The ManuallyCompleted interaction the threshold ends; may be invalid.
+    // The ManuallyCompleted interaction the threshold ends; invalid once it was cancelled.
     UPROPERTY()
     FCk_Handle_Interaction Interaction;
 
     UPROPERTY()
     FCk_Handle Manipulator;
 
-    // Handle position 0..1 (seeded from the Mover's alpha on Begin, else IsActive ? 1 : 0).
+    // Handle position 0..1, seeded from the Mover's alpha on Begin, else from where the pull starts.
     UPROPERTY()
     float32 Alpha = 0.0f;
 
@@ -197,6 +205,7 @@ struct FMars_Control_Manipulation
     float32 Velocity = 0.0f;
 }
 
+// Written only by the two Control processors.
 struct FMars_Fragment_Control
 {
     UPROPERTY()
@@ -209,26 +218,34 @@ struct FMars_Fragment_Control
     UPROPERTY()
     FCk_Handle_Mover Mover;
 
+    // Set while gripped.
     UPROPERTY()
-    FMars_Control_Manipulation Manipulation;
+    TOptional<FMars_Control_Manipulation> Manipulation;
 }
 
-// Present while Manipulation.IsActive; gates UMars_Processor_Control_Tick.
+// Present while Manipulation is set; gates UMars_Processor_Control_Tick.
 struct FMars_Tag_Control_Manipulating {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_Control_OnActiveChanged(FCk_Handle_Control InControl, bool InActive);
-event void FMars_Delegate_Control_OnActiveChanged_MC(FCk_Handle_Control InControl, bool InActive);
+delegate void FMars_Delegate_Control_OnActiveChanged(FCk_Handle_Control InControl, EMars_Control_Activation InActivation);
+event void FMars_Delegate_Control_OnActiveChanged_MC(FCk_Handle_Control InControl, EMars_Control_Activation InActivation);
 
 // Every accepted use, including one that does not change IsActive (a Momentary re-engage).
 delegate void FMars_Delegate_Control_OnEngaged(FCk_Handle_Control InControl);
 event void FMars_Delegate_Control_OnEngaged_MC(FCk_Handle_Control InControl);
 
-delegate void FMars_Delegate_Control_OnManipulationChanged(FCk_Handle_Control InControl, bool InManipulating);
-event void FMars_Delegate_Control_OnManipulationChanged_MC(FCk_Handle_Control InControl, bool InManipulating);
+// Gripped when a manipulation begins; Released when it ends, at the threshold or on EndManipulation.
+enum EMars_Control_Grip
+{
+    Released,
+    Gripped
+}
+
+delegate void FMars_Delegate_Control_OnManipulationChanged(FCk_Handle_Control InControl, EMars_Control_Grip InGrip);
+event void FMars_Delegate_Control_OnManipulationChanged_MC(FCk_Handle_Control InControl, EMars_Control_Grip InGrip);
 
 // 0..1 toward EngageAlpha in the pull's direction, every manipulated frame; 0 when the manipulation ends.
 delegate void FMars_Delegate_Control_OnManipulationProgress(FCk_Handle_Control InControl, float32 InProgress);
@@ -246,16 +263,26 @@ struct FMars_Fragment_Control_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Request_Control_Engage {}
+// Payload-less: one placeholder field (request doctrine).
+struct FMars_Request_Control_Engage
+{
+    UPROPERTY()
+    bool Requested = true;
 
+    FMars_Request_Control_Engage() {}
+}
+
+// Activating a Momentary control arms its release timer, as an engage would.
 struct FMars_Request_Control_SetActive
 {
     UPROPERTY()
-    bool Active = false;
+    EMars_Control_Activation Activation = EMars_Control_Activation::Inactive;
 
-    FMars_Request_Control_SetActive(bool InActive)
+    FMars_Request_Control_SetActive() {}
+
+    FMars_Request_Control_SetActive(EMars_Control_Activation InActivation)
     {
-        Active = InActive;
+        Activation = InActivation;
     }
 }
 
@@ -291,7 +318,7 @@ struct FMars_Request_Control_Nudge
     }
 }
 
-// AngelScript rejects an empty struct in a TOptional/TArray, so it carries one placeholder field.
+// Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Control_EndManipulation
 {
     UPROPERTY()

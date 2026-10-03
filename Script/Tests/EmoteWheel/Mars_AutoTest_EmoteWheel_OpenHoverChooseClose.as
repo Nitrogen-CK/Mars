@@ -9,10 +9,10 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     private int32 _ClosedCount = 0;
     private int32 _HoverChangeCount = 0;
     private int32 _ChosenCount = 0;
-    private int32 _ChosenIndex = -1;
+    private TOptional<int32> _ChosenIndex;
     private FGameplayTag _ChosenEmote;
     // OnEmoteChosen must precede OnClosed.
-    private int32 _ClosedCountWhenChosen = -1;
+    private TOptional<int32> _ClosedCountWhenChosen;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -63,7 +63,7 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void OnHoveredChanged(FCk_Handle_EmoteWheel InWheel, int32 InPrevIndex, int32 InNewIndex)
+    private void OnHoveredChanged(FCk_Handle_EmoteWheel InWheel)
     {
         _HoverChangeCount += 1;
     }
@@ -72,9 +72,9 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     private void OnEmoteChosen(FCk_Handle_EmoteWheel InWheel, int32 InIndex, FGameplayTag InEmote)
     {
         _ChosenCount += 1;
-        _ChosenIndex = InIndex;
+        _ChosenIndex = TOptional<int32>(InIndex);
         _ChosenEmote = InEmote;
-        _ClosedCountWhenChosen = _ClosedCount;
+        _ClosedCountWhenChosen = TOptional<int32>(_ClosedCount);
     }
 
     UFUNCTION()
@@ -99,7 +99,7 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Confirm(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Wheel.Request_Close(FMars_Request_EmoteWheel_Close(true));
+        _Wheel.Request_Close(FMars_Request_EmoteWheel_Close(EMars_EmoteWheel_CloseAction::Choose));
     }
 
     UFUNCTION()
@@ -113,7 +113,7 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     private void Check_OpenCentred(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_OpenedCount == 1 && _Wheel.Get_IsOpen() && _Wheel.Get_HoveredIndex() == -1
+        Res.Set(_OpenedCount == 1 && _Wheel.Get_IsOpen() && _Wheel.Get_HoveredIndex().IsSet() == false
             && _Wheel.Get_Pointer().IsNearlyZero() && _HoverChangeCount == 0);
     }
 
@@ -121,7 +121,7 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     private void Check_HoveredZero(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Wheel.Get_HoveredIndex() == 0 && _HoverChangeCount == 1);
+        Res.Set(_Wheel.Get_HoveredIndex() == TOptional<int32>(0) && _HoverChangeCount == 1);
     }
 
     UFUNCTION()
@@ -136,18 +136,22 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     private void Check_ChosenThenClosed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto Expected = utils_emote_wheel::Get_SectorAt(FVector2D(1.0, 0.0), _Wheel.Get_EntryCount(), _Wheel.Get_DeadZoneRatio());
-        const auto ExpectedEntry = _Wheel.TryGet_Entry(Expected);
+        auto ExpectedEntry = TOptional<FMars_EmoteWheel_Entry>();
+        if (Expected.IsSet())
+        { ExpectedEntry = _Wheel.TryGet_Entry(Expected.GetValue()); }
+
         auto Res = OutResult;
-        Res.Set(_ChosenCount == 1 && _ChosenIndex == Expected && ExpectedEntry.IsSet()
-            && _ChosenEmote == ExpectedEntry.GetValue().Emote && _ClosedCountWhenChosen == 0
-            && _ClosedCount == 1 && _Wheel.Get_IsOpen() == false && _Wheel.Get_HoveredIndex() == -1);
+        Res.Set(_ChosenCount == 1 && _ChosenIndex.IsSet() && _ChosenIndex == Expected && ExpectedEntry.IsSet()
+            && _ChosenEmote == ExpectedEntry.GetValue().Emote
+            && _ClosedCountWhenChosen.IsSet() && _ClosedCountWhenChosen.GetValue() == 0
+            && _ClosedCount == 1 && _Wheel.Get_IsOpen() == false && _Wheel.Get_HoveredIndex().IsSet() == false);
     }
 
     UFUNCTION()
     private void Check_OpenAgain(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_OpenedCount == 2 && _Wheel.Get_IsOpen() && _Wheel.Get_HoveredIndex() == -1);
+        Res.Set(_OpenedCount == 2 && _Wheel.Get_IsOpen() && _Wheel.Get_HoveredIndex().IsSet() == false);
     }
 
     UFUNCTION()

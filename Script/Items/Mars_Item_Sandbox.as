@@ -5,10 +5,10 @@ asset Mars_ItemDef_Rock of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Rock"));
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = engine::Sphere();
-    Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.GripShape = EMars_FPHands_GripShape::Sphere;
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = engine::Sphere();
+    Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.3);
+    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -20,9 +20,9 @@ asset Mars_ItemDef_Ration of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Ration"));
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = engine::Cube();
-    Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = engine::Cube();
+    Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.3);
+    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
@@ -42,9 +42,9 @@ asset Mars_ItemDef_Cog of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cog"));
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = engine::Cylinder();
-    Presentation.MeshScale = FVector(0.3, 0.3, 0.3);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = engine::Cylinder();
+    Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.3);
+    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -58,12 +58,12 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     _CoreInfo.Set_Icon(assets::Backpack_T());
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = assets::SM_PlayerBackpack();
-    Presentation.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -10.0));
-    Presentation.Persistence = EMars_WorldItem_Persistence::Persistent;
-    Presentation.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
+    Presentation.Visual.Mesh = assets::SM_PlayerBackpack();
+    Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -10.0));
+    Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
+    Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
     // Pushed back off the Back attach point so the worn pack stays out of the camera when looking down.
-    Presentation.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(-20.0, 0.0, 0.0));
+    Presentation.Mounting.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(-20.0, 0.0, 0.0));
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -75,25 +75,25 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     auto Backpack = Cast<UMars_ItemTrait_Backpack>(NewObject(this, UMars_ItemTrait_Backpack));
     auto Mount = FMars_CargoSlot_Mount();
     Mount.ProbeRadius = 10.0f;
-    Mount.Socket = n"Pocket1";
+    Mount.Socket = TOptional<FName>(n"Pocket1");
     Backpack.CargoSlots.Add(Mount);
-    Mount.Socket = n"Pocket2";
+    Mount.Socket = TOptional<FName>(n"Pocket2");
     Backpack.CargoSlots.Add(Mount);
-    Mount.Socket = n"Pocket3";
+    Mount.Socket = TOptional<FName>(n"Pocket3");
     Backpack.CargoSlots.Add(Mount);
     _ItemTraits.Add(Backpack);
 }
 
-// Melee items for the crawler room (Room 5). Use swings them (UMars_SmState_ItemUse_Strike); the Strike trait holds the
-// damage knobs. The cleaver severs (preserves parts), the tenderizer crushes (ruins soft parts).
+// Melee items. Use swings them (UMars_SmState_ItemUse_Strike); the Strike trait holds the damage knobs. The cleaver
+// severs (preserves parts), the tenderizer crushes (ruins soft parts).
 asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cleaver"));
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = engine::Cube();
-    Presentation.MeshScale = FVector(0.08, 0.5, 0.25);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = engine::Cube();
+    Presentation.Visual.MeshScale = FVector(0.08, 0.5, 0.25);
+    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
@@ -104,7 +104,7 @@ asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
 
     auto Strike = Cast<UMars_ItemTrait_Strike>(NewObject(this, UMars_ItemTrait_Strike));
     Strike.Damage = 20.0f;
-    Strike.DamageType = GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever");
+    Strike.DamageType = GameplayTags::DamageType_Mars_Sever;
     _ItemTraits.Add(Strike);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -116,9 +116,9 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Tenderizer"));
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Mesh = engine::Cylinder();
-    Presentation.MeshScale = FVector(0.25, 0.25, 0.5);
-    Presentation.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = engine::Cylinder();
+    Presentation.Visual.MeshScale = FVector(0.25, 0.25, 0.5);
+    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
@@ -129,7 +129,7 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
 
     auto Strike = Cast<UMars_ItemTrait_Strike>(NewObject(this, UMars_ItemTrait_Strike));
     Strike.Damage = 35.0f;
-    Strike.DamageType = GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Crush");
+    Strike.DamageType = GameplayTags::DamageType_Mars_Crush;
     _ItemTraits.Add(Strike);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));

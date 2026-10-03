@@ -1,5 +1,5 @@
 // With Gaze on the same face node and a target's head 45 degrees to the right, LookOffset.X settles at +0.75
-// (45 / LookMaxYawDeg 60); an expression with AllowLook = false brings it back to ~0 while the target is still there,
+// (45 / Look.MaxYawDeg 60); an expression with AllowLook = false brings it back to ~0 while the target is still there,
 // clearing it restores the look, and destroying the target returns it to ~0. A target in front and 100 cm above the
 // node then gives a positive LookOffset.Y, and one 100 cm below a negative one. Isolated Z band: -67000.
 class UMars_AutoTest_Eyes_LookFollowsGaze : UCk_AutoTest_Base
@@ -32,9 +32,10 @@ class UMars_AutoTest_Eyes_LookFollowsGaze : UCk_AutoTest_Base
         _Gaze = utils_gaze::Add(FaceNode, GazeSpec);
 
         auto EyesSpec = FMars_Eyes_Spec();
-        EyesSpec.BlinkEnabled = false;
-        EyesSpec.LookMaxYawDeg = 60.0f;
-        EyesSpec.LookMaxPitchDeg = _LookMaxPitchDeg;
+        auto Look = FMars_Eyes_LookSpec();
+        Look.MaxYawDeg = 60.0f;
+        Look.MaxPitchDeg = _LookMaxPitchDeg;
+        EyesSpec.Look = Look;
         _Eyes = utils_eyes::Add(FaceNode, EyesSpec);
 
         _ExpectedLookY = Math::RadiansToDegrees(Math::Atan2(100.0, 200.0)) / _LookMaxPitchDeg;

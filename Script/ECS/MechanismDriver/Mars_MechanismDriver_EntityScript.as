@@ -33,13 +33,9 @@ class UMars_MechanismDriver_EntityScript : UCk_GenericEntityScript_UE
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    FCk_Handle_MechanismDriver Get_Driver() const
-    {
-        return _Driver;
-    }
-
     // Reconcile from _Handles (the full population), not the deltas: the bind-time FireIfPayloadInFlight pass carries
-    // pre-existing matches in _Handles but may not surface them in _Added.
+    // pre-existing matches in _Handles but may not surface them in _Added. Every tagged entity carries the feature
+    // (its Add adds the tag), so the casts are checked.
     UFUNCTION()
     private void OnSourcesChanged(FCk_Handle_EntityTagQuery InQuery, bool InIsSatisfied,
                                   const TArray<FCk_EntityTagQuery_Result>&in InResults)
@@ -50,22 +46,22 @@ class UMars_MechanismDriver_EntityScript : UCk_GenericEntityScript_UE
         TSet<FCk_Handle_MechanismSource> Incoming;
         for (auto Entity : InResults[0]._Handles)
         {
-            auto Source = Entity.As_MechanismSource(ECk_SanityCheck::UnChecked);
-            if (ck::Is_NOT_Valid(Source))
+            if (ck::Is_NOT_Valid(Entity))
             { continue; }
-            Incoming.Add(Source);
+
+            Incoming.Add(Entity.As_MechanismSource());
         }
 
         TSet<FCk_Handle_MechanismSource> Current = _Driver.Get_Sources();
         for (auto Tracked : Current)
         {
             if (Incoming.Contains(Tracked) == false)
-            { _Driver.Request_UntrackSource(Tracked); }
+            { _Driver.Request_UntrackSource(FMars_Request_MechanismDriver_UntrackSource(Tracked)); }
         }
         for (auto Found : Incoming)
         {
             if (Current.Contains(Found) == false)
-            { _Driver.Request_TrackSource(Found); }
+            { _Driver.Request_TrackSource(FMars_Request_MechanismDriver_TrackSource(Found)); }
         }
     }
 
@@ -79,22 +75,22 @@ class UMars_MechanismDriver_EntityScript : UCk_GenericEntityScript_UE
         TSet<FCk_Handle_MechanismSink> Incoming;
         for (auto Entity : InResults[0]._Handles)
         {
-            auto Sink = Entity.As_MechanismSink(ECk_SanityCheck::UnChecked);
-            if (ck::Is_NOT_Valid(Sink))
+            if (ck::Is_NOT_Valid(Entity))
             { continue; }
-            Incoming.Add(Sink);
+
+            Incoming.Add(Entity.As_MechanismSink());
         }
 
         TSet<FCk_Handle_MechanismSink> Current = _Driver.Get_Sinks();
         for (auto Tracked : Current)
         {
             if (Incoming.Contains(Tracked) == false)
-            { _Driver.Request_UntrackSink(Tracked); }
+            { _Driver.Request_UntrackSink(FMars_Request_MechanismDriver_UntrackSink(Tracked)); }
         }
         for (auto Found : Incoming)
         {
             if (Current.Contains(Found) == false)
-            { _Driver.Request_TrackSink(Found); }
+            { _Driver.Request_TrackSink(FMars_Request_MechanismDriver_TrackSink(Found)); }
         }
     }
 }

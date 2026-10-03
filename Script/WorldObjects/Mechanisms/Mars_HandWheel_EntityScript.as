@@ -45,7 +45,7 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
         MoverSpec.EndLocation = WheelLocation;
         MoverSpec.EndRotation = FRotator(0.0, 0.0, TurnDegrees);
         MoverSpec.Duration = MoveDuration;
-        MoverSpec.StartAtEnd = Control.StartActive;
+        MoverSpec.StartPose = Control.StartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         auto Mover = utils_mover::Add(WheelNode, MoverSpec);
 
         auto ControlHandle = utils_control::Add(InHandle, Control, Mover);
@@ -62,26 +62,23 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InWheelNode)
     {
         auto CubeMesh = engine::load::Cube();
-
         auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine shapes are 100 uu with a centered pivot. Pipe: 12 x 12 from the wall to the wheel.
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(WheelDistance * 0.5, 0.0, 0.0), FVector(WheelDistance * 0.01, 0.12, 0.12)),
-            CubeMesh, Material, collision::profile::BlockAll, n"HandWheel_Pipe");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(WheelDistance * 0.5, 0.0, 0.0), FVector(WheelDistance * 0.01, 0.12, 0.12)),
+            CubeMesh, Material, collision::profile::BlockAll, n"HandWheel_Pipe"));
 
-        // Wheel: 50 across, 5 thick; the cylinder's Z axis is pitched onto X, the roll axis. The spoke makes the turn
-        // readable on an otherwise symmetric disc.
-        // A cylinder with Grip_R / Grip_L sockets on the rim at 2 and 10 o'clock: the first-person gloves take it with both hands.
+        // Wheel: 50 across, 5 thick; the mesh's Z axis is pitched onto X, the roll axis. Grip_R / Grip_L sockets on the
+        // rim at 2 and 10 o'clock let the first-person gloves take it with both hands. The spoke makes the turn readable
+        // on an otherwise symmetric disc.
         auto WheelTransform = InWheelNode.As_Transform();
-        const auto WheelMeshPath = "/Game/Mars/Gameplay/Mechanisms/HandWheel_Mars_SM.HandWheel_Mars_SM";
-        auto WheelMesh = Cast<UStaticMesh>(LoadObject(this, WheelMeshPath));
-        if (ck::EnsureIfNot(ck::IsValid(WheelMesh), f"[HandWheel] Wheel mesh [{WheelMeshPath}] did not load - the hand wheel has no wheel to see or grip"))
-        { return; }
-
-        AddMesh(WheelTransform, FTransform(FRotator(90.0, 0.0, 0.0), FVector::ZeroVector, FVector(0.5, 0.5, 0.05)),
-            WheelMesh, Material, collision::profile::NoCollision, n"HandWheel_Wheel");
-        AddMesh(WheelTransform, FTransform(FRotator::ZeroRotator, FVector(4.0, 0.0, 0.0), FVector(0.04, 0.46, 0.06)),
-            CubeMesh, Material, collision::profile::NoCollision, n"HandWheel_Spoke");
+        WheelTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator(90.0, 0.0, 0.0), FVector::ZeroVector, FVector(0.5, 0.5, 0.05)),
+            assets::load::HandWheel_Mars_SM(), Material, collision::profile::NoCollision, n"HandWheel_Wheel"));
+        WheelTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(4.0, 0.0, 0.0), FVector(0.04, 0.46, 0.06)),
+            CubeMesh, Material, collision::profile::NoCollision, n"HandWheel_Spoke"));
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
@@ -100,33 +97,5 @@ class UMars_HandWheel_EntityScript : UCk_GenericEntityScript_UE
         Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
 
         utils_interactable::Create(InRoot, Spec);
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddMesh(
-        FCk_Handle_Transform& InAttachTo,
-        FTransform InLocalTransform,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        if (ck::Is_NOT_Valid(InMesh))
-        { return; }
-
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component receives the entity transform after registration, and the wheel turns.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 }

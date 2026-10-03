@@ -9,8 +9,7 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UCk_A
     private FCk_Handle _Player;
     private TArray<EMars_FPHands_Phase> _Phases;
     private float32 _AlphaBefore = 0.0f;
-    private float32 _FirstHoldAlpha = -1.0f;
-    private bool _SawSecondHold = false;
+    private TOptional<float32> _SecondHoldStartAlpha;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -21,12 +20,13 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UCk_A
         auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.GrabOutSeconds = 0.2f;
-        Spec.Reach.GrabGripSeconds = 0.2f;
-        Spec.Reach.GrabBackSeconds = 0.2f;
-        Spec.Reach.ReleaseSeconds = 0.4f;
+        Spec.Reach.Grab.OutSeconds = 0.2f;
+        Spec.Reach.Grab.GripSeconds = 0.2f;
+        Spec.Reach.Grab.BackSeconds = 0.2f;
+        Spec.Reach.Hold.ReleaseSeconds = 0.4f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -61,7 +61,7 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UCk_A
     UFUNCTION()
     private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Player, false));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Timed));
     }
 
     UFUNCTION()
@@ -91,28 +91,26 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UCk_A
     {
         _AlphaBefore = _Hands.Get_ReachAlpha();
         Assert_True(_AlphaBefore > 0.0f && _AlphaBefore < 1.0f, f"the release is part way back (alpha {_AlphaBefore})");
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Player, false));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Timed));
     }
 
     // Captures the alpha on the first frame the second Hold is observed.
     UFUNCTION()
     private void Check_SecondHold(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        if (_SawSecondHold == false && _Hands.Get_Phase() == EMars_FPHands_Phase::Hold)
-        {
-            _SawSecondHold = true;
-            _FirstHoldAlpha = _Hands.Get_ReachAlpha();
-        }
+        if (_SecondHoldStartAlpha.IsSet() == false && _Hands.Get_Phase() == EMars_FPHands_Phase::Hold)
+        { _SecondHoldStartAlpha = TOptional<float32>(_Hands.Get_ReachAlpha()); }
 
         auto Res = OutResult;
-        Res.Set(_SawSecondHold);
+        Res.Set(_SecondHoldStartAlpha.IsSet());
     }
 
     UFUNCTION()
     private void Step_AssertNoSnap(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_FirstHoldAlpha >= _AlphaBefore - 0.05f,
-            f"the new hold starts from the release alpha, no snap to zero (first hold alpha {_FirstHoldAlpha}, release alpha {_AlphaBefore})");
+        const auto StartAlpha = _SecondHoldStartAlpha.GetValue();
+        Assert_True(StartAlpha >= _AlphaBefore - 0.05f,
+            f"the new hold starts from the release alpha, no snap to zero (first hold alpha {StartAlpha}, release alpha {_AlphaBefore})");
     }
 
     UFUNCTION()
@@ -129,8 +127,8 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UCk_A
         if (_Phases.Num() != 3)
         { return; }
 
-        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, "first change is to Hold");
-        Assert_True(_Phases[1] == EMars_FPHands_Phase::Release, "second change is to Release");
-        Assert_True(_Phases[2] == EMars_FPHands_Phase::Hold, "third change is back to Hold, with no stop at rest");
+        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, f"first change is to Hold (got {_Phases[0] :n})");
+        Assert_True(_Phases[1] == EMars_FPHands_Phase::Release, f"second change is to Release (got {_Phases[1] :n})");
+        Assert_True(_Phases[2] == EMars_FPHands_Phase::Hold, f"third change is back to Hold, with no stop at rest (got {_Phases[2] :n})");
     }
 }

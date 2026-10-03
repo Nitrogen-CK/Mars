@@ -16,35 +16,38 @@ namespace utils_hotbar
 {
     const int32 k_MaxBagSlotCount = 8;
 
-    // Composes BagSlotCount capacity-1 bag slot inventories, one overflow slot and (HasBackpackSlot) one backpack slot
+    // Composes BagSlotCount capacity-1 bag slot inventories, one overflow slot and (BackpackSlot Enable) one backpack slot
     // on InPlayer. The Hotbar never moves items itself: a caller stows by transferring into TryGet_StowTarget(Item), and
     // the sync pass reacts to what lands. Every slot's accept policy is enforced by CkInventory on every add/transfer.
     FCk_Handle_Hotbar Add(FCk_Handle& InPlayer, FMars_Hotbar_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Hotbar] {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Hotbar] {Validation.Get_Error()}"))
         { return FCk_Handle_Hotbar(); }
 
         TSubclassOf<UMars_Hotbar_AcceptPolicy> PolicyClass = UMars_Hotbar_AcceptPolicy;
         auto Policy = PolicyClass.GetDefaultObject();
 
-        const auto SlotCount = InSpec.BagSlotCount + 1 + (InSpec.HasBackpackSlot ? 1 : 0);
+        const auto HasBackpackSlot = InSpec.BackpackSlot == ECk_EnableDisable::Enable;
+        const auto SlotCount = InSpec.BagSlotCount + 1 + (HasBackpackSlot ? 1 : 0);
 
         auto State = FMars_Fragment_Hotbar();
         for (int32 Index = 0; Index <= SlotCount - 1; ++Index)
         {
-            auto SlotName = FName(f"Inventory.Mars.Slot.{Index}");
             auto PolicyFunction = n"OnCanAccept_ItemSlot";
+            auto SlotTag = FGameplayTag();
             if (Index == InSpec.BagSlotCount)
-            { SlotName = n"Inventory.Mars.Overflow"; }
+            { SlotTag = GameplayTags::Inventory_Mars_Overflow; }
             else if (Index == InSpec.BagSlotCount + 1)
             {
-                SlotName = n"Inventory.Mars.Backpack";
+                SlotTag = GameplayTags::Inventory_Mars_Backpack;
                 PolicyFunction = n"OnCanAccept_BackpackSlot";
             }
+            else
+            { SlotTag = utils_gameplay_tag::ResolveGameplayTag(FName(f"Inventory.Mars.Slot.{Index}")); }
 
             auto SlotParams = utils_inventory_data_only::Make_Params_Bounded(
-                utils_gameplay_tag::ResolveGameplayTag(SlotName), 1,
+                SlotTag, 1,
                 FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(Policy, PolicyFunction),
                 FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
             SlotParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
@@ -55,8 +58,7 @@ namespace utils_hotbar
         }
 
         auto Params = FMars_Fragment_Hotbar_Params();
-        Params.BagSlotCount = InSpec.BagSlotCount;
-        Params.HasBackpackSlot = InSpec.HasBackpackSlot;
+        Params.Spec = InSpec;
 
         InPlayer.Add_Fragment(FMars_Feature_Hotbar());
         InPlayer.Add_Fragment(Params);
@@ -64,13 +66,16 @@ namespace utils_hotbar
         return InPlayer.As_Hotbar();
     }
 
-    FCk_Handle_Item DoGet_FirstItem(FCk_Handle_Inventory_DataOnly InSlot)
+    // Processor-only: the two Hotbar processors are the only writers of SelectedIndex.
+    void Apply_Selection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, TOptional<int32> InNewIndex)
     {
-        if (ck::Is_NOT_Valid(InSlot) || InSlot.Get_NumItems() == 0)
-        { return FCk_Handle_Item(); }
+        if (InState.SelectedIndex == InNewIndex)
+        { return; }
 
-        auto Items = InSlot.Get_Items();
-        return Items[0];
+        InState.SelectedIndex = InNewIndex;
+
+        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
+        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar); }
     }
 }
 
@@ -80,7 +85,7 @@ namespace utils_hotbar
 
 mixin int32 Get_BagSlotCount(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Hotbar_Params).BagSlotCount;
+    return Self.Get_Fragment(FMars_Fragment_Hotbar_Params).Spec.BagSlotCount;
 }
 
 mixin int32 Get_OverflowIndex(const FCk_Handle_Hotbar& Self)
@@ -90,13 +95,16 @@ mixin int32 Get_OverflowIndex(const FCk_Handle_Hotbar& Self)
 
 mixin bool Get_HasBackpackSlot(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Hotbar_Params).HasBackpackSlot;
+    return Self.Get_Fragment(FMars_Fragment_Hotbar_Params).Spec.BackpackSlot == ECk_EnableDisable::Enable;
 }
 
-// -1 when the hotbar has no backpack slot.
-mixin int32 Get_BackpackIndex(const FCk_Handle_Hotbar& Self)
+// Unset when the hotbar has no backpack slot.
+mixin TOptional<int32> Get_BackpackIndex(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_HasBackpackSlot() ? Self.Get_BagSlotCount() + 1 : -1;
+    if (Self.Get_HasBackpackSlot() == false)
+    { return TOptional<int32>(); }
+
+    return TOptional<int32>(Self.Get_BagSlotCount() + 1);
 }
 
 // The highest selectable index: the backpack slot when present, else the overflow slot.
@@ -120,26 +128,40 @@ mixin FCk_Handle_Inventory_DataOnly Get_Slot(const FCk_Handle_Hotbar& Self, int3
     return State.Slots[InIndex];
 }
 
+// Invalid when InIndex is out of range or the slot is empty.
 mixin FCk_Handle_Item Get_ItemAt(const FCk_Handle_Hotbar& Self, int32 InIndex)
 {
-    return utils_hotbar::DoGet_FirstItem(Self.Get_Slot(InIndex));
+    const auto Slot = Self.Get_Slot(InIndex);
+    return Slot.Get_SoleItem();
 }
 
-mixin int32 Get_SelectedIndex(const FCk_Handle_Hotbar& Self)
+// Unset while hands are empty.
+mixin TOptional<int32> Get_SelectedIndex(const FCk_Handle_Hotbar& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Hotbar).SelectedIndex;
+}
+
+// Unset while nothing is parked; see FMars_Hotbar_ParkedSelection.
+mixin TOptional<FMars_Hotbar_ParkedSelection> TryGet_ParkedSelection(const FCk_Handle_Hotbar& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Hotbar).ParkedSelection;
 }
 
 // Invalid while hands are empty.
 mixin FCk_Handle_Inventory_DataOnly Get_SelectedSlot(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_Slot(Self.Get_SelectedIndex());
+    const auto SelectedIndex = Self.Get_SelectedIndex();
+    if (SelectedIndex.IsSet() == false)
+    { return FCk_Handle_Inventory_DataOnly(); }
+
+    return Self.Get_Slot(SelectedIndex.GetValue());
 }
 
 // Invalid while hands are empty or the selected slot is empty.
 mixin FCk_Handle_Item Get_SelectedItem(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_ItemAt(Self.Get_SelectedIndex());
+    const auto Slot = Self.Get_SelectedSlot();
+    return Slot.Get_SoleItem();
 }
 
 mixin bool Get_IsOverflowOccupied(const FCk_Handle_Hotbar& Self)
@@ -150,13 +172,18 @@ mixin bool Get_IsOverflowOccupied(const FCk_Handle_Hotbar& Self)
 // Invalid when the hotbar has no backpack slot.
 mixin FCk_Handle_Inventory_DataOnly Get_BackpackSlot(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_Slot(Self.Get_BackpackIndex());
+    const auto BackpackIndex = Self.Get_BackpackIndex();
+    if (BackpackIndex.IsSet() == false)
+    { return FCk_Handle_Inventory_DataOnly(); }
+
+    return Self.Get_Slot(BackpackIndex.GetValue());
 }
 
 // Invalid when the hotbar has no backpack slot or it is empty.
 mixin FCk_Handle_Item Get_BackpackItem(const FCk_Handle_Hotbar& Self)
 {
-    return Self.Get_ItemAt(Self.Get_BackpackIndex());
+    const auto Slot = Self.Get_BackpackSlot();
+    return Slot.Get_SoleItem();
 }
 
 mixin bool Get_IsWearingBackpack(const FCk_Handle_Hotbar& Self)
@@ -164,16 +191,17 @@ mixin bool Get_IsWearingBackpack(const FCk_Handle_Hotbar& Self)
     return ck::IsValid(Self.Get_BackpackItem());
 }
 
-// -1 when every bag slot holds an item.
-mixin int32 TryGet_FirstEmptyBagSlot(const FCk_Handle_Hotbar& Self)
+// Unset when every bag slot holds an item.
+mixin TOptional<int32> TryGet_FirstEmptyBagSlot(const FCk_Handle_Hotbar& Self)
 {
     const auto BagSlotCount = Self.Get_BagSlotCount();
     for (int32 Index = 0; Index < BagSlotCount; ++Index)
     {
         if (ck::Is_NOT_Valid(Self.Get_ItemAt(Index)))
-        { return Index; }
+        { return TOptional<int32>(Index); }
     }
-    return -1;
+
+    return TOptional<int32>();
 }
 
 // Backpack item: the backpack slot if present and empty, else invalid.
@@ -192,8 +220,8 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_StowTarget(const FCk_Handle_Hotbar& S
     }
 
     const auto BagIndex = Self.TryGet_FirstEmptyBagSlot();
-    if (BagIndex != -1)
-    { return Self.Get_Slot(BagIndex); }
+    if (BagIndex.IsSet())
+    { return Self.Get_Slot(BagIndex.GetValue()); }
 
     if (Self.Get_IsOverflowOccupied())
     { return FCk_Handle_Inventory_DataOnly(); }
@@ -213,9 +241,9 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_TakeTarget(const FCk_Handle_Hotbar& S
     { return FCk_Handle_Inventory_DataOnly(); }
 
     const auto SelectedIndex = Self.Get_SelectedIndex();
-    const auto SelectedIsBagSlot = SelectedIndex >= 0 && SelectedIndex < Self.Get_BagSlotCount();
-    if (SelectedIsBagSlot && InItem.Has_Backpack() == false && ck::Is_NOT_Valid(Self.Get_ItemAt(SelectedIndex)))
-    { return Self.Get_Slot(SelectedIndex); }
+    const auto SelectedIsBagSlot = SelectedIndex.IsSet() && SelectedIndex.GetValue() < Self.Get_BagSlotCount();
+    if (SelectedIsBagSlot && InItem.Has_Backpack() == false && ck::Is_NOT_Valid(Self.Get_ItemAt(SelectedIndex.GetValue())))
+    { return Self.Get_Slot(SelectedIndex.GetValue()); }
 
     return Self.TryGet_StowTarget(InItem);
 }
@@ -227,25 +255,25 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_TakeTarget(const FCk_Handle_Hotbar& S
 mixin void Request_Select(FCk_Handle_Hotbar& Self, const FMars_Request_Hotbar_Select& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.SelectRequests.Add(InRequest);
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::Select, InRequest.Index));
 }
 
 mixin void Request_Deselect(FCk_Handle_Hotbar& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.DeselectRequests.Add(FMars_Request_Hotbar_Deselect());
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::Deselect));
 }
 
 mixin void Request_CycleNext(FCk_Handle_Hotbar& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.CycleRequests.Add(FMars_Request_Hotbar_Cycle(1));
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::CycleNext));
 }
 
 mixin void Request_CyclePrevious(FCk_Handle_Hotbar& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Hotbar_Requests);
-    Requests.CycleRequests.Add(FMars_Request_Hotbar_Cycle(-1));
+    Requests.SelectionChangeRequests.Add(FMars_Hotbar_SelectionChangeRequest(EMars_Hotbar_SelectionChange::CyclePrevious));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

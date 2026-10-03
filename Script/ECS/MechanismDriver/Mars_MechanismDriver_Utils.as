@@ -26,39 +26,38 @@ mixin const TSet<FCk_Handle_MechanismSink>& Get_Sinks(const FCk_Handle_Mechanism
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_TrackSource(FCk_Handle_MechanismDriver& Self, FCk_Handle_MechanismSource InSource)
+mixin void Request_TrackSource(FCk_Handle_MechanismDriver& Self, const FMars_Request_MechanismDriver_TrackSource& InRequest)
 {
-    if (ck::Is_NOT_Valid(InSource))
+    if (ck::EnsureIfNot(ck::IsValid(InRequest.Source), f"[MechanismDriver] [{Self.ToString()}] was asked to track an invalid source"))
     { return; }
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismDriver_Requests);
-    Requests.TrackSources.Add(InSource);
+    Requests.TrackSourceRequests.Add(InRequest);
 }
 
-mixin void Request_UntrackSource(FCk_Handle_MechanismDriver& Self, FCk_Handle_MechanismSource InSource)
+mixin void Request_UntrackSource(FCk_Handle_MechanismDriver& Self, const FMars_Request_MechanismDriver_UntrackSource& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismDriver_Requests);
-    Requests.UntrackSources.Add(InSource);
+    Requests.UntrackSourceRequests.Add(InRequest);
 }
 
-mixin void Request_TrackSink(FCk_Handle_MechanismDriver& Self, FCk_Handle_MechanismSink InSink)
+mixin void Request_TrackSink(FCk_Handle_MechanismDriver& Self, const FMars_Request_MechanismDriver_TrackSink& InRequest)
 {
-    if (ck::Is_NOT_Valid(InSink))
+    if (ck::EnsureIfNot(ck::IsValid(InRequest.Sink), f"[MechanismDriver] [{Self.ToString()}] was asked to track an invalid sink"))
     { return; }
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismDriver_Requests);
-    Requests.TrackSinks.Add(InSink);
+    Requests.TrackSinkRequests.Add(InRequest);
 }
 
-mixin void Request_UntrackSink(FCk_Handle_MechanismDriver& Self, FCk_Handle_MechanismSink InSink)
+mixin void Request_UntrackSink(FCk_Handle_MechanismDriver& Self, const FMars_Request_MechanismDriver_UntrackSink& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismDriver_Requests);
-    Requests.UntrackSinks.Add(InSink);
+    Requests.UntrackSinkRequests.Add(InRequest);
 }
 
-// Coalesces: any number of calls before the drain produce one full recompute.
 mixin void Request_Recompute(FCk_Handle_MechanismDriver& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismDriver_Requests);
-    Requests.Recompute = true;
+    Requests.RecomputeRequests.Add(FMars_Request_MechanismDriver_Recompute());
 }

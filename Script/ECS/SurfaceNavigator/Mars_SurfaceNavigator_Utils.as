@@ -4,13 +4,13 @@ namespace utils_surface_navigator
     // ensures and returns an invalid handle with nothing composed.
     FCk_Handle_SurfaceNavigator Add(FCk_Handle_SurfaceMotion& InMotion, FMars_SurfaceNavigator_Spec InSpec)
     {
-        auto Entity = FCk_Handle(InMotion);
+        FCk_Handle Entity = InMotion;
 
         if (ck::EnsureIfNot(ck::IsValid(InMotion), f"[SurfaceNavigator] [{Entity.ToString()}] needs a valid surface motion"))
         { return FCk_Handle_SurfaceNavigator(); }
 
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[SurfaceNavigator] [{Entity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[SurfaceNavigator] [{Entity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_SurfaceNavigator(); }
 
         auto Params = FMars_Fragment_SurfaceNavigator_Params();
@@ -25,8 +25,8 @@ namespace utils_surface_navigator
         return Entity.As_SurfaceNavigator();
     }
 
-    // The ground-nav volume a crawler room uses: 25/10 cells on 500 uu tiles, a 40 x 40 capsule agent, no ledge
-    // demotion (the field is clipped to the volume, whose edges are not ledges). AutoBuildOnSetup stays enabled.
+    // The crawler room's ground-nav volume. No ledge demotion: the field is clipped to the volume, whose edges are not
+    // ledges. AutoBuildOnSetup stays enabled.
     FCk_GroundNavVolume_Spec Make_NavFieldSpec(FBox InBounds)
     {
         auto Config = FCk_GroundNav_BakeConfig(25.0f, 10.0f);
@@ -36,27 +36,6 @@ namespace utils_surface_navigator
         Profile.Set_LedgeSensitivity(0.0f);
 
         return FCk_GroundNavVolume_Spec(InBounds, Config, Profile);
-    }
-
-    // Processor-only (the navigator's request drain and tick). Steering is sticky in SurfaceMotion, so the request goes
-    // out only when the direction turns by more than ~1 degree or the speed changes; a zero steer always goes out.
-    void Steer(FMars_Fragment_SurfaceNavigator& InOutState, FVector InDirection, float32 InSpeed)
-    {
-        const auto IsZero = InSpeed <= 0.0f;
-        const auto Direction = IsZero ? FVector::ZeroVector : InDirection;
-        const auto Speed = IsZero ? 0.0f : InSpeed;
-
-        if (IsZero == false && Speed == InOutState.Steering.Speed && Direction.DotProduct(InOutState.Steering.Direction) >= 0.9998)
-        { return; }
-
-        InOutState.Steering.Direction = Direction;
-        InOutState.Steering.Speed = Speed;
-
-        auto Motion = InOutState.Motion;
-        if (ck::Is_NOT_Valid(Motion))
-        { return; }
-
-        utils_surface_motion::Request_Steering(Motion, FCk_Request_SurfaceMotion_Steering(Direction, Speed));
     }
 }
 
@@ -108,13 +87,21 @@ mixin int32 Get_WaypointIndex(const FCk_Handle_SurfaceNavigator& Self)
     return Self.Get_Fragment(FMars_Fragment_SurfaceNavigator).Route.WaypointIndex;
 }
 
+// True until the request drain has run: the status and the goal still describe the move before the queued requests.
+mixin bool Get_HasPendingRequests(const FCk_Handle_SurfaceNavigator& Self)
+{
+    return Self.Has_Fragment(FMars_Fragment_SurfaceNavigator_Requests);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Cancels every MoveTo queued before it: the Stop wins over a move requested earlier in the same frame.
 mixin void Request_Stop(FCk_Handle_SurfaceNavigator& Self, const FMars_Request_SurfaceNavigator_Stop& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_SurfaceNavigator_Requests);
+    Requests.MoveToRequests.Empty();
     Requests.StopRequests.Add(InRequest);
 }
 

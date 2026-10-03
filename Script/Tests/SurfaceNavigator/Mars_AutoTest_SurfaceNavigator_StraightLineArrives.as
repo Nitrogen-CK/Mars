@@ -1,8 +1,8 @@
-// With no nav provider over the test world (T14: the Mars autotest map has no field there), a MoveTo runs straight to
-// the goal: the navigator goes Moving with PathMode StraightLine and the goal as its one waypoint, then arrives within
+// With no nav provider over the test world (the Mars autotest map has no field there), a MoveTo runs straight to the
+// goal: the navigator goes Moving with PathMode StraightLine and the goal as its one waypoint, then arrives within
 // AcceptanceRadius of the goal, OnArrived firing once. The spec rejects a zero Speed and a zero AcceptanceRadius.
 //
-// The body is a plain SurfaceMotion body on a runtime static Jolt floor (D-T1; no legs, so it rides its rays).
+// The body is a plain SurfaceMotion body on a runtime static Jolt floor (no legs, so it rides its rays).
 // Isolated origin (140000, 80000, 600): the Mars autotest map has no floor of its own there.
 class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UCk_AutoTest_Base
 {
@@ -32,10 +32,6 @@ class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UCk_AutoTest_Base
         Add_Step("the body is at the goal and OnArrived fired once", n"Step_AssertArrived");
         Run_Steps(InHandle);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
 
     private FCk_SurfaceMotion_Spec Make_MotionSpec()
     {
@@ -81,10 +77,6 @@ class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UCk_AutoTest_Base
         Res.Set(ck::IsValid(_Motion) && utils_surface_motion::Get_Status(_Motion) == ECk_ProceduralAnimation_Status::Ready);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Handlers
-    //----------------------------------------------------------------------------------------------------------------------
-
     UFUNCTION()
     private void OnArrived(FCk_Handle_SurfaceNavigator InNavigator, FVector InGoal)
     {
@@ -98,19 +90,15 @@ class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UCk_AutoTest_Base
         ++_FailedCount;
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Steps
-    //----------------------------------------------------------------------------------------------------------------------
-
     UFUNCTION()
     private void Step_AssertValidation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(FMars_SurfaceNavigator_Spec().Validate().IsValid, "the default spec is valid");
-        Assert_False(FMars_SurfaceNavigator_Spec(0.0f, 40.0f).Validate().IsValid, "Speed 0 is rejected");
-        Assert_False(FMars_SurfaceNavigator_Spec(120.0f, 0.0f).Validate().IsValid, "AcceptanceRadius 0 is rejected");
-        Assert_True(ck::IsValid(_Nav), "the navigator composed on the body");
-        Assert_True(FCk_Handle(_Nav.Get_Motion()) == FCk_Handle(_Motion), "the navigator steers the body's motion");
-        Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Idle, "a new navigator is Idle");
+        Assert_True(FMars_SurfaceNavigator_Spec().Validate().IsValid(), "the default spec is valid");
+        Assert_False(FMars_SurfaceNavigator_Spec(0.0f, 40.0f).Validate().IsValid(), "Speed 0 is rejected");
+        Assert_False(FMars_SurfaceNavigator_Spec(120.0f, 0.0f).Validate().IsValid(), "AcceptanceRadius 0 is rejected");
+        Assert_Valid(_Nav, "utils_surface_navigator::Add composed the navigator on the body");
+        Assert_True(_Nav.Get_Motion() == _Motion, "the navigator steers the body's motion");
+        Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Idle, f"a new navigator is Idle (got [{_Nav.Get_Status() :n}])");
     }
 
     UFUNCTION()
@@ -131,11 +119,15 @@ class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertStraightLine(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Nav.Get_PathMode() == EMars_SurfaceNavigator_PathMode::StraightLine, "no provider covers the test world: straight line");
-        Assert_Equals_Int(_Nav.Get_Waypoints().Num(), 1, "a straight-line move has one waypoint");
-        if (_Nav.Get_Waypoints().Num() > 0)
-        { Assert_True(_Nav.Get_Waypoints()[0].Equals(_Goal), "the waypoint is the goal"); }
-        Assert_True(_Nav.Get_Goal().Equals(_Goal), "the navigator records the goal");
+        Assert_True(_Nav.Get_PathMode() == EMars_SurfaceNavigator_PathMode::StraightLine,
+            f"no provider covers the test world: straight line (got [{_Nav.Get_PathMode() :n}])");
+
+        const auto Waypoints = _Nav.Get_Waypoints();
+        Assert_Equals_Int(Waypoints.Num(), 1, "a straight-line move has one waypoint");
+        if (Waypoints.Num() == 1)
+        { Assert_True(Waypoints[0].Equals(_Goal), f"the waypoint is the goal (got [{Waypoints[0].ToString()}])"); }
+
+        Assert_True(_Nav.Get_Goal().Equals(_Goal), f"the navigator records the goal (got [{_Nav.Get_Goal().ToString()}])");
     }
 
     UFUNCTION()
@@ -154,11 +146,11 @@ class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertArrived(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Location = utils_transform::Get_EntityCurrentLocation(utils_transform::DoCastChecked(FCk_Handle(_Motion)));
+        const auto Location = utils_transform::Get_EntityCurrentLocation(_Motion.As_Transform());
         const auto Acceptance = _Nav.Get_Spec().AcceptanceRadius;
 
         Assert_Equals_Int(_ArrivedCount, 1, "OnArrived fired once");
-        Assert_True(_ArrivedGoal.Equals(_Goal), "OnArrived carries the goal");
+        Assert_True(_ArrivedGoal.Equals(_Goal), f"OnArrived carries the goal (got [{_ArrivedGoal.ToString()}])");
         Assert_Equals_Int(_FailedCount, 0, "OnFailed never fired");
         Assert_True((Location - _Goal).Size2D() <= Acceptance + 10.0,
             f"the body is within AcceptanceRadius + 10 of the goal in XY ({(Location - _Goal).Size2D()})");

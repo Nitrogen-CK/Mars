@@ -4,7 +4,7 @@
 // |    `- Behavior sub-SM (initial = Idle)
 // |         Idle    ->Roam [LeafRoam]  ->Flinch [LeafFlinch]  ->Cower [LeafCower]          (no tasks: the hub)
 // |         Roam    ->Idle [LeafNotRoam]     tasks: Roam (Tick): pick a goal in RoamBounds -> MoveTo -> arrive/fail -> dwell
-// |         Flinch  ->Idle [LeafNotFlinch]   tasks: Flinch (Tick): Stop; after FlinchSeconds -> SetFact(IsHurt, false)
+// |         Flinch  ->Idle [LeafNotFlinch]   tasks: Flinch (Tick): Stop; after FlinchSeconds -> SetFact(IsHurt, false); a hit restarts it
 // |         Cower   ->Idle [LeafNotCower]    tasks: Cower (EnterExitOnly): Stop
 // `- Dead             (sink)  tasks: Die (EnterExitOnly): stop, brain off, shed legs, body zone off, corpse timer -> despawn
 //
@@ -19,7 +19,7 @@
 
 class UMars_SmCondition_Crawler_IsDead : UMars_SmCondition_ByteAttribute
 {
-    default AttributeTag = GameplayTags::ResolveGameplayTag(n"ByteAttribute.Mars.Monster.Dead");
+    default AttributeTag = GameplayTags::ByteAttribute_Mars_Monster_Dead;
     default Comparison._Operator = ECk_ComparisonOperators::EqualTo;
     default Comparison._RHS = 1;
 }
@@ -32,7 +32,7 @@ class UMars_SmCondition_Crawler_LeafRoam : UMars_SmCondition_BrainLeaf
 class UMars_SmCondition_Crawler_LeafNotRoam : UMars_SmCondition_BrainLeaf
 {
     default LeafClass = UMars_GoapAction_Crawler_Roam;
-    default RequirePresent = false;
+    default LeafMatch = EMars_BrainLeaf_Match::Absent;
 }
 
 class UMars_SmCondition_Crawler_LeafFlinch : UMars_SmCondition_BrainLeaf
@@ -43,7 +43,7 @@ class UMars_SmCondition_Crawler_LeafFlinch : UMars_SmCondition_BrainLeaf
 class UMars_SmCondition_Crawler_LeafNotFlinch : UMars_SmCondition_BrainLeaf
 {
     default LeafClass = UMars_GoapAction_Crawler_Flinch;
-    default RequirePresent = false;
+    default LeafMatch = EMars_BrainLeaf_Match::Absent;
 }
 
 class UMars_SmCondition_Crawler_LeafCower : UMars_SmCondition_BrainLeaf
@@ -54,7 +54,7 @@ class UMars_SmCondition_Crawler_LeafCower : UMars_SmCondition_BrainLeaf
 class UMars_SmCondition_Crawler_LeafNotCower : UMars_SmCondition_BrainLeaf
 {
     default LeafClass = UMars_GoapAction_Crawler_Cower;
-    default RequirePresent = false;
+    default LeafMatch = EMars_BrainLeaf_Match::Absent;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ class UMars_SmState_Crawler_Dead : UCk_SmState_EntityScript
 // The teardown, all of it requests: stop the navigator, disable the brain, sever every still-attached part with the
 // death's cause (their debris is world-owned and dies on its own timer), disable the body zone, then start the corpse
 // timer whose expiry destroys the crawler root and everything it owns. The presentation keeps the body pose's collapse
-// (no legs left): that is the corpse pose. This task is the only place the corpse timer exists (D-M3).
+// (no legs left): that is the corpse pose. This task is the only place the corpse timer exists.
 class UMars_SmTask_Crawler_Die : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -112,25 +112,25 @@ class UMars_SmTask_Crawler_Die : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Root = ck::Ctx(InHandle);
-        auto Crawler = Root.As_Crawler(ECk_SanityCheck::UnChecked);
-        if (ck::EnsureIfNot(ck::IsValid(Crawler), f"[Crawler] Die task: context [{Root.ToString()}] is not a crawler"))
+        auto Crawler = ck::Ctx(InHandle).As_Crawler();
+        if (ck::Is_NOT_Valid(Crawler))
         { return; }
 
         auto Monster = Crawler.Get_Monster();
-        auto Brain = Root.As_Brain(ECk_SanityCheck::UnChecked);
 
         auto Navigator = Crawler.Get_Navigator();
-        if (ck::IsValid(Navigator))
-        { Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop()); }
+        Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
 
-        if (ck::IsValid(Brain))
-        { Brain.Request_SetEnabled(FMars_Request_Brain_SetEnabled(false)); }
+        auto Brain = Crawler.Get_Brain();
+        Brain.Request_SetEnabled(FMars_Request_Brain_SetEnabled(ECk_EnableDisable::Disable));
 
+        // The monster's Die drain records the cause before the Dead attribute that brought this state in can read 1.
         const auto MaybeCause = Monster.Get_DeathCause();
+        ck::EnsureIfNot(MaybeCause.IsSet(), f"[Crawler] [{Crawler.ToString()}] entered Dead with no death cause");
         const auto Cause = MaybeCause.IsSet() ? MaybeCause.GetValue() : FMars_DamageEvent();
 
         auto Shed = 0;
+        // An index loop: a range-for over the returned array yields read-only elements.
         auto Parts = Monster.Get_Parts();
         for (int32 Index = 0; Index < Parts.Num(); ++Index)
         {
@@ -143,26 +143,17 @@ class UMars_SmTask_Crawler_Die : UCk_SmTask_EntityScript
         }
 
         auto BodyZone = Monster.Get_BodyZone();
-        if (ck::IsValid(BodyZone))
-        { BodyZone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(false)); }
+        BodyZone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
 
-        auto TimerSpec = FCk_Timer_Spec(FCk_Time(Monster.Get_CorpseSeconds()));
-        TimerSpec.Set_StartingState(ECk_Timer_State::Running)
-                 .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
-        auto Timer = utils_timer::Add(Root, TimerSpec);
-        if (ck::IsValid(Timer))
-        { utils_timer::BindTo_OnDone(Timer, FCk_Delegate_Timer(this, n"OnCorpseExpired")); }
+        utils_monster::Add_DespawnTimer(Crawler, Monster.Get_CorpseSeconds(), FCk_Delegate_Timer(this, n"OnCorpseExpired"));
 
-        ck::Trace(f"[Crawler] [{Root.ToString()}] died: shedding [{Shed}] parts, corpse for [{Monster.Get_CorpseSeconds()}]s");
+        ck::Trace(f"[Crawler] [{Crawler.ToString()}] died: shedding [{Shed}] parts, corpse for [{Monster.Get_CorpseSeconds()}]s");
     }
 
-    // The timer's owner is the crawler root; destroying it takes everything body-owned along.
     UFUNCTION()
     private void OnCorpseExpired(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        auto Root = utils_entity_lifetime::Get_LifetimeOwner(FCk_Handle(InTimer));
-        if (ck::IsValid(Root))
-        { utils_entity_lifetime::Request_DestroyEntity(Root); }
+        utils_monster::Request_DestroyTimerOwner(InTimer);
     }
 }
 
@@ -254,14 +245,14 @@ class UMars_SmState_Crawler_Cower : UCk_SmState_EntityScript
 enum EMars_Crawler_RoamPhase
 {
     Pick,
-    // A MoveTo is out; waiting for its drain, then for Arrived or Failed.
+    // A MoveTo is out: waiting for Arrived or Failed.
     Travel,
     Dwell
 }
 
 // Pick a goal in RoamBounds -> MoveTo -> on Arrived dwell RoamDwellSeconds -> repeat. A failed move picks again at once,
-// except after 3 consecutive failures, when it dwells first (no tight NoPath loop). Always Running; the exit stops the
-// navigator (a leaf change or death tears the state down mid-move).
+// except after 3 consecutive failures, when it dwells first (no tight NoPath loop); a move stopped from outside dwells
+// too. Always Running; the exit stops the navigator (a leaf change or death tears the state down mid-move).
 class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -270,19 +261,15 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
 
     private FCk_Handle_Crawler _Crawler;
     private EMars_Crawler_RoamPhase _Phase = EMars_Crawler_RoamPhase::Pick;
-    private FVector _Goal;
-    private bool _MoveDrained = false;
     private float32 _DwellRemaining = 0.0f;
     private int32 _ConsecutiveFailures = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _Crawler = ck::Ctx(InHandle).As_Crawler(ECk_SanityCheck::UnChecked);
-        ck::EnsureIfNot(ck::IsValid(_Crawler), f"[Crawler] Roam task: context [{ck::Ctx(InHandle).ToString()}] is not a crawler");
+        _Crawler = ck::Ctx(InHandle).As_Crawler();
 
         _Phase = EMars_Crawler_RoamPhase::Pick;
-        _MoveDrained = false;
         _DwellRemaining = 0.0f;
         _ConsecutiveFailures = 0;
     }
@@ -290,35 +277,26 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
+        // The enter's checked cast already ensured.
         if (ck::Is_NOT_Valid(_Crawler))
         { return ECk_SmTaskResult::Running; }
 
         auto Navigator = _Crawler.Get_Navigator();
-        if (ck::Is_NOT_Valid(Navigator))
-        { return ECk_SmTaskResult::Running; }
 
         if (_Phase == EMars_Crawler_RoamPhase::Pick)
         {
-            _Goal = _Crawler.Pick_RoamPoint();
-            _MoveDrained = false;
-            Navigator.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(_Goal));
+            Navigator.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(_Crawler.Pick_RoamPoint()));
             _Phase = EMars_Crawler_RoamPhase::Travel;
             return ECk_SmTaskResult::Running;
         }
 
         if (_Phase == EMars_Crawler_RoamPhase::Travel)
         {
+            // Until the drain runs, the status still describes the previous move.
+            if (Navigator.Get_HasPendingRequests())
+            { return ECk_SmTaskResult::Running; }
+
             const auto Status = Navigator.Get_Status();
-
-            // A status read before the MoveTo drains belongs to the previous move; the drain records the new goal and
-            // leaves the navigator Moving (or Failed on NoPath).
-            if (_MoveDrained == false)
-            {
-                _MoveDrained = Navigator.Get_Goal().Equals(_Goal) && Status != EMars_SurfaceNavigator_Status::Idle;
-                if (_MoveDrained == false)
-                { return ECk_SmTaskResult::Running; }
-            }
-
             if (Status == EMars_SurfaceNavigator_Status::Arrived)
             {
                 _ConsecutiveFailures = 0;
@@ -334,6 +312,11 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
                 }
                 else
                 { _Phase = EMars_Crawler_RoamPhase::Pick; }
+            }
+            else if (Status == EMars_SurfaceNavigator_Status::Idle)
+            {
+                // Stopped from outside, or the MoveTo was cancelled by a later Stop: rest, then pick again.
+                BeginDwell();
             }
 
             return ECk_SmTaskResult::Running;
@@ -353,8 +336,7 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
         { return; }
 
         auto Navigator = _Crawler.Get_Navigator();
-        if (ck::IsValid(Navigator))
-        { Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop()); }
+        Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
 
         _Crawler = FCk_Handle_Crawler();
     }
@@ -366,61 +348,56 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
     }
 }
 
-// Stop, hold FlinchSeconds, then clear IsHurt through the brain (the replan moves the leaf on and tears this state down).
-// Always Running: a hit landing after the clear but before the replan sets IsHurt again with the plan, and so the leaf,
-// unchanged; the task sees the fact back at true and flinches again instead of resting forever on a spent timer.
+enum EMars_Crawler_FlinchPhase
+{
+    // Stopped, waiting out FlinchSeconds.
+    Holding,
+    // The IsHurt clear is requested; the replan moves the leaf on and tears this state down.
+    Clearing
+}
+
+// Stop, hold FlinchSeconds, then clear IsHurt through the brain. Always Running. Every damage event bumps the crawler's
+// HurtCount and a bump restarts the hold: a hit that lands while the clear is in flight writes IsHurt back to true, and
+// the restarted hold clears it again instead of waiting for a cleared fact that never comes.
 class UMars_SmTask_Crawler_Flinch : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     private FCk_Handle_Crawler _Crawler;
+    private EMars_Crawler_FlinchPhase _Phase = EMars_Crawler_FlinchPhase::Holding;
     private float32 _Elapsed = 0.0f;
-    private bool _ClearRequested = false;
-    private bool _SawCleared = false;
+    private int32 _SeenHurtCount = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _Crawler = ck::Ctx(InHandle).As_Crawler(ECk_SanityCheck::UnChecked);
-        ck::EnsureIfNot(ck::IsValid(_Crawler), f"[Crawler] Flinch task: context [{ck::Ctx(InHandle).ToString()}] is not a crawler");
-
+        _Crawler = ck::Ctx(InHandle).As_Crawler();
         BeginFlinch();
     }
 
     UFUNCTION(BlueprintOverride)
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
+        // The enter's checked cast already ensured.
         if (ck::Is_NOT_Valid(_Crawler))
         { return ECk_SmTaskResult::Running; }
 
-        auto Brain = _Crawler.Get_Brain();
-        if (ck::Is_NOT_Valid(Brain))
+        if (_Crawler.Get_HurtCount() != _SeenHurtCount)
+        {
+            BeginFlinch();
+            return ECk_SmTaskResult::Running;
+        }
+
+        if (_Phase == EMars_Crawler_FlinchPhase::Clearing)
         { return ECk_SmTaskResult::Running; }
 
-        const auto IsHurtFact = utils_crawler::Get_IsHurtFact();
+        _Elapsed += float32(InDeltaT.Get_Seconds());
+        if (_Elapsed < _Crawler.Get_Spec().FlinchSeconds)
+        { return ECk_SmTaskResult::Running; }
 
-        if (_ClearRequested == false)
-        {
-            _Elapsed += float32(InDeltaT.Get_Seconds());
-            if (_Elapsed >= _Crawler.Get_Spec().FlinchSeconds)
-            {
-                _ClearRequested = true;
-                Brain.Request_SetFact(FMars_Request_Brain_SetFact(IsHurtFact, false));
-            }
-            return ECk_SmTaskResult::Running;
-        }
-
-        // The clear is deferred twice (the brain's drain, then CkGoap's write): see it land before watching for a re-hurt.
-        const auto IsHurt = Brain.Get_Fact(IsHurtFact);
-        if (_SawCleared == false)
-        {
-            _SawCleared = IsHurt == false;
-            return ECk_SmTaskResult::Running;
-        }
-
-        if (IsHurt)
-        { BeginFlinch(); }
-
+        _Phase = EMars_Crawler_FlinchPhase::Clearing;
+        auto Brain = _Crawler.Get_Brain();
+        Brain.Request_SetFact(FMars_Request_Brain_SetFact(utils_crawler::Get_IsHurtFact(), false));
         return ECk_SmTaskResult::Running;
     }
 
@@ -433,15 +410,15 @@ class UMars_SmTask_Crawler_Flinch : UCk_SmTask_EntityScript
     private void BeginFlinch()
     {
         _Elapsed = 0.0f;
-        _ClearRequested = false;
-        _SawCleared = false;
+        _Phase = EMars_Crawler_FlinchPhase::Holding;
 
         if (ck::Is_NOT_Valid(_Crawler))
         { return; }
 
+        _SeenHurtCount = _Crawler.Get_HurtCount();
+
         auto Navigator = _Crawler.Get_Navigator();
-        if (ck::IsValid(Navigator))
-        { Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop()); }
+        Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
     }
 }
 
@@ -452,12 +429,11 @@ class UMars_SmTask_Crawler_Cower : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Crawler = ck::Ctx(InHandle).As_Crawler(ECk_SanityCheck::UnChecked);
-        if (ck::EnsureIfNot(ck::IsValid(Crawler), f"[Crawler] Cower task: context [{ck::Ctx(InHandle).ToString()}] is not a crawler"))
+        auto Crawler = ck::Ctx(InHandle).As_Crawler();
+        if (ck::Is_NOT_Valid(Crawler))
         { return; }
 
         auto Navigator = Crawler.Get_Navigator();
-        if (ck::IsValid(Navigator))
-        { Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop()); }
+        Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
     }
 }

@@ -1,6 +1,6 @@
-// Leaving the Hands state machine does not touch the phase (no state is entered, so nothing requests one): stopping it
-// mid-Hold leaves the phase at Hold. Starting it again re-enters Rest, whose enter task puts the phase back to None -
-// what re-entering Alive does to the gloves.
+// Despite the name, exiting the Hands state machine resets nothing: stopping it mid-Hold leaves the phase at Hold (no
+// state is entered, so nothing requests a phase). It is re-entering it that resets: starting it again re-enters Rest,
+// whose enter task puts the phase back to None - what re-entering Alive does to the gloves.
 class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UCk_AutoTest_Base
 {
     private FCk_Handle_FPHands _Hands;
@@ -17,12 +17,13 @@ class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UCk_AutoTest_Base
         auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.GrabOutSeconds = 0.2f;
-        Spec.Reach.GrabGripSeconds = 0.2f;
-        Spec.Reach.GrabBackSeconds = 0.2f;
-        Spec.Reach.ReleaseSeconds = 0.2f;
+        Spec.Reach.Grab.OutSeconds = 0.2f;
+        Spec.Reach.Grab.GripSeconds = 0.2f;
+        Spec.Reach.Grab.BackSeconds = 0.2f;
+        Spec.Reach.Hold.ReleaseSeconds = 0.2f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -56,7 +57,7 @@ class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Player, false));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Timed));
     }
 
     UFUNCTION()
@@ -82,7 +83,7 @@ class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertStillHold(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, "the phase is still Hold once the state machine stopped");
+        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the phase is still Hold once the state machine stopped (got {_Hands.Get_Phase() :n})");
     }
 
     UFUNCTION()
@@ -107,7 +108,7 @@ class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UCk_AutoTest_Base
         if (_Phases.Num() != 2)
         { return; }
 
-        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, "first change is to Hold");
-        Assert_True(_Phases[1] == EMars_FPHands_Phase::None, "second change is back to None");
+        Assert_True(_Phases[0] == EMars_FPHands_Phase::Hold, f"first change is to Hold (got {_Phases[0] :n})");
+        Assert_True(_Phases[1] == EMars_FPHands_Phase::None, f"second change is back to None (got {_Phases[1] :n})");
     }
 }

@@ -22,7 +22,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default CameraComponent._Placement = ECk_Camera_OutputComponentPlacement::FollowView;
 
     // Floating first-person gloves. Owner-only: other players see the full body. Mesh and anim class come from
-    // Config.FPHands; UMars_FPHands_AnimInstance places each glove from the player entity's FPHands feature.
+    // Config.FPHands.Visual; UMars_FPHands_AnimInstance places each glove from the player entity's FPHands feature.
     UPROPERTY(DefaultComponent, Attach = CameraComponent)
     USkeletalMeshComponent FPHands;
     default FPHands.RelativeRotation = FRotator(0.0, -90.0, 0.0);
@@ -43,20 +43,26 @@ class AMars_PlayerCharacter : ACk_Character_UE
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
 
+    // The Hand node rest offset last sent to _HandSway. The gloves' own hold only updates at their next drain, so a
+    // second item change before it would compare against a stale rest.
+    private FTransform _HandRestOffset;
+
     UFUNCTION(BlueprintOverride)
     void ConstructionScript()
     {
-        CapsuleComponent.SetCapsuleSize(Config.CapsuleRadius, Config.CapsuleHalfHeight);
-        CameraComponent.SetRelativeLocation(FVector(0.0, 0.0, Config.EyeHeight.Height));
+        const auto& Body = Config.Body;
+        CapsuleComponent.SetCapsuleSize(Body.CapsuleRadius, Body.CapsuleHalfHeight);
+        CameraComponent.SetRelativeLocation(FVector(0.0, 0.0, Config.View.EyeHeight.Height));
 
-        CharacterMovement.MaxWalkSpeed = Config.WalkSpeed;
-        CharacterMovement.MaxWalkSpeedCrouched = Config.CrouchSpeed;
-        CharacterMovement.MaxAcceleration = Config.MaxAcceleration;
-        CharacterMovement.BrakingDecelerationWalking = Config.BrakingDecelerationWalking;
-        CharacterMovement.JumpZVelocity = Config.JumpZVelocity;
-        CharacterMovement.GravityScale = Config.GravityScale;
-        CharacterMovement.AirControl = Config.AirControl;
-        CharacterMovement.SetCrouchedHalfHeight(Config.CrouchedHalfHeight);
+        const auto& Movement = Config.Movement;
+        CharacterMovement.MaxWalkSpeed = Movement.Speeds.Walk;
+        CharacterMovement.MaxWalkSpeedCrouched = Movement.Speeds.Crouch;
+        CharacterMovement.MaxAcceleration = Movement.MaxAcceleration;
+        CharacterMovement.BrakingDecelerationWalking = Movement.BrakingDecelerationWalking;
+        CharacterMovement.JumpZVelocity = Movement.JumpZVelocity;
+        CharacterMovement.GravityScale = Movement.GravityScale;
+        CharacterMovement.AirControl = Movement.AirControl;
+        CharacterMovement.SetCrouchedHalfHeight(Body.CrouchedHalfHeight);
 
         // The gloves render first-person; held items tag themselves as they attach under the hand (Mars_FPHands_View).
         const auto& View = Config.FPHands.View;
@@ -65,11 +71,12 @@ class AMars_PlayerCharacter : ACk_Character_UE
         CameraComponent.SetEnableFirstPersonScale(IsFirstPerson);
         CameraComponent.SetFirstPersonScale(View.FirstPersonScale);
 
-        if (Config.FPHands.Mesh.IsNull() == false)
-        { FPHands.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Config.FPHands.Mesh)); }
+        const auto& Visual = Config.FPHands.Visual;
+        if (Visual.Mesh.IsNull() == false)
+        { FPHands.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Visual.Mesh)); }
 
-        if (Config.FPHands.AnimClass.IsNull() == false)
-        { FPHands.SetAnimInstanceClass(System::LoadClassAsset_Blocking(Config.FPHands.AnimClass)); }
+        if (Visual.AnimClass.IsNull() == false)
+        { FPHands.SetAnimInstanceClass(System::LoadClassAsset_Blocking(Visual.AnimClass)); }
     }
 
     // BeginPlay, not ConstructionScript: ck::TransientEntity() needs a live world.
@@ -95,40 +102,44 @@ class AMars_PlayerCharacter : ACk_Character_UE
 
         // The character's stride clock; the head and hand bobs below read it. The spec's tunables come from the config,
         // its motion source is this pawn's movement component.
-        auto GaitSpec = Config.Gait;
+        auto GaitSpec = Config.View.Gait;
         GaitSpec.Set_MovementComponent(CharacterMovement);
         _Gait = utils_gait::Add(Player, GaitSpec);
 
         // The view: a bob node on the eye node is the director's input anchor, so the rendered view bobs with the gait
-        // (PEAK-style positional bob) and eases with the eye across a crouch. The director lives on the head node;
+        // (a positional bob) and eases with the eye across a crouch. The director lives on the head node;
         // PlayerViewpoint keeps the handles.
         auto PlayerTransform = Player.As_Transform();
-        auto Eye = utils_eye_height::Create(PlayerTransform, Config.EyeHeight, this);
-        utils_handle::Set_DebugName(FCk_Handle(Eye), n"Player.Eye");
+        auto EyeHeightSpec = Config.View.EyeHeight;
+        EyeHeightSpec.Character = this;
+        auto Eye = utils_eye_height::Create(PlayerTransform, EyeHeightSpec);
+        utils_handle::Set_DebugName(Eye.H(), n"Player.Eye");
         auto EyeTransform = Eye.As_Transform();
-        auto HeadBobSpec = Config.HeadBob;
+        auto HeadBobSpec = Config.View.HeadBob;
         HeadBobSpec.Set_Gait(_Gait);
         auto Head = utils_bob::Create(EyeTransform, FTransform::Identity, HeadBobSpec);
-        utils_handle::Set_DebugName(FCk_Handle(Head), n"Player.Head");
+        utils_handle::Set_DebugName(Head.H(), n"Player.Head");
 
         auto CameraSpec = FCk_Camera_Spec(CameraComponent);
-        CameraSpec.Set_Profile(utils_player_viewpoint::Make_CameraProfile(Config.Viewpoint));
+        CameraSpec.Set_Profile(utils_player_viewpoint::Make_CameraProfile(Config.View.Viewpoint));
         CameraSpec.Set_DriveControllerControlRotation(true);
         auto HeadTransform = Head.As_Transform();
         auto Camera = utils_camera::Add(HeadTransform, CameraSpec);
 
-        utils_player_viewpoint::Add(Player, Camera, Config.Viewpoint);
+        auto ViewpointSpec = Config.View.Viewpoint;
+        ViewpointSpec.Camera = Camera;
+        utils_player_viewpoint::Add(Player, ViewpointSpec);
         utils_interaction_resolver::Add(Player, Config.InteractionResolver, ECk_Replication::DoesNotReplicate);
         utils_interact_prompt_display::Add(Player);
         utils_action_hint_display::Add(Player);
 
         // Silent: volumes that filter on Probe.Mars.Player detect the player; the player detects nothing through it.
         // Resizes with the capsule, so a crouched player is a crouched-height body to those volumes.
-        auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
+        auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Player);
         BodyProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
                      .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
-        auto BodyProbe = utils_body_probe::Create(PlayerTransform, BodyProbeSpec, this);
-        utils_handle::Set_DebugName(FCk_Handle(BodyProbe), n"Player.Probe.Body");
+        auto BodyProbe = utils_body_probe::Create(PlayerTransform, FMars_BodyProbe_Spec(BodyProbeSpec, this));
+        utils_handle::Set_DebugName(BodyProbe.H(), n"Player.Probe.Body");
 
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
@@ -136,10 +147,11 @@ class AMars_PlayerCharacter : ACk_Character_UE
 
         // Hangs off the rendered view (the director's view anchor), so it carries the view's pitch in the same frame.
         auto ViewAnchor = Camera.Get_ViewAnchor();
-        auto Hand = utils_scene_node::Create(ViewAnchor, utils_fphands::Get_HandRestOffset(Config.FPHands, FMars_FPHands_Hold(), Config.HandOffset));
-        utils_handle::Set_DebugName(FCk_Handle(Hand), n"Player.Hand");
+        _HandRestOffset = utils_fphands::Get_HandRestOffset(Config.FPHands.Rest, FMars_FPHands_Hold());
+        auto Hand = utils_scene_node::Create(ViewAnchor, _HandRestOffset);
+        utils_handle::Set_DebugName(Hand.H(), n"Player.Hand");
 
-        // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; HandOffset is its rest.
+        // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; _HandRestOffset is its rest.
         _HandSway = utils_sway::Add(Hand, Config.HandSway);
 
         // Locomotion bob under the swaying hand, in phase with the head; the held item and both gloves hang off it.
@@ -147,12 +159,14 @@ class AMars_PlayerCharacter : ACk_Character_UE
         auto HandBobSpec = Config.FPHands.Bob;
         HandBobSpec.Set_Gait(_Gait);
         auto HandBob = utils_bob::Create(HandTransform, FTransform::Identity, HandBobSpec);
-        utils_handle::Set_DebugName(FCk_Handle(HandBob), n"Player.HandBob");
+        utils_handle::Set_DebugName(HandBob.H(), n"Player.HandBob");
         _HandNode = HandBob.As_Transform();
-        _Hands = utils_fphands::Add(Player, Config.FPHands, _HandNode);
+        auto HandsSpec = Config.FPHands;
+        HandsSpec.HandNode = _HandNode;
+        _Hands = utils_fphands::Add(Player, HandsSpec);
 
-        auto Back = utils_scene_node::Create(PlayerTransform, Config.BackOffset);
-        utils_handle::Set_DebugName(FCk_Handle(Back), n"Player.Back");
+        auto Back = utils_scene_node::Create(PlayerTransform, Config.Inventory.BackOffset);
+        utils_handle::Set_DebugName(Back.H(), n"Player.Back");
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
@@ -162,65 +176,35 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_attach_points::Add(Player, AttachPointsSpec);
 
         auto HotbarSpec = FMars_Hotbar_Spec();
-        HotbarSpec.BagSlotCount = Config.BagSlotCount;
+        HotbarSpec.BagSlotCount = Config.Inventory.BagSlotCount;
         utils_hotbar::Add(Player, HotbarSpec);
         auto HeldItem = utils_held_item::Add(Player);
         HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
         utils_held_item_use::Add(Player);
         utils_emote_wheel::Add(Player, Config.EmoteWheel);
-        utils_climber::Add(Player, FMars_Climber_Spec(Config.ClimbSpeed));
+        utils_climber::Add(Player, FMars_Climber_Spec(Config.Movement.Speeds.Climb));
         utils_operator::Add(Player);
 
         utils_state_machine::Add(Player, FCk_StateMachine_Spec(UMars_SmState_Alive));
     }
 
-    // Plays an emote on the first-person gloves. False while they are busy (holding an item or reaching for something).
-    UFUNCTION()
-    bool Request_FPEmote(EMars_FPEmote InEmote)
-    {
-        if (ck::Is_NOT_Valid(_Hands) || _Hands.Get_Hold().IsHolding || _Hands.Get_Phase() != EMars_FPHands_Phase::None)
-        { return false; }
-
-        const auto Index = int32(InEmote);
-        const auto& Montages = Config.FPHands.EmoteMontages;
-        if (Montages.IsValidIndex(Index) == false || Montages[Index].IsNull())
-        { return false; }
-
-        auto AnimInstance = FPHands.GetAnimInstance();
-        auto Montage = System::LoadAsset_Blocking(Montages[Index]);
-        if (ck::Is_NOT_Valid(AnimInstance) || ck::Is_NOT_Valid(Montage))
-        { return false; }
-
-        AnimInstance.Montage_Play(Montage);
-        return true;
-    }
-
-    // Hands the gloves back to the procedural placement (a reach or a newly held item takes over).
-    void Stop_FPEmote()
-    {
-        auto AnimInstance = FPHands.GetAnimInstance();
-        if (ck::IsValid(AnimInstance) && AnimInstance.IsAnyMontagePlaying())
-        { AnimInstance.Montage_Stop(Config.FPHands.EmoteCancelBlendSeconds); }
-    }
-
     // Empty hands and two-handed holds centre the Hand node between the gloves; one-handed items move it to the right.
     // The gloves' own hold (and the carry of a picked-up item) is the FPHands feature's; the rest offset is measured
-    // here from the same item.
+    // here from the same item. Stays on the actor: the Hand node's sway handle is held only here.
     UFUNCTION()
     private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
     {
-        const auto PrevRest = utils_fphands::Get_HandRestOffset(Config.FPHands, _Hands.Get_Hold(), Config.HandOffset);
         _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(InNew));
 
         const auto NewHold = utils_fphands::Make_Hold(InNew);
-        if (NewHold.IsHolding)
-        { Stop_FPEmote(); }
+        if (NewHold.Kind != EMars_FPHands_HoldKind::Empty)
+        { utils_fphands::Stop_Emote(_Hands); }
 
-        const auto NewRest = utils_fphands::Get_HandRestOffset(Config.FPHands, NewHold, Config.HandOffset);
-
-        if (NewRest.Equals(PrevRest) || ck::Is_NOT_Valid(_HandSway))
+        const auto NewRest = utils_fphands::Get_HandRestOffset(Config.FPHands.Rest, NewHold);
+        if (NewRest.Equals(_HandRestOffset))
         { return; }
 
+        _HandRestOffset = NewRest;
         utils_sway::Request_SetRestOffset(_HandSway, FCk_Request_Sway_SetRestOffset(NewRest));
     }
 }

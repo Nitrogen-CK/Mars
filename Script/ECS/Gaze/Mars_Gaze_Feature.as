@@ -85,29 +85,11 @@ mixin FMars_Validation Validate(const FMars_Gaze_Spec& Self)
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The spec fields the select pass reads; DetectionFilter is consumed by utils_gaze::Add (it shapes the sense trigger).
-struct FMars_Gaze_Tuning
-{
-    UPROPERTY(meta = (Categories = "AttachPoint"))
-    FGameplayTag AimPoint;
-
-    UPROPERTY()
-    float32 RangeCm = 900.0f;
-
-    UPROPERTY()
-    float32 MinRangeCm = 20.0f;
-
-    UPROPERTY()
-    float32 ConeHalfAngleDeg = 80.0f;
-
-    UPROPERTY()
-    float32 SwitchCloserRatio = 0.15f;
-}
-
+// DetectionFilter only shapes the sense trigger at Add; the select pass reads the rest.
 struct FMars_Fragment_Gaze_Params
 {
     UPROPERTY()
-    FMars_Gaze_Tuning Tuning;
+    FMars_Gaze_Spec Spec;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

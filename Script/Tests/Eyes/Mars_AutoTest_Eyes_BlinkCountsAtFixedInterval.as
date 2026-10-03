@@ -13,7 +13,7 @@ class UMars_AutoTest_Eyes_BlinkCountsAtFixedInterval : UCk_AutoTest_Base
     // fully open before the next blink completed, and the time each count was first seen.
     private float32 _MaxBlinkSeen = 0.0f;
     private TArray<bool> _SeenOpenAtCount;
-    private TArray<float> _FirstSeenAtCount;
+    private TMap<int32, float> _FirstSeenAtCount;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -23,16 +23,15 @@ class UMars_AutoTest_Eyes_BlinkCountsAtFixedInterval : UCk_AutoTest_Base
             ECk_Replication::DoesNotReplicate);
 
         _Spec = FMars_Eyes_Spec();
-        _Spec.BlinkIntervalMinSeconds = 0.2f;
-        _Spec.BlinkIntervalMaxSeconds = 0.2f;
-        _Spec.DoubleBlinkChance = 0.0f;
+        auto Blink = FMars_Eyes_BlinkSpec();
+        Blink.IntervalMinSeconds = 0.2f;
+        Blink.IntervalMaxSeconds = 0.2f;
+        Blink.DoubleBlinkChance = 0.0f;
+        _Spec.Blink = Blink;
         _Eyes = utils_eyes::Add(FaceNode, _Spec);
 
         for (int32 Count = 0; Count <= 3; ++Count)
-        {
-            _SeenOpenAtCount.Add(false);
-            _FirstSeenAtCount.Add(-1.0);
-        }
+        { _SeenOpenAtCount.Add(false); }
 
         Add_Step("the eyes have a presentation", n"Step_AssertPresentation");
         Add_Step_WaitUntil("three blinks completed", n"Check_ThreeBlinks");
@@ -61,8 +60,8 @@ class UMars_AutoTest_Eyes_BlinkCountsAtFixedInterval : UCk_AutoTest_Base
             if (Blink <= 0.0f)
             { _SeenOpenAtCount[Count] = true; }
 
-            if (_FirstSeenAtCount[Count] < 0.0)
-            { _FirstSeenAtCount[Count] = System::GetGameTimeInSeconds(); }
+            if (_FirstSeenAtCount.Contains(Count) == false)
+            { _FirstSeenAtCount.Add(Count, System::GetGameTimeInSeconds()); }
         }
 
         auto Res = OutResult;
@@ -80,13 +79,20 @@ class UMars_AutoTest_Eyes_BlinkCountsAtFixedInterval : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertBlinkSpacing(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Expected = float(_Spec.BlinkIntervalMinSeconds
-            + _Spec.BlinkCloseSeconds + _Spec.BlinkHoldSeconds + _Spec.BlinkOpenSeconds);
+        const auto& BlinkSpec = _Spec.Blink.GetValue();
+        const auto Expected = float(BlinkSpec.IntervalMinSeconds
+            + BlinkSpec.CloseSeconds + BlinkSpec.HoldSeconds + BlinkSpec.OpenSeconds);
         for (int32 Count = 2; Count <= 3; ++Count)
         {
-            const auto Gap = _FirstSeenAtCount[Count] - _FirstSeenAtCount[Count - 1];
-            Assert_True(_FirstSeenAtCount[Count - 1] >= 0.0 && _FirstSeenAtCount[Count] >= 0.0,
-                f"blink {Count - 1} and blink {Count} were both seen completing");
+            float Previous = 0.0;
+            float Current = 0.0;
+            if (_FirstSeenAtCount.Find(Count - 1, Previous) == false || _FirstSeenAtCount.Find(Count, Current) == false)
+            {
+                Assert_True(false, f"blink {Count - 1} and blink {Count} were both seen completing");
+                continue;
+            }
+
+            const auto Gap = Current - Previous;
             Assert_True(Gap >= Expected - _GapToleranceSeconds,
                 f"blink {Count} completed [{Gap :.3}] s after blink {Count - 1} - no sooner than [{Expected :.3}] s minus [{_GapToleranceSeconds}]");
             Assert_True(Gap <= Expected + _GapToleranceSeconds,

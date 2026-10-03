@@ -1,6 +1,5 @@
 // Keyboard & mouse key glyphs for UCommonActionWidget / UCk_InputActionWidget_UE.
-// Brush lines are commented out until the Prompt_* textures exist under /Game/Mars and their
-// accessors are generated (Script/Mars_Assets.as) - uncomment them, and the size locals, then.
+// Keys without a Prompt_* texture under /Game/Mars map to an empty brush.
 
 TArray<FCommonInputKeyBrushConfiguration> Get_Mars_KeyboardBrushEntries()
 {
@@ -135,7 +134,6 @@ TArray<FCommonInputKeyBrushConfiguration> Get_Mars_KeyboardBrushEntries()
     // Mouse wheel
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::MouseScrollUp, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::MouseScrollDown, EmptyBrush));
-
 
     return Entries;
 }

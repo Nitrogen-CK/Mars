@@ -26,52 +26,52 @@ class UMars_Processor_Ladder_Setup : UCk_Processor_Script_Base_UE
         Ladder.Request_TryRemove(FMars_Tag_Ladder_NeedsSetup);
     }
 
+    // Add composes both zones.
     private void SetupZone(FCk_Handle_Trigger& InZone)
     {
-        if (ck::Is_NOT_Valid(InZone))
-        { return; }
-
         InZone.BindTo_OnEntityEntered(FMars_Delegate_Trigger_OnEntityEntered(this, n"OnZoneEntityEntered"));
         InZone.BindTo_OnEntityExited(FMars_Delegate_Trigger_OnEntityExited(this, n"OnZoneEntityExited"));
 
         for (auto Entity : InZone.Get_EntitiesInside())
-        { Offer(InZone, Entity, true); }
+        { Offer(InZone, Entity); }
     }
 
     UFUNCTION()
     private void OnZoneEntityEntered(FCk_Handle_Trigger InTrigger, FCk_Handle InEntity)
     {
-        Offer(InTrigger, InEntity, true);
+        Offer(InTrigger, InEntity);
     }
 
     UFUNCTION()
     private void OnZoneEntityExited(FCk_Handle_Trigger InTrigger, FCk_Handle InEntity)
     {
-        Offer(InTrigger, InEntity, false);
+        Withdraw(InTrigger, InEntity);
     }
 
-    private void Offer(const FCk_Handle_Trigger& InTrigger, FCk_Handle InEntity, bool InEntered)
+    private void Offer(const FCk_Handle_Trigger& InTrigger, FCk_Handle InEntity)
     {
-        if (InTrigger.Has_Fragment(FMars_Fragment_Ladder_TriggerLink) == false)
-        { return; }
-
         const auto Link = InTrigger.Get_Fragment(FMars_Fragment_Ladder_TriggerLink);
-        if (ck::Is_NOT_Valid(Link.Ladder))
-        { return; }
-
         auto Climber = Resolve_Climber(InEntity);
-        if (ck::Is_NOT_Valid(Climber))
+        if (ck::Is_NOT_Valid(Link.Ladder) || ck::Is_NOT_Valid(Climber))
         { return; }
 
-        if (InEntered)
-        { Climber.Request_AddCandidate(FMars_Request_Climber_AddCandidate(Link.Ladder, Link.Zone)); }
-        else
-        { Climber.Request_RemoveCandidate(FMars_Request_Climber_RemoveCandidate(Link.Ladder, Link.Zone)); }
+        Climber.Request_AddCandidate(FMars_Request_Climber_AddCandidate(Link.Ladder, Link.Zone));
     }
 
+    private void Withdraw(const FCk_Handle_Trigger& InTrigger, FCk_Handle InEntity)
+    {
+        const auto Link = InTrigger.Get_Fragment(FMars_Fragment_Ladder_TriggerLink);
+        auto Climber = Resolve_Climber(InEntity);
+        if (ck::Is_NOT_Valid(Link.Ladder) || ck::Is_NOT_Valid(Climber))
+        { return; }
+
+        Climber.Request_RemoveCandidate(FMars_Request_Climber_RemoveCandidate(Link.Ladder, Link.Zone));
+    }
+
+    // Invalid for anything but a climber: an entity that is not a player, or one being destroyed (it still reports its
+    // exit, with a dead handle; its climber goes with it). A ladder being destroyed leaves a dead Link.Ladder the same way.
     private FCk_Handle_Climber Resolve_Climber(FCk_Handle InEntity) const
     {
-        // An entity being destroyed still reports its exit, with a dead handle; its climber goes with it.
         if (ck::Is_NOT_Valid(InEntity))
         { return FCk_Handle_Climber(); }
 

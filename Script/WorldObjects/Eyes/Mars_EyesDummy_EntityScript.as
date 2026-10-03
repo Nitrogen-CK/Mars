@@ -43,37 +43,37 @@ class UMars_EyesDummy_EntityScript : UCk_GenericEntityScript_UE
         UMaterialInterface LookMaster = nullptr;
         if (CanShowCosmetics)
         {
-            LookMaster = utils_usf::Get_LookMasterMaterial(mars_eyes::Look_EyePlate());
+            LookMaster = utils_usf::Get_LookMasterMaterial(utils_eyes::Look_EyePlate());
             // No stand-in material: without the generated look there is no hood and no plate; gaze and eyes stay.
             ck::EnsureIfNot(ck::IsValid(LookMaster),
                 f"[EyesDummy] [{InHandle.ToString()}] the MarsEyePlate look master is not generated - run Ck_Usf_GenerateLooks MarsEyePlate");
 
-            AddMesh(Root, FTransform(FRotator::ZeroRotator, BodyOffset, BodyScale),
-                MakeArchetype(engine::load::Cylinder(), assets::load::ProtoGrid_Item_Mars_MI()), n"EyesDummy_Body");
+            // Nothing on the dummy collides.
+            Root.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, BodyOffset, BodyScale),
+                engine::load::Cylinder(), assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"EyesDummy_Body"));
         }
         const auto HasLookMaster = ck::IsValid(LookMaster);
 
         auto Head = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, HeadOffset)).As_Transform();
-        utils_handle::Set_DebugName(FCk_Handle(Head), n"EyesDummy.Head");
+        utils_handle::Set_DebugName(Head.H(), n"EyesDummy.Head");
 
         // With no custom primitive data written the look's strength is 0, so the hood renders as the black void.
         if (HasLookMaster)
         {
-            AddMesh(Head, FTransform(FRotator::ZeroRotator, FVector::ZeroVector, HoodScale),
-                MakeArchetype(engine::load::Sphere(), LookMaster), n"EyesDummy_Hood");
+            Head.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector::ZeroVector, HoodScale),
+                engine::load::Sphere(), LookMaster, collision::profile::NoCollision, n"EyesDummy_Hood"));
         }
 
         auto Face = utils_scene_node::Create(Head, FTransform(FRotator::ZeroRotator, FaceOffset)).As_Transform();
-        utils_handle::Set_DebugName(FCk_Handle(Face), n"EyesDummy.Face");
+        utils_handle::Set_DebugName(Face.H(), n"EyesDummy.Face");
 
         auto Plate = FCk_Handle_UnrealComponent();
         if (HasLookMaster)
         {
-            auto PlateArchetype = MakeArchetype(engine::load::Plane(), LookMaster);
-            if (ck::IsValid(PlateArchetype))
-            { PlateArchetype.SetCastShadow(false); }
-
-            Plate = AddMesh(Face, FTransform(PlateRotation, FVector::ZeroVector, PlateScale), PlateArchetype, n"EyesDummy_Plate");
+            auto PlatePart = FMars_MeshPart(FTransform(PlateRotation, FVector::ZeroVector, PlateScale),
+                engine::load::Plane(), LookMaster, collision::profile::NoCollision, n"EyesDummy_Plate");
+            PlatePart.CastShadow = false;
+            Plate = Face.Add_MeshPart(this, PlatePart);
         }
 
         // Other gazes look at the dummy's head.
@@ -90,11 +90,11 @@ class UMars_EyesDummy_EntityScript : UCk_GenericEntityScript_UE
         }
 
         auto EyesSpec = FMars_Eyes_Spec();
-        EyesSpec.Style = mars_eyes::Catalog().Styles[_StyleIndex].Def;
+        EyesSpec.Style = utils_eyes::Catalog().Styles[_StyleIndex].Def;
+        EyesSpec.Blink = FMars_Eyes_BlinkSpec();
+        EyesSpec.Look = FMars_Eyes_LookSpec();
+        EyesSpec.Plate = Plate;
         _Eyes = utils_eyes::Add(Face, EyesSpec);
-
-        if (ck::IsValid(_Eyes) && ck::IsValid(Plate))
-        { _Eyes.Set_Plate(Plate); }
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
@@ -120,48 +120,10 @@ class UMars_EyesDummy_EntityScript : UCk_GenericEntityScript_UE
         if (ck::IsValid(_CycleTimer))
         {
             _CycleTimer.UnbindFrom_OnDone(FCk_Delegate_Timer(this, n"OnCycleDone"));
-            utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(_CycleTimer));
+            utils_entity_lifetime::Request_DestroyEntity(_CycleTimer.H());
         }
 
         _CycleTimer = FCk_Handle_Timer();
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Visuals
-    //----------------------------------------------------------------------------------------------------------------------
-
-    // NewObject needs a UObject outer, hence a private method on the entity script. Nothing on the dummy collides.
-    private UStaticMeshComponent MakeArchetype(UStaticMesh InMesh, UMaterialInterface InMaterial)
-    {
-        if (ck::Is_NOT_Valid(InMesh))
-        { return nullptr; }
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component is registered first and then receives the entity transform, which a Static component
-        // refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(collision::profile::NoCollision);
-        return Archetype;
-    }
-
-    private FCk_Handle_UnrealComponent AddMesh(
-        FCk_Handle_Transform& InAttachTo,
-        FTransform InLocalTransform,
-        UStaticMeshComponent InArchetype,
-        FName InDebugName)
-    {
-        if (ck::Is_NOT_Valid(InArchetype))
-        { return FCk_Handle_UnrealComponent(); }
-
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            InArchetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        return utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -176,7 +138,7 @@ class UMars_EyesDummy_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(_Eyes))
         { return; }
 
-        auto Catalog = mars_eyes::Catalog();
+        auto Catalog = utils_eyes::Catalog();
         const auto NumExpressions = Catalog.Expressions.Num();
         for (int32 Tried = 0; Tried < NumExpressions; ++Tried)
         {

@@ -14,17 +14,17 @@ namespace utils_crawler
 {
     FGameplayTag Get_IsHurtFact()
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.IsHurt");
+        return GameplayTags::Mars_WS_Crawler_IsHurt;
     }
 
     FGameplayTag Get_CanWalkFact()
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.CanWalk");
+        return GameplayTags::Mars_WS_Crawler_CanWalk;
     }
 
     FGameplayTag Get_SettledFact()
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.Settled");
+        return GameplayTags::Mars_WS_Crawler_Settled;
     }
 }
 

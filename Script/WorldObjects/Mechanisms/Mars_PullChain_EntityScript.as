@@ -70,19 +70,18 @@ class UMars_PullChain_EntityScript : UCk_GenericEntityScript_UE
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InChainNode)
     {
         auto CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(CubeMesh))
-        { return; }
-
         auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
         auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine cube is 100 uu, pivot at its center. The bracket arm reaches out to a housing the chain runs through.
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(ChainOffsetX * 0.5, 0.0, 0.0), FVector(ChainOffsetX, 8.0, 8.0) * 0.01),
-            CubeMesh, WallMaterial, collision::profile::NoCollision, n"PullChain_Bracket");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(ChainOffsetX * 0.5, 0.0, 0.0), FVector(ChainOffsetX, 8.0, 8.0) * 0.01),
+            CubeMesh, WallMaterial, collision::profile::NoCollision, n"PullChain_Bracket"));
         // Tall enough to hide the reserve chain that a full pull draws out.
         const auto HousingHeight = PullDistance + 14.0;
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(ChainOffsetX, 0.0, HousingHeight * 0.5 - 7.0), FVector(14.0, 14.0, HousingHeight) * 0.01),
-            CubeMesh, WallMaterial, collision::profile::NoCollision, n"PullChain_Housing");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(ChainOffsetX, 0.0, HousingHeight * 0.5 - 7.0), FVector(14.0, 14.0, HousingHeight) * 0.01),
+            CubeMesh, WallMaterial, collision::profile::NoCollision, n"PullChain_Housing"));
 
         // Links and grip ride the chain node, so the node's offset stays a pure pull translation. The links start inside the
         // housing so pulling draws more chain out of it.
@@ -96,15 +95,15 @@ class UMars_PullChain_EntityScript : UCk_GenericEntityScript_UE
 
             // Alternating links turned 90 degrees, like a real chain.
             const auto LinkYaw = (Index % 2 == 0) ? 0.0 : 90.0;
-            AddMesh(ChainTransform, FTransform(FRotator(0.0, LinkYaw, 0.0), FVector(ChainOffsetX, 0.0, LinkZ), FVector(1.5, 4.0, 7.0) * 0.01),
-                CubeMesh, Material, collision::profile::NoCollision, n"PullChain_Link");
+            ChainTransform.Add_MeshPart(this, FMars_MeshPart(
+                FTransform(FRotator(0.0, LinkYaw, 0.0), FVector(ChainOffsetX, 0.0, LinkZ), FVector(1.5, 4.0, 7.0) * 0.01),
+                CubeMesh, Material, collision::profile::NoCollision, n"PullChain_Link"));
         }
 
         // The grip bar carries a Grip socket, so the first-person gloves take hold of it and follow it down.
-        auto GripMesh = Cast<UStaticMesh>(LoadObject(this, "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM"));
-        AddMesh(ChainTransform,
+        ChainTransform.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(ChainOffsetX, 0.0, -ChainLength - GripLength * 0.5), FVector(0.06, 0.06, GripLength * 0.01)),
-            ck::IsValid(GripMesh) ? GripMesh : CubeMesh, Material, collision::profile::NoCollision, n"PullChain_Grip");
+            assets::load::LeverHandle_Mars_SM(), Material, collision::profile::NoCollision, n"PullChain_Grip"));
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
@@ -124,33 +123,5 @@ class UMars_PullChain_EntityScript : UCk_GenericEntityScript_UE
         Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
 
         utils_interactable::Create(InRoot, Spec);
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddMesh(
-        FCk_Handle_Transform& InAttachTo,
-        FTransform InLocalTransform,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        if (ck::Is_NOT_Valid(InMesh))
-        { return; }
-
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component receives the entity transform after registration, and the chain moves.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 }

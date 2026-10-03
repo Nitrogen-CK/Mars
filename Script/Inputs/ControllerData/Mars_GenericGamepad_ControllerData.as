@@ -1,6 +1,5 @@
 // Generic gamepad key glyphs for UCommonActionWidget / UCk_InputActionWidget_UE.
-// Brush lines are commented out until the Prompt_* textures exist under /Game/Mars and their
-// accessors are generated (Script/Mars_Assets.as) - uncomment them, and the size locals, then.
+// Keys without a Prompt_* texture under /Game/Mars map to an empty brush.
 
 TArray<FCommonInputKeyBrushConfiguration> Get_Mars_GenericGamepadBrushEntries()
 {
@@ -49,7 +48,6 @@ TArray<FCommonInputKeyBrushConfiguration> Get_Mars_GenericGamepadBrushEntries()
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_RightStick_Down, FSlateBrush(assets::load::Prompt_Joystick_RDown_Mars_T(), BrushSize)));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_RightStick_Left, FSlateBrush(assets::load::Prompt_Joystick_RLeft_Mars_T(), BrushSize)));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_RightStick_Right, FSlateBrush(assets::load::Prompt_Joystick_RRight_Mars_T(), BrushSize)));
-
 
     return Entries;
 }

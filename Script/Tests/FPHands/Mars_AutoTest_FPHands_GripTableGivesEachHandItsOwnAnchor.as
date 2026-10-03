@@ -25,8 +25,9 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
         auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.HoldReachSeconds = 0.1f;
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.Reach.Hold.ReachSeconds = 0.1f;
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         BuildOwner(InHandle);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
 
@@ -56,8 +57,8 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
         _NodeL = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, -15.0, 0.0))).As_Transform();
 
         auto Entries = TArray<FMars_FPHands_GripEntry>();
-        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Right, _NodeR, NAME_None, EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
-        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Left, _NodeL, NAME_None, EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
+        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Right, _NodeR, TOptional<FName>(), EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
+        Entries.Add(FMars_FPHands_GripEntry(EMars_Hand::Left, _NodeL, TOptional<FName>(), EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         utils_fphands::Add_Grips(_Owner, Entries);
 
         _Interactable = utils_interactable::Create(Root, FMars_Interactable_Spec());
@@ -75,7 +76,7 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
     UFUNCTION()
     private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), _Interactable, _Owner, false));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FMars_FPHands_ReachSubject(_Interactable, _Owner), ECk_Interaction_CompletionPolicy::Timed));
     }
 
     UFUNCTION()
@@ -88,44 +89,60 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
     UFUNCTION()
     private void Step_AssertPerHandAnchors(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Target = _Hands.Get_Target();
-        Assert_True(Target.IsValid, "the reach resolves");
-        Assert_True(Target.Right.IsUsed, "the right glove is used");
-        Assert_True(Target.Left.IsUsed, "the left glove is used");
-        Assert_True(FCk_Handle(Target.Right.Anchor) == FCk_Handle(_NodeR), "the right glove anchors to node R");
-        Assert_True(FCk_Handle(Target.Left.Anchor) == FCk_Handle(_NodeL), "the left glove anchors to node L");
-        Assert_True(Target.Left.HasPose && Target.Left.Pose == EMars_HandGripPose::Open, "the left glove takes its entry's Open pose");
-        Assert_True(Target.Right.HasPose && Target.Right.Pose == EMars_HandGripPose::Power, "the right glove takes its entry's Power pose");
-        Assert_True(Target.Left.IsAuthored, "a socketless entry that uses its node frame is an authored grip");
-        Assert_False(Target.Right.IsAuthored, "a socketless entry without it stays a point grip");
+        const auto MaybeTarget = _Hands.Get_Target();
+        Assert_True(MaybeTarget.IsSet(), "the reach resolves");
+        if (MaybeTarget.IsSet() == false)
+        { return; }
 
-        _RightBeforeMove = Target.Right.AnchorWorld;
-        _LeftBeforeMove = Target.Left.AnchorWorld;
+        const auto Target = MaybeTarget.GetValue();
+        Assert_True(Target.Right.IsSet(), "the right glove is used");
+        Assert_True(Target.Left.IsSet(), "the left glove is used");
+        if (Target.Right.IsSet() == false || Target.Left.IsSet() == false)
+        { return; }
+
+        const auto Right = Target.Right.GetValue();
+        const auto Left = Target.Left.GetValue();
+        Assert_True(Right.Anchor == _NodeR, "the right glove anchors to node R");
+        Assert_True(Left.Anchor == _NodeL, "the left glove anchors to node L");
+        Assert_True(Left.Pose.IsSet() && Left.Pose.GetValue() == EMars_HandGripPose::Open, "the left glove takes its entry's Open pose");
+        Assert_True(Right.Pose.IsSet() && Right.Pose.GetValue() == EMars_HandGripPose::Power, "the right glove takes its entry's Power pose");
+        Assert_True(Left.IsAuthored, "a socketless entry that uses its node frame is an authored grip");
+        Assert_False(Right.IsAuthored, "a socketless entry without it stays a point grip");
+
+        _RightBeforeMove = Right.AnchorWorld;
+        _LeftBeforeMove = Left.AnchorWorld;
     }
 
     UFUNCTION()
     private void Step_MoveR(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _MoverR.Request_MoveTo(true);
+        _MoverR.Request_MoveTo(FMars_Request_Mover_MoveTo(EMars_Mover_Pose::End));
     }
 
     UFUNCTION()
     private void Check_MoverAtEnd(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_MoverR.Get_AtEnd() && _MoverR.Get_Alpha() >= 0.999f);
+        Res.Set(_MoverR.Get_Target() == EMars_Mover_Pose::End && _MoverR.Get_Alpha() >= 0.999f);
     }
 
     UFUNCTION()
     private void Step_AssertOnlyRightFollows(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Target = _Hands.Get_Target();
-        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, "the gloves still hold");
+        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the gloves still hold (got {_Hands.Get_Phase() :n})");
 
-        const auto RightDeltaZ = Target.Right.AnchorWorld.GetLocation().Z - _RightBeforeMove.GetLocation().Z;
+        const auto BothUsed = utils_fphands::Get_UsesHand(Target, EMars_Hand::Right) && utils_fphands::Get_UsesHand(Target, EMars_Hand::Left);
+        Assert_True(BothUsed, "both gloves are still on the target");
+        if (BothUsed == false)
+        { return; }
+
+        const auto Right = Target.GetValue().Right.GetValue();
+        const auto Left = Target.GetValue().Left.GetValue();
+        const auto RightDeltaZ = Right.AnchorWorld.GetLocation().Z - _RightBeforeMove.GetLocation().Z;
         Assert_True(Math::Abs(RightDeltaZ + 20.0) <= 0.5, f"the right anchor moved down 20 with node R (moved {RightDeltaZ})");
 
-        const auto LeftMoved = Target.Left.AnchorWorld.GetLocation().Distance(_LeftBeforeMove.GetLocation());
+        const auto LeftMoved = Left.AnchorWorld.GetLocation().Distance(_LeftBeforeMove.GetLocation());
         Assert_True(LeftMoved <= 0.01, f"the left anchor did not move (moved {LeftMoved})");
     }
 }

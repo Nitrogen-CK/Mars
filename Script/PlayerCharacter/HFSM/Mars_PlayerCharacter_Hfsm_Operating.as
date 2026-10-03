@@ -1,17 +1,7 @@
-// The Alive sub-SM's Operating state: the player holds a station (FMars_Fragment_Operator.Station is valid).
-//   Locomotion ->Operating [IsOperating]       (the station's Use interaction reserved it for this player)
-//   Operating  ->Locomotion [IsNotOperating]   (the station released this player: Leave, the station's own SM, or a
-//                                               destroyed station)
-// Entering Operating tears Locomotion down - its movement and every free-roam interaction task (view-trace focus, resolver
-// intents, levers, hotbar keys, emotes, held-item use / drop / hints) - which is what locks the body in place and leaves
-// the keys to the station. Tasks, in order:
-//   PoseLock     glide the capsule to the stand and decouple body yaw from the view
-//   Camera       snap the view to the stand's facing at Camera.PitchOffset; Free fences the yaw, Captured freezes it
-//   Grip         start the station's grip interaction under its own Operate intent so the gloves Hold on the station
-//                (the grip never touches the Use intent: E while operating cannot disturb the gloves)
-//   LeaveIntent  Mars.Intent.Back pressed -> Operator.Request_Leave()
-//   Hints        the "leave" legend row (owner key Station); a minigame adds its own rows
-// Leaving Operating any other way (Alive -> Downed tears it down) releases the station from DoExitState.
+// The Alive sub-SM's Operating state: the player holds a station (FMars_Fragment_Operator.Station is valid). Entering it
+// tears Locomotion down - its movement and every free-roam interaction task - which is what locks the body in place and
+// leaves the keys to the station. Leaving it any other way than the station's release (Alive -> Downed tears it down)
+// releases the station from DoExitState.
 
 // Polled on the context entity's Operator; false without one.
 class UMars_SmCondition_IsOperating : UCk_SmCondition_Polled
@@ -59,11 +49,7 @@ class UMars_SmState_Operating : UCk_SmState_EntityScript
     void DoExitState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto Player = ck::Ctx(InHandle);
-        auto Operator = Player.As_Operator(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Operator))
-        { return; }
-
-        auto Station = Operator.Get_Station();
+        auto Station = Player.As_Operator().Get_Station();
         if (ck::Is_NOT_Valid(Station) || Station.Get_IsOperatedBy(Player) == false)
         { return; }
 
@@ -101,12 +87,9 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(_Character))
         { return; }
 
-        auto Operator = Player.As_Operator(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Operator))
-        { return; }
-
-        auto Station = Operator.Get_Station();
-        if (ck::Is_NOT_Valid(Station))
+        // Operating is entered only while the operator holds a station.
+        auto Station = Player.As_Operator().Get_Station();
+        if (ck::EnsureIfNot(ck::IsValid(Station), "[Operating] PoseLock entered with no station"))
         { return; }
 
         _Character.bUseControllerRotationYaw = false;
@@ -123,7 +106,6 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
 
         while (_DeltaYaw < -180.0)
         { _DeltaYaw += 360.0; }
-
 
         const auto Distance = float32((_TargetLocation - _StartLocation).Size());
         _GlideSeconds = utils_station::Get_EngageSeconds(Distance, float32(_DeltaYaw), Station.Get_Spec().EngageMaxSeconds);
@@ -161,7 +143,8 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
     {
         const auto Location = _StartLocation + (_TargetLocation - _StartLocation) * float64(InAlpha);
         const auto Rotation = FRotator(0.0, _StartYaw + _DeltaYaw * float64(InAlpha), 0.0);
-        _Character.SetActorLocationAndRotation(Location, Rotation, true);
+        const auto bTeleport = true;
+        _Character.SetActorLocationAndRotation(Location, Rotation, bTeleport);
 
         if (InAlpha >= 1.0f)
         { _Gliding = false; }
@@ -193,15 +176,11 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
         { return; }
 
         _Camera = Viewpoint.Get_Camera();
-        if (ck::Is_NOT_Valid(_Camera))
+        if (ck::EnsureIfNot(ck::IsValid(_Camera), "[Operating] the player's viewpoint has no camera"))
         { return; }
 
-        auto Operator = Player.As_Operator(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Operator))
-        { return; }
-
-        auto Station = Operator.Get_Station();
-        if (ck::Is_NOT_Valid(Station))
+        auto Station = Player.As_Operator().Get_Station();
+        if (ck::EnsureIfNot(ck::IsValid(Station), "[Operating] Camera entered with no station"))
         { return; }
 
         const auto CameraSpec = Station.Get_Spec().Camera;
@@ -261,23 +240,19 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Player = ck::Ctx(InHandle);
-        _Resolver = _Player.As_InteractionResolver(ECk_SanityCheck::UnChecked);
+        _Resolver = _Player.As_InteractionResolver();
 
-        auto Operator = _Player.As_Operator(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Operator) || ck::Is_NOT_Valid(_Resolver))
+        auto Station = _Player.As_Operator().Get_Station();
+        if (ck::EnsureIfNot(ck::IsValid(Station), "[Operating] Grip entered with no station"))
         { return; }
 
-        auto Station = Operator.Get_Station();
-        if (ck::Is_NOT_Valid(Station))
-        { return; }
-
+        // A station without a grip interactable leaves the gloves at rest.
         _Target = Station.Get_GripTarget();
         if (ck::Is_NOT_Valid(_Target))
         { return; }
 
         _Resolver.Request_AddInteractTarget(FCk_Request_InteractionResolver_AddInteractTarget(_Target));
-        _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(
-            GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate")));
+        _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(GameplayTags::InteractionIntent_Mars_Operate));
         _Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Player, _Player));
     }
 
@@ -292,8 +267,7 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
             if (ck::IsValid(_Target))
             { _Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(_Target)); }
 
-            _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(
-                GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate")));
+            _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(GameplayTags::InteractionIntent_Mars_Operate));
         }
 
         _Player = FCk_Handle();
@@ -310,13 +284,11 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
 class UMars_SmTask_Operating_LeaveIntent : UMars_SmTask_IntentEdges
 {
     private FCk_Handle_Operator _Operator;
-    private FGameplayTag _BackIntent;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _Operator = ck::Ctx(InHandle).As_Operator(ECk_SanityCheck::UnChecked);
-        _BackIntent = GameplayTags::ResolveGameplayTag(n"Mars.Intent.Back");
+        _Operator = ck::Ctx(InHandle).As_Operator();
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -331,7 +303,7 @@ class UMars_SmTask_Operating_LeaveIntent : UMars_SmTask_IntentEdges
 
     protected void OnIntentPressed(FGameplayTag InIntent) override
     {
-        if (InIntent != _BackIntent || ck::Is_NOT_Valid(_Operator))
+        if (InIntent != GameplayTags::Mars_Intent_Back)
         { return; }
 
         _Operator.Request_Leave();

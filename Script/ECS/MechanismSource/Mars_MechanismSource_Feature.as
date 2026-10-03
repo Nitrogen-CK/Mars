@@ -10,6 +10,12 @@ asset Mars_MechanismSourceHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_MechanismSource {}
 
+enum EMars_MechanismSource_Output
+{
+    Deasserted,
+    Asserted
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -21,6 +27,14 @@ struct FMars_MechanismSource_Spec
 
     UPROPERTY()
     bool StartAsserted = false;
+}
+
+mixin FMars_Validation Validate(const FMars_MechanismSource_Spec& Self)
+{
+    if (Self.OutputChannel.IsValid() == false)
+    { return FMars_Validation("OutputChannel must be set"); }
+
+    return FMars_Validation();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -40,15 +54,15 @@ struct FMars_Fragment_MechanismSource_Params
 struct FMars_Fragment_MechanismSource
 {
     UPROPERTY()
-    bool IsAsserted = false;
+    EMars_MechanismSource_Output Output = EMars_MechanismSource_Output::Deasserted;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_MechanismSource_OnAssertedChanged(FCk_Handle_MechanismSource InSource, bool InAsserted);
-event void FMars_Delegate_MechanismSource_OnAssertedChanged_MC(FCk_Handle_MechanismSource InSource, bool InAsserted);
+delegate void FMars_Delegate_MechanismSource_OnAssertedChanged(FCk_Handle_MechanismSource InSource, EMars_MechanismSource_Output InOutput);
+event void FMars_Delegate_MechanismSource_OnAssertedChanged_MC(FCk_Handle_MechanismSource InSource, EMars_MechanismSource_Output InOutput);
 
 struct FMars_Fragment_MechanismSource_Signals
 {
@@ -59,20 +73,22 @@ struct FMars_Fragment_MechanismSource_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Request_MechanismSource_SetAsserted
+struct FMars_Request_MechanismSource_SetOutput
 {
     UPROPERTY()
-    bool Asserted = false;
+    EMars_MechanismSource_Output Output = EMars_MechanismSource_Output::Deasserted;
 
-    FMars_Request_MechanismSource_SetAsserted(bool InAsserted)
+    FMars_Request_MechanismSource_SetOutput() {}
+
+    FMars_Request_MechanismSource_SetOutput(EMars_MechanismSource_Output InOutput)
     {
-        Asserted = InAsserted;
+        Output = InOutput;
     }
 }
 
-// Absolute and latest-wins, so the fragment holds a single pending request; its presence means pending.
+// SetOutput is absolute: the latest one wins.
 struct FMars_Fragment_MechanismSource_Requests
 {
     UPROPERTY()
-    FMars_Request_MechanismSource_SetAsserted SetAsserted;
+    TArray<FMars_Request_MechanismSource_SetOutput> SetOutputRequests;
 }

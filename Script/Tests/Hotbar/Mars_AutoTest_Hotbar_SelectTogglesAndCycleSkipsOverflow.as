@@ -57,20 +57,20 @@ class UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow : UCk_AutoTest_Ba
     private void Check_SelectedNone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == -1);
+        Res.Set(_Hotbar.Get_SelectedIndex().IsSet() == false);
     }
 
     UFUNCTION()
     private void Check_SelectedZero(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == 0);
+        Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0));
     }
 
     UFUNCTION()
     private void Check_SelectedOne(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == 1);
+        Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(1));
     }
 }

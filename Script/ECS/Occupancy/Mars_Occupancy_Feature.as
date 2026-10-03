@@ -24,6 +24,45 @@ struct FMars_Occupancy_Spec
     float32 ReleaseDelaySeconds = 0.0f;
 }
 
+mixin FMars_Validation Validate(const FMars_Occupancy_Spec& Self)
+{
+    if (Self.RequiredCount < 1)
+    { return FMars_Validation(f"RequiredCount [{Self.RequiredCount}] must be at least 1: an occupancy needing nobody is always active"); }
+
+    if (Self.ReleaseDelaySeconds < 0.0f)
+    { return FMars_Validation(f"ReleaseDelaySeconds [{Self.ReleaseDelaySeconds}] must not be negative"); }
+
+    return FMars_Validation();
+}
+
+// The entities an occupancy works through, built by its owner before Add.
+struct FMars_Occupancy_Parts
+{
+    // Counted for occupancy. Several occupancies may share one trigger.
+    UPROPERTY()
+    FCk_Handle_Trigger Trigger;
+
+    // Optional: moved to its end pose while active and back to its start pose when released.
+    UPROPERTY()
+    FCk_Handle_Mover Mover;
+
+    FMars_Occupancy_Parts() {}
+
+    FMars_Occupancy_Parts(FCk_Handle_Trigger InTrigger, FCk_Handle_Mover InMover = FCk_Handle_Mover())
+    {
+        Trigger = InTrigger;
+        Mover = InMover;
+    }
+}
+
+mixin FMars_Validation Validate(const FMars_Occupancy_Parts& Self)
+{
+    if (ck::Is_NOT_Valid(Self.Trigger))
+    { return FMars_Validation("Trigger must be set: an occupancy without one never counts anybody"); }
+
+    return FMars_Validation();
+}
+
 struct FMars_Tag_Occupancy_NeedsSetup {}
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -68,6 +107,7 @@ struct FMars_Fragment_Occupancy_TriggerLink
     UPROPERTY()
     TArray<FCk_Handle_Occupancy> Occupancies;
 
+    // Several occupancies may share a trigger; binding the setup processor twice to one event would double-fire.
     UPROPERTY()
     bool IsBound = false;
 }
@@ -79,8 +119,14 @@ struct FMars_Fragment_Occupancy_TriggerLink
 delegate void FMars_Delegate_Occupancy_OnCountChanged(FCk_Handle_Occupancy InOccupancy, int32 InCount);
 event void FMars_Delegate_Occupancy_OnCountChanged_MC(FCk_Handle_Occupancy InOccupancy, int32 InCount);
 
-delegate void FMars_Delegate_Occupancy_OnActiveChanged(FCk_Handle_Occupancy InOccupancy, bool InActive);
-event void FMars_Delegate_Occupancy_OnActiveChanged_MC(FCk_Handle_Occupancy InOccupancy, bool InActive);
+enum EMars_Occupancy_Activation
+{
+    Inactive,
+    Active
+}
+
+delegate void FMars_Delegate_Occupancy_OnActiveChanged(FCk_Handle_Occupancy InOccupancy, EMars_Occupancy_Activation InActivation);
+event void FMars_Delegate_Occupancy_OnActiveChanged_MC(FCk_Handle_Occupancy InOccupancy, EMars_Occupancy_Activation InActivation);
 
 struct FMars_Fragment_Occupancy_Signals
 {

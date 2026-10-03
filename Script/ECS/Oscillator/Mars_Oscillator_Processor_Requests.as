@@ -15,20 +15,23 @@ class UMars_Processor_Oscillator_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Oscillator();
 
-        const auto HasRequest = InRequests.SetRunningRequest.IsSet();
-        auto TargetRunning = false;
+        const auto HasRequest = InRequests.SetRunningRequests.Num() > 0;
+        auto TargetRunState = EMars_Oscillator_RunState::Stopped;
         if (HasRequest)
-        { TargetRunning = InRequests.SetRunningRequest.GetValue().Running; }
+        { TargetRunState = InRequests.SetRunningRequests.Last().RunState; }
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Oscillator_Requests);
 
-        if (HasRequest == false || InState.IsRunning == TargetRunning)
+        const auto WasRunning = InState.State == EMars_Oscillator_State::Running;
+        const auto Running = TargetRunState == EMars_Oscillator_RunState::Running;
+        if (HasRequest == false || WasRunning == Running)
         { return; }
 
-        InState.IsRunning = TargetRunning;
+        // A caught swing is not running, so a stop never reaches it here; a start releases it.
+        InState.State = Running ? EMars_Oscillator_State::Running : EMars_Oscillator_State::Stopped;
 
         if (Self.Has_Fragment(FMars_Fragment_Oscillator_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnRunningChanged.Broadcast(Self, TargetRunning); }
+        { Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnRunningChanged.Broadcast(Self, TargetRunState); }
     }
 }

@@ -11,6 +11,6 @@ class UMars_AutoTest_Smoke_Boots : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_CheckHandle(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(InHandle), "test entity should be valid");
+        Assert_Valid(InHandle, "the test entity is valid");
     }
 }

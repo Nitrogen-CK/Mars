@@ -1,17 +1,22 @@
 namespace utils_pendulum
 {
-    // InHazard must live on InHandle, and InOscillator on InHandle or on a scene node created directly under it:
-    // the pendulum finds itself from their signals.
-    FCk_Handle_Pendulum Add(FCk_Handle& InHandle, FMars_Pendulum_Spec InParams, FCk_Handle_Oscillator InOscillator, FCk_Handle_Hazard InHazard)
+    // Parts that fail Validate(), or a hazard on another entity, ensure and add nothing.
+    FCk_Handle_Pendulum Add(FCk_Handle& InHandle, FMars_Pendulum_Spec InParams, FMars_Pendulum_Parts InParts)
     {
-        ck::EnsureIfNot(FCk_Handle(InHazard) == InHandle, f"Pendulum on [{InHandle.ToString()}] was given Hazard [{InHazard.ToString()}] on another entity; OnTriggered will not fire");
+        const auto Validation = InParts.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Pendulum] [{InHandle.ToString()}] rejected the parts: {Validation.Get_Error()}"))
+        { return FCk_Handle_Pendulum(); }
+
+        if (ck::EnsureIfNot(InParts.Hazard == InHandle,
+            f"[Pendulum] [{InHandle.ToString()}] was given Hazard [{InParts.Hazard.ToString()}] on another entity; OnTriggered could not fire"))
+        { return FCk_Handle_Pendulum(); }
 
         auto Params = FMars_Fragment_Pendulum_Params();
         Params.Powered = InParams.Powered;
 
         auto State = FMars_Fragment_Pendulum();
-        State.Oscillator = InOscillator;
-        State.Hazard = InHazard;
+        State.Oscillator = InParts.Oscillator;
+        State.Hazard = InParts.Hazard;
 
         InHandle.Add_Fragment(FMars_Feature_Pendulum());
         InHandle.Add_Fragment(Params);
@@ -19,20 +24,6 @@ namespace utils_pendulum
         InHandle.Add_Fragment(FMars_Tag_Pendulum_NeedsSetup());
         return InHandle.As_Pendulum();
     }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-// Getters
-//--------------------------------------------------------------------------------------------------------------------------
-
-mixin FCk_Handle_Oscillator Get_Oscillator(const FCk_Handle_Pendulum& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Pendulum).Oscillator;
-}
-
-mixin FCk_Handle_Hazard Get_Hazard(const FCk_Handle_Pendulum& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Pendulum).Hazard;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

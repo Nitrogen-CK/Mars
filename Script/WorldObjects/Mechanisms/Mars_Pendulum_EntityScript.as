@@ -51,7 +51,7 @@ class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
         auto TriggerSpec = FMars_Trigger_Spec();
         TriggerSpec.Shape = EMars_Trigger_Shape::Box;
         TriggerSpec.BoxHalfExtents = FVector::OneVector * (BobSize * 0.5);
-        TriggerSpec.DetectionFilter = GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
+        TriggerSpec.DetectionFilter = GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_Player);
         TriggerSpec.Moving = true;
         auto BobTransform = BobNode.As_Transform();
         auto Trigger = utils_trigger::Add(BobTransform, TriggerSpec);
@@ -61,64 +61,34 @@ class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
         { HazardSpec.PushImpulse = FVector(600.0, 0.0, 300.0); }
         auto HazardHandle = utils_hazard::Add(InHandle, HazardSpec, Trigger);
 
-        utils_pendulum::Add(InHandle, Pendulum, OscillatorHandle, HazardHandle);
+        utils_pendulum::Add(InHandle, Pendulum, FMars_Pendulum_Parts(OscillatorHandle, HazardHandle));
 
         if (Sink.InputChannels.Num() > 0)
         { utils_mechanism_sink::Add(InHandle, Sink); }
 
-        AddVisuals(PendulumRoot, PivotTransform, BobTransform, PivotHeight);
+        AddVisuals(PendulumRoot, PivotTransform, BobTransform);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    private void AddVisuals(
-        FCk_Handle_Transform& InRoot,
-        FCk_Handle_Transform& InPivot,
-        FCk_Handle_Transform& InBob,
-        float64 InPivotHeight)
+    private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Transform& InPivot, FCk_Handle_Transform& InBob)
     {
         auto CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(CubeMesh))
-        { return; }
-
         auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
         auto HazardMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine cube is 100 uu with its pivot at the centre.
-        AddBox(InRoot, FVector(0.0, 0.0, InPivotHeight), FVector(60.0, 60.0, 40.0) * 0.01,
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"Pendulum_PivotBlock");
+        const auto PivotHeight = ArmLength + PivotClearance;
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, PivotHeight), FVector(60.0, 60.0, 40.0) * 0.01),
+            CubeMesh, WallMaterial, collision::profile::BlockAll, n"Pendulum_PivotBlock"));
 
-        AddBox(InPivot, FVector(0.0, 0.0, -ArmLength * 0.5), FVector(10.0, 10.0, ArmLength) * 0.01,
-            CubeMesh, HazardMaterial, collision::profile::NoCollision, n"Pendulum_Arm");
+        InPivot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -ArmLength * 0.5), FVector(10.0, 10.0, ArmLength) * 0.01),
+            CubeMesh, HazardMaterial, collision::profile::NoCollision, n"Pendulum_Arm"));
 
-        AddBox(InBob, FVector::ZeroVector, FVector::OneVector * (BobSize * 0.01),
-            CubeMesh, HazardMaterial, collision::profile::NoCollision, n"Pendulum_Bob");
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddBox(
-        FCk_Handle_Transform& InAttachTo,
-        FVector InLocation,
-        FVector InScale,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        auto Node = utils_scene_node::Create(InAttachTo, FTransform(FRotator::ZeroRotator, InLocation, InScale));
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable even when static: the component is registered first and then receives the entity transform,
-        // which a Static component refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
+        InBob.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector * (BobSize * 0.01)),
+            CubeMesh, HazardMaterial, collision::profile::NoCollision, n"Pendulum_Bob"));
     }
 }

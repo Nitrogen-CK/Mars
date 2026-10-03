@@ -1,11 +1,6 @@
-// The dealer arbiter. Drains DealDamage in arrival order; each request is resolved, gated and forwarded on its own:
-//
-//   1. resolve: the hit entity -> its zone (utils_hit_zone::TryGet_Zone); none -> rejected NoHitZone.
-//   2. enabled: a disabled zone -> rejected ZoneDisabled.
-//   3. attitude: utils_relationship::Get_AttitudeTowards(dealer, zone) walks both ownership chains for a team; Friendly
-//      (same team, or the dealer hitting its own zone) -> rejected Friendly unless the spec allows friendly fire. A side
-//      with no team is Neutral and passes.
-//   4. forward: Amount *= DamageScale, Zone.Request_Hit, count, record LastDealt, broadcast OnDamageDealt.
+// The dealer arbiter. Each DealDamage resolves its hit entity to a zone, rejects a disabled zone and (unless friendly fire
+// is allowed) a Friendly one, then forwards the hit scaled by DamageScale. The attitude walks both ownership chains for a
+// team, so the dealer hitting its own zone is Friendly and a side with no team is Neutral.
 //
 // The zone, never a context root, is the hit's identity: a creature's limbs are distinct zones under one root.
 // Hit feedback (cues, debug draws) belongs at this pass, not on attribute signals (they coalesce same-frame hits).
@@ -28,7 +23,7 @@ class UMars_Processor_DamageDealer_HandleRequests : UCk_Processor_Script_Base_UE
 
         TArray<FMars_Request_DamageDealer_DealDamage> DealDamageRequests = InRequests.DealDamageRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_DamageDealer_Requests);
 
         for (const auto& Request : DealDamageRequests)
@@ -51,8 +46,8 @@ class UMars_Processor_DamageDealer_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         const auto Spec = InDealer.Get_Spec();
-        if (Spec.AllowFriendlyFire == false &&
-            utils_relationship::Get_AttitudeTowards(FCk_Handle(InDealer), FCk_Handle(Zone)) == ECk_RelationshipAttitude::Friendly)
+        if (Spec.FriendlyFire == EMars_DamageDealer_FriendlyFire::Reject &&
+            utils_relationship::Get_AttitudeTowards(InDealer, Zone) == ECk_RelationshipAttitude::Friendly)
         {
             Reject(InDealer, InRequest.HitEntity, EMars_DamageDealer_RejectReason::Friendly);
             return;

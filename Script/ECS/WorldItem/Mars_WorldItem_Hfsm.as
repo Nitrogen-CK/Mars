@@ -1,6 +1,10 @@
-// What picking up a World-mode item does: stow it into the initiator's hotbar.
-class UMars_SmState_WorldItem_PickUp : UCk_SmState_EntityScript
+// An interaction state that replaces UMars_SmState_InteractTarget_Enter: it runs TaskClass and exits the interaction
+// once the task succeeds or fails. Subclasses only set TaskClass.
+UCLASS(Abstract)
+class UMars_SmState_InteractTarget_RunTask : UCk_SmState_EntityScript
 {
+    protected TSubclassOf<UCk_SmTask_EntityScript> TaskClass;
+
     UFUNCTION(BlueprintOverride)
     TArray<FGameplayTag> DoGet_StatesToOverride() const
     {
@@ -11,7 +15,7 @@ class UMars_SmState_WorldItem_PickUp : UCk_SmState_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
-        AddTask(InHandle, UMars_SmTask_WorldItem_StowIntoInitiator);
+        AddTask(InHandle, TaskClass);
 
         auto OnSuccess = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
         AddCondition(OnSuccess, UMars_SmCondition_AllTasksSucceeded);
@@ -21,9 +25,15 @@ class UMars_SmState_WorldItem_PickUp : UCk_SmState_EntityScript
     }
 }
 
+// What picking up a World-mode item does: stow it into the initiator's hotbar.
+class UMars_SmState_WorldItem_PickUp : UMars_SmState_InteractTarget_RunTask
+{
+    default TaskClass = UMars_SmTask_WorldItem_StowIntoInitiator;
+}
+
 // Transfers the world item's held item into the initiator's hotbar stow target and runs until the transfer reports.
 // A Transient world item destroys itself once its holder empties; a Persistent one is asked to Carry itself onto the
-// initiator once the stow succeeds.
+// initiator once the stow succeeds. A full hotbar fails (the pickup is normally disabled before it gets here).
 class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -39,23 +49,24 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
         _Initiator = FCk_Handle();
         _WorldItem = FCk_Handle_WorldItem();
 
+        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
         auto Context = Get_StateMachineContext();
-        auto SubSm = FCk_Handle(Get_OwningStateMachine());
-        if (Context.Has_Fragment(FMars_Fragment_InteractionContext) == false ||
-            ck::Is_NOT_Valid(SubSm) || SubSm.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        FCk_Handle SubSm = Get_OwningStateMachine();
+        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
+            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
+        if (ck::EnsureIfNot(HasContext, "[WorldItem] Pickup ran without an interaction context"))
         {
-            DoFail("no interaction context");
+            _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 
-        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
         auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
         auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
-        auto WorldItem = Owner.As_WorldItem(ECk_SanityCheck::UnChecked);
-        auto Hotbar = Initiator.As_Hotbar(ECk_SanityCheck::UnChecked);
+        auto WorldItem = Owner.As_WorldItem();
+        auto Hotbar = Initiator.As_Hotbar();
         if (ck::Is_NOT_Valid(WorldItem) || ck::Is_NOT_Valid(Hotbar))
         {
-            DoFail("the interactable owner is not a world item, or the initiator has no hotbar");
+            _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 

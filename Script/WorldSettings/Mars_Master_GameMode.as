@@ -1,5 +1,4 @@
-// Base game mode shared by every Mars mode (gameplay today; frontend/kitchen later). Leaves
-// override the class slots; this layer holds what all of them agree on.
+// Base game mode shared by every Mars mode. Leaves override the class slots; this layer holds what all of them agree on.
 UCLASS(Abstract)
 class AMars_Master_GameMode : ACk_GameMode_UE
 {

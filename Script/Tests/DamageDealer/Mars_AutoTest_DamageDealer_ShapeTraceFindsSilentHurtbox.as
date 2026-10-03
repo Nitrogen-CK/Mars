@@ -1,7 +1,7 @@
 // The strike's sweep finds a hurtbox: a sphere ProbeTrace filtered on Probe.Mars.HitZone (Blocking world policy, Silent
 // overlap notify - the strike's settings) reports the Silent, Kinematic hurtbox probe as a Probe hit whose entity resolves
-// to the zone, and feeding that hit entity to a dealer lands the damage (90 left). The design's E2 risk probe: a sweep
-// that skips Silent probes never reports the hit and the wait below times out.
+// to the zone, and feeding that hit entity to a dealer lands the damage (90 left). A sweep that skips Silent probes never
+// reports the hit and the wait below times out.
 //
 // Runs in its own band (Y -41000, Z 300) so no other test's hurtbox is in the sweep.
 class UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox : UCk_AutoTest_Base
@@ -23,7 +23,7 @@ class UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox : UCk_AutoTest_Ba
 
         auto Target = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Health = utils_health::Add(Target, FMars_Health_Spec(100.0f));
-        _Zone = utils_hit_zone::Add(Target, FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Body")));
+        _Zone = utils_hit_zone::Add(Target, FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Body));
         auto Root = utils_transform::Add(Target, FTransform(FRotator::ZeroRotator, _Origin), ECk_Replication::DoesNotReplicate);
         _Hurtbox = utils_hit_zone::AddHurtbox_Box(_Zone, Root, FMars_HitZone_Hurtbox(FVector(20.0, 20.0, 20.0), FTransform::Identity));
 
@@ -47,7 +47,7 @@ class UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox : UCk_AutoTest_Ba
             _Origin + FVector(-200.0, 0.0, 0.0),
             _Origin + FVector(200.0, 0.0, 0.0),
             utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(25.0f)),
-            GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Probe.Mars.HitZone")));
+            GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_HitZone));
         Settings.Set_WorldHitPolicy(ECk_ProbeTrace_WorldHitPolicy::Blocking);
         Settings.Set_OverlapNotifyPolicy(ECk_ProbeResponse_Policy::Silent);
 
@@ -61,13 +61,12 @@ class UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox : UCk_AutoTest_Ba
     UFUNCTION()
     private void Step_AssertHitAndDeal(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Result.Get_HitKind() == ECk_ProbeTrace_HitKind::Probe, "the sweep reports a Probe hit");
+        Assert_True(_Result.Get_HitKind() == ECk_ProbeTrace_HitKind::Probe, f"the sweep reports a Probe hit (got {_Result.Get_HitKind() :n})");
         Assert_True(_Result.Get_HitEntity() == _Hurtbox, "the hit entity is the hurtbox node");
-        Assert_True(FCk_Handle(utils_hit_zone::TryGet_Zone(_Result.Get_HitEntity())) == FCk_Handle(_Zone),
-            "the hit entity resolves to the zone");
+        Assert_True(utils_hit_zone::TryGet_Zone(_Result.Get_HitEntity()) == _Zone, "the hit entity resolves to the zone");
 
         _Dealer.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(_Result.Get_HitEntity(),
-            utils_damage_dealer::Make_Event(_Dealer, 10.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt"))));
+            utils_damage_dealer::Make_Event(_Dealer, 10.0f, GameplayTags::DamageType_Mars_Blunt)));
     }
 
     UFUNCTION()

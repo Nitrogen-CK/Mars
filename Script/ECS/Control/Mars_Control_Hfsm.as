@@ -27,15 +27,16 @@ class UMars_SmTask_Control_Engage : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        // The state only runs as a control target's interaction (Make_InteractTarget), so its owner is the control.
         auto Context = Get_StateMachineContext();
-        if (Context.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        if (ck::EnsureIfNot(Context.Has_Fragment(FMars_Fragment_InteractionContext),
+            f"[Control] Engage ran on [{Context.ToString()}], which carries no InteractionContext"))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
         }
 
-        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Control = Owner.As_Control(ECk_SanityCheck::UnChecked);
+        auto Control = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control();
         if (ck::Is_NOT_Valid(Control))
         {
             Mark_Result(ECk_SmTaskResult::Failed);

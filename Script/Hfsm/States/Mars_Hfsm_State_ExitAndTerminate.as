@@ -17,9 +17,13 @@ class UMars_SmTask_TerminateOwningSm : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto OwningSm = Get_OwningStateMachine();
-        if (ck::IsValid(OwningSm))
-        { utils_state_machine::Request_Stop(OwningSm); }
+        if (ck::EnsureIfNot(ck::IsValid(OwningSm), "[ExitAndTerminate] the task has no owning state machine to stop"))
+        {
+            Mark_Result(ECk_SmTaskResult::Failed);
+            return;
+        }
 
+        utils_state_machine::Request_Stop(OwningSm);
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }

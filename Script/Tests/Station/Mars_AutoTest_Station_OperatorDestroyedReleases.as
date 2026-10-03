@@ -51,24 +51,24 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
         _ReleaseReasons.Add(InReason);
     }
 
-    private FString Get_PromptText() const
+    // The Use target and its prompt are composed with the station, so their absence fails the test.
+    private FString Get_PromptText()
     {
         auto Target = _Station.Get_UseTarget();
         if (ck::Is_NOT_Valid(Target))
-        { return ""; }
+        {
+            FinishFailure("the station has no Use target");
+            return "";
+        }
 
-        auto Prompt = FCk_Handle(Target).As_InteractPrompt(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Prompt))
-        { return ""; }
-
-        return Prompt.Get_PromptText().ToString();
+        return Target.As_InteractPrompt().Get_PromptText().ToString();
     }
 
     UFUNCTION()
     private void Step_Reserve(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Station), "the station composed");
-        Assert_True(ck::IsValid(_Station.Get_UseTarget()), "the station has a Use target");
+        Assert_Valid(_Station, "utils_station::Add composed the station");
+        Assert_Valid(_Station.Get_UseTarget(), "the station has a Use target");
         _Station.Request_Reserve(FMars_Request_Station_Reserve(_Operator));
     }
 
@@ -100,9 +100,13 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
     private void Step_AssertReleased(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Released.Num(), 1, "OnReleased fired once");
-        Assert_True(_Released[0] == _Operator, "OnReleased carries the destroyed operator's handle");
-        Assert_True(_ReleaseReasons[0] == EMars_Station_ReleaseReason::OperatorLost,
-            f"the release reason is OperatorLost (got {_ReleaseReasons[0] :n})");
+        if (_Released.Num() == 1)
+        {
+            Assert_True(_Released[0] == _Operator, "OnReleased carries the destroyed operator's handle");
+            Assert_True(_ReleaseReasons[0] == EMars_Station_ReleaseReason::OperatorLost,
+                f"the release reason is OperatorLost (got {_ReleaseReasons[0] :n})");
+        }
+
         Assert_False(_Station.Get_IsOperated(), "the station is free");
     }
 

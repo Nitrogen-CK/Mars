@@ -24,21 +24,25 @@ enum EMars_FPHands_Phase
     Push
 }
 
+// The gesture a reach plays: Grab (an instant interaction) runs Reach -> Grip -> Return on its own; Hold (a timed or
+// manually completed one) keeps the gloves on the target until it is lost.
+enum EMars_FPHands_ReachKind
+{
+    Grab,
+    Hold
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Retained whole: the anim instance and the pure functions read the placement sub-specs from here.
+// Retained whole: the anim instance and the pure functions read the sub-specs from here.
 struct FMars_Fragment_FPHands_Params
 {
     UPROPERTY()
     FMars_FPHands_Spec Spec;
 
-    // The swaying, bobbing hand node the gloves hang off (Player.HandBob, a CkGait bob node).
-    UPROPERTY()
-    FCk_Handle_Transform HandNode;
-
-    // The character's stride clock (CkGait); the free-hand arm swing is derived from it.
+    // The character's stride clock (CkGait); the free-hand arm swing is derived from it. Invalid without one.
     UPROPERTY()
     FCk_Handle_Gait Gait;
 }
@@ -47,71 +51,84 @@ struct FMars_Fragment_FPHands_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by UMars_Processor_FPHands_HandleRequests, UMars_Processor_FPHands_Tick and utils_fphands::Add.
-struct FMars_Fragment_FPHands
+// The reach the gloves are on (or last were on).
+struct FMars_FPHands_ReachState
 {
     UPROPERTY()
-    EMars_FPHands_Phase Phase = EMars_FPHands_Phase::None;
+    TOptional<FMars_FPHands_ReachTarget> Target;
 
-    // Seconds since the current phase was set (reset by every SetPhase).
+    // Unset when the reach serves no interaction (a bare reach, a target-less subject).
     UPROPERTY()
-    float32 PhaseTime = 0.0f;
-
-    // The reach alpha when Release began (a release eases back from wherever the gloves were).
-    UPROPERTY()
-    float32 ReleaseFromAlpha = 1.0f;
-
-    // The reach alpha when Reach or Hold began (a reach that interrupts a release continues from where the gloves are).
-    UPROPERTY()
-    float32 ReachFromAlpha = 0.0f;
+    TOptional<FCk_Handle_InteractTarget> InteractTarget;
 
     UPROPERTY()
-    FMars_FPHands_ReachTarget Target;
+    ECk_Interaction_CompletionPolicy CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
 
+    // Single-handed targets near the centre line stay with this glove; every resolve (focus included) updates it.
     UPROPERTY()
-    FCk_Handle_InteractTarget InteractTarget;
+    EMars_Hand PreferredHand = EMars_Hand::Right;
+}
 
+// The lean toward what is looked at.
+struct FMars_FPHands_FocusState
+{
+    // Re-resolved when focus changes. Outlives the focus while the gloves lean back out; cleared once both leans are gone.
     UPROPERTY()
-    bool IsInstant = true;
-
-    // What the gloves lean toward while it is looked at, re-resolved when focus changes.
-    UPROPERTY()
-    FMars_FPHands_ReachTarget FocusTarget;
+    TOptional<FMars_FPHands_ReachTarget> Target;
 
     UPROPERTY()
     FCk_Handle_Interactable FocusedFor;
 
-    // Smoothed focus lean per glove (each eases on its own, so switching sides cross-fades).
+    // Smoothed lean per glove (each eases on its own, so switching sides cross-fades).
     UPROPERTY()
-    float32 FocusAlpha_L = 0.0f;
+    float32 Alpha_L = 0.0f;
 
     UPROPERTY()
-    float32 FocusAlpha_R = 0.0f;
+    float32 Alpha_R = 0.0f;
+}
 
-    // Single-handed targets near the centre line stay with this glove.
-    UPROPERTY()
-    bool PreferRightHand = true;
-
+// What a push follows through from.
+struct FMars_FPHands_PushState
+{
+    // The hold the gloves had when the item launched: the feature's Hold empties a few frames later, the push keeps this
+    // grip shape.
     UPROPERTY()
     FMars_FPHands_Hold Hold;
 
     UPROPERTY()
-    FMars_FPHands_Carry Carry;
+    EMars_LaunchKind Kind = EMars_LaunchKind::Drop;
+}
 
-    // The hold the gloves had when the item launched: Hold empties a few frames later, the push keeps this grip shape.
+// Written only by UMars_Processor_FPHands_HandleRequests, UMars_Processor_FPHands_Tick and utils_fphands::Add.
+struct FMars_Fragment_FPHands
+{
+    // Phase and the From alphas are written only by the requests drain's SetPhase; PhaseTime also advances in the Tick.
     UPROPERTY()
-    FMars_FPHands_Hold PushHold;
+    FMars_FPHands_PhaseState PhaseState;
 
     UPROPERTY()
-    bool PushIsThrow = false;
+    FMars_FPHands_ReachState Reach;
+
+    UPROPERTY()
+    FMars_FPHands_FocusState Focus;
+
+    UPROPERTY()
+    FMars_FPHands_Hold Hold;
+
+    // Set while a picked-up item rides in with the gloves.
+    UPROPERTY()
+    TOptional<FMars_FPHands_Carry> Carry;
+
+    UPROPERTY()
+    FMars_FPHands_PushState Push;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_FPHands_OnReachRequested(FCk_Handle_FPHands InHands, bool InIsInstant);
-event void FMars_Delegate_FPHands_OnReachRequested_MC(FCk_Handle_FPHands InHands, bool InIsInstant);
+delegate void FMars_Delegate_FPHands_OnReachRequested(FCk_Handle_FPHands InHands, ECk_Interaction_CompletionPolicy InCompletionPolicy);
+event void FMars_Delegate_FPHands_OnReachRequested_MC(FCk_Handle_FPHands InHands, ECk_Interaction_CompletionPolicy InCompletionPolicy);
 
 delegate void FMars_Delegate_FPHands_OnReachTargetLost(FCk_Handle_FPHands InHands);
 event void FMars_Delegate_FPHands_OnReachTargetLost_MC(FCk_Handle_FPHands InHands);
@@ -148,31 +165,29 @@ struct FMars_Request_FPHands_SetPhase
     }
 }
 
-// Reach for an interact target. The last one in a drain wins; ignored unless the gloves are at rest (Phase None) or
-// letting go (Release, Return), and when the target is unresolvable.
+// Reach for a subject. The last one in a drain wins; ignored unless the gloves are at rest (Phase None) or letting go
+// (Release, Return), when the subject died before the drain, and when it is unresolvable.
 struct FMars_Request_FPHands_StartReach
 {
+    // Unset: a bare reach - the right glove toward the hand node itself, which drives the phase machine without an
+    // interactable to resolve (headless tests).
     UPROPERTY()
-    FCk_Handle_InteractTarget Target;
+    TOptional<FMars_FPHands_ReachSubject> Subject;
 
     UPROPERTY()
-    FCk_Handle_Interactable Interactable;
-
-    UPROPERTY()
-    FCk_Handle Owner;
-
-    UPROPERTY()
-    bool IsInstant = true;
+    ECk_Interaction_CompletionPolicy CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
 
     FMars_Request_FPHands_StartReach() {}
 
-    FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interactable InInteractable, FCk_Handle InOwner,
-                                     bool InIsInstant)
+    FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy InCompletionPolicy)
     {
-        Target = InTarget;
-        Interactable = InInteractable;
-        Owner = InOwner;
-        IsInstant = InIsInstant;
+        CompletionPolicy = InCompletionPolicy;
+    }
+
+    FMars_Request_FPHands_StartReach(FMars_FPHands_ReachSubject InSubject, ECk_Interaction_CompletionPolicy InCompletionPolicy)
+    {
+        Subject = TOptional<FMars_FPHands_ReachSubject>(InSubject);
+        CompletionPolicy = InCompletionPolicy;
     }
 }
 
@@ -225,14 +240,14 @@ struct FMars_Request_FPHands_StartPush
     FMars_FPHands_Hold Hold;
 
     UPROPERTY()
-    bool IsThrow = false;
+    EMars_LaunchKind Kind = EMars_LaunchKind::Drop;
 
     FMars_Request_FPHands_StartPush() {}
 
-    FMars_Request_FPHands_StartPush(FMars_FPHands_Hold InHold, bool InIsThrow)
+    FMars_Request_FPHands_StartPush(FMars_FPHands_Hold InHold, EMars_LaunchKind InKind)
     {
         Hold = InHold;
-        IsThrow = InIsThrow;
+        Kind = InKind;
     }
 }
 

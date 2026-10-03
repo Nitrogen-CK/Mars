@@ -9,8 +9,8 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
     private FCk_Handle_InteractionResolver _Resolver;
     private FCk_Handle_InteractTarget _Target;
     private FCk_Handle _Player;
-    private bool _SawBestChange = false;
-    private EMars_FPHands_Phase _PhaseAtBestChange = EMars_FPHands_Phase::None;
+    // The gloves' phase when the lever first became the resolver's best; unset until it does.
+    private TOptional<EMars_FPHands_Phase> _PhaseAtBestChange;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -21,15 +21,16 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
         auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.GrabOutSeconds = 0.2f;
-        Spec.Reach.GrabGripSeconds = 0.2f;
-        Spec.Reach.GrabBackSeconds = 0.2f;
-        Spec.Reach.ReleaseSeconds = 0.4f;
+        Spec.Reach.Grab.OutSeconds = 0.2f;
+        Spec.Reach.Grab.GripSeconds = 0.2f;
+        Spec.Reach.Grab.BackSeconds = 0.2f;
+        Spec.Reach.Hold.ReleaseSeconds = 0.4f;
         // A push long enough that the target is added well inside it.
         Spec.Push.OutSeconds = 0.2f;
         Spec.Push.BackSeconds = 0.4f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Resolver = utils_interaction_resolver::Add(_Player, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
         _Resolver.BindTo_OnBestTargetsChanged(FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
         BuildLever(InHandle);
@@ -88,16 +89,13 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
                                       const TArray<FCk_Handle_InteractTarget>&in InNewTargets,
                                       const TArray<FCk_Handle_InteractTarget>&in InRemovedTargets)
     {
-        if (InIntent != GameplayTags::InteractionIntent_Mars_Use || _SawBestChange)
+        if (InIntent != GameplayTags::InteractionIntent_Mars_Use || _PhaseAtBestChange.IsSet())
         { return; }
 
         for (auto Target : InNewTargets)
         {
             if (Target == _Target)
-            {
-                _SawBestChange = true;
-                _PhaseAtBestChange = _Hands.Get_Phase();
-            }
+            { _PhaseAtBestChange = TOptional<EMars_FPHands_Phase>(_Hands.Get_Phase()); }
         }
     }
 
@@ -113,7 +111,7 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
     UFUNCTION()
     private void Step_RequestPush(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(FMars_FPHands_Hold(), false));
+        _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(FMars_FPHands_Hold(), EMars_LaunchKind::Drop));
     }
 
     UFUNCTION()
@@ -148,9 +146,15 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
     UFUNCTION()
     private void Step_AssertHoldsTarget(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_SawBestChange, "the resolver picked the lever");
-        Assert_True(_PhaseAtBestChange == EMars_FPHands_Phase::Push, "the lever became best while the gloves were pushing");
-        Assert_True(_Hands.Get_InteractTarget() == _Target, "the gloves hold the lever's interact target");
-        Assert_False(_Hands.Get_IsInstant(), "the hold is timed");
+        Assert_True(_PhaseAtBestChange.IsSet(), "the resolver picked the lever");
+        if (_PhaseAtBestChange.IsSet())
+        {
+            const auto PhaseAtBestChange = _PhaseAtBestChange.GetValue();
+            Assert_True(PhaseAtBestChange == EMars_FPHands_Phase::Push,
+                f"the lever became best while the gloves were pushing (got {PhaseAtBestChange :n})");
+        }
+
+        Assert_True(_Hands.Get_IsReachTarget(_Target), "the gloves hold the lever's interact target");
+        Assert_True(_Hands.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed, "the hold is timed");
     }
 }

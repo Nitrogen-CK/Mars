@@ -18,22 +18,25 @@ class UMars_CampStationPanel_Widget : UCk_ActivatableWidget_UE
     UPROPERTY(EditDefaultsOnly, Category = "Camp")
     FText Title;
 
+    // Once per widget: CommonUI re-runs Construct each time a pooled widget is shown again, which would bind twice.
     UFUNCTION(BlueprintOverride)
-    void Construct()
+    void OnInitialized()
     {
-        if (ck::IsValid(Menu_Back))
-        { Menu_Back.OnButtonBaseClicked.AddUFunction(this, n"OnBackClicked"); }
+        Menu_Back.OnButtonBaseClicked.AddUFunction(this, n"OnBackClicked");
 
         if (ck::IsValid(TitleText))
         { TitleText.SetText(Title); }
     }
 
+    // The camp layout is only ever shown to a camp player controller.
     UFUNCTION(BlueprintOverride)
     void OnActivated()
     {
         auto PC = Cast<AMars_Camp_PlayerController>(GetOwningPlayer());
-        if (ck::IsValid(PC))
-        { PC.Request_FocusStation(Station); }
+        if (ck::EnsureIfNot(ck::IsValid(PC), "[Mars_CampStationPanel] the owning player is not an AMars_Camp_PlayerController"))
+        { return; }
+
+        PC.FocusStation(Station);
     }
 
     UFUNCTION(BlueprintOverride)

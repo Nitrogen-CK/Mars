@@ -11,6 +11,17 @@ asset Mars_HeldItemUseHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_HeldItemUse {}
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Enums
+//--------------------------------------------------------------------------------------------------------------------------
+
+// How a held item leaves the hands. Shared with FPHands, whose push pose differs per kind.
+enum EMars_LaunchKind
+{
+    Drop,
+    Throw
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -55,8 +66,8 @@ event void FMars_Delegate_HeldItemUse_OnThrowArmedChanged_MC(FCk_Handle_HeldItem
 
 // The held item has just been dropped or thrown. It is still the held item (and the hands' hold) when this fires; the
 // world item adopts it a frame or more later.
-delegate void FMars_Delegate_HeldItemUse_OnItemLaunched(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, bool InIsThrow);
-event void FMars_Delegate_HeldItemUse_OnItemLaunched_MC(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, bool InIsThrow);
+delegate void FMars_Delegate_HeldItemUse_OnItemLaunched(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, EMars_LaunchKind InKind);
+event void FMars_Delegate_HeldItemUse_OnItemLaunched_MC(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, EMars_LaunchKind InKind);
 
 struct FMars_Fragment_HeldItemUse_Signals
 {

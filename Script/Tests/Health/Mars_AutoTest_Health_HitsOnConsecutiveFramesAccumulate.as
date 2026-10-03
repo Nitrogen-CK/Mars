@@ -58,12 +58,15 @@ class UMars_AutoTest_Health_HitsOnConsecutiveFramesAccumulate : UCk_AutoTest_Bas
 
     private FMars_Request_Health_ApplyDamage Make_Hit()
     {
-        return FMars_Request_Health_ApplyDamage(FMars_DamageEvent(10.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt")));
+        return FMars_Request_Health_ApplyDamage(FMars_DamageEvent(10.0f, GameplayTags::DamageType_Mars_Blunt));
     }
 
     private void Assert_Sequence(int32 InFirst, const TArray<float32>& InExpectedRemaining, const FString& InSegment)
     {
         Assert_Equals_Int(_DamagedRemaining.Num(), InFirst + InExpectedRemaining.Num(), f"{InSegment}: OnDamaged fired once per hit");
+        if (_DamagedRemaining.Num() != InFirst + InExpectedRemaining.Num())
+        { return; }
+
         for (int32 Index = 0; Index < InExpectedRemaining.Num(); ++Index)
         {
             const auto Slot = InFirst + Index;
@@ -76,7 +79,7 @@ class UMars_AutoTest_Health_HitsOnConsecutiveFramesAccumulate : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_Hit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Health), "the Health composed");
+        Assert_Valid(_Health, "utils_health::Add composed the Health");
         _Health.Request_ApplyDamage(Make_Hit());
     }
 

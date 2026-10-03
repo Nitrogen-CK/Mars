@@ -14,8 +14,9 @@ class UMars_Processor_EyeHeight_Tick : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_EyeHeight& InState)
     {
-        const auto& Params = InHandle.Get_Fragment(FMars_Fragment_EyeHeight_Params);
-        auto Character = Params.Character.Get();
+        const auto& Spec = InHandle.Get_Fragment(FMars_Fragment_EyeHeight_Params).Spec;
+        // The character can be destroyed before its entity.
+        auto Character = Spec.Character.Get();
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
@@ -31,12 +32,12 @@ class UMars_Processor_EyeHeight_Tick : UCk_Processor_Script_Base_UE
 
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
         if (DeltaSeconds > 0.0f)
-        { InState.Offset *= float32(Math::Exp(-Params.BlendRate * DeltaSeconds)); }
+        { InState.Offset *= float32(Math::Exp(-Spec.BlendRate * DeltaSeconds)); }
 
         if (Math::Abs(InState.Offset) < 0.01f)
         { InState.Offset = 0.0f; }
 
         auto Node = InHandle.As_SceneNode();
-        utils_scene_node::Request_UpdateOffset_Location(Node, FVector(0.0, 0.0, Params.Height + InState.Offset));
+        utils_scene_node::Request_UpdateOffset_Location(Node, FVector(0.0, 0.0, Spec.Height + InState.Offset));
     }
 }

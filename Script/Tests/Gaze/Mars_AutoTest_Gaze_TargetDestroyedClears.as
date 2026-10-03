@@ -62,8 +62,8 @@ class UMars_AutoTest_Gaze_TargetDestroyedClears : UCk_AutoTest_Base
     {
         Assert_True(_LastPrevious == _TargetHead, "the clearing OnTargetChanged comes from the destroyed target's Head");
         Assert_Invalid(_LastCurrent, "the clearing OnTargetChanged goes to no target");
-        Assert_False(_Gaze.Get_HasTarget(), "Get_HasTarget() after the target's owner is destroyed");
-        Assert_Invalid(_Gaze.Get_Target(), "Get_Target() after the target's owner is destroyed");
+        Assert_False(_Gaze.Get_HasTarget(), "Get_HasTarget() is false after the target's owner is destroyed");
+        Assert_Invalid(_Gaze.Get_Target(), "Get_Target() is none after the target's owner is destroyed");
 
         const auto Aim = _Gaze.Get_AimYawPitchDeg();
         Assert_True(Aim.IsNearlyZero(), f"the aim is zero without a target (got [{Aim.ToString()}])");

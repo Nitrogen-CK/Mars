@@ -1,4 +1,4 @@
-// In-dungeon gameplay mode. Assign it per map (World Settings > GameMode Override) - the
+// In-dungeon gameplay mode, picked by the Sandbox_Mars_ map prefix (DefaultEngine.ini GameModeMapPrefixes). The
 // project-wide GlobalDefaultGameMode is left alone so plugin test levels keep theirs.
 class AMars_Gameplay_GameMode : AMars_Master_GameMode
 {

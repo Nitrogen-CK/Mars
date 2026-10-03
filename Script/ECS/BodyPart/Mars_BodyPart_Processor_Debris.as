@@ -12,20 +12,20 @@ class UMars_Processor_BodyPart_Debris : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_BodyPart_PendingDebris& InPending)
     {
-        for (int32 Index = InPending.Bodies.Num() - 1; Index >= 0; --Index)
+        for (int32 Index = InPending.Impulses.Num() - 1; Index >= 0; --Index)
         {
-            auto DebrisBody = InPending.Bodies[Index];
+            const auto Pending = InPending.Impulses[Index];
+            auto DebrisBody = Pending.Body;
             if (ck::IsValid(DebrisBody) && utils_jolt_body::Get_IsBodyAdded(DebrisBody) == false)
             { continue; }
 
             if (ck::IsValid(DebrisBody))
-            { utils_jolt_body::Request_AddImpulse(DebrisBody, FCk_Request_JoltBody_AddImpulse(InPending.Impulses[Index])); }
+            { utils_jolt_body::Request_AddImpulse(DebrisBody, FCk_Request_JoltBody_AddImpulse(Pending.Impulse)); }
 
-            InPending.Bodies.RemoveAt(Index);
             InPending.Impulses.RemoveAt(Index);
         }
 
-        if (InPending.Bodies.Num() == 0)
+        if (InPending.Impulses.Num() == 0)
         { InHandle.Request_TryRemove(FMars_Fragment_BodyPart_PendingDebris); }
     }
 }

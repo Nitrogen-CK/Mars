@@ -2,7 +2,7 @@
 // to Idle with no waypoints, and half a second later the body is still (SurfaceMotion keeps the last steering, so the
 // stop must clear it). Neither OnArrived nor OnFailed fires.
 //
-// The body is a plain SurfaceMotion body on a runtime static Jolt floor (D-T1; no legs, so it rides its rays).
+// The body is a plain SurfaceMotion body on a runtime static Jolt floor (no legs, so it rides its rays).
 // Isolated origin (140000, 88000, 600): the Mars autotest map has no floor of its own there.
 class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UCk_AutoTest_Base
 {
@@ -30,10 +30,6 @@ class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UCk_AutoTest_Base
         Add_Step("the body is still and no move signal fired", n"Step_AssertStopped");
         Run_Steps(InHandle);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
 
     private FCk_SurfaceMotion_Spec Make_MotionSpec()
     {
@@ -81,12 +77,8 @@ class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UCk_AutoTest_Base
 
     private FVector Get_BodyLocation() const
     {
-        return utils_transform::Get_EntityCurrentLocation(utils_transform::DoCastChecked(FCk_Handle(_Motion)));
+        return utils_transform::Get_EntityCurrentLocation(_Motion.As_Transform());
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Handlers
-    //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
     private void OnArrived(FCk_Handle_SurfaceNavigator InNavigator, FVector InGoal)
@@ -99,10 +91,6 @@ class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UCk_AutoTest_Base
     {
         ++_FailedCount;
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Steps
-    //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
     private void Step_MoveTo(FCk_Handle InHandle, FInstancedStruct InPayload)
@@ -138,9 +126,10 @@ class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UCk_AutoTest_Base
     {
         const auto Speed = utils_surface_motion::Get_Velocity(_Motion).Size();
         Assert_True(Speed < 5.0, f"the stop cleared the steering: the body is still ({Speed} uu/s)");
-        Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Idle, "the navigator stays Idle");
+        Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Idle, f"the navigator stays Idle (got [{_Nav.Get_Status() :n}])");
         Assert_Equals_Int(_Nav.Get_Waypoints().Num(), 0, "a stopped navigator has no waypoints");
-        Assert_True((Get_BodyLocation() - _Start).Size2D() < 600.0, "the body stopped well short of the goal");
+        const auto Travelled = (Get_BodyLocation() - _Start).Size2D();
+        Assert_True(Travelled < 600.0, f"the body stopped well short of the goal (travelled {Travelled} of 1200 uu)");
         Assert_Equals_Int(_ArrivedCount, 0, "OnArrived never fired");
         Assert_Equals_Int(_FailedCount, 0, "OnFailed never fired");
     }

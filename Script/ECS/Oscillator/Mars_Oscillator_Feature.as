@@ -10,6 +10,12 @@ asset Mars_OscillatorHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_Oscillator {}
 
+enum EMars_Oscillator_RunState
+{
+    Stopped,
+    Running
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -46,18 +52,20 @@ struct FMars_Oscillator_Spec
     TOptional<float32> CatchAngleDegrees;
 }
 
-// A catch angle the swing reaches, on a swing that moves.
+// A swing that moves in positive time, settling in non-negative time, and a catch angle the swing reaches.
 mixin FMars_Validation Validate(const FMars_Oscillator_Spec& Self)
 {
-    if (Self.CatchAngleDegrees.IsSet() == false)
-    { return FMars_Validation(); }
-
-    const auto CatchAngle = Self.CatchAngleDegrees.GetValue();
-    if (Math::Abs(CatchAngle) > Self.AmplitudeDegrees)
-    { return FMars_Validation(f"CatchAngleDegrees [{CatchAngle}] must be within AmplitudeDegrees [{Self.AmplitudeDegrees}]"); }
+    if (Self.AmplitudeDegrees < 0.0f)
+    { return FMars_Validation(f"AmplitudeDegrees [{Self.AmplitudeDegrees}] must not be negative"); }
 
     if (Self.PeriodSeconds <= 0.0f)
-    { return FMars_Validation(f"PeriodSeconds [{Self.PeriodSeconds}] must be positive for a swing to reach its catch angle"); }
+    { return FMars_Validation(f"PeriodSeconds [{Self.PeriodSeconds}] must be positive"); }
+
+    if (Self.SettleSeconds < 0.0f)
+    { return FMars_Validation(f"SettleSeconds [{Self.SettleSeconds}] must not be negative"); }
+
+    if (Self.CatchAngleDegrees.IsSet() && Math::Abs(Self.CatchAngleDegrees.GetValue()) > Self.AmplitudeDegrees)
+    { return FMars_Validation(f"CatchAngleDegrees [{Self.CatchAngleDegrees.GetValue()}] must be within AmplitudeDegrees [{Self.AmplitudeDegrees}]"); }
 
     return FMars_Validation();
 }
@@ -92,10 +100,19 @@ struct FMars_Fragment_Oscillator_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+enum EMars_Oscillator_State
+{
+    // Easing to rest, or braking toward the catch angle when one is set.
+    Stopped,
+    Running,
+    // Stopped and held at the catch angle. Time and Envelope stay where the catch took them.
+    Caught
+}
+
 struct FMars_Fragment_Oscillator
 {
     UPROPERTY()
-    bool IsRunning = false;
+    EMars_Oscillator_State State = EMars_Oscillator_State::Stopped;
 
     UPROPERTY()
     float32 Time = 0.0f;
@@ -103,18 +120,14 @@ struct FMars_Fragment_Oscillator
     // 0 = at rest, 1 = full amplitude.
     UPROPERTY()
     float32 Envelope = 0.0f;
-
-    // Stopped and held at the catch angle (CatchAngleDegrees set). Time and Envelope stay where the catch took them.
-    UPROPERTY()
-    bool IsCaught = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_Oscillator_OnRunningChanged(FCk_Handle_Oscillator InOscillator, bool InRunning);
-event void FMars_Delegate_Oscillator_OnRunningChanged_MC(FCk_Handle_Oscillator InOscillator, bool InRunning);
+delegate void FMars_Delegate_Oscillator_OnRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState);
+event void FMars_Delegate_Oscillator_OnRunningChanged_MC(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState);
 
 struct FMars_Fragment_Oscillator_Signals
 {
@@ -128,17 +141,19 @@ struct FMars_Fragment_Oscillator_Signals
 struct FMars_Request_Oscillator_SetRunning
 {
     UPROPERTY()
-    bool Running = false;
+    EMars_Oscillator_RunState RunState = EMars_Oscillator_RunState::Stopped;
 
-    FMars_Request_Oscillator_SetRunning(bool InRunning)
+    FMars_Request_Oscillator_SetRunning() {}
+
+    FMars_Request_Oscillator_SetRunning(EMars_Oscillator_RunState InRunState)
     {
-        Running = InRunning;
+        RunState = InRunState;
     }
 }
 
-// Absolute and latest-wins: one pending value, overwritten by each new request.
+// SetRunning is absolute: the latest one wins.
 struct FMars_Fragment_Oscillator_Requests
 {
     UPROPERTY()
-    TOptional<FMars_Request_Oscillator_SetRunning> SetRunningRequest;
+    TArray<FMars_Request_Oscillator_SetRunning> SetRunningRequests;
 }

@@ -15,8 +15,8 @@ struct FMars_Feature_Ladder {}
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Ladder frame: the origin is the foot on the floor; local +X points OUT of the ladder toward the climber; the rungs span
-// local Y; the climb line is (Standoff, 0, z) for z in [0, Height]. Field order is the positional constructor's order (the
-// spawn-params generator emits it when a subclass changes a default).
+// local Y; the climb line is (Standoff, 0, z) for z in [0, Height]. The spawn-params generator emits a non-default value
+// as the positional constructor call.
 struct FMars_Ladder_Spec
 {
     // Foot (origin) to the top rung / the surface of the platform the ladder serves.
@@ -105,22 +105,7 @@ struct FMars_Tag_Ladder_NeedsSetup {}
 struct FMars_Fragment_Ladder_Params
 {
     UPROPERTY()
-    float32 Height = 300.0f;
-
-    UPROPERTY()
-    float32 Width = 60.0f;
-
-    UPROPERTY()
-    float32 Standoff = 45.0f;
-
-    UPROPERTY()
-    float32 MountDepth = 90.0f;
-
-    UPROPERTY()
-    float32 TopExitDepth = 70.0f;
-
-    UPROPERTY()
-    float32 ZoneHeightPadding = 100.0f;
+    FMars_Ladder_Spec Spec;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

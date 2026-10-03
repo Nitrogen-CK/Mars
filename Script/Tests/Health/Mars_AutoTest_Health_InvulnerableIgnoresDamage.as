@@ -30,14 +30,14 @@ class UMars_AutoTest_Health_InvulnerableIgnoresDamage : UCk_AutoTest_Base
 
     private FMars_Request_Health_ApplyDamage Make_Hit(float32 InAmount)
     {
-        return FMars_Request_Health_ApplyDamage(FMars_DamageEvent(InAmount, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt")));
+        return FMars_Request_Health_ApplyDamage(FMars_DamageEvent(InAmount, GameplayTags::DamageType_Mars_Blunt));
     }
 
     UFUNCTION()
     private void Step_InvulnerableHit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Health), "the Health composed");
-        _Health.Request_SetInvulnerable(FMars_Request_Health_SetInvulnerable(true));
+        Assert_Valid(_Health, "utils_health::Add composed the Health");
+        _Health.Request_SetInvulnerable(FMars_Request_Health_SetInvulnerable(ECk_EnableDisable::Enable));
         _Health.Request_ApplyDamage(Make_Hit(50.0f));
     }
 
@@ -49,7 +49,7 @@ class UMars_AutoTest_Health_InvulnerableIgnoresDamage : UCk_AutoTest_Base
         Assert_Equals_Int(_DamagedApplied.Num(), 0, "no OnDamaged while invulnerable");
         Assert_False(_Health.Get_LastHit().IsSet(), "an ignored hit is not recorded");
 
-        _Health.Request_SetInvulnerable(FMars_Request_Health_SetInvulnerable(false));
+        _Health.Request_SetInvulnerable(FMars_Request_Health_SetInvulnerable(ECk_EnableDisable::Disable));
         _Health.Request_ApplyDamage(Make_Hit(50.0f));
     }
 
@@ -65,6 +65,7 @@ class UMars_AutoTest_Health_InvulnerableIgnoresDamage : UCk_AutoTest_Base
     {
         Assert_False(_Health.Get_IsInvulnerable(), "the Health is vulnerable again");
         Assert_Equals_Int(_DamagedApplied.Num(), 1, "OnDamaged fired once, for the vulnerable hit");
-        Assert_Equals_Float(_DamagedApplied[0], 50.0f, 0.001f, "the vulnerable hit applied 50");
+        if (_DamagedApplied.Num() == 1)
+        { Assert_Equals_Float(_DamagedApplied[0], 50.0f, 0.001f, "the vulnerable hit applied 50"); }
     }
 }

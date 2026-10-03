@@ -1,9 +1,8 @@
 // The player's ManipulateControl task holds the camera still from the moment a lever's interaction starts, not only once
 // the gloves grip it: a look drag during the reach must not turn the view off the lever. A pending interaction cancelled
-// before any grip hands the orientation control back. Rig: T3's (Mars_AutoTest_Control_ManipulationWaitsForTheGrip: the
-// ManuallyCompleted lever, hands + resolver on the test entity, UMars_AutoTestState_ManipulateControlRig) plus a headless
-// camera director on a CkTests camera helper actor and a PlayerViewpoint on the test entity pointing at it. The gloves'
-// timed reach is slowed to 2 s so the cancel always lands before the grip (and before the task's 1 s grip-wait fallback).
+// before any grip hands the orientation control back. The camera is a headless director on a CkTests camera helper
+// actor, with a PlayerViewpoint on the test entity pointing at it. The gloves' timed reach is slowed to 2 s so the
+// cancel always lands before the grip (and before the task's 1 s grip-wait fallback).
 class UMars_AutoTest_Control_PendingGripFreezesCamera : UCk_AutoTest_Base
 {
     private ACkAutoTest_GameplayCamera_Helper _CameraHelper;
@@ -23,19 +22,23 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UCk_AutoTest_Base
 
         _CameraHelper = Cast<ACkAutoTest_GameplayCamera_Helper>(SpawnActor(
             ACkAutoTest_GameplayCamera_Helper, FVector::ZeroVector, FRotator::ZeroRotator));
-        if (ck::IsValid(_CameraHelper))
+        if (ck::Is_NOT_Valid(_CameraHelper))
         {
-            utils_pending_entity_script::Promise_OnConstructed(
-                _CameraHelper.PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
+            FinishFailure("failed to spawn the camera helper actor");
+            return;
         }
+
+        utils_pending_entity_script::Promise_OnConstructed(
+            _CameraHelper.PendingEntity, FCk_Delegate_EntityScript_Constructed(this, n"OnCameraHelperReady"));
 
         auto HandRootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto HandRoot = utils_transform::Add(HandRootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
 
         auto HandsSpec = FMars_FPHands_Spec();
-        HandsSpec.Reach.HoldReachSeconds = 2.0f;
-        _Hands = utils_fphands::Add(_Player, HandsSpec, HandNode.As_Transform());
+        HandsSpec.Reach.Hold.ReachSeconds = 2.0f;
+        HandsSpec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, HandsSpec);
         _Resolver = utils_interaction_resolver::Add(_Player, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
         BuildLever(InHandle);
 
@@ -93,8 +96,8 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UCk_AutoTest_Base
     private void OnCameraHelperReady(FCk_Handle_EntityScript InEntityScriptHandle)
     {
         // Outside the test's own lifetime subtree: the runner's cascade would leave it alive into later tests.
-        Track_ForCleanup(FCk_Handle(InEntityScriptHandle));
-        _CameraOwner = FCk_Handle(InEntityScriptHandle).As_Transform();
+        Track_ForCleanup(InEntityScriptHandle);
+        _CameraOwner = InEntityScriptHandle.As_Transform();
     }
 
     UFUNCTION()
@@ -112,9 +115,14 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UCk_AutoTest_Base
         auto CameraSpec = FCk_Camera_Spec(_CameraHelper.CameraComponent);
         CameraSpec.Set_Profile(utils_player_viewpoint::Make_CameraProfile(ViewpointSpec));
         _Camera = utils_camera::Add(_CameraOwner, CameraSpec);
-        Assert_True(ck::IsValid(_Camera), "the camera director composed headless");
+        if (ck::Is_NOT_Valid(_Camera))
+        {
+            FinishFailure("the camera director did not compose headless");
+            return;
+        }
 
-        utils_player_viewpoint::Add(_Player, _Camera, ViewpointSpec);
+        ViewpointSpec.Camera = _Camera;
+        utils_player_viewpoint::Add(_Player, ViewpointSpec);
         utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_ManipulateControlRig));
     }
 
@@ -183,12 +191,9 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UCk_AutoTest_Base
         { _SawManipulation = true; }
     }
 
-    // Assembled from the camera's live state (Request_Set_HasOrientationControl writes it immediately).
+    // Read from the camera's live state (Request_Set_HasOrientationControl writes it immediately).
     private bool Get_HasOrientationControl() const
     {
-        if (ck::Is_NOT_Valid(_Camera))
-        { return false; }
-
         return _Camera.Get_Profile().Get_HasOrientationControl();
     }
 }

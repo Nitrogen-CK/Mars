@@ -1,21 +1,8 @@
 // A lever manipulation begun by the player's ManipulateControl task at the grip engages at the threshold: pulling past
 // EngageAlpha ends the CkInteraction Succeeded and the Interactable's Engage chain toggles the Control on. Regression
 // for the task forwarding an invalid interaction to the Control (the pending slot was cleared before it was passed on):
-// the handle still followed the pull, but the threshold found no interaction to end, so nothing engaged.
-// Rig: Mars_AutoTest_Control_ManipulationWaitsForTheGrip's (hands + resolver + an SM running ManipulateControl,
-// InteractionResolverBinds and the Hands sub-SM), plus a focus request on the lever's Interactable so its HFSM can
-// reach Interacting and run the Engage.
-class UMars_AutoTestState_GripEngageRig : UCk_SmState_EntityScript
-{
-    UFUNCTION(BlueprintOverride)
-    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
-    {
-        AddTask(InHandle, UMars_SmTask_ManipulateControl);
-        AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
-        AddTask(InHandle, UMars_SmTask_HandsSubSm);
-    }
-}
-
+// the handle still followed the pull, but the threshold found no interaction to end, so nothing engaged. The lever's
+// Interactable is focused so its HFSM can reach Interacting and run the Engage.
 class UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold : UCk_AutoTest_Base
 {
     private FCk_Handle_Control _Control;
@@ -35,10 +22,12 @@ class UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold : UCk_AutoT
         auto HandRoot = utils_transform::Add(HandRootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
 
-        _Hands = utils_fphands::Add(_Player, FMars_FPHands_Spec(), HandNode.As_Transform());
+        auto HandsSpec = FMars_FPHands_Spec();
+        HandsSpec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, HandsSpec);
         _Resolver = utils_interaction_resolver::Add(_Player, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
         BuildLever(InHandle);
-        utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_GripEngageRig));
+        utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_ManipulateControlRig));
 
         Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 5.0f);
         Add_Step("focus the lever", n"Step_FocusLever");
@@ -125,7 +114,7 @@ class UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold : UCk_AutoT
     private void Check_TargetFocused(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(FCk_Handle(_Target).As_StateMachine()) == UMars_SmState_Interactable_Focused);
+        Res.Set(utils_state_machine::Get_CurrentStateClass(_Target.As_StateMachine()) == UMars_SmState_Interactable_Focused);
     }
 
     UFUNCTION()
@@ -164,7 +153,10 @@ class UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold : UCk_AutoT
         Assert_Equals_Int(_EngagedCount, 1, "the threshold engaged the lever exactly once");
         Assert_Equals_Int(_FinishedResults.Num(), 1, "the interaction finished once");
         if (_FinishedResults.Num() > 0)
-        { Assert_True(_FinishedResults[0] == ECk_SucceededFailed::Succeeded, "the threshold ended the interaction Succeeded"); }
+        {
+            Assert_True(_FinishedResults[0] == ECk_SucceededFailed::Succeeded,
+                f"the threshold ended the interaction Succeeded (got {_FinishedResults[0] :n})");
+        }
 
         Assert_True(_Control.Get_IsActive(), "the toggle lever is on after the engage");
     }

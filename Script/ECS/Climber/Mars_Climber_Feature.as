@@ -38,11 +38,10 @@ mixin FMars_Validation Validate(const FMars_Climber_Spec& Self)
     return FMars_Validation();
 }
 
-// How the last climb ended. Top: topped out onto the platform; Bottom: stepped off at the foot; Jump: jumped off away
-// from the plane; Lost: the ladder died under the climber.
+// How a climb ended. Top: topped out onto the platform; Bottom: stepped off at the foot; Jump: jumped off away from the
+// plane; Lost: the ladder died under the climber, or the climber's locomotion left the climb.
 enum EMars_Climber_Dismount
 {
-    None,
     Top,
     Bottom,
     Jump,
@@ -74,21 +73,16 @@ struct FMars_Climber_Candidate
 struct FMars_Fragment_Climber_Params
 {
     UPROPERTY()
-    float32 ClimbSpeed = 220.0f;
+    FMars_Climber_Spec Spec;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written by the two Climber processors. With an owning character, a climb holds it on the ladder's climb line in
-// MOVE_Flying; without one (headless) only the model runs.
-struct FMars_Fragment_Climber
+// One climb on one ladder, from the mount to the dismount.
+struct FMars_Climber_Climb
 {
-    UPROPERTY()
-    TArray<FMars_Climber_Candidate> Candidates;
-
-    // The ladder being climbed; invalid when not climbing.
     UPROPERTY()
     FCk_Handle_Ladder Ladder;
 
@@ -96,33 +90,61 @@ struct FMars_Fragment_Climber
     UPROPERTY()
     float32 Alpha = 0.0f;
 
-    UPROPERTY()
-    bool IsClimbing = false;
-
-    UPROPERTY()
-    EMars_Ladder_Zone MountZone = EMars_Ladder_Zone::Front;
-
-    // False after a Top mount until Alpha drops below 0.95: holding up right after mounting at the top does not top out.
+    // False after a Top mount until Alpha drops below constants_climber::k_LeftTopAlpha: holding up right after mounting
+    // at the top does not top out.
     UPROPERTY()
     bool HasLeftTop = true;
-
-    UPROPERTY()
-    EMars_Climber_Dismount LastDismount = EMars_Climber_Dismount::None;
 
     // This frame's climb input, summed by the request drain; the tick clamps it to [-1, 1], consumes and zeroes it.
     UPROPERTY()
     float32 PendingAxis = 0.0f;
 }
 
-// Present while IsClimbing; gates UMars_Processor_Climber_Tick.
+// Written only by the two Climber processors. With an owning character, a climb holds it on the ladder's climb line in
+// MOVE_Flying; without one (headless) only the model runs. Only the request drain starts and ends a climb.
+struct FMars_Fragment_Climber
+{
+    UPROPERTY()
+    TArray<FMars_Climber_Candidate> Candidates;
+
+    // Set while climbing.
+    UPROPERTY()
+    TOptional<FMars_Climber_Climb> Climb;
+
+    // How the last climb ended; unset before the first one ends.
+    UPROPERTY()
+    TOptional<EMars_Climber_Dismount> LastDismount;
+}
+
+// Present while Climb is set; gates UMars_Processor_Climber_Tick.
 struct FMars_Tag_Climber_Climbing {}
+
+namespace constants_climber
+{
+    // A Top mount re-arms the top-out once the climber is below this alpha.
+    const float32 k_LeftTopAlpha = 0.95f;
+
+    // A top-out lifts the capsule this far above the platform so it does not start inside the floor (uu).
+    const float64 k_TopOutClearance = 2.0;
+
+    // A jump-off launch: away from the ladder's plane, and up (uu/s).
+    const float64 k_JumpAwaySpeed = 300.0;
+    const float64 k_JumpUpSpeed = 250.0;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_Climber_OnClimbingChanged(FCk_Handle_Climber InClimber, bool InClimbing);
-event void FMars_Delegate_Climber_OnClimbingChanged_MC(FCk_Handle_Climber InClimber, bool InClimbing);
+// Climbing on a mount; NotClimbing on a dismount, with LastDismount already set.
+enum EMars_Climber_ClimbState
+{
+    NotClimbing,
+    Climbing
+}
+
+delegate void FMars_Delegate_Climber_OnClimbingChanged(FCk_Handle_Climber InClimber, EMars_Climber_ClimbState InClimbState);
+event void FMars_Delegate_Climber_OnClimbingChanged_MC(FCk_Handle_Climber InClimber, EMars_Climber_ClimbState InClimbState);
 
 delegate void FMars_Delegate_Climber_OnCandidatesChanged(FCk_Handle_Climber InClimber);
 event void FMars_Delegate_Climber_OnCandidatesChanged_MC(FCk_Handle_Climber InClimber);
@@ -203,7 +225,7 @@ struct FMars_Request_Climber_Climb
     }
 }
 
-// Latest wins; ignored unless climbing.
+// Latest wins; ignored unless climbing. The tick ends a climb at the top, at the bottom or on a lost ladder with one too.
 struct FMars_Request_Climber_Dismount
 {
     UPROPERTY()

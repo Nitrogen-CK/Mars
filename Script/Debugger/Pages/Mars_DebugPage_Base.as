@@ -1,25 +1,25 @@
-// Base class for debugger pages. Subclass, override GetPageName + DrawPage, and register the
-// page in UMars_DebuggerContent::Initialize.
+// Base class for debugger pages. Subclass, override GetPageName + DrawPage, and register the page in
+// UMars_DebuggerContent::Initialize.
 class UMars_DebugPage_Base : UObject
 {
     private TMap<FString, bool> HoverStates;
-    private UWorld CachedWorld;
-    private APlayerController SelectedPlayerController;
+
+    // Weak: the content outlives map travel, and a strong ref would keep the old world alive.
+    private TWeakObjectPtr<APlayerController> SelectedPlayerController;
 
     FString GetPageName()
     {
         return "Base Page";
     }
 
-    void PrepareForDraw(UWorld InWorld, APlayerController InSelectedPlayerController)
+    void PrepareForDraw(APlayerController InSelectedPlayerController)
     {
-        CachedWorld = InWorld;
         SelectedPlayerController = InSelectedPlayerController;
     }
 
     void DrawPage(float DeltaTime)
     {
-        utils_mars_debugger::Text("Override DrawPage() to implement page content");
+        utils_mars_debugger::Text("Override DrawPage() to implement page content", FMars_Debugger_TextStyle());
     }
 
     void OnPageActivated()
@@ -29,27 +29,32 @@ class UMars_DebugPage_Base : UObject
 
     void OnPageDeactivated() {}
 
-    protected UWorld GetDebugWorld() const
-    {
-        return CachedWorld;
-    }
-
     // The picked connection's server-side controller - use this, not GetPlayerController(0).
     protected APlayerController GetSelectedPlayerController() const
     {
-        return SelectedPlayerController;
+        return SelectedPlayerController.Get();
     }
 
     protected FCk_Handle TryGet_PlayerEntity() const
     {
-        if (ck::Is_NOT_Valid(CachedWorld) || ck::Is_NOT_Valid(SelectedPlayerController))
+        auto PC = GetSelectedPlayerController();
+        if (ck::Is_NOT_Valid(PC))
         { return FCk_Handle(); }
 
-        auto Pawn = SelectedPlayerController.ControlledPawn;
+        auto Pawn = PC.ControlledPawn;
         if (ck::Is_NOT_Valid(Pawn))
         { return FCk_Handle(); }
 
         return Pawn.TryGet_ActorEntityHandle();
+    }
+
+    // "-" before the state machine has entered its first state.
+    protected FString Get_StateClassName(TSubclassOf<UCk_SmState_EntityScript> InStateClass) const
+    {
+        if (ck::Is_NOT_Valid(InStateClass))
+        { return "-"; }
+
+        return InStateClass.Get().GetName().ToString();
     }
 
     //------------------------------------------------------------------------
@@ -61,7 +66,7 @@ class UMars_DebugPage_Base : UObject
         mm::HAlign_Fill();
         mm::WithinBorder(FLinearColor(0.1f, 0.1f, 0.12f), 4.0f);
         mm::Padding(10, 4);
-        utils_mars_debugger::Text(InTitle, 16, FLinearColor::White, false, true);
+        utils_mars_debugger::Text(InTitle, FMars_Debugger_TextStyle(16, FLinearColor::White, EMars_Debugger_TextWeight::Bold));
         mm::Spacer(0, 4);
     }
 
@@ -73,18 +78,18 @@ class UMars_DebugPage_Base : UObject
 
         mm::Slot_Auto();
         mm::VAlign_Center();
-        utils_mars_debugger::Text(InKey, 13, FLinearColor(0.7f, 0.7f, 0.7f));
+        utils_mars_debugger::Text(InKey, FMars_Debugger_TextStyle(13, FLinearColor(0.7f, 0.7f, 0.7f)));
 
         mm::Slot_Fill();
         mm::HAlign_Right();
         mm::VAlign_Center();
-        utils_mars_debugger::Text(InValue, 13, InValueColor, false, true);
+        utils_mars_debugger::Text(InValue, FMars_Debugger_TextStyle(13, InValueColor, EMars_Debugger_TextWeight::Bold));
 
         mm::EndHorizontalBox();
     }
 
-    // Returns true on the frame the button was clicked.
-    protected bool DrawButton(const FString& InButtonId, const FString& InLabel, const FLinearColor& InBaseColor = FLinearColor(0.15f, 0.3f, 0.5f))
+    // Draws the button and returns true on the frame it was clicked.
+    protected bool DrawButton_WasClicked(const FString& InButtonId, const FString& InLabel, const FLinearColor& InBaseColor = FLinearColor(0.15f, 0.3f, 0.5f))
     {
         const bool IsHovered = HoverStates.Contains(InButtonId) && HoverStates[InButtonId];
         const auto Color = IsHovered ? BrightenColor(InBaseColor) : InBaseColor;
@@ -92,7 +97,7 @@ class UMars_DebugPage_Base : UObject
         mm::Padding(2);
         auto Button = mm::WithinBorder(Color, 4.0f);
         mm::Padding(14, 6);
-        utils_mars_debugger::Text(InLabel, 13, FLinearColor::White, false, true);
+        utils_mars_debugger::Text(InLabel, FMars_Debugger_TextStyle(13, FLinearColor::White, EMars_Debugger_TextWeight::Bold));
 
         HoverStates.FindOrAdd(InButtonId) = Button.IsHovered();
         return Button.WasClicked();
@@ -116,7 +121,9 @@ class UMars_DebugPage_Base : UObject
         mm::WithinBorder(FLinearColor(0.3f, 0.3f, 0.1f), 4.0f);
         mm::Padding(10, 5);
         mm::HAlign_Center();
-        utils_mars_debugger::Text(InMessage, 0, FLinearColor(1.0f, 1.0f, 0.5f));
+        auto Style = FMars_Debugger_TextStyle();
+        Style.Color = FLinearColor(1.0f, 1.0f, 0.5f);
+        utils_mars_debugger::Text(InMessage, Style);
     }
 
     protected FLinearColor BrightenColor(const FLinearColor& InColor, float InAmount = 0.15f) const

@@ -41,7 +41,7 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UCk_AutoTest_
         auto MoverSpec = FMars_Mover_Spec();
         MoverSpec.EndRotation = FRotator(70.0, 0.0, 0.0);
         MoverSpec.Duration = 0.3f;
-        MoverSpec.StartAtEnd = InStartActive;
+        MoverSpec.StartPose = InStartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         _Mover = utils_mover::Add(HandleNode, MoverSpec);
 
         auto ControlSpec = FMars_Control_Spec();
@@ -145,7 +145,7 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UCk_AutoTest_
     {
         Assert_False(_Control.Get_IsManipulating(), "let go");
         Assert_Equals_Int(_EngagedCount, 0, "nothing engaged");
-        Assert_False(_Mover.Get_AtEnd(), "the target is still the rest pose");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "the target is still the rest pose");
         Assert_Equals_Float(_Control.Get_ManipulationProgress(), 0.0, 0.0001, "no progress once released");
     }
 
@@ -165,7 +165,8 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UCk_AutoTest_
     UFUNCTION()
     private void Step_AssertCancelled(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_FinishedResults[0] == ECk_SucceededFailed::Failed, "a cancel finishes the interaction Failed");
+        const auto Result = _FinishedResults[0];
+        Assert_True(Result == ECk_SucceededFailed::Failed, f"a cancel finishes the interaction Failed (got {Result :n})");
         Assert_False(_Control.Get_IsManipulating(), "a late cancel does not re-grip");
     }
 }

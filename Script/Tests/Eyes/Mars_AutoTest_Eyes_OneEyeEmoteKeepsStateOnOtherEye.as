@@ -3,10 +3,6 @@
 // style; clearing the emote puts both eyes back on Downed. Isolated Z band: -72000.
 class UMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye : UCk_AutoTest_Base
 {
-    // Catalog indices are append-only (Mars_Eyes_Assets.as).
-    private const int32 WinkIndex = 1;
-    private const int32 DownedIndex = 8;
-
     private FCk_Handle_Eyes _Eyes;
     private FMars_Eyes_ExpressionDef _Wink;
     private FMars_Eyes_ExpressionDef _Downed;
@@ -21,11 +17,10 @@ class UMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye : UCk_AutoTest_Base
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
         Spec.Style.RightCell = 3;
-        Spec.BlinkEnabled = false;
         _Eyes = utils_eyes::Add(FaceNode, Spec);
 
-        _Wink = mars_eyes::Catalog().Expressions[WinkIndex].Def;
-        _Downed = mars_eyes::Catalog().Expressions[DownedIndex].Def;
+        _Wink = utils_eyes::Expression_Wink().Def;
+        _Downed = utils_eyes::Expression_Downed().Def;
 
         Add_Step("the eyes have a presentation", n"Step_AssertPresentation");
         Add_Step("set the State layer to Downed", n"Step_SetDowned");
@@ -48,9 +43,9 @@ class UMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye : UCk_AutoTest_Base
             return;
         }
 
-        Assert_False(_Wink.OverrideLeft, "the catalog's Wink keeps the left eye");
-        Assert_True(_Wink.OverrideRight && _Wink.RightCell != _Downed.RightCell, "the catalog's Wink changes the right eye away from Downed");
-        Assert_True(_Downed.LeftCell != 3 && _Downed.RightCell != 3, "Downed differs from the style on both eyes");
+        Assert_False(_Wink.LeftCell.IsSet(), "the catalog's Wink keeps the left eye");
+        Assert_True(_Wink.RightCell.IsSet() && _Wink.RightCell != _Downed.RightCell, "the catalog's Wink changes the right eye away from Downed");
+        Assert_True(_Downed.LeftCell.Get(3) != 3 && _Downed.RightCell.Get(3) != 3, "Downed sets both eyes away from the style");
     }
 
     UFUNCTION()
@@ -64,8 +59,8 @@ class UMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Eyes.Get_HasEmote() == false
-            && _Eyes.Get_ResolvedLeftCell() == _Downed.LeftCell
-            && _Eyes.Get_ResolvedRightCell() == _Downed.RightCell);
+            && _Eyes.Get_ResolvedLeftCell() == _Downed.LeftCell.Get(-1)
+            && _Eyes.Get_ResolvedRightCell() == _Downed.RightCell.Get(-1));
     }
 
     UFUNCTION()
@@ -80,14 +75,14 @@ class UMars_AutoTest_Eyes_OneEyeEmoteKeepsStateOnOtherEye : UCk_AutoTest_Base
     private void Check_RightWinked(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Eyes.Get_HasEmote() && _Eyes.Get_ResolvedRightCell() == _Wink.RightCell);
+        Res.Set(_Eyes.Get_HasEmote() && _Eyes.Get_ResolvedRightCell() == _Wink.RightCell.Get(-1));
     }
 
     UFUNCTION()
     private void Step_AssertLeftOnDowned(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_Eyes.Get_ResolvedLeftCell(), _Downed.LeftCell, "the left cell while winking over Downed");
-        Assert_Equals_Int(_Eyes.Get_ResolvedRightCell(), _Wink.RightCell, "the right cell while winking over Downed");
+        Assert_Equals_Int(_Eyes.Get_ResolvedLeftCell(), _Downed.LeftCell.Get(-1), "the left cell while winking over Downed");
+        Assert_Equals_Int(_Eyes.Get_ResolvedRightCell(), _Wink.RightCell.Get(-1), "the right cell while winking over Downed");
     }
 
     UFUNCTION()

@@ -40,8 +40,8 @@ struct FMars_Fragment_InteractPromptDisplay_Signals
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Stamped onto a prompt (by the display processor) when it joins a display, so a prompt text change can refresh that
-// display.
+// Stamped onto a prompt by the display processor while the prompt has an entry on that display, so a changed prompt can
+// refresh it. Removed with the prompt's last entry.
 struct FMars_Fragment_InteractPrompt_DisplayBinding
 {
     UPROPERTY()
@@ -62,7 +62,7 @@ struct FMars_InteractPromptDisplay_Slot
     FName SlotKey;
 
     UPROPERTY()
-    int32 SortOrder = 999;
+    int32 SortOrder = constants_interact_prompt::k_OtherSortOrder;
 
     UPROPERTY()
     TArray<FMars_InteractPromptDisplay_Entry> Stack;

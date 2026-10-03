@@ -50,12 +50,12 @@ class UMars_AutoTest_Gaze_IgnoresOutOfRangeAndBehind : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertNoTarget(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_False(_Gaze.Get_HasTarget(), "Get_HasTarget() with only out-of-range, too-close and behind targets");
-        Assert_Invalid(_Gaze.Get_Target(), "Get_Target() with only out-of-range, too-close and behind targets");
+        Assert_False(_Gaze.Get_HasTarget(), "Get_HasTarget() is false with only out-of-range, too-close and behind targets");
+        Assert_Invalid(_Gaze.Get_Target(), "Get_Target() is none with only out-of-range, too-close and behind targets");
 
         const auto Aim = _Gaze.Get_AimYawPitchDeg();
         Assert_True(Aim.IsNearlyZero(), f"the aim is zero without a target (got [{Aim.ToString()}])");
-        Assert_Equals_Int(_TargetChangedCount, 0, "OnTargetChanged broadcasts");
+        Assert_Equals_Int(_TargetChangedCount, 0, "OnTargetChanged never fired");
     }
 
     UFUNCTION()

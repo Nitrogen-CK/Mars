@@ -55,7 +55,7 @@ class UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows : UCk_AutoTest_Ba
     UFUNCTION()
     private void Step_FallingEdge(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Sink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(_InputChannel, false));
+        _Sink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(_InputChannel, EMars_MechanismSource_Output::Deasserted));
     }
 
     UFUNCTION()
@@ -68,7 +68,7 @@ class UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows : UCk_AutoTest_Ba
     UFUNCTION()
     private void Step_RisingEdge(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Sink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(_InputChannel, true));
+        _Sink.Request_NotifyInputEdge(FMars_Request_MechanismSink_NotifyInputEdge(_InputChannel, EMars_MechanismSource_Output::Asserted));
     }
 
     UFUNCTION()

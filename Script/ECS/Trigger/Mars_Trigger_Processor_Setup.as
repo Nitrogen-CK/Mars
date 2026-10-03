@@ -13,12 +13,9 @@ class UMars_Processor_Trigger_Setup : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle)
     {
-        auto Probe = InHandle.As_Probe(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Probe))
-        {
-            utils_probe::BindTo_OnBeginOverlap(Probe, FCk_Delegate_Probe_OnBeginOverlap(this, n"OnProbeBeginOverlap"));
-            utils_probe::BindTo_OnEndOverlap(Probe, FCk_Delegate_Probe_OnEndOverlap(this, n"OnProbeEndOverlap"));
-        }
+        auto Probe = InHandle.As_Probe();
+        utils_probe::BindTo_OnBeginOverlap(Probe, FCk_Delegate_Probe_OnBeginOverlap(this, n"OnProbeBeginOverlap"));
+        utils_probe::BindTo_OnEndOverlap(Probe, FCk_Delegate_Probe_OnEndOverlap(this, n"OnProbeEndOverlap"));
 
         InHandle.Request_TryRemove(FMars_Tag_Trigger_NeedsSetup);
     }
@@ -26,9 +23,7 @@ class UMars_Processor_Trigger_Setup : UCk_Processor_Script_Base_UE
     UFUNCTION()
     private void OnProbeBeginOverlap(FCk_Handle_Probe InProbe, FCk_Probe_Payload_OnBeginOverlap InPayload)
     {
-        auto Trigger = InProbe.As_Trigger(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Trigger))
-        { return; }
+        auto Trigger = InProbe.As_Trigger();
 
         auto Entity = InPayload.Get_OtherEntity();
         auto& State = Trigger.Get_Fragment(FMars_Fragment_Trigger);
@@ -45,9 +40,7 @@ class UMars_Processor_Trigger_Setup : UCk_Processor_Script_Base_UE
     UFUNCTION()
     private void OnProbeEndOverlap(FCk_Handle_Probe InProbe, FCk_Probe_Payload_OnEndOverlap InPayload)
     {
-        auto Trigger = InProbe.As_Trigger(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Trigger))
-        { return; }
+        auto Trigger = InProbe.As_Trigger();
 
         // Matched before pruning: an entity being destroyed still reports its exit with a now-invalid handle.
         auto Entity = InPayload.Get_OtherEntity();

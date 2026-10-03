@@ -52,7 +52,8 @@ class UMars_SmState_Station_Grip : UMars_SmState_ExitAndTerminate
     }
 }
 
-// Reserves the station for the initiator; fails when either cannot be resolved.
+// Reserves the station for the initiator. The state only runs as a station's Use interaction, so the owner is the
+// station and the interaction recorded its initiator; failing either ensures and fails the task.
 class UMars_SmTask_Station_RequestReserve : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -60,9 +61,10 @@ class UMars_SmTask_Station_RequestReserve : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        const auto Context = utils_station::Get_InteractionContext(Get_StateMachineContext(), FCk_Handle(Get_OwningStateMachine()));
-        auto Station = Context.InteractableOwner.As_Station(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Station) || ck::Is_NOT_Valid(Context.Initiator))
+        const auto Context = utils_station::Get_InteractionContext(Get_StateMachineContext(), Get_OwningStateMachine());
+        auto Station = Context.InteractableOwner.As_Station();
+        if (ck::Is_NOT_Valid(Station) ||
+            ck::EnsureIfNot(ck::IsValid(Context.Initiator), f"[Station] [{Station.ToString()}] Use interaction has no initiator"))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
@@ -83,7 +85,7 @@ class UMars_SmCondition_Station_ReserveConfirmed : UCk_SmCondition_EventDriven
     UFUNCTION(BlueprintOverride)
     void DoEnterCondition(FCk_Handle_SmCondition InHandle, ECk_Sm_NetContext InNetContext)
     {
-        const auto Context = utils_station::Get_InteractionContext(Get_StateMachineContext(), FCk_Handle(Get_OwningStateMachine()));
+        const auto Context = utils_station::Get_InteractionContext(Get_StateMachineContext(), Get_OwningStateMachine());
         _Station = Context.InteractableOwner.As_Station(ECk_SanityCheck::UnChecked);
         _Initiator = Context.Initiator;
         if (ck::Is_NOT_Valid(_Station) || ck::Is_NOT_Valid(_Initiator))
@@ -128,7 +130,7 @@ class UMars_SmCondition_Station_ReserveRejected : UCk_SmCondition_EventDriven
     UFUNCTION(BlueprintOverride)
     void DoEnterCondition(FCk_Handle_SmCondition InHandle, ECk_Sm_NetContext InNetContext)
     {
-        const auto Context = utils_station::Get_InteractionContext(Get_StateMachineContext(), FCk_Handle(Get_OwningStateMachine()));
+        const auto Context = utils_station::Get_InteractionContext(Get_StateMachineContext(), Get_OwningStateMachine());
         _Station = Context.InteractableOwner.As_Station(ECk_SanityCheck::UnChecked);
         _Initiator = Context.Initiator;
         if (ck::Is_NOT_Valid(_Station) || ck::Is_NOT_Valid(_Initiator))
@@ -138,8 +140,7 @@ class UMars_SmCondition_Station_ReserveRejected : UCk_SmCondition_EventDriven
         }
 
         _Station.BindTo_OnReserveRejected(FMars_Delegate_Station_OnReserveRejected(this, n"OnReserveRejected"));
-        auto StationEntity = FCk_Handle(_Station);
-        StationEntity.BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
+        _Station.H().BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
 
         MarkUnsatisfied();
     }
@@ -150,8 +151,7 @@ class UMars_SmCondition_Station_ReserveRejected : UCk_SmCondition_EventDriven
         if (ck::IsValid(_Station))
         {
             _Station.UnbindFrom_OnReserveRejected(FMars_Delegate_Station_OnReserveRejected(this, n"OnReserveRejected"));
-            auto StationEntity = FCk_Handle(_Station);
-            StationEntity.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
+            _Station.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
         }
 
         _Station = FCk_Handle_Station();
@@ -189,7 +189,7 @@ class UMars_SmCondition_Station_ReserveTimeout : UCk_SmCondition_EventDriven
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
                  .Set_Behavior(ECk_Timer_Behavior::PauseOnDone);
 
-        _Timer = utils_timer::Add(FCk_Handle(InHandle), TimerSpec);
+        _Timer = utils_timer::Add(InHandle, TimerSpec);
         if (ck::IsValid(_Timer))
         { _Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnTimeout")); }
     }
@@ -198,7 +198,7 @@ class UMars_SmCondition_Station_ReserveTimeout : UCk_SmCondition_EventDriven
     void DoExitCondition(FCk_Handle_SmCondition InHandle, ECk_Sm_NetContext InNetContext)
     {
         if (ck::IsValid(_Timer))
-        { utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(_Timer)); }
+        { utils_entity_lifetime::Request_DestroyEntity(_Timer); }
 
         _Timer = FCk_Handle_Timer();
     }

@@ -14,6 +14,14 @@ struct FMars_Feature_Hazard {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Whether a hazard hits what is inside its trigger.
+enum EMars_Hazard_Arming
+{
+    Disarmed,
+    Armed
+}
+
+// Spawn params of the placeable mechanism scripts: per-instance values live in saved maps.
 struct FMars_Hazard_Spec
 {
     UPROPERTY()
@@ -37,10 +45,7 @@ struct FMars_Tag_Hazard_NeedsSetup {}
 struct FMars_Fragment_Hazard_Params
 {
     UPROPERTY()
-    FVector PushImpulse = FVector::ZeroVector;
-
-    UPROPERTY()
-    bool PushIsRelative = true;
+    FMars_Hazard_Spec Spec;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +55,7 @@ struct FMars_Fragment_Hazard_Params
 struct FMars_Fragment_Hazard
 {
     UPROPERTY()
-    bool IsArmed = false;
+    EMars_Hazard_Arming Arming = EMars_Hazard_Arming::Disarmed;
 
     UPROPERTY()
     FCk_Handle_Trigger Trigger;
@@ -73,8 +78,8 @@ struct FMars_Fragment_Hazard_TriggerLink
 delegate void FMars_Delegate_Hazard_OnHit(FCk_Handle_Hazard InHazard, FCk_Handle InEntity);
 event void FMars_Delegate_Hazard_OnHit_MC(FCk_Handle_Hazard InHazard, FCk_Handle InEntity);
 
-delegate void FMars_Delegate_Hazard_OnArmedChanged(FCk_Handle_Hazard InHazard, bool InArmed);
-event void FMars_Delegate_Hazard_OnArmedChanged_MC(FCk_Handle_Hazard InHazard, bool InArmed);
+delegate void FMars_Delegate_Hazard_OnArmedChanged(FCk_Handle_Hazard InHazard, EMars_Hazard_Arming InArming);
+event void FMars_Delegate_Hazard_OnArmedChanged_MC(FCk_Handle_Hazard InHazard, EMars_Hazard_Arming InArming);
 
 struct FMars_Fragment_Hazard_Signals
 {
@@ -89,17 +94,19 @@ struct FMars_Fragment_Hazard_Signals
 struct FMars_Request_Hazard_SetArmed
 {
     UPROPERTY()
-    bool Armed = false;
+    EMars_Hazard_Arming Arming = EMars_Hazard_Arming::Armed;
 
-    FMars_Request_Hazard_SetArmed(bool InArmed)
+    FMars_Request_Hazard_SetArmed() {}
+
+    FMars_Request_Hazard_SetArmed(EMars_Hazard_Arming InArming)
     {
-        Armed = InArmed;
+        Arming = InArming;
     }
 }
 
-// Absolute and latest-wins, so the fragment holds a single pending request; its presence means pending.
+// Absolute: the drain applies only the last request, and only a change broadcasts.
 struct FMars_Fragment_Hazard_Requests
 {
     UPROPERTY()
-    FMars_Request_Hazard_SetArmed SetArmed;
+    TArray<FMars_Request_Hazard_SetArmed> SetArmedRequests;
 }

@@ -1,9 +1,6 @@
-// The zone arbiter. Drains SetEnabled -> ReleaseHurtboxes -> Hit, each kind in arrival order.
-//
-// A hit on an enabled zone is scaled by the reaction row for its damage type (DefaultMultiplier, Impact None when no row
-// names it), stamped with this zone, counted, broadcast as OnHit, then forwarded to the zone's Health as one
-// ApplyDamage request. OnHit fires before the Health drain, so a listener (the BodyPart ledger) sees the hit even when
-// the Health ignores it (invulnerable or already depleted).
+// The zone arbiter. A hit on an enabled zone is scaled by its reaction row, stamped with this zone, broadcast as OnHit,
+// then forwarded to the zone's Health. OnHit fires before the Health drain, so a listener (the BodyPart ledger) sees the
+// hit even when the Health ignores it (invulnerable or already depleted).
 //
 // The state is re-fetched per request: an OnHit handler may compose features on another entity mid-broadcast, which can
 // move the fragment storage under a reference held across the broadcast.
@@ -28,11 +25,11 @@ class UMars_Processor_HitZone_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_HitZone_ReleaseHurtboxes> ReleaseHurtboxesRequests = InRequests.ReleaseHurtboxesRequests;
         TArray<FMars_Request_HitZone_Hit> HitRequests = InRequests.HitRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_HitZone_Requests);
 
         for (const auto& Request : SetEnabledRequests)
-        { Self.Get_Fragment(FMars_Fragment_HitZone).IsEnabled = Request.Enabled; }
+        { Self.Get_Fragment(FMars_Fragment_HitZone).IsEnabled = Request.EnableDisable == ECk_EnableDisable::Enable; }
 
         if (ReleaseHurtboxesRequests.Num() > 0)
         { HandleReleaseHurtboxes(Self); }
@@ -66,7 +63,7 @@ class UMars_Processor_HitZone_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Scaled = InRequest.Event;
         Scaled.Amount *= Reaction.Multiplier;
-        Scaled.HitZone = FCk_Handle(InZone);
+        Scaled.HitZone = InZone;
 
         ++State.HitCount;
         auto Health = State.Health;
@@ -74,7 +71,6 @@ class UMars_Processor_HitZone_HandleRequests : UCk_Processor_Script_Base_UE
         if (InZone.Has_Fragment(FMars_Fragment_HitZone_Signals))
         { InZone.Get_Fragment(FMars_Fragment_HitZone_Signals).OnHit.Broadcast(InZone, Scaled, Reaction); }
 
-        if (ck::IsValid(Health))
-        { Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Scaled)); }
+        Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Scaled));
     }
 }

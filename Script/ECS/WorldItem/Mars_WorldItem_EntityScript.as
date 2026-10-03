@@ -42,7 +42,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
-    // Visual: when set, the visual starts at this world pose and lerps to AttachOffset over Presentation.ArriveSeconds.
+    // Visual: when set, the visual starts at this world pose and lerps to AttachOffset over Presentation.Mounting.ArriveSeconds.
     UPROPERTY(ExposeOnSpawn)
     FMars_WorldItem_Arrival ArriveFrom;
 
@@ -58,8 +58,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private TSoftObjectPtr<UMaterialInterface> _MaterialOverride;
     private FCk_Handle_Interactable _Pickup;
 
-    // Set while the pickup is disabled because the focuser's hotbar had nowhere to stow the item.
-    private bool _DisabledForFull = false;
+    // Valid while the pickup is disabled because this focuser's hotbar had nowhere to stow the item.
     private FCk_Handle_Hotbar _GatingHotbar;
 
     UFUNCTION(BlueprintOverride)
@@ -79,29 +78,39 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         const UMars_ItemTrait_Presentation Presentation = _Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
 
-        auto State = FMars_Fragment_WorldItem();
+        auto Spec = FMars_WorldItem_Spec();
+        Spec.Mode = Mode;
+        Spec.Definition = Definition;
+
         if (ck::IsValid(Presentation))
         {
-            _Mesh = Presentation.Mesh;
-            _MaterialOverride = Presentation.MaterialOverride;
-            State.VisualRoot = AddVisual(Root, Presentation.MeshScale);
+            _Mesh = Presentation.Visual.Mesh;
+            _MaterialOverride = Presentation.Visual.MaterialOverride;
+            AddVisual(Root, Presentation.Visual.MeshScale);
         }
 
         if (Mode == EMars_WorldItem_Mode::World)
         {
-            State.Holder = AddHolder(InHandle);
+            Spec.Holder = AddHolder(InHandle);
             if (ck::IsValid(Presentation))
             {
-                State.Body = AddBody(InHandle, Presentation.MeshScale);
-                State.Pickup = AddPickup(Root, utils_world_item::Make_ProbeFit(Presentation));
+                Spec.Body = AddBody(InHandle, Presentation.Visual.MeshScale);
+                Spec.Pickup = AddPickup(Root, utils_world_item::Make_ProbeFit(Presentation));
             }
             else
             {
-                State.Pickup = AddPickup(Root, FMars_WorldItem_ProbeFit(
+                Spec.Pickup = AddPickup(Root, FMars_WorldItem_ProbeFit(
                     utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(40.0f)), FTransform::Identity));
             }
 
-            _Pickup = State.Pickup;
+            _Pickup = Spec.Pickup;
+
+            const auto Launched = LaunchVelocity.IsNearlyZero() == false || AngularVelocityDeg.IsNearlyZero() == false;
+            if (Launched && ck::IsValid(Spec.Body))
+            {
+                Spec.Launch = TOptional<FMars_Fragment_WorldItem_PendingLaunch>(
+                    FMars_Fragment_WorldItem_PendingLaunch(LaunchVelocity, AngularVelocityDeg));
+            }
         }
         else
         {
@@ -122,17 +131,16 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
                 auto Arrival = FMars_Fragment_WorldItem_Arrival();
                 Arrival.FromOffset = FromOffset;
                 Arrival.ToOffset = AttachOffset;
-                Arrival.Duration = ck::IsValid(Presentation) ? Presentation.ArriveSeconds : 0.0f;
-                InHandle.Add_Fragment(Arrival);
+                Arrival.Duration = ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f;
+                Spec.Arrival = TOptional<FMars_Fragment_WorldItem_Arrival>(Arrival);
             }
             else
             { utils_scene_node::Add(Root, AttachTransform, AttachOffset); }
         }
 
-        auto Params = FMars_Fragment_WorldItem_Params();
-        Params.Mode = Mode;
-        Params.Definition = Definition;
-        utils_world_item::Add(InHandle, Params, State);
+        auto WorldItem = utils_world_item::Add(InHandle, Spec);
+        if (ck::Is_NOT_Valid(WorldItem))
+        { utils_entity_lifetime::Request_DestroyEntity(InHandle); }
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
@@ -167,13 +175,12 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     void DoEndPlay(FCk_Handle InHandle)
     {
-        if (_DisabledForFull && ck::IsValid(_GatingHotbar))
+        if (ck::IsValid(_GatingHotbar))
         {
             _GatingHotbar.UnbindFrom_OnSlotItemChanged(
                 FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
         }
 
-        _DisabledForFull = false;
         _GatingHotbar = FCk_Handle_Hotbar();
     }
 
@@ -181,24 +188,23 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     // Composition
     //--------------------------------------------------------------------------------------------------------------------------
 
-    private FCk_Handle_Transform AddVisual(FCk_Handle_Transform& InRoot, FVector InMeshScale)
+    // A unit-scale child of the root that carries the mesh and the display scale.
+    private void AddVisual(FCk_Handle_Transform& InRoot, FVector InMeshScale)
     {
         auto VisualRoot = utils_scene_node::Create(InRoot, FTransform(FRotator::ZeroRotator, FVector::ZeroVector, InMeshScale)).As_Transform();
 
         const auto ComponentParams = utils_unreal_component::Make_Params(UStaticMeshComponent, ECk_UnrealComponent_TickPolicy::DoNotTick, n"WorldItem_Mesh");
-        auto ComponentHandle = utils_unreal_component::Add(FCk_Handle(VisualRoot), ComponentParams);
+        auto ComponentHandle = utils_unreal_component::Add(VisualRoot.H(), ComponentParams);
 
         utils_unreal_component::BindTo_OnAdded(
             ComponentHandle,
             FCk_Delegate_UnrealComponent_OnAdded(this, n"OnMeshComponentAdded"));
-
-        return VisualRoot;
     }
 
     private FCk_Handle_Inventory_DataOnly AddHolder(FCk_Handle& InHandle)
     {
         auto HolderParams = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         HolderParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
@@ -226,21 +232,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         BodySpec.Set_Friction(k_Friction);
         BodySpec.Set_Restitution(k_Restitution);
 
-        auto Body = utils_jolt_body::Add(InHandle, BodySpec);
-        if (ck::Is_NOT_Valid(Body))
-        { return Body; }
-
-        const auto Launched = LaunchVelocity.IsNearlyZero() == false || AngularVelocityDeg.IsNearlyZero() == false;
-        if (Launched)
-        {
-            // Never applied here: the body is not added for at least one frame. The launch processor drains this.
-            auto Pending = FMars_Fragment_WorldItem_PendingLaunch();
-            Pending.LinearVelocity = LaunchVelocity;
-            Pending.AngularVelocityDeg = AngularVelocityDeg;
-            InHandle.Add_Fragment(Pending);
-        }
-
-        return Body;
+        return utils_jolt_body::Add(InHandle, BodySpec);
     }
 
     // The probe carries Probe.Mars.Interact: the player's interaction trace only sees probes under that tag. It is
@@ -283,7 +275,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private void OnMeshComponentAdded(FCk_Handle_UnrealComponent InHandle)
     {
         auto MeshComponent = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(InHandle));
-        if (ck::Is_NOT_Valid(MeshComponent))
+        if (ck::EnsureIfNot(ck::IsValid(MeshComponent), f"[WorldItem] [{_SelfEntity.ToString()}] got no UStaticMeshComponent for its visual"))
         { return; }
 
         MeshComponent.SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -295,14 +287,14 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         { MeshComponent.SetMaterial(0, System::LoadAsset_Blocking(_MaterialOverride)); }
 
         // A visual attached under the local player's hand is drawn with the first-person gloves holding it.
-        MeshComponent.SetFirstPersonPrimitiveType(utils_fphands::Get_FirstPersonType(FCk_Handle(InHandle)));
+        MeshComponent.SetFirstPersonPrimitiveType(utils_fphands::Get_FirstPersonType(InHandle));
     }
 
     // A persistent item moving into or out of the local player's hand switches how it, and what it carries, is drawn.
     UFUNCTION()
     private void OnMountChanged_FirstPerson(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
     {
-        utils_fphands::Apply_FirstPersonType(FCk_Handle(InWorldItem));
+        utils_fphands::Apply_FirstPersonType(InWorldItem);
     }
 
     UFUNCTION()
@@ -318,8 +310,10 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             return;
         }
 
-        if (InItemsCreated.Num() > 0)
-        { StampPersistentWorldItem(InItemsCreated[0]); }
+        if (ck::EnsureIfNot(InItemsCreated.Num() > 0, f"[WorldItem] Seeding [{_SelfEntity.ToString()}] reported success but created no item"))
+        { return; }
+
+        StampPersistentWorldItem(InItemsCreated[0]);
     }
 
     UFUNCTION()
@@ -338,7 +332,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             return;
         }
 
-        StampPersistentWorldItem(InNewItemInTarget);
+        StampPersistentWorldItem(ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem);
     }
 
     // Transient: the item was stowed and nothing is left to present. Persistent: the world item IS the item's body and
@@ -351,20 +345,22 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (InItemsRemoved.Num() == 0 || InInventory.Get_NumItems() != 0)
         { return; }
 
-        auto WorldItem = _SelfEntity.As_WorldItem(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(WorldItem) && WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
+        auto WorldItem = _SelfEntity.As_WorldItem();
+        if (WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent)
         { return; }
 
         utils_entity_lifetime::Request_DestroyEntity(_SelfEntity);
     }
 
-    // The sanctioned construction-like marker (design 7.3/7.5): a Persistent world item links its item back to itself
-    // once, so HeldItem / HeldItemUse / the pickup task can route the item's moves through this entity.
+    // A Persistent world item links its item back to itself once, so HeldItem / HeldItemUse / the pickup task can route
+    // the item's moves through this entity. A Transient one stamps nothing.
     private void StampPersistentWorldItem(FCk_Handle_Item InItem)
     {
-        auto WorldItem = _SelfEntity.As_WorldItem(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(WorldItem) || ck::Is_NOT_Valid(InItem) ||
-            WorldItem.Get_Persistence() != EMars_WorldItem_Persistence::Persistent)
+        if (ck::EnsureIfNot(ck::IsValid(InItem), f"[WorldItem] [{_SelfEntity.ToString()}] has no item to link"))
+        { return; }
+
+        auto WorldItem = _SelfEntity.As_WorldItem();
+        if (WorldItem.Get_Persistence() != EMars_WorldItem_Persistence::Persistent)
         { return; }
 
         auto Item = InItem;
@@ -386,12 +382,11 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private void OnPickupFocused(FCk_Handle_Interactable InInteractable, FCk_Handle InFocusedBy)
     {
         auto Hotbar = InFocusedBy.As_Hotbar(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hotbar) || DoGet_CanStowSelf(Hotbar) || _DisabledForFull)
+        if (ck::Is_NOT_Valid(Hotbar) || DoGet_CanStowSelf(Hotbar) || ck::IsValid(_GatingHotbar))
         { return; }
 
-        _DisabledForFull = true;
         _GatingHotbar = Hotbar;
-        _Pickup.Request_SetEnableDisable(ECk_EnableDisable::Disable);
+        _Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Disable));
         _GatingHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
     }
 
@@ -401,12 +396,11 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (DoGet_CanStowSelf(InHotbar) == false)
         { return; }
 
-        _DisabledForFull = false;
         _GatingHotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
         _GatingHotbar = FCk_Handle_Hotbar();
 
         if (ck::IsValid(_Pickup))
-        { _Pickup.Request_SetEnableDisable(ECk_EnableDisable::Enable); }
+        { _Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Enable)); }
     }
 
     // An item-aware stow check: a second backpack has nowhere to go while one is worn. No held item -> cannot stow.

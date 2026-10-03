@@ -1,9 +1,9 @@
 struct FMars_CargoSlot_Mount
 {
-    // NAME_None = Offset is relative to the pack root. Otherwise Offset is applied on top of the socket's transform
-    // (socket location scaled by Presentation.MeshScale, since the pack root is unit scale and the visual node carries the scale).
+    // Unset: Offset is relative to the pack root. Set: Offset is applied on top of the socket's transform (socket location
+    // scaled by Presentation.Visual.MeshScale, since the pack root is unit scale and the visual node carries the scale).
     UPROPERTY()
-    FName Socket;
+    TOptional<FName> Socket;
 
     UPROPERTY()
     FTransform Offset;

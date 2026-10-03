@@ -1,16 +1,9 @@
-// Drains Carry, then Hold, then Release (each kind in queue order) for Persistent world items, then broadcasts.
+// Drains Carry, then Hold, then Release (each kind in queue order) for Persistent world items. Transitions are validated
+// against Get_TargetMount, so a Carry and a Hold queued back to back are both legal; anything illegal, or a Transient
+// item, is a caller bug.
 //
-// Legal transitions, validated against Get_TargetMount (the committed mount, or the one a PendingMount is already
-// moving toward, so a Carry and a Hold queued back to back are both legal):
-//   Carry:   World | Held    -> Carried
-//   Hold:    Carried         -> Held
-//   Release: Carried | Held  -> World
-// Anything else, or a Transient item, is a caller bug: ensure + skip.
-//
-// Carry / Hold never attach here: they disable the pickup, ask the body to go Kinematic and write a PendingMount that
-// UMars_Processor_WorldItem_Mount commits once the body reads Kinematic (SetMotionType is deferred). Release commits
-// immediately: detach (immediate, keeps the world pose), body back to Dynamic + a PendingLaunch, transfer the item back
-// into the holder, re-enable the pickup.
+// Carry / Hold never attach here: SetMotionType is deferred, so they write a PendingMount that
+// UMars_Processor_WorldItem_Mount commits once the body reads Kinematic. Release commits immediately.
 class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -32,14 +25,14 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_WorldItem_Hold> HoldRequests = InRequests.HoldRequests;
         TArray<FMars_Request_WorldItem_Release> ReleaseRequests = InRequests.ReleaseRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_WorldItem_Requests);
 
         for (const auto& Request : CarryRequests)
-        { HandleMountRequest(Self, InState, EMars_WorldItem_Mount::Carried, Request.Carrier, "Carry"); }
+        { HandleMountRequest(Self, InState, FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount::Carried, Request.Carrier)); }
 
         for (const auto& Request : HoldRequests)
-        { HandleMountRequest(Self, InState, EMars_WorldItem_Mount::Held, Request.Carrier, "Hold"); }
+        { HandleMountRequest(Self, InState, FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount::Held, Request.Carrier)); }
 
         for (const auto& Request : ReleaseRequests)
         { HandleReleaseRequest(Self, InState, Request); }
@@ -49,36 +42,34 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
     // Carry / Hold
     //--------------------------------------------------------------------------------------------------------------------------
 
+    //   Carry: World | Held -> Carried
+    //   Hold:  Carried      -> Held
+    // InMount names the mount and the carrier; its attach node and offset are resolved here.
     private void HandleMountRequest(FCk_Handle_WorldItem& InWorldItem,
                                     FMars_Fragment_WorldItem& InState,
-                                    EMars_WorldItem_Mount InNewMount,
-                                    const FCk_Handle& InCarrier,
-                                    const FString& InRequestName)
+                                    FMars_Fragment_WorldItem_PendingMount InMount)
     {
         const auto TargetMount = InWorldItem.Get_TargetMount();
-        const auto IsLegal = InNewMount == EMars_WorldItem_Mount::Carried
+        const auto IsCarry = InMount.Mount == EMars_WorldItem_Mount::Carried;
+        const auto IsLegal = IsCarry
             ? (TargetMount == EMars_WorldItem_Mount::World || TargetMount == EMars_WorldItem_Mount::Held)
             : TargetMount == EMars_WorldItem_Mount::Carried;
 
-        if (DoEnsureLegal(InWorldItem, InRequestName, IsLegal) == false)
+        if (DoEnsureLegal(InWorldItem, InMount.Mount, IsLegal) == false)
         { return; }
 
         const UMars_ItemTrait_Presentation Presentation = utils_world_item::TryGet_Presentation(InWorldItem);
+        const auto PointTag = IsCarry ? Presentation.Mounting.CarryPoint : GameplayTags::AttachPoint_Mars_Hand;
 
-        const auto IsCarry = InNewMount == EMars_WorldItem_Mount::Carried;
-        const auto PointTag = IsCarry ? Presentation.CarryPoint : GameplayTags::AttachPoint_Mars_Hand;
-        const auto Offset = IsCarry ? Presentation.CarryOffset : Presentation.HeldOffset;
-
-        auto Carrier = InCarrier;
-        auto AttachPoints = Carrier.As_AttachPoints(ECk_SanityCheck::UnChecked);
+        auto AttachPoints = InMount.Carrier.As_AttachPoints(ECk_SanityCheck::UnChecked);
         const auto HasPoint = ck::IsValid(AttachPoints) && AttachPoints.Has_AttachPoint(PointTag);
         if (ck::EnsureIfNot(HasPoint,
-            f"[WorldItem] {InRequestName} of [{InWorldItem.ToString()}]: carrier [{Carrier.ToString()}] publishes no attach point [{PointTag.ToString()}]"))
+            f"[WorldItem] Mount [{InMount.Mount :n}] of [{InWorldItem.ToString()}]: carrier [{InMount.Carrier.ToString()}] publishes no attach point [{PointTag.ToString()}]"))
         { return; }
 
         auto Pickup = InState.Pickup;
         if (ck::IsValid(Pickup))
-        { Pickup.Request_SetEnableDisable(ECk_EnableDisable::Disable); }
+        { Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Disable)); }
 
         auto Body = InState.Body;
         if (ck::IsValid(Body) && utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Kinematic)
@@ -87,24 +78,27 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
                 FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Kinematic));
         }
 
+        auto Mount = InMount;
+        Mount.Node = AttachPoints.Get_AttachPoint(PointTag);
+        Mount.Offset = IsCarry ? Presentation.Mounting.CarryOffset : Presentation.Mounting.HeldOffset;
+
         auto& Pending = InWorldItem.AddOrGet_Fragment(FMars_Fragment_WorldItem_PendingMount);
-        Pending.Mount = InNewMount;
-        Pending.Carrier = Carrier;
-        Pending.Node = AttachPoints.Get_AttachPoint(PointTag);
-        Pending.Offset = Offset;
+        Pending = Mount;
     }
 
     //--------------------------------------------------------------------------------------------------------------------------
     // Release
     //--------------------------------------------------------------------------------------------------------------------------
 
+    // Carried | Held -> World: detach (immediate, keeps the world pose), body back to Dynamic plus a PendingLaunch,
+    // transfer the item back into the holder, re-enable the pickup.
     private void HandleReleaseRequest(FCk_Handle_WorldItem& InWorldItem,
                                       FMars_Fragment_WorldItem& InState,
                                       const FMars_Request_WorldItem_Release& InRequest)
     {
         const auto TargetMount = InWorldItem.Get_TargetMount();
         const auto IsLegal = TargetMount == EMars_WorldItem_Mount::Carried || TargetMount == EMars_WorldItem_Mount::Held;
-        if (DoEnsureLegal(InWorldItem, "Release", IsLegal) == false)
+        if (DoEnsureLegal(InWorldItem, EMars_WorldItem_Mount::World, IsLegal) == false)
         { return; }
 
         auto Source = InRequest.SourceInventory;
@@ -116,8 +110,7 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
         InWorldItem.Request_TryRemove(FMars_Fragment_WorldItem_PendingMount);
         InWorldItem.Request_TryRemove(FMars_Fragment_WorldItem_Arrival);
 
-        // Immediate: the transform keeps its world pose and stops following the attach point.
-        auto SceneNode = FCk_Handle(InWorldItem).As_SceneNode(ECk_SanityCheck::UnChecked);
+        auto SceneNode = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(SceneNode))
         { utils_scene_node::Request_Detach(SceneNode); }
 
@@ -139,7 +132,7 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Pickup = InState.Pickup;
         if (ck::IsValid(Pickup))
-        { Pickup.Request_SetEnableDisable(ECk_EnableDisable::Enable); }
+        { Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Enable)); }
 
         const auto PrevMount = InState.Mount;
         InState.Mount = EMars_WorldItem_Mount::World;
@@ -165,14 +158,14 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
     // Helpers
     //--------------------------------------------------------------------------------------------------------------------------
 
-    private bool DoEnsureLegal(FCk_Handle_WorldItem& InWorldItem, const FString& InRequestName, bool InIsLegal) const
+    private bool DoEnsureLegal(FCk_Handle_WorldItem& InWorldItem, EMars_WorldItem_Mount InNewMount, bool InIsLegal) const
     {
         const auto Persistence = InWorldItem.Get_Persistence();
         const auto TargetMount = InWorldItem.Get_TargetMount();
         const auto IsPersistent = Persistence == EMars_WorldItem_Persistence::Persistent;
 
         if (ck::EnsureIfNot(IsPersistent && InIsLegal,
-            f"[WorldItem] Illegal {InRequestName} request on [{InWorldItem.ToString()}]: mount [{TargetMount :n}], persistence [{Persistence :n}] - skipped"))
+            f"[WorldItem] Illegal move to [{InNewMount :n}] on [{InWorldItem.ToString()}]: mount [{TargetMount :n}], persistence [{Persistence :n}] - skipped"))
         { return false; }
 
         return true;

@@ -1,8 +1,6 @@
-// Random blinking on the presentation: counts down to the next blink, then closes (smoothstep over BlinkCloseSeconds),
-// holds, and opens again (smoothstep over BlinkOpenSeconds). After a blink a second one may follow after a short gap
-// (DoubleBlinkChance, never chained into a third); otherwise the next one is drawn from the blink interval. A disabled
-// spec or an active expression that forbids blinking holds the eyes open, drops a pending double blink and, as it
-// starts, draws the next blink afresh, so blinking resumes a full interval after the suppression ends.
+// Random blinking on the presentation (see FMars_Eyes_BlinkSpec). An active expression that forbids blinking holds the
+// eyes open, drops a pending double blink and, as it starts, draws the next blink afresh, so blinking resumes a full
+// interval after the suppression ends. Eyes without a blink spec stay open.
 class UMars_Processor_Eyes_Blink : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,77 +13,81 @@ class UMars_Processor_Eyes_Blink : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Eyes_Presentation& InPresentation)
     {
-        const auto& Tuning = InHandle.Get_Fragment(FMars_Fragment_Eyes_Params).Tuning;
-        const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
+        const auto& BlinkSpec = InHandle.Get_Fragment(FMars_Fragment_Eyes_Params).Blink;
+        auto& State = InPresentation.Blink;
 
-        if (Tuning.BlinkEnabled == false || InPresentation.AllowBlink == false)
+        if (BlinkSpec.IsSet() == false)
         {
-            if (InPresentation.BlinkSuppressed == false)
-            {
-                InPresentation.BlinkSuppressed = true;
-                InPresentation.SecondsToNextBlink = utils_eyes::DoDraw_BlinkInterval(Tuning);
-            }
-
-            InPresentation.Blink = 0.0f;
-            InPresentation.BlinkPhaseSeconds = -1.0f;
-            InPresentation.DoubleBlinkPending = false;
+            State.Closure = 0.0f;
             return;
         }
 
-        InPresentation.BlinkSuppressed = false;
+        const auto& Spec = BlinkSpec.GetValue();
+        const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
-        if (InPresentation.BlinkPhaseSeconds < 0.0f)
+        if (InPresentation.AllowBlink == false)
         {
-            InPresentation.SecondsToNextBlink -= DeltaSeconds;
-            if (InPresentation.SecondsToNextBlink > 0.0f)
+            if (State.Stage != EMars_Eyes_BlinkStage::Suppressed)
+            {
+                State.Stage = EMars_Eyes_BlinkStage::Suppressed;
+                State.SecondsToNextBlink = utils_eyes::DoDraw_BlinkInterval(Spec);
+            }
+
+            State.Closure = 0.0f;
+            return;
+        }
+
+        if (State.Stage == EMars_Eyes_BlinkStage::Suppressed)
+        { State.Stage = EMars_Eyes_BlinkStage::Waiting; }
+
+        if (State.Stage == EMars_Eyes_BlinkStage::Waiting || State.Stage == EMars_Eyes_BlinkStage::WaitingForSecond)
+        {
+            State.SecondsToNextBlink -= DeltaSeconds;
+            if (State.SecondsToNextBlink > 0.0f)
             { return; }
 
-            InPresentation.BlinkPhaseSeconds = 0.0f;
+            State.Stage = State.Stage == EMars_Eyes_BlinkStage::WaitingForSecond
+                ? EMars_Eyes_BlinkStage::BlinkingSecond
+                : EMars_Eyes_BlinkStage::Blinking;
+            State.PhaseSeconds = 0.0f;
         }
         else
-        { InPresentation.BlinkPhaseSeconds += DeltaSeconds; }
+        { State.PhaseSeconds += DeltaSeconds; }
 
-        const auto Phase = InPresentation.BlinkPhaseSeconds;
-        const auto ClosedAt = Tuning.BlinkCloseSeconds;
-        const auto HoldEndsAt = ClosedAt + Tuning.BlinkHoldSeconds;
-        const auto OpenedAt = HoldEndsAt + Tuning.BlinkOpenSeconds;
+        const auto Phase = State.PhaseSeconds;
+        const auto ClosedAt = Spec.CloseSeconds;
+        const auto HoldEndsAt = ClosedAt + Spec.HoldSeconds;
+        const auto OpenedAt = HoldEndsAt + Spec.OpenSeconds;
 
         if (Phase < ClosedAt)
         {
-            InPresentation.Blink = Math::SmoothStep(0.0f, ClosedAt, Phase);
+            State.Closure = Math::SmoothStep(0.0f, ClosedAt, Phase);
             return;
         }
 
         if (Phase < HoldEndsAt)
         {
-            InPresentation.Blink = 1.0f;
+            State.Closure = 1.0f;
             return;
         }
 
         if (Phase < OpenedAt)
         {
-            InPresentation.Blink = 1.0f - Math::SmoothStep(HoldEndsAt, OpenedAt, Phase);
+            State.Closure = 1.0f - Math::SmoothStep(HoldEndsAt, OpenedAt, Phase);
             return;
         }
 
-        InPresentation.Blink = 0.0f;
-        InPresentation.BlinkPhaseSeconds = -1.0f;
-        ++InPresentation.BlinkCount;
+        State.Closure = 0.0f;
+        ++State.Count;
 
-        if (InPresentation.DoubleBlinkPending)
+        if (State.Stage == EMars_Eyes_BlinkStage::Blinking && Math::RandRange(0.0f, 1.0f) < Spec.DoubleBlinkChance)
         {
-            InPresentation.DoubleBlinkPending = false;
-            InPresentation.SecondsToNextBlink = utils_eyes::DoDraw_BlinkInterval(Tuning);
+            State.Stage = EMars_Eyes_BlinkStage::WaitingForSecond;
+            State.SecondsToNextBlink = constants_eyes::k_DoubleBlinkGapSeconds;
             return;
         }
 
-        if (Math::RandRange(0.0f, 1.0f) < Tuning.DoubleBlinkChance)
-        {
-            InPresentation.DoubleBlinkPending = true;
-            InPresentation.SecondsToNextBlink = constants_eyes::k_DoubleBlinkGapSeconds;
-            return;
-        }
-
-        InPresentation.SecondsToNextBlink = utils_eyes::DoDraw_BlinkInterval(Tuning);
+        State.Stage = EMars_Eyes_BlinkStage::Waiting;
+        State.SecondsToNextBlink = utils_eyes::DoDraw_BlinkInterval(Spec);
     }
 }

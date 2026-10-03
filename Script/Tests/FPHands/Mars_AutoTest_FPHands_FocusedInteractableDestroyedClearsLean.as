@@ -19,13 +19,14 @@ class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UCk_AutoTe
 
         // Something to look at, ahead of and below the hand node: a transform-only interactable (no probe, no targets).
         auto AnchorNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(80.0, 0.0, -40.0)));
-        _Anchor = FCk_Handle(AnchorNode);
+        _Anchor = AnchorNode;
         auto AnchorTransform = AnchorNode.As_Transform();
         _Interactable = utils_interactable::Create(AnchorTransform, FMars_Interactable_Spec());
 
         auto Spec = FMars_FPHands_Spec();
-        _FocusLean = Spec.Reach.FocusLean;
-        _Hands = utils_fphands::Add(Player, Spec, HandNode.As_Transform());
+        _FocusLean = Spec.Reach.Focus.Lean;
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(Player, Spec);
 
         Add_Step("focus the interactable", n"Step_Focus");
         Add_Step_WaitUntil("a glove leans toward it", n"Check_IsLeaning", 0, 5.0f);
@@ -45,27 +46,27 @@ class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UCk_AutoTe
     private void Check_IsLeaning(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hands.Get_FocusTarget().IsValid && Get_Lean() > _FocusLean * 0.5f);
+        Res.Set(_Hands.Get_FocusTarget().IsSet() && Get_Lean() > _FocusLean * 0.5f);
     }
 
     UFUNCTION()
     private void Step_DestroyInteractable(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(_Interactable));
+        utils_entity_lifetime::Request_DestroyEntity(_Interactable.H());
     }
 
     UFUNCTION()
     private void Check_LeanCleared(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hands.Get_FocusTarget().IsValid == false && Get_Lean() < 0.01f);
+        Res.Set(_Hands.Get_FocusTarget().IsSet() == false && Get_Lean() < 0.01f);
     }
 
     UFUNCTION()
     private void Step_AssertCleared(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(ck::Is_NOT_Valid(_Interactable), "the focused interactable was destroyed");
-        Assert_True(_Hands.Get_FocusTarget().IsValid == false, "a dead focus is no focus");
+        Assert_True(_Hands.Get_FocusTarget().IsSet() == false, "a dead focus is no focus");
 
         const auto Lean = Get_Lean();
         Assert_True(Lean < 0.01f, f"the lean eased out (lean {Lean})");
@@ -74,6 +75,6 @@ class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UCk_AutoTe
     // The larger of the two gloves' focus leans; which glove a point target picks is the resolver's business.
     private float32 Get_Lean() const
     {
-        return Math::Max(_Hands.Get_FocusAlpha_L(), _Hands.Get_FocusAlpha_R());
+        return Math::Max(_Hands.Get_FocusAlpha(EMars_Hand::Left), _Hands.Get_FocusAlpha(EMars_Hand::Right));
     }
 }

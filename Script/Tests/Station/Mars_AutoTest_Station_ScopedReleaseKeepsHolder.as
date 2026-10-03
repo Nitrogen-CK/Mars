@@ -52,8 +52,8 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_ReserveA(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Station), "the station composed");
-        _Station.Request_Reserve(FMars_Request_Station_Reserve(FCk_Handle(_OperatorA)));
+        Assert_Valid(_Station, "utils_station::Add composed the station");
+        _Station.Request_Reserve(FMars_Request_Station_Reserve(_OperatorA));
     }
 
     UFUNCTION()
@@ -66,18 +66,18 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_ReleaseB(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Station.Get_IsOperatedBy(FCk_Handle(_OperatorA)), "operator A holds the station");
-        _Station.Request_Release(FMars_Request_Station_Release(FCk_Handle(_OperatorB), EMars_Station_ReleaseReason::OperatorRequested));
+        Assert_True(_Station.Get_IsOperatedBy(_OperatorA), "operator A holds the station");
+        _Station.Request_Release(FMars_Request_Station_Release(_OperatorB, EMars_Station_ReleaseReason::OperatorRequested));
     }
 
     UFUNCTION()
     private void Step_AssertKeptThenReleaseA(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Released.Num(), 0, "the release scoped to operator B fired no OnReleased");
-        Assert_True(_Station.Get_Operator() == FCk_Handle(_OperatorA), "operator A still holds the station");
-        Assert_True(FCk_Handle(_OperatorA.Get_Station()) == FCk_Handle(_Station), "operator A's back-ref is intact");
+        Assert_True(_OperatorA == _Station.Get_Operator(), "operator A still holds the station");
+        Assert_True(_OperatorA.Get_Station() == _Station, "operator A's back-ref is intact");
 
-        _Station.Request_Release(FMars_Request_Station_Release(FCk_Handle(_OperatorA), EMars_Station_ReleaseReason::OperatorRequested));
+        _Station.Request_Release(FMars_Request_Station_Release(_OperatorA, EMars_Station_ReleaseReason::OperatorRequested));
     }
 
     UFUNCTION()
@@ -91,9 +91,13 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
     private void Step_AssertReleased(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Released.Num(), 1, "OnReleased fired once");
-        Assert_True(_Released[0] == FCk_Handle(_OperatorA), "OnReleased carries operator A");
-        Assert_True(_ReleaseReasons[0] == EMars_Station_ReleaseReason::OperatorRequested,
-            f"the release reason is OperatorRequested (got {_ReleaseReasons[0] :n})");
+        if (_Released.Num() == 1)
+        {
+            Assert_True(_OperatorA == _Released[0], "OnReleased carries operator A");
+            Assert_True(_ReleaseReasons[0] == EMars_Station_ReleaseReason::OperatorRequested,
+                f"the release reason is OperatorRequested (got {_ReleaseReasons[0] :n})");
+        }
+
         Assert_False(_Station.Get_IsOperated(), "the station is free");
         Assert_False(_OperatorA.Get_IsOperating(), "operator A's back-ref is clear");
         Assert_False(_OperatorB.Get_IsOperating(), "operator B never operated");

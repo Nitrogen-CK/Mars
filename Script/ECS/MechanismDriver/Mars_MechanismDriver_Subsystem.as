@@ -1,6 +1,6 @@
+// Spawns the world's mechanism driver entity at begin play; the driver finds every source and sink through entity tags.
 class UMars_MechanismDriver_Subsystem : UScriptWorldSubsystem
 {
-    private FCk_Handle_MechanismDriver _DriverHandle;
     private FCk_Handle_PendingEntityScript _PendingDriver;
 
     UFUNCTION(BlueprintOverride)
@@ -27,12 +27,6 @@ class UMars_MechanismDriver_Subsystem : UScriptWorldSubsystem
     UFUNCTION()
     private void OnDriverEntityConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _DriverHandle = InEntityScriptHandle.As_MechanismDriver(ECk_SanityCheck::UnChecked);
         _PendingDriver = FCk_Handle_PendingEntityScript();
-    }
-
-    FCk_Handle_MechanismDriver Get_DriverHandle() const
-    {
-        return _DriverHandle;
     }
 }

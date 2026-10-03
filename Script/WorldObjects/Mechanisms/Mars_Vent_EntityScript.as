@@ -49,7 +49,7 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
         TriggerSpec.BoxHalfExtents = FVector(JetLength * 0.5, JetWidth * 0.5, JetWidth * 0.5);
         TriggerSpec.LocalOffset = FTransform(FRotator::ZeroRotator,
             NozzleMouth + FVector(JetLength * 0.5, 0.0, 0.0), FVector::OneVector);
-        TriggerSpec.DetectionFilter = GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
+        TriggerSpec.DetectionFilter = GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_Player);
         auto Trigger = utils_trigger::Add(VentRoot, TriggerSpec);
 
         auto HazardSpec = Hazard;
@@ -70,6 +70,7 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
+        // A rejected trap already ensured in utils_trap::Add and composed no cycle; the vent then never fires.
         auto Cycle = InHandle.As_Cycle(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Cycle))
         { return; }
@@ -98,16 +99,16 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
     }
 
     UFUNCTION()
-    private void OnCycleRunningChanged(FCk_Handle_Cycle InCycle, bool InRunning)
+    private void OnCycleRunningChanged(FCk_Handle_Cycle InCycle, EMars_Cycle_RunState InRunState)
     {
-        if (InRunning == false)
+        if (InRunState == EMars_Cycle_RunState::Stopped)
         { Set_SteamActive(false); }
     }
 
     private void Apply_SteamForPhase(FGameplayTag InPhase)
     {
-        const auto IsFire = InPhase == GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Fire");
-        const auto IsTelegraph = InPhase == GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Telegraph");
+        const auto IsFire = InPhase == GameplayTags::Mechanism_Phase_Fire;
+        const auto IsTelegraph = InPhase == GameplayTags::Mechanism_Phase_Telegraph;
         if (IsFire == false && IsTelegraph == false)
         {
             Set_SteamActive(false);
@@ -163,43 +164,11 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
 
     private void AddVisuals(FCk_Handle_Transform& InRoot)
     {
-        auto CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(CubeMesh))
-        { return; }
-
-        auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
-
         // Engine cube is 100 uu with its pivot at the centre. The nozzle block ends at the nozzle mouth.
         const auto NozzleDepth = NozzleMouth.X * 2.0;
         const auto NozzleHeight = NozzleMouth.Z + JetWidth;
-        AddBox(InRoot, FVector(0.0, 0.0, NozzleHeight * 0.5), FVector(NozzleDepth, JetWidth * 1.4, NozzleHeight) * 0.01,
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"Vent_Nozzle");
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddBox(
-        FCk_Handle_Transform& InAttachTo,
-        FVector InLocation,
-        FVector InScale,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        auto Node = utils_scene_node::Create(InAttachTo, FTransform(FRotator::ZeroRotator, InLocation, InScale));
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable even when static: the component is registered first and then receives the entity transform,
-        // which a Static component refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, NozzleHeight * 0.5), FVector(NozzleDepth, JetWidth * 1.4, NozzleHeight) * 0.01),
+            engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"Vent_Nozzle"));
     }
 }

@@ -1,11 +1,10 @@
 // A spawned eyes dummy publishes its head as AttachPoint.Mars.Head; the face node under the head carries Gaze and Eyes
-// with a presentation and a plate, and the apply pass writes the catalog's first style into the plate's custom
-// primitive data: its glow strength (slot 7), its cells (slots 0 and 1) and its colour (slots 10..12). Fails at the
-// plate until the editor step has generated the MarsEyePlate master: without it the dummy builds no plate. Isolated Z
-// band: -71000.
+// with a presentation and a plate, and the apply pass writes the catalog's first style (the dummy's starting style) into
+// the plate's custom primitive data: its glow strength, its cells and its colour. Fails at the plate until the editor
+// step has generated the MarsEyePlate master: without it the dummy builds no plate. Isolated Z band: -71000.
 class UMars_AutoTest_EyesDummy_ComposesAndWrites : UCk_AutoTest_Base
 {
-    private const int32 StrengthSlot = mars_eyes_material::Slot_Anim + 3;
+    private const int32 StrengthSlot = constants_eyes::k_Slot_Anim + 3;
 
     private FCk_Handle _Dummy;
     private FCk_Handle _Face;
@@ -34,7 +33,7 @@ class UMars_AutoTest_EyesDummy_ComposesAndWrites : UCk_AutoTest_Base
     UFUNCTION()
     private void OnDummyConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _Dummy = FCk_Handle(InEntityScriptHandle);
+        _Dummy = InEntityScriptHandle;
     }
 
     UFUNCTION()
@@ -62,9 +61,9 @@ class UMars_AutoTest_EyesDummy_ComposesAndWrites : UCk_AutoTest_Base
         }
 
         // The face is a scene node of the head, so its lifetime is owned by the head.
-        for (auto Dependent : FCk_Handle(Head).Get_LifetimeDependents())
+        for (auto Dependent : Head.Get_LifetimeDependents())
         {
-            if (utils_eyes::Has(Dependent))
+            if (Dependent.Is_Eyes())
             { _Face = Dependent; }
         }
 
@@ -74,7 +73,7 @@ class UMars_AutoTest_EyesDummy_ComposesAndWrites : UCk_AutoTest_Base
             return;
         }
 
-        Assert_True(utils_gaze::Has(_Face), "the face node carries Gaze");
+        Assert_True(_Face.Is_Gaze(), "the face node carries Gaze");
 
         _Eyes = _Face.As_Eyes();
         if (_Eyes.Get_HasPresentation() == false)
@@ -84,7 +83,7 @@ class UMars_AutoTest_EyesDummy_ComposesAndWrites : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertPlate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Plate = _Eyes.Get_Fragment(FMars_Fragment_Eyes_Presentation).Plate;
+        _Plate = _Eyes.Get_Plate();
         if (ck::Is_NOT_Valid(_Plate))
         { FinishFailure("the dummy built no plate - the MarsEyePlate master is not generated; run Ck_Usf_GenerateLooks MarsEyePlate in the editor"); }
     }
@@ -99,12 +98,12 @@ class UMars_AutoTest_EyesDummy_ComposesAndWrites : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertFirstStyleWritten(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Style = mars_eyes::Catalog().Styles[0].Def;
-        AssertSlot(mars_eyes_material::Slot_Cells, float32(Style.LeftCell), "slot 0 holds the first style's left cell");
-        AssertSlot(mars_eyes_material::Slot_Cells + 1, float32(Style.RightCell), "slot 1 holds the first style's right cell");
-        AssertSlot(mars_eyes_material::Slot_Color, Style.Color.R, "slot 10 holds the first style's red");
-        AssertSlot(mars_eyes_material::Slot_Color + 1, Style.Color.G, "slot 11 holds the first style's green");
-        AssertSlot(mars_eyes_material::Slot_Color + 2, Style.Color.B, "slot 12 holds the first style's blue");
+        const auto Style = utils_eyes::Catalog().Styles[0].Def;
+        AssertSlot(constants_eyes::k_Slot_Cells, float32(Style.LeftCell), "the left cell slot holds the first style's left cell");
+        AssertSlot(constants_eyes::k_Slot_Cells + 1, float32(Style.RightCell), "the right cell slot holds the first style's right cell");
+        AssertSlot(constants_eyes::k_Slot_Color, Style.Color.R, "the colour slots hold the first style's red");
+        AssertSlot(constants_eyes::k_Slot_Color + 1, Style.Color.G, "the colour slots hold the first style's green");
+        AssertSlot(constants_eyes::k_Slot_Color + 2, Style.Color.B, "the colour slots hold the first style's blue");
     }
 
     private void AssertSlot(int32 InIndex, float32 InExpected, const FString& InWhat)

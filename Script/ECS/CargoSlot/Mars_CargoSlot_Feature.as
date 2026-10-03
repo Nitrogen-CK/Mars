@@ -18,12 +18,10 @@ struct FMars_Feature_CargoSlot {}
 // Enums
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What interacting with a slot would do for a given focuser (utils_cargo_slot Get_ActionFor). Only Stow and Take enable
-// the slot's interact target; every Blocked_ reason keeps the prompt visible with the reason and E does nothing.
+// What interacting with a slot would do for a given focuser (Get_ActionFor). Only Stow and Take enable the slot's
+// interact target; every Blocked_ reason keeps the prompt visible with the reason and E does nothing.
 enum EMars_CargoSlot_Action
 {
-    // Not evaluated (the slot is not focused).
-    Unset,
     Stow,
     Take,
     Blocked_NothingHeld,
@@ -41,40 +39,14 @@ namespace constants_cargo_slot
 {
     // Beats the pack's own pickup (0), whose probe sphere encloses the cargo probes under the same view ray.
     const int32 k_FocusPriority = 10;
-
-    // InItemName is the held item for Stow and the slot's item for Take; the Blocked_ texts ignore it.
-    FText k_PromptTextFor(EMars_CargoSlot_Action InAction, FText InItemName)
-    {
-        if (InAction == EMars_CargoSlot_Action::Stow)
-        { return FText::FromString(f"Stow {InItemName.ToString()}"); }
-
-        if (InAction == EMars_CargoSlot_Action::Take)
-        { return FText::FromString(f"Take {InItemName.ToString()}"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_NothingHeld)
-        { return FText::FromString("Nothing to stow"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_NotStowable)
-        { return FText::FromString("Can't stow that"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_SlotOccupied)
-        { return FText::FromString("Slot occupied"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_NoRoom)
-        { return FText::FromString("No room"); }
-
-        if (InAction == EMars_CargoSlot_Action::Blocked_PackHeld)
-        { return FText::FromString("Put the pack down"); }
-
-        return FText::FromString("Cargo");
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Resolved by the Backpack entity script from the item's FMars_CargoSlot_Mount (socket already applied).
+// Resolved by the Backpack entity script from the item's FMars_CargoSlot_Mount (socket already applied); utils_backpack::Add
+// fills in Backpack.
 struct FMars_CargoSlot_Spec
 {
     // 0..7 (Inventory.Mars.Cargo.<Index>).
@@ -87,9 +59,13 @@ struct FMars_CargoSlot_Spec
 
     UPROPERTY()
     float32 ProbeRadius = 12.0f;
+
+    // The pack's world item (its Mount decides Blocked_PackHeld); the slot is created under its root.
+    UPROPERTY()
+    FCk_Handle_WorldItem Backpack;
 }
 
-// Index in [0, 7] (the Inventory.Mars.Cargo.N tags only go that far), ProbeRadius > 0.
+// Index in [0, 7] (the Inventory.Mars.Cargo.N tags only go that far), ProbeRadius > 0, a valid Backpack.
 mixin FMars_Validation Validate(const FMars_CargoSlot_Spec& Self)
 {
     if (Self.Index < 0 || Self.Index > 7)
@@ -97,6 +73,9 @@ mixin FMars_Validation Validate(const FMars_CargoSlot_Spec& Self)
 
     if (Self.ProbeRadius <= 0.0f)
     { return FMars_Validation(f"slot [{Self.Index}] has a non-positive ProbeRadius [{Self.ProbeRadius}]"); }
+
+    if (ck::Is_NOT_Valid(Self.Backpack))
+    { return FMars_Validation(f"slot [{Self.Index}] has no Backpack"); }
 
     return FMars_Validation();
 }
@@ -108,10 +87,6 @@ mixin FMars_Validation Validate(const FMars_CargoSlot_Spec& Self)
 struct FMars_Fragment_CargoSlot_Params
 {
     UPROPERTY()
-    int32 Index = 0;
-
-    // The pack's world item (its Mount decides Blocked_PackHeld).
-    UPROPERTY()
     FCk_Handle_WorldItem Backpack;
 }
 
@@ -120,7 +95,8 @@ struct FMars_Fragment_CargoSlot_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Inventory and Interactable are composed by utils_cargo_slot::Create. Visual and LastSeen are written only by
-// UMars_Processor_CargoSlot_Sync; LastPromptAction only by UMars_Processor_CargoSlot_Prompt.
+// UMars_Processor_CargoSlot_Sync, PendingArrival by the request drain and the sync, LastPromptAction only by
+// UMars_Processor_CargoSlot_Prompt.
 struct FMars_Fragment_CargoSlot
 {
     UPROPERTY()
@@ -137,9 +113,13 @@ struct FMars_Fragment_CargoSlot
     UPROPERTY()
     FCk_Handle_Item LastSeen;
 
-    // The action the prompt currently shows; Unset while the slot is not focused.
+    // Where a stowed item visually was; its cargo visual starts there.
     UPROPERTY()
-    EMars_CargoSlot_Action LastPromptAction = EMars_CargoSlot_Action::Unset;
+    TOptional<FMars_WorldItem_PendingArrival> PendingArrival;
+
+    // The action the prompt currently shows; unset while the slot is not focused.
+    UPROPERTY()
+    TOptional<EMars_CargoSlot_Action> LastPromptAction;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -149,9 +129,14 @@ struct FMars_Fragment_CargoSlot
 delegate void FMars_Delegate_CargoSlot_OnItemChanged(FCk_Handle_CargoSlot InSlot, FCk_Handle_Item InMaybeItem);
 event void FMars_Delegate_CargoSlot_OnItemChanged_MC(FCk_Handle_CargoSlot InSlot, FCk_Handle_Item InMaybeItem);
 
+// A Stow or Take of InItem was refused (by the drain or by the inventory); the item did not move.
+delegate void FMars_Delegate_CargoSlot_OnTransferFailed(FCk_Handle_CargoSlot InSlot, FCk_Handle_Item InItem);
+event void FMars_Delegate_CargoSlot_OnTransferFailed_MC(FCk_Handle_CargoSlot InSlot, FCk_Handle_Item InItem);
+
 struct FMars_Fragment_CargoSlot_Signals
 {
     FMars_Delegate_CargoSlot_OnItemChanged_MC OnItemChanged;
+    FMars_Delegate_CargoSlot_OnTransferFailed_MC OnTransferFailed;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -164,11 +149,21 @@ struct FMars_Request_CargoSlot_Stow
     UPROPERTY()
     FCk_Handle_Item Item;
 
+    // Where the item visually is now; its cargo visual lerps in from there. Unset = it appears at rest.
+    UPROPERTY()
+    TOptional<FTransform> ArriveFrom;
+
     FMars_Request_CargoSlot_Stow() {}
 
     FMars_Request_CargoSlot_Stow(const FCk_Handle_Item& InItem)
     {
         Item = InItem;
+    }
+
+    FMars_Request_CargoSlot_Stow(const FCk_Handle_Item& InItem, const FTransform& InArriveFrom)
+    {
+        Item = InItem;
+        ArriveFrom = TOptional<FTransform>(InArriveFrom);
     }
 }
 

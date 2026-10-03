@@ -1,11 +1,10 @@
 // Keeps a focused slot's prompt and interact target in step with what its focuser could do (Get_ActionFor). Polls: a
 // focused slot depends on the focuser's held item AND the slot content, and at most a handful of slots are focused.
 //
-// While focused: the prompt text/colour follow the action every pass (Request_UpdateText drops an unchanged text, so
-// only a change is queued), and on an action change the framework target is enabled for Stow / Take and disabled
-// otherwise (utils_interact_target::Set_Enabled: immediate, cancels the target's interactions, and the resolver then
-// filters the target - the prompt stays visible with the reason and E does nothing). Not focused: LastPromptAction
-// resets to Unset so the next focus re-evaluates; nothing else is written.
+// While focused, the prompt text/colour follow the action every pass, and on an action change the framework target is
+// enabled for Stow / Take and disabled otherwise (utils_interact_target::Set_Enabled cancels the target's interactions;
+// the prompt stays visible with the reason and E does nothing). Not focused: LastPromptAction resets so the next focus
+// re-evaluates.
 class UMars_Processor_CargoSlot_Prompt : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,9 +18,12 @@ class UMars_Processor_CargoSlot_Prompt : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_CargoSlot& InState)
     {
         auto Interactable = InState.Interactable;
-        if (ck::Is_NOT_Valid(Interactable) || Interactable.Get_IsFocused() == false)
+        if (ck::EnsureIfNot(ck::IsValid(Interactable), f"[CargoSlot] [{InHandle.ToString()}] has no interactable"))
+        { return; }
+
+        if (Interactable.Get_IsFocused() == false)
         {
-            InState.LastPromptAction = EMars_CargoSlot_Action::Unset;
+            InState.LastPromptAction.Reset();
             return;
         }
 
@@ -30,18 +32,17 @@ class UMars_Processor_CargoSlot_Prompt : UCk_Processor_Script_Base_UE
         const auto Action = Slot.Get_ActionFor(Focuser);
         const auto IsAction = Action == EMars_CargoSlot_Action::Stow || Action == EMars_CargoSlot_Action::Take;
 
-        const auto Text = constants_cargo_slot::k_PromptTextFor(Action, DoGet_ItemName(Slot, Focuser, Action));
+        const auto Text = utils_cargo_slot::Get_PromptText(Action, DoGet_ItemName(Slot, Focuser, Action));
         const auto Color = IsAction ? constants_ui_colors::k_PromptText : constants_ui_colors::k_PromptText_Blocked;
 
-        const auto ActionChanged = Action != InState.LastPromptAction;
-        InState.LastPromptAction = Action;
+        const auto ActionChanged = InState.LastPromptAction.IsSet() == false || InState.LastPromptAction.GetValue() != Action;
+        InState.LastPromptAction = TOptional<EMars_CargoSlot_Action>(Action);
 
         auto Targets = Interactable.Get_AllInteractTargets();
         for (auto& Target : Targets)
         {
-            auto Prompt = FCk_Handle(Target).As_InteractPrompt(ECk_SanityCheck::UnChecked);
-            if (ck::IsValid(Prompt))
-            { Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(Text, Color)); }
+            auto Prompt = Target.As_InteractPrompt();
+            Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(Text, Color));
 
             if (ActionChanged)
             { utils_interact_target::Set_Enabled(Target, IsAction ? ECk_EnableDisable::Enable : ECk_EnableDisable::Disable); }
@@ -55,11 +56,7 @@ class UMars_Processor_CargoSlot_Prompt : UCk_Processor_Script_Base_UE
         if (InAction == EMars_CargoSlot_Action::Take)
         { Item = InSlot.Get_Item(); }
         else if (InAction == EMars_CargoSlot_Action::Stow)
-        {
-            const auto HeldItem = InFocuser.As_HeldItem(ECk_SanityCheck::UnChecked);
-            if (ck::IsValid(HeldItem))
-            { Item = HeldItem.Get_CurrentItem(); }
-        }
+        { Item = InFocuser.As_HeldItem().Get_CurrentItem(); }
 
         if (ck::Is_NOT_Valid(Item))
         { return FText(); }

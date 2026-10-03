@@ -1,7 +1,5 @@
 // Drains Refresh, then Drop, then Throw, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each kind is
-// applied at most once per drain however many were queued (a second Refresh would rebuild the use interactable again; a
-// second Drop/Throw is already a no-op through LaunchedItem). SetThrowArmed applies in order and broadcasts
-// OnThrowArmedChanged on every change.
+// applied at most once per drain (a second Drop/Throw is already a no-op through LaunchedItem).
 //
 // Refresh owns the use interactable: a no-probe child of the player whose single Primary.UsableItem target runs the held
 // item's UseAction state. Nothing traces it, so it is focused and offered to the player's resolver here, and torn down
@@ -33,17 +31,17 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Throw = InRequests.ThrowRequests.Num() > 0;
         TArray<FMars_Request_HeldItemUse_SetThrowArmed> SetThrowArmedRequests = InRequests.SetThrowArmedRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before acting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_HeldItemUse_Requests);
 
         if (Refresh)
         { RebuildFromHeldItem(InHandle, InState); }
 
         if (Drop)
-        { LaunchHeldItem(InHandle, InState, false); }
+        { LaunchHeldItem(InHandle, InState, EMars_LaunchKind::Drop); }
 
         if (Throw)
-        { LaunchHeldItem(InHandle, InState, true); }
+        { LaunchHeldItem(InHandle, InState, EMars_LaunchKind::Throw); }
 
         for (const auto& Request : SetThrowArmedRequests)
         { HandleSetThrowArmedRequest(Self, InState, Request); }
@@ -75,14 +73,14 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     {
         TearDown(InPlayer, InState);
 
-        // A new held item (or none) is a new launch candidate.
-        InState.LaunchedItem = FCk_Handle_Item();
-
-        auto HeldItem = InPlayer.As_HeldItem(ECk_SanityCheck::UnChecked);
-        if (ck::EnsureIfNot(ck::IsValid(HeldItem), f"[HeldItemUse] [{InPlayer.ToString()}] has no HeldItem feature"))
-        { return; }
-
+        auto HeldItem = InPlayer.As_HeldItem();
         auto Item = HeldItem.Get_CurrentItem();
+
+        // A new held item (or none) is a new launch candidate. A refresh while the launched item is still held keeps the
+        // guard: its world item has not adopted it yet.
+        if (Item != InState.LaunchedItem)
+        { InState.LaunchedItem = FCk_Handle_Item(); }
+
         if (ck::Is_NOT_Valid(Item) || Item.Has_UseAction() == false)
         { return; }
 
@@ -138,13 +136,12 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Interactable))
         { return; }
 
-        auto Resolver = InPlayer.As_InteractionResolver(ECk_SanityCheck::UnChecked);
+        auto Resolver = InPlayer.As_InteractionResolver();
         auto Targets = Interactable.Get_AllInteractTargets();
         for (auto& InteractTarget : Targets)
         {
             InteractTarget.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(InPlayer));
-            if (ck::IsValid(Resolver))
-            { Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(InteractTarget)); }
+            Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(InteractTarget));
         }
 
         Interactable.Request_Unfocus(FMars_Request_Interactable_Unfocus(InPlayer));
@@ -155,28 +152,27 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     // Drop / Throw
     //--------------------------------------------------------------------------------------------------------------------------
 
-    private void LaunchHeldItem(FCk_Handle& InPlayer, FMars_Fragment_HeldItemUse& InState, bool InIsThrow)
+    private void LaunchHeldItem(FCk_Handle& InPlayer, FMars_Fragment_HeldItemUse& InState, EMars_LaunchKind InKind)
     {
-        auto HeldItem = InPlayer.As_HeldItem(ECk_SanityCheck::UnChecked);
-        if (ck::EnsureIfNot(ck::IsValid(HeldItem), f"[HeldItemUse] [{InPlayer.ToString()}] has no HeldItem feature"))
-        { return; }
-
+        auto HeldItem = InPlayer.As_HeldItem();
         auto Item = HeldItem.Get_CurrentItem();
         if (ck::Is_NOT_Valid(Item) || Item == InState.LaunchedItem)
         { return; }
 
-        auto Speed = InIsThrow ? constants_held_item_use::k_DefaultThrowSpeed : constants_held_item_use::k_DefaultDropSpeed;
+        const auto IsThrow = InKind == EMars_LaunchKind::Throw;
+        auto Speed = IsThrow ? constants_held_item_use::k_DefaultThrowSpeed : constants_held_item_use::k_DefaultDropSpeed;
         auto AngularVelocityDeg = FVector::ZeroVector;
         if (Item.Has_Throwable())
         {
             const UMars_ItemTrait_Throwable Throwable = Item.Get_Throwable();
-            Speed = InIsThrow ? Throwable.ThrowSpeed : Throwable.DropSpeed;
+            Speed = IsThrow ? Throwable.ThrowSpeed : Throwable.DropSpeed;
             AngularVelocityDeg = Throwable.AngularVelocityDeg;
         }
 
         const auto View = Get_ViewTransform(InPlayer);
         const auto Forward = View.GetRotation().GetForwardVector();
 
+        // Optional: a test player has no actor.
         auto PawnVelocity = FVector::ZeroVector;
         auto Character = Cast<ACharacter>(ck::ToActor(InPlayer, ECk_SanityCheck::UnChecked));
         if (ck::IsValid(Character))
@@ -192,7 +188,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
                 Item, HeldItem.Get_CurrentInventory(), Forward * Speed + PawnVelocity, AngularVelocityDeg));
 
             InState.LaunchedItem = Item;
-            Broadcast_ItemLaunched(InPlayer, Item, InIsThrow);
+            Broadcast_ItemLaunched(InPlayer, Item, InKind);
             return;
         }
 
@@ -214,25 +210,22 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
         utils_entity_script::Request_SpawnEntity(ck::TransientEntity(), utils_world_item::Get_WorldItemScriptClass(Item), SpawnParams);
 
         InState.LaunchedItem = Item;
-        Broadcast_ItemLaunched(InPlayer, Item, InIsThrow);
+        Broadcast_ItemLaunched(InPlayer, Item, InKind);
     }
 
-    private void Broadcast_ItemLaunched(FCk_Handle& InPlayer, FCk_Handle_Item InItem, bool InIsThrow)
+    private void Broadcast_ItemLaunched(FCk_Handle& InPlayer, FCk_Handle_Item InItem, EMars_LaunchKind InKind)
     {
         if (InPlayer.Has_Fragment(FMars_Fragment_HeldItemUse_Signals))
-        { InPlayer.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnItemLaunched.Broadcast(InPlayer.As_HeldItemUse(), InItem, InIsThrow); }
+        { InPlayer.Get_Fragment(FMars_Fragment_HeldItemUse_Signals).OnItemLaunched.Broadcast(InPlayer.As_HeldItemUse(), InItem, InKind); }
     }
 
+    // The player's view; a carrier without a PlayerViewpoint (a test rig) launches from its own transform.
     private FTransform Get_ViewTransform(FCk_Handle& InPlayer) const
     {
         auto Viewpoint = InPlayer.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Viewpoint))
         { return utils_transform::Get_EntityCurrentTransform(Viewpoint.Get_Viewpoint()); }
 
-        auto PlayerTransform = InPlayer.As_Transform(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(PlayerTransform))
-        { return utils_transform::Get_EntityCurrentTransform(PlayerTransform); }
-
-        return FTransform::Identity;
+        return utils_transform::Get_EntityCurrentTransform(InPlayer.As_Transform());
     }
 }

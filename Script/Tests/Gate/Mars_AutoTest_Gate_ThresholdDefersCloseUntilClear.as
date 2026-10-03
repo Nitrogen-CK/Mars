@@ -45,8 +45,8 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertThreshold(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Gate), "utils_gate::Add returned a gate");
-        Assert_True(ck::IsValid(_Gate.Get_Threshold()), "a spec with a Threshold gives the gate a threshold trigger");
+        Assert_Valid(_Gate, "utils_gate::Add returned a gate");
+        Assert_Valid(_Gate.Get_Threshold(), "a spec with a Threshold gives the gate a threshold trigger");
         Assert_True(_Gate.Get_IsOpen(), "StartOpen opens the gate");
     }
 
@@ -60,7 +60,7 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Close(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Gate.Request_SetOpen(false);
+        _Gate.Request_SetPosition(FMars_Request_Gate_SetPosition(EMars_Gate_Position::Closed));
     }
 
     UFUNCTION()
@@ -80,7 +80,7 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Open(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Gate.Request_SetOpen(true);
+        _Gate.Request_SetPosition(FMars_Request_Gate_SetPosition(EMars_Gate_Position::Open));
     }
 
     UFUNCTION()

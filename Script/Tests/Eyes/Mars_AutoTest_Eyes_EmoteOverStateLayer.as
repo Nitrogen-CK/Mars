@@ -7,10 +7,6 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
     // The timed Happy lasts 2 s.
     default _TimeoutSeconds = 8.0f;
 
-    // Catalog indices are append-only (Mars_Eyes_Assets.as).
-    private const int32 HappyIndex = 0;
-    private const int32 DownedIndex = 8;
-
     private FCk_Handle_Eyes _Eyes;
     private FMars_Eyes_ExpressionDef _Happy;
     private FMars_Eyes_ExpressionDef _Downed;
@@ -25,11 +21,10 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
         Spec.Style.RightCell = 3;
-        Spec.BlinkEnabled = false;
         _Eyes = utils_eyes::Add(FaceNode, Spec);
 
-        _Happy = mars_eyes::Catalog().Expressions[HappyIndex].Def;
-        _Downed = mars_eyes::Catalog().Expressions[DownedIndex].Def;
+        _Happy = utils_eyes::Expression_Happy().Def;
+        _Downed = utils_eyes::Expression_Downed().Def;
 
         Add_Step("the eyes have a presentation", n"Step_AssertPresentation");
         Add_Step("set the State layer to Downed", n"Step_SetDowned");
@@ -59,8 +54,9 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
         Assert_True(_Downed.DurationSeconds.IsSet() == false, "the catalog's Downed stays until cleared");
         Assert_True(_Happy.DurationSeconds.IsSet() && _Happy.DurationSeconds.GetValue() >= 1.0f,
             f"the catalog's Happy is timed for at least 1 s (set [{_Happy.DurationSeconds.IsSet()}], got [{_Happy.DurationSeconds.Get(0.0f)}])");
-        Assert_True(_Downed.LeftCell != 3 && _Downed.RightCell != 3, "Downed differs from the style on both eyes");
-        Assert_True(_Happy.LeftCell != _Downed.LeftCell && _Happy.RightCell != _Downed.RightCell, "Happy differs from Downed on both eyes");
+        Assert_True(_Downed.LeftCell.Get(3) != 3 && _Downed.RightCell.Get(3) != 3, "Downed sets both eyes away from the style");
+        Assert_True(_Happy.LeftCell.IsSet() && _Happy.RightCell.IsSet()
+            && _Happy.LeftCell != _Downed.LeftCell && _Happy.RightCell != _Downed.RightCell, "Happy sets both eyes away from Downed");
     }
 
     UFUNCTION()
@@ -74,8 +70,8 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Eyes.Get_HasEmote() == false
-            && _Eyes.Get_ResolvedLeftCell() == _Downed.LeftCell
-            && _Eyes.Get_ResolvedRightCell() == _Downed.RightCell);
+            && _Eyes.Get_ResolvedLeftCell() == _Downed.LeftCell.Get(-1)
+            && _Eyes.Get_ResolvedRightCell() == _Downed.RightCell.Get(-1));
     }
 
     UFUNCTION()
@@ -91,8 +87,8 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Eyes.Get_HasEmote()
-            && _Eyes.Get_ResolvedLeftCell() == _Happy.LeftCell
-            && _Eyes.Get_ResolvedRightCell() == _Happy.RightCell
+            && _Eyes.Get_ResolvedLeftCell() == _Happy.LeftCell.Get(-1)
+            && _Eyes.Get_ResolvedRightCell() == _Happy.RightCell.Get(-1)
             && _Eyes.Get_Blend() >= 1.0f);
     }
 

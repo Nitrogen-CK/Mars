@@ -1,10 +1,10 @@
-// The Health arbiter. Drains SetInvulnerable -> Heal -> ApplyDamage, each kind in arrival order, against ONE running value
-// read from the attribute at the start of the drain, then writes the attribute once. Every applied request broadcasts its
-// own signal here (attribute signals coalesce same-frame mutations, so they never carry hit feedback).
+// The Health arbiter. Every request of the drain runs against ONE running value read from the attribute at the start,
+// then the attribute is written once; each applied request broadcasts its own signal here (attribute signals coalesce
+// same-frame mutations, so they never carry hit feedback).
 //
-// Depletion is latched in FMars_Fragment_Health.IsDepleted the moment the running value reaches 0, BEFORE OnDepleted
-// broadcasts: a handler that queues another hit sees a depleted Health, and later hits in the same drain are ignored, so
-// two lethal hits in one frame deplete once and LastHit names the one that crossed zero.
+// Depletion is latched the moment the running value reaches 0, BEFORE OnDepleted broadcasts: a handler that queues
+// another hit sees a depleted Health, and later hits in the same drain are ignored, so two lethal hits in one frame
+// deplete once and LastHit names the one that crossed zero.
 //
 // The state is re-fetched per request: a handler may compose Health on another entity mid-broadcast, which can move the
 // fragment storage under a reference held across the broadcast.
@@ -29,7 +29,7 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_Health_Heal> HealRequests = InRequests.HealRequests;
         TArray<FMars_Request_Health_ApplyDamage> ApplyDamageRequests = InRequests.ApplyDamageRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Health_Requests);
 
         const auto Attribute = InState.Attribute;
@@ -38,7 +38,7 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
         auto Changed = false;
 
         for (const auto& Request : SetInvulnerableRequests)
-        { Self.Get_Fragment(FMars_Fragment_Health).IsInvulnerable = Request.Invulnerable; }
+        { Self.Get_Fragment(FMars_Fragment_Health).IsInvulnerable = Request.Invulnerability == ECk_EnableDisable::Enable; }
 
         for (const auto& Request : HealRequests)
         {
@@ -65,7 +65,6 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
             Running -= Applied;
             Changed = true;
             State.LastHit = Request.Event;
-            State.HasLastHit = true;
 
             const auto Depleted = Running <= 0.0f;
             if (Depleted)

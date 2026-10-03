@@ -26,7 +26,7 @@ class UMars_OccupancyVolume_EntityScript : UCk_GenericEntityScript_UE
         utils_entity_tag::Add(InHandle, n"TAG_MarsOccupancyVolume");
 
         auto TriggerHandle = utils_trigger::Add(Root, Trigger);
-        utils_occupancy::Add(InHandle, Occupancy, TriggerHandle);
+        utils_occupancy::Add(InHandle, Occupancy, FMars_Occupancy_Parts(TriggerHandle));
 
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }

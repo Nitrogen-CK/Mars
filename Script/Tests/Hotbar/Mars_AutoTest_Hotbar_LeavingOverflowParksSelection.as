@@ -5,7 +5,6 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UCk_AutoTest_Base
     private FCk_Handle_Hotbar _Hotbar;
     private TArray<FCk_Handle_Inventory_DataOnly> _Holders;
     private int32 _EjectCount = 0;
-    private int32 _EjectPendingIndex = -2;
     private FCk_Handle_Item _EjectItem;
 
     UFUNCTION(BlueprintOverride)
@@ -40,10 +39,9 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem, int32 InPendingIndex)
+    private void OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem)
     {
         _EjectCount += 1;
-        _EjectPendingIndex = InPendingIndex;
         _EjectItem = InItem;
     }
 
@@ -94,7 +92,7 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UCk_AutoTest_Base
     private void Check_OverflowFilled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_Slot(2).Get_NumItems() == 1 && _Hotbar.Get_SelectedIndex() == 2);
+        Res.Set(_Hotbar.Get_Slot(2).Get_NumItems() == 1 && _Hotbar.Get_SelectedIndex() == TOptional<int32>(2));
     }
 
     UFUNCTION()
@@ -107,21 +105,22 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UCk_AutoTest_Base
     private void Check_EjectRequested(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_EjectCount == 1 && _EjectPendingIndex == 0);
+        const auto Parked = _Hotbar.TryGet_ParkedSelection();
+        Res.Set(_EjectCount == 1 && Parked.IsSet() && Parked.GetValue().Index == TOptional<int32>(0));
     }
 
     UFUNCTION()
     private void Step_AssertStillOnOverflow(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_Hotbar.Get_SelectedIndex(), 2, "SelectedIndex while the overflow item is still held");
+        Assert_True(_Hotbar.Get_SelectedIndex() == TOptional<int32>(2), "the selection stays parked on the overflow slot while its item is held");
         Assert_True(_EjectItem == _Hotbar.Get_ItemAt(2), "the eject request names the overflow item");
     }
 
     UFUNCTION()
     private void Step_AssertSingleEject(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_EjectCount, 1, "OnOverflowEjectRequested count after a re-press while parked");
-        Assert_Equals_Int(_Hotbar.Get_SelectedIndex(), 2, "SelectedIndex after a re-press while parked");
+        Assert_Equals_Int(_EjectCount, 1, "a re-press while parked does not ask for another eject");
+        Assert_True(_Hotbar.Get_SelectedIndex() == TOptional<int32>(2), "a re-press while parked keeps the overflow slot selected");
     }
 
     UFUNCTION()
@@ -137,14 +136,14 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UCk_AutoTest_Base
     private void Check_SelectedZero(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == 0);
+        Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0));
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

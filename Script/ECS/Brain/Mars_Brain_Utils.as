@@ -8,7 +8,7 @@ namespace utils_brain
     FCk_Handle_Brain Add(FCk_Handle& InOwner, FMars_Brain_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Brain] [{InOwner.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Brain] [{InOwner.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Brain(); }
 
         auto Keys = TArray<FGameplayTag>();
@@ -27,6 +27,9 @@ namespace utils_brain
         PlannerSpec.Set_ReplanPolicy(ECk_Goap_ReplanPolicy::OnWorldStateDirty);
         PlannerSpec.Set_MinReplanIntervalSeconds(InSpec.MinReplanIntervalSeconds);
         auto Planner = utils_goap_planner::Create(InOwner, InSpec.PlannerTag, PlannerSpec);
+        if (ck::EnsureIfNot(ck::IsValid(WorldState) && ck::IsValid(Planner),
+            f"[Brain] [{InOwner.ToString()}] CkGoap rejected the world state or the planner"))
+        { return FCk_Handle_Brain(); }
 
         for (const auto& Action : InSpec.Actions)
         {
@@ -48,27 +51,7 @@ namespace utils_brain
         return InOwner.As_Brain();
     }
 
-    // Processor-only (the brain's setup processor and its active-chain handler). Reads the planner's first plan class
-    // and, when it differs from the stored leaf, stores it and broadcasts OnLeafChanged.
-    void Refresh(FCk_Handle_Brain& InBrain)
-    {
-        auto& State = InBrain.Get_Fragment(FMars_Fragment_Brain);
-        if (ck::Is_NOT_Valid(State.Planner))
-        { return; }
-
-        const TSubclassOf<UCk_GoapAction_EntityScript> Old = State.LeafClass.Get();
-        const TSubclassOf<UCk_GoapAction_EntityScript> New = utils_goap_planner::Get_FirstPlanClass(State.Planner);
-        if (Old == New)
-        { return; }
-
-        State.LeafClass = New;
-
-        ck::Trace(f"[Brain] [{InBrain.ToString()}] leaf [{Get_ClassName(Old)}] -> [{Get_ClassName(New)}]");
-
-        if (InBrain.Has_Fragment(FMars_Fragment_Brain_Signals))
-        { InBrain.Get_Fragment(FMars_Fragment_Brain_Signals).OnLeafChanged.Broadcast(InBrain, Old, New); }
-    }
-
+    // "-" for no class (no plan yet).
     FString Get_ClassName(TSubclassOf<UCk_GoapAction_EntityScript> InClass)
     {
         if (ck::Is_NOT_Valid(InClass))

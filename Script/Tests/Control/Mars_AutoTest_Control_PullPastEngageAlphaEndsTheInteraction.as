@@ -39,7 +39,7 @@ class UMars_AutoTest_Control_PullPastEngageAlphaEndsTheInteraction : UCk_AutoTes
         auto MoverSpec = FMars_Mover_Spec();
         MoverSpec.EndRotation = FRotator(70.0, 0.0, 0.0);
         MoverSpec.Duration = 0.3f;
-        MoverSpec.StartAtEnd = InStartActive;
+        MoverSpec.StartPose = InStartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         _Mover = utils_mover::Add(HandleNode, MoverSpec);
 
         auto ControlSpec = FMars_Control_Spec();
@@ -123,12 +123,13 @@ class UMars_AutoTest_Control_PullPastEngageAlphaEndsTheInteraction : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertEnded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_FinishedResults[0] == ECk_SucceededFailed::Succeeded, "the threshold ends the interaction Succeeded");
+        const auto Result = _FinishedResults[0];
+        Assert_True(Result == ECk_SucceededFailed::Succeeded, f"the threshold ends the interaction Succeeded (got {Result :n})");
         Assert_Equals_Int(_EngagedCount, 0, "no focus, so no Engage chain");
 
-        const auto Alpha = _Mover.Get_Alpha();
-        Assert_True(Alpha >= 0.85f - 0.02f, f"the handle is at the threshold when the interaction ends (alpha {Alpha})");
-        Assert_False(_Mover.Get_AtEnd(), "the Control never moved the target itself");
+        // Two-sided: the spring overshoots the threshold by one frame's travel, a snap to the far stop is 0.15 off.
+        Assert_Equals_Float(_Mover.Get_Alpha(), 0.85, 0.05, "the handle is at the threshold when the interaction ends");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "the Control never moved the target itself");
     }
 
     UFUNCTION()

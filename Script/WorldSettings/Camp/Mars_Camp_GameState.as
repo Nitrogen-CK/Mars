@@ -1,5 +1,4 @@
-// Owns the camp session (design D1). The session lives on this actor's entity so every machine has one place to
-// read the phase; the joining campaign makes its state machine replicate.
+// Owns the camp session. The session lives on this actor's entity so every machine has one place to read the phase.
 class AMars_Camp_GameState : AMars_Master_GameState
 {
     private FCk_Handle_CampSession _CampSession;

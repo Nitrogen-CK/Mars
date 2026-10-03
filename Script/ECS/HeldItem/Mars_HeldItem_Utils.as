@@ -22,6 +22,18 @@ namespace utils_held_item
 
         return TSoftObjectPtr<UCk_InventoryItem_Definition>(FSoftObjectPath(InDefinition));
     }
+
+    // The held item of whoever uses it, from a held-item use state's context: the InteractTarget, whose
+    // InteractionContext names the player as the interactable owner.
+    FCk_Handle_HeldItem Get_UserHeldItem(FCk_Handle InContext)
+    {
+        if (ck::EnsureIfNot(InContext.Has_Fragment(FMars_Fragment_InteractionContext),
+            f"[HeldItem] [{InContext.ToString()}] has no interaction context"))
+        { return FCk_Handle_HeldItem(); }
+
+        auto Player = InContext.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
+        return Player.As_HeldItem();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -48,29 +60,41 @@ mixin FCk_Handle Get_PresentationEntity(const FCk_Handle_HeldItem& Self)
 
 mixin FCk_Handle_Transform Get_HandAttachPoint(const FCk_Handle_HeldItem& Self)
 {
-    return FCk_Handle(Self).As_AttachPoints().Get_AttachPoint(GameplayTags::AttachPoint_Mars_Hand);
+    return Self.As_AttachPoints().Get_AttachPoint(GameplayTags::AttachPoint_Mars_Hand);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The next held visual spawns at InWorldTransform (consumed by that spawn). Clear it if no spawn follows.
-mixin void Set_NextSpawnFrom(FCk_Handle_HeldItem& Self, const FTransform& InWorldTransform)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_SpawnFrom);
-    Fragment.WorldTransform = InWorldTransform;
-}
-
-mixin void Clear_NextSpawnFrom(FCk_Handle_HeldItem& Self)
-{
-    Self.Request_TryRemove(FMars_Fragment_HeldItem_SpawnFrom);
-}
-
 mixin void Request_SetSlot(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetSlot& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
     Requests.SetSlotRequests.Add(InRequest);
+}
+
+// The next held visual spawns at InRequest.WorldTransform and keeps that offset from the hand; consumed by that spawn.
+// Clear it if no spawn follows.
+mixin void Request_SetNextSpawnFrom(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetNextSpawnFrom& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
+    Requests.SetNextSpawnFromRequests.Add(InRequest);
+}
+
+// Also drops a SetNextSpawnFrom queued before it, so the clear wins whatever the drain order.
+mixin void Request_ClearNextSpawnFrom(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_ClearNextSpawnFrom& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
+    Requests.SetNextSpawnFromRequests.Empty();
+    Requests.ClearNextSpawnFromRequests.Add(InRequest);
+}
+
+// The next held visual of InRequest.Item starts at InRequest.World and lerps in, unless it spawns later than
+// constants_world_item::k_ArriveFromMaxAgeSeconds.
+mixin void Request_SetNextArrival(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetNextArrival& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
+    Requests.SetNextArrivalRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

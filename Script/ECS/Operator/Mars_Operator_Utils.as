@@ -36,5 +36,5 @@ mixin void Request_Leave(FCk_Handle_Operator& Self)
     if (ck::Is_NOT_Valid(Station))
     { return; }
 
-    Station.Request_Release(FMars_Request_Station_Release(FCk_Handle(Self), EMars_Station_ReleaseReason::OperatorRequested));
+    Station.Request_Release(FMars_Request_Station_Release(Self, EMars_Station_ReleaseReason::OperatorRequested));
 }

@@ -10,6 +10,12 @@ asset Mars_CycleHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_Cycle {}
 
+enum EMars_Cycle_RunState
+{
+    Stopped,
+    Running
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -41,6 +47,25 @@ struct FMars_Cycle_Spec
     bool StartRunning = true;
 }
 
+// At least one phase, each tagged and lasting a positive time.
+mixin FMars_Validation Validate(const FMars_Cycle_Spec& Self)
+{
+    if (Self.Phases.Num() == 0)
+    { return FMars_Validation("Phases must list at least one phase"); }
+
+    for (int32 Index = 0; Index < Self.Phases.Num(); ++Index)
+    {
+        const auto& Phase = Self.Phases[Index];
+        if (Phase.Phase.IsValid() == false)
+        { return FMars_Validation(f"Phases[{Index}] has no Phase tag"); }
+
+        if (Phase.Duration <= 0.0f)
+        { return FMars_Validation(f"Phases[{Index}] [{Phase.Phase.ToString()}] Duration [{Phase.Duration}] must be positive"); }
+    }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
@@ -61,8 +86,9 @@ struct FMars_Fragment_Cycle_Params
 struct FMars_Fragment_Cycle
 {
     UPROPERTY()
-    bool IsRunning = false;
+    EMars_Cycle_RunState RunState = EMars_Cycle_RunState::Stopped;
 
+    // Kept while stopped; a start re-enters phase 0 regardless.
     UPROPERTY()
     int32 PhaseIndex = 0;
 
@@ -77,8 +103,8 @@ struct FMars_Fragment_Cycle
 delegate void FMars_Delegate_Cycle_OnPhaseChanged(FCk_Handle_Cycle InCycle, FGameplayTag InPhase, int32 InIndex);
 event void FMars_Delegate_Cycle_OnPhaseChanged_MC(FCk_Handle_Cycle InCycle, FGameplayTag InPhase, int32 InIndex);
 
-delegate void FMars_Delegate_Cycle_OnRunningChanged(FCk_Handle_Cycle InCycle, bool InRunning);
-event void FMars_Delegate_Cycle_OnRunningChanged_MC(FCk_Handle_Cycle InCycle, bool InRunning);
+delegate void FMars_Delegate_Cycle_OnRunningChanged(FCk_Handle_Cycle InCycle, EMars_Cycle_RunState InRunState);
+event void FMars_Delegate_Cycle_OnRunningChanged_MC(FCk_Handle_Cycle InCycle, EMars_Cycle_RunState InRunState);
 
 struct FMars_Fragment_Cycle_Signals
 {
@@ -93,25 +119,42 @@ struct FMars_Fragment_Cycle_Signals
 struct FMars_Request_Cycle_SetRunning
 {
     UPROPERTY()
-    bool Running = false;
+    EMars_Cycle_RunState RunState = EMars_Cycle_RunState::Stopped;
 
-    FMars_Request_Cycle_SetRunning(bool InRunning)
+    FMars_Request_Cycle_SetRunning() {}
+
+    FMars_Request_Cycle_SetRunning(EMars_Cycle_RunState InRunState)
     {
-        Running = InRunning;
+        RunState = InRunState;
     }
 }
 
-struct FMars_Request_Cycle_Restart {}
+struct FMars_Request_Cycle_Restart
+{
+    UPROPERTY()
+    bool Requested = true;
 
-// SetRunning is absolute and latest-wins. Advance is enqueued only by the processor's own phase timer.
+    FMars_Request_Cycle_Restart() {}
+}
+
+// Enqueued only by the processor's own phase timer.
+struct FMars_Request_Cycle_Advance
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Cycle_Advance() {}
+}
+
+// SetRunning is absolute: the latest one wins. Any number of restarts or advances in one drain act once.
 struct FMars_Fragment_Cycle_Requests
 {
     UPROPERTY()
-    TOptional<FMars_Request_Cycle_SetRunning> SetRunningRequest;
+    TArray<FMars_Request_Cycle_SetRunning> SetRunningRequests;
 
     UPROPERTY()
-    TOptional<FMars_Request_Cycle_Restart> RestartRequest;
+    TArray<FMars_Request_Cycle_Restart> RestartRequests;
 
     UPROPERTY()
-    bool Advance = false;
+    TArray<FMars_Request_Cycle_Advance> AdvanceRequests;
 }

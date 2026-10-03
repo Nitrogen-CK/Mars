@@ -25,12 +25,41 @@ namespace constants_fphands_view
     // Deepest attach chain looked through for a hand node (visual -> cargo slot -> pack -> hand is 4).
     const int32 k_MaxAttachDepth = 16;
 
-    // Most transform entities under one held item (a pack, its probe nodes, cargo slots and their visuals).
+    // Most transform entities walked under one root: a held item (a pack, its probe nodes, cargo slots and their
+    // visuals) or a mechanism searched for grip sockets.
     const int32 k_MaxHeldEntities = 64;
 }
 
 namespace utils_fphands
 {
+    // InRoot (when valid) and its transform descendants, breadth first. Only the transform tree: primitives hang off scene
+    // nodes (their component entities are found through the owner), while interactables' state machines, inventories,
+    // items and timers would only fill the cap. Past k_MaxHeldEntities it ensures and returns what it has.
+    TArray<FCk_Handle> Get_TransformTree(const FCk_Handle& InRoot)
+    {
+        TArray<FCk_Handle> Tree;
+        if (ck::Is_NOT_Valid(InRoot))
+        { return Tree; }
+
+        Tree.Add(InRoot);
+        for (int32 Index = 0; Index < Tree.Num(); ++Index)
+        {
+            auto Entity = Tree[Index];
+            for (auto Dependent : Entity.Get_LifetimeDependents())
+            {
+                if (ck::Is_NOT_Valid(Dependent) || Dependent.Is_Transform() == false)
+                { continue; }
+
+                if (ck::EnsureIfNot(Tree.Num() < constants_fphands_view::k_MaxHeldEntities,
+                    f"[FPHands] [{InRoot.ToString()}] has more than [{constants_fphands_view::k_MaxHeldEntities}] transform entities under it - the rest are skipped"))
+                { return Tree; }
+
+                Tree.Add(Dependent);
+            }
+        }
+        return Tree;
+    }
+
     // InNode is the hand node of the gloves of the character this machine controls, with first-person rendering on.
     bool Get_IsFirstPersonHandNode(const FCk_Handle& InNode)
     {
@@ -38,18 +67,19 @@ namespace utils_fphands
         if (ck::Is_NOT_Valid(Character) || Character.IsLocallyControlled() == false || Character.Get_IsActorEcsReady() == false)
         { return false; }
 
+        // Characters without gloves (any other pawn) have no first-person hand node.
         const auto Hands = Character.TryGet_ActorEntityHandle().As_FPHands(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Hands))
         { return false; }
 
-        return Hands.Get_Spec().View.FirstPersonRendering == ECk_EnableDisable::Enable && FCk_Handle(Hands.Get_HandNode()) == InNode;
+        return Hands.Get_Spec().View.FirstPersonRendering == ECk_EnableDisable::Enable && Hands.Get_HandNode() == InNode;
     }
 
     // How a primitive on InNode is rendered: first-person when InNode hangs (through any number of scene nodes) off the
     // local player's hand node, as a normal world primitive otherwise - including for every other player's view of it.
     EFirstPersonPrimitiveType Get_FirstPersonType(const FCk_Handle& InNode)
     {
-        auto Node = InNode;
+        FCk_Handle Node = InNode;
         for (int32 Depth = 0; Depth < constants_fphands_view::k_MaxAttachDepth; ++Depth)
         {
             if (ck::Is_NOT_Valid(Node))
@@ -62,7 +92,7 @@ namespace utils_fphands
             if (ck::Is_NOT_Valid(SceneNode))
             { return EFirstPersonPrimitiveType::None; }
 
-            Node = FCk_Handle(SceneNode.Get_Parent());
+            Node = SceneNode.Get_Parent();
         }
 
         ck::EnsureIfNot(false,
@@ -75,32 +105,13 @@ namespace utils_fphands
     void Apply_FirstPersonType(const FCk_Handle& InRoot)
     {
         const auto Type = Get_FirstPersonType(InRoot);
-
-        TArray<FCk_Handle> Queue;
-        Queue.Add(InRoot);
-        for (int32 Index = 0; Index < Queue.Num(); ++Index)
+        for (auto Entity : Get_TransformTree(InRoot))
         {
-            if (ck::EnsureIfNot(Index < constants_fphands_view::k_MaxHeldEntities,
-                f"[FPHands] [{InRoot.ToString()}] has more than [{constants_fphands_view::k_MaxHeldEntities}] entities under it - the rest keep their rendering"))
-            { return; }
-
-            auto Entity = Queue[Index];
-            if (ck::Is_NOT_Valid(Entity))
-            { continue; }
-
             for (auto Component : utils_unreal_component::Get_ComponentsByType(Entity, UStaticMeshComponent))
             {
                 auto Primitive = Cast<UPrimitiveComponent>(Component);
                 if (ck::IsValid(Primitive))
                 { Primitive.SetFirstPersonPrimitiveType(Type); }
-            }
-
-            // Only the transform tree: primitives hang off scene nodes (their component entities are found through the
-            // owner above). Interactables' state machines, inventories, items and timers would otherwise fill the cap.
-            for (auto Dependent : Entity.Get_LifetimeDependents())
-            {
-                if (ck::IsValid(Dependent.As_Transform(ECk_SanityCheck::UnChecked)))
-                { Queue.Add(Dependent); }
             }
         }
     }

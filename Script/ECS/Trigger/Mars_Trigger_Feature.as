@@ -44,6 +44,23 @@ struct FMars_Trigger_Spec
     bool Moving = false;
 }
 
+// A volume with size along every axis of its shape.
+mixin FMars_Validation Validate(const FMars_Trigger_Spec& Self)
+{
+    if (Self.Shape == EMars_Trigger_Shape::Sphere)
+    {
+        if (Self.SphereRadius <= 0.0f)
+        { return FMars_Validation(f"SphereRadius [{Self.SphereRadius}] must be positive"); }
+
+        return FMars_Validation();
+    }
+
+    if (Self.BoxHalfExtents.X <= 0.0 || Self.BoxHalfExtents.Y <= 0.0 || Self.BoxHalfExtents.Z <= 0.0)
+    { return FMars_Validation(f"BoxHalfExtents [{Self.BoxHalfExtents.ToString()}] must be positive on every axis"); }
+
+    return FMars_Validation();
+}
+
 struct FMars_Tag_Trigger_NeedsSetup {}
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,16 +1,16 @@
-// Drains SetHold, then SetFocus, then Release, then SetPhase, then StartPush, then StartReach. The phase itself only moves
-// through SetPhase (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the
-// sub-SM's conditions turn those broadcasts into transitions. Release is honoured only while holding; StartPush only at
-// rest (Phase None); StartReach at rest and while letting go (Release, Return), the phases whose states listen for it -
-// a reach requested mid-grab, mid-hold or mid-push leaves the current target alone, so a same-drain release still eases
-// back from the target it was holding. SetPhase drains before both so a request arriving in the same drain as Rest's
-// SetPhase(None) is honoured. A reach that interrupts a release or return starts from the alpha the gloves were at
-// (ReachFromAlpha, recorded by SetPhase). A Return with a picked-up item still riding in (Carry active) is not
-// interrupted - the carry would snap back to where the item lay; a timed target that arrives then is caught by Rest's
-// re-sync once the return ends.
+// Drains SetHold, SetFocus, SetPhase, Release, StartPush, then StartReach. The phase itself only moves through SetPhase
+// (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the sub-SM's conditions
+// turn those broadcasts into transitions.
 //
-// A StartReach with no Interactable is a bare reach: one glove (the right) toward the hand node itself. Headless tests
-// drive the phase machine this way, without an interactable to resolve.
+// SetPhase drains first so the others gate on the phase the sub-SM is in now: a Release queued beside Hold's
+// SetPhase(Hold) lets go, and a StartPush / StartReach beside Rest's SetPhase(None) is honoured. Release is honoured
+// only while holding; StartPush only at rest; StartReach at rest and while letting go (Release, Return), the phases
+// whose states listen for it - a reach requested mid-grab, mid-hold or mid-push leaves the current target alone, so a
+// later release still eases back from the target it was holding. A push accepted in this drain wins over a reach in
+// the same drain (both would leave Rest; the reach would overwrite the target the push does not use). A reach that
+// interrupts a release or return starts from the alpha the gloves were at (ReachFromAlpha, recorded by SetPhase). A
+// Return with a picked-up item still riding in is not interrupted - the carry would snap back to where the item lay; a
+// timed target that arrives then is caught by Rest's re-sync once the return ends.
 class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -36,7 +36,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_FPHands_SetPhase> SetPhaseRequests = InRequests.SetPhaseRequests;
         TArray<FMars_Request_FPHands_StartPush> StartPushRequests = InRequests.StartPushRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_FPHands_Requests);
 
         for (const auto& Request : SetHoldRequests)
@@ -45,17 +45,23 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Request : SetFocusRequests)
         { HandleSetFocus(Params, InState, Request); }
 
-        if (ReleaseRequests.Num() > 0)
-        { HandleRelease(InHandle, InState); }
-
         if (SetPhaseRequests.Num() > 0)
         { HandleSetPhase(InHandle, InState, SetPhaseRequests.Last().Phase); }
 
+        if (ReleaseRequests.Num() > 0)
+        { HandleRelease(InHandle, InState); }
+
+        auto PushAccepted = false;
         if (StartPushRequests.Num() > 0)
-        { HandleStartPush(InHandle, InState, StartPushRequests.Last()); }
+        { PushAccepted = HandleStartPush(InHandle, InState, StartPushRequests.Last()); }
 
         if (StartReachRequests.Num() > 0)
-        { HandleStartReach(InHandle, InState, StartReachRequests.Last()); }
+        {
+            if (PushAccepted)
+            { Log("[FPHands] StartReach ignored: a push started in the same drain"); }
+            else
+            { HandleStartReach(InHandle, InState, StartReachRequests.Last()); }
+        }
     }
 
     // A pickup that lands while the gloves are still on it rides in with them (see the Tick processor's carry). Not a
@@ -64,49 +70,52 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleSetHold(FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_SetHold& InRequest)
     {
         const auto& Item = InRequest.Item;
-        InState.Hold = ck::IsValid(Item) ? utils_fphands::Make_Hold(Item) : FMars_FPHands_Hold();
+        InState.Hold = utils_fphands::Make_Hold(Item);
+        InState.Carry.Reset();
 
-        InState.Carry = FMars_FPHands_Carry();
-        const auto IsGrabbing = InState.Phase == EMars_FPHands_Phase::Reach || InState.Phase == EMars_FPHands_Phase::Grip
-            || InState.Phase == EMars_FPHands_Phase::Return;
+        if (utils_fphands::Get_IsGrabbing(InState.PhaseState.Phase) == false || InState.Reach.Target.IsSet() == false)
+        { return; }
+
+        const auto Target = InState.Reach.Target.GetValue();
         const auto IsSpawnedVisual = ck::IsValid(Item) && Item.Has_Presentation() && Item.Has_PersistentWorldItem() == false;
-        if (IsGrabbing && ck::IsValid(InState.Target.ShapeMesh.Get()) && IsSpawnedVisual)
-        {
-            InState.Carry.IsActive = true;
-            InState.Carry.StartWorld = InState.Target.Get_HandGrip(InState.Target.Right.IsUsed).AnchorWorld;
-            InState.Carry.HeldOffset = Item.Get_Presentation().HeldOffset;
-        }
+        if (ck::Is_NOT_Valid(Target.Shape.Mesh.Get()) || IsSpawnedVisual == false)
+        { return; }
+
+        auto Carry = FMars_FPHands_Carry();
+        Carry.StartWorld = Target.Get_LeadingGrip().AnchorWorld;
+        Carry.HeldOffset = Item.Get_Presentation().Mounting.HeldOffset;
+        InState.Carry = TOptional<FMars_FPHands_Carry>(Carry);
     }
 
     private void HandleSetFocus(const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState,
                                 const FMars_Request_FPHands_SetFocus& InRequest)
     {
-        // Unfocus keeps FocusTarget: the gloves lean back out from it, and the Tick clears it once the lean is gone.
+        // Unfocus keeps the focus target: the gloves lean back out from it, and the Tick clears it once the lean is gone.
         if (ck::Is_NOT_Valid(InRequest.Interactable))
         {
-            InState.FocusedFor = FCk_Handle_Interactable();
+            InState.Focus.FocusedFor = FCk_Handle_Interactable();
             return;
         }
 
-        if (InRequest.Interactable == InState.FocusedFor)
+        if (InRequest.Interactable == InState.Focus.FocusedFor)
         { return; }
 
-        InState.FocusedFor = InRequest.Interactable;
-        const auto Subject = FMars_FPHands_ReachSubject(FCk_Handle_InteractTarget(), InRequest.Interactable, InRequest.Owner);
-        InState.FocusTarget = Resolve_Target(InParams, InState, Subject);
+        InState.Focus.FocusedFor = InRequest.Interactable;
+        InState.Focus.Target = Resolve_Target(InParams, InState, FMars_FPHands_ReachSubject(InRequest.Interactable, InRequest.Owner));
     }
 
     private void HandleStartReach(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartReach& InRequest)
     {
-        const auto CanReach = InState.Phase == EMars_FPHands_Phase::None || InState.Phase == EMars_FPHands_Phase::Release
-            || InState.Phase == EMars_FPHands_Phase::Return;
+        const auto Phase = InState.PhaseState.Phase;
+        const auto CanReach = Phase == EMars_FPHands_Phase::None || Phase == EMars_FPHands_Phase::Release
+            || Phase == EMars_FPHands_Phase::Return;
         if (CanReach == false)
         {
-            Log(f"[FPHands] StartReach ignored: the gloves are busy (phase {InState.Phase :n})");
+            Log(f"[FPHands] StartReach ignored: the gloves are busy (phase {Phase :n})");
             return;
         }
 
-        if (InState.Phase == EMars_FPHands_Phase::Return && InState.Carry.IsActive)
+        if (Phase == EMars_FPHands_Phase::Return && InState.Carry.IsSet())
         {
             Log("[FPHands] StartReach ignored: a picked-up item is still riding in (phase Return)");
             return;
@@ -114,123 +123,164 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto& Params = InHandle.Get_Fragment(FMars_Fragment_FPHands_Params);
 
-        auto Target = FMars_FPHands_ReachTarget();
-        if (ck::Is_NOT_Valid(InRequest.Interactable))
+        auto Target = TOptional<FMars_FPHands_ReachTarget>();
+        auto InteractTarget = TOptional<FCk_Handle_InteractTarget>();
+        if (InRequest.Subject.IsSet())
         {
-            Target.IsValid = true;
-            Target.Layout = EMars_FPHands_GripLayout::Point;
-            Target.Right.IsUsed = true;
-            Target.Right.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Params.HandNode);
-        }
-        else
-        {
-            const auto Subject = FMars_FPHands_ReachSubject(InRequest.Target, InRequest.Interactable, InRequest.Owner);
+            const auto Subject = InRequest.Subject.GetValue();
+
+            // Destroyed between the request and this drain (a picked-up item, a removed device).
+            const auto InteractTargetDied = Subject.InteractTarget.IsSet() && ck::Is_NOT_Valid(Subject.InteractTarget.GetValue());
+            if (InteractTargetDied || ck::Is_NOT_Valid(Subject.Owner))
+            {
+                ck::Trace("[FPHands] StartReach ignored: the subject is gone");
+                return;
+            }
+
+            InteractTarget = Subject.InteractTarget;
             Target = Resolve_Target(Params, InState, Subject);
         }
+        else
+        { Target = TOptional<FMars_FPHands_ReachTarget>(Make_BareReach(Params)); }
 
-        if (Target.IsValid == false)
+        if (Target.IsSet() == false)
         {
             ck::Trace("[FPHands] StartReach ignored: the gloves cannot reach the target");
             return;
         }
 
-        InState.Target = Target;
-        InState.InteractTarget = InRequest.Target;
-        InState.IsInstant = InRequest.IsInstant;
+        InState.Reach.Target = Target;
+        InState.Reach.InteractTarget = InteractTarget;
+        InState.Reach.CompletionPolicy = InRequest.CompletionPolicy;
 
-        // A pickup: if it lands in the hands, its held visual starts where the item lay.
-        if (ck::IsValid(Target.ShapeMesh.Get()))
+        // A pickup: if it lands in the hands, its held visual starts where the item lay. No HeldItem (tests): no visual.
+        const auto Resolved = Target.GetValue();
+        if (ck::IsValid(Resolved.Shape.Mesh.Get()))
         {
             auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
             if (ck::IsValid(HeldItem))
-            { HeldItem.Set_NextSpawnFrom(Target.Get_HandGrip(Target.Right.IsUsed).AnchorWorld); }
+            { HeldItem.Request_SetNextSpawnFrom(FMars_Request_HeldItem_SetNextSpawnFrom(Resolved.Get_LeadingGrip().AnchorWorld)); }
         }
 
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
-        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Broadcast(InHandle.As_FPHands(), InRequest.IsInstant); }
+        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Broadcast(InHandle.As_FPHands(), InRequest.CompletionPolicy); }
     }
 
-    private void HandleStartPush(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartPush& InRequest)
+    // The right glove toward the hand node itself.
+    private FMars_FPHands_ReachTarget Make_BareReach(const FMars_Fragment_FPHands_Params& InParams)
     {
-        if (InState.Phase != EMars_FPHands_Phase::None)
+        auto Grip = FMars_FPHands_HandGrip();
+        Grip.AnchorWorld = utils_transform::Get_EntityCurrentTransform(InParams.Spec.HandNode);
+
+        auto Target = FMars_FPHands_ReachTarget();
+        Target.Layout = EMars_FPHands_GripLayout::Point;
+        Target.Right = TOptional<FMars_FPHands_HandGrip>(Grip);
+        return Target;
+    }
+
+    // True when the push was accepted.
+    private bool HandleStartPush(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartPush& InRequest)
+    {
+        if (InState.PhaseState.Phase != EMars_FPHands_Phase::None)
         {
-            Log(f"[FPHands] StartPush ignored: the gloves are busy (phase {InState.Phase :n})");
-            return;
+            Log(f"[FPHands] StartPush ignored: the gloves are busy (phase {InState.PhaseState.Phase :n})");
+            return false;
         }
 
-        InState.PushHold = InRequest.Hold;
-        InState.PushIsThrow = InRequest.IsThrow;
+        InState.Push.Hold = InRequest.Hold;
+        InState.Push.Kind = InRequest.Kind;
 
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPushRequested.Broadcast(InHandle.As_FPHands()); }
+
+        return true;
     }
 
     // Only a hold lets go early; a grab always finishes on its own (a picked-up item removes its own target mid-grab).
     private void HandleRelease(FCk_Handle& InHandle, const FMars_Fragment_FPHands& InState)
     {
-        if (InState.Phase != EMars_FPHands_Phase::Hold)
+        if (InState.PhaseState.Phase != EMars_FPHands_Phase::Hold)
         {
-            Log(f"[FPHands] Release ignored: the gloves are not holding (phase {InState.Phase :n})");
+            Log(f"[FPHands] Release ignored: the gloves are not holding (phase {InState.PhaseState.Phase :n})");
             return;
         }
 
-        if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
-        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachTargetLost.Broadcast(InHandle.As_FPHands()); }
+        Broadcast_ReachTargetLost(InHandle);
     }
 
-    // Phase and PhaseTime are written only here; PhaseTime also advances in UMars_Processor_FPHands_Tick. Release records
-    // the alpha it eases back from; Reach and Hold record the alpha they ease out from (0 from rest, the current release
-    // or return alpha when they interrupt one).
+    // Release records the alpha it eases back from; Reach and Hold record the alpha they ease out from (0 from rest, the
+    // current release or return alpha when they interrupt one).
     private void HandleSetPhase(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, EMars_FPHands_Phase InNewPhase)
     {
-        const auto Previous = InState.Phase;
+        const auto Previous = InState.PhaseState.Phase;
         const auto& Params = InHandle.Get_Fragment(FMars_Fragment_FPHands_Params);
-        const auto PhaseState = FMars_FPHands_PhaseState(Previous, InState.PhaseTime, InState.ReleaseFromAlpha, InState.ReachFromAlpha);
+        const auto FromAlpha = utils_fphands::Get_PhaseAlpha(InState.PhaseState, Params.Spec.Reach);
 
         if (InNewPhase == EMars_FPHands_Phase::Release)
-        { InState.ReleaseFromAlpha = utils_fphands::Get_PhaseAlpha(PhaseState, Params.Spec.Reach); }
+        { InState.PhaseState.ReleaseFromAlpha = FromAlpha; }
 
         if (InNewPhase == EMars_FPHands_Phase::Reach || InNewPhase == EMars_FPHands_Phase::Hold)
-        { InState.ReachFromAlpha = utils_fphands::Get_PhaseAlpha(PhaseState, Params.Spec.Reach); }
+        { InState.PhaseState.ReachFromAlpha = FromAlpha; }
 
         if (InNewPhase == EMars_FPHands_Phase::None)
         {
-            InState.Carry = FMars_FPHands_Carry();
+            InState.Carry.Reset();
 
             // The grab ended without the item landing in the hands: don't let a later equip spawn at the pickup spot.
-            if (InHandle.Has_Fragment(FMars_Fragment_HeldItem_SpawnFrom))
-            {
-                auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
-                if (ck::IsValid(HeldItem))
-                { HeldItem.Clear_NextSpawnFrom(); }
-            }
+            auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(HeldItem))
+            { HeldItem.Request_ClearNextSpawnFrom(FMars_Request_HeldItem_ClearNextSpawnFrom()); }
         }
 
-        InState.Phase = InNewPhase;
-        InState.PhaseTime = 0.0f;
+        InState.PhaseState.Phase = InNewPhase;
+        InState.PhaseState.PhaseTime = 0.0f;
 
         if (Previous == InNewPhase)
         { return; }
 
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPhaseChanged.Broadcast(InHandle.As_FPHands(), Previous, InNewPhase); }
+
+        // The interact target died before the Hold state bound its release (between the reach's drain and this one):
+        // nothing would ever remove it now, so the gloves let go.
+        if (InNewPhase == EMars_FPHands_Phase::Hold && Get_IsInteractTargetGone(InState.Reach))
+        {
+            Log("[FPHands] Hold entered for an interact target that is gone; letting go");
+            Broadcast_ReachTargetLost(InHandle);
+        }
+    }
+
+    private bool Get_IsInteractTargetGone(const FMars_FPHands_ReachState& InReach) const
+    {
+        return InReach.InteractTarget.IsSet() && ck::Is_NOT_Valid(InReach.InteractTarget.GetValue());
+    }
+
+    private void Broadcast_ReachTargetLost(FCk_Handle& InHandle)
+    {
+        if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
+        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachTargetLost.Broadcast(InHandle.As_FPHands()); }
     }
 
     // What the gloves go for, from where they are now; a single-handed result becomes the glove later reaches prefer.
-    private FMars_FPHands_ReachTarget Resolve_Target(const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState,
-                                                     const FMars_FPHands_ReachSubject& InSubject)
+    private TOptional<FMars_FPHands_ReachTarget> Resolve_Target(const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState,
+                                                                const FMars_FPHands_ReachSubject& InSubject)
     {
-        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(InParams.HandNode);
-        auto Hand = FMars_FPHands_HandState(InState.Hold, HandWorld, InState.PreferRightHand);
+        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(InParams.Spec.HandNode);
+        auto Hand = FMars_FPHands_HandState(InState.Hold, HandWorld, InState.Reach.PreferredHand);
 
         // The rest pose seen from where the player stands: FaceViewer grips (levers, chains) are taken from this side.
-        const auto Rest = utils_fphands::Get_RestTargets(InParams.Spec, InState.Hold,
+        const auto Rest = utils_fphands::Get_RestTargets(InParams.Spec.Rest, InState.Hold,
             FMars_FPHands_TargetFrame(HandWorld, FVector::ZeroVector, FVector::ZeroVector));
-        Hand.RestGripWorld_R = (Rest.Right.GripInHand * HandWorld).GetRotation();
-        Hand.RestGripWorld_L = (Rest.Left.GripInHand * HandWorld).GetRotation();
-        auto Target = utils_fphands::Resolve_ReachTarget(InParams.Spec.Reach, FMars_FPHands_ReachQuery(InSubject, Hand));
-        if (Target.IsValid && Target.Right.IsUsed != Target.Left.IsUsed)
-        { InState.PreferRightHand = Target.Right.IsUsed; }
+        Hand.RestGripWorld = TOptional<FMars_FPHands_GloveRotations>(FMars_FPHands_GloveRotations(
+            (Rest.Right.GripInHand * HandWorld).GetRotation(), (Rest.Left.GripInHand * HandWorld).GetRotation()));
+
+        const auto Target = utils_fphands::Resolve_ReachTarget(InParams.Spec.Reach, FMars_FPHands_ReachQuery(InSubject, Hand));
+        if (Target.IsSet())
+        {
+            const auto Resolved = Target.GetValue();
+            if (Resolved.Right.IsSet() != Resolved.Left.IsSet())
+            { InState.Reach.PreferredHand = Resolved.Right.IsSet() ? EMars_Hand::Right : EMars_Hand::Left; }
+        }
 
         return Target;
     }

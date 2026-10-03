@@ -1,5 +1,5 @@
-// Stateless CanInteractWith predicate for every RequiresFreeHands target, bound from the CDO (the CargoSlot accept
-// policy's shape). The source is the player whose resolver or StartInteraction asks.
+// Stateless CanInteractWith predicate for every RequiresFreeHands target, bound from the CDO. The source is the player
+// whose resolver or StartInteraction asks.
 UCLASS()
 class UMars_Interactable_FreeHandsPolicy : UObject
 {
@@ -10,12 +10,10 @@ class UMars_Interactable_FreeHandsPolicy : UObject
 
 namespace utils_interactable
 {
-    int32 Get_SortOrderFromChannel(FGameplayTag InChannel)
+    // The blocked reason a RequiresFreeHands prompt shows while the focuser holds an item.
+    FText Get_HandsFullText()
     {
-        if (InChannel == GameplayTags::InteractionChannel_Mars_Use)
-        { return 0; }
-
-        return 999;
+        return FText::FromString("Hands full");
     }
 
     // Nothing in hand. An entity without HeldItem (tests, an NPC) has free hands.
@@ -25,12 +23,19 @@ namespace utils_interactable
         return ck::Is_NOT_Valid(HeldItem) || ck::Is_NOT_Valid(HeldItem.Get_CurrentItem());
     }
 
-    FCk_Handle_Interactable Create(FCk_Handle_Transform& InOwner, FMars_Interactable_Spec InParams)
+    // Composes the interactable as a child of InOwner: a probe node when InSpec.ProbeInfo is set, else a transform-only
+    // node, with one InteractTarget (and its prompt and per-interaction state machine) per spec target. A rejected spec
+    // ensures and returns an invalid handle with nothing composed.
+    FCk_Handle_Interactable Create(FCk_Handle_Transform& InOwner, FMars_Interactable_Spec InSpec)
     {
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Interactable] [{InOwner.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_Interactable(); }
+
         FCk_Handle_Transform InteractableHandle;
-        if (InParams.ProbeInfo.IsSet())
+        if (InSpec.ProbeInfo.IsSet())
         {
-            auto Probe = InParams.ProbeInfo.GetValue();
+            auto Probe = InSpec.ProbeInfo.GetValue();
             // QueryOnly: traceable by the player's view ray, never a physical contact.
             Probe.ProbeSpec
                 .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent)
@@ -43,15 +48,15 @@ namespace utils_interactable
         }
 
         auto Params = FMars_Fragment_Interactable_Params();
-        for (const auto& Entry : InParams.Targets)
+        for (const auto& Entry : InSpec.Targets)
         { Params.TargetChannels.Add(Entry.InteractTargetSpec.Get_InteractionChannel()); }
-        Params.FocusPriority = InParams.FocusPriority;
+        Params.FocusPriority = InSpec.FocusPriority;
 
         InteractableHandle.Add_Fragment(Params);
         InteractableHandle.Add_Fragment(FMars_Feature_Interactable());
 
         auto InitialState = FMars_Fragment_Interactable();
-        InitialState.EnableDisable = InParams.StartEnableDisable;
+        InitialState.EnableDisable = InSpec.StartEnableDisable;
         InteractableHandle.Add_Fragment(InitialState);
 
         InteractableHandle.Add_Fragment(FMars_Tag_Interactable_NeedsSetup());
@@ -66,36 +71,24 @@ namespace utils_interactable
         TSubclassOf<UMars_Interactable_FreeHandsPolicy> FreeHandsPolicyClass = UMars_Interactable_FreeHandsPolicy;
         auto FreeHandsPolicy = FreeHandsPolicyClass.GetDefaultObject();
 
-        for (const auto& Entry : InParams.Targets)
+        for (const auto& Entry : InSpec.Targets)
         {
             auto TargetSpec = Entry.InteractTargetSpec;
             if (Entry.RequiresFreeHands)
             { TargetSpec.Set_CustomCanInteractWithDynamic(FCk_Delegate_InteractTarget_CanInteractWith(FreeHandsPolicy, n"OnCanInteractWith")); }
 
             auto InteractTarget = utils_interact_target::Add(InteractableHandle, TargetSpec);
-            auto TargetHandle = InteractTarget.H();
             InteractTarget.Request_OverrideToSelf();
-            TargetHandle.Add_Fragment(Context);
+            InteractTarget.Add_Fragment(Context);
 
             if (Entry.RequiresFreeHands)
-            { TargetHandle.Add_Fragment(FMars_Tag_InteractTarget_RequiresFreeHands()); }
+            { InteractTarget.Add_Fragment(FMars_Tag_InteractTarget_RequiresFreeHands()); }
 
             if (Entry.InteractPromptSpec.IsSet())
-            {
-                auto PromptSpec = Entry.InteractPromptSpec.GetValue();
-                PromptSpec.SortOrder = Get_SortOrderFromChannel(Entry.InteractTargetSpec.Get_InteractionChannel());
-                PromptSpec.IsTimedInteraction =
-                    Entry.InteractTargetSpec.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::Instant;
-                utils_interact_prompt::Add(TargetHandle, PromptSpec);
-            }
+            { utils_interact_prompt::Add(InteractTarget, Entry.InteractPromptSpec.GetValue()); }
 
-            auto InteractionStateClass = Entry.InteractionStateClass.Get();
-            if (ck::EnsureIfNot(ck::IsValid(InteractionStateClass),
-                f"Invalid Interaction State supplied to Interact Target {TargetHandle.ToString()} on [{InOwner.ToString()}]"))
-            { continue; }
-
-            auto TargetSm = utils_state_machine::Add(TargetHandle, FCk_StateMachine_Spec(UMars_SmState_Interactable_Idle));
-            TargetSm.Request_AddOverrideState(InteractionStateClass);
+            auto TargetSm = utils_state_machine::Add(InteractTarget, FCk_StateMachine_Spec(UMars_SmState_Interactable_Idle));
+            TargetSm.Request_AddOverrideState(Entry.InteractionStateClass.Get());
         }
 
         return Interactable;
@@ -136,12 +129,24 @@ mixin ECk_EnableDisable Get_EnableDisable(const FCk_Handle_Interactable& Self)
 
 mixin bool Get_IsFocused(const FCk_Handle_Interactable& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Interactable).IsFocused;
+    return ck::IsValid(Self.Get_Fragment(FMars_Fragment_Interactable).Focuser);
 }
 
+// Invalid when not focused.
 mixin FCk_Handle Get_CurrentFocuser(const FCk_Handle_Interactable& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Interactable).CurrentFocuser;
+    return Self.Get_Fragment(FMars_Fragment_Interactable).Focuser;
+}
+
+// The source of the most recent interaction started on InTarget; invalid when the most recent interaction started on
+// this interactable was on another target, or none has started.
+mixin FCk_Handle Get_InitiatorOn(const FCk_Handle_Interactable& Self, const FCk_Handle& InTarget)
+{
+    const auto LastStarted = Self.Get_Fragment(FMars_Fragment_Interactable).LastStarted;
+    if (LastStarted.Target != InTarget)
+    { return FCk_Handle(); }
+
+    return LastStarted.Initiator;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -150,20 +155,23 @@ mixin FCk_Handle Get_CurrentFocuser(const FCk_Handle_Interactable& Self)
 
 mixin void Request_Focus(FCk_Handle_Interactable& Self, const FMars_Request_Interactable_Focus& InRequest)
 {
+    if (ck::EnsureIfNot(ck::IsValid(InRequest.FocusedBy), f"[Interactable] [{Self.ToString()}] was asked to focus for an invalid focuser"))
+    { return; }
+
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Interactable_Requests);
-    Requests.FocusRequests.Add(InRequest);
+    Requests.FocusChangeRequests.Add(FMars_Interactable_FocusChangeRequest(EMars_Interactable_FocusChange::Focus, InRequest.FocusedBy));
 }
 
 mixin void Request_Unfocus(FCk_Handle_Interactable& Self, const FMars_Request_Interactable_Unfocus& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Interactable_Requests);
-    Requests.UnfocusRequests.Add(InRequest);
+    Requests.FocusChangeRequests.Add(FMars_Interactable_FocusChangeRequest(EMars_Interactable_FocusChange::Unfocus, InRequest.UnfocusedBy));
 }
 
-mixin void Request_SetEnableDisable(FCk_Handle_Interactable& Self, ECk_EnableDisable InEnableDisable)
+mixin void Request_SetEnableDisable(FCk_Handle_Interactable& Self, const FMars_Request_Interactable_SetEnableDisable& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Interactable_Requests);
-    Requests.SetEnableDisableRequests.Add(FMars_Request_Interactable_SetEnableDisable(InEnableDisable));
+    Requests.SetEnableDisableRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

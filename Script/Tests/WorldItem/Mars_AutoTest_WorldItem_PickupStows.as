@@ -33,8 +33,7 @@ class UMars_AutoTest_WorldItem_PickupStows : UCk_AutoTest_Base
     UFUNCTION()
     private void OnWorldItemConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        auto Entity = FCk_Handle(InEntityScriptHandle);
-        _WorldItem = Entity.As_WorldItem(ECk_SanityCheck::UnChecked);
+        _WorldItem = InEntityScriptHandle.As_WorldItem();
     }
 
     UFUNCTION()
@@ -64,7 +63,7 @@ class UMars_AutoTest_WorldItem_PickupStows : UCk_AutoTest_Base
     private void Check_Stowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == 0);
+        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == TOptional<int32>(0));
     }
 
     UFUNCTION()

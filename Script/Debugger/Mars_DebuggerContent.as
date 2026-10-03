@@ -1,6 +1,13 @@
-// Shared debugger content: owns the pages, draws the header, page tabs, player picker and the
-// active page. Created per GameInstance by UMars_DebuggerSubsystem; rendered by the popup
-// window or the editor tab.
+enum EMars_Debugger_TabState
+{
+    Idle,
+    Hovered,
+    Selected,
+    SelectedHovered
+}
+
+// Shared debugger content: owns the pages, draws the header, page tabs, player picker and the active page. Created per
+// GameInstance by UMars_DebuggerSubsystem; rendered by the popup window or the editor tab.
 class UMars_DebuggerContent : UObject
 {
     private TArray<UMars_DebugPage_Base> Pages;
@@ -44,8 +51,8 @@ class UMars_DebuggerContent : UObject
         Initialized = false;
     }
 
-    // The authority (server/standalone) world, so every Request_* reaches the server. Falls back
-    // to the local world on a pure client (inspection only).
+    // The authority (server/standalone) world, so every Request_* reaches the server. Falls back to the local world on a
+    // pure client (inspection only). Null outside a game world.
     UWorld GetOperatingWorld() const
     {
         auto EngineSubsystem = Subsystem::GetEngineSubsystem(UMars_DebuggerEngineSubsystem);
@@ -76,7 +83,7 @@ class UMars_DebuggerContent : UObject
         { return; }
 
         auto OperatingWorld = GetOperatingWorld();
-        const bool HasWorld = ck::IsValid(OperatingWorld) && OperatingWorld.IsGameWorld();
+        const bool HasWorld = ck::IsValid(OperatingWorld);
 
         if (_HadValidWorld == false && HasWorld)
         { ActivateCurrentPage(); }
@@ -92,20 +99,16 @@ class UMars_DebuggerContent : UObject
         DrawTabs();
         mm::Spacer(0, 8);
 
-        if (HasWorld == false)
+        if (HasWorld)
         {
-            DrawPageContainer(DeltaTime, nullptr, false);
-            mm::EndVerticalBox();
-            return;
+            // Page draws + click handlers resolve Gameplay::* / authority against the operating world.
+            const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(OperatingWorld);
+            DrawPlayerPicker(System::IsServer());
+            mm::Spacer(0, 8);
+            DrawPageContainer(DeltaTime, OperatingWorld);
         }
-
-        // Page draws + click handlers resolve Gameplay::* / authority against the operating world.
-        const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(OperatingWorld);
-        const bool OperatingIsAuthority = System::IsServer();
-
-        DrawPlayerPicker(OperatingIsAuthority);
-        mm::Spacer(0, 8);
-        DrawPageContainer(DeltaTime, OperatingWorld, true);
+        else
+        { DrawPageContainer(DeltaTime, nullptr); }
 
         mm::EndVerticalBox();
     }
@@ -115,12 +118,13 @@ class UMars_DebuggerContent : UObject
         if (Pages.IsValidIndex(CurrentPageIndex) == false)
         { return; }
 
+        // No game world yet: DrawDebugger activates the page when one appears.
         auto OperatingWorld = GetOperatingWorld();
-        if (ck::Is_NOT_Valid(OperatingWorld) || OperatingWorld.IsGameWorld() == false)
+        if (ck::Is_NOT_Valid(OperatingWorld))
         { return; }
 
         const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(OperatingWorld);
-        Pages[CurrentPageIndex].PrepareForDraw(OperatingWorld, ResolveSelectedPlayerController());
+        Pages[CurrentPageIndex].PrepareForDraw(ResolveSelectedPlayerController());
         Pages[CurrentPageIndex].OnPageActivated();
     }
 
@@ -133,7 +137,7 @@ class UMars_DebuggerContent : UObject
 
         mm::Slot_Fill();
         mm::VAlign_Center();
-        utils_mars_debugger::Text("Mars Game Debugger", 20, FLinearColor::White, false, true);
+        utils_mars_debugger::Text("Mars Game Debugger", FMars_Debugger_TextStyle(20, FLinearColor::White, EMars_Debugger_TextWeight::Bold));
 
         mm::EndHorizontalBox();
     }
@@ -153,15 +157,16 @@ class UMars_DebuggerContent : UObject
     {
         mm::Padding(2, 0);
 
-        const bool IsActive = InTabIndex == CurrentPageIndex;
+        const bool IsSelected = InTabIndex == CurrentPageIndex;
         const bool IsHovered = TabHoverStates.Contains(InTabIndex) && TabHoverStates[InTabIndex];
 
-        mm::WithinBorder(GetTabColor(IsActive, IsHovered), 4.0f);
+        mm::WithinBorder(GetTabColor(Get_TabState(IsSelected, IsHovered)), 4.0f);
         mm::Padding(12, 8);
 
         auto TabButton = mm::WithinBorder(FLinearColor::Transparent);
         mm::Padding(0);
-        utils_mars_debugger::Text(Pages[InTabIndex].GetPageName(), 14, FLinearColor::White, false, IsActive);
+        const auto Weight = IsSelected ? EMars_Debugger_TextWeight::Bold : EMars_Debugger_TextWeight::Regular;
+        utils_mars_debugger::Text(Pages[InTabIndex].GetPageName(), FMars_Debugger_TextStyle(14, FLinearColor::White, Weight));
 
         TabHoverStates.FindOrAdd(InTabIndex) = TabButton.IsHovered();
 
@@ -169,7 +174,8 @@ class UMars_DebuggerContent : UObject
         { SwitchToPage(InTabIndex); }
     }
 
-    private void DrawPageContainer(float DeltaTime, UWorld InOperatingWorld, bool HasWorld)
+    // A null InOperatingWorld means no game world: the container shows why instead of a page.
+    private void DrawPageContainer(float DeltaTime, UWorld InOperatingWorld)
     {
         mm::Slot_Fill();
         mm::HAlign_Fill();
@@ -180,23 +186,24 @@ class UMars_DebuggerContent : UObject
         mm::VAlign_Fill();
         mm::BeginVerticalBox();
 
-        if (HasWorld == false)
+        if (ck::Is_NOT_Valid(InOperatingWorld))
         {
             mm::Slot_Auto();
-            utils_mars_debugger::Text("Not in-game. Debugger features are unavailable.", 16, FLinearColor::Red, false, true);
+            utils_mars_debugger::Text("Not in-game. Debugger features are unavailable.",
+                FMars_Debugger_TextStyle(16, FLinearColor::Red, EMars_Debugger_TextWeight::Bold));
             mm::EndVerticalBox();
             return;
         }
 
         auto CurrentPage = Pages[CurrentPageIndex];
-        CurrentPage.PrepareForDraw(InOperatingWorld, ResolveSelectedPlayerController());
+        CurrentPage.PrepareForDraw(ResolveSelectedPlayerController());
         CurrentPage.DrawPage(DeltaTime);
 
         mm::EndVerticalBox();
     }
 
-    // The selected PC is that connection's SERVER-side controller: mutations are
-    // server-authoritative and replicate down to its owning client.
+    // The selected PC is that connection's SERVER-side controller: mutations are server-authoritative and replicate down
+    // to its owning client.
     private void DrawPlayerPicker(bool InOperatingIsAuthority)
     {
         auto PCs = EnumeratePlayerControllers();
@@ -209,14 +216,14 @@ class UMars_DebuggerContent : UObject
 
         mm::Slot_Auto();
         mm::VAlign_Center();
-        utils_mars_debugger::Text("Target player:", 13, FLinearColor(0.7f, 0.7f, 0.7f), false, true);
+        utils_mars_debugger::Text("Target player:", FMars_Debugger_TextStyle(13, FLinearColor(0.7f, 0.7f, 0.7f), EMars_Debugger_TextWeight::Bold));
         mm::Spacer(8, 0);
 
         if (PCs.Num() == 0)
         {
             mm::Slot_Auto();
             mm::VAlign_Center();
-            utils_mars_debugger::Text("(no players in world yet)", 12, FLinearColor(0.6f, 0.6f, 0.6f));
+            utils_mars_debugger::Text("(no players in world yet)", FMars_Debugger_TextStyle(12, FLinearColor(0.6f, 0.6f, 0.6f)));
             mm::EndHorizontalBox();
             return;
         }
@@ -228,9 +235,9 @@ class UMars_DebuggerContent : UObject
         mm::HAlign_Right();
         mm::VAlign_Center();
         if (InOperatingIsAuthority)
-        { utils_mars_debugger::Text("authority - mutations apply", 11, FLinearColor(0.5f, 0.9f, 0.5f)); }
+        { utils_mars_debugger::Text("authority - mutations apply", FMars_Debugger_TextStyle(11, FLinearColor(0.5f, 0.9f, 0.5f))); }
         else
-        { utils_mars_debugger::Text("no authority world - inspection only", 11, FLinearColor(1.0f, 0.8f, 0.4f)); }
+        { utils_mars_debugger::Text("no authority world - inspection only", FMars_Debugger_TextStyle(11, FLinearColor(1.0f, 0.8f, 0.4f))); }
 
         mm::EndHorizontalBox();
     }
@@ -239,16 +246,17 @@ class UMars_DebuggerContent : UObject
     {
         mm::Padding(2, 0);
 
-        const bool IsActive = InIndex == SelectedPlayerIndex;
+        const bool IsSelected = InIndex == SelectedPlayerIndex;
         const bool IsHovered = PlayerTabHoverStates.Contains(InIndex) && PlayerTabHoverStates[InIndex];
 
-        mm::WithinBorder(GetTabColor(IsActive, IsHovered), 4.0f);
+        mm::WithinBorder(GetTabColor(Get_TabState(IsSelected, IsHovered)), 4.0f);
         mm::Padding(10, 5);
 
         auto TabButton = mm::WithinBorder(FLinearColor::Transparent);
         mm::Padding(0);
         const FString Label = InPC.IsLocalController() ? "Host" : f"Client {InIndex}";
-        utils_mars_debugger::Text(Label, 12, FLinearColor::White, false, IsActive);
+        const auto Weight = IsSelected ? EMars_Debugger_TextWeight::Bold : EMars_Debugger_TextWeight::Regular;
+        utils_mars_debugger::Text(Label, FMars_Debugger_TextStyle(12, FLinearColor::White, Weight));
 
         PlayerTabHoverStates.FindOrAdd(InIndex) = TabButton.IsHovered();
 
@@ -256,17 +264,18 @@ class UMars_DebuggerContent : UObject
         { SelectedPlayerIndex = InIndex; }
     }
 
-    // Must be called within the operating-world scope.
+    // Must be called within the operating-world scope. GetPlayerController indexes the live controllers without gaps, so
+    // the first invalid one ends the list.
     private TArray<APlayerController> EnumeratePlayerControllers() const
     {
         TArray<APlayerController> Result;
-        for (int32 Index = 0; Index < 8; ++Index)
+        auto PC = Gameplay::GetPlayerController(0);
+        while (ck::IsValid(PC))
         {
-            auto PC = Gameplay::GetPlayerController(Index);
-            if (ck::Is_NOT_Valid(PC))
-            { break; }
             Result.Add(PC);
+            PC = Gameplay::GetPlayerController(Result.Num());
         }
+
         return Result;
     }
 
@@ -276,15 +285,27 @@ class UMars_DebuggerContent : UObject
         auto PC = Gameplay::GetPlayerController(SelectedPlayerIndex);
         if (ck::IsValid(PC))
         { return PC; }
+
         return Gameplay::GetPlayerController(0);
     }
 
-    private FLinearColor GetTabColor(bool InIsActive, bool InIsHovered) const
+    private EMars_Debugger_TabState Get_TabState(bool InIsSelected, bool InIsHovered) const
     {
-        if (InIsActive)
-        { return InIsHovered ? FLinearColor(0.2f, 0.45f, 0.7f) : FLinearColor(0.15f, 0.35f, 0.6f); }
+        if (InIsSelected)
+        { return InIsHovered ? EMars_Debugger_TabState::SelectedHovered : EMars_Debugger_TabState::Selected; }
 
-        return InIsHovered ? FLinearColor(0.2f, 0.2f, 0.25f) : FLinearColor(0.1f, 0.1f, 0.1f);
+        return InIsHovered ? EMars_Debugger_TabState::Hovered : EMars_Debugger_TabState::Idle;
+    }
+
+    private FLinearColor GetTabColor(EMars_Debugger_TabState InState) const
+    {
+        switch (InState)
+        {
+            case EMars_Debugger_TabState::SelectedHovered: return FLinearColor(0.2f, 0.45f, 0.7f);
+            case EMars_Debugger_TabState::Selected: return FLinearColor(0.15f, 0.35f, 0.6f);
+            case EMars_Debugger_TabState::Hovered: return FLinearColor(0.2f, 0.2f, 0.25f);
+            default: return FLinearColor(0.1f, 0.1f, 0.1f);
+        }
     }
 
     private void SwitchToPage(int32 InNewPageIndex)

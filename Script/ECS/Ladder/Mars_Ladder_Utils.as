@@ -1,15 +1,19 @@
 namespace utils_ladder
 {
+    // Each zone reaches this far past the rails, and the top zone this far past the top exit (uu).
+    const float64 k_ZoneSidePadding = 20.0;
+    const float64 k_TopZoneOvershoot = 20.0;
+
     // Composes the ladder on InRoot (its frame is InRoot's transform, see FMars_Ladder_Spec) with its two zones as child
     // trigger nodes that detect the player probe. A rejected spec ensures and returns an invalid handle.
     FCk_Handle_Ladder Add(FCk_Handle_Transform& InRoot, FMars_Ladder_Spec InParams)
     {
         const auto Validation = InParams.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Ladder] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Ladder] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Ladder(); }
 
-        const auto PlayerProbe = GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
-        const auto ZoneHalfWidth = float64(InParams.Width) * 0.5 + 20.0;
+        const auto PlayerProbe = GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_Player);
+        const auto ZoneHalfWidth = float64(InParams.Width) * 0.5 + k_ZoneSidePadding;
 
         // In front of the plane, MountDepth deep, over the whole height plus a capsule.
         const auto FrontHalfHeight = float64(InParams.Height + InParams.ZoneHeightPadding) * 0.5;
@@ -22,7 +26,7 @@ namespace utils_ladder
         auto FrontZone = utils_trigger::Add(InRoot, FrontSpec);
 
         // Behind the plane at the top, on the platform, reaching just past the top exit.
-        const auto TopHalfDepth = float64(InParams.TopExitDepth + 20.0f) * 0.5;
+        const auto TopHalfDepth = (float64(InParams.TopExitDepth) + k_TopZoneOvershoot) * 0.5;
         const auto TopHalfHeight = float64(InParams.ZoneHeightPadding) * 0.5;
         auto TopSpec = FMars_Trigger_Spec();
         TopSpec.Shape = EMars_Trigger_Shape::Box;
@@ -33,12 +37,7 @@ namespace utils_ladder
         auto TopZone = utils_trigger::Add(InRoot, TopSpec);
 
         auto Params = FMars_Fragment_Ladder_Params();
-        Params.Height = InParams.Height;
-        Params.Width = InParams.Width;
-        Params.Standoff = InParams.Standoff;
-        Params.MountDepth = InParams.MountDepth;
-        Params.TopExitDepth = InParams.TopExitDepth;
-        Params.ZoneHeightPadding = InParams.ZoneHeightPadding;
+        Params.Spec = InParams;
 
         auto State = FMars_Fragment_Ladder();
         State.FrontZone = FrontZone;
@@ -60,9 +59,6 @@ namespace utils_ladder
         TopLink.Zone = EMars_Ladder_Zone::Top;
         TopZone.Add_Fragment(TopLink);
 
-        // Composition is synchronous, so the ladder is bindable the moment the tag lands.
-        utils_entity_tag::Add(InRoot, n"TAG_MarsLadder");
-
         return Ladder;
     }
 }
@@ -73,17 +69,7 @@ namespace utils_ladder
 
 mixin float32 Get_Height(const FCk_Handle_Ladder& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Ladder_Params).Height;
-}
-
-mixin float32 Get_Standoff(const FCk_Handle_Ladder& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Ladder_Params).Standoff;
-}
-
-mixin float32 Get_TopExitDepth(const FCk_Handle_Ladder& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Ladder_Params).TopExitDepth;
+    return Self.Get_Fragment(FMars_Fragment_Ladder_Params).Spec.Height;
 }
 
 mixin FCk_Handle_Trigger Get_FrontZone(const FCk_Handle_Ladder& Self)
@@ -96,29 +82,25 @@ mixin FCk_Handle_Trigger Get_TopZone(const FCk_Handle_Ladder& Self)
     return Self.Get_Fragment(FMars_Fragment_Ladder).TopZone;
 }
 
-// The ladder frame in world space (identity when the ladder entity has no Transform).
+// The ladder frame in world space (Add composes the ladder on a transform).
 mixin FTransform Get_FrameWorld(const FCk_Handle_Ladder& Self)
 {
-    const auto Transform = FCk_Handle(Self).As_Transform(ECk_SanityCheck::UnChecked);
-    if (ck::Is_NOT_Valid(Transform))
-    { return FTransform::Identity; }
-
-    return utils_transform::Get_EntityCurrentTransform(Transform);
+    return utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
 }
 
 // The point on the climb line at InAlpha (0 foot .. 1 top), in world space: the climber's feet, not its capsule centre.
 mixin FVector Get_LineWorldLocation(const FCk_Handle_Ladder& Self, float32 InAlpha)
 {
-    const auto& Params = Self.Get_Fragment(FMars_Fragment_Ladder_Params);
-    return Self.Get_FrameWorld().TransformPosition(FVector(Params.Standoff, 0.0, float64(InAlpha * Params.Height)));
+    const auto& Spec = Self.Get_Fragment(FMars_Fragment_Ladder_Params).Spec;
+    return Self.Get_FrameWorld().TransformPosition(FVector(Spec.Standoff, 0.0, float64(InAlpha * Spec.Height)));
 }
 
 // Where a top-out puts the climber's feet: TopExitDepth behind the plane, on the platform; rotated as the ladder.
 mixin FTransform Get_TopExitWorld(const FCk_Handle_Ladder& Self)
 {
-    const auto& Params = Self.Get_Fragment(FMars_Fragment_Ladder_Params);
+    const auto& Spec = Self.Get_Fragment(FMars_Fragment_Ladder_Params).Spec;
     const auto Frame = Self.Get_FrameWorld();
-    const auto Location = Frame.TransformPosition(FVector(-Params.TopExitDepth, 0.0, Params.Height));
+    const auto Location = Frame.TransformPosition(FVector(-Spec.TopExitDepth, 0.0, Spec.Height));
     return FTransform(Frame.GetRotation(), Location, FVector::OneVector);
 }
 

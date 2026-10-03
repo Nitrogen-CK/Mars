@@ -1,10 +1,9 @@
-// Commits the new held item, replaces its Visual-mode world item, then broadcasts OnHeldItemChanged. An unchanged item
-// only records the (possibly different, empty) selected slot.
+// Records the requested start poses, then commits the new held item, replaces its presentation and broadcasts
+// OnHeldItemChanged. An unchanged item only records the (possibly different, empty) selected slot.
 //
 // A Persistent item (one whose item carries FMars_Fragment_Item_PersistentWorldItem) is never respawned: its own World-mode
 // world item is asked to Hold (onto the hand) when it becomes held and to Carry (back onto its carry point) when it stops
-// being held while still in the hand. PresentationEntity then names that world item, which HeldItem does not own and
-// never destroys.
+// being held while still in the hand. That world item is a Borrowed presentation, never destroyed here.
 //
 // Only the LAST queued SetSlot is applied: each one is a full snapshot of the selection, and applying the earlier ones
 // would spawn and destroy an intermediate visual and broadcast a held item that was never current at a drain.
@@ -25,10 +24,26 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_HeldItem();
 
+        const auto ClearNextSpawnFrom = InRequests.ClearNextSpawnFromRequests.Num() > 0;
+        TArray<FMars_Request_HeldItem_SetNextSpawnFrom> SetNextSpawnFromRequests = InRequests.SetNextSpawnFromRequests;
+        TArray<FMars_Request_HeldItem_SetNextArrival> SetNextArrivalRequests = InRequests.SetNextArrivalRequests;
         TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests = InRequests.SetSlotRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_HeldItem_Requests);
+
+        if (ClearNextSpawnFrom)
+        { InState.NextSpawnFrom.Reset(); }
+
+        if (SetNextSpawnFromRequests.Num() > 0)
+        { InState.NextSpawnFrom = TOptional<FTransform>(SetNextSpawnFromRequests.Last().WorldTransform); }
+
+        if (SetNextArrivalRequests.Num() > 0)
+        {
+            const auto& Request = SetNextArrivalRequests.Last();
+            InState.NextArrival = TOptional<FMars_WorldItem_PendingArrival>(
+                FMars_WorldItem_PendingArrival(Request.Item, Request.World, System::GetGameTimeInSeconds()));
+        }
 
         if (SetSlotRequests.Num() > 0)
         { HandleSetSlotRequest(Self, InState, SetSlotRequests.Last()); }
@@ -44,18 +59,7 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
         FCk_Handle Player = InHeldItem;
 
-        const auto PrevIsPersistent = ck::IsValid(PrevItem) && PrevItem.Has_PersistentWorldItem();
-        if (PrevIsPersistent)
-        {
-            // Released (dropped / thrown) items read World here and stay where they are.
-            auto PrevWorldItem = PrevItem.Get_PersistentWorldItem();
-            if (ck::IsValid(PrevWorldItem) && PrevWorldItem.Get_TargetMount() == EMars_WorldItem_Mount::Held)
-            { PrevWorldItem.Request_Carry(FMars_Request_WorldItem_Carry(Player)); }
-        }
-        else if (ck::IsValid(InState.PresentationEntity))
-        { utils_entity_lifetime::Request_DestroyEntity(InState.PresentationEntity); }
-
-        InState.PresentationEntity = FCk_Handle();
+        ReleasePresentation(Player, InState);
         InState.CurrentItem = InRequest.Item;
 
         auto NewItem = InRequest.Item;
@@ -68,22 +72,45 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
             if (HasWorldItem)
             {
                 NewWorldItem.Request_Hold(FMars_Request_WorldItem_Hold(Player));
-                InState.PresentationEntity = FCk_Handle(NewWorldItem);
+                InState.PresentationEntity = NewWorldItem;
+                InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
             }
         }
         else if (ck::IsValid(NewItem) && NewItem.Has_Presentation())
-        { InState.PresentationEntity = SpawnVisual(InHeldItem, NewItem); }
+        {
+            InState.PresentationEntity = SpawnVisual(InHeldItem, InState, NewItem);
+            InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Owned;
+        }
 
         if (InHeldItem.Has_Fragment(FMars_Fragment_HeldItem_Signals))
         { InHeldItem.Get_Fragment(FMars_Fragment_HeldItem_Signals).OnHeldItemChanged.Broadcast(InHeldItem, PrevItem, NewItem); }
     }
 
-    // Spawned at its final held pose (offset composed onto the hand) so the first rendered frame is already at rest;
-    // the world item then scene-node-parents itself under the hand. Owned by the player, so it dies with it.
-    // Two one-shot start poses, exclusive: the gloves' FMars_Fragment_HeldItem_SpawnFrom (a pickup riding in; the offset
-    // then carries that pose) wins over the item's ArriveFrom stamp (taken from a cargo slot; lerps to HeldOffset). The
-    // stamp is consumed either way so it never animates a later spawn.
-    private FCk_Handle SpawnVisual(FCk_Handle_HeldItem& InHeldItem, FCk_Handle_Item& InItem)
+    // Owned: destroyed. Borrowed: a world item still in the hand goes back onto its carry point; a released one (dropped
+    // or thrown) already reads World and stays where it is.
+    private void ReleasePresentation(FCk_Handle& InPlayer, FMars_Fragment_HeldItem& InState)
+    {
+        auto Presentation = InState.PresentationEntity;
+        InState.PresentationEntity = FCk_Handle();
+
+        if (ck::Is_NOT_Valid(Presentation))
+        { return; }
+
+        if (InState.PresentationOwnership == EMars_HeldItem_PresentationOwnership::Owned)
+        {
+            utils_entity_lifetime::Request_DestroyEntity(Presentation);
+            return;
+        }
+
+        auto WorldItem = Presentation.As_WorldItem();
+        if (WorldItem.Get_TargetMount() == EMars_WorldItem_Mount::Held)
+        { WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(InPlayer)); }
+    }
+
+    // Two one-shot start poses, exclusive: the gloves' NextSpawnFrom (a pickup riding in; the hold offset then carries
+    // that pose) wins over this item's NextArrival (taken from a cargo slot; lerps to HeldOffset). Both are consumed
+    // here either way, so neither animates a later spawn.
+    private FCk_Handle SpawnVisual(FCk_Handle_HeldItem& InHeldItem, FMars_Fragment_HeldItem& InState, FCk_Handle_Item& InItem)
     {
         auto Hand = InHeldItem.Get_HandAttachPoint();
         if (ck::EnsureIfNot(ck::IsValid(Hand), f"[HeldItem] [{InHeldItem.ToString()}] has no hand attach point"))
@@ -91,38 +118,24 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
         const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
 
-        TSubclassOf<UMars_WorldItem_EntityScript> ScriptClass = UMars_WorldItem_EntityScript;
-        if (ck::IsValid(Presentation.WorldItemScriptClass))
-        { ScriptClass = Presentation.WorldItemScriptClass; }
-
-        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hand);
-        auto SpawnTransform = Presentation.HeldOffset * HandWorld;
-        auto AttachOffset = Presentation.HeldOffset;
-        const auto HasSpawnFrom = InHeldItem.Has_Fragment(FMars_Fragment_HeldItem_SpawnFrom);
-        if (HasSpawnFrom)
+        auto Arrival = FMars_WorldItem_Arrival();
+        if (InState.NextArrival.IsSet() && InState.NextArrival.GetValue().Item == InItem)
         {
-            SpawnTransform = InHeldItem.Get_Fragment(FMars_Fragment_HeldItem_SpawnFrom).WorldTransform;
-            AttachOffset = SpawnTransform.GetRelativeTransform(HandWorld);
-            InHeldItem.Request_TryRemove(FMars_Fragment_HeldItem_SpawnFrom);
+            Arrival = utils_world_item::Get_FreshArrival(InState.NextArrival.GetValue());
+            InState.NextArrival.Reset();
         }
 
-        auto SpawnParams = UMars_WorldItem_EntityScript::Params();
-        SpawnParams.SpawnTransform = SpawnTransform;
-        SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(InItem.Get_Definition());
-        SpawnParams.Mode = EMars_WorldItem_Mode::Visual;
-        SpawnParams.AttachTo = Hand;
-        SpawnParams.AttachOffset = AttachOffset;
-
-        // Taken out of a cargo slot (or anything else that stamped it): start where the item visually was and lerp in.
-        const auto ArriveFrom = InItem.TryConsume_ArriveFrom();
-        if (ArriveFrom.IsSet && HasSpawnFrom == false)
+        auto Visual = FMars_WorldItem_VisualSpec(InItem, Hand, Presentation.Mounting.HeldOffset);
+        if (InState.NextSpawnFrom.IsSet())
         {
-            SpawnParams.ArriveFrom = ArriveFrom;
-            SpawnParams.SpawnTransform = ArriveFrom.World;
+            const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hand);
+            Visual.AttachOffset = InState.NextSpawnFrom.GetValue().GetRelativeTransform(HandWorld);
+            InState.NextSpawnFrom.Reset();
         }
+        else
+        { Visual.ArriveFrom = Arrival; }
 
         FCk_Handle Owner = InHeldItem;
-        auto Pending = utils_entity_script::Request_SpawnEntity(Owner, ScriptClass, SpawnParams);
-        return Pending.Get_EntityUnderConstruction();
+        return utils_world_item::Request_SpawnVisual(Owner, Visual);
     }
 }

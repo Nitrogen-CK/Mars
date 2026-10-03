@@ -1,8 +1,8 @@
 namespace utils_station
 {
-    // Engage motion rates (BusterBlock's station port). The glide matches the player's walk speed, so being carried to the
-    // stand reads as finishing your own walk; the turn rate caps involuntary body rotation; the floor keeps a zero-travel
-    // engage from being an instant snap.
+    // Engage motion rates. The glide matches the player's walk speed, so being carried to the stand reads as finishing
+    // your own walk; the turn rate caps involuntary body rotation; the floor keeps a zero-travel engage from being an
+    // instant snap.
     const float32 k_EngageGlideSpeed = 600.0f;
     const float32 k_EngageMaxTurnRate = 220.0f;
     const float32 k_EngageMinSeconds = 0.15f;
@@ -10,12 +10,13 @@ namespace utils_station
     // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
     // Use interactable (probe-driven focus when InSetup.Probe is set, else a transform-only child) with its one reserving
     // target, the grip table on the root (each spec grip on the node InSetup.GripNodes registers under its tag), the grip
-    // interactable on the root, and the minigame state machine when the spec names one. A rejected spec, or a grip naming a
-    // node tag nothing registers, ensures and returns an invalid handle with nothing composed.
+    // interactable on the root, and the minigame state machine when the spec names one. A rejected spec, a grip naming a
+    // node tag nothing registers, or a minigame class that does not load ensures and returns an invalid handle with nothing
+    // composed.
     FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec, FMars_Station_Setup InSetup)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Station] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Station] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Station(); }
 
         FString GripError;
@@ -30,17 +31,23 @@ namespace utils_station
                 continue;
             }
 
-            GripEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Grip.Socket, Grip.Pose, Grip.ReachOverrideCm, Grip.Frame, Grip.Roll));
+            GripEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Grip.Socket == NAME_None ? TOptional<FName>() : TOptional<FName>(Grip.Socket), Grip.Pose, Grip.ReachOverrideCm, Grip.Frame, Grip.Roll));
         }
 
         if (ck::EnsureIfNot(GripError.IsEmpty(), f"[Station] [{InRoot.ToString()}] rejected the grips: {GripError}"))
+        { return FCk_Handle_Station(); }
+
+        // Unset = no minigame; set but not loadable is an authoring error.
+        auto MinigameClass = InSpec.MinigameStateClass.Get();
+        if (ck::EnsureIfNot(InSpec.MinigameStateClass.IsNull() || ck::IsValid(MinigameClass),
+            f"[Station] [{InRoot.ToString()}] names a MinigameStateClass that does not load"))
         { return FCk_Handle_Station(); }
 
         auto Params = FMars_Fragment_Station_Params();
         Params.Spec = InSpec;
 
         auto State = FMars_Fragment_Station();
-        State.IsEngagementEnabled = InSpec.AllowEngagement;
+        State.Engagement = InSpec.AllowEngagement ? ECk_EnableDisable::Enable : ECk_EnableDisable::Disable;
         State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
 
         InRoot.Add_Fragment(FMars_Feature_Station());
@@ -50,10 +57,7 @@ namespace utils_station
         auto Station = InRoot.As_Station();
 
         if (GripEntries.Num() > 0)
-        {
-            auto RootEntity = FCk_Handle(InRoot);
-            utils_fphands::Add_Grips(RootEntity, GripEntries);
-        }
+        { utils_fphands::Add_Grips(InRoot.H(), GripEntries); }
 
         auto UseSpec = FMars_Interactable_Spec();
         UseSpec.ProbeInfo = InSetup.Probe;
@@ -65,7 +69,6 @@ namespace utils_station
         auto GripInteractable = utils_interactable::Create(InRoot, GripSpec);
 
         auto MinigameSm = FCk_Handle_StateMachine();
-        auto MinigameClass = InSpec.MinigameStateClass.Get();
         if (ck::IsValid(MinigameClass))
         { MinigameSm = utils_state_machine::Add(InRoot, FCk_StateMachine_Spec(MinigameClass)); }
 
@@ -101,8 +104,8 @@ namespace utils_station
     }
 
     // The interaction context of a station interaction sub-SM: the stamped sub-SM root's copy when it carries the
-    // initiator, else the InteractTarget's copy with the initiator taken from the interactable's focuser (the value the
-    // stamp copies).
+    // initiator, else the InteractTarget's copy with the initiator the interactable recorded for the interaction that
+    // started on it (the value the stamp copies; the stamp can land after the sub-SM's first state entered).
     FMars_Fragment_InteractionContext Get_InteractionContext(FCk_Handle InContext, FCk_Handle InOwningSm)
     {
         if (ck::IsValid(InOwningSm) && InOwningSm.Has_Fragment(FMars_Fragment_InteractionContext))
@@ -112,12 +115,13 @@ namespace utils_station
             { return Stamped; }
         }
 
-        if (ck::Is_NOT_Valid(InContext) || InContext.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        if (ck::EnsureIfNot(ck::IsValid(InContext) && InContext.Has_Fragment(FMars_Fragment_InteractionContext),
+            f"[Station] [{InContext.ToString()}] is not an interact target: a station interaction state ran outside one"))
         { return FMars_Fragment_InteractionContext(); }
 
         auto Context = InContext.Get_Fragment(FMars_Fragment_InteractionContext);
         if (ck::Is_NOT_Valid(Context.Initiator) && ck::IsValid(Context.Interactable))
-        { Context.Initiator = Context.Interactable.Get_CurrentFocuser(); }
+        { Context.Initiator = Context.Interactable.Get_InitiatorOn(InContext); }
 
         return Context;
     }
@@ -153,7 +157,7 @@ mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Se
 // Use key never touches it. Its live interaction is what the gloves hold.
 mixin FMars_Interactable_TargetEntry Make_GripTarget(const FCk_Handle_Station& Self)
 {
-    auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Operate"));
+    auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Operate);
     TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::ManuallyCompleted);
 
     auto Target = FMars_Interactable_TargetEntry();
@@ -187,9 +191,9 @@ mixin bool Get_IsOperatedBy(const FCk_Handle_Station& Self, FCk_Handle InOperato
     return ck::IsValid(Operator) && Operator == InOperator;
 }
 
-mixin bool Get_IsEngagementEnabled(const FCk_Handle_Station& Self)
+mixin ECk_EnableDisable Get_Engagement(const FCk_Handle_Station& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Station).IsEngagementEnabled;
+    return Self.Get_Fragment(FMars_Fragment_Station).Engagement;
 }
 
 mixin FCk_Handle_Transform Get_Stand(const FCk_Handle_Station& Self)
@@ -204,7 +208,7 @@ mixin FTransform Get_StandWorld(const FCk_Handle_Station& Self)
     if (ck::IsValid(Stand))
     { return utils_transform::Get_EntityCurrentTransform(Stand); }
 
-    return utils_transform::Get_EntityCurrentTransform(FCk_Handle(Self).As_Transform());
+    return utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
 }
 
 mixin FCk_Handle_Interactable Get_Interactable(const FCk_Handle_Station& Self)
@@ -227,7 +231,7 @@ mixin FCk_Handle_InteractTarget Get_GripTarget(const FCk_Handle_Station& Self)
     if (ck::Is_NOT_Valid(GripInteractable))
     { return FCk_Handle_InteractTarget(); }
 
-    return GripInteractable.Get_InteractTarget(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Operate"));
+    return GripInteractable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Operate);
 }
 
 mixin FCk_Handle_StateMachine Get_MinigameSm(const FCk_Handle_Station& Self)
@@ -251,10 +255,10 @@ mixin void Request_Release(FCk_Handle_Station& Self, const FMars_Request_Station
     Requests.ReleaseRequests.Add(InRequest);
 }
 
-mixin void Request_SetEngagementEnabled(FCk_Handle_Station& Self, const FMars_Request_Station_SetEngagementEnabled& InRequest)
+mixin void Request_SetEngagement(FCk_Handle_Station& Self, const FMars_Request_Station_SetEngagement& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Station_Requests);
-    Requests.SetEngagementEnabledRequests.Add(InRequest);
+    Requests.SetEngagementRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

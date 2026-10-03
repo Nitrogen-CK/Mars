@@ -56,8 +56,8 @@ class UMars_AutoTest_Gaze_TargetWithoutHeadEnsures : UCk_AutoTest_Base
     private void Step_AssertOnlyWithHead(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Gaze.Get_Target() == DoGet_Head(_WithHead), "the gaze still looks at the owner with a Head");
-        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged broadcasts (only the owner with a Head was ever selected)");
-        Assert_Equals_Int(_Gaze.Get_ReportedOwnerCount(), 2, "headless owners reported while sensed");
+        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged fired once: only the owner with a Head was ever selected");
+        Assert_Equals_Int(_Gaze.Get_ReportedOwnerCount(), 2, "both headless owners are reported while sensed");
     }
 
     UFUNCTION()
@@ -79,7 +79,7 @@ class UMars_AutoTest_Gaze_TargetWithoutHeadEnsures : UCk_AutoTest_Base
     private void Step_AssertStillWithHead(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Gaze.Get_Target() == DoGet_Head(_WithHead), "the gaze looks at the owner with a Head after the others left");
-        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged broadcasts after the headless owners left");
+        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged did not fire again after the headless owners left");
     }
 
     // Its own owner and context (so the gaze's probe may overlap it) with a kinematic Silent Probe.Mars.Player sphere like

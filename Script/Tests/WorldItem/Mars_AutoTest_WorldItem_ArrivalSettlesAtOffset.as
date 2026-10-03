@@ -3,8 +3,8 @@
 class UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset : UCk_AutoTest_Base
 {
     private FCk_Handle _Visual;
-    private bool _ConstructedWithArrival = false;
-    private FVector _ConstructedOffsetLocation = FVector::ZeroVector;
+    // The Arrival's start offset at construction; unset when the visual was constructed without an Arrival.
+    private TOptional<FVector> _ConstructedArrivalFrom;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -36,12 +36,15 @@ class UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset : UCk_AutoTest_Base
     UFUNCTION()
     private void OnVisualConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _Visual = FCk_Handle(InEntityScriptHandle);
-        _ConstructedWithArrival = _Visual.Has_Fragment(FMars_Fragment_WorldItem_Arrival);
+        _Visual = InEntityScriptHandle;
+        if (_Visual.Is_SceneNode() == false)
+        {
+            FinishFailure("the Visual world item was constructed without a scene node");
+            return;
+        }
 
-        auto Node = _Visual.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Node) && _ConstructedWithArrival)
-        { _ConstructedOffsetLocation = _Visual.Get_Fragment(FMars_Fragment_WorldItem_Arrival).FromOffset.GetLocation(); }
+        if (_Visual.Has_Fragment(FMars_Fragment_WorldItem_Arrival))
+        { _ConstructedArrivalFrom = TOptional<FVector>(_Visual.Get_Fragment(FMars_Fragment_WorldItem_Arrival).FromOffset.GetLocation()); }
     }
 
     UFUNCTION()
@@ -54,9 +57,13 @@ class UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertArriving(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_ConstructedWithArrival, "a Visual spawned with ArriveFrom carries an Arrival fragment");
-        Assert_True(_ConstructedOffsetLocation.Equals(FVector(110.0, 0.0, 0.0), 0.01),
-            f"the Arrival starts at the ArriveFrom pose relative to the root (got [{_ConstructedOffsetLocation.ToString()}])");
+        Assert_True(_ConstructedArrivalFrom.IsSet(), "a Visual spawned with ArriveFrom carries an Arrival fragment");
+        if (_ConstructedArrivalFrom.IsSet() == false)
+        { return; }
+
+        const auto ArrivalFrom = _ConstructedArrivalFrom.GetValue();
+        Assert_True(ArrivalFrom.Equals(FVector(110.0, 0.0, 0.0), 0.01),
+            f"the Arrival starts at the ArriveFrom pose relative to the root (got [{ArrivalFrom.ToString()}])");
     }
 
     UFUNCTION()
@@ -69,14 +76,7 @@ class UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSettled(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Node = _Visual.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        {
-            FinishFailure("the visual is not a scene node");
-            return;
-        }
-
-        const auto Offset = utils_scene_node::Get_Offset(Node).GetLocation();
+        const auto Offset = utils_scene_node::Get_Offset(_Visual.As_SceneNode()).GetLocation();
         Assert_True(Offset.Equals(FVector(10.0, 0.0, 0.0), 0.01),
             f"the settled offset is AttachOffset (got [{Offset.ToString()}])");
     }

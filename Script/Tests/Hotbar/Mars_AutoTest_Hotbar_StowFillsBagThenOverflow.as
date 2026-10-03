@@ -47,7 +47,7 @@ class UMars_AutoTest_Hotbar_StowFillsBagThenOverflow : UCk_AutoTest_Base
     private void Check_FirstStowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == 0);
+        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == TOptional<int32>(0));
     }
 
     UFUNCTION()
@@ -76,14 +76,14 @@ class UMars_AutoTest_Hotbar_StowFillsBagThenOverflow : UCk_AutoTest_Base
         Res.Set(_Hotbar.Get_Slot(0).Get_NumItems() == 1
             && _Hotbar.Get_Slot(1).Get_NumItems() == 1
             && _Hotbar.Get_Slot(2).Get_NumItems() == 1
-            && _Hotbar.Get_SelectedIndex() == 2);
+            && _Hotbar.Get_SelectedIndex() == TOptional<int32>(2));
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

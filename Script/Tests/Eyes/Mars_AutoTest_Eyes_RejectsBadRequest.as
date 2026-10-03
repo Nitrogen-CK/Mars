@@ -15,7 +15,6 @@ class UMars_AutoTest_Eyes_RejectsBadRequest : UCk_AutoTest_Base
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
         Spec.Style.RightCell = 3;
-        Spec.BlinkEnabled = false;
         _Eyes = utils_eyes::Add(FaceNode, Spec);
 
         Add_Step("the eyes have a presentation", n"Step_AssertPresentation");

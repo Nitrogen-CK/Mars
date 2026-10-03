@@ -77,7 +77,7 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
         if (ck::Is_NOT_Valid(InRow))
         { return; }
 
-        const auto Sequence = InRow.Get_Sequence();
+        const auto Sequence = InRow.Get_Sequence().GetValue();
         if (_ActiveHints.Contains(Sequence))
         { return; }
 
@@ -85,7 +85,7 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
         { return; }
 
         auto NewWidget = Cast<UMars_ActionHint_Widget>(WidgetBlueprint::CreateWidget(HintWidgetClass, GetOwningPlayer()));
-        if (ck::Is_NOT_Valid(NewWidget))
+        if (ck::EnsureIfNot(ck::IsValid(NewWidget), "[Mars_ActionHintBox] Could not create the hint widget"))
         { return; }
 
         const auto Spec = InRow.Get_Spec();
@@ -102,7 +102,7 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
         if (ck::Is_NOT_Valid(InRow))
         { return; }
 
-        const auto Sequence = InRow.Get_Sequence();
+        const auto Sequence = InRow.Get_Sequence().GetValue();
         if (_ActiveHints.Contains(Sequence) == false)
         { return; }
 
@@ -117,7 +117,7 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
         if (ck::Is_NOT_Valid(InRow))
         { return; }
 
-        const auto Sequence = InRow.Get_Sequence();
+        const auto Sequence = InRow.Get_Sequence().GetValue();
         if (_ActiveHints.Contains(Sequence) == false)
         { return; }
 

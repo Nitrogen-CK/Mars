@@ -1,7 +1,7 @@
-// Polls every slot's first item against the last pass: a change broadcasts OnSlotItemChanged, and an arrival applies
-// the arrival rule (overflow always selects itself; a bag slot is auto-held while hands are empty; a backpack arrival
-// never selects (PEAK: the pack goes on the back)). Items only ever arrive by stow, so the rule needs no provenance.
-// Then a parked selection applies once the overflow slot reads empty.
+// Polls every slot's item against the last pass: a change broadcasts OnSlotItemChanged, and an arrival applies the
+// arrival rule (overflow always selects itself; a bag slot is auto-held while hands are empty; a backpack arrival never
+// selects - the pack goes on the back). Items only ever arrive by stow, so the rule needs no provenance. Then a parked
+// selection applies once the overflow slot reads empty.
 class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -16,10 +16,11 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Hotbar();
         const auto OverflowIndex = Self.Get_OverflowIndex();
+        const auto BackpackIndex = Self.Get_BackpackIndex();
 
         for (int32 Index = 0; Index < InState.Slots.Num(); ++Index)
         {
-            const auto Now = utils_hotbar::DoGet_FirstItem(InState.Slots[Index]);
+            const auto Now = InState.Slots[Index].Get_SoleItem();
             if (Now == InState.LastSeen[Index])
             { continue; }
 
@@ -31,30 +32,18 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
             if (ck::Is_NOT_Valid(Now))
             { continue; }
 
+            const auto IsBackpackSlot = BackpackIndex.IsSet() && BackpackIndex.GetValue() == Index;
             if (Index == OverflowIndex)
-            { ApplySelection(Self, InState, OverflowIndex); }
-            else if (InState.SelectedIndex == -1 && Index != Self.Get_BackpackIndex())
-            { ApplySelection(Self, InState, Index); }
+            { utils_hotbar::Apply_Selection(Self, InState, TOptional<int32>(OverflowIndex)); }
+            else if (InState.SelectedIndex.IsSet() == false && IsBackpackSlot == false)
+            { utils_hotbar::Apply_Selection(Self, InState, TOptional<int32>(Index)); }
         }
 
-        if (InState.PendingSelectedIndex == -2 || ck::IsValid(InState.LastSeen[OverflowIndex]))
+        if (InState.ParkedSelection.IsSet() == false || ck::IsValid(InState.LastSeen[OverflowIndex]))
         { return; }
 
-        const auto ParkedIndex = InState.PendingSelectedIndex;
-        InState.PendingSelectedIndex = -2;
-        ApplySelection(Self, InState, ParkedIndex);
-    }
-
-    // SelectedIndex is written only here and in the other hotbar processor's copy (UMars_Processor_Hotbar_HandleRequests).
-    private void ApplySelection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, int32 InNewIndex)
-    {
-        const auto PrevIndex = InState.SelectedIndex;
-        if (PrevIndex == InNewIndex)
-        { return; }
-
-        InState.SelectedIndex = InNewIndex;
-
-        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
-        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar, PrevIndex, InNewIndex); }
+        const auto Parked = InState.ParkedSelection.GetValue().Index;
+        InState.ParkedSelection.Reset();
+        utils_hotbar::Apply_Selection(Self, InState, Parked);
     }
 }

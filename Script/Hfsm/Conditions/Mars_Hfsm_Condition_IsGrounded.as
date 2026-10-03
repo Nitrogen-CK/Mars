@@ -1,7 +1,16 @@
+enum EMars_Hfsm_GroundState
+{
+    Falling,
+    Grounded
+}
+
 // Polled: CharacterMovement.IsFalling() on the context actor. Polled conditions only run on the
-// machine with transition authority (owning client / listen host for its own pawn).
+// machine with transition authority (owning client / listen host for its own pawn). IsGrounded is its own answer
+// rather than a negated IsFalling, so a missing movement component fails both instead of passing IsGrounded.
 class UMars_SmCondition_IsFalling : UCk_SmCondition_Polled
 {
+    protected EMars_Hfsm_GroundState PassesWhen = EMars_Hfsm_GroundState::Falling;
+
     private UCharacterMovementComponent CachedMovement;
 
     UFUNCTION(BlueprintOverride)
@@ -12,6 +21,7 @@ class UMars_SmCondition_IsFalling : UCk_SmCondition_Polled
         { return; }
 
         CachedMovement = Character.CharacterMovement;
+        ck::EnsureIfNot(ck::IsValid(CachedMovement), f"[{Character.GetName()}] has no CharacterMovement");
     }
 
     UFUNCTION(BlueprintOverride)
@@ -20,11 +30,12 @@ class UMars_SmCondition_IsFalling : UCk_SmCondition_Polled
         if (ck::Is_NOT_Valid(CachedMovement))
         { return false; }
 
-        return CachedMovement.IsFalling();
+        const auto IsFalling = CachedMovement.IsFalling();
+        return PassesWhen == EMars_Hfsm_GroundState::Falling ? IsFalling : IsFalling == false;
     }
 }
 
 class UMars_SmCondition_IsGrounded : UMars_SmCondition_IsFalling
 {
-    default _NegateResult = true;
+    default PassesWhen = EMars_Hfsm_GroundState::Grounded;
 }

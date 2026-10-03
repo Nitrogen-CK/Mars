@@ -1,16 +1,8 @@
-// Editor-only: generates the camp front-end blockout into /Game/Mars/Maps/Camp_Mars_MAP (geometry: design
-// docs/design/mars-camp-frontend.md section 6; +X = north, cauldron at the origin).
-//   1. File > New Level > Empty Level (or open an empty /Game/Mars/Maps/Camp_Mars_MAP created by Monolith)
-//   2. Console: Mars.Camp.Build
-// It populates the open level (floor disc, octagon wall with the north departure gate and the south entry left open,
-// fire pit + cauldron, six ring stations with a table, a text label and their props, four bedrolls with a player start
-// each, one AMars_CampStationCamera per EMars_CampStation, lights) and saves it to the map path. It refuses any other
+// Editor-only: generates the camp front-end blockout into /Game/Mars/Maps/Camp_Mars_MAP (+X = north, cauldron at the
+// origin). Open File > New Level > Empty Level (or an empty Camp_Mars_MAP), then run Mars.Camp.Build. It refuses any other
 // open level, and an already-built camp (an actor labelled Camp_*): delete the Camp_ actors first to rebuild.
-//
-// Surfaces use the shared CkUsf ProtoGrid MaterialInstanceConstants (utils_mars_map_builder). To (re)apply them to an
-// existing camp map, open it and run: Mars.Camp.ApplyMaterials
-// To re-place the four player starts on an existing camp map (e.g. after k_PlayerStartRadius changes), open it and
-// run: Mars.Camp.PlaceStarts
+// Mars.Camp.ApplyMaterials re-applies the ProtoGrid materials; Mars.Camp.PlaceStarts re-places the four player starts
+// (e.g. after k_PlayerStartRadius changes).
 //
 // It must NOT create/load a level itself: swapping the editor world from inside a script call GCs the world the
 // calling script context holds, and the next nested script call (Ck processor Configure during the new world's
@@ -44,22 +36,28 @@ void Mars_PlaceCampStartsFunc(const TArray<FString>& Args)
 
 const FConsoleCommand Mars_PlaceCampStartsCommand("Mars.Camp.PlaceStarts", n"Mars_PlaceCampStartsFunc");
 
-// One ring station: its angle on the ring (degrees from +X), the text on its label, and whether it gets a table.
+enum EMars_CampStationFurniture
+{
+    None,
+    Table
+}
+
+// One ring station: its angle on the ring (degrees from +X), the text on its label, and its furniture.
 struct FMars_CampStationRow
 {
     EMars_CampStation Station;
     float64 AngleDeg;
-    FString Label;      // text on the ATextRenderActor
-    bool HasTable;
+    FString Label;
+    EMars_CampStationFurniture Furniture;
 
     FMars_CampStationRow() {}
 
-    FMars_CampStationRow(EMars_CampStation InStation, float64 InAngleDeg, const FString& InLabel, bool InHasTable)
+    FMars_CampStationRow(EMars_CampStation InStation, float64 InAngleDeg, const FString& InLabel, EMars_CampStationFurniture InFurniture)
     {
         Station = InStation;
         AngleDeg = InAngleDeg;
         Label = InLabel;
-        HasTable = InHasTable;
+        Furniture = InFurniture;
     }
 }
 
@@ -100,8 +98,9 @@ namespace utils_mars_camp
 
     void Build()
     {
+        const FString Command = "Mars.Camp.Build";
         auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
-        if (ck::EnsureIfNot(ck::IsValid(World), "[Mars.Camp.Build] No editor world"))
+        if (ck::EnsureIfNot(ck::IsValid(World), f"[{Command}] No editor world"))
         { return; }
 
         const FString WorldPath = World.GetPathName();
@@ -110,43 +109,38 @@ namespace utils_mars_camp
         {
             if (EditorAsset::DoesAssetExist(k_MapPath))
             {
-                ck::Warning(f"[Mars.Camp.Build] [{k_MapPath}] already exists. Open it (empty) or delete it first to rebuild.");
+                ck::Warning(f"[{Command}] [{k_MapPath}] already exists. Open it (empty) or delete it first to rebuild.");
                 return;
             }
         }
         else
         {
-            if (Get_IsCampMap(World) == false)
+            if (utils_mars_map_builder::Get_IsMap(World, k_MapPath) == false)
             {
-                ck::Warning(f"[Mars.Camp.Build] The open level [{WorldPath}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.");
+                ck::Warning(f"[{Command}] The open level [{WorldPath}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.");
                 return;
             }
 
-            for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
-            {
-                if (Actor.GetActorLabel().StartsWith(k_LabelPrefix))
-                {
-                    ck::Warning(f"[Mars.Camp.Build] [{Actor.GetActorLabel()}] already exists. Delete the {k_LabelPrefix} actors first to rebuild.");
-                    return;
-                }
-            }
+            auto Blocker = utils_mars_map_builder::TryGet_LevelActorWithPrefix(k_LabelPrefix);
+            if (utils_mars_map_builder::Get_IsUnblocked(Command, Blocker, f"Delete the {k_LabelPrefix} actors first to rebuild.") == false)
+            { return; }
         }
 
         auto Cube = engine::load::Cube();
         auto Cylinder = engine::load::Cylinder();
 
-        // Floor: 10m radius disc, top face at Z=0. The fire pit and the cauldron sit on it at the origin.
-        utils_mars_map_builder::Spawn_Block(Cylinder, "Camp_Floor", FVector(0.0, 0.0, -10.0), FVector(20.0, 20.0, 0.2));
-        utils_mars_map_builder::Spawn_Block(Cylinder, "Camp_FirePit", FVector(0.0, 0.0, 15.0), FVector(3.0, 3.0, 0.3));
-        utils_mars_map_builder::Spawn_Block(Cylinder, "Camp_Cauldron", FVector(0.0, 0.0, 60.0), FVector(1.6, 1.6, 1.2));
+        // Top face at Z=0. The fire pit and the cauldron sit on it at the origin.
+        utils_mars_map_builder::Spawn_Block(Cylinder, FMars_MapBuilder_Block("Camp_Floor", FVector(0.0, 0.0, -10.0), FVector(20.0, 20.0, 0.2)));
+        utils_mars_map_builder::Spawn_Block(Cylinder, FMars_MapBuilder_Block("Camp_FirePit", FVector(0.0, 0.0, 15.0), FVector(3.0, 3.0, 0.3)));
+        utils_mars_map_builder::Spawn_Block(Cylinder, FMars_MapBuilder_Block("Camp_Cauldron", FVector(0.0, 0.0, 60.0), FVector(1.6, 1.6, 1.2)));
 
         Spawn_Walls(Cube);
         Spawn_Stations(Cube);
         Spawn_Bedrolls(Cube);
 
         // Camera-only stations: Title looks north from outside the entry, Cauldron from the entry side at the cauldron.
-        Spawn_StationCamera(EMars_CampStation::Title, FVector(-1300.0, 0.0, 220.0), FRotator(-8.0, 0.0, 0.0), "Camp_Cam_Title");
-        Spawn_StationCamera(EMars_CampStation::Cauldron, FVector(-500.0, 0.0, 200.0), FRotator(-15.0, 0.0, 0.0), "Camp_Cam_Cauldron");
+        Spawn_StationCamera(EMars_CampStation::Title, FVector(-1300.0, 0.0, 220.0), FRotator(-8.0, 0.0, 0.0));
+        Spawn_StationCamera(EMars_CampStation::Cauldron, FVector(-500.0, 0.0, 200.0), FRotator(-15.0, 0.0, 0.0));
 
         auto Actors = UEditorActorSubsystem::Get();
 
@@ -154,14 +148,7 @@ namespace utils_mars_camp
         Sun.SetActorLabel("Sun");
         Actors.SpawnActorFromClass(ASkyLight, FVector(0.0, 0.0, 900.0)).SetActorLabel("SkyLight");
         Actors.SpawnActorFromClass(ASkyAtmosphere, FVector::ZeroVector).SetActorLabel("SkyAtmosphere");
-
-        auto FireLight = Cast<APointLight>(Actors.SpawnActorFromClass(APointLight, FVector(0.0, 0.0, 220.0)));
-        if (ck::IsValid(FireLight))
-        {
-            FireLight.PointLightComponent.SetIntensity(8000.0f);
-            FireLight.PointLightComponent.SetLightColor(FLinearColor(1.0, 0.6, 0.3));
-            FireLight.SetActorLabel("Camp_FireLight");
-        }
+        Spawn_FireLight();
 
         Apply_ProtoGridMaterials();
 
@@ -181,33 +168,25 @@ namespace utils_mars_camp
         else
         { Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel(); }
 
-        ck::Trace(f"[Mars.Camp.Build] cameras={CameraCount} starts={StartCount} saved={Saved}");
+        ck::Trace(f"[{Command}] cameras={CameraCount} starts={StartCount} saved={Saved}");
     }
 
     void ApplyMaterials()
     {
-        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
-        if (ck::Is_NOT_Valid(World) || Get_IsCampMap(World) == false)
-        {
-            ck::Warning(f"[Mars.Camp.ApplyMaterials] Open [{k_MapPath}] first.");
-            return;
-        }
+        const FString Command = "Mars.Camp.ApplyMaterials";
+        if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
+        { return; }
 
         Apply_ProtoGridMaterials();
-
-        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
-        ck::Trace(f"[Mars.Camp.ApplyMaterials] applied, saved={Saved}");
+        utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // Destroys every Camp_PlayerStart_* actor in the open camp map, re-spawns the four starts and saves the level.
+    // Replaces every Camp_PlayerStart_* actor.
     void PlaceStarts()
     {
-        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
-        if (ck::Is_NOT_Valid(World) || Get_IsCampMap(World) == false)
-        {
-            ck::Warning(f"[Mars.Camp.PlaceStarts] Open [{k_MapPath}] first.");
-            return;
-        }
+        const FString Command = "Mars.Camp.PlaceStarts";
+        if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
+        { return; }
 
         auto Actors = UEditorActorSubsystem::Get();
         for (auto Actor : Actors.GetAllLevelActors())
@@ -217,14 +196,8 @@ namespace utils_mars_camp
         }
 
         const int32 Count = Spawn_PlayerStarts();
-
-        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
-        ck::Trace(f"[Mars.Camp.PlaceStarts] starts={Count} saved={Saved}");
-    }
-
-    bool Get_IsCampMap(UWorld InWorld)
-    {
-        return InWorld.GetPathName().StartsWith(f"{k_MapPath}.");
+        ck::Trace(f"[{Command}] starts={Count}");
+        utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
     // A point on a ring around the cauldron; the angle is in degrees from +X (north) toward +Y.
@@ -245,8 +218,8 @@ namespace utils_mars_camp
 
             const int32 Angle = 45 * Index;
             const float64 AngleDeg = float64(Angle);
-            utils_mars_map_builder::Spawn_Block(InCube, f"Camp_Wall_{Angle}", Get_RingPoint(AngleDeg, k_WallRadius, 150.0),
-                FVector(8.0, 0.2, 3.0), FRotator(0.0, AngleDeg + 90.0, 0.0));
+            utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(f"Camp_Wall_{Angle}",
+                Get_RingPoint(AngleDeg, k_WallRadius, 150.0), FVector(8.0, 0.2, 3.0), FRotator(0.0, AngleDeg + 90.0, 0.0)));
         }
 
         const float64 GateDeg = 0.0;
@@ -254,10 +227,12 @@ namespace utils_mars_camp
         const FVector GateCentre = Get_RingPoint(GateDeg, k_WallRadius, 150.0);
         const FVector Along = FVector(-Math::Sin(GateRad), Math::Cos(GateRad), 0.0);
         const FRotator GateRotation = FRotator(0.0, GateDeg + 90.0, 0.0);
-        utils_mars_map_builder::Spawn_Block(InCube, "Camp_Gate_Left", GateCentre + Along * 275.0, FVector(2.5, 0.2, 3.0), GateRotation);
-        utils_mars_map_builder::Spawn_Block(InCube, "Camp_Gate_Right", GateCentre - Along * 275.0, FVector(2.5, 0.2, 3.0), GateRotation);
-        utils_mars_map_builder::Spawn_Block(InCube, "Camp_Gate_Header", Get_RingPoint(GateDeg, k_WallRadius, 270.0),
-            FVector(3.0, 0.2, 0.6), GateRotation);
+        utils_mars_map_builder::Spawn_Block(InCube,
+            FMars_MapBuilder_Block("Camp_Gate_Left", GateCentre + Along * 275.0, FVector(2.5, 0.2, 3.0), GateRotation));
+        utils_mars_map_builder::Spawn_Block(InCube,
+            FMars_MapBuilder_Block("Camp_Gate_Right", GateCentre - Along * 275.0, FVector(2.5, 0.2, 3.0), GateRotation));
+        utils_mars_map_builder::Spawn_Block(InCube,
+            FMars_MapBuilder_Block("Camp_Gate_Header", Get_RingPoint(GateDeg, k_WallRadius, 270.0), FVector(3.0, 0.2, 0.6), GateRotation));
     }
 
     // Per station: a table (top at Z=90) and a label at the ring radius, both facing the centre, and the station's
@@ -265,25 +240,23 @@ namespace utils_mars_camp
     void Spawn_Stations(UStaticMesh InCube)
     {
         TArray<FMars_CampStationRow> Rows;
-        Rows.Add(FMars_CampStationRow(EMars_CampStation::Departure, 0.0, "Departure Gate", false));
-        Rows.Add(FMars_CampStationRow(EMars_CampStation::Backpack, 45.0, "Expedition Backpack", true));
-        Rows.Add(FMars_CampStationRow(EMars_CampStation::Wardrobe, 90.0, "Wardrobe", true));
-        Rows.Add(FMars_CampStationRow(EMars_CampStation::Guests, 135.0, "Guests", true));
-        Rows.Add(FMars_CampStationRow(EMars_CampStation::Contracts, 270.0, "Contract Board", true));
-        Rows.Add(FMars_CampStationRow(EMars_CampStation::Workbench, 315.0, "Workbench", true));
+        Rows.Add(FMars_CampStationRow(EMars_CampStation::Departure, 0.0, "Departure Gate", EMars_CampStationFurniture::None));
+        Rows.Add(FMars_CampStationRow(EMars_CampStation::Backpack, 45.0, "Expedition Backpack", EMars_CampStationFurniture::Table));
+        Rows.Add(FMars_CampStationRow(EMars_CampStation::Wardrobe, 90.0, "Wardrobe", EMars_CampStationFurniture::Table));
+        Rows.Add(FMars_CampStationRow(EMars_CampStation::Guests, 135.0, "Guests", EMars_CampStationFurniture::Table));
+        Rows.Add(FMars_CampStationRow(EMars_CampStation::Contracts, 270.0, "Contract Board", EMars_CampStationFurniture::Table));
+        Rows.Add(FMars_CampStationRow(EMars_CampStation::Workbench, 315.0, "Workbench", EMars_CampStationFurniture::Table));
 
         for (auto Row : Rows)
         {
-            const FRotator FacingCentre = FRotator(0.0, Row.AngleDeg + 180.0, 0.0);
-            if (Row.HasTable)
+            if (Row.Furniture == EMars_CampStationFurniture::Table)
             {
-                utils_mars_map_builder::Spawn_Block(InCube, f"Camp_Table_{Row.Label}", Get_RingPoint(Row.AngleDeg, k_StationRadius, 45.0),
-                    FVector(2.0, 1.0, 0.9), FacingCentre);
+                utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(f"Camp_Table_{Row.Label}",
+                    Get_RingPoint(Row.AngleDeg, k_StationRadius, 45.0), FVector(2.0, 1.0, 0.9), FRotator(0.0, Row.AngleDeg + 180.0, 0.0)));
             }
 
-            Spawn_Label(Row.Label, Get_RingPoint(Row.AngleDeg, k_StationRadius, 200.0), FacingCentre, f"Camp_Label_{Row.Station :n}");
-            Spawn_StationCamera(Row.Station, Get_RingPoint(Row.AngleDeg, k_CameraRadius, 170.0), FRotator(-12.0, Row.AngleDeg, 0.0),
-                f"Camp_Cam_{Row.Station :n}");
+            Spawn_StationLabel(Row);
+            Spawn_StationCamera(Row.Station, Get_RingPoint(Row.AngleDeg, k_CameraRadius, 170.0), FRotator(-12.0, Row.AngleDeg, 0.0));
         }
 
         // The mirror stands 120uu behind the wardrobe table; boards and the rack are flush against the wall's inner face.
@@ -295,8 +268,8 @@ namespace utils_mars_camp
 
         for (auto Prop : Props)
         {
-            utils_mars_map_builder::Spawn_Block(InCube, Prop.ActorLabel, Get_RingPoint(Prop.AngleDeg, Prop.Radius, Prop.Z), Prop.Scale,
-                FRotator(0.0, Prop.AngleDeg + 180.0, 0.0));
+            utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(Prop.ActorLabel,
+                Get_RingPoint(Prop.AngleDeg, Prop.Radius, Prop.Z), Prop.Scale, FRotator(0.0, Prop.AngleDeg + 180.0, 0.0)));
         }
     }
 
@@ -310,22 +283,21 @@ namespace utils_mars_camp
         return Angles;
     }
 
-    // Four bedrolls in the south-west quarter, each with a player start toward the centre (Spawn_PlayerStarts).
+    // Four bedrolls in the south-west quarter, each with a player start toward the centre.
     void Spawn_Bedrolls(UStaticMesh InCube)
     {
         auto Angles = Get_BedrollAngles();
         for (int32 Index = 0; Index < Angles.Num(); ++Index)
         {
             const float64 AngleDeg = Angles[Index];
-            const FRotator FacingCentre = FRotator(0.0, AngleDeg + 180.0, 0.0);
-            utils_mars_map_builder::Spawn_Block(InCube, f"Camp_Bedroll_{Index}", Get_RingPoint(AngleDeg, k_BedrollRadius, 10.0),
-                FVector(1.8, 0.7, 0.2), FacingCentre);
+            utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(f"Camp_Bedroll_{Index}",
+                Get_RingPoint(AngleDeg, k_BedrollRadius, 10.0), FVector(1.8, 0.7, 0.2), FRotator(0.0, AngleDeg + 180.0, 0.0)));
         }
 
         Spawn_PlayerStarts();
     }
 
-    // One player start per bedroll at k_PlayerStartRadius, facing the centre. Returns how many were spawned.
+    // One player start per bedroll, facing the centre. Returns how many were spawned.
     int32 Spawn_PlayerStarts()
     {
         auto Angles = Get_BedrollAngles();
@@ -336,7 +308,7 @@ namespace utils_mars_camp
             const float64 AngleDeg = Angles[Index];
             const FRotator FacingCentre = FRotator(0.0, AngleDeg + 180.0, 0.0);
             auto Start = Actors.SpawnActorFromClass(APlayerStart, Get_RingPoint(AngleDeg, k_PlayerStartRadius, 100.0), FacingCentre);
-            if (ck::Is_NOT_Valid(Start))
+            if (ck::EnsureIfNot(ck::IsValid(Start), f"[Mars.Camp] Failed to place [{k_PlayerStartLabelPrefix}{Index}]"))
             { continue; }
 
             Start.SetActorLabel(f"{k_PlayerStartLabelPrefix}{Index}");
@@ -346,31 +318,46 @@ namespace utils_mars_camp
         return Count;
     }
 
-    void Spawn_StationCamera(EMars_CampStation InStation, FVector InLocation, FRotator InRotation, const FString& InLabel)
+    void Spawn_StationCamera(EMars_CampStation InStation, FVector InLocation, FRotator InRotation)
     {
+        const FString Label = f"Camp_Cam_{InStation :n}";
         auto Cam = Cast<AMars_CampStationCamera>(
             UEditorActorSubsystem::Get().SpawnActorFromClass(AMars_CampStationCamera, InLocation, InRotation));
-        if (ck::EnsureIfNot(ck::IsValid(Cam), f"[Mars.Camp.Build] Failed to place [{InLabel}]"))
+        if (ck::EnsureIfNot(ck::IsValid(Cam), f"[Mars.Camp] Failed to place [{Label}]"))
         { return; }
 
         Cam.Station = InStation;
-        Cam.SetActorLabel(InLabel);
+        Cam.SetActorLabel(Label);
     }
 
-    void Spawn_Label(const FString& InText, FVector InLocation, FRotator InRotation, const FString& InLabel)
+    // The station's name at the ring radius, facing the centre.
+    void Spawn_StationLabel(const FMars_CampStationRow& InRow)
     {
-        auto Actor = Cast<ATextRenderActor>(UEditorActorSubsystem::Get().SpawnActorFromClass(ATextRenderActor, InLocation, InRotation));
-        if (ck::EnsureIfNot(ck::IsValid(Actor), f"[Mars.Camp.Build] Failed to place [{InLabel}]"))
+        const FString Label = f"Camp_Label_{InRow.Station :n}";
+        auto Actor = Cast<ATextRenderActor>(UEditorActorSubsystem::Get().SpawnActorFromClass(ATextRenderActor,
+            Get_RingPoint(InRow.AngleDeg, k_StationRadius, 200.0), FRotator(0.0, InRow.AngleDeg + 180.0, 0.0)));
+        if (ck::EnsureIfNot(ck::IsValid(Actor), f"[Mars.Camp] Failed to place [{Label}]"))
         { return; }
 
-        Actor.TextRender.SetText(FText::FromString(InText));
+        Actor.TextRender.SetText(FText::FromString(InRow.Label));
         Actor.TextRender.SetWorldSize(40.0f);
         Actor.TextRender.SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
         Actor.TextRender.SetTextRenderColor(FColor(255, 238, 0, 255));
-        Actor.SetActorLabel(InLabel);
+        Actor.SetActorLabel(Label);
     }
 
-    // Matches blocks by the labels Build gives them (design section 6).
+    void Spawn_FireLight()
+    {
+        auto FireLight = Cast<APointLight>(UEditorActorSubsystem::Get().SpawnActorFromClass(APointLight, FVector(0.0, 0.0, 220.0)));
+        if (ck::EnsureIfNot(ck::IsValid(FireLight), "[Mars.Camp] Failed to place [Camp_FireLight]"))
+        { return; }
+
+        FireLight.PointLightComponent.SetIntensity(8000.0f);
+        FireLight.PointLightComponent.SetLightColor(FLinearColor(1.0, 0.6, 0.3));
+        FireLight.SetActorLabel("Camp_FireLight");
+    }
+
+    // Matches blocks by the labels Build gives them.
     void Apply_ProtoGridMaterials()
     {
         auto Floor = utils_mars_map_builder::Get_ProtoGrid_Floor();

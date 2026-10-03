@@ -25,22 +25,19 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
         if (Monsters.Num() == 0)
         { DrawWarningBox("No monster in this world."); }
 
+        // utils_monster::Add tags only what it composes as a monster.
         for (auto Entity : Monsters)
         {
-            const auto Monster = Entity.As_Monster(ECk_SanityCheck::UnChecked);
-            if (ck::Is_NOT_Valid(Monster))
-            { continue; }
-
-            DrawMonster(Entity, Monster);
+            DrawMonster(Entity.As_Monster());
             mm::Spacer(0, 6);
         }
 
         EndPageScrollBox();
     }
 
-    private void DrawMonster(FCk_Handle InEntity, FCk_Handle_Monster InMonster)
+    private void DrawMonster(FCk_Handle_Monster InMonster)
     {
-        DrawSectionHeading(f"{utils_handle::Get_DebugName(InEntity)}  {InEntity.ToString()}");
+        DrawSectionHeading(f"{utils_handle::Get_DebugName(InMonster)}  {InMonster.ToString()}");
 
         const auto IsDead = InMonster.Get_IsDead();
         DrawKvRow("Dead", BoolText(IsDead), IsDead ? FLinearColor(1.0f, 0.4f, 0.4f) : FLinearColor(0.5f, 1.0f, 0.5f));
@@ -57,24 +54,20 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
                 Part.Get_State() == EMars_BodyPart_State::Attached ? FLinearColor::White : FLinearColor(0.6f, 0.6f, 0.6f));
         }
 
-        const auto Crawler = InEntity.As_Crawler(ECk_SanityCheck::UnChecked);
+        const auto Crawler = InMonster.As_Crawler(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Crawler))
         { DrawCrawler(Crawler); }
 
-        auto StateMachine = InEntity.As_StateMachine(ECk_SanityCheck::UnChecked);
+        auto StateMachine = InMonster.As_StateMachine(ECk_SanityCheck::UnChecked);
         const FString RootState = ck::IsValid(StateMachine)
-            ? utils_state_machine::Get_CurrentStateClass(StateMachine).Get().GetName().ToString()
+            ? Get_StateClassName(utils_state_machine::Get_CurrentStateClass(StateMachine))
             : "-";
         DrawKvRow("SM root state", RootState, FLinearColor(0.6f, 0.9f, 1.0f));
 
         if (ck::IsValid(Crawler))
-        {
-            const TSubclassOf<UCk_SmState_EntityScript> BehaviorState = Crawler.Get_BehaviorStateClass();
-            DrawKvRow("SM behaviour state", ck::IsValid(BehaviorState) ? BehaviorState.Get().GetName().ToString() : "-",
-                FLinearColor(0.6f, 0.9f, 1.0f));
-        }
+        { DrawKvRow("SM behaviour state", Get_StateClassName(Crawler.Get_BehaviorStateClass()), FLinearColor(0.6f, 0.9f, 1.0f)); }
 
-        const auto Brain = InEntity.As_Brain(ECk_SanityCheck::UnChecked);
+        const auto Brain = InMonster.As_Brain(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Brain))
         { DrawBrain(Brain); }
     }

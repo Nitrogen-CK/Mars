@@ -19,7 +19,8 @@ class UMars_AutoTest_CampSession_PlayTransitionsToLive : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertLobby(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Session.Get_Phase() == EMars_CampPhase::Lobby, "Phase is Lobby at Add");
+        const auto Phase = _Session.Get_Phase();
+        Assert_True(Phase == EMars_CampPhase::Lobby, f"Phase is Lobby at Add (got {Phase :n})");
         Assert_False(_Session.Get_IsLive(), "Get_IsLive is false at Add");
     }
 

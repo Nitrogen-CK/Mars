@@ -6,23 +6,22 @@ namespace utils_monster
     FCk_Handle_Monster Add(FCk_Handle& InRoot, FMars_Monster_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Monster] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Monster] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Monster(); }
 
+        // Each Add ensures on its own rejection.
         auto BodyHealth = utils_health::Add(InRoot, InSpec.BodyHealth);
         if (ck::Is_NOT_Valid(BodyHealth))
         { return FCk_Handle_Monster(); }
 
-        auto ZoneSpec = InSpec.BodyZone;
-        ZoneSpec.Health = BodyHealth;
-        auto BodyZone = utils_hit_zone::Add(InRoot, ZoneSpec);
+        auto BodyZone = utils_hit_zone::Add(InRoot, InSpec.BodyZone);
         if (ck::Is_NOT_Valid(BodyZone))
         { return FCk_Handle_Monster(); }
 
         utils_team::Add(InRoot, InSpec.Team, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InRoot, n"TAG_MarsMonster");
 
-        auto DeadSpec = FCk_ByteAttribute_Spec(GameplayTags::ResolveGameplayTag(n"ByteAttribute.Mars.Monster.Dead"), 0);
+        auto DeadSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Monster_Dead, 0);
         DeadSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
 
         auto Params = FMars_Fragment_Monster_Params();
@@ -38,6 +37,30 @@ namespace utils_monster
         InRoot.Add_Fragment(State);
         InRoot.Add_Fragment(FMars_Tag_Monster_NeedsSetup());
         return InRoot.As_Monster();
+    }
+
+    // A running one-shot timer on InDoomed (the corpse, a severed limb). InOnExpired is bound to its OnDone and should
+    // call Request_DestroyTimerOwner, which takes InDoomed and everything it owns along.
+    FCk_Handle_Timer Add_DespawnTimer(FCk_Handle InDoomed, float32 InSeconds, FCk_Delegate_Timer InOnExpired)
+    {
+        auto TimerSpec = FCk_Timer_Spec(FCk_Time(InSeconds));
+        TimerSpec.Set_StartingState(ECk_Timer_State::Running)
+                 .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
+
+        auto Timer = utils_timer::Add(InDoomed, TimerSpec);
+        if (ck::EnsureIfNot(ck::IsValid(Timer), f"[Monster] [{InDoomed.ToString()}] could not add a despawn timer"))
+        { return Timer; }
+
+        utils_timer::BindTo_OnDone(Timer, InOnExpired);
+        return Timer;
+    }
+
+    // Destroys the entity a despawn timer lives on (and so the timer).
+    void Request_DestroyTimerOwner(FCk_Handle_Timer InTimer)
+    {
+        auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTimer);
+        if (ck::IsValid(Owner))
+        { utils_entity_lifetime::Request_DestroyEntity(Owner); }
     }
 }
 
@@ -65,7 +88,7 @@ mixin FCk_Handle_ByteAttribute Get_DeadAttribute(const FCk_Handle_Monster& Self)
     return Self.Get_Fragment(FMars_Fragment_Monster).Dead;
 }
 
-// Every registered part, severed ones included until their entity dies.
+// Every part ever registered: a severed one stays listed, and its handle goes invalid once its debris timer destroys it.
 mixin TArray<FCk_Handle_BodyPart> Get_Parts(const FCk_Handle_Monster& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Monster).Parts;
@@ -85,17 +108,13 @@ mixin int32 Get_AttachedPartCount(const FCk_Handle_Monster& Self)
 
 mixin bool Get_IsDead(const FCk_Handle_Monster& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Monster).IsDead;
+    return Self.Get_Fragment(FMars_Fragment_Monster).DeathCause.IsSet();
 }
 
 // Unset while alive.
 mixin TOptional<FMars_DamageEvent> Get_DeathCause(const FCk_Handle_Monster& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Monster);
-    if (State.IsDead == false)
-    { return TOptional<FMars_DamageEvent>(); }
-
-    return TOptional<FMars_DamageEvent>(State.DeathCause);
+    return Self.Get_Fragment(FMars_Fragment_Monster).DeathCause;
 }
 
 mixin float32 Get_CorpseSeconds(const FCk_Handle_Monster& Self)

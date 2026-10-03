@@ -1,20 +1,24 @@
 namespace utils_body_probe
 {
-    // Creates the probe node under InParent (the character's transform), sized to InCharacter's capsule.
-    FCk_Handle_BodyProbe Create(FCk_Handle_Transform& InParent, FCk_Probe_Spec InProbeSpec, ACharacter InCharacter)
+    // Creates the probe node under InParent (the character's transform), sized to the spec's character capsule. A rejected
+    // spec ensures and returns an invalid handle with nothing created.
+    FCk_Handle_BodyProbe Create(FCk_Handle_Transform& InParent, FMars_BodyProbe_Spec InSpec)
     {
-        if (ck::EnsureIfNot(ck::IsValid(InCharacter), f"[BodyProbe] [{InParent.ToString()}] needs a valid character"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[BodyProbe] [{InParent.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_BodyProbe(); }
 
-        const auto Capsule = InCharacter.CapsuleComponent;
+        auto Character = InSpec.Character.Get();
+        const auto Capsule = Character.CapsuleComponent;
         auto ProbeNode = utils_prefab::Create_ProbeNode_Capsule(
-            InParent, Capsule.GetScaledCapsuleHalfHeight(), Capsule.GetScaledCapsuleRadius(), InProbeSpec);
+            InParent, Capsule.GetScaledCapsuleHalfHeight(), Capsule.GetScaledCapsuleRadius(), InSpec.Probe);
 
         auto Params = FMars_Fragment_BodyProbe_Params();
-        Params.Character = InCharacter;
+        Params.Spec = InSpec;
 
         auto State = FMars_Fragment_BodyProbe();
         State.HalfHeight = Capsule.GetScaledCapsuleHalfHeight();
+        State.Radius = Capsule.GetScaledCapsuleRadius();
 
         ProbeNode.Add_Fragment(FMars_Feature_BodyProbe());
         ProbeNode.Add_Fragment(Params);

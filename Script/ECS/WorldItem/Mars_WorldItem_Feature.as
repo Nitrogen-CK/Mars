@@ -48,7 +48,7 @@ enum EMars_WorldItem_Mount
 
 namespace constants_world_item
 {
-    // An ArriveFrom stamp older than this is dropped unread, so a stale pose never animates a later visual.
+    // A pending arrival older than this is dropped unread, so a stale pose never animates a later visual.
     const float64 k_ArriveFromMaxAgeSeconds = 0.5;
 }
 
@@ -71,6 +71,55 @@ struct FMars_WorldItem_Arrival
     {
         IsSet = true;
         World = InWorld;
+    }
+}
+
+// Where an item visually was when someone started moving it, kept by whoever spawns its next visual (a cargo slot for a
+// stow, HeldItem for a take) until that visual spawns. utils_world_item::Get_FreshArrival ages it out.
+struct FMars_WorldItem_PendingArrival
+{
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    UPROPERTY()
+    FTransform World;
+
+    UPROPERTY()
+    float64 StampedAtSeconds = 0.0;
+
+    FMars_WorldItem_PendingArrival() {}
+
+    FMars_WorldItem_PendingArrival(const FCk_Handle_Item& InItem, const FTransform& InWorld, float64 InStampedAtSeconds)
+    {
+        Item = InItem;
+        World = InWorld;
+        StampedAtSeconds = InStampedAtSeconds;
+    }
+}
+
+// A Visual-mode world item of Item following AttachTo at AttachOffset (utils_world_item::Request_SpawnVisual).
+struct FMars_WorldItem_VisualSpec
+{
+    UPROPERTY()
+    FCk_Handle_Item Item;
+
+    UPROPERTY()
+    FCk_Handle_Transform AttachTo;
+
+    UPROPERTY()
+    FTransform AttachOffset;
+
+    // Unset = spawn at rest.
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom;
+
+    FMars_WorldItem_VisualSpec() {}
+
+    FMars_WorldItem_VisualSpec(const FCk_Handle_Item& InItem, const FCk_Handle_Transform& InAttachTo, const FTransform& InAttachOffset)
+    {
+        Item = InItem;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
     }
 }
 
@@ -97,47 +146,8 @@ struct FMars_WorldItem_ProbeFit
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Params
+// Transient fragments (drained by the WorldItem processors)
 //--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_Fragment_WorldItem_Params
-{
-    UPROPERTY()
-    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
-
-    // Soft: fragments must not hold strong UObject refs.
-    UPROPERTY()
-    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-// State
-//--------------------------------------------------------------------------------------------------------------------------
-
-// World mode owns a capacity-1 holder and the item entity lives inside it, so pickup and drop are entity-preserving
-// transfers. Every handle is invalid in Visual mode except VisualRoot.
-struct FMars_Fragment_WorldItem
-{
-    UPROPERTY()
-    FCk_Handle_Inventory_DataOnly Holder;
-
-    UPROPERTY()
-    FCk_Handle_Interactable Pickup;
-
-    UPROPERTY()
-    FCk_Handle_JoltBody Body;
-
-    UPROPERTY()
-    FCk_Handle_Transform VisualRoot;
-
-    // Persistent only; always World for a Transient item.
-    UPROPERTY()
-    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::World;
-
-    // Valid while Carried / Held.
-    UPROPERTY()
-    FCk_Handle Carrier;
-}
 
 // A launch applied once the Jolt body exists and reads Dynamic; drained by UMars_Processor_WorldItem_Launch.
 struct FMars_Fragment_WorldItem_PendingLaunch
@@ -147,6 +157,14 @@ struct FMars_Fragment_WorldItem_PendingLaunch
 
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    FMars_Fragment_WorldItem_PendingLaunch() {}
+
+    FMars_Fragment_WorldItem_PendingLaunch(FVector InLinearVelocity, FVector InAngularVelocityDeg)
+    {
+        LinearVelocity = InLinearVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+    }
 }
 
 // Waiting for the body to read Kinematic before the scene-node attach (SetMotionType is deferred; attaching a Dynamic
@@ -165,6 +183,14 @@ struct FMars_Fragment_WorldItem_PendingMount
 
     UPROPERTY()
     FTransform Offset;
+
+    FMars_Fragment_WorldItem_PendingMount() {}
+
+    FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier)
+    {
+        Mount = InMount;
+        Carrier = InCarrier;
+    }
 }
 
 // Drives the scene-node offset FromOffset -> ToOffset with OutCubic over Duration; ONE Request_UpdateOffset per frame.
@@ -185,7 +211,104 @@ struct FMars_Fragment_WorldItem_Arrival
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Item-side markers (on the ITEM entity, not the world item)
+// Spec
+//--------------------------------------------------------------------------------------------------------------------------
+
+// What the entity script composed for utils_world_item::Add. Holder and Pickup exist in World mode only; Body in World
+// mode with a Mesh.
+struct FMars_WorldItem_Spec
+{
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition;
+
+    UPROPERTY()
+    FCk_Handle_Inventory_DataOnly Holder;
+
+    UPROPERTY()
+    FCk_Handle_Interactable Pickup;
+
+    UPROPERTY()
+    FCk_Handle_JoltBody Body;
+
+    // Visual mode: the offset lerp of a visual that arrives from somewhere.
+    UPROPERTY()
+    TOptional<FMars_Fragment_WorldItem_Arrival> Arrival;
+
+    // World mode with a Body: the launch of a dropped or thrown item.
+    UPROPERTY()
+    TOptional<FMars_Fragment_WorldItem_PendingLaunch> Launch;
+}
+
+mixin FMars_Validation Validate(const FMars_WorldItem_Spec& Self)
+{
+    if (Self.Definition.IsNull())
+    { return FMars_Validation("Definition is not set"); }
+
+    if (Self.Mode == EMars_WorldItem_Mode::World)
+    {
+        if (ck::Is_NOT_Valid(Self.Holder) || ck::Is_NOT_Valid(Self.Pickup))
+        { return FMars_Validation("a World-mode world item needs a Holder and a Pickup"); }
+
+        if (Self.Arrival.IsSet())
+        { return FMars_Validation("only a Visual-mode world item arrives"); }
+
+        if (Self.Launch.IsSet() && ck::Is_NOT_Valid(Self.Body))
+        { return FMars_Validation("a launch needs a Body"); }
+
+        return FMars_Validation();
+    }
+
+    if (ck::IsValid(Self.Holder) || ck::IsValid(Self.Pickup) || ck::IsValid(Self.Body) || Self.Launch.IsSet())
+    { return FMars_Validation("a Visual-mode world item has no Holder, Pickup, Body or Launch"); }
+
+    return FMars_Validation();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Params
+//--------------------------------------------------------------------------------------------------------------------------
+
+struct FMars_Fragment_WorldItem_Params
+{
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    // Soft: fragments must not hold strong UObject refs.
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// State
+//--------------------------------------------------------------------------------------------------------------------------
+
+// World mode owns a capacity-1 holder and the item entity lives inside it, so pickup and drop are entity-preserving
+// transfers. Every handle is invalid in Visual mode.
+struct FMars_Fragment_WorldItem
+{
+    UPROPERTY()
+    FCk_Handle_Inventory_DataOnly Holder;
+
+    UPROPERTY()
+    FCk_Handle_Interactable Pickup;
+
+    UPROPERTY()
+    FCk_Handle_JoltBody Body;
+
+    // Persistent only; always World for a Transient item.
+    UPROPERTY()
+    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::World;
+
+    // Valid while Carried / Held.
+    UPROPERTY()
+    FCk_Handle Carrier;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Item-side marker (on the ITEM entity, not the world item)
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Stamped once by a Persistent world item on its item at seed/adopt; lives as long as the item.
@@ -193,17 +316,6 @@ struct FMars_Fragment_Item_PersistentWorldItem
 {
     UPROPERTY()
     FCk_Handle_WorldItem WorldItem;
-}
-
-// Where the item visually was when someone started moving it. Consumed by the next visual spawned for it; ignored (and
-// dropped) when older than constants_world_item::k_ArriveFromMaxAgeSeconds.
-struct FMars_Fragment_Item_ArriveFrom
-{
-    UPROPERTY()
-    FTransform World;
-
-    UPROPERTY()
-    float64 StampedAtSeconds = 0.0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

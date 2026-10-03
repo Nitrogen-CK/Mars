@@ -37,12 +37,13 @@ class AMars_Master_GameState : ACk_GameState_UE
         _OnEcsComposed.Broadcast(ThisActorEntity);
     }
 
-    // Fires once, right after EcsConstructionScript has composed this GameState's features; binding after the fact
-    // calls the delegate immediately. Promise_OnActorEcsReady is NOT this: on authority it fires at LINK time, inside
-    // the entity's Construct, before EcsConstructionScript (ECk_ActorEcsReady_Policy::ValuesReplicated "collapses to
-    // link-time on authority").
+    // Fires once, right after EcsConstructionScript has composed this GameState's features (step 3 above); binding after
+    // the fact calls the delegate immediately.
     void Promise_OnEcsComposed(FMars_Delegate_GameState_OnEcsComposed InDelegate)
     {
+        if (ck::EnsureIfNot(InDelegate.IsBound(), "[Mars_Master_GameState] Promise_OnEcsComposed needs a bound delegate"))
+        { return; }
+
         if (_IsEcsComposed)
         {
             InDelegate.ExecuteIfBound(ThisActorEntity);

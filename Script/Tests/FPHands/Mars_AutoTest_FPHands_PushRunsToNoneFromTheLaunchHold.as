@@ -7,7 +7,9 @@ class UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold : UCk_AutoTest_Base
     private FCk_Handle_StateMachine _Sm;
     private FCk_Handle _Player;
     private TArray<EMars_FPHands_Phase> _Phases;
-    private bool _PushHoldWasTwoHanded = false;
+    // Every poll that reads Push must see the launch hold kept: one bad sample fails the run.
+    private int32 _PushPolls = 0;
+    private bool _PushHoldWasTwoHanded = true;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -21,7 +23,8 @@ class UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold : UCk_AutoTest_Base
         Spec.Push.OutSeconds = 0.1f;
         Spec.Push.BackSeconds = 0.2f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -64,9 +67,8 @@ class UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold : UCk_AutoTest_Base
     private void Step_RequestPush(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Hold = FMars_FPHands_Hold();
-        Hold.IsHolding = true;
-        Hold.IsTwoHanded = true;
-        _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(Hold, true));
+        Hold.Kind = EMars_FPHands_HoldKind::TwoHanded;
+        _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(Hold, EMars_LaunchKind::Throw));
         _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(FCk_Handle_Item()));
     }
 
@@ -75,8 +77,10 @@ class UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold : UCk_AutoTest_Base
     {
         if (_Hands.Get_Phase() == EMars_FPHands_Phase::Push)
         {
-            _PushHoldWasTwoHanded = _Hands.Get_PushHold().IsHolding && _Hands.Get_PushHold().IsTwoHanded
-                && _Hands.Get_Hold().IsHolding == false && _Hands.Get_PushIsThrow();
+            const auto KeptLaunchHold = _Hands.Get_PushHold().Kind == EMars_FPHands_HoldKind::TwoHanded
+                && _Hands.Get_Hold().Kind == EMars_FPHands_HoldKind::Empty && _Hands.Get_PushKind() == EMars_LaunchKind::Throw;
+            _PushPolls += 1;
+            _PushHoldWasTwoHanded = _PushHoldWasTwoHanded && KeptLaunchHold;
         }
 
         auto Res = OutResult;
@@ -86,12 +90,15 @@ class UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSequence(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        Assert_True(_PushPolls > 0, "the Push phase was observed at least once");
+        Assert_True(_PushHoldWasTwoHanded,
+            f"on every one of {_PushPolls} Push polls the gloves kept the launch's two-handed throw hold while the feature's hold was empty");
+
         Assert_Equals_Int(_Phases.Num(), 2, "two phase changes");
         if (_Phases.Num() != 2)
         { return; }
 
-        Assert_True(_Phases[0] == EMars_FPHands_Phase::Push, "first change is to Push");
-        Assert_True(_Phases[1] == EMars_FPHands_Phase::None, "second change is back to None");
-        Assert_True(_PushHoldWasTwoHanded, "during Push the gloves kept the launch's two-handed throw hold while the feature's hold was empty");
+        Assert_True(_Phases[0] == EMars_FPHands_Phase::Push, f"first change is to Push (got {_Phases[0] :n})");
+        Assert_True(_Phases[1] == EMars_FPHands_Phase::None, f"second change is back to None (got {_Phases[1] :n})");
     }
 }

@@ -1,6 +1,5 @@
 // ChopsPerState aligned chops advance the pile one state, and the band steps through the band table after each useful
-// chop. Rig: Dicing on a transform-only entity with a real Mover (Duration 0.05) on a cleaver node under the lateral node;
-// before each chop the hand is nudged onto the band (which moved after the previous chop).
+// chop. Before each chop the hand is nudged onto the band, which moved after the previous chop.
 class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_Base
 {
     private FCk_Handle_Dicing _Dicing;
@@ -28,7 +27,8 @@ class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_B
         MoverSpec.Duration = 0.05f;
         auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
 
-        _Dicing = utils_dicing::Add(StationEntity, _Spec, FMars_Dicing_Nodes(LateralNode, Mover));
+        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
+        _Dicing = utils_dicing::Add(StationEntity, _Spec);
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
         _Dicing.BindTo_OnStateChanged(FMars_Delegate_Dicing_OnStateChanged(this, n"OnStateChanged"));
@@ -47,9 +47,9 @@ class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_B
     }
 
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, bool InAligned)
+    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
     {
-        _Resolved.Add(InAligned);
+        _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
     }
 
     UFUNCTION()
@@ -68,7 +68,8 @@ class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_B
     private void Step_AssertComposed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(ck::IsValid(_Dicing), "the feature composed");
-        Assert_True(_Dicing.Get_MaterialState() == EMars_Dicing_State::WholeLeaves, "the pile starts as whole leaves");
+        const auto MaterialState = _Dicing.Get_MaterialState();
+        Assert_True(MaterialState == EMars_Dicing_State::WholeLeaves, f"the pile starts as whole leaves (got {MaterialState :n})");
         Assert_Equals_Float(_Dicing.Get_BandCenter(), utils_dicing::Get_BandCenterAt(_Spec, 0), 0.001, "the band starts on table entry 0");
         Assert_Equals_Float(_Dicing.Get_HandLateral(), 0.0, 0.001, "the hand starts at the board centre");
     }
@@ -113,7 +114,8 @@ class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_B
         if (_States.Num() > 0)
         { Assert_True(_States[0] == EMars_Dicing_State::CoarseChop, f"the pile became coarse chop (got {_States[0] :n})"); }
 
-        Assert_True(_Dicing.Get_MaterialState() == EMars_Dicing_State::CoarseChop, "the pile reads coarse chop");
+        const auto MaterialState = _Dicing.Get_MaterialState();
+        Assert_True(MaterialState == EMars_Dicing_State::CoarseChop, f"the pile reads coarse chop (got {MaterialState :n})");
         Assert_Equals_Int(_Dicing.Get_UsefulChops(), _Spec.ChopsPerState, "every chop was useful");
         Assert_Equals_Int(_Dicing.Get_ChopsInState(), 0, "the chop count restarted in the new state");
 

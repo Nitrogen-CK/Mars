@@ -1,12 +1,12 @@
 // A World-mode, Persistent world item whose definition carries UMars_ItemTrait_Backpack: the base WorldItem composition,
 // then one cargo slot per mount of the trait (utils_backpack::Add).
 //
-// Mounts resolve here: Socket None -> Offset is pack-root relative; a named socket -> Offset on top of the socket
-// transform, the socket location scaled by Presentation.MeshScale (the pack root is unit scale; the visual node carries
-// the display scale). A named socket the mesh does not have is a configuration error: ensure, destroy self.
+// Mounts resolve here: Socket unset -> Offset is pack-root relative; a named socket -> Offset on top of the socket
+// transform, the socket location scaled by Presentation.Visual.MeshScale (the pack root is unit scale; the visual node
+// carries the display scale). A named socket the mesh does not have is a configuration error: ensure, destroy self.
 //
-// While the pack is Held (in its carrier's hands) its cargo interactables are Mars-disabled: nobody can reach them
-// (design D-B5). Every other mount re-enables them.
+// While the pack is Held (in its carrier's hands) its cargo interactables are disabled: nobody can reach them. Every
+// other mount re-enables them.
 //
 // The weight probe (Probe.Mars.Backpack) is what backpack pressure plates feel. It is enabled only while the pack lies in
 // the world (Mount World): a carried or held pack weighs on nothing.
@@ -40,14 +40,14 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
-        auto Spec = FMars_Backpack_Spec();
-        if (ResolveMounts(InHandle, BackpackTrait, Presentation, Spec) == false)
+        const auto Spec = ResolveMounts(BackpackTrait, Presentation);
+        if (Spec.IsSet() == false)
         {
             utils_entity_lifetime::Request_DestroyEntity(InHandle);
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
-        auto Backpack = utils_backpack::Add(WorldItem, Spec);
+        auto Backpack = utils_backpack::Add(WorldItem, Spec.GetValue());
         if (ck::Is_NOT_Valid(Backpack))
         {
             utils_entity_lifetime::Request_DestroyEntity(InHandle);
@@ -66,15 +66,15 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    // False (after an ensure) when a mount names a socket the mesh does not have.
-    private bool ResolveMounts(const FCk_Handle& InHandle,
-                               const UMars_ItemTrait_Backpack InBackpackTrait,
-                               const UMars_ItemTrait_Presentation InPresentation,
-                               FMars_Backpack_Spec& OutSpec)
+    // Unset (after an ensure) when a mount names a socket the mesh does not have.
+    private TOptional<FMars_Backpack_Spec> ResolveMounts(const UMars_ItemTrait_Backpack InBackpackTrait,
+                                                         const UMars_ItemTrait_Presentation InPresentation) const
     {
+        auto Spec = FMars_Backpack_Spec();
+
         // Loaded only when a mount names a socket: the socket-less default (the engine cube) never blocks on a load.
         UStaticMesh Mesh = nullptr;
-        TSoftObjectPtr<UStaticMesh> MeshSoft = InPresentation.Mesh;
+        TSoftObjectPtr<UStaticMesh> MeshSoft = InPresentation.Visual.Mesh;
 
         for (int32 Index = 0; Index < InBackpackTrait.CargoSlots.Num(); ++Index)
         {
@@ -85,27 +85,28 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
             SlotSpec.ProbeRadius = Mount.ProbeRadius;
             SlotSpec.MountOffset = Mount.Offset;
 
-            if (Mount.Socket.IsNone() == false)
+            if (Mount.Socket.IsSet())
             {
+                const auto SocketName = Mount.Socket.GetValue();
                 if (ck::Is_NOT_Valid(Mesh) && MeshSoft.IsNull() == false)
                 { Mesh = System::LoadAsset_Blocking(MeshSoft); }
 
                 UStaticMeshSocket Socket = nullptr;
                 if (ck::IsValid(Mesh))
-                { Socket = Mesh.FindSocket(Mount.Socket); }
+                { Socket = Mesh.FindSocket(SocketName); }
 
                 if (ck::EnsureIfNot(ck::IsValid(Socket),
-                    f"[Backpack] [{InHandle.ToString()}] cargo mount [{Index}] names socket [{Mount.Socket.ToString()}], which the Presentation mesh does not have"))
-                { return false; }
+                    f"[Backpack] [{Definition.ToString()}] cargo mount [{Index}] names socket [{SocketName.ToString()}], which the Presentation mesh does not have"))
+                { return TOptional<FMars_Backpack_Spec>(); }
 
-                const auto SocketTransform = FTransform(Socket.RelativeRotation, Socket.RelativeLocation * InPresentation.MeshScale, FVector::OneVector);
+                const auto SocketTransform = FTransform(Socket.RelativeRotation, Socket.RelativeLocation * InPresentation.Visual.MeshScale, FVector::OneVector);
                 SlotSpec.MountOffset = Mount.Offset * SocketTransform;
             }
 
-            OutSpec.CargoSlots.Add(SlotSpec);
+            Spec.CargoSlots.Add(SlotSpec);
         }
 
-        return true;
+        return TOptional<FMars_Backpack_Spec>(Spec);
     }
 
     // The same shape as the pickup probe (utils_world_item::Make_ProbeFit), as a separate probe: the pickup is a QueryOnly
@@ -114,15 +115,15 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
     // enabled.
     private FCk_Handle_Probe AddWeightProbe(FCk_Handle& InHandle, const UMars_ItemTrait_Presentation InPresentation)
     {
-        auto ProbeSpec = FCk_Probe_Spec(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Backpack"));
+        auto ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Backpack);
         ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
                  .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
 
         const auto Fit = utils_world_item::Make_ProbeFit(InPresentation);
         auto Node = utils_prefab::Create_ProbeNode(InHandle.As_Transform(), Fit.Shape, ProbeSpec, Fit.Offset);
 
-        utils_handle::Set_DebugName(FCk_Handle(Node), n"Backpack.Probe.Weight");
-        return FCk_Handle(Node).As_Probe();
+        utils_handle::Set_DebugName(Node.H(), n"Backpack.Probe.Weight");
+        return Node.As_Probe();
     }
 
     // Held = in the carrier's own hands: the cargo is out of anyone's reach until the pack is carried or released.
@@ -134,7 +135,7 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         for (auto& Interactable : _CargoInteractables)
         {
             if (ck::IsValid(Interactable))
-            { Interactable.Request_SetEnableDisable(EnableDisable); }
+            { Interactable.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(EnableDisable)); }
         }
 
         if (ck::IsValid(_WeightProbe))

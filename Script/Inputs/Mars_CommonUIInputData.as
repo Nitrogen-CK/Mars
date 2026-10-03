@@ -1,8 +1,5 @@
-// CommonUI reads this class's CDO, so the defaults ARE the data - no companion asset.
-// Register in Config/DefaultGame.ini once menus exist:
-//   [/Script/CommonInput.CommonInputSettings]
-//   bEnableEnhancedInputSupport=True
-//   InputData=/Script/Angelscript.Mars_CommonUIInputData
+// CommonUI reads this class's CDO, so the defaults ARE the data - no companion asset. Registered as
+// [/Script/CommonInput.CommonInputSettings] InputData in Config/DefaultGame.ini; renaming the class breaks that line.
 class UMars_CommonUIInputData : UCommonUIInputData
 {
     default EnhancedInputBackAction = mars::Mars_IA_UI_Back;

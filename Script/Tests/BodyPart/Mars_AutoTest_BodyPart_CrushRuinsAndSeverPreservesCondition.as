@@ -36,10 +36,6 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
         Run_Steps(InHandle);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
-
     private FMars_Crawler_Spec Make_Spec()
     {
         const auto Half = FVector(400.0, 400.0, 200.0);
@@ -69,7 +65,7 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     UFUNCTION()
     private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _Crawler = FCk_Handle(InEntityScriptHandle).As_Crawler(ECk_SanityCheck::UnChecked);
+        _Crawler = InEntityScriptHandle.As_Crawler();
     }
 
     UFUNCTION()
@@ -105,10 +101,10 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
         _ChangedNew.Add(InNew);
     }
 
-    private void Hit(FCk_Handle_BodyPart InPart, float32 InAmount, FName InDamageType)
+    private void Hit(FCk_Handle_BodyPart InPart, float32 InAmount, FGameplayTag InDamageType)
     {
         auto Zone = InPart.Get_Zone();
-        Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(InAmount, GameplayTags::ResolveGameplayTag(InDamageType))));
+        Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(InAmount, InDamageType)));
     }
 
     private bool Get_BodyIs(float32 InExpected)
@@ -119,10 +115,19 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     private void AssertChange(int32 InIndex, EMars_BodyPart_Condition InOld, EMars_BodyPart_Condition InNew)
     {
         if (_ChangedParts.Num() <= InIndex)
-        { return; }
+        {
+            Assert_True(false, f"change {InIndex} was signalled ({_ChangedParts.Num()} changes)");
+            return;
+        }
 
-        Assert_True(_ChangedOld[InIndex] == InOld, f"change {InIndex} starts at {InOld :n}");
-        Assert_True(_ChangedNew[InIndex] == InNew, f"change {InIndex} ends at {InNew :n}");
+        Assert_True(_ChangedOld[InIndex] == InOld, f"change {InIndex} starts at {InOld :n} (got {_ChangedOld[InIndex] :n})");
+        Assert_True(_ChangedNew[InIndex] == InNew, f"change {InIndex} ends at {InNew :n} (got {_ChangedNew[InIndex] :n})");
+    }
+
+    private void AssertCondition(FCk_Handle_BodyPart InPart, EMars_BodyPart_Condition InExpected, const FString& InWhat)
+    {
+        const auto Condition = InPart.Get_Condition();
+        Assert_True(Condition == InExpected, f"{InWhat} (got {Condition :n})");
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -137,7 +142,7 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
         _Part0.BindTo_OnConditionChanged(FMars_Delegate_BodyPart_OnConditionChanged(this, n"OnConditionChanged"));
         _Part1.BindTo_OnConditionChanged(FMars_Delegate_BodyPart_OnConditionChanged(this, n"OnConditionChanged"));
 
-        Hit(_Part0, 10.0f, n"DamageType.Mars.Sever");
+        Hit(_Part0, 10.0f, GameplayTags::DamageType_Mars_Sever);
     }
 
     UFUNCTION()
@@ -150,13 +155,13 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertDamagedAndSeverAgain(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Part0.Get_Condition() == EMars_BodyPart_Condition::Damaged, "Sever moved leg 0 to Damaged");
+        AssertCondition(_Part0, EMars_BodyPart_Condition::Damaged, "Sever moved leg 0 to Damaged");
         Assert_Equals_Int(_ChangedParts.Num(), 1, "one condition change");
-        Assert_True(_ChangedParts.Num() > 0 && FCk_Handle(_ChangedParts[0]) == FCk_Handle(_Part0), "change 0 is leg 0's");
+        Assert_True(_ChangedParts.Num() > 0 && _ChangedParts[0] == _Part0, "change 0 is leg 0's");
         AssertChange(0, EMars_BodyPart_Condition::Pristine, EMars_BodyPart_Condition::Damaged);
         Assert_Equals_Float(_Part0.Get_RuinDamageTaken(), 0.0f, 0.001f, "Sever adds no ruin damage");
 
-        Hit(_Part0, 10.0f, n"DamageType.Mars.Sever");
+        Hit(_Part0, 10.0f, GameplayTags::DamageType_Mars_Sever);
     }
 
     UFUNCTION()
@@ -169,11 +174,11 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertStillDamagedAndCrushLeg1(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Part0.Get_Condition() == EMars_BodyPart_Condition::Damaged, "a second Sever leaves leg 0 Damaged");
+        AssertCondition(_Part0, EMars_BodyPart_Condition::Damaged, "a second Sever leaves leg 0 Damaged");
         Assert_Equals_Int(_ChangedParts.Num(), 1, "no signal for an unchanged condition");
         Assert_Equals_Float(_Part0.Get_Health().Get_Current(), 10.0f, 0.001f, "leg 0 took both Sever hits");
 
-        Hit(_Part1, 6.0f, n"DamageType.Mars.Crush");
+        Hit(_Part1, 6.0f, GameplayTags::DamageType_Mars_Crush);
     }
 
     UFUNCTION()
@@ -186,13 +191,13 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertCrushDamagedAndCrushAgain(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Part1.Get_Condition() == EMars_BodyPart_Condition::Damaged, "Crush below the ruin threshold moves leg 1 to Damaged");
+        AssertCondition(_Part1, EMars_BodyPart_Condition::Damaged, "Crush below the ruin threshold moves leg 1 to Damaged");
         Assert_Equals_Float(_Part1.Get_RuinDamageTaken(), 9.0f, 0.001f, "leg 1 took 6 x 1.5 = 9 ruin damage");
         Assert_Equals_Int(_ChangedParts.Num(), 2, "two condition changes");
-        Assert_True(_ChangedParts.Num() > 1 && FCk_Handle(_ChangedParts[1]) == FCk_Handle(_Part1), "change 1 is leg 1's");
+        Assert_True(_ChangedParts.Num() > 1 && _ChangedParts[1] == _Part1, "change 1 is leg 1's");
         AssertChange(1, EMars_BodyPart_Condition::Pristine, EMars_BodyPart_Condition::Damaged);
 
-        Hit(_Part1, 6.0f, n"DamageType.Mars.Crush");
+        Hit(_Part1, 6.0f, GameplayTags::DamageType_Mars_Crush);
     }
 
     UFUNCTION()
@@ -205,14 +210,15 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertRuined(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Part1.Get_Condition() == EMars_BodyPart_Condition::Ruined, "18 ruin damage >= 15 ruins leg 1");
+        AssertCondition(_Part1, EMars_BodyPart_Condition::Ruined, "18 ruin damage >= 15 ruins leg 1");
         Assert_Equals_Float(_Part1.Get_RuinDamageTaken(), 18.0f, 0.001f, "leg 1 took 18 ruin damage");
         Assert_Equals_Int(_ChangedParts.Num(), 3, "three condition changes");
-        Assert_True(_ChangedParts.Num() > 2 && FCk_Handle(_ChangedParts[2]) == FCk_Handle(_Part1), "change 2 is leg 1's");
+        Assert_True(_ChangedParts.Num() > 2 && _ChangedParts[2] == _Part1, "change 2 is leg 1's");
         AssertChange(2, EMars_BodyPart_Condition::Damaged, EMars_BodyPart_Condition::Ruined);
 
-        Assert_True(_Part0.Get_Condition() == EMars_BodyPart_Condition::Damaged, "leg 0 is still Damaged");
-        Assert_True(_Part1.Get_State() == EMars_BodyPart_State::Attached, "a ruined leg with health left stays attached");
+        AssertCondition(_Part0, EMars_BodyPart_Condition::Damaged, "leg 0 is still Damaged");
+        Assert_True(_Part1.Get_State() == EMars_BodyPart_State::Attached,
+            f"a ruined leg with health left stays attached (got {_Part1.Get_State() :n})");
         Assert_Equals_Float(_Part1.Get_Health().Get_Current(), 12.0f, 0.001f, "leg 1 has 12 left");
     }
 }

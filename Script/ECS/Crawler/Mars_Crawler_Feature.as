@@ -15,7 +15,7 @@ struct FMars_Feature_Crawler {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What the crawler's body and legs are made of. Field order is the positional constructor's order.
+// What the crawler's body and legs are made of.
 struct FMars_Crawler_Vitals
 {
     UPROPERTY()
@@ -47,7 +47,7 @@ struct FMars_Crawler_Vitals
     }
 }
 
-// One leg's rigid parts. Field order is the positional constructor's order.
+// One leg's rigid parts.
 struct FMars_Crawler_LegRig
 {
     // The rig asset's leg id (Leg0..).
@@ -112,10 +112,9 @@ mixin FMars_Validation Validate(const FMars_Crawler_Rig& Self, int32 InLegCount)
     return FMars_Validation();
 }
 
-// Field order is the positional constructor's order.
 struct FMars_Crawler_Spec
 {
-    // 4 or 6.
+    // 4 or 6 (utils_crawler::Get_RigData).
     UPROPERTY()
     int32 LegCount = 4;
 
@@ -151,7 +150,7 @@ struct FMars_Crawler_Spec
 
 mixin FMars_Validation Validate(const FMars_Crawler_Spec& Self)
 {
-    if (Self.LegCount != 4 && Self.LegCount != 6)
+    if (ck::Is_NOT_Valid(utils_crawler::Get_RigData(Self.LegCount)))
     { return FMars_Validation(f"Crawler has LegCount [{Self.LegCount}]; only 4 and 6 have rigs"); }
 
     if (Self.MinLegsToWalk < 2 || Self.MinLegsToWalk > Self.LegCount)
@@ -175,15 +174,11 @@ mixin FMars_Validation Validate(const FMars_Crawler_Spec& Self)
     { return FMars_Validation(f"Crawler has a negative CorpseSeconds [{Vitals.CorpseSeconds}]"); }
 
     const auto RigValidation = Self.Rig.Validate(Self.LegCount);
-    if (RigValidation.IsValid == false)
+    if (RigValidation.IsValid() == false)
     { return RigValidation; }
 
     return Vitals.LegDebris.Validate();
 }
-
-//--------------------------------------------------------------------------------------------------------------------------
-// Rig (built by the entity script, which owns the visuals)
-//--------------------------------------------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
@@ -199,8 +194,8 @@ struct FMars_Fragment_Crawler_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Composed by Add; nothing writes it afterwards (the walker's legs, the parts, the navigator and the brain on the same
-// root keep their own state).
+// Composed by Add; afterwards only UMars_Processor_Crawler_Setup's damage handler writes it (HurtCount). The walker's
+// legs, the parts, the navigator and the brain on the same root keep their own state.
 struct FMars_Fragment_Crawler
 {
     UPROPERTY()
@@ -215,16 +210,18 @@ struct FMars_Fragment_Crawler
     UPROPERTY()
     FCk_Handle_Transform Presentation;
 
-    // In the rig asset's leg order; LegParts[i] is Legs[i] (the leg entity carries the part).
-    UPROPERTY()
-    TArray<FCk_Handle_ProceduralLeg> Legs;
-
+    // In the rig asset's leg order; each leg entity carries its part, so the part names its leg.
     UPROPERTY()
     TArray<FCk_Handle_BodyPart> LegParts;
 
     // On the root (the motion's entity): goal -> path -> steering.
     UPROPERTY()
     FCk_Handle_SurfaceNavigator Navigator;
+
+    // Damage events on the body or any leg so far. The Flinch task restarts its hold whenever it changes, so a hit that
+    // lands while the flinch is being cleared cannot leave the crawler waiting on a fact that never clears.
+    UPROPERTY()
+    int32 HurtCount = 0;
 }
 
 struct FMars_Tag_Crawler_NeedsSetup {}

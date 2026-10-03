@@ -3,25 +3,34 @@
 // holds until the target is lost, then releases; a dropped or thrown item is followed through by a push. The phase itself
 // lives on the FPHands feature: each state's enter task requests it.
 //
-//   Rest    ->Push    [HandsPushRequested]   ->Reach [HandsReachRequested instant]   ->Hold [HandsReachRequested timed]
-//   Reach   ->Grip    [HandsPhaseElapsed Reach]
-//   Grip    ->Return  [HandsPhaseElapsed Grip]
-//   Return  ->Reach   [HandsReachRequested instant]   ->Hold [HandsReachRequested timed]   ->Rest [HandsPhaseElapsed Return]
-//   Hold    ->Release [HandsTargetLost]
-//   Release ->Reach   [HandsReachRequested instant]   ->Hold [HandsReachRequested timed]   ->Rest [HandsPhaseElapsed Release]
-//   Push    ->Rest    [HandsPhaseElapsed Push]
-//
 // The resolver is listened to in Rest, Hold, Release and Return: a new target interrupts a release or return (the reach
 // continues from the gloves' current alpha) but is ignored mid-grab, mid-hold and mid-push rather than restarting them.
-// Entering Rest, Release or Return re-reads the resolver (Hold does not), so a timed target that became best while the
-// gloves were busy and whose interaction is still live is reached for then - the gloves always end up on the device
-// they are using. Tasks and conditions only issue FPHands requests and read its getters; ck::Ctx is the player entity
-// (the sub-SM inherits its parent's context).
+// Entering Rest, Release or Return re-reads the resolver, so a timed target that became best while the gloves were busy
+// and whose interaction is still live is reached for then - the gloves always end up on the device they are using.
+// Entering Hold checks the reached target is still best, so a removal broadcast before Hold bound is not missed. Tasks
+// and conditions only issue FPHands requests and read its getters; ck::Ctx is the player entity (the sub-SM inherits
+// its parent's context).
 
 class UMars_SmTask_HandsSubSm : UCk_SmTask_SubStateMachine
 {
     default _InitialStateClass = UMars_SmState_Hands_Rest;
     default _CompletionBehavior = ECk_SmTask_SubSm_CompletionBehavior::KeepRunning;
+}
+
+namespace utils_fphands
+{
+    // Hands the gloves back to the procedural placement: stops a playing emote montage (a reach or a newly held item
+    // takes over). An entity with no character (tests) plays no emotes.
+    void Stop_Emote(const FCk_Handle_FPHands& InHands)
+    {
+        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(InHands, ECk_SanityCheck::UnChecked));
+        if (ck::Is_NOT_Valid(Character))
+        { return; }
+
+        auto AnimInstance = Character.FPHands.GetAnimInstance();
+        if (ck::IsValid(AnimInstance) && AnimInstance.IsAnyMontagePlaying())
+        { AnimInstance.Montage_Stop(InHands.Get_Spec().Emotes.CancelBlendSeconds); }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -38,10 +47,7 @@ class UMars_SmTask_Hands_SetPhase : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Hands = ck::Ctx(InHandle).As_FPHands(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hands))
-        { return; }
-
+        auto Hands = ck::Ctx(InHandle).As_FPHands();
         Hands.Request_SetPhase(FMars_Request_FPHands_SetPhase(Phase));
     }
 }
@@ -94,9 +100,9 @@ class UMars_SmTask_HandsLaunchBinds : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto Player = ck::Ctx(InHandle);
-        _Hands = Player.As_FPHands(ECk_SanityCheck::UnChecked);
+        _Hands = Player.As_FPHands();
         _Use = Player.As_HeldItemUse(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Hands) || ck::Is_NOT_Valid(_Use))
+        if (ck::Is_NOT_Valid(_Use))
         { return; }
 
         _Use.BindTo_OnItemLaunched(FMars_Delegate_HeldItemUse_OnItemLaunched(this, n"OnItemLaunched"));
@@ -113,16 +119,13 @@ class UMars_SmTask_HandsLaunchBinds : UCk_SmTask_EntityScript
     }
 
     UFUNCTION()
-    private void OnItemLaunched(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, bool InIsThrow)
+    private void OnItemLaunched(FCk_Handle_HeldItemUse InUse, FCk_Handle_Item InItem, EMars_LaunchKind InKind)
     {
-        if (ck::Is_NOT_Valid(_Hands))
-        { return; }
-
-        _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(_Hands.Get_Hold(), InIsThrow));
+        _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(_Hands.Get_Hold(), InKind));
     }
 }
 
-// A reach or a hold interrupts a playing emote (an actor API; an entity with no character, as in tests, has none to stop).
+// A reach or a hold interrupts a playing emote.
 class UMars_SmTask_Hands_StopEmote : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -130,75 +133,57 @@ class UMars_SmTask_Hands_StopEmote : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(ck::Ctx(InHandle), ECk_SanityCheck::UnChecked));
-        if (ck::Is_NOT_Valid(Character))
-        { return; }
-
-        Character.Stop_FPEmote();
+        utils_fphands::Stop_Emote(ck::Ctx(InHandle).As_FPHands());
     }
+}
+
+// What the resolver binds do on enter, beyond listening.
+enum EMars_FPHands_EnterSync
+{
+    // Rest, Release, Return: reach for a best target whose non-instant interaction is live (it became best while the
+    // gloves were busy).
+    Resync,
+    // Hold: let go when the reached target is no longer best (its removal may have been broadcast before Hold bound).
+    VerifyTarget
 }
 
 // Resolver -> feature requests, in the states that can start or lose a target (Rest, Hold, Release, Return). A new
 // Use- or Operate-intent target (Operate: a station's grip, opened only by the player's Operating state) starts a reach
-// (instant when its interaction completes instantly); a removed one that is the current reach target releases. On enter
-// it also re-syncs to the resolver's current best targets (see DoEnterTask) unless ResyncOnEnter is off (Hold: the gloves
-// are already on the target they reached for). An entity without a resolver (tests) binds nothing.
+// with its completion policy; a removed one that is the current reach target releases. An entity without a resolver
+// (tests) binds nothing.
 class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
-    protected bool ResyncOnEnter = true;
+    protected EMars_FPHands_EnterSync EnterSync = EMars_FPHands_EnterSync::Resync;
 
+    private FCk_Handle _Player;
     private FCk_Handle_FPHands _Hands;
     private FCk_Handle_InteractionResolver _Resolver;
-    private FGameplayTag _OperateIntent;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _OperateIntent = GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate");
-
-        auto Player = ck::Ctx(InHandle);
-        _Hands = Player.As_FPHands(ECk_SanityCheck::UnChecked);
-        _Resolver = Player.As_InteractionResolver(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Hands) || ck::Is_NOT_Valid(_Resolver))
+        _Player = ck::Ctx(InHandle);
+        _Hands = _Player.As_FPHands();
+        _Resolver = _Player.As_InteractionResolver(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(_Resolver))
         { return; }
 
         _Resolver.BindTo_OnBestTargetsChanged(
             FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
 
-        if (ResyncOnEnter == false)
-        { return; }
-
-        // A target that became best while the gloves were busy (Push, a grab, a release): if its non-instant interaction
-        // is still live, reach for it now. Instant targets are never re-reached - a grab always finishes on its own. Use
-        // first, then Operate (same rules).
-        if (TryResync(Player, GameplayTags::InteractionIntent_Mars_Use))
-        { return; }
-
-        TryResync(Player, _OperateIntent);
-    }
-
-    private bool TryResync(FCk_Handle InPlayer, FGameplayTag InIntent)
-    {
-        auto BestTargets = _Resolver.Get_BestInteractTargets(InIntent);
-        for (auto Target : BestTargets)
+        if (EnterSync == EMars_FPHands_EnterSync::VerifyTarget)
         {
-            if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
-            { continue; }
-
-            if (Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::Instant)
-            { continue; }
-
-            if (ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, InPlayer)))
-            { continue; }
-
-            const auto& Context = Target.Get_Fragment(FMars_Fragment_InteractionContext);
-            _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Target, Context.Interactable, Context.InteractableOwner, false));
-            return true;
+            Release_IfNoLongerBest();
+            return;
         }
 
-        return false;
+        // Instant targets are never re-reached - a grab always finishes on its own. Use first, then Operate.
+        if (TryResync(GameplayTags::InteractionIntent_Mars_Use))
+        { return; }
+
+        TryResync(GameplayTags::InteractionIntent_Mars_Operate);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -210,8 +195,62 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
                 FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
         }
 
+        _Player = FCk_Handle();
         _Hands = FCk_Handle_FPHands();
         _Resolver = FCk_Handle_InteractionResolver();
+    }
+
+    private bool TryResync(FGameplayTag InIntent)
+    {
+        auto BestTargets = _Resolver.Get_BestInteractTargets(InIntent);
+        for (auto Target : BestTargets)
+        {
+            if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+            { continue; }
+
+            const auto CompletionPolicy = Target.Get_InteractionCompletionPolicy();
+            if (CompletionPolicy == ECk_Interaction_CompletionPolicy::Instant)
+            { continue; }
+
+            if (ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, _Player)))
+            { continue; }
+
+            Request_Reach(Target, CompletionPolicy);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void Release_IfNoLongerBest()
+    {
+        if (_Hands.Get_ReachInteractTarget().IsSet() == false)
+        { return; }
+
+        if (Get_IsBestReachTarget(GameplayTags::InteractionIntent_Mars_Use)
+            || Get_IsBestReachTarget(GameplayTags::InteractionIntent_Mars_Operate))
+        { return; }
+
+        _Hands.Request_Release();
+    }
+
+    private bool Get_IsBestReachTarget(FGameplayTag InIntent)
+    {
+        auto BestTargets = _Resolver.Get_BestInteractTargets(InIntent);
+        for (auto Target : BestTargets)
+        {
+            if (_Hands.Get_IsReachTarget(Target))
+            { return true; }
+        }
+
+        return false;
+    }
+
+    private void Request_Reach(FCk_Handle_InteractTarget InTarget, ECk_Interaction_CompletionPolicy InCompletionPolicy)
+    {
+        const auto& Context = InTarget.Get_Fragment(FMars_Fragment_InteractionContext);
+        const auto Subject = FMars_FPHands_ReachSubject(InTarget, Context.Interactable, Context.InteractableOwner);
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, InCompletionPolicy));
     }
 
     UFUNCTION()
@@ -220,13 +259,14 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
                                       const TArray<FCk_Handle_InteractTarget>&in InNewTargets,
                                       const TArray<FCk_Handle_InteractTarget>&in InRemovedTargets)
     {
-        const auto IsHandsIntent = InIntent == GameplayTags::InteractionIntent_Mars_Use || InIntent == _OperateIntent;
-        if (IsHandsIntent == false || ck::Is_NOT_Valid(_Hands))
+        const auto IsHandsIntent = InIntent == GameplayTags::InteractionIntent_Mars_Use
+            || InIntent == GameplayTags::InteractionIntent_Mars_Operate;
+        if (IsHandsIntent == false)
         { return; }
 
         for (auto Removed : InRemovedTargets)
         {
-            if (Removed == _Hands.Get_InteractTarget())
+            if (_Hands.Get_IsReachTarget(Removed))
             { _Hands.Request_Release(); }
         }
 
@@ -235,19 +275,17 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
             { continue; }
 
-            const auto& Context = Target.Get_Fragment(FMars_Fragment_InteractionContext);
-            const auto IsInstant = Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::Instant;
-            _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Target, Context.Interactable, Context.InteractableOwner, IsInstant));
+            Request_Reach(Target, Target.Get_InteractionCompletionPolicy());
             return;
         }
     }
 }
 
-// Hold's resolver binds: no re-sync on enter (the reach that entered Hold already chose the target; re-syncing would
-// only re-request it, and the drain would reject it as busy).
+// Hold's resolver binds: no re-sync on enter (the reach that entered Hold already chose the target, and the drain would
+// reject a second one as busy); instead the target is verified to still be best.
 class UMars_SmTask_HandsResolverBinds_NoResync : UMars_SmTask_HandsResolverBinds
 {
-    default ResyncOnEnter = false;
+    default EnterSync = EMars_FPHands_EnterSync::VerifyTarget;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -262,10 +300,7 @@ class UMars_SmCondition_HandsPhaseElapsed : UCk_SmCondition_Polled
     UFUNCTION(BlueprintOverride)
     bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
     {
-        auto Hands = ck::Ctx(InHandle).As_FPHands(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hands))
-        { return false; }
-
+        const auto Hands = ck::Ctx(InHandle).As_FPHands();
         const auto PhaseSeconds = utils_fphands::Get_PhaseSeconds(Phase, Hands.Get_Spec());
         return Hands.Get_Phase() == Phase && PhaseSeconds.IsSet() && Hands.Get_PhaseTime() >= PhaseSeconds.GetValue();
     }
@@ -327,10 +362,10 @@ class UMars_SmCondition_HandsPushRequested : UCk_SmCondition_EventDriven
     }
 }
 
-// Event-driven: OnReachRequested with the wanted IsInstant. Rests at Fail; marks only from the signal handler.
+// Event-driven: OnReachRequested of the wanted reach kind. Rests at Fail; marks only from the signal handler.
 class UMars_SmCondition_HandsReachRequested : UCk_SmCondition_EventDriven
 {
-    protected bool WantsInstant = true;
+    protected EMars_FPHands_ReachKind WantedKind = EMars_FPHands_ReachKind::Grab;
 
     private FCk_Handle_FPHands _Hands;
 
@@ -354,21 +389,21 @@ class UMars_SmCondition_HandsReachRequested : UCk_SmCondition_EventDriven
     }
 
     UFUNCTION()
-    private void OnReachRequested(FCk_Handle_FPHands InHands, bool InIsInstant)
+    private void OnReachRequested(FCk_Handle_FPHands InHands, ECk_Interaction_CompletionPolicy InCompletionPolicy)
     {
-        if (InIsInstant == WantsInstant)
+        if (utils_fphands::Get_ReachKind(InCompletionPolicy) == WantedKind)
         { MarkSatisfied(); }
     }
 }
 
 class UMars_SmCondition_HandsReachRequested_Instant : UMars_SmCondition_HandsReachRequested
 {
-    default WantsInstant = true;
+    default WantedKind = EMars_FPHands_ReachKind::Grab;
 }
 
 class UMars_SmCondition_HandsReachRequested_Timed : UMars_SmCondition_HandsReachRequested
 {
-    default WantsInstant = false;
+    default WantedKind = EMars_FPHands_ReachKind::Hold;
 }
 
 // Event-driven: OnReachTargetLost. Rests at Fail; marks only from the signal handler.

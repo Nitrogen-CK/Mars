@@ -1,18 +1,13 @@
-// Death is a state, and the Dead state does the teardown: a roaming 4-leg crawler (CorpseSeconds 1.5, leg debris 1.0 s)
-// takes 200 Blunt on its body zone; the body Health depletes, the monster dies (Dead = 1) and the root HFSM leaves Alive
-// for Dead. Within 1 s of entering Dead the Die task has stopped the navigator, disabled the brain, severed all 4 still
-// attached legs (4 OnSevered, the gait has 0 legs enabled) and disabled the body zone. The corpse timer then destroys the
-// crawler root, the severed limbs (world-owned) die on their own debris timer, and the test's floor is untouched.
-//
-// Spawned through the real entity script onto a runtime static Jolt floor (no nav field: straight-line moves).
-// Isolated origin (160000, 80000, 600): the Mars autotest map has no floor of its own there.
-class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UCk_AutoTest_Base
+// Death is a state, and the Dead state does the teardown: a roaming 4-leg crawler takes 200 Blunt on its body zone; the
+// monster dies and the root HFSM leaves Alive for Dead, whose Die task stops the navigator, disables the brain, severs
+// all 4 legs and disables the body zone. The severed legs are handed to the world while the corpse still stands, so they
+// die on their own debris timer rather than with the root; the corpse timer then destroys the root.
+class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 30.0f;
+    default _Origin = FVector(160000.0, 80000.0, 600.0);
 
-    private FVector _Origin = FVector(160000.0, 80000.0, 600.0);
     private FCk_Handle _Floor;
-    private FCk_Handle_Crawler _Crawler;
     private FCk_Handle _CrawlerRoot;
 
     private int32 _DiedCount = 0;
@@ -23,79 +18,28 @@ class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        SpawnFloorAndCrawler(InHandle, Make_Spec());
+        _Floor = SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed and its gait Ready", n"Check_Ready", 0, 10.0f);
+        Add_Step_WaitUntil("the crawler is composed and its gait Ready", n"Check_GaitReady", 0, 10.0f);
         Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 5.0f);
         Add_Step("bind OnDied and every part's OnSevered; hit the body zone with 200 Blunt", n"Step_BindAndKill");
         Add_Step_WaitUntil("the root state machine is in Dead", n"Check_InDead", 0, 3.0f);
         Add_Step_WaitUntil("the Die task tore the crawler down", n"Check_TornDown", 0, 1.0f);
         Add_Step("one death, four severs, no leg enabled", n"Step_AssertTeardown");
+        Add_Step_WaitUntil("every severed leg is world-owned while the corpse stands", n"Check_LegsWorldOwned", 0, 1.0f);
         Add_Step_WaitUntil("the corpse timer destroyed the crawler root", n"Check_RootDestroyed", 0, 2.5f);
         Add_Step("the severed limbs died on their own timer; the floor is untouched", n"Step_AssertDespawned");
         Run_Steps(InHandle);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
-
     private FMars_Crawler_Spec Make_Spec()
     {
-        const auto Half = FVector(300.0, 300.0, 200.0);
-        auto Spec = FMars_Crawler_Spec(4, FBox(_Origin - Half, _Origin + Half));
+        auto Spec = Make_CrawlerSpec(FVector(300.0, 300.0, 200.0));
         Spec.RoamDwellSeconds = 0.3f;
         // Both overrides keep everything the death releases inside the test (no entity outlives it).
         Spec.Vitals.CorpseSeconds = 1.5f;
         Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         return Spec;
-    }
-
-    private void SpawnFloorAndCrawler(FCk_Handle InHandle, FMars_Crawler_Spec InSpec)
-    {
-        _Floor = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(_Floor, FTransform(FRotator::ZeroRotator, _Origin - FVector(0.0, 0.0, 10.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(1500.0, 1500.0, 10.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(_Floor, FloorSpec);
-
-        auto SpawnParams = UMars_Crawler_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0));
-        SpawnParams.Spec = InSpec;
-        SpawnParams.WithVisuals = false;
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
-        utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
-    }
-
-    UFUNCTION()
-    private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
-    {
-        _CrawlerRoot = FCk_Handle(InEntityScriptHandle);
-        _Crawler = _CrawlerRoot.As_Crawler(ECk_SanityCheck::UnChecked);
-    }
-
-    UFUNCTION()
-    private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        if (ck::Is_NOT_Valid(_Crawler))
-        {
-            Res.Set(false);
-            return;
-        }
-
-        const auto Gait = _Crawler.Get_Gait();
-        if (utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Failed)
-        {
-            FinishFailure(f"the crawler's gait failed: {utils_procedural_gait::Get_Failure(Gait) :n}");
-            return;
-        }
-
-        Res.Set(utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Ready);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -112,9 +56,9 @@ class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UCk_AutoTest_Base
     private void OnSevered(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased)
     {
         ++_SeveredCount;
-        _SeveredLegs.Add(FCk_Handle(InPart));
+        _SeveredLegs.Add(InPart);
         for (const auto& Released : InReleased)
-        { _Debris.Add(FCk_Handle(Released)); }
+        { _Debris.Add(Released); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -122,15 +66,10 @@ class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UCk_AutoTest_Base
     //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
-    private void Check_InRoam(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Crawler.Get_BehaviorStateClass() == UMars_SmState_Crawler_Roam);
-    }
-
-    UFUNCTION()
     private void Step_BindAndKill(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        _CrawlerRoot = _Crawler;
+
         auto Monster = _Crawler.Get_Monster();
         Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnDied"));
 
@@ -144,15 +83,14 @@ class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UCk_AutoTest_Base
 
         auto BodyZone = Monster.Get_BodyZone();
         BodyZone.Request_Hit(FMars_Request_HitZone_Hit(
-            FMars_DamageEvent(200.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt"))));
+            FMars_DamageEvent(200.0f, GameplayTags::DamageType_Mars_Blunt)));
     }
 
     UFUNCTION()
     private void Check_InDead(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        auto RootMachine = _CrawlerRoot.As_StateMachine(ECk_SanityCheck::UnChecked);
-        Res.Set(ck::IsValid(RootMachine) && utils_state_machine::IsInState(RootMachine, UMars_SmState_Crawler_Dead));
+        Res.Set(utils_state_machine::IsInState(_CrawlerRoot.As_StateMachine(), UMars_SmState_Crawler_Dead));
     }
 
     UFUNCTION()
@@ -190,6 +128,28 @@ class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UCk_AutoTest_Base
         Assert_Equals_Int(_Debris.Num(), 12, "each leg released its 2 segments and its foot");
         Assert_True(Monster.Get_BodyHealth().Get_IsDepleted(), "the body Health is depleted");
         Assert_True(ck::IsValid(_CrawlerRoot), "the corpse is still there before CorpseSeconds");
+    }
+
+    // Polled while the root still lives: a leg the root kept would die with the corpse and pass the despawn check too.
+    UFUNCTION()
+    private void Check_LegsWorldOwned(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        if (ck::Is_NOT_Valid(_CrawlerRoot))
+        {
+            FinishFailure("the corpse was destroyed before every severed leg was seen world-owned");
+            return;
+        }
+
+        auto AllWorldOwned = _SeveredLegs.Num() == 4;
+        for (const auto& Leg : _SeveredLegs)
+        {
+            const auto LegOwner = utils_entity_lifetime::Get_LifetimeOwner(Leg);
+            AllWorldOwned = AllWorldOwned && LegOwner != _CrawlerRoot
+                && ck::IsValid(LegOwner) && utils_entity_lifetime::Get_IsTransientEntity(LegOwner);
+        }
+
+        Res.Set(AllWorldOwned);
     }
 
     UFUNCTION()

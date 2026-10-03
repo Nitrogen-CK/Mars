@@ -1,67 +1,62 @@
 namespace utils_dicing
 {
-    // The band table: where the band sits after each useful chop, as a fraction of BoardHalfWidth. Deterministic so tests
-    // can follow it; it wraps after the last entry.
-    const int32 k_BandTableSize = 8;
-
-    // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature). InNodes are
-    // built by the caller (the entity script): the hand slides InNodes.LateralNode along local Y, and InNodes.ChopMover
-    // strikes from its start (raised) to its end (contact). A rejected spec or a missing node ensures and returns an
-    // invalid handle.
-    FCk_Handle_Dicing Add(FCk_Handle& InHandle, FMars_Dicing_Spec InSpec, FMars_Dicing_Nodes InNodes)
+    // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature). The spec's
+    // Nodes are built by the caller: the hand slides Nodes.LateralNode along local Y, and Nodes.ChopMover strikes from
+    // its start (raised) to its end (contact). A rejected spec or a missing node ensures and returns an invalid handle.
+    FCk_Handle_Dicing Add(FCk_Handle& InHandle, FMars_Dicing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Dicing] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Dicing] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Dicing(); }
 
-        if (ck::EnsureIfNot(ck::IsValid(InNodes.LateralNode) && ck::IsValid(InNodes.ChopMover),
+        if (ck::EnsureIfNot(ck::IsValid(InSpec.Nodes.LateralNode) && ck::IsValid(InSpec.Nodes.ChopMover),
             f"[Dicing] [{InHandle.ToString()}] needs a lateral node and a chop Mover"))
         { return FCk_Handle_Dicing(); }
 
         auto Params = FMars_Fragment_Dicing_Params();
         Params.Spec = InSpec;
 
-        auto State = FMars_Fragment_Dicing();
-        State.BandIndex = 0;
-        State.BandCenter = Get_BandCenterAt(InSpec, 0);
-        State.LateralNode = InNodes.LateralNode;
-        State.ChopMover = InNodes.ChopMover;
-
         InHandle.Add_Fragment(FMars_Feature_Dicing());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(FMars_Fragment_Dicing());
         InHandle.Add_Fragment(FMars_Tag_Dicing_NeedsSetup());
         auto Dicing = InHandle.As_Dicing();
 
         auto Link = FMars_Fragment_Dicing_ChopLink();
         Link.Dicing = Dicing;
-        auto MoverEntity = FCk_Handle(InNodes.ChopMover);
-        MoverEntity.Add_Fragment(Link);
+        auto ChopMover = InSpec.Nodes.ChopMover;
+        ChopMover.Add_Fragment(Link);
 
         return Dicing;
     }
 
-    float32 Get_BandFraction(int32 InIndex)
+    // The band table: where the band sits after each useful chop, as a fraction of BoardHalfWidth. Deterministic so tests
+    // can follow it; it wraps after the last entry.
+    TArray<float32> Get_BandTable()
     {
-        switch (InIndex % k_BandTableSize)
-        {
-            case 0: return -0.6f;
-            case 1: return 0.6f;
-            case 2: return -0.2f;
-            case 3: return 0.4f;
-            case 4: return -0.5f;
-            case 5: return 0.1f;
-            case 6: return 0.6f;
-            case 7: return -0.4f;
-        }
+        TArray<float32> Fractions;
+        Fractions.Add(-0.6f);
+        Fractions.Add(0.6f);
+        Fractions.Add(-0.2f);
+        Fractions.Add(0.4f);
+        Fractions.Add(-0.5f);
+        Fractions.Add(0.1f);
+        Fractions.Add(0.6f);
+        Fractions.Add(-0.4f);
+        return Fractions;
+    }
 
-        return 0.0f;
+    // The table entry after InIndex, wrapping.
+    int32 Get_NextBandIndex(int32 InIndex)
+    {
+        return (InIndex + 1) % Get_BandTable().Num();
     }
 
     // uu along the board for band table entry InIndex.
     float32 Get_BandCenterAt(const FMars_Dicing_Spec& InSpec, int32 InIndex)
     {
-        return Get_BandFraction(InIndex) * InSpec.BoardHalfWidth;
+        const auto Table = Get_BandTable();
+        return Table[InIndex % Table.Num()] * InSpec.BoardHalfWidth;
     }
 
     // GreenPaste stays GreenPaste.
@@ -113,7 +108,7 @@ mixin FMars_Dicing_Spec Get_Spec(const FCk_Handle_Dicing& Self)
 
 mixin EMars_Dicing_State Get_MaterialState(const FCk_Handle_Dicing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Dicing).MaterialState;
+    return Self.Get_Fragment(FMars_Fragment_Dicing).Pile.MaterialState;
 }
 
 mixin EMars_Dicing_State Get_RequestedState(const FCk_Handle_Dicing& Self)
@@ -134,13 +129,13 @@ mixin float32 Get_HandLateral(const FCk_Handle_Dicing& Self)
 
 mixin float32 Get_BandCenter(const FCk_Handle_Dicing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Dicing).BandCenter;
+    return utils_dicing::Get_BandCenterAt(Self.Get_Spec(), Self.Get_Fragment(FMars_Fragment_Dicing).BandIndex);
 }
 
 mixin bool Get_IsAligned(const FCk_Handle_Dicing& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Dicing);
-    return Math::Abs(State.HandLateral - State.BandCenter) <= Self.Get_Fragment(FMars_Fragment_Dicing_Params).Spec.BandHalfWidth;
+    const auto HandLateral = Self.Get_Fragment(FMars_Fragment_Dicing).HandLateral;
+    return Math::Abs(HandLateral - Self.Get_BandCenter()) <= Self.Get_Spec().BandHalfWidth;
 }
 
 mixin bool Get_IsChopping(const FCk_Handle_Dicing& Self)
@@ -150,12 +145,12 @@ mixin bool Get_IsChopping(const FCk_Handle_Dicing& Self)
 
 mixin int32 Get_UsefulChops(const FCk_Handle_Dicing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Dicing).UsefulChops;
+    return Self.Get_Fragment(FMars_Fragment_Dicing).Pile.UsefulChops;
 }
 
 mixin int32 Get_ChopsInState(const FCk_Handle_Dicing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Dicing).ChopsInState;
+    return Self.Get_Fragment(FMars_Fragment_Dicing).Pile.ChopsInState;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

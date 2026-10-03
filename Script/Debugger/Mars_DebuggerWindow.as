@@ -29,7 +29,7 @@ class UMars_DebuggerWindow : UMMPopupWindow
     {
         if (ck::Is_NOT_Valid(Content))
         {
-            utils_mars_debugger::Text("Debugger content unavailable", 14, FLinearColor::Red);
+            utils_mars_debugger::Text("Debugger content unavailable", FMars_Debugger_TextStyle(14, FLinearColor::Red));
             return;
         }
 

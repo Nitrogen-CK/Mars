@@ -41,16 +41,16 @@ class UMars_AutoTest_Health_DamageLowersCurrentAndSignals : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_ValidateAndHit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_False(FMars_Health_Spec(0.0f).Validate().IsValid, "a Max of 0 is rejected");
-        Assert_False(FMars_Health_Spec(100.0f, 150.0f).Validate().IsValid, "a Start above Max is rejected");
-        Assert_True(FMars_Health_Spec(100.0f).Validate().IsValid, "a Max of 100 is accepted");
+        Assert_False(FMars_Health_Spec(0.0f).Validate().IsValid(), "a Max of 0 is rejected");
+        Assert_False(FMars_Health_Spec(100.0f, 150.0f).Validate().IsValid(), "a Start above Max is rejected");
+        Assert_True(FMars_Health_Spec(100.0f).Validate().IsValid(), "a Max of 100 is accepted");
 
-        Assert_True(ck::IsValid(_Health), "the Health composed");
+        Assert_Valid(_Health, "utils_health::Add composed the Health");
         Assert_Equals_Float(_Health.Get_Current(), 100.0f, 0.001f, "a fresh Health starts at Max");
         Assert_Equals_Float(_Health.Get_Max(), 100.0f, 0.001f, "Max is the spec's");
         Assert_False(_Health.Get_LastHit().IsSet(), "no LastHit before any hit");
 
-        auto Event = FMars_DamageEvent(30.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"));
+        auto Event = FMars_DamageEvent(30.0f, GameplayTags::DamageType_Mars_Sever);
         _Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Event));
     }
 
@@ -65,13 +65,18 @@ class UMars_AutoTest_Health_DamageLowersCurrentAndSignals : UCk_AutoTest_Base
     private void Step_AssertDamaged(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_DamagedEvents.Num(), 1, "OnDamaged fired once");
-        Assert_Equals_Float(_DamagedApplied[0], 30.0f, 0.001f, "OnDamaged reports 30 applied");
-        Assert_Equals_Float(_DamagedRemaining[0], 70.0f, 0.001f, "OnDamaged reports 70 remaining");
-        Assert_True(_DamagedEvents[0].DamageType == GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"), "OnDamaged carries the event's damage type");
+        if (_DamagedEvents.Num() == 1)
+        {
+            Assert_Equals_Float(_DamagedApplied[0], 30.0f, 0.001f, "OnDamaged reports 30 applied");
+            Assert_Equals_Float(_DamagedRemaining[0], 70.0f, 0.001f, "OnDamaged reports 70 remaining");
+            Assert_True(_DamagedEvents[0].DamageType == GameplayTags::DamageType_Mars_Sever,
+                f"OnDamaged carries the event's damage type (got [{_DamagedEvents[0].DamageType.ToString()}])");
+        }
 
         const auto LastHit = _Health.Get_LastHit();
         Assert_True(LastHit.IsSet(), "LastHit is recorded");
-        Assert_Equals_Float(LastHit.GetValue().Amount, 30.0f, 0.001f, "LastHit is the 30 hit");
+        if (LastHit.IsSet())
+        { Assert_Equals_Float(LastHit.GetValue().Amount, 30.0f, 0.001f, "LastHit is the 30 hit"); }
 
         Assert_False(_Health.Get_IsDepleted(), "70 of 100 is not depleted");
         Assert_Equals_Int(_DepletedCount, 0, "OnDepleted did not fire");

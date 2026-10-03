@@ -34,7 +34,7 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_MoveToEnd(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Mover.Request_MoveTo(true);
+        _Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(EMars_Mover_Pose::End));
     }
 
     UFUNCTION()
@@ -54,9 +54,8 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_AssertHeld(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Alpha = _Mover.Get_Alpha();
-        Assert_True(Math::Abs(Alpha - 0.3f) < 0.001f, f"a scrub stops the tween and holds (alpha {Alpha})");
-        Assert_True(_Mover.Get_AtEnd(), "scrub leaves the target alone");
+        Assert_Equals_Float(_Mover.Get_Alpha(), 0.3f, 0.001f, "a scrub stops the tween and holds the scrubbed alpha");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::End, "scrub leaves the target alone");
     }
 
     UFUNCTION()
@@ -75,7 +74,7 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_AssertAtEnd(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Mover.Get_AtEnd(), "a settle does not change the target");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::End, "a settle does not change the target");
     }
 
     UFUNCTION()
@@ -100,6 +99,6 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
     {
         Assert_True(_LowestAlphaWhileSettling < 0.5f,
             f"the settle tweened from the scrubbed alpha (lowest alpha seen {_LowestAlphaWhileSettling})");
-        Assert_True(_Mover.Get_AtEnd(), "the target is still the end");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::End, "the target is still the end");
     }
 }

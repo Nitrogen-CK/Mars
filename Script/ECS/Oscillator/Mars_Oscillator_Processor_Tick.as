@@ -13,21 +13,20 @@ class UMars_Processor_Oscillator_Tick : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Oscillator& InState)
     {
-        if (InState.IsRunning)
-        { InState.IsCaught = false; }
-        else if (InState.IsCaught)
+        if (InState.State == EMars_Oscillator_State::Caught)
         { return; }
 
+        const auto IsRunning = InState.State == EMars_Oscillator_State::Running;
         const auto& Params = InHandle.Get_Fragment(FMars_Fragment_Oscillator_Params);
-        const auto IsBraking = InState.IsRunning == false && Params.CatchAngleDegrees.IsSet();
+        const auto IsBraking = IsRunning == false && Params.CatchAngleDegrees.IsSet();
 
         const auto WasAtRest = InState.Envelope <= 0.0f;
-        if (InState.IsRunning == false && IsBraking == false && WasAtRest)
+        if (IsRunning == false && IsBraking == false && WasAtRest)
         { return; }
 
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
-        const auto TargetEnvelope = (InState.IsRunning || IsBraking) ? 1.0f : 0.0f;
+        const auto TargetEnvelope = (IsRunning || IsBraking) ? 1.0f : 0.0f;
         if (Params.SettleSeconds <= KINDA_SMALL_NUMBER)
         { InState.Envelope = TargetEnvelope; }
         else
@@ -36,32 +35,28 @@ class UMars_Processor_Oscillator_Tick : UCk_Processor_Script_Base_UE
             InState.Envelope += Math::Clamp(TargetEnvelope - InState.Envelope, -MaxStep, MaxStep);
         }
 
-        auto Angle = 0.0f;
-        if (Params.PeriodSeconds > KINDA_SMALL_NUMBER)
+        const auto PreviousTime = InState.Time;
+        InState.Time = float32(Math::Fmod(InState.Time + DeltaSeconds, Params.PeriodSeconds));
+
+        if (IsBraking)
         {
-            const auto PreviousTime = InState.Time;
-            InState.Time = float32(Math::Fmod(InState.Time + DeltaSeconds, Params.PeriodSeconds));
+            const auto RadiansPerSecond = 2.0 * PI / Params.PeriodSeconds;
+            const auto PhaseRange = FVector2D(PreviousTime * RadiansPerSecond, (PreviousTime + DeltaSeconds) * RadiansPerSecond);
+            const auto CatchPhase = utils_oscillator::Find_CatchPhase(PhaseRange,
+                Params.AmplitudeDegrees * InState.Envelope, Params.CatchAngleDegrees.GetValue());
 
-            if (IsBraking)
+            if (CatchPhase.IsSet())
             {
-                const auto RadiansPerSecond = 2.0 * PI / Params.PeriodSeconds;
-                const auto PhaseRange = FVector2D(PreviousTime * RadiansPerSecond, (PreviousTime + DeltaSeconds) * RadiansPerSecond);
-                const auto CatchPhase = utils_oscillator::Find_CatchPhase(PhaseRange,
-                    Params.AmplitudeDegrees * InState.Envelope, Params.CatchAngleDegrees.GetValue());
-
-                if (CatchPhase.IsSet())
-                {
-                    InState.Time = float32(Math::Fmod(CatchPhase.GetValue() / RadiansPerSecond, Params.PeriodSeconds));
-                    InState.IsCaught = true;
-                }
+                InState.Time = float32(Math::Fmod(CatchPhase.GetValue() / RadiansPerSecond, Params.PeriodSeconds));
+                InState.State = EMars_Oscillator_State::Caught;
             }
-
-            Angle = Params.AmplitudeDegrees * InState.Envelope * float32(Math::Sin(2.0 * PI * InState.Time / Params.PeriodSeconds));
         }
 
-        auto Node = utils_scene_node::DoCastChecked(InHandle);
+        const auto Angle = Params.AmplitudeDegrees * InState.Envelope * float32(Math::Sin(2.0 * PI * InState.Time / Params.PeriodSeconds));
+
+        auto Node = InHandle.As_SceneNode();
         utils_scene_node::Request_UpdateOffset_Rotation(Node,
-            Params.RestRotation + utils_oscillator::Make_SwingRotation(Params.Axis, Angle),
+            utils_oscillator::Make_NodeRotation(Params.RestRotation, Params.Axis, Angle),
             ECk_RelativeAbsolute::Absolute);
     }
 }

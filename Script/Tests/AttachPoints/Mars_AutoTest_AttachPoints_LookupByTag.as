@@ -38,7 +38,7 @@ class UMars_AutoTest_AttachPoints_LookupByTag : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertUnpublishedTag(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Unpublished = GameplayTags::ResolveGameplayTag(n"Inventory.Mars.Backpack");
+        const auto Unpublished = GameplayTags::Inventory_Mars_Backpack;
         Assert_False(_AttachPoints.Has_AttachPoint(Unpublished), "Has_AttachPoint(Inventory.Mars.Backpack)");
         Assert_Invalid(_AttachPoints.Get_AttachPoint(Unpublished), "Get_AttachPoint(Inventory.Mars.Backpack)");
     }
@@ -48,7 +48,7 @@ class UMars_AutoTest_AttachPoints_LookupByTag : UCk_AutoTest_Base
     {
         const auto Spec = MakeDuplicateSpec();
         const auto Validation = Spec.Validate();
-        Assert_False(Validation.IsValid, "Validate() on a spec repeating a tag");
+        Assert_False(Validation.IsValid(), "Validate() on a spec repeating a tag");
         Assert_True(Validation.Get_Error().Contains("repeats the tag"),
             f"Validate() names the repeated tag (got [{Validation.Get_Error()}])");
     }

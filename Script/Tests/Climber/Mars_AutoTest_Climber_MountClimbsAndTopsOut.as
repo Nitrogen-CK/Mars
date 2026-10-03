@@ -1,6 +1,6 @@
 // A Front mount starts at the foot (no character: Alpha seeds 0), climbing up moves Alpha at the climber's ClimbSpeed /
-// the ladder's Height, and holding up past the top ends the climb with a Top dismount. OnClimbingChanged reports true, then
-// false. Also: the climber spec accepts the default speed and rejects a zero one.
+// the ladder's Height, and holding up past the top ends the climb with a Top dismount. OnClimbingChanged reports Climbing, then
+// NotClimbing. Also: the climber spec accepts the default speed and rejects a zero one.
 class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
 {
     private FCk_Handle_Ladder _Ladder;
@@ -32,19 +32,19 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void OnClimbingChanged(FCk_Handle_Climber InClimber, bool InClimbing)
+    private void OnClimbingChanged(FCk_Handle_Climber InClimber, EMars_Climber_ClimbState InClimbState)
     {
-        _ClimbingChanges.Add(InClimbing);
+        _ClimbingChanges.Add(InClimbState == EMars_Climber_ClimbState::Climbing);
     }
 
     UFUNCTION()
     private void Step_ValidateSpec(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Default = FMars_Climber_Spec().Validate();
-        Assert_True(Default.IsValid, f"the default climber spec is accepted (error: {Default.Get_Error()})");
+        Assert_True(Default.IsValid(), f"the default climber spec is accepted (error: {Default.Get_Error()})");
 
         const auto Stuck = FMars_Climber_Spec(0.0f).Validate();
-        Assert_False(Stuck.IsValid, "ClimbSpeed 0 is rejected");
+        Assert_False(Stuck.IsValid(), "ClimbSpeed 0 is rejected");
         Assert_True(Stuck.Get_Error().Len() > 0, f"ClimbSpeed 0 names its rule (error: {Stuck.Get_Error()})");
         Assert_True(Math::Abs(_Climber.Get_ClimbSpeed() - 300.0f) < 0.001f, f"the climber keeps its spec's speed ({_Climber.Get_ClimbSpeed()})");
     }
@@ -103,7 +103,12 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
     private void Step_AssertToppedOut(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount == EMars_Climber_Dismount::Top, f"the climb ended at the top (dismount {LastDismount :n})");
+        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
+        if (LastDismount.IsSet())
+        {
+            const auto Reason = LastDismount.GetValue();
+            Assert_True(Reason == EMars_Climber_Dismount::Top, f"the climb ended at the top (dismount {Reason :n})");
+        }
         Assert_False(ck::IsValid(_Climber.Get_Ladder()), "no ladder after the dismount");
         Assert_True(_ClimbingChanges.Num() == 2, f"OnClimbingChanged fired twice (fired {_ClimbingChanges.Num()})");
         if (_ClimbingChanges.Num() == 2)

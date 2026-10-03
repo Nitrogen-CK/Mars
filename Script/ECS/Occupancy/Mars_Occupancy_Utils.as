@@ -1,18 +1,23 @@
 namespace utils_occupancy
 {
-    FCk_Handle_Occupancy Add(
-        FCk_Handle& InHandle,
-        FMars_Occupancy_Spec InParams,
-        FCk_Handle_Trigger InTrigger,
-        FCk_Handle_Mover InMover = FCk_Handle_Mover())
+    // A spec or parts that fail Validate() ensure and add nothing.
+    FCk_Handle_Occupancy Add(FCk_Handle& InHandle, FMars_Occupancy_Spec InParams, FMars_Occupancy_Parts InParts)
     {
+        const auto SpecValidation = InParams.Validate();
+        if (ck::EnsureIfNot(SpecValidation.IsValid(), f"[Occupancy] [{InHandle.ToString()}] rejected the spec: {SpecValidation.Get_Error()}"))
+        { return FCk_Handle_Occupancy(); }
+
+        const auto PartsValidation = InParts.Validate();
+        if (ck::EnsureIfNot(PartsValidation.IsValid(), f"[Occupancy] [{InHandle.ToString()}] rejected the parts: {PartsValidation.Get_Error()}"))
+        { return FCk_Handle_Occupancy(); }
+
         auto Params = FMars_Fragment_Occupancy_Params();
-        Params.RequiredCount = Math::Max(InParams.RequiredCount, 1);
+        Params.RequiredCount = InParams.RequiredCount;
         Params.ReleaseDelaySeconds = InParams.ReleaseDelaySeconds;
 
         auto State = FMars_Fragment_Occupancy();
-        State.Trigger = InTrigger;
-        State.Mover = InMover;
+        State.Trigger = InParts.Trigger;
+        State.Mover = InParts.Mover;
 
         InHandle.Add_Fragment(FMars_Feature_Occupancy());
         InHandle.Add_Fragment(Params);
@@ -20,11 +25,8 @@ namespace utils_occupancy
         InHandle.Add_Fragment(FMars_Tag_Occupancy_NeedsSetup());
         auto Occupancy = InHandle.As_Occupancy();
 
-        if (ck::IsValid(InTrigger))
-        {
-            auto Trigger = InTrigger;
-            Trigger.AddOrGet_Fragment(FMars_Fragment_Occupancy_TriggerLink).Occupancies.Add(Occupancy);
-        }
+        auto Trigger = InParts.Trigger;
+        Trigger.AddOrGet_Fragment(FMars_Fragment_Occupancy_TriggerLink).Occupancies.Add(Occupancy);
 
         return Occupancy;
     }
@@ -52,11 +54,6 @@ mixin bool Get_IsActive(const FCk_Handle_Occupancy& Self)
 mixin FCk_Handle_Trigger Get_Trigger(const FCk_Handle_Occupancy& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Occupancy).Trigger;
-}
-
-mixin FCk_Handle_Mover Get_Mover(const FCk_Handle_Occupancy& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Occupancy).Mover;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// One entry per camp station (design section 6). Title and Cauldron are camera-only stations.
+// One entry per camp station. Title and Cauldron are camera-only stations.
 enum EMars_CampStation
 {
     Title,

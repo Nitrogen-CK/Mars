@@ -15,17 +15,17 @@ class UMars_Processor_MechanismSource_HandleRequests : UCk_Processor_Script_Base
     {
         auto Self = InHandle.As_MechanismSource();
 
-        const auto Asserted = InRequests.SetAsserted.Asserted;
+        const auto Output = InRequests.SetOutputRequests.Last().Output;
 
-        // Swap-and-pop - InRequests is dead past this line; a request enqueued by a listener survives to next pass.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_MechanismSource_Requests);
 
-        if (InSourceComp.IsAsserted == Asserted)
+        if (InSourceComp.Output == Output)
         { return; }
 
-        InSourceComp.IsAsserted = Asserted;
+        InSourceComp.Output = Output;
 
         if (Self.Has_Fragment(FMars_Fragment_MechanismSource_Signals))
-        { Self.Get_Fragment(FMars_Fragment_MechanismSource_Signals).OnAssertedChanged.Broadcast(Self, Asserted); }
+        { Self.Get_Fragment(FMars_Fragment_MechanismSource_Signals).OnAssertedChanged.Broadcast(Self, Output); }
     }
 }

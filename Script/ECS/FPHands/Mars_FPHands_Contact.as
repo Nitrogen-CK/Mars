@@ -13,36 +13,65 @@ enum EMars_FPHands_GripShape
     Capsule
 }
 
-// A primitive in world space. Box: Extent = half extents. Sphere: Extent.X = radius. Capsule: along local X,
-// Extent.X = half length of the core segment, Extent.Y = radius.
-struct FMars_FPHands_ContactShape
+// The solved digits of one glove, in bone order (utils_fphands::Get_DigitBoneName).
+enum EMars_FPHands_Digit
+{
+    Thumb,
+    Index,
+    Middle,
+    Pinky
+}
+
+// A mesh whose bounds the fingers close on.
+// Weak: fragments may not hold strong UObject refs (Schema.IsSafe); the item's presentation owns the mesh.
+struct FMars_FPHands_ShapeMesh
 {
     UPROPERTY()
-    bool IsValid = false;
+    TWeakObjectPtr<UStaticMesh> Mesh;
 
+    UPROPERTY()
+    FVector Scale = FVector::OneVector;
+
+    UPROPERTY()
+    EMars_FPHands_GripShape Type = EMars_FPHands_GripShape::Auto;
+}
+
+// A primitive in world space. A capsule runs along its local X.
+struct FMars_FPHands_ContactShape
+{
     UPROPERTY()
     EMars_FPHands_GripShape Type = EMars_FPHands_GripShape::Box;
 
     UPROPERTY()
     FTransform World;
 
+    // Box only.
     UPROPERTY()
-    FVector Extent;
+    FVector HalfExtents;
+
+    // Sphere and capsule.
+    UPROPERTY()
+    float Radius = 0.0;
+
+    // Capsule only: half the length of the core segment.
+    UPROPERTY()
+    float HalfLength = 0.0;
 }
 
+// Unset = that glove keeps its authored pose.
 struct FMars_FPHands_ContactShapes
 {
     UPROPERTY()
-    FMars_FPHands_ContactShape Left;
+    TOptional<FMars_FPHands_ContactShape> Left;
 
     UPROPERTY()
-    FMars_FPHands_ContactShape Right;
+    TOptional<FMars_FPHands_ContactShape> Right;
 }
 
 struct FMars_FPHands_ContactSpec
 {
     UPROPERTY()
-    bool IsEnabled = true;
+    ECk_EnableDisable EnableDisable = ECk_EnableDisable::Enable;
 
     // Glove finger thickness (radius, cm) used for the contact test.
     UPROPERTY()
@@ -70,9 +99,6 @@ struct FMars_FPHands_ContactSpec
 // Reference (bind) pose data the solver needs, read once from the gloves' mesh.
 struct FMars_FPHands_ContactRig
 {
-    UPROPERTY()
-    bool IsValid = false;
-
     // Per digit bone (utils_fphands::Get_DigitBoneName order): local ref transform.
     UPROPERTY()
     TArray<FTransform> RefLocal;
@@ -83,32 +109,6 @@ struct FMars_FPHands_ContactRig
 
     UPROPERTY()
     FTransform HandInLowerArm_R;
-}
-
-// A mesh's bounds as a contact primitive: the mesh (MeshScale applied) placed by MeshWorld.
-struct FMars_FPHands_BoundsQuery
-{
-    UPROPERTY()
-    UStaticMesh Mesh;
-
-    UPROPERTY()
-    FVector MeshScale = FVector::OneVector;
-
-    UPROPERTY()
-    EMars_FPHands_GripShape Type = EMars_FPHands_GripShape::Auto;
-
-    UPROPERTY()
-    FTransform MeshWorld;
-
-    FMars_FPHands_BoundsQuery() {}
-
-    FMars_FPHands_BoundsQuery(UStaticMesh InMesh, FVector InMeshScale, EMars_FPHands_GripShape InType, FTransform InMeshWorld)
-    {
-        Mesh = InMesh;
-        MeshScale = InMeshScale;
-        Type = InType;
-        MeshWorld = InMeshWorld;
-    }
 }
 
 // One digit of one glove closing on a shape, curled from rest toward Pose.
@@ -124,20 +124,19 @@ struct FMars_FPHands_DigitQuery
     EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
 
     UPROPERTY()
-    bool IsRightHand = false;
+    EMars_Hand Hand = EMars_Hand::Right;
 
-    // 0 = thumb, then index, middle, pinky.
     UPROPERTY()
-    int32 Digit = 0;
+    EMars_FPHands_Digit Digit = EMars_FPHands_Digit::Thumb;
 
     FMars_FPHands_DigitQuery() {}
 
-    FMars_FPHands_DigitQuery(FMars_FPHands_ContactShape InShape, FTransform InHandWorld, EMars_HandGripPose InPose, bool InIsRightHand)
+    FMars_FPHands_DigitQuery(FMars_FPHands_ContactShape InShape, FTransform InHandWorld, EMars_HandGripPose InPose, EMars_Hand InHand)
     {
         Shape = InShape;
         HandWorld = InHandWorld;
         Pose = InPose;
-        IsRightHand = InIsRightHand;
+        Hand = InHand;
     }
 }
 
@@ -146,27 +145,28 @@ namespace utils_fphands
     const int32 DigitCount = 4;
     const int32 SegmentsPerDigit = 3;
 
-    FMars_FPHands_ContactRig Make_ContactRig(USkeletalMeshComponent InMesh)
+    // Unset (after an ensure) when the mesh lacks a bone the solver reads: finger contact is then off.
+    TOptional<FMars_FPHands_ContactRig> Make_ContactRig(USkeletalMeshComponent InMesh)
     {
         auto Rig = FMars_FPHands_ContactRig();
         for (int32 Bone = 0; Bone < utils_fphands::DigitBoneCount; ++Bone)
         {
-            const auto Index = InMesh.GetBoneIndex(utils_fphands::Get_DigitBoneName(Bone));
-            if (Index == -1)
-            { return Rig; }
+            const auto BoneName = utils_fphands::Get_DigitBoneName(Bone);
+            const auto Index = InMesh.GetBoneIndex(BoneName);
+            if (ck::EnsureIfNot(Index != -1, f"[FPHands] the glove mesh has no digit bone [{BoneName}]; finger contact is off"))
+            { return TOptional<FMars_FPHands_ContactRig>(); }
 
             Rig.RefLocal.Add(InMesh.GetRefPoseTransform(Index));
         }
 
         const auto HandL = InMesh.GetBoneIndex(n"hand_l");
         const auto HandR = InMesh.GetBoneIndex(n"hand_r");
-        if (HandL == -1 || HandR == -1)
-        { return Rig; }
+        if (ck::EnsureIfNot(HandL != -1 && HandR != -1, "[FPHands] the glove mesh has no hand_l / hand_r bone; finger contact is off"))
+        { return TOptional<FMars_FPHands_ContactRig>(); }
 
         Rig.HandInLowerArm_L = InMesh.GetRefPoseTransform(HandL);
         Rig.HandInLowerArm_R = InMesh.GetRefPoseTransform(HandR);
-        Rig.IsValid = true;
-        return Rig;
+        return TOptional<FMars_FPHands_ContactRig>(Rig);
     }
 
     // Signed distance from InPoint to the shape's surface (negative inside).
@@ -174,15 +174,16 @@ namespace utils_fphands
     {
         const auto Local = InShape.World.InverseTransformPositionNoScale(InPoint);
         if (InShape.Type == EMars_FPHands_GripShape::Sphere)
-        { return Local.Size() - InShape.Extent.X; }
+        { return Local.Size() - InShape.Radius; }
 
         if (InShape.Type == EMars_FPHands_GripShape::Capsule)
         {
-            const auto OnAxis = FVector(Math::Clamp(Local.X, -InShape.Extent.X, InShape.Extent.X), 0.0, 0.0);
-            return (Local - OnAxis).Size() - InShape.Extent.Y;
+            const auto OnAxis = FVector(Math::Clamp(Local.X, -InShape.HalfLength, InShape.HalfLength), 0.0, 0.0);
+            return (Local - OnAxis).Size() - InShape.Radius;
         }
 
-        const auto Q = FVector(Math::Abs(Local.X) - InShape.Extent.X, Math::Abs(Local.Y) - InShape.Extent.Y, Math::Abs(Local.Z) - InShape.Extent.Z);
+        const auto Extent = InShape.HalfExtents;
+        const auto Q = FVector(Math::Abs(Local.X) - Extent.X, Math::Abs(Local.Y) - Extent.Y, Math::Abs(Local.Z) - Extent.Z);
         const auto Outside = FVector(Math::Max(Q.X, 0.0), Math::Max(Q.Y, 0.0), Math::Max(Q.Z, 0.0)).Size();
         const auto Inside = Math::Min(Math::Max(Q.X, Math::Max(Q.Y, Q.Z)), 0.0);
         return Outside + Inside;
@@ -193,7 +194,8 @@ namespace utils_fphands
     // the way.
     TArray<float> Sample_DigitDistances(const FMars_FPHands_ContactRig& InRig, const FMars_FPHands_DigitQuery& InQuery, float InCurl)
     {
-        const auto FirstBone = (InQuery.IsRightHand ? DigitCount * SegmentsPerDigit : 0) + InQuery.Digit * SegmentsPerDigit;
+        const auto SideOffset = InQuery.Hand == EMars_Hand::Right ? DigitCount * SegmentsPerDigit : 0;
+        const auto FirstBone = SideOffset + int32(InQuery.Digit) * SegmentsPerDigit;
 
         TArray<float> Distances;
         auto Parent = InQuery.HandWorld;
@@ -210,6 +212,7 @@ namespace utils_fphands
             {
                 if (Segment > 1)
                 { Distances.Add(Get_ShapeDistance(InQuery.Shape, (Previous + Joint.GetLocation()) * 0.5)); }
+
                 Distances.Add(Get_ShapeDistance(InQuery.Shape, Joint.GetLocation()));
             }
 
@@ -240,10 +243,7 @@ namespace utils_fphands
     // How far (0..1 of the authored curl) a digit can close before touching the shape. 1 = authored pose.
     float32 Solve_Digit(const FMars_FPHands_ContactSpec& InSpec, const FMars_FPHands_ContactRig& InRig, const FMars_FPHands_DigitQuery& InQuery)
     {
-        if (InQuery.Shape.IsValid == false || InRig.IsValid == false)
-        { return 1.0f; }
-
-        const auto Radius = InQuery.Digit == 0 ? InSpec.ThumbRadiusCm : InSpec.FingerRadiusCm;
+        const auto Radius = InQuery.Digit == EMars_FPHands_Digit::Thumb ? InSpec.ThumbRadiusCm : InSpec.FingerRadiusCm;
         const auto Steps = Math::Max(InSpec.SearchSteps, 2);
         const auto Rest = Sample_DigitDistances(InRig, InQuery, 0.0);
 
@@ -272,25 +272,26 @@ namespace utils_fphands
         return 1.0f;
     }
 
-    // A primitive fitted to a mesh's bounds (mesh space, MeshScale applied), placed by MeshWorld.
-    FMars_FPHands_ContactShape Make_BoundsShape(const FMars_FPHands_BoundsQuery& InQuery)
+    // A primitive fitted to a mesh's bounds (Scale applied), placed by InMeshWorld. Unset without a mesh.
+    TOptional<FMars_FPHands_ContactShape> Make_BoundsShape(const FMars_FPHands_ShapeMesh& InShapeMesh, const FTransform& InMeshWorld)
     {
+        auto Mesh = InShapeMesh.Mesh.Get();
+        if (ck::Is_NOT_Valid(Mesh))
+        { return TOptional<FMars_FPHands_ContactShape>(); }
+
+        const auto Scale = InShapeMesh.Scale;
+        const auto Bounds = Mesh.GetBounds();
+        const auto Extent = FVector(Math::Abs(Bounds.BoxExtent.X * Scale.X), Math::Abs(Bounds.BoxExtent.Y * Scale.Y),
+                                    Math::Abs(Bounds.BoxExtent.Z * Scale.Z));
+        const auto CenterWorld = InMeshWorld.TransformPosition(Bounds.Origin * Scale);
+
         auto Shape = FMars_FPHands_ContactShape();
-        if (ck::Is_NOT_Valid(InQuery.Mesh))
-        { return Shape; }
-
-        const auto Bounds = InQuery.Mesh.GetBounds();
-        const auto Extent = FVector(Math::Abs(Bounds.BoxExtent.X * InQuery.MeshScale.X), Math::Abs(Bounds.BoxExtent.Y * InQuery.MeshScale.Y),
-                                    Math::Abs(Bounds.BoxExtent.Z * InQuery.MeshScale.Z));
-        const auto CenterWorld = InQuery.MeshWorld.TransformPosition(Bounds.Origin * InQuery.MeshScale);
-
-        Shape.IsValid = true;
-        Shape.Type = InQuery.Type == EMars_FPHands_GripShape::Auto ? EMars_FPHands_GripShape::Box : InQuery.Type;
-        Shape.World = FTransform(InQuery.MeshWorld.GetRotation(), CenterWorld, FVector::OneVector);
-        Shape.Extent = Extent;
+        Shape.Type = InShapeMesh.Type == EMars_FPHands_GripShape::Auto ? EMars_FPHands_GripShape::Box : InShapeMesh.Type;
+        Shape.World = FTransform(InMeshWorld.GetRotation(), CenterWorld, FVector::OneVector);
+        Shape.HalfExtents = Extent;
 
         if (Shape.Type == EMars_FPHands_GripShape::Sphere)
-        { Shape.Extent = FVector(Math::Max(Extent.X, Math::Max(Extent.Y, Extent.Z)), 0.0, 0.0); }
+        { Shape.Radius = Math::Max(Extent.X, Math::Max(Extent.Y, Extent.Z)); }
         else if (Shape.Type == EMars_FPHands_GripShape::Capsule)
         {
             // Orient local X along the longest axis.
@@ -302,21 +303,22 @@ namespace utils_fphands
             else if (Extent.Z >= Extent.X && Extent.Z >= Extent.Y)
             { Axis = FVector::UpVector; Length = Extent.Z; Radius = Math::Max(Extent.X, Extent.Y); }
 
-            const auto AxisWorld = InQuery.MeshWorld.GetRotation().RotateVector(Axis);
+            const auto AxisWorld = InMeshWorld.GetRotation().RotateVector(Axis);
             Shape.World = FTransform(FQuat::FindBetweenNormals(FVector::ForwardVector, AxisWorld), CenterWorld, FVector::OneVector);
-            Shape.Extent = FVector(Math::Max(Length - Radius, 0.0), Radius, 0.0);
+            Shape.HalfLength = Math::Max(Length - Radius, 0.0);
+            Shape.Radius = Radius;
         }
-        return Shape;
+        return TOptional<FMars_FPHands_ContactShape>(Shape);
     }
 
     // The handle an authored grip closes on: a capsule along the socket's X (handle) axis.
     FMars_FPHands_ContactShape Make_SocketShape(const FMars_FPHands_ContactSpec& InSpec, const FTransform& InSocketWorld)
     {
         auto Shape = FMars_FPHands_ContactShape();
-        Shape.IsValid = true;
         Shape.Type = EMars_FPHands_GripShape::Capsule;
         Shape.World = FTransform(InSocketWorld.GetRotation(), InSocketWorld.GetLocation(), FVector::OneVector);
-        Shape.Extent = FVector(InSpec.SocketHandleHalfLengthCm, InSpec.SocketHandleRadiusCm, 0.0);
+        Shape.HalfLength = InSpec.SocketHandleHalfLengthCm;
+        Shape.Radius = InSpec.SocketHandleRadiusCm;
         return Shape;
     }
 }
@@ -325,43 +327,39 @@ namespace utils_fphands
 // Contact shapes (read the feature)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What each glove's fingers close on this frame (invalid = keep the authored pose): a reaching glove near contact
-// closes on its target, a holding glove on its item.
+// What each glove's fingers close on this frame: a reaching glove near contact closes on its target, a holding glove
+// on its item.
 mixin void Get_ContactShapes(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, FMars_FPHands_ContactShapes& OutShapes)
 {
-    OutShapes.Left = Self.Get_ContactShape(InHandWorld, false);
-    OutShapes.Right = Self.Get_ContactShape(InHandWorld, true);
+    OutShapes.Left = Self.Get_ContactShape(InHandWorld, EMars_Hand::Left);
+    OutShapes.Right = Self.Get_ContactShape(InHandWorld, EMars_Hand::Right);
 }
 
-mixin FMars_FPHands_ContactShape Get_ContactShape(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, bool InIsRightHand)
+mixin TOptional<FMars_FPHands_ContactShape> Get_ContactShape(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, EMars_Hand InHand)
 {
     const auto& Spec = Self.Get_Spec();
-    if (Self.Get_IsReaching(InIsRightHand) && Self.Get_ReachAlpha() > 0.6f)
+    if (Self.Get_IsReaching(InHand) && Self.Get_ReachAlpha() > 0.6f)
     {
-        const auto Target = Self.Get_Target();
-        const auto HandGrip = Target.Get_HandGrip(InIsRightHand);
-        if (ck::IsValid(Target.ShapeMesh.Get()))
-        {
-            return utils_fphands::Make_BoundsShape(
-                FMars_FPHands_BoundsQuery(Target.ShapeMesh.Get(), Target.ShapeScale, Target.ShapeType, HandGrip.AnchorWorld));
-        }
+        // Reaching with this glove: the target is set and uses it.
+        const auto MaybeTarget = Self.Get_Target();
+        const auto Target = MaybeTarget.GetValue();
+        const auto MaybeGrip = Target.Get_HandGrip(InHand);
+        const auto HandGrip = MaybeGrip.GetValue();
+        if (ck::IsValid(Target.Shape.Mesh.Get()))
+        { return utils_fphands::Make_BoundsShape(Target.Shape, HandGrip.AnchorWorld); }
 
         if (HandGrip.IsAuthored)
         {
-            auto Grip = FMars_FPHands_GripQuery(InHandWorld, InIsRightHand, FTransform());
+            auto Grip = FMars_FPHands_GripQuery(InHandWorld, InHand, FTransform());
             utils_fphands::Resolve_WorldGrip(Spec, Target, Grip);
-            return utils_fphands::Make_SocketShape(Spec.Contact, Grip.WorldGrip);
+            return TOptional<FMars_FPHands_ContactShape>(utils_fphands::Make_SocketShape(Spec.Contact, Grip.WorldGrip));
         }
-        return FMars_FPHands_ContactShape();
+        return TOptional<FMars_FPHands_ContactShape>();
     }
 
     const auto Hold = Self.Get_Hold();
-    const auto HoldsWithThisHand = Hold.IsHolding && (Hold.IsTwoHanded || InIsRightHand);
-    if (HoldsWithThisHand && ck::IsValid(Hold.ShapeMesh.Get()))
-    {
-        return utils_fphands::Make_BoundsShape(
-            FMars_FPHands_BoundsQuery(Hold.ShapeMesh.Get(), Hold.ShapeScale, Hold.ShapeType, Hold.ShapeOffset * InHandWorld));
-    }
+    if (Hold.Get_HoldsWith(InHand))
+    { return utils_fphands::Make_BoundsShape(Hold.Shape, Hold.HeldOffset * InHandWorld); }
 
-    return FMars_FPHands_ContactShape();
+    return TOptional<FMars_FPHands_ContactShape>();
 }

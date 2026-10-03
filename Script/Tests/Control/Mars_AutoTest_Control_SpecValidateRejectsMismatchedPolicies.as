@@ -58,13 +58,13 @@ class UMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies : UCk_AutoTes
     private void AssertValid(const FMars_Control_Spec& InSpec, const FString& InCase)
     {
         const auto Validation = InSpec.Validate();
-        Assert_True(Validation.IsValid, f"{InCase} is accepted (error: {Validation.Get_Error()})");
+        Assert_True(Validation.IsValid(), f"{InCase} is accepted (error: {Validation.Get_Error()})");
     }
 
     private void AssertInvalid(const FMars_Control_Spec& InSpec, const FString& InCase)
     {
         const auto Validation = InSpec.Validate();
-        Assert_False(Validation.IsValid, f"{InCase} is rejected");
+        Assert_False(Validation.IsValid(), f"{InCase} is rejected");
         Assert_True(Validation.Get_Error().Len() > 0, f"{InCase} names its rule (error: {Validation.Get_Error()})");
     }
 }

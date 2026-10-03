@@ -20,7 +20,7 @@ enum EMars_Station_RejectReason
     Occupied,
     // The operator already holds a different station.
     AlreadyOperating,
-    // The station is not taking operators right now (SetEngagementEnabled false, or the spec's AllowEngagement).
+    // The station's engagement is disabled (FMars_Request_Station_SetEngagement, or the spec's AllowEngagement).
     Disabled
 }
 
@@ -115,7 +115,7 @@ struct FMars_Station_Setup
     TArray<FMars_Station_GripNode> GripNodes;
 }
 
-// The operator's view while operating. Field order is the positional constructor's order.
+// The operator's view while operating.
 struct FMars_Station_CameraSpec
 {
     UPROPERTY()
@@ -139,7 +139,7 @@ struct FMars_Station_CameraSpec
     }
 }
 
-// What the Use prompt reads. Field order is the positional constructor's order.
+// What the Use prompt reads.
 struct FMars_Station_PromptSpec
 {
     UPROPERTY()
@@ -159,8 +159,8 @@ struct FMars_Station_PromptSpec
 }
 
 // Station frame: the root is the station's origin on the floor. StandLocal is where the operator stands (Z at the floor,
-// +X facing the station); Grips are where the gloves hold while operating, at most one per hand. Field order is the
-// positional constructor's order (the spawn-params generator emits it when a subclass changes a default).
+// +X facing the station); Grips are where the gloves hold while operating, at most one per hand. The spawn-params
+// generator emits a non-default value as the positional constructor call.
 struct FMars_Station_Spec
 {
     UPROPERTY()
@@ -174,7 +174,7 @@ struct FMars_Station_Spec
     UPROPERTY()
     float32 EngageMaxSeconds = 0.35f;
 
-    // The starting value of the station's engagement switch (FMars_Request_Station_SetEngagementEnabled changes it).
+    // The starting value of the station's engagement switch (FMars_Request_Station_SetEngagement changes it).
     UPROPERTY()
     bool AllowEngagement = true;
 
@@ -257,16 +257,17 @@ struct FMars_Fragment_Station_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Operator is written only by UMars_Processor_Station_HandleRequests, in the same drain as the operator's
-// FMars_Fragment_Operator.Station (both ends of the link at once). The handles are composed by Add.
+// Operator and Engagement are written only by UMars_Processor_Station_HandleRequests (its drain and its destroy watches),
+// Operator always in the same call as the operator's FMars_Fragment_Operator.Station. The handles are set once by Add.
 struct FMars_Fragment_Station
 {
     // The operating entity (the player); invalid = free.
     UPROPERTY()
     FCk_Handle Operator;
 
+    // Disabled rejects every reserve (Disabled); it does not evict the current operator.
     UPROPERTY()
-    bool IsEngagementEnabled = true;
+    ECk_EnableDisable Engagement = ECk_EnableDisable::Enable;
 
     // Child scene node at StandLocal: the world pose the operator glides to.
     UPROPERTY()
@@ -345,25 +346,25 @@ struct FMars_Request_Station_Release
 }
 
 // Disabling rejects later reserves (Disabled); it does not evict the current operator.
-struct FMars_Request_Station_SetEngagementEnabled
+struct FMars_Request_Station_SetEngagement
 {
     UPROPERTY()
-    bool Enabled = true;
+    ECk_EnableDisable Engagement = ECk_EnableDisable::Enable;
 
-    FMars_Request_Station_SetEngagementEnabled() {}
+    FMars_Request_Station_SetEngagement() {}
 
-    FMars_Request_Station_SetEngagementEnabled(bool InEnabled)
+    FMars_Request_Station_SetEngagement(ECk_EnableDisable InEngagement)
     {
-        Enabled = InEnabled;
+        Engagement = InEngagement;
     }
 }
 
-// Applied SetEngagementEnabled -> Release -> Reserve, each kind in arrival order: a release and a reserve in one drain
-// re-seat the station, and of two reserves in one drain the first wins and the second is rejected Occupied.
+// Applied SetEngagement -> Release -> Reserve, each kind in arrival order: a release and a reserve in one drain re-seat
+// the station, and of two reserves in one drain the first wins and the second is rejected Occupied.
 struct FMars_Fragment_Station_Requests
 {
     UPROPERTY()
-    TArray<FMars_Request_Station_SetEngagementEnabled> SetEngagementEnabledRequests;
+    TArray<FMars_Request_Station_SetEngagement> SetEngagementRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Station_Release> ReleaseRequests;

@@ -43,7 +43,7 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
         TriggerSpec.Shape = EMars_Trigger_Shape::Box;
         TriggerSpec.BoxHalfExtents = FVector(TileSize * 0.5, TileSize * 0.5, 50.0);
         TriggerSpec.LocalOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 50.0), FVector::OneVector);
-        TriggerSpec.DetectionFilter = GameplayTag::MakeContainerFromTag(GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
+        TriggerSpec.DetectionFilter = GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_Player);
         auto Trigger = utils_trigger::Add(TrapRoot, TriggerSpec);
 
         auto HazardSpec = Hazard;
@@ -64,16 +64,14 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InSpikeNode)
     {
         auto CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(CubeMesh))
-        { return; }
-
         auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
         auto HazardMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine cube is 100 uu with its pivot at the centre.
         const float64 TileThickness = 10.0;
-        AddBox(InRoot, FVector(0.0, 0.0, TileThickness * 0.5), FVector(TileSize, TileSize, TileThickness) * 0.01,
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"SpikeTrap_Tile");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TileThickness * 0.5), FVector(TileSize, TileSize, TileThickness) * 0.01),
+            CubeMesh, WallMaterial, collision::profile::BlockAll, n"SpikeTrap_Tile"));
 
         // Tips rest just below the tile's top face, so the retracted spikes are hidden inside it.
         const int32 SpikesPerSide = 4;
@@ -82,6 +80,7 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
         const float64 SpikeTipAtRest = TileThickness - 2.0;
         const auto Spacing = TileSize * 0.8 / SpikesPerSide;
         const auto FirstOffset = -Spacing * (SpikesPerSide - 1) * 0.5;
+        const auto SpikeScale = FVector(SpikeWidth, SpikeWidth, SpikeHeight) * 0.01;
 
         auto SpikeTransform = InSpikeNode.As_Transform();
         for (int32 X = 0; X < SpikesPerSide; ++X)
@@ -89,36 +88,9 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
             for (int32 Y = 0; Y < SpikesPerSide; ++Y)
             {
                 const auto Location = FVector(FirstOffset + Spacing * X, FirstOffset + Spacing * Y, SpikeTipAtRest - SpikeHeight * 0.5);
-                AddBox(SpikeTransform, Location, FVector(SpikeWidth, SpikeWidth, SpikeHeight) * 0.01,
-                    CubeMesh, HazardMaterial, collision::profile::NoCollision, n"SpikeTrap_Spike");
+                SpikeTransform.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, Location, SpikeScale),
+                    CubeMesh, HazardMaterial, collision::profile::NoCollision, n"SpikeTrap_Spike"));
             }
         }
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddBox(
-        FCk_Handle_Transform& InAttachTo,
-        FVector InLocation,
-        FVector InScale,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        auto Node = utils_scene_node::Create(InAttachTo, FTransform(FRotator::ZeroRotator, InLocation, InScale));
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable even when static: the component is registered first and then receives the entity transform,
-        // which a Static component refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 }

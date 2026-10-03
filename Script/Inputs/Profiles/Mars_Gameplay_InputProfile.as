@@ -1,3 +1,12 @@
+// Where the gameplay intent set's swap onto this profile's matcher stands.
+enum EMars_GameplayInput_SwapState
+{
+    // Waiting for every row's Mapped button to be minted.
+    NotRequested,
+    Requested,
+    Succeeded
+}
+
 struct FMars_Gameplay_IntentRow
 {
     FString Token;
@@ -34,8 +43,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     private FCk_Handle_InputLayer _Layer;
     private FCk_Handle_IntentMatcher _Matcher;
     private FTimerHandle _ComposeTimer;
-    private bool _SwapRequested = false;
-    private bool _SwapSucceeded = false;
+    private EMars_GameplayInput_SwapState _SwapState = EMars_GameplayInput_SwapState::NotRequested;
     private int32 _ComposeAttempts = 0;
 
     UFUNCTION(BlueprintOverride)
@@ -62,23 +70,23 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     {
         Super::Activate(InController, InPawn);
 
-        _SwapRequested = false;
-        _SwapSucceeded = false;
-        _ComposeAttempts = 0;
-        System::ClearAndInvalidateTimerHandle(_ComposeTimer);
-        _ComposeTimer = System::SetTimer(this, n"DoTryCompose", 0.1f, true);
-        DoTryCompose();
+        _SwapState = EMars_GameplayInput_SwapState::NotRequested;
+        DoStart_ComposeRetry();
     }
 
+    // The layer and its matcher survive a re-point. The new pawn may not be ECS-ready yet, so the retry tick hands it
+    // the matcher once it is.
     UFUNCTION(BlueprintOverride)
     void Repoint(APawn InNewPawn)
     {
-        auto OldIntents = TryGet_PawnIntents();
-        if (ck::IsValid(OldIntents))
-        { OldIntents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(FCk_Handle_IntentMatcher())); }
-
+        DoRelease_PawnIntents();
         Super::Repoint(InNewPawn);
-        DoTryCompose();
+
+        // A suspended (deactivated) profile composes when it is activated again.
+        if (ck::Is_NOT_Valid(OwningController))
+        { return; }
+
+        DoStart_ComposeRetry();
     }
 
     // Destroying the layer emits no phase signal, but the pawn stops reading the matcher, so every
@@ -87,23 +95,35 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     void Deactivate(APlayerController InController)
     {
         System::ClearAndInvalidateTimerHandle(_ComposeTimer);
-
-        auto Intents = TryGet_PawnIntents();
-        if (ck::IsValid(Intents))
-        {
-            Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(FCk_Handle_IntentMatcher()));
-            Intents.Request_SetMoveDirection(FMars_Request_InputIntents_SetMoveDirection(FVector::ZeroVector));
-        }
+        DoRelease_PawnIntents();
 
         if (ck::IsValid(_Layer))
         { utils_entity_lifetime::Request_DestroyEntity(_Layer); }
 
         _Layer = FCk_Handle_InputLayer();
         _Matcher = FCk_Handle_IntentMatcher();
-        _SwapRequested = false;
-        _SwapSucceeded = false;
+        _SwapState = EMars_GameplayInput_SwapState::NotRequested;
 
         Super::Deactivate(InController);
+    }
+
+    private void DoStart_ComposeRetry()
+    {
+        _ComposeAttempts = 0;
+        System::ClearAndInvalidateTimerHandle(_ComposeTimer);
+        _ComposeTimer = System::SetTimer(this, n"DoTryCompose", 0.1f, true);
+        DoTryCompose();
+    }
+
+    // The controlled pawn stops reading this profile: no matcher, no move.
+    private void DoRelease_PawnIntents()
+    {
+        auto Intents = TryGet_PawnIntents();
+        if (ck::Is_NOT_Valid(Intents))
+        { return; }
+
+        Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(FCk_Handle_IntentMatcher()));
+        Intents.Request_SetMoveDirection(FMars_Request_InputIntents_SetMoveDirection(FVector::ZeroVector));
     }
 
     //--------------------------------------------------------------------------------------------
@@ -149,7 +169,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Crouch, EKeys::C);
         Context.MapKey(mars::Mars_IA_Interact_Primary, EKeys::LeftMouseButton);
         Context.MapKey(mars::Mars_IA_Interact_Secondary, EKeys::RightMouseButton);
-        Context.MapKey(mars::Mars_IA_Interact_Use, EKeys::E);
+        Context.MapKey(mars::Mars_IA_Interact_Use, EKeys::LeftMouseButton);
         Context.MapKey(mars::Mars_IA_Slot1, EKeys::One);
         Context.MapKey(mars::Mars_IA_Slot2, EKeys::Two);
         Context.MapKey(mars::Mars_IA_Slot3, EKeys::Three);
@@ -224,8 +244,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Intents.Request_SetMoveDirection(FMars_Request_InputIntents_SetMoveDirection(FVector(Input.X, Input.Y, 0.0)));
     }
 
-    // The legacy controller input scale the previous controller-rotation look path applied (engine BaseGame.ini InputYawScale); kept as an
-    // explicit factor so the tuned mouse and stick feel carry over to the camera director's intention.
+    // The engine's controller input yaw scale (BaseGame.ini InputYawScale), kept as an explicit factor so the tuned mouse
+    // and stick feel carry over to the camera director's intention.
     private const float32 LegacyLookScale = 2.5f;
 
     // CkCamera consumes the intention as a per-frame delta: degrees of view rotation = intention x the profile's LookSpeed.
@@ -303,13 +323,13 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("SC", n"IA_Slot3", GameplayTags::Mars_Intent_Slot3));
         Rows.Add(FMars_Gameplay_IntentRow("SD", n"IA_Slot4", GameplayTags::Mars_Intent_Slot4));
         Rows.Add(FMars_Gameplay_IntentRow("DR", n"IA_Drop", GameplayTags::Mars_Intent_Drop));
-        Rows.Add(FMars_Gameplay_IntentRow("BK", n"IA_Back", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Back")));
-        Rows.Add(FMars_Gameplay_IntentRow("EM", n"IA_EmoteWheel", GameplayTags::ResolveGameplayTag(n"Mars.Intent.EmoteWheel")));
-        Rows.Add(FMars_Gameplay_IntentRow("EW", n"IA_Emote_Wave", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Wave")));
-        Rows.Add(FMars_Gameplay_IntentRow("ET", n"IA_Emote_ThumbsUp", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.ThumbsUp")));
-        Rows.Add(FMars_Gameplay_IntentRow("EP", n"IA_Emote_Point", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Point")));
-        Rows.Add(FMars_Gameplay_IntentRow("EC", n"IA_Emote_Clap", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.Clap")));
-        Rows.Add(FMars_Gameplay_IntentRow("EF", n"IA_Emote_FlipOff", GameplayTags::ResolveGameplayTag(n"Mars.Intent.Emote.FlipOff")));
+        Rows.Add(FMars_Gameplay_IntentRow("BK", n"IA_Back", GameplayTags::Mars_Intent_Back));
+        Rows.Add(FMars_Gameplay_IntentRow("EM", n"IA_EmoteWheel", GameplayTags::Mars_Intent_EmoteWheel));
+        Rows.Add(FMars_Gameplay_IntentRow("EW", n"IA_Emote_Wave", GameplayTags::Mars_Intent_Emote_Wave));
+        Rows.Add(FMars_Gameplay_IntentRow("ET", n"IA_Emote_ThumbsUp", GameplayTags::Mars_Intent_Emote_ThumbsUp));
+        Rows.Add(FMars_Gameplay_IntentRow("EP", n"IA_Emote_Point", GameplayTags::Mars_Intent_Emote_Point));
+        Rows.Add(FMars_Gameplay_IntentRow("EC", n"IA_Emote_Clap", GameplayTags::Mars_Intent_Emote_Clap));
+        Rows.Add(FMars_Gameplay_IntentRow("EF", n"IA_Emote_FlipOff", GameplayTags::Mars_Intent_Emote_FlipOff));
         return Rows;
     }
 
@@ -338,15 +358,16 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
             _Matcher = utils_intent_matcher::Add(LayerEntity, FCk_IntentMatcher_Spec());
         }
 
-        if (_SwapRequested == false && Get_AreRowsMinted(ButtonMap))
+        if (_SwapState == EMars_GameplayInput_SwapState::NotRequested && Get_AreRowsMinted(ButtonMap))
         { DoRequestSwap(); }
 
         // ~5s at the 0.1s cadence: one unminted button costs every button on the layer, silently.
         _ComposeAttempts += 1;
-        if (_ComposeAttempts == 50 && _SwapSucceeded == false)
+        const auto HasSwapped = _SwapState == EMars_GameplayInput_SwapState::Succeeded;
+        if (_ComposeAttempts == 50 && HasSwapped == false)
         { ck::Warning("[GameplayInput] the intent set has not composed after 5s - is every IA_* row's Mapped button minted (IMC registered with user settings)?"); }
 
-        if (_SwapSucceeded == false)
+        if (HasSwapped == false)
         { return; }
 
         auto Intents = TryGet_PawnIntents();
@@ -363,14 +384,13 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     {
         FCk_Handle SourceEntity = InSource;
 
-        if (utils_intent_sampler::DoCast(SourceEntity).IsSet() == false)
+        if (SourceEntity.Is_IntentSampler() == false)
         { utils_intent_sampler::Add(SourceEntity, FCk_IntentSampler_Spec(120)); }
 
-        auto ExistingMap = utils_input_button_map::DoCast(SourceEntity);
-        if (ExistingMap.IsSet() == false)
+        auto ButtonMap = SourceEntity.As_InputButtonMap(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(ButtonMap))
         { return utils_input_button_map::Add(SourceEntity, FCk_InputButtonMap_Spec(TArray<FKey>())); }
 
-        auto ButtonMap = ExistingMap.GetValue();
         utils_input_button_map::Request_Rederive(ButtonMap, FCk_Request_InputButtonMap_Rederive());
         return ButtonMap;
     }
@@ -419,7 +439,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         utils_intent_matcher::Request_SwapSet(_Matcher,
             FCk_Request_IntentMatcher_SwapSet(Baked.Get_CompiledSet()),
             FCk_Delegate_Request_OnCompleted(this, n"OnSwapCompleted"));
-        _SwapRequested = true;
+        _SwapState = EMars_GameplayInput_SwapState::Requested;
     }
 
     UFUNCTION()
@@ -428,11 +448,11 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         if (InResult != ECk_Request_OperationResult::Succeeded)
         {
             // A terminal lost its key between the mint check and the drain - retry from the tick.
-            _SwapRequested = false;
+            _SwapState = EMars_GameplayInput_SwapState::NotRequested;
             return;
         }
 
-        _SwapSucceeded = true;
+        _SwapState = EMars_GameplayInput_SwapState::Succeeded;
         DoTryCompose();
     }
 }

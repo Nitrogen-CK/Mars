@@ -70,8 +70,9 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTe
     UFUNCTION()
     private void Step_ReserveOne(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_StationOne) && ck::IsValid(_StationTwo), "both stations composed");
-        _StationOne.Request_Reserve(FMars_Request_Station_Reserve(FCk_Handle(_Operator)));
+        Assert_Valid(_StationOne, "utils_station::Add composed S1");
+        Assert_Valid(_StationTwo, "utils_station::Add composed S2");
+        _StationOne.Request_Reserve(FMars_Request_Station_Reserve(_Operator));
     }
 
     UFUNCTION()
@@ -84,7 +85,7 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTe
     UFUNCTION()
     private void Step_ReserveTwo(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _StationTwo.Request_Reserve(FMars_Request_Station_Reserve(FCk_Handle(_Operator)));
+        _StationTwo.Request_Reserve(FMars_Request_Station_Reserve(_Operator));
     }
 
     UFUNCTION()
@@ -97,14 +98,19 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTe
     UFUNCTION()
     private void Step_AssertRejectedThenReleaseOne(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_TwoRejectReasons[0] == EMars_Station_RejectReason::AlreadyOperating,
-            f"S2 rejected the operator AlreadyOperating (got {_TwoRejectReasons[0] :n})");
+        Assert_Equals_Int(_TwoRejectReasons.Num(), 1, "S2 rejected the operator once");
+        if (_TwoRejectReasons.Num() == 1)
+        {
+            Assert_True(_TwoRejectReasons[0] == EMars_Station_RejectReason::AlreadyOperating,
+                f"S2 rejected the operator AlreadyOperating (got {_TwoRejectReasons[0] :n})");
+        }
+
         Assert_Equals_Int(_TwoReservedCount, 0, "S2 did not reserve");
         Assert_False(_StationTwo.Get_IsOperated(), "S2 stayed free");
-        Assert_True(_StationOne.Get_IsOperatedBy(FCk_Handle(_Operator)), "S1 still holds the operator");
-        Assert_True(FCk_Handle(_Operator.Get_Station()) == FCk_Handle(_StationOne), "the operator's back-ref still names S1");
+        Assert_True(_StationOne.Get_IsOperatedBy(_Operator), "S1 still holds the operator");
+        Assert_True(_Operator.Get_Station() == _StationOne, "the operator's back-ref still names S1");
 
-        _StationOne.Request_Release(FMars_Request_Station_Release(FCk_Handle(_Operator), EMars_Station_ReleaseReason::OperatorRequested));
+        _StationOne.Request_Release(FMars_Request_Station_Release(_Operator, EMars_Station_ReleaseReason::OperatorRequested));
     }
 
     UFUNCTION()
@@ -125,8 +131,8 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTe
     private void Step_AssertMoved(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_TwoRejectReasons.Num(), 1, "S2 rejected only the first reserve");
-        Assert_True(_StationTwo.Get_IsOperatedBy(FCk_Handle(_Operator)), "S2 holds the operator");
+        Assert_True(_StationTwo.Get_IsOperatedBy(_Operator), "S2 holds the operator");
         Assert_False(_StationOne.Get_IsOperated(), "S1 is free");
-        Assert_True(FCk_Handle(_Operator.Get_Station()) == FCk_Handle(_StationTwo), "the operator's back-ref names S2");
+        Assert_True(_Operator.Get_Station() == _StationTwo, "the operator's back-ref names S2");
     }
 }

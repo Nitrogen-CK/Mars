@@ -1,6 +1,5 @@
 // Xbox gamepad key glyphs for UCommonActionWidget / UCk_InputActionWidget_UE.
-// Brush lines are commented out until the Prompt_* textures exist under /Game/Mars and their
-// accessors are generated (Script/Mars_Assets.as) - uncomment them, and the size locals, then.
+// No Xbox glyph textures exist yet, so every key maps to an empty brush (the generic gamepad data has them).
 
 TArray<FCommonInputKeyBrushConfiguration> Get_Mars_XboxGamepadBrushEntries()
 {
@@ -48,7 +47,6 @@ TArray<FCommonInputKeyBrushConfiguration> Get_Mars_XboxGamepadBrushEntries()
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_RightStick_Down, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_RightStick_Left, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_RightStick_Right, EmptyBrush));
-
 
     return Entries;
 }

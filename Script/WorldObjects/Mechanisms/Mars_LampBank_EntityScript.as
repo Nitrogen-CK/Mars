@@ -41,6 +41,7 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }
 
+        // A rejected Countdown spec already ensured in utils_countdown::Add; the lamps then stay dark.
         if (ck::IsValid(_Countdown))
         { _Countdown.BindTo_OnRemainingChanged(FMars_Delegate_Countdown_OnRemainingChanged(this, n"OnRemainingChanged")); }
 
@@ -52,8 +53,6 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
     private void AddVisuals(FCk_Handle_Transform& InRoot)
     {
         auto CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(CubeMesh))
-        { return; }
 
         // Engine cube is 100 uu, pivot at its center.
         const float64 LampSize = 16.0;
@@ -64,16 +63,17 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
         const auto LampCount = Math::Max(Countdown.Steps, 1);
         const auto PlateWidth = LampCount * LampSpacing + 12.0;
 
-        AddBox(InRoot, FVector(PlateDepth * 0.5, 0.0, 0.0), FVector(PlateDepth, PlateWidth, PlateHeight) * 0.01,
-            CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"LampBank_Plate");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(PlateDepth * 0.5, 0.0, 0.0), FVector(PlateDepth, PlateWidth, PlateHeight) * 0.01),
+            CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"LampBank_Plate"));
 
         auto LampMaterial = assets::load::ProtoGrid_Interactable_Mars_MI();
         const auto FirstY = -(LampCount - 1) * LampSpacing * 0.5;
         for (int32 Index = 0; Index < LampCount; ++Index)
         {
-            auto Lamp = AddBox(InRoot, FVector(PlateDepth + LampSize * 0.5, FirstY + Index * LampSpacing, 0.0),
-                FVector(LampSize, LampSize, LampSize) * 0.01,
-                CubeMesh, LampMaterial, collision::profile::NoCollision, n"LampBank_Lamp");
+            auto Lamp = InRoot.Add_MeshPart(this, FMars_MeshPart(
+                FTransform(FRotator::ZeroRotator, FVector(PlateDepth + LampSize * 0.5, FirstY + Index * LampSpacing, 0.0), FVector(LampSize, LampSize, LampSize) * 0.01),
+                CubeMesh, LampMaterial, collision::profile::NoCollision, n"LampBank_Lamp"));
 
             _Lamps.Add(Lamp);
             if (ck::IsValid(Lamp))
@@ -81,37 +81,7 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
         }
     }
 
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private FCk_Handle_UnrealComponent AddBox(
-        FCk_Handle_Transform& InAttachTo,
-        FVector InLocation,
-        FVector InScale,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        auto Node = utils_scene_node::Create(InAttachTo, FTransform(FRotator::ZeroRotator, InLocation, InScale));
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component is registered first and then receives the entity transform, which a Static component
-        // refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        return utils_unreal_component::Add(NodeEntity, ComponentParams);
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Lamp colors (visual only; the Countdown is the source of truth)
-    //----------------------------------------------------------------------------------------------------------------------
-
+    // Visual only; the Countdown is the source of truth.
     private void Repaint()
     {
         const auto Dim = FLinearColor(0.06f, 0.06f, 0.06f, 1.0f);
@@ -122,32 +92,7 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
         { Remaining = _Countdown.Get_Remaining(); }
 
         for (int32 Index = 0; Index < _Lamps.Num(); ++Index)
-        { PaintLamp(_Lamps[Index], Index < Remaining ? Lit : Dim); }
-    }
-
-    private void PaintLamp(FCk_Handle_UnrealComponent InLamp, FLinearColor InColor)
-    {
-        if (ck::Is_NOT_Valid(InLamp))
-        { return; }
-
-        // Null until the component is created (asynchronously); OnLampAdded repaints then.
-        auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(InLamp));
-        if (ck::Is_NOT_Valid(Mesh))
-        { return; }
-
-        // Returns the existing dynamic instance on later calls.
-        auto Material = Mesh.CreateDynamicMaterialInstance(0);
-        if (ck::Is_NOT_Valid(Material))
-        { return; }
-
-        Material.SetVectorParameterValue(n"PrimaryColor", InColor);
-        Material.SetVectorParameterValue(n"SecondaryColor", ScaleColor(InColor, 0.6f));
-        Material.SetVectorParameterValue(n"LineColor", ScaleColor(InColor, 1.5f));
-    }
-
-    private FLinearColor ScaleColor(FLinearColor InColor, float32 InScale) const
-    {
-        return FLinearColor(InColor.R * InScale, InColor.G * InScale, InColor.B * InScale, InColor.A);
+        { _Lamps[Index].Paint_MeshPart(Index < Remaining ? Lit : Dim); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------

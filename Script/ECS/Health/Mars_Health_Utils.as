@@ -1,19 +1,19 @@
 namespace utils_health
 {
-    // Composes Health on InHandle: the FloatAttribute.Mars.Health attribute (MinMax 0..Max, starting at Start or Max when
-    // Start <= 0) and the latch state. A rejected spec ensures and returns an invalid handle with nothing composed.
+    // Composes Health on InHandle: the FloatAttribute.Mars.Health attribute (MinMax 0..Max, starting at Start, or at Max
+    // when Start is unset) and the latch state. A rejected spec ensures and returns an invalid handle with nothing composed.
     FCk_Handle_Health Add(FCk_Handle& InHandle, FMars_Health_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Health] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Health] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Health(); }
 
-        const auto Start = InSpec.Start <= 0.0f ? InSpec.Max : InSpec.Start;
+        const auto Start = InSpec.Start.IsSet() ? InSpec.Start.GetValue() : InSpec.Max;
 
         auto State = FMars_Fragment_Health();
-        State.Attribute = utils_float_attribute::Add(InHandle, GameplayTags::ResolveGameplayTag(n"FloatAttribute.Mars.Health"),
+        State.Attribute = utils_float_attribute::Add(InHandle, GameplayTags::FloatAttribute_Mars_Health,
             Start, ECk_Replication::DoesNotReplicate, ECk_MinMax::MinMax, 0.0f, InSpec.Max);
-        State.IsInvulnerable = InSpec.StartInvulnerable;
+        State.IsInvulnerable = InSpec.Invulnerability == ECk_EnableDisable::Enable;
 
         auto Params = FMars_Fragment_Health_Params();
         Params.Spec = InSpec;
@@ -63,11 +63,7 @@ mixin FCk_Handle_FloatAttribute Get_Attribute(const FCk_Handle_Health& Self)
 // Unset until a hit applies damage.
 mixin TOptional<FMars_DamageEvent> Get_LastHit(const FCk_Handle_Health& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Health);
-    if (State.HasLastHit == false)
-    { return TOptional<FMars_DamageEvent>(); }
-
-    return TOptional<FMars_DamageEvent>(State.LastHit);
+    return Self.Get_Fragment(FMars_Fragment_Health).LastHit;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

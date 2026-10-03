@@ -1,5 +1,5 @@
-// A chop with the hand just outside the band resolves not aligned: no useful chop, the pile and the band stay put. Rig as
-// AlignedChopsAdvanceStateAndMoveBand; the hand is nudged to BandCenter + BandHalfWidth + 5.
+// A chop with the hand just outside the band (BandCenter + BandHalfWidth + 5) resolves not aligned: no useful chop, the
+// pile and the band stay put.
 class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
 {
     private FCk_Handle_Dicing _Dicing;
@@ -28,7 +28,8 @@ class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
         MoverSpec.Duration = 0.05f;
         auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
 
-        _Dicing = utils_dicing::Add(StationEntity, _Spec, FMars_Dicing_Nodes(LateralNode, Mover));
+        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
+        _Dicing = utils_dicing::Add(StationEntity, _Spec);
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
         _Dicing.BindTo_OnStateChanged(FMars_Delegate_Dicing_OnStateChanged(this, n"OnStateChanged"));
@@ -43,9 +44,9 @@ class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, bool InAligned)
+    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
     {
-        _Resolved.Add(InAligned);
+        _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
     }
 
     UFUNCTION()
@@ -98,7 +99,8 @@ class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
         { Assert_False(_Resolved[0], "the chop resolved not aligned"); }
 
         Assert_Equals_Int(_States.Num(), 0, "OnStateChanged did not fire");
-        Assert_True(_Dicing.Get_MaterialState() == EMars_Dicing_State::WholeLeaves, "the pile is still whole leaves");
+        const auto MaterialState = _Dicing.Get_MaterialState();
+        Assert_True(MaterialState == EMars_Dicing_State::WholeLeaves, f"the pile is still whole leaves (got {MaterialState :n})");
         Assert_Equals_Int(_Dicing.Get_UsefulChops(), 0, "no useful chop");
         Assert_Equals_Int(_Dicing.Get_ChopsInState(), 0, "no chop counted toward the next state");
         Assert_Equals_Int(_BandMoves.Num(), 0, "OnBandMoved did not fire");

@@ -44,7 +44,6 @@ enum EMars_SurfaceNavigator_PathMode
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Field order is the positional constructor's order.
 struct FMars_SurfaceNavigator_Spec
 {
     // The steering speed (SurfaceMotion clamps it to its own MaxSpeed).
@@ -150,9 +149,9 @@ struct FMars_SurfaceNavigator_Steering
     UPROPERTY()
     FVector Direction = FVector::ZeroVector;
 
-    // Negative: nothing steered yet, so the next steer always goes out.
+    // Unset: nothing steered since the move began, so the next steer always goes out.
     UPROPERTY()
-    float32 Speed = -1.0f;
+    TOptional<float32> Speed;
 }
 
 // Written only by the navigator's two processors (and composed by Add). The navigator never writes the transform:
@@ -222,8 +221,8 @@ struct FMars_Request_SurfaceNavigator_MoveTo
     }
 }
 
-// Applied Stop -> MoveTo, each kind in arrival order: a Stop and a MoveTo in the same drain leave the MoveTo running, and
-// of several MoveTo the last one stands.
+// Request_Stop drops every MoveTo queued before it, so applying Stop and then the last MoveTo is arrival order: a Stop
+// after a MoveTo in one frame stops, a MoveTo after a Stop moves.
 struct FMars_Fragment_SurfaceNavigator_Requests
 {
     UPROPERTY()

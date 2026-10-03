@@ -21,10 +21,6 @@ class UMars_AutoTest_BodyPart_SpillDamagesBody : UCk_AutoTest_Base
         Run_Steps(InHandle);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
-
     private FMars_Crawler_Spec Make_Spec()
     {
         const auto Half = FVector(400.0, 400.0, 200.0);
@@ -54,7 +50,7 @@ class UMars_AutoTest_BodyPart_SpillDamagesBody : UCk_AutoTest_Base
     UFUNCTION()
     private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _Crawler = FCk_Handle(InEntityScriptHandle).As_Crawler(ECk_SanityCheck::UnChecked);
+        _Crawler = InEntityScriptHandle.As_Crawler();
     }
 
     UFUNCTION()
@@ -86,7 +82,7 @@ class UMars_AutoTest_BodyPart_SpillDamagesBody : UCk_AutoTest_Base
     private void Step_HitLeg0(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Zone = _Crawler.Get_LegParts()[0].Get_Zone();
-        Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"))));
+        Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, GameplayTags::DamageType_Mars_Sever)));
     }
 
     UFUNCTION()
@@ -104,7 +100,8 @@ class UMars_AutoTest_BodyPart_SpillDamagesBody : UCk_AutoTest_Base
         for (int32 Index = 1; Index < Parts.Num(); ++Index)
         { Assert_Equals_Float(Parts[Index].Get_Health().Get_Current(), 30.0f, 0.001f, f"leg {Index} is untouched"); }
 
-        Assert_True(Parts[0].Get_State() == EMars_BodyPart_State::Attached, "a non-lethal hit leaves the leg attached");
+        Assert_True(Parts[0].Get_State() == EMars_BodyPart_State::Attached,
+            f"a non-lethal hit leaves the leg attached (got {Parts[0].Get_State() :n})");
         Assert_Equals_Float(_Crawler.Get_Monster().Get_BodyHealth().Get_Current(), 115.0f, 0.001f, "the body took exactly the spill");
     }
 }

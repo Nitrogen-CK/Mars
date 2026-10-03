@@ -1,4 +1,5 @@
-// Drains Add, then Refresh, then Remove. Entries are keyed by their prompt handle.
+// Drains Add, then Refresh, then Remove. Entries are keyed by their prompt handle. A prompt carries
+// FMars_Fragment_InteractPrompt_DisplayBinding from its first entry here until its last one is removed.
 class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -20,7 +21,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         TArray<FMars_Request_InteractPromptDisplay_RefreshPrompt> RefreshRequests = InRequests.RefreshRequests;
         TArray<FMars_Request_InteractPromptDisplay_RemovePrompt> RemoveRequests = InRequests.RemoveRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_InteractPromptDisplay_Requests);
 
         for (const auto& AddRequest : AddRequests)
@@ -33,6 +34,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         { HandleRemoveRequest(Self, InState, RemoveRequest); }
     }
 
+    // A prompt destroyed between its request and this drain is skipped.
     private void HandleAddRequest(
         FCk_Handle_InteractPromptDisplay& InDisplay,
         FMars_Fragment_InteractPromptDisplay& InState,
@@ -42,7 +44,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         { return; }
 
         const auto SlotKey = InRequest.Prompt.Get_SlotKeyFromPrompt();
-        const auto SortOrder = InRequest.Prompt.Get_Fragment(FMars_Fragment_InteractPrompt_Params).SortOrder;
+        const auto SortOrder = InRequest.Prompt.Get_SortOrder();
 
         auto Entry = FMars_InteractPromptDisplay_Entry();
         Entry.PromptHandle = InRequest.Prompt;
@@ -84,15 +86,10 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
         auto& Binding = PromptHandle.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_DisplayBinding);
         Binding.Display = InDisplay;
 
-        if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals) == false)
-        { return; }
-
-        auto& Signals = InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals);
-        const auto SlotSortOrder = InState.Slots[SlotIndex].SortOrder;
         if (WasEmpty)
-        { Signals.OnPromptAppeared.Broadcast(InDisplay, SlotKey, SlotSortOrder, InRequest.Prompt); }
+        { Broadcast_Appeared(InDisplay, InState.Slots[SlotIndex], InRequest.Prompt); }
         else
-        { Signals.OnPromptUpdated.Broadcast(InDisplay, SlotKey, SlotSortOrder, InRequest.Prompt); }
+        { Broadcast_Updated(InDisplay, InState.Slots[SlotIndex], InRequest.Prompt); }
     }
 
     private void HandleRefreshRequest(
@@ -107,7 +104,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
             { continue; }
 
             const auto TopIndex = Slot.Stack.Num() - 1;
-            if ((Slot.Stack[TopIndex].PromptHandle == InRequest.Prompt) == false)
+            if (Slot.Stack[TopIndex].PromptHandle != InRequest.Prompt)
             { continue; }
 
             auto TopPrompt = Slot.Stack[TopIndex].PromptHandle;
@@ -117,15 +114,15 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
 
                 if (Slot.Stack.IsEmpty())
                 {
-                    Broadcast_Removed(InDisplay, Slot.SlotKey, Slot.SortOrder, TopPrompt);
+                    Broadcast_Removed(InDisplay, Slot, TopPrompt);
                     InState.Slots.RemoveAt(SlotIndex);
                 }
                 else
-                { Broadcast_Updated(InDisplay, Slot.SlotKey, Slot.SortOrder, Slot.Stack.Last().PromptHandle); }
+                { Broadcast_Updated(InDisplay, Slot, Slot.Stack.Last().PromptHandle); }
                 return;
             }
 
-            Broadcast_Updated(InDisplay, Slot.SlotKey, Slot.SortOrder, TopPrompt);
+            Broadcast_Updated(InDisplay, Slot, TopPrompt);
             return;
         }
     }
@@ -144,7 +141,7 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
 
             for (int32 EntryIndex = Slot.Stack.Num() - 1; EntryIndex >= 0; --EntryIndex)
             {
-                if ((Slot.Stack[EntryIndex].PromptHandle == InRequest.Prompt) == false)
+                if (Slot.Stack[EntryIndex].PromptHandle != InRequest.Prompt)
                 { continue; }
 
                 WasTop = EntryIndex == Slot.Stack.Num() - 1;
@@ -157,33 +154,65 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
             if (Found == false)
             { continue; }
 
-            if (WasTop == false)
-            { break; }
-
-            PruneInvalidTopEntries(Slot);
-
-            if (Slot.Stack.IsEmpty())
+            if (WasTop)
             {
-                Broadcast_Removed(InDisplay, Slot.SlotKey, Slot.SortOrder, RemovedPrompt);
-                InState.Slots.RemoveAt(SlotIndex);
-            }
-            else
-            { Broadcast_Updated(InDisplay, Slot.SlotKey, Slot.SortOrder, Slot.Stack.Last().PromptHandle); }
+                PruneInvalidTopEntries(Slot);
 
+                if (Slot.Stack.IsEmpty())
+                {
+                    Broadcast_Removed(InDisplay, Slot, RemovedPrompt);
+                    InState.Slots.RemoveAt(SlotIndex);
+                }
+                else
+                { Broadcast_Updated(InDisplay, Slot, Slot.Stack.Last().PromptHandle); }
+            }
+
+            Unbind_IfNoEntries(InDisplay, InState, RemovedPrompt);
             break;
         }
     }
 
-    private void Broadcast_Removed(FCk_Handle_InteractPromptDisplay& InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt)
+    // A prompt's last entry on this display removed: it no longer refreshes this display.
+    private void Unbind_IfNoEntries(
+        const FCk_Handle_InteractPromptDisplay& InDisplay,
+        const FMars_Fragment_InteractPromptDisplay& InState,
+        FCk_Handle_InteractPrompt InPrompt)
     {
-        if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptRemoved.Broadcast(InDisplay, InSlotKey, InSortOrder, InPrompt); }
+        if (ck::Is_NOT_Valid(InPrompt) || InPrompt.Has_Fragment(FMars_Fragment_InteractPrompt_DisplayBinding) == false)
+        { return; }
+
+        for (const auto& Slot : InState.Slots)
+        {
+            for (const auto& Entry : Slot.Stack)
+            {
+                if (Entry.PromptHandle == InPrompt)
+                { return; }
+            }
+        }
+
+        if (InPrompt.Get_Fragment(FMars_Fragment_InteractPrompt_DisplayBinding).Display != InDisplay)
+        { return; }
+
+        auto Prompt = InPrompt;
+        Prompt.Request_TryRemove(FMars_Fragment_InteractPrompt_DisplayBinding);
     }
 
-    private void Broadcast_Updated(FCk_Handle_InteractPromptDisplay& InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt)
+    private void Broadcast_Appeared(FCk_Handle_InteractPromptDisplay& InDisplay, const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt)
     {
         if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptUpdated.Broadcast(InDisplay, InSlotKey, InSortOrder, InPrompt); }
+        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptAppeared.Broadcast(InDisplay, InSlot.SlotKey, InSlot.SortOrder, InPrompt); }
+    }
+
+    private void Broadcast_Removed(FCk_Handle_InteractPromptDisplay& InDisplay, const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt)
+    {
+        if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
+        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptRemoved.Broadcast(InDisplay, InSlot.SlotKey, InSlot.SortOrder, InPrompt); }
+    }
+
+    private void Broadcast_Updated(FCk_Handle_InteractPromptDisplay& InDisplay, const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt)
+    {
+        if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
+        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptUpdated.Broadcast(InDisplay, InSlot.SlotKey, InSlot.SortOrder, InPrompt); }
     }
 
     private void PruneInvalidTopEntries(FMars_InteractPromptDisplay_Slot& InSlot)

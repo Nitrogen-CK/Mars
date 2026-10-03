@@ -5,11 +5,11 @@ namespace utils_gaze
     FCk_Handle_Gaze Add(FCk_Handle_Transform& InEyeNode, FMars_Gaze_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Gaze] [{InEyeNode.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Gaze] [{InEyeNode.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Gaze(); }
 
         auto SenseNode = utils_scene_node::Create(InEyeNode, FTransform::Identity);
-        utils_handle::Set_DebugName(FCk_Handle(SenseNode), n"Gaze.Sense");
+        utils_handle::Set_DebugName(SenseNode.H(), n"Gaze.Sense");
 
         auto TriggerSpec = FMars_Trigger_Spec();
         TriggerSpec.Shape = EMars_Trigger_Shape::Sphere;
@@ -20,24 +20,17 @@ namespace utils_gaze
         auto SenseTransform = SenseNode.As_Transform();
 
         auto Params = FMars_Fragment_Gaze_Params();
-        Params.Tuning.AimPoint = InSpec.AimPoint;
-        Params.Tuning.RangeCm = InSpec.RangeCm;
-        Params.Tuning.MinRangeCm = InSpec.MinRangeCm;
-        Params.Tuning.ConeHalfAngleDeg = InSpec.ConeHalfAngleDeg;
-        Params.Tuning.SwitchCloserRatio = InSpec.SwitchCloserRatio;
+        Params.Spec = InSpec;
 
         auto State = FMars_Fragment_Gaze();
+        // The sense probe keeps the default DifferentContextOnly overlap policy and the sense node shares the owner's
+        // context, so the owner's own probes (its body) never enter the sense.
         State.Sense = utils_trigger::Add(SenseTransform, TriggerSpec);
 
         InEyeNode.Add_Fragment(FMars_Feature_Gaze());
         InEyeNode.Add_Fragment(Params);
         InEyeNode.Add_Fragment(State);
         return InEyeNode.As_Gaze();
-    }
-
-    bool Has(const FCk_Handle& InHandle)
-    {
-        return InHandle.Has_Fragment(FMars_Feature_Gaze);
     }
 }
 

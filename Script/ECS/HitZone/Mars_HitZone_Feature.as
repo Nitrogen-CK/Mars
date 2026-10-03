@@ -25,8 +25,7 @@ enum EMars_HitZone_ConditionImpact
     Ruins
 }
 
-// One row of a zone's reaction table: hits of DamageType are scaled by Multiplier. Field order is the positional
-// constructor's order.
+// One row of a zone's reaction table: hits of DamageType are scaled by Multiplier.
 struct FMars_HitZone_Reaction
 {
     UPROPERTY(meta = (Categories = "DamageType"))
@@ -52,7 +51,7 @@ struct FMars_HitZone_Reaction
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Field order is the positional constructor's order.
+// The zone always feeds the Health on its own entity (utils_health::Add first).
 struct FMars_HitZone_Spec
 {
     // HitZone.Mars.{Body, Limb}.
@@ -66,10 +65,6 @@ struct FMars_HitZone_Spec
     // Damage types with no row: scaled by this, with no condition impact.
     UPROPERTY()
     float32 DefaultMultiplier = 1.0f;
-
-    // The Health hits are forwarded to; invalid = the zone entity's own Health.
-    UPROPERTY()
-    FCk_Handle_Health Health;
 
     FMars_HitZone_Spec() {}
 
@@ -100,8 +95,7 @@ mixin FMars_Validation Validate(const FMars_HitZone_Spec& Self)
     return FMars_Validation();
 }
 
-// A box hurtbox: a Probe.Mars.HitZone probe on a scene node under the transform it rides. Field order is the positional
-// constructor's order.
+// A box hurtbox: a Probe.Mars.HitZone probe on a scene node under the transform it rides.
 struct FMars_HitZone_Hurtbox
 {
     UPROPERTY()
@@ -136,7 +130,7 @@ struct FMars_Fragment_HitZone_Params
 // Written only by UMars_Processor_HitZone_HandleRequests, Add and AddHurtbox_Box (composition).
 struct FMars_Fragment_HitZone
 {
-    // The resolved target: the spec's Health, or the zone entity's own.
+    // The zone entity's own Health.
     UPROPERTY()
     FCk_Handle_Health Health;
 
@@ -181,13 +175,13 @@ struct FMars_Fragment_HitZone_Signals
 struct FMars_Request_HitZone_SetEnabled
 {
     UPROPERTY()
-    bool Enabled = true;
+    ECk_EnableDisable EnableDisable = ECk_EnableDisable::Enable;
 
     FMars_Request_HitZone_SetEnabled() {}
 
-    FMars_Request_HitZone_SetEnabled(bool InEnabled)
+    FMars_Request_HitZone_SetEnabled(ECk_EnableDisable InEnableDisable)
     {
-        Enabled = InEnabled;
+        EnableDisable = InEnableDisable;
     }
 }
 

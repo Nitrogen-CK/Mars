@@ -1,7 +1,7 @@
-// HoldWhilePowered, the Porter's Wager slab: while a source on the countdown's input channel is asserted, the countdown is
-// full and held (no drain, its own source asserted throughout); once the input drops it drains step by step to empty and
-// its source drops. The input is a real MechanismSource, so the world's mechanism driver powers the sink, as in the level:
-// counts fed straight to the sink would be overwritten by the driver's next recompute.
+// HoldWhilePowered: while a source on the countdown's input channel is asserted, the countdown is full and held (no
+// drain, its own source asserted throughout); once the input drops it drains step by step to empty and its source drops.
+// The input is a real MechanismSource, so the world's mechanism driver powers the sink, as in the level: counts fed
+// straight to the sink would be overwritten by the driver's next recompute.
 class UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains : UCk_AutoTest_Base
 {
     private FCk_Handle_Countdown _Countdown;
@@ -63,7 +63,7 @@ class UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains : UCk_AutoTes
     UFUNCTION()
     private void Step_Power(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Input.Request_SetAsserted(true);
+        _Input.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(EMars_MechanismSource_Output::Asserted));
     }
 
     UFUNCTION()
@@ -86,7 +86,7 @@ class UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains : UCk_AutoTes
     UFUNCTION()
     private void Step_Unpower(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Input.Request_SetAsserted(false);
+        _Input.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(EMars_MechanismSource_Output::Deasserted));
     }
 
     UFUNCTION()

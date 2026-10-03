@@ -41,12 +41,10 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(_Health))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
-        auto ZoneSpec = FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Body"));
-        ZoneSpec.Reactions.Add(FMars_HitZone_Reaction(GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"), 1.0f,
-            EMars_HitZone_ConditionImpact::Damages));
-        ZoneSpec.Reactions.Add(FMars_HitZone_Reaction(GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Crush"), 1.5f,
-            EMars_HitZone_ConditionImpact::Ruins));
-        auto Zone = utils_hit_zone::Add(InHandle, ZoneSpec);
+        // Each Add ensures on its own rejection.
+        auto Zone = utils_hit_zone::Add(InHandle, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.5f));
+        if (ck::Is_NOT_Valid(Zone))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
 
         // The body node sits at the base so the punch and the flatten scale the post toward the floor.
         _BodyNode = utils_scene_node::Create(Root, FTransform::Identity);
@@ -55,13 +53,13 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
 
         // The hurtbox wraps the post with a margin, so a Blocking strike sweep meets the probe before the post's own
         // collision should that ever be part of the Jolt world.
-        if (ck::IsValid(Zone))
-        {
-            const auto HalfExtents = FVector(PostWidth * 0.5, PostWidth * 0.5, PostHeight * 0.5) + FVector(HurtboxMargin, HurtboxMargin, HurtboxMargin);
-            utils_hit_zone::AddHurtbox_Box(Zone, Body, FMars_HitZone_Hurtbox(HalfExtents, PostCentre));
-        }
+        const auto HalfExtents = FVector(PostWidth * 0.5, PostWidth * 0.5, PostHeight * 0.5) + FVector(HurtboxMargin, HurtboxMargin, HurtboxMargin);
+        utils_hit_zone::AddHurtbox_Box(Zone, Body, FMars_HitZone_Hurtbox(HalfExtents, PostCentre));
 
-        AddPost(Body, PostCentre.GetLocation());
+        // Engine cube is 100 uu with its pivot at the centre.
+        Body.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, PostCentre.GetLocation(), FVector(PostWidth, PostWidth, PostHeight) * 0.01),
+            engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::BlockAll, n"TargetDummy_Post"));
 
         _Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnDamaged"));
         _Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnDepleted"));
@@ -94,7 +92,7 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnPunchDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        if ((FCk_Handle(_PunchTimer) == FCk_Handle(InTimer)) == false || _IsFlattened)
+        if (_PunchTimer != InTimer || _IsFlattened)
         { return; }
 
         SetBodyScale(FVector::OneVector);
@@ -103,7 +101,7 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION()
     private void OnRearmDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        if ((FCk_Handle(_RearmTimer) == FCk_Handle(InTimer)) == false)
+        if (_RearmTimer != InTimer)
         { return; }
 
         _IsFlattened = false;
@@ -131,47 +129,17 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle_Timer RestartTimer(FCk_Handle_Timer InPrevious, float32 InSeconds, FName InHandler)
     {
         if (ck::IsValid(InPrevious))
-        { utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(InPrevious)); }
-
-        auto Owner = FCk_Handle(_Health);
-        if (ck::Is_NOT_Valid(Owner))
-        { return FCk_Handle_Timer(); }
+        { utils_entity_lifetime::Request_DestroyEntity(InPrevious); }
 
         auto TimerSpec = FCk_Timer_Spec(FCk_Time(InSeconds));
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
                  .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
 
-        auto Timer = utils_timer::Add(Owner, TimerSpec);
+        // The handlers that restart timers are bound only once _Health composed.
+        auto Timer = utils_timer::Add(_Health, TimerSpec);
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, InHandler)); }
 
         return Timer;
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddPost(FCk_Handle_Transform& InAttachTo, FVector InLocation)
-    {
-        auto CubeMesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(CubeMesh))
-        { return; }
-
-        // Engine cube is 100 uu with its pivot at the centre.
-        const auto Scale = FVector(PostWidth, PostWidth, PostHeight) * 0.01;
-        auto Node = utils_scene_node::Create(InAttachTo, FTransform(FRotator::ZeroRotator, InLocation, Scale));
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component is registered first and then receives the entity transform, which a Static component
-        // refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(CubeMesh);
-        auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
-        if (ck::IsValid(Material))
-        { Archetype.SetMaterial(0, Material); }
-        Archetype.SetCollisionProfileName(collision::profile::BlockAll);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"TargetDummy_Post");
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 }

@@ -1,3 +1,6 @@
+// A start enters phase 0 afresh (re-entering the kept index would apply only that phase's actions); a stop keeps the
+// index. A restart rewinds to phase 0 and re-enters it while running. An advance comes from the current phase's timer.
+// Every broadcast comes last, and the fragments are re-read after one: a listener may enqueue requests.
 class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -15,42 +18,34 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Cycle();
 
-        auto TargetRunning = InState.IsRunning;
-        if (InRequests.SetRunningRequest.IsSet())
-        { TargetRunning = InRequests.SetRunningRequest.GetValue().Running; }
+        auto TargetRunState = InState.RunState;
+        if (InRequests.SetRunningRequests.Num() > 0)
+        { TargetRunState = InRequests.SetRunningRequests.Last().RunState; }
 
-        const auto HasRestart = InRequests.RestartRequest.IsSet();
-        const auto HasAdvance = InRequests.Advance;
+        const auto HasRestart = InRequests.RestartRequests.Num() > 0;
+        const auto HasAdvance = InRequests.AdvanceRequests.Num() > 0;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Cycle_Requests);
-
-        const auto& Params = Self.Get_Fragment(FMars_Fragment_Cycle_Params);
-        if (Params.Phases.Num() == 0)
-        { TargetRunning = false; }
 
         if (HasRestart)
         { InState.PhaseIndex = 0; }
 
-        if (TargetRunning != InState.IsRunning)
+        if (TargetRunState != InState.RunState)
         {
-            InState.IsRunning = TargetRunning;
-            if (TargetRunning == false)
+            InState.RunState = TargetRunState;
+
+            const auto Running = TargetRunState == EMars_Cycle_RunState::Running;
+            if (Running)
+            { EnterPhase(Self, 0); }
+            else
             { DestroyPhaseTimer(InState); }
 
-            BroadcastRunningChanged(Self, TargetRunning);
-
-            // A resumed cycle starts over: re-entering the kept index would apply only that phase's actions.
-            if (TargetRunning)
-            {
-                InState.PhaseIndex = 0;
-                EnterPhase(Self, 0);
-            }
-
+            BroadcastRunningChanged(Self, TargetRunState);
             return;
         }
 
-        if (InState.IsRunning == false)
+        if (InState.RunState == EMars_Cycle_RunState::Stopped)
         { return; }
 
         if (HasRestart)
@@ -60,34 +55,36 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         if (HasAdvance)
-        { Advance(Self, InState, Params); }
+        { Advance(Self, InState); }
     }
 
-    private void Advance(FCk_Handle_Cycle& InCycle, FMars_Fragment_Cycle& InState, const FMars_Fragment_Cycle_Params& InParams)
+    private void Advance(FCk_Handle_Cycle& InCycle, FMars_Fragment_Cycle& InState)
     {
+        const auto& Params = InCycle.Get_Fragment(FMars_Fragment_Cycle_Params);
         const auto NextIndex = InState.PhaseIndex + 1;
-        if (NextIndex < InParams.Phases.Num())
+        if (NextIndex < Params.Phases.Num())
         {
             EnterPhase(InCycle, NextIndex);
             return;
         }
 
-        if (InParams.Loop)
+        if (Params.Loop)
         {
             EnterPhase(InCycle, 0);
             return;
         }
 
-        InState.IsRunning = false;
+        InState.RunState = EMars_Cycle_RunState::Stopped;
         DestroyPhaseTimer(InState);
-        BroadcastRunningChanged(InCycle, false);
+        BroadcastRunningChanged(InCycle, EMars_Cycle_RunState::Stopped);
     }
 
     // Broadcasts last and re-reads the fragment: a listener may enqueue requests, which must not invalidate this state.
     private void EnterPhase(FCk_Handle_Cycle& InCycle, int32 InIndex)
     {
         const auto& Params = InCycle.Get_Fragment(FMars_Fragment_Cycle_Params);
-        if (Params.Phases.IsValidIndex(InIndex) == false)
+        if (ck::EnsureIfNot(Params.Phases.IsValidIndex(InIndex),
+            f"[Cycle] [{InCycle.ToString()}] has no phase [{InIndex}] of [{Params.Phases.Num()}]"))
         { return; }
 
         const auto Phase = Params.Phases[InIndex];
@@ -100,8 +97,7 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
                  .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
 
-        auto CycleEntity = FCk_Handle(InCycle);
-        auto Timer = utils_timer::Add(CycleEntity, TimerSpec);
+        auto Timer = utils_timer::Add(InCycle.H(), TimerSpec);
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnPhaseTimerDone")); }
         State.PhaseTimer = Timer;
@@ -113,36 +109,34 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
     private void DestroyPhaseTimer(FMars_Fragment_Cycle& InState)
     {
         if (ck::IsValid(InState.PhaseTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(InState.PhaseTimer)); }
+        { utils_entity_lifetime::Request_DestroyEntity(InState.PhaseTimer.H()); }
 
         InState.PhaseTimer = FCk_Handle_Timer();
     }
 
-    private void BroadcastRunningChanged(FCk_Handle_Cycle& InCycle, bool InRunning)
+    private void BroadcastRunningChanged(FCk_Handle_Cycle& InCycle, EMars_Cycle_RunState InRunState)
     {
         if (InCycle.Has_Fragment(FMars_Fragment_Cycle_Signals) == false)
         { return; }
 
-        InCycle.Get_Fragment(FMars_Fragment_Cycle_Signals).OnRunningChanged.Broadcast(InCycle, InRunning);
+        InCycle.Get_Fragment(FMars_Fragment_Cycle_Signals).OnRunningChanged.Broadcast(InCycle, InRunState);
     }
 
     UFUNCTION()
     private void OnPhaseTimerDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        // The owner is gone only while the cycle is being torn down.
         auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTimer);
         if (ck::Is_NOT_Valid(Owner))
         { return; }
 
-        auto Cycle = Owner.As_Cycle(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Cycle))
-        { return; }
+        auto Cycle = Owner.As_Cycle();
 
         // A timer replaced by a phase entry or a stop can still finish in the frame it was destroyed.
-        const auto& State = Cycle.Get_Fragment(FMars_Fragment_Cycle);
-        if ((FCk_Handle(State.PhaseTimer) == FCk_Handle(InTimer)) == false)
+        if (Cycle.Get_Fragment(FMars_Fragment_Cycle).PhaseTimer != InTimer)
         { return; }
 
         auto& Requests = Cycle.AddOrGet_Fragment(FMars_Fragment_Cycle_Requests);
-        Requests.Advance = true;
+        Requests.AdvanceRequests.Add(FMars_Request_Cycle_Advance());
     }
 }

@@ -18,21 +18,40 @@ class UMars_Processor_Brain_Setup : UCk_Processor_Script_Base_UE
         auto Brain = InHandle.As_Brain();
 
         auto Planner = Brain.Get_Planner();
-        if (ck::IsValid(Planner))
-        { utils_goap_planner::BindTo_OnActiveChainChanged(Planner, FCk_Delegate_Goap_OnActiveChainChanged(this, n"OnActiveChainChanged")); }
+        utils_goap_planner::BindTo_OnActiveChainChanged(Planner, FCk_Delegate_Goap_OnActiveChainChanged(this, n"OnActiveChainChanged"));
 
         Brain.Request_TryRemove(FMars_Tag_Brain_NeedsSetup);
-        utils_brain::Refresh(Brain);
+        RefreshLeaf(Brain);
     }
 
-    // The planner is a lifetime child of the brain's owner (utils_goap_planner::Create).
+    // The planner is a lifetime child of the brain's owner (utils_goap_planner::Create). The owner is excluded once it is
+    // pending destroy, so a chain change during teardown finds no brain.
     UFUNCTION()
     private void OnActiveChainChanged(FCk_Handle_Goap_Planner InPlanner, FCk_Goap_Payload_OnActiveChainChanged InPayload)
     {
-        auto Brain = utils_entity_lifetime::Get_LifetimeOwner(FCk_Handle(InPlanner)).As_Brain(ECk_SanityCheck::UnChecked);
+        auto Brain = utils_entity_lifetime::Get_LifetimeOwner(InPlanner).As_Brain(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Brain))
         { return; }
 
-        utils_brain::Refresh(Brain);
+        RefreshLeaf(Brain);
+    }
+
+    // Reads the planner's first plan class and, when it differs from the stored leaf, stores it and broadcasts
+    // OnLeafChanged.
+    private void RefreshLeaf(FCk_Handle_Brain& InBrain)
+    {
+        auto& State = InBrain.Get_Fragment(FMars_Fragment_Brain);
+
+        const TSubclassOf<UCk_GoapAction_EntityScript> Old = State.LeafClass.Get();
+        const TSubclassOf<UCk_GoapAction_EntityScript> New = utils_goap_planner::Get_FirstPlanClass(State.Planner);
+        if (Old == New)
+        { return; }
+
+        State.LeafClass = New;
+
+        ck::Trace(f"[Brain] [{InBrain.ToString()}] leaf [{utils_brain::Get_ClassName(Old)}] -> [{utils_brain::Get_ClassName(New)}]");
+
+        if (InBrain.Has_Fragment(FMars_Fragment_Brain_Signals))
+        { InBrain.Get_Fragment(FMars_Fragment_Brain_Signals).OnLeafChanged.Broadcast(InBrain, Old, New); }
     }
 }

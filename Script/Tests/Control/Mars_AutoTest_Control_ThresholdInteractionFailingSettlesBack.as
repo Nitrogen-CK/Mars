@@ -1,7 +1,11 @@
-// A threshold-ended interaction that finishes Failed settles the handle: the frame the pull crosses EngageAlpha (the
-// Control ends the manipulation and requests EndInteraction Succeeded), a cancel races it. If the cancel wins, nothing
-// engages and the handle eases back to rest; if the end wins, the handle stays at the threshold as in the plain pull.
-// Either way nothing engages here (no focus, so no Engage chain).
+// A threshold-ended interaction that finishes Failed settles the handle back to rest: the crossing frame's own
+// Succeeded end loses to a Failed end of the same interaction already queued in that frame (a cancel landing as the pull
+// crosses EngageAlpha). Nothing engages (no focus, so no Engage chain).
+//
+// The Failed end is requested from the Control's OnManipulationChanged(Released), which the tick broadcasts in the crossing
+// frame just before it requests its own Succeeded end, so the interaction drains Failed first. A cancel sent from a test
+// step cannot hit that frame: the spring crosses EngageAlpha frames after the last nudge, and an interaction that
+// finished in an earlier frame is gone before the tick binds to it.
 class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTest_Base
 {
     private FCk_Handle_Control _Control;
@@ -11,6 +15,7 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
     private FCk_Handle_Interaction _Interaction;
     private FCk_Handle _Player;
     private int32 _EngagedCount = 0;
+    private int32 _FailedEndsRequested = 0;
     private TArray<ECk_SucceededFailed> _FinishedResults;
 
     UFUNCTION(BlueprintOverride)
@@ -22,10 +27,11 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
         Add_Step_WaitUntil("the interaction exists", n"Check_HasInteraction", 0, 5.0f);
         Add_Step("grip the lever", n"Step_BeginManipulation");
         Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 5.0f);
-        Add_Step_WaitUntil("pull until the manipulation ends, then cancel at once", n"Check_PullUntilEndedThenCancel", 0, 5.0f);
+        Add_Step_WaitUntil("pull until the threshold ends the manipulation (the interaction is ended Failed in that frame)", n"Check_PullUntilEnded", 0, 5.0f);
         Add_Step_WaitUntil("the interaction finishes", n"Check_InteractionFinished", 0, 5.0f);
-        Add_Step_WaitUntil("a Failed finish settles the handle back to rest", n"Check_SettledIfFailed", 0, 5.0f);
-        Add_Step("nothing engaged and the handle matches the race's winner", n"Step_AssertOutcome");
+        Add_Step("the interaction finished Failed, once, and nothing engaged", n"Step_AssertFailed");
+        Add_Step_WaitUntil("the Failed finish settles the handle back to rest", n"Check_SettledToRest", 0, 5.0f);
+        Add_Step("the handle rests at the start pose", n"Step_AssertSettled");
         Run_Steps(InHandle);
     }
 
@@ -39,7 +45,7 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
         auto MoverSpec = FMars_Mover_Spec();
         MoverSpec.EndRotation = FRotator(70.0, 0.0, 0.0);
         MoverSpec.Duration = 0.3f;
-        MoverSpec.StartAtEnd = InStartActive;
+        MoverSpec.StartPose = InStartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         _Mover = utils_mover::Add(HandleNode, MoverSpec);
 
         auto ControlSpec = FMars_Control_Spec();
@@ -50,6 +56,7 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
         _Control = utils_control::Add(RootEntity, ControlSpec, _Mover);
         _Control.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnEngaged"));
+        _Control.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnManipulationChanged"));
 
         // No ProbeInfo: a transform-only child; the test drives the interaction without focus.
         auto Spec = FMars_Interactable_Spec();
@@ -78,6 +85,18 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
         _FinishedResults.Add(InResult);
     }
 
+    // Broadcast from inside the tick's crossing branch, before the tick requests EndInteraction Succeeded: this Failed
+    // end is queued on the interaction first, so it is the outcome the drain broadcasts first.
+    UFUNCTION()
+    private void OnManipulationChanged(FCk_Handle_Control InControl, EMars_Control_Grip InGrip)
+    {
+        if (InGrip == EMars_Control_Grip::Gripped)
+        { return; }
+
+        _FailedEndsRequested += 1;
+        utils_interaction::Request_EndInteraction(_Interaction, FCk_Request_Interaction_EndInteraction(ECk_SucceededFailed::Failed));
+    }
+
     UFUNCTION()
     private void Step_StartInteraction(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -104,10 +123,8 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
         Res.Set(_Control.Get_IsManipulating());
     }
 
-    // The first evaluation that reads the manipulation ended is the frame the Control requested EndInteraction: the
-    // cancel goes out in that same frame.
     UFUNCTION()
-    private void Check_PullUntilEndedThenCancel(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_PullUntilEnded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
         if (_Control.Get_IsManipulating())
@@ -117,7 +134,6 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
             return;
         }
 
-        _Target.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Player));
         Res.Set(true);
     }
 
@@ -129,35 +145,30 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UCk_AutoTe
     }
 
     UFUNCTION()
-    private void Check_SettledIfFailed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Step_AssertFailed(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_FailedEndsRequested, 1, "the crossing frame broadcast the manipulation's end once");
+        Assert_Equals_Int(_FinishedResults.Num(), 1, "the target finishes the interaction once");
+
+        const auto Result = _FinishedResults[0];
+        Assert_True(Result == ECk_SucceededFailed::Failed,
+            f"the Failed end queued in the crossing frame wins over the threshold's Succeeded (got {Result :n})");
+        Assert_Equals_Int(_EngagedCount, 0, "no focus, so no Engage chain");
+        Assert_False(_Control.Get_IsManipulating(), "the manipulation stays ended");
+    }
+
+    UFUNCTION()
+    private void Check_SettledToRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        if (_FinishedResults[0] == ECk_SucceededFailed::Succeeded)
-        {
-            Res.Set(true);
-            return;
-        }
-
         Res.Set(_Mover.Get_Alpha() < 0.01f);
     }
 
     UFUNCTION()
-    private void Step_AssertOutcome(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertSettled(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_FinishedResults.Num(), 1, "the target finishes the interaction once");
-        Assert_Equals_Int(_EngagedCount, 0, "no focus, so no Engage chain");
-        Assert_False(_Control.Get_IsManipulating(), "the manipulation stays ended");
-        Assert_False(_Mover.Get_AtEnd(), "the Control never moved the target itself");
-
-        const auto Alpha = _Mover.Get_Alpha();
-        if (_FinishedResults[0] == ECk_SucceededFailed::Succeeded)
-        {
-            ck::Trace(f"[ThresholdInteractionFailingSettlesBack] race outcome: Succeeded (the end won; alpha {Alpha})");
-            Assert_True(Alpha >= 0.85f - 0.02f, f"the end won the race: the handle stays at the threshold (alpha {Alpha})");
-            return;
-        }
-
-        ck::Trace(f"[ThresholdInteractionFailingSettlesBack] race outcome: Failed (the cancel won; alpha {Alpha})");
-        Assert_True(Alpha < 0.01f, f"the cancel won the race: the handle settled back to rest (alpha {Alpha})");
+        Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "the Control never moved the target itself");
+        Assert_False(_Control.Get_IsActive(), "a Failed threshold finish leaves the lever off");
+        Assert_Equals_Int(_EngagedCount, 0, "nothing engaged while the handle settled");
     }
 }

@@ -1,5 +1,5 @@
-// The MarsEyePlate look reads custom primitive data exactly where mars_eyes_material writes it: LeftCell / Blend /
-// LookX / EyeColor sit at Slot_Cells / Slot_Anim / Slot_Look / Slot_Color and the 4 + 4 + 2 scalars of each group are
+// The MarsEyePlate look reads custom primitive data exactly where utils_eyes::Push_PlateGroup writes it: LeftCell / Blend /
+// LookX / EyeColor sit at k_Slot_Cells / k_Slot_Anim / k_Slot_Look / k_Slot_Color and the 4 + 4 + 2 scalars of each group are
 // consecutive from their slot. The parameters are in the shader's order after In (the generator passes them
 // positionally). The master is generated under the Mars root as an unlit opaque surface. Reads the definition only;
 // nothing is placed. Isolated Z band: -69000.
@@ -38,7 +38,7 @@ class UMars_AutoTest_Eyes_LookMatchesMaterialSlots : UCk_AutoTest_Base
         Expected.Add(n"GlowStrength");
         Expected.Add(n"CellPad");
 
-        auto LookDefinition = mars_eyes::Look_EyePlate();
+        auto LookDefinition = utils_eyes::Look_EyePlate();
         const auto NumParameters = LookDefinition._Parameters.Num();
         Assert_Equals_Int(NumParameters, Expected.Num(), "MarsEyePlate parameter count");
 
@@ -54,38 +54,38 @@ class UMars_AutoTest_Eyes_LookMatchesMaterialSlots : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSlots(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        AssertSlot(n"LeftCell", mars_eyes_material::Slot_Cells, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"RightCell", mars_eyes_material::Slot_Cells + 1, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"PrevLeftCell", mars_eyes_material::Slot_Cells + 2, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"PrevRightCell", mars_eyes_material::Slot_Cells + 3, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"LeftCell", constants_eyes::k_Slot_Cells, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"RightCell", constants_eyes::k_Slot_Cells + 1, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"PrevLeftCell", constants_eyes::k_Slot_Cells + 2, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"PrevRightCell", constants_eyes::k_Slot_Cells + 3, ECk_Usf_ParamType::Scalar);
 
-        AssertSlot(n"Blend", mars_eyes_material::Slot_Anim, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"BlinkLeft", mars_eyes_material::Slot_Anim + 1, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"BlinkRight", mars_eyes_material::Slot_Anim + 2, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"Strength", mars_eyes_material::Slot_Anim + 3, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"Blend", constants_eyes::k_Slot_Anim, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"BlinkLeft", constants_eyes::k_Slot_Anim + 1, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"BlinkRight", constants_eyes::k_Slot_Anim + 2, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"Strength", constants_eyes::k_Slot_Anim + 3, ECk_Usf_ParamType::Scalar);
 
-        AssertSlot(n"LookX", mars_eyes_material::Slot_Look, ECk_Usf_ParamType::Scalar);
-        AssertSlot(n"LookY", mars_eyes_material::Slot_Look + 1, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"LookX", constants_eyes::k_Slot_Look, ECk_Usf_ParamType::Scalar);
+        AssertSlot(n"LookY", constants_eyes::k_Slot_Look + 1, ECk_Usf_ParamType::Scalar);
 
-        AssertSlot(n"EyeColor", mars_eyes_material::Slot_Color, ECk_Usf_ParamType::Vector);
+        AssertSlot(n"EyeColor", constants_eyes::k_Slot_Color, ECk_Usf_ParamType::Vector);
     }
 
     UFUNCTION()
     private void Step_AssertMaster(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_String(mars_eyes::Look_EyePlate()._GeneratedPackageRoot, "/Game/Mars/Materials/GeneratedLooks", "_GeneratedPackageRoot");
+        Assert_Equals_String(utils_eyes::Look_EyePlate()._GeneratedPackageRoot, "/Game/Mars/Materials/GeneratedLooks", "_GeneratedPackageRoot");
 
-        const auto Domain = mars_eyes::Look_EyePlate()._Domain;
+        const auto Domain = utils_eyes::Look_EyePlate()._Domain;
         Assert_True(Domain == ECk_Usf_Domain::SurfaceUnlit, f"_Domain is SurfaceUnlit (got [{Domain :n}])");
 
-        const auto BlendMode = mars_eyes::Look_EyePlate()._BlendMode;
+        const auto BlendMode = utils_eyes::Look_EyePlate()._BlendMode;
         Assert_True(BlendMode == ECk_Usf_BlendMode::Opaque, f"_BlendMode is Opaque (got [{BlendMode :n}])");
     }
 
     private void AssertSlot(FName InName, int32 InExpectedIndex, ECk_Usf_ParamType InExpectedType)
     {
         const auto ParamName = InName.ToString();
-        for (const auto& Parameter : mars_eyes::Look_EyePlate()._Parameters)
+        for (const auto& Parameter : utils_eyes::Look_EyePlate()._Parameters)
         {
             if (Parameter._Name != InName)
             { continue; }

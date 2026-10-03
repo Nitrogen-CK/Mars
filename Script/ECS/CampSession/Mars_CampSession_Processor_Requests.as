@@ -1,5 +1,5 @@
 // Drains Play: while the state machine is not in the Live state, requests the transition into it. Any number of Play
-// requests in one drain issue ONE transition; a Play while Live is ignored.
+// requests in one drain issue one transition; a Play while Live is ignored.
 class UMars_Processor_CampSession_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,7 +19,7 @@ class UMars_Processor_CampSession_HandleRequests : UCk_Processor_Script_Base_UE
 
         TArray<FMars_Request_CampSession_Play> PlayRequests = InRequests.PlayRequests;
 
-        // Swap-and-pop - InRequests is dead past this line.
+        // InRequests is invalid past this line.
         Self.Request_TryRemove(FMars_Fragment_CampSession_Requests);
 
         if (PlayRequests.Num() == 0)

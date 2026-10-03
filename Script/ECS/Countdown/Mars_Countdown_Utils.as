@@ -4,7 +4,7 @@ namespace utils_countdown
     FCk_Handle_Countdown Add(FCk_Handle& InHandle, FMars_Countdown_Spec InParams)
     {
         const auto Validation = InParams.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Countdown] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Countdown] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Countdown(); }
 
         auto Params = FMars_Fragment_Countdown_Params();

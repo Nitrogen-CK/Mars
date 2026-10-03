@@ -1035,6 +1035,19 @@ namespace UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo
+{
+    FMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction_SpawnParams
 {
 }
@@ -1135,6 +1148,19 @@ namespace UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear
     FMars_AutoTest_Gate_ThresholdDefersCloseUntilClear_SpawnParams Params()
     {
         return FMars_AutoTest_Gate_ThresholdDefersCloseUntilClear_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Gate_UnsourcedSinkClosesStartOpenGate_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Gate_UnsourcedSinkClosesStartOpenGate
+{
+    FMars_AutoTest_Gate_UnsourcedSinkClosesStartOpenGate_SpawnParams Params()
+    {
+        return FMars_AutoTest_Gate_UnsourcedSinkClosesStartOpenGate_SpawnParams();
     }
 }
 
@@ -1360,6 +1386,19 @@ namespace UMars_AutoTest_Hotbar_LeavingOverflowParksSelection
 }
 
 USTRUCT()
+struct FMars_AutoTest_Hotbar_SelectionChangesApplyInArrivalOrder_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_SelectionChangesApplyInArrivalOrder
+{
+    FMars_AutoTest_Hotbar_SelectionChangesApplyInArrivalOrder_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_SelectionChangesApplyInArrivalOrder_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow_SpawnParams
 {
 }
@@ -1434,6 +1473,19 @@ namespace UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain
     FMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain_SpawnParams Params()
     {
         return FMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Interactable_FocusChangesApplyInArrivalOrder_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Interactable_FocusChangesApplyInArrivalOrder
+{
+    FMars_AutoTest_Interactable_FocusChangesApplyInArrivalOrder_SpawnParams Params()
+    {
+        return FMars_AutoTest_Interactable_FocusChangesApplyInArrivalOrder_SpawnParams();
     }
 }
 
@@ -1607,6 +1659,19 @@ namespace UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall
 }
 
 USTRUCT()
+struct FMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder
+{
+    FMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_SurfaceNavigator_StopHaltsMovement_SpawnParams
 {
 }
@@ -1737,6 +1802,19 @@ namespace UMars_AutoTestCondition_LeafIsRoam
 }
 
 USTRUCT()
+struct FMars_AutoTestState_BareLocomotion_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_BareLocomotion
+{
+    FMars_AutoTestState_BareLocomotion_SpawnParams Params()
+    {
+        return FMars_AutoTestState_BareLocomotion_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTestState_BrainFlinch_SpawnParams
 {
 }
@@ -1776,15 +1854,41 @@ namespace UMars_AutoTestState_BrainRoam
 }
 
 USTRUCT()
-struct FMars_AutoTestState_GripEngageRig_SpawnParams
+struct FMars_AutoTestState_FreeHandsCarrierRig_SpawnParams
 {
 }
 
-namespace UMars_AutoTestState_GripEngageRig
+namespace UMars_AutoTestState_FreeHandsCarrierRig
 {
-    FMars_AutoTestState_GripEngageRig_SpawnParams Params()
+    FMars_AutoTestState_FreeHandsCarrierRig_SpawnParams Params()
     {
-        return FMars_AutoTestState_GripEngageRig_SpawnParams();
+        return FMars_AutoTestState_FreeHandsCarrierRig_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTestState_FullHandsCarrierRig_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_FullHandsCarrierRig
+{
+    FMars_AutoTestState_FullHandsCarrierRig_SpawnParams Params()
+    {
+        return FMars_AutoTestState_FullHandsCarrierRig_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTestState_LeftLocomotion_SpawnParams
+{
+}
+
+namespace UMars_AutoTestState_LeftLocomotion
+{
+    FMars_AutoTestState_LeftLocomotion_SpawnParams Params()
+    {
+        return FMars_AutoTestState_LeftLocomotion_SpawnParams();
     }
 }
 

@@ -1,12 +1,24 @@
-// A carrier (AttachPoints + Hotbar + HeldItem, the test entity) holding a rock can't start a RequiresFreeHands lever:
-// Get_CanInteractWith reads CustomValidationFailed and a StartInteraction creates nothing, while the same lever without
-// the flag reads CanInteractWith. Selecting the empty bag slot frees the hands; the gated lever then reads CanInteractWith
-// and the same StartInteraction creates the interaction. Isolated Z band: -81000.
+// The carrier's SM root state: the player HFSM's real Hotbar -> HeldItem glue.
+class UMars_AutoTestState_FreeHandsCarrierRig : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
+    }
+}
+
+// A carrier (AttachPoints + Hotbar + HeldItem + HeldItemUse, the test entity, whose SM runs the player HFSM's
+// HotbarDrivesHeldItem task) holding a rock can't start a RequiresFreeHands lever: Get_CanInteractWith reads
+// CustomValidationFailed and a StartInteraction creates nothing, while the same lever without the flag reads
+// CanInteractWith. Selecting the empty bag slot frees the hands; the gated lever then reads CanInteractWith and the same
+// StartInteraction creates the interaction. Isolated Z band: -81000.
 class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest_Base
 {
     private FCk_Handle _Carrier;
     private FCk_Handle_Hotbar _Hotbar;
     private FCk_Handle_HeldItem _HeldItem;
+    private FCk_Handle_StateMachine _Sm;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
     private FCk_Handle_Item _Rock;
     private FCk_Handle_InteractTarget _GatedTarget;
@@ -28,16 +40,15 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
         HotbarSpec.BagSlotCount = 2;
         _Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
         _HeldItem = utils_held_item::Add(_Carrier);
-
-        // What the player HFSM's HotbarDrivesHeldItem task does: push the selection into HeldItem on every change.
-        _Hotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
-        _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
+        utils_held_item_use::Add(_Carrier);
 
         _RockHolder = MakeSeededHolder(InHandle, mars_items::Rock());
         _GatedTarget = MakeLeverTarget(InHandle, FVector(200.0, 0.0, -81000.0), true);
         _UngatedTarget = MakeLeverTarget(InHandle, FVector(200.0, 300.0, -81000.0), false);
 
-        Add_Step_WaitUntil("the rock holder is seeded", n"Check_Ready");
+        _Sm = utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_FreeHandsCarrierRig));
+
+        Add_Step_WaitUntil("the carrier's SM runs the glue and the rock holder is seeded", n"Check_Ready");
         Add_Step("stow the rock into bag slot 0", n"Step_StowRockIntoHotbar");
         Add_Step_WaitUntil("the rock is held", n"Check_RockHeld");
         Add_Step("holding the rock: the gated lever refuses the carrier, the ungated one accepts; try to start the gated one", n"Step_AssertRefusedAndTryStart");
@@ -51,37 +62,17 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
     }
 
     UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar, int32 InPrevIndex, int32 InNewIndex)
-    {
-        PushSelection();
-    }
-
-    UFUNCTION()
-    private void OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        PushSelection();
-    }
-
-    private void PushSelection()
-    {
-        if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
-        { return; }
-
-        _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
-    }
-
-    UFUNCTION()
     private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Ready = _RockHolder.Get_NumItems() == 1;
-        if (Ready && ck::Is_NOT_Valid(_Rock))
+        const auto Seeded = _RockHolder.Get_NumItems() == 1;
+        if (Seeded && ck::Is_NOT_Valid(_Rock))
         {
             auto Items = _RockHolder.Get_Items();
             _Rock = Items[0];
         }
 
         auto Res = OutResult;
-        Res.Set(Ready);
+        Res.Set(Seeded && utils_state_machine::IsInState(_Sm, UMars_AutoTestState_FreeHandsCarrierRig));
     }
 
     UFUNCTION()
@@ -102,7 +93,7 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
     private void Check_RockHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == 0 && _HeldItem.Get_CurrentItem() == _Rock);
+        Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0) && _HeldItem.Get_CurrentItem() == _Rock);
     }
 
     UFUNCTION()
@@ -124,7 +115,7 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
     UFUNCTION()
     private void Step_AssertNoInteraction(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_False(ck::IsValid(utils_interact_target::TryGet_Interaction(_GatedTarget, _Carrier)),
+        Assert_Invalid(utils_interact_target::TryGet_Interaction(_GatedTarget, _Carrier),
             "the refused StartInteraction created no interaction");
     }
 
@@ -179,14 +170,22 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
         auto Spec = FMars_Interactable_Spec();
         Spec.Targets.Add(Entry);
         auto Interactable = utils_interactable::Create(Root, Spec);
-        return Interactable.Get_AllInteractTargets()[0];
+
+        const auto Targets = Interactable.Get_AllInteractTargets();
+        if (Targets.Num() != 1)
+        {
+            FinishFailure(f"the lever interactable at [{InLocation.ToString()}] has {Targets.Num()} interact targets, expected 1");
+            return FCk_Handle_InteractTarget();
+        }
+
+        return Targets[0];
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

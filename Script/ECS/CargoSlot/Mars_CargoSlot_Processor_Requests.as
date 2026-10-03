@@ -2,8 +2,8 @@
 // visual here - UMars_Processor_CargoSlot_Sync reacts to what lands, like the hotbar's sync pass.
 //   Stow: Item.Get_ParentInventory() -> this slot's inventory.
 //   Take: this slot's inventory -> Target.
-// Every transfer reports to a processor-bound callback that ensures Success: a refusal here means a caller bypassed
-// Get_ActionFor (the accept policy itself is the hard boundary and still refuses).
+// A refused transfer (here, or by the inventory) ensures - the caller bypassed Get_ActionFor, or raced another change to
+// the slot - and broadcasts OnTransferFailed so whoever waits on the slot can stop waiting.
 class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -24,7 +24,7 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_CargoSlot_Stow> StowRequests = InRequests.StowRequests;
         TArray<FMars_Request_CargoSlot_Take> TakeRequests = InRequests.TakeRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before acting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_CargoSlot_Requests);
 
         for (const auto& Request : StowRequests)
@@ -42,7 +42,16 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
         auto Source = ck::IsValid(Item) ? Item.Get_ParentInventory() : FCk_Handle_Inventory();
         if (ck::EnsureIfNot(ck::IsValid(Source),
             f"[CargoSlot] Stow into [{InSlot.ToString()}]: item [{Item.ToString()}] is invalid or in no inventory - skipped"))
-        { return; }
+        {
+            Broadcast_TransferFailed(InSlot, Item);
+            return;
+        }
+
+        if (InRequest.ArriveFrom.IsSet())
+        {
+            InState.PendingArrival = TOptional<FMars_WorldItem_PendingArrival>(
+                FMars_WorldItem_PendingArrival(Item, InRequest.ArriveFrom.GetValue(), System::GetGameTimeInSeconds()));
+        }
 
         Source.Request_TransferItem_ToDataOnly(
             FCk_Request_Inventory_TransferItem_ToDataOnly(Item, InState.Inventory),
@@ -56,7 +65,10 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
         const auto CanTake = ck::IsValid(InRequest.Item) && ck::IsValid(InRequest.Target);
         if (ck::EnsureIfNot(CanTake,
             f"[CargoSlot] Take out of [{InSlot.ToString()}]: invalid item [{InRequest.Item.ToString()}] or target [{InRequest.Target.ToString()}] - skipped"))
-        { return; }
+        {
+            Broadcast_TransferFailed(InSlot, InRequest.Item);
+            return;
+        }
 
         auto Inventory = InState.Inventory;
         Inventory.Request_TransferItem_ToDataOnly(
@@ -64,6 +76,7 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
             FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnTransferComplete"));
     }
 
+    // The slot is whichever end of the transfer a cargo slot owns: the target of a Stow, the source of a Take.
     UFUNCTION()
     private void OnTransferComplete(FCk_Handle_Inventory InSource,
                                     FCk_Handle_Item InItem,
@@ -72,7 +85,25 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
                                     FCk_Handle_Item InNewItemInTarget,
                                     ECk_Inventory_OperationResult_Transfer InResult)
     {
-        ck::EnsureIfNot(InResult == ECk_Inventory_OperationResult_Transfer::Success,
-            f"[CargoSlot] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}] - the caller bypassed Get_ActionFor");
+        const auto Succeeded = InResult == ECk_Inventory_OperationResult_Transfer::Success;
+        ck::EnsureIfNot(Succeeded,
+            f"[CargoSlot] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]");
+
+        if (Succeeded)
+        { return; }
+
+        auto TargetSlot = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_CargoSlot(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(TargetSlot))
+        { Broadcast_TransferFailed(TargetSlot, InItem); }
+
+        auto SourceSlot = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_CargoSlot(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(SourceSlot))
+        { Broadcast_TransferFailed(SourceSlot, InItem); }
+    }
+
+    private void Broadcast_TransferFailed(FCk_Handle_CargoSlot& InSlot, const FCk_Handle_Item& InItem)
+    {
+        if (InSlot.Has_Fragment(FMars_Fragment_CargoSlot_Signals))
+        { InSlot.Get_Fragment(FMars_Fragment_CargoSlot_Signals).OnTransferFailed.Broadcast(InSlot, InItem); }
     }
 }

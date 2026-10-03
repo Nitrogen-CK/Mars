@@ -18,12 +18,13 @@ class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UCk_AutoTes
         auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
 
         auto Spec = FMars_FPHands_Spec();
-        Spec.Reach.GrabOutSeconds = 0.2f;
-        Spec.Reach.GrabGripSeconds = 0.2f;
-        Spec.Reach.GrabBackSeconds = 0.2f;
-        Spec.Reach.ReleaseSeconds = 0.2f;
+        Spec.Reach.Grab.OutSeconds = 0.2f;
+        Spec.Reach.Grab.GripSeconds = 0.2f;
+        Spec.Reach.Grab.BackSeconds = 0.2f;
+        Spec.Reach.Hold.ReleaseSeconds = 0.2f;
 
-        _Hands = utils_fphands::Add(_Player, Spec, HandNode.As_Transform());
+        Spec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, Spec);
         _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -53,7 +54,7 @@ class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UCk_AutoTes
     UFUNCTION()
     private void Step_RequestInstantReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Player, true));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Instant));
     }
 
     UFUNCTION()
@@ -66,16 +67,16 @@ class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertSequence(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        for (int32 Index = 0; Index < _PhaseTimesAtChange.Num(); ++Index)
+        { Assert_True(_PhaseTimesAtChange[Index] < 0.05f, f"PhaseTime was reset at change {Index}"); }
+
         Assert_Equals_Int(_Phases.Num(), 4, "four phase changes");
         if (_Phases.Num() != 4)
         { return; }
 
-        Assert_True(_Phases[0] == EMars_FPHands_Phase::Reach, "first change is to Reach");
-        Assert_True(_Phases[1] == EMars_FPHands_Phase::Grip, "second change is to Grip");
-        Assert_True(_Phases[2] == EMars_FPHands_Phase::Return, "third change is to Return");
-        Assert_True(_Phases[3] == EMars_FPHands_Phase::None, "fourth change is back to None");
-
-        for (int32 Index = 0; Index < _PhaseTimesAtChange.Num(); ++Index)
-        { Assert_True(_PhaseTimesAtChange[Index] < 0.05f, f"PhaseTime was reset at change {Index}"); }
+        Assert_True(_Phases[0] == EMars_FPHands_Phase::Reach, f"first change is to Reach (got {_Phases[0] :n})");
+        Assert_True(_Phases[1] == EMars_FPHands_Phase::Grip, f"second change is to Grip (got {_Phases[1] :n})");
+        Assert_True(_Phases[2] == EMars_FPHands_Phase::Return, f"third change is to Return (got {_Phases[2] :n})");
+        Assert_True(_Phases[3] == EMars_FPHands_Phase::None, f"fourth change is back to None (got {_Phases[3] :n})");
     }
 }

@@ -1,19 +1,20 @@
 namespace utils_player_viewpoint
 {
-    // InCamera is the player's director (its view anchor becomes the viewpoint); InParams shapes the interaction trace.
-    FCk_Handle_PlayerViewpoint Add(FCk_Handle& InHandle, FCk_Handle_Camera InCamera, FMars_PlayerViewpoint_Spec InParams)
+    // All-or-nothing: a rejected spec adds nothing and returns an invalid handle.
+    FCk_Handle_PlayerViewpoint Add(FCk_Handle& InHandle, FMars_PlayerViewpoint_Spec InSpec)
     {
-        if (ck::EnsureIfNot(ck::IsValid(InCamera), f"[PlayerViewpoint] [{InHandle.ToString()}] needs a valid camera director"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[PlayerViewpoint] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_PlayerViewpoint(); }
 
         auto State = FMars_Fragment_PlayerViewpoint();
-        State.Camera = InCamera;
-        State.Viewpoint = InCamera.Get_ViewAnchor();
+        State.Camera = InSpec.Camera;
+        State.Viewpoint = InSpec.Camera.Get_ViewAnchor();
         utils_handle::Set_DebugName(State.Viewpoint, n"PlayerViewpoint");
 
         auto TraceSettings = FCk_Probe_RayCastPersistent_Settings(
             State.Viewpoint,
-            FVector(InParams.InteractionTraceDistance, 0.0, 0.0),
+            FVector(InSpec.InteractionTraceDistance, 0.0, 0.0),
             GameplayTag::MakeGameplayTagContainerFromTag(GameplayTags::Probe_Mars_Interact));
         TraceSettings.Set_TracePolicy(ECk_ProbeTrace_Policy::Multi);
         State.InteractionTrace = utils_probe_trace::Create_LineTrace_Persistent(TraceSettings);

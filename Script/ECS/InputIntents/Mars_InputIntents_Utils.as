@@ -49,14 +49,18 @@ mixin bool Get_IsIntentActive(const FCk_Handle_InputIntents& Self, FGameplayTag 
     return Self.Get_IntentPhase(InIntent) == ECk_Intent_Phase::Active;
 }
 
-// INDEX_NONE unless the level row is Active - the frame its current hold began on.
-mixin int32 TryGet_IntentActivationFrame(const FCk_Handle_InputIntents& Self, FGameplayTag InIntent)
+// The frame the level row's current hold began on; unset while the row is not Active or no matcher has arrived yet.
+mixin TOptional<int32> TryGet_IntentActivationFrame(const FCk_Handle_InputIntents& Self, FGameplayTag InIntent)
 {
     const auto Matcher = Self.Get_Matcher();
     if (ck::Is_NOT_Valid(Matcher))
-    { return -1; }
+    { return TOptional<int32>(); }
 
-    return utils_intent_matcher::TryGet_ActivationFrame(Matcher, InIntent);
+    const auto Frame = utils_intent_matcher::TryGet_ActivationFrame(Matcher, InIntent);
+    if (Frame == ck::INDEX_NONE())
+    { return TOptional<int32>(); }
+
+    return TOptional<int32>(Frame);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,5 @@
+// One-shot per interactable: relays each target's new and finished interactions to the interactable's channeled signals,
+// and records who started the latest interaction while that interaction is still alive.
 class UMars_Processor_Interactable_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -25,6 +27,7 @@ class UMars_Processor_Interactable_Setup : UCk_Processor_Script_Base_UE
         Self.Request_TryRemove(FMars_Tag_Interactable_NeedsSetup);
     }
 
+    // An invalid interactable here is a teardown race: the target outlived its interactable by a frame.
     UFUNCTION()
     private void OnNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
     {
@@ -33,8 +36,8 @@ class UMars_Processor_Interactable_Setup : UCk_Processor_Script_Base_UE
         { return; }
 
         auto& State = Interactable.Get_Fragment(FMars_Fragment_Interactable);
-        State.CurrentInteractTarget = InTarget;
-        State.CurrentInteraction = InInteraction;
+        State.LastStarted.Target = InTarget;
+        State.LastStarted.Initiator = utils_interaction::Get_InteractionSource(InInteraction);
 
         if (Interactable.Has_Fragment(FMars_Fragment_Interactable_Signals) == false)
         { return; }

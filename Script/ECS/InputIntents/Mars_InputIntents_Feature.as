@@ -14,11 +14,10 @@ struct FMars_Feature_InputIntents {}
 // Fragments
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by UMars_Processor_InputIntents_HandleRequests, from the input profile's SetMatcher /
-// SetMoveDirection / AddLookDelta requests - so Get_Matcher / Get_MoveDirection / Get_LookDelta read one drain behind
-// the write. The matcher arrives
-// late (the input profile composes its layer on a retry tick), so readers resolve it on every read and treat an invalid
-// matcher as "no input yet". Consumers of the matcher's own signals rebind on OnMatcherChanged.
+// Written only by UMars_Processor_InputIntents_HandleRequests, from the input profile's SetMatcher / SetMoveDirection /
+// AddLookDelta requests, so the getters read one drain behind the write. The matcher arrives late (the input profile
+// composes its layer on a retry tick), so readers resolve it on every read and treat an invalid matcher as "no input
+// yet". Consumers of the matcher's own signals rebind on OnMatcherChanged.
 struct FMars_Fragment_InputIntents
 {
     UPROPERTY()

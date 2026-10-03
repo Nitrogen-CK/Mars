@@ -1,4 +1,4 @@
-// A StartLive session is Live from Add, stays Live once its state machine starts, and never broadcasts a phase change.
+// A session whose spec starts Live is Live from Add, stays Live once its state machine starts, and never broadcasts a phase change.
 class UMars_AutoTest_CampSession_StartLiveSpecIsLive : UCk_AutoTest_Base
 {
     private FCk_Handle_CampSession _Session;
@@ -9,7 +9,7 @@ class UMars_AutoTest_CampSession_StartLiveSpecIsLive : UCk_AutoTest_Base
     {
         auto Local = InHandle;
         auto Spec = FMars_CampSession_Spec();
-        Spec.StartLive = true;
+        Spec.StartPhase = EMars_CampPhase::Live;
         _Session = utils_camp_session::Add(Local, Spec);
 
         _Session.BindTo_OnPhaseChanged(FMars_Delegate_CampSession_OnPhaseChanged(this, n"OnPhaseChanged"));

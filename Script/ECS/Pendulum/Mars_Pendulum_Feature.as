@@ -20,6 +20,36 @@ struct FMars_Pendulum_Spec
     EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
 }
 
+// The swing and the hazard a pendulum drives, built by its owner before Add. The pendulum finds itself from their signals,
+// so the hazard lives on the pendulum's entity and the oscillator on it or on a scene node created directly under it.
+struct FMars_Pendulum_Parts
+{
+    UPROPERTY()
+    FCk_Handle_Oscillator Oscillator;
+
+    UPROPERTY()
+    FCk_Handle_Hazard Hazard;
+
+    FMars_Pendulum_Parts() {}
+
+    FMars_Pendulum_Parts(FCk_Handle_Oscillator InOscillator, FCk_Handle_Hazard InHazard)
+    {
+        Oscillator = InOscillator;
+        Hazard = InHazard;
+    }
+}
+
+mixin FMars_Validation Validate(const FMars_Pendulum_Parts& Self)
+{
+    if (ck::Is_NOT_Valid(Self.Oscillator))
+    { return FMars_Validation("Oscillator must be set: a pendulum without one never swings"); }
+
+    if (ck::Is_NOT_Valid(Self.Hazard))
+    { return FMars_Validation("Hazard must be set: a pendulum without one never hits"); }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------

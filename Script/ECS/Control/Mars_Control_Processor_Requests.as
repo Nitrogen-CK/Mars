@@ -1,3 +1,4 @@
+// Drains SetActive -> Engage -> EndManipulation -> BeginManipulation -> Nudges (see FMars_Fragment_Control_Requests).
 class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,7 +20,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         const auto HasSetActive = InRequests.SetActiveRequest.IsSet();
         auto SetActiveValue = false;
         if (HasSetActive)
-        { SetActiveValue = InRequests.SetActiveRequest.GetValue().Active; }
+        { SetActiveValue = InRequests.SetActiveRequest.GetValue().Activation == EMars_Control_Activation::Active; }
 
         const auto HasEndManipulation = InRequests.EndManipulationRequest.IsSet();
         const auto HasBeginManipulation = InRequests.BeginManipulationRequest.IsSet();
@@ -29,7 +30,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 
         TArray<FMars_Request_Control_Nudge> NudgeRequests = InRequests.NudgeRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Control_Requests);
 
         const auto& Params = Self.Get_Fragment(FMars_Fragment_Control_Params);
@@ -40,6 +41,8 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         {
             if (SetActiveValue == false)
             { DestroyReleaseTimer(InState); }
+            else if (Params.Behavior == EMars_Control_Behavior::Momentary)
+            { ArmReleaseTimer(Self, InState, Params.ActiveSeconds); }
 
             NewActive = SetActiveValue;
         }
@@ -63,11 +66,11 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
             // A returns-to-rest handle is not a state display: it springs back after every pull.
             auto Mover = InState.Mover;
             if (ck::IsValid(Mover) && Self.Get_ReturnsToRest() == false)
-            { Mover.Request_MoveTo(NewActive); }
+            { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(NewActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
         }
 
         // Not manipulating: the threshold already ended it, and a Settle here would fight the Engage's MoveTo.
-        const auto Ended = HasEndManipulation && InState.Manipulation.IsActive;
+        const auto Ended = HasEndManipulation && InState.Manipulation.IsSet();
         if (Ended)
         { EndManipulation(Self, InState); }
 
@@ -75,29 +78,32 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasBeginManipulation)
         { Began = BeginManipulation(Self, InState, BeginManipulationRequest); }
 
-        if (InState.Manipulation.IsActive)
+        if (InState.Manipulation.IsSet())
         { ApplyNudges(Self, InState, NudgeRequests); }
 
         if (HasEngage && Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnEngaged.Broadcast(Self); }
 
         if (Changed && Self.Has_Fragment(FMars_Fragment_Control_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnActiveChanged.Broadcast(Self, NewActive); }
+        {
+            const auto Activation = NewActive ? EMars_Control_Activation::Active : EMars_Control_Activation::Inactive;
+            Self.Get_Fragment(FMars_Fragment_Control_Signals).OnActiveChanged.Broadcast(Self, Activation);
+        }
 
         if (Ended && Self.Has_Fragment(FMars_Fragment_Control_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, false); }
+        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, EMars_Control_Grip::Released); }
 
         if (Ended && Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationProgress.Broadcast(Self, 0.0f); }
 
         if (Began && Self.Has_Fragment(FMars_Fragment_Control_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, true); }
+        { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, EMars_Control_Grip::Gripped); }
     }
 
     // Lets go before the threshold: the handle settles back to the current target pose from wherever it is.
     private void EndManipulation(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState)
     {
-        InState.Manipulation = FMars_Control_Manipulation();
+        InState.Manipulation.Reset();
         InControl.Request_TryRemove(FMars_Tag_Control_Manipulating);
 
         auto Mover = InState.Mover;
@@ -105,8 +111,8 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         { Mover.Request_Settle(); }
     }
 
-    // Returns false when the control is not ManuallyCompleted (ensures). The grip starts where the handle stands, and
-    // the scrub stops an in-flight engage tween so the hand owns the handle.
+    // Returns false when the control is not ManuallyCompleted (ensures). The grip starts where the handle stands (without
+    // a Mover: at the end the pull runs from), and the scrub stops an in-flight engage tween so the hand owns the handle.
     private bool BeginManipulation(
         FCk_Handle_Control& InControl,
         FMars_Fragment_Control& InState,
@@ -120,11 +126,12 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         auto Mover = InState.Mover;
         const auto HasMover = ck::IsValid(Mover);
 
+        const auto RestAlpha = InControl.Get_PullDirection() == EMars_Control_PullDirection::TowardStart ? 1.0f : 0.0f;
+
         auto Manipulation = FMars_Control_Manipulation();
-        Manipulation.IsActive = true;
         Manipulation.Interaction = InRequest.Interaction;
         Manipulation.Manipulator = InRequest.Manipulator;
-        Manipulation.Alpha = HasMover ? Mover.Get_Alpha() : (InState.IsActive ? 1.0f : 0.0f);
+        Manipulation.Alpha = HasMover ? Mover.Get_Alpha() : RestAlpha;
         Manipulation.Pull = Manipulation.Alpha;
         InState.Manipulation = Manipulation;
 
@@ -150,7 +157,9 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         { PullDegrees += Nudge.PullDegrees; }
 
         const auto AlphaPerDegree = InControl.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.AlphaPerDegree;
-        InState.Manipulation.Pull = Math::Clamp(InState.Manipulation.Pull + PullDegrees * AlphaPerDegree, 0.0f, 1.0f);
+        auto Manipulation = InState.Manipulation.GetValue();
+        Manipulation.Pull = Math::Clamp(Manipulation.Pull + PullDegrees * AlphaPerDegree, 0.0f, 1.0f);
+        InState.Manipulation = Manipulation;
     }
 
     private void ArmReleaseTimer(FCk_Handle_Control& InControl, FMars_Fragment_Control& InState, float32 InActiveSeconds)
@@ -161,8 +170,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
                  .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
 
-        auto ControlEntity = FCk_Handle(InControl);
-        auto Timer = utils_timer::Add(ControlEntity, TimerSpec);
+        auto Timer = utils_timer::Add(InControl, TimerSpec);
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnReleaseTimerDone")); }
         InState.ReleaseTimer = Timer;
@@ -171,7 +179,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
     private void DestroyReleaseTimer(FMars_Fragment_Control& InState)
     {
         if (ck::IsValid(InState.ReleaseTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(InState.ReleaseTimer)); }
+        { utils_entity_lifetime::Request_DestroyEntity(InState.ReleaseTimer); }
 
         InState.ReleaseTimer = FCk_Handle_Timer();
     }
@@ -179,16 +187,18 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
     UFUNCTION()
     private void OnReleaseTimerDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        // The control is going away with its timer.
         auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTimer);
-        auto Control = Owner.As_Control(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Control))
+        if (ck::Is_NOT_Valid(Owner))
         { return; }
+
+        auto Control = Owner.As_Control();
 
         // A timer replaced by a re-engage can still finish in the frame it was destroyed.
         const auto& State = Control.Get_Fragment(FMars_Fragment_Control);
-        if ((FCk_Handle(State.ReleaseTimer) == FCk_Handle(InTimer)) == false)
+        if (State.ReleaseTimer != InTimer)
         { return; }
 
-        Control.Request_SetActive(false);
+        Control.Request_SetActive(FMars_Request_Control_SetActive(EMars_Control_Activation::Inactive));
     }
 }

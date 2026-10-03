@@ -1,7 +1,12 @@
 namespace utils_mover
 {
+    // A spec that fails Validate() ensures and adds nothing.
     FCk_Handle_Mover Add(FCk_Handle_SceneNode& InNode, FMars_Mover_Spec InParams)
     {
+        const auto Validation = InParams.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Mover] [{InNode.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_Mover(); }
+
         auto Params = FMars_Fragment_Mover_Params();
         Params.StartLocation = InParams.StartLocation;
         Params.StartRotation = InParams.StartRotation;
@@ -11,8 +16,8 @@ namespace utils_mover
         Params.Easing = InParams.Easing;
 
         auto State = FMars_Fragment_Mover();
-        State.AtEnd = InParams.StartAtEnd;
-        State.Alpha = InParams.StartAtEnd ? 1.0f : 0.0f;
+        State.Target = InParams.StartPose;
+        State.Alpha = InParams.StartPose == EMars_Mover_Pose::End ? 1.0f : 0.0f;
 
         InNode.Add_Fragment(FMars_Feature_Mover());
         InNode.Add_Fragment(Params);
@@ -43,9 +48,10 @@ namespace utils_mover
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin bool Get_AtEnd(const FCk_Handle_Mover& Self)
+// The pose the mover is going to (or rests at), not where it is now.
+mixin EMars_Mover_Pose Get_Target(const FCk_Handle_Mover& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Mover).AtEnd;
+    return Self.Get_Fragment(FMars_Fragment_Mover).Target;
 }
 
 mixin float32 Get_Alpha(const FCk_Handle_Mover& Self)
@@ -57,22 +63,22 @@ mixin float32 Get_Alpha(const FCk_Handle_Mover& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_MoveTo(FCk_Handle_Mover& Self, bool InAtEnd)
+mixin void Request_MoveTo(FCk_Handle_Mover& Self, const FMars_Request_Mover_MoveTo& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Mover_Requests);
-    Requests.MoveToRequest = FMars_Request_Mover_MoveTo(InAtEnd);
+    Requests.MoveToRequests.Add(InRequest);
 }
 
 mixin void Request_Scrub(FCk_Handle_Mover& Self, const FMars_Request_Mover_Scrub& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Mover_Requests);
-    Requests.ScrubRequest = InRequest;
+    Requests.ScrubRequests.Add(InRequest);
 }
 
 mixin void Request_Settle(FCk_Handle_Mover& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Mover_Requests);
-    Requests.SettleRequest = FMars_Request_Mover_Settle();
+    Requests.SettleRequests.Add(FMars_Request_Mover_Settle());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

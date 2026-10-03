@@ -26,7 +26,7 @@ class UMars_HotbarSlot_Widget : UCk_InventoryUI_DataOnlyPanel
     UPROPERTY(meta = (BindWidgetOptional))
     UWidget KeyBadge;
 
-    // Takes the key badge's place on the overflow slot (PEAK: that item is carried in hand, not stowed under a key).
+    // Takes the key badge's place on the overflow slot: that item is carried in hand, not stowed under a key.
     UPROPERTY(meta = (BindWidgetOptional))
     UWidget HandMarker;
 
@@ -99,7 +99,7 @@ class UMars_HotbarSlot_Widget : UCk_InventoryUI_DataOnlyPanel
     {
         const auto IsOccupied = ck::IsValid(_Item);
 
-        // PEAK layout: the overflow slot is only on screen while it holds something.
+        // The overflow slot is only on screen while it holds something.
         if (_Kind == EMars_HotbarSlot_Kind::Overflow)
         { SetVisibility(IsOccupied ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed); }
 
@@ -131,7 +131,7 @@ class UMars_HotbarSlot_Widget : UCk_InventoryUI_DataOnlyPanel
     private FText DoGet_ItemName()
     {
         const auto Definition = utils_item::Get_Definition(_Item);
-        if (ck::Is_NOT_Valid(Definition))
+        if (ck::EnsureIfNot(ck::IsValid(Definition), "[Mars_HotbarSlot] Item has no Definition"))
         { return FText(); }
 
         return Definition.Get_CoreInfo().Get_Name();

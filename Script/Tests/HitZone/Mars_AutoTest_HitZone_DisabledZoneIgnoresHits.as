@@ -13,9 +13,8 @@ class UMars_AutoTest_HitZone_DisabledZoneIgnoresHits : UCk_AutoTest_Base
         auto Target = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Health = utils_health::Add(Target, FMars_Health_Spec(100.0f));
 
-        auto Spec = FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Limb"));
-        Spec.Reactions.Add(FMars_HitZone_Reaction(GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"), 2.0f,
-            EMars_HitZone_ConditionImpact::Damages));
+        auto Spec = FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Limb);
+        Spec.Reactions.Add(FMars_HitZone_Reaction(GameplayTags::DamageType_Mars_Sever, 2.0f, EMars_HitZone_ConditionImpact::Damages));
         _Zone = utils_hit_zone::Add(Target, Spec);
 
         _Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnHit"));
@@ -31,7 +30,7 @@ class UMars_AutoTest_HitZone_DisabledZoneIgnoresHits : UCk_AutoTest_Base
 
     private FMars_Request_HitZone_Hit Make_Hit()
     {
-        return FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt")));
+        return FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, GameplayTags::DamageType_Mars_Blunt));
     }
 
     UFUNCTION()
@@ -43,8 +42,8 @@ class UMars_AutoTest_HitZone_DisabledZoneIgnoresHits : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_DisableAndHit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Zone), "the zone composed");
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(false));
+        Assert_Valid(_Zone, "utils_hit_zone::Add composed the zone");
+        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
         _Zone.Request_Hit(Make_Hit());
     }
 
@@ -56,7 +55,7 @@ class UMars_AutoTest_HitZone_DisabledZoneIgnoresHits : UCk_AutoTest_Base
         Assert_Equals_Int(_HitCount, 0, "no OnHit while disabled");
         Assert_Equals_Int(_Zone.Get_HitCount(), 0, "the disabled zone counted nothing");
 
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(true));
+        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Enable));
         _Zone.Request_Hit(Make_Hit());
     }
 

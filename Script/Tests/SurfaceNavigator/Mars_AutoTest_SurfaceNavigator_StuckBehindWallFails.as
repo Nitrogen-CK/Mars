@@ -2,7 +2,7 @@
 // Slide wall policy the body presses into it and stops making progress, so the watchdog fails the move (Failed, Stuck,
 // OnFailed once with the goal and Stuck, OnArrived never) and clears the steering: one second later the body is still.
 //
-// The body is a plain SurfaceMotion body on a runtime static Jolt floor (D-T1; no legs, so it rides its rays).
+// The body is a plain SurfaceMotion body on a runtime static Jolt floor (no legs, so it rides its rays).
 // Isolated origin (140000, 84000, 600): the Mars autotest map has no floor of its own there.
 class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
 {
@@ -16,7 +16,8 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
     private int32 _ArrivedCount = 0;
     private int32 _FailedCount = 0;
     private FVector _FailedGoal;
-    private EMars_SurfaceNavigator_FailReason _FailedReason = EMars_SurfaceNavigator_FailReason::None;
+    // The latest OnFailed's reason; unset until it fires.
+    private TOptional<EMars_SurfaceNavigator_FailReason> _FailedReason;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -33,10 +34,6 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
         Add_Step("the body is still", n"Step_AssertStill");
         Run_Steps(InHandle);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
 
     private FCk_SurfaceMotion_Spec Make_MotionSpec()
     {
@@ -93,10 +90,6 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
         Res.Set(ck::IsValid(_Motion) && utils_surface_motion::Get_Status(_Motion) == ECk_ProceduralAnimation_Status::Ready);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Handlers
-    //----------------------------------------------------------------------------------------------------------------------
-
     UFUNCTION()
     private void OnArrived(FCk_Handle_SurfaceNavigator InNavigator, FVector InGoal)
     {
@@ -108,12 +101,8 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
     {
         ++_FailedCount;
         _FailedGoal = InGoal;
-        _FailedReason = InReason;
+        _FailedReason = TOptional<EMars_SurfaceNavigator_FailReason>(InReason);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Steps
-    //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
     private void Step_MoveTo(FCk_Handle InHandle, FInstancedStruct InPayload)
@@ -139,13 +128,19 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertStuck(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Location = utils_transform::Get_EntityCurrentLocation(utils_transform::DoCastChecked(FCk_Handle(_Motion)));
+        const auto Location = utils_transform::Get_EntityCurrentLocation(_Motion.As_Transform());
 
-        Assert_True(_Nav.Get_FailReason() == EMars_SurfaceNavigator_FailReason::Stuck, f"the move failed as Stuck ({_Nav.Get_FailReason() :n})");
-        Assert_True(_Nav.Get_PathMode() == EMars_SurfaceNavigator_PathMode::StraightLine, "no provider: the move ran straight into the wall");
+        Assert_True(_Nav.Get_FailReason() == EMars_SurfaceNavigator_FailReason::Stuck, f"the move failed as Stuck (got [{_Nav.Get_FailReason() :n}])");
+        Assert_True(_Nav.Get_PathMode() == EMars_SurfaceNavigator_PathMode::StraightLine,
+            f"no provider: the move ran straight into the wall (got [{_Nav.Get_PathMode() :n}])");
         Assert_Equals_Int(_FailedCount, 1, "OnFailed fired once");
-        Assert_True(_FailedReason == EMars_SurfaceNavigator_FailReason::Stuck, "OnFailed carries Stuck");
-        Assert_True(_FailedGoal.Equals(_Goal), "OnFailed carries the goal");
+        if (_FailedReason.IsSet())
+        {
+            const auto FailedReason = _FailedReason.GetValue();
+            Assert_True(FailedReason == EMars_SurfaceNavigator_FailReason::Stuck, f"OnFailed carries Stuck (got [{FailedReason :n}])");
+        }
+
+        Assert_True(_FailedGoal.Equals(_Goal), f"OnFailed carries the goal (got [{_FailedGoal.ToString()}])");
         Assert_Equals_Int(_ArrivedCount, 0, "OnArrived never fired");
         Assert_True(Location.X < _Origin.X + 190.0, f"the body stopped in front of the wall (X offset {Location.X - _Origin.X})");
     }
@@ -155,7 +150,7 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UCk_AutoTest_Base
     {
         const auto Speed = utils_surface_motion::Get_Velocity(_Motion).Size();
         Assert_True(Speed < 5.0, f"the steering was cleared: the body is still ({Speed} uu/s)");
-        Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Failed, "the navigator stays Failed");
+        Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Failed, f"the navigator stays Failed (got [{_Nav.Get_Status() :n}])");
         Assert_Equals_Int(_FailedCount, 1, "OnFailed did not fire again");
     }
 }

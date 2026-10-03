@@ -1,7 +1,12 @@
 namespace utils_mechanism_sink
 {
+    // A spec that fails Validate() ensures and adds nothing.
     FCk_Handle_MechanismSink Add(FCk_Handle& InHandle, FMars_MechanismSink_Spec InParams)
     {
+        const auto Validation = InParams.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[MechanismSink] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_MechanismSink(); }
+
         auto Params = FMars_Fragment_MechanismSink_Params();
         Params.InputChannels = InParams.InputChannels;
         Params.Rule = InParams.Rule;
@@ -32,36 +37,23 @@ mixin TArray<FGameplayTag> Get_InputChannels(const FCk_Handle_MechanismSink& Sel
     return Self.Get_Fragment(FMars_Fragment_MechanismSink_Params).InputChannels;
 }
 
-mixin EMars_MechanismSink_Rule Get_Rule(const FCk_Handle_MechanismSink& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_MechanismSink_Params).Rule;
-}
-
-mixin bool Get_IsLatch(const FCk_Handle_MechanismSink& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_MechanismSink_Params).Latch;
-}
-
 mixin bool Get_HasEvaluated(const FCk_Handle_MechanismSink& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_MechanismSink).HasEvaluated;
+    return Self.Get_Fragment(FMars_Fragment_MechanismSink).Power != EMars_MechanismSink_Power::Unevaluated;
 }
 
 mixin bool Get_IsPowered(const FCk_Handle_MechanismSink& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_MechanismSink).IsPowered;
-}
-
-mixin TArray<FMars_MechanismSink_ChannelInput> Get_Inputs(const FCk_Handle_MechanismSink& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_MechanismSink).Inputs;
+    return Self.Get_Fragment(FMars_Fragment_MechanismSink).Power == EMars_MechanismSink_Power::Powered;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Only the mechanism driver calls this; it pushes every channel on every recompute, so unchanged inputs are dropped here.
+// Only the mechanism driver calls this; it pushes every channel on every recompute, so once the sink has evaluated an
+// unchanged input is dropped here. Before that every push goes through: the first evaluation needs one in the drain, and
+// an unsourced channel's (0, 0) push matches the initial input.
 mixin void Request_SetChannelInput(FCk_Handle_MechanismSink& Self, const FMars_Request_MechanismSink_SetChannelInput& InRequest)
 {
     if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Requests))
@@ -78,12 +70,15 @@ mixin void Request_SetChannelInput(FCk_Handle_MechanismSink& Self, const FMars_R
     }
 
     const auto& State = Self.Get_Fragment(FMars_Fragment_MechanismSink);
-    for (const auto& Input : State.Inputs)
+    if (State.Power != EMars_MechanismSink_Power::Unevaluated)
     {
-        if (Input.Channel == InRequest.Channel
-            && Input.AssertedCount == InRequest.AssertedCount
-            && Input.TotalCount == InRequest.TotalCount)
-        { return; }
+        for (const auto& Input : State.Inputs)
+        {
+            if (Input.Channel == InRequest.Channel
+                && Input.AssertedCount == InRequest.AssertedCount
+                && Input.TotalCount == InRequest.TotalCount)
+            { return; }
+        }
     }
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_MechanismSink_Requests);

@@ -1,4 +1,5 @@
-// Validate() accepts the default ladder and rejects one with no height, no standoff, no top exit or no zone height padding.
+// Validate() accepts the default ladder and rejects one with no height, no standoff, no top exit or no zone height padding,
+// each with an error naming the field it rejected.
 class UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -15,31 +16,34 @@ class UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions : UCk_AutoTest_Base
 
         auto NoHeight = FMars_Ladder_Spec();
         NoHeight.Height = 0.0f;
-        AssertInvalid(NoHeight, "Height 0");
+        AssertRejectedField(NoHeight, "Height");
 
         auto NoStandoff = FMars_Ladder_Spec();
         NoStandoff.Standoff = 0.0f;
-        AssertInvalid(NoStandoff, "Standoff 0");
+        AssertRejectedField(NoStandoff, "Standoff");
 
         auto NoTopExit = FMars_Ladder_Spec();
         NoTopExit.TopExitDepth = 0.0f;
-        AssertInvalid(NoTopExit, "TopExitDepth 0");
+        AssertRejectedField(NoTopExit, "TopExitDepth");
 
         auto NoZonePadding = FMars_Ladder_Spec();
         NoZonePadding.ZoneHeightPadding = 0.0f;
-        AssertInvalid(NoZonePadding, "ZoneHeightPadding 0");
+        AssertRejectedField(NoZonePadding, "ZoneHeightPadding");
     }
 
     private void AssertValid(const FMars_Ladder_Spec& InSpec, const FString& InCase)
     {
         const auto Validation = InSpec.Validate();
-        Assert_True(Validation.IsValid, f"{InCase} is accepted (error: {Validation.Get_Error()})");
+        Assert_True(Validation.IsValid(), f"{InCase} is accepted (error: {Validation.Get_Error()})");
     }
 
-    private void AssertInvalid(const FMars_Ladder_Spec& InSpec, const FString& InCase)
+    // InField set to 0 is rejected by its own rule: the error names the field followed by its bracketed value, so
+    // "Height [" cannot match the ZoneHeightPadding rule.
+    private void AssertRejectedField(const FMars_Ladder_Spec& InSpec, const FString& InField)
     {
         const auto Validation = InSpec.Validate();
-        Assert_False(Validation.IsValid, f"{InCase} is rejected");
-        Assert_True(Validation.Get_Error().Len() > 0, f"{InCase} names its rule (error: {Validation.Get_Error()})");
+        Assert_False(Validation.IsValid(), f"Validate() rejects {InField} 0");
+        Assert_True(Validation.Get_Error().Contains(f"{InField} ["),
+            f"Validate() on {InField} 0 names [{InField}] as the rejected field (got [{Validation.Get_Error()}])");
     }
 }

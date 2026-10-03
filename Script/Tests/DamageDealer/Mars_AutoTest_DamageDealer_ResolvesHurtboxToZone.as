@@ -10,7 +10,7 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
     private FCk_Handle _Bare;
     private FCk_Handle_DamageDealer _Dealer;
 
-    private TArray<FCk_Handle> _DealtZones;
+    private TArray<FCk_Handle_HitZone> _DealtZones;
     private TArray<FMars_DamageEvent> _DealtEvents;
     private TArray<FCk_Handle> _RejectedEntities;
     private TArray<EMars_DamageDealer_RejectReason> _RejectedReasons;
@@ -21,7 +21,7 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
         auto Target = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Health = utils_health::Add(Target, FMars_Health_Spec(100.0f));
 
-        auto Spec = FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Limb"));
+        auto Spec = FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Limb);
         Spec.Reactions.Add(FMars_HitZone_Reaction(Sever(), 2.0f, EMars_HitZone_ConditionImpact::Damages));
         _Zone = utils_hit_zone::Add(Target, Spec);
 
@@ -47,13 +47,13 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
 
     private FGameplayTag Sever()
     {
-        return GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever");
+        return GameplayTags::DamageType_Mars_Sever;
     }
 
     UFUNCTION()
     private void OnDamageDealt(FCk_Handle_DamageDealer InDealer, FCk_Handle_HitZone InZone, FMars_DamageEvent InEvent)
     {
-        _DealtZones.Add(FCk_Handle(InZone));
+        _DealtZones.Add(InZone);
         _DealtEvents.Add(InEvent);
     }
 
@@ -70,11 +70,11 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
         Assert_True(ck::IsValid(_Zone), "the zone composed");
         Assert_True(ck::IsValid(_Hurtbox), "the hurtbox node exists");
         Assert_True(ck::IsValid(_Dealer), "the dealer composed");
-        Assert_True(FCk_Handle(utils_hit_zone::TryGet_Zone(_Hurtbox)) == FCk_Handle(_Zone), "the hurtbox links to the zone");
+        Assert_True(utils_hit_zone::TryGet_Zone(_Hurtbox) == _Zone, "the hurtbox links to the zone");
         Assert_Equals_Int(_Zone.Get_Hurtboxes().Num(), 1, "the zone lists its hurtbox");
 
         const auto Event = utils_damage_dealer::Make_Event(_Dealer, 10.0f, Sever());
-        Assert_True(Event.Instigator == _Attacker, "Make_Event names the dealer's entity as Instigator");
+        Assert_True(Event.Source.Instigator == _Attacker, "Make_Event names the dealer's entity as Instigator");
 
         _Dealer.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(_Hurtbox, Event));
     }
@@ -90,8 +90,12 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
     private void Step_AssertDealtAndDealToBare(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_DealtZones.Num(), 1, "OnDamageDealt fired once");
-        Assert_True(_DealtZones[0] == FCk_Handle(_Zone), "OnDamageDealt names the zone, not the hurtbox");
-        Assert_True(_DealtEvents[0].Instigator == _Attacker, "the dealt event's Instigator is the attacker");
+        if (_DealtZones.Num() == 1)
+        {
+            Assert_True(_DealtZones[0] == _Zone, "OnDamageDealt names the zone, not the hurtbox");
+            Assert_True(_DealtEvents[0].Source.Instigator == _Attacker, "the dealt event's Instigator is the attacker");
+        }
+
         Assert_Equals_Int(_Dealer.Get_HitsDealt(), 1, "the dealer counted the hit");
         Assert_Equals_Int(_RejectedReasons.Num(), 0, "nothing was rejected");
 
@@ -110,7 +114,8 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
     private void Step_AssertRejected(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_RejectedReasons.Num(), 1, "OnDamageRejected fired once");
-        Assert_True(_RejectedReasons[0] == EMars_DamageDealer_RejectReason::NoHitZone, "the bare entity is rejected NoHitZone");
+        Assert_True(_RejectedReasons[0] == EMars_DamageDealer_RejectReason::NoHitZone,
+            f"the bare entity is rejected NoHitZone (got {_RejectedReasons[0] :n})");
         Assert_True(_RejectedEntities[0] == _Bare, "the rejection names the bare entity");
         Assert_Equals_Int(_Dealer.Get_HitsRejected(), 1, "the dealer counted the rejection");
         Assert_Equals_Int(_Dealer.Get_HitsDealt(), 1, "the rejected hit was not dealt");

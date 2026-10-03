@@ -1,78 +1,106 @@
+struct FMars_PlayerCharacter_Speeds
+{
+    UPROPERTY()
+    float32 Walk = 420.0f;
+
+    UPROPERTY()
+    float32 Sprint = 700.0f;
+
+    UPROPERTY()
+    float32 Crouch = 220.0f;
+
+    // Along a ladder's climb line (the Climber's spec).
+    UPROPERTY()
+    float32 Climb = 220.0f;
+}
+
+struct FMars_PlayerCharacter_Movement
+{
+    UPROPERTY()
+    FMars_PlayerCharacter_Speeds Speeds;
+
+    UPROPERTY()
+    float32 MaxAcceleration = 2400.0f;
+
+    UPROPERTY()
+    float32 BrakingDecelerationWalking = 2400.0f;
+
+    UPROPERTY()
+    float32 JumpZVelocity = 480.0f;
+
+    UPROPERTY()
+    float32 GravityScale = 1.6f;
+
+    UPROPERTY()
+    float32 AirControl = 0.35f;
+}
+
+struct FMars_PlayerCharacter_Body
+{
+    UPROPERTY()
+    float32 CapsuleHalfHeight = 88.0f;
+
+    UPROPERTY()
+    float32 CapsuleRadius = 34.0f;
+
+    UPROPERTY()
+    float32 CrouchedHalfHeight = 52.0f;
+}
+
+struct FMars_PlayerCharacter_View
+{
+    // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch.
+    UPROPERTY()
+    FMars_EyeHeight_Spec EyeHeight;
+
+    // Stride clock of the character (CkGait); the head and hand bobs read it.
+    UPROPERTY()
+    FCk_Gait_Spec Gait;
+
+    // Positional camera bob on the head node (CkGait Bob).
+    UPROPERTY()
+    FCk_Bob_Spec HeadBob;
+
+    UPROPERTY()
+    FMars_PlayerViewpoint_Spec Viewpoint;
+}
+
+struct FMars_PlayerCharacter_Inventory
+{
+    UPROPERTY()
+    int32 BagSlotCount = 3;
+
+    // Worn-backpack mount relative to the capsule root (X forward).
+    UPROPERTY()
+    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0), FVector::OneVector);
+
+    // Drop held past this arms a throw.
+    UPROPERTY()
+    float32 ThrowHoldSeconds = 0.35f;
+}
+
 class UMars_PlayerCharacter_Config : UDataAsset
 {
     UPROPERTY(Category = "Movement")
-    float32 WalkSpeed = 420.0f;
-
-    UPROPERTY(Category = "Movement")
-    float32 SprintSpeed = 700.0f;
-
-    UPROPERTY(Category = "Movement")
-    float32 CrouchSpeed = 220.0f;
-
-    // Along a ladder's climb line (the Climber's spec).
-    UPROPERTY(Category = "Movement")
-    float32 ClimbSpeed = 220.0f;
-
-    UPROPERTY(Category = "Movement")
-    float32 MaxAcceleration = 2400.0f;
-
-    UPROPERTY(Category = "Movement")
-    float32 BrakingDecelerationWalking = 2400.0f;
-
-    UPROPERTY(Category = "Movement")
-    float32 JumpZVelocity = 480.0f;
-
-    UPROPERTY(Category = "Movement")
-    float32 GravityScale = 1.6f;
-
-    UPROPERTY(Category = "Movement")
-    float32 AirControl = 0.35f;
+    FMars_PlayerCharacter_Movement Movement;
 
     UPROPERTY(Category = "Body")
-    float32 CapsuleHalfHeight = 88.0f;
+    FMars_PlayerCharacter_Body Body;
 
-    UPROPERTY(Category = "Body")
-    float32 CapsuleRadius = 34.0f;
-
-    UPROPERTY(Category = "Body")
-    float32 CrouchedHalfHeight = 52.0f;
-
-    // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch.
-    UPROPERTY(Category = "Camera")
-    FMars_EyeHeight_Spec EyeHeight;
-
-    // Stride clock of the character (CkGait); the head and hand bobs read it. Tune in the Mars_PlayerCharacter_Config asset.
-    UPROPERTY(Category = "Camera")
-    FCk_Gait_Spec Gait;
-
-    // PEAK-style positional camera bob on the head node (CkGait Bob). Roll/pitch stay 0: PEAK's walk has no rotational bob.
-    UPROPERTY(Category = "Camera")
-    FCk_Bob_Spec HeadBob;
-
-    UPROPERTY(Category = "Interaction")
-    FMars_PlayerViewpoint_Spec Viewpoint;
+    UPROPERTY(Category = "View")
+    FMars_PlayerCharacter_View View;
 
     UPROPERTY(Category = "Interaction")
     FCk_InteractionResolver_Spec InteractionResolver;
 
     UPROPERTY(Category = "Inventory")
-    int32 BagSlotCount = 3;
+    FMars_PlayerCharacter_Inventory Inventory;
 
-    // Hand attach point relative to the first-person camera (X forward, Y right, Z up).
-    UPROPERTY(Category = "Inventory")
-    FTransform HandOffset = FTransform(FRotator::ZeroRotator, FVector(60.0, 25.0, -20.0), FVector::OneVector);
-
-    // Damped-spring lag of the held item behind the hand (CkSway). Tune in the Mars_PlayerCharacter_Config asset.
-    UPROPERTY(Category = "Inventory")
+    // Damped-spring lag of the Hand node (and everything on it) behind the view (CkSway).
+    UPROPERTY(Category = "Hands")
     FCk_Sway_Spec HandSway;
 
-    // Worn-backpack mount relative to the capsule root (X forward).
-    UPROPERTY(Category = "Inventory")
-    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0), FVector::OneVector);
-
-    UPROPERTY(Category = "Inventory")
-    float32 ThrowHoldSeconds = 0.35f;
-
+    // The gloves; HandNode is supplied by the pawn at composition.
     UPROPERTY(Category = "Hands")
     FMars_FPHands_Spec FPHands;
 
@@ -92,20 +120,18 @@ namespace mars
         Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, UseChannels));
 
         TArray<FGameplayTag> PrimaryChannels;
-        PrimaryChannels.Add(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Primary.UsableItem"));
-        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(
-            GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Primary"), PrimaryChannels));
+        PrimaryChannels.Add(GameplayTags::InteractionChannel_Mars_Primary_UsableItem);
+        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Primary, PrimaryChannels));
 
         // A station's grip: opened and closed only by the Operating state (UMars_SmTask_Operating_Grip), never by a key.
         TArray<FGameplayTag> OperateChannels;
-        OperateChannels.Add(GameplayTags::ResolveGameplayTag(n"InteractionChannel.Mars.Operate"));
-        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(
-            GameplayTags::ResolveGameplayTag(n"InteractionIntent.Mars.Operate"), OperateChannels));
+        OperateChannels.Add(GameplayTags::InteractionChannel_Mars_Operate);
+        Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Operate, OperateChannels));
 
         InteractionResolver = FCk_InteractionResolver_Spec(Mappings);
 
-        // The view trace reaches 150 uu; the gloves reach anything it hits (FPHands MaxReachCm unset = uncapped).
-        Viewpoint.InteractionTraceDistance = 250.0f;
+        // The view trace reaches 250 uu; the gloves reach anything it hits (FPHands MaxReachCm unset = uncapped).
+        View.Viewpoint.InteractionTraceDistance = 250.0f;
 
         HandSway = FCk_Sway_Spec();
         HandSway.Set_Location(FCk_Sway_Response(FVector(12.0, 16.0, 12.0), 3.5f, 0.7f));
@@ -119,12 +145,13 @@ namespace mars
         HandSway.Set_TeleportDistanceCm(300.0f);
         HandSway.Set_TeleportAngleDeg(90.0f);
 
-        Gait = FCk_Gait_Spec();   // the movement component is supplied by the pawn at Add; only tunables live here
-        auto GaitStride = Gait.Get_Stride();
+        // The movement component is supplied by the pawn at composition; only tunables live here.
+        View.Gait = FCk_Gait_Spec();
+        auto GaitStride = View.Gait.Get_Stride();
         GaitStride.Set_ReferenceSpeed(420.0f);
-        Gait.Set_Stride(GaitStride);
+        View.Gait.Set_Stride(GaitStride);
 
-        // The gait is supplied by the pawn at composition (Set_Gait); only tunables live here.
+        // The gait is supplied by the pawn at composition (Set_Gait); only tunables live here. No rotational bob.
         auto HeadBobStride = FCk_Bob_StrideParams();
         HeadBobStride.Set_VerticalCm(6.0f);
         HeadBobStride.Set_LateralCm(3.0f);
@@ -139,20 +166,20 @@ namespace mars
         HeadBobAir.Set_MaxLandKick(40.0f);
         HeadBobAir.Set_Spring(FCk_Bob_SpringResponse(4.0f, 0.6f));
 
-        HeadBob = FCk_Bob_Spec();
-        HeadBob.Set_Stride(HeadBobStride);
-        HeadBob.Set_Air(HeadBobAir);
-        HeadBob.Set_LagRate(14.0f);
-        HeadBob.Set_BreathCm(0.25f);
-        HeadBob.Set_MaxOffsetCm(10.0f);
+        View.HeadBob = FCk_Bob_Spec();
+        View.HeadBob.Set_Stride(HeadBobStride);
+        View.HeadBob.Set_Air(HeadBobAir);
+        View.HeadBob.Set_LagRate(14.0f);
+        View.HeadBob.Set_BreathCm(0.25f);
+        View.HeadBob.Set_MaxOffsetCm(10.0f);
 
-        FPHands.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/SK_FPHands.SK_FPHands"));
-        FPHands.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/ABP_FPHands.ABP_FPHands_C"));
-        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Wave.AM_FPHands_Emote_Wave")));
-        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_ThumbsUp.AM_FPHands_Emote_ThumbsUp")));
-        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Point.AM_FPHands_Emote_Point")));
-        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Clap.AM_FPHands_Emote_Clap")));
-        FPHands.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_FlipOff.AM_FPHands_Emote_FlipOff")));
+        FPHands.Visual.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/SK_FPHands.SK_FPHands"));
+        FPHands.Visual.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/ABP_FPHands.ABP_FPHands_C"));
+        FPHands.Emotes.Montages.Add(EMars_FPEmote::Wave, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Wave.AM_FPHands_Emote_Wave")));
+        FPHands.Emotes.Montages.Add(EMars_FPEmote::ThumbsUp, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_ThumbsUp.AM_FPHands_Emote_ThumbsUp")));
+        FPHands.Emotes.Montages.Add(EMars_FPEmote::Point, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Point.AM_FPHands_Emote_Point")));
+        FPHands.Emotes.Montages.Add(EMars_FPEmote::Clap, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Clap.AM_FPHands_Emote_Clap")));
+        FPHands.Emotes.Montages.Add(EMars_FPEmote::FlipOff, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_FlipOff.AM_FPHands_Emote_FlipOff")));
 
         // The hands' bob keeps the landing dip but adds no airborne lift: CkSway on the parent Hand node already lags
         // the hands while the body rises and falls (HandSway LocationFromLinearVelocity.Z). One owner per effect.

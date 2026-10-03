@@ -11,22 +11,23 @@ class UMars_Processor_Hazard_HandleRequests : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle,
                        FMars_Fragment_Hazard_Requests& InRequests,
-                       FMars_Fragment_Hazard& InHazardComp)
+                       FMars_Fragment_Hazard& InState)
     {
         auto Hazard = InHandle.As_Hazard();
 
-        const auto Armed = InRequests.SetArmed.Armed;
+        // Absolute requests: the last one stands.
+        const auto Arming = InRequests.SetArmedRequests.Last().Arming;
 
-        // Swap-and-pop - InRequests is dead past this line; a request enqueued by a listener survives to next pass.
+        // InRequests is invalid past this line; a request enqueued by a listener survives to the next pass.
         Hazard.Request_TryRemove(FMars_Fragment_Hazard_Requests);
 
-        if (InHazardComp.IsArmed == Armed)
+        if (InState.Arming == Arming)
         { return; }
 
-        InHazardComp.IsArmed = Armed;
+        InState.Arming = Arming;
 
         // Hitting what is already inside on arming is the setup processor's reaction to this signal.
         if (Hazard.Has_Fragment(FMars_Fragment_Hazard_Signals))
-        { Hazard.Get_Fragment(FMars_Fragment_Hazard_Signals).OnArmedChanged.Broadcast(Hazard, Armed); }
+        { Hazard.Get_Fragment(FMars_Fragment_Hazard_Signals).OnArmedChanged.Broadcast(Hazard, Arming); }
     }
 }

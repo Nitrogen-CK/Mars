@@ -1,6 +1,7 @@
 // MaxReachCm unset (the default) is uncapped: a grip 90 cm from the glove's rest is reached. A set MaxReachCm is a look
-// cap, and a grip may carry its own: the same grip stretches 60 under MaxReachCm 60, and all 90 under ReachOverrideCm 100. An authored grip matches the socket's rotation either
-// way, even past the cap. Pure: Make_ReachedGrip on hand-built grip queries.
+// cap, and a grip may carry its own: the same grip stretches 60 under MaxReachCm 60, and all 90 under ReachOverrideCm
+// 100. An authored grip matches the socket's rotation either way, even past the cap. Pure: Make_ReachedGrip on hand-built
+// grip queries.
 class UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -14,10 +15,10 @@ class UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach : UCk_AutoTest_Bas
     private void Step_AssertReach(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Spec = FMars_FPHands_ReachSpec();
-        Spec.MaxReachCm = 60.0f;
+        Spec.Stretch.MaxReachCm = 60.0f;
 
         const auto SocketRotation = FQuat(FRotator(10.0, 20.0, 30.0));
-        auto Grip = FMars_FPHands_GripQuery(FTransform::Identity, true, FTransform::Identity);
+        auto Grip = FMars_FPHands_GripQuery(FTransform::Identity, EMars_Hand::Right, FTransform::Identity);
         Grip.WorldGrip = FTransform(SocketRotation, FVector(90.0, 0.0, 0.0), FVector::OneVector);
         Grip.IsAuthored = true;
         Grip.Standoff = 0.0;
@@ -25,7 +26,7 @@ class UMars_AutoTest_FPHands_ReachOverrideExtendsPastMaxReach : UCk_AutoTest_Bas
         auto Uncapped = FMars_FPHands_ReachSpec();
         const auto Reached = utils_fphands::Make_ReachedGrip(Uncapped, Grip);
         const auto ReachedLength = Reached.GetLocation().Size();
-        Assert_True(Uncapped.MaxReachCm.IsSet() == false, "the default spec is uncapped");
+        Assert_True(Uncapped.Stretch.MaxReachCm.IsSet() == false, "the default spec is uncapped");
         Assert_True(Math::Abs(ReachedLength - 90.0) <= 0.01, f"uncapped: the glove reaches the grip (got {ReachedLength})");
         AssertRotationMatches(Reached, SocketRotation, "uncapped");
 

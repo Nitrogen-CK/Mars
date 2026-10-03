@@ -1,4 +1,4 @@
-// PEAK layout: the bag slots in SlotContainer, the overflow slot apart on the far left in OverflowContainer, where it
+// The bag slots in SlotContainer, the overflow slot apart on the far left in OverflowContainer, where it
 // only shows while it holds an item (see UMars_HotbarSlot_Widget), and the backpack slot in BackpackContainer (falls
 // back to the end of SlotContainer = far right, so a WBP without it keeps working).
 UCLASS(Abstract)
@@ -96,7 +96,7 @@ class UMars_Hotbar_Widget : UCk_UserWidget_UE
         for (int32 Index = 0; Index < _SlotWidgets.Num(); ++Index)
         {
             _SlotWidgets[Index].Set_Item(_Hotbar.Get_ItemAt(Index));
-            _SlotWidgets[Index].Set_Selected(Index == SelectedIndex);
+            _SlotWidgets[Index].Set_Selected(SelectedIndex == TOptional<int32>(Index));
         }
     }
 
@@ -114,13 +114,11 @@ class UMars_Hotbar_Widget : UCk_UserWidget_UE
     }
 
     UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar, int32 InPrevIndex, int32 InNewIndex)
+    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
     {
-        if (_SlotWidgets.IsValidIndex(InPrevIndex))
-        { _SlotWidgets[InPrevIndex].Set_Selected(false); }
-
-        if (_SlotWidgets.IsValidIndex(InNewIndex))
-        { _SlotWidgets[InNewIndex].Set_Selected(true); }
+        const auto SelectedIndex = InHotbar.Get_SelectedIndex();
+        for (int32 Index = 0; Index < _SlotWidgets.Num(); ++Index)
+        { _SlotWidgets[Index].Set_Selected(SelectedIndex == TOptional<int32>(Index)); }
     }
 
     UFUNCTION()
@@ -130,12 +128,12 @@ class UMars_Hotbar_Widget : UCk_UserWidget_UE
         { _SlotWidgets[InIndex].Set_Item(InMaybeItem); }
     }
 
-    private EMars_HotbarSlot_Kind DoGet_Kind(int32 InIndex, int32 InOverflowIndex, int32 InBackpackIndex)
+    private EMars_HotbarSlot_Kind DoGet_Kind(int32 InIndex, int32 InOverflowIndex, TOptional<int32> InBackpackIndex)
     {
         if (InIndex == InOverflowIndex)
         { return EMars_HotbarSlot_Kind::Overflow; }
 
-        if (InIndex == InBackpackIndex)
+        if (InBackpackIndex == TOptional<int32>(InIndex))
         { return EMars_HotbarSlot_Kind::Backpack; }
 
         return EMars_HotbarSlot_Kind::Bag;

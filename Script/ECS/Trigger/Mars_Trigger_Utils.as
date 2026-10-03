@@ -1,7 +1,12 @@
 namespace utils_trigger
 {
+    // A spec that fails Validate() ensures and adds nothing.
     FCk_Handle_Trigger Add(FCk_Handle_Transform& InTransform, FMars_Trigger_Spec InParams)
     {
+        const auto Validation = InParams.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Trigger] [{InTransform.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_Trigger(); }
+
         auto TriggerTransform = InTransform;
         if (InParams.LocalOffset.Equals(FTransform::Identity) == false)
         { TriggerTransform = utils_scene_node::Create(InTransform, InParams.LocalOffset).As_Transform(); }

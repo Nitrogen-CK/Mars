@@ -6,7 +6,7 @@ class UMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell : UCk_AutoTest_Base
     private FCk_Handle_Eyes _Eyes;
 
     private float32 _BlendSeconds = 1.0f;
-    private float32 _BlendAtRetarget = -1.0f;
+    private float32 _BlendAtRetarget = 0.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -18,7 +18,6 @@ class UMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell : UCk_AutoTest_Base
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
         Spec.Style.RightCell = 3;
-        Spec.BlinkEnabled = false;
         _Eyes = utils_eyes::Add(FaceNode, Spec);
 
         Add_Step("the eyes have a presentation and show the style", n"Step_AssertComposed");

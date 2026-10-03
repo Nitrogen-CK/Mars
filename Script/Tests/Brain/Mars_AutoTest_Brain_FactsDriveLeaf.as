@@ -38,23 +38,19 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
         Run_Steps(InHandle);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
-
     private FGameplayTag IsHurt() const
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.IsHurt");
+        return GameplayTags::Mars_WS_Crawler_IsHurt;
     }
 
     private FGameplayTag CanWalk() const
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.CanWalk");
+        return GameplayTags::Mars_WS_Crawler_CanWalk;
     }
 
     private FGameplayTag Settled() const
     {
-        return GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler.Settled");
+        return GameplayTags::Mars_WS_Crawler_Settled;
     }
 
     private FMars_Brain_Spec Make_Spec() const
@@ -67,7 +63,7 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
         auto Goal = TArray<FCk_GoapWS_Condition_Authored>();
         Goal.Add(FCk_GoapWS_Condition_Authored(Settled(), true));
 
-        auto Spec = FMars_Brain_Spec(GameplayTags::ResolveGameplayTag(n"Mars.Goap.Crawler"), GameplayTags::ResolveGameplayTag(n"Mars.WS.Crawler"),
+        auto Spec = FMars_Brain_Spec(GameplayTags::Mars_Goap_Crawler, GameplayTags::Mars_WS_Crawler,
             Facts, Goal, 0.0f);
         Spec.AddAction(UMars_GoapAction_Crawler_Roam);
         Spec.AddAction(UMars_GoapAction_Crawler_Flinch);
@@ -101,20 +97,20 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertValidation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Make_Spec().Validate().IsValid, "the crawler-shaped spec is valid");
+        Assert_True(Make_Spec().Validate().IsValid(), "the crawler-shaped spec is valid");
 
         auto NoFacts = Make_Spec();
         NoFacts.Facts.Empty();
-        Assert_False(NoFacts.Validate().IsValid, "a spec with no facts is rejected");
+        Assert_False(NoFacts.Validate().IsValid(), "a spec with no facts is rejected");
 
         auto NoGoal = Make_Spec();
         NoGoal.Goal.Empty();
-        Assert_False(NoGoal.Validate().IsValid, "a spec with an empty goal is rejected");
+        Assert_False(NoGoal.Validate().IsValid(), "a spec with an empty goal is rejected");
 
         Assert_True(ck::IsValid(_Brain), "the brain composed");
         Assert_True(ck::IsValid(_Brain.Get_Planner()), "the brain has a planner child");
         Assert_True(ck::IsValid(_Brain.Get_WorldState()), "the brain has a world-state child");
-        Assert_True(FCk_Handle(_Brain.Get_Planner()) != FCk_Handle(_Brain), "the planner is a child, not stamped on the owner");
+        Assert_True(_Brain.Get_Planner() != _Brain, "the planner is a child, not stamped on the owner");
         Assert_True(_Brain.Get_IsEnabled(), "a new brain is enabled");
     }
 
@@ -152,7 +148,7 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Disable(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Brain.Request_SetEnabled(FMars_Request_Brain_SetEnabled(false));
+        _Brain.Request_SetEnabled(FMars_Request_Brain_SetEnabled(ECk_EnableDisable::Disable));
     }
 
     UFUNCTION()

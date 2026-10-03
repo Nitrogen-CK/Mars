@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------------------------------------------
-// Mars Game Debugger - EmmsUI immediate-mode debugger (ported from BusterBlock's).
+// Mars Game Debugger - EmmsUI immediate-mode debugger.
 //
 // Open it with the console (Mars.Debugger.Toggle), the Mars_Debugger cheat, or F9 in gameplay.
 // In the editor it docks as a tab (Tools > Mars Debug Tools); elsewhere it is a popup window.
@@ -44,15 +44,17 @@ namespace utils_mars_debugger
         Open();
     }
 
-    // Editor tab first; popup window in packaged/standalone.
+    // Editor tab first; popup window in packaged/standalone, where every game world has the GameInstance subsystem.
     void Open()
     {
         if (UCk_Utils_EditorOnly_UE::TryInvokeEditorTab(EditorTabId))
         { return; }
 
         auto Subsystem = Subsystem::GetGameInstanceSubsystem(UMars_DebuggerSubsystem);
-        if (ck::IsValid(Subsystem))
-        { Subsystem.OpenPopupWindow(); }
+        if (ck::EnsureIfNot(ck::IsValid(Subsystem), "[Mars.Debugger] no editor tab and no UMars_DebuggerSubsystem to open the popup from"))
+        { return; }
+
+        Subsystem.OpenPopupWindow();
     }
 
     void Close()
@@ -60,6 +62,7 @@ namespace utils_mars_debugger
         if (UCk_Utils_EditorOnly_UE::TryCloseEditorTab(EditorTabId))
         { return; }
 
+        // Outside a game world there is no subsystem, and so no popup to close.
         auto Subsystem = Subsystem::GetGameInstanceSubsystem(UMars_DebuggerSubsystem);
         if (ck::IsValid(Subsystem))
         { Subsystem.ClosePopupWindow(); }
@@ -77,7 +80,7 @@ namespace utils_mars_debugger
     UMars_DebuggerContent GetContent()
     {
         auto EngineSubsystem = Subsystem::GetEngineSubsystem(UMars_DebuggerEngineSubsystem);
-        if (ck::Is_NOT_Valid(EngineSubsystem))
+        if (ck::EnsureIfNot(ck::IsValid(EngineSubsystem), "[Mars.Debugger] the UMars_DebuggerEngineSubsystem is missing"))
         { return nullptr; }
 
         return EngineSubsystem.GetContent();
@@ -86,13 +89,16 @@ namespace utils_mars_debugger
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Engine subsystem - survives PIE so the editor tab can keep rendering, and tracks every live
-// game world (listen server + each PIE client) so the debugger can find the authority one.
+// game instance (listen server + each PIE client) so the debugger can find the authority world.
 //--------------------------------------------------------------------------------------------------------------------------
 
 class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
 {
     private UMars_DebuggerContent StoredContent;
-    private TArray<UWorld> RegisteredWorlds;
+
+    // The GameInstance subsystems, not their worlds: a world is resolved live through its subsystem, so no reference
+    // outlives a map travel. Each subsystem unregisters itself in Deinitialize.
+    private TArray<UMars_DebuggerSubsystem> RegisteredSubsystems;
 
     void SetContent(UMars_DebuggerContent InContent)
     {
@@ -110,43 +116,57 @@ class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
         { StoredContent = nullptr; }
     }
 
-    void RegisterWorld(UWorld InWorld)
+    void RegisterSubsystem(UMars_DebuggerSubsystem InSubsystem)
     {
-        if (ck::IsValid(InWorld))
-        { RegisteredWorlds.AddUnique(InWorld); }
+        RegisteredSubsystems.AddUnique(InSubsystem);
     }
 
-    void UnregisterWorld(UWorld InWorld)
+    void UnregisterSubsystem(UMars_DebuggerSubsystem InSubsystem)
     {
-        RegisteredWorlds.Remove(InWorld);
+        RegisteredSubsystems.Remove(InSubsystem);
     }
 
     // Decided live (scoped) rather than cached: a world's net mode may not be settled at registration.
     UWorld GetAuthorityWorld()
     {
-        for (int32 Index = 0; Index < RegisteredWorlds.Num(); ++Index)
+        for (auto RegisteredSubsystem : RegisteredSubsystems)
         {
-            auto RegisteredWorld = RegisteredWorlds[Index];
-            if (ck::Is_NOT_Valid(RegisteredWorld) || RegisteredWorld.IsGameWorld() == false)
+            auto World = Get_GameWorld(RegisteredSubsystem);
+            if (ck::Is_NOT_Valid(World))
             { continue; }
 
-            const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(RegisteredWorld);
+            const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(World);
             if (System::IsServer())
-            { return RegisteredWorld; }
+            { return World; }
         }
+
         return nullptr;
     }
 
     // Pure-client fallback (packaged client): inspection only.
     UWorld GetAnyGameWorld()
     {
-        for (int32 Index = 0; Index < RegisteredWorlds.Num(); ++Index)
+        for (auto RegisteredSubsystem : RegisteredSubsystems)
         {
-            auto RegisteredWorld = RegisteredWorlds[Index];
-            if (ck::IsValid(RegisteredWorld) && RegisteredWorld.IsGameWorld())
-            { return RegisteredWorld; }
+            auto World = Get_GameWorld(RegisteredSubsystem);
+            if (ck::IsValid(World))
+            { return World; }
         }
+
         return nullptr;
+    }
+
+    // The subsystem's current world when it is a game world, else null.
+    private UWorld Get_GameWorld(UMars_DebuggerSubsystem InSubsystem) const
+    {
+        if (ck::Is_NOT_Valid(InSubsystem))
+        { return nullptr; }
+
+        auto World = InSubsystem.GetWorld();
+        if (ck::Is_NOT_Valid(World) || World.IsGameWorld() == false)
+        { return nullptr; }
+
+        return World;
     }
 }
 
@@ -177,11 +197,11 @@ class UMars_DebuggerSubsystem : UScriptGameInstanceSubsystem
         Content.Initialize();
 
         auto EngineSubsystem = Subsystem::GetEngineSubsystem(UMars_DebuggerEngineSubsystem);
-        if (ck::IsValid(EngineSubsystem))
-        {
-            EngineSubsystem.SetContent(Content);
-            EngineSubsystem.RegisterWorld(GetWorld());
-        }
+        if (ck::EnsureIfNot(ck::IsValid(EngineSubsystem), "[Mars.Debugger] the UMars_DebuggerEngineSubsystem is missing"))
+        { return; }
+
+        EngineSubsystem.SetContent(Content);
+        EngineSubsystem.RegisterSubsystem(this);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -189,10 +209,11 @@ class UMars_DebuggerSubsystem : UScriptGameInstanceSubsystem
     {
         ClosePopupWindow();
 
+        // Engine shutdown may already have torn the engine subsystem down.
         auto EngineSubsystem = Subsystem::GetEngineSubsystem(UMars_DebuggerEngineSubsystem);
         if (ck::IsValid(EngineSubsystem))
         {
-            EngineSubsystem.UnregisterWorld(GetWorld());
+            EngineSubsystem.UnregisterSubsystem(this);
             EngineSubsystem.ClearContent(Content);
         }
 

@@ -94,21 +94,41 @@ struct FMars_Interactable_Spec
     TArray<FMars_Interactable_TargetEntry> Targets;
     ECk_EnableDisable StartEnableDisable = ECk_EnableDisable::Enable;
 
-    // Higher wins focus when several interactables sit under the view ray; ties fall back to distance. Cargo slots use 10.
+    // Higher wins focus when several interactables sit under the view ray; ties fall back to distance.
     int32 FocusPriority = 0;
 }
 
-//--------------------------------------------------------------------------------------------------------------------------
-// Constants
-//--------------------------------------------------------------------------------------------------------------------------
-
-namespace constants_interactable
+// Every target names a channel no other target uses (targets are looked up by channel) and an InteractionStateClass that
+// loads (the sub-SM has nothing to run without one), and its prompt, if any, validates. No targets is valid: a bare
+// interactable that only takes focus.
+mixin FMars_Validation Validate(const FMars_Interactable_Spec& Self)
 {
-    // The blocked reason a RequiresFreeHands prompt shows while the focuser holds an item.
-    FText k_HandsFullText()
+    for (int32 Index = 0; Index < Self.Targets.Num(); ++Index)
     {
-        return FText::FromString("Hands full");
+        const auto& Entry = Self.Targets[Index];
+        const auto Channel = Entry.InteractTargetSpec.Get_InteractionChannel();
+        if (Channel.IsValid() == false)
+        { return FMars_Validation(f"Interactable target [{Index}] has no interaction channel"); }
+
+        for (int32 Earlier = 0; Earlier < Index; ++Earlier)
+        {
+            if (Self.Targets[Earlier].InteractTargetSpec.Get_InteractionChannel() == Channel)
+            { return FMars_Validation(f"Interactable target [{Index}] repeats the channel [{Channel.ToString()}] of target [{Earlier}]"); }
+        }
+
+        auto InteractionStateClass = Entry.InteractionStateClass.Get();
+        if (ck::Is_NOT_Valid(InteractionStateClass))
+        { return FMars_Validation(f"Interactable target [{Index}] on [{Channel.ToString()}] has no InteractionStateClass"); }
+
+        if (Entry.InteractPromptSpec.IsSet())
+        {
+            const auto PromptValidation = Entry.InteractPromptSpec.GetValue().Validate();
+            if (PromptValidation.IsValid() == false)
+            { return FMars_Validation(f"Interactable target [{Index}] on [{Channel.ToString()}]: {PromptValidation.Get_Error()}"); }
+        }
     }
+
+    return FMars_Validation();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -129,22 +149,29 @@ struct FMars_Fragment_Interactable_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Fragment_Interactable
+// The most recent interaction started on one of the interactable's targets. Its source is read when it starts: a finished
+// interaction is destroyed, often before the per-interaction sub-SM that needs its initiator is constructed.
+struct FMars_Interactable_StartedInteraction
 {
     UPROPERTY()
-    FCk_Handle CurrentFocuser;
+    FCk_Handle_InteractTarget Target;
 
     UPROPERTY()
-    bool IsFocused = false;
+    FCk_Handle Initiator;
+}
+
+// Written only by the Interactable processors.
+struct FMars_Fragment_Interactable
+{
+    // Invalid = not focused.
+    UPROPERTY()
+    FCk_Handle Focuser;
 
     UPROPERTY()
     ECk_EnableDisable EnableDisable = ECk_EnableDisable::Enable;
 
     UPROPERTY()
-    FCk_Handle_InteractTarget CurrentInteractTarget;
-
-    UPROPERTY()
-    FCk_Handle_Interaction CurrentInteraction;
+    FMars_Interactable_StartedInteraction LastStarted;
 }
 
 // Stamped on every InteractTarget (and, with Initiator set, on each per-interaction sub-SM root) so
@@ -178,6 +205,7 @@ struct FMars_Request_Interactable_Focus
     }
 }
 
+// Scoped: a no-op unless UnfocusedBy is the focuser when it drains.
 struct FMars_Request_Interactable_Unfocus
 {
     UPROPERTY()
@@ -204,13 +232,36 @@ struct FMars_Request_Interactable_SetEnableDisable
     }
 }
 
+enum EMars_Interactable_FocusChange
+{
+    Focus,
+    Unfocus
+}
+
+// A Focus or an Unfocus request, queued with the other kind so the drain sees them in arrival order.
+struct FMars_Interactable_FocusChangeRequest
+{
+    UPROPERTY()
+    EMars_Interactable_FocusChange Change = EMars_Interactable_FocusChange::Focus;
+
+    UPROPERTY()
+    FCk_Handle Focuser;
+
+    FMars_Interactable_FocusChangeRequest() {}
+
+    FMars_Interactable_FocusChangeRequest(EMars_Interactable_FocusChange InChange, const FCk_Handle& InFocuser)
+    {
+        Change = InChange;
+        Focuser = InFocuser;
+    }
+}
+
+// Focus changes apply in arrival order (a player sliding focus A -> B -> A in one frame ends with A focused), then
+// SetEnableDisable requests.
 struct FMars_Fragment_Interactable_Requests
 {
     UPROPERTY()
-    TArray<FMars_Request_Interactable_Focus> FocusRequests;
-
-    UPROPERTY()
-    TArray<FMars_Request_Interactable_Unfocus> UnfocusRequests;
+    TArray<FMars_Interactable_FocusChangeRequest> FocusChangeRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Interactable_SetEnableDisable> SetEnableDisableRequests;

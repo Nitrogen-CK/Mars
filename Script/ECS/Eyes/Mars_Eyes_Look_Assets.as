@@ -1,7 +1,7 @@
 // The eye-plate look: an opaque unlit master that CkUsf generates from Shaders/Looks/EyePlate.ush into Mars content
 // (console: Ck_Usf_GenerateLooks MarsEyePlate). The generator passes _Parameters to the shader positionally, so their
-// order IS the .ush signature after In. The custom-primitive-data indices are the layout mars_eyes_material writes
-// (Mars_Eyes_Material.as); they are spelled out here rather than read from it so a test can compare the two. With
+// order IS the .ush signature after In. The custom-primitive-data indices are the constants_eyes::k_Slot_* layout
+// utils_eyes::Push_PlateGroup writes; they are spelled out here rather than read from it so a test can compare the two. With
 // nothing written Strength reads 0 and the surface is pure black, which is why the same master also draws the void.
 
 asset MarsEyePlate of UCkUsf_LookDefinition
@@ -154,10 +154,8 @@ asset MarsEyePlate of UCkUsf_LookDefinition
     _Parameters.Add(CellPad);
 }
 
-namespace mars_eyes
+// Script asset globals are file-local: other files reach them through this accessor.
+namespace utils_eyes
 {
-    UCkUsf_LookDefinition Look_EyePlate()
-    {
-        return MarsEyePlate;
-    }
+    UCkUsf_LookDefinition Look_EyePlate() { return MarsEyePlate; }
 }

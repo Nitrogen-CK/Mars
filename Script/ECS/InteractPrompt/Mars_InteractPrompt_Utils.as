@@ -1,20 +1,26 @@
 namespace utils_interact_prompt
 {
-    FCk_Handle_InteractPrompt Add(FCk_Handle& InHandle, FMars_InteractPrompt_Spec InParams)
+    // Composes the prompt on InTarget; the channel and completion policy are read from the target. A rejected spec
+    // ensures and returns an invalid handle.
+    FCk_Handle_InteractPrompt Add(FCk_Handle_InteractTarget& InTarget, FMars_InteractPrompt_Spec InSpec)
     {
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[InteractPrompt] [{InTarget.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_InteractPrompt(); }
+
         auto Params = FMars_Fragment_InteractPrompt_Params();
-        Params.InputAction = InParams.InputAction;
-        Params.SortOrder = InParams.SortOrder;
-        Params.IsTimedInteraction = InParams.IsTimedInteraction;
+        Params.InputAction = InSpec.InputAction;
+        Params.Channel = utils_interact_target::Get_InteractionChannel(InTarget);
+        Params.CompletionPolicy = utils_interact_target::Get_InteractionCompletionPolicy(InTarget);
 
         auto State = FMars_Fragment_InteractPrompt();
-        State.PromptText = InParams.PromptText;
-        State.TextColor = InParams.TextColor;
+        State.PromptText = InSpec.PromptText;
+        State.TextColor = InSpec.TextColor;
 
-        InHandle.Add_Fragment(FMars_Feature_InteractPrompt());
-        InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
-        return InHandle.As_InteractPrompt();
+        InTarget.Add_Fragment(FMars_Feature_InteractPrompt());
+        InTarget.Add_Fragment(Params);
+        InTarget.Add_Fragment(State);
+        return InTarget.As_InteractPrompt();
     }
 }
 
@@ -25,6 +31,24 @@ namespace utils_interact_prompt
 mixin UInputAction Get_InputAction(const FCk_Handle_InteractPrompt& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).InputAction.Get();
+}
+
+mixin FGameplayTag Get_Channel(const FCk_Handle_InteractPrompt& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).Channel;
+}
+
+mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_InteractPrompt& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).CompletionPolicy;
+}
+
+mixin int32 Get_SortOrder(const FCk_Handle_InteractPrompt& Self)
+{
+    if (Self.Get_Channel() == GameplayTags::InteractionChannel_Mars_Use)
+    { return constants_interact_prompt::k_UseSortOrder; }
+
+    return constants_interact_prompt::k_OtherSortOrder;
 }
 
 mixin FText Get_PromptText(const FCk_Handle_InteractPrompt& Self)
@@ -61,11 +85,6 @@ mixin FLinearColor Get_DisplayTextColor(const FCk_Handle_InteractPrompt& Self)
     return Fragment.TextColor;
 }
 
-mixin bool Get_IsTimedInteraction(const FCk_Handle_InteractPrompt& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params).IsTimedInteraction;
-}
-
 mixin FCk_Handle_Interaction Get_CurrentInteraction(const FCk_Handle_InteractPrompt& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_InteractPrompt).CurrentInteraction;
@@ -75,19 +94,14 @@ mixin FCk_Handle_Interaction Get_CurrentInteraction(const FCk_Handle_InteractPro
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The drain compares against the state it ends with, so a text that returns to the current one within a drain changes
+// nothing.
 mixin void Request_UpdateText(FCk_Handle_InteractPrompt& Self, const FMars_Request_InteractPrompt_UpdateText& InRequest)
 {
-    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt);
-    const auto TextUnchanged = Fragment.PromptText.ToString() == InRequest.NewText.ToString();
-    const auto ColorUnchanged = InRequest.NewColor.IsSet() == false || Fragment.TextColor == InRequest.NewColor.GetValue();
-    if (TextUnchanged && ColorUnchanged)
-    { return; }
-
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Requests);
     Requests.UpdateRequests.Add(InRequest);
 }
 
-// The drain drops a request that matches the current blocked state.
 mixin void Request_SetBlocked(FCk_Handle_InteractPrompt& Self, const FMars_Request_InteractPrompt_SetBlocked& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Requests);

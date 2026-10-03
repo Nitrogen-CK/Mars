@@ -4,7 +4,7 @@ namespace utils_attach_points
     FCk_Handle_AttachPoints Add(FCk_Handle& InOwner, FMars_AttachPoints_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[AttachPoints] [{InOwner.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[AttachPoints] [{InOwner.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_AttachPoints(); }
 
         auto Params = FMars_Fragment_AttachPoints_Params();

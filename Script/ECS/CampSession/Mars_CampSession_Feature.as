@@ -11,7 +11,7 @@ asset Mars_CampSessionHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_CampSession {}
 
 // Lobby: the menu is up and every player holds a viewer pawn. Live: the chefs are spawned and the camp is playable.
-// Live never returns to Lobby in this package (a fresh map load is the reset).
+// Live never returns to Lobby; a fresh map load is the reset.
 enum EMars_CampPhase
 {
     Lobby,
@@ -25,17 +25,17 @@ enum EMars_CampPhase
 // Consumed at Add; not retained (no Params fragment).
 struct FMars_CampSession_Spec
 {
-    // Test hook: construct already Live (the state machine starts in the Live state). Gameplay leaves it false.
+    // The phase the state machine starts in. Gameplay starts in Lobby; tests may start Live.
     UPROPERTY()
-    bool StartLive = false;
+    EMars_CampPhase StartPhase = EMars_CampPhase::Lobby;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Phase is a MIRROR of the state machine's current state, written only by Add and UMars_Processor_CampSession_Sync.
-// Consumers read Phase / bind OnPhaseChanged; they never touch the state machine (design D1).
+// Phase mirrors the state machine's current state, written only by Add and UMars_Processor_CampSession_Sync. Consumers
+// read Phase or bind OnPhaseChanged; they never touch the state machine.
 struct FMars_Fragment_CampSession
 {
     UPROPERTY()

@@ -14,6 +14,7 @@ struct FMars_Feature_InteractPrompt {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The prompt of one InteractTarget; its channel and completion policy are the target's.
 struct FMars_InteractPrompt_Spec
 {
     UPROPERTY()
@@ -24,31 +25,49 @@ struct FMars_InteractPrompt_Spec
 
     UPROPERTY()
     FLinearColor TextColor = constants_ui_colors::k_PromptText;
+}
 
-    UPROPERTY()
-    int32 SortOrder = 999;
+// A prompt without an action renders no key glyph, and one without text leaves the player a glyph with no verb.
+mixin FMars_Validation Validate(const FMars_InteractPrompt_Spec& Self)
+{
+    if (Self.InputAction.IsNull())
+    { return FMars_Validation("InteractPrompt has no InputAction"); }
 
-    // Stamped at composition from the target's completion policy; the widget shows a hold bar: Timed (interaction time)
-    // or ManuallyCompleted (the control's manipulation progress).
-    UPROPERTY()
-    bool IsTimedInteraction = false;
+    if (Self.PromptText.IsEmpty())
+    { return FMars_Validation("InteractPrompt has an empty PromptText"); }
+
+    return FMars_Validation();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Constants
+//--------------------------------------------------------------------------------------------------------------------------
+
+namespace constants_interact_prompt
+{
+    // Display order: the Use prompt first, every other channel after it.
+    const int32 k_UseSortOrder = 0;
+    const int32 k_OtherSortOrder = 999;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The spec fields read after construction. Text and color are mutable, so they live in FMars_Fragment_InteractPrompt.
+// The spec fields read after construction, plus the target's channel and completion policy (read from the target by Add).
+// Text and color are mutable, so they live in FMars_Fragment_InteractPrompt.
 struct FMars_Fragment_InteractPrompt_Params
 {
     UPROPERTY()
     TSoftObjectPtr<UInputAction> InputAction;
 
     UPROPERTY()
-    int32 SortOrder = 999;
+    FGameplayTag Channel;
 
+    // Anything but Instant shows a hold bar: Timed fills from the interaction time, ManuallyCompleted from the control's
+    // manipulation progress.
     UPROPERTY()
-    bool IsTimedInteraction = false;
+    ECk_Interaction_CompletionPolicy CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

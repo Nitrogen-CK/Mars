@@ -38,7 +38,7 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
         auto MoverSpec = FMars_Mover_Spec();
         MoverSpec.EndRotation = FRotator(PulledAngle, 0.0, 0.0);
         MoverSpec.Duration = MoveDuration;
-        MoverSpec.StartAtEnd = Control.StartActive;
+        MoverSpec.StartPose = Control.StartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         auto Mover = utils_mover::Add(HandleNode, MoverSpec);
 
         auto ControlHandle = utils_control::Add(InHandle, Control, Mover);
@@ -54,24 +54,19 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
 
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InHandleNode)
     {
-        auto CylinderMesh = engine::load::Cylinder();
-
         auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine shapes are 100 uu with a centered pivot; the cylinder's axis is Z, rolled onto Y to form the axle.
-        AddMesh(InRoot, FTransform(FRotator(0.0, 0.0, 90.0), FVector::ZeroVector, FVector(0.24, 0.24, 0.5)),
-            CylinderMesh, Material, collision::profile::BlockAll, n"Lever_Base");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator(0.0, 0.0, 90.0), FVector::ZeroVector, FVector(0.24, 0.24, 0.5)),
+            engine::load::Cylinder(), Material, collision::profile::BlockAll, n"Lever_Base"));
 
-        // On a child of the handle node so the node's offset stays a pure pull rotation about the pivot.
-        // A cube with a Grip socket near the top of the bar: the first-person gloves reach for it.
-        const auto HandleMeshPath = "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM";
-        auto HandleMesh = Cast<UStaticMesh>(LoadObject(this, HandleMeshPath));
-        if (ck::EnsureIfNot(ck::IsValid(HandleMesh), f"[Lever] Handle mesh [{HandleMeshPath}] did not load - the lever has no handle to see or grip"))
-        { return; }
-
+        // On a child of the handle node so the node's offset stays a pure pull rotation about the pivot. The handle mesh
+        // carries a Grip socket near the top of the bar: the first-person gloves reach for it.
         auto HandleTransform = InHandleNode.As_Transform();
-        AddMesh(HandleTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0), FVector(0.08, 0.08, 0.9)),
-            HandleMesh, Material, collision::profile::NoCollision, n"Lever_Handle");
+        HandleTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0), FVector(0.08, 0.08, 0.9)),
+            assets::load::LeverHandle_Mars_SM(), Material, collision::profile::NoCollision, n"Lever_Handle"));
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
@@ -90,33 +85,5 @@ class UMars_Lever_EntityScript : UCk_GenericEntityScript_UE
         Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
 
         utils_interactable::Create(InRoot, Spec);
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddMesh(
-        FCk_Handle_Transform& InAttachTo,
-        FTransform InLocalTransform,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        if (ck::Is_NOT_Valid(InMesh))
-        { return; }
-
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component receives the entity transform after registration, and the handle moves.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 }

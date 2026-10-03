@@ -20,10 +20,10 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Source))
         { Occupancy.BindTo_OnActiveChanged(FMars_Delegate_Occupancy_OnActiveChanged(this, n"OnOccupancyActiveChanged")); }
 
+        // Add links the trigger, so the link is there whenever the trigger is still alive.
         auto Trigger = Occupancy.Get_Trigger();
-        if (ck::IsValid(Trigger) && Trigger.Has_Fragment(FMars_Fragment_Occupancy_TriggerLink))
+        if (ck::IsValid(Trigger))
         {
-            // Several occupancies may share a trigger; binding this processor twice to one event would double-fire.
             auto& Link = Trigger.Get_Fragment(FMars_Fragment_Occupancy_TriggerLink);
             if (Link.IsBound == false)
             {
@@ -36,9 +36,14 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         Recount(Occupancy);
 
         if (ck::IsValid(Source))
-        { Source.Request_SetAsserted(Occupancy.Get_IsActive()); }
+        { Source.Request_SetOutput(Make_SetOutput(Occupancy.Get_IsActive())); }
 
         Occupancy.Request_TryRemove(FMars_Tag_Occupancy_NeedsSetup);
+    }
+
+    private FMars_Request_MechanismSource_SetOutput Make_SetOutput(bool InActive) const
+    {
+        return FMars_Request_MechanismSource_SetOutput(InActive ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted);
     }
 
     UFUNCTION()
@@ -54,29 +59,24 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
     }
 
     UFUNCTION()
-    private void OnOccupancyActiveChanged(FCk_Handle_Occupancy InOccupancy, bool InActive)
+    private void OnOccupancyActiveChanged(FCk_Handle_Occupancy InOccupancy, EMars_Occupancy_Activation InActivation)
     {
-        auto Source = InOccupancy.As_MechanismSource(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Source))
-        { return; }
-
-        Source.Request_SetAsserted(InActive);
+        auto Source = InOccupancy.As_MechanismSource();
+        Source.Request_SetOutput(Make_SetOutput(InActivation == EMars_Occupancy_Activation::Active));
     }
 
     UFUNCTION()
     private void OnReleaseTimerDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
+        // The owner is gone only while the occupancy is being torn down.
         auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTimer);
         if (ck::Is_NOT_Valid(Owner))
         { return; }
 
-        auto Occupancy = Owner.As_Occupancy(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Occupancy))
-        { return; }
+        auto Occupancy = Owner.As_Occupancy();
 
         // A timer cancelled by a re-entry can still finish in the frame it was destroyed.
-        const auto& State = Occupancy.Get_Fragment(FMars_Fragment_Occupancy);
-        if ((FCk_Handle(State.ReleaseTimer) == FCk_Handle(InTimer)) == false)
+        if (Occupancy.Get_Fragment(FMars_Fragment_Occupancy).ReleaseTimer != InTimer)
         { return; }
 
         DestroyReleaseTimer(Occupancy);
@@ -89,9 +89,6 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
 
     private void RecountLinked(FCk_Handle_Trigger InTrigger)
     {
-        if (InTrigger.Has_Fragment(FMars_Fragment_Occupancy_TriggerLink) == false)
-        { return; }
-
         // Copied: a recount broadcasts, and a listener may change the link.
         auto Occupancies = InTrigger.Get_Fragment(FMars_Fragment_Occupancy_TriggerLink).Occupancies;
         for (auto LinkedOccupancy : Occupancies)
@@ -146,10 +143,13 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
 
         auto Mover = State.Mover;
         if (ck::IsValid(Mover))
-        { Mover.Request_MoveTo(InActive); }
+        { Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(InActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start)); }
 
         if (InOccupancy.Has_Fragment(FMars_Fragment_Occupancy_Signals))
-        { InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Signals).OnActiveChanged.Broadcast(InOccupancy, InActive); }
+        {
+            const auto Activation = InActive ? EMars_Occupancy_Activation::Active : EMars_Occupancy_Activation::Inactive;
+            InOccupancy.Get_Fragment(FMars_Fragment_Occupancy_Signals).OnActiveChanged.Broadcast(InOccupancy, Activation);
+        }
     }
 
     private void ArmReleaseTimer(FCk_Handle_Occupancy& InOccupancy, float32 InDelaySeconds)
@@ -160,8 +160,7 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         TimerSpec.Set_StartingState(ECk_Timer_State::Running)
                  .Set_Behavior(ECk_Timer_Behavior::StopOnDone);
 
-        auto OccupancyEntity = FCk_Handle(InOccupancy);
-        auto Timer = utils_timer::Add(OccupancyEntity, TimerSpec);
+        auto Timer = utils_timer::Add(InOccupancy.H(), TimerSpec);
         if (ck::IsValid(Timer))
         { Timer.BindTo_OnDone(FCk_Delegate_Timer(this, n"OnReleaseTimerDone")); }
 
@@ -172,7 +171,7 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
     {
         auto& State = InOccupancy.Get_Fragment(FMars_Fragment_Occupancy);
         if (ck::IsValid(State.ReleaseTimer))
-        { utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(State.ReleaseTimer)); }
+        { utils_entity_lifetime::Request_DestroyEntity(State.ReleaseTimer.H()); }
 
         State.ReleaseTimer = FCk_Handle_Timer();
     }

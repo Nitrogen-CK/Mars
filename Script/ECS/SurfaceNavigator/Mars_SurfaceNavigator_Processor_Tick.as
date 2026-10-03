@@ -1,7 +1,5 @@
-// Every frame, for a navigator that is Moving: advances past every waypoint within AcceptanceRadius (horizontally),
-// arrives after the last one (steering cleared, OnArrived), otherwise steers toward the next one, and runs the stuck
-// watchdog (less than StuckDistance of horizontal progress for StuckSeconds -> Failed(Stuck), steering cleared,
-// OnFailed). Steering goes through SurfaceMotion only; the navigator never writes the transform.
+// Follows a Moving navigator's waypoints (horizontal distances only) and runs the stuck watchdog. Steering goes through
+// SurfaceMotion only; the navigator never writes the transform.
 class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -19,7 +17,7 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
 
         auto Self = InHandle.As_SurfaceNavigator();
         const auto& Spec = InHandle.Get_Fragment(FMars_Fragment_SurfaceNavigator_Params).Spec;
-        const auto Location = utils_transform::Get_EntityCurrentLocation(utils_transform::DoCastChecked(InHandle));
+        const auto Location = utils_transform::Get_EntityCurrentLocation(InHandle.As_Transform());
 
         auto ToTarget = FVector::ZeroVector;
         auto& Route = InState.Route;
@@ -35,7 +33,7 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
 
         if (Route.WaypointIndex >= Route.Waypoints.Num())
         {
-            utils_surface_navigator::Steer(InState, FVector::ZeroVector, 0.0f);
+            Steer(InState, FVector::ZeroVector, 0.0f);
             InState.Status = EMars_SurfaceNavigator_Status::Arrived;
             const auto Goal = Route.Goal;
 
@@ -44,7 +42,7 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
             return;
         }
 
-        utils_surface_navigator::Steer(InState, ToTarget.GetSafeNormal(), Spec.Speed);
+        Steer(InState, ToTarget.GetSafeNormal(), Spec.Speed);
 
         auto& Watchdog = InState.Watchdog;
         if ((Location - Watchdog.StuckAnchor).Size2D() > Spec.StuckDistance)
@@ -58,7 +56,7 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
         if (Watchdog.StuckTimer <= Spec.StuckSeconds)
         { return; }
 
-        utils_surface_navigator::Steer(InState, FVector::ZeroVector, 0.0f);
+        Steer(InState, FVector::ZeroVector, 0.0f);
         InState.Status = EMars_SurfaceNavigator_Status::Failed;
         InState.FailReason = EMars_SurfaceNavigator_FailReason::Stuck;
         const auto FailedGoal = Route.Goal;
@@ -67,5 +65,22 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
 
         if (Self.Has_Fragment(FMars_Fragment_SurfaceNavigator_Signals))
         { Self.Get_Fragment(FMars_Fragment_SurfaceNavigator_Signals).OnFailed.Broadcast(Self, FailedGoal, EMars_SurfaceNavigator_FailReason::Stuck); }
+    }
+
+    // Steering is sticky in SurfaceMotion, so a non-zero steer goes out only when the direction turns by more than ~1
+    // degree or the speed changes; a zero steer always goes out.
+    private void Steer(FMars_Fragment_SurfaceNavigator& InOutState, FVector InDirection, float32 InSpeed)
+    {
+        const auto IsZero = InSpeed <= 0.0f;
+        const auto Direction = IsZero ? FVector::ZeroVector : InDirection;
+        const auto Speed = IsZero ? 0.0f : InSpeed;
+
+        const auto& Last = InOutState.Steering;
+        if (IsZero == false && Last.Speed.IsSet() && Speed == Last.Speed.GetValue() && Direction.DotProduct(Last.Direction) >= 0.9998)
+        { return; }
+
+        InOutState.Steering.Direction = Direction;
+        InOutState.Steering.Speed = TOptional<float32>(Speed);
+        utils_surface_motion::Request_Steering(InOutState.Motion, FCk_Request_SurfaceMotion_Steering(Direction, Speed));
     }
 }

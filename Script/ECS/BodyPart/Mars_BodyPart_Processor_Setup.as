@@ -17,12 +17,10 @@ class UMars_Processor_BodyPart_Setup : UCk_Processor_Script_Base_UE
         auto Part = InHandle.As_BodyPart();
 
         auto Zone = Part.Get_Zone();
-        if (ck::IsValid(Zone))
-        { Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnZoneHit")); }
+        Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnZoneHit"));
 
         auto Health = Part.Get_Health();
-        if (ck::IsValid(Health))
-        { Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnHealthDepleted")); }
+        Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnHealthDepleted"));
 
         Part.Request_TryRemove(FMars_Tag_BodyPart_NeedsSetup);
     }
@@ -30,20 +28,14 @@ class UMars_Processor_BodyPart_Setup : UCk_Processor_Script_Base_UE
     UFUNCTION()
     private void OnZoneHit(FCk_Handle_HitZone InZone, FMars_DamageEvent InScaledEvent, FMars_HitZone_Reaction InReaction)
     {
-        auto Part = FCk_Handle(InZone).As_BodyPart(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Part))
-        { return; }
-
+        auto Part = InZone.As_BodyPart();
         Part.Request_RecordHit(FMars_Request_BodyPart_RecordHit(InScaledEvent, InReaction));
     }
 
     UFUNCTION()
     private void OnHealthDepleted(FCk_Handle_Health InHealth, FMars_DamageEvent InCause)
     {
-        auto Part = FCk_Handle(InHealth).As_BodyPart(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Part))
-        { return; }
-
+        auto Part = InHealth.As_BodyPart();
         Part.Request_Sever(FMars_Request_BodyPart_Sever(InCause));
     }
 }

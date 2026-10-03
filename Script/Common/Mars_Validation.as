@@ -2,9 +2,6 @@
 // and ensure on it; tests may call it directly to assert a rejection without tripping the ensure.
 struct FMars_Validation
 {
-    UPROPERTY()
-    bool IsValid = true;
-
     // Set only when invalid.
     UPROPERTY()
     TOptional<FString> Error;
@@ -13,8 +10,12 @@ struct FMars_Validation
 
     FMars_Validation(const FString& InError)
     {
-        IsValid = false;
         Error = TOptional<FString>(InError);
+    }
+
+    bool IsValid() const
+    {
+        return Error.IsSet() == false;
     }
 
     // Empty when valid.

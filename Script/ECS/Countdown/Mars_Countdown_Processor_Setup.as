@@ -17,6 +17,9 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
         auto Countdown = InHandle.As_Countdown();
 
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
+        ck::EnsureIfNot(ck::IsValid(Sink) || Countdown.Get_HoldWhilePowered() == false,
+            f"[Countdown] [{Countdown.ToString()}] has HoldWhilePowered but no MechanismSink on its entity; nothing will ever hold it");
+
         if (ck::IsValid(Sink))
         {
             Sink.BindTo_OnInputEdge(FMars_Delegate_MechanismSink_OnInputEdge(this, n"OnSinkInputEdge"));
@@ -33,36 +36,38 @@ class UMars_Processor_Countdown_Setup : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Source))
         {
             Countdown.BindTo_OnRemainingChanged(FMars_Delegate_Countdown_OnRemainingChanged(this, n"OnRemainingChanged"));
-            Source.Request_SetAsserted(Countdown.Get_IsCharged());
+            Source.Request_SetOutput(Make_SetOutput(Countdown.Get_IsCharged()));
         }
 
         Countdown.Request_TryRemove(FMars_Tag_Countdown_NeedsSetup);
     }
 
-    UFUNCTION()
-    private void OnSinkInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, bool InAsserted)
+    private FMars_Request_MechanismSource_SetOutput Make_SetOutput(bool InCharged) const
     {
-        if (InAsserted == false)
-        { return; }
-
-        auto Countdown = InSink.As_Countdown(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Countdown))
-        { Countdown.Request_Charge(); }
+        return FMars_Request_MechanismSource_SetOutput(InCharged ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted);
     }
 
     UFUNCTION()
-    private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, bool InPowered)
+    private void OnSinkInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, EMars_MechanismSource_Output InOutput)
     {
-        auto Countdown = InSink.As_Countdown(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Countdown))
-        { Countdown.Request_SetHeld(FMars_Request_Countdown_SetHeld(InPowered)); }
+        if (InOutput == EMars_MechanismSource_Output::Deasserted)
+        { return; }
+
+        auto Countdown = InSink.As_Countdown();
+        Countdown.Request_Charge();
+    }
+
+    UFUNCTION()
+    private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower)
+    {
+        auto Countdown = InSink.As_Countdown();
+        Countdown.Request_SetHeld(FMars_Request_Countdown_SetHeld(InPower == EMars_MechanismSink_Power::Powered));
     }
 
     UFUNCTION()
     private void OnRemainingChanged(FCk_Handle_Countdown InCountdown, int32 InRemaining)
     {
-        auto Source = InCountdown.As_MechanismSource(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Source))
-        { Source.Request_SetAsserted(InRemaining > 0); }
+        auto Source = InCountdown.As_MechanismSource();
+        Source.Request_SetOutput(Make_SetOutput(InRemaining > 0));
     }
 }

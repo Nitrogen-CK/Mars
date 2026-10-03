@@ -91,7 +91,7 @@ class AMars_TestLamp : AActor
     private void OnVisualAdded(FCk_Handle_UnrealComponent InHandle)
     {
         auto Visual = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(InHandle));
-        if (ck::Is_NOT_Valid(Visual))
+        if (ck::EnsureIfNot(ck::IsValid(Visual), f"[TestLamp] [{GetName()}] visual [{InHandle.ToString()}] was added without its static mesh component"))
         { return; }
 
         Visual.SetStaticMesh(Mesh.StaticMesh);

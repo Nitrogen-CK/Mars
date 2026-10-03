@@ -1,11 +1,15 @@
 namespace utils_control
 {
+    // A pull axis whose on-screen projection is shorter than this (a unit axis pointing nearly at the viewer) has no
+    // usable screen direction.
+    const float64 k_MinScreenPullLength = 0.05;
+
     // InMover is optional: an invalid handle means the control moves nothing. The completion policy and HoldSeconds are
     // retained for Make_InteractTarget; a rejected spec ensures and returns an invalid handle.
     FCk_Handle_Control Add(FCk_Handle& InHandle, FMars_Control_Spec InParams, FCk_Handle_Mover InMover)
     {
         const auto Validation = InParams.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid, f"[Control] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Control] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Control(); }
 
         auto Manipulation = InParams.Manipulation;
@@ -38,18 +42,27 @@ namespace utils_control
         const auto Right = InView.GetRotation().GetRightVector();
         const auto Up = InView.GetRotation().GetUpVector();
         auto Screen = FVector2D(InPullWorld.DotProduct(Right), -InPullWorld.DotProduct(Up));
-        if (Screen.Size() < 0.05)
+        if (Screen.Size() < k_MinScreenPullLength)
         { return float32(InLookDelta.Y); }
 
         Screen.Normalize();
         return float32(InLookDelta.X * Screen.X + InLookDelta.Y * Screen.Y);
     }
 
-    // 0..1 toward EngageAlpha in the pull's direction: toward alpha 1, or toward 0 when InTowardStart.
-    float32 Get_ProgressTowardEngage(bool InTowardStart, float32 InAlpha, float32 InEngageAlpha)
+    // 0..1 toward EngageAlpha in the pull's direction.
+    float32 Get_ProgressTowardEngage(EMars_Control_PullDirection InDirection, float32 InAlpha, float32 InEngageAlpha)
     {
-        const auto Travelled = InTowardStart ? 1.0f - InAlpha : InAlpha;
+        const auto Travelled = InDirection == EMars_Control_PullDirection::TowardStart ? 1.0f - InAlpha : InAlpha;
         return Math::Clamp(Travelled / InEngageAlpha, 0.0f, 1.0f);
+    }
+
+    // Whether InAlpha is past EngageAlpha in the pull's direction.
+    bool Get_HasCrossedEngage(EMars_Control_PullDirection InDirection, float32 InAlpha, float32 InEngageAlpha)
+    {
+        if (InDirection == EMars_Control_PullDirection::TowardStart)
+        { return InAlpha <= 1.0f - InEngageAlpha; }
+
+        return InAlpha >= InEngageAlpha;
     }
 }
 
@@ -102,23 +115,27 @@ mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_Con
 
 mixin bool Get_IsManipulating(const FCk_Handle_Control& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Control).Manipulation.IsActive;
+    return Self.Get_Fragment(FMars_Fragment_Control).Manipulation.IsSet();
 }
 
+// 0 when not manipulating.
 mixin float32 Get_ManipulationAlpha(const FCk_Handle_Control& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Control).Manipulation.Alpha;
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
+    if (State.Manipulation.IsSet() == false)
+    { return 0.0f; }
+
+    return State.Manipulation.GetValue().Alpha;
 }
 
 // 0 when not manipulating.
 mixin float32 Get_ManipulationProgress(const FCk_Handle_Control& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
-    if (State.Manipulation.IsActive == false)
+    if (Self.Get_IsManipulating() == false)
     { return 0.0f; }
 
     const auto EngageAlpha = Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.EngageAlpha;
-    return utils_control::Get_ProgressTowardEngage(Self.Get_PullsTowardStart(), State.Manipulation.Alpha, EngageAlpha);
+    return utils_control::Get_ProgressTowardEngage(Self.Get_PullDirection(), Self.Get_ManipulationAlpha(), EngageAlpha);
 }
 
 // A ManuallyCompleted control whose handle springs back to rest after every pull instead of following IsActive (a pull
@@ -129,24 +146,24 @@ mixin bool Get_ReturnsToRest(const FCk_Handle_Control& Self)
     return Params.CompletionPolicy == ECk_Interaction_CompletionPolicy::ManuallyCompleted && Params.Manipulation.ReturnsToRest;
 }
 
-// The next pull runs toward the start pose: an active control whose handle stayed where it was pulled (a lever that is on).
-mixin bool Get_PullsTowardStart(const FCk_Handle_Control& Self)
+// The next pull runs toward the start pose only on an active control whose handle stayed where it was pulled (a lever that
+// is on).
+mixin EMars_Control_PullDirection Get_PullDirection(const FCk_Handle_Control& Self)
 {
-    return Self.Get_IsActive() && Self.Get_ReturnsToRest() == false;
+    if (Self.Get_IsActive() && Self.Get_ReturnsToRest() == false)
+    { return EMars_Control_PullDirection::TowardStart; }
+
+    return EMars_Control_PullDirection::TowardEnd;
 }
 
-// PullAxis rotated into world space; zero when the axis is zero or the control entity has no Transform.
+// PullAxis rotated into world space; zero when the axis is zero.
 mixin FVector Get_PullDirectionWorld(const FCk_Handle_Control& Self)
 {
     const auto PullAxis = Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.PullAxis;
     if (PullAxis.IsNearlyZero())
     { return FVector::ZeroVector; }
 
-    const auto Transform = FCk_Handle(Self).As_Transform(ECk_SanityCheck::UnChecked);
-    if (ck::Is_NOT_Valid(Transform))
-    { return FVector::ZeroVector; }
-
-    return utils_transform::Get_EntityCurrentTransform(Transform).GetRotation().RotateVector(PullAxis);
+    return utils_transform::Get_EntityCurrentTransform(Self.As_Transform()).GetRotation().RotateVector(PullAxis);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -159,10 +176,10 @@ mixin void Request_Engage(FCk_Handle_Control& Self)
     Requests.EngageRequest = FMars_Request_Control_Engage();
 }
 
-mixin void Request_SetActive(FCk_Handle_Control& Self, bool InActive)
+mixin void Request_SetActive(FCk_Handle_Control& Self, const FMars_Request_Control_SetActive& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
-    Requests.SetActiveRequest = FMars_Request_Control_SetActive(InActive);
+    Requests.SetActiveRequest = InRequest;
 }
 
 // Grips a ManuallyCompleted control; any other policy ensures and is ignored.

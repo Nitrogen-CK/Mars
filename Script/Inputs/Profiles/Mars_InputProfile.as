@@ -12,6 +12,13 @@ enum EMars_InputDeactivationMode
     PopAll
 }
 
+enum EMars_InputProfile_State
+{
+    Active,
+    // Deactivated by a Replace push above it; reactivated when that profile pops.
+    Suspended
+}
+
 struct FMars_InputProfileEntry
 {
     UPROPERTY()
@@ -21,15 +28,15 @@ struct FMars_InputProfileEntry
     APawn Pawn;
 
     UPROPERTY()
-    bool IsSuspended = false;
+    EMars_InputProfile_State State = EMars_InputProfile_State::Active;
 
     FMars_InputProfileEntry() {}
 
-    FMars_InputProfileEntry(UMars_InputProfile InProfile, APawn InPawn, bool InSuspended)
+    FMars_InputProfileEntry(UMars_InputProfile InProfile, APawn InPawn, EMars_InputProfile_State InState)
     {
         Profile = InProfile;
         Pawn = InPawn;
-        IsSuspended = InSuspended;
+        State = InState;
     }
 }
 
@@ -57,9 +64,15 @@ class UMars_InputProfile : UObject
         OwningController = InController;
         ControlledPawn = InPawn;
 
+        if (ck::EnsureIfNot(ck::IsValid(Context), f"[InputProfile] [{GetName()}] has no mapping context - Setup must build one"))
+        { return; }
+
         auto EnhancedInputSubsystem = UEnhancedInputLocalPlayerSubsystem::Get(InController);
-        if (ck::IsValid(EnhancedInputSubsystem) && ck::IsValid(Context))
-        { EnhancedInputSubsystem.AddMappingContext(Context, 0, ModifyContextOptions); }
+        if (ck::EnsureIfNot(ck::IsValid(EnhancedInputSubsystem),
+            f"[InputProfile] [{GetName()}] activated on a controller without a local player"))
+        { return; }
+
+        EnhancedInputSubsystem.AddMappingContext(Context, 0, ModifyContextOptions);
     }
 
     UFUNCTION(BlueprintEvent)
@@ -68,6 +81,7 @@ class UMars_InputProfile : UObject
         ControlledPawn = InNewPawn;
     }
 
+    // The local player can already be gone when the stack is popped during teardown.
     UFUNCTION(BlueprintEvent)
     void Deactivate(APlayerController InController)
     {

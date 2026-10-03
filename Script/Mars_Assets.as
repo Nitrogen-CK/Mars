@@ -11,12 +11,4 @@ asset MarsAssets of UCkAssetRegistryConfig
     OutputFileName = "MarsAssets.as";
 }
 
-// !NOTE Commented out since they have already been generated
-// asset EngineAssets of UCkAssetRegistryConfig
-// {
-//     Namespace = "engine";
-//     AssetDiscoveryRoot = "/Engine/";
-//     OutputFileName = "EngineAssets.as";
-// }
-
 #endif

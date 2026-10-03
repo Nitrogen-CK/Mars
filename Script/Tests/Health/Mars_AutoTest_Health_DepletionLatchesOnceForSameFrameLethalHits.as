@@ -55,15 +55,15 @@ class UMars_AutoTest_Health_DepletionLatchesOnceForSameFrameLethalHits : UCk_Aut
 
     private FMars_DamageEvent Make_Hit(float32 InAmount, float32 InMarkerX)
     {
-        auto Event = FMars_DamageEvent(InAmount, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever"));
-        Event.HitLocation = FVector(InMarkerX, 0.0f, 0.0f);
+        auto Event = FMars_DamageEvent(InAmount, GameplayTags::DamageType_Mars_Sever);
+        Event.Hit.Location = FVector(InMarkerX, 0.0f, 0.0f);
         return Event;
     }
 
     UFUNCTION()
     private void Step_TwoLethalHits(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Health), "the Health composed");
+        Assert_Valid(_Health, "utils_health::Add composed the Health");
         _Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Make_Hit(80.0f, 1.0f)));
         _Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Make_Hit(80.0f, 2.0f)));
     }
@@ -79,15 +79,20 @@ class UMars_AutoTest_Health_DepletionLatchesOnceForSameFrameLethalHits : UCk_Aut
     private void Step_AssertAndHitAgain(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_DepletedCauses.Num(), 1, "OnDepleted fired exactly once for two same-frame lethal hits");
-        Assert_Equals_Float(_DepletedCauses[0].HitLocation.X, 2.0f, 0.001f, "OnDepleted carries the hit that crossed zero (the second)");
+        if (_DepletedCauses.Num() == 1)
+        { Assert_Equals_Float(_DepletedCauses[0].Hit.Location.X, 2.0f, 0.001f, "OnDepleted carries the hit that crossed zero (the second)"); }
 
         Assert_Equals_Int(_DamagedEvents.Num(), 2, "OnDamaged fired once per hit");
-        Assert_Equals_Float(_DamagedApplied[0], 80.0f, 0.001f, "the first hit applied 80");
-        Assert_Equals_Float(_DamagedApplied[1], 20.0f, 0.001f, "the second hit was clamped to the remaining 20");
+        if (_DamagedEvents.Num() == 2)
+        {
+            Assert_Equals_Float(_DamagedApplied[0], 80.0f, 0.001f, "the first hit applied 80");
+            Assert_Equals_Float(_DamagedApplied[1], 20.0f, 0.001f, "the second hit was clamped to the remaining 20");
+        }
 
         const auto LastHit = _Health.Get_LastHit();
         Assert_True(LastHit.IsSet(), "LastHit is recorded");
-        Assert_Equals_Float(LastHit.GetValue().HitLocation.X, 2.0f, 0.001f, "LastHit is the second hit");
+        if (LastHit.IsSet())
+        { Assert_Equals_Float(LastHit.GetValue().Hit.Location.X, 2.0f, 0.001f, "LastHit is the second hit"); }
 
         _Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Make_Hit(10.0f, 3.0f)));
         _Sentinel.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(Make_Hit(10.0f, 4.0f)));
@@ -105,7 +110,11 @@ class UMars_AutoTest_Health_DepletionLatchesOnceForSameFrameLethalHits : UCk_Aut
     {
         Assert_Equals_Int(_DepletedCauses.Num(), 1, "no further OnDepleted");
         Assert_Equals_Int(_DamagedEvents.Num(), 2, "no OnDamaged for a hit on a depleted Health");
-        Assert_Equals_Float(_Health.Get_LastHit().GetValue().HitLocation.X, 2.0f, 0.001f, "LastHit still names the lethal hit");
         Assert_True(_Health.Get_IsDepleted(), "the Health stays depleted");
+
+        const auto LastHit = _Health.Get_LastHit();
+        Assert_True(LastHit.IsSet(), "LastHit is still recorded");
+        if (LastHit.IsSet())
+        { Assert_Equals_Float(LastHit.GetValue().Hit.Location.X, 2.0f, 0.001f, "LastHit still names the lethal hit"); }
     }
 }

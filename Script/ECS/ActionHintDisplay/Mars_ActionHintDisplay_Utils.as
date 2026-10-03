@@ -6,20 +6,30 @@ namespace utils_action_hint_display
         InHandle.Add_Fragment(FMars_Fragment_ActionHintDisplay());
         return InHandle.As_ActionHintDisplay();
     }
+
+    // Suppression hides the rows registered before it was taken. A row whose register has not drained is never hidden.
+    bool Get_IsRowHidden(const FMars_Fragment_ActionHintDisplay& InState, const FCk_Handle_ActionHintRow& InRow)
+    {
+        if (InState.SuppressWatermark.IsSet() == false)
+        { return false; }
+
+        const auto Sequence = InRow.Get_Sequence();
+        return Sequence.IsSet() && Sequence.GetValue() < InState.SuppressWatermark.GetValue();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Row Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Default-constructed until the row's register drains.
 mixin FMars_ActionHint_Spec Get_Spec(const FCk_Handle_ActionHintRow& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_ActionHintRow).Spec;
 }
 
-// -1 until the row's register drains; afterwards the display-wide registration order.
-mixin int64 Get_Sequence(const FCk_Handle_ActionHintRow& Self)
+// Unset until the row's register drains; afterwards the display-wide registration order. Always set on a row a display
+// signal hands out or Get_VisibleHints returns.
+mixin TOptional<int64> Get_Sequence(const FCk_Handle_ActionHintRow& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_ActionHintRow).Sequence;
 }
@@ -35,8 +45,7 @@ mixin FName Get_OwnerKey(const FCk_Handle_ActionHintRow& Self)
 
 mixin bool Get_IsHidden(const FCk_Handle_ActionHintDisplay& Self, const FCk_Handle_ActionHintRow& InRow)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_ActionHintDisplay);
-    return State.SuppressDepth > 0 && InRow.Get_Sequence() < State.SuppressWatermark;
+    return utils_action_hint_display::Get_IsRowHidden(Self.Get_Fragment(FMars_Fragment_ActionHintDisplay), InRow);
 }
 
 // What a legend should show right now: suppressed rows filtered out, registration order preserved.
@@ -47,7 +56,7 @@ mixin TArray<FCk_Handle_ActionHintRow> Get_VisibleHints(const FCk_Handle_ActionH
     TArray<FCk_Handle_ActionHintRow> Visible;
     for (const auto& Row : State.Hints)
     {
-        if (State.SuppressDepth > 0 && Row.Get_Sequence() < State.SuppressWatermark)
+        if (utils_action_hint_display::Get_IsRowHidden(State, Row))
         { continue; }
 
         Visible.Add(Row);
@@ -60,19 +69,18 @@ mixin TArray<FCk_Handle_ActionHintRow> Get_VisibleHints(const FCk_Handle_ActionH
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Mints the row synchronously - a child entity of the display carrying the spec - so the caller can update or unregister
-// it before the register drains. The display processor fills the row's state in on the drain.
+// it before the register drains. The drain gives the row its Sequence.
 mixin FCk_Handle_ActionHintRow Request_RegisterHint(
     FCk_Handle_ActionHintDisplay& Self,
     const FMars_ActionHint_Spec& InSpec)
 {
-    auto RowEntity = utils_entity_lifetime::Request_CreateEntity(FCk_Handle(Self));
+    auto RowEntity = utils_entity_lifetime::Request_CreateEntity(Self);
 
-    auto Params = FMars_Fragment_ActionHintRow_Params();
-    Params.Spec = InSpec;
+    auto RowState = FMars_Fragment_ActionHintRow();
+    RowState.Spec = InSpec;
 
     RowEntity.Add_Fragment(FMars_Feature_ActionHintRow());
-    RowEntity.Add_Fragment(Params);
-    RowEntity.Add_Fragment(FMars_Fragment_ActionHintRow());
+    RowEntity.Add_Fragment(RowState);
     auto Row = RowEntity.As_ActionHintRow();
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
@@ -98,24 +106,11 @@ mixin void Request_UnregisterHintsByOwner(
     Requests.UnregisterByOwnerRequests.Add(InRequest);
 }
 
-// Skips the queue when the registered row already holds the requested values, so per-frame callers do not churn the
-// fragment. A row whose register has not drained yet always queues (its state is still default).
+// Always queued: an update equal to the committed row may still revert a pending one. The drain skips no-op updates.
 mixin void Request_UpdateHint(
     FCk_Handle_ActionHintDisplay& Self,
     const FMars_Request_ActionHintDisplay_Update& InRequest)
 {
-    if (ck::IsValid(InRequest.Row) && InRequest.Row.Get_Sequence() >= 0)
-    {
-        const auto Spec = InRequest.Row.Get_Spec();
-        const auto TextUnchanged = InRequest.NewText.IsSet() == false
-            || Spec.Text.ToString() == InRequest.NewText.GetValue().ToString();
-        const auto HoldLabelUnchanged = InRequest.NewHoldLabel.IsSet() == false
-            || Spec.HoldLabel.ToString() == InRequest.NewHoldLabel.GetValue().ToString();
-
-        if (TextUnchanged && HoldLabelUnchanged)
-        { return; }
-    }
-
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
     Requests.UpdateRequests.Add(InRequest);
 }
@@ -124,13 +119,13 @@ mixin void Request_UpdateHint(
 mixin void Request_Suppress(FCk_Handle_ActionHintDisplay& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
-    Requests.SuppressRequests.Add(FMars_Request_ActionHintDisplay_SetSuppressed(true));
+    Requests.SuppressRequests.Add(FMars_Request_ActionHintDisplay_SetSuppressed(EMars_ActionHintDisplay_Suppression::Suppress));
 }
 
 mixin void Request_ReleaseSuppress(FCk_Handle_ActionHintDisplay& Self)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
-    Requests.SuppressRequests.Add(FMars_Request_ActionHintDisplay_SetSuppressed(false));
+    Requests.SuppressRequests.Add(FMars_Request_ActionHintDisplay_SetSuppressed(EMars_ActionHintDisplay_Suppression::Release));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

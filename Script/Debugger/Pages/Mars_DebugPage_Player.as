@@ -22,10 +22,10 @@ class UMars_DebugPage_Player : UMars_DebugPage_Base
         DrawSectionHeading("State machine");
         auto StateMachine = PlayerEntity.As_StateMachine(ECk_SanityCheck::UnChecked);
         const FString RootState = ck::IsValid(StateMachine)
-            ? utils_state_machine::Get_CurrentStateClass(StateMachine).Get().GetName().ToString()
+            ? Get_StateClassName(utils_state_machine::Get_CurrentStateClass(StateMachine))
             : "-";
         DrawKvRow("Root state", RootState, FLinearColor(0.6f, 0.9f, 1.0f));
-        const auto IsDowned = utils_byte_attribute::Get_FinalValueOr(PlayerEntity, GameplayTags::ByteAttribute_Mars_Player_Downed, 0) > 0;
+        const auto IsDowned = utils_byte_attribute::Get_FinalValue(PlayerEntity, GameplayTags::ByteAttribute_Mars_Player_Downed) > 0;
         DrawKvRow("Downed", BoolText(IsDowned));
         mm::Spacer(0, 6);
 
@@ -55,10 +55,14 @@ class UMars_DebugPage_Player : UMars_DebugPage_Base
         DrawSectionHeading("Cheats");
         mm::BeginHorizontalBox();
         const FString DownedLabel = IsDowned ? "Revive" : "Down";
-        if (DrawButton("Downed", DownedLabel))
+        if (DrawButton_WasClicked("Downed", DownedLabel))
         { utils_byte_attribute::Override(PlayerEntity, GameplayTags::ByteAttribute_Mars_Player_Downed, uint8(IsDowned ? 0 : 1)); }
-        if (DrawButton("LaunchUp", "Launch up"))
-        { Character.LaunchCharacter(FVector(0.0, 0.0, 900.0), false, true); }
+        if (DrawButton_WasClicked("LaunchUp", "Launch up"))
+        {
+            const bool OverrideXY = false;
+            const bool OverrideZ = true;
+            Character.LaunchCharacter(FVector(0.0, 0.0, 900.0), OverrideXY, OverrideZ);
+        }
         mm::EndHorizontalBox();
 
         EndPageScrollBox();

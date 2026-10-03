@@ -1,19 +1,6 @@
-// Editor-only: the sandbox gauntlets, five cells that each combine several mechanisms (design: the "Small dungeon gauntlets"
-// handoff of 3 October 2026; presets in Script/WorldObjects/Mechanisms/Mars_SandboxGauntlets.as). To add them to an
-// already-built sandbox map, open it and run: Mars.Sandbox.BuildGauntlets
-//
-// A hall (X -3700..2000, Y 2000..2600) runs along the main floor's north edge; the cells open off its north side, each a
-// self-contained socket with its own walls, controls, reward and recovery:
-//   G3 Bellkeeper's Confession (X -3700..-2200): circle seal below, triangle seal on the gallery -> reliquary (Root);
-//      the reliquary's wheel latches a return door into the west corridor back to the hall.
-//   G6 Blind Choir (X -2100..-900): the lower wheel opens the bell loft's shutter on the gallery; the bell's face reads
-//      circle -> triangle; the lower seals in that order -> fungus vault (Fungus).
-//   G1 Mourner's Table (X -800..0): chef plate AND dropped-pack plate together -> truffle alcove (Truffle).
-//   G5 Porter's Wager (X 100..700): dropped pack on the slab holds the freight gate open, lifting it starts three grace
-//      lamps; beyond the gate a dropped pack anywhere in the passage holds them too, and a chain lets a chef out; salt
-//      niche beyond (Salt). Nothing outside but the slab opens the gate.
-//   G4 Censer's Window (X 800..2000): a chain on either side lights three lamps that brake the censer and raise the shutter
-//      at the end of its lane; a walled slalom lane beside it always works.
+// Editor-only: the sandbox gauntlets, five cells that each combine several mechanisms (presets in
+// Script/WorldObjects/Mechanisms/Mars_SandboxGauntlets.as). A hall runs along the main floor's north edge; the cells open
+// off its north side, each a self-contained socket with its own walls, controls, reward and recovery.
 //
 // Cell coordinates are local: the origin is the cell's main doorway on its south wall, at floor level; +Y runs into the
 // cell. Blocks (walls are 20 uu thick, centred on their line) are given as min/max corners in those coordinates. Labels
@@ -63,13 +50,14 @@ struct FMars_SandboxGauntlet_Cell
 
     void Block(const FString& InName, FVector InMin, FVector InMax) const
     {
-        utils_mars_map_builder::Spawn_Block(engine::load::Cube(), f"{Prefix}_{InName}",
-            Origin + (InMin + InMax) * 0.5, (InMax - InMin) * 0.01);
+        utils_mars_map_builder::Spawn_Block(engine::load::Cube(),
+            FMars_MapBuilder_Block(f"{Prefix}_{InName}", Origin + (InMin + InMax) * 0.5, (InMax - InMin) * 0.01));
     }
 
     void Place(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InName, FTransform InLocal) const
     {
-        utils_mars_sandbox::Spawn_Mechanism(InScriptClass, f"{Prefix}_{InName}", Origin + InLocal.GetLocation(), InLocal.Rotator());
+        utils_mars_sandbox::Spawn_Mechanism(InScriptClass,
+            FMars_MapBuilder_Placement(f"{Prefix}_{InName}", Origin + InLocal.GetLocation(), InLocal.Rotator()));
     }
 
     // A wall along X across InSpanX with a gate frame (240 wide, 240 tall) in it: two segments and a header. InWall: X = the
@@ -106,6 +94,9 @@ struct FMars_SandboxGauntlet_Cell
 
         const auto Span = InTo - InFrom;
         const auto Length = Span.Size();
+        if (ck::EnsureIfNot(Length > 0.0, f"[Mars.Sandbox] Balustrade [{Prefix}_{InName}] starts and ends at the same point"))
+        { return; }
+
         const auto Direction = Span / Length;
         const auto Half = FVector(PostSize * 0.5, PostSize * 0.5, 0.0);
 
@@ -129,22 +120,23 @@ struct FMars_SandboxGauntlet_Cell
         if (InGlyph == EMars_Seal_Glyph::Circle)
         {
             // Roll 90 turns the cylinder's axis along Y.
-            utils_mars_map_builder::Spawn_Block(engine::load::Cylinder(), Label, Location, FVector(0.5, 0.5, 0.04), FRotator(0.0, 0.0, 90.0));
+            utils_mars_map_builder::Spawn_Block(engine::load::Cylinder(),
+                FMars_MapBuilder_Block(Label, Location, FVector(0.5, 0.5, 0.04), FRotator(0.0, 0.0, 90.0)));
         }
         else if (InGlyph == EMars_Seal_Glyph::Triangle)
-        { utils_mars_map_builder::Spawn_Block(engine::load::Cone(), Label, Location, FVector(0.5, 0.04, 0.5)); }
+        { utils_mars_map_builder::Spawn_Block(engine::load::Cone(), FMars_MapBuilder_Block(Label, Location, FVector(0.5, 0.04, 0.5))); }
         else
-        { utils_mars_map_builder::Spawn_Block(engine::load::Cube(), Label, Location, FVector(0.4, 0.04, 0.4)); }
+        { utils_mars_map_builder::Spawn_Block(engine::load::Cube(), FMars_MapBuilder_Block(Label, Location, FVector(0.4, 0.04, 0.4))); }
     }
 
     // A reading-order arrow between two glyphs, facing -Y: it points -X, which is to the right of a player looking north.
     void Arrow(const FString& InName, FVector InCenter) const
     {
-        utils_mars_map_builder::Spawn_Block(engine::load::Cube(), f"{Prefix}_{InName}Shaft",
-            Origin + InCenter + FVector(5.0, 0.0, 0.0), FVector(0.3, 0.04, 0.06));
+        utils_mars_map_builder::Spawn_Block(engine::load::Cube(), FMars_MapBuilder_Block(f"{Prefix}_{InName}Shaft",
+            Origin + InCenter + FVector(5.0, 0.0, 0.0), FVector(0.3, 0.04, 0.06)));
         // Pitch 90 points the cone's apex along -X; its local Y (thin) stays along Y.
-        utils_mars_map_builder::Spawn_Block(engine::load::Cone(), f"{Prefix}_{InName}Head",
-            Origin + InCenter + FVector(-20.0, 0.0, 0.0), FVector(0.2, 0.04, 0.2), FRotator(90.0, 0.0, 0.0));
+        utils_mars_map_builder::Spawn_Block(engine::load::Cone(), FMars_MapBuilder_Block(f"{Prefix}_{InName}Head",
+            Origin + InCenter + FVector(-20.0, 0.0, 0.0), FVector(0.2, 0.04, 0.2), FRotator(90.0, 0.0, 0.0)));
     }
 }
 
@@ -159,27 +151,13 @@ namespace utils_mars_sandbox
 
     void BuildGauntlets()
     {
-        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
-        if (ck::Is_NOT_Valid(World) || World.GetPathName().StartsWith(k_MapPath) == false)
-        {
-            ck::Warning(f"[Mars.Sandbox.BuildGauntlets] Open [{k_MapPath}] first.");
-            return;
-        }
-
-        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
-        {
-            if (Actor.GetActorLabel() == k_GauntletHallFloorLabel)
-            {
-                ck::Warning(f"[Mars.Sandbox.BuildGauntlets] [{k_GauntletHallFloorLabel}] already exists. Delete the {k_GauntletLabelPrefix}* actors first to rebuild.");
-                return;
-            }
-        }
+        const FString Command = "Mars.Sandbox.BuildGauntlets";
+        if (Get_CanAdd(Command, k_GauntletHallFloorLabel, f"Delete the {k_GauntletLabelPrefix}* actors first to rebuild.") == false)
+        { return; }
 
         Spawn_Gauntlets();
         Apply_ProtoGridMaterials();
-
-        const bool Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel();
-        ck::Trace(f"[Mars.Sandbox.BuildGauntlets] built, saved={Saved}");
+        utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
     void Spawn_Gauntlets()
@@ -402,8 +380,8 @@ namespace utils_mars_sandbox
         InCell.Block("LoftWall_West", FVector(-310.0, 1000.0, 0.0), FVector(-290.0, 1300.0, Height));
         InCell.Block("LoftWall_East", FVector(290.0, 1000.0, 0.0), FVector(310.0, 1300.0, Height));
         InCell.Block("LoftWall_North", FVector(-300.0, 1290.0, 0.0), FVector(300.0, 1310.0, Height));
-        utils_mars_map_builder::Spawn_Block(engine::load::Cone(), f"{InCell.Prefix}_Bell",
-            InCell.Origin + FVector(0.0, 1170.0, 480.0), FVector(2.4, 2.4, 2.4));
+        utils_mars_map_builder::Spawn_Block(engine::load::Cone(),
+            FMars_MapBuilder_Block(f"{InCell.Prefix}_Bell", InCell.Origin + FVector(0.0, 1170.0, 480.0), FVector(2.4, 2.4, 2.4)));
         InCell.Block("BellChain", FVector(-5.0, 1165.0, 600.0), FVector(5.0, 1175.0, Height));
         InCell.Block("BellPlaque", FVector(-110.0, 1036.0, 420.0), FVector(110.0, 1044.0, 520.0));
         InCell.Glyph("Glyph_BellCircle", EMars_Seal_Glyph::Circle, FVector(60.0, 1032.0, 470.0));

@@ -1,5 +1,6 @@
-// The latest SetOpen wins; a RetryClose in the same drain is then moot (the SetOpen already decided). A close while the
-// gate is open and its threshold occupied is deferred: the gate stays open until a RetryClose finds the threshold clear.
+// The latest SetPosition wins; a RetryClose in the same drain is then moot (the SetPosition already decided). A close
+// while the gate is open and its threshold occupied is deferred: the gate stays open until a RetryClose finds the
+// threshold clear.
 class UMars_Processor_Gate_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -17,46 +18,46 @@ class UMars_Processor_Gate_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Gate();
 
-        const auto HasSetOpen = InRequests.SetOpenRequests.Num() > 0;
-        auto TargetOpen = false;
-        if (HasSetOpen)
-        { TargetOpen = InRequests.SetOpenRequests.Last().Open; }
+        const auto HasSetPosition = InRequests.SetPositionRequests.Num() > 0;
+        auto TargetPosition = EMars_Gate_Position::Closed;
+        if (HasSetPosition)
+        { TargetPosition = InRequests.SetPositionRequests.Last().Position; }
 
         const auto HasRetryClose = InRequests.RetryCloseRequests.Num() > 0;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Gate_Requests);
 
-        if (HasSetOpen)
+        if (HasSetPosition)
         {
-            DoHandle_SetOpen(Self, InState, TargetOpen);
+            DoHandle_SetPosition(Self, InState, TargetPosition);
             return;
         }
 
-        if (HasRetryClose && InState.IsCloseDeferred)
-        { DoHandle_SetOpen(Self, InState, false); }
+        if (HasRetryClose && InState.State == EMars_Gate_State::CloseDeferred)
+        { DoHandle_SetPosition(Self, InState, EMars_Gate_Position::Closed); }
     }
 
-    private void DoHandle_SetOpen(FCk_Handle_Gate& InGate, FMars_Fragment_Gate& InState, bool InOpen)
+    private void DoHandle_SetPosition(FCk_Handle_Gate& InGate, FMars_Fragment_Gate& InState, EMars_Gate_Position InPosition)
     {
-        if (InOpen == false && InState.IsOpen && InGate.Get_IsThresholdOccupied())
+        const auto WasOpen = InState.State != EMars_Gate_State::Closed;
+        const auto Open = InPosition == EMars_Gate_Position::Open;
+
+        if (Open == false && WasOpen && InGate.Get_IsThresholdOccupied())
         {
-            InState.IsCloseDeferred = true;
+            InState.State = EMars_Gate_State::CloseDeferred;
             return;
         }
 
-        InState.IsCloseDeferred = false;
+        InState.State = Open ? EMars_Gate_State::Open : EMars_Gate_State::Closed;
 
-        if (InState.IsOpen == InOpen)
+        if (WasOpen == Open)
         { return; }
 
-        InState.IsOpen = InOpen;
-
-        auto Mover = InState.MovingNode.As_Mover(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Mover))
-        { Mover.Request_MoveTo(InOpen); }
+        auto Mover = InState.MovingNode.As_Mover();
+        Mover.Request_MoveTo(FMars_Request_Mover_MoveTo(Open ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start));
 
         if (InGate.Has_Fragment(FMars_Fragment_Gate_Signals))
-        { InGate.Get_Fragment(FMars_Fragment_Gate_Signals).OnOpenChanged.Broadcast(InGate, InOpen); }
+        { InGate.Get_Fragment(FMars_Fragment_Gate_Signals).OnOpenChanged.Broadcast(InGate, InPosition); }
     }
 }

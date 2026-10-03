@@ -1,15 +1,15 @@
 namespace utils_fphands
 {
-    // The gloves of InPlayer. The phase is driven by a Hands state machine (UMars_SmState_Hands_Rest as its initial state)
-    // whose context is InPlayer; InHandNode is what the gloves hang off and what reaches are measured from.
-    FCk_Handle_FPHands Add(FCk_Handle& InPlayer, FMars_FPHands_Spec InSpec, FCk_Handle_Transform InHandNode)
+    // The gloves of InPlayer, hanging off InSpec.HandNode. The phase is driven by a Hands state machine
+    // (UMars_SmState_Hands_Rest as its initial state) whose context is InPlayer. A spec that fails Validate() adds nothing.
+    FCk_Handle_FPHands Add(FCk_Handle& InPlayer, FMars_FPHands_Spec InSpec)
     {
-        if (ck::EnsureIfNot(ck::IsValid(InHandNode), f"[FPHands] [{InPlayer.ToString()}] needs a valid hand node"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[FPHands] [{InPlayer.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_FPHands(); }
 
         auto Params = FMars_Fragment_FPHands_Params();
         Params.Spec = InSpec;
-        Params.HandNode = InHandNode;
 
         // The player composes its gait before its hands; a missing gait only disables the arm swing.
         if (InPlayer.Is_Gait())
@@ -21,14 +21,12 @@ namespace utils_fphands
         return InPlayer.As_FPHands();
     }
 
-    FVector Make_ArmSwing(const FCk_Handle_FPHands& InHands, float32 InSide)
+    EMars_FPHands_ReachKind Get_ReachKind(ECk_Interaction_CompletionPolicy InCompletionPolicy)
     {
-        const auto& Params = InHands.Get_Fragment(FMars_Fragment_FPHands_Params);
-        if (ck::Is_NOT_Valid(Params.Gait))
-        { return FVector::ZeroVector; }
+        if (InCompletionPolicy == ECk_Interaction_CompletionPolicy::Instant)
+        { return EMars_FPHands_ReachKind::Grab; }
 
-        const auto Swing = Math::Sin(Params.Gait.Get_Phase()) * Params.Gait.Get_Amount() * InSide;
-        return FVector(Params.Spec.ArmSwingCm * Swing, 0.0, Params.Spec.ArmSwingLiftCm * Math::Max(Swing, 0.0f));
+        return EMars_FPHands_ReachKind::Hold;
     }
 }
 
@@ -38,53 +36,59 @@ namespace utils_fphands
 
 mixin EMars_FPHands_Phase Get_Phase(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).Phase;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PhaseState.Phase;
 }
 
 mixin float32 Get_PhaseTime(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).PhaseTime;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PhaseState.PhaseTime;
 }
 
 mixin float32 Get_ReleaseFromAlpha(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).ReleaseFromAlpha;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PhaseState.ReleaseFromAlpha;
 }
 
 mixin FMars_FPHands_PhaseState Get_PhaseState(const FCk_Handle_FPHands& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_FPHands);
-    return FMars_FPHands_PhaseState(State.Phase, State.PhaseTime, State.ReleaseFromAlpha, State.ReachFromAlpha);
+    return Self.Get_Fragment(FMars_Fragment_FPHands).PhaseState;
 }
 
-mixin FMars_FPHands_ReachTarget Get_Target(const FCk_Handle_FPHands& Self)
+mixin TOptional<FMars_FPHands_ReachTarget> Get_Target(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).Target;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Reach.Target;
 }
 
-mixin FCk_Handle_InteractTarget Get_InteractTarget(const FCk_Handle_FPHands& Self)
+// Unset when the last reach served no interaction.
+mixin TOptional<FCk_Handle_InteractTarget> Get_ReachInteractTarget(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).InteractTarget;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Reach.InteractTarget;
 }
 
-mixin bool Get_IsInstant(const FCk_Handle_FPHands& Self)
+// InTarget is the interact target of the gloves' current (or last) reach.
+mixin bool Get_IsReachTarget(const FCk_Handle_FPHands& Self, const FCk_Handle_InteractTarget& InTarget)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).IsInstant;
+    const auto& Reach = Self.Get_Fragment(FMars_Fragment_FPHands).Reach;
+    return Reach.InteractTarget.IsSet() && Reach.InteractTarget.GetValue() == InTarget;
 }
 
-mixin FMars_FPHands_ReachTarget Get_FocusTarget(const FCk_Handle_FPHands& Self)
+mixin ECk_Interaction_CompletionPolicy Get_CompletionPolicy(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).FocusTarget;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Reach.CompletionPolicy;
 }
 
-mixin float32 Get_FocusAlpha_L(const FCk_Handle_FPHands& Self)
+mixin TOptional<FMars_FPHands_ReachTarget> Get_FocusTarget(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).FocusAlpha_L;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Focus.Target;
 }
 
-mixin float32 Get_FocusAlpha_R(const FCk_Handle_FPHands& Self)
+mixin float32 Get_FocusAlpha(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).FocusAlpha_R;
+    const auto& Focus = Self.Get_Fragment(FMars_Fragment_FPHands).Focus;
+    if (InHand == EMars_Hand::Right)
+    { return Focus.Alpha_R; }
+
+    return Focus.Alpha_L;
 }
 
 mixin FMars_FPHands_Hold Get_Hold(const FCk_Handle_FPHands& Self)
@@ -94,17 +98,17 @@ mixin FMars_FPHands_Hold Get_Hold(const FCk_Handle_FPHands& Self)
 
 mixin FMars_FPHands_Hold Get_PushHold(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).PushHold;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Push.Hold;
 }
 
-mixin bool Get_PushIsThrow(const FCk_Handle_FPHands& Self)
+mixin EMars_LaunchKind Get_PushKind(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands).PushIsThrow;
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Push.Kind;
 }
 
 mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_FPHands& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_FPHands_Params).HandNode;
+    return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec.HandNode;
 }
 
 mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
@@ -112,15 +116,18 @@ mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec;
 }
 
-// Free-hand arm swing this frame in the hand node's frame: the gait's stride swing, opposite per hand; the forward hand lifts.
-mixin FVector Get_ArmSwing_Left(const FCk_Handle_FPHands& Self)
+// A free glove's arm swing this frame in the hand node's frame: the gait's stride swing, opposite per glove; the glove
+// swinging forward lifts. Zero without a gait.
+mixin FVector Get_ArmSwing(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
 {
-    return utils_fphands::Make_ArmSwing(Self, -1.0f);
-}
+    const auto& Params = Self.Get_Fragment(FMars_Fragment_FPHands_Params);
+    if (ck::Is_NOT_Valid(Params.Gait))
+    { return FVector::ZeroVector; }
 
-mixin FVector Get_ArmSwing_Right(const FCk_Handle_FPHands& Self)
-{
-    return utils_fphands::Make_ArmSwing(Self, 1.0f);
+    const auto Side = InHand == EMars_Hand::Right ? 1.0f : -1.0f;
+    const auto Swing = Math::Sin(Params.Gait.Get_Phase()) * Params.Gait.Get_Amount() * Side;
+    const auto& ArmSwing = Params.Spec.ArmSwing;
+    return FVector(ArmSwing.Cm * Swing, 0.0, ArmSwing.LiftCm * Math::Max(Swing, 0.0f));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

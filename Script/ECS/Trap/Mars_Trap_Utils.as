@@ -1,15 +1,35 @@
 namespace utils_trap
 {
-    // InHazard must live on InHandle: the trap finds itself from the hazard's OnHit.
-    FCk_Handle_Trap Add(FCk_Handle& InHandle, FMars_Trap_Spec InParams, FCk_Handle_Hazard InHazard, FCk_Handle_Mover InMover)
+    // Composes the trap's cycle on InHandle; its phases drive InHazard and the optional InMover. InHazard must live on
+    // InHandle: the trap finds itself from the hazard's OnHit. A rejected spec, a hazard elsewhere, or actions that move a
+    // part with no mover ensure and return an invalid handle with nothing composed.
+    FCk_Handle_Trap Add(FCk_Handle& InHandle, FMars_Trap_Spec InSpec, FCk_Handle_Hazard InHazard, FCk_Handle_Mover InMover)
     {
-        ck::EnsureIfNot(FCk_Handle(InHazard) == InHandle, f"Trap on [{InHandle.ToString()}] was given Hazard [{InHazard.ToString()}] on another entity; OnTriggered will not fire");
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Trap] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_Trap(); }
 
-        auto Cycle = utils_cycle::Add(InHandle, InParams.Cycle);
+        if (ck::EnsureIfNot(ck::IsValid(InHazard) && InHazard == InHandle,
+            f"[Trap] [{InHandle.ToString()}] needs its hazard on its own entity, not [{InHazard.ToString()}]; OnTriggered would never fire"))
+        { return FCk_Handle_Trap(); }
+
+        auto MovesAPart = false;
+        for (const auto& Action : InSpec.Actions)
+        {
+            if (Action.MoverAtEnd.IsSet())
+            { MovesAPart = true; }
+        }
+
+        if (ck::EnsureIfNot(MovesAPart == false || ck::IsValid(InMover), f"[Trap] [{InHandle.ToString()}] has actions that move a part but no mover"))
+        { return FCk_Handle_Trap(); }
+
+        // utils_cycle::Add ensures on its own rejection.
+        auto Cycle = utils_cycle::Add(InHandle, InSpec.Cycle);
+        if (ck::Is_NOT_Valid(Cycle))
+        { return FCk_Handle_Trap(); }
 
         auto Params = FMars_Fragment_Trap_Params();
-        Params.Actions = InParams.Actions;
-        Params.Powered = InParams.Powered;
+        Params.Spec = InSpec;
 
         auto State = FMars_Fragment_Trap();
         State.Cycle = Cycle;
@@ -41,9 +61,9 @@ namespace utils_trap
     // Safe 2.0 / Warn 0.6 / Active 1.2: the part rises on Warn, the hazard arms on Active, Safe resets both.
     FMars_Trap_Spec Make_SpikeTrapSpec()
     {
-        const auto Safe = GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Safe");
-        const auto Warn = GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Warn");
-        const auto Active = GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Active");
+        const auto Safe = GameplayTags::Mechanism_Phase_Safe;
+        const auto Warn = GameplayTags::Mechanism_Phase_Warn;
+        const auto Active = GameplayTags::Mechanism_Phase_Active;
 
         auto Spec = FMars_Trap_Spec();
         Spec.Cycle.Phases.Add(FMars_CyclePhase(Safe, 2.0f));
@@ -73,9 +93,9 @@ namespace utils_trap
     // Idle 3.0 / Telegraph 1.0 / Fire 1.5: the hazard arms on Fire and disarms on Idle.
     FMars_Trap_Spec Make_VentSpec()
     {
-        const auto Idle = GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Idle");
-        const auto Telegraph = GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Telegraph");
-        const auto Fire = GameplayTags::ResolveGameplayTag(n"Mechanism.Phase.Fire");
+        const auto Idle = GameplayTags::Mechanism_Phase_Idle;
+        const auto Telegraph = GameplayTags::Mechanism_Phase_Telegraph;
+        const auto Fire = GameplayTags::Mechanism_Phase_Fire;
 
         auto Spec = FMars_Trap_Spec();
         Spec.Cycle.Phases.Add(FMars_CyclePhase(Idle, 3.0f));

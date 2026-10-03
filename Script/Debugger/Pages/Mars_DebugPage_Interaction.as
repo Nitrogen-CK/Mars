@@ -10,17 +10,11 @@ class UMars_DebugPage_Interaction : UMars_DebugPage_Base
         BeginPageScrollBox();
 
         DrawSectionHeading("Prompt display (selected player)");
-        auto Display = TryGet_PlayerEntity().As_InteractPromptDisplay(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Display))
-        {
-            auto Slots = Display.Get_Slots();
-            DrawKvRow("Visible slots", f"{Slots.Num()}");
-            for (const auto& PromptSlot : Slots)
-            {
-                if (PromptSlot.Stack.IsEmpty() == false && ck::IsValid(PromptSlot.Stack.Last().PromptHandle))
-                { DrawKvRow(PromptSlot.SlotKey.ToString(), PromptSlot.Stack.Last().PromptHandle.Get_DisplayText().ToString()); }
-            }
-        }
+        auto PlayerEntity = TryGet_PlayerEntity();
+        if (ck::IsValid(PlayerEntity))
+        { DrawPromptDisplay(PlayerEntity.As_InteractPromptDisplay()); }
+        else
+        { DrawWarningBox("No Mars player entity (or it is not ready yet)."); }
         mm::Spacer(0, 6);
 
         DrawSectionHeading("Test lamps");
@@ -40,14 +34,26 @@ class UMars_DebugPage_Interaction : UMars_DebugPage_Base
             mm::Slot_Fill();
             mm::VAlign_Center();
             const FString StateLabel = Lamp.Light.IsVisible() ? "on" : "off";
-            utils_mars_debugger::Text(f"{Lamp.GetName()}  [{StateLabel}]", 13);
+            utils_mars_debugger::Text(f"{Lamp.GetName()}  [{StateLabel}]", FMars_Debugger_TextStyle(13));
 
-            if (DrawButton(f"Toggle{Index}", "Toggle"))
+            if (DrawButton_WasClicked(f"Toggle{Index}", "Toggle"))
             { Lamp.Toggle(); }
 
             mm::EndHorizontalBox();
         }
 
         EndPageScrollBox();
+    }
+
+    // The player character always composes a prompt display.
+    private void DrawPromptDisplay(FCk_Handle_InteractPromptDisplay InDisplay)
+    {
+        auto Slots = InDisplay.Get_Slots();
+        DrawKvRow("Visible slots", f"{Slots.Num()}");
+        for (const auto& PromptSlot : Slots)
+        {
+            if (PromptSlot.Stack.IsEmpty() == false && ck::IsValid(PromptSlot.Stack.Last().PromptHandle))
+            { DrawKvRow(PromptSlot.SlotKey.ToString(), PromptSlot.Stack.Last().PromptHandle.Get_DisplayText().ToString()); }
+        }
     }
 }

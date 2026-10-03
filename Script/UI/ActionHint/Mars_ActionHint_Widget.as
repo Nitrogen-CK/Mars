@@ -1,5 +1,5 @@
 UCLASS(Abstract)
-class UMars_ActionHint_Widget : UCk_UserWidget_UE
+class UMars_ActionHint_Widget : UMars_KeyGlyph_Widget
 {
     UPROPERTY(meta = (BindWidget))
     UCommonTextBlock HintText;
@@ -28,28 +28,6 @@ class UMars_ActionHint_Widget : UCk_UserWidget_UE
             HoldLabel.SetVisibility(InSpec.HoldLabel.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
         }
 
-        Report_MissingIcon(InputAction);
-    }
-
-    // Names the broken link once per widget when the key glyph cannot render: key resolution (profile / applied
-    // contexts), brush lookup (CommonInput controller data for the current input type), or CommonUI collapsing the
-    // action widget (e.g. Enhanced Input support off in CommonInputSettings).
-    private bool _HasReportedMissingIcon = false;
-
-    private void Report_MissingIcon(UInputAction InAction)
-    {
-        if (_HasReportedMissingIcon || ck::Is_NOT_Valid(HintIcon))
-        { return; }
-
-        const auto Key = HintIcon.Get_ResolvedKey();
-        const auto Brush = UCk_Utils_KeyIcon_UE::Get_BrushForKey(GetOwningPlayer(), Key);
-        const auto HasBrush = ck::IsValid(Brush.ResourceObject);
-        const auto IconCollapsed = HintIcon.GetVisibility() == ESlateVisibility::Collapsed;
-        if (Key.IsValid() && HasBrush && IconCollapsed == false)
-        { return; }
-
-        _HasReportedMissingIcon = true;
-        const FString KeyName = Key.IsValid() ? Key.ToString() : "Invalid";
-        ck::Warning(f"[Mars_ActionHint] No key icon for [{InAction.GetName()}]: ResolvedKey=[{KeyName}] BrushFound=[{HasBrush}] IconCollapsed=[{IconCollapsed}]");
+        Report_MissingIcon(HintIcon, InputAction);
     }
 }

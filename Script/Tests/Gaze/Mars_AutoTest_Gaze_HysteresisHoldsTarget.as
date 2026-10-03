@@ -58,7 +58,7 @@ class UMars_AutoTest_Gaze_HysteresisHoldsTarget : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertAcquired(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged broadcasts after acquiring the first target");
+        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged fired once, on acquiring the first target");
         Assert_Invalid(_LastPrevious, "the first OnTargetChanged comes from no target");
         Assert_True(_LastCurrent == DoGet_Head(_Current), "the first OnTargetChanged names the target's Head");
     }
@@ -81,7 +81,7 @@ class UMars_AutoTest_Gaze_HysteresisHoldsTarget : UCk_AutoTest_Base
     private void Step_AssertHeld(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Gaze.Get_Target() == DoGet_Head(_Current), "a challenger 10% closer does not take the gaze");
-        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged broadcasts while the target is held");
+        Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged did not fire again while the target was held");
     }
 
     UFUNCTION()
@@ -101,7 +101,7 @@ class UMars_AutoTest_Gaze_HysteresisHoldsTarget : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSwitched(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_TargetChangedCount, 2, "OnTargetChanged broadcasts after the switch");
+        Assert_Equals_Int(_TargetChangedCount, 2, "OnTargetChanged fired a second time, on the switch");
         Assert_True(_LastPrevious == DoGet_Head(_Current), "the switch's OnTargetChanged comes from the old target's Head");
         Assert_True(_LastCurrent == DoGet_Head(_Challenger), "the switch's OnTargetChanged names the challenger's Head");
     }
@@ -115,7 +115,7 @@ class UMars_AutoTest_Gaze_HysteresisHoldsTarget : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSwitchedBack(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_TargetChangedCount, 3, "OnTargetChanged broadcasts after switching back");
+        Assert_Equals_Int(_TargetChangedCount, 3, "OnTargetChanged fired a third time, on the switch back");
         Assert_True(_LastPrevious == DoGet_Head(_Challenger), "the switch back's OnTargetChanged comes from the challenger's Head");
         Assert_True(_LastCurrent == DoGet_Head(_Current), "the switch back's OnTargetChanged names the first target's Head");
     }

@@ -6,26 +6,9 @@
 // Consume
 //--------------------------------------------------------------------------------------------------------------------------
 
-class UMars_SmState_ItemUse_Consume : UCk_SmState_EntityScript
+class UMars_SmState_ItemUse_Consume : UMars_SmState_InteractTarget_RunTask
 {
-    UFUNCTION(BlueprintOverride)
-    TArray<FGameplayTag> DoGet_StatesToOverride() const
-    {
-        return GameplayTag::MakeGameplayTagArrayFromTag(
-            UCk_SmState_EntityScript::Get_StateTagForClass(UMars_SmState_InteractTarget_Enter));
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
-    {
-        AddTask(InHandle, UMars_SmTask_ItemUse_Consume);
-
-        auto OnSuccess = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
-        AddCondition(OnSuccess, UMars_SmCondition_AllTasksSucceeded);
-
-        auto OnFailure = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
-        AddCondition(OnFailure, UMars_SmCondition_AnyTaskFailed);
-    }
+    default TaskClass = UMars_SmTask_ItemUse_Consume;
 }
 
 // Destroys the held item when its UseAction says the use consumes it. The slot stays selected with empty hands.
@@ -36,15 +19,17 @@ class UMars_SmTask_ItemUse_Consume : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto HeldItem = utils_item_use::Get_UserHeldItem(Get_StateMachineContext());
+        auto HeldItem = utils_held_item::Get_UserHeldItem(Get_StateMachineContext());
         if (ck::Is_NOT_Valid(HeldItem))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
         }
 
+        // The use interactable only exists while the held item has a UseAction.
         auto Item = HeldItem.Get_CurrentItem();
-        if (ck::Is_NOT_Valid(Item) || Item.Has_UseAction() == false)
+        if (ck::EnsureIfNot(ck::IsValid(Item) && Item.Has_UseAction(),
+            f"[ItemUse] Consume ran while [{HeldItem.ToString()}] holds no item with a UseAction"))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
@@ -54,6 +39,12 @@ class UMars_SmTask_ItemUse_Consume : UCk_SmTask_EntityScript
         if (UseAction.ConsumeOnSuccess)
         {
             auto Inventory = Item.Get_ParentInventory();
+            if (ck::EnsureIfNot(ck::IsValid(Inventory), f"[ItemUse] Held item [{Item.ToString()}] is in no inventory"))
+            {
+                Mark_Result(ECk_SmTaskResult::Failed);
+                return;
+            }
+
             auto Request = FCk_Request_Inventory_RemoveItem(Item);
             Request.Set_PostRemovePolicy(ECk_Inventory_PostRemovePolicy::DestroyItem);
             Inventory.Request_RemoveItem(Request, FCk_Delegate_Inventory_OnOperationResult_Remove());
@@ -68,26 +59,9 @@ class UMars_SmTask_ItemUse_Consume : UCk_SmTask_EntityScript
 //--------------------------------------------------------------------------------------------------------------------------
 
 // For items that want the Primary button to throw. The same launch Drop-hold-release reaches.
-class UMars_SmState_ItemUse_Throw : UCk_SmState_EntityScript
+class UMars_SmState_ItemUse_Throw : UMars_SmState_InteractTarget_RunTask
 {
-    UFUNCTION(BlueprintOverride)
-    TArray<FGameplayTag> DoGet_StatesToOverride() const
-    {
-        return GameplayTag::MakeGameplayTagArrayFromTag(
-            UCk_SmState_EntityScript::Get_StateTagForClass(UMars_SmState_InteractTarget_Enter));
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
-    {
-        AddTask(InHandle, UMars_SmTask_ItemUse_Throw);
-
-        auto OnSuccess = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
-        AddCondition(OnSuccess, UMars_SmCondition_AllTasksSucceeded);
-
-        auto OnFailure = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
-        AddCondition(OnFailure, UMars_SmCondition_AnyTaskFailed);
-    }
+    default TaskClass = UMars_SmTask_ItemUse_Throw;
 }
 
 class UMars_SmTask_ItemUse_Throw : UCk_SmTask_EntityScript
@@ -98,20 +72,16 @@ class UMars_SmTask_ItemUse_Throw : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto Context = Get_StateMachineContext();
-        if (Context.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        if (ck::EnsureIfNot(Context.Has_Fragment(FMars_Fragment_InteractionContext),
+            f"[ItemUse] Throw ran on [{Context.ToString()}] without an interaction context"))
         {
             Mark_Result(ECk_SmTaskResult::Failed);
             return;
         }
 
+        // The use interactable is built by HeldItemUse, so its owner always has it.
         auto Player = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Use = Player.As_HeldItemUse(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Use))
-        {
-            Mark_Result(ECk_SmTaskResult::Failed);
-            return;
-        }
-
+        auto Use = Player.As_HeldItemUse();
         Use.Request_Throw();
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
@@ -122,38 +92,28 @@ class UMars_SmTask_ItemUse_Throw : UCk_SmTask_EntityScript
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Melee items (UMars_ItemTrait_Strike): one swing per use - windup, a viewpoint sphere sweep for hurtboxes, recovery.
-class UMars_SmState_ItemUse_Strike : UCk_SmState_EntityScript
+class UMars_SmState_ItemUse_Strike : UMars_SmState_InteractTarget_RunTask
 {
-    UFUNCTION(BlueprintOverride)
-    TArray<FGameplayTag> DoGet_StatesToOverride() const
-    {
-        return GameplayTag::MakeGameplayTagArrayFromTag(
-            UCk_SmState_EntityScript::Get_StateTagForClass(UMars_SmState_InteractTarget_Enter));
-    }
+    default TaskClass = UMars_SmTask_ItemUse_Strike;
+}
 
-    UFUNCTION(BlueprintOverride)
-    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
-    {
-        AddTask(InHandle, UMars_SmTask_ItemUse_Strike);
-
-        auto OnSuccess = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
-        AddCondition(OnSuccess, UMars_SmCondition_AllTasksSucceeded);
-
-        auto OnFailure = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
-        AddCondition(OnFailure, UMars_SmCondition_AnyTaskFailed);
-    }
+enum EMars_ItemUse_StrikePhase
+{
+    // Before the sweep (WindupSeconds).
+    Windup,
+    // After the sweep (RecoverySeconds), hit or miss.
+    Recovery
 }
 
 // After the trait's WindupSeconds, one sphere sweep from the player's viewpoint along its forward out to Reach through
-// utils_damage_dealer::Request_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
+// utils_damage_dealer::Try_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
 // hurtbox stops the swing; Silent overlap notify). The first hurtbox hit is dealt through the player's DamageDealer,
-// which resolves it to its zone; a debug sphere marks the hit. Succeeds RecoverySeconds after
-// the sweep, hit or miss. Fails when the player has no dealer or viewpoint, or the held item has no Strike trait.
+// which resolves it to its zone. Succeeds RecoverySeconds after the sweep. Fails when the player has no dealer or
+// viewpoint, or the held item has no Strike trait.
 class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
-    private const float32 k_DebugSphereSeconds = 0.5f;
     private const float32 k_ImpulseSpeed = 300.0f;
 
     private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
@@ -170,7 +130,7 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
     private float32 _RecoverySeconds = 0.0f;
 
     private float32 _Elapsed = 0.0f;
-    private bool _Swung = false;
+    private EMars_ItemUse_StrikePhase _Phase = EMars_ItemUse_StrikePhase::Windup;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -180,24 +140,26 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         _Dealer = FCk_Handle_DamageDealer();
         _Item = FCk_Handle_Item();
         _Elapsed = 0.0f;
-        _Swung = false;
+        _Phase = EMars_ItemUse_StrikePhase::Windup;
 
         auto Context = Get_StateMachineContext();
-        if (Context.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        if (ck::EnsureIfNot(Context.Has_Fragment(FMars_Fragment_InteractionContext),
+            f"[ItemUse] Strike ran on [{Context.ToString()}] without an interaction context"))
         {
-            DoFail("no interaction context");
+            _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 
+        // Optional on the player: without a dealer or a viewpoint nothing can be struck.
         auto Player = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
         auto Dealer = Player.As_DamageDealer(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Dealer) || ck::Is_NOT_Valid(Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked)))
+        if (ck::Is_NOT_Valid(Dealer) || Player.Is_PlayerViewpoint() == false)
         {
             DoFail("the player has no DamageDealer or no PlayerViewpoint");
             return;
         }
 
-        auto HeldItem = utils_item_use::Get_UserHeldItem(Context);
+        auto HeldItem = utils_held_item::Get_UserHeldItem(Context);
         auto Item = ck::IsValid(HeldItem) ? HeldItem.Get_CurrentItem() : FCk_Handle_Item();
         if (ck::Is_NOT_Valid(Item) || Item.Has_Strike() == false)
         {
@@ -226,13 +188,13 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 
         _Elapsed += float32(InDeltaT.Get_Seconds());
 
-        if (_Swung == false && _Elapsed >= _WindupSeconds)
+        if (_Phase == EMars_ItemUse_StrikePhase::Windup && _Elapsed >= _WindupSeconds)
         {
-            _Swung = true;
+            _Phase = EMars_ItemUse_StrikePhase::Recovery;
             DoSwing();
         }
 
-        if (_Swung && _Elapsed >= _WindupSeconds + _RecoverySeconds)
+        if (_Phase == EMars_ItemUse_StrikePhase::Recovery && _Elapsed >= _WindupSeconds + _RecoverySeconds)
         { _Outcome = ECk_SmTaskResult::Succeeded; }
 
         return _Outcome;
@@ -240,50 +202,26 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 
     private void DoSwing()
     {
+        // Checked on enter; the player can only lose them by being torn down mid-swing.
         if (ck::Is_NOT_Valid(_Player) || ck::Is_NOT_Valid(_Dealer))
         { return; }
 
-        auto Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Viewpoint))
-        { return; }
-
+        auto Viewpoint = _Player.As_PlayerViewpoint();
         const auto View = utils_transform::Get_EntityCurrentTransform(Viewpoint.Get_Viewpoint());
         const auto Forward = View.GetRotation().GetForwardVector();
         const auto Start = View.GetLocation();
 
         auto Template = utils_damage_dealer::Make_Event(_Dealer, _Damage, _DamageType);
-        Template.Causer = FCk_Handle(_Item);
-        Template.Impulse = Forward * k_ImpulseSpeed;
+        Template.Source.Causer = _Item;
+        Template.Hit.Impulse = Forward * k_ImpulseSpeed;
 
         // The dealer is the player's entity, so the sweep skips the player's own bodies.
-        const auto Result = utils_damage_dealer::Request_StrikeSweep(_Dealer,
-            FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
-
-        // A miss returns a default result whose HitKind reads Probe; the hit entity tells a hit apart.
-        if (Result.Get_HitKind() != ECk_ProbeTrace_HitKind::Probe || ck::Is_NOT_Valid(Result.Get_HitEntity()))
-        { return; }
-
-        utils_debug_draw::DrawDebugSphere(Result.Get_HitLocation(), _Radius, 12, FLinearColor(1.0, 0.2, 0.1), k_DebugSphereSeconds, 2.0f);
+        utils_damage_dealer::Try_StrikeSweep(_Dealer, FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
     }
 
     private void DoFail(const FString& InReason)
     {
         ck::Warning(f"[ItemUse] Strike failed: {InReason}");
         _Outcome = ECk_SmTaskResult::Failed;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-
-namespace utils_item_use
-{
-    // The context is the InteractTarget; its InteractionContext names the player as the interactable owner.
-    FCk_Handle_HeldItem Get_UserHeldItem(FCk_Handle InContext)
-    {
-        if (InContext.Has_Fragment(FMars_Fragment_InteractionContext) == false)
-        { return FCk_Handle_HeldItem(); }
-
-        auto Player = InContext.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        return Player.As_HeldItem(ECk_SanityCheck::UnChecked);
     }
 }

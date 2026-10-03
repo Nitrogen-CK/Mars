@@ -1,9 +1,5 @@
-// The monster arbiter. Drains RegisterPart -> Die, each kind in arrival order.
-//
-// RegisterPart adds the part to the roster (once), binds its OnSevered for the OnPartSevered fan-in and broadcasts
-// OnPartRegistered. Die is latched: the first one sets IsDead and DeathCause, requests Dead = 1 on the byte attribute and
-// broadcasts OnDied; later ones are ignored. Teardown (shedding legs, the corpse timer) belongs to the Dead HFSM state,
-// not to this drain.
+// The monster arbiter. Die is latched: only the first one records the cause and raises the Dead attribute. Teardown
+// (shedding legs, the corpse timer) belongs to the Dead HFSM state, not to this drain.
 class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -24,7 +20,7 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_Monster_RegisterPart> RegisterPartRequests = InRequests.RegisterPartRequests;
         TArray<FMars_Request_Monster_Die> DieRequests = InRequests.DieRequests;
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Monster_Requests);
 
         for (const auto& Request : RegisterPartRequests)
@@ -37,13 +33,13 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleRegisterPart(FCk_Handle_Monster& InMonster, const FMars_Request_Monster_RegisterPart& InRequest)
     {
         auto Part = InRequest.Part;
-        if (ck::Is_NOT_Valid(Part))
+        if (ck::EnsureIfNot(ck::IsValid(Part), f"[Monster] [{InMonster.ToString()}] was asked to register an invalid part"))
         { return; }
 
         auto& State = InMonster.Get_Fragment(FMars_Fragment_Monster);
         for (auto Registered : State.Parts)
         {
-            if (FCk_Handle(Registered) == FCk_Handle(Part))
+            if (Registered == Part)
             { return; }
         }
 
@@ -57,15 +53,11 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleDie(FCk_Handle_Monster& InMonster, const FMars_Request_Monster_Die& InRequest)
     {
         auto& State = InMonster.Get_Fragment(FMars_Fragment_Monster);
-        if (State.IsDead)
+        if (State.DeathCause.IsSet())
         { return; }
 
-        State.IsDead = true;
         State.DeathCause = InRequest.Cause;
-        auto Dead = State.Dead;
-
-        if (ck::IsValid(Dead))
-        { utils_byte_attribute::Request_Override(Dead, 1, ECk_MinMaxCurrent::Current); }
+        utils_byte_attribute::Request_Override(State.Dead, 1, ECk_MinMaxCurrent::Current);
 
         ck::Trace(f"[Monster] [{InMonster.ToString()}] died of [{InRequest.Cause.Amount}] [{InRequest.Cause.DamageType.ToString()}]");
 
@@ -73,6 +65,7 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
         { InMonster.Get_Fragment(FMars_Fragment_Monster_Signals).OnDied.Broadcast(InMonster, InRequest.Cause); }
     }
 
+    // A severed part's monster may already be gone (the leg is world-owned by then).
     UFUNCTION()
     private void OnPartSevered(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased)
     {

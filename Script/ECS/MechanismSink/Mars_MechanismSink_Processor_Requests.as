@@ -18,7 +18,7 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
         const auto SetChannelInputRequests = InRequests.SetChannelInputRequests;
         const auto NotifyInputEdgeRequests = InRequests.NotifyInputEdgeRequests;
 
-        // Swap-and-pop - InRequests is dead past this line; a request enqueued by a listener survives to next pass.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_MechanismSink_Requests);
 
         for (const auto& Request : SetChannelInputRequests)
@@ -35,17 +35,19 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
 
         const auto& Params = Self.Get_Fragment(FMars_Fragment_MechanismSink_Params);
         auto Powered = Evaluate_Rule(Params.Rule, InSinkComp.Inputs);
-        if (Params.Latch && InSinkComp.IsPowered)
+        if (Params.Latch && InSinkComp.Power == EMars_MechanismSink_Power::Powered)
         { Powered = true; }
 
-        const auto FirstEvaluation = InSinkComp.HasEvaluated == false && SetChannelInputRequests.Num() > 0;
-        if (FirstEvaluation || InSinkComp.IsPowered != Powered)
+        const auto Power = Powered ? EMars_MechanismSink_Power::Powered : EMars_MechanismSink_Power::Unpowered;
+
+        // The first evaluation broadcasts even when unpowered: link setups wait for it instead of reading a default.
+        const auto FirstEvaluation = InSinkComp.Power == EMars_MechanismSink_Power::Unevaluated && SetChannelInputRequests.Num() > 0;
+        if (FirstEvaluation || (InSinkComp.Power != EMars_MechanismSink_Power::Unevaluated && InSinkComp.Power != Power))
         {
-            InSinkComp.IsPowered = Powered;
-            InSinkComp.HasEvaluated = true;
+            InSinkComp.Power = Power;
 
             if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals))
-            { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Self, Powered); }
+            { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnPoweredChanged.Broadcast(Self, Power); }
         }
 
         if (NotifyInputEdgeRequests.Num() == 0 || Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals) == false)
@@ -54,7 +56,7 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
         for (const auto& Edge : NotifyInputEdgeRequests)
         {
             // Fetched per edge: a listener binding a signal on another entity can reallocate the signals storage.
-            Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge.Broadcast(Self, Edge.Channel, Edge.Asserted);
+            Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge.Broadcast(Self, Edge.Channel, Edge.Output);
         }
     }
 

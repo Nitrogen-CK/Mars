@@ -1,6 +1,6 @@
 // Front-end mode for Camp_Mars_MAP (assigned by the Camp_Mars_ prefix in DefaultEngine.ini). Lobby: everyone
-// holds a viewer pawn. Live: everyone is restarted as a chef (design D5); late joiners spawn as chefs directly
-// through GetDefaultPawnClassForController.
+// holds a viewer pawn. Live: everyone is restarted as a chef; late joiners spawn as chefs directly through
+// GetDefaultPawnClassForController.
 class AMars_Camp_GameMode : AMars_Master_GameMode
 {
     default GameStateClass = AMars_Camp_GameState;
@@ -57,13 +57,18 @@ class AMars_Camp_GameMode : AMars_Master_GameMode
     private bool Get_IsLive() const
     {
         auto CampState = Cast<AMars_Camp_GameState>(Gameplay::GetGameState());
-        if (ck::Is_NOT_Valid(CampState) || ck::Is_NOT_Valid(CampState.Get_CampSession()))
+        if (ck::EnsureIfNot(ck::IsValid(CampState), "[Mars_Camp_GameMode] the GameState is not an AMars_Camp_GameState"))
         { return false; }
 
-        return CampState.Get_CampSession().Get_IsLive();
+        // Before the GameState's entity is composed there is no session yet: still the lobby.
+        auto Session = CampState.Get_CampSession();
+        if (ck::Is_NOT_Valid(Session))
+        { return false; }
+
+        return Session.Get_IsLive();
     }
 
-    // RestartPlayer keeps an existing pawn (trap 27): drop the viewer pawn first.
+    // RestartPlayer keeps an existing pawn: drop the viewer pawn first.
     private void SpawnChefsForEveryone()
     {
         auto GameSession = Subsystem::GetGameInstanceSubsystem(UCk_GameSession_Subsystem_UE);

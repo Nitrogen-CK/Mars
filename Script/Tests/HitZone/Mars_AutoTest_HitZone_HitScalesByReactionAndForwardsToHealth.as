@@ -15,8 +15,8 @@ class UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth : UCk_AutoTe
         auto Target = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Health = utils_health::Add(Target, FMars_Health_Spec(100.0f));
 
-        auto Spec = FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Limb"));
-        Spec.Reactions.Add(FMars_HitZone_Reaction(Sever(), 2.0f, EMars_HitZone_ConditionImpact::Damages));
+        auto Spec = FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Limb);
+        Spec.Reactions.Add(FMars_HitZone_Reaction(GameplayTags::DamageType_Mars_Sever, 2.0f, EMars_HitZone_ConditionImpact::Damages));
         Spec.DefaultMultiplier = 1.0f;
         _Zone = utils_hit_zone::Add(Target, Spec);
 
@@ -30,16 +30,6 @@ class UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth : UCk_AutoTe
         Run_Steps(InHandle);
     }
 
-    private FGameplayTag Sever()
-    {
-        return GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Sever");
-    }
-
-    private FGameplayTag Crush()
-    {
-        return GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Crush");
-    }
-
     UFUNCTION()
     private void OnHit(FCk_Handle_HitZone InZone, FMars_DamageEvent InScaledEvent, FMars_HitZone_Reaction InReaction)
     {
@@ -50,22 +40,22 @@ class UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth : UCk_AutoTe
     UFUNCTION()
     private void Step_ValidateAndHitSever(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_False(FMars_HitZone_Spec().Validate().IsValid, "a spec with no ZoneTag is rejected");
+        Assert_False(FMars_HitZone_Spec().Validate().IsValid(), "a spec with no ZoneTag is rejected");
 
-        auto Negative = FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Limb"));
+        auto Negative = FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Limb);
         Negative.DefaultMultiplier = -1.0f;
-        Assert_False(Negative.Validate().IsValid, "a negative DefaultMultiplier is rejected");
+        Assert_False(Negative.Validate().IsValid(), "a negative DefaultMultiplier is rejected");
 
-        auto NegativeRow = FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Limb"));
-        NegativeRow.Reactions.Add(FMars_HitZone_Reaction(Sever(), -2.0f, EMars_HitZone_ConditionImpact::Damages));
-        Assert_False(NegativeRow.Validate().IsValid, "a negative reaction multiplier is rejected");
+        auto NegativeRow = FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Limb);
+        NegativeRow.Reactions.Add(FMars_HitZone_Reaction(GameplayTags::DamageType_Mars_Sever, -2.0f, EMars_HitZone_ConditionImpact::Damages));
+        Assert_False(NegativeRow.Validate().IsValid(), "a negative reaction multiplier is rejected");
 
-        Assert_True(ck::IsValid(_Health), "the Health composed");
-        Assert_True(ck::IsValid(_Zone), "the zone composed");
-        Assert_True(FCk_Handle(_Zone.Get_Health()) == FCk_Handle(_Health), "the zone feeds its entity's own Health");
+        Assert_Valid(_Health, "utils_health::Add composed the Health");
+        Assert_Valid(_Zone, "utils_hit_zone::Add composed the zone");
+        Assert_True(_Zone.Get_Health() == _Health, "the zone feeds its entity's own Health");
         Assert_True(_Zone.Get_IsEnabled(), "a fresh zone is enabled");
 
-        _Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, Sever())));
+        _Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, GameplayTags::DamageType_Mars_Sever)));
     }
 
     UFUNCTION()
@@ -79,12 +69,17 @@ class UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth : UCk_AutoTe
     private void Step_AssertSeverAndHitCrush(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_HitEvents.Num(), 1, "OnHit fired once");
-        Assert_Equals_Float(_HitEvents[0].Amount, 20.0f, 0.001f, "the scaled event carries 10 x 2");
-        Assert_True(_HitReactions[0].Impact == EMars_HitZone_ConditionImpact::Damages, "the Sever row's impact is Damages");
-        Assert_True(_HitEvents[0].HitZone == FCk_Handle(_Zone), "the zone stamped itself on the event");
-        Assert_True(_HitEvents[0].DamageType == Sever(), "the damage type is kept");
+        if (_HitEvents.Num() == 1)
+        {
+            Assert_Equals_Float(_HitEvents[0].Amount, 20.0f, 0.001f, "the scaled event carries 10 x 2");
+            Assert_True(_HitReactions[0].Impact == EMars_HitZone_ConditionImpact::Damages,
+                f"the Sever row's impact is Damages (got [{_HitReactions[0].Impact :n}])");
+            Assert_True(_Zone == _HitEvents[0].HitZone, "the zone stamped itself on the event");
+            Assert_True(_HitEvents[0].DamageType == GameplayTags::DamageType_Mars_Sever,
+                f"the damage type is kept (got [{_HitEvents[0].DamageType.ToString()}])");
+        }
 
-        _Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, Crush())));
+        _Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(10.0f, GameplayTags::DamageType_Mars_Crush)));
     }
 
     UFUNCTION()
@@ -98,8 +93,13 @@ class UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth : UCk_AutoTe
     private void Step_AssertCrush(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_HitEvents.Num(), 2, "OnHit fired for the Crush hit");
-        Assert_Equals_Float(_HitEvents[1].Amount, 10.0f, 0.001f, "Crush takes the default x1");
-        Assert_True(_HitReactions[1].Impact == EMars_HitZone_ConditionImpact::None, "the default row has no condition impact");
+        if (_HitEvents.Num() == 2)
+        {
+            Assert_Equals_Float(_HitEvents[1].Amount, 10.0f, 0.001f, "Crush takes the default x1");
+            Assert_True(_HitReactions[1].Impact == EMars_HitZone_ConditionImpact::None,
+                f"the default row has no condition impact (got [{_HitReactions[1].Impact :n}])");
+        }
+
         Assert_Equals_Int(_Zone.Get_HitCount(), 2, "the zone counted two hits");
     }
 }

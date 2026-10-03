@@ -26,7 +26,8 @@ class UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain : UCk_AutoTe
     private void Step_AssertInitial(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Intents.Get_LookDeltaSequence(), 0, "the sequence starts at 0");
-        Assert_True(_Intents.Get_LookDelta() == FVector::ZeroVector, "the delta starts at zero");
+        const auto LookDelta = _Intents.Get_LookDelta();
+        Assert_True(LookDelta == FVector::ZeroVector, f"the delta starts at zero (got [{LookDelta.ToString()}])");
     }
 
     UFUNCTION()
@@ -47,7 +48,7 @@ class UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain : UCk_AutoTe
     private void Step_AssertSummed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto LookDelta = _Intents.Get_LookDelta();
-        Assert_True(LookDelta.Equals(FVector(4.0, 6.0, 0.0), 0.001), f"a drain sums the frame's deltas ({LookDelta.ToString()})");
+        Assert_True(LookDelta.Equals(FVector(4.0, 6.0, 0.0), 0.001), f"a drain sums the frame's deltas to (4, 6, 0) (got [{LookDelta.ToString()}])");
     }
 
     UFUNCTION()
@@ -73,6 +74,6 @@ class UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain : UCk_AutoTe
     private void Step_AssertReplaced(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto LookDelta = _Intents.Get_LookDelta();
-        Assert_True(LookDelta.Equals(FVector(0.0, -1.0, 0.0), 0.001), f"the latest drain replaces, never accumulates ({LookDelta.ToString()})");
+        Assert_True(LookDelta.Equals(FVector(0.0, -1.0, 0.0), 0.001), f"the latest drain replaces, never accumulates: (0, -1, 0) (got [{LookDelta.ToString()}])");
     }
 }

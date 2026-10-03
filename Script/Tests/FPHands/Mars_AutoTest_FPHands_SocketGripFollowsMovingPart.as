@@ -8,7 +8,7 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
     private FCk_Handle_Mover _Mover;
     private FCk_Handle _MeshNode;
     private FMars_FPHands_Spec _Spec;
-    private FMars_FPHands_ReachTarget _Target;
+    private TOptional<FMars_FPHands_ReachTarget> _Target;
     private FVector _GripBeforeMove;
 
     UFUNCTION(BlueprintOverride)
@@ -26,18 +26,21 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
         // Same placement as UMars_Lever_EntityScript: a scaled mesh node under the Mover node.
         auto HandleTransform = HandleNode.As_Transform();
         auto MeshNode = utils_scene_node::Create(HandleTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 45.0), FVector(0.08, 0.08, 0.9)));
-        _MeshNode = FCk_Handle(MeshNode);
+        _MeshNode = MeshNode;
 
         auto Mesh = Cast<UStaticMesh>(LoadObject(this, "/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM"));
-        if (ck::IsValid(Mesh))
+        if (ck::Is_NOT_Valid(Mesh))
         {
-            auto Archetype = NewObject(this, UStaticMeshComponent);
-            Archetype.SetMobility(EComponentMobility::Movable);
-            Archetype.SetStaticMesh(Mesh);
-            Archetype.SetCollisionProfileName(n"NoCollision");
-            utils_unreal_component::Add(_MeshNode,
-                utils_unreal_component::Make_Params_FromArchetype(Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"Test_LeverHandle"));
+            FinishFailure("LeverHandle_Mars_SM does not load");
+            return;
         }
+
+        auto Archetype = NewObject(this, UStaticMeshComponent);
+        Archetype.SetMobility(EComponentMobility::Movable);
+        Archetype.SetStaticMesh(Mesh);
+        Archetype.SetCollisionProfileName(n"NoCollision");
+        utils_unreal_component::Add(_MeshNode,
+            utils_unreal_component::Make_Params_FromArchetype(Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"Test_LeverHandle"));
 
         Add_Step("the lever handle mesh carries a Grip socket", n"Step_AssertMeshHasSocket");
         Add_Step_WaitUntil("the handle mesh component exists", n"Check_HasComponent", 0, 5.0f);
@@ -67,13 +70,17 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_ResolveAndAssert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Hand = FMars_FPHands_HandState(FMars_FPHands_Hold(), FTransform::Identity, true);
-        const auto Subject = FMars_FPHands_ReachSubject(FCk_Handle_InteractTarget(), FCk_Handle_Interactable(), _Root);
+        const auto Hand = FMars_FPHands_HandState(FMars_FPHands_Hold(), FTransform::Identity, EMars_Hand::Right);
+        const auto Subject = FMars_FPHands_ReachSubject(FCk_Handle_Interactable(), _Root);
         _Target = utils_fphands::Resolve_ReachTarget(_Spec.Reach, FMars_FPHands_ReachQuery(Subject, Hand));
 
-        Assert_True(_Target.IsValid, "the reach resolves");
-        Assert_True(_Target.Layout == EMars_FPHands_GripLayout::Authored, "the grip comes from the socket");
-        Assert_True(FCk_Handle(_Target.Right.Anchor) == _MeshNode, "the reach anchors the right glove to the mesh node that carries the socket, not the root");
+        Assert_True(utils_fphands::Get_UsesHand(_Target, EMars_Hand::Right), "the reach resolves, with the right glove");
+        if (utils_fphands::Get_UsesHand(_Target, EMars_Hand::Right) == false)
+        { return; }
+
+        const auto Target = _Target.GetValue();
+        Assert_True(Target.Layout == EMars_FPHands_GripLayout::Authored, f"the grip comes from the socket (got {Target.Layout :n})");
+        Assert_True(Target.Right.GetValue().Anchor == _MeshNode, "the reach anchors the right glove to the mesh node that carries the socket, not the root");
 
         _GripBeforeMove = Get_ResolvedGrip();
         const auto Live = Get_LiveSocket();
@@ -102,8 +109,14 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
 
     private FVector Get_ResolvedGrip()
     {
-        auto Grip = FMars_FPHands_GripQuery(FTransform::Identity, true, FTransform::Identity);
-        utils_fphands::Resolve_WorldGrip(_Spec, _Target, Grip);
+        if (utils_fphands::Get_UsesHand(_Target, EMars_Hand::Right) == false)
+        {
+            FinishFailure("the reach did not resolve, so there is no grip to compare with");
+            return FVector::ZeroVector;
+        }
+
+        auto Grip = FMars_FPHands_GripQuery(FTransform::Identity, EMars_Hand::Right, FTransform::Identity);
+        utils_fphands::Resolve_WorldGrip(_Spec, _Target.GetValue(), Grip);
         return Grip.WorldGrip.GetLocation();
     }
 
@@ -111,7 +124,10 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
     {
         auto Component = Get_HandleComponent();
         if (ck::Is_NOT_Valid(Component))
-        { return FVector::ZeroVector; }
+        {
+            FinishFailure("the handle mesh component is gone, so there is no live socket to compare with");
+            return FVector::ZeroVector;
+        }
 
         return Component.GetSocketTransform(n"Grip", ERelativeTransformSpace::RTS_World).GetLocation();
     }

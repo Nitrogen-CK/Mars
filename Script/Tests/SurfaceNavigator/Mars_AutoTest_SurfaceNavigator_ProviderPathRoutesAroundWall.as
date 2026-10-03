@@ -3,10 +3,10 @@
 // navigator goes Moving with PathMode Provider and at least 3 waypoints, the body passes the wall's end (|Y| > 300) and
 // arrives within AcceptanceRadius of the goal, OnArrived once, OnFailed never.
 //
-// Phase 3 decision gate E4 found that a volume over runtime static Jolt bodies bakes (T13 does not hold for them). The
-// field uses the Room 5 recipe (utils_surface_navigator::Make_NavFieldSpec) with AutoBuildOnSetup disabled and an explicit
-// Request_Build once the floor and wall are in the Jolt world, so the bake waited on is the one that sees them.
-// The body is a plain SurfaceMotion body (D-T1; no legs, so it rides its rays).
+// A field over runtime static Jolt bodies bakes them, but only once they are in the Jolt world: the field
+// (utils_surface_navigator::Make_NavFieldSpec) has AutoBuildOnSetup disabled and an explicit Request_Build follows the
+// floor and wall being added, so the bake waited on is the one that sees them.
+// The body is a plain SurfaceMotion body (no legs, so it rides its rays).
 // Isolated origin (140000, 92000, 600): the Mars autotest map has no floor of its own there.
 class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTest_Base
 {
@@ -43,10 +43,6 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
         Add_Step("the body went round the wall and is at the goal", n"Step_AssertArrived");
         Run_Steps(InHandle);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
 
     private FCk_SurfaceMotion_Spec Make_MotionSpec()
     {
@@ -102,7 +98,7 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
 
     private FVector Get_BodyLocation() const
     {
-        return utils_transform::Get_EntityCurrentLocation(utils_transform::DoCastChecked(FCk_Handle(_Motion)));
+        return utils_transform::Get_EntityCurrentLocation(_Motion.As_Transform());
     }
 
     UFUNCTION()
@@ -112,10 +108,6 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
         Res.Set(utils_jolt_body::Get_IsBodyAdded(_FloorBody) && utils_jolt_body::Get_IsBodyAdded(_WallBody) &&
             ck::IsValid(_Motion) && utils_surface_motion::Get_Status(_Motion) == ECk_ProceduralAnimation_Status::Ready);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Handlers
-    //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
     private void OnArrived(FCk_Handle_SurfaceNavigator InNavigator, FVector InGoal)
@@ -129,14 +121,10 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
         ++_FailedCount;
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Steps
-    //----------------------------------------------------------------------------------------------------------------------
-
     UFUNCTION()
     private void Step_Build(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Volume), "the field composed");
+        Assert_Valid(_Volume, "utils_ground_nav_volume::Add composed the field");
         utils_ground_nav_volume::Request_Build(_Volume, FCk_Request_GroundNavVolume_Build());
     }
 
@@ -171,7 +159,8 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
     UFUNCTION()
     private void Step_AssertProviderRoute(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Nav.Get_PathMode() == EMars_SurfaceNavigator_PathMode::Provider, "the field answered: the move follows the provider's route");
+        Assert_True(_Nav.Get_PathMode() == EMars_SurfaceNavigator_PathMode::Provider,
+            f"the field answered: the move follows the provider's route (got [{_Nav.Get_PathMode() :n}])");
         Assert_True(_Nav.Get_Waypoints().Num() >= 3, f"the route bends round the wall ({_Nav.Get_Waypoints().Num()} waypoints)");
     }
 

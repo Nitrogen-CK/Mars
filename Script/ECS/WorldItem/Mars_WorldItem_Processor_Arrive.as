@@ -26,7 +26,7 @@ class UMars_Processor_WorldItem_Arrive : UCk_Processor_Script_Base_UE
 
         InArrival.Elapsed += float32(InDeltaT.Get_Seconds());
 
-        // Snapshot before a possible remove: Request_TryRemove is immediate (entt swap-and-pop).
+        // Snapshot before a possible remove: InArrival is invalid once Request_TryRemove returns.
         const auto From = InArrival.FromOffset;
         const auto To = InArrival.ToOffset;
         const auto Duration = InArrival.Duration;

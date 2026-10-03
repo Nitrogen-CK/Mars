@@ -1,4 +1,4 @@
-// Removing the held item leaves its slot selected with empty hands (PEAK): SelectedIndex never follows the item out.
+// Removing the held item leaves its slot selected with empty hands: SelectedIndex never follows the item out.
 class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UCk_AutoTest_Base
 {
     private FCk_Handle_Hotbar _Hotbar;
@@ -40,7 +40,7 @@ class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UCk_AutoTest_Base
     private void Check_StowedAndSelected(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == 0);
+        Res.Set(ck::IsValid(_Hotbar.Get_ItemAt(0)) && _Hotbar.Get_SelectedIndex() == TOptional<int32>(0));
     }
 
     UFUNCTION()
@@ -62,15 +62,15 @@ class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertSelectionKept(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_Hotbar.Get_SelectedIndex(), 0, "SelectedIndex after the held item was removed");
-        Assert_False(ck::IsValid(_Hotbar.Get_SelectedItem()), "Get_SelectedItem after the held item was removed");
+        Assert_True(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0), "slot 0 stays selected after the held item was removed");
+        Assert_Invalid(_Hotbar.Get_SelectedItem(), "the hands are empty after the held item was removed");
     }
 
     private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

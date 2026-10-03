@@ -35,9 +35,11 @@ class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UCk_AutoTest_Base
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
         Spec.Style.RightCell = 3;
-        Spec.BlinkIntervalMinSeconds = _IntervalSeconds;
-        Spec.BlinkIntervalMaxSeconds = _IntervalSeconds;
-        Spec.DoubleBlinkChance = 1.0f;
+        auto Blink = FMars_Eyes_BlinkSpec();
+        Blink.IntervalMinSeconds = _IntervalSeconds;
+        Blink.IntervalMaxSeconds = _IntervalSeconds;
+        Blink.DoubleBlinkChance = 1.0f;
+        Spec.Blink = Blink;
         _Eyes = utils_eyes::Add(FaceNode, Spec);
 
         Add_Step("the eyes have a presentation", n"Step_AssertPresentation");

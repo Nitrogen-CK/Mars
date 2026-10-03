@@ -246,7 +246,7 @@
 		{
 			"TypeName": "FCk_Handle_Hotbar",
 			"ShortName": "Hotbar",
-			"Description": "The player's PEAK-style hotbar: capacity-1 bag slot inventories plus one overflow slot, and the selected slot",
+			"Description": "The player's hotbar: capacity-1 bag slot inventories plus one overflow slot, and the selected slot",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_HotbarHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Hotbar"

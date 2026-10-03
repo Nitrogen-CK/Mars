@@ -80,19 +80,17 @@ class UMars_SmTask_Dicing_OperatorInput : UCk_SmTask_EntityScript
     private FCk_Handle_Dicing _Dicing;
     private FCk_Handle_InputIntents _Intents;
     private int32 _SeenLookSequence = 0;
-    private int32 _SeenChopFrame = -1;
+    // The activation frame of the Interact_Primary hold last seen; unset while it is not held.
+    private TOptional<int32> _SeenChopFrame;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         auto StationEntity = ck::Ctx(InHandle);
-        _Dicing = StationEntity.As_Dicing(ECk_SanityCheck::UnChecked);
+        _Dicing = StationEntity.As_Dicing();
         _Intents = FCk_Handle_InputIntents();
 
-        auto Station = StationEntity.As_Station(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Station))
-        { return; }
-
+        auto Station = StationEntity.As_Station();
         auto Operator = Station.Get_Operator();
         _Intents = Operator.As_InputIntents(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(_Intents))
@@ -120,7 +118,7 @@ class UMars_SmTask_Dicing_OperatorInput : UCk_SmTask_EntityScript
         if (ChopFrame != _SeenChopFrame)
         {
             _SeenChopFrame = ChopFrame;
-            if (ChopFrame >= 0)
+            if (ChopFrame.IsSet())
             { _Dicing.Request_Chop(FMars_Request_Dicing_Chop()); }
         }
 
@@ -133,18 +131,20 @@ class UMars_SmTask_Dicing_OperatorInput : UCk_SmTask_EntityScript
         _Dicing = FCk_Handle_Dicing();
         _Intents = FCk_Handle_InputIntents();
         _SeenLookSequence = 0;
-        _SeenChopFrame = -1;
+        _SeenChopFrame.Reset();
     }
 }
 
 // The operator's legend rows while operating, under owner key k_OwnerKey: "move hand" (IA_Look) and "chop"
 // (IA_Interact_Primary). The pile's state is the station's world label, not a row: a legend row without an InputAction
-// does not render (UMars_ActionHint_Widget::OnVisualUpdate ensures and returns).
+// does not render. An operator without a display (headless) gets no rows.
 class UMars_SmTask_Dicing_OperatorHints : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private const FName k_OwnerKey = n"Dicing";
+    private const int32 k_MoveHandSortOrder = 7;
+    private const int32 k_ChopSortOrder = 8;
 
     private FCk_Handle_ActionHintDisplay _Display;
 
@@ -153,17 +153,14 @@ class UMars_SmTask_Dicing_OperatorHints : UCk_SmTask_EntityScript
     {
         _Display = FCk_Handle_ActionHintDisplay();
 
-        auto Station = ck::Ctx(InHandle).As_Station(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Station))
-        { return; }
-
+        auto Station = ck::Ctx(InHandle).As_Station();
         auto Operator = Station.Get_Operator();
         _Display = Operator.As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(_Display))
         { return; }
 
-        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Look, FText::FromString("move hand"), 7, k_OwnerKey));
-        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, FText::FromString("chop"), 8, k_OwnerKey));
+        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Look, FText::FromString("move hand"), k_MoveHandSortOrder, k_OwnerKey));
+        _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, FText::FromString("chop"), k_ChopSortOrder, k_OwnerKey));
     }
 
     UFUNCTION(BlueprintOverride)

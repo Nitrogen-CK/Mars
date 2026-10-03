@@ -23,7 +23,7 @@ class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasSetHeld)
         { Held = InRequests.SetHeldRequests.Last().Held; }
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Countdown_Requests);
 
         if (HasCharge == false && HasSetHeld == false)

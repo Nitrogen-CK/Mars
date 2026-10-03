@@ -112,7 +112,6 @@ asset Mars_EyeExpression_Happy of UMars_EyeExpression
 // The left eye keeps the style's cell.
 asset Mars_EyeExpression_Wink of UMars_EyeExpression
 {
-    Def.OverrideLeft = false;
     Def.RightCell = 13;
     Def.AllowBlink = false;
     Def.AllowLook = true;
@@ -211,7 +210,11 @@ asset Mars_EyeCatalog of UMars_EyeCatalog
     Expressions.Add(Mars_EyeExpression_Downed);
 }
 
-namespace mars_eyes
+// Script asset globals are file-local: other files reach them through these accessors.
+namespace utils_eyes
 {
     UMars_EyeCatalog Catalog() { return Mars_EyeCatalog; }
+    UMars_EyeExpression Expression_Happy() { return Mars_EyeExpression_Happy; }
+    UMars_EyeExpression Expression_Wink() { return Mars_EyeExpression_Wink; }
+    UMars_EyeExpression Expression_Downed() { return Mars_EyeExpression_Downed; }
 }

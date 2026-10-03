@@ -36,6 +36,27 @@ struct FMars_Sequence_Spec
     float32 OutputPulseSeconds = 0.0f;
 }
 
+// At least one step, each set; a timeout, when set, and a pulse that do not run backwards.
+mixin FMars_Validation Validate(const FMars_Sequence_Spec& Self)
+{
+    if (Self.Steps.Num() == 0)
+    { return FMars_Validation("Steps must list at least one channel: an empty combination never completes"); }
+
+    for (int32 Index = 0; Index < Self.Steps.Num(); ++Index)
+    {
+        if (Self.Steps[Index].IsValid() == false)
+        { return FMars_Validation(f"Steps[{Index}] is not set"); }
+    }
+
+    if (Self.StepTimeoutSeconds.IsSet() && Self.StepTimeoutSeconds.GetValue() <= 0.0f)
+    { return FMars_Validation(f"StepTimeoutSeconds [{Self.StepTimeoutSeconds.GetValue()}] must be positive when set"); }
+
+    if (Self.OutputPulseSeconds < 0.0f)
+    { return FMars_Validation(f"OutputPulseSeconds [{Self.OutputPulseSeconds}] must not be negative"); }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
@@ -62,6 +83,7 @@ struct FMars_Fragment_Sequence_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Written only by UMars_Processor_Sequence_HandleRequests and utils_sequence::Add.
 struct FMars_Fragment_Sequence
 {
     UPROPERTY()
@@ -105,11 +127,35 @@ struct FMars_Fragment_Sequence_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Request_Sequence_Reset {}
+struct FMars_Request_Sequence_Reset
+{
+    UPROPERTY()
+    bool Requested = true;
 
-// Presence of the request = pending reset.
+    FMars_Request_Sequence_Reset() {}
+}
+
+// A rising edge on one of the sequence's input channels, forwarded from the sink on its entity in signal order.
+struct FMars_Request_Sequence_Input
+{
+    UPROPERTY()
+    FGameplayTag Channel;
+
+    FMars_Request_Sequence_Input() {}
+
+    FMars_Request_Sequence_Input(FGameplayTag InChannel)
+    {
+        Channel = InChannel;
+    }
+}
+
+// A pending reset applies first, then the inputs in arrival order: an input after a wrong one in the same drain is
+// judged against the progress the wrong one left.
 struct FMars_Fragment_Sequence_Requests
 {
     UPROPERTY()
-    TOptional<FMars_Request_Sequence_Reset> ResetRequest;
+    TArray<FMars_Request_Sequence_Reset> ResetRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Sequence_Input> InputRequests;
 }

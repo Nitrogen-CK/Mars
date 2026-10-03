@@ -1,9 +1,9 @@
 // The player's ManipulateControl task begins a lever's manipulation only once the gloves grip it: Use on a
 // ManuallyCompleted lever starts the interaction at once, but the Control is not manipulated while the gloves are still
-// reaching. Rig: the ManuallyCompleted lever of Mars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack
-// (transform-only interactable: the reach resolves as a point grip at the lever root), hands + resolver on the test
-// entity, and an SM on the test entity whose root state runs the player's ManipulateControl, InteractionResolverBinds
-// and Hands sub-SM tasks.
+// reaching. The lever's interactable is transform-only, so the reach resolves as a point grip at the lever root.
+
+// Runs the player's real ManipulateControl, InteractionResolverBinds and Hands sub-SM tasks on the test entity; the
+// Control tests that drive a lever through the player's tasks share it.
 class UMars_AutoTestState_ManipulateControlRig : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
@@ -32,7 +32,9 @@ class UMars_AutoTest_Control_ManipulationWaitsForTheGrip : UCk_AutoTest_Base
         auto HandRoot = utils_transform::Add(HandRootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
 
-        _Hands = utils_fphands::Add(_Player, FMars_FPHands_Spec(), HandNode.As_Transform());
+        auto HandsSpec = FMars_FPHands_Spec();
+        HandsSpec.HandNode = HandNode.As_Transform();
+        _Hands = utils_fphands::Add(_Player, HandsSpec);
         _Resolver = utils_interaction_resolver::Add(_Player, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
         BuildLever(InHandle);
         utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_ManipulateControlRig));
@@ -117,7 +119,7 @@ class UMars_AutoTest_Control_ManipulationWaitsForTheGrip : UCk_AutoTest_Base
         Assert_False(_SawManipulationBeforeGrip,
             f"the lever was manipulated while the gloves were not gripping it (phase {_Hands.Get_Phase() :n}, alpha {_Hands.Get_ReachAlpha()})");
         Assert_True(_Hands.Get_IsGrippingTarget(_Target), "the gloves grip the lever while it is manipulated");
-        Assert_True(ck::IsValid(_Control.Get_Fragment(FMars_Fragment_Control).Manipulation.Interaction),
+        Assert_True(_Control.Get_IsManipulating() && ck::IsValid(_Control.Get_Fragment(FMars_Fragment_Control).Manipulation.GetValue().Interaction),
             "the manipulation carries the started interaction (the threshold ends it)");
     }
 }

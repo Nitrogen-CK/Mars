@@ -37,12 +37,12 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
 
     private FGameplayTag Get_ToolTag() const
     {
-        return GameplayTags::ResolveGameplayTag(n"Station.Node.Tool");
+        return GameplayTags::Station_Node_Tool;
     }
 
     private FGameplayTag Get_SurfaceTag() const
     {
-        return GameplayTags::ResolveGameplayTag(n"Station.Node.Surface");
+        return GameplayTags::Station_Node_Surface;
     }
 
     UFUNCTION()
@@ -54,14 +54,14 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
         { return; }
 
         const auto Entries = _StationEntity.Get_Fragment(FMars_Fragment_FPHands_Grips).Entries;
-        Assert_True(Entries.Num() == 2, f"the table has two rows (got {Entries.Num()})");
+        Assert_Equals_Int(Entries.Num(), 2, "the table has two rows");
         if (Entries.Num() != 2)
         { return; }
 
-        Assert_True(Entries[0].Hand == EMars_Hand::Right && FCk_Handle(Entries[0].Node) == FCk_Handle(_ToolNode),
+        Assert_True(Entries[0].Hand == EMars_Hand::Right && Entries[0].Node == _ToolNode,
             "row 0: the right glove on the node registered under Station.Node.Tool");
-        Assert_True(Entries[0].Pose == EMars_HandGripPose::Power && Entries[0].Socket == NAME_None, "row 0 keeps its pose and socket");
-        Assert_True(Entries[1].Hand == EMars_Hand::Left && FCk_Handle(Entries[1].Node) == FCk_Handle(_SurfaceNode),
+        Assert_True(Entries[0].Pose == EMars_HandGripPose::Power && Entries[0].Socket.IsSet() == false, "row 0 keeps its pose and its unset socket");
+        Assert_True(Entries[1].Hand == EMars_Hand::Left && Entries[1].Node == _SurfaceNode,
             "row 1: the left glove on the node registered under Station.Node.Surface");
         Assert_True(Entries[1].Pose == EMars_HandGripPose::Open && Entries[1].ReachOverrideCm.IsSet() &&
             Math::Abs(Entries[1].ReachOverrideCm.GetValue() - 80.0f) < 0.001f,
@@ -94,13 +94,13 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
         TwoRight.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_ToolTag(), NAME_None, EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         TwoRight.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, Get_SurfaceTag(), NAME_None, EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         const auto TwoRightResult = TwoRight.Validate();
-        Assert_False(TwoRightResult.IsValid, "Validate() on two grips for the right hand");
+        Assert_False(TwoRightResult.IsValid(), "Validate() rejects two grips for the right hand");
         Assert_True(TwoRightResult.Get_Error().Contains("repeats the hand"), f"Validate() names the repeated hand (got [{TwoRightResult.Get_Error()}])");
 
         auto NoTag = FMars_Station_Spec();
         NoTag.Grips.Add(FMars_Station_Grip(EMars_Hand::Right, FGameplayTag(), NAME_None, EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Aimed, EMars_FPHands_GripRoll::Fixed));
         const auto NoTagResult = NoTag.Validate();
-        Assert_False(NoTagResult.IsValid, "Validate() on a grip without a node tag");
+        Assert_False(NoTagResult.IsValid(), "Validate() rejects a grip without a node tag");
         Assert_True(NoTagResult.Get_Error().Contains("has no node tag"), f"Validate() names the missing tag (got [{NoTagResult.Get_Error()}])");
     }
 

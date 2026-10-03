@@ -50,8 +50,8 @@ class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_ReserveA(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(ck::IsValid(_Station), "the station composed");
-        _Station.Request_Reserve(FMars_Request_Station_Reserve(FCk_Handle(_OperatorA)));
+        Assert_Valid(_Station, "utils_station::Add composed the station");
+        _Station.Request_Reserve(FMars_Request_Station_Reserve(_OperatorA));
     }
 
     UFUNCTION()
@@ -65,11 +65,13 @@ class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UCk_AutoTest_Base
     private void Step_ReserveB(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Reserved.Num(), 1, "OnReserved fired once");
-        Assert_True(_Reserved[0] == FCk_Handle(_OperatorA), "OnReserved carries operator A");
-        Assert_True(_Station.Get_IsOperatedBy(FCk_Handle(_OperatorA)), "the station names operator A");
-        Assert_True(FCk_Handle(_OperatorA.Get_Station()) == FCk_Handle(_Station), "operator A's back-ref names the station");
+        if (_Reserved.Num() == 1)
+        { Assert_True(_OperatorA == _Reserved[0], "OnReserved carries operator A"); }
 
-        _Station.Request_Reserve(FMars_Request_Station_Reserve(FCk_Handle(_OperatorB)));
+        Assert_True(_Station.Get_IsOperatedBy(_OperatorA), "the station names operator A");
+        Assert_True(_OperatorA.Get_Station() == _Station, "operator A's back-ref names the station");
+
+        _Station.Request_Reserve(FMars_Request_Station_Reserve(_OperatorB));
     }
 
     UFUNCTION()
@@ -83,11 +85,15 @@ class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UCk_AutoTest_Base
     private void Step_AssertRejected(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Rejected.Num(), 1, "OnReserveRejected fired once");
-        Assert_True(_Rejected[0] == FCk_Handle(_OperatorB), "the rejection carries operator B");
-        Assert_True(_RejectReasons[0] == EMars_Station_RejectReason::Occupied, f"B was rejected Occupied (got {_RejectReasons[0] :n})");
+        if (_Rejected.Num() == 1)
+        {
+            Assert_True(_OperatorB == _Rejected[0], "the rejection carries operator B");
+            Assert_True(_RejectReasons[0] == EMars_Station_RejectReason::Occupied, f"B was rejected Occupied (got {_RejectReasons[0] :n})");
+        }
+
         Assert_Equals_Int(_Reserved.Num(), 1, "OnReserved did not fire for operator B");
-        Assert_True(_Station.Get_Operator() == FCk_Handle(_OperatorA), "operator A still holds the station");
-        Assert_True(FCk_Handle(_OperatorA.Get_Station()) == FCk_Handle(_Station), "operator A's back-ref is intact");
+        Assert_True(_OperatorA == _Station.Get_Operator(), "operator A still holds the station");
+        Assert_True(_OperatorA.Get_Station() == _Station, "operator A's back-ref is intact");
         Assert_False(_OperatorB.Get_IsOperating(), "operator B stayed free");
     }
 }

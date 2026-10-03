@@ -17,8 +17,9 @@ class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_WorldItem_PendingLaunch& InPending)
     {
+        // A launch is only ever queued for a world item with a body.
         auto Body = InHandle.As_JoltBody(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Body))
+        if (ck::EnsureIfNot(ck::IsValid(Body), f"[WorldItem] Launch on [{InHandle.ToString()}], which has no Jolt body - dropped"))
         {
             InHandle.Request_TryRemove(FMars_Fragment_WorldItem_PendingLaunch);
             return;
@@ -28,8 +29,7 @@ class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
         if (utils_jolt_body::Get_IsBodyAdded(Body) == false || utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Dynamic)
         { return; }
 
-        // Snapshot before the remove: Request_TryRemove is immediate (entt swap-and-pop), so the fragment reference is
-        // dangling the moment it returns.
+        // Snapshot before the remove: InPending is invalid once Request_TryRemove returns.
         const auto Linear = InPending.LinearVelocity;
         const auto AngularDeg = InPending.AngularVelocityDeg;
 

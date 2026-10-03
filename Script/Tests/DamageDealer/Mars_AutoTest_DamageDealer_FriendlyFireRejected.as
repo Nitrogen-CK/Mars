@@ -20,7 +20,7 @@ class UMars_AutoTest_DamageDealer_FriendlyFireRejected : UCk_AutoTest_Base
 
         auto Target = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Health = utils_health::Add(Target, FMars_Health_Spec(100.0f));
-        _Zone = utils_hit_zone::Add(Target, FMars_HitZone_Spec(GameplayTags::ResolveGameplayTag(n"HitZone.Mars.Body")));
+        _Zone = utils_hit_zone::Add(Target, FMars_HitZone_Spec(GameplayTags::HitZone_Mars_Body));
         auto Root = utils_transform::Add(Target, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         _Hurtbox = utils_hit_zone::AddHurtbox_Box(_Zone, Root, FMars_HitZone_Hurtbox(FVector(20.0, 20.0, 20.0), FTransform::Identity));
         _TargetTeam = utils_team::Add(Target, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
@@ -45,7 +45,7 @@ class UMars_AutoTest_DamageDealer_FriendlyFireRejected : UCk_AutoTest_Base
     private FMars_Request_DamageDealer_DealDamage Make_Deal(FCk_Handle_DamageDealer InDealer)
     {
         return FMars_Request_DamageDealer_DealDamage(_Hurtbox,
-            utils_damage_dealer::Make_Event(InDealer, 10.0f, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt")));
+            utils_damage_dealer::Make_Event(InDealer, 10.0f, GameplayTags::DamageType_Mars_Blunt));
     }
 
     UFUNCTION()
@@ -73,7 +73,8 @@ class UMars_AutoTest_DamageDealer_FriendlyFireRejected : UCk_AutoTest_Base
     private void Step_AssertFriendlyAndRetag(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_RejectedReasons.Num(), 1, "OnDamageRejected fired once");
-        Assert_True(_RejectedReasons[0] == EMars_DamageDealer_RejectReason::Friendly, "a same-team hit is rejected Friendly");
+        Assert_True(_RejectedReasons[0] == EMars_DamageDealer_RejectReason::Friendly,
+            f"a same-team hit is rejected Friendly (got {_RejectedReasons[0] :n})");
         Assert_Equals_Float(_Health.Get_Current(), 100.0f, 0.001f, "the Health still reads 100");
         Assert_Equals_Int(_Dealer.Get_HitsDealt(), 0, "nothing was dealt");
 
@@ -97,7 +98,7 @@ class UMars_AutoTest_DamageDealer_FriendlyFireRejected : UCk_AutoTest_Base
 
         auto FriendlyFireAttacker = utils_entity_lifetime::Request_CreateEntity(_Self);
         utils_team::Add(FriendlyFireAttacker, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
-        _FriendlyFireDealer = utils_damage_dealer::Add(FriendlyFireAttacker, FMars_DamageDealer_Spec(1.0f, true));
+        _FriendlyFireDealer = utils_damage_dealer::Add(FriendlyFireAttacker, FMars_DamageDealer_Spec(1.0f, EMars_DamageDealer_FriendlyFire::Allow));
         _FriendlyFireDealer.BindTo_OnDamageRejected(FMars_Delegate_DamageDealer_OnDamageRejected(this, n"OnDamageRejected"));
 
         _FriendlyFireDealer.Request_DealDamage(Make_Deal(_FriendlyFireDealer));

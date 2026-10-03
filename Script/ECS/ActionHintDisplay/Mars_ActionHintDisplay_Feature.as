@@ -19,6 +19,18 @@ asset Mars_ActionHintRowHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_ActionHintRow {}
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Enums
+//--------------------------------------------------------------------------------------------------------------------------
+
+enum EMars_ActionHintDisplay_Suppression
+{
+    // Takes one suppress reference.
+    Suppress,
+    // Returns one suppress reference.
+    Release
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -66,21 +78,15 @@ struct FMars_ActionHint_Spec
 // Row
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Set once when Request_RegisterHint mints the row; the display processor copies it into the row state on register.
-struct FMars_Fragment_ActionHintRow_Params
-{
-    UPROPERTY()
-    FMars_ActionHint_Spec Spec;
-}
-
-// Written only by the display processor. Sequence stays -1 until the row's register drains.
+// Spec is set when Request_RegisterHint mints the row; afterwards only the display processor writes it (updates).
 struct FMars_Fragment_ActionHintRow
 {
     UPROPERTY()
     FMars_ActionHint_Spec Spec;
 
+    // Unset until the row's register drains; afterwards the display-wide registration order.
     UPROPERTY()
-    int64 Sequence = -1;
+    TOptional<int64> Sequence;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -100,9 +106,9 @@ struct FMars_Fragment_ActionHintDisplay
     UPROPERTY()
     int32 SuppressDepth = 0;
 
-    // Rows whose Sequence is below it are hidden while SuppressDepth > 0.
+    // Set while SuppressDepth > 0: rows whose Sequence is below it are hidden.
     UPROPERTY()
-    int64 SuppressWatermark = -1;
+    TOptional<int64> SuppressWatermark;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -213,13 +219,13 @@ struct FMars_Request_ActionHintDisplay_Update
 struct FMars_Request_ActionHintDisplay_SetSuppressed
 {
     UPROPERTY()
-    bool Suppressed = false;
+    EMars_ActionHintDisplay_Suppression Suppression = EMars_ActionHintDisplay_Suppression::Suppress;
 
     FMars_Request_ActionHintDisplay_SetSuppressed() {}
 
-    FMars_Request_ActionHintDisplay_SetSuppressed(bool InSuppressed)
+    FMars_Request_ActionHintDisplay_SetSuppressed(EMars_ActionHintDisplay_Suppression InSuppression)
     {
-        Suppressed = InSuppressed;
+        Suppression = InSuppression;
     }
 }
 

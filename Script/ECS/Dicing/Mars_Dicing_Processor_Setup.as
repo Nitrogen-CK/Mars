@@ -1,10 +1,6 @@
-// One-shot per Dicing entity: binds the cleaver Mover's OnArrived, where a chop resolves.
-//   Arrived at the end (contact): aligned = the hand is within BandHalfWidth of the band. An aligned chop counts; at
-//     ChopsPerState the pile advances one state (GreenPaste stays) and the band steps to the next table entry. Writes land
-//     first, then OnStateChanged (+ OnRequestedStateReached on exactly the requested state), OnBandMoved, OnChopResolved;
-//     then the cleaver is sent back up.
-//   Arrived at the start (back up): the chop is over; the next press may chop.
-// The Mover finds its Dicing through FMars_Fragment_Dicing_ChopLink (stamped by Add on the Mover entity).
+// One-shot per Dicing entity: binds the cleaver Mover's OnArrived, where a chop resolves. At the end pose (contact) the
+// chop is judged and the cleaver sent back up; at the start pose (back up) the next press may chop. The Mover finds its
+// Dicing through FMars_Fragment_Dicing_ChopLink (stamped by Add on the Mover entity).
 class UMars_Processor_Dicing_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -21,21 +17,21 @@ class UMars_Processor_Dicing_Setup : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Dicing();
 
-        auto Mover = InState.ChopMover;
-        if (ck::IsValid(Mover))
-        { Mover.BindTo_OnArrived(FMars_Delegate_Mover_OnArrived(this, n"OnChopMoverArrived")); }
+        auto Mover = Self.Get_Spec().Nodes.ChopMover;
+        Mover.BindTo_OnArrived(FMars_Delegate_Mover_OnArrived(this, n"OnChopMoverArrived"));
 
         Self.Request_TryRemove(FMars_Tag_Dicing_NeedsSetup);
     }
 
     UFUNCTION()
-    private void OnChopMoverArrived(FCk_Handle_Mover InMover, bool InAtEnd)
+    private void OnChopMoverArrived(FCk_Handle_Mover InMover, EMars_Mover_Pose InPose)
     {
-        auto MoverEntity = FCk_Handle(InMover);
-        if (ck::Is_NOT_Valid(MoverEntity) || MoverEntity.Has_Fragment(FMars_Fragment_Dicing_ChopLink) == false)
+        if (ck::EnsureIfNot(InMover.Has_Fragment(FMars_Fragment_Dicing_ChopLink),
+            f"[Dicing] chop Mover [{InMover.ToString()}] carries no ChopLink"))
         { return; }
 
-        auto Dicing = MoverEntity.Get_Fragment(FMars_Fragment_Dicing_ChopLink).Dicing;
+        // The station is being torn down with its cleaver.
+        auto Dicing = InMover.Get_Fragment(FMars_Fragment_Dicing_ChopLink).Dicing;
         if (ck::Is_NOT_Valid(Dicing))
         { return; }
 
@@ -43,7 +39,7 @@ class UMars_Processor_Dicing_Setup : UCk_Processor_Script_Base_UE
         if (State.IsChopping == false)
         { return; }
 
-        if (InAtEnd == false)
+        if (InPose == EMars_Mover_Pose::Start)
         {
             State.IsChopping = false;
             return;
@@ -52,39 +48,40 @@ class UMars_Processor_Dicing_Setup : UCk_Processor_Script_Base_UE
         Resolve_Contact(Dicing, State);
 
         auto ChopMover = InMover;
-        ChopMover.Request_MoveTo(false);
+        ChopMover.Request_MoveTo(FMars_Request_Mover_MoveTo(EMars_Mover_Pose::Start));
     }
 
+    // An aligned chop counts; at ChopsPerState the pile advances one state (GreenPaste stays) and the band steps to the
+    // next table entry. Writes land first, then OnStateChanged (+ OnRequestedStateReached on exactly the requested state),
+    // OnBandMoved, OnChopResolved.
     private void Resolve_Contact(FCk_Handle_Dicing& InDicing, FMars_Fragment_Dicing& InState)
     {
         const auto Spec = InDicing.Get_Spec();
-        const auto Aligned = Math::Abs(InState.HandLateral - InState.BandCenter) <= Spec.BandHalfWidth;
+        const auto StartBand = utils_dicing::Get_BandCenterAt(Spec, InState.BandIndex);
+        const auto Result = Math::Abs(InState.HandLateral - StartBand) <= Spec.BandHalfWidth
+            ? EMars_Dicing_ChopResult::Aligned
+            : EMars_Dicing_ChopResult::OffTheBand;
 
         auto StateChanged = false;
-        auto BandMoved = false;
-        if (Aligned)
+        if (Result == EMars_Dicing_ChopResult::Aligned)
         {
-            InState.UsefulChops += 1;
-            InState.ChopsInState += 1;
+            InState.Pile.UsefulChops += 1;
+            InState.Pile.ChopsInState += 1;
 
-            if (InState.ChopsInState >= Spec.ChopsPerState && InState.MaterialState != EMars_Dicing_State::GreenPaste)
+            if (InState.Pile.ChopsInState >= Spec.ChopsPerState && InState.Pile.MaterialState != EMars_Dicing_State::GreenPaste)
             {
-                InState.MaterialState = utils_dicing::Get_NextState(InState.MaterialState);
-                InState.ChopsInState = 0;
+                InState.Pile.MaterialState = utils_dicing::Get_NextState(InState.Pile.MaterialState);
+                InState.Pile.ChopsInState = 0;
                 StateChanged = true;
             }
 
-            InState.BandIndex = (InState.BandIndex + 1) % utils_dicing::k_BandTableSize;
-            const auto NewCenter = utils_dicing::Get_BandCenterAt(Spec, InState.BandIndex);
-            BandMoved = NewCenter != InState.BandCenter;
-            InState.BandCenter = NewCenter;
+            InState.BandIndex = utils_dicing::Get_NextBandIndex(InState.BandIndex);
         }
 
-        const auto NewState = InState.MaterialState;
-        const auto NewBand = InState.BandCenter;
+        const auto NewState = InState.Pile.MaterialState;
+        const auto NewBand = utils_dicing::Get_BandCenterAt(Spec, InState.BandIndex);
 
-        const FString Verdict = Aligned ? "aligned" : "off the band";
-        ck::Trace(f"[Dicing] [{InDicing.ToString()}] chop {Verdict}: state {NewState :n}, useful chops {InState.UsefulChops}");
+        ck::Trace(f"[Dicing] [{InDicing.ToString()}] chop {Result :n}: state {NewState :n}, useful chops {InState.Pile.UsefulChops}");
 
         if (InDicing.Has_Fragment(FMars_Fragment_Dicing_Signals) == false)
         { return; }
@@ -97,10 +94,10 @@ class UMars_Processor_Dicing_Setup : UCk_Processor_Script_Base_UE
             { InDicing.Get_Fragment(FMars_Fragment_Dicing_Signals).OnRequestedStateReached.Broadcast(InDicing); }
         }
 
-        if (BandMoved && InDicing.Has_Fragment(FMars_Fragment_Dicing_Signals))
+        if (NewBand != StartBand && InDicing.Has_Fragment(FMars_Fragment_Dicing_Signals))
         { InDicing.Get_Fragment(FMars_Fragment_Dicing_Signals).OnBandMoved.Broadcast(InDicing, NewBand); }
 
         if (InDicing.Has_Fragment(FMars_Fragment_Dicing_Signals))
-        { InDicing.Get_Fragment(FMars_Fragment_Dicing_Signals).OnChopResolved.Broadcast(InDicing, Aligned); }
+        { InDicing.Get_Fragment(FMars_Fragment_Dicing_Signals).OnChopResolved.Broadcast(InDicing, Result); }
     }
 }

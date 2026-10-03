@@ -1,8 +1,6 @@
-// Picks what each eye node looks at, every pass: every entity inside the sense trigger resolves to its owner (ck::Ctx)
-// and that owner's AimPoint attach point; the nearest one inside [MinRangeCm, RangeCm] and the cone around the eye
-// node's +X wins, except that the current target is kept until a challenger is closer by SwitchCloserRatio of its
-// distance. A sensed owner without the aim point is reported once while it stays sensed (and again if it leaves and
-// returns). OnTargetChanged fires after Target and AimYawPitchDeg are written.
+// Picks what each eye node looks at, every pass. The current target is kept until a challenger is closer by
+// SwitchCloserRatio of its distance. A sensed owner without the aim point is reported once while it stays sensed (and
+// again if it leaves and returns). OnTargetChanged fires after Target and AimYawPitchDeg are written.
 class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -18,8 +16,7 @@ class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
         if (ck::EnsureIfNot(ck::IsValid(InState.Sense), f"[Gaze] [{InHandle.ToString()}] has no sense trigger - nothing to look at"))
         { return; }
 
-        const auto& Tuning = InHandle.Get_Fragment(FMars_Fragment_Gaze_Params).Tuning;
-        const auto OwnContext = ck::Ctx(InHandle);
+        const auto& Spec = InHandle.Get_Fragment(FMars_Fragment_Gaze_Params).Spec;
         const auto EyeWorld = utils_transform::Get_EntityCurrentTransform(InHandle.As_Transform());
 
         auto Nearest = FCk_Handle_Transform();
@@ -34,12 +31,8 @@ class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
 
         for (auto Entity : InState.Sense.Get_EntitiesInside())
         {
-            // A probe under the gaze's own owner (its own body) is never something to look at.
             auto Owner = ck::Ctx(Entity);
-            if (Owner == OwnContext)
-            { continue; }
-
-            const auto AimNode = DoGet_AimNode(Owner, Tuning.AimPoint);
+            const auto AimNode = DoGet_AimNode(Owner, Spec.AimPoint);
             if (ck::Is_NOT_Valid(AimNode))
             {
                 OwnersWithoutAim.AddUnique(Owner);
@@ -47,7 +40,7 @@ class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
                 {
                     InState.ReportedOwnersWithoutAim.Add(Owner);
                     ck::EnsureIfNot(false,
-                        f"[Gaze] [{InHandle.ToString()}] detected [{Owner.ToString()}], which publishes no [{Tuning.AimPoint.ToString()}] attach point - not a look target");
+                        f"[Gaze] [{InHandle.ToString()}] detected [{Owner.ToString()}], which publishes no [{Spec.AimPoint.ToString()}] attach point - not a look target");
                 }
                 continue;
             }
@@ -55,11 +48,11 @@ class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
             const auto AimWorld = utils_transform::Get_EntityCurrentTransform(AimNode);
             const auto Local = EyeWorld.InverseTransformPositionNoScale(AimWorld.GetLocation());
             const auto Distance = Local.Size();
-            if (Distance <= KINDA_SMALL_NUMBER || Distance < Tuning.MinRangeCm || Distance > Tuning.RangeCm)
+            if (Distance <= KINDA_SMALL_NUMBER || Distance < Spec.MinRangeCm || Distance > Spec.RangeCm)
             { continue; }
 
             const auto AngleToForwardDeg = Math::RadiansToDegrees(Math::Acos(Math::Clamp(Local.X / Distance, -1.0, 1.0)));
-            if (AngleToForwardDeg > Tuning.ConeHalfAngleDeg)
+            if (AngleToForwardDeg > Spec.ConeHalfAngleDeg)
             { continue; }
 
             if (AimNode == InState.Target)
@@ -86,10 +79,9 @@ class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
             { InState.ReportedOwnersWithoutAim.RemoveAt(Index); }
         }
 
-        // A challenger at least SwitchCloserRatio closer takes over; anything less keeps the current target.
         auto Chosen = Nearest;
         auto ChosenLocal = NearestLocal;
-        if (CurrentIsEligible && NearestDistance > CurrentDistance * (1.0 - Tuning.SwitchCloserRatio))
+        if (CurrentIsEligible && NearestDistance > CurrentDistance * (1.0 - Spec.SwitchCloserRatio))
         {
             Chosen = InState.Target;
             ChosenLocal = CurrentLocal;
@@ -110,10 +102,11 @@ class UMars_Processor_Gaze_Select : UCk_Processor_Script_Base_UE
     // Invalid when InOwner has no AttachPoints or publishes nothing under InAimPoint.
     private FCk_Handle_Transform DoGet_AimNode(const FCk_Handle& InOwner, FGameplayTag InAimPoint) const
     {
-        if (InOwner.Has_Fragment(FMars_Feature_AttachPoints) == false)
+        const auto AttachPoints = InOwner.As_AttachPoints(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(AttachPoints))
         { return FCk_Handle_Transform(); }
 
-        return InOwner.As_AttachPoints().Get_AttachPoint(InAimPoint);
+        return AttachPoints.Get_AttachPoint(InAimPoint);
     }
 
     // InLocal is in the eye node's frame (X forward, Y right, Z up).

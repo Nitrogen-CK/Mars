@@ -1,5 +1,5 @@
 UCLASS(Abstract)
-class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
+class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
 {
     UPROPERTY(meta = (BindWidget))
     UCommonTextBlock PromptText;
@@ -41,8 +41,8 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
         { return; }
 
         Set_Prompt(InPrompt.Get_DisplayText(), InputAction, InPrompt.Get_DisplayTextColor());
-        Report_MissingIcon(InputAction);
-        Show_Progress(InPrompt.Get_IsTimedInteraction());
+        Report_MissingIcon(PromptIcon, InputAction);
+        Show_Progress(InPrompt.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::Instant);
 
         auto Interaction = InPrompt.Get_CurrentInteraction();
         auto TimeAttribute = ck::IsValid(Interaction)
@@ -55,7 +55,7 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
         { StopHoldProgress(); }
 
         auto Control = FCk_Handle_Control();
-        auto Target = FCk_Handle(InPrompt).As_InteractTarget(ECk_SanityCheck::UnChecked);
+        auto Target = InPrompt.As_InteractTarget(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext)
             && Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted)
         { Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked); }
@@ -76,28 +76,6 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
 
         if (ck::IsValid(PromptIcon) && ck::IsValid(InAction))
         { PromptIcon.SetEnhancedInputAction(InAction); }
-    }
-
-    // Names the broken link once per widget when the key glyph cannot render: key resolution (profile / applied
-    // contexts), brush lookup (CommonInput controller data for the current input type), or CommonUI collapsing the
-    // action widget (e.g. Enhanced Input support off in CommonInputSettings).
-    private bool _HasReportedMissingIcon = false;
-
-    private void Report_MissingIcon(UInputAction InAction)
-    {
-        if (_HasReportedMissingIcon || ck::Is_NOT_Valid(PromptIcon))
-        { return; }
-
-        const auto Key = PromptIcon.Get_ResolvedKey();
-        const auto Brush = UCk_Utils_KeyIcon_UE::Get_BrushForKey(GetOwningPlayer(), Key);
-        const auto HasBrush = ck::IsValid(Brush.ResourceObject);
-        const auto IconCollapsed = PromptIcon.GetVisibility() == ESlateVisibility::Collapsed;
-        if (Key.IsValid() && HasBrush && IconCollapsed == false)
-        { return; }
-
-        _HasReportedMissingIcon = true;
-        const FString KeyName = Key.IsValid() ? Key.ToString() : "Invalid";
-        ck::Warning(f"[Mars_InteractPrompt] No key icon for [{InAction.GetName()}]: ResolvedKey=[{KeyName}] BrushFound=[{HasBrush}] IconCollapsed=[{IconCollapsed}]");
     }
 
     private void ListenForHoldProgress(FCk_Handle_FloatAttribute InTimeAttribute)
@@ -161,9 +139,9 @@ class UMars_InteractPrompt_Widget : UCk_UserWidget_UE
     }
 
     UFUNCTION()
-    private void OnManipulationChanged(FCk_Handle_Control InControl, bool InManipulating)
+    private void OnManipulationChanged(FCk_Handle_Control InControl, EMars_Control_Grip InGrip)
     {
-        if (InManipulating == false)
+        if (InGrip == EMars_Control_Grip::Released)
         { Set_ProgressPercent(0.0f); }
     }
 

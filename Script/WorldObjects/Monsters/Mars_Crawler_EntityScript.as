@@ -1,3 +1,13 @@
+// One ISM renderer per tint, each with its own LitMetal MID.
+struct FMars_Crawler_TintedRenderer
+{
+    UPROPERTY()
+    FLinearColor Color;
+
+    UPROPERTY()
+    UCk_IsmRenderer_Data Renderer;
+}
+
 // Placeable crawler (Room 5): a 4- or 6-legged procedural walker whose every leg is a body part. This script owns the
 // visuals: it builds the presentation, segment and foot transform entities (each a DIRECT lifetime child of the root, as
 // the rig requires) with ISM box visuals tinted Color, then hands them to utils_crawler::Add in Spec.Rig, which composes
@@ -29,9 +39,8 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     private const float64 SegmentHalfThickness = 6.0;
     private const float64 FootHalfExtent = 8.0;
 
-    // One renderer per tint, created on first use (each carries its own LitMetal MID).
-    private TArray<FLinearColor> _RendererColors;
-    private TArray<UCk_IsmRenderer_Data> _Renderers;
+    // Created on first use of each tint.
+    private TArray<FMars_Crawler_TintedRenderer> _Renderers;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -42,6 +51,11 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_handle::Set_DebugName(InHandle, FName(f"Crawler{Spec.LegCount}"));
 
+        // Before any rig entity or visual is built: only some leg counts have a rig asset.
+        auto RigData = utils_crawler::Get_RigData(Spec.LegCount);
+        if (ck::EnsureIfNot(ck::IsValid(RigData), f"[Crawler] [{InHandle.ToString()}] has LegCount [{Spec.LegCount}]; only 4 and 6 have rigs"))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
         auto CrawlerSpec = Spec;
         if (CrawlerSpec.RoamBounds.Max.X <= CrawlerSpec.RoamBounds.Min.X || CrawlerSpec.RoamBounds.Max.Y <= CrawlerSpec.RoamBounds.Min.Y)
         {
@@ -49,7 +63,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
             CrawlerSpec.RoamBounds = FBox(SpawnTransform.GetLocation() - Half, SpawnTransform.GetLocation() + Half);
         }
 
-        CrawlerSpec.Rig = BuildRig(InHandle, CrawlerSpec.LegCount);
+        CrawlerSpec.Rig = BuildRig(InHandle, RigData);
         utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");
 
@@ -62,17 +76,17 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
 
     // The presentation (the body visual, sagged by the body pose) and, per leg of the rig asset, its segment boxes
     // (Length/2 x 6 x 6, centred, +X along the segment) and a foot box.
-    private FMars_Crawler_Rig BuildRig(FCk_Handle& InRoot, int32 InLegCount)
+    private FMars_Crawler_Rig BuildRig(FCk_Handle& InRoot, UCk_ProceduralRig_Data InRigData)
     {
+        const TArray<FCk_ProceduralLeg_Spec> LegSpecs = InRigData.Get_Legs();
+
         auto Rig = FMars_Crawler_Rig();
-        Rig.BodyHalfExtents = InLegCount == 6 ? FVector(55.0, 30.0, 15.0) : FVector(40.0, 30.0, 15.0);
+        Rig.BodyHalfExtents = LegSpecs.Num() == 6 ? FVector(55.0, 30.0, 15.0) : FVector(40.0, 30.0, 15.0);
         Rig.Presentation = AddVisual(InRoot, Rig.BodyHalfExtents, Color);
 
         const auto FootHalfExtents = FVector(FootHalfExtent, FootHalfExtent, FootHalfExtent);
         const auto FootColor = FLinearColor(0.85f, 0.85f, 0.8f, 1.0f);
 
-        const auto RigData = InLegCount == 6 ? utils_crawler::Mars_CrawlerRig6 : utils_crawler::Mars_CrawlerRig4;
-        const TArray<FCk_ProceduralLeg_Spec> LegSpecs = RigData.Get_Legs();
         for (const auto& LegSpec : LegSpecs)
         {
             auto LegRig = FMars_Crawler_LegRig();
@@ -122,15 +136,18 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // NewObject-backed MIDs need a world; hence a method on the entity script, not on the feature.
     private UCk_IsmRenderer_Data GetOrCreate_Renderer(FCk_Handle& InRoot, FLinearColor InColor)
     {
-        for (int32 Index = 0; Index < _RendererColors.Num(); ++Index)
+        for (const auto& Tinted : _Renderers)
         {
-            if (_RendererColors[Index].Equals(InColor) && ck::IsValid(_Renderers[Index]))
-            { return _Renderers[Index]; }
+            if (Tinted.Color.Equals(InColor) && ck::IsValid(Tinted.Renderer))
+            { return Tinted.Renderer; }
         }
 
         auto EntityWorld = utils_entity_lifetime::Get_WorldForEntity(InRoot);
+        if (ck::Is_NOT_Valid(EntityWorld))
+        { return nullptr; }
+
         auto Mesh = engine::load::Cube();
-        if (ck::Is_NOT_Valid(EntityWorld) || ck::Is_NOT_Valid(Mesh))
+        if (ck::EnsureIfNot(ck::IsValid(Mesh), f"[Crawler] [{InRoot.ToString()}] could not load the engine cube"))
         { return nullptr; }
 
         auto Material = utils_usf::Create_MID_ForLook(CkUsf::LitMetal, EntityWorld);
@@ -147,8 +164,10 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(Renderer))
         { return nullptr; }
 
-        _RendererColors.Add(InColor);
-        _Renderers.Add(Renderer);
+        auto Tinted = FMars_Crawler_TintedRenderer();
+        Tinted.Color = InColor;
+        Tinted.Renderer = Renderer;
+        _Renderers.Add(Tinted);
         return Renderer;
     }
 }

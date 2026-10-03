@@ -13,7 +13,7 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
     private FCk_Handle_Crawler _Crawler;
 
     private TArray<FMars_DamageEvent> _DiedCauses;
-    private TArray<FCk_Handle> _Legs;
+    private TArray<FCk_Handle_BodyPart> _Legs;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -29,10 +29,6 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
         Add_Step_WaitUntil("the Dead state shed every leg and the severed limbs died on their timer", n"Check_LegsShedAndGone", 0, 3.0f);
         Run_Steps(InHandle);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Shared rig (one scenario per file: copied, not shared)
-    //----------------------------------------------------------------------------------------------------------------------
 
     private FMars_Crawler_Spec Make_Spec()
     {
@@ -66,7 +62,7 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
     UFUNCTION()
     private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        _Crawler = FCk_Handle(InEntityScriptHandle).As_Crawler(ECk_SanityCheck::UnChecked);
+        _Crawler = InEntityScriptHandle.As_Crawler();
     }
 
     UFUNCTION()
@@ -90,10 +86,6 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
             _Crawler.Get_Monster().Get_Parts().Num() == 4);
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Steps
-    //----------------------------------------------------------------------------------------------------------------------
-
     UFUNCTION()
     private void OnDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause)
     {
@@ -102,8 +94,8 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
 
     private FMars_DamageEvent Make_Hit(float32 InAmount, float32 InMarkerX)
     {
-        auto Event = FMars_DamageEvent(InAmount, GameplayTags::ResolveGameplayTag(n"DamageType.Mars.Blunt"));
-        Event.HitLocation = FVector(InMarkerX, 0.0, 0.0);
+        auto Event = FMars_DamageEvent(InAmount, GameplayTags::DamageType_Mars_Blunt);
+        Event.Hit.Location = FVector(InMarkerX, 0.0, 0.0);
         return Event;
     }
 
@@ -111,13 +103,11 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
     private void Step_BindAndKill(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Monster = _Crawler.Get_Monster();
-        Assert_Equals_Int(int32(utils_byte_attribute::Get_FinalValueOr(FCk_Handle(Monster), GameplayTags::ResolveGameplayTag(n"ByteAttribute.Mars.Monster.Dead"), 7)), 0,
-            "the Dead attribute starts at 0");
+        Assert_Equals_Int(int32(Monster.Get_DeadAttribute().Get_FinalValue()), 0, "the Dead attribute starts at 0");
 
         Monster.BindTo_OnDied(FMars_Delegate_Monster_OnDied(this, n"OnDied"));
 
-        for (auto Part : Monster.Get_Parts())
-        { _Legs.Add(FCk_Handle(Part)); }
+        _Legs = Monster.Get_Parts();
 
         auto Zone = Monster.Get_BodyZone();
         Zone.Request_Hit(FMars_Request_HitZone_Hit(Make_Hit(200.0f, 1.0f)));
@@ -128,8 +118,7 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
     {
         auto Monster = _Crawler.Get_Monster();
         auto Res = OutResult;
-        Res.Set(Monster.Get_IsDead() &&
-            utils_byte_attribute::Get_FinalValueOr(FCk_Handle(Monster), GameplayTags::ResolveGameplayTag(n"ByteAttribute.Mars.Monster.Dead"), 0) == 1);
+        Res.Set(Monster.Get_IsDead() && Monster.Get_DeadAttribute().Get_FinalValue() == 1);
     }
 
     UFUNCTION()
@@ -137,9 +126,14 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
     {
         auto Monster = _Crawler.Get_Monster();
         Assert_Equals_Int(_DiedCauses.Num(), 1, "OnDied fired once");
-        Assert_Equals_Float(_DiedCauses[0].Amount, 200.0f, 0.001f, "OnDied carries the lethal hit");
-        Assert_True(Monster.Get_DeathCause().IsSet(), "the death cause is recorded");
-        Assert_Equals_Float(Monster.Get_DeathCause().GetValue().HitLocation.X, 1.0f, 0.001f, "the death cause is the lethal hit");
+        if (_DiedCauses.Num() == 1)
+        { Assert_Equals_Float(_DiedCauses[0].Amount, 200.0f, 0.001f, "OnDied carries the lethal hit"); }
+
+        const auto DeathCause = Monster.Get_DeathCause();
+        Assert_True(DeathCause.IsSet(), "the death cause is recorded");
+        if (DeathCause.IsSet())
+        { Assert_Equals_Float(DeathCause.GetValue().Hit.Location.X, 1.0f, 0.001f, "the death cause is the lethal hit"); }
+
         Assert_True(Monster.Get_BodyHealth().Get_IsDepleted(), "the body Health is depleted");
 
         auto Zone = Monster.Get_BodyZone();
@@ -153,9 +147,13 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
         auto Monster = _Crawler.Get_Monster();
         Assert_Equals_Int(_DiedCauses.Num(), 1, "still one OnDied");
         Assert_True(Monster.Get_IsDead(), "the monster stays dead");
-        Assert_Equals_Float(Monster.Get_DeathCause().GetValue().HitLocation.X, 1.0f, 0.001f, "the first cause is kept");
-        Assert_Equals_Int(int32(utils_byte_attribute::Get_FinalValueOr(FCk_Handle(Monster), GameplayTags::ResolveGameplayTag(n"ByteAttribute.Mars.Monster.Dead"), 0)), 1,
-            "the Dead attribute stays 1");
+
+        const auto DeathCause = Monster.Get_DeathCause();
+        Assert_True(DeathCause.IsSet(), "the death cause is still recorded");
+        if (DeathCause.IsSet())
+        { Assert_Equals_Float(DeathCause.GetValue().Hit.Location.X, 1.0f, 0.001f, "the first cause is kept"); }
+
+        Assert_Equals_Int(int32(Monster.Get_DeadAttribute().Get_FinalValue()), 1, "the Dead attribute stays 1");
     }
 
     UFUNCTION()

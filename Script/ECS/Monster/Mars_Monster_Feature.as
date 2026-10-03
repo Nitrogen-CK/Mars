@@ -15,7 +15,6 @@ struct FMars_Feature_Monster {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Field order is the positional constructor's order.
 struct FMars_Monster_Spec
 {
     // Monster.Mars.*
@@ -25,11 +24,11 @@ struct FMars_Monster_Spec
     UPROPERTY()
     FMars_Health_Spec BodyHealth;
 
-    // Its Health is ignored: the body zone always feeds the body Health.
+    // Composed on the root beside the body Health, which it feeds.
     UPROPERTY()
     FMars_HitZone_Spec BodyZone;
 
-    // Between death and despawn (the Dead state's timer, Phase 5).
+    // Between death and despawn (the Dead state's corpse timer).
     UPROPERTY()
     float32 CorpseSeconds = 8.0f;
 
@@ -55,11 +54,11 @@ mixin FMars_Validation Validate(const FMars_Monster_Spec& Self)
     { return FMars_Validation("Monster has no MonsterTag"); }
 
     const auto HealthValidation = Self.BodyHealth.Validate();
-    if (HealthValidation.IsValid == false)
+    if (HealthValidation.IsValid() == false)
     { return HealthValidation; }
 
     const auto ZoneValidation = Self.BodyZone.Validate();
-    if (ZoneValidation.IsValid == false)
+    if (ZoneValidation.IsValid() == false)
     { return ZoneValidation; }
 
     if (Self.CorpseSeconds < 0.0f)
@@ -82,8 +81,9 @@ struct FMars_Fragment_Monster_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by UMars_Processor_Monster_HandleRequests (and composed by Add). The roster keeps a severed part until its
-// entity dies; readers count attached parts by the part's State, never by handle validity.
+// Written only by UMars_Processor_Monster_HandleRequests (and composed by Add). The roster is never pruned: a severed part
+// stays listed, valid until its debris timer destroys it and invalid after. Readers count attached parts by the part's
+// State and check validity before any read.
 struct FMars_Fragment_Monster
 {
     UPROPERTY()
@@ -99,12 +99,9 @@ struct FMars_Fragment_Monster
     UPROPERTY()
     TArray<FCk_Handle_BodyPart> Parts;
 
-    // Latched by the first Die; meaningful with DeathCause.
+    // Latched by the first Die: the monster is dead once it is set.
     UPROPERTY()
-    bool IsDead = false;
-
-    UPROPERTY()
-    FMars_DamageEvent DeathCause;
+    TOptional<FMars_DamageEvent> DeathCause;
 }
 
 struct FMars_Tag_Monster_NeedsSetup {}
@@ -120,7 +117,7 @@ event void FMars_Delegate_Monster_OnPartRegistered_MC(FCk_Handle_Monster InMonst
 delegate void FMars_Delegate_Monster_OnPartSevered(FCk_Handle_Monster InMonster, FCk_Handle_BodyPart InPart);
 event void FMars_Delegate_Monster_OnPartSevered_MC(FCk_Handle_Monster InMonster, FCk_Handle_BodyPart InPart);
 
-// Once per monster; IsDead and the Dead attribute request are already in place when it fires.
+// Once per monster; DeathCause and the Dead attribute request are already in place when it fires.
 delegate void FMars_Delegate_Monster_OnDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause);
 event void FMars_Delegate_Monster_OnDied_MC(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause);
 

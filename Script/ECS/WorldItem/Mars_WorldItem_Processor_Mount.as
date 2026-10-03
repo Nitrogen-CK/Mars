@@ -41,7 +41,7 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
 
         auto Self = InHandle.As_WorldItem();
 
-        // Snapshot before the remove: Request_TryRemove is immediate (entt swap-and-pop).
+        // Snapshot before the remove: InPending is invalid once Request_TryRemove returns.
         const auto NewMount = InPending.Mount;
         const auto Carrier = InPending.Carrier;
         auto Node = InPending.Node;
@@ -75,7 +75,7 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         auto& Arrival = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Arrival);
         Arrival.FromOffset = FromOffset;
         Arrival.ToOffset = Offset;
-        Arrival.Duration = ck::IsValid(Presentation) ? Presentation.ArriveSeconds : 0.0f;
+        Arrival.Duration = ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f;
         Arrival.Elapsed = 0.0f;
 
         if (PrevMount != NewMount && Self.Has_Fragment(FMars_Fragment_WorldItem_Signals))

@@ -1,5 +1,5 @@
-// The custom-primitive-data layout the eye-plate look reads, and the only writer of it. Each group's floats are
-// consecutive from its slot; a group is pushed as one request. Both eyes get the same blink (a wink is an expression).
+// The only writer of the eye plate's custom primitive data; the layout is constants_eyes::k_Slot_*. Both eyes get the
+// same blink (a wink is an expression).
 
 struct FMars_Eyes_MaterialValues
 {
@@ -16,45 +16,30 @@ struct FMars_Eyes_MaterialValues
     FLinearColor Color;
 }
 
-namespace mars_eyes_material
+namespace utils_eyes
 {
-    const int32 Slot_Cells = 0;    // LeftCell, RightCell, PrevLeftCell, PrevRightCell
-    const int32 Slot_Anim = 4;     // Blend, BlinkLeft, BlinkRight, Strength
-    const int32 Slot_Look = 8;     // LookX, LookY
-    const int32 Slot_Color = 10;   // r, g, b, (unused)
-
-    // The request writes a linear colour as four plain floats, and every value here is single-precision.
-    FLinearColor Make_FourFloats(const FVector4& InValue)
+    // One deferred request for the group; the plate applies it once its component exists.
+    void Push_PlateGroup(FCk_Handle_UnrealComponent& InPlate, const FMars_Eyes_MaterialValues& InValues, EMars_Eyes_PlateGroup InGroup)
     {
-        return FLinearColor(float32(InValue.X), float32(InValue.Y), float32(InValue.Z), float32(InValue.W));
+        auto Data = FCk_CustomPrimitiveData();
+        if (InGroup == EMars_Eyes_PlateGroup::Cells)
+        { Data = FCk_CustomPrimitiveData(constants_eyes::k_Slot_Cells, FCk_CustomPrimitiveData_Value(DoMake_FourFloats(InValues.Cells))); }
+        else if (InGroup == EMars_Eyes_PlateGroup::Anim)
+        { Data = FCk_CustomPrimitiveData(constants_eyes::k_Slot_Anim, FCk_CustomPrimitiveData_Value(DoMake_FourFloats(InValues.Anim))); }
+        else if (InGroup == EMars_Eyes_PlateGroup::Look)
+        { Data = FCk_CustomPrimitiveData(constants_eyes::k_Slot_Look, FCk_CustomPrimitiveData_Value(InValues.Look)); }
+        else
+        {
+            // A linear color is written as four floats; the fourth (alpha) is unused by the look.
+            Data = FCk_CustomPrimitiveData(constants_eyes::k_Slot_Color, FCk_CustomPrimitiveData_Value(InValues.Color));
+        }
+
+        utils_unreal_component::Request_SetCustomPrimitiveData(InPlate, FCk_Request_UnrealComponent_SetCustomPrimitiveData(Data));
     }
 
-    // One deferred request per requested group; the plate applies them once its component exists.
-    void Push(FCk_Handle_UnrealComponent& InPlate, const FMars_Eyes_MaterialValues& InValues, bool InCells, bool InAnim, bool InLook, bool InColor)
+    // The request writes a linear colour as four plain floats, and every value here is single-precision.
+    FLinearColor DoMake_FourFloats(const FVector4& InValue)
     {
-        if (InCells)
-        {
-            utils_unreal_component::Request_SetCustomPrimitiveData(InPlate, FCk_Request_UnrealComponent_SetCustomPrimitiveData(
-                FCk_CustomPrimitiveData(Slot_Cells, FCk_CustomPrimitiveData_Value(Make_FourFloats(InValues.Cells)))));
-        }
-
-        if (InAnim)
-        {
-            utils_unreal_component::Request_SetCustomPrimitiveData(InPlate, FCk_Request_UnrealComponent_SetCustomPrimitiveData(
-                FCk_CustomPrimitiveData(Slot_Anim, FCk_CustomPrimitiveData_Value(Make_FourFloats(InValues.Anim)))));
-        }
-
-        if (InLook)
-        {
-            utils_unreal_component::Request_SetCustomPrimitiveData(InPlate, FCk_Request_UnrealComponent_SetCustomPrimitiveData(
-                FCk_CustomPrimitiveData(Slot_Look, FCk_CustomPrimitiveData_Value(InValues.Look))));
-        }
-
-        // A linear color is written as four floats; the fourth (alpha) is unused by the look.
-        if (InColor)
-        {
-            utils_unreal_component::Request_SetCustomPrimitiveData(InPlate, FCk_Request_UnrealComponent_SetCustomPrimitiveData(
-                FCk_CustomPrimitiveData(Slot_Color, FCk_CustomPrimitiveData_Value(InValues.Color))));
-        }
+        return FLinearColor(float32(InValue.X), float32(InValue.Y), float32(InValue.Z), float32(InValue.W));
     }
 }

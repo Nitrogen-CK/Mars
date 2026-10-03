@@ -69,6 +69,14 @@ namespace utils_fphands
         return InSpec.OutSeconds + InSpec.BackSeconds;
     }
 
+    FVector Get_PushOffset(const FMars_FPHands_PushSpec& InSpec, EMars_LaunchKind InKind)
+    {
+        if (InKind == EMars_LaunchKind::Throw)
+        { return InSpec.ThrowOffset; }
+
+        return InSpec.DropOffset;
+    }
+
     // Through the reach channel, which the anim instance blends after its grip easing, so the thrust stays crisp.
     void Push_Hand(const FMars_FPHands_PushSpec& InSpec, const FMars_FPHands_HandPush& InPush, FMars_FPHands_HandTarget& InOutHand)
     {
@@ -85,19 +93,19 @@ namespace utils_fphands
 // Push targets (read the feature)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The gloves that held the launched item thrust along the push offset; a free off-hand keeps its rest. InOutTargets are
-// the rest targets of the hold being pushed.
+// The gloves that held the launched item thrust along the push offset; the free off-hand of a one-handed hold keeps its
+// rest. InOutTargets are the rest targets of the hold being pushed.
 mixin void Apply_HandPush(const FCk_Handle_FPHands& Self, FMars_FPHands_HandTargets& InOutTargets)
 {
     const auto& Spec = Self.Get_Spec().Push;
     const auto Hold = Self.Get_PushHold();
     const auto PhaseTime = Self.Get_PhaseTime();
     const auto Push = FMars_FPHands_HandPush(
-        Self.Get_PushIsThrow() ? Spec.ThrowOffset : Spec.DropOffset,
+        utils_fphands::Get_PushOffset(Spec, Self.Get_PushKind()),
         utils_fphands::Get_PushAlpha(Spec, PhaseTime),
         PhaseTime >= Spec.OutSeconds * Spec.OpenAtOutFraction);
 
     utils_fphands::Push_Hand(Spec, Push, InOutTargets.Right);
-    if (Hold.IsHolding == false || Hold.IsTwoHanded)
+    if (Hold.Kind != EMars_FPHands_HoldKind::OneHanded)
     { utils_fphands::Push_Hand(Spec, Push, InOutTargets.Left); }
 }

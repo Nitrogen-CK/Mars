@@ -65,12 +65,11 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     UFUNCTION()
     private void OnBackpackConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
-        auto Entity = FCk_Handle(InEntityScriptHandle);
-        _Backpack = Entity.As_Backpack(ECk_SanityCheck::UnChecked);
+        _Backpack = InEntityScriptHandle.As_Backpack();
     }
 
     UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar, int32 InPrevIndex, int32 InNewIndex)
+    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
     {
         PushSelection();
     }
@@ -84,7 +83,10 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     private void PushSelection()
     {
         if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
-        { return; }
+        {
+            FinishFailure("the carrier's Hotbar or HeldItem did not compose");
+            return;
+        }
 
         _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
     }
@@ -125,7 +127,7 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_ItemAt(0) == _Rock &&
-                _Hotbar.Get_SelectedIndex() == 0 &&
+                _Hotbar.Get_SelectedIndex() == TOptional<int32>(0) &&
                 _HeldItem.Get_CurrentItem() == _Rock &&
                 ck::IsValid(_HeldItem.Get_PresentationEntity()));
     }
@@ -199,7 +201,7 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

@@ -95,7 +95,7 @@ class UMars_Sandbox_BackpackPlateF_EntityScript : UMars_PressurePlate_EntityScri
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         Trigger.DetectionFilter = GameplayTag::MakeGameplayTagContainerFromTag(
-            GameplayTags::ResolveGameplayTag(n"Probe.Mars.Backpack"));
+            GameplayTags::Probe_Mars_Backpack);
         Occupancy.RequiredCount = 1;
         Occupancy.ReleaseDelaySeconds = 0.5f;
         return Super::DoConstruct(InHandle);

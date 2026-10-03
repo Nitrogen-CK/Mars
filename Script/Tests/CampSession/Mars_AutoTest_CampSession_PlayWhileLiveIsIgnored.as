@@ -3,8 +3,8 @@ class UMars_AutoTest_CampSession_PlayWhileLiveIsIgnored : UCk_AutoTest_Base
 {
     private FCk_Handle_CampSession _Session;
     private int32 _Count = 0;
-    private EMars_CampPhase _Prev = EMars_CampPhase::Live;
-    private EMars_CampPhase _New = EMars_CampPhase::Lobby;
+    private TOptional<EMars_CampPhase> _Prev;
+    private TOptional<EMars_CampPhase> _New;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -28,8 +28,8 @@ class UMars_AutoTest_CampSession_PlayWhileLiveIsIgnored : UCk_AutoTest_Base
     private void OnPhaseChanged(FCk_Handle_CampSession InSession, EMars_CampPhase InPrevious, EMars_CampPhase InNew)
     {
         _Count += 1;
-        _Prev = InPrevious;
-        _New = InNew;
+        _Prev = TOptional<EMars_CampPhase>(InPrevious);
+        _New = TOptional<EMars_CampPhase>(InNew);
     }
 
     UFUNCTION()
@@ -48,8 +48,10 @@ class UMars_AutoTest_CampSession_PlayWhileLiveIsIgnored : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertLobbyToLive(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Prev == EMars_CampPhase::Lobby, "previous phase is Lobby");
-        Assert_True(_New == EMars_CampPhase::Live, "new phase is Live");
+        const auto PreviousPhase = _Prev.GetValue();
+        const auto NewPhase = _New.GetValue();
+        Assert_True(PreviousPhase == EMars_CampPhase::Lobby, f"previous phase is Lobby (got {PreviousPhase :n})");
+        Assert_True(NewPhase == EMars_CampPhase::Live, f"new phase is Live (got {NewPhase :n})");
     }
 
     UFUNCTION()

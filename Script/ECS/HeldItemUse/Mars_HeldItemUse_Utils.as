@@ -1,8 +1,11 @@
 namespace utils_held_item_use
 {
-    // Requires utils_held_item on the same entity: every request reads the held item from it.
+    // Every request reads the held item, so HeldItem must be composed first.
     FCk_Handle_HeldItemUse Add(FCk_Handle& InPlayer)
     {
+        if (ck::EnsureIfNot(InPlayer.Is_HeldItem(), f"[HeldItemUse] [{InPlayer.ToString()}] needs HeldItem before HeldItemUse"))
+        { return FCk_Handle_HeldItemUse(); }
+
         InPlayer.Add_Fragment(FMars_Feature_HeldItemUse());
         InPlayer.Add_Fragment(FMars_Fragment_HeldItemUse());
         return InPlayer.As_HeldItemUse();
@@ -12,12 +15,6 @@ namespace utils_held_item_use
 //--------------------------------------------------------------------------------------------------------------------------
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
-
-// Invalid while the held item has no UseAction trait.
-mixin FCk_Handle_Interactable Get_CurrentInteractable(const FCk_Handle_HeldItemUse& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_HeldItemUse).CurrentInteractable;
-}
 
 mixin bool Get_ThrowArmed(const FCk_Handle_HeldItemUse& Self)
 {

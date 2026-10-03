@@ -53,8 +53,7 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
     FMars_Trigger_Spec Trigger;
     default Trigger.BoxHalfExtents = FVector(60.0, 60.0, 30.0);
     default Trigger.LocalOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 30.0));
-    default Trigger.DetectionFilter = GameplayTag::MakeGameplayTagContainerFromTag(
-        GameplayTags::ResolveGameplayTag(n"Probe.Mars.Player"));
+    default Trigger.DetectionFilter = GameplayTag::MakeGameplayTagContainerFromTag(GameplayTags::Probe_Mars_Player);
 
     UPROPERTY(ExposeOnSpawn)
     FMars_Occupancy_Spec Occupancy;
@@ -90,7 +89,7 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
         auto MoverHandle = utils_mover::Add(PlateNode, MoverSpec);
 
         auto TriggerHandle = utils_trigger::Add(PlateRoot, Trigger);
-        utils_occupancy::Add(InHandle, Occupancy, TriggerHandle, MoverHandle);
+        utils_occupancy::Add(InHandle, Occupancy, FMars_Occupancy_Parts(TriggerHandle, MoverHandle));
 
         if (Source.OutputChannel.IsValid())
         { utils_mechanism_source::Add(InHandle, Source); }
@@ -106,10 +105,10 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
 
         // Engine cube is 100 uu with a centered pivot. The slab rides a child of the plate node so the node's offset
         // stays a pure press translation.
-        auto PlateNode = InPlateNode;
-        auto PlateTransform = PlateNode.As_Transform();
-        AddMesh(PlateTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, PlateSize.Z * 0.5), PlateSize * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::BlockAll, n"PressurePlate_Slab");
+        auto PlateTransform = InPlateNode.As_Transform();
+        PlateTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, PlateSize.Z * 0.5), PlateSize * 0.01),
+            CubeMesh, assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::BlockAll, n"PressurePlate_Slab"));
 
         if (DecalTexture.IsNull() == false)
         { AddDecal(PlateTransform); }
@@ -122,14 +121,14 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
         const auto AlongXScale = FVector(PlateSize.X + FrameWidth * 2.0, FrameWidth, FrameHeight) * 0.01;
         const auto AlongYScale = FVector(FrameWidth, PlateSize.Y, FrameHeight) * 0.01;
 
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, -SideY, FrameHeight * 0.5), AlongXScale),
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameLeft");
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, SideY, FrameHeight * 0.5), AlongXScale),
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameRight");
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(-SideX, 0.0, FrameHeight * 0.5), AlongYScale),
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameBack");
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(SideX, 0.0, FrameHeight * 0.5), AlongYScale),
-            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameFront");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, -SideY, FrameHeight * 0.5), AlongXScale),
+            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameLeft"));
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(0.0, SideY, FrameHeight * 0.5), AlongXScale),
+            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameRight"));
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(-SideX, 0.0, FrameHeight * 0.5), AlongYScale),
+            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameBack"));
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, FVector(SideX, 0.0, FrameHeight * 0.5), AlongYScale),
+            CubeMesh, WallMaterial, collision::profile::BlockAll, n"PressurePlate_FrameFront"));
     }
 
     // A decal projects along its local +X, so pitch -90 aims it down at the slab's top face, and yaw 90 turns the image's
@@ -157,34 +156,6 @@ class UMars_PressurePlate_EntityScript : UCk_GenericEntityScript_UE
 
         auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
             Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"PressurePlate_Decal");
-        utils_unreal_component::Add(FCk_Handle(Node), ComponentParams);
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddMesh(
-        FCk_Handle_Transform& InAttachTo,
-        FTransform InLocalTransform,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        if (ck::Is_NOT_Valid(InMesh))
-        { return; }
-
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component receives the entity transform after registration, and the slab moves.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
+        utils_unreal_component::Add(Node.H(), ComponentParams);
     }
 }

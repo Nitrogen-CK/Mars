@@ -1,3 +1,8 @@
+namespace constants_interact_prompt_display
+{
+    const FName k_UseSlotKey = n"InteractChannel_Use";
+}
+
 namespace utils_interact_prompt_display
 {
     FCk_Handle_InteractPromptDisplay Add(FCk_Handle& InHandle)
@@ -12,17 +17,18 @@ namespace utils_interact_prompt_display
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Slot by channel (SortOrder carries the channel identity), so one button never renders two prompts.
+// Every Use prompt shares one slot; any other prompt is slotted by its input action, so one button never renders two
+// prompts.
 mixin FName Get_SlotKeyFromPrompt(const FCk_Handle_InteractPrompt& Self)
 {
-    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt_Params);
-    if (Fragment.SortOrder == 0) { return n"InteractChannel_Use"; }
+    if (Self.Get_Channel() == GameplayTags::InteractionChannel_Mars_Use)
+    { return constants_interact_prompt_display::k_UseSlotKey; }
 
-    auto InputAction = Fragment.InputAction.Get();
-    if (ck::IsValid(InputAction))
-    { return InputAction.GetName(); }
+    auto InputAction = Self.Get_InputAction();
+    if (ck::EnsureIfNot(ck::IsValid(InputAction), f"[InteractPromptDisplay] prompt [{Self.ToString()}] has no loadable InputAction"))
+    { return NAME_None; }
 
-    return NAME_None;
+    return InputAction.GetName();
 }
 
 mixin TArray<FMars_InteractPromptDisplay_Slot> Get_Slots(const FCk_Handle_InteractPromptDisplay& Self)

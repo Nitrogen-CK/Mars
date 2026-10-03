@@ -38,7 +38,7 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
         auto MoverSpec = FMars_Mover_Spec();
         MoverSpec.EndLocation = PressOffset;
         MoverSpec.Duration = MoveDuration;
-        MoverSpec.StartAtEnd = Control.StartActive;
+        MoverSpec.StartPose = Control.StartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         auto Mover = utils_mover::Add(ButtonNode, MoverSpec);
 
         auto ControlHandle = utils_control::Add(InHandle, Control, Mover);
@@ -54,19 +54,18 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
 
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_SceneNode InButtonNode)
     {
-        auto CubeMesh = engine::load::Cube();
-        auto CylinderMesh = engine::load::Cylinder();
-
         auto Material = assets::load::ProtoGrid_Interactable_Mars_MI();
 
         // Engine shapes are 100 uu with a centered pivot. Plate: 30 x 30 x 6; button: 16 across, 8 tall, on top of it.
-        AddMesh(InRoot, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 3.0), FVector(0.3, 0.3, 0.06)),
-            CubeMesh, Material, collision::profile::BlockAll, n"Switch_Plate");
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 3.0), FVector(0.3, 0.3, 0.06)),
+            engine::load::Cube(), Material, collision::profile::BlockAll, n"Switch_Plate"));
 
         // On a child of the button node so the node's offset stays a pure press translation.
         auto ButtonTransform = InButtonNode.As_Transform();
-        AddMesh(ButtonTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 10.0), FVector(0.16, 0.16, 0.08)),
-            CylinderMesh, Material, collision::profile::NoCollision, n"Switch_Button");
+        ButtonTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 10.0), FVector(0.16, 0.16, 0.08)),
+            engine::load::Cylinder(), Material, collision::profile::NoCollision, n"Switch_Button"));
     }
 
     private void AddInteractable(FCk_Handle_Transform& InRoot, const FCk_Handle_Control& InControl)
@@ -85,33 +84,5 @@ class UMars_Switch_EntityScript : UCk_GenericEntityScript_UE
         Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
 
         utils_interactable::Create(InRoot, Spec);
-    }
-
-    // NewObject needs a UObject outer, hence a private method on the entity script.
-    private void AddMesh(
-        FCk_Handle_Transform& InAttachTo,
-        FTransform InLocalTransform,
-        UStaticMesh InMesh,
-        UMaterialInterface InMaterial,
-        FName InCollisionProfile,
-        FName InDebugName)
-    {
-        if (ck::Is_NOT_Valid(InMesh))
-        { return; }
-
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-        auto NodeEntity = FCk_Handle(Node);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component receives the entity transform after registration, and the button moves.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(InMesh);
-        if (ck::IsValid(InMaterial))
-        { Archetype.SetMaterial(0, InMaterial); }
-        Archetype.SetCollisionProfileName(InCollisionProfile);
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        utils_unreal_component::Add(NodeEntity, ComponentParams);
     }
 }

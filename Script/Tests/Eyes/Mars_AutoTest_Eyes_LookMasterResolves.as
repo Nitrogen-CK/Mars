@@ -15,7 +15,7 @@ class UMars_AutoTest_Eyes_LookMasterResolves : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertMasterResolves(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Master = utils_usf::Get_LookMasterMaterial(mars_eyes::Look_EyePlate());
+        auto Master = utils_usf::Get_LookMasterMaterial(utils_eyes::Look_EyePlate());
         Assert_True(ck::IsValid(Master),
             "Get_LookMasterMaterial(MarsEyePlate) - the master is not generated; run Ck_Usf_GenerateLooks MarsEyePlate in the editor");
     }
@@ -24,7 +24,7 @@ class UMars_AutoTest_Eyes_LookMasterResolves : UCk_AutoTest_Base
     private void Step_AssertAtlasIsLinear(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto AtlasPath = FString();
-        for (const auto& Parameter : mars_eyes::Look_EyePlate()._Parameters)
+        for (const auto& Parameter : utils_eyes::Look_EyePlate()._Parameters)
         {
             if (Parameter._Name == n"Atlas")
             { AtlasPath = Parameter._DefaultTexturePath; }
@@ -46,7 +46,7 @@ class UMars_AutoTest_Eyes_LookMasterResolves : UCk_AutoTest_Base
         Assert_False(Atlas.SRGB, f"the atlas [{AtlasPath}] has sRGB off");
 
 #if EDITOR
-        auto Master = utils_usf::Get_LookMasterMaterial(mars_eyes::Look_EyePlate());
+        auto Master = utils_usf::Get_LookMasterMaterial(utils_eyes::Look_EyePlate());
         if (ck::Is_NOT_Valid(Master))
         {
             FinishFailure("Get_LookMasterMaterial(MarsEyePlate) - the master is not generated; run Ck_Usf_GenerateLooks MarsEyePlate in the editor");

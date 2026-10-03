@@ -23,22 +23,19 @@ class UMars_Processor_Dicing_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_Dicing_Nudge> NudgeRequests = InRequests.NudgeRequests;
         const auto ChopCount = InRequests.ChopRequests.Num();
 
-        // Swap-and-pop - InRequests is dead past this line. Removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Dicing_Requests);
 
         const auto Spec = Self.Get_Spec();
 
-        const auto StartState = InState.MaterialState;
-        const auto StartBand = InState.BandCenter;
+        const auto StartState = InState.Pile.MaterialState;
+        const auto StartBand = utils_dicing::Get_BandCenterAt(Spec, InState.BandIndex);
         const auto StartHand = InState.HandLateral;
 
         if (HasReset)
         {
-            InState.MaterialState = EMars_Dicing_State::WholeLeaves;
-            InState.ChopsInState = 0;
-            InState.UsefulChops = 0;
+            InState.Pile = FMars_Dicing_Pile();
             InState.BandIndex = 0;
-            InState.BandCenter = utils_dicing::Get_BandCenterAt(Spec, 0);
             InState.HandLateral = 0.0f;
         }
 
@@ -54,31 +51,15 @@ class UMars_Processor_Dicing_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto HandMoved = InState.HandLateral != StartHand;
         if (HandMoved)
-        { Apply_HandToNode(InState); }
+        { Apply_HandToNode(Spec.Nodes.LateralNode, InState.HandLateral); }
 
         // Only the first chop of the drain can start a strike; the rest are presses during it.
-        auto StartChop = false;
         if (ChopCount > 0)
-        {
-            if (InState.IsChopping)
-            { ck::Trace(f"[Dicing] [{Self.ToString()}] chop ignored: the cleaver is still moving"); }
-            else
-            {
-                InState.IsChopping = true;
-                StartChop = true;
-            }
-        }
+        { Try_StartChop(Self, InState, Spec.Nodes.ChopMover); }
 
-        const auto NewState = InState.MaterialState;
-        const auto NewBand = InState.BandCenter;
+        const auto NewState = InState.Pile.MaterialState;
+        const auto NewBand = utils_dicing::Get_BandCenterAt(Spec, InState.BandIndex);
         const auto NewHand = InState.HandLateral;
-
-        if (StartChop)
-        {
-            auto Mover = InState.ChopMover;
-            if (ck::IsValid(Mover))
-            { Mover.Request_MoveTo(true); }
-        }
 
         if (Self.Has_Fragment(FMars_Fragment_Dicing_Signals) == false)
         { return; }
@@ -93,15 +74,30 @@ class UMars_Processor_Dicing_HandleRequests : UCk_Processor_Script_Base_UE
         { Self.Get_Fragment(FMars_Fragment_Dicing_Signals).OnHandMoved.Broadcast(Self, NewHand); }
     }
 
-    // The lateral node's offset Y is the hand; X and Z stay where the entity script put them.
-    private void Apply_HandToNode(const FMars_Fragment_Dicing& InState)
+    // The cleaver is armed only once its Mover is known to take the strike, so a missing Mover cannot leave chopping
+    // locked.
+    private void Try_StartChop(FCk_Handle_Dicing& InDicing, FMars_Fragment_Dicing& InState, FCk_Handle_Mover InChopMover)
     {
-        auto Node = InState.LateralNode;
-        if (ck::Is_NOT_Valid(Node))
+        if (InState.IsChopping)
+        {
+            ck::Trace(f"[Dicing] [{InDicing.ToString()}] chop ignored: the cleaver is still moving");
+            return;
+        }
+
+        if (ck::EnsureIfNot(ck::IsValid(InChopMover), f"[Dicing] [{InDicing.ToString()}] has no chop Mover; the chop is dropped"))
         { return; }
 
-        auto Location = utils_scene_node::Get_Offset_Location(Node);
-        Location.Y = InState.HandLateral;
-        utils_scene_node::Request_UpdateOffset_Location(Node, Location, ECk_RelativeAbsolute::Absolute);
+        InState.IsChopping = true;
+        auto ChopMover = InChopMover;
+        ChopMover.Request_MoveTo(FMars_Request_Mover_MoveTo(EMars_Mover_Pose::End));
+    }
+
+    // The lateral node's offset Y is the hand; X and Z stay where the entity script put them.
+    private void Apply_HandToNode(FCk_Handle_SceneNode InLateralNode, float32 InHandLateral)
+    {
+        auto LateralNode = InLateralNode;
+        auto Location = utils_scene_node::Get_Offset_Location(LateralNode);
+        Location.Y = InHandLateral;
+        utils_scene_node::Request_UpdateOffset_Location(LateralNode, Location, ECk_RelativeAbsolute::Absolute);
     }
 }

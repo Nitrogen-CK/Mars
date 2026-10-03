@@ -10,6 +10,12 @@ asset Mars_GateHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_Gate {}
 
+enum EMars_Gate_Position
+{
+    Closed,
+    Open
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -35,14 +41,41 @@ struct FMars_Gate_Spec
     TOptional<FMars_Trigger_Spec> Threshold;
 }
 
+// A leaf that moves, in non-negative time, and a valid threshold when one is set.
+mixin FMars_Validation Validate(const FMars_Gate_Spec& Self)
+{
+    if (Self.OpenOffset.IsNearlyZero())
+    { return FMars_Validation("OpenOffset must move the leaf"); }
+
+    if (Self.MoveDuration < 0.0f)
+    { return FMars_Validation(f"MoveDuration [{Self.MoveDuration}] must not be negative"); }
+
+    if (Self.Threshold.IsSet())
+    {
+        const auto ThresholdValidation = Self.Threshold.GetValue().Validate();
+        if (ThresholdValidation.IsValid() == false)
+        { return FMars_Validation(f"Threshold: {ThresholdValidation.Get_Error()}"); }
+    }
+
+    return FMars_Validation();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+enum EMars_Gate_State
+{
+    Closed,
+    Open,
+    // Told to close while the threshold was occupied: still open, and closes once the threshold clears.
+    CloseDeferred
+}
+
 struct FMars_Fragment_Gate
 {
     UPROPERTY()
-    bool IsOpen = false;
+    EMars_Gate_State State = EMars_Gate_State::Closed;
 
     // Carries the Mover that slides the leaf.
     UPROPERTY()
@@ -51,10 +84,6 @@ struct FMars_Fragment_Gate
     // Invalid when the spec set no Threshold.
     UPROPERTY()
     FCk_Handle_Trigger Threshold;
-
-    // Told to close while the threshold was occupied: still open, and closes once the threshold clears.
-    UPROPERTY()
-    bool IsCloseDeferred = false;
 }
 
 struct FMars_Tag_Gate_NeedsSetup {}
@@ -63,8 +92,8 @@ struct FMars_Tag_Gate_NeedsSetup {}
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_Gate_OnOpenChanged(FCk_Handle_Gate InGate, bool InOpen);
-event void FMars_Delegate_Gate_OnOpenChanged_MC(FCk_Handle_Gate InGate, bool InOpen);
+delegate void FMars_Delegate_Gate_OnOpenChanged(FCk_Handle_Gate InGate, EMars_Gate_Position InPosition);
+event void FMars_Delegate_Gate_OnOpenChanged_MC(FCk_Handle_Gate InGate, EMars_Gate_Position InPosition);
 
 struct FMars_Fragment_Gate_Signals
 {
@@ -75,16 +104,16 @@ struct FMars_Fragment_Gate_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Request_Gate_SetOpen
+struct FMars_Request_Gate_SetPosition
 {
     UPROPERTY()
-    bool Open = false;
+    EMars_Gate_Position Position = EMars_Gate_Position::Closed;
 
-    FMars_Request_Gate_SetOpen() {}
+    FMars_Request_Gate_SetPosition() {}
 
-    FMars_Request_Gate_SetOpen(bool InOpen)
+    FMars_Request_Gate_SetPosition(EMars_Gate_Position InPosition)
     {
-        Open = InOpen;
+        Position = InPosition;
     }
 }
 
@@ -98,11 +127,11 @@ struct FMars_Request_Gate_RetryClose
     FMars_Request_Gate_RetryClose() {}
 }
 
-// SetOpen is absolute: the latest one wins.
+// SetPosition is absolute: the latest one wins.
 struct FMars_Fragment_Gate_Requests
 {
     UPROPERTY()
-    TArray<FMars_Request_Gate_SetOpen> SetOpenRequests;
+    TArray<FMars_Request_Gate_SetPosition> SetPositionRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Gate_RetryClose> RetryCloseRequests;
