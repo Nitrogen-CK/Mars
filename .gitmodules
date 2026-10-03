@@ -10,21 +10,12 @@
 [submodule "Plugins/AutoSizeComments"]
 	path = Plugins/AutoSizeComments
 	url = https://github.com/chainkemists/AutoSizeComments.git
-[submodule "Plugins/BlueprintAssist"]
-	path = Plugins/BlueprintAssist
-	url = https://github.com/chainkemists/BlueprintAssist.git
 [submodule "Plugins/GitSourceControl"]
 	path = Plugins/GitSourceControl
 	url = https://github.com/chainkemists/UEGitPlugin.git
-[submodule "Plugins/NodeGraphAssistant"]
-	path = Plugins/NodeGraphAssistant
-	url = https://github.com/chainkemists/NodeGraphAssistant.git
 [submodule "CkAuto"]
 	path = CkAuto
 	url = https://github.com/CommitAndChill/CkAuto.git
-[submodule "Plugins/ZenMode"]
-	path = Plugins/ZenMode
-	url = https://github.com/chainkemists/ZenMode.git
 [submodule "Plugins/GitLink"]
 	path = Plugins/GitLink
 	url = https://github.com/CommitAndChill/GitLink.git

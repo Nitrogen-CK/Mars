@@ -117,10 +117,7 @@ CkAuto/SubmodulesCustomCommand.bat "git status"
 ### Third-party dev tools
 
 - **AutoSizeComments** — Comment node enhancements in the Blueprint editor.
-- **BlueprintAssist** — Blueprint editing enhancements.
-- **NodeGraphAssistant** — Node graph editing utilities.
 - **GitSourceControl** (chainkemists fork of UEGitPlugin) — Git source control provider for the editor.
-- **ZenMode** — Editor focus / zen mode.
 
 ## CkFoundation Architecture Notes
 
