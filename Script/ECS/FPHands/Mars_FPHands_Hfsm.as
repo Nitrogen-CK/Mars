@@ -20,7 +20,8 @@ class UMars_SmTask_HandsSubSm : UCk_SmTask_SubStateMachine
 namespace utils_fphands
 {
     // Hands the gloves back to the procedural placement: stops a playing emote montage (a reach or a newly held item
-    // takes over). An entity with no character (tests) plays no emotes.
+    // takes over), and the body's emote with it (AMars_PlayerCharacter::Request_StopEmote). An entity with no character
+    // (tests) plays no emotes.
     void Stop_Emote(const FCk_Handle_FPHands& InHands)
     {
         auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(InHands, ECk_SanityCheck::UnChecked));
@@ -30,6 +31,8 @@ namespace utils_fphands
         auto AnimInstance = Character.FPHands.GetAnimInstance();
         if (ck::IsValid(AnimInstance) && AnimInstance.IsAnyMontagePlaying())
         { AnimInstance.Montage_Stop(InHands.Get_Spec().Emotes.CancelBlendSeconds); }
+
+        Character.Request_StopEmote();
     }
 
     // Plays InEmote's montage on the gloves (both, through the spec's emote slot). Refused while the gloves are busy:

@@ -1,13 +1,13 @@
-// Emote keys -> the first-person gloves. A press plays its emote while the gloves are at rest with empty hands. Only
-// the first five emotes have keys; the rest are wheel-only.
+// Emote keys -> the character's emote, gloves and body (AMars_PlayerCharacter::Request_Emote). A press plays its emote
+// while the gloves are at rest with empty hands. Only the first five emotes have keys; the rest are wheel-only.
 class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
 {
-    private FCk_Handle_FPHands _Hands;
+    private AMars_PlayerCharacter _Character;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _Hands = ck::Ctx(InHandle).As_FPHands();
+        _Character = Cast<AMars_PlayerCharacter>(ck::ToActor(ck::Ctx(InHandle), ECk_SanityCheck::UnChecked));
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -17,17 +17,17 @@ class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
     {
         Super::DoExitTask(InHandle, InNetContext);
 
-        _Hands = FCk_Handle_FPHands();
+        _Character = nullptr;
     }
 
-    // No character (headless): utils_fphands::Play_Emote plays nothing.
+    // No character (headless): nothing to play on.
     protected void OnIntentPressed(FGameplayTag InIntent) override
     {
         const auto Emote = TryGet_Emote(InIntent);
-        if (Emote.IsSet() == false)
+        if (Emote.IsSet() == false || ck::Is_NOT_Valid(_Character))
         { return; }
 
-        utils_fphands::Play_Emote(_Hands, Emote.GetValue());
+        _Character.Request_Emote(Emote.GetValue());
     }
 
     private TOptional<EMars_FPEmote> TryGet_Emote(FGameplayTag InIntent) const
@@ -54,7 +54,8 @@ class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
 // EmoteWheel held -> the wheel is open. The view holds still and the look input steers the wheel's pointer instead
 // (one MovePointer per drained look delta, hence Tick); the release chooses the hovered emote, the centre cancels.
 // Leaving Alive, or a matcher swap that reads the row Idle, cancels. A chosen entry's Mars.Emote.* tag plays that
-// emote on the gloves (utils_fphands::TryGet_Emote, Play_Emote); an entity without a character (tests) plays nothing.
+// emote on the character (utils_fphands::TryGet_Emote, AMars_PlayerCharacter::Request_Emote); an entity without a
+// character (tests) plays nothing.
 //
 // The wheel does not open while a gripped control holds the view (UMars_SmTask_ManipulateControl freezes it from the
 // interaction's start): both toggle the camera's orientation control and both read the look delta, so closing the
@@ -64,7 +65,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     private FCk_Handle _Player;
-    private FCk_Handle_FPHands _Hands;
+    private AMars_PlayerCharacter _Character;
     private FCk_Handle_EmoteWheel _Wheel;
     private FCk_Handle_InputIntents _InputIntents;
     private FCk_Handle_InteractionResolver _Resolver;
@@ -77,7 +78,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Player = ck::Ctx(InHandle);
-        _Hands = _Player.As_FPHands(ECk_SanityCheck::UnChecked);
+        _Character = Cast<AMars_PlayerCharacter>(ck::ToActor(_Player, ECk_SanityCheck::UnChecked));
         _Wheel = _Player.As_EmoteWheel();
         _InputIntents = _Player.As_InputIntents();
         _Resolver = _Player.As_InteractionResolver();
@@ -101,7 +102,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         { _Wheel.UnbindFrom_OnEmoteChosen(FMars_Delegate_EmoteWheel_OnEmoteChosen(this, n"OnEmoteChosen")); }
 
         _Player = FCk_Handle();
-        _Hands = FCk_Handle_FPHands();
+        _Character = nullptr;
         _Wheel = FCk_Handle_EmoteWheel();
         _InputIntents = FCk_Handle_InputIntents();
         _Resolver = FCk_Handle_InteractionResolver();
@@ -131,10 +132,10 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
     private void OnEmoteChosen(FCk_Handle_EmoteWheel InWheel, int32 InIndex, FGameplayTag InEmote)
     {
         auto Emote = EMars_FPEmote::Wave;
-        if (utils_fphands::TryGet_Emote(InEmote, Emote) == false)
+        if (ck::Is_NOT_Valid(_Character) || utils_fphands::TryGet_Emote(InEmote, Emote) == false)
         { return; }
 
-        utils_fphands::Play_Emote(_Hands, Emote);
+        _Character.Request_Emote(Emote);
     }
 
     protected void OnMatcherRebound() override

@@ -12,7 +12,13 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default CharacterMovement.NavAgentProps.bCanCrouch = true;
     default CharacterMovement.bCanWalkOffLedgesWhenCrouching = true;
 
-    default Mesh.SetVisibility(false, true);
+    // The third-person chef body (Config.TPBody): everyone but its owner sees it; the owner sees the gloves below. Its
+    // emote and strike montages must play on simulated proxies and the listen host (their notifies included), so it
+    // always ticks.
+    default Mesh.bOwnerNoSee = true;
+    default Mesh.CastShadow = true;
+    default Mesh.VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+    default Mesh.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     // The CkCamera director's output sink. Its GetCameraView delivers the director's composed view to the player camera
     // manager; FollowView also moves the component onto that view each frame, so the gloves attached below render exactly
@@ -35,6 +41,16 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default FPHands.VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
     default FPHands.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+    // The chef's hat (Config.TPBody.Hat), a cosmetic on the body's Hat socket: it follows the head and takes the body's
+    // scale through the attachment. Hidden from the owner with the body. CharacterMesh0 is ACharacter's Mesh.
+    UPROPERTY(DefaultComponent, Attach = CharacterMesh0, AttachSocket = Hat)
+    UStaticMeshComponent Hat;
+    default Hat.SetMobility(EComponentMobility::Movable);
+    default Hat.bOwnerNoSee = true;
+    default Hat.CastShadow = true;
+    default Hat.bReceivesDecals = false;
+    default Hat.SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
     UPROPERTY(ExposeOnSpawn)
     UMars_PlayerCharacter_Config Config = mars::Mars_PlayerCharacter_Config;
 
@@ -42,6 +58,17 @@ class AMars_PlayerCharacter : ACk_Character_UE
     private FCk_Handle_Transform _HandNode;
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
+    // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
+    private UAnimMontage _BodyEmoteMontage;
+    // The player entity's transform once constructed; invalid before (the eyes wait for it).
+    private FCk_Handle_Transform _PlayerTransform;
+    // The chef's face node carrying Gaze, Eyes and the eye plate; invalid while there are no eyes (see RefreshEyes).
+    private FCk_Handle_Transform _Face;
+
+    // The eye plate is the engine plane (100 uu). Taking its face as local +Z with U along local +X and V along local +Y:
+    // the yaw and roll turn its face to the face node's +X with U along +Y, and the negative Y scale sends V down (the
+    // look moves the shapes toward +U for a target on the face's right). Same recipe as UMars_EyesDummy_EntityScript.
+    private const FRotator EyePlateRotation = FRotator(0.0, 90.0, -90.0);
 
     // The Hand node rest offset last sent to _HandSway. The gloves' own hold only updates at their next drain, so a
     // second item change before it would compare against a stale rest.
@@ -77,6 +104,50 @@ class AMars_PlayerCharacter : ACk_Character_UE
 
         if (Visual.AnimClass.IsNull() == false)
         { FPHands.SetAnimInstanceClass(System::LoadClassAsset_Blocking(Visual.AnimClass)); }
+
+        ConstructBody();
+    }
+
+    // Before PostInitializeComponents, so ACharacter caches this placement as the mesh's base (crouch offsets it).
+    private void ConstructBody()
+    {
+        const auto& Body = Config.TPBody;
+        const auto Validation = Body.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[PlayerCharacter] TPBody: {Validation.Get_Error()}"))
+        { return; }
+
+        Mesh.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Body.Mesh));
+        Mesh.SetAnimInstanceClass(System::LoadClassAsset_Blocking(Body.AnimClass));
+
+        // MeshOffset is relative to the capsule's base; the capsule's origin is its centre.
+        const auto FeetLocation = Body.MeshOffset.GetLocation() - FVector(0.0, 0.0, Config.Body.CapsuleHalfHeight);
+        Mesh.SetRelativeLocationAndRotation(FeetLocation, Body.MeshOffset.Rotator());
+        Mesh.SetRelativeScale3D(FVector(Body.Scale, Body.Scale, Body.Scale));
+
+        ConstructHat();
+    }
+
+    // The spec's socket wins over the declared AttachSocket; Offset is in unscaled body units (the hat inherits Scale).
+    private void ConstructHat()
+    {
+        const auto& HatSpec = Config.TPBody.Hat;
+        if (HatSpec.Mesh.IsNull())
+        {
+            Hat.SetStaticMesh(nullptr);
+            return;
+        }
+
+        ck::EnsureIfNot(Mesh.DoesSocketExist(HatSpec.Socket),
+            f"[PlayerCharacter] TPBody: the body mesh has no [{HatSpec.Socket}] socket for the hat - it sits at the body's origin");
+
+        if (Hat.GetAttachSocketName() != HatSpec.Socket)
+        {
+            Hat.AttachToComponent(Mesh, HatSpec.Socket,
+                EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, false);
+        }
+
+        Hat.SetRelativeTransform(HatSpec.Offset);
+        Hat.SetStaticMesh(System::LoadAsset_Blocking(HatSpec.Mesh));
     }
 
     // BeginPlay, not ConstructionScript: ck::TransientEntity() needs a live world.
@@ -192,6 +263,231 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_operator::Add(Player);
 
         utils_state_machine::Add(Player, FCk_StateMachine_Spec(UMars_SmState_Alive));
+
+        _PlayerTransform = PlayerTransform;
+        RefreshEyes();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The chef's eyes: a face node following the head bone carries Gaze (looking at other players' heads), Eyes and the
+    // eye plate. Only copies other players see have them: the owner's view sits at the face, and the plate (a
+    // CkUnrealComponent outered to this actor) cannot be hidden from the owner by OwnerNoSee. Possession can land after
+    // the entity is constructed (an owning client learns its controller by replication), so a controller change
+    // re-decides.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Server and owning client (APawn::NotifyControllerChanged); Possessed/Unpossessed fire on the server only. A pawn
+    // being destroyed is unpossessed first (APawn::Destroyed) and must not grow eyes on its way out.
+    UFUNCTION(BlueprintOverride)
+    void ControllerChanged(AController OldController, AController NewController)
+    {
+        if (IsActorBeingDestroyed())
+        { return; }
+
+        RefreshEyes();
+    }
+
+    private void RefreshEyes()
+    {
+        if (ck::Is_NOT_Valid(_PlayerTransform))
+        { return; }
+
+        const auto WantsEyes = IsLocallyControlled() == false;
+        const auto HasEyes = ck::IsValid(_Face);
+        if (WantsEyes == HasEyes)
+        { return; }
+
+        if (WantsEyes)
+        {
+            ConstructEyes();
+            return;
+        }
+
+        // The node's children (the plate, the gaze's sense node) go with it.
+        utils_entity_lifetime::Request_DestroyEntity(_Face.H());
+        _Face = FCk_Handle_Transform();
+    }
+
+    // Where cosmetics cannot run (a dedicated server) the face is only its node and the eyes' logic: no plate, no gaze.
+    private void ConstructEyes()
+    {
+        const auto& FaceSpec = Config.TPBody.Face;
+        if (ck::EnsureIfNot(Mesh.DoesSocketExist(FaceSpec.Bone),
+            f"[PlayerCharacter] TPBody: the body mesh has no [{FaceSpec.Bone}] bone for the eyes"))
+        { return; }
+
+        auto Face = utils_scene_node::CreateAndAttachToUnrealMesh(_PlayerTransform, Mesh, FaceSpec.Bone, FaceSpec.Offset);
+        utils_handle::Set_DebugName(Face.H(), n"Player.Face");
+        _Face = Face.As_Transform();
+
+        auto EyesSpec = Config.Eyes;
+        if (utils_net::Get_CanExecuteCosmeticEvents(_Face))
+        {
+            EyesSpec.Plate = AddEyePlate();
+
+            auto GazeSpec = FMars_Gaze_Spec();
+            GazeSpec.DetectionFilter.AddTag(GameplayTags::Probe_Mars_Player);
+            GazeSpec.AimPoint = GameplayTags::AttachPoint_Mars_Head;
+            utils_gaze::Add(_Face, GazeSpec);
+        }
+
+        utils_eyes::Add(_Face, EyesSpec);
+    }
+
+    // Invalid when the MarsEyePlate look master is not generated (the eyes then have logic but nothing to draw on).
+    private FCk_Handle_UnrealComponent AddEyePlate()
+    {
+        auto LookMaster = utils_usf::Get_LookMasterMaterial(utils_eyes::Look_EyePlate());
+        if (ck::EnsureIfNot(ck::IsValid(LookMaster),
+            "[PlayerCharacter] the MarsEyePlate look master is not generated - run Ck_Usf_GenerateLooks MarsEyePlate"))
+        { return FCk_Handle_UnrealComponent(); }
+
+        // The face node carries the body's scale; the plate undoes it so PlateSize is world cm.
+        const auto& Size = Config.TPBody.Face.PlateSize;
+        const auto Scale = float64(Config.TPBody.Scale);
+        const auto PlateScale = FVector(Size.X / (100.0 * Scale), -Size.Y / (100.0 * Scale), 1.0);
+        auto PlatePart = FMars_MeshPart(FTransform(EyePlateRotation, FVector::ZeroVector, PlateScale),
+            engine::load::Plane(), LookMaster, collision::profile::NoCollision, n"Player_EyePlate");
+        PlatePart.CastShadow = false;
+        return _Face.Add_MeshPart(this, PlatePart);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Emotes and the strike. The HFSM tasks decide when (emote keys, the emote wheel, a held item's strike); the character
+    // only plays the montages and carries them over the network. The machine that asks plays at once - the owner's
+    // gloves, and its body for a listen host's view - and, when it is the owner, forwards to the server, which
+    // multicasts. Each multicast skips the locally controlled copy (the owner already played it), so every machine
+    // plays an emote exactly once. A call on a machine that does not control this character stays local.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The one emote entry point. False while the gloves are busy (holding an item, or out of Rest), or when neither the
+    // gloves nor the body has a montage for it.
+    UFUNCTION()
+    bool Request_Emote(EMars_FPEmote InEmote)
+    {
+        if (ck::Is_NOT_Valid(_Hands) || _Hands.Get_Hold().Kind != EMars_FPHands_HoldKind::Empty
+            || _Hands.Get_Phase() != EMars_FPHands_Phase::None)
+        { return false; }
+
+        const auto IsOwner = IsLocallyControlled();
+        const auto PlayedHands = IsOwner && utils_fphands::Play_Emote(_Hands, InEmote);
+        const auto PlayedBody = PlayBodyEmote(InEmote);
+        if (PlayedHands == false && PlayedBody == false)
+        { return false; }
+
+        if (IsOwner)
+        { Server_PlayEmote(InEmote); }
+
+        return true;
+    }
+
+    // Ends the body's emote; the gloves' own is stopped by utils_fphands::Stop_Emote, which calls this. The owner
+    // forwards the stop.
+    void Request_StopEmote()
+    {
+        if (StopBodyEmote() && IsLocallyControlled())
+        { Server_StopEmote(); }
+    }
+
+    // A held item's strike starts (UMars_SmTask_ItemUse_Strike): the body swings. The first-person swing is the item's.
+    UFUNCTION()
+    void Request_Strike()
+    {
+        if (ck::Is_NOT_Valid(PlayBodyMontage(Config.TPBody.Montages.StrikeMontage)))
+        { return; }
+
+        if (IsLocallyControlled())
+        { Server_PlayStrike(); }
+    }
+
+    UFUNCTION(Server)
+    void Server_PlayEmote(EMars_FPEmote InEmote)
+    {
+        Multicast_PlayEmote(InEmote);
+    }
+
+    // The owner's gloves never replay here: the owner is the one copy that is skipped.
+    UFUNCTION(NetMulticast)
+    void Multicast_PlayEmote(EMars_FPEmote InEmote)
+    {
+        if (IsLocallyControlled())
+        { return; }
+
+        PlayBodyEmote(InEmote);
+    }
+
+    UFUNCTION(Server)
+    void Server_StopEmote()
+    {
+        Multicast_StopEmote();
+    }
+
+    UFUNCTION(NetMulticast)
+    void Multicast_StopEmote()
+    {
+        if (IsLocallyControlled())
+        { return; }
+
+        StopBodyEmote();
+    }
+
+    UFUNCTION(Server)
+    void Server_PlayStrike()
+    {
+        Multicast_PlayStrike();
+    }
+
+    UFUNCTION(NetMulticast)
+    void Multicast_PlayStrike()
+    {
+        if (IsLocallyControlled())
+        { return; }
+
+        PlayBodyMontage(Config.TPBody.Montages.StrikeMontage);
+    }
+
+    private bool PlayBodyEmote(EMars_FPEmote InEmote)
+    {
+        const auto Index = int32(InEmote);
+        const auto& Montages = Config.TPBody.Montages.EmoteMontages;
+        if (Montages.IsValidIndex(Index) == false)
+        { return false; }
+
+        auto Montage = PlayBodyMontage(Montages[Index]);
+        if (ck::Is_NOT_Valid(Montage))
+        { return false; }
+
+        _BodyEmoteMontage = Montage;
+        return true;
+    }
+
+    // True when it stopped a body emote that was still playing.
+    private bool StopBodyEmote()
+    {
+        auto Montage = _BodyEmoteMontage;
+        _BodyEmoteMontage = nullptr;
+
+        auto AnimInstance = Mesh.GetAnimInstance();
+        if (ck::Is_NOT_Valid(AnimInstance) || ck::Is_NOT_Valid(Montage) || AnimInstance.Montage_IsPlaying(Montage) == false)
+        { return false; }
+
+        AnimInstance.Montage_Stop(Config.TPBody.Montages.EmoteCancelBlendSeconds, Montage);
+        return true;
+    }
+
+    // Null when the montage is unset or did not load, or the body has no anim instance (yet).
+    private UAnimMontage PlayBodyMontage(TSoftObjectPtr<UAnimMontage> InMontage)
+    {
+        if (InMontage.IsNull())
+        { return nullptr; }
+
+        auto AnimInstance = Mesh.GetAnimInstance();
+        auto Montage = System::LoadAsset_Blocking(InMontage);
+        if (ck::Is_NOT_Valid(AnimInstance) || ck::Is_NOT_Valid(Montage))
+        { return nullptr; }
+
+        AnimInstance.Montage_Play(Montage);
+        return Montage;
     }
 
     // Empty hands and two-handed holds centre the Hand node between the gloves; one-handed items move it to the right.

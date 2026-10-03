@@ -89,13 +89,13 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
 
         // 100 / 91.167 (the unscaled chef's top, hat excluded).
         Assert_True(Math::Abs(Body.Scale - 1.0969f) < 0.001f, f"the chef is scaled to 1 m (Scale [{Body.Scale}] ~ 1.097)");
-        Assert_True(Math::Abs(Config.CapsuleHalfHeight - 50.0f) < 0.001f, f"the capsule stands 1 m (half height [{Config.CapsuleHalfHeight}])");
-        Assert_True(Config.CrouchedHalfHeight < Config.CapsuleHalfHeight, "the crouched capsule is shorter than the standing one");
+        Assert_True(Math::Abs(Config.Body.CapsuleHalfHeight - 50.0f) < 0.001f, f"the capsule stands 1 m (half height [{Config.Body.CapsuleHalfHeight}])");
+        Assert_True(Config.Body.CrouchedHalfHeight < Config.Body.CapsuleHalfHeight, "the crouched capsule is shorter than the standing one");
 
         // The view at the chef's face centre: 71.1 cm unscaled above the feet, measured from the capsule centre.
-        const auto FaceHeight = 71.1f * Body.Scale - Config.CapsuleHalfHeight;
-        Assert_True(Math::Abs(Config.EyeHeight.Height - FaceHeight) < 0.5f,
-            f"the eye height [{Config.EyeHeight.Height}] is the chef's face [{FaceHeight}] above the capsule centre");
+        const auto FaceHeight = 71.1f * Body.Scale - Config.Body.CapsuleHalfHeight;
+        Assert_True(Math::Abs(Config.View.EyeHeight.Height - FaceHeight) < 0.5f,
+            f"the eye height [{Config.View.EyeHeight.Height}] is the chef's face [{FaceHeight}] above the capsule centre");
 
         Assert_False(Body.Hat.Mesh.IsNull(), "the chef has a hat mesh");
         Assert_True(Body.Hat.Socket == n"Hat", f"the hat rides the Hat socket (got [{Body.Hat.Socket}])");
