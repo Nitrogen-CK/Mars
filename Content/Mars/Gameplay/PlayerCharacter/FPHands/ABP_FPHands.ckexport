@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "0d969199cff7f93e70bd19ac84b7b970",
+		"sourceHash": "7da227f5bf6f080ea1da201763bc0163",
 		"exporterVersion": 3
 	},
 	"blueprintType": "AnimBlueprint",
@@ -27,112 +27,151 @@
 			"value": 0
 		},
 		{
-			"name": "LowerArmLocation_L",
-			"type": "FVector",
+			"name": "GripTarget_L",
+			"type": "FTransform",
 			"category": "FPHands",
 			"value":
 			{
-				"X": 0,
-				"Y": 0,
-				"Z": 0
+				"Rotation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0,
+					"W": 1
+				},
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"Scale3D":
+				{
+					"X": 1,
+					"Y": 1,
+					"Z": 1
+				}
 			},
-			"tooltip": "Component space; fed to the Transform (Modify) Bone nodes on lowerarm_l / lowerarm_r."
+			"tooltip": "Where each glove's grip bone goes, component space (Glove Placement Target)."
 		},
 		{
-			"name": "LowerArmRotation_L",
-			"type": "FRotator",
+			"name": "GripTarget_R",
+			"type": "FTransform",
 			"category": "FPHands",
 			"value":
 			{
-				"Pitch": 0,
-				"Yaw": 0,
-				"Roll": 0
+				"Rotation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0,
+					"W": 1
+				},
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"Scale3D":
+				{
+					"X": 1,
+					"Y": 1,
+					"Z": 1
+				}
 			}
 		},
 		{
-			"name": "LowerArmLocation_R",
-			"type": "FVector",
-			"category": "FPHands",
-			"value":
-			{
-				"X": 0,
-				"Y": 0,
-				"Z": 0
-			}
-		},
-		{
-			"name": "LowerArmRotation_R",
-			"type": "FRotator",
-			"category": "FPHands",
-			"value":
-			{
-				"Pitch": 0,
-				"Yaw": 0,
-				"Roll": 0
-			}
-		},
-		{
-			"name": "PlacementAlpha",
+			"name": "PlacementAlpha_L",
 			"type": "float",
 			"category": "FPHands",
 			"value": 0,
-			"tooltip": "0 until the owner provides targets (editor preview, pawn still constructing) - the gloves keep their anim pose."
+			"tooltip": "fading to 0 as an emote takes the glove over."
 		},
 		{
-			"name": "Curl_L_Thumb",
+			"name": "PlacementAlpha_R",
 			"type": "float",
-			"category": "FPHands|Contact",
-			"value": 1,
-			"tooltip": "Finger contact, fed to CR_FPHands_Contact: how far (0..1) each digit closes toward its authored grip pose."
+			"category": "FPHands",
+			"value": 0
 		},
 		{
-			"name": "Curl_L_Index",
-			"type": "float",
+			"name": "ContactShape_L",
+			"type": "FCk_Hands_ContactShape",
 			"category": "FPHands|Contact",
-			"value": 1
+			"value":
+			{
+				"_Type": "None",
+				"_Transform":
+				{
+					"Rotation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 1
+					},
+					"Translation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0
+					},
+					"Scale3D":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				"_HalfExtents":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"_Radius": 0,
+				"_HalfHeight": 0
+			},
+			"tooltip": "node. Type None = the authored grip pose."
 		},
 		{
-			"name": "Curl_L_Middle",
-			"type": "float",
+			"name": "ContactShape_R",
+			"type": "FCk_Hands_ContactShape",
 			"category": "FPHands|Contact",
-			"value": 1
-		},
-		{
-			"name": "Curl_L_Pinky",
-			"type": "float",
-			"category": "FPHands|Contact",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Thumb",
-			"type": "float",
-			"category": "FPHands|Contact",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Index",
-			"type": "float",
-			"category": "FPHands|Contact",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Middle",
-			"type": "float",
-			"category": "FPHands|Contact",
-			"value": 1
-		},
-		{
-			"name": "Curl_R_Pinky",
-			"type": "float",
-			"category": "FPHands|Contact",
-			"value": 1
-		},
-		{
-			"name": "ContactCurves",
-			"type": "TMap",
-			"category": "FPHands|Contact",
-			"value": [],
-			"tooltip": "CR_FPHands_Contact reads them back into its variables (its input mapping works on curves)."
+			"value":
+			{
+				"_Type": "None",
+				"_Transform":
+				{
+					"Rotation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 1
+					},
+					"Translation":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0
+					},
+					"Scale3D":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				"_HalfExtents":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"_Radius": 0,
+				"_HalfHeight": 0
+			}
 		},
 		{
 			"name": "RootMotionMode",
@@ -288,7 +327,7 @@
 							"direction": "Input",
 							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
 							"connections": [
-								"Node_DebZ6ERWYwbz1AGR-p5Kxg.Pose"
+								"Node_fuehpkQzStvxUgO5TKfk3Q.Pose"
 							]
 						}
 					],
@@ -854,7 +893,7 @@
 							"direction": "Input",
 							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
 							"connections": [
-								"Node_-mP9bEqamXkFgwCy3N93Ew.Pose"
+								"Node_yuPpuk76OgNJqVW9M4GbDA.Pose"
 							]
 						}
 					],
@@ -864,227 +903,7 @@
 							"pinType": "ComponentSpacePoseLink",
 							"direction": "Output",
 							"connections": [
-								"Node_rvASCktqwXRZYd6YQtEJXQ.ComponentPose"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_rvASCktqwXRZYd6YQtEJXQ",
-					"nodeClass": "AnimGraphNode_ModifyBone",
-					"nodeTitle": "Transform (Modify) Bone\nBone: lowerarm_l",
-					"inputPins": [
-						{
-							"pinName": "ComponentPose",
-							"pinType": "ComponentSpacePoseLink",
-							"direction": "Input",
-							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
-							"connections": [
-								"Node__pH-RUplsfw68xiBC8LkPg.ComponentPose"
-							]
-						},
-						{
-							"pinName": "Alpha",
-							"pinType": "float",
-							"direction": "Input",
-							"defaultValue": "1.000000",
-							"connections": [
-								"Node_QqDxLE4PhFa1k8ukavHwEA.PlacementAlpha"
-							]
-						},
-						{
-							"pinName": "Translation",
-							"pinType": "Vector",
-							"direction": "Input",
-							"defaultValue": "0.000000,0.000000,0.000000",
-							"connections": [
-								"Node_ZlBcZ0bn2AWmY5GrMdWWmw.LowerArmLocation_L"
-							]
-						},
-						{
-							"pinName": "Rotation",
-							"pinType": "Rotator",
-							"direction": "Input",
-							"defaultValue": "0.000000,0.000000,0.000000",
-							"connections": [
-								"Node_Vlo76kjZtoj_F1apGRApcA.LowerArmRotation_L"
-							]
-						},
-						{
-							"pinName": "Scale",
-							"pinType": "Vector",
-							"direction": "Input",
-							"defaultValue": "1.000000,1.000000,1.000000"
-						}
-					],
-					"outputPins": [
-						{
-							"pinName": "Pose",
-							"pinType": "ComponentSpacePoseLink",
-							"direction": "Output",
-							"connections": [
-								"Node_3rUihk3NvhUiIeKq1js5yw.ComponentPose"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_ZlBcZ0bn2AWmY5GrMdWWmw",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get LowerArmLocation_L",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "LowerArmLocation_L",
-							"pinType": "Vector",
-							"direction": "Output",
-							"defaultValue": "0, 0, 0",
-							"connections": [
-								"Node_rvASCktqwXRZYd6YQtEJXQ.Translation"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_Vlo76kjZtoj_F1apGRApcA",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get LowerArmRotation_L",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "LowerArmRotation_L",
-							"pinType": "Rotator",
-							"direction": "Output",
-							"defaultValue": "0, 0, 0",
-							"connections": [
-								"Node_rvASCktqwXRZYd6YQtEJXQ.Rotation"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_QqDxLE4PhFa1k8ukavHwEA",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get PlacementAlpha",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "PlacementAlpha",
-							"pinType": "float",
-							"direction": "Output",
-							"defaultValue": "0.0",
-							"connections": [
-								"Node_rvASCktqwXRZYd6YQtEJXQ.Alpha"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_3rUihk3NvhUiIeKq1js5yw",
-					"nodeClass": "AnimGraphNode_ModifyBone",
-					"nodeTitle": "Transform (Modify) Bone\nBone: lowerarm_r",
-					"inputPins": [
-						{
-							"pinName": "ComponentPose",
-							"pinType": "ComponentSpacePoseLink",
-							"direction": "Input",
-							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
-							"connections": [
-								"Node_rvASCktqwXRZYd6YQtEJXQ.Pose"
-							]
-						},
-						{
-							"pinName": "Alpha",
-							"pinType": "float",
-							"direction": "Input",
-							"defaultValue": "1.000000",
-							"connections": [
-								"Node_bg3ck0zIiC9CzSy3gs05Lg.PlacementAlpha"
-							]
-						},
-						{
-							"pinName": "Translation",
-							"pinType": "Vector",
-							"direction": "Input",
-							"defaultValue": "0.000000,0.000000,0.000000",
-							"connections": [
-								"Node_3dRqyUFfAUGvVuCeN1k43A.LowerArmLocation_R"
-							]
-						},
-						{
-							"pinName": "Rotation",
-							"pinType": "Rotator",
-							"direction": "Input",
-							"defaultValue": "0.000000,0.000000,0.000000",
-							"connections": [
-								"Node_jh2v307ng4yUJYSVdMarlw.LowerArmRotation_R"
-							]
-						},
-						{
-							"pinName": "Scale",
-							"pinType": "Vector",
-							"direction": "Input",
-							"defaultValue": "1.000000,1.000000,1.000000"
-						}
-					],
-					"outputPins": [
-						{
-							"pinName": "Pose",
-							"pinType": "ComponentSpacePoseLink",
-							"direction": "Output",
-							"connections": [
-								"Node_3Cnr8kd9qcLxG8GUG9FBnQ.ComponentPose"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_3dRqyUFfAUGvVuCeN1k43A",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get LowerArmLocation_R",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "LowerArmLocation_R",
-							"pinType": "Vector",
-							"direction": "Output",
-							"defaultValue": "0, 0, 0",
-							"connections": [
-								"Node_3rUihk3NvhUiIeKq1js5yw.Translation"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_jh2v307ng4yUJYSVdMarlw",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get LowerArmRotation_R",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "LowerArmRotation_R",
-							"pinType": "Rotator",
-							"direction": "Output",
-							"defaultValue": "0, 0, 0",
-							"connections": [
-								"Node_3rUihk3NvhUiIeKq1js5yw.Rotation"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_bg3ck0zIiC9CzSy3gs05Lg",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get PlacementAlpha",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "PlacementAlpha",
-							"pinType": "float",
-							"direction": "Output",
-							"defaultValue": "0.0",
-							"connections": [
-								"Node_3rUihk3NvhUiIeKq1js5yw.Alpha"
+								"Node_aw8TF0j3F9fU9ieuLKVxsQ.ComponentPose"
 							]
 						}
 					]
@@ -1100,7 +919,7 @@
 							"direction": "Input",
 							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
 							"connections": [
-								"Node_3rUihk3NvhUiIeKq1js5yw.Pose"
+								"Node_SB6ToUZfrtrYtuu8i6hxOw.Pose"
 							]
 						},
 						{
@@ -1174,96 +993,7 @@
 							"pinType": "PoseLink",
 							"direction": "Output",
 							"connections": [
-								"Node_EomoK0QUixUHK2-2UprMWw.Result"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_-mP9bEqamXkFgwCy3N93Ew",
-					"nodeClass": "AnimGraphNode_ControlRig",
-					"nodeTitle": "Control Rig",
-					"inputPins": [
-						{
-							"pinName": "Source",
-							"pinType": "PoseLink",
-							"direction": "Input",
-							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
-							"connections": [
-								"Node_uC8--0bvUK-vJJKvFK7R1w.Pose"
-							]
-						},
-						{
-							"pinName": "Alpha",
-							"pinType": "float",
-							"direction": "Input",
-							"defaultValue": "1.000000"
-						}
-					],
-					"outputPins": [
-						{
-							"pinName": "Pose",
-							"pinType": "PoseLink",
-							"direction": "Output",
-							"connections": [
-								"Node__pH-RUplsfw68xiBC8LkPg.LocalPose"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_uC8--0bvUK-vJJKvFK7R1w",
-					"nodeClass": "AnimGraphNode_ModifyCurve",
-					"nodeTitle": "Modify Curve",
-					"inputPins": [
-						{
-							"pinName": "SourcePose",
-							"pinType": "PoseLink",
-							"direction": "Input",
-							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
-							"connections": [
-								"Node_yuPpuk76OgNJqVW9M4GbDA.Pose"
-							]
-						},
-						{
-							"pinName": "CurveMap",
-							"pinType": "TMap<Name, real>",
-							"direction": "Input",
-							"defaultValue": "()",
-							"connections": [
-								"Node_LViZ60DRWs0IOxyPbVgcWg.ContactCurves"
-							]
-						},
-						{
-							"pinName": "Alpha",
-							"pinType": "float",
-							"direction": "Input",
-							"defaultValue": "1.000000"
-						}
-					],
-					"outputPins": [
-						{
-							"pinName": "Pose",
-							"pinType": "PoseLink",
-							"direction": "Output",
-							"connections": [
-								"Node_-mP9bEqamXkFgwCy3N93Ew.Source"
-							]
-						}
-					]
-				},
-				{
-					"nodeId": "Node_LViZ60DRWs0IOxyPbVgcWg",
-					"nodeClass": "K2Node_VariableGet",
-					"nodeTitle": "Get ContactCurves",
-					"inputPins": [],
-					"outputPins": [
-						{
-							"pinName": "ContactCurves",
-							"pinType": "TMap<Name, real>",
-							"direction": "Output",
-							"connections": [
-								"Node_uC8--0bvUK-vJJKvFK7R1w.CurveMap"
+								"Node_fuehpkQzStvxUgO5TKfk3Q.Source"
 							]
 						}
 					]
@@ -1289,7 +1019,243 @@
 							"pinType": "PoseLink",
 							"direction": "Output",
 							"connections": [
-								"Node_uC8--0bvUK-vJJKvFK7R1w.SourcePose"
+								"Node__pH-RUplsfw68xiBC8LkPg.LocalPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_pmNBlEUQYVpWAU2El5myxQ",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get PlacementAlpha_L",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "PlacementAlpha_L",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_aw8TF0j3F9fU9ieuLKVxsQ.Alpha"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_-mdDfUs3VklShbW0eDRBFw",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get PlacementAlpha_R",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "PlacementAlpha_R",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0",
+							"connections": [
+								"Node_SB6ToUZfrtrYtuu8i6hxOw.Alpha"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_g9Q8ckFxKR2Xb1q0ked2RQ",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get GripTarget_L",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "GripTarget_L",
+							"pinType": "Transform",
+							"direction": "Output",
+							"connections": [
+								"Node_aw8TF0j3F9fU9ieuLKVxsQ.Target"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_sZ44FkR5NCTpcvKEA6602w",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get GripTarget_R",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "GripTarget_R",
+							"pinType": "Transform",
+							"direction": "Output",
+							"connections": [
+								"Node_SB6ToUZfrtrYtuu8i6hxOw.Target"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_aw8TF0j3F9fU9ieuLKVxsQ",
+					"nodeClass": "Ck_AnimGraphNode_Hands_GlovePlacement",
+					"nodeTitle": "Glove Placement (Ck Hands)\ngrip_l -> Target",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node__pH-RUplsfw68xiBC8LkPg.ComponentPose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000",
+							"connections": [
+								"Node_pmNBlEUQYVpWAU2El5myxQ.PlacementAlpha_L"
+							]
+						},
+						{
+							"pinName": "Target",
+							"pinType": "Transform",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000|0.000000,0.000000,-0.000000|1.000000,1.000000,1.000000",
+							"connections": [
+								"Node_g9Q8ckFxKR2Xb1q0ked2RQ.GripTarget_L"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_SB6ToUZfrtrYtuu8i6hxOw.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_SB6ToUZfrtrYtuu8i6hxOw",
+					"nodeClass": "Ck_AnimGraphNode_Hands_GlovePlacement",
+					"nodeTitle": "Glove Placement (Ck Hands)\ngrip_r -> Target",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_aw8TF0j3F9fU9ieuLKVxsQ.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000",
+							"connections": [
+								"Node_-mdDfUs3VklShbW0eDRBFw.PlacementAlpha_R"
+							]
+						},
+						{
+							"pinName": "Target",
+							"pinType": "Transform",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000|0.000000,0.000000,-0.000000|1.000000,1.000000,1.000000",
+							"connections": [
+								"Node_sZ44FkR5NCTpcvKEA6602w.GripTarget_R"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_3Cnr8kd9qcLxG8GUG9FBnQ.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_w2D-jEogz3Y5WlKn_SuZGw",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get ContactShape_L",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "ContactShape_L",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Output",
+							"connections": [
+								"Node_fuehpkQzStvxUgO5TKfk3Q.Shape_L"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_h-k91k6xi5moENeZ2KpZtA",
+					"nodeClass": "K2Node_VariableGet",
+					"nodeTitle": "Get ContactShape_R",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "ContactShape_R",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Output",
+							"connections": [
+								"Node_fuehpkQzStvxUgO5TKfk3Q.Shape_R"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_fuehpkQzStvxUgO5TKfk3Q",
+					"nodeClass": "AnimGraphNode_ControlRig",
+					"nodeTitle": "Control Rig",
+					"inputPins": [
+						{
+							"pinName": "Source",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_DebZ6ERWYwbz1AGR-p5Kxg.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Shape_L",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"defaultValue": "(_Type=None,_Transform=(Rotation=(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000),Translation=(X=0.000000,Y=0.000000,Z=0.000000),Scale3D=(X=1.000000,Y=1.000000,Z=1.000000)),_HalfExtents=(X=0.000000,Y=0.000000,Z=0.000000),_Radius=0.000000,_HalfHeight=0.000000)",
+							"connections": [
+								"Node_w2D-jEogz3Y5WlKn_SuZGw.ContactShape_L"
+							]
+						},
+						{
+							"pinName": "Shape_R",
+							"pinType": "Ck_Hands_ContactShape",
+							"direction": "Input",
+							"defaultValue": "(_Type=None,_Transform=(Rotation=(X=0.000000,Y=0.000000,Z=0.000000,W=1.000000),Translation=(X=0.000000,Y=0.000000,Z=0.000000),Scale3D=(X=1.000000,Y=1.000000,Z=1.000000)),_HalfExtents=(X=0.000000,Y=0.000000,Z=0.000000),_Radius=0.000000,_HalfHeight=0.000000)",
+							"connections": [
+								"Node_h-k91k6xi5moENeZ2KpZtA.ContactShape_R"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_EomoK0QUixUHK2-2UprMWw.Result"
 							]
 						}
 					]
