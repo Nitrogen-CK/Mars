@@ -1,5 +1,6 @@
 // The link: a Gate that also has a MechanismSink opens while powered; a Gate that also has a MechanismSource
-// asserts while open. Both features live on the gate's own entity.
+// asserts while open. Both features live on the gate's own entity. A gate with a threshold retries a deferred close
+// each time something leaves it.
 class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -31,7 +32,29 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
             Source.Request_SetAsserted(Gate.Get_IsOpen());
         }
 
+        auto Threshold = Gate.Get_Threshold();
+        if (ck::IsValid(Threshold))
+        { Threshold.BindTo_OnEntityExited(FMars_Delegate_Trigger_OnEntityExited(this, n"OnThresholdEntityExited")); }
+
         Gate.Request_TryRemove(FMars_Tag_Gate_NeedsSetup);
+    }
+
+    UFUNCTION()
+    private void OnThresholdEntityExited(FCk_Handle_Trigger InTrigger, FCk_Handle InEntity)
+    {
+        // The threshold lives on the gate's root, or on a scene node directly under it when it has a LocalOffset.
+        auto Gate = InTrigger.As_Gate(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Gate))
+        {
+            auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTrigger);
+            if (ck::IsValid(Owner))
+            { Gate = Owner.As_Gate(ECk_SanityCheck::UnChecked); }
+        }
+
+        if (ck::Is_NOT_Valid(Gate) || Gate.Get_IsCloseDeferred() == false || Gate.Get_IsThresholdOccupied())
+        { return; }
+
+        Gate.Request_RetryClose();
     }
 
     UFUNCTION()

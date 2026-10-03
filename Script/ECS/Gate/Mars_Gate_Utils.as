@@ -15,6 +15,8 @@ namespace utils_gate
         auto State = FMars_Fragment_Gate();
         State.IsOpen = InParams.StartOpen;
         State.MovingNode = MovingNode;
+        if (InParams.Threshold.IsSet())
+        { State.Threshold = utils_trigger::Add(InOwner, InParams.Threshold.GetValue()); }
 
         InOwner.Add_Fragment(FMars_Feature_Gate());
         InOwner.Add_Fragment(State);
@@ -37,6 +39,23 @@ mixin FCk_Handle_SceneNode Get_MovingNode(const FCk_Handle_Gate& Self)
     return Self.Get_Fragment(FMars_Fragment_Gate).MovingNode;
 }
 
+mixin FCk_Handle_Trigger Get_Threshold(const FCk_Handle_Gate& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Gate).Threshold;
+}
+
+mixin bool Get_IsCloseDeferred(const FCk_Handle_Gate& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Gate).IsCloseDeferred;
+}
+
+// False for a gate without a threshold.
+mixin bool Get_IsThresholdOccupied(const FCk_Handle_Gate& Self)
+{
+    const auto Threshold = Self.Get_Threshold();
+    return ck::IsValid(Threshold) && Threshold.Get_EntityCount() > 0;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +63,13 @@ mixin FCk_Handle_SceneNode Get_MovingNode(const FCk_Handle_Gate& Self)
 mixin void Request_SetOpen(FCk_Handle_Gate& Self, bool InOpen)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Gate_Requests);
-    Requests.SetOpenRequest = FMars_Request_Gate_SetOpen(InOpen);
+    Requests.SetOpenRequests.Add(FMars_Request_Gate_SetOpen(InOpen));
+}
+
+mixin void Request_RetryClose(FCk_Handle_Gate& Self)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Gate_Requests);
+    Requests.RetryCloseRequests.Add(FMars_Request_Gate_RetryClose());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
