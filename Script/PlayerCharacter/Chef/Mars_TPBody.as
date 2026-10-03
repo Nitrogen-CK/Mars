@@ -55,6 +55,16 @@ struct FMars_TPBody_Face
     FVector2D PlateSize = FVector2D(12.0, 6.0);
 }
 
+// The cosmetics that ride the chef's head: the hat on its socket and the face node carrying the eyes.
+struct FMars_TPBody_Head
+{
+    UPROPERTY()
+    FMars_TPBody_Hat Hat;
+
+    UPROPERTY()
+    FMars_TPBody_Face Face;
+}
+
 struct FMars_TPBody_Spec
 {
     UPROPERTY()
@@ -83,10 +93,11 @@ struct FMars_TPBody_Spec
     FMars_TPBody_Montages Montages;
 
     UPROPERTY()
-    FMars_TPBody_Hat Hat;
+    FMars_TPBody_Head Head;
 
+    // Where the hands hold an item other players see (Mars_HeldView.as).
     UPROPERTY()
-    FMars_TPBody_Face Face;
+    FMars_TPBody_Hold Hold;
 }
 
 mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
@@ -111,27 +122,31 @@ mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
     if (Self.Montages.EmoteCancelBlendSeconds < 0.0f)
     { return FMars_Validation(f"EmoteCancelBlendSeconds [{Self.Montages.EmoteCancelBlendSeconds}] is negative"); }
 
-    const auto& Hat = Self.Hat;
+    const auto& Hat = Self.Head.Hat;
     if (Hat.Mesh.IsNull() == false && Hat.Socket.IsNone())
-    { return FMars_Validation("Hat.Socket is not set (the hat mesh needs a socket)"); }
+    { return FMars_Validation("Head.Hat.Socket is not set (the hat mesh needs a socket)"); }
 
     // IsValid: finite, with a normalized rotation.
     if (Hat.Offset.IsValid() == false)
-    { return FMars_Validation(f"Hat.Offset [{Hat.Offset}] is not finite or its rotation is not normalized"); }
+    { return FMars_Validation(f"Head.Hat.Offset [{Hat.Offset}] is not finite or its rotation is not normalized"); }
 
-    const auto& Face = Self.Face;
+    const auto& Face = Self.Head.Face;
     if (Face.Bone.IsNone())
-    { return FMars_Validation("Face.Bone is not set"); }
+    { return FMars_Validation("Head.Face.Bone is not set"); }
 
     if (Face.Offset.IsValid() == false)
-    { return FMars_Validation(f"Face.Offset [{Face.Offset}] is not finite or its rotation is not normalized"); }
+    { return FMars_Validation(f"Head.Face.Offset [{Face.Offset}] is not finite or its rotation is not normalized"); }
 
     if (Face.Offset.GetScale3D().Equals(FVector::OneVector) == false)
-    { return FMars_Validation(f"Face.Offset scale [{Face.Offset.GetScale3D()}] must be one - the Scale field sizes the face"); }
+    { return FMars_Validation(f"Head.Face.Offset scale [{Face.Offset.GetScale3D()}] must be one - the Scale field sizes the face"); }
 
     // A NaN fails the comparison, so it is rejected too.
     if ((Face.PlateSize.X > 0.0 && Face.PlateSize.Y > 0.0) == false)
-    { return FMars_Validation(f"Face.PlateSize [{Face.PlateSize}] must be positive"); }
+    { return FMars_Validation(f"Head.Face.PlateSize [{Face.PlateSize}] must be positive"); }
+
+    const auto HoldValidation = Self.Hold.Validate();
+    if (HoldValidation.IsValid() == false)
+    { return FMars_Validation(f"Hold: {HoldValidation.Get_Error()}"); }
 
     return FMars_Validation();
 }

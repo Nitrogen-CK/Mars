@@ -1373,6 +1373,32 @@ namespace UMars_AutoTest_Health_InvulnerableIgnoresDamage
 }
 
 USTRUCT()
+struct FMars_AutoTest_HeldView_ItemSitsAtTheRightPalm_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HeldView_ItemSitsAtTheRightPalm
+{
+    FMars_AutoTest_HeldView_ItemSitsAtTheRightPalm_SpawnParams Params()
+    {
+        return FMars_AutoTest_HeldView_ItemSitsAtTheRightPalm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HeldView_MakeMatchesFPHold_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HeldView_MakeMatchesFPHold
+{
+    FMars_AutoTest_HeldView_MakeMatchesFPHold_SpawnParams Params()
+    {
+        return FMars_AutoTest_HeldView_MakeMatchesFPHold_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_HitZone_DisabledZoneIgnoresHits_SpawnParams
 {
 }
@@ -1759,6 +1785,19 @@ namespace UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails
     FMars_AutoTest_SurfaceNavigator_StuckBehindWallFails_SpawnParams Params()
     {
         return FMars_AutoTest_SurfaceNavigator_StuckBehindWallFails_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_TPBody_HoldSpecValidates_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_TPBody_HoldSpecValidates
+{
+    FMars_AutoTest_TPBody_HoldSpecValidates_SpawnParams Params()
+    {
+        return FMars_AutoTest_TPBody_HoldSpecValidates_SpawnParams();
     }
 }
 

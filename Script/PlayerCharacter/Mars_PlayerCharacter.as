@@ -41,7 +41,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default FPHands.VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
     default FPHands.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-    // The chef's hat (Config.TPBody.Hat), a cosmetic on the body's Hat socket: it follows the head and takes the body's
+    // The chef's hat (Config.TPBody.Head.Hat), a cosmetic on the body's Hat socket: it follows the head and takes the body's
     // scale through the attachment. Hidden from the owner with the body. CharacterMesh0 is ACharacter's Mesh.
     UPROPERTY(DefaultComponent, Attach = CharacterMesh0, AttachSocket = Hat)
     UStaticMeshComponent Hat;
@@ -50,6 +50,17 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default Hat.CastShadow = true;
     default Hat.bReceivesDecals = false;
     default Hat.SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    // The held item as other players see it: in the body's right hand (a bone is a valid socket; the AttachSocket warning
+    // before the body mesh is assigned at spawn is harmless). Pawn-owned so OwnerNoSee works: the owner sees its
+    // first-person item instead, and (WorldSpaceRepresentation, set in ConstructionScript) only this one's shadow.
+    UPROPERTY(DefaultComponent, Attach = CharacterMesh0, AttachSocket = grip_r)
+    UStaticMeshComponent BodyHeldItem;
+    default BodyHeldItem.SetMobility(EComponentMobility::Movable);
+    default BodyHeldItem.bOwnerNoSee = true;
+    default BodyHeldItem.CastShadow = true;
+    default BodyHeldItem.bReceivesDecals = false;
+    default BodyHeldItem.SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     UPROPERTY(ExposeOnSpawn)
     UMars_PlayerCharacter_Config Config = mars::Mars_PlayerCharacter_Config;
@@ -64,6 +75,19 @@ class AMars_PlayerCharacter : ACk_Character_UE
     private FCk_Handle_Transform _PlayerTransform;
     // The chef's face node carrying Gaze, Eyes and the eye plate; invalid while there are no eyes (see RefreshEyes).
     private FCk_Handle_Transform _Face;
+
+    // What this player holds, for everyone (Mars_HeldView.as). The owner sets it (Request_SetHeldView); the server's copy
+    // replicates to every client, late joiners included.
+    UPROPERTY(Replicated, ReplicatedUsing = OnRep_HeldView)
+    private FMars_HeldView _HeldView;
+
+    // The arms' targets for _HeldView at full alpha, and the eased frame the anim instance reads (Update_BodyHold).
+    private FMars_TPBody_HoldFrame _BodyHoldTarget;
+    private FMars_TPBody_HoldFrame _BodyHoldFrame;
+
+    // The body's grip bones: the gloves' grip axes, children of the hand bones ABP_Chef's IK moves.
+    private const FName BodyGripBone_R = n"grip_r";
+    private const FName BodyGripBone_L = n"grip_l";
 
     // The eye plate is the engine plane (100 uu). Taking its face as local +Z with U along local +X and V along local +Y:
     // the yaw and roll turn its face to the face node's +X with U along +Y, and the negative Y scale sends V down (the
@@ -95,6 +119,10 @@ class AMars_PlayerCharacter : ACk_Character_UE
         const auto& View = Config.FPHands.View;
         const auto IsFirstPerson = View.FirstPersonRendering == ECk_EnableDisable::Enable;
         FPHands.SetFirstPersonPrimitiveType(IsFirstPerson ? EFirstPersonPrimitiveType::FirstPerson : EFirstPersonPrimitiveType::None);
+        // The body and its held item stay hidden from the owner but cast the owner's shadow (the first-person shadow path).
+        const auto BodyType = IsFirstPerson ? EFirstPersonPrimitiveType::WorldSpaceRepresentation : EFirstPersonPrimitiveType::None;
+        Mesh.SetFirstPersonPrimitiveType(BodyType);
+        BodyHeldItem.SetFirstPersonPrimitiveType(BodyType);
         CameraComponent.SetEnableFirstPersonScale(IsFirstPerson);
         CameraComponent.SetFirstPersonScale(View.FirstPersonScale);
 
@@ -130,7 +158,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     // The spec's socket wins over the declared AttachSocket; Offset is in unscaled body units (the hat inherits Scale).
     private void ConstructHat()
     {
-        const auto& HatSpec = Config.TPBody.Hat;
+        const auto& HatSpec = Config.TPBody.Head.Hat;
         if (HatSpec.Mesh.IsNull())
         {
             Hat.SetStaticMesh(nullptr);
@@ -311,7 +339,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
     // Where cosmetics cannot run (a dedicated server) the face is only its node and the eyes' logic: no plate, no gaze.
     private void ConstructEyes()
     {
-        const auto& FaceSpec = Config.TPBody.Face;
+        const auto& FaceSpec = Config.TPBody.Head.Face;
         if (ck::EnsureIfNot(Mesh.DoesSocketExist(FaceSpec.Bone),
             f"[PlayerCharacter] TPBody: the body mesh has no [{FaceSpec.Bone}] bone for the eyes"))
         { return; }
@@ -343,7 +371,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
         { return FCk_Handle_UnrealComponent(); }
 
         // The face node carries the body's scale; the plate undoes it so PlateSize is world cm.
-        const auto& Size = Config.TPBody.Face.PlateSize;
+        const auto& Size = Config.TPBody.Head.Face.PlateSize;
         const auto Scale = float64(Config.TPBody.Scale);
         const auto PlateScale = FVector(Size.X / (100.0 * Scale), -Size.Y / (100.0 * Scale), 1.0);
         auto PlatePart = FMars_MeshPart(FTransform(EyePlateRotation, FVector::ZeroVector, PlateScale),
@@ -490,6 +518,121 @@ class AMars_PlayerCharacter : ACk_Character_UE
         return Montage;
     }
 
+    //----------------------------------------------------------------------------------------------------------------------
+    // The held item on the body (Mars_HeldView.as). The owner describes what its gloves hold; the view replicates and every
+    // machine shows it on the body: the item on grip_r, the arms aimed by ABP_Chef's IK. The owner applies at once and,
+    // as a client, forwards to the server, which stores the replicated copy and applies it too. OnRep skips the locally
+    // controlled copy (the owner already applied it), so every machine applies each change once.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION()
+    void Request_SetHeldView(FMars_HeldView InView)
+    {
+        auto View = InView;
+        View.Serial = _HeldView.Serial + 1;
+        _HeldView = View;
+        ApplyHeldView();
+
+        if (HasAuthority() == false)
+        { Server_SetHeldView(View); }
+    }
+
+    UFUNCTION(Server)
+    void Server_SetHeldView(FMars_HeldView InView)
+    {
+        _HeldView = InView;
+        ApplyHeldView();
+    }
+
+    UFUNCTION()
+    private void OnRep_HeldView()
+    {
+        if (IsLocallyControlled())
+        { return; }
+
+        ApplyHeldView();
+    }
+
+    // The eased arm targets, component space; UMars_Chef_AnimInstance reads them after Update_BodyHold.
+    UFUNCTION()
+    FMars_TPBody_HoldFrame Get_BodyHoldFrame() const
+    {
+        return _BodyHoldFrame;
+    }
+
+    // Eases the arms toward _HeldView's hold. Driven by UMars_Chef_AnimInstance's update (the body's anim always ticks,
+    // see Mesh's VisibilityBasedAnimTickOption), so the arms move exactly as often as the pose is evaluated and the
+    // character needs no actor tick. A body montage while holding is the strike (emotes refuse while holding): the arms
+    // let go of the IK for its duration and the swing carries the item on grip_r.
+    void Update_BodyHold(float32 InDeltaSeconds)
+    {
+        auto Target = _BodyHoldTarget;
+        auto AnimInstance = Mesh.GetAnimInstance();
+        if (ck::IsValid(AnimInstance) && AnimInstance.IsAnyMontagePlaying())
+        {
+            Target.Left.Alpha = 0.0f;
+            Target.Right.Alpha = 0.0f;
+        }
+
+        const auto Speed = Config.TPBody.Hold.InterpSpeed;
+        const auto Step = Speed <= 0.0f ? 1.0f : Math::Clamp(InDeltaSeconds * Speed, 0.0f, 1.0f);
+        _BodyHoldFrame.Left = utils_held_view::Ease_Arm(_BodyHoldFrame.Left, Target.Left, Step);
+        _BodyHoldFrame.Right = utils_held_view::Ease_Arm(_BodyHoldFrame.Right, Target.Right, Step);
+    }
+
+    // Shows _HeldView on the body: the item mesh relative to grip_r where the first-person system puts it relative to the
+    // right glove's grip, and the arms' targets. Empty hands clear the mesh and lower both arms (they keep their last
+    // targets while the alphas ease out).
+    private void ApplyHeldView()
+    {
+        const auto& View = _HeldView;
+        if (View.IsHolding == false)
+        {
+            BodyHeldItem.SetStaticMesh(nullptr);
+            _BodyHoldTarget.Left.Alpha = 0.0f;
+            _BodyHoldTarget.Right.Alpha = 0.0f;
+            return;
+        }
+
+        const auto& Body = Config.TPBody;
+        // The body's own palm thickness replaces the gloves' for the fitted grips; the rest of the layout is the gloves'.
+        auto HandsSpec = Config.FPHands;
+        HandsSpec.PalmSurfaceOffset = Body.Hold.PalmSurfaceOffset;
+
+        UStaticMesh ItemMesh = nullptr;
+        if (View.Mesh.IsNull() == false)
+        { ItemMesh = System::LoadAsset_Blocking(View.Mesh); }
+
+        // No material clears the override (the mesh's own material shows), as on the WorldItem visual.
+        UMaterialInterface ItemMaterial = nullptr;
+        if (View.Material.IsNull() == false)
+        { ItemMaterial = System::LoadAsset_Blocking(View.Material); }
+
+        BodyHeldItem.SetStaticMesh(ItemMesh);
+        BodyHeldItem.SetMaterial(0, ItemMaterial);
+        const auto ItemInGrip = utils_held_view::Get_ItemInGrip(HandsSpec, View);
+        BodyHeldItem.SetRelativeTransform(utils_held_view::Get_BodyItemTransform(ItemInGrip, View.MeshScale, Body.Scale));
+
+        auto Query = FMars_TPBody_HoldQuery();
+        Query.Grips = utils_held_view::Get_GripTargets(HandsSpec, View.Grip);
+        Query.IsTwoHanded = View.Grip.IsTwoHanded;
+        Query.Hold = Body.Hold;
+        Query.BodyScale = Body.Scale;
+        Query.HandInGrip_R = Get_HandInGrip(BodyGripBone_R);
+        Query.HandInGrip_L = Get_HandInGrip(BodyGripBone_L);
+        _BodyHoldTarget = utils_held_view::Make_HoldFrame(Query);
+    }
+
+    // The grip bone's parent (the hand ABP_Chef's IK moves) relative to the grip bone, from the body's reference pose.
+    private FTransform Get_HandInGrip(FName InGripBone)
+    {
+        const auto Index = Mesh.GetBoneIndex(InGripBone);
+        if (ck::EnsureIfNot(Index >= 0, f"[PlayerCharacter] TPBody: the body mesh has no [{InGripBone}] bone for the held item"))
+        { return FTransform::Identity; }
+
+        return Mesh.GetRefPoseTransform(Index).Inverse();
+    }
+
     // Empty hands and two-handed holds centre the Hand node between the gloves; one-handed items move it to the right.
     // The gloves' own hold (and the carry of a picked-up item) is the FPHands feature's; the rest offset is measured
     // here from the same item. Stays on the actor: the Hand node's sway handle is held only here.
@@ -501,6 +644,10 @@ class AMars_PlayerCharacter : ACk_Character_UE
         const auto NewHold = utils_fphands::Make_Hold(InNew);
         if (NewHold.Kind != EMars_FPHands_HoldKind::Empty)
         { utils_fphands::Stop_Emote(_Hands); }
+
+        // Only the owner's held item is real (nothing about items replicates); everyone else learns it from _HeldView.
+        if (IsLocallyControlled())
+        { Request_SetHeldView(utils_held_view::Make(InNew)); }
 
         const auto NewRest = utils_fphands::Get_HandRestOffset(Config.FPHands.Rest, NewHold);
         if (NewRest.Equals(_HandRestOffset))

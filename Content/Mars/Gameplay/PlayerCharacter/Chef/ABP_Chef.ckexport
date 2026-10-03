@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "ac801f15238ac1eaa49f64d179bc0686",
+		"sourceHash": "7fef3b74caa9d19aaa8fce1e582773c4",
 		"exporterVersion": 3
 	},
 	"blueprintType": "AnimBlueprint",
@@ -33,6 +33,85 @@
 			"category": "Chef",
 			"value": false,
 			"tooltip": "Character movement reports falling (jump or drop)."
+		},
+		{
+			"name": "HoldAlpha_L",
+			"type": "float",
+			"category": "Chef|Hold",
+			"value": 0,
+			"tooltip": "the arm keeps the locomotion/montage pose; one-handed items only raise the right alpha."
+		},
+		{
+			"name": "HoldAlpha_R",
+			"type": "float",
+			"category": "Chef|Hold",
+			"value": 0
+		},
+		{
+			"name": "HandLocation_L",
+			"type": "FVector",
+			"category": "Chef|Hold",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			}
+		},
+		{
+			"name": "HandLocation_R",
+			"type": "FVector",
+			"category": "Chef|Hold",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			}
+		},
+		{
+			"name": "HandRotation_L",
+			"type": "FRotator",
+			"category": "Chef|Hold",
+			"value":
+			{
+				"Pitch": 0,
+				"Yaw": 0,
+				"Roll": 0
+			}
+		},
+		{
+			"name": "HandRotation_R",
+			"type": "FRotator",
+			"category": "Chef|Hold",
+			"value":
+			{
+				"Pitch": 0,
+				"Yaw": 0,
+				"Roll": 0
+			}
+		},
+		{
+			"name": "ElbowTarget_L",
+			"type": "FVector",
+			"category": "Chef|Hold",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			}
+		},
+		{
+			"name": "ElbowTarget_R",
+			"type": "FVector",
+			"category": "Chef|Hold",
+			"value":
+			{
+				"X": 0,
+				"Y": 0,
+				"Z": 0
+			}
 		},
 		{
 			"name": "MovingSpeedThreshold",
@@ -195,7 +274,7 @@
 							"direction": "Input",
 							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
 							"connections": [
-								"Node_G-X5AE-sE-lO1e2KUybahw.Pose"
+								"Node_paRivEQ82oAhOMWwfdHk_w.Pose"
 							]
 						}
 					],
@@ -229,6 +308,246 @@
 							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
 							"connections": [
 								"Node_EDcVZEYKCwPFThOMQ6cbQg.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "PoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_k3DwcESGj77G9w-yKTpCMQ.LocalPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_k3DwcESGj77G9w-yKTpCMQ",
+					"nodeClass": "AnimGraphNode_LocalToComponentSpace",
+					"nodeTitle": "Local To Component",
+					"inputPins": [
+						{
+							"pinName": "LocalPose",
+							"pinType": "PoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_G-X5AE-sE-lO1e2KUybahw.Pose"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_AGr5hUxpHNncxLaVPxSwug.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_AGr5hUxpHNncxLaVPxSwug",
+					"nodeClass": "AnimGraphNode_TwoBoneIK",
+					"nodeTitle": "Two Bone IK\nBone: hand_l",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_k3DwcESGj77G9w-yKTpCMQ.ComponentPose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "EffectorLocation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "JointTargetLocation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_LBO9MEg7QexwnGqyzFmfRA.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_LBO9MEg7QexwnGqyzFmfRA",
+					"nodeClass": "AnimGraphNode_TwoBoneIK",
+					"nodeTitle": "Two Bone IK\nBone: hand_r",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_AGr5hUxpHNncxLaVPxSwug.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "EffectorLocation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "JointTargetLocation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_zYRcpEPl-nWWdASEANMopA.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_zYRcpEPl-nWWdASEANMopA",
+					"nodeClass": "AnimGraphNode_ModifyBone",
+					"nodeTitle": "Transform (Modify) Bone\nBone: hand_l",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_LBO9MEg7QexwnGqyzFmfRA.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Translation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "Rotation",
+							"pinType": "Rotator",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "Scale",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "1.000000,1.000000,1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_6u4CnEGNo1O3jxCdwBp-QQ.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_6u4CnEGNo1O3jxCdwBp-QQ",
+					"nodeClass": "AnimGraphNode_ModifyBone",
+					"nodeTitle": "Transform (Modify) Bone\nBone: hand_r",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_zYRcpEPl-nWWdASEANMopA.Pose"
+							]
+						},
+						{
+							"pinName": "Alpha",
+							"pinType": "float",
+							"direction": "Input",
+							"defaultValue": "1.000000"
+						},
+						{
+							"pinName": "Translation",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "Rotation",
+							"pinType": "Rotator",
+							"direction": "Input",
+							"defaultValue": "0.000000,0.000000,0.000000"
+						},
+						{
+							"pinName": "Scale",
+							"pinType": "Vector",
+							"direction": "Input",
+							"defaultValue": "1.000000,1.000000,1.000000"
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "Pose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Output",
+							"connections": [
+								"Node_paRivEQ82oAhOMWwfdHk_w.ComponentPose"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_paRivEQ82oAhOMWwfdHk_w",
+					"nodeClass": "AnimGraphNode_ComponentToLocalSpace",
+					"nodeTitle": "Component To Local",
+					"inputPins": [
+						{
+							"pinName": "ComponentPose",
+							"pinType": "ComponentSpacePoseLink",
+							"direction": "Input",
+							"defaultValue": "(LinkID=-1,SourceLinkID=-1)",
+							"connections": [
+								"Node_6u4CnEGNo1O3jxCdwBp-QQ.Pose"
 							]
 						}
 					],

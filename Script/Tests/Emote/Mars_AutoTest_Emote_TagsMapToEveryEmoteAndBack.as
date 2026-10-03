@@ -97,33 +97,33 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         Assert_True(Math::Abs(Config.View.EyeHeight.Height - FaceHeight) < 0.5f,
             f"the eye height [{Config.View.EyeHeight.Height}] is the chef's face [{FaceHeight}] above the capsule centre");
 
-        Assert_False(Body.Hat.Mesh.IsNull(), "the chef has a hat mesh");
-        Assert_True(Body.Hat.Socket == n"Hat", f"the hat rides the Hat socket (got [{Body.Hat.Socket}])");
-        Assert_True(Body.Face.Bone == n"head", f"the face follows the head bone (got [{Body.Face.Bone}])");
+        Assert_False(Body.Head.Hat.Mesh.IsNull(), "the chef has a hat mesh");
+        Assert_True(Body.Head.Hat.Socket == n"Hat", f"the hat rides the Hat socket (got [{Body.Head.Hat.Socket}])");
+        Assert_True(Body.Head.Face.Bone == n"head", f"the face follows the head bone (got [{Body.Head.Face.Bone}])");
         Assert_True(Config.Eyes.Validate().IsValid(), f"the chef's eyes spec is valid ({Config.Eyes.Validate().Get_Error()})");
 
         auto NoHat = Body;
-        NoHat.Hat.Mesh = TSoftObjectPtr<UStaticMesh>();
+        NoHat.Head.Hat.Mesh = TSoftObjectPtr<UStaticMesh>();
         Assert_True(NoHat.Validate().IsValid(), "the hat is optional");
 
         auto HatWithoutSocket = Body;
-        HatWithoutSocket.Hat.Socket = NAME_None;
+        HatWithoutSocket.Head.Hat.Socket = NAME_None;
         Assert_False(HatWithoutSocket.Validate().IsValid(), "a hat mesh without a socket is rejected");
 
         auto NoPlate = Body;
-        NoPlate.Face.PlateSize = FVector2D(0.0, 6.0);
+        NoPlate.Head.Face.PlateSize = FVector2D(0.0, 6.0);
         Assert_False(NoPlate.Validate().IsValid(), "a zero-width eye plate is rejected");
 
         auto ScaledFace = Body;
-        ScaledFace.Face.Offset.SetScale3D(FVector(2.0, 2.0, 2.0));
+        ScaledFace.Head.Face.Offset.SetScale3D(FVector(2.0, 2.0, 2.0));
         Assert_False(ScaledFace.Validate().IsValid(), "a scaled face offset is rejected (Scale sizes the body)");
 
         auto BrokenFace = Body;
-        BrokenFace.Face.Offset.SetTranslation(FVector(Math::Sqrt(-1.0), 0.0, 0.0));
+        BrokenFace.Head.Face.Offset.SetTranslation(FVector(Math::Sqrt(-1.0), 0.0, 0.0));
         Assert_False(BrokenFace.Validate().IsValid(), "a non-finite face offset is rejected");
 
         auto NoBone = Body;
-        NoBone.Face.Bone = NAME_None;
+        NoBone.Head.Face.Bone = NAME_None;
         Assert_False(NoBone.Validate().IsValid(), "a face without a bone is rejected");
     }
 }
