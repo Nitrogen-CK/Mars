@@ -1,6 +1,6 @@
 // Every EMars_FPEmote has a registered Mars.Emote.<name> tag, and the tag maps back to the same emote; tags that are not
 // emotes map to nothing. The player config carries one glove and one body montage per emote, and the body spec's rules
-// hold: the 1 m chef (scale, capsule, eye height), its hat and its face.
+// hold: the 1.5 m chef (scale, capsule, eye height, locomotion play rate), its hat and its face.
 class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -9,7 +9,7 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         Add_Step("map every emote to its tag and back", n"Step_RoundTrip");
         Add_Step("reject tags that are not emotes", n"Step_NotEmotes");
         Add_Step("check the configured montage tables and the body spec", n"Step_Config");
-        Add_Step("check the 1 m chef: scale, capsule, eye height, hat and face", n"Step_BodySize");
+        Add_Step("check the 1.5 m chef: scale, capsule, eye height, play rate, hat and face", n"Step_BodySize");
         Run_Steps(InHandle);
     }
 
@@ -87,15 +87,19 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         auto Config = mars::Mars_PlayerCharacter_Config;
         const auto& Body = Config.TPBody;
 
-        // 100 / 91.167 (the unscaled chef's top, hat excluded).
-        Assert_True(Math::Abs(Body.Scale - 1.0969f) < 0.001f, f"the chef is scaled to 1 m (Scale [{Body.Scale}] ~ 1.097)");
-        Assert_True(Math::Abs(Config.CapsuleHalfHeight - 50.0f) < 0.001f, f"the capsule stands 1 m (half height [{Config.CapsuleHalfHeight}])");
+        // 150 / 91.167 (the unscaled chef's top, hat excluded); the clips are authored on the 1 m chef (1.0969).
+        Assert_True(Math::Abs(Body.Scale - 1.6453f) < 0.001f, f"the chef is scaled to 1.5 m (Scale [{Body.Scale}] ~ 1.645)");
+        Assert_True(Math::Abs(Config.CapsuleHalfHeight - 75.0f) < 0.001f, f"the capsule stands 1.5 m (half height [{Config.CapsuleHalfHeight}])");
         Assert_True(Config.CrouchedHalfHeight < Config.CapsuleHalfHeight, "the crouched capsule is shorter than the standing one");
 
         // The view at the chef's face centre: 71.1 cm unscaled above the feet, measured from the capsule centre.
         const auto FaceHeight = 71.1f * Body.Scale - Config.CapsuleHalfHeight;
         Assert_True(Math::Abs(Config.EyeHeight.Height - FaceHeight) < 0.5f,
             f"the eye height [{Config.EyeHeight.Height}] is the chef's face [{FaceHeight}] above the capsule centre");
+
+        // The walk clips' footfalls were laid down on the 1 m chef; the 1.5 m body plays them 1.5x slower so they do not slide.
+        Assert_True(Math::Abs(Body.AuthoredScale - 1.0969f) < 0.001f, f"the locomotion clips are authored at the 1 m scale (AuthoredScale [{Body.AuthoredScale}])");
+        Assert_True(Math::Abs(Body.Get_LocomotionPlayRate() - 1.0969f / 1.6453f) < 0.001f, f"the locomotion play rate [{Body.Get_LocomotionPlayRate()}] is AuthoredScale / Scale");
 
         Assert_False(Body.Head.Hat.Mesh.IsNull(), "the chef has a hat mesh");
         Assert_True(Body.Head.Hat.Socket == n"Hat", f"the hat rides the Hat socket (got [{Body.Head.Hat.Socket}])");

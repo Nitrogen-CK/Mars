@@ -83,14 +83,22 @@ struct FMars_TPBody_Spec
     UPROPERTY()
     FTransform MeshOffset = FTransform(FRotator(0.0, -90.0, 0.0), FVector::ZeroVector, FVector::OneVector);
 
-    // Uniform body scale. The chef stands 1 m without its hat:
-    //   Scale = 100 / ChefTopCm = 100 / 91.167 = 1.0969
-    // (ChefTopCm: the unscaled mesh's top above its feet, hat excluded). The capsule (Config.CapsuleHalfHeight 50) is
+    // Uniform body scale. The chef stands 1.5 m without its hat (settled 2026-10-03 after a trial in the crypt levels;
+    // SK_Chef is authored at 1 m, so this stays above one until the mesh is re-authored at 1.5 m):
+    //   Scale = 150 / ChefTopCm = 150 / 91.167 = 1.6453   (1 m: 100 / 91.167 = 1.0969)
+    // (ChefTopCm: the unscaled mesh's top above its feet, hat excluded). The capsule (Config.CapsuleHalfHeight 75) is
     // the chef's height, and the view sits at the chef's face centre (unscaled 71.1 cm above the feet):
-    //   EyeHeight.Height = 71.1 * Scale - CapsuleHalfHeight = 78.0 - 50 = 28
+    //   EyeHeight.Height = 71.1 * Scale - CapsuleHalfHeight = 117.0 - 75 = 42   (1 m: 78.0 - 50 = 28)
     // (EyeHeight is measured from the capsule centre). Re-derive all three when the chef mesh or the capsule changes.
     UPROPERTY()
-    float32 Scale = 1.0969f;
+    float32 Scale = 1.6453f;
+
+    // The Scale the locomotion clips were authored against: at it, A_Chef_Walk_F's footfalls cover the ground at
+    // Config.WalkSpeed with no slide. ABP_Chef plays BS_Chef_Locomotion at AuthoredScale / Scale (Get_LocomotionPlayRate)
+    // so longer legs take proportionally slower steps instead of sliding. Set it to the new Scale when the clips are
+    // re-authored at the body's final height.
+    UPROPERTY()
+    float32 AuthoredScale = 1.0969f;
 
     UPROPERTY()
     FMars_TPBody_Montages Montages;
@@ -101,6 +109,12 @@ struct FMars_TPBody_Spec
     // Where the hands hold an item other players see (Mars_HeldView.as).
     UPROPERTY()
     FMars_TPBody_Hold Hold;
+}
+
+// The blend space play rate that keeps the locomotion clips' footfalls on the ground at the config speeds (see AuthoredScale).
+mixin float32 Get_LocomotionPlayRate(const FMars_TPBody_Spec& Self)
+{
+    return Self.AuthoredScale / Self.Scale;
 }
 
 mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
@@ -114,6 +128,9 @@ mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
     // A NaN fails the comparison, so it is rejected too.
     if ((Self.Scale > 0.0f) == false)
     { return FMars_Validation(f"Scale [{Self.Scale}] must be positive"); }
+
+    if ((Self.AuthoredScale > 0.0f) == false)
+    { return FMars_Validation(f"AuthoredScale [{Self.AuthoredScale}] must be positive"); }
 
     if (Self.MeshOffset.GetScale3D().Equals(FVector::OneVector) == false)
     { return FMars_Validation(f"MeshOffset scale [{Self.MeshOffset.GetScale3D()}] must be one - the Scale field sizes the body"); }

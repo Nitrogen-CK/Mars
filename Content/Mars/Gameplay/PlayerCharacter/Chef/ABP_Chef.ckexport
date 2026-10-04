@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "7fef3b74caa9d19aaa8fce1e582773c4",
+		"sourceHash": "e7696683dc15b00c24be0f7778a9fef6",
 		"exporterVersion": 3
 	},
 	"blueprintType": "AnimBlueprint",
@@ -35,11 +35,18 @@
 			"tooltip": "Character movement reports falling (jump or drop)."
 		},
 		{
+			"name": "LocomotionPlayRate",
+			"type": "float",
+			"category": "Chef",
+			"value": 1,
+			"tooltip": "footfalls keep covering the ground at the config speeds when the body is scaled past the height they were made at."
+		},
+		{
 			"name": "HoldAlpha_L",
 			"type": "float",
 			"category": "Chef|Hold",
 			"value": 0,
-			"tooltip": "the arm keeps the locomotion/montage pose; one-handed items only raise the right alpha."
+			"tooltip": "IK joint targets. Alpha 0 = the arm keeps the locomotion/montage pose; one-handed items only raise the right alpha."
 		},
 		{
 			"name": "HoldAlpha_R",

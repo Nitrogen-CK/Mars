@@ -28,16 +28,16 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Movement")
     float32 AirControl = 0.35f;
 
-    // The capsule is the chef's size: 1 m tall (Config.TPBody.Scale stands the chef 1 m), ~52 cm across (the scaled
-    // chef's torso is about +-25 cm wide).
+    // The capsule is the chef's size: 1.5 m tall (Config.TPBody.Scale stands the 1 m SK_Chef at 1.5 m), ~78 cm across
+    // (the scaled chef's torso is about +-37 cm wide). 1.5x the 1 m chef's capsule (half height 50, radius 26, crouched 35).
     UPROPERTY(Category = "Body")
-    float32 CapsuleHalfHeight = 50.0f;
+    float32 CapsuleHalfHeight = 75.0f;
 
     UPROPERTY(Category = "Body")
-    float32 CapsuleRadius = 26.0f;
+    float32 CapsuleRadius = 39.0f;
 
     UPROPERTY(Category = "Body")
-    float32 CrouchedHalfHeight = 35.0f;
+    float32 CrouchedHalfHeight = 52.5f;
 
     // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch. The config
     // asset puts it at the chef's face (see FMars_TPBody_Spec::Scale for the formula).
@@ -69,9 +69,10 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Inventory")
     FCk_Sway_Spec HandSway;
 
-    // Worn-backpack mount relative to the capsule root (X forward): the 1 m chef's upper back, 50 cm above its feet.
+    // Worn-backpack mount relative to the capsule root (X forward): the 1.5 m chef's upper back, 75 cm above its feet
+    // (the 1 m chef's was (-30, 0, 0)).
     UPROPERTY(Category = "Inventory")
-    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 0.0), FVector::OneVector);
+    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-45.0, 0.0, 0.0), FVector::OneVector);
 
     UPROPERTY(Category = "Inventory")
     float32 ThrowHoldSeconds = 0.35f;
@@ -131,8 +132,11 @@ namespace mars
         HandSway.Set_TeleportAngleDeg(90.0f);
 
         Gait = FCk_Gait_Spec();   // the movement component is supplied by the pawn at Add; only tunables live here
+        // The 1.5 m chef's legs are 1.5x the 1 m chef's, so at WalkSpeed it takes 1 / 1.5 the steps: 1.6 / 1.5 = 1.07 strides
+        // per second, matching the body's locomotion play rate (FMars_TPBody_Spec::AuthoredScale).
         auto GaitStride = Gait.Get_Stride();
         GaitStride.Set_ReferenceSpeed(420.0f);
+        GaitStride.Set_StridesPerSecond(1.07f);
         Gait.Set_Stride(GaitStride);
 
         // The gait is supplied by the pawn at composition (Set_Gait); only tunables live here.
@@ -178,9 +182,9 @@ namespace mars
         HandBobAir.Set_MaxLiftCm(0.0f);
         FPHands.Bob.Set_Air(HandBobAir);
 
-        // The view at the chef's face: 71.1 cm (unscaled) * TPBody.Scale 1.0969 = 78.0 cm above the feet, less
-        // CapsuleHalfHeight 50 (FMars_TPBody_Spec::Scale).
-        EyeHeight.Height = 28.0f;
+        // The view at the chef's face: 71.1 cm (unscaled) * TPBody.Scale 1.6453 = 117.0 cm above the feet, less
+        // CapsuleHalfHeight 75 (FMars_TPBody_Spec::Scale). The 1 m chef's was 28.
+        EyeHeight.Height = 42.0f;
 
         TPBody.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SK_Chef.SK_Chef"));
         TPBody.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C"));
