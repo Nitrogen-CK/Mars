@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "49a70f381d4b2d629820359bfc53b682",
+		"sourceHash": "47f7bf73984e90557421ec5d061a3629",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -20,7 +20,7 @@
 	{
 		"Multiply": 1,
 		"ScalarParameter": 1,
-		"VectorParameter": 2
+		"VectorParameter": 1
 	},
 	"graph":
 	{
@@ -28,7 +28,7 @@
 			{
 				"id": 0,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_4",
+				"name": "MaterialExpressionVectorParameter_0",
 				"outputs": [
 					"RGB",
 					"R",
@@ -47,28 +47,8 @@
 			},
 			{
 				"id": 1,
-				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_5",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"DefaultValue": "(R=1.000000,G=0.700000,B=0.350000,A=1.000000)",
-					"ParameterName": "Color",
-					"Group": "Emissive",
-					"SortPriority": 0
-				}
-			},
-			{
-				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_5",
+				"name": "MaterialExpressionScalarParameter_0",
 				"props":
 				{
 					"DefaultValue": 6,
@@ -78,21 +58,21 @@
 				}
 			},
 			{
-				"id": 3,
+				"id": 2,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_5",
+				"name": "MaterialExpressionMultiply_0",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "A",
-						"node": 1,
+						"node": 0,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 1,
 						"name": "B",
-						"node": 2,
+						"node": 1,
 						"output": 0
 					}
 				]
@@ -101,12 +81,12 @@
 		"outputs": [
 			{
 				"property": "MP_EmissiveColor",
-				"node": 3,
+				"node": 2,
 				"output": 0
 			},
 			{
 				"property": "MP_BaseColor",
-				"node": 1,
+				"node": 0,
 				"output": 0,
 				"mask": "rgb"
 			}

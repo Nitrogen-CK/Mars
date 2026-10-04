@@ -1,15 +1,12 @@
 {
-	"material": "Flame_Mars_MI",
-	"packagePath": "/Game/Mars/Environment/Materials/Instances/Flame_Mars_MI",
+	"material": "Emissive_Mars_M_retired",
+	"packagePath": "/Game/Mars/Environment/Materials/Emissive_Mars_M_retired",
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "7a0b0eca0a2ad792aa021a3a237c3404",
+		"sourceHash": "326ba6804d822eb729f5dbbd95a2adc4",
 		"exporterVersion": 3
 	},
-	"parentChain": [
-		"/Game/Mars/Environment/Materials/Emissive_Mars_M.Emissive_Mars_M"
-	],
 	"blendMode": "BLEND_Opaque",
 	"twoSided": false,
 	"unlit": false,
@@ -98,13 +95,13 @@
 	"scalarParams": [
 		{
 			"name": "Strength",
-			"value": 12
+			"value": 6
 		}
 	],
 	"vectorParams": [
 		{
 			"name": "Color",
-			"value": "RGBA(1, 0.6, 0.25, 1)"
+			"value": "RGBA(1, 0.7, 0.35, 1)"
 		}
 	],
 	"textureParams": [],

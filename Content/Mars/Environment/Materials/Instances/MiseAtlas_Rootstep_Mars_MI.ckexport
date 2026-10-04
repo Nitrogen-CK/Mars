@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "be7de5bf4e939858fb08a2b33bb92f59",
+		"sourceHash": "61bf41cc175a73febca6194a224aeb5e",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -26,13 +26,12 @@
 		"CurveAtlasRowParameter": 1,
 		"Custom": 4,
 		"LinearInterpolate": 1,
-		"Multiply": 4,
-		"ScalarParameter": 18,
+		"Multiply": 2,
+		"ScalarParameter": 10,
 		"TextureObjectParameter": 2,
-		"TextureSampleParameter2D": 8,
+		"TextureSampleParameter2D": 4,
 		"Transform": 1,
-		"VectorParameter": 2,
-		"VertexNormalWS": 2,
+		"VertexNormalWS": 1,
 		"WorldPosition": 1
 	},
 	"graph":
@@ -41,221 +40,7 @@
 			{
 				"id": 0,
 				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_2",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "ORM",
-					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_ORM_Mars_T.MiseAtlas_Bellfold_ORM_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Masks"
-				}
-			},
-			{
-				"id": 1,
-				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_1",
-				"inputs": [
-					{
-						"index": 1,
-						"name": "B",
-						"node": 6,
-						"output": 0
-					}
-				]
-			},
-			{
-				"id": 2,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_1",
-				"props":
-				{
-					"DefaultValue": 1,
-					"ParameterName": "AOStrength"
-				}
-			},
-			{
-				"id": 3,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_7",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "Emissive",
-					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Emissive_Mars_T.MiseAtlas_Bellfold_Emissive_Mars_T"
-				}
-			},
-			{
-				"id": 4,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_3",
-				"props":
-				{
-					"DefaultValue": 1,
-					"ParameterName": "AOStrength"
-				}
-			},
-			{
-				"id": 5,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_8",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "Normal",
-					"Texture": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Normal_Mars_T.MiseAtlas_Bellfold_Normal_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Normal"
-				}
-			},
-			{
-				"id": 6,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_0",
-				"props":
-				{
-					"DefaultValue": 4,
-					"ParameterName": "EmissiveStrength"
-				}
-			},
-			{
-				"id": 7,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_4",
-				"props":
-				{
-					"DefaultValue": 1,
-					"ParameterName": "AOStrength"
-				}
-			},
-			{
-				"id": 8,
-				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_4"
-			},
-			{
-				"id": 9,
-				"class": "VertexNormalWS",
-				"name": "MaterialExpressionVertexNormalWS_0"
-			},
-			{
-				"id": 10,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_6",
-				"props":
-				{
-					"DefaultValue": 6,
-					"ParameterName": "PaintMaskTile"
-				}
-			},
-			{
-				"id": 11,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_7",
-				"props":
-				{
-					"DefaultValue": 2,
-					"ParameterName": "PaintNormalTile"
-				}
-			},
-			{
-				"id": 12,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_10",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "PaintMask",
-					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Masks"
-				}
-			},
-			{
-				"id": 13,
-				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_0",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"DefaultValue": "(R=0.300000,G=0.240000,B=0.340000,A=1.000000)",
-					"ParameterName": "PaintShadow"
-				}
-			},
-			{
-				"id": 14,
-				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_2",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"DefaultValue": "(R=0.780000,G=0.740000,B=0.640000,A=1.000000)",
-					"ParameterName": "PaintHighlight"
-				}
-			},
-			{
-				"id": 15,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_9",
-				"props":
-				{
-					"DefaultValue": 0.25,
-					"ParameterName": "PaintStrength"
-				}
-			},
-			{
-				"id": 16,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_11",
-				"props":
-				{
-					"DefaultValue": 0.079999998211860657,
-					"ParameterName": "PaintRoughnessBias"
-				}
-			},
-			{
-				"id": 17,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
 				"outputs": [
 					"RGB",
 					"R",
@@ -273,9 +58,9 @@
 				}
 			},
 			{
-				"id": 18,
+				"id": 1,
 				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_4",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
 				"outputs": [
 					"RGB",
 					"R",
@@ -294,9 +79,9 @@
 				}
 			},
 			{
-				"id": 19,
+				"id": 2,
 				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_6",
+				"name": "MaterialExpressionTextureSampleParameter2D_2",
 				"outputs": [
 					"RGB",
 					"R",
@@ -315,9 +100,9 @@
 				}
 			},
 			{
-				"id": 20,
+				"id": 3,
 				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_11",
+				"name": "MaterialExpressionTextureSampleParameter2D_3",
 				"outputs": [
 					"RGB",
 					"R",
@@ -335,9 +120,9 @@
 				}
 			},
 			{
-				"id": 21,
+				"id": 4,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_2",
+				"name": "MaterialExpressionScalarParameter_0",
 				"props":
 				{
 					"DefaultValue": 4,
@@ -347,38 +132,38 @@
 				}
 			},
 			{
-				"id": 22,
+				"id": 5,
 				"class": "Multiply",
 				"name": "MaterialExpressionMultiply_0",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "A",
-						"node": 20,
+						"node": 3,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 1,
 						"name": "B",
-						"node": 21,
+						"node": 4,
 						"output": 0
 					}
 				]
 			},
 			{
-				"id": 23,
+				"id": 6,
 				"class": "Constant",
-				"name": "MaterialExpressionConstant_1",
+				"name": "MaterialExpressionConstant_0",
 				"props":
 				{
 					"R": 1
 				}
 			},
 			{
-				"id": 24,
+				"id": 7,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_13",
+				"name": "MaterialExpressionScalarParameter_1",
 				"props":
 				{
 					"DefaultValue": 1,
@@ -388,55 +173,55 @@
 				}
 			},
 			{
-				"id": 25,
+				"id": 8,
 				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_1",
+				"name": "MaterialExpressionLinearInterpolate_0",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "A",
-						"node": 23,
+						"node": 6,
 						"output": 0
 					},
 					{
 						"index": 1,
 						"name": "B",
-						"node": 18,
+						"node": 1,
 						"output": 1,
 						"mask": "r"
 					},
 					{
 						"index": 2,
 						"name": "Alpha",
-						"node": 24,
+						"node": 7,
 						"output": 0
 					}
 				]
 			},
 			{
-				"id": 26,
+				"id": 9,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_3",
+				"name": "MaterialExpressionMultiply_1",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "A",
-						"node": 17,
+						"node": 0,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 1,
 						"name": "B",
-						"node": 25,
+						"node": 8,
 						"output": 0
 					}
 				]
 			},
 			{
-				"id": 27,
+				"id": 10,
 				"class": "WorldPosition",
-				"name": "MaterialExpressionWorldPosition_1",
+				"name": "MaterialExpressionWorldPosition_0",
 				"outputs": [
 					"XYZ",
 					"XY",
@@ -444,14 +229,14 @@
 				]
 			},
 			{
-				"id": 28,
+				"id": 11,
 				"class": "VertexNormalWS",
-				"name": "MaterialExpressionVertexNormalWS_1"
+				"name": "MaterialExpressionVertexNormalWS_0"
 			},
 			{
-				"id": 29,
+				"id": 12,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_14",
+				"name": "MaterialExpressionScalarParameter_2",
 				"props":
 				{
 					"DefaultValue": 6,
@@ -461,9 +246,9 @@
 				}
 			},
 			{
-				"id": 30,
+				"id": 13,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_15",
+				"name": "MaterialExpressionScalarParameter_3",
 				"props":
 				{
 					"DefaultValue": 2,
@@ -473,9 +258,9 @@
 				}
 			},
 			{
-				"id": 31,
+				"id": 14,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_16",
+				"name": "MaterialExpressionScalarParameter_4",
 				"props":
 				{
 					"DefaultValue": 17,
@@ -485,9 +270,9 @@
 				}
 			},
 			{
-				"id": 32,
+				"id": 15,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_17",
+				"name": "MaterialExpressionScalarParameter_5",
 				"props":
 				{
 					"DefaultValue": 1,
@@ -497,7 +282,7 @@
 				}
 			},
 			{
-				"id": 33,
+				"id": 16,
 				"class": "TextureObjectParameter",
 				"name": "MaterialExpressionTextureObjectParameter_0",
 				"props":
@@ -510,7 +295,7 @@
 				}
 			},
 			{
-				"id": 34,
+				"id": 17,
 				"class": "TextureObjectParameter",
 				"name": "MaterialExpressionTextureObjectParameter_1",
 				"props":
@@ -523,57 +308,57 @@
 				}
 			},
 			{
-				"id": 35,
+				"id": 18,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_4",
+				"name": "MaterialExpressionCustom_0",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "P",
-						"node": 27,
+						"node": 10,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 1,
 						"name": "N",
-						"node": 28,
+						"node": 11,
 						"output": 0
 					},
 					{
 						"index": 2,
 						"name": "Tile",
-						"node": 29,
+						"node": 12,
 						"output": 0
 					},
 					{
 						"index": 3,
 						"name": "NrmTile",
-						"node": 30,
+						"node": 13,
 						"output": 0
 					},
 					{
 						"index": 4,
 						"name": "Angle",
-						"node": 31,
+						"node": 14,
 						"output": 0
 					},
 					{
 						"index": 5,
 						"name": "Bomb",
-						"node": 32,
+						"node": 15,
 						"output": 0
 					},
 					{
 						"index": 6,
 						"name": "MaskTex",
-						"node": 33,
+						"node": 16,
 						"output": 0
 					},
 					{
 						"index": 7,
 						"name": "NrmTex",
-						"node": 34,
+						"node": 17,
 						"output": 0
 					}
 				],
@@ -588,9 +373,9 @@
 				}
 			},
 			{
-				"id": 36,
+				"id": 19,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_18",
+				"name": "MaterialExpressionScalarParameter_6",
 				"props":
 				{
 					"DefaultValue": 1,
@@ -600,20 +385,20 @@
 				}
 			},
 			{
-				"id": 37,
+				"id": 20,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_5",
+				"name": "MaterialExpressionCustom_1",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Mask",
-						"node": 35,
+						"node": 18,
 						"output": 1
 					},
 					{
 						"index": 1,
 						"name": "Contrast",
-						"node": 36,
+						"node": 19,
 						"output": 0
 					}
 				],
@@ -625,9 +410,9 @@
 				}
 			},
 			{
-				"id": 38,
+				"id": 21,
 				"class": "CurveAtlasRowParameter",
-				"name": "MaterialExpressionCurveAtlasRowParameter_1",
+				"name": "MaterialExpressionCurveAtlasRowParameter_0",
 				"outputs": [
 					"None",
 					"None",
@@ -645,9 +430,9 @@
 				}
 			},
 			{
-				"id": 39,
+				"id": 22,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_19",
+				"name": "MaterialExpressionScalarParameter_7",
 				"props":
 				{
 					"DefaultValue": 0.34999999403953552,
@@ -657,9 +442,9 @@
 				}
 			},
 			{
-				"id": 40,
+				"id": 23,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_20",
+				"name": "MaterialExpressionScalarParameter_8",
 				"props":
 				{
 					"DefaultValue": 0.079999998211860657,
@@ -669,46 +454,46 @@
 				}
 			},
 			{
-				"id": 41,
+				"id": 24,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_6",
+				"name": "MaterialExpressionCustom_2",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Base",
-						"node": 26,
+						"node": 9,
 						"output": 0
 					},
 					{
 						"index": 1,
 						"name": "M",
-						"node": 37,
+						"node": 20,
 						"output": 0
 					},
 					{
 						"index": 2,
 						"name": "Ramp",
-						"node": 38,
+						"node": 21,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 3,
 						"name": "Strength",
-						"node": 39,
+						"node": 22,
 						"output": 0
 					},
 					{
 						"index": 4,
 						"name": "RoughIn",
-						"node": 18,
+						"node": 1,
 						"output": 2,
 						"mask": "g"
 					},
 					{
 						"index": 5,
 						"name": "RoughBias",
-						"node": 40,
+						"node": 23,
 						"output": 0
 					}
 				],
@@ -723,14 +508,14 @@
 				}
 			},
 			{
-				"id": 42,
+				"id": 25,
 				"class": "Transform",
 				"name": "MaterialExpressionTransform_0",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Input",
-						"node": 35,
+						"node": 18,
 						"output": 0
 					}
 				],
@@ -741,9 +526,9 @@
 				}
 			},
 			{
-				"id": 43,
+				"id": 26,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_21",
+				"name": "MaterialExpressionScalarParameter_9",
 				"props":
 				{
 					"DefaultValue": 0.40000000596046448,
@@ -753,27 +538,27 @@
 				}
 			},
 			{
-				"id": 44,
+				"id": 27,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_7",
+				"name": "MaterialExpressionCustom_3",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Base",
-						"node": 19,
+						"node": 2,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 1,
 						"name": "Detail",
-						"node": 42,
+						"node": 25,
 						"output": 0
 					},
 					{
 						"index": 2,
 						"name": "Strength",
-						"node": 43,
+						"node": 26,
 						"output": 0
 					}
 				],
@@ -787,40 +572,40 @@
 		"outputs": [
 			{
 				"property": "MP_EmissiveColor",
-				"node": 22,
+				"node": 5,
 				"output": 0
 			},
 			{
 				"property": "MP_BaseColor",
-				"node": 41,
+				"node": 24,
 				"output": 0
 			},
 			{
 				"property": "MP_Metallic",
-				"node": 18,
+				"node": 1,
 				"output": 3,
 				"mask": "b"
 			},
 			{
 				"property": "MP_Roughness",
-				"node": 41,
+				"node": 24,
 				"output": 1
 			},
 			{
 				"property": "MP_Normal",
-				"node": 44,
+				"node": 27,
 				"output": 0
 			}
 		]
 	},
 	"scalarParams": [
 		{
-			"name": "AOStrength",
-			"value": 1
-		},
-		{
 			"name": "EmissiveStrength",
 			"value": 4
+		},
+		{
+			"name": "AOStrength",
+			"value": 1
 		},
 		{
 			"name": "PaintMaskTile",
@@ -829,14 +614,6 @@
 		{
 			"name": "PaintNormalTile",
 			"value": 2
-		},
-		{
-			"name": "PaintStrength",
-			"value": 0.34999999403953552
-		},
-		{
-			"name": "PaintRoughnessBias",
-			"value": 0.079999998211860657
 		},
 		{
 			"name": "PaintAngle",
@@ -855,40 +632,39 @@
 			"value": 2
 		},
 		{
+			"name": "PaintStrength",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "PaintRoughnessBias",
+			"value": 0.079999998211860657
+		},
+		{
 			"name": "PaintNormalStrength",
 			"value": 0.40000000596046448
 		}
 	],
-	"vectorParams": [
-		{
-			"name": "PaintShadow",
-			"value": "RGBA(0.3, 0.24, 0.34, 1)"
-		},
-		{
-			"name": "PaintHighlight",
-			"value": "RGBA(0.78, 0.74, 0.64, 1)"
-		}
-	],
+	"vectorParams": [],
 	"textureParams": [
+		{
+			"name": "BaseColor",
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_BaseColor_Mars_T.MiseAtlas_Rootstep_BaseColor_Mars_T"
+		},
 		{
 			"name": "ORM",
 			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_ORM_Mars_T.MiseAtlas_Rootstep_ORM_Mars_T"
-		},
-		{
-			"name": "Emissive",
-			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Emissive_Mars_T.MiseAtlas_Rootstep_Emissive_Mars_T"
 		},
 		{
 			"name": "Normal",
 			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Normal_Mars_T.MiseAtlas_Rootstep_Normal_Mars_T"
 		},
 		{
-			"name": "PaintMask",
-			"value": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T"
+			"name": "Emissive",
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_Emissive_Mars_T.MiseAtlas_Rootstep_Emissive_Mars_T"
 		},
 		{
-			"name": "BaseColor",
-			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Rootstep/MiseAtlas_Rootstep_BaseColor_Mars_T.MiseAtlas_Rootstep_BaseColor_Mars_T"
+			"name": "PaintMask",
+			"value": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T"
 		},
 		{
 			"name": "PaintNormal",

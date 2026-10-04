@@ -1,15 +1,12 @@
 {
-	"material": "MiseAtlas_Spillring_Mars_MI",
-	"packagePath": "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Spillring_Mars_MI",
+	"material": "MiseAtlas_Mars_M_retired",
+	"packagePath": "/Game/Mars/Environment/Materials/MiseAtlas_Mars_M_retired",
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "edb4d5148302d40b0fa8f938b7c39e58",
+		"sourceHash": "8a4f2c787f12a790cdc5bcdee92eb781",
 		"exporterVersion": 3
 	},
-	"parentChain": [
-		"/Game/Mars/Environment/Materials/MiseAtlas_Mars_M.MiseAtlas_Mars_M"
-	],
 	"blendMode": "BLEND_Opaque",
 	"twoSided": false,
 	"unlit": false,
@@ -629,7 +626,7 @@
 		},
 		{
 			"name": "PaintRamp",
-			"value": 1
+			"value": 0
 		},
 		{
 			"name": "PaintStrength",
@@ -648,19 +645,19 @@
 	"textureParams": [
 		{
 			"name": "BaseColor",
-			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_BaseColor_Mars_T.MiseAtlas_Spillring_BaseColor_Mars_T"
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_BaseColor_Mars_T.MiseAtlas_Bellfold_BaseColor_Mars_T"
 		},
 		{
 			"name": "ORM",
-			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_ORM_Mars_T.MiseAtlas_Spillring_ORM_Mars_T"
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_ORM_Mars_T.MiseAtlas_Bellfold_ORM_Mars_T"
 		},
 		{
 			"name": "Normal",
-			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_Normal_Mars_T.MiseAtlas_Spillring_Normal_Mars_T"
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Normal_Mars_T.MiseAtlas_Bellfold_Normal_Mars_T"
 		},
 		{
 			"name": "Emissive",
-			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_Emissive_Mars_T.MiseAtlas_Spillring_Emissive_Mars_T"
+			"value": "/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Emissive_Mars_T.MiseAtlas_Bellfold_Emissive_Mars_T"
 		},
 		{
 			"name": "PaintMask",
@@ -672,12 +669,12 @@
 		}
 	],
 	"usedTextures": [
-		"/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_Normal_Mars_T.MiseAtlas_Spillring_Normal_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Normal_Mars_T.MiseAtlas_Bellfold_Normal_Mars_T",
 		"/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T",
 		"/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Normal_Mars_T.Paint_Normal_Mars_T",
-		"/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_Emissive_Mars_T.MiseAtlas_Spillring_Emissive_Mars_T",
-		"/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_BaseColor_Mars_T.MiseAtlas_Spillring_BaseColor_Mars_T",
-		"/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_ORM_Mars_T.MiseAtlas_Spillring_ORM_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_Emissive_Mars_T.MiseAtlas_Bellfold_Emissive_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_BaseColor_Mars_T.MiseAtlas_Bellfold_BaseColor_Mars_T",
+		"/Game/Mars/Environment/Textures/MiseAtlas/Bellfold/MiseAtlas_Bellfold_ORM_Mars_T.MiseAtlas_Bellfold_ORM_Mars_T",
 		"/Game/Mars/Environment/Materials/Curves/PaintRamps_Mars_CurveAtlas.PaintRamps_Mars_CurveAtlas"
 	]
 }
