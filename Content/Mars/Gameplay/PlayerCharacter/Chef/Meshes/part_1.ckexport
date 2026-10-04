@@ -4,54 +4,40 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "6858e21695f2e4f101b67cdb86534efc",
+		"sourceHash": "81c20eac966edadba92ed61299bc84ce",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
 	"twoSided": false,
-	"unlit": false,
-	"shadingModel": "MSM_DefaultLit",
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
 	"domain": "MD_Surface",
 	"connectedOutputs": [
-		"BaseColor"
+		"EmissiveColor"
 	],
 	"expressions":
 	{
-		"VectorParameter": 1
+		"Constant": 1
 	},
 	"graph":
 	{
 		"nodes": [
 			{
 				"id": 0,
-				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_0",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				]
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
 			}
 		],
 		"outputs": [
 			{
-				"property": "MP_BaseColor",
+				"property": "MP_EmissiveColor",
 				"node": 0,
-				"output": 0,
-				"mask": "rgb"
+				"output": 0
 			}
 		]
 	},
 	"scalarParams": [],
-	"vectorParams": [
-		{
-			"name": "Param",
-			"value": "RGBA(0, 0, 0, 0)"
-		}
-	],
+	"vectorParams": [],
 	"textureParams": [],
 	"usedTextures": []
 }

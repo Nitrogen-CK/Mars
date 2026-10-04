@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "ae5e44abec16f21ab7bb3dfbaa3797c2",
+		"sourceHash": "44985c7c6121aa84bed0edd771fa5025",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -17,15 +17,26 @@
 	],
 	"expressions":
 	{
-		"VectorParameter": 1
+		"ComponentMask": 1,
+		"Constant3Vector": 1,
+		"LinearInterpolate": 1,
+		"Multiply": 1,
+		"SmoothStep": 1,
+		"TextureCoordinate": 1,
+		"TextureSample": 1
 	},
 	"graph":
 	{
 		"nodes": [
 			{
 				"id": 0,
-				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_0",
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 1,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
 				"outputs": [
 					"RGB",
 					"R",
@@ -36,26 +47,116 @@
 				],
 				"props":
 				{
-					"DefaultValue": "(R=0.500000,G=0.500000,B=0.500000,A=0.000000)"
+					"Texture": "/CkFoundation/CkParticles/Textures/T_CkParticles_TileNoiseCoarse.T_CkParticles_TileNoiseCoarse",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 2,
+						"mask": "g"
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"G": true
+				}
+			},
+			{
+				"id": 4,
+				"class": "SmoothStep",
+				"name": "MaterialExpressionSmoothStep_0",
+				"inputs": [
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstMin": 0.30000001192092896
+				}
+			},
+			{
+				"id": 5,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 1,
+						"name": "B",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstA": 1
+				}
+			},
+			{
+				"id": 6,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=0.041667,G=0.006402,B=0.000029,A=1.000000)"
 				}
 			}
 		],
 		"outputs": [
 			{
 				"property": "MP_BaseColor",
-				"node": 0,
-				"output": 0,
-				"mask": "rgb"
+				"node": 5,
+				"output": 0
 			}
 		]
 	},
 	"scalarParams": [],
-	"vectorParams": [
-		{
-			"name": "Param",
-			"value": "RGBA(0.5, 0.5, 0.5, 0)"
-		}
-	],
+	"vectorParams": [],
 	"textureParams": [],
-	"usedTextures": []
+	"usedTextures": [
+		"/CkFoundation/CkParticles/Textures/T_CkParticles_TileNoiseCoarse.T_CkParticles_TileNoiseCoarse"
+	]
 }
