@@ -17,6 +17,11 @@ class UMars_Chef_AnimInstance : UAnimInstance
     UPROPERTY(BlueprintReadOnly, NotEditable, Category = "Chef")
     bool IsInAir = false;
 
+    // Play rate of BS_Chef_Locomotion (bound to its PlayRate pin): Config.TPBody.AuthoredScale / Scale, so the clips'
+    // footfalls keep covering the ground at the config speeds when the body is scaled past the height they were made at.
+    UPROPERTY(BlueprintReadOnly, NotEditable, Category = "Chef")
+    float32 LocomotionPlayRate = 1.0f;
+
     // Held-item arm pose (component space), read by ABP_Chef's TwoBoneIK + Transform (Modify) Bone chain after the
     // DefaultSlot. Pulled each update from AMars_PlayerCharacter::Get_BodyHoldFrame (see Mars_HeldView.as). Locations
     // and rotations are the hand_l / hand_r bones' (already converted from the grip targets); the elbow targets are the
@@ -62,7 +67,10 @@ class UMars_Chef_AnimInstance : UAnimInstance
             return;
         }
 
-        UpdateHold(Cast<AMars_PlayerCharacter>(Character), float32(DeltaTimeX));
+        auto MarsCharacter = Cast<AMars_PlayerCharacter>(Character);
+        UpdateHold(MarsCharacter, float32(DeltaTimeX));
+        if (ck::IsValid(MarsCharacter))
+        { LocomotionPlayRate = MarsCharacter.Config.TPBody.Get_LocomotionPlayRate(); }
 
         const auto Velocity = Character.GetVelocity();
         const auto Planar = FVector(Velocity.X, Velocity.Y, 0.0);

@@ -188,7 +188,7 @@ namespace utils_mars_sandbox
         Spawn_Cube("Ledge_Step", FVector(300.0, -600.0, 30.0), FVector(2.0, 2.0, 0.6));
         Spawn_Cube("Ledge_Platform", FVector(500.0, -600.0, 60.0), FVector(4.0, 4.0, 1.2));
 
-        // Crouch tunnel: 130uu clearance - too low standing (176), fits crouched (~104).
+        // Crouch tunnel: 130uu clearance - too low standing (150, Config.Body.CapsuleHalfHeight 75), fits crouched (105).
         Spawn_Cube("Tunnel_WallLeft", FVector(500.0, 300.0, 65.0), FVector(4.0, 0.2, 1.3));
         Spawn_Cube("Tunnel_WallRight", FVector(500.0, 600.0, 65.0), FVector(4.0, 0.2, 1.3));
         Spawn_Cube("Tunnel_Roof", FVector(500.0, 450.0, 140.0), FVector(4.0, 3.2, 0.2));
