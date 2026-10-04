@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "9c7c7d23229b7fa585136af2976056b3",
+		"sourceHash": "99ada063092a7772aa8a71613067c714",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -31,7 +31,7 @@
 			{
 				"id": 0,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_3",
+				"name": "MaterialExpressionVectorParameter_4",
 				"outputs": [
 					"RGB",
 					"R",
@@ -51,7 +51,7 @@
 			{
 				"id": 1,
 				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_4",
+				"name": "MaterialExpressionVectorParameter_5",
 				"outputs": [
 					"RGB",
 					"R",
@@ -71,7 +71,7 @@
 			{
 				"id": 2,
 				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_4",
+				"name": "MaterialExpressionScalarParameter_5",
 				"props":
 				{
 					"DefaultValue": 6,
@@ -83,7 +83,7 @@
 			{
 				"id": 3,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_4",
+				"name": "MaterialExpressionMultiply_5",
 				"inputs": [
 					{
 						"index": 0,
