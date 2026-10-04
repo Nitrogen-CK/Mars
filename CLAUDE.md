@@ -12,7 +12,7 @@ Use this project when you need to work on a Chainkemists plugin in isolation: yo
 
 Before writing code against CkFoundation, read the appropriate guide in the submodule:
 
-- **AngelScript (.as):** [Plugins/CkFoundation/Script/CLAUDE.md](Plugins/CkFoundation/Script/CLAUDE.md) — language differences from C++, `utils_*` shortcuts, entity script lifecycle, asset definitions, dynamic handle registration gotcha.
+- **AngelScript (.as):** [Plugins/CkFoundation/Script/ARCHITECTURE.md](Plugins/CkFoundation/Script/ARCHITECTURE.md) — language differences from C++, `utils_*` shortcuts, entity script lifecycle, asset definitions, dynamic handle registration gotcha, actors and components (§8), common mistakes (§21).
 - **C++ framework patterns:** [Plugins/CkFoundation/Source/CLAUDE.md](Plugins/CkFoundation/Source/CLAUDE.md) — full development guidelines: function formatting, ECS patterns, `CK_PROPERTY`, request structs, component lifetimes, module tier table.
 - **C++ quick reference:** [Plugins/CkFoundation/CLAUDE.md](Plugins/CkFoundation/CLAUDE.md) — condensed architecture overview (macros, fragments, processors, naming).
 
@@ -34,7 +34,7 @@ Other plugins under `Plugins/` may adopt the same pattern over time; check their
 - `/CkAuto/` — Shared developer scripts (build, run, submodule management) — itself a submodule.
 - `/Config/` — UE project config (`DefaultEngine.ini`, `DefaultGame.ini`, etc.). Mostly stock.
 - `/Content/` — Minimal — host project has almost no Blueprint or asset content. Real assets live inside each plugin's `Plugins/<Name>/Content/`.
-- `/Script/` — Empty by design. AngelScript content for the plugin ecosystem lives in `Plugins/CkFoundation/Script/` and other plugins' `Script/` folders.
+- `/Script/` — The Mars gameplay AngelScript (features under `ECS/`, player, HFSM, UI, world objects, editor map builders, tests); conventions below. Framework AngelScript lives in `Plugins/CkFoundation/Script/` and other plugins' `Script/` folders. Note: the Grep tool skips `Script/*.as` because of the superproject `.ignore`; use `rg --no-ignore` or Read.
 - `/.runreal/` — Build pipeline configuration using the runreal build system.
 
 ## Build System and Development Commands
