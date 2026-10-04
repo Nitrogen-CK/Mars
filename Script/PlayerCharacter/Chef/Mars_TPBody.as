@@ -46,11 +46,12 @@ struct FMars_TPBody_Face
     // The face node relative to Bone, in unscaled body units: +X out of the face, +Y the chef's right, +Z up, midway
     // between the two eye quads. Derived from SK_Chef's reference pose (2026-10-03): head bone at component (0, -7, 62),
     // its X along the neck (up, tilted 2.862 deg back), Y to the chef's left, Z out of the face. The eye quads (Eyes_LP,
-    // two ~5.9 x 5.5 cm quads flush on the face plate, centred at x +-6.1, z 71.0, wrapping its curve back to y 6.89)
-    // have their midpoint at component (0, 6.89, 71.0), facing +Y: Offset = FaceInComponent * Inverse(HeadInComponent),
-    // i.e. the delta (0, 13.89, 9.0) in head axes. Gaze aims from here. Scale must stay one (the body's Scale sizes it).
+    // two 8.5 x 6 cm quads flush on the face plate, centred at x +-4.75, z 71.0, wrapping its curve back to y 7.66; they
+    // were 5.4 cm squares at x +-6 until the eyes were widened on 2026-10-03) have their midpoint at component
+    // (0, 7.66, 71.0), facing +Y: Offset = FaceInComponent * Inverse(HeadInComponent), i.e. the delta (0, 14.66, 9.0) in
+    // head axes. Gaze aims from here. Scale must stay one (the body's Scale sizes it).
     UPROPERTY()
-    FTransform Offset = FTransform(FRotator(87.138, 180.0, 0.0), FVector(8.29, 0.0, 14.32), FVector::OneVector);
+    FTransform Offset = FTransform(FRotator(87.138, 180.0, 0.0), FVector(8.26, 0.0, 15.09), FVector::OneVector);
 
     // The body mesh's material slot the eyes are drawn on (SK_Chef's Eyes_LP quads). The character replaces its
     // material with the MarsEyePlate look; the slot reads the eyes' custom primitive data.

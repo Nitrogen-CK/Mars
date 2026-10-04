@@ -96,6 +96,14 @@ asset Mars_EyeStyle_Cracked of UMars_EyeStyle
     Def.RightCell = 11;
 }
 
+// The chef's resting eyes (2026-10-03): atlas cell 19 is a full circle, which the body's 8.5 x 6 cm eye quads draw as
+// a wide 1.42:1 oval, like the concept art's big eyes.
+asset Mars_EyeStyle_Wide of UMars_EyeStyle
+{
+    Def.LeftCell = 19;
+    Def.RightCell = 19;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Expressions
 //--------------------------------------------------------------------------------------------------------------------------
@@ -200,6 +208,7 @@ asset Mars_EyeCatalog of UMars_EyeCatalog
     Styles.Add(Mars_EyeStyle_Spiral);
     Styles.Add(Mars_EyeStyle_Candle);
     Styles.Add(Mars_EyeStyle_Cracked);
+    Styles.Add(Mars_EyeStyle_Wide);
 
     Expressions.Add(Mars_EyeExpression_Happy);
     Expressions.Add(Mars_EyeExpression_Wink);
@@ -215,4 +224,7 @@ asset Mars_EyeCatalog of UMars_EyeCatalog
 namespace mars_eyes
 {
     UMars_EyeCatalog Catalog() { return Mars_EyeCatalog; }
+
+    // The chef's resting style (AMars_PlayerCharacter's config); assets resolve across files through a namespace.
+    UMars_EyeStyle Style_Wide() { return Mars_EyeStyle_Wide; }
 }

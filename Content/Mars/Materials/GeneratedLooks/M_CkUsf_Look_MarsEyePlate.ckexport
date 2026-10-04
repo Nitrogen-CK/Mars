@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "c954d80d78a0145bde086635786c0a20",
+		"sourceHash": "cb2935235abab66277217778040c3ead",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -439,7 +439,7 @@
 				"name": "MaterialExpressionScalarParameter_12",
 				"props":
 				{
-					"DefaultValue": 0.69999998807907104,
+					"DefaultValue": 1,
 					"ParameterName": "EyeScale"
 				}
 			},
@@ -583,7 +583,7 @@
 		},
 		{
 			"name": "EyeScale",
-			"value": 0.69999998807907104
+			"value": 1
 		},
 		{
 			"name": "LookMaxUV",
