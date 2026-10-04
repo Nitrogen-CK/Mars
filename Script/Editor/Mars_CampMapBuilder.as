@@ -10,6 +10,11 @@
 //
 // Game mode: the map picks up AMars_Camp_GameMode through the "Camp_Mars_" entry in Config/DefaultEngine.ini
 // [GameMapsSettings] GameModeMapPrefixes.
+//
+// Kit camp (v2.2): the crypt kit's camp planner (vns_trim_sheet crypt_camp.plan_camp -> mise_mars_ue.build_camp_map
+// over Monolith) replaces the blockout geometry with the Sunken Chapel and drops TargetPoints tagged Mise_Socket
+// named camp_cam_<Station> / camp_start_<i>. On such a map Mars.Camp.Build places only the gameplay actors, and
+// Mars.Camp.PlaceStations re-places the station cameras and the four starts from those sockets.
 
 #if EDITOR
 UFUNCTION()
@@ -35,6 +40,14 @@ void Mars_PlaceCampStartsFunc(const TArray<FString>& Args)
 }
 
 const FConsoleCommand Mars_PlaceCampStartsCommand("Mars.Camp.PlaceStarts", n"Mars_PlaceCampStartsFunc");
+
+UFUNCTION()
+void Mars_PlaceCampStationsFunc(const TArray<FString>& Args)
+{
+    utils_mars_camp::PlaceStations();
+}
+
+const FConsoleCommand Mars_PlaceCampStationsCommand("Mars.Camp.PlaceStations", n"Mars_PlaceCampStationsFunc");
 
 enum EMars_CampStationFurniture
 {
@@ -95,6 +108,8 @@ namespace utils_mars_camp
     // the bedroll and the spawn was refused.
     const float64 k_PlayerStartRadius = 650.0;
     const FString k_PlayerStartLabelPrefix = "Camp_PlayerStart_";
+    const FString k_CameraLabelPrefix = "Camp_Cam_";
+    const FName k_SocketTag = n"Mise_Socket";
 
     void Build()
     {
@@ -118,6 +133,15 @@ namespace utils_mars_camp
             if (utils_mars_map_builder::Get_IsMap(World, k_MapPath) == false)
             {
                 ck::Warning(f"[{Command}] The open level [{WorldPath}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.");
+                return;
+            }
+
+            // A kit camp: the chapel geometry is already there, only the gameplay actors are (re)placed.
+            if (Get_CampSockets().Num() > 0)
+            {
+                const int32 Placed = Place_FromSockets();
+                ck::Trace(f"[{Command}] kit camp: placed {Placed} gameplay actors from the camp sockets");
+                utils_mars_map_builder::SaveOpenLevel(Command);
                 return;
             }
 
@@ -181,12 +205,19 @@ namespace utils_mars_camp
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // Replaces every Camp_PlayerStart_* actor.
+    // Replaces every Camp_PlayerStart_* actor. On a kit camp the starts come from the camp_start_<i> sockets
+    // (PlaceStations).
     void PlaceStarts()
     {
         const FString Command = "Mars.Camp.PlaceStarts";
         if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
         { return; }
+
+        if (Get_CampSockets().Num() > 0)
+        {
+            PlaceStations();
+            return;
+        }
 
         auto Actors = UEditorActorSubsystem::Get();
         for (auto Actor : Actors.GetAllLevelActors())
@@ -198,6 +229,119 @@ namespace utils_mars_camp
         const int32 Count = Spawn_PlayerStarts();
         ck::Trace(f"[{Command}] starts={Count}");
         utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // Kit camp: re-places every station camera (one per EMars_CampStation) and the four starts from the Mise_Socket
+    // TargetPoints the kit builder dropped, then saves the level.
+    void PlaceStations()
+    {
+        const FString Command = "Mars.Camp.PlaceStations";
+        if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
+        { return; }
+
+        if (Get_CampSockets().Num() == 0)
+        {
+            ck::Warning(f"[{Command}] No camp sockets (Mise_Socket TargetPoints) in this map: build the kit camp first.");
+            return;
+        }
+
+        const int32 Placed = Place_FromSockets();
+        ck::Trace(f"[{Command}] placed={Placed}");
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // The kit builder's TargetPoints: tagged Mise_Socket plus their socket name (camp_cam_<Station>, camp_start_<i>).
+    TArray<ATargetPoint> Get_CampSockets()
+    {
+        TArray<ATargetPoint> Sockets;
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            auto Point = Cast<ATargetPoint>(Actor);
+            if (ck::Is_NOT_Valid(Point) || Point.Tags.Contains(k_SocketTag) == false)
+            { continue; }
+
+            for (auto Tag : Point.Tags)
+            {
+                if (Tag.ToString().StartsWith("camp_"))
+                {
+                    Sockets.Add(Point);
+                    break;
+                }
+            }
+        }
+
+        return Sockets;
+    }
+
+    ATargetPoint TryGet_CampSocket(const TArray<ATargetPoint>& InSockets, const FString& InName)
+    {
+        for (auto Point : InSockets)
+        {
+            if (Point.Tags.Contains(FName(InName)))
+            { return Point; }
+        }
+
+        return nullptr;
+    }
+
+    // Drops the existing Camp_Cam_* and Camp_PlayerStart_* actors and spawns them again on their sockets. The sockets
+    // carry the yaw; the pitch is the camp design's per-station framing. Returns how many actors were placed.
+    int32 Place_FromSockets()
+    {
+        auto Actors = UEditorActorSubsystem::Get();
+        for (auto Actor : Actors.GetAllLevelActors())
+        {
+            const FString Label = Actor.GetActorLabel();
+            if (Label.StartsWith(k_CameraLabelPrefix) || Label.StartsWith(k_PlayerStartLabelPrefix))
+            { Actors.DestroyActor(Actor); }
+        }
+
+        auto Sockets = Get_CampSockets();
+        int32 Placed = 0;
+
+        TArray<EMars_CampStation> Stations;
+        Stations.Add(EMars_CampStation::Title);
+        Stations.Add(EMars_CampStation::Cauldron);
+        Stations.Add(EMars_CampStation::Departure);
+        Stations.Add(EMars_CampStation::Backpack);
+        Stations.Add(EMars_CampStation::Wardrobe);
+        Stations.Add(EMars_CampStation::Guests);
+        Stations.Add(EMars_CampStation::Contracts);
+        Stations.Add(EMars_CampStation::Workbench);
+
+        for (auto Station : Stations)
+        {
+            auto Socket = TryGet_CampSocket(Sockets, f"camp_cam_{Station :n}");
+            if (ck::Is_NOT_Valid(Socket))
+            {
+                ck::Warning(f"[Mars.Camp] no camp_cam_{Station :n} socket in the map");
+                continue;
+            }
+
+            const float64 Pitch = Station == EMars_CampStation::Title ? -8.0 : (Station == EMars_CampStation::Cauldron ? -15.0 : -12.0);
+            Spawn_StationCamera(Station, Socket.GetActorLocation(), FRotator(Pitch, Socket.GetActorRotation().Yaw, 0.0));
+            ++Placed;
+        }
+
+        for (int32 Index = 0; Index < 4; ++Index)
+        {
+            auto Socket = TryGet_CampSocket(Sockets, f"camp_start_{Index}");
+            if (ck::Is_NOT_Valid(Socket))
+            {
+                ck::Warning(f"[Mars.Camp] no camp_start_{Index} socket in the map");
+                continue;
+            }
+
+            auto Start = Actors.SpawnActorFromClass(APlayerStart, Socket.GetActorLocation(),
+                FRotator(0.0, Socket.GetActorRotation().Yaw, 0.0));
+            if (ck::Is_NOT_Valid(Start))
+            { continue; }
+
+            Start.SetActorLabel(f"{k_PlayerStartLabelPrefix}{Index}");
+            ++Placed;
+        }
+
+        return Placed;
     }
 
     // A point on a ring around the cauldron; the angle is in degrees from +X (north) toward +Y.
@@ -320,7 +464,7 @@ namespace utils_mars_camp
 
     void Spawn_StationCamera(EMars_CampStation InStation, FVector InLocation, FRotator InRotation)
     {
-        const FString Label = f"Camp_Cam_{InStation :n}";
+        const FString Label = f"{k_CameraLabelPrefix}{InStation :n}";
         auto Cam = Cast<AMars_CampStationCamera>(
             UEditorActorSubsystem::Get().SpawnActorFromClass(AMars_CampStationCamera, InLocation, InRotation));
         if (ck::EnsureIfNot(ck::IsValid(Cam), f"[Mars.Camp] Failed to place [{Label}]"))
