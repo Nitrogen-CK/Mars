@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "56e4f2891518f683c8ac79770772455c",
+		"sourceHash": "c4b6fae43a8464e7b54477854764c26e",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -21,47 +21,27 @@
 	],
 	"expressions":
 	{
-		"ComponentMask": 3,
+		"ComponentMask": 1,
 		"Constant": 2,
-		"Custom": 5,
-		"LinearInterpolate": 2,
-		"Multiply": 2,
-		"ScalarParameter": 9,
-		"TextureSampleParameter2D": 8,
-		"VectorParameter": 5,
+		"Custom": 9,
+		"LinearInterpolate": 1,
+		"Multiply": 3,
+		"ScalarParameter": 13,
+		"TextureSampleParameter2D": 9,
+		"VectorParameter": 9,
 		"VertexNormalWS": 3,
-		"WorldPosition": 2
+		"WorldPosition": 4
 	},
 	"graph":
 	{
 		"nodes": [
 			{
 				"id": 0,
-				"class": "ComponentMask",
-				"name": "MaterialExpressionComponentMask_0",
-				"props":
-				{
-					"R": true,
-					"G": true
-				}
-			},
-			{
-				"id": 1,
 				"class": "VertexNormalWS",
 				"name": "MaterialExpressionVertexNormalWS_1"
 			},
 			{
-				"id": 2,
-				"class": "ComponentMask",
-				"name": "MaterialExpressionComponentMask_1",
-				"props":
-				{
-					"R": true,
-					"G": true
-				}
-			},
-			{
-				"id": 3,
+				"id": 1,
 				"class": "TextureSampleParameter2D",
 				"name": "MaterialExpressionTextureSampleParameter2D_0",
 				"outputs": [
@@ -79,26 +59,7 @@
 				}
 			},
 			{
-				"id": 4,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_2",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "Normal",
-					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_Normal_Mars_T.StoneWall_Bellfold_Normal_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Normal"
-				}
-			},
-			{
-				"id": 5,
+				"id": 2,
 				"class": "Constant",
 				"name": "MaterialExpressionConstant_0",
 				"props":
@@ -107,20 +68,7 @@
 				}
 			},
 			{
-				"id": 6,
-				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_0",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "A",
-						"node": 5,
-						"output": 0
-					}
-				]
-			},
-			{
-				"id": 7,
+				"id": 3,
 				"class": "WorldPosition",
 				"name": "MaterialExpressionWorldPosition_0",
 				"outputs": [
@@ -130,12 +78,7 @@
 				]
 			},
 			{
-				"id": 8,
-				"class": "VertexNormalWS",
-				"name": "MaterialExpressionVertexNormalWS_2"
-			},
-			{
-				"id": 9,
+				"id": 4,
 				"class": "VectorParameter",
 				"name": "MaterialExpressionVectorParameter_0",
 				"outputs": [
@@ -153,47 +96,16 @@
 				}
 			},
 			{
-				"id": 10,
-				"class": "ComponentMask",
-				"name": "MaterialExpressionComponentMask_2",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "Input",
-						"node": 9,
-						"output": 0,
-						"mask": "rgb"
-					}
-				],
-				"props":
-				{
-					"R": true,
-					"G": true
-				}
-			},
-			{
-				"id": 11,
+				"id": 5,
 				"class": "Custom",
 				"name": "MaterialExpressionCustom_0",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "P",
-						"node": 7,
+						"node": 3,
 						"output": 0,
 						"mask": "rgb"
-					},
-					{
-						"index": 1,
-						"name": "N",
-						"node": 8,
-						"output": 0
-					},
-					{
-						"index": 2,
-						"name": "Tile",
-						"node": 10,
-						"output": 0
 					}
 				],
 				"props":
@@ -204,40 +116,14 @@
 				}
 			},
 			{
-				"id": 12,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_3",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "Coordinates",
-						"node": 11,
-						"output": 0
-					}
-				],
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "BaseColor",
-					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_BaseColor_Mars_T.StoneWall_Bellfold_BaseColor_Mars_T"
-				}
-			},
-			{
-				"id": 13,
+				"id": 6,
 				"class": "TextureSampleParameter2D",
 				"name": "MaterialExpressionTextureSampleParameter2D_4",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Coordinates",
-						"node": 11,
+						"node": 5,
 						"output": 0
 					}
 				],
@@ -257,34 +143,7 @@
 				}
 			},
 			{
-				"id": 14,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_5",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "Coordinates",
-						"node": 11,
-						"output": 0
-					}
-				],
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "Normal",
-					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_Normal_Mars_T.StoneWall_Bellfold_Normal_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Normal"
-				}
-			},
-			{
-				"id": 15,
+				"id": 7,
 				"class": "VectorParameter",
 				"name": "MaterialExpressionVectorParameter_3",
 				"outputs": [
@@ -302,16 +161,7 @@
 				}
 			},
 			{
-				"id": 16,
-				"class": "Constant",
-				"name": "MaterialExpressionConstant_1",
-				"props":
-				{
-					"R": 1
-				}
-			},
-			{
-				"id": 17,
+				"id": 8,
 				"class": "ScalarParameter",
 				"name": "MaterialExpressionScalarParameter_1",
 				"props":
@@ -321,73 +171,12 @@
 				}
 			},
 			{
-				"id": 18,
-				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_1",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "A",
-						"node": 16,
-						"output": 0
-					},
-					{
-						"index": 1,
-						"name": "B",
-						"node": 13,
-						"output": 1,
-						"mask": "r"
-					},
-					{
-						"index": 2,
-						"name": "Alpha",
-						"node": 17,
-						"output": 0
-					}
-				]
-			},
-			{
-				"id": 19,
+				"id": 9,
 				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_2",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "A",
-						"node": 12,
-						"output": 0,
-						"mask": "rgb"
-					},
-					{
-						"index": 1,
-						"name": "B",
-						"node": 18,
-						"output": 0
-					}
-				]
+				"name": "MaterialExpressionMultiply_2"
 			},
 			{
-				"id": 20,
-				"class": "Multiply",
-				"name": "MaterialExpressionMultiply_3",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "A",
-						"node": 19,
-						"output": 0
-					},
-					{
-						"index": 1,
-						"name": "B",
-						"node": 15,
-						"output": 0,
-						"mask": "rgb"
-					}
-				]
-			},
-			{
-				"id": 21,
+				"id": 10,
 				"class": "WorldPosition",
 				"name": "MaterialExpressionWorldPosition_2",
 				"outputs": [
@@ -397,12 +186,7 @@
 				]
 			},
 			{
-				"id": 22,
-				"class": "VertexNormalWS",
-				"name": "MaterialExpressionVertexNormalWS_3"
-			},
-			{
-				"id": 23,
+				"id": 11,
 				"class": "ScalarParameter",
 				"name": "MaterialExpressionScalarParameter_2",
 				"props":
@@ -412,43 +196,21 @@
 				}
 			},
 			{
-				"id": 24,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_3",
-				"props":
-				{
-					"DefaultValue": 6,
-					"ParameterName": "PaintMaskTile"
-				}
-			},
-			{
-				"id": 25,
+				"id": 12,
 				"class": "Custom",
 				"name": "MaterialExpressionCustom_2",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "P",
-						"node": 21,
+						"node": 10,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 1,
-						"name": "N",
-						"node": 22,
-						"output": 0
-					},
-					{
-						"index": 2,
-						"name": "Tile",
-						"node": 24,
-						"output": 0
-					},
-					{
 						"index": 3,
 						"name": "Angle",
-						"node": 23,
+						"node": 11,
 						"output": 0
 					}
 				],
@@ -460,43 +222,21 @@
 				}
 			},
 			{
-				"id": 26,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_4",
-				"props":
-				{
-					"DefaultValue": 2,
-					"ParameterName": "PaintNormalTile"
-				}
-			},
-			{
-				"id": 27,
+				"id": 13,
 				"class": "Custom",
 				"name": "MaterialExpressionCustom_3",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "P",
-						"node": 21,
+						"node": 10,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 1,
-						"name": "N",
-						"node": 22,
-						"output": 0
-					},
-					{
-						"index": 2,
-						"name": "Tile",
-						"node": 26,
-						"output": 0
-					},
-					{
 						"index": 3,
 						"name": "Angle",
-						"node": 23,
+						"node": 11,
 						"output": 0
 					}
 				],
@@ -508,41 +248,14 @@
 				}
 			},
 			{
-				"id": 28,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_6",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "Coordinates",
-						"node": 25,
-						"output": 0
-					}
-				],
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "PaintMask",
-					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Masks"
-				}
-			},
-			{
-				"id": 29,
+				"id": 14,
 				"class": "TextureSampleParameter2D",
 				"name": "MaterialExpressionTextureSampleParameter2D_7",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Coordinates",
-						"node": 25,
+						"node": 12,
 						"output": 0
 					}
 				],
@@ -561,34 +274,7 @@
 				}
 			},
 			{
-				"id": 30,
-				"class": "TextureSampleParameter2D",
-				"name": "MaterialExpressionTextureSampleParameter2D_8",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "Coordinates",
-						"node": 27,
-						"output": 0
-					}
-				],
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"ParameterName": "PaintNormal",
-					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Normal_Mars_T.Paint_Normal_Mars_T",
-					"SamplerType": "SAMPLERTYPE_Normal"
-				}
-			},
-			{
-				"id": 31,
+				"id": 15,
 				"class": "VectorParameter",
 				"name": "MaterialExpressionVectorParameter_4",
 				"outputs": [
@@ -606,25 +292,7 @@
 				}
 			},
 			{
-				"id": 32,
-				"class": "VectorParameter",
-				"name": "MaterialExpressionVectorParameter_5",
-				"outputs": [
-					"RGB",
-					"R",
-					"G",
-					"B",
-					"A",
-					"RGBA"
-				],
-				"props":
-				{
-					"DefaultValue": "(R=0.550000,G=0.500000,B=0.460000,A=1.000000)",
-					"ParameterName": "PaintMid"
-				}
-			},
-			{
-				"id": 33,
+				"id": 16,
 				"class": "VectorParameter",
 				"name": "MaterialExpressionVectorParameter_6",
 				"outputs": [
@@ -642,17 +310,7 @@
 				}
 			},
 			{
-				"id": 34,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_5",
-				"props":
-				{
-					"DefaultValue": 1,
-					"ParameterName": "PaintContrast"
-				}
-			},
-			{
-				"id": 35,
+				"id": 17,
 				"class": "ScalarParameter",
 				"name": "MaterialExpressionScalarParameter_6",
 				"props":
@@ -662,16 +320,7 @@
 				}
 			},
 			{
-				"id": 36,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_7",
-				"props":
-				{
-					"ParameterName": "PaintDiffuseWeight"
-				}
-			},
-			{
-				"id": 37,
+				"id": 18,
 				"class": "ScalarParameter",
 				"name": "MaterialExpressionScalarParameter_8",
 				"props":
@@ -681,90 +330,48 @@
 				}
 			},
 			{
-				"id": 38,
-				"class": "ScalarParameter",
-				"name": "MaterialExpressionScalarParameter_9",
-				"props":
-				{
-					"DefaultValue": 0.40000000596046448,
-					"ParameterName": "PaintNormalStrength"
-				}
-			},
-			{
-				"id": 39,
+				"id": 19,
 				"class": "Custom",
 				"name": "MaterialExpressionCustom_4",
 				"inputs": [
 					{
-						"index": 0,
-						"name": "Base",
-						"node": 20,
-						"output": 0
-					},
-					{
-						"index": 1,
-						"name": "Mask",
-						"node": 28,
-						"output": 1,
-						"mask": "r"
-					},
-					{
 						"index": 2,
 						"name": "Shadow",
-						"node": 31,
-						"output": 0,
-						"mask": "rgb"
-					},
-					{
-						"index": 3,
-						"name": "Mid",
-						"node": 32,
+						"node": 15,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 4,
 						"name": "High",
-						"node": 33,
+						"node": 16,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 5,
-						"name": "Contrast",
-						"node": 34,
-						"output": 0
-					},
-					{
 						"index": 6,
 						"name": "Strength",
-						"node": 35,
+						"node": 17,
 						"output": 0
 					},
 					{
 						"index": 7,
 						"name": "Diffuse",
-						"node": 29,
+						"node": 14,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
-						"index": 8,
-						"name": "DiffuseWeight",
-						"node": 36,
-						"output": 0
-					},
-					{
 						"index": 9,
 						"name": "RoughIn",
-						"node": 13,
+						"node": 6,
 						"output": 2,
 						"mask": "g"
 					},
 					{
 						"index": 10,
 						"name": "RoughBias",
-						"node": 37,
+						"node": 18,
 						"output": 0
 					}
 				],
@@ -779,28 +386,727 @@
 				}
 			},
 			{
+				"id": 20,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_3",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 21,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_4"
+			},
+			{
+				"id": 22,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_7",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=4.000000,G=4.000000,B=0.000000,A=0.000000)",
+					"ParameterName": "TileMetres",
+					"Group": "Shading",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 23,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 22,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"R": true,
+					"G": true
+				}
+			},
+			{
+				"id": 24,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 23,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 a = abs(N);\nfloat2 uv;\nif (a.z >= a.x && a.z >= a.y) { uv = P.xy; }\nelse if (a.x >= a.y) { uv = float2(P.y * sign(N.x), -P.z); }\nelse { uv = float2(-P.x * sign(N.y), -P.z); }\nreturn uv / (Tile * 100.0);",
+					"OutputType": "CMOT_Float2",
+					"Description": "WorldAxisUV (Mise)"
+				}
+			},
+			{
+				"id": 25,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_9",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 24,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "BaseColor",
+					"Group": "Base Maps",
+					"SortPriority": 0,
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_BaseColor_Mars_T.StoneWall_Bellfold_BaseColor_Mars_T"
+				}
+			},
+			{
+				"id": 26,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_10",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 24,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "ORM",
+					"Group": "Base Maps",
+					"SortPriority": 1,
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_ORM_Mars_T.StoneWall_Bellfold_ORM_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 27,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_11",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 24,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Normal",
+					"Group": "Base Maps",
+					"SortPriority": 2,
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Bellfold/StoneWall_Bellfold_Normal_Mars_T.StoneWall_Bellfold_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 28,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_8",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint",
+					"Group": "Shading",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 29,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_2",
+				"props":
+				{
+					"R": 1
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "AOStrength",
+					"Group": "Shading",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 31,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 26,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 30,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 32,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 25,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 31,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 33,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_5",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 28,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 34,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_4",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 35,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_5"
+			},
+			{
+				"id": 36,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": 17,
+					"ParameterName": "PaintAngle",
+					"Group": "Paint Wash",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 37,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 6,
+					"ParameterName": "PaintMaskTile",
+					"Group": "Paint Wash",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 38,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 34,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Angle",
+						"node": 36,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 a = abs(N);\nfloat2 uv;\nif (a.z >= a.x && a.z >= a.y) { uv = P.xy; }\nelse if (a.x >= a.y) { uv = float2(P.y * sign(N.x), -P.z); }\nelse { uv = float2(-P.x * sign(N.y), -P.z); }\nfloat ang = radians(Angle);\nfloat c = cos(ang), sn = sin(ang);\nuv = float2(uv.x * c - uv.y * sn, uv.x * sn + uv.y * c);\nreturn uv / (Tile * 100.0);",
+					"OutputType": "CMOT_Float2",
+					"Description": "PaintUV (Mise)"
+				}
+			},
+			{
+				"id": 39,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"props":
+				{
+					"DefaultValue": 2,
+					"ParameterName": "PaintNormalTile",
+					"Group": "Paint Normal",
+					"SortPriority": 2
+				}
+			},
+			{
 				"id": 40,
 				"class": "Custom",
-				"name": "MaterialExpressionCustom_5",
+				"name": "MaterialExpressionCustom_8",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 34,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tile",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Angle",
+						"node": 36,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float3 a = abs(N);\nfloat2 uv;\nif (a.z >= a.x && a.z >= a.y) { uv = P.xy; }\nelse if (a.x >= a.y) { uv = float2(P.y * sign(N.x), -P.z); }\nelse { uv = float2(-P.x * sign(N.y), -P.z); }\nfloat ang = radians(Angle);\nfloat c = cos(ang), sn = sin(ang);\nuv = float2(uv.x * c - uv.y * sn, uv.x * sn + uv.y * c);\nreturn uv / (Tile * 100.0);",
+					"OutputType": "CMOT_Float2",
+					"Description": "PaintUV (Mise)"
+				}
+			},
+			{
+				"id": 41,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_12",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 38,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "PaintMask",
+					"Group": "Paint Wash",
+					"SortPriority": 6,
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 42,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_13",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 38,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "PaintDiffuse",
+					"Group": "Paint Wash",
+					"SortPriority": 10,
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_BaseColor_Mars_T.Paint_BaseColor_Mars_T"
+				}
+			},
+			{
+				"id": 43,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_14",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 40,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "PaintNormal",
+					"Group": "Paint Normal",
+					"SortPriority": 1,
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Normal_Mars_T.Paint_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 44,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.300000,G=0.240000,B=0.340000,A=1.000000)",
+					"ParameterName": "PaintShadow",
+					"Group": "Paint Wash",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 45,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.550000,G=0.500000,B=0.460000,A=1.000000)",
+					"ParameterName": "PaintMid",
+					"Group": "Paint Wash",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 46,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_11",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.780000,G=0.740000,B=0.640000,A=1.000000)",
+					"ParameterName": "PaintHighlight",
+					"Group": "Paint Wash",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 47,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "PaintContrast",
+					"Group": "Paint Wash",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 48,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"ParameterName": "PaintStrength",
+					"Group": "Paint Wash",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 49,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"props":
+				{
+					"ParameterName": "PaintDiffuseWeight",
+					"Group": "Paint Wash",
+					"SortPriority": 11
+				}
+			},
+			{
+				"id": 50,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"props":
+				{
+					"DefaultValue": 0.079999998211860657,
+					"ParameterName": "PaintRoughnessBias",
+					"Group": "Paint Wash",
+					"SortPriority": 9
+				}
+			},
+			{
+				"id": 51,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"ParameterName": "PaintNormalStrength",
+					"Group": "Paint Normal",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 52,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_9",
 				"inputs": [
 					{
 						"index": 0,
 						"name": "Base",
-						"node": 14,
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Mask",
+						"node": 41,
+						"output": 1,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "Shadow",
+						"node": 44,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Mid",
+						"node": 45,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "High",
+						"node": 46,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 5,
+						"name": "Contrast",
+						"node": 47,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Strength",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Diffuse",
+						"node": 42,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "DiffuseWeight",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "RoughIn",
+						"node": 26,
+						"output": 2,
+						"mask": "g"
+					},
+					{
+						"index": 10,
+						"name": "RoughBias",
+						"node": 50,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Roughness"
+				],
+				"props":
+				{
+					"Code": "float m = saturate((Mask - 0.5) * Contrast + 0.5);\nfloat3 wash = m < 0.5 ? lerp(Shadow, Mid, m * 2.0) : lerp(Mid, High, m * 2.0 - 1.0);\nwash = lerp(wash, Diffuse, DiffuseWeight);\nfloat3 lo = 2.0 * Base * wash;\nfloat3 hi = 1.0 - 2.0 * (1.0 - Base) * (1.0 - wash);\nfloat3 over = lerp(hi, lo, step(Base, 0.5));\nRoughness = saturate(RoughIn + (m - 0.5) * RoughBias * 2.0);\nreturn lerp(Base, over, Strength);",
+					"Description": "PaintWash (Mise)"
+				}
+			},
+			{
+				"id": 53,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_10",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 27,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 1,
 						"name": "Detail",
-						"node": 30,
+						"node": 43,
 						"output": 0,
 						"mask": "rgb"
 					},
 					{
 						"index": 2,
 						"name": "Strength",
-						"node": 38,
+						"node": 51,
 						"output": 0
 					}
 				],
@@ -814,23 +1120,23 @@
 		"outputs": [
 			{
 				"property": "MP_BaseColor",
-				"node": 39,
+				"node": 52,
 				"output": 0
 			},
 			{
 				"property": "MP_Metallic",
-				"node": 13,
+				"node": 26,
 				"output": 3,
 				"mask": "b"
 			},
 			{
 				"property": "MP_Roughness",
-				"node": 39,
+				"node": 52,
 				"output": 1
 			},
 			{
 				"property": "MP_Normal",
-				"node": 40,
+				"node": 53,
 				"output": 0
 			}
 		]
@@ -845,6 +1151,14 @@
 			"value": 17
 		},
 		{
+			"name": "PaintStrength",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "PaintRoughnessBias",
+			"value": 0.079999998211860657
+		},
+		{
 			"name": "PaintMaskTile",
 			"value": 6
 		},
@@ -857,16 +1171,8 @@
 			"value": 1
 		},
 		{
-			"name": "PaintStrength",
-			"value": 0.34999999403953552
-		},
-		{
 			"name": "PaintDiffuseWeight",
 			"value": 0
-		},
-		{
-			"name": "PaintRoughnessBias",
-			"value": 0.079999998211860657
 		},
 		{
 			"name": "PaintNormalStrength",
@@ -887,12 +1193,12 @@
 			"value": "RGBA(0.16, 0.22, 0.3, 1)"
 		},
 		{
-			"name": "PaintMid",
-			"value": "RGBA(0.4, 0.46, 0.5, 1)"
-		},
-		{
 			"name": "PaintHighlight",
 			"value": "RGBA(0.7, 0.66, 0.52, 1)"
+		},
+		{
+			"name": "PaintMid",
+			"value": "RGBA(0.4, 0.46, 0.5, 1)"
 		}
 	],
 	"textureParams": [
@@ -901,20 +1207,20 @@
 			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_BaseColor_Mars_T.StoneWall_Spillring_BaseColor_Mars_T"
 		},
 		{
-			"name": "Normal",
-			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_Normal_Mars_T.StoneWall_Spillring_Normal_Mars_T"
-		},
-		{
 			"name": "ORM",
 			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_ORM_Mars_T.StoneWall_Spillring_ORM_Mars_T"
 		},
 		{
-			"name": "PaintMask",
-			"value": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T"
-		},
-		{
 			"name": "PaintDiffuse",
 			"value": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_BaseColor_Mars_T.Paint_BaseColor_Mars_T"
+		},
+		{
+			"name": "Normal",
+			"value": "/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_Normal_Mars_T.StoneWall_Spillring_Normal_Mars_T"
+		},
+		{
+			"name": "PaintMask",
+			"value": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Mask_Mars_T.Paint_Mask_Mars_T"
 		},
 		{
 			"name": "PaintNormal",
