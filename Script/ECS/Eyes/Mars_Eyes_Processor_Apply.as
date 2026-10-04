@@ -1,5 +1,6 @@
 // Builds the plate's values from the presentation and the style, and pushes only the groups that moved since the last
-// push (every group on the first push to a plate). Nothing is pushed while there is no plate.
+// push (every group on the first push to a plate). Nothing is pushed while there is no plate (a CkUnrealComponent plate
+// or a plate primitive); a plate that went away hands the next one every group again.
 class UMars_Processor_Eyes_Apply : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -12,9 +13,13 @@ class UMars_Processor_Eyes_Apply : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Eyes_Presentation& InPresentation)
     {
+        // The plate primitive is held weakly: once its actor destroys it the pointer reads null and nothing is pushed.
         auto& Plate = InPresentation.Plate;
-        if (ck::Is_NOT_Valid(Plate.Component))
-        { return; }
+        if (ck::Is_NOT_Valid(Plate.Primitive.Get()) && ck::Is_NOT_Valid(Plate.Component))
+        {
+            Plate.LastPushed.Reset();
+            return;
+        }
 
         const auto& Style = InHandle.Get_Fragment(FMars_Fragment_Eyes).Style;
         const auto& Cells = InPresentation.Cells;
@@ -41,25 +46,25 @@ class UMars_Processor_Eyes_Apply : UCk_Processor_Script_Base_UE
         // Only the pushed groups advance, so a slow drift below the tolerance still gets pushed once it adds up.
         if (PushCells)
         {
-            utils_eyes::Push_PlateGroup(Plate.Component, Values, EMars_Eyes_PlateGroup::Cells);
+            utils_eyes::Push_Group(Plate, Values, EMars_Eyes_PlateGroup::Cells);
             Last.Cells = Values.Cells;
         }
 
         if (PushAnim)
         {
-            utils_eyes::Push_PlateGroup(Plate.Component, Values, EMars_Eyes_PlateGroup::Anim);
+            utils_eyes::Push_Group(Plate, Values, EMars_Eyes_PlateGroup::Anim);
             Last.Anim = Values.Anim;
         }
 
         if (PushLook)
         {
-            utils_eyes::Push_PlateGroup(Plate.Component, Values, EMars_Eyes_PlateGroup::Look);
+            utils_eyes::Push_Group(Plate, Values, EMars_Eyes_PlateGroup::Look);
             Last.Look = Values.Look;
         }
 
         if (PushColor)
         {
-            utils_eyes::Push_PlateGroup(Plate.Component, Values, EMars_Eyes_PlateGroup::Color);
+            utils_eyes::Push_Group(Plate, Values, EMars_Eyes_PlateGroup::Color);
             Last.Color = Values.Color;
         }
 

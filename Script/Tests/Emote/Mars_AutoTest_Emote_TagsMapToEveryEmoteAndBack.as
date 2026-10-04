@@ -110,9 +110,11 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         HatWithoutSocket.Head.Hat.Socket = NAME_None;
         Assert_False(HatWithoutSocket.Validate().IsValid(), "a hat mesh without a socket is rejected");
 
-        auto NoPlate = Body;
-        NoPlate.Head.Face.PlateSize = FVector2D(0.0, 6.0);
-        Assert_False(NoPlate.Validate().IsValid(), "a zero-width eye plate is rejected");
+        Assert_True(Body.Head.Face.EyesSlot == n"M_EyePlate", f"the eyes are drawn on the M_EyePlate slot (got [{Body.Head.Face.EyesSlot}])");
+
+        auto NoEyesSlot = Body;
+        NoEyesSlot.Head.Face.EyesSlot = NAME_None;
+        Assert_False(NoEyesSlot.Validate().IsValid(), "a face without an eyes slot is rejected");
 
         auto ScaledFace = Body;
         ScaledFace.Head.Face.Offset.SetScale3D(FVector(2.0, 2.0, 2.0));

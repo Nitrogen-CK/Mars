@@ -1,7 +1,7 @@
-// Drains SetPlate, SetStyle, ClearExpression, SetStateExpression, then PlayExpression (each kind in queue order), so a
+// Drains SetPlate, SetPlatePrimitive, SetStyle, ClearExpression, SetStateExpression, then PlayExpression (each kind in queue order), so a
 // clear and a new expression issued in the same frame leave the new one showing. Every style and expression is
-// validated with its def's Validate(); a rejected one ensures and changes nothing. SetPlate is the only request that
-// writes the presentation; the cells follow the logic fragment on the resolve pass.
+// validated with its def's Validate(); a rejected one ensures and changes nothing. The two plate requests are the only ones
+// that write the presentation; the cells follow the logic fragment on the resolve pass.
 class UMars_Processor_Eyes_Requests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -20,6 +20,7 @@ class UMars_Processor_Eyes_Requests : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_Eyes();
 
         TArray<FMars_Request_Eyes_SetPlate> SetPlateRequests = InRequests.SetPlateRequests;
+        TArray<FMars_Request_Eyes_SetPlatePrimitive> SetPlatePrimitiveRequests = InRequests.SetPlatePrimitiveRequests;
         TArray<FMars_Request_Eyes_SetStyle> SetStyleRequests = InRequests.SetStyleRequests;
         TArray<FMars_Request_Eyes_ClearExpression> ClearExpressionRequests = InRequests.ClearExpressionRequests;
         TArray<FMars_Request_Eyes_SetStateExpression> SetStateExpressionRequests = InRequests.SetStateExpressionRequests;
@@ -30,6 +31,9 @@ class UMars_Processor_Eyes_Requests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : SetPlateRequests)
         { HandleSetPlate(Self, Request); }
+
+        for (const auto& Request : SetPlatePrimitiveRequests)
+        { HandleSetPlatePrimitive(Self, Request); }
 
         for (const auto& Request : SetStyleRequests)
         { HandleSetStyle(Self, InState, Request); }
@@ -52,6 +56,28 @@ class UMars_Processor_Eyes_Requests : UCk_Processor_Script_Base_UE
 
         auto& Presentation = InEyes.Get_Fragment(FMars_Fragment_Eyes_Presentation);
         Presentation.Plate.Component = InRequest.Plate;
+        Presentation.Plate.Primitive = nullptr;
+        Presentation.Plate.LastPushed.Reset();
+    }
+
+    // A primitive that went away before the drain (its actor died) is no plate: nothing is drawn until the next request.
+    private void HandleSetPlatePrimitive(FCk_Handle_Eyes& InEyes, const FMars_Request_Eyes_SetPlatePrimitive& InRequest)
+    {
+        if (InEyes.Has_Fragment(FMars_Fragment_Eyes_Presentation) == false)
+        { return; }
+
+        auto Primitive = InRequest.Primitive.Get();
+        if (ck::IsValid(Primitive))
+        {
+            const auto NumMaterials = Primitive.GetNumMaterials();
+            if (ck::EnsureIfNot(InRequest.MaterialSlot >= 0 && InRequest.MaterialSlot < NumMaterials,
+                f"[Eyes] [{InEyes.ToString()}] SetPlatePrimitive: [{Primitive.GetName()}] has no material slot [{InRequest.MaterialSlot}] (it has [{NumMaterials}])"))
+            { return; }
+        }
+
+        auto& Presentation = InEyes.Get_Fragment(FMars_Fragment_Eyes_Presentation);
+        Presentation.Plate.Component = FCk_Handle_UnrealComponent();
+        Presentation.Plate.Primitive = Primitive;
         Presentation.Plate.LastPushed.Reset();
     }
 

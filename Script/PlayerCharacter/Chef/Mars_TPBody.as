@@ -36,23 +36,26 @@ struct FMars_TPBody_Hat
     FTransform Offset = FTransform::Identity;
 }
 
-// Where the eyes sit on the chef (AMars_PlayerCharacter composes Gaze and Eyes on a face node that follows Bone).
+// Where the eyes sit on the chef. They are drawn by the body mesh itself (EyesSlot); AMars_PlayerCharacter composes Gaze
+// and Eyes on a face node that follows Bone, and the eyes write the body's custom primitive data.
 struct FMars_TPBody_Face
 {
     UPROPERTY()
     FName Bone = n"head";
 
-    // The face node relative to Bone, in unscaled body units: +X out of the face, +Y the chef's right, +Z up, 1.5 cm
-    // in front of the face plate's centre. Derived from SK_Chef's reference pose (2026-10-03): head bone at component
-    // (0, -7, 62), its X along the neck (up), Y to the chef's left, Z out of the face; the face plate (Face_LP) spans
-    // component z 58.6..83.6 and bulges to y 9.56 at its centre, so the node sits at component (0, 11.06, 71.1) facing
-    // +Y: Offset = FaceInComponent * Inverse(HeadInComponent). Scale must stay one (the body's Scale sizes it).
+    // The face node relative to Bone, in unscaled body units: +X out of the face, +Y the chef's right, +Z up, midway
+    // between the two eye quads. Derived from SK_Chef's reference pose (2026-10-03): head bone at component (0, -7, 62),
+    // its X along the neck (up, tilted 2.862 deg back), Y to the chef's left, Z out of the face. The eye quads (Eyes_LP,
+    // two ~5.9 x 5.5 cm quads flush on the face plate, centred at x +-6.1, z 71.0, wrapping its curve back to y 6.89)
+    // have their midpoint at component (0, 6.89, 71.0), facing +Y: Offset = FaceInComponent * Inverse(HeadInComponent),
+    // i.e. the delta (0, 13.89, 9.0) in head axes. Gaze aims from here. Scale must stay one (the body's Scale sizes it).
     UPROPERTY()
-    FTransform Offset = FTransform(FRotator(87.138, 180.0, 0.0), FVector(8.19, 0.0, 18.49), FVector::OneVector);
+    FTransform Offset = FTransform(FRotator(87.138, 180.0, 0.0), FVector(8.29, 0.0, 14.32), FVector::OneVector);
 
-    // The eye plate's world size, cm (width, height).
+    // The body mesh's material slot the eyes are drawn on (SK_Chef's Eyes_LP quads). The character replaces its
+    // material with the MarsEyePlate look; the slot reads the eyes' custom primitive data.
     UPROPERTY()
-    FVector2D PlateSize = FVector2D(12.0, 6.0);
+    FName EyesSlot = n"M_EyePlate";
 }
 
 // The cosmetics that ride the chef's head: the hat on its socket and the face node carrying the eyes.
@@ -140,9 +143,8 @@ mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
     if (Face.Offset.GetScale3D().Equals(FVector::OneVector) == false)
     { return FMars_Validation(f"Head.Face.Offset scale [{Face.Offset.GetScale3D()}] must be one - the Scale field sizes the face"); }
 
-    // A NaN fails the comparison, so it is rejected too.
-    if ((Face.PlateSize.X > 0.0 && Face.PlateSize.Y > 0.0) == false)
-    { return FMars_Validation(f"Head.Face.PlateSize [{Face.PlateSize}] must be positive"); }
+    if (Face.EyesSlot.IsNone())
+    { return FMars_Validation("Head.Face.EyesSlot is not set"); }
 
     const auto HoldValidation = Self.Hold.Validate();
     if (HoldValidation.IsValid() == false)

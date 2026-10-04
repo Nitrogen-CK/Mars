@@ -1,5 +1,6 @@
-// The only writer of the eye plate's custom primitive data; the layout is constants_eyes::k_Slot_*. Both eyes get the
-// same blink (a wink is an expression).
+// The only writer of the eye plate's custom primitive data; the layout is constants_eyes::k_Slot_*. A group reaches a
+// CkUnrealComponent plate as one deferred request (applied once its component exists) and a plate primitive straight
+// away. Both eyes get the same blink (a wink is an expression).
 
 struct FMars_Eyes_MaterialValues
 {
@@ -18,6 +19,37 @@ struct FMars_Eyes_MaterialValues
 
 namespace utils_eyes
 {
+    // To whichever the plate names: the primitive when set, else the CkUnrealComponent plate. The caller checks one is set.
+    void Push_Group(FMars_Eyes_Plate& InPlate, const FMars_Eyes_MaterialValues& InValues, EMars_Eyes_PlateGroup InGroup)
+    {
+        auto Primitive = InPlate.Primitive.Get();
+        if (ck::IsValid(Primitive))
+        {
+            Push_PrimitiveGroup(Primitive, InValues, InGroup);
+            return;
+        }
+
+        Push_PlateGroup(InPlate.Component, InValues, InGroup);
+    }
+
+    // Straight into the primitive's custom primitive data (per primitive, so every material slot on it sees the values;
+    // only the eye-plate slot reads them).
+    void Push_PrimitiveGroup(UPrimitiveComponent InPrimitive, const FMars_Eyes_MaterialValues& InValues, EMars_Eyes_PlateGroup InGroup)
+    {
+        if (InGroup == EMars_Eyes_PlateGroup::Cells)
+        { InPrimitive.SetCustomPrimitiveDataVector4(constants_eyes::k_Slot_Cells, InValues.Cells); }
+        else if (InGroup == EMars_Eyes_PlateGroup::Anim)
+        { InPrimitive.SetCustomPrimitiveDataVector4(constants_eyes::k_Slot_Anim, InValues.Anim); }
+        else if (InGroup == EMars_Eyes_PlateGroup::Look)
+        { InPrimitive.SetCustomPrimitiveDataVector2(constants_eyes::k_Slot_Look, InValues.Look); }
+        else
+        {
+            // Four floats, like the request path; the fourth (alpha) is unused by the look.
+            const auto& Color = InValues.Color;
+            InPrimitive.SetCustomPrimitiveDataVector4(constants_eyes::k_Slot_Color, FVector4(Color.R, Color.G, Color.B, Color.A));
+        }
+    }
+
     // One deferred request for the group; the plate applies it once its component exists.
     void Push_PlateGroup(FCk_Handle_UnrealComponent& InPlate, const FMars_Eyes_MaterialValues& InValues, EMars_Eyes_PlateGroup InGroup)
     {

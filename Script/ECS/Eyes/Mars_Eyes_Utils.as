@@ -1,9 +1,11 @@
-// The presentation getters ensure where this machine has no presentation (see Get_HasPresentation).
+// The Eyes feature's public surface: the composer, the request writers and the getters. The presentation getters ensure
+// where this machine has no presentation (see Get_HasPresentation).
 
 namespace utils_eyes
 {
     // The eyes live on InFaceNode (+X forward). All-or-nothing on validation: a rejected spec adds nothing and returns an
-    // invalid handle. The presentation fragment is added only where cosmetic events can run.
+    // invalid handle. The presentation fragment is added only where cosmetic events can run; the spec's Plate, or a later
+    // Request_SetPlate / Request_SetPlatePrimitive, names what the look is drawn on.
     FCk_Handle_Eyes Add(FCk_Handle_Transform& InFaceNode, FMars_Eyes_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -63,6 +65,12 @@ mixin void Request_SetPlate(FCk_Handle_Eyes& Self, const FMars_Request_Eyes_SetP
     Requests.SetPlateRequests.Add(InRequest);
 }
 
+mixin void Request_SetPlatePrimitive(FCk_Handle_Eyes& Self, const FMars_Request_Eyes_SetPlatePrimitive& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Eyes_Requests);
+    Requests.SetPlatePrimitiveRequests.Add(InRequest);
+}
+
 mixin void Request_SetStyle(FCk_Handle_Eyes& Self, FMars_Request_Eyes_SetStyle InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Eyes_Requests);
@@ -106,7 +114,7 @@ mixin bool Get_HasPresentation(const FCk_Handle_Eyes& Self)
     return Self.Has_Fragment(FMars_Fragment_Eyes_Presentation);
 }
 
-// The component the look is drawn on; invalid until one is set.
+// The CkUnrealComponent plate the look is drawn on; invalid until one is set, or while a primitive is the plate.
 mixin FCk_Handle_UnrealComponent Get_Plate(const FCk_Handle_Eyes& Self)
 {
     if (utils_eyes::DoEnsure_HasPresentation(Self, "Get_Plate") == false)

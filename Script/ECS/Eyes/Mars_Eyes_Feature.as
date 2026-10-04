@@ -1,7 +1,8 @@
 // Two glowing eyes on a face node (+X forward): a cosmetic style, expressions that override the style's shape for a
 // while, random blinking and a look offset toward whatever the node's Gaze targets. The logic state (style and the two
 // expression layers) exists on every machine; the presentation (resolved cells, blink, look, the plate) only where
-// cosmetic events can run. Values reach the plate only through custom primitive data (utils_eyes::Push_PlateGroup).
+// cosmetic events can run. Values reach the plate (a CkUnrealComponent plate, or a primitive one of whose material slots
+// uses the eye-plate look, such as the chef body's eye slot) only through custom primitive data (utils_eyes::Push_Group).
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -413,12 +414,18 @@ struct FMars_Eyes_BlinkState
     int32 Count = 0;
 }
 
+// What the look is drawn on: a CkUnrealComponent plate (Component), or a primitive one of whose material slots uses the
+// eye-plate look (Primitive; held weakly, so once its actor destroys it the pointer reads null and nothing is pushed). A
+// set primitive wins; Request_SetPlate and Request_SetPlatePrimitive replace one with the other.
 struct FMars_Eyes_Plate
 {
     UPROPERTY()
     FCk_Handle_UnrealComponent Component;
 
-    // Unset until the first push to this component, which therefore sends every group.
+    UPROPERTY()
+    TWeakObjectPtr<UPrimitiveComponent> Primitive;
+
+    // Unset until the first push to the current plate, which therefore sends every group.
     UPROPERTY()
     TOptional<FMars_Eyes_MaterialValues> LastPushed;
 }
@@ -520,12 +527,36 @@ struct FMars_Request_Eyes_SetPlate
     }
 }
 
-// Drain order SetPlate -> SetStyle -> ClearExpression -> SetStateExpression -> PlayExpression (see
+// Draws the look on Primitive's material slot MaterialSlot (which must use the eye-plate look; the caller assigns it):
+// the values go straight into the primitive's custom primitive data, which every slot on it sees and only the eye-plate
+// slot reads. Replaces a CkUnrealComponent plate. A slot the primitive lacks is rejected after an ensure; a primitive
+// gone by the drain is no plate.
+struct FMars_Request_Eyes_SetPlatePrimitive
+{
+    UPROPERTY()
+    TWeakObjectPtr<UPrimitiveComponent> Primitive;
+
+    UPROPERTY()
+    int32 MaterialSlot = 0;
+
+    FMars_Request_Eyes_SetPlatePrimitive() {}
+
+    FMars_Request_Eyes_SetPlatePrimitive(UPrimitiveComponent InPrimitive, int32 InMaterialSlot)
+    {
+        Primitive = InPrimitive;
+        MaterialSlot = InMaterialSlot;
+    }
+}
+
+// Drain order SetPlate -> SetPlatePrimitive -> SetStyle -> ClearExpression -> SetStateExpression -> PlayExpression (see
 // UMars_Processor_Eyes_Requests).
 struct FMars_Fragment_Eyes_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_Eyes_SetPlate> SetPlateRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Eyes_SetPlatePrimitive> SetPlatePrimitiveRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Eyes_SetStyle> SetStyleRequests;
