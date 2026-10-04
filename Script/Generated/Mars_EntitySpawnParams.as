@@ -1321,6 +1321,19 @@ namespace UMars_AutoTest_Gaze_TargetWithoutHeadEnsures
 }
 
 USTRUCT()
+struct FMars_AutoTest_HangingChain_CatenaryLaysLinksAndSags_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HangingChain_CatenaryLaysLinksAndSags
+{
+    FMars_AutoTest_HangingChain_CatenaryLaysLinksAndSags_SpawnParams Params()
+    {
+        return FMars_AutoTest_HangingChain_CatenaryLaysLinksAndSags_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Health_DamageLowersCurrentAndSignals_SpawnParams
 {
 }

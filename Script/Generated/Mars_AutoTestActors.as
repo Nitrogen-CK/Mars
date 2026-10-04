@@ -1111,6 +1111,18 @@ class AMars_AutoTest_Gaze_TargetDestroyedClears_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_HangingChain_CatenaryLaysLinksAndSags_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_HangingChain_CatenaryLaysLinksAndSags");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Health_DamageLowersCurrentAndSignals_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

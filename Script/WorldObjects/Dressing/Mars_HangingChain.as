@@ -138,23 +138,28 @@ class AMars_HangingChain : AActor
     UPROPERTY(Category = "Layout")
     int32 CatenarySamples = 24;
 
-    // Unset: the engine cube at LinkScale, as the sandbox pull chain.
+    // Unset: the crypt kit's 14 cm link when it is imported, else the engine cube shaped like the pull chain's links.
     UPROPERTY(Category = "Links")
     UStaticMesh LinkMesh;
 
+    // Unset: the mesh's own materials (the cube fallback gets the ProtoGrid interactable look).
     UPROPERTY(Category = "Links")
     UMaterialInterface LinkMaterial;
 
-    // Long axis X along the chain; the cube at these scales is a 7 x 1.5 x 4 cm link.
+    // Long axis X along the chain.
     UPROPERTY(Category = "Links")
-    FVector LinkScale = FVector(0.07, 0.015, 0.04);
+    FVector LinkScale = FVector::OneVector;
 
     // Centre-to-centre distance between links (cm); 0 derives it from the scaled mesh length minus LinkOverlap.
     UPROPERTY(Category = "Links")
     float32 LinkPitchOverride = 0.0f;
 
+    // The kit link is 14 cm long with 3 cm wire: links interlock by two wires, so the pitch is 8 cm.
     UPROPERTY(Category = "Links")
-    float32 LinkOverlap = 1.5f;
+    float32 LinkOverlap = 6.0f;
+
+    private const FString KitLinkAsset = "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM";
+    private const FVector CubeLinkScale = FVector(0.07, 0.015, 0.04);
 
     UPROPERTY(Category = "Links")
     bool AlternateRoll = true;
@@ -187,19 +192,28 @@ class AMars_HangingChain : AActor
     UFUNCTION(CallInEditor, Category = "Layout")
     void Rebuild()
     {
-        auto Mesh = ck::IsValid(LinkMesh) ? LinkMesh : engine::load::Cube();
+        auto Mesh = LinkMesh;
+        if (ck::Is_NOT_Valid(Mesh))
+        { Mesh = TryLoad_KitLink(); }
+
+        const bool IsCubeFallback = ck::Is_NOT_Valid(Mesh);
+        if (IsCubeFallback)
+        { Mesh = engine::load::Cube(); }
+
         if (ck::Is_NOT_Valid(Mesh))
         { return; }
 
-        auto Material = ck::IsValid(LinkMaterial) ? LinkMaterial : assets::load::ProtoGrid_Interactable_Mars_MI();
-
         Links.SetStaticMesh(Mesh);
-        if (ck::IsValid(Material))
-        { Links.SetMaterial(0, Material); }
+        if (ck::IsValid(LinkMaterial))
+        { Links.SetMaterial(0, LinkMaterial); }
+        else if (IsCubeFallback)
+        { Links.SetMaterial(0, assets::load::ProtoGrid_Interactable_Mars_MI()); }
+
+        const FVector Scale = IsCubeFallback ? LinkScale * CubeLinkScale : LinkScale;
 
         ApplyPhysics();
         AuthorSpline();
-        LayLinks(Get_LinkPitch(Mesh));
+        LayLinks(Get_LinkPitch(Mesh, Scale), Scale);
         PlaceAttachments();
     }
 
@@ -216,6 +230,26 @@ class AMars_HangingChain : AActor
     float Get_ChainLength() const
     {
         return Spline.GetSplineLength();
+    }
+
+    // The kit link, looked up only in the editor world (a missing package must not log: it fails automation runs,
+    // and the editor asset library refuses play worlds). Found once, it is kept on LinkMesh so PIE and cooked builds
+    // never look it up.
+    private UStaticMesh TryLoad_KitLink()
+    {
+#if EDITOR
+        auto World = GetWorld();
+        if (ck::Is_NOT_Valid(World) || World.IsGameWorld() || EditorAsset::DoesAssetExist(KitLinkAsset) == false)
+        { return nullptr; }
+
+        auto Found = Cast<UStaticMesh>(LoadObject(this, f"{KitLinkAsset}.CryptChainLink_Mars_SM"));
+        if (ck::IsValid(Found))
+        { LinkMesh = Found; }
+
+        return Found;
+#else
+        return nullptr;
+#endif
     }
 
     // Instance properties cannot be defaults: they are applied per rebuild.
@@ -284,17 +318,18 @@ class AMars_HangingChain : AActor
         Spline.UpdateSpline();
     }
 
-    private float Get_LinkPitch(UStaticMesh InMesh) const
+    // The overlap never eats more than half a link: a short fallback link still reads as a chain.
+    private float Get_LinkPitch(UStaticMesh InMesh, FVector InScale) const
     {
         if (LinkPitchOverride > 0.0f)
         { return float(LinkPitchOverride); }
 
-        const float MeshLength = 2.0 * InMesh.GetBounds().BoxExtent.X * LinkScale.X;
-        return Math::Max(MeshLength - float(LinkOverlap), 1.0);
+        const float MeshLength = 2.0 * InMesh.GetBounds().BoxExtent.X * InScale.X;
+        return Math::Max(MeshLength - float(LinkOverlap), Math::Max(MeshLength * 0.5, 1.0));
     }
 
     // DefaultComponents survive construction-script reruns, so the instances must be cleared first.
-    private void LayLinks(float InPitch)
+    private void LayLinks(float InPitch, FVector InScale)
     {
         Links.ClearInstances();
 
@@ -309,7 +344,7 @@ class AMars_HangingChain : AActor
             // Alternating links turned 90 degrees about the tangent, like a real chain.
             const float Roll = (AlternateRoll && Index % 2 == 1) ? 90.0 : 0.0;
             Link.SetRotation(Link.GetRotation() * FRotator(0.0, 0.0, Roll).Quaternion());
-            Link.SetScale3D(LinkScale);
+            Link.SetScale3D(InScale);
             Links.AddInstance(Link, false);
         }
     }
