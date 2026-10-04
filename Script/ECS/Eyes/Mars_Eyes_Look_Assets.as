@@ -126,7 +126,7 @@ asset MarsEyePlate of UCkUsf_LookDefinition
     FCk_Usf_ParamDesc EyeScale;
     EyeScale._Name          = n"EyeScale";
     EyeScale._Type          = ECk_Usf_ParamType::Scalar;
-    EyeScale._DefaultScalar = 0.70f;
+    EyeScale._DefaultScalar = 1.0f;
     _Parameters.Add(EyeScale);
 
     FCk_Usf_ParamDesc LookMaxUV;

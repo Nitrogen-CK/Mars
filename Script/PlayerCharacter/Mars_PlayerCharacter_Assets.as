@@ -229,6 +229,9 @@ namespace mars
         TPBody.Montages.StrikeMontage = TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/AM_Chef_Strike.AM_Chef_Strike"));
         TPBody.Head.Hat.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SM_Chef_Hat.SM_Chef_Hat"));
 
+        // Big wide eyes, as the concept art: the Wide style on the body's 8.5 x 6 cm eye quads (Mars_Eyes_Assets.as).
+        Eyes.Style = utils_eyes::Style_Wide().Def;
+
         EmoteWheel.Definition = TSoftObjectPtr<UMars_EmoteWheel_Definition>(FSoftObjectPath("/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA"));
     }
 }
