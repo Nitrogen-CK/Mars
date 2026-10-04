@@ -1,11 +1,11 @@
-// The Eyes feature's public surface: the composer, the plate setter, the four request writers and the getters. The
+// The Eyes feature's public surface: the composer, the two plate setters, the four request writers and the getters. The
 // presentation getters ensure where this machine has no presentation (see Get_HasPresentation).
 
 namespace utils_eyes
 {
     // The eyes live on InFaceNode (+X forward). All-or-nothing on validation: a rejected spec adds nothing and returns an
-    // invalid handle. The presentation fragment is added only where cosmetic events can run; Set_Plate later names the
-    // component the look is drawn on.
+    // invalid handle. The presentation fragment is added only where cosmetic events can run; Set_Plate or
+    // Set_PlateComponent later names what the look is drawn on.
     FCk_Handle_Eyes Add(FCk_Handle_Transform& InFaceNode, FMars_Eyes_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -71,8 +71,8 @@ namespace utils_eyes
 // Setters
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The plate the look is drawn on; every group is pushed to it on the next apply pass. No-op where there is no
-// presentation.
+// The plate the look is drawn on; every group is pushed to it on the next apply pass. Replaces a plate component. No-op
+// where there is no presentation.
 mixin void Set_Plate(FCk_Handle_Eyes& Self, FCk_Handle_UnrealComponent InPlate)
 {
     if (Self.Has_Fragment(FMars_Fragment_Eyes_Presentation) == false)
@@ -80,6 +80,30 @@ mixin void Set_Plate(FCk_Handle_Eyes& Self, FCk_Handle_UnrealComponent InPlate)
 
     auto& Presentation = Self.Get_Fragment(FMars_Fragment_Eyes_Presentation);
     Presentation.Plate = InPlate;
+    Presentation.PlateComponent = nullptr;
+    Presentation.HasPushed = false;
+}
+
+// Draws the look on InComponent's material slot InMaterialSlot (which must use the eye-plate look; the caller assigns
+// it): the values go straight into the primitive's custom primitive data, which every slot on it sees and only the
+// eye-plate slot reads. Replaces a CkUnrealComponent plate; every group is pushed on the next apply pass. Ensures and
+// changes nothing on a missing component or a slot it does not have. No-op where there is no presentation.
+mixin void Set_PlateComponent(FCk_Handle_Eyes& Self, UPrimitiveComponent InComponent, int32 InMaterialSlot)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Eyes_Presentation) == false)
+    { return; }
+
+    if (ck::EnsureIfNot(ck::IsValid(InComponent), f"[Eyes] [{Self.ToString()}] Set_PlateComponent: the component is not valid"))
+    { return; }
+
+    const auto NumMaterials = InComponent.GetNumMaterials();
+    if (ck::EnsureIfNot(InMaterialSlot >= 0 && InMaterialSlot < NumMaterials,
+        f"[Eyes] [{Self.ToString()}] Set_PlateComponent: [{InComponent.GetName()}] has no material slot [{InMaterialSlot}] (it has [{NumMaterials}])"))
+    { return; }
+
+    auto& Presentation = Self.Get_Fragment(FMars_Fragment_Eyes_Presentation);
+    Presentation.Plate = FCk_Handle_UnrealComponent();
+    Presentation.PlateComponent = InComponent;
     Presentation.HasPushed = false;
 }
 

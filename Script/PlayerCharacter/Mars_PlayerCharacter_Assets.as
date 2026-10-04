@@ -83,7 +83,7 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Body")
     FMars_TPBody_Spec TPBody;
 
-    // The chef's eyes, which other players see on its face (TPBody.Head.Face); its owner never has them.
+    // The chef's eyes, drawn by the body's eye slot (TPBody.Head.Face): part of the body, so its owner never sees them.
     UPROPERTY(Category = "Body")
     FMars_Eyes_Spec Eyes;
 

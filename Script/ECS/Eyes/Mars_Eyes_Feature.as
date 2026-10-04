@@ -1,7 +1,8 @@
 // Two glowing eyes on a face node (+X forward): a cosmetic style, expressions that override the style's shape for a
 // while, random blinking and a look offset toward whatever the node's Gaze targets. The logic state (style and the two
 // expression layers) exists on every machine; the presentation (resolved cells, blink, look, the plate) only where
-// cosmetic events can run. Values reach the plate only through custom primitive data (Mars_Eyes_Material.as).
+// cosmetic events can run. Values reach the plate (a CkUnrealComponent plate, or a material slot of any primitive such as
+// the chef body's eye slot) only through custom primitive data (Mars_Eyes_Material.as).
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -388,9 +389,16 @@ struct FMars_Fragment_Eyes_Presentation
     UPROPERTY()
     FVector2D LookOffset;
 
+    // What the look is drawn on: either a CkUnrealComponent plate (Set_Plate) or a primitive one of whose material slots
+    // reads the custom primitive data (Set_PlateComponent; the chef body's eye slot). Setting one clears the other. The
+    // primitive belongs to its actor, so it is held weakly; once it is gone nothing is pushed.
     UPROPERTY()
     FCk_Handle_UnrealComponent Plate;
 
+    UPROPERTY()
+    TWeakObjectPtr<UPrimitiveComponent> PlateComponent;
+
+    // False until a push reaches the current plate; a new plate (or one that went away) pushes every group again.
     UPROPERTY()
     bool HasPushed = false;
 

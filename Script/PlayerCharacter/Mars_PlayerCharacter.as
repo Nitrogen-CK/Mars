@@ -71,10 +71,6 @@ class AMars_PlayerCharacter : ACk_Character_UE
     private FCk_Handle_FPHands _Hands;
     // The body emote montage last played on this machine (Stop_FPEmote ends it); null when none.
     private UAnimMontage _BodyEmoteMontage;
-    // The player entity's transform once constructed; invalid before (the eyes wait for it).
-    private FCk_Handle_Transform _PlayerTransform;
-    // The chef's face node carrying Gaze, Eyes and the eye plate; invalid while there are no eyes (see RefreshEyes).
-    private FCk_Handle_Transform _Face;
 
     // What this player holds, for everyone (Mars_HeldView.as). The owner sets it (Request_SetHeldView); the server's copy
     // replicates to every client, late joiners included.
@@ -88,11 +84,6 @@ class AMars_PlayerCharacter : ACk_Character_UE
     // The body's grip bones: the gloves' grip axes, children of the hand bones ABP_Chef's IK moves.
     private const FName BodyGripBone_R = n"grip_r";
     private const FName BodyGripBone_L = n"grip_l";
-
-    // The eye plate is the engine plane (100 uu). Taking its face as local +Z with U along local +X and V along local +Y:
-    // the yaw and roll turn its face to the face node's +X with U along +Y, and the negative Y scale sends V down (the
-    // look moves the shapes toward +U for a target on the face's right). Same recipe as UMars_EyesDummy_EntityScript.
-    private const FRotator EyePlateRotation = FRotator(0.0, 90.0, -90.0);
 
     UFUNCTION(BlueprintOverride)
     void ConstructionScript()
@@ -279,105 +270,61 @@ class AMars_PlayerCharacter : ACk_Character_UE
 
         utils_state_machine::Add(Player, FCk_StateMachine_Spec(UMars_SmState_Alive));
 
-        _PlayerTransform = PlayerTransform;
-        RefreshEyes();
+        ConstructEyes(PlayerTransform);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // The chef's eyes: a face node following the head bone carries Gaze (looking at other players' heads), Eyes and the
-    // eye plate. Only copies other players see have them: the owner's view sits at the face, and the plate (a
-    // CkUnrealComponent outered to this actor) cannot be hidden from the owner by OwnerNoSee. Possession can land after
-    // the entity is constructed (an owning client learns its controller by replication), so a controller change
-    // re-decides.
+    // The chef's eyes: drawn by the body mesh's eye slot (Config.TPBody.Head.Face.EyesSlot, SK_Chef's M_EyePlate), so
+    // they are part of the body - hidden from the owner by OwnerNoSee and seen by everyone else - and every copy composes
+    // them, whoever possesses it. A face node following the head bone carries Gaze (looking at other players' heads) and
+    // Eyes, which write their values into the body's custom primitive data.
     //----------------------------------------------------------------------------------------------------------------------
 
-    // Server and owning client (APawn::NotifyControllerChanged); Possessed/Unpossessed fire on the server only. A pawn
-    // being destroyed is unpossessed first (APawn::Destroyed) and must not grow eyes on its way out.
-    UFUNCTION(BlueprintOverride)
-    void ControllerChanged(AController OldController, AController NewController)
-    {
-        if (IsActorBeingDestroyed())
-        { return; }
-
-        RefreshEyes();
-    }
-
-    private void RefreshEyes()
-    {
-        if (ck::Is_NOT_Valid(_PlayerTransform))
-        { return; }
-
-        const auto WantsEyes = IsLocallyControlled() == false;
-        const auto HasEyes = ck::IsValid(_Face);
-        if (WantsEyes == HasEyes)
-        { return; }
-
-        if (WantsEyes)
-        {
-            ConstructEyes();
-            return;
-        }
-
-        // The node's children (the plate, the gaze's sense node) go with it.
-        utils_entity_lifetime::Request_DestroyEntity(FCk_Handle(_Face));
-        _Face = FCk_Handle_Transform();
-    }
-
-    // Where cosmetics cannot run (a dedicated server) the face is only its node and the eyes' logic: no plate, no gaze.
-    private void ConstructEyes()
+    // Where cosmetics cannot run (a dedicated server) the face is only its node and the eyes' logic: no look, no gaze.
+    private void ConstructEyes(FCk_Handle_Transform& InPlayerTransform)
     {
         const auto& FaceSpec = Config.TPBody.Head.Face;
         if (ck::EnsureIfNot(Mesh.DoesSocketExist(FaceSpec.Bone),
             f"[PlayerCharacter] TPBody: the body mesh has no [{FaceSpec.Bone}] bone for the eyes"))
         { return; }
 
-        auto Face = utils_scene_node::CreateAndAttachToUnrealMesh(_PlayerTransform, Mesh, FaceSpec.Bone, FaceSpec.Offset);
-        utils_handle::Set_DebugName(FCk_Handle(Face), n"Player.Face");
-        _Face = Face.As_Transform();
+        auto FaceNode = utils_scene_node::CreateAndAttachToUnrealMesh(InPlayerTransform, Mesh, FaceSpec.Bone, FaceSpec.Offset);
+        utils_handle::Set_DebugName(FCk_Handle(FaceNode), n"Player.Face");
+        auto Face = FaceNode.As_Transform();
 
-        auto Plate = FCk_Handle_UnrealComponent();
-        if (utils_net::Get_CanExecuteCosmeticEvents(_Face))
+        auto EyesSlot = ck::INDEX_NONE();
+        if (utils_net::Get_CanExecuteCosmeticEvents(Face))
         {
-            Plate = AddEyePlate(_Face);
+            EyesSlot = SetUpEyesSlot(FaceSpec.EyesSlot);
 
             auto GazeSpec = FMars_Gaze_Spec();
             GazeSpec.DetectionFilter.AddTag(GameplayTags::Probe_Mars_Player);
             GazeSpec.AimPoint = GameplayTags::AttachPoint_Mars_Head;
-            utils_gaze::Add(_Face, GazeSpec);
+            utils_gaze::Add(Face, GazeSpec);
         }
 
-        auto Eyes = utils_eyes::Add(_Face, Config.Eyes);
-        if (ck::IsValid(Eyes) && ck::IsValid(Plate))
-        { Eyes.Set_Plate(Plate); }
+        auto Eyes = utils_eyes::Add(Face, Config.Eyes);
+        if (ck::IsValid(Eyes) && EyesSlot != ck::INDEX_NONE())
+        { Eyes.Set_PlateComponent(Mesh, EyesSlot); }
     }
 
-    // Invalid when the MarsEyePlate look master is not generated (the eyes then have logic but nothing to draw on).
-    private FCk_Handle_UnrealComponent AddEyePlate(FCk_Handle_Transform& InFace)
+    // Puts the eye-plate look on the body's eye slot (replacing the imported placeholder material) and returns the
+    // slot's index. INDEX_NONE (after an ensure) when the body mesh has no such slot or the MarsEyePlate look master is
+    // not generated; the eyes then have logic but nothing to draw on.
+    private int32 SetUpEyesSlot(FName InSlotName)
     {
+        const auto SlotIndex = Mesh.GetMaterialIndex(InSlotName);
+        if (ck::EnsureIfNot(SlotIndex != ck::INDEX_NONE(),
+            f"[PlayerCharacter] TPBody: the body mesh has no [{InSlotName}] material slot for the eyes - re-import SK_Chef with its Eyes_LP"))
+        { return ck::INDEX_NONE(); }
+
         auto LookMaster = utils_usf::Get_LookMasterMaterial(mars_eyes::Look_EyePlate());
         if (ck::EnsureIfNot(ck::IsValid(LookMaster),
             "[PlayerCharacter] the MarsEyePlate look master is not generated - run Ck_Usf_GenerateLooks MarsEyePlate"))
-        { return FCk_Handle_UnrealComponent(); }
+        { return ck::INDEX_NONE(); }
 
-        // Movable: the component is registered first and then receives the entity transform, which a Static component
-        // refuses once the world has begun play.
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(engine::load::Plane());
-        Archetype.SetMaterial(0, LookMaster);
-        Archetype.SetCollisionProfileName(collision::profile::NoCollision);
-        Archetype.SetCastShadow(false);
-
-        // The face node carries the body's scale; the plate undoes it so PlateSize is world cm.
-        const auto& Size = Config.TPBody.Head.Face.PlateSize;
-        const auto Scale = float64(Config.TPBody.Scale);
-        const auto PlateScale = FVector(Size.X / (100.0 * Scale), -Size.Y / (100.0 * Scale), 1.0);
-        auto PlateNode = utils_scene_node::Create(InFace, FTransform(EyePlateRotation, FVector::ZeroVector, PlateScale));
-        utils_handle::Set_DebugName(FCk_Handle(PlateNode), n"Player.EyePlate");
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"Player_EyePlate");
-        return utils_unreal_component::Add(FCk_Handle(PlateNode), ComponentParams);
+        Mesh.SetMaterial(SlotIndex, LookMaster);
+        return SlotIndex;
     }
 
     //----------------------------------------------------------------------------------------------------------------------

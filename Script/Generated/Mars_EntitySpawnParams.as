@@ -775,6 +775,19 @@ namespace UMars_AutoTest_EmoteWheel_SectorMathAndSpec
 }
 
 USTRUCT()
+struct FMars_AutoTest_Eyes_ApplyWritesComponentPlate_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Eyes_ApplyWritesComponentPlate
+{
+    FMars_AutoTest_Eyes_ApplyWritesComponentPlate_SpawnParams Params()
+    {
+        return FMars_AutoTest_Eyes_ApplyWritesComponentPlate_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Eyes_ApplyWritesPlate_SpawnParams
 {
 }

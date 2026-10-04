@@ -1,6 +1,6 @@
 // Builds the plate's values from the presentation and the style, and pushes only the groups that moved since the last
 // push (everything on the first push to a plate). The only writer of the plate's custom primitive data; nothing is
-// pushed before Set_Plate.
+// pushed before Set_Plate / Set_PlateComponent, nor once a plate component is gone (the next plate gets every group).
 class UMars_Processor_Eyes_Apply : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -13,8 +13,13 @@ class UMars_Processor_Eyes_Apply : UCk_Processor_Script_Base_UE
 
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Eyes_Presentation& InPresentation)
     {
-        if (ck::Is_NOT_Valid(InPresentation.Plate))
-        { return; }
+        // The plate component is held weakly: once its actor destroys it the pointer reads null and nothing is pushed.
+        const auto HasPlateComponent = ck::IsValid(InPresentation.PlateComponent.Get());
+        if (HasPlateComponent == false && ck::Is_NOT_Valid(InPresentation.Plate))
+        {
+            InPresentation.HasPushed = false;
+            return;
+        }
 
         const auto& Style = InHandle.Get_Fragment(FMars_Fragment_Eyes).Style;
 
@@ -28,27 +33,28 @@ class UMars_Processor_Eyes_Apply : UCk_Processor_Script_Base_UE
 
         const auto PushAll = InPresentation.HasPushed == false;
         const auto& Last = InPresentation.LastPushed;
-        const auto PushCells = PushAll || DoGet_HasMoved(Values.Cells, Last.Cells);
-        const auto PushAnim = PushAll || DoGet_HasMoved(Values.Anim, Last.Anim);
-        const auto PushLook = PushAll || Values.Look.Equals(Last.Look, constants_eyes::k_PushTolerance) == false;
-        const auto PushColor = PushAll || Values.Color.Equals(Last.Color, constants_eyes::k_PushTolerance) == false;
+        auto Groups = FMars_Eyes_PushGroups();
+        Groups.Cells = PushAll || DoGet_HasMoved(Values.Cells, Last.Cells);
+        Groups.Anim = PushAll || DoGet_HasMoved(Values.Anim, Last.Anim);
+        Groups.Look = PushAll || Values.Look.Equals(Last.Look, constants_eyes::k_PushTolerance) == false;
+        Groups.Color = PushAll || Values.Color.Equals(Last.Color, constants_eyes::k_PushTolerance) == false;
 
-        if ((PushCells || PushAnim || PushLook || PushColor) == false)
+        if (Groups.Get_Any() == false)
         { return; }
 
-        mars_eyes_material::Push(InPresentation.Plate, Values, PushCells, PushAnim, PushLook, PushColor);
+        mars_eyes_material::Push(InPresentation, Values, Groups);
 
         // Only the pushed groups advance, so a slow drift below the tolerance still gets pushed once it adds up.
-        if (PushCells)
+        if (Groups.Cells)
         { InPresentation.LastPushed.Cells = Values.Cells; }
 
-        if (PushAnim)
+        if (Groups.Anim)
         { InPresentation.LastPushed.Anim = Values.Anim; }
 
-        if (PushLook)
+        if (Groups.Look)
         { InPresentation.LastPushed.Look = Values.Look; }
 
-        if (PushColor)
+        if (Groups.Color)
         { InPresentation.LastPushed.Color = Values.Color; }
 
         InPresentation.HasPushed = true;
