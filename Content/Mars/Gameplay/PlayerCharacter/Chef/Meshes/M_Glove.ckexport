@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "9d835f2306615879105b1ade750fc9d2",
+		"sourceHash": "9ce5448857a3bef5195c205d827c0c6b",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -17,6 +17,9 @@
 	],
 	"expressions":
 	{
+		"Constant3Vector": 1,
+		"Fresnel": 1,
+		"LinearInterpolate": 1,
 		"VectorParameter": 1
 	},
 	"graph":
@@ -38,14 +41,64 @@
 				{
 					"DefaultValue": "(R=0.042929,G=0.014688,B=0.003059,A=0.000000)"
 				}
+			},
+			{
+				"id": 1,
+				"class": "Fresnel",
+				"name": "MaterialExpressionFresnel_0",
+				"props":
+				{
+					"Exponent": 0.5
+				}
+			},
+			{
+				"id": 2,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 1,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "Constant3Vector",
+				"name": "MaterialExpressionConstant3Vector_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None"
+				],
+				"props":
+				{
+					"Constant": "(R=1.000000,G=0.299929,B=0.107307,A=1.000000)"
+				}
 			}
 		],
 		"outputs": [
 			{
 				"property": "MP_BaseColor",
-				"node": 0,
-				"output": 0,
-				"mask": "rgb"
+				"node": 2,
+				"output": 0
 			}
 		]
 	},
