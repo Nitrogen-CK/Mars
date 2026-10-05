@@ -1,0 +1,429 @@
+Begin Object Class=/Script/UMG.Overlay Name="ViewportRoot" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportRoot'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportRoot.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportRoot.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportRoot.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'ViewportRoot'"
+      Content="/Script/UMG.ScaleBox'ViewportScale'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportRoot.OverlaySlot_0'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'ViewportRoot'"
+      Content="/Script/UMG.Image'Scrim'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_115" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_115'"
+   WidgetName="ViewportRoot"
+End Object
+Begin Object Class=/Script/UMG.Image Name="Scrim" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Scrim'"
+   Brush=(TintColor=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.550000)))
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.ScaleBox Name="ViewportScale" ExportPath="/Script/UMG.ScaleBox'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportScale'"
+   Begin Object Class=/Script/UMG.ScaleBoxSlot Name="ScaleBoxSlot_0" ExportPath="/Script/UMG.ScaleBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportScale.ScaleBoxSlot_0'"
+   End Object
+   Begin Object Name="ScaleBoxSlot_0" ExportPath="/Script/UMG.ScaleBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewportScale.ScaleBoxSlot_0'"
+      Parent="/Script/UMG.ScaleBox'ViewportScale'"
+      Content="/Script/UMG.SizeBox'DesignSize'"
+   End Object
+   Slots(0)="/Script/UMG.ScaleBoxSlot'ScaleBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="DesignSize" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.DesignSize'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.DesignSize.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.DesignSize.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'DesignSize'"
+      Content="/Script/UMG.CanvasPanel'Root'"
+   End Object
+   WidthOverride=1600.000000
+   HeightOverride=900.000000
+   bOverride_WidthOverride=True
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.CanvasPanel Name="Root" ExportPath="/Script/UMG.CanvasPanel'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root'"
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_9" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_9'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_8" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_8'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_7" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_7'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_6" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_6'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_4" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_4'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_3" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_3'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_2" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_10" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_10'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_1" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_18" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_18'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_17" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_17'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_16" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_16'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_15" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_15'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_14" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_14'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_12" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_12'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_11" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_11'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_20" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_20'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_19" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_19'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_23" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_23'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_22" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_22'"
+   End Object
+   Begin Object Class=/Script/UMG.CanvasPanelSlot Name="CanvasPanelSlot_21" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_21'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_9" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_9'"
+      LayoutData=(Offsets=(Left=100.000000,Top=328.000000,Right=275.000000,Bottom=80.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'TabVideo'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_8" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_8'"
+      LayoutData=(Offsets=(Left=100.000000,Top=232.000000,Right=275.000000,Bottom=80.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'TabAudio'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_7" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_7'"
+      LayoutData=(Offsets=(Left=1290.000000,Top=752.000000,Right=200.000000,Bottom=65.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonMoss_Mars_WBP.ButtonMoss_Mars_WBP_C'_ApplyButton'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_6" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_6'"
+      LayoutData=(Offsets=(Left=1060.000000,Top=752.000000,Right=200.000000,Bottom=65.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'_CancelButton'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_4" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_4'"
+      LayoutData=(Offsets=(Left=430.000000,Top=215.000000,Right=720.000000,Bottom=64.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/CommonUI.CommonTextBlock'SectionText'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_3" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_3'"
+      LayoutData=(Offsets=(Left=120.000000,Top=82.000000,Right=600.000000,Bottom=85.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/CommonUI.CommonTextBlock'TitleText'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_2" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_2'"
+      LayoutData=(Offsets=(Left=70.000000,Top=60.000000,Right=1460.000000,Bottom=125.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'Header'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_10" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_10'"
+      LayoutData=(Offsets=(Left=100.000000,Top=424.000000,Right=275.000000,Bottom=80.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'TabControls'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_1" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_1'"
+      LayoutData=(Offsets=(Left=70.000000,Top=60.000000,Right=1460.000000,Bottom=780.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/CommonUI.CommonBorder'Paper'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_18" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_18'"
+      LayoutData=(Offsets=(Left=430.000000,Top=286.000000,Right=700.000000,Bottom=1.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'SectionRule'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_17" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_17'"
+      LayoutData=(Offsets=(Left=110.000000,Top=722.000000,Right=1380.000000,Bottom=1.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'FooterRule'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_16" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_16'"
+      LayoutData=(Offsets=(Left=1170.000000,Top=215.000000,Right=1.000000,Bottom=475.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'HelpRule'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_15" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_15'"
+      LayoutData=(Offsets=(Left=395.000000,Top=215.000000,Right=1.000000,Bottom=475.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'RailRule'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_14" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_14'"
+      LayoutData=(Offsets=(Left=1210.000000,Top=85.000000,Right=270.000000,Bottom=80.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'BrandWordmark'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_12" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_12'"
+      LayoutData=(Offsets=(Left=660.000000,Top=767.000000,Right=350.000000,Bottom=45.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/CommonUI.CommonTextBlock'PendingText'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_11" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_11'"
+      LayoutData=(Offsets=(Left=1200.000000,Top=342.000000,Right=270.000000,Bottom=310.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/CommonUI.CommonTextBlock'HelpDescription'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_0" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_0'"
+      LayoutData=(Offsets=(Left=1200.000000,Top=222.000000,Right=270.000000,Bottom=112.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/CommonUI.CommonTextBlock'HelpTitle'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_20" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_20'"
+      LayoutData=(Offsets=(Left=430.000000,Top=302.000000,Right=700.000000,Bottom=406.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.ScrollBox'RowsScroll'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_19" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_19'"
+      LayoutData=(Offsets=(Left=70.000000,Top=60.000000,Right=1460.000000,Bottom=780.000000))
+      ZOrder=10
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.Image'ShellTrim'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_23" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_23'"
+      LayoutData=(Offsets=(Left=430.000000,Top=602.000000,Right=700.000000,Bottom=100.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Script/UMG.HorizontalBox'BindingsRow'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_22" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_22'"
+      LayoutData=(Offsets=(Left=110.000000,Top=752.000000,Right=430.000000,Bottom=65.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'RestoreDefaults'"
+   End Object
+   Begin Object Name="CanvasPanelSlot_21" ExportPath="/Script/UMG.CanvasPanelSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Root.CanvasPanelSlot_21'"
+      LayoutData=(Offsets=(Left=100.000000,Top=520.000000,Right=275.000000,Bottom=80.000000))
+      Parent="/Script/UMG.CanvasPanel'Root'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'TabAccessibility'"
+   End Object
+   Slots(0)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_1'"
+   Slots(1)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_2'"
+   Slots(2)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_3'"
+   Slots(3)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_4'"
+   Slots(4)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_8'"
+   Slots(5)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_9'"
+   Slots(6)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_10'"
+   Slots(7)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_6'"
+   Slots(8)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_7'"
+   Slots(9)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_0'"
+   Slots(10)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_11'"
+   Slots(11)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_12'"
+   Slots(12)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_14'"
+   Slots(13)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_15'"
+   Slots(14)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_16'"
+   Slots(15)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_17'"
+   Slots(16)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_18'"
+   Slots(17)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_19'"
+   Slots(18)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_20'"
+   Slots(19)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_21'"
+   Slots(20)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_22'"
+   Slots(21)="/Script/UMG.CanvasPanelSlot'CanvasPanelSlot_23'"
+End Object
+Begin Object Class=/Script/CommonUI.CommonBorder Name="Paper" ExportPath="/Script/CommonUI.CommonBorder'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Paper'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/BorderSettings_Mars_STYLE.BorderSettings_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   Background=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ParchmentSurface_Mars_T.ParchmentSurface_Mars_T'")
+   BrushColor=(R=1.000000,G=0.960000,B=0.860000,A=1.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="Header" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.Header'"
+   Brush=(DrawAs=Box,ImageSize=(X=1460.000000,Y=125.000000),Margin=(Left=0.025000,Top=0.140000,Right=0.025000,Bottom=0.140000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/HeaderInk_Mars_T.HeaderInk_Mars_T'",UVRegion=(Min=(X=0.033149,Y=0.265193),Max=(X=0.968692,Y=0.729282),bIsValid=True))
+   ColorAndOpacity=(R=0.120000,G=0.120000,B=0.100000,A=1.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="TitleText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.TitleText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextDisplay_Mars_STYLE.TextDisplay_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   Text=INVTEXT("SETTINGS")
+   ColorAndOpacity=(SpecifiedColor=(R=0.887923,G=0.752942,B=0.508881,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/PirataOne/PirataOne_Font.PirataOne_Font'",TypefaceFontName="Regular",Size=48.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="SectionText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.SectionText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextHeading_Mars_STYLE.TextHeading_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   Text=NSLOCTEXT("", "986F1A9E4F0E4E9FE420B2AED6077AED", "VIDEO")
+   ColorAndOpacity=(SpecifiedColor=(R=0.090000,G=0.070000,B=0.040000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/IMFellEnglish/IMFellEnglish_Font.IMFellEnglish_Font'",TypefaceFontName="Regular",Size=32.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="TabAudio" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.TabAudio'"
+   ButtonText=INVTEXT("Audio")
+   bAlignLabelLeft=True
+   bSelectable=True
+   bTriggerClickedAfterSelection=True
+   NormalStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   SelectedStyle=(Normal=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   DisabledStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   LockedStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="TabVideo" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.TabVideo'"
+   ButtonText=INVTEXT("Video")
+   bAlignLabelLeft=True
+   bSelectable=True
+   bTriggerClickedAfterSelection=True
+   NormalStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   SelectedStyle=(Normal=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   DisabledStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   LockedStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="TabControls" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.TabControls'"
+   ButtonText=INVTEXT("Controls")
+   bAlignLabelLeft=True
+   bSelectable=True
+   bTriggerClickedAfterSelection=True
+   NormalStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   SelectedStyle=(Normal=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   DisabledStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   LockedStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="_CancelButton" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree._CancelButton'"
+   ButtonText=NSLOCTEXT("", "014AADD24FFED992CE25519D20844327", "Cancel")
+   NormalStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   SelectedStyle=(Normal=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   DisabledStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   LockedStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T'",UVRegion=(Min=(X=0.016575,Y=0.167127),Max=(X=0.983886,Y=0.827348),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonMoss_Mars_WBP.ButtonMoss_Mars_WBP_C Name="_ApplyButton" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonMoss_Mars_WBP.ButtonMoss_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree._ApplyButton'"
+   ButtonText=NSLOCTEXT("", "91547B4D4287752D65B2278E65120814", "Apply")
+   NormalStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   SelectedStyle=(Normal=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   DisabledStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+   LockedStyle=(Normal=(TintColor=(SpecifiedColor=(R=0.920000,G=0.920000,B=0.920000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Hovered=(DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Pressed=(TintColor=(SpecifiedColor=(R=0.720000,G=0.720000,B=0.720000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),Disabled=(TintColor=(SpecifiedColor=(R=0.600000,G=0.600000,B=0.600000,A=1.000000)),DrawAs=Box,ImageSize=(X=320.000000,Y=64.000000),Margin=(Left=0.035000,Top=0.100000,Right=0.035000,Bottom=0.100000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T'",UVRegion=(Min=(X=0.007827,Y=0.120166),Max=(X=0.992634,Y=0.878453),bIsValid=True)),NormalPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000),PressedPadding=(Left=24.000000,Top=8.000000,Right=24.000000,Bottom=8.000000))
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="HelpTitle" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.HelpTitle'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextHeading_Mars_STYLE.TextHeading_Mars_STYLE_C'"
+   Text=INVTEXT("Display")
+   ColorAndOpacity=(SpecifiedColor=(R=0.090000,G=0.070000,B=0.040000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/IMFellEnglish/IMFellEnglish_Font.IMFellEnglish_Font'",TypefaceFontName="Regular",Size=32.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+   AutoWrapText=True
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="HelpDescription" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.HelpDescription'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C'"
+   Text=INVTEXT("Choose a setting to see what it changes.")
+   ColorAndOpacity=(SpecifiedColor=(R=0.017640,G=0.014440,B=0.010960,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="Regular")
+   ShadowOffset=(X=0.000000,Y=0.000000)
+   AutoWrapText=True
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="PendingText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.PendingText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C'"
+   Text=INVTEXT("Unsaved changes")
+   ColorAndOpacity=(SpecifiedColor=(R=0.017640,G=0.014440,B=0.010960,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="Regular")
+   ShadowOffset=(X=0.000000,Y=0.000000)
+   AutoWrapText=True
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="BrandWordmark" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BrandWordmark'"
+   Brush=(ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/Wordmark_Mars_T.Wordmark_Mars_T'")
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="RailRule" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.RailRule'"
+   ColorAndOpacity=(R=0.220000,G=0.160000,B=0.080000,A=0.400000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="HelpRule" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.HelpRule'"
+   ColorAndOpacity=(R=0.220000,G=0.160000,B=0.080000,A=0.400000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="FooterRule" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.FooterRule'"
+   ColorAndOpacity=(R=0.220000,G=0.160000,B=0.080000,A=0.400000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="SectionRule" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.SectionRule'"
+   ColorAndOpacity=(R=0.220000,G=0.160000,B=0.080000,A=0.400000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="ShellTrim" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ShellTrim'"
+   Brush=(DrawAs=Box,ImageSize=(X=1460.000000,Y=780.000000),Margin=(Left=0.025000,Top=0.025000,Right=0.025000,Bottom=0.025000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/PanelTrim_Mars_T.PanelTrim_Mars_T'",UVRegion=(Min=(X=0.012759,Y=0.012759),Max=(X=0.988836,Y=0.988836),bIsValid=True))
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.ScrollBox Name="RowsScroll" ExportPath="/Script/UMG.ScrollBox'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.RowsScroll'"
+   Begin Object Class=/Script/UMG.ScrollBoxSlot Name="ScrollBoxSlot_0" ExportPath="/Script/UMG.ScrollBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.RowsScroll.ScrollBoxSlot_0'"
+   End Object
+   Begin Object Name="ScrollBoxSlot_0" ExportPath="/Script/UMG.ScrollBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.RowsScroll.ScrollBoxSlot_0'"
+      Parent="/Script/UMG.ScrollBox'RowsScroll'"
+      Content="/Script/UMG.VerticalBox'_RowContainer'"
+   End Object
+   WidgetBarStyle=(HorizontalBackgroundImage=(TintColor=(SpecifiedColor=(R=0.160000,G=0.120000,B=0.055000,A=0.300000)),DrawAs=RoundedBox,ImageSize=(X=12.000000,Y=24.000000),OutlineSettings=(CornerRadii=(X=4.000000,Y=4.000000,Z=4.000000,W=4.000000),RoundingType=FixedRadius)),VerticalBackgroundImage=(TintColor=(SpecifiedColor=(R=0.160000,G=0.120000,B=0.055000,A=0.300000)),DrawAs=RoundedBox,ImageSize=(X=12.000000,Y=24.000000),OutlineSettings=(CornerRadii=(X=4.000000,Y=4.000000,Z=4.000000,W=4.000000),RoundingType=FixedRadius)),VerticalTopSlotImage=(DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),ResourceName=""),HorizontalTopSlotImage=(DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),ResourceName=""),VerticalBottomSlotImage=(DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),ResourceName=""),HorizontalBottomSlotImage=(DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),ResourceName=""),NormalThumbImage=(TintColor=(SpecifiedColor=(R=0.120000,G=0.170000,B=0.060000,A=1.000000)),DrawAs=RoundedBox,ImageType=NoImage,ImageSize=(X=12.000000,Y=24.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),OutlineSettings=(CornerRadii=(X=4.000000,Y=4.000000,Z=4.000000,W=4.000000),Color=(SpecifiedColor=(R=0.055000,G=0.045000,B=0.025000,A=1.000000)),Width=1.000000,RoundingType=FixedRadius),ResourceName=""),HoveredThumbImage=(TintColor=(SpecifiedColor=(R=0.270000,G=0.360000,B=0.120000,A=1.000000)),DrawAs=RoundedBox,ImageType=NoImage,ImageSize=(X=12.000000,Y=24.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),OutlineSettings=(CornerRadii=(X=4.000000,Y=4.000000,Z=4.000000,W=4.000000),Color=(SpecifiedColor=(R=0.055000,G=0.045000,B=0.025000,A=1.000000)),Width=1.000000,RoundingType=FixedRadius),ResourceName=""),DraggedThumbImage=(TintColor=(SpecifiedColor=(R=0.055000,G=0.090000,B=0.025000,A=1.000000)),DrawAs=RoundedBox,ImageType=NoImage,ImageSize=(X=12.000000,Y=24.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),OutlineSettings=(CornerRadii=(X=4.000000,Y=4.000000,Z=4.000000,W=4.000000),Color=(SpecifiedColor=(R=0.055000,G=0.045000,B=0.025000,A=1.000000)),Width=1.000000,RoundingType=FixedRadius),ResourceName=""),Thickness=12.000000)
+   ScrollbarThickness=(X=12.000000,Y=12.000000)
+   Slots(0)="/Script/UMG.ScrollBoxSlot'ScrollBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.VerticalBox Name="_RowContainer" ExportPath="/Script/UMG.VerticalBox'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree._RowContainer'"
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="TabAccessibility" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.TabAccessibility'"
+   ButtonText=INVTEXT("Accessibility")
+   bAlignLabelLeft=True
+   bIsEnabled=False
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="RestoreDefaults" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.RestoreDefaults'"
+   ButtonText=INVTEXT("Restore audio defaults")
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="BindingsRow" ExportPath="/Script/UMG.HorizontalBox'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_6" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_6'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_5'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_4'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_3'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_6" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_6'"
+      Size=(SizeRule=Fill)
+      Padding=(Left=20.000000,Top=12.000000,Bottom=12.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'BindingsRow'"
+      Content="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'ViewBindings'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_5" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_5'"
+      Parent="/Script/UMG.HorizontalBox'BindingsRow'"
+      Content="/Script/UMG.SizeBox'LabelColumn'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_4" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_4'"
+      Size=(SizeRule=Fill)
+      Padding=(Left=20.000000,Top=12.000000,Bottom=12.000000)
+      VerticalAlignment=VAlign_Center
+   End Object
+   Begin Object Name="HorizontalBoxSlot_3" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsRow.HorizontalBoxSlot_3'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_5'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_6'"
+   Visibility=Collapsed
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="LabelColumn" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.LabelColumn'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.LabelColumn.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.LabelColumn.SizeBoxSlot_0'"
+      Padding=(Right=20.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.SizeBox'LabelColumn'"
+      Content="/Script/CommonUI.CommonTextBlock'BindingsLabel'"
+   End Object
+   WidthOverride=335.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="BindingsLabel" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.BindingsLabel'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE_C'"
+   Text=INVTEXT("Input bindings")
+   ColorAndOpacity=(SpecifiedColor=(R=0.008000,G=0.006000,B=0.004000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",Size=28.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+End Object
+Begin Object Class=/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C Name="ViewBindings" ExportPath="/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C'/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP:WidgetTree.ViewBindings'"
+   ButtonText=INVTEXT("VIEW BINDINGS")
+   bIsEnabled=False
+End Object

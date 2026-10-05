@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "349c7774fe7a8c3ba7126248783233bc",
+		"sourceHash": "285bbcd903337293d9d84ccccc3ead3d",
 		"exporterVersion": 3
 	},
 	"blueprintType": "WidgetBlueprint",
@@ -64,6 +64,42 @@
 			"type": "float",
 			"category": "Mars|Style",
 			"value": 40
+		},
+		{
+			"name": "ThumbIdle",
+			"type": "FLinearColor",
+			"category": "Mars|Style",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 1
+			}
+		},
+		{
+			"name": "ThumbHovered",
+			"type": "FLinearColor",
+			"category": "Mars|Style",
+			"value":
+			{
+				"R": 0.55000001192092896,
+				"G": 0.72000002861022949,
+				"B": 0.30000001192092896,
+				"A": 1
+			}
+		},
+		{
+			"name": "ThumbPressed",
+			"type": "FLinearColor",
+			"category": "Mars|Style",
+			"value":
+			{
+				"R": 0.20000000298023224,
+				"G": 0.34000000357627869,
+				"B": 0.10000000149011612,
+				"A": 1
+			}
 		},
 		{
 			"name": "_ValueSlider",
@@ -646,8 +682,8 @@
 					},
 					"children": [
 						{
-							"name": "_DisplayNameText",
-							"class": "CommonTextBlock",
+							"name": "LabelColumn",
+							"class": "SizeBox",
 							"isVariable": false,
 							"visibility": "SelfHitTestInvisible",
 							"slot":
@@ -661,7 +697,7 @@
 										"value":
 										{
 											"Value": 1,
-											"SizeRule": "Fill"
+											"SizeRule": "Automatic"
 										},
 										"tooltip": "How much space this slot should occupy in the direction of the panel."
 									},
@@ -673,7 +709,7 @@
 										{
 											"Left": 0,
 											"Top": 0,
-											"Right": 20,
+											"Right": 0,
 											"Bottom": 0
 										},
 										"tooltip": "The amount of padding between the slots parent and the content."
@@ -688,313 +724,458 @@
 										"name": "VerticalAlignment",
 										"type": "TEnumAsByte<EVerticalAlignment>",
 										"category": "Layout|Horizontal Box Slot",
-										"value": "VAlign_Center"
+										"value": "VAlign_Fill"
 									}
 								]
 							},
 							"properties": [
 								{
-									"name": "MobileFontSizeMultiplier",
+									"name": "WidthOverride",
 									"type": "float",
-									"category": "Mobile",
-									"value": 1,
-									"tooltip": "Mobile font size multiplier. Activated by default on mobile. See CVar Mobile_PreviewFontSize"
+									"category": "Child Layout",
+									"value": 335,
+									"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
 								},
 								{
-									"name": "bIsScrollingEnabled",
-									"type": "bool",
-									"category": "CommonText",
-									"value": true,
-									"tooltip": "If scrolling is enabled/disabled initially, this can be updated in blueprint"
-								},
-								{
-									"name": "bAutoCollapseWithEmptyText",
-									"type": "bool",
-									"category": "CommonText",
-									"value": false,
-									"tooltip": "True to automatically collapse this text block when set to display an empty string. Conversely, will be SelfHitTestInvisible when showing a non-empty string."
-								},
-								{
-									"name": "Style",
-									"type": "TSubclassOf<UCommonTextStyle>",
-									"category": "CommonText",
-									"value": "/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE_C",
-									"tooltip": "References the text style to use"
-								},
-								{
-									"name": "ScrollStyle",
-									"type": "TSubclassOf<UCommonTextScrollStyle>",
-									"category": "CommonText",
-									"value": "None",
-									"tooltip": "References the scroll style asset to use, no reference disables scrolling"
-								},
-								{
-									"name": "ScrollOrientation",
-									"type": "TEnumAsByte<EOrientation>",
-									"category": "CommonText",
-									"value": "Orient_Horizontal",
-									"tooltip": "The orientation the text will scroll if out of bounds."
-								},
-								{
-									"name": "Text",
-									"type": "FText",
-									"category": "Content",
-									"value": "",
-									"tooltip": "The text to display"
-								},
-								{
-									"name": "ColorAndOpacity",
-									"type": "FSlateColor",
-									"category": "Appearance",
-									"value":
-									{
-										"SpecifiedColor":
-										{
-											"R": 0.0080000003799796104,
-											"G": 0.0060000000521540642,
-											"B": 0.0040000001899898052,
-											"A": 1
-										},
-										"ColorUseRule": "UseColor_Specified"
-									},
-									"tooltip": "The color of the text"
+									"name": "HeightOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
 								},
 								{
 									"name": "MinDesiredWidth",
 									"type": "float",
-									"category": "Appearance",
+									"category": "Child Layout",
 									"value": 0,
-									"tooltip": "The minimum desired size for the text"
+									"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
 								},
 								{
-									"name": "Font",
-									"type": "FSlateFontInfo",
-									"category": "Appearance",
-									"value":
+									"name": "MinDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+								},
+								{
+									"name": "MaxDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+								},
+								{
+									"name": "MaxDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+								},
+								{
+									"name": "MinAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "MaxAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "bOverride_WidthOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_HeightOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								}
+							],
+							"children": [
+								{
+									"name": "_DisplayNameText",
+									"class": "CommonTextBlock",
+									"isVariable": false,
+									"visibility": "SelfHitTestInvisible",
+									"slot":
 									{
-										"FontObject": "/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font",
-										"FontMaterial": "None",
-										"OutlineSettings":
+										"type": "SizeBoxSlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|SizeBox Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 20,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "VAlign_Center",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
 										{
-											"OutlineSize": 0,
-											"bMiteredCorners": false,
-											"bSeparateFillAlpha": false,
-											"bApplyOutlineToDropShadows": false,
-											"OutlineMaterial": "None",
-											"OutlineColor":
+											"name": "MobileFontSizeMultiplier",
+											"type": "float",
+											"category": "Mobile",
+											"value": 1,
+											"tooltip": "Mobile font size multiplier. Activated by default on mobile. See CVar Mobile_PreviewFontSize"
+										},
+										{
+											"name": "bIsScrollingEnabled",
+											"type": "bool",
+											"category": "CommonText",
+											"value": true,
+											"tooltip": "If scrolling is enabled/disabled initially, this can be updated in blueprint"
+										},
+										{
+											"name": "bAutoCollapseWithEmptyText",
+											"type": "bool",
+											"category": "CommonText",
+											"value": false,
+											"tooltip": "True to automatically collapse this text block when set to display an empty string. Conversely, will be SelfHitTestInvisible when showing a non-empty string."
+										},
+										{
+											"name": "Style",
+											"type": "TSubclassOf<UCommonTextStyle>",
+											"category": "CommonText",
+											"value": "/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE_C",
+											"tooltip": "References the text style to use"
+										},
+										{
+											"name": "ScrollStyle",
+											"type": "TSubclassOf<UCommonTextScrollStyle>",
+											"category": "CommonText",
+											"value": "None",
+											"tooltip": "References the scroll style asset to use, no reference disables scrolling"
+										},
+										{
+											"name": "ScrollOrientation",
+											"type": "TEnumAsByte<EOrientation>",
+											"category": "CommonText",
+											"value": "Orient_Horizontal",
+											"tooltip": "The orientation the text will scroll if out of bounds."
+										},
+										{
+											"name": "Text",
+											"type": "FText",
+											"category": "Content",
+											"value": "",
+											"tooltip": "The text to display"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FSlateColor",
+											"category": "Appearance",
+											"value":
+											{
+												"SpecifiedColor":
+												{
+													"R": 0.0080000003799796104,
+													"G": 0.0060000000521540642,
+													"B": 0.0040000001899898052,
+													"A": 1
+												},
+												"ColorUseRule": "UseColor_Specified"
+											},
+											"tooltip": "The color of the text"
+										},
+										{
+											"name": "MinDesiredWidth",
+											"type": "float",
+											"category": "Appearance",
+											"value": 0,
+											"tooltip": "The minimum desired size for the text"
+										},
+										{
+											"name": "Font",
+											"type": "FSlateFontInfo",
+											"category": "Appearance",
+											"value":
+											{
+												"FontObject": "/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font",
+												"FontMaterial": "None",
+												"OutlineSettings":
+												{
+													"OutlineSize": 0,
+													"bMiteredCorners": false,
+													"bSeparateFillAlpha": false,
+													"bApplyOutlineToDropShadows": false,
+													"OutlineMaterial": "None",
+													"OutlineColor":
+													{
+														"R": 0,
+														"G": 0,
+														"B": 0,
+														"A": 1
+													}
+												},
+												"TypefaceFontName": "Bold",
+												"Size": 28,
+												"LetterSpacing": 0,
+												"SkewAmount": 0,
+												"bForceMonospaced": false,
+												"bMaterialIsStencil": false,
+												"MonospacedWidth": 1
+											},
+											"tooltip": "The font to render the text with"
+										},
+										{
+											"name": "StrikeBrush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 32,
+													"Y": 32
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "None",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"Max":
+													{
+														"X": 0,
+														"Y": 0
+													},
+													"bIsValid": false
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "The brush to strike through text with"
+										},
+										{
+											"name": "ShadowOffset",
+											"type": "FVector2D",
+											"category": "Appearance",
+											"value":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"tooltip": "The direction the shadow is cast"
+										},
+										{
+											"name": "ShadowColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
 											{
 												"R": 0,
 												"G": 0,
 												"B": 0,
-												"A": 1
-											}
-										},
-										"TypefaceFontName": "Bold",
-										"Size": 28,
-										"LetterSpacing": 0,
-										"SkewAmount": 0,
-										"bForceMonospaced": false,
-										"bMaterialIsStencil": false,
-										"MonospacedWidth": 1
-									},
-									"tooltip": "The font to render the text with"
-								},
-								{
-									"name": "StrikeBrush",
-									"type": "FSlateBrush",
-									"category": "Appearance",
-									"value":
-									{
-										"TintColor":
-										{
-											"SpecifiedColor":
-											{
-												"R": 1,
-												"G": 1,
-												"B": 1,
-												"A": 1
+												"A": 0
 											},
-											"ColorUseRule": "UseColor_Specified"
+											"tooltip": "The color of the shadow"
 										},
-										"DrawAs": "Image",
-										"Tiling": "NoTile",
-										"Mirroring": "NoMirror",
-										"ImageType": "NoImage",
-										"ImageSize":
 										{
-											"X": 32,
-											"Y": 32
+											"name": "bWrapWithInvalidationPanel",
+											"type": "bool",
+											"category": "Performance",
+											"value": false,
+											"tooltip": "If true, it will automatically wrap this text widget with an invalidation panel"
 										},
-										"Margin":
 										{
-											"Left": 0,
-											"Top": 0,
-											"Right": 0,
-											"Bottom": 0
+											"name": "TextTransformPolicy",
+											"type": "ETextTransformPolicy",
+											"category": "Appearance",
+											"value": "None",
+											"tooltip": "The text transformation policy to apply to this text block."
 										},
-										"ResourceObject": "None",
-										"OutlineSettings":
 										{
-											"CornerRadii":
-											{
-												"X": 0,
-												"Y": 0,
-												"Z": 0,
-												"W": 0
-											},
-											"Color":
-											{
-												"SpecifiedColor":
-												{
-													"R": 0,
-													"G": 0,
-													"B": 0,
-													"A": 0
-												},
-												"ColorUseRule": "UseColor_Specified"
-											},
-											"Width": 0,
-											"RoundingType": "HalfHeightRadius",
-											"bUseBrushTransparency": false
+											"name": "TextOverflowPolicy",
+											"type": "ETextOverflowPolicy",
+											"category": "Clipping",
+											"value": "Clip",
+											"tooltip": "Sets what happens to text that is clipped and doesn't fit within the clip rect for this widget"
 										},
-										"UVRegion":
 										{
-											"Min":
-											{
-												"X": 0,
-												"Y": 0
-											},
-											"Max":
-											{
-												"X": 0,
-												"Y": 0
-											},
-											"bIsValid": false
+											"name": "bSimpleTextMode",
+											"type": "bool",
+											"category": "Performance",
+											"value": false,
+											"tooltip": "If this is enabled, text shaping, wrapping, justification are disabled in favor of much faster text layout and measurement.\nThis feature is only suitable for \"simple\" text (ie, text containing only numbers or basic ASCII) as it disables the complex text rendering support required for certain languages (such as Arabic and Thai).\nIt is significantly faster for text that can take advantage of it (particularly if that text changes frequently), but shouldn't be used for localized user-facing text."
 										},
-										"bIsDynamicallyLoaded": false,
-										"ResourceName": "None"
-									},
-									"tooltip": "The brush to strike through text with"
-								},
-								{
-									"name": "ShadowOffset",
-									"type": "FVector2D",
-									"category": "Appearance",
-									"value":
-									{
-										"X": 0,
-										"Y": 0
-									},
-									"tooltip": "The direction the shadow is cast"
-								},
-								{
-									"name": "ShadowColorAndOpacity",
-									"type": "FLinearColor",
-									"category": "Appearance",
-									"value":
-									{
-										"R": 0,
-										"G": 0,
-										"B": 0,
-										"A": 0
-									},
-									"tooltip": "The color of the shadow"
-								},
-								{
-									"name": "bWrapWithInvalidationPanel",
-									"type": "bool",
-									"category": "Performance",
-									"value": false,
-									"tooltip": "If true, it will automatically wrap this text widget with an invalidation panel"
-								},
-								{
-									"name": "TextTransformPolicy",
-									"type": "ETextTransformPolicy",
-									"category": "Appearance",
-									"value": "None",
-									"tooltip": "The text transformation policy to apply to this text block."
-								},
-								{
-									"name": "TextOverflowPolicy",
-									"type": "ETextOverflowPolicy",
-									"category": "Clipping",
-									"value": "Clip",
-									"tooltip": "Sets what happens to text that is clipped and doesn't fit within the clip rect for this widget"
-								},
-								{
-									"name": "bSimpleTextMode",
-									"type": "bool",
-									"category": "Performance",
-									"value": false,
-									"tooltip": "If this is enabled, text shaping, wrapping, justification are disabled in favor of much faster text layout and measurement.\nThis feature is only suitable for \"simple\" text (ie, text containing only numbers or basic ASCII) as it disables the complex text rendering support required for certain languages (such as Arabic and Thai).\nIt is significantly faster for text that can take advantage of it (particularly if that text changes frequently), but shouldn't be used for localized user-facing text."
-								},
-								{
-									"name": "ShapedTextOptions",
-									"type": "FShapedTextOptions",
-									"category": "Localization",
-									"value":
-									{
-										"bOverride_TextShapingMethod": false,
-										"bOverride_TextFlowDirection": false,
-										"TextShapingMethod": "Auto",
-										"TextFlowDirection": "Auto"
-									},
-									"tooltip": "Controls how the text within this widget should be shaped."
-								},
-								{
-									"name": "Justification",
-									"type": "TEnumAsByte<ETextJustify::Type>",
-									"category": "Appearance",
-									"value": "Left",
-									"tooltip": "How the text should be aligned with the margin."
-								},
-								{
-									"name": "WrappingPolicy",
-									"type": "ETextWrappingPolicy",
-									"category": "Wrapping",
-									"value": "DefaultWrapping",
-									"tooltip": "The wrapping policy to use."
-								},
-								{
-									"name": "AutoWrapText",
-									"type": "uint8",
-									"category": "Wrapping",
-									"value": false,
-									"tooltip": "True if we're wrapping text automatically based on the computed horizontal space for this widget."
-								},
-								{
-									"name": "ApplyLineHeightToBottomLine",
-									"type": "bool",
-									"category": "Appearance",
-									"value": true,
-									"tooltip": "Whether to leave extra space below the last line due to line height."
-								},
-								{
-									"name": "WrapTextAt",
-									"type": "float",
-									"category": "Wrapping",
-									"value": 0,
-									"tooltip": "Whether text wraps onto a new line when it's length exceeds this width; if this value is zero or negative, no wrapping occurs."
-								},
-								{
-									"name": "Margin",
-									"type": "FMargin",
-									"category": "Appearance",
-									"value":
-									{
-										"Left": 0,
-										"Top": 0,
-										"Right": 0,
-										"Bottom": 0
-									},
-									"tooltip": "The amount of blank space left around the edges of text area."
-								},
-								{
-									"name": "LineHeightPercentage",
-									"type": "float",
-									"category": "Appearance",
-									"value": 1,
-									"tooltip": "The amount to scale each lines height by."
+										{
+											"name": "ShapedTextOptions",
+											"type": "FShapedTextOptions",
+											"category": "Localization",
+											"value":
+											{
+												"bOverride_TextShapingMethod": false,
+												"bOverride_TextFlowDirection": false,
+												"TextShapingMethod": "Auto",
+												"TextFlowDirection": "Auto"
+											},
+											"tooltip": "Controls how the text within this widget should be shaped."
+										},
+										{
+											"name": "Justification",
+											"type": "TEnumAsByte<ETextJustify::Type>",
+											"category": "Appearance",
+											"value": "Left",
+											"tooltip": "How the text should be aligned with the margin."
+										},
+										{
+											"name": "WrappingPolicy",
+											"type": "ETextWrappingPolicy",
+											"category": "Wrapping",
+											"value": "DefaultWrapping",
+											"tooltip": "The wrapping policy to use."
+										},
+										{
+											"name": "AutoWrapText",
+											"type": "uint8",
+											"category": "Wrapping",
+											"value": false,
+											"tooltip": "True if we're wrapping text automatically based on the computed horizontal space for this widget."
+										},
+										{
+											"name": "ApplyLineHeightToBottomLine",
+											"type": "bool",
+											"category": "Appearance",
+											"value": true,
+											"tooltip": "Whether to leave extra space below the last line due to line height."
+										},
+										{
+											"name": "WrapTextAt",
+											"type": "float",
+											"category": "Wrapping",
+											"value": 0,
+											"tooltip": "Whether text wraps onto a new line when it's length exceeds this width; if this value is zero or negative, no wrapping occurs."
+										},
+										{
+											"name": "Margin",
+											"type": "FMargin",
+											"category": "Appearance",
+											"value":
+											{
+												"Left": 0,
+												"Top": 0,
+												"Right": 0,
+												"Bottom": 0
+											},
+											"tooltip": "The amount of blank space left around the edges of text area."
+										},
+										{
+											"name": "LineHeightPercentage",
+											"type": "float",
+											"category": "Appearance",
+											"value": 1,
+											"tooltip": "The amount to scale each lines height by."
+										}
+									]
 								}
 							]
 						},
@@ -1050,7 +1231,7 @@
 									"name": "WidthOverride",
 									"type": "float",
 									"category": "Child Layout",
-									"value": 285,
+									"value": 255,
 									"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
 								},
 								{
@@ -1116,7 +1297,7 @@
 									"name": "bOverride_MinDesiredWidth",
 									"type": "uint8",
 									"category": "Child Layout",
-									"value": true
+									"value": false
 								},
 								{
 									"name": "bOverride_MinDesiredHeight",
@@ -2996,7 +3177,7 @@
 										{
 											"Left": 12,
 											"Top": 0,
-											"Right": 0,
+											"Right": 8,
 											"Bottom": 0
 										},
 										"tooltip": "The amount of padding between the slots parent and the content."
@@ -3086,7 +3267,7 @@
 									"name": "MinDesiredWidth",
 									"type": "float",
 									"category": "Appearance",
-									"value": 68,
+									"value": 90,
 									"tooltip": "The minimum desired size for the text"
 								},
 								{
