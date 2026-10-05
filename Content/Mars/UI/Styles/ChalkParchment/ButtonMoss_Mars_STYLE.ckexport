@@ -1,0 +1,854 @@
+{
+	"assetName": "ButtonMoss_Mars_STYLE",
+	"assetPath": "/Game/Mars/UI/Styles/ChalkParchment/ButtonMoss_Mars_STYLE.ButtonMoss_Mars_STYLE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "a578a5742554ca2b7225614240402928",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "CommonButtonStyle",
+	"parentClassPath": "/Script/CommonUI.CommonButtonStyle",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "bSingleMaterial",
+			"type": "bool",
+			"category": "Properties",
+			"value": false,
+			"tooltip": "Whether or not the style uses a drop shadow"
+		},
+		{
+			"name": "SingleMaterialBrush",
+			"type": "FSlateBrush",
+			"category": "Properties",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Image",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 32,
+					"Y": 32
+				},
+				"Margin":
+				{
+					"Left": 0,
+					"Top": 0,
+					"Right": 0,
+					"Bottom": 0
+				},
+				"ResourceObject": "None",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"Max":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"bIsValid": false
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The normal (un-selected) brush to apply to each size of this button"
+		},
+		{
+			"name": "NormalBase",
+			"type": "FSlateBrush",
+			"category": "Normal",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 0.92000001668930054,
+						"G": 0.92000001668930054,
+						"B": 0.92000001668930054,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The normal (un-selected) brush to apply to each size of this button"
+		},
+		{
+			"name": "NormalHovered",
+			"type": "FSlateBrush",
+			"category": "Normal",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The normal (un-selected) brush to apply to each size of this button when hovered"
+		},
+		{
+			"name": "NormalPressed",
+			"type": "FSlateBrush",
+			"category": "Normal",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 0.72000002861022949,
+						"G": 0.72000002861022949,
+						"B": 0.72000002861022949,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The normal (un-selected) brush to apply to each size of this button when pressed"
+		},
+		{
+			"name": "SelectedBase",
+			"type": "FSlateBrush",
+			"category": "Selected",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The selected brush to apply to each size of this button"
+		},
+		{
+			"name": "SelectedHovered",
+			"type": "FSlateBrush",
+			"category": "Selected",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The selected brush to apply to each size of this button when hovered"
+		},
+		{
+			"name": "SelectedPressed",
+			"type": "FSlateBrush",
+			"category": "Selected",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 0.72000002861022949,
+						"G": 0.72000002861022949,
+						"B": 0.72000002861022949,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The selected brush to apply to each size of this button when pressed"
+		},
+		{
+			"name": "Disabled",
+			"type": "FSlateBrush",
+			"category": "Disabled",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 0.60000002384185791,
+						"G": 0.60000002384185791,
+						"B": 0.60000002384185791,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 320,
+					"Y": 64
+				},
+				"Margin":
+				{
+					"Left": 0.035000000149011612,
+					"Top": 0.10000000149011612,
+					"Right": 0.035000000149011612,
+					"Bottom": 0.10000000149011612
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.0078268880024552345,
+						"Y": 0.12016574293375015
+					},
+					"Max":
+					{
+						"X": 0.99263352155685425,
+						"Y": 0.87845301628112793
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The disabled brush to apply to each size of this button"
+		},
+		{
+			"name": "ButtonPadding",
+			"type": "FMargin",
+			"category": "Properties",
+			"value":
+			{
+				"Left": 24,
+				"Top": 8,
+				"Right": 24,
+				"Bottom": 8
+			},
+			"tooltip": "The button content padding to apply for each size"
+		},
+		{
+			"name": "CustomPadding",
+			"type": "FMargin",
+			"category": "Properties",
+			"value":
+			{
+				"Left": 0,
+				"Top": 0,
+				"Right": 0,
+				"Bottom": 0
+			},
+			"tooltip": "The custom padding of the button to use for each size"
+		},
+		{
+			"name": "MinWidth",
+			"type": "int32",
+			"category": "Properties",
+			"value": 160,
+			"tooltip": "The minimum width of buttons using this style"
+		},
+		{
+			"name": "MinHeight",
+			"type": "int32",
+			"category": "Properties",
+			"value": 64,
+			"tooltip": "The minimum height of buttons using this style"
+		},
+		{
+			"name": "MaxWidth",
+			"type": "int32",
+			"category": "Properties",
+			"value": 0,
+			"tooltip": "The maximum width of buttons using this style"
+		},
+		{
+			"name": "MaxHeight",
+			"type": "int32",
+			"category": "Properties",
+			"value": 0,
+			"tooltip": "The maximum height of buttons using this style"
+		},
+		{
+			"name": "NormalTextStyle",
+			"type": "TSubclassOf<UCommonTextStyle>",
+			"category": "Properties",
+			"value": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C",
+			"tooltip": "The text style to use when un-selected"
+		},
+		{
+			"name": "NormalHoveredTextStyle",
+			"type": "TSubclassOf<UCommonTextStyle>",
+			"category": "Properties",
+			"value": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C",
+			"tooltip": "The text style to use when un-selected"
+		},
+		{
+			"name": "SelectedTextStyle",
+			"type": "TSubclassOf<UCommonTextStyle>",
+			"category": "Properties",
+			"value": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C",
+			"tooltip": "The text style to use when selected"
+		},
+		{
+			"name": "SelectedHoveredTextStyle",
+			"type": "TSubclassOf<UCommonTextStyle>",
+			"category": "Properties",
+			"value": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C",
+			"tooltip": "The text style to use when un-selected"
+		},
+		{
+			"name": "DisabledTextStyle",
+			"type": "TSubclassOf<UCommonTextStyle>",
+			"category": "Properties",
+			"value": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C",
+			"tooltip": "The text style to use when disabled"
+		},
+		{
+			"name": "PressedSlateSound",
+			"type": "FSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "The sound to play when the button is pressed"
+		},
+		{
+			"name": "ClickedSlateSound",
+			"type": "FSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "The sound to play when the button is clicked"
+		},
+		{
+			"name": "SelectedPressedSlateSound",
+			"type": "FCommonButtonStyleOptionalSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"bHasSound": false,
+				"Sound":
+				{
+					"ResourceObject": "None"
+				}
+			},
+			"tooltip": "The sound to play when the button is pressed while selected"
+		},
+		{
+			"name": "SelectedClickedSlateSound",
+			"type": "FCommonButtonStyleOptionalSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"bHasSound": false,
+				"Sound":
+				{
+					"ResourceObject": "None"
+				}
+			},
+			"tooltip": "The sound to play when the button is clicked while selected"
+		},
+		{
+			"name": "LockedPressedSlateSound",
+			"type": "FCommonButtonStyleOptionalSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"bHasSound": false,
+				"Sound":
+				{
+					"ResourceObject": "None"
+				}
+			},
+			"tooltip": "The sound to play when the button is pressed while locked"
+		},
+		{
+			"name": "LockedClickedSlateSound",
+			"type": "FCommonButtonStyleOptionalSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"bHasSound": false,
+				"Sound":
+				{
+					"ResourceObject": "None"
+				}
+			},
+			"tooltip": "The sound to play when the button is clicked while locked"
+		},
+		{
+			"name": "HoveredSlateSound",
+			"type": "FSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "The sound to play when the button is hovered"
+		},
+		{
+			"name": "SelectedHoveredSlateSound",
+			"type": "FCommonButtonStyleOptionalSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"bHasSound": false,
+				"Sound":
+				{
+					"ResourceObject": "None"
+				}
+			},
+			"tooltip": "The sound to play when the button is hovered while selected"
+		},
+		{
+			"name": "LockedHoveredSlateSound",
+			"type": "FCommonButtonStyleOptionalSlateSound",
+			"category": "Properties",
+			"value":
+			{
+				"bHasSound": false,
+				"Sound":
+				{
+					"ResourceObject": "None"
+				}
+			},
+			"tooltip": "The sound to play when the button is hovered while locked"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

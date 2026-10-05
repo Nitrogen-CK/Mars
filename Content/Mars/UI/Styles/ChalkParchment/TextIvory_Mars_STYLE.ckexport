@@ -1,0 +1,209 @@
+{
+	"assetName": "TextIvory_Mars_STYLE",
+	"assetPath": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "8f0ecf67c056dfd249448dc83843557e",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "CommonTextStyle",
+	"parentClassPath": "/Script/CommonUI.CommonTextStyle",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "Font",
+			"type": "FSlateFontInfo",
+			"category": "Font",
+			"value":
+			{
+				"FontObject": "/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font",
+				"FontMaterial": "None",
+				"OutlineSettings":
+				{
+					"OutlineSize": 0,
+					"bMiteredCorners": false,
+					"bSeparateFillAlpha": false,
+					"bApplyOutlineToDropShadows": false,
+					"OutlineMaterial": "None",
+					"OutlineColor":
+					{
+						"R": 0,
+						"G": 0,
+						"B": 0,
+						"A": 1
+					}
+				},
+				"TypefaceFontName": "Regular",
+				"Size": 24,
+				"LetterSpacing": 0,
+				"SkewAmount": 0,
+				"bForceMonospaced": false,
+				"bMaterialIsStencil": false,
+				"MonospacedWidth": 1
+			},
+			"tooltip": "The font to apply at each size"
+		},
+		{
+			"name": "Color",
+			"type": "FLinearColor",
+			"category": "Color",
+			"value":
+			{
+				"R": 0.88792300224304199,
+				"G": 0.75294202566146851,
+				"B": 0.50888097286224365,
+				"A": 1
+			},
+			"tooltip": "The color of the text"
+		},
+		{
+			"name": "bUsesDropShadow",
+			"type": "bool",
+			"category": "Shadow",
+			"value": false,
+			"tooltip": "Whether or not the style uses a drop shadow"
+		},
+		{
+			"name": "ShadowOffset",
+			"type": "FVector2D",
+			"category": "Shadow",
+			"value":
+			{
+				"X": 0,
+				"Y": 0
+			},
+			"tooltip": "The offset of the drop shadow at each size"
+		},
+		{
+			"name": "ShadowColor",
+			"type": "FLinearColor",
+			"category": "Shadow",
+			"value":
+			{
+				"R": 0,
+				"G": 0,
+				"B": 0,
+				"A": 0
+			},
+			"tooltip": "The drop shadow color"
+		},
+		{
+			"name": "Margin",
+			"type": "FMargin",
+			"category": "Properties",
+			"value":
+			{
+				"Left": 0,
+				"Top": 0,
+				"Right": 0,
+				"Bottom": 0
+			},
+			"tooltip": "The amount of blank space left around the edges of text area at each size"
+		},
+		{
+			"name": "StrikeBrush",
+			"type": "FSlateBrush",
+			"category": "Properties",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Image",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 32,
+					"Y": 32
+				},
+				"Margin":
+				{
+					"Left": 0,
+					"Top": 0,
+					"Right": 0,
+					"Bottom": 0
+				},
+				"ResourceObject": "None",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"Max":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"bIsValid": false
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The brush used to draw an strike through the text (if any)"
+		},
+		{
+			"name": "LineHeightPercentage",
+			"type": "float",
+			"category": "Properties",
+			"value": 1,
+			"tooltip": "The amount to scale each lines height by at each size"
+		},
+		{
+			"name": "ApplyLineHeightToBottomLine",
+			"type": "bool",
+			"category": "Properties",
+			"value": true,
+			"tooltip": "Whether to leave extra space below the last line due to line height"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

@@ -1,0 +1,2999 @@
+{
+	"assetName": "ButtonRibbon_Mars_WBP",
+	"assetPath": "/Game/Mars/UI/Widgets/ChalkParchment/ButtonRibbon_Mars_WBP.ButtonRibbon_Mars_WBP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "5cf8d4f0af5d47ebcf80c8ca4d9db293",
+		"exporterVersion": 3
+	},
+	"blueprintType": "WidgetBlueprint",
+	"parentClass": "Mars_Button_Widget",
+	"parentClassPath": "/Script/Angelscript.Mars_Button_Widget",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "FocusTR",
+			"type": "UImage*",
+			"category": "ButtonRibbon_Mars_WBP",
+			"value": "None"
+		},
+		{
+			"name": "FocusTL",
+			"type": "UImage*",
+			"category": "ButtonRibbon_Mars_WBP",
+			"value": "None"
+		},
+		{
+			"name": "FocusBR",
+			"type": "UImage*",
+			"category": "ButtonRibbon_Mars_WBP",
+			"value": "None"
+		},
+		{
+			"name": "FocusBL",
+			"type": "UImage*",
+			"category": "ButtonRibbon_Mars_WBP",
+			"value": "None"
+		},
+		{
+			"name": "Text",
+			"type": "UCommonTextBlock*",
+			"value": "None"
+		},
+		{
+			"name": "FocusCorners",
+			"type": "UWidget*",
+			"value": "None"
+		},
+		{
+			"name": "SpoonFocus",
+			"type": "UWidget*",
+			"value": "None"
+		},
+		{
+			"name": "SelectedMarker",
+			"type": "UWidget*",
+			"value": "None"
+		},
+		{
+			"name": "BusyMarker",
+			"type": "UWidget*",
+			"value": "None"
+		},
+		{
+			"name": "ButtonText",
+			"type": "FText",
+			"category": "Mars",
+			"value": "Continue"
+		},
+		{
+			"name": "bShowSpoonFocus",
+			"type": "bool",
+			"category": "Mars",
+			"value": false
+		},
+		{
+			"name": "bAlignLabelLeft",
+			"type": "bool",
+			"category": "Mars",
+			"value": false
+		},
+		{
+			"name": "ClickEvent",
+			"type": "FWidgetEventField",
+			"category": "Common Button",
+			"value":
+			{
+			}
+		},
+		{
+			"name": "MinWidth",
+			"type": "int32",
+			"category": "Layout",
+			"value": 0,
+			"tooltip": "The minimum width of the button (only used if greater than the style's minimum)"
+		},
+		{
+			"name": "MinHeight",
+			"type": "int32",
+			"category": "Layout",
+			"value": 0,
+			"tooltip": "The minimum height of the button (only used if greater than the style's minimum)"
+		},
+		{
+			"name": "MaxWidth",
+			"type": "int32",
+			"category": "Layout",
+			"value": 0,
+			"tooltip": "The maximum width of the button (only used if greater than the style's maximum)"
+		},
+		{
+			"name": "MaxHeight",
+			"type": "int32",
+			"category": "Layout",
+			"value": 0,
+			"tooltip": "The maximum height of the button (only used if greater than the style's maximum)"
+		},
+		{
+			"name": "Style",
+			"type": "TSubclassOf<UCommonButtonStyle>",
+			"category": "Style",
+			"value": "/Game/Mars/UI/Styles/ChalkParchment/ButtonRibbon_Mars_STYLE.ButtonRibbon_Mars_STYLE_C",
+			"tooltip": "References the button style asset that defines a style in multiple sizes"
+		},
+		{
+			"name": "bHideInputAction",
+			"type": "bool",
+			"category": "Style",
+			"value": false,
+			"tooltip": "Whether to hide the input action widget at all times (useful for textless small buttons)"
+		},
+		{
+			"name": "PressedSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is pressed.\nAlso used for the Selected and Locked Pressed state if their respective overrides are empty."
+		},
+		{
+			"name": "ClickedSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is clicked (based on Click/Touch/Press methods)."
+		},
+		{
+			"name": "HoveredSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is hovered.\nAlso used for the Selected and Locked Hovered state if their respective overrides are empty."
+		},
+		{
+			"name": "SelectedPressedSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is pressed while Selected"
+		},
+		{
+			"name": "SelectedClickedSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is clicked while Selected"
+		},
+		{
+			"name": "SelectedHoveredSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is hovered while Selected"
+		},
+		{
+			"name": "LockedPressedSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is pressed while Locked"
+		},
+		{
+			"name": "LockedClickedSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is clicked while Locked"
+		},
+		{
+			"name": "LockedHoveredSlateSoundOverride",
+			"type": "FSlateSound",
+			"category": "Sound",
+			"value":
+			{
+				"ResourceObject": "None"
+			},
+			"tooltip": "Optional override for the sound to play when this button is hovered while Locked"
+		},
+		{
+			"name": "bApplyAlphaOnDisable",
+			"type": "uint8",
+			"category": "Style",
+			"value": true,
+			"tooltip": "The type of mouse action required by the user to trigger the button's 'Click'"
+		},
+		{
+			"name": "bLocked",
+			"type": "uint8",
+			"category": "Locked",
+			"value": false,
+			"tooltip": "True if this button is currently locked.\nLocked button can be hovered, focused, and pressed, but the Click event will not go through.\nBusiness logic behind it will not be executed. Designed for progressive disclosure"
+		},
+		{
+			"name": "bSelectable",
+			"type": "uint8",
+			"category": "Selection",
+			"value": false,
+			"tooltip": "True if the button supports being in a \"selected\" state, which will update the style accordingly"
+		},
+		{
+			"name": "bShouldSelectUponReceivingFocus",
+			"type": "uint8",
+			"category": "Selection",
+			"value": false,
+			"tooltip": "If true, the button will be selected when it receives focus."
+		},
+		{
+			"name": "bInteractableWhenSelected",
+			"type": "uint8",
+			"category": "Selection",
+			"value": false,
+			"tooltip": "If true, the button may be clicked while selected. Otherwise, interaction is disabled in the selected state."
+		},
+		{
+			"name": "bToggleable",
+			"type": "uint8",
+			"category": "Selection",
+			"value": false,
+			"tooltip": "True if the button can be deselected by clicking it when selected"
+		},
+		{
+			"name": "bTriggerClickedAfterSelection",
+			"type": "uint8",
+			"category": "Selection",
+			"value": false
+		},
+		{
+			"name": "bDisplayInputActionWhenNotInteractable",
+			"type": "uint8",
+			"category": "Input",
+			"value": true,
+			"tooltip": "True if the input action should be displayed when the button is not interactable"
+		},
+		{
+			"name": "bHideInputActionWithKeyboard",
+			"type": "uint8",
+			"category": "Input",
+			"value": false,
+			"tooltip": "True if the input action should be hidden while the user is using a keyboard"
+		},
+		{
+			"name": "bShouldUseFallbackDefaultInputAction",
+			"type": "uint8",
+			"category": "Input",
+			"value": true,
+			"tooltip": "True if this button should use the default fallback input action (bool is useful for buttons that shouldn't because they are never directly hit via controller)"
+		},
+		{
+			"name": "bRequiresHold",
+			"type": "uint8",
+			"category": "Input|Hold",
+			"value": false,
+			"tooltip": "True if this button should have a press and hold behavior, triggering the click when the specified hold time is met"
+		},
+		{
+			"name": "HoldData",
+			"type": "TSubclassOf<UCommonUIHoldData>",
+			"category": "Input|Hold",
+			"value": "None",
+			"tooltip": "Press and Hold values used for Keyboard and Mouse, Gamepad and Touch, depending on the current input type"
+		},
+		{
+			"name": "bSimulateHoverOnTouchInput",
+			"type": "bool",
+			"category": "Input",
+			"value": true,
+			"tooltip": "True if this button should play the hover effect when pressed by a touch input"
+		},
+		{
+			"name": "ClickMethod",
+			"type": "TEnumAsByte<EButtonClickMethod::Type>",
+			"category": "Input",
+			"value": "DownAndUp",
+			"tooltip": "The type of mouse action required by the user to trigger the button's 'Click'"
+		},
+		{
+			"name": "TouchMethod",
+			"type": "TEnumAsByte<EButtonTouchMethod::Type>",
+			"category": "Input",
+			"value": "DownAndUp"
+		},
+		{
+			"name": "PressMethod",
+			"type": "TEnumAsByte<EButtonPressMethod::Type>",
+			"category": "Input",
+			"value": "DownAndUp"
+		},
+		{
+			"name": "InputPriority",
+			"type": "int32",
+			"category": "Input",
+			"value": 0,
+			"tooltip": "This is the priority for the TriggeringInputAction.  The first, HIGHEST PRIORITY widget will handle the input action, and no other widgets will be considered.\nAdditionally, no inputs with a priority below the current ActivatablePanel's Input Priority value will even be considered!\n\n@TODO: This is part of legacy CommonUI and should be removed"
+		},
+		{
+			"name": "TriggeringInputAction",
+			"type": "FDataTableRowHandle",
+			"category": "Input",
+			"value":
+			{
+				"DataTable": "None",
+				"RowName": "None"
+			},
+			"tooltip": "The input action that is bound to this button. The common input manager will trigger this button to\nclick if the action was pressed"
+		},
+		{
+			"name": "TriggeringEnhancedInputAction",
+			"type": "TObjectPtr<UInputAction>",
+			"category": "Input",
+			"value": "None",
+			"tooltip": "The enhanced input action that is bound to this button. The common input manager will trigger this button to\nclick if the action was pressed"
+		},
+		{
+			"name": "bNavigateToNextWidgetOnDisable",
+			"type": "uint8",
+			"category": "Input",
+			"value": false,
+			"tooltip": "If this button is currently in focus, and is disabled, hidden, or collapsed then focus will be routed to the next available widget"
+		},
+		{
+			"name": "bIsPersistentBinding",
+			"type": "bool",
+			"category": "Input",
+			"value": false,
+			"tooltip": "DANGER! Be very, very careful with this. Unless you absolutely know what you're doing, this is not the property you're looking for.\n\nTrue to register the action bound to this button as a \"persistent\" binding. False (default) will register a standard activation-based binding.\nA persistent binding ignores the standard ruleset for UI input routing - the binding will be live immediately upon construction of the button."
+		},
+		{
+			"name": "InputModeOverride",
+			"type": "ECommonInputMode",
+			"category": "Input",
+			"value": "Menu",
+			"tooltip": "Set this to Game for special cases where an input action needs to be set for an in-game button."
+		},
+		{
+			"name": "InputActionWidget",
+			"type": "TObjectPtr<UCommonActionWidget>",
+			"category": "Input",
+			"value": "None",
+			"tooltip": "Optionally bound widget for visualization behavior of an input action;\nNOTE: If specified, will visualize according to the following algorithm:\nIf TriggeringEnhancedInputAction is specified, visualize it else:\nIf TriggeringInputAction is specified, visualize it else:\nIf TriggeredInputAction is specified, visualize it else:\nVisualize the default click action while hovered"
+		},
+		{
+			"name": "bDisplayInActionBar",
+			"type": "bool",
+			"category": "Input",
+			"value": false,
+			"tooltip": "True to generally display this widget's actions in the action bar, assuming it has actions."
+		},
+		{
+			"name": "bConsumePointerInput",
+			"type": "bool",
+			"category": "Input",
+			"value": false,
+			"tooltip": "Set this to true if you don't want any pointer (mouse and touch) input to bubble past this widget"
+		},
+		{
+			"name": "ColorAndOpacity",
+			"type": "FLinearColor",
+			"category": "Appearance",
+			"value":
+			{
+				"R": 1,
+				"G": 1,
+				"B": 1,
+				"A": 1
+			},
+			"tooltip": "The color and opacity of this widget.  Tints all child widgets."
+		},
+		{
+			"name": "ForegroundColor",
+			"type": "FSlateColor",
+			"category": "Appearance",
+			"value":
+			{
+				"SpecifiedColor":
+				{
+					"R": 1,
+					"G": 0,
+					"B": 1,
+					"A": 1
+				},
+				"ColorUseRule": "UseColor_Foreground"
+			},
+			"tooltip": "The foreground color of the widget, this is inherited by sub widgets.  Any color property\nthat is marked as inherit will use this color."
+		},
+		{
+			"name": "Padding",
+			"type": "FMargin",
+			"category": "Appearance",
+			"value":
+			{
+				"Left": 0,
+				"Top": 0,
+				"Right": 0,
+				"Bottom": 0
+			},
+			"tooltip": "The padding area around the content."
+		},
+		{
+			"name": "Priority",
+			"type": "int32",
+			"category": "Input",
+			"value": 0
+		},
+		{
+			"name": "bIsFocusable",
+			"type": "uint8",
+			"category": "Interaction",
+			"value": true,
+			"tooltip": "Setting this flag to true, allows this widget to accept focus when clicked, or when navigated to."
+		},
+		{
+			"name": "bStopAction",
+			"type": "uint8",
+			"category": "Input",
+			"value": false
+		},
+		{
+			"name": "PreviewBackground",
+			"type": "TObjectPtr<UTexture2D>",
+			"category": "Designer",
+			"value": "None",
+			"tooltip": "A preview background that you can use when designing the UI to get a sense of scale on the screen.  Use\na texture with a screenshot of your game in it, for example if you were designing a HUD."
+		},
+		{
+			"name": "TickFrequency",
+			"type": "EWidgetTickFrequency",
+			"category": "Performance",
+			"value": "Auto",
+			"tooltip": "This widget is allowed to tick. If this is unchecked tick will never be called, animations will not play correctly, and latent actions will not execute.\nUncheck this for performance reasons only"
+		},
+		{
+			"name": "DesiredFocusWidget",
+			"type": "FWidgetChild",
+			"category": "Interaction",
+			"value":
+			{
+				"WidgetName": "None"
+			}
+		},
+		{
+			"name": "Slot",
+			"type": "TObjectPtr<UPanelSlot>",
+			"category": "Layout",
+			"value": "None",
+			"tooltip": "The parent slot of the UWidget.  Allows us to easily inline edit the layout controlling this widget."
+		},
+		{
+			"name": "ToolTipText",
+			"type": "FText",
+			"category": "Behavior",
+			"value": "",
+			"tooltip": "Tooltip text to show when the user hovers over the widget with the mouse"
+		},
+		{
+			"name": "ToolTipWidget",
+			"type": "TObjectPtr<UWidget>",
+			"category": "Behavior",
+			"value": "None",
+			"tooltip": "Tooltip widget to show when the user hovers over the widget with the mouse"
+		},
+		{
+			"name": "RenderTransform",
+			"type": "FWidgetTransform",
+			"category": "Render Transform",
+			"value":
+			{
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0
+				},
+				"Scale":
+				{
+					"X": 1,
+					"Y": 1
+				},
+				"Shear":
+				{
+					"X": 0,
+					"Y": 0
+				},
+				"Angle": 0
+			},
+			"tooltip": "The render transform of the widget allows for arbitrary 2D transforms to be applied to the widget."
+		},
+		{
+			"name": "RenderTransformPivot",
+			"type": "FVector2D",
+			"category": "Render Transform",
+			"value":
+			{
+				"X": 0.5,
+				"Y": 0.5
+			},
+			"tooltip": "The render transform pivot controls the location about which transforms are applied.\nThis value is a normalized coordinate about which things like rotations will occur."
+		},
+		{
+			"name": "FlowDirectionPreference",
+			"type": "EFlowDirectionPreference",
+			"category": "Localization",
+			"value": "Inherit",
+			"tooltip": "Allows you to set a new flow direction"
+		},
+		{
+			"name": "bIsEnabled",
+			"type": "uint8",
+			"category": "Behavior",
+			"value": true,
+			"tooltip": "Sets whether this widget can be modified interactively by the user"
+		},
+		{
+			"name": "bOverride_Cursor",
+			"type": "uint8",
+			"category": "Behavior",
+			"value": false
+		},
+		{
+			"name": "bOverrideAccessibleDefaults",
+			"type": "uint8",
+			"category": "Accessibility",
+			"value": false,
+			"tooltip": "Override all of the default accessibility behavior and text for this widget."
+		},
+		{
+			"name": "bCanChildrenBeAccessible",
+			"type": "uint8",
+			"category": "Accessibility",
+			"value": true,
+			"tooltip": "Whether or not children of this widget can appear as distinct accessible widgets."
+		},
+		{
+			"name": "AccessibleBehavior",
+			"type": "ESlateAccessibleBehavior",
+			"category": "Accessibility",
+			"value": "NotAccessible",
+			"tooltip": "Whether or not the widget is accessible, and how to describe it. If set to custom, additional customization options will appear."
+		},
+		{
+			"name": "AccessibleSummaryBehavior",
+			"type": "ESlateAccessibleBehavior",
+			"category": "Accessibility",
+			"value": "Auto",
+			"tooltip": "How to describe this widget when it's being presented through a summary of a parent widget. If set to custom, additional customization options will appear."
+		},
+		{
+			"name": "AccessibleText",
+			"type": "FText",
+			"category": "Accessibility",
+			"value": "",
+			"tooltip": "When AccessibleBehavior is set to Custom, this is the text that will be used to describe the widget."
+		},
+		{
+			"name": "AccessibleSummaryText",
+			"type": "FText",
+			"category": "Accessibility",
+			"value": "",
+			"tooltip": "When AccessibleSummaryBehavior is set to Custom, this is the text that will be used to describe the widget."
+		},
+		{
+			"name": "bIsVolatile",
+			"type": "uint8",
+			"category": "Performance",
+			"value": false,
+			"tooltip": "If true prevents the widget or its child's geometry or layout information from being cached.  If this widget\nchanges every frame, but you want it to still be in an invalidation panel you should make it as volatile\ninstead of invalidating it every frame, which would prevent the invalidation panel from actually\never caching anything."
+		},
+		{
+			"name": "Cursor",
+			"type": "TEnumAsByte<EMouseCursor::Type>",
+			"category": "Behavior",
+			"value": "Default",
+			"tooltip": "The cursor to show when the mouse is over the widget"
+		},
+		{
+			"name": "Clipping",
+			"type": "EWidgetClipping",
+			"category": "Rendering",
+			"value": "Inherit",
+			"tooltip": "Controls how the clipping behavior of this widget.  Normally content that overflows the\nbounds of the widget continues rendering.  Enabling clipping prevents that overflowing content\nfrom being seen.\n\nNOTE: Elements in different clipping spaces can not be batched together, and so there is a\nperformance cost to clipping.  Do not enable clipping unless a panel actually needs to prevent\ncontent from showing up outside its bounds."
+		},
+		{
+			"name": "Visibility",
+			"type": "ESlateVisibility",
+			"category": "Behavior",
+			"value": "SelfHitTestInvisible",
+			"tooltip": "The visibility of the widget"
+		},
+		{
+			"name": "PixelSnapping",
+			"type": "EWidgetPixelSnapping",
+			"category": "Rendering",
+			"value": "Inherit",
+			"tooltip": "If the widget will draw snapped to the nearest pixel.  Improves clarity but might cause visibile stepping in animation"
+		},
+		{
+			"name": "RenderOpacity",
+			"type": "float",
+			"category": "Rendering",
+			"value": 1,
+			"tooltip": "The opacity of the widget"
+		},
+		{
+			"name": "Navigation",
+			"type": "TObjectPtr<UWidgetNavigation>",
+			"category": "Navigation",
+			"value": "None",
+			"tooltip": "The navigation object for this widget is optionally created if the user has configured custom\nnavigation rules for this widget in the widget designer.  Those rules determine how navigation transitions\ncan occur between widgets."
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [
+				{
+					"entryPoint": "Event PreConstruct",
+					"entryNodeId": "Node_gPfOMU7v1zBf60WDjCjybw",
+					"steps": [
+						{
+							"nodeId": "Node_gPfOMU7v1zBf60WDjCjybw",
+							"title": "Event PreConstruct"
+						},
+						{
+							"nodeId": "Node_tV1QKUmOG6tGy1qq_9F1aA",
+							"title": "Parent: PreConstruct"
+						}
+					]
+				},
+				{
+					"entryPoint": "Event Construct",
+					"entryNodeId": "Node_XXNZi0zghTnSi7SIXxV_JQ",
+					"steps": [
+						{
+							"nodeId": "Node_XXNZi0zghTnSi7SIXxV_JQ",
+							"title": "Event Construct"
+						}
+					]
+				},
+				{
+					"entryPoint": "Event Tick",
+					"entryNodeId": "Node_KVL-RErKnBtKKYmtR_osrA",
+					"steps": [
+						{
+							"nodeId": "Node_KVL-RErKnBtKKYmtR_osrA",
+							"title": "Event Tick"
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"nodeId": "Node_gPfOMU7v1zBf60WDjCjybw",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event PreConstruct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output",
+							"connections": [
+								"Node_tV1QKUmOG6tGy1qq_9F1aA.execute"
+							]
+						},
+						{
+							"pinName": "IsDesignTime",
+							"pinType": "Boolean",
+							"direction": "Output",
+							"defaultValue": "false",
+							"connections": [
+								"Node_tV1QKUmOG6tGy1qq_9F1aA.IsDesignTime"
+							]
+						}
+					]
+				},
+				{
+					"nodeId": "Node_tV1QKUmOG6tGy1qq_9F1aA",
+					"nodeClass": "K2Node_CallParentFunction",
+					"nodeTitle": "Parent: PreConstruct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [
+						{
+							"pinName": "execute",
+							"pinType": "exec",
+							"direction": "Input",
+							"connections": [
+								"Node_gPfOMU7v1zBf60WDjCjybw.then"
+							]
+						},
+						{
+							"pinName": "IsDesignTime",
+							"pinType": "Boolean",
+							"direction": "Input",
+							"defaultValue": "false",
+							"connections": [
+								"Node_gPfOMU7v1zBf60WDjCjybw.IsDesignTime"
+							]
+						}
+					],
+					"outputPins": [
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_XXNZi0zghTnSi7SIXxV_JQ",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event Construct",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						}
+					]
+				},
+				{
+					"nodeId": "Node_KVL-RErKnBtKKYmtR_osrA",
+					"nodeClass": "K2Node_Event",
+					"nodeTitle": "Event Tick",
+					"nodeComment": "This node is disabled and will not be called.\nDrag off pins to build functionality.",
+					"inputPins": [],
+					"outputPins": [
+						{
+							"pinName": "OutputDelegate",
+							"pinType": "Delegate",
+							"direction": "Output"
+						},
+						{
+							"pinName": "then",
+							"pinType": "exec",
+							"direction": "Output"
+						},
+						{
+							"pinName": "MyGeometry",
+							"pinType": "Geometry",
+							"direction": "Output"
+						},
+						{
+							"pinName": "InDeltaTime",
+							"pinType": "float",
+							"direction": "Output",
+							"defaultValue": "0.0"
+						}
+					]
+				}
+			]
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": [],
+	"widgetHierarchy":
+	{
+		"root":
+		{
+			"name": "Root",
+			"class": "Overlay",
+			"isVariable": false,
+			"visibility": "SelfHitTestInvisible",
+			"children": [
+				{
+					"name": "Text",
+					"class": "CommonTextBlock",
+					"isVariable": false,
+					"visibility": "HitTestInvisible",
+					"slot":
+					{
+						"type": "OverlaySlot",
+						"properties": [
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Overlay Slot",
+								"value":
+								{
+									"Left": 0,
+									"Top": 0,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "HAlign_Center",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "VAlign_Center",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"properties": [
+						{
+							"name": "MobileFontSizeMultiplier",
+							"type": "float",
+							"category": "Mobile",
+							"value": 1,
+							"tooltip": "Mobile font size multiplier. Activated by default on mobile. See CVar Mobile_PreviewFontSize"
+						},
+						{
+							"name": "bIsScrollingEnabled",
+							"type": "bool",
+							"category": "CommonText",
+							"value": true,
+							"tooltip": "If scrolling is enabled/disabled initially, this can be updated in blueprint"
+						},
+						{
+							"name": "bAutoCollapseWithEmptyText",
+							"type": "bool",
+							"category": "CommonText",
+							"value": false,
+							"tooltip": "True to automatically collapse this text block when set to display an empty string. Conversely, will be SelfHitTestInvisible when showing a non-empty string."
+						},
+						{
+							"name": "Style",
+							"type": "TSubclassOf<UCommonTextStyle>",
+							"category": "CommonText",
+							"value": "/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C",
+							"tooltip": "References the text style to use"
+						},
+						{
+							"name": "ScrollStyle",
+							"type": "TSubclassOf<UCommonTextScrollStyle>",
+							"category": "CommonText",
+							"value": "None",
+							"tooltip": "References the scroll style asset to use, no reference disables scrolling"
+						},
+						{
+							"name": "ScrollOrientation",
+							"type": "TEnumAsByte<EOrientation>",
+							"category": "CommonText",
+							"value": "Orient_Horizontal",
+							"tooltip": "The orientation the text will scroll if out of bounds."
+						},
+						{
+							"name": "Text",
+							"type": "FText",
+							"category": "Content",
+							"value": "Continue",
+							"tooltip": "The text to display"
+						},
+						{
+							"name": "ColorAndOpacity",
+							"type": "FSlateColor",
+							"category": "Appearance",
+							"value":
+							{
+								"SpecifiedColor":
+								{
+									"R": 0.88792300224304199,
+									"G": 0.75294202566146851,
+									"B": 0.50888097286224365,
+									"A": 1
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"tooltip": "The color of the text"
+						},
+						{
+							"name": "MinDesiredWidth",
+							"type": "float",
+							"category": "Appearance",
+							"value": 0,
+							"tooltip": "The minimum desired size for the text"
+						},
+						{
+							"name": "Font",
+							"type": "FSlateFontInfo",
+							"category": "Appearance",
+							"value":
+							{
+								"FontObject": "/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font",
+								"FontMaterial": "None",
+								"OutlineSettings":
+								{
+									"OutlineSize": 0,
+									"bMiteredCorners": false,
+									"bSeparateFillAlpha": false,
+									"bApplyOutlineToDropShadows": false,
+									"OutlineMaterial": "None",
+									"OutlineColor":
+									{
+										"R": 0,
+										"G": 0,
+										"B": 0,
+										"A": 1
+									}
+								},
+								"TypefaceFontName": "Regular",
+								"Size": 24,
+								"LetterSpacing": 0,
+								"SkewAmount": 0,
+								"bForceMonospaced": false,
+								"bMaterialIsStencil": false,
+								"MonospacedWidth": 1
+							},
+							"tooltip": "The font to render the text with"
+						},
+						{
+							"name": "StrikeBrush",
+							"type": "FSlateBrush",
+							"category": "Appearance",
+							"value":
+							{
+								"TintColor":
+								{
+									"SpecifiedColor":
+									{
+										"R": 1,
+										"G": 1,
+										"B": 1,
+										"A": 1
+									},
+									"ColorUseRule": "UseColor_Specified"
+								},
+								"DrawAs": "Image",
+								"Tiling": "NoTile",
+								"Mirroring": "NoMirror",
+								"ImageType": "NoImage",
+								"ImageSize":
+								{
+									"X": 32,
+									"Y": 32
+								},
+								"Margin":
+								{
+									"Left": 0,
+									"Top": 0,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"ResourceObject": "None",
+								"OutlineSettings":
+								{
+									"CornerRadii":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0,
+										"W": 0
+									},
+									"Color":
+									{
+										"SpecifiedColor":
+										{
+											"R": 0,
+											"G": 0,
+											"B": 0,
+											"A": 0
+										},
+										"ColorUseRule": "UseColor_Specified"
+									},
+									"Width": 0,
+									"RoundingType": "HalfHeightRadius",
+									"bUseBrushTransparency": false
+								},
+								"UVRegion":
+								{
+									"Min":
+									{
+										"X": 0,
+										"Y": 0
+									},
+									"Max":
+									{
+										"X": 0,
+										"Y": 0
+									},
+									"bIsValid": false
+								},
+								"bIsDynamicallyLoaded": false,
+								"ResourceName": "None"
+							},
+							"tooltip": "The brush to strike through text with"
+						},
+						{
+							"name": "ShadowOffset",
+							"type": "FVector2D",
+							"category": "Appearance",
+							"value":
+							{
+								"X": 0,
+								"Y": 0
+							},
+							"tooltip": "The direction the shadow is cast"
+						},
+						{
+							"name": "ShadowColorAndOpacity",
+							"type": "FLinearColor",
+							"category": "Appearance",
+							"value":
+							{
+								"R": 0,
+								"G": 0,
+								"B": 0,
+								"A": 0
+							},
+							"tooltip": "The color of the shadow"
+						},
+						{
+							"name": "bWrapWithInvalidationPanel",
+							"type": "bool",
+							"category": "Performance",
+							"value": false,
+							"tooltip": "If true, it will automatically wrap this text widget with an invalidation panel"
+						},
+						{
+							"name": "TextTransformPolicy",
+							"type": "ETextTransformPolicy",
+							"category": "Appearance",
+							"value": "None",
+							"tooltip": "The text transformation policy to apply to this text block."
+						},
+						{
+							"name": "TextOverflowPolicy",
+							"type": "ETextOverflowPolicy",
+							"category": "Clipping",
+							"value": "Clip",
+							"tooltip": "Sets what happens to text that is clipped and doesn't fit within the clip rect for this widget"
+						},
+						{
+							"name": "bSimpleTextMode",
+							"type": "bool",
+							"category": "Performance",
+							"value": false,
+							"tooltip": "If this is enabled, text shaping, wrapping, justification are disabled in favor of much faster text layout and measurement.\nThis feature is only suitable for \"simple\" text (ie, text containing only numbers or basic ASCII) as it disables the complex text rendering support required for certain languages (such as Arabic and Thai).\nIt is significantly faster for text that can take advantage of it (particularly if that text changes frequently), but shouldn't be used for localized user-facing text."
+						},
+						{
+							"name": "ShapedTextOptions",
+							"type": "FShapedTextOptions",
+							"category": "Localization",
+							"value":
+							{
+								"bOverride_TextShapingMethod": false,
+								"bOverride_TextFlowDirection": false,
+								"TextShapingMethod": "Auto",
+								"TextFlowDirection": "Auto"
+							},
+							"tooltip": "Controls how the text within this widget should be shaped."
+						},
+						{
+							"name": "Justification",
+							"type": "TEnumAsByte<ETextJustify::Type>",
+							"category": "Appearance",
+							"value": "Left",
+							"tooltip": "How the text should be aligned with the margin."
+						},
+						{
+							"name": "WrappingPolicy",
+							"type": "ETextWrappingPolicy",
+							"category": "Wrapping",
+							"value": "DefaultWrapping",
+							"tooltip": "The wrapping policy to use."
+						},
+						{
+							"name": "AutoWrapText",
+							"type": "uint8",
+							"category": "Wrapping",
+							"value": false,
+							"tooltip": "True if we're wrapping text automatically based on the computed horizontal space for this widget."
+						},
+						{
+							"name": "ApplyLineHeightToBottomLine",
+							"type": "bool",
+							"category": "Appearance",
+							"value": true,
+							"tooltip": "Whether to leave extra space below the last line due to line height."
+						},
+						{
+							"name": "WrapTextAt",
+							"type": "float",
+							"category": "Wrapping",
+							"value": 0,
+							"tooltip": "Whether text wraps onto a new line when it's length exceeds this width; if this value is zero or negative, no wrapping occurs."
+						},
+						{
+							"name": "Margin",
+							"type": "FMargin",
+							"category": "Appearance",
+							"value":
+							{
+								"Left": 0,
+								"Top": 0,
+								"Right": 0,
+								"Bottom": 0
+							},
+							"tooltip": "The amount of blank space left around the edges of text area."
+						},
+						{
+							"name": "LineHeightPercentage",
+							"type": "float",
+							"category": "Appearance",
+							"value": 1,
+							"tooltip": "The amount to scale each lines height by."
+						}
+					]
+				},
+				{
+					"name": "FocusCorners",
+					"class": "Overlay",
+					"isVariable": false,
+					"visibility": "Collapsed",
+					"slot":
+					{
+						"type": "OverlaySlot",
+						"properties": [
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Overlay Slot",
+								"value":
+								{
+									"Left": -16,
+									"Top": 0,
+									"Right": -16,
+									"Bottom": 0
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "HAlign_Fill",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "VAlign_Fill",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"children": [
+						{
+							"name": "FocusSizeTL",
+							"class": "SizeBox",
+							"isVariable": false,
+							"visibility": "SelfHitTestInvisible",
+							"slot":
+							{
+								"type": "OverlaySlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|Overlay Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "HAlign_Left",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "VAlign_Top",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "WidthOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+								},
+								{
+									"name": "HeightOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+								},
+								{
+									"name": "MinDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+								},
+								{
+									"name": "MinDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+								},
+								{
+									"name": "MaxDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+								},
+								{
+									"name": "MaxDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+								},
+								{
+									"name": "MinAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "MaxAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "bOverride_WidthOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_HeightOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_MinDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								}
+							],
+							"children": [
+								{
+									"name": "FocusTL",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "SizeBoxSlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|SizeBox Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 20,
+													"Y": 20
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0.15390700101852417,
+														"Y": 0.17623600363731384
+													},
+													"Max":
+													{
+														"X": 0.84688997268676758,
+														"Y": 0.82296699285507202
+													},
+													"bIsValid": true
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 0.64999997615814209,
+												"G": 0.56000000238418579,
+												"B": 0.31999999284744263,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "FocusSizeTR",
+							"class": "SizeBox",
+							"isVariable": false,
+							"visibility": "SelfHitTestInvisible",
+							"slot":
+							{
+								"type": "OverlaySlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|Overlay Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "HAlign_Right",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "VAlign_Top",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "WidthOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+								},
+								{
+									"name": "HeightOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+								},
+								{
+									"name": "MinDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+								},
+								{
+									"name": "MinDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+								},
+								{
+									"name": "MaxDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+								},
+								{
+									"name": "MaxDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+								},
+								{
+									"name": "MinAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "MaxAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "bOverride_WidthOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_HeightOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_MinDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								}
+							],
+							"children": [
+								{
+									"name": "FocusTR",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "SizeBoxSlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|SizeBox Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 20,
+													"Y": 20
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0.15390700101852417,
+														"Y": 0.17623600363731384
+													},
+													"Max":
+													{
+														"X": 0.84688997268676758,
+														"Y": 0.82296699285507202
+													},
+													"bIsValid": true
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 0.64999997615814209,
+												"G": 0.56000000238418579,
+												"B": 0.31999999284744263,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "FocusSizeBR",
+							"class": "SizeBox",
+							"isVariable": false,
+							"visibility": "SelfHitTestInvisible",
+							"slot":
+							{
+								"type": "OverlaySlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|Overlay Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "HAlign_Right",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "VAlign_Bottom",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "WidthOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+								},
+								{
+									"name": "HeightOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+								},
+								{
+									"name": "MinDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+								},
+								{
+									"name": "MinDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+								},
+								{
+									"name": "MaxDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+								},
+								{
+									"name": "MaxDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+								},
+								{
+									"name": "MinAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "MaxAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "bOverride_WidthOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_HeightOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_MinDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								}
+							],
+							"children": [
+								{
+									"name": "FocusBR",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "SizeBoxSlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|SizeBox Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 20,
+													"Y": 20
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0.15390700101852417,
+														"Y": 0.17623600363731384
+													},
+													"Max":
+													{
+														"X": 0.84688997268676758,
+														"Y": 0.82296699285507202
+													},
+													"bIsValid": true
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 0.64999997615814209,
+												"G": 0.56000000238418579,
+												"B": 0.31999999284744263,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "FocusSizeBL",
+							"class": "SizeBox",
+							"isVariable": false,
+							"visibility": "SelfHitTestInvisible",
+							"slot":
+							{
+								"type": "OverlaySlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|Overlay Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "HAlign_Left",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|Overlay Slot",
+										"value": "VAlign_Bottom",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "WidthOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+								},
+								{
+									"name": "HeightOverride",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 16,
+									"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+								},
+								{
+									"name": "MinDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+								},
+								{
+									"name": "MinDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+								},
+								{
+									"name": "MaxDesiredWidth",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+								},
+								{
+									"name": "MaxDesiredHeight",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 0,
+									"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+								},
+								{
+									"name": "MinAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "MaxAspectRatio",
+									"type": "float",
+									"category": "Child Layout",
+									"value": 1
+								},
+								{
+									"name": "bOverride_WidthOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_HeightOverride",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": true
+								},
+								{
+									"name": "bOverride_MinDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredWidth",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxDesiredHeight",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MinAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								},
+								{
+									"name": "bOverride_MaxAspectRatio",
+									"type": "uint8",
+									"category": "Child Layout",
+									"value": false
+								}
+							],
+							"children": [
+								{
+									"name": "FocusBL",
+									"class": "Image",
+									"isVariable": true,
+									"visibility": "HitTestInvisible",
+									"slot":
+									{
+										"type": "SizeBoxSlot",
+										"properties": [
+											{
+												"name": "Padding",
+												"type": "FMargin",
+												"category": "Layout|SizeBox Slot",
+												"value":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"tooltip": "The padding area between the slot and the content it contains."
+											},
+											{
+												"name": "HorizontalAlignment",
+												"type": "TEnumAsByte<EHorizontalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "HAlign_Fill",
+												"tooltip": "The alignment of the object horizontally."
+											},
+											{
+												"name": "VerticalAlignment",
+												"type": "TEnumAsByte<EVerticalAlignment>",
+												"category": "Layout|SizeBox Slot",
+												"value": "VAlign_Fill",
+												"tooltip": "The alignment of the object vertically."
+											}
+										]
+									},
+									"properties": [
+										{
+											"name": "Brush",
+											"type": "FSlateBrush",
+											"category": "Appearance",
+											"value":
+											{
+												"TintColor":
+												{
+													"SpecifiedColor":
+													{
+														"R": 1,
+														"G": 1,
+														"B": 1,
+														"A": 1
+													},
+													"ColorUseRule": "UseColor_Specified"
+												},
+												"DrawAs": "Image",
+												"Tiling": "NoTile",
+												"Mirroring": "NoMirror",
+												"ImageType": "NoImage",
+												"ImageSize":
+												{
+													"X": 20,
+													"Y": 20
+												},
+												"Margin":
+												{
+													"Left": 0,
+													"Top": 0,
+													"Right": 0,
+													"Bottom": 0
+												},
+												"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T",
+												"OutlineSettings":
+												{
+													"CornerRadii":
+													{
+														"X": 0,
+														"Y": 0,
+														"Z": 0,
+														"W": 0
+													},
+													"Color":
+													{
+														"SpecifiedColor":
+														{
+															"R": 0,
+															"G": 0,
+															"B": 0,
+															"A": 0
+														},
+														"ColorUseRule": "UseColor_Specified"
+													},
+													"Width": 0,
+													"RoundingType": "HalfHeightRadius",
+													"bUseBrushTransparency": false
+												},
+												"UVRegion":
+												{
+													"Min":
+													{
+														"X": 0.15390700101852417,
+														"Y": 0.17623600363731384
+													},
+													"Max":
+													{
+														"X": 0.84688997268676758,
+														"Y": 0.82296699285507202
+													},
+													"bIsValid": true
+												},
+												"bIsDynamicallyLoaded": false,
+												"ResourceName": "None"
+											},
+											"tooltip": "Image to draw"
+										},
+										{
+											"name": "ColorAndOpacity",
+											"type": "FLinearColor",
+											"category": "Appearance",
+											"value":
+											{
+												"R": 0.64999997615814209,
+												"G": 0.56000000238418579,
+												"B": 0.31999999284744263,
+												"A": 1
+											},
+											"tooltip": "Color and opacity"
+										},
+										{
+											"name": "bFlipForRightToLeftFlowDirection",
+											"type": "bool",
+											"category": "Localization",
+											"value": false,
+											"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+										},
+										{
+											"name": "OnMouseButtonDownEvent",
+											"type": "FOnPointerEvent",
+											"category": "Events",
+											"value": "(null).None"
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "SelectedSize",
+					"class": "SizeBox",
+					"isVariable": false,
+					"visibility": "HitTestInvisible",
+					"slot":
+					{
+						"type": "OverlaySlot",
+						"properties": [
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Overlay Slot",
+								"value":
+								{
+									"Left": 0,
+									"Top": 0,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "HAlign_Left",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "VAlign_Center",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"properties": [
+						{
+							"name": "WidthOverride",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 20,
+							"tooltip": "When specified, ignore the content's desired size and report the WidthOverride as the Box's desired width."
+						},
+						{
+							"name": "HeightOverride",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 20,
+							"tooltip": "When specified, ignore the content's desired size and report the HeightOverride as the Box's desired height."
+						},
+						{
+							"name": "MinDesiredWidth",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MinDesiredWidth if larger than the content's desired width."
+						},
+						{
+							"name": "MinDesiredHeight",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MinDesiredHeight if larger than the content's desired height."
+						},
+						{
+							"name": "MaxDesiredWidth",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MaxDesiredWidth if smaller than the content's desired width."
+						},
+						{
+							"name": "MaxDesiredHeight",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 0,
+							"tooltip": "When specified, will report the MaxDesiredHeight if smaller than the content's desired height."
+						},
+						{
+							"name": "MinAspectRatio",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 1
+						},
+						{
+							"name": "MaxAspectRatio",
+							"type": "float",
+							"category": "Child Layout",
+							"value": 1
+						},
+						{
+							"name": "bOverride_WidthOverride",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": true
+						},
+						{
+							"name": "bOverride_HeightOverride",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": true
+						},
+						{
+							"name": "bOverride_MinDesiredWidth",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MinDesiredHeight",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxDesiredWidth",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxDesiredHeight",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MinAspectRatio",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						},
+						{
+							"name": "bOverride_MaxAspectRatio",
+							"type": "uint8",
+							"category": "Child Layout",
+							"value": false
+						}
+					],
+					"children": [
+						{
+							"name": "SelectedMarker",
+							"class": "Image",
+							"isVariable": true,
+							"visibility": "Collapsed",
+							"slot":
+							{
+								"type": "SizeBoxSlot",
+								"properties": [
+									{
+										"name": "Padding",
+										"type": "FMargin",
+										"category": "Layout|SizeBox Slot",
+										"value":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"tooltip": "The padding area between the slot and the content it contains."
+									},
+									{
+										"name": "HorizontalAlignment",
+										"type": "TEnumAsByte<EHorizontalAlignment>",
+										"category": "Layout|SizeBox Slot",
+										"value": "HAlign_Fill",
+										"tooltip": "The alignment of the object horizontally."
+									},
+									{
+										"name": "VerticalAlignment",
+										"type": "TEnumAsByte<EVerticalAlignment>",
+										"category": "Layout|SizeBox Slot",
+										"value": "VAlign_Fill",
+										"tooltip": "The alignment of the object vertically."
+									}
+								]
+							},
+							"properties": [
+								{
+									"name": "Brush",
+									"type": "FSlateBrush",
+									"category": "Appearance",
+									"value":
+									{
+										"TintColor":
+										{
+											"SpecifiedColor":
+											{
+												"R": 1,
+												"G": 1,
+												"B": 1,
+												"A": 1
+											},
+											"ColorUseRule": "UseColor_Specified"
+										},
+										"DrawAs": "Image",
+										"Tiling": "NoTile",
+										"Mirroring": "NoMirror",
+										"ImageType": "NoImage",
+										"ImageSize":
+										{
+											"X": 32,
+											"Y": 32
+										},
+										"Margin":
+										{
+											"Left": 0,
+											"Top": 0,
+											"Right": 0,
+											"Bottom": 0
+										},
+										"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/Checkmark_Mars_T.Checkmark_Mars_T",
+										"OutlineSettings":
+										{
+											"CornerRadii":
+											{
+												"X": 0,
+												"Y": 0,
+												"Z": 0,
+												"W": 0
+											},
+											"Color":
+											{
+												"SpecifiedColor":
+												{
+													"R": 0,
+													"G": 0,
+													"B": 0,
+													"A": 0
+												},
+												"ColorUseRule": "UseColor_Specified"
+											},
+											"Width": 0,
+											"RoundingType": "HalfHeightRadius",
+											"bUseBrushTransparency": false
+										},
+										"UVRegion":
+										{
+											"Min":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"Max":
+											{
+												"X": 0,
+												"Y": 0
+											},
+											"bIsValid": false
+										},
+										"bIsDynamicallyLoaded": false,
+										"ResourceName": "None"
+									},
+									"tooltip": "Image to draw"
+								},
+								{
+									"name": "ColorAndOpacity",
+									"type": "FLinearColor",
+									"category": "Appearance",
+									"value":
+									{
+										"R": 1,
+										"G": 1,
+										"B": 1,
+										"A": 1
+									},
+									"tooltip": "Color and opacity"
+								},
+								{
+									"name": "bFlipForRightToLeftFlowDirection",
+									"type": "bool",
+									"category": "Localization",
+									"value": false,
+									"tooltip": "Flips the image if the localization's flow direction is RightToLeft"
+								},
+								{
+									"name": "OnMouseButtonDownEvent",
+									"type": "FOnPointerEvent",
+									"category": "Events",
+									"value": "(null).None"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "BusyMarker",
+					"class": "CommonTextBlock",
+					"isVariable": false,
+					"visibility": "Collapsed",
+					"slot":
+					{
+						"type": "OverlaySlot",
+						"properties": [
+							{
+								"name": "Padding",
+								"type": "FMargin",
+								"category": "Layout|Overlay Slot",
+								"value":
+								{
+									"Left": 0,
+									"Top": 0,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"tooltip": "The padding area between the slot and the content it contains."
+							},
+							{
+								"name": "HorizontalAlignment",
+								"type": "TEnumAsByte<EHorizontalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "HAlign_Right",
+								"tooltip": "The alignment of the object horizontally."
+							},
+							{
+								"name": "VerticalAlignment",
+								"type": "TEnumAsByte<EVerticalAlignment>",
+								"category": "Layout|Overlay Slot",
+								"value": "VAlign_Center",
+								"tooltip": "The alignment of the object vertically."
+							}
+						]
+					},
+					"properties": [
+						{
+							"name": "MobileFontSizeMultiplier",
+							"type": "float",
+							"category": "Mobile",
+							"value": 1,
+							"tooltip": "Mobile font size multiplier. Activated by default on mobile. See CVar Mobile_PreviewFontSize"
+						},
+						{
+							"name": "bIsScrollingEnabled",
+							"type": "bool",
+							"category": "CommonText",
+							"value": true,
+							"tooltip": "If scrolling is enabled/disabled initially, this can be updated in blueprint"
+						},
+						{
+							"name": "bAutoCollapseWithEmptyText",
+							"type": "bool",
+							"category": "CommonText",
+							"value": false,
+							"tooltip": "True to automatically collapse this text block when set to display an empty string. Conversely, will be SelfHitTestInvisible when showing a non-empty string."
+						},
+						{
+							"name": "Style",
+							"type": "TSubclassOf<UCommonTextStyle>",
+							"category": "CommonText",
+							"value": "None",
+							"tooltip": "References the text style to use"
+						},
+						{
+							"name": "ScrollStyle",
+							"type": "TSubclassOf<UCommonTextScrollStyle>",
+							"category": "CommonText",
+							"value": "None",
+							"tooltip": "References the scroll style asset to use, no reference disables scrolling"
+						},
+						{
+							"name": "ScrollOrientation",
+							"type": "TEnumAsByte<EOrientation>",
+							"category": "CommonText",
+							"value": "Orient_Horizontal",
+							"tooltip": "The orientation the text will scroll if out of bounds."
+						},
+						{
+							"name": "Text",
+							"type": "FText",
+							"category": "Content",
+							"value": "...",
+							"tooltip": "The text to display"
+						},
+						{
+							"name": "ColorAndOpacity",
+							"type": "FSlateColor",
+							"category": "Appearance",
+							"value":
+							{
+								"SpecifiedColor":
+								{
+									"R": 1,
+									"G": 1,
+									"B": 1,
+									"A": 1
+								},
+								"ColorUseRule": "UseColor_Specified"
+							},
+							"tooltip": "The color of the text"
+						},
+						{
+							"name": "MinDesiredWidth",
+							"type": "float",
+							"category": "Appearance",
+							"value": 0,
+							"tooltip": "The minimum desired size for the text"
+						},
+						{
+							"name": "Font",
+							"type": "FSlateFontInfo",
+							"category": "Appearance",
+							"value":
+							{
+								"FontObject": "/Engine/EngineFonts/Roboto.Roboto",
+								"FontMaterial": "None",
+								"OutlineSettings":
+								{
+									"OutlineSize": 0,
+									"bMiteredCorners": false,
+									"bSeparateFillAlpha": false,
+									"bApplyOutlineToDropShadows": false,
+									"OutlineMaterial": "None",
+									"OutlineColor":
+									{
+										"R": 0,
+										"G": 0,
+										"B": 0,
+										"A": 1
+									}
+								},
+								"TypefaceFontName": "Bold",
+								"Size": 20,
+								"LetterSpacing": 0,
+								"SkewAmount": 0,
+								"bForceMonospaced": false,
+								"bMaterialIsStencil": false,
+								"MonospacedWidth": 1
+							},
+							"tooltip": "The font to render the text with"
+						},
+						{
+							"name": "StrikeBrush",
+							"type": "FSlateBrush",
+							"category": "Appearance",
+							"value":
+							{
+								"TintColor":
+								{
+									"SpecifiedColor":
+									{
+										"R": 1,
+										"G": 1,
+										"B": 1,
+										"A": 1
+									},
+									"ColorUseRule": "UseColor_Specified"
+								},
+								"DrawAs": "Image",
+								"Tiling": "NoTile",
+								"Mirroring": "NoMirror",
+								"ImageType": "NoImage",
+								"ImageSize":
+								{
+									"X": 32,
+									"Y": 32
+								},
+								"Margin":
+								{
+									"Left": 0,
+									"Top": 0,
+									"Right": 0,
+									"Bottom": 0
+								},
+								"ResourceObject": "None",
+								"OutlineSettings":
+								{
+									"CornerRadii":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0,
+										"W": 0
+									},
+									"Color":
+									{
+										"SpecifiedColor":
+										{
+											"R": 0,
+											"G": 0,
+											"B": 0,
+											"A": 0
+										},
+										"ColorUseRule": "UseColor_Specified"
+									},
+									"Width": 0,
+									"RoundingType": "HalfHeightRadius",
+									"bUseBrushTransparency": false
+								},
+								"UVRegion":
+								{
+									"Min":
+									{
+										"X": 0,
+										"Y": 0
+									},
+									"Max":
+									{
+										"X": 0,
+										"Y": 0
+									},
+									"bIsValid": false
+								},
+								"bIsDynamicallyLoaded": false,
+								"ResourceName": "None"
+							},
+							"tooltip": "The brush to strike through text with"
+						},
+						{
+							"name": "ShadowOffset",
+							"type": "FVector2D",
+							"category": "Appearance",
+							"value":
+							{
+								"X": 1,
+								"Y": 1
+							},
+							"tooltip": "The direction the shadow is cast"
+						},
+						{
+							"name": "ShadowColorAndOpacity",
+							"type": "FLinearColor",
+							"category": "Appearance",
+							"value":
+							{
+								"R": 0,
+								"G": 0,
+								"B": 0,
+								"A": 0
+							},
+							"tooltip": "The color of the shadow"
+						},
+						{
+							"name": "bWrapWithInvalidationPanel",
+							"type": "bool",
+							"category": "Performance",
+							"value": false,
+							"tooltip": "If true, it will automatically wrap this text widget with an invalidation panel"
+						},
+						{
+							"name": "TextTransformPolicy",
+							"type": "ETextTransformPolicy",
+							"category": "Appearance",
+							"value": "None",
+							"tooltip": "The text transformation policy to apply to this text block."
+						},
+						{
+							"name": "TextOverflowPolicy",
+							"type": "ETextOverflowPolicy",
+							"category": "Clipping",
+							"value": "Clip",
+							"tooltip": "Sets what happens to text that is clipped and doesn't fit within the clip rect for this widget"
+						},
+						{
+							"name": "bSimpleTextMode",
+							"type": "bool",
+							"category": "Performance",
+							"value": false,
+							"tooltip": "If this is enabled, text shaping, wrapping, justification are disabled in favor of much faster text layout and measurement.\nThis feature is only suitable for \"simple\" text (ie, text containing only numbers or basic ASCII) as it disables the complex text rendering support required for certain languages (such as Arabic and Thai).\nIt is significantly faster for text that can take advantage of it (particularly if that text changes frequently), but shouldn't be used for localized user-facing text."
+						},
+						{
+							"name": "ShapedTextOptions",
+							"type": "FShapedTextOptions",
+							"category": "Localization",
+							"value":
+							{
+								"bOverride_TextShapingMethod": false,
+								"bOverride_TextFlowDirection": false,
+								"TextShapingMethod": "Auto",
+								"TextFlowDirection": "Auto"
+							},
+							"tooltip": "Controls how the text within this widget should be shaped."
+						},
+						{
+							"name": "Justification",
+							"type": "TEnumAsByte<ETextJustify::Type>",
+							"category": "Appearance",
+							"value": "Left",
+							"tooltip": "How the text should be aligned with the margin."
+						},
+						{
+							"name": "WrappingPolicy",
+							"type": "ETextWrappingPolicy",
+							"category": "Wrapping",
+							"value": "DefaultWrapping",
+							"tooltip": "The wrapping policy to use."
+						},
+						{
+							"name": "AutoWrapText",
+							"type": "uint8",
+							"category": "Wrapping",
+							"value": false,
+							"tooltip": "True if we're wrapping text automatically based on the computed horizontal space for this widget."
+						},
+						{
+							"name": "ApplyLineHeightToBottomLine",
+							"type": "bool",
+							"category": "Appearance",
+							"value": true,
+							"tooltip": "Whether to leave extra space below the last line due to line height."
+						},
+						{
+							"name": "WrapTextAt",
+							"type": "float",
+							"category": "Wrapping",
+							"value": 0,
+							"tooltip": "Whether text wraps onto a new line when it's length exceeds this width; if this value is zero or negative, no wrapping occurs."
+						},
+						{
+							"name": "Margin",
+							"type": "FMargin",
+							"category": "Appearance",
+							"value":
+							{
+								"Left": 0,
+								"Top": 0,
+								"Right": 0,
+								"Bottom": 0
+							},
+							"tooltip": "The amount of blank space left around the edges of text area."
+						},
+						{
+							"name": "LineHeightPercentage",
+							"type": "float",
+							"category": "Appearance",
+							"value": 1,
+							"tooltip": "The amount to scale each lines height by."
+						}
+					]
+				}
+			]
+		}
+	},
+	"animations": []
+}
