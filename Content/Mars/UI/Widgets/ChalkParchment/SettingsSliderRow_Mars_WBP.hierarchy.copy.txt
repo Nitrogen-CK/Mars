@@ -1,0 +1,203 @@
+Begin Object Class=/Script/UMG.SizeBox Name="Root" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Root'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Root.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Root.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'Root'"
+      Content="/Script/UMG.HorizontalBox'Row'"
+   End Object
+   HeightOverride=100.000000
+   MinDesiredHeight=58.000000
+   bOverride_HeightOverride=True
+   bOverride_MinDesiredHeight=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_87" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_87'"
+   WidgetName="Root"
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="Row" ExportPath="/Script/UMG.HorizontalBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_0'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_2" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_2'"
+      Padding=(Left=12.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/CommonUI.CommonTextBlock'_ValueText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_1" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_1'"
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/UMG.SizeBox'SliderHitArea'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_0" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_0'"
+      Size=(SizeRule=Fill)
+      Padding=(Right=20.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/CommonUI.CommonTextBlock'_DisplayNameText'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_0'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_1'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_2'"
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="_DisplayNameText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree._DisplayNameText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   ColorAndOpacity=(SpecifiedColor=(R=0.008000,G=0.006000,B=0.004000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",Size=28.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="SliderHitArea" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderHitArea'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderHitArea.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderHitArea.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'SliderHitArea'"
+      Content="/Script/UMG.Overlay'SliderOverlay'"
+   End Object
+   WidthOverride=285.000000
+   MinDesiredWidth=360.000000
+   MinDesiredHeight=48.000000
+   bOverride_WidthOverride=True
+   bOverride_MinDesiredWidth=True
+   bOverride_MinDesiredHeight=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="SliderOverlay" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_0'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_3'"
+   End Object
+   Begin Object Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_2'"
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'SliderOverlay'"
+      Content="/Script/UMG.Slider'_ValueSlider'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_1'"
+      Padding=(Left=20.000000,Right=20.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'SliderOverlay'"
+      Content="/Script/UMG.SizeBox'FillSize'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_0'"
+      Padding=(Left=20.000000,Right=20.000000)
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.Overlay'SliderOverlay'"
+      Content="/Script/UMG.SizeBox'TrackSize'"
+   End Object
+   Begin Object Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderOverlay.OverlaySlot_3'"
+      Padding=(Top=24.000000,Bottom=24.000000)
+      HorizontalAlignment=HAlign_Fill
+      VerticalAlignment=VAlign_Fill
+      Parent="/Script/UMG.Overlay'SliderOverlay'"
+      Content="/Script/UMG.Overlay'FocusCorners'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Slots(2)="/Script/UMG.OverlaySlot'OverlaySlot_2'"
+   Slots(3)="/Script/UMG.OverlaySlot'OverlaySlot_3'"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="TrackSize" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.TrackSize'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.TrackSize.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.TrackSize.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'TrackSize'"
+      Content="/Script/UMG.Image'SliderTrack'"
+   End Object
+   HeightOverride=12.000000
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="SliderTrack" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderTrack'"
+   Brush=(ImageSize=(X=253.000000,Y=12.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/SliderTrack_Mars_T.SliderTrack_Mars_T'",UVRegion=(Min=(X=0.033149,Y=0.375691),Max=(X=0.968692,Y=0.618785),bIsValid=True))
+   ColorAndOpacity=(R=0.400000,G=0.370000,B=0.300000,A=1.000000)
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="FillSize" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FillSize'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FillSize.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FillSize.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'FillSize'"
+      Content="/Script/UMG.Image'SliderFill'"
+   End Object
+   HeightOverride=12.000000
+   bOverride_HeightOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="SliderFill" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.SliderFill'"
+   Brush=(ImageSize=(X=253.000000,Y=12.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/SliderFill_Mars_T.SliderFill_Mars_T'",UVRegion=(Min=(X=0.018416,Y=0.364641),Max=(X=0.983425,Y=0.640884),bIsValid=True))
+End Object
+Begin Object Class=/Script/UMG.Slider Name="_ValueSlider" ExportPath="/Script/UMG.Slider'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree._ValueSlider'"
+   WidgetStyle=(NormalBarImage=(DrawAs=NoDrawType,ImageSize=(X=32.000000,Y=32.000000)),HoveredBarImage=(DrawAs=NoDrawType,ImageSize=(X=32.000000,Y=32.000000)),DisabledBarImage=(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000)),DrawAs=NoDrawType,ImageSize=(X=32.000000,Y=32.000000)),NormalThumbImage=(ImageType=NoImage,ImageSize=(X=40.000000,Y=40.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ControlThumb_Mars_T.ControlThumb_Mars_T'",UVRegion=(Min=(X=0.070175,Y=0.070175),Max=(X=0.925040,Y=0.925040),bIsValid=True),ResourceName=""),HoveredThumbImage=(ImageType=NoImage,ImageSize=(X=40.000000,Y=40.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ControlThumb_Mars_T.ControlThumb_Mars_T'",UVRegion=(Min=(X=0.070175,Y=0.070175),Max=(X=0.925040,Y=0.925040),bIsValid=True),ResourceName=""),DisabledThumbImage=(ImageType=NoImage,ImageSize=(X=40.000000,Y=40.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/ControlThumb_Mars_T.ControlThumb_Mars_T'",UVRegion=(Min=(X=0.070175,Y=0.070175),Max=(X=0.925040,Y=0.925040),bIsValid=True),ResourceName=""),BarThickness=8.000000)
+End Object
+Begin Object Class=/Script/UMG.Overlay Name="FocusCorners" ExportPath="/Script/UMG.Overlay'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners'"
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_3'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_2'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_1'"
+   End Object
+   Begin Object Class=/Script/UMG.OverlaySlot Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_0'"
+   End Object
+   Begin Object Name="OverlaySlot_3" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_3'"
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.Overlay'FocusCorners'"
+      Content="/Script/UMG.Image'FocusBL'"
+   End Object
+   Begin Object Name="OverlaySlot_2" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_2'"
+      HorizontalAlignment=HAlign_Right
+      VerticalAlignment=VAlign_Bottom
+      Parent="/Script/UMG.Overlay'FocusCorners'"
+      Content="/Script/UMG.Image'FocusBR'"
+   End Object
+   Begin Object Name="OverlaySlot_1" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_1'"
+      HorizontalAlignment=HAlign_Right
+      Parent="/Script/UMG.Overlay'FocusCorners'"
+      Content="/Script/UMG.Image'FocusTR'"
+   End Object
+   Begin Object Name="OverlaySlot_0" ExportPath="/Script/UMG.OverlaySlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusCorners.OverlaySlot_0'"
+      Parent="/Script/UMG.Overlay'FocusCorners'"
+      Content="/Script/UMG.Image'FocusTL'"
+   End Object
+   Slots(0)="/Script/UMG.OverlaySlot'OverlaySlot_0'"
+   Slots(1)="/Script/UMG.OverlaySlot'OverlaySlot_1'"
+   Slots(2)="/Script/UMG.OverlaySlot'OverlaySlot_2'"
+   Slots(3)="/Script/UMG.OverlaySlot'OverlaySlot_3'"
+   Visibility=Collapsed
+End Object
+Begin Object Class=/Script/UMG.Image Name="FocusTL" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusTL'"
+   Brush=(ImageSize=(X=20.000000,Y=20.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T'",UVRegion=(Min=(X=0.153907,Y=0.176236),Max=(X=0.846890,Y=0.822967),bIsValid=True))
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="FocusTR" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusTR'"
+   Brush=(ImageSize=(X=20.000000,Y=20.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T'",UVRegion=(Min=(X=0.153907,Y=0.176236),Max=(X=0.846890,Y=0.822967),bIsValid=True))
+   RenderTransform=(Angle=90.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="FocusBR" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusBR'"
+   Brush=(ImageSize=(X=20.000000,Y=20.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T'",UVRegion=(Min=(X=0.153907,Y=0.176236),Max=(X=0.846890,Y=0.822967),bIsValid=True))
+   RenderTransform=(Angle=180.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/UMG.Image Name="FocusBL" ExportPath="/Script/UMG.Image'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree.FocusBL'"
+   Brush=(ImageSize=(X=20.000000,Y=20.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T'",UVRegion=(Min=(X=0.153907,Y=0.176236),Max=(X=0.846890,Y=0.822967),bIsValid=True))
+   RenderTransform=(Angle=270.000000)
+   Visibility=HitTestInvisible
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="_ValueText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP:WidgetTree._ValueText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextSettingsValue_Mars_STYLE.TextSettingsValue_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   ColorAndOpacity=(SpecifiedColor=(R=0.008000,G=0.006000,B=0.004000,A=1.000000))
+   MinDesiredWidth=68.000000
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="Regular",Size=27.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+   Justification=Right
+End Object
