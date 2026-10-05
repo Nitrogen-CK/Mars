@@ -4,6 +4,19 @@
 // straight back to Sprint. Landing goes straight to the moving state: a frame in Idle drops MaxWalkSpeed and input,
 // braking the run.
 
+namespace utils_mars_sprint
+{
+    UMars_InputProfile_Gameplay Get_ActiveProfile(FCk_Handle_SmCondition InCondition)
+    {
+        auto Player = Cast<AMars_PlayerCharacter>(
+            utils_owning_actor::TryGet_EntityOwningActor_Recursive(ck::Ctx(InCondition)));
+        auto Controller = ck::IsValid(Player)
+            ? Cast<AMars_Master_PlayerController>(Player.GetController()) : nullptr;
+        return ck::IsValid(Controller)
+            ? Cast<UMars_InputProfile_Gameplay>(Controller.InputComp.GetActiveProfile()) : nullptr;
+    }
+}
+
 class UMars_SmCondition_JumpPressed : UMars_SmCondition_IntentPressed
 {
     default IntentTag = GameplayTags::Mars_Intent_Jump;
@@ -22,6 +35,16 @@ class UMars_SmCondition_JumpReleased : UMars_SmCondition_JumpHeld
 class UMars_SmCondition_SprintHeld : UMars_SmCondition_IntentActive
 {
     default IntentTag = GameplayTags::Mars_Intent_Sprint;
+
+    UFUNCTION(BlueprintOverride)
+    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
+    {
+        auto Profile = utils_mars_sprint::Get_ActiveProfile(InHandle);
+        if (ck::IsValid(Profile) && Profile.Get_IsSprintToggleMode())
+        { return Profile.Get_IsSprintToggleLatched(); }
+
+        return Super::DoEvaluate(InHandle, InDeltaT);
+    }
 }
 
 class UMars_SmCondition_SprintReleased : UMars_SmCondition_SprintHeld
@@ -32,6 +55,16 @@ class UMars_SmCondition_SprintReleased : UMars_SmCondition_SprintHeld
 class UMars_SmCondition_SprintPressed : UMars_SmCondition_IntentPressed
 {
     default IntentTag = GameplayTags::Mars_Intent_Sprint;
+
+    UFUNCTION(BlueprintOverride)
+    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
+    {
+        auto Profile = utils_mars_sprint::Get_ActiveProfile(InHandle);
+        if (ck::IsValid(Profile) && Profile.Get_IsSprintToggleMode() && !Profile.Get_IsSprintToggleLatched())
+        { return false; }
+
+        return Super::DoEvaluate(InHandle, InDeltaT);
+    }
 }
 
 class UMars_SmCondition_CrouchPressed : UMars_SmCondition_IntentPressed

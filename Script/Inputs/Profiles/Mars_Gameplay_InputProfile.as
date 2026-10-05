@@ -39,6 +39,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     private float32 MouseLookScale = 0.4f;
     private float32 GamepadYawRate = 70.0f;
     private float32 GamepadPitchRate = 45.0f;
+    private bool _SprintToggleMode = false;
+    private bool _SprintToggleLatched = false;
 
     private FCk_Handle_InputLayer _Layer;
     private FCk_Handle_IntentMatcher _Matcher;
@@ -63,6 +65,10 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnLook"));
         InInputComponent.BindAction(mars::Mars_IA_CycleSlot, ETriggerEvent::Triggered,
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnCycleSlot"));
+        InInputComponent.BindAction(mars::Mars_IA_Sprint, ETriggerEvent::Started,
+            FEnhancedInputActionHandlerDynamicSignature(this, n"OnSprintStarted"));
+        InInputComponent.BindAction(mars::Mars_IA_Crouch, ETriggerEvent::Started,
+            FEnhancedInputActionHandlerDynamicSignature(this, n"OnCrouchStarted"));
     }
 
     UFUNCTION(BlueprintOverride)
@@ -70,6 +76,10 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     {
         Super::Activate(InController, InPawn);
 
+        _SprintToggleLatched = false;
+        _SprintToggleMode = utils_game_settings::Get_SettingValue_Bool(n"controls.sprint_toggle", false);
+        utils_game_settings::BindTo_OnSettingChanged(n"controls.sprint_toggle",
+            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnSprintModeChanged"));
         _SwapState = EMars_GameplayInput_SwapState::NotRequested;
         DoStart_ComposeRetry();
     }
@@ -79,6 +89,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     UFUNCTION(BlueprintOverride)
     void Repoint(APawn InNewPawn)
     {
+        _SprintToggleLatched = false;
         DoRelease_PawnIntents();
         Super::Repoint(InNewPawn);
 
@@ -94,6 +105,9 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     UFUNCTION(BlueprintOverride)
     void Deactivate(APlayerController InController)
     {
+        utils_game_settings::UnbindFrom_OnSettingChanged(n"controls.sprint_toggle",
+            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnSprintModeChanged"));
+        _SprintToggleLatched = false;
         System::ClearAndInvalidateTimerHandle(_ComposeTimer);
         DoRelease_PawnIntents();
 
@@ -105,6 +119,26 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         _SwapState = EMars_GameplayInput_SwapState::NotRequested;
 
         Super::Deactivate(InController);
+    }
+
+    bool Get_IsSprintToggleMode() const
+    { return _SprintToggleMode; }
+
+    bool Get_IsSprintToggleLatched() const
+    { return _SprintToggleLatched && Get_HasCurrentMatcher(); }
+
+    private bool Get_HasCurrentMatcher() const
+    {
+        auto Intents = TryGet_PawnIntents();
+        return ck::IsValid(_Matcher) && ck::IsValid(Intents) &&
+            Intents.Get_Matcher() == _Matcher;
+    }
+
+    UFUNCTION()
+    private void OnSprintModeChanged(FName InKey, FString InNewValue)
+    {
+        _SprintToggleLatched = false;
+        _SprintToggleMode = utils_game_settings::Get_SettingValue_Bool(n"controls.sprint_toggle", false);
     }
 
     private void DoStart_ComposeRetry()
@@ -233,6 +267,19 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     //--------------------------------------------------------------------------------------------
 
     UFUNCTION()
+    private void OnSprintStarted(FInputActionValue ActionValue, float32 ElapsedTime,
+        float32 TriggeredTime, const UInputAction SourceAction)
+    {
+        if (_SprintToggleMode && Get_HasCurrentMatcher())
+        { _SprintToggleLatched = !_SprintToggleLatched; }
+    }
+
+    UFUNCTION()
+    private void OnCrouchStarted(FInputActionValue ActionValue, float32 ElapsedTime,
+        float32 TriggeredTime, const UInputAction SourceAction)
+    { _SprintToggleLatched = false; }
+
+    UFUNCTION()
     private void OnMove(FInputActionValue ActionValue, float32 ElapsedTime,
         float32 TriggeredTime, const UInputAction SourceAction)
     {
@@ -256,8 +303,10 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         float32 TriggeredTime, const UInputAction SourceAction)
     {
         const auto LookDelta = ActionValue.GetAxis2D();
-        const auto Scale = MouseLookScale * LegacyLookScale;
-        const auto Intention = FVector(LookDelta.X * Scale, -LookDelta.Y * Scale, 0.0);
+        const auto Sensitivity = utils_game_settings::Get_SettingValue_Float(n"controls.look_sensitivity", 1.0f);
+        const auto PitchSign = utils_game_settings::Get_SettingValue_Bool(n"controls.invert_y", false) ? 1.0f : -1.0f;
+        const auto Scale = MouseLookScale * LegacyLookScale * Sensitivity;
+        const auto Intention = FVector(LookDelta.X * Scale, LookDelta.Y * Scale * PitchSign, 0.0);
 
         auto Intents = TryGet_PawnIntents();
         if (ck::IsValid(Intents))

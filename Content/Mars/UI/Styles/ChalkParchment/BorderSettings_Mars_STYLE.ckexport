@@ -1,0 +1,105 @@
+{
+	"assetName": "BorderSettings_Mars_STYLE",
+	"assetPath": "/Game/Mars/UI/Styles/ChalkParchment/BorderSettings_Mars_STYLE.BorderSettings_Mars_STYLE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "cb03aed95d98b8544f11a6f69cd90b63",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "CommonBorderStyle",
+	"parentClassPath": "/Script/CommonUI.CommonBorderStyle",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "Background",
+			"type": "FSlateBrush",
+			"category": "Properties",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Image",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 1460,
+					"Y": 780
+				},
+				"Margin":
+				{
+					"Left": 0,
+					"Top": 0,
+					"Right": 0,
+					"Bottom": 0
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ParchmentSurface_Mars_T.ParchmentSurface_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0,
+						"Y": 0
+					},
+					"Max":
+					{
+						"X": 1,
+						"Y": 1
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The brush for the background of the border"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

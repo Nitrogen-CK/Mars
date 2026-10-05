@@ -12,6 +12,42 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
     UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
     float32 ThumbSize = 40.0f;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
+    FLinearColor ThumbIdle = FLinearColor(1.0f, 1.0f, 1.0f);
+
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
+    FLinearColor ThumbHovered = FLinearColor(0.55f, 0.72f, 0.30f);
+
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
+    FLinearColor ThumbPressed = FLinearColor(0.20f, 0.34f, 0.10f);
+
+    private bool _Captured = false;
+
+    UFUNCTION(BlueprintOverride)
+    void OnInitialized()
+    {
+        _ValueSlider.OnMouseCaptureBegin.AddUFunction(this, n"OnCaptureStarted");
+        _ValueSlider.OnMouseCaptureEnd.AddUFunction(this, n"OnCaptureStopped");
+        _ValueSlider.OnControllerCaptureBegin.AddUFunction(this, n"OnCaptureStarted");
+        _ValueSlider.OnControllerCaptureEnd.AddUFunction(this, n"OnCaptureStopped");
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void Construct()
+    { _Captured = false; }
+
+    UFUNCTION(BlueprintOverride)
+    void Destruct()
+    { _Captured = false; }
+
+    UFUNCTION()
+    private void OnCaptureStarted()
+    { _Captured = true; }
+
+    UFUNCTION()
+    private void OnCaptureStopped()
+    { _Captured = false; }
+
     UFUNCTION(BlueprintOverride)
     void Tick(FGeometry MyGeometry, float InDeltaTime)
     {
@@ -21,11 +57,18 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
         const float32 Value = _ValueSlider.GetValue();
         const FName Key = Get_SettingKey();
         if (ck::IsValid(FocusCorners))
-        { FocusCorners.SetVisibility(_ValueSlider.IsHovered() || _ValueSlider.HasAnyUserFocus()
-            ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed); }
+        { FocusCorners.SetVisibility(ESlateVisibility::Collapsed); }
+        _ValueSlider.SetSliderHandleColor(_Captured ? ThumbPressed :
+            (_ValueSlider.IsHovered() || _ValueSlider.HasAnyUserFocus()) ? ThumbHovered : ThumbIdle);
         if (ck::IsValid(_ValueText) && Key.ToString().StartsWith("audio."))
         {
             const FText Label = FText::FromString(f"{Math::RoundToInt(Value * 100.0f)}%");
+            if (!_ValueText.GetText().EqualTo(Label))
+            { _ValueText.SetText(Label); }
+        }
+        else if (ck::IsValid(_ValueText) && Key == n"controls.look_sensitivity")
+        {
+            const FText Label = FText::FromString(f"{Value :.2}");
             if (!_ValueText.GetText().EqualTo(Label))
             { _ValueText.SetText(Label); }
         }

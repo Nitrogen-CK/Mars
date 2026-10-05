@@ -1,0 +1,88 @@
+Begin Object Class=/Script/UMG.SizeBox Name="Root" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Root'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Root.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Root.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'Root'"
+      Content="/Script/UMG.HorizontalBox'Row'"
+   End Object
+   HeightOverride=100.000000
+   MinDesiredHeight=96.000000
+   bOverride_HeightOverride=True
+   bOverride_MinDesiredHeight=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_122" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_122'"
+   WidgetName="Root"
+End Object
+Begin Object Class=/Script/UMG.HorizontalBox Name="Row" ExportPath="/Script/UMG.HorizontalBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row'"
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_9" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_9'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_8" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_8'"
+   End Object
+   Begin Object Class=/Script/UMG.HorizontalBoxSlot Name="HorizontalBoxSlot_7" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_7'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_9" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_9'"
+      Padding=(Left=12.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/CommonUI.CommonTextBlock'_ValueText'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_8" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_8'"
+      Padding=(Left=20.000000)
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/UMG.SizeBox'CheckHitArea'"
+   End Object
+   Begin Object Name="HorizontalBoxSlot_7" ExportPath="/Script/UMG.HorizontalBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.Row.HorizontalBoxSlot_7'"
+      Parent="/Script/UMG.HorizontalBox'Row'"
+      Content="/Script/UMG.SizeBox'LabelColumn'"
+   End Object
+   Slots(0)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_7'"
+   Slots(1)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_8'"
+   Slots(2)="/Script/UMG.HorizontalBoxSlot'HorizontalBoxSlot_9'"
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="LabelColumn" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.LabelColumn'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.LabelColumn.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.LabelColumn.SizeBoxSlot_0'"
+      Padding=(Right=20.000000)
+      VerticalAlignment=VAlign_Center
+      Parent="/Script/UMG.SizeBox'LabelColumn'"
+      Content="/Script/CommonUI.CommonTextBlock'_DisplayNameText'"
+   End Object
+   WidthOverride=335.000000
+   bOverride_WidthOverride=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="_DisplayNameText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree._DisplayNameText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   ColorAndOpacity=(SpecifiedColor=(R=0.008000,G=0.006000,B=0.004000,A=1.000000))
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",Size=28.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+End Object
+Begin Object Class=/Script/UMG.SizeBox Name="CheckHitArea" ExportPath="/Script/UMG.SizeBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.CheckHitArea'"
+   Begin Object Class=/Script/UMG.SizeBoxSlot Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.CheckHitArea.SizeBoxSlot_0'"
+   End Object
+   Begin Object Name="SizeBoxSlot_0" ExportPath="/Script/UMG.SizeBoxSlot'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree.CheckHitArea.SizeBoxSlot_0'"
+      Parent="/Script/UMG.SizeBox'CheckHitArea'"
+      Content="/Script/UMG.CheckBox'_ValueCheckBox'"
+   End Object
+   WidthOverride=48.000000
+   MinDesiredWidth=48.000000
+   MinDesiredHeight=48.000000
+   bOverride_WidthOverride=True
+   bOverride_MinDesiredWidth=True
+   bOverride_MinDesiredHeight=True
+   Slots(0)="/Script/UMG.SizeBoxSlot'SizeBoxSlot_0'"
+End Object
+Begin Object Class=/Script/UMG.CheckBox Name="_ValueCheckBox" ExportPath="/Script/UMG.CheckBox'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree._ValueCheckBox'"
+   WidgetStyle=(UncheckedImage=(DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=30.000000,Y=30.000000),ResourceName=""),UncheckedHoveredImage=(DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=30.000000,Y=30.000000),ResourceName=""),UncheckedPressedImage=(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000)),DrawAs=NoDrawType,ImageType=NoImage,ImageSize=(X=30.000000,Y=30.000000),ResourceName=""),CheckedImage=(ImageType=NoImage,ImageSize=(X=30.000000,Y=30.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/Checkmark_Mars_T.Checkmark_Mars_T'",UVRegion=(Min=(X=0.057416,Y=0.095694),Max=(X=0.969697,Y=0.931419),bIsValid=True),ResourceName=""),CheckedHoveredImage=(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000)),ImageType=NoImage,ImageSize=(X=30.000000,Y=30.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/Checkmark_Mars_T.Checkmark_Mars_T'",UVRegion=(Min=(X=0.057416,Y=0.095694),Max=(X=0.969697,Y=0.931419),bIsValid=True),ResourceName=""),CheckedPressedImage=(ImageType=NoImage,ImageSize=(X=30.000000,Y=30.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/Checkmark_Mars_T.Checkmark_Mars_T'",UVRegion=(Min=(X=0.057416,Y=0.095694),Max=(X=0.969697,Y=0.931419),bIsValid=True),ResourceName=""),UndeterminedImage=(DrawAs=NoDrawType,ImageSize=(X=18.000000,Y=18.000000)),UndeterminedHoveredImage=(DrawAs=NoDrawType,ImageSize=(X=18.000000,Y=18.000000)),UndeterminedPressedImage=(DrawAs=NoDrawType,ImageSize=(X=18.000000,Y=18.000000)),Padding=(Left=0.000000),BackgroundImage=(DrawAs=Image,ImageSize=(X=30.000000,Y=30.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/CheckboxWell_Mars_T.CheckboxWell_Mars_T'",UVRegion=(Min=(X=0.121212,Y=0.121212),Max=(X=0.880383,Y=0.861244),bIsValid=True)),BackgroundHoveredImage=(DrawAs=Image,ImageSize=(X=30.000000,Y=30.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/CheckboxWell_Mars_T.CheckboxWell_Mars_T'",UVRegion=(Min=(X=0.121212,Y=0.121212),Max=(X=0.880383,Y=0.861244),bIsValid=True)),BackgroundPressedImage=(DrawAs=Image,ImageSize=(X=30.000000,Y=30.000000),ResourceObject="/Script/Engine.Texture2D'/Game/Mars/UI/Textures/ChalkParchment/CheckboxWell_Mars_T.CheckboxWell_Mars_T'",UVRegion=(Min=(X=0.121212,Y=0.121212),Max=(X=0.880383,Y=0.861244),bIsValid=True)),ForegroundColor=(SpecifiedColor=(R=0.045000,G=0.032000,B=0.018000,A=1.000000),ColorUseRule=UseColor_Specified),HoveredForeground=(SpecifiedColor=(R=0.045000,G=0.032000,B=0.018000,A=1.000000),ColorUseRule=UseColor_Specified),PressedForeground=(SpecifiedColor=(R=0.045000,G=0.032000,B=0.018000,A=1.000000),ColorUseRule=UseColor_Specified),CheckedForeground=(SpecifiedColor=(R=0.045000,G=0.032000,B=0.018000,A=1.000000),ColorUseRule=UseColor_Specified),CheckedHoveredForeground=(SpecifiedColor=(R=0.045000,G=0.032000,B=0.018000,A=1.000000),ColorUseRule=UseColor_Specified),CheckedPressedForeground=(SpecifiedColor=(R=0.045000,G=0.032000,B=0.018000,A=1.000000),ColorUseRule=UseColor_Specified))
+End Object
+Begin Object Class=/Script/CommonUI.CommonTextBlock Name="_ValueText" ExportPath="/Script/CommonUI.CommonTextBlock'/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP:WidgetTree._ValueText'"
+   Style="/Script/Engine.BlueprintGeneratedClass'/Game/Mars/UI/Styles/ChalkParchment/TextSettingsValue_Mars_STYLE.TextSettingsValue_Mars_STYLE_C'"
+   bStyleNoLongerNeedsConversion=True
+   ColorAndOpacity=(SpecifiedColor=(R=0.008000,G=0.006000,B=0.004000,A=1.000000))
+   MinDesiredWidth=285.000000
+   Font=(FontObject="/Script/Engine.Font'/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font'",TypefaceFontName="Regular",Size=27.000000)
+   ShadowOffset=(X=0.000000,Y=0.000000)
+End Object
