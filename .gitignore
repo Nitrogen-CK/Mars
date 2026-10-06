@@ -357,3 +357,8 @@ docs/
 .utoolbox/
 Config/DynamicHandleTypes.json
 Config/_StubRecovery_DynamicHandleTypes.json
+
+# UMG Designer paste artifacts written by CkAssetExporter; machine-local, regenerated on export, never read by anything.
+Content/**/*.hierarchy.copy.txt
+Content/**/*.animation.*.t3d.txt
+!Content/Tests/Monolith/**

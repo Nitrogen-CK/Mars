@@ -1,5 +1,0 @@
-Begin Object Class=/Script/UMG.VerticalBox Name="HintContainer" ExportPath="/Script/UMG.VerticalBox'/Game/Mars/UI/Widgets/ActionHint/ActionHintBox_Mars_WBP.ActionHintBox_Mars_WBP:WidgetTree.HintContainer'"
-End Object
-Begin Object Class=/Script/UMGEditor.WidgetSlotPair Name="WidgetSlotPair_8" ExportPath="/Script/UMGEditor.WidgetSlotPair'/Engine/Transient.WidgetSlotPair_8'"
-   WidgetName="HintContainer"
-End Object
