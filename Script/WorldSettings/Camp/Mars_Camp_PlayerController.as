@@ -1,25 +1,88 @@
-class UMars_Camp_CheatManager : UMars_Gameplay_CheatManager
-{
-    // Console: Mars_Camp_Play - the Play button's path, for smoke tests.
-    UFUNCTION(Exec)
-    void Mars_Camp_Play()
-    {
-        auto PC = Cast<AMars_Camp_PlayerController>(GetPlayerController());
-        if (ck::EnsureIfNot(ck::IsValid(PC), "[Mars_Camp_CheatManager] its PlayerController is not an AMars_Camp_PlayerController"))
-        { return; }
-
-        PC.Server_RequestPlay();
-    }
-}
-
 // Camp front-end controller. Client-local: the menu camera tour (FocusStation) and the gameplay input profile once a chef
-// is possessed. Server: Server_RequestPlay. Input MODE is owned by the CkUI layout (the Menu layer is UIOnly while the
-// menu is up), so there is no SetInputMode here.
+// is possessed. Server: the host's service commit and departure RPCs. Input mode is owned by the CkUI layout.
 class AMars_Camp_PlayerController : AMars_Master_PlayerController
 {
-    default CheatClass = UMars_Camp_CheatManager;
+    default CheatClass = UMars_Gameplay_CheatManager;
 
     private TArray<AMars_CampStationCamera> _StationCameras;
+    private AMars_CampUiPresenter _UiPresenter;
+
+    UFUNCTION(BlueprintOverride)
+    protected void EcsConstructionScript(FCk_Handle InEntity)
+    {
+        if (IsLocalController() == false)
+        { return; }
+        // Client-local targets are owned by this controller's entity and follow the placed boards.
+        TArray<AMars_CampBoardAnchor> Anchors;
+        GetAllActorsOfClass(Anchors);
+        AMars_CampBoardAnchor ContractsAnchor;
+        AMars_CampBoardAnchor DepartureAnchor;
+        int32 ContractsCount = 0;
+        int32 DepartureCount = 0;
+        for (auto Anchor : Anchors)
+        {
+            if (ck::Is_NOT_Valid(Anchor) || Anchor.GetWorld() != GetWorld())
+            { continue; }
+            if (Anchor.Station == EMars_CampStation::Contracts)
+            {
+                ContractsAnchor = Anchor;
+                ++ContractsCount;
+            }
+            else if (Anchor.Station == EMars_CampStation::Departure)
+            {
+                DepartureAnchor = Anchor;
+                ++DepartureCount;
+            }
+        }
+
+        if (ck::EnsureIfNot(ContractsCount == 1 && DepartureCount == 1,
+            f"[Mars_Camp_PlayerController] expected one Contracts and one Departure board anchor, found [{ContractsCount}] and [{DepartureCount}]"))
+        { return; }
+
+        SpawnStationTarget(InEntity, ContractsAnchor, EMars_CampStation::Contracts);
+        SpawnStationTarget(InEntity, DepartureAnchor, EMars_CampStation::Departure);
+    }
+
+    private void SpawnStationTarget(FCk_Handle InEntity, AMars_CampBoardAnchor InAnchor, EMars_CampStation InStation)
+    {
+        const auto Scale = InAnchor.GetActorScale3D();
+        if (ck::EnsureIfNot(InAnchor.DrawSize.X > 0 && InAnchor.DrawSize.Y > 0
+            && Math::Abs(Scale.Y) > 0.0 && Math::Abs(Scale.Z) > 0.0,
+            "[Mars_Camp_PlayerController] board anchor has invalid size or scale"))
+        { return; }
+
+        const auto HalfExtents = FVector(15.0,
+            InAnchor.DrawSize.X * Math::Abs(Scale.Y) * 0.5,
+            InAnchor.DrawSize.Y * Math::Abs(Scale.Z) * 0.5);
+        // The probe dimensions are already world-sized; keep the entity root at unit scale.
+        const auto SpawnTransform = FTransform(InAnchor.GetActorRotation(), InAnchor.GetActorLocation());
+        utils_entity_script::Request_SpawnEntity(InEntity, UMars_CampUiStation_EntityScript,
+            UMars_CampUiStation_EntityScript::Params(SpawnTransform, InStation, HalfExtents));
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void EndPlay(EEndPlayReason InReason)
+    {
+        if (ck::IsValid(_UiPresenter))
+        { _UiPresenter.DestroyActor(); }
+        _UiPresenter = nullptr;
+    }
+
+    UFUNCTION()
+    void OpenCampStation(EMars_CampStation InStation)
+    {
+        if (IsLocalController() && ck::IsValid(_UiPresenter))
+        { _UiPresenter.OpenStation(InStation); }
+    }
+
+    private void EnsurePresenter()
+    {
+        if (ck::IsValid(_UiPresenter) || !IsLocalController())
+        { return; }
+        _UiPresenter = Cast<AMars_CampUiPresenter>(SpawnActor(AMars_CampUiPresenter));
+        if (ck::IsValid(_UiPresenter))
+        { _UiPresenter.Initialize(this); }
+    }
 
     // Blends the local view to a station camera, starting now. Cameras are level content, gathered once.
     UFUNCTION()
@@ -28,42 +91,65 @@ class AMars_Camp_PlayerController : AMars_Master_PlayerController
         if (ck::EnsureIfNot(IsLocalController(), f"[Mars_Camp_PlayerController] FocusStation [{InStation}] drives the local view; call it on the local controller"))
         { return; }
 
-        if (_StationCameras.IsEmpty())
-        { GetAllActorsOfClass(_StationCameras); }
-
-        auto Camera = utils_camp_station::TryGet_Camera(_StationCameras, InStation);
+        auto Camera = GetStationCamera(InStation);
         if (ck::EnsureIfNot(ck::IsValid(Camera), f"[Mars_Camp_PlayerController] no AMars_CampStationCamera for station [{InStation}] in this map"))
         { return; }
 
         const float32 BlendExponent = 2.0f;
-        const bool LockOutgoing = false;
+        // Freeze the current cached POV so Back can reverse an unfinished blend without snapping.
+        const bool LockOutgoing = true;
         SetViewTargetWithBlend(Camera, InBlendSeconds, EViewTargetBlendFunction::VTBlend_EaseInOut, BlendExponent, LockOutgoing);
     }
 
-    UFUNCTION(Server)
-    void Server_RequestPlay()
+    AMars_CampStationCamera GetStationCamera(EMars_CampStation InStation)
     {
-        auto CampState = Cast<AMars_Camp_GameState>(Gameplay::GetGameState());
-        if (ck::EnsureIfNot(ck::IsValid(CampState), "[Mars_Camp_PlayerController] the GameState is not an AMars_Camp_GameState"))
-        { return; }
+        _StationCameras.Empty();
+        GetAllActorsOfClass(_StationCameras);
+        AMars_CampStationCamera Result;
+        int Matches = 0;
+        for (auto Camera : _StationCameras)
+        {
+            if (ck::IsValid(Camera) && Camera.bStationEnabled && Camera.GetWorld() == GetWorld() && Camera.Station == InStation)
+            { Result = Camera; ++Matches; }
+        }
+        if (ck::EnsureIfNot(Matches == 1, f"[Camp] Expected exactly one camera for [{InStation}], found [{Matches}]"))
+        { return nullptr; }
+        return Result;
+    }
 
-        // Before the GameState's entity is composed there is no session to start yet.
-        auto Session = CampState.Get_CampSession();
-        if (ck::Is_NOT_Valid(Session))
-        { return; }
+    UFUNCTION(Server)
+    void Server_CommitService(FName InServiceId)
+    {
+        auto Mode = Cast<AMars_Camp_GameMode>(Gameplay::GetGameMode());
+        if (ck::IsValid(Mode))
+        { Mode.TryCommitService(this, InServiceId); }
+    }
 
-        Session.Request_Play();
+    UFUNCTION(Server)
+    void Server_RequestDepart()
+    {
+        auto Mode = Cast<AMars_Camp_GameMode>(Gameplay::GetGameMode());
+        if (ck::IsValid(Mode))
+        { Mode.TryDepart(this); }
     }
 
     protected void OnLocalPawnPossessed(APawn InPawn) override
     {
+        EnsurePresenter();
         if (ck::IsValid(Cast<AMars_Camp_ViewerPawn>(InPawn)))
         {
             FocusStation(EMars_CampStation::Title, 0.0f);
+            if (ck::IsValid(_UiPresenter))
+            { _UiPresenter.OpenVestibule(); }
             return;
         }
 
         if (ck::IsValid(Cast<AMars_PlayerCharacter>(InPawn)))
-        { TryActivateGameplayInputs(InPawn); }
+        {
+            if (ck::IsValid(_UiPresenter))
+            { _UiPresenter.OnChefPossessed(); }
+            TryActivateGameplayInputs(InPawn);
+            SetViewTargetWithBlend(InPawn, 0.0f);
+        }
     }
 }

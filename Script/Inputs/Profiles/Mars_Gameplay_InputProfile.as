@@ -65,6 +65,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnLook"));
         InInputComponent.BindAction(mars::Mars_IA_CycleSlot, ETriggerEvent::Triggered,
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnCycleSlot"));
+        InInputComponent.BindAction(mars::Mars_IA_Pause, ETriggerEvent::Started,
+            FEnhancedInputActionHandlerDynamicSignature(this, n"OnPause"));
         InInputComponent.BindAction(mars::Mars_IA_Sprint, ETriggerEvent::Started,
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnSprintStarted"));
         InInputComponent.BindAction(mars::Mars_IA_Crouch, ETriggerEvent::Started,
@@ -219,6 +221,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::MouseWheelAxis);
 
         Context.MapKey(mars::Mars_IA_ToggleDebugger, EKeys::F9);
+        Context.MapKey(mars::Mars_IA_Pause, EKeys::Escape);
     }
 
     private void SetupGamepadBindings()
@@ -258,6 +261,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         // Shares B with Crouch: Back is read only while operating a station, where Locomotion (and crouch) is down.
         Context.MapKey(mars::Mars_IA_Back, EKeys::Gamepad_FaceButton_Right);
         Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::Gamepad_RightShoulder);
+        Context.MapKey(mars::Mars_IA_Pause, EKeys::Gamepad_Special_Right);
         auto& MappingCyclePrevious = Context.MapKey(mars::Mars_IA_CycleSlot, EKeys::Gamepad_LeftShoulder);
         MappingCyclePrevious.Modifiers.Add(NewObject(Context, UInputModifierNegate));
     }
@@ -265,6 +269,15 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     //--------------------------------------------------------------------------------------------
     // Enhanced Input handlers
     //--------------------------------------------------------------------------------------------
+
+    UFUNCTION()
+    private void OnPause(FInputActionValue ActionValue, float32 ElapsedTime,
+        float32 TriggeredTime, const UInputAction SourceAction)
+    {
+        auto PC = Cast<AMars_Master_PlayerController>(OwningController);
+        if (ck::IsValid(PC) && ck::IsValid(PC.PauseMenu))
+        { PC.PauseMenu.OpenPause(); }
+    }
 
     UFUNCTION()
     private void OnSprintStarted(FInputActionValue ActionValue, float32 ElapsedTime,

@@ -4,6 +4,9 @@ class AMars_Master_PlayerController : ACk_PlayerController_UE
     UPROPERTY(DefaultComponent)
     UMars_InputComponent InputComp;
 
+    UPROPERTY(DefaultComponent)
+    UMars_PauseMenuComponent PauseMenu;
+
     protected FCk_Handle ThisActorEntity;
 
     UFUNCTION(BlueprintOverride)
@@ -53,9 +56,16 @@ class AMars_Master_PlayerController : ACk_PlayerController_UE
     UFUNCTION()
     private void HandlePossessedPawnChanged(APawn OldPawn, APawn NewPawn)
     {
+        // A same-world possession change closes pause before any profile is re-pointed.
+        PauseMenu.ClosePause(EMars_PauseClose::Resume);
+
         // An unpossess: nothing to do until the next possession.
         if (ck::Is_NOT_Valid(NewPawn))
-        { return; }
+        {
+            if (InputComp.GetProfileCount() > 0)
+            { InputComp.RepointPawn(nullptr); }
+            return;
+        }
 
         OnLocalPawnPossessed(NewPawn);
     }

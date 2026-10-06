@@ -13,10 +13,10 @@ class AMars_Camp_HUD : AMars_Master_HUD
         if (ck::Is_NOT_Valid(_GameplayHud))
         {
             auto PC = GetOwningPlayerController();
-            utils_u_i_layout::ClearLayer(PC, GameplayTags::ResolveGameplayTag(n"UI.Layer.Menu"));
+            utils_u_i_layout::ClearLayer(PC, GameplayTags::UI_Layer_Menu);
 
             auto HudClass = System::LoadClassAsset_Blocking(assets::Gameplay_HUD_Mars_WBP_Class());
-            _GameplayHud = utils_u_i_layout::PushWidgetToLayer(PC, GameplayTags::ResolveGameplayTag(n"UI.Layer.Game"), HudClass);
+            _GameplayHud = utils_u_i_layout::PushWidgetToLayer(PC, GameplayTags::UI_Layer_Game, HudClass);
             if (ck::EnsureIfNot(ck::IsValid(_GameplayHud), "[Mars_Camp_HUD] failed to push the gameplay HUD widget"))
             { return; }
         }

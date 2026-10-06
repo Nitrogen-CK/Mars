@@ -26,8 +26,38 @@ namespace assets
     TSoftObjectPtr<UAnimSequence> A_FPHands_Ready() { return TSoftObjectPtr<UAnimSequence>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/A_FPHands_Ready.A_FPHands_Ready")); }
     TSoftObjectPtr<UAnimSequence> A_FPHands_Relaxed() { return TSoftObjectPtr<UAnimSequence>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/A_FPHands_Relaxed.A_FPHands_Relaxed")); }
     TSoftObjectPtr<UAnimSequence> A_FPHands_Rest() { return TSoftObjectPtr<UAnimSequence>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/A_FPHands_Rest.A_FPHands_Rest")); }
+    TSoftObjectPtr<UCk_GameSettingsUI_RowWidget_Toggle> SettingsToggleRow_Mars_WBP() { return TSoftObjectPtr<UCk_GameSettingsUI_RowWidget_Toggle>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP")); }
+    TSoftClassPtr<UCk_GameSettingsUI_RowWidget_Toggle> SettingsToggleRow_Mars_WBP_Class() { return TSoftClassPtr<UCk_GameSettingsUI_RowWidget_Toggle>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/SettingsToggleRow_Mars_WBP.SettingsToggleRow_Mars_WBP_C")); }
     TSoftObjectPtr<UCk_UI_LayoutConfigAsset_UE> Camp_LayoutConfig_Mars_DA() { return TSoftObjectPtr<UCk_UI_LayoutConfigAsset_UE>(FSoftObjectPath("/Game/Mars/UI/LayoutConfig/Camp_LayoutConfig_Mars_DA.Camp_LayoutConfig_Mars_DA")); }
     TSoftObjectPtr<UCk_UI_LayoutConfigAsset_UE> Gameplay_LayoutConfig_Mars_DA() { return TSoftObjectPtr<UCk_UI_LayoutConfigAsset_UE>(FSoftObjectPath("/Game/Mars/UI/LayoutConfig/Gameplay_LayoutConfig_Mars_DA.Gameplay_LayoutConfig_Mars_DA")); }
+    TSoftObjectPtr<UCommonBorderStyle> BorderPaper_Mars_STYLE() { return TSoftObjectPtr<UCommonBorderStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/BorderPaper_Mars_STYLE.BorderPaper_Mars_STYLE")); }
+    TSoftClassPtr<UCommonBorderStyle> BorderPaper_Mars_STYLE_Class() { return TSoftClassPtr<UCommonBorderStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/BorderPaper_Mars_STYLE.BorderPaper_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonBorderStyle> BorderSettings_Mars_STYLE() { return TSoftObjectPtr<UCommonBorderStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/BorderSettings_Mars_STYLE.BorderSettings_Mars_STYLE")); }
+    TSoftClassPtr<UCommonBorderStyle> BorderSettings_Mars_STYLE_Class() { return TSoftClassPtr<UCommonBorderStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/BorderSettings_Mars_STYLE.BorderSettings_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonBorderStyle> BorderSlate_Mars_STYLE() { return TSoftObjectPtr<UCommonBorderStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/BorderSlate_Mars_STYLE.BorderSlate_Mars_STYLE")); }
+    TSoftClassPtr<UCommonBorderStyle> BorderSlate_Mars_STYLE_Class() { return TSoftClassPtr<UCommonBorderStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/BorderSlate_Mars_STYLE.BorderSlate_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonButtonStyle> ButtonMoss_Mars_STYLE() { return TSoftObjectPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonMoss_Mars_STYLE.ButtonMoss_Mars_STYLE")); }
+    TSoftClassPtr<UCommonButtonStyle> ButtonMoss_Mars_STYLE_Class() { return TSoftClassPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonMoss_Mars_STYLE.ButtonMoss_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonButtonStyle> ButtonPaper_Mars_STYLE() { return TSoftObjectPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonPaper_Mars_STYLE.ButtonPaper_Mars_STYLE")); }
+    TSoftClassPtr<UCommonButtonStyle> ButtonPaper_Mars_STYLE_Class() { return TSoftClassPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonPaper_Mars_STYLE.ButtonPaper_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonButtonStyle> ButtonRibbon_Mars_STYLE() { return TSoftObjectPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonRibbon_Mars_STYLE.ButtonRibbon_Mars_STYLE")); }
+    TSoftClassPtr<UCommonButtonStyle> ButtonRibbon_Mars_STYLE_Class() { return TSoftClassPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonRibbon_Mars_STYLE.ButtonRibbon_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonButtonStyle> ButtonSlate_Mars_STYLE() { return TSoftObjectPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonSlate_Mars_STYLE.ButtonSlate_Mars_STYLE")); }
+    TSoftClassPtr<UCommonButtonStyle> ButtonSlate_Mars_STYLE_Class() { return TSoftClassPtr<UCommonButtonStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/ButtonSlate_Mars_STYLE.ButtonSlate_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextDisplay_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextDisplay_Mars_STYLE.TextDisplay_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextDisplay_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextDisplay_Mars_STYLE.TextDisplay_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextHeading_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextHeading_Mars_STYLE.TextHeading_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextHeading_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextHeading_Mars_STYLE.TextHeading_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextInk_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextInk_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextInk_Mars_STYLE.TextInk_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextIvory_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextIvory_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextIvory_Mars_STYLE.TextIvory_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextMuted_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextMuted_Mars_STYLE.TextMuted_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextMuted_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextMuted_Mars_STYLE.TextMuted_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextSettingsLabel_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextSettingsLabel_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextSettingsLabel_Mars_STYLE.TextSettingsLabel_Mars_STYLE_C")); }
+    TSoftObjectPtr<UCommonTextStyle> TextSettingsValue_Mars_STYLE() { return TSoftObjectPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextSettingsValue_Mars_STYLE.TextSettingsValue_Mars_STYLE")); }
+    TSoftClassPtr<UCommonTextStyle> TextSettingsValue_Mars_STYLE_Class() { return TSoftClassPtr<UCommonTextStyle>(FSoftObjectPath("/Game/Mars/UI/Styles/ChalkParchment/TextSettingsValue_Mars_STYLE.TextSettingsValue_Mars_STYLE_C")); }
     TSoftObjectPtr<UControlRig> CR_FPHands_Contact() { return TSoftObjectPtr<UControlRig>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/CR_FPHands_Contact.CR_FPHands_Contact")); }
     TSoftClassPtr<UControlRig> CR_FPHands_Contact_Class() { return TSoftClassPtr<UControlRig>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/CR_FPHands_Contact.CR_FPHands_Contact_C")); }
     TSoftObjectPtr<UFont> Alegreya_Font() { return TSoftObjectPtr<UFont>(FSoftObjectPath("/Game/Mars/UI/Font/Alegreya/Alegreya_Font.Alegreya_Font")); }
@@ -66,12 +96,28 @@ namespace assets
     TSoftClassPtr<UMars_ActionHintBox_Widget> ActionHintBox_Mars_WBP_Class() { return TSoftClassPtr<UMars_ActionHintBox_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ActionHint/ActionHintBox_Mars_WBP.ActionHintBox_Mars_WBP_C")); }
     TSoftObjectPtr<UMars_Button_Widget> Button_Mars_WBP() { return TSoftObjectPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP")); }
     TSoftClassPtr<UMars_Button_Widget> Button_Mars_WBP_Class() { return TSoftClassPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Common/Button_Mars_WBP.Button_Mars_WBP_C")); }
-    TSoftObjectPtr<UMars_CampMenu_Widget> CampMenu_Mars_WBP() { return TSoftObjectPtr<UMars_CampMenu_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Camp/CampMenu_Mars_WBP.CampMenu_Mars_WBP")); }
-    TSoftClassPtr<UMars_CampMenu_Widget> CampMenu_Mars_WBP_Class() { return TSoftClassPtr<UMars_CampMenu_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Camp/CampMenu_Mars_WBP.CampMenu_Mars_WBP_C")); }
-    TSoftObjectPtr<UMars_CampStationPanel_Widget> CampCustomise_Mars_WBP() { return TSoftObjectPtr<UMars_CampStationPanel_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Camp/CampCustomise_Mars_WBP.CampCustomise_Mars_WBP")); }
-    TSoftClassPtr<UMars_CampStationPanel_Widget> CampCustomise_Mars_WBP_Class() { return TSoftClassPtr<UMars_CampStationPanel_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Camp/CampCustomise_Mars_WBP.CampCustomise_Mars_WBP_C")); }
-    TSoftObjectPtr<UMars_CampStationPanel_Widget> CampSettings_Mars_WBP() { return TSoftObjectPtr<UMars_CampStationPanel_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Camp/CampSettings_Mars_WBP.CampSettings_Mars_WBP")); }
-    TSoftClassPtr<UMars_CampStationPanel_Widget> CampSettings_Mars_WBP_Class() { return TSoftClassPtr<UMars_CampStationPanel_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Camp/CampSettings_Mars_WBP.CampSettings_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_Button_Widget> ButtonMoss_Mars_WBP() { return TSoftObjectPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonMoss_Mars_WBP.ButtonMoss_Mars_WBP")); }
+    TSoftClassPtr<UMars_Button_Widget> ButtonMoss_Mars_WBP_Class() { return TSoftClassPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonMoss_Mars_WBP.ButtonMoss_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_Button_Widget> ButtonPaper_Mars_WBP() { return TSoftObjectPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP")); }
+    TSoftClassPtr<UMars_Button_Widget> ButtonPaper_Mars_WBP_Class() { return TSoftClassPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonPaper_Mars_WBP.ButtonPaper_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_Button_Widget> ButtonRibbon_Mars_WBP() { return TSoftObjectPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonRibbon_Mars_WBP.ButtonRibbon_Mars_WBP")); }
+    TSoftClassPtr<UMars_Button_Widget> ButtonRibbon_Mars_WBP_Class() { return TSoftClassPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonRibbon_Mars_WBP.ButtonRibbon_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_Button_Widget> ButtonSlate_Mars_WBP() { return TSoftObjectPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonSlate_Mars_WBP.ButtonSlate_Mars_WBP")); }
+    TSoftClassPtr<UMars_Button_Widget> ButtonSlate_Mars_WBP_Class() { return TSoftClassPtr<UMars_Button_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ButtonSlate_Mars_WBP.ButtonSlate_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkConfirmation_Widget> Confirmation_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkConfirmation_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Confirmation_Mars_WBP.Confirmation_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkConfirmation_Widget> Confirmation_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkConfirmation_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Confirmation_Mars_WBP.Confirmation_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkDeparture_Widget> Departure_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkDeparture_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Departure_Mars_WBP.Departure_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkDeparture_Widget> Departure_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkDeparture_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Departure_Mars_WBP.Departure_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkInput_Widget> Input_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkInput_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Input_Mars_WBP.Input_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkInput_Widget> Input_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkInput_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Input_Mars_WBP.Input_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkPause_Widget> Pause_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkPause_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Pause_Mars_WBP.Pause_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkPause_Widget> Pause_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkPause_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Pause_Mars_WBP.Pause_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkService_Widget> Service_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkService_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Service_Mars_WBP.Service_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkService_Widget> Service_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkService_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Service_Mars_WBP.Service_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkServiceRow_Widget> ServiceRow_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkServiceRow_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ServiceRow_Mars_WBP.ServiceRow_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkServiceRow_Widget> ServiceRow_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkServiceRow_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/ServiceRow_Mars_WBP.ServiceRow_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_ChalkSettings_Widget> Settings_Mars_WBP() { return TSoftObjectPtr<UMars_ChalkSettings_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP")); }
+    TSoftClassPtr<UMars_ChalkSettings_Widget> Settings_Mars_WBP_Class() { return TSoftClassPtr<UMars_ChalkSettings_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP_C")); }
     TSoftObjectPtr<UMars_Crosshair_Widget> Crosshair_Mars_WBP() { return TSoftObjectPtr<UMars_Crosshair_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Crosshair/Crosshair_Mars_WBP.Crosshair_Mars_WBP")); }
     TSoftClassPtr<UMars_Crosshair_Widget> Crosshair_Mars_WBP_Class() { return TSoftClassPtr<UMars_Crosshair_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/Crosshair/Crosshair_Mars_WBP.Crosshair_Mars_WBP_C")); }
     TSoftObjectPtr<UMars_EmoteWheel_Definition> EmoteWheel_Mars_DA() { return TSoftObjectPtr<UMars_EmoteWheel_Definition>(FSoftObjectPath("/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA")); }
@@ -99,8 +145,17 @@ namespace assets
     TSoftClassPtr<UMars_Keyboard_ControllerData> Keyboard_ControllerData_Mars_BP_Class() { return TSoftClassPtr<UMars_Keyboard_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/Keyboard_ControllerData_Mars_BP.Keyboard_ControllerData_Mars_BP_C")); }
     TSoftObjectPtr<UMars_PS5Gamepad_ControllerData> PS5_ControllerData_Mars_BP() { return TSoftObjectPtr<UMars_PS5Gamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/PS5_ControllerData_Mars_BP.PS5_ControllerData_Mars_BP")); }
     TSoftClassPtr<UMars_PS5Gamepad_ControllerData> PS5_ControllerData_Mars_BP_Class() { return TSoftClassPtr<UMars_PS5Gamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/PS5_ControllerData_Mars_BP.PS5_ControllerData_Mars_BP_C")); }
+    TSoftObjectPtr<UMars_SettingsDropdownRow_Widget> SettingsDropdownRow_Mars_WBP() { return TSoftObjectPtr<UMars_SettingsDropdownRow_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/SettingsDropdownRow_Mars_WBP.SettingsDropdownRow_Mars_WBP")); }
+    TSoftClassPtr<UMars_SettingsDropdownRow_Widget> SettingsDropdownRow_Mars_WBP_Class() { return TSoftClassPtr<UMars_SettingsDropdownRow_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/SettingsDropdownRow_Mars_WBP.SettingsDropdownRow_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_SettingsSliderRow_Widget> SettingsSliderRow_Mars_WBP() { return TSoftObjectPtr<UMars_SettingsSliderRow_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP")); }
+    TSoftClassPtr<UMars_SettingsSliderRow_Widget> SettingsSliderRow_Mars_WBP_Class() { return TSoftClassPtr<UMars_SettingsSliderRow_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/SettingsSliderRow_Mars_WBP.SettingsSliderRow_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_VestibuleJoin_Widget> VestibuleJoin_Mars_WBP() { return TSoftObjectPtr<UMars_VestibuleJoin_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/VestibuleJoin_Mars_WBP.VestibuleJoin_Mars_WBP")); }
+    TSoftClassPtr<UMars_VestibuleJoin_Widget> VestibuleJoin_Mars_WBP_Class() { return TSoftClassPtr<UMars_VestibuleJoin_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/VestibuleJoin_Mars_WBP.VestibuleJoin_Mars_WBP_C")); }
+    TSoftObjectPtr<UMars_VestibuleMain_Widget> VestibuleMain_Mars_WBP() { return TSoftObjectPtr<UMars_VestibuleMain_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/VestibuleMain_Mars_WBP.VestibuleMain_Mars_WBP")); }
+    TSoftClassPtr<UMars_VestibuleMain_Widget> VestibuleMain_Mars_WBP_Class() { return TSoftClassPtr<UMars_VestibuleMain_Widget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/VestibuleMain_Mars_WBP.VestibuleMain_Mars_WBP_C")); }
     TSoftObjectPtr<UMars_XboxGamepad_ControllerData> Xbox_ControllerData_Mars_BP() { return TSoftObjectPtr<UMars_XboxGamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/Xbox_ControllerData_Mars_BP.Xbox_ControllerData_Mars_BP")); }
     TSoftClassPtr<UMars_XboxGamepad_ControllerData> Xbox_ControllerData_Mars_BP_Class() { return TSoftClassPtr<UMars_XboxGamepad_ControllerData>(FSoftObjectPath("/Game/Mars/UI/Input/Xbox_ControllerData_Mars_BP.Xbox_ControllerData_Mars_BP_C")); }
+    TSoftObjectPtr<UMaterial> CampCloth_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Environment/Materials/Camp/CampCloth_Mars_M.CampCloth_Mars_M")); }
     TSoftObjectPtr<UMaterial> Emissive_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Environment/Materials/Emissive_Mars_M.Emissive_Mars_M")); }
     TSoftObjectPtr<UMaterial> EmoteIcon_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/UI/Materials/EmoteWheel/EmoteIcon_Mars_M.EmoteIcon_Mars_M")); }
     TSoftObjectPtr<UMaterial> EmoteWheelDisk_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/UI/Materials/EmoteWheel/EmoteWheelDisk_Mars_M.EmoteWheelDisk_Mars_M")); }
@@ -110,16 +165,37 @@ namespace assets
     TSoftObjectPtr<UMaterial> M_PlayerBackpack() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerBackpack/Meshes/M_PlayerBackpack.M_PlayerBackpack")); }
     TSoftObjectPtr<UMaterial> M_RadialProgress() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Materials/RadialFill/M_RadialProgress.M_RadialProgress")); }
     TSoftObjectPtr<UMaterial> MiseAtlas_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Environment/Materials/MiseAtlas_Mars_M.MiseAtlas_Mars_M")); }
+    TSoftObjectPtr<UMaterial> OpenSlotDash_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/UI/Materials/ChalkParchment/OpenSlotDash_Mars_M.OpenSlotDash_Mars_M")); }
+    TSoftObjectPtr<UMaterial> PlayerCookbook_Cover_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Cover_Mars_M.PlayerCookbook_Cover_Mars_M")); }
+    TSoftObjectPtr<UMaterial> PlayerCookbook_Pages_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Pages_Mars_M.PlayerCookbook_Pages_Mars_M")); }
+    TSoftObjectPtr<UMaterial> PotUtensilsInk_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/UI/Materials/ChalkParchment/PotUtensilsInk_Mars_M.PotUtensilsInk_Mars_M")); }
     TSoftObjectPtr<UMaterial> Surface_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Environment/Materials/Surface_Mars_M.Surface_Mars_M")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> CampMenuFrame_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Camp/CampMenuFrame_Mars_MI.CampMenuFrame_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> Cover() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Cover.Cover")); }
     TSoftObjectPtr<UMaterialInstanceConstant> Flame_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/Flame_Mars_MI.Flame_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> Glow_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/Glow_Mars_MI.Glow_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> MI_RadialProgress() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/RadialFill/MI_RadialProgress.MI_RadialProgress")); }
     TSoftObjectPtr<UMaterialInstanceConstant> MiseAtlas_Bellfold_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> MiseAtlas_Rootstep_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/MiseAtlas_Rootstep_Mars_MI.MiseAtlas_Rootstep_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> MiseAtlas_Spillring_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/MiseAtlas_Spillring_Mars_MI.MiseAtlas_Spillring_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> OpenSlotDash_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/UI/Materials/ChalkParchment/OpenSlotDash_Mars_MI.OpenSlotDash_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PageA() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PageA.PageA")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PageB() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PageB.PageB")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PageC() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PageC.PageC")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PageD() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PageD.PageD")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PageFirst() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PageFirst.PageFirst")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PageLast() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PageLast.PageLast")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PagesBase() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/PagesBase.PagesBase")); }
     TSoftObjectPtr<UMaterialInstanceConstant> PlainStone_Bellfold_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/PlainStone_Bellfold_Mars_MI.PlainStone_Bellfold_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> PlainStone_Rootstep_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/PlainStone_Rootstep_Mars_MI.PlainStone_Rootstep_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> PlainStone_Spillring_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/PlainStone_Spillring_Mars_MI.PlainStone_Spillring_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PlayerCookbook_Cover_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_Cover_Mars_MI.PlayerCookbook_Cover_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PlayerCookbook_PageA_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageA_Mars_MI.PlayerCookbook_PageA_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PlayerCookbook_PageB_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageB_Mars_MI.PlayerCookbook_PageB_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PlayerCookbook_PageC_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageC_Mars_MI.PlayerCookbook_PageC_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PlayerCookbook_PageD_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PageD_Mars_MI.PlayerCookbook_PageD_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PlayerCookbook_PagesBase_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Materials/PlayerCookbook_PagesBase_Mars_MI.PlayerCookbook_PagesBase_Mars_MI")); }
+    TSoftObjectPtr<UMaterialInstanceConstant> PotUtensilsInk_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/UI/Materials/ChalkParchment/PotUtensilsInk_Mars_MI.PotUtensilsInk_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Floor_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Floor_Mars_MI.ProtoGrid_Floor_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Interactable_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Interactable_Mars_MI.ProtoGrid_Interactable_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> ProtoGrid_Item_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Materials/ProtoGrid/ProtoGrid_Item_Mars_MI.ProtoGrid_Item_Mars_MI")); }
@@ -132,6 +208,7 @@ namespace assets
     TSoftObjectPtr<UMaterialInstanceConstant> StoneWall_Rootstep_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/StoneWall_Rootstep_Mars_MI.StoneWall_Rootstep_Mars_MI")); }
     TSoftObjectPtr<UMaterialInstanceConstant> StoneWall_Spillring_Mars_MI() { return TSoftObjectPtr<UMaterialInstanceConstant>(FSoftObjectPath("/Game/Mars/Environment/Materials/Instances/StoneWall_Spillring_Mars_MI.StoneWall_Spillring_Mars_MI")); }
     TSoftObjectPtr<UPhysicsAsset> PA_FPHands() { return TSoftObjectPtr<UPhysicsAsset>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/PA_FPHands.PA_FPHands")); }
+    TSoftObjectPtr<USkeletalMesh> SK_Book_Worn() { return TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/SK_Book_Worn.SK_Book_Worn")); }
     TSoftObjectPtr<USkeletalMesh> SK_FPHands() { return TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/SK_FPHands.SK_FPHands")); }
     TSoftObjectPtr<USoundClass> MasterSoundClass_Mars() { return TSoftObjectPtr<USoundClass>(FSoftObjectPath("/Game/Mars/Audio/SoundClass/MasterSoundClass_Mars.MasterSoundClass_Mars")); }
     TSoftObjectPtr<USoundClass> MusicSoundClass_Mars() { return TSoftObjectPtr<USoundClass>(FSoftObjectPath("/Game/Mars/Audio/SoundClass/MusicSoundClass_Mars.MusicSoundClass_Mars")); }
@@ -149,6 +226,7 @@ namespace assets
     TSoftObjectPtr<USoundCue> Sand_Landed_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Sand/cue/Sand_Landed_Mars_SND.Sand_Landed_Mars_SND")); }
     TSoftObjectPtr<USoundCue> Stone_Footstep_BB_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Concrete/Normal/wav/Stone_Footstep_BB_SND.Stone_Footstep_BB_SND")); }
     TSoftObjectPtr<USoundCue> Stone_Landed_BB_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Concrete/Normal/wav/Stone_Landed_BB_SND.Stone_Landed_BB_SND")); }
+    TSoftObjectPtr<USoundMix> Settings_Mars_MIX() { return TSoftObjectPtr<USoundMix>(FSoftObjectPath("/Game/Mars/Audio/Settings_Mars_MIX.Settings_Mars_MIX")); }
     TSoftObjectPtr<USoundWave> carpet_running_1_1() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Carpet/wav/carpet_running_1_1.carpet_running_1_1")); }
     TSoftObjectPtr<USoundWave> carpet_running_1_10() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Carpet/wav/carpet_running_1_10.carpet_running_1_10")); }
     TSoftObjectPtr<USoundWave> carpet_running_1_2() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Carpet/wav/carpet_running_1_2.carpet_running_1_2")); }
@@ -501,9 +579,23 @@ namespace assets
     TSoftObjectPtr<UStaticMesh> LeverHandle_Mars_SM() { return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/Mechanisms/LeverHandle_Mars_SM.LeverHandle_Mars_SM")); }
     TSoftObjectPtr<UStaticMesh> SM_FPHands_GripTestCube() { return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Test/SM_FPHands_GripTestCube.SM_FPHands_GripTestCube")); }
     TSoftObjectPtr<UStaticMesh> SM_PlayerBackpack() { return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerBackpack/Meshes/SM_PlayerBackpack.SM_PlayerBackpack")); }
+    TSoftObjectPtr<UTexture2D> AudioIcon_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/AudioIcon_Mars_T.AudioIcon_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Backpack_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Backpack_T.Backpack_T")); }
+    TSoftObjectPtr<UTexture2D> ButtonMoss_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ButtonMoss_Mars_T.ButtonMoss_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ButtonPaper_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ButtonPaper_Mars_T.ButtonPaper_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ButtonRibbon_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ButtonRibbon_Mars_T.ButtonRibbon_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ButtonSlate_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ButtonSlate_Mars_T.ButtonSlate_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> CarrotChalk_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/CarrotChalk_Mars_T.CarrotChalk_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> CategoryPointer_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/CategoryPointer_Mars_T.CategoryPointer_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> CheckboxWell_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/CheckboxWell_Mars_T.CheckboxWell_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> Checkmark_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/Checkmark_Mars_T.Checkmark_Mars_T")); }
     TSoftObjectPtr<UTexture2D> ChefCharacter_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChefCharacter_T.ChefCharacter_T")); }
+    TSoftObjectPtr<UTexture2D> ChefPortraitRed_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ChefPortraitRed_Mars_T.ChefPortraitRed_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> CompassFlourish_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/CompassFlourish_Mars_T.CompassFlourish_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ControlThumb_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ControlThumb_Mars_T.ControlThumb_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Cursor_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Cursor_T.Cursor_T")); }
+    TSoftObjectPtr<UTexture2D> DividerDiamond_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/DividerDiamond_Mars_T.DividerDiamond_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> DropdownChevron_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/DropdownChevron_Mars_T.DropdownChevron_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Emote_Bow_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/Emote_Bow_Mars_T.Emote_Bow_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Emote_Cheer_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/Emote_Cheer_Mars_T.Emote_Cheer_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Emote_Dance_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/Emote_Dance_Mars_T.Emote_Dance_Mars_T")); }
@@ -518,7 +610,14 @@ namespace assets
     TSoftObjectPtr<UTexture2D> EmoteWheel_Ring_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Ring_Mars_T.EmoteWheel_Ring_Mars_T")); }
     TSoftObjectPtr<UTexture2D> EmoteWheel_Selector_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/EmoteWheel/EmoteWheel_Selector_Mars_T.EmoteWheel_Selector_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Eyes_Atlas_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Eyes/Eyes_Atlas_Mars_T.Eyes_Atlas_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> FieldInset_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/FieldInset_Mars_T.FieldInset_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> FocusCorner_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/FocusCorner_Mars_T.FocusCorner_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> FrameRail_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/FrameRail_Mars_T.FrameRail_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> GarlicChalk_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/GarlicChalk_Mars_T.GarlicChalk_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Hand_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Hand_T.Hand_T")); }
+    TSoftObjectPtr<UTexture2D> HeaderInk_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/HeaderInk_Mars_T.HeaderInk_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> HeaderOrnate_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/HeaderOrnate_Mars_T.HeaderOrnate_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> HerbSprig_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/HerbSprig_Mars_T.HerbSprig_Mars_T")); }
     TSoftObjectPtr<UTexture2D> InteractPromptBackground_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Interaction/InteractPromptBackground_T.InteractPromptBackground_T")); }
     TSoftObjectPtr<UTexture2D> InteractPromptButton_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Interaction/InteractPromptButton_T.InteractPromptButton_T")); }
     TSoftObjectPtr<UTexture2D> Inventory_HandMarker_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inventory/Inventory_HandMarker_Mars_T.Inventory_HandMarker_Mars_T")); }
@@ -538,6 +637,12 @@ namespace assets
     TSoftObjectPtr<UTexture2D> MiseAtlas_Spillring_Emissive_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_Emissive_Mars_T.MiseAtlas_Spillring_Emissive_Mars_T")); }
     TSoftObjectPtr<UTexture2D> MiseAtlas_Spillring_Normal_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_Normal_Mars_T.MiseAtlas_Spillring_Normal_Mars_T")); }
     TSoftObjectPtr<UTexture2D> MiseAtlas_Spillring_ORM_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/MiseAtlas/Spillring/MiseAtlas_Spillring_ORM_Mars_T.MiseAtlas_Spillring_ORM_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> MotionIcon_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/MotionIcon_Mars_T.MotionIcon_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PanelCorner_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/PanelCorner_Mars_T.PanelCorner_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PanelTrim_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/PanelTrim_Mars_T.PanelTrim_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ParchmentPanel_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ParchmentPanel_Mars_T.ParchmentPanel_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ParchmentSurface_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ParchmentSurface_Mars_T.ParchmentSurface_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PickleJarIcon_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/PickleJarIcon_Mars_T.PickleJarIcon_Mars_T")); }
     TSoftObjectPtr<UTexture2D> PlainStone_Bellfold_BaseColor_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/PlainStone_Bellfold/PlainStone_Bellfold_BaseColor_Mars_T.PlainStone_Bellfold_BaseColor_Mars_T")); }
     TSoftObjectPtr<UTexture2D> PlainStone_Bellfold_Normal_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/PlainStone_Bellfold/PlainStone_Bellfold_Normal_Mars_T.PlainStone_Bellfold_Normal_Mars_T")); }
     TSoftObjectPtr<UTexture2D> PlainStone_Bellfold_ORM_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/PlainStone_Bellfold/PlainStone_Bellfold_ORM_Mars_T.PlainStone_Bellfold_ORM_Mars_T")); }
@@ -547,6 +652,13 @@ namespace assets
     TSoftObjectPtr<UTexture2D> PlainStone_Spillring_BaseColor_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/PlainStone_Spillring/PlainStone_Spillring_BaseColor_Mars_T.PlainStone_Spillring_BaseColor_Mars_T")); }
     TSoftObjectPtr<UTexture2D> PlainStone_Spillring_Normal_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/PlainStone_Spillring/PlainStone_Spillring_Normal_Mars_T.PlainStone_Spillring_Normal_Mars_T")); }
     TSoftObjectPtr<UTexture2D> PlainStone_Spillring_ORM_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/PlainStone_Spillring/PlainStone_Spillring_ORM_Mars_T.PlainStone_Spillring_ORM_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PlayerCookbook_CoverStain_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_CoverStain_Mars_T.PlayerCookbook_CoverStain_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PlayerCookbook_CoverStainMask_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_CoverStainMask_Mars_T.PlayerCookbook_CoverStainMask_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PlayerCookbook_PagesStain_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStain_Mars_T.PlayerCookbook_PagesStain_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PlayerCookbook_PagesStainMask_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCookbook/Textures/PlayerCookbook_PagesStainMask_Mars_T.PlayerCookbook_PagesStainMask_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PlusMark_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/PlusMark_Mars_T.PlusMark_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PotEmblem_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/PotEmblem_Mars_T.PotEmblem_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> PotUtensils_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/PotUtensils_Mars_T.PotUtensils_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_Joystick_A_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_A_Mars_T.Prompt_Joystick_A_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_Joystick_ArrowDown_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_ArrowDown_Mars_T.Prompt_Joystick_ArrowDown_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_Joystick_ArrowLeft_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Gamepad/Prompt_Joystick_ArrowLeft_Mars_T.Prompt_Joystick_ArrowLeft_Mars_T")); }
@@ -659,6 +771,14 @@ namespace assets
     TSoftObjectPtr<UTexture2D> Prompt_PC_X_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_X_Mars_T.Prompt_PC_X_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_PC_Y_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Y_Mars_T.Prompt_PC_Y_Mars_T")); }
     TSoftObjectPtr<UTexture2D> Prompt_PC_Z_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/Inputs/Keyboard/Prompt_PC_Z_Mars_T.Prompt_PC_Z_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ScrollBottom_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ScrollBottom_Mars_T.ScrollBottom_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> ScrollTop_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/ScrollTop_Mars_T.ScrollTop_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> SlatePanel_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/SlatePanel_Mars_T.SlatePanel_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> SlateSurface_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/SlateSurface_Mars_T.SlateSurface_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> SliderFill_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/SliderFill_Mars_T.SliderFill_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> SliderTrack_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/SliderTrack_Mars_T.SliderTrack_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> SlotFrame_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/SlotFrame_Mars_T.SlotFrame_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> SpoonMarker_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/SpoonMarker_Mars_T.SpoonMarker_Mars_T")); }
     TSoftObjectPtr<UTexture2D> StoneFloor_Bellfold_BaseColor_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/StoneFloor_Bellfold/StoneFloor_Bellfold_BaseColor_Mars_T.StoneFloor_Bellfold_BaseColor_Mars_T")); }
     TSoftObjectPtr<UTexture2D> StoneFloor_Bellfold_Normal_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/StoneFloor_Bellfold/StoneFloor_Bellfold_Normal_Mars_T.StoneFloor_Bellfold_Normal_Mars_T")); }
     TSoftObjectPtr<UTexture2D> StoneFloor_Bellfold_ORM_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/StoneFloor_Bellfold/StoneFloor_Bellfold_ORM_Mars_T.StoneFloor_Bellfold_ORM_Mars_T")); }
@@ -679,6 +799,10 @@ namespace assets
     TSoftObjectPtr<UTexture2D> StoneWall_Spillring_ORM_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Environment/Textures/Surfaces/StoneWall_Spillring/StoneWall_Spillring_ORM_Mars_T.StoneWall_Spillring_ORM_Mars_T")); }
     TSoftObjectPtr<UTexture2D> T_PlayerBackPack_D() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerBackpack/Meshes/T_PlayerBackPack_D.T_PlayerBackPack_D")); }
     TSoftObjectPtr<UTexture2D> T_PlayerBackPack_N() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerBackpack/Meshes/T_PlayerBackPack_N.T_PlayerBackPack_N")); }
+    TSoftObjectPtr<UTexture2D> WarningIcon_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/WarningIcon_Mars_T.WarningIcon_Mars_T")); }
+    TSoftObjectPtr<UTexture2D> Wordmark_Mars_T() { return TSoftObjectPtr<UTexture2D>(FSoftObjectPath("/Game/Mars/UI/Textures/ChalkParchment/Wordmark_Mars_T.Wordmark_Mars_T")); }
+    TSoftObjectPtr<UUserWidget> Loading_Mars_WBP() { return TSoftObjectPtr<UUserWidget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Loading_Mars_WBP.Loading_Mars_WBP")); }
+    TSoftClassPtr<UUserWidget> Loading_Mars_WBP_Class() { return TSoftClassPtr<UUserWidget>(FSoftObjectPath("/Game/Mars/UI/Widgets/ChalkParchment/Loading_Mars_WBP.Loading_Mars_WBP_C")); }
     TSoftObjectPtr<UWorld> AutoTests_Mars_MAP() { return TSoftObjectPtr<UWorld>(FSoftObjectPath("/Game/Mars/Maps/AutoTests_Mars_MAP.AutoTests_Mars_MAP")); }
     TSoftObjectPtr<UWorld> Camp_Mars_MAP() { return TSoftObjectPtr<UWorld>(FSoftObjectPath("/Game/Mars/Maps/Camp_Mars_MAP.Camp_Mars_MAP")); }
     TSoftObjectPtr<UWorld> CryptLevel01_Mars_MAP() { return TSoftObjectPtr<UWorld>(FSoftObjectPath("/Game/Mars/Maps/CryptLevel01_Mars_MAP.CryptLevel01_Mars_MAP")); }
@@ -870,6 +994,24 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::A_FPHands_Rest());
     }
+    UCk_GameSettingsUI_RowWidget_Toggle SettingsToggleRow_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SettingsToggleRow_Mars_WBP() called before engine init. Use assets::SettingsToggleRow_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SettingsToggleRow_Mars_WBP());
+    }
+    TSubclassOf<UCk_GameSettingsUI_RowWidget_Toggle> SettingsToggleRow_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SettingsToggleRow_Mars_WBP_Class() called before engine init. Use assets::SettingsToggleRow_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::SettingsToggleRow_Mars_WBP_Class());
+    }
     UCk_UI_LayoutConfigAsset_UE Camp_LayoutConfig_Mars_DA()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -887,6 +1029,258 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Gameplay_LayoutConfig_Mars_DA());
+    }
+    UCommonBorderStyle BorderPaper_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::BorderPaper_Mars_STYLE() called before engine init. Use assets::BorderPaper_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::BorderPaper_Mars_STYLE());
+    }
+    TSubclassOf<UCommonBorderStyle> BorderPaper_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::BorderPaper_Mars_STYLE_Class() called before engine init. Use assets::BorderPaper_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::BorderPaper_Mars_STYLE_Class());
+    }
+    UCommonBorderStyle BorderSettings_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::BorderSettings_Mars_STYLE() called before engine init. Use assets::BorderSettings_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::BorderSettings_Mars_STYLE());
+    }
+    TSubclassOf<UCommonBorderStyle> BorderSettings_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::BorderSettings_Mars_STYLE_Class() called before engine init. Use assets::BorderSettings_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::BorderSettings_Mars_STYLE_Class());
+    }
+    UCommonBorderStyle BorderSlate_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::BorderSlate_Mars_STYLE() called before engine init. Use assets::BorderSlate_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::BorderSlate_Mars_STYLE());
+    }
+    TSubclassOf<UCommonBorderStyle> BorderSlate_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::BorderSlate_Mars_STYLE_Class() called before engine init. Use assets::BorderSlate_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::BorderSlate_Mars_STYLE_Class());
+    }
+    UCommonButtonStyle ButtonMoss_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonMoss_Mars_STYLE() called before engine init. Use assets::ButtonMoss_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonMoss_Mars_STYLE());
+    }
+    TSubclassOf<UCommonButtonStyle> ButtonMoss_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonMoss_Mars_STYLE_Class() called before engine init. Use assets::ButtonMoss_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::ButtonMoss_Mars_STYLE_Class());
+    }
+    UCommonButtonStyle ButtonPaper_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonPaper_Mars_STYLE() called before engine init. Use assets::ButtonPaper_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonPaper_Mars_STYLE());
+    }
+    TSubclassOf<UCommonButtonStyle> ButtonPaper_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonPaper_Mars_STYLE_Class() called before engine init. Use assets::ButtonPaper_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::ButtonPaper_Mars_STYLE_Class());
+    }
+    UCommonButtonStyle ButtonRibbon_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonRibbon_Mars_STYLE() called before engine init. Use assets::ButtonRibbon_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonRibbon_Mars_STYLE());
+    }
+    TSubclassOf<UCommonButtonStyle> ButtonRibbon_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonRibbon_Mars_STYLE_Class() called before engine init. Use assets::ButtonRibbon_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::ButtonRibbon_Mars_STYLE_Class());
+    }
+    UCommonButtonStyle ButtonSlate_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonSlate_Mars_STYLE() called before engine init. Use assets::ButtonSlate_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonSlate_Mars_STYLE());
+    }
+    TSubclassOf<UCommonButtonStyle> ButtonSlate_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonSlate_Mars_STYLE_Class() called before engine init. Use assets::ButtonSlate_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::ButtonSlate_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextDisplay_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextDisplay_Mars_STYLE() called before engine init. Use assets::TextDisplay_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextDisplay_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextDisplay_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextDisplay_Mars_STYLE_Class() called before engine init. Use assets::TextDisplay_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextDisplay_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextHeading_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextHeading_Mars_STYLE() called before engine init. Use assets::TextHeading_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextHeading_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextHeading_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextHeading_Mars_STYLE_Class() called before engine init. Use assets::TextHeading_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextHeading_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextInk_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextInk_Mars_STYLE() called before engine init. Use assets::TextInk_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextInk_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextInk_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextInk_Mars_STYLE_Class() called before engine init. Use assets::TextInk_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextInk_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextIvory_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextIvory_Mars_STYLE() called before engine init. Use assets::TextIvory_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextIvory_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextIvory_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextIvory_Mars_STYLE_Class() called before engine init. Use assets::TextIvory_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextIvory_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextMuted_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextMuted_Mars_STYLE() called before engine init. Use assets::TextMuted_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextMuted_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextMuted_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextMuted_Mars_STYLE_Class() called before engine init. Use assets::TextMuted_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextMuted_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextSettingsLabel_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextSettingsLabel_Mars_STYLE() called before engine init. Use assets::TextSettingsLabel_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextSettingsLabel_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextSettingsLabel_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextSettingsLabel_Mars_STYLE_Class() called before engine init. Use assets::TextSettingsLabel_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextSettingsLabel_Mars_STYLE_Class());
+    }
+    UCommonTextStyle TextSettingsValue_Mars_STYLE()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextSettingsValue_Mars_STYLE() called before engine init. Use assets::TextSettingsValue_Mars_STYLE() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TextSettingsValue_Mars_STYLE());
+    }
+    TSubclassOf<UCommonTextStyle> TextSettingsValue_Mars_STYLE_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TextSettingsValue_Mars_STYLE_Class() called before engine init. Use assets::TextSettingsValue_Mars_STYLE_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::TextSettingsValue_Mars_STYLE_Class());
     }
     UControlRig CR_FPHands_Contact()
     {
@@ -1230,59 +1624,203 @@ namespace assets::load
         }
         return System::LoadClassAsset_Blocking(assets::Button_Mars_WBP_Class());
     }
-    UMars_CampMenu_Widget CampMenu_Mars_WBP()
+    UMars_Button_Widget ButtonMoss_Mars_WBP()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
         {
-            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampMenu_Mars_WBP() called before engine init. Use assets::CampMenu_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonMoss_Mars_WBP() called before engine init. Use assets::ButtonMoss_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
             return nullptr;
         }
-        return System::LoadAsset_Blocking(assets::CampMenu_Mars_WBP());
+        return System::LoadAsset_Blocking(assets::ButtonMoss_Mars_WBP());
     }
-    TSubclassOf<UMars_CampMenu_Widget> CampMenu_Mars_WBP_Class()
+    TSubclassOf<UMars_Button_Widget> ButtonMoss_Mars_WBP_Class()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
         {
-            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampMenu_Mars_WBP_Class() called before engine init. Use assets::CampMenu_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonMoss_Mars_WBP_Class() called before engine init. Use assets::ButtonMoss_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
             return nullptr;
         }
-        return System::LoadClassAsset_Blocking(assets::CampMenu_Mars_WBP_Class());
+        return System::LoadClassAsset_Blocking(assets::ButtonMoss_Mars_WBP_Class());
     }
-    UMars_CampStationPanel_Widget CampCustomise_Mars_WBP()
+    UMars_Button_Widget ButtonPaper_Mars_WBP()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
         {
-            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampCustomise_Mars_WBP() called before engine init. Use assets::CampCustomise_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonPaper_Mars_WBP() called before engine init. Use assets::ButtonPaper_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
             return nullptr;
         }
-        return System::LoadAsset_Blocking(assets::CampCustomise_Mars_WBP());
+        return System::LoadAsset_Blocking(assets::ButtonPaper_Mars_WBP());
     }
-    TSubclassOf<UMars_CampStationPanel_Widget> CampCustomise_Mars_WBP_Class()
+    TSubclassOf<UMars_Button_Widget> ButtonPaper_Mars_WBP_Class()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
         {
-            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampCustomise_Mars_WBP_Class() called before engine init. Use assets::CampCustomise_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonPaper_Mars_WBP_Class() called before engine init. Use assets::ButtonPaper_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
             return nullptr;
         }
-        return System::LoadClassAsset_Blocking(assets::CampCustomise_Mars_WBP_Class());
+        return System::LoadClassAsset_Blocking(assets::ButtonPaper_Mars_WBP_Class());
     }
-    UMars_CampStationPanel_Widget CampSettings_Mars_WBP()
+    UMars_Button_Widget ButtonRibbon_Mars_WBP()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
         {
-            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampSettings_Mars_WBP() called before engine init. Use assets::CampSettings_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonRibbon_Mars_WBP() called before engine init. Use assets::ButtonRibbon_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
             return nullptr;
         }
-        return System::LoadAsset_Blocking(assets::CampSettings_Mars_WBP());
+        return System::LoadAsset_Blocking(assets::ButtonRibbon_Mars_WBP());
     }
-    TSubclassOf<UMars_CampStationPanel_Widget> CampSettings_Mars_WBP_Class()
+    TSubclassOf<UMars_Button_Widget> ButtonRibbon_Mars_WBP_Class()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
         {
-            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampSettings_Mars_WBP_Class() called before engine init. Use assets::CampSettings_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonRibbon_Mars_WBP_Class() called before engine init. Use assets::ButtonRibbon_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
             return nullptr;
         }
-        return System::LoadClassAsset_Blocking(assets::CampSettings_Mars_WBP_Class());
+        return System::LoadClassAsset_Blocking(assets::ButtonRibbon_Mars_WBP_Class());
+    }
+    UMars_Button_Widget ButtonSlate_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonSlate_Mars_WBP() called before engine init. Use assets::ButtonSlate_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonSlate_Mars_WBP());
+    }
+    TSubclassOf<UMars_Button_Widget> ButtonSlate_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonSlate_Mars_WBP_Class() called before engine init. Use assets::ButtonSlate_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::ButtonSlate_Mars_WBP_Class());
+    }
+    UMars_ChalkConfirmation_Widget Confirmation_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Confirmation_Mars_WBP() called before engine init. Use assets::Confirmation_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Confirmation_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkConfirmation_Widget> Confirmation_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Confirmation_Mars_WBP_Class() called before engine init. Use assets::Confirmation_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Confirmation_Mars_WBP_Class());
+    }
+    UMars_ChalkDeparture_Widget Departure_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Departure_Mars_WBP() called before engine init. Use assets::Departure_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Departure_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkDeparture_Widget> Departure_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Departure_Mars_WBP_Class() called before engine init. Use assets::Departure_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Departure_Mars_WBP_Class());
+    }
+    UMars_ChalkInput_Widget Input_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Input_Mars_WBP() called before engine init. Use assets::Input_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Input_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkInput_Widget> Input_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Input_Mars_WBP_Class() called before engine init. Use assets::Input_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Input_Mars_WBP_Class());
+    }
+    UMars_ChalkPause_Widget Pause_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Pause_Mars_WBP() called before engine init. Use assets::Pause_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Pause_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkPause_Widget> Pause_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Pause_Mars_WBP_Class() called before engine init. Use assets::Pause_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Pause_Mars_WBP_Class());
+    }
+    UMars_ChalkService_Widget Service_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Service_Mars_WBP() called before engine init. Use assets::Service_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Service_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkService_Widget> Service_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Service_Mars_WBP_Class() called before engine init. Use assets::Service_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Service_Mars_WBP_Class());
+    }
+    UMars_ChalkServiceRow_Widget ServiceRow_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ServiceRow_Mars_WBP() called before engine init. Use assets::ServiceRow_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ServiceRow_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkServiceRow_Widget> ServiceRow_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ServiceRow_Mars_WBP_Class() called before engine init. Use assets::ServiceRow_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::ServiceRow_Mars_WBP_Class());
+    }
+    UMars_ChalkSettings_Widget Settings_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Settings_Mars_WBP() called before engine init. Use assets::Settings_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Settings_Mars_WBP());
+    }
+    TSubclassOf<UMars_ChalkSettings_Widget> Settings_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Settings_Mars_WBP_Class() called before engine init. Use assets::Settings_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Settings_Mars_WBP_Class());
     }
     UMars_Crosshair_Widget Crosshair_Mars_WBP()
     {
@@ -1527,6 +2065,78 @@ namespace assets::load
         }
         return System::LoadClassAsset_Blocking(assets::PS5_ControllerData_Mars_BP_Class());
     }
+    UMars_SettingsDropdownRow_Widget SettingsDropdownRow_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SettingsDropdownRow_Mars_WBP() called before engine init. Use assets::SettingsDropdownRow_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SettingsDropdownRow_Mars_WBP());
+    }
+    TSubclassOf<UMars_SettingsDropdownRow_Widget> SettingsDropdownRow_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SettingsDropdownRow_Mars_WBP_Class() called before engine init. Use assets::SettingsDropdownRow_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::SettingsDropdownRow_Mars_WBP_Class());
+    }
+    UMars_SettingsSliderRow_Widget SettingsSliderRow_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SettingsSliderRow_Mars_WBP() called before engine init. Use assets::SettingsSliderRow_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SettingsSliderRow_Mars_WBP());
+    }
+    TSubclassOf<UMars_SettingsSliderRow_Widget> SettingsSliderRow_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SettingsSliderRow_Mars_WBP_Class() called before engine init. Use assets::SettingsSliderRow_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::SettingsSliderRow_Mars_WBP_Class());
+    }
+    UMars_VestibuleJoin_Widget VestibuleJoin_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::VestibuleJoin_Mars_WBP() called before engine init. Use assets::VestibuleJoin_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::VestibuleJoin_Mars_WBP());
+    }
+    TSubclassOf<UMars_VestibuleJoin_Widget> VestibuleJoin_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::VestibuleJoin_Mars_WBP_Class() called before engine init. Use assets::VestibuleJoin_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::VestibuleJoin_Mars_WBP_Class());
+    }
+    UMars_VestibuleMain_Widget VestibuleMain_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::VestibuleMain_Mars_WBP() called before engine init. Use assets::VestibuleMain_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::VestibuleMain_Mars_WBP());
+    }
+    TSubclassOf<UMars_VestibuleMain_Widget> VestibuleMain_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::VestibuleMain_Mars_WBP_Class() called before engine init. Use assets::VestibuleMain_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::VestibuleMain_Mars_WBP_Class());
+    }
     UMars_XboxGamepad_ControllerData Xbox_ControllerData_Mars_BP()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -1544,6 +2154,15 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadClassAsset_Blocking(assets::Xbox_ControllerData_Mars_BP_Class());
+    }
+    UMaterial CampCloth_Mars_M()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampCloth_Mars_M() called before engine init. Use assets::CampCloth_Mars_M() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::CampCloth_Mars_M());
     }
     UMaterial Emissive_Mars_M()
     {
@@ -1626,6 +2245,42 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::MiseAtlas_Mars_M());
     }
+    UMaterial OpenSlotDash_Mars_M()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::OpenSlotDash_Mars_M() called before engine init. Use assets::OpenSlotDash_Mars_M() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::OpenSlotDash_Mars_M());
+    }
+    UMaterial PlayerCookbook_Cover_Mars_M()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_Cover_Mars_M() called before engine init. Use assets::PlayerCookbook_Cover_Mars_M() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_Cover_Mars_M());
+    }
+    UMaterial PlayerCookbook_Pages_Mars_M()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_Pages_Mars_M() called before engine init. Use assets::PlayerCookbook_Pages_Mars_M() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_Pages_Mars_M());
+    }
+    UMaterial PotUtensilsInk_Mars_M()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PotUtensilsInk_Mars_M() called before engine init. Use assets::PotUtensilsInk_Mars_M() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PotUtensilsInk_Mars_M());
+    }
     UMaterial Surface_Mars_M()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -1634,6 +2289,24 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Surface_Mars_M());
+    }
+    UMaterialInstanceConstant CampMenuFrame_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CampMenuFrame_Mars_MI() called before engine init. Use assets::CampMenuFrame_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::CampMenuFrame_Mars_MI());
+    }
+    UMaterialInstanceConstant Cover()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Cover() called before engine init. Use assets::Cover() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Cover());
     }
     UMaterialInstanceConstant Flame_Mars_MI()
     {
@@ -1689,6 +2362,78 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::MiseAtlas_Spillring_Mars_MI());
     }
+    UMaterialInstanceConstant OpenSlotDash_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::OpenSlotDash_Mars_MI() called before engine init. Use assets::OpenSlotDash_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::OpenSlotDash_Mars_MI());
+    }
+    UMaterialInstanceConstant PageA()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PageA() called before engine init. Use assets::PageA() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PageA());
+    }
+    UMaterialInstanceConstant PageB()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PageB() called before engine init. Use assets::PageB() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PageB());
+    }
+    UMaterialInstanceConstant PageC()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PageC() called before engine init. Use assets::PageC() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PageC());
+    }
+    UMaterialInstanceConstant PageD()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PageD() called before engine init. Use assets::PageD() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PageD());
+    }
+    UMaterialInstanceConstant PageFirst()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PageFirst() called before engine init. Use assets::PageFirst() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PageFirst());
+    }
+    UMaterialInstanceConstant PageLast()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PageLast() called before engine init. Use assets::PageLast() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PageLast());
+    }
+    UMaterialInstanceConstant PagesBase()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PagesBase() called before engine init. Use assets::PagesBase() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PagesBase());
+    }
     UMaterialInstanceConstant PlainStone_Bellfold_Mars_MI()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -1715,6 +2460,69 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::PlainStone_Spillring_Mars_MI());
+    }
+    UMaterialInstanceConstant PlayerCookbook_Cover_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_Cover_Mars_MI() called before engine init. Use assets::PlayerCookbook_Cover_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_Cover_Mars_MI());
+    }
+    UMaterialInstanceConstant PlayerCookbook_PageA_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PageA_Mars_MI() called before engine init. Use assets::PlayerCookbook_PageA_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PageA_Mars_MI());
+    }
+    UMaterialInstanceConstant PlayerCookbook_PageB_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PageB_Mars_MI() called before engine init. Use assets::PlayerCookbook_PageB_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PageB_Mars_MI());
+    }
+    UMaterialInstanceConstant PlayerCookbook_PageC_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PageC_Mars_MI() called before engine init. Use assets::PlayerCookbook_PageC_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PageC_Mars_MI());
+    }
+    UMaterialInstanceConstant PlayerCookbook_PageD_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PageD_Mars_MI() called before engine init. Use assets::PlayerCookbook_PageD_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PageD_Mars_MI());
+    }
+    UMaterialInstanceConstant PlayerCookbook_PagesBase_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PagesBase_Mars_MI() called before engine init. Use assets::PlayerCookbook_PagesBase_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PagesBase_Mars_MI());
+    }
+    UMaterialInstanceConstant PotUtensilsInk_Mars_MI()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PotUtensilsInk_Mars_MI() called before engine init. Use assets::PotUtensilsInk_Mars_MI() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PotUtensilsInk_Mars_MI());
     }
     UMaterialInstanceConstant ProtoGrid_Floor_Mars_MI()
     {
@@ -1823,6 +2631,15 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::PA_FPHands());
+    }
+    USkeletalMesh SK_Book_Worn()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SK_Book_Worn() called before engine init. Use assets::SK_Book_Worn() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SK_Book_Worn());
     }
     USkeletalMesh SK_FPHands()
     {
@@ -1976,6 +2793,15 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Stone_Landed_BB_SND());
+    }
+    USoundMix Settings_Mars_MIX()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Settings_Mars_MIX() called before engine init. Use assets::Settings_Mars_MIX() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Settings_Mars_MIX());
     }
     USoundWave carpet_running_1_1()
     {
@@ -5145,6 +5971,15 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::SM_PlayerBackpack());
     }
+    UTexture2D AudioIcon_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::AudioIcon_Mars_T() called before engine init. Use assets::AudioIcon_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::AudioIcon_Mars_T());
+    }
     UTexture2D Backpack_T()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -5153,6 +5988,78 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Backpack_T());
+    }
+    UTexture2D ButtonMoss_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonMoss_Mars_T() called before engine init. Use assets::ButtonMoss_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonMoss_Mars_T());
+    }
+    UTexture2D ButtonPaper_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonPaper_Mars_T() called before engine init. Use assets::ButtonPaper_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonPaper_Mars_T());
+    }
+    UTexture2D ButtonRibbon_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonRibbon_Mars_T() called before engine init. Use assets::ButtonRibbon_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonRibbon_Mars_T());
+    }
+    UTexture2D ButtonSlate_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ButtonSlate_Mars_T() called before engine init. Use assets::ButtonSlate_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ButtonSlate_Mars_T());
+    }
+    UTexture2D CarrotChalk_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CarrotChalk_Mars_T() called before engine init. Use assets::CarrotChalk_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::CarrotChalk_Mars_T());
+    }
+    UTexture2D CategoryPointer_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CategoryPointer_Mars_T() called before engine init. Use assets::CategoryPointer_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::CategoryPointer_Mars_T());
+    }
+    UTexture2D CheckboxWell_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CheckboxWell_Mars_T() called before engine init. Use assets::CheckboxWell_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::CheckboxWell_Mars_T());
+    }
+    UTexture2D Checkmark_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Checkmark_Mars_T() called before engine init. Use assets::Checkmark_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Checkmark_Mars_T());
     }
     UTexture2D ChefCharacter_T()
     {
@@ -5163,6 +6070,33 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::ChefCharacter_T());
     }
+    UTexture2D ChefPortraitRed_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ChefPortraitRed_Mars_T() called before engine init. Use assets::ChefPortraitRed_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ChefPortraitRed_Mars_T());
+    }
+    UTexture2D CompassFlourish_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::CompassFlourish_Mars_T() called before engine init. Use assets::CompassFlourish_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::CompassFlourish_Mars_T());
+    }
+    UTexture2D ControlThumb_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ControlThumb_Mars_T() called before engine init. Use assets::ControlThumb_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ControlThumb_Mars_T());
+    }
     UTexture2D Cursor_T()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -5171,6 +6105,24 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Cursor_T());
+    }
+    UTexture2D DividerDiamond_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::DividerDiamond_Mars_T() called before engine init. Use assets::DividerDiamond_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::DividerDiamond_Mars_T());
+    }
+    UTexture2D DropdownChevron_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::DropdownChevron_Mars_T() called before engine init. Use assets::DropdownChevron_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::DropdownChevron_Mars_T());
     }
     UTexture2D Emote_Bow_Mars_T()
     {
@@ -5298,6 +6250,42 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::Eyes_Atlas_Mars_T());
     }
+    UTexture2D FieldInset_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FieldInset_Mars_T() called before engine init. Use assets::FieldInset_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FieldInset_Mars_T());
+    }
+    UTexture2D FocusCorner_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FocusCorner_Mars_T() called before engine init. Use assets::FocusCorner_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FocusCorner_Mars_T());
+    }
+    UTexture2D FrameRail_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FrameRail_Mars_T() called before engine init. Use assets::FrameRail_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FrameRail_Mars_T());
+    }
+    UTexture2D GarlicChalk_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::GarlicChalk_Mars_T() called before engine init. Use assets::GarlicChalk_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::GarlicChalk_Mars_T());
+    }
     UTexture2D Hand_T()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -5306,6 +6294,33 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Hand_T());
+    }
+    UTexture2D HeaderInk_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::HeaderInk_Mars_T() called before engine init. Use assets::HeaderInk_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::HeaderInk_Mars_T());
+    }
+    UTexture2D HeaderOrnate_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::HeaderOrnate_Mars_T() called before engine init. Use assets::HeaderOrnate_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::HeaderOrnate_Mars_T());
+    }
+    UTexture2D HerbSprig_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::HerbSprig_Mars_T() called before engine init. Use assets::HerbSprig_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::HerbSprig_Mars_T());
     }
     UTexture2D InteractPromptBackground_T()
     {
@@ -5478,6 +6493,60 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::MiseAtlas_Spillring_ORM_Mars_T());
     }
+    UTexture2D MotionIcon_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::MotionIcon_Mars_T() called before engine init. Use assets::MotionIcon_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::MotionIcon_Mars_T());
+    }
+    UTexture2D PanelCorner_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PanelCorner_Mars_T() called before engine init. Use assets::PanelCorner_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PanelCorner_Mars_T());
+    }
+    UTexture2D PanelTrim_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PanelTrim_Mars_T() called before engine init. Use assets::PanelTrim_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PanelTrim_Mars_T());
+    }
+    UTexture2D ParchmentPanel_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ParchmentPanel_Mars_T() called before engine init. Use assets::ParchmentPanel_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ParchmentPanel_Mars_T());
+    }
+    UTexture2D ParchmentSurface_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ParchmentSurface_Mars_T() called before engine init. Use assets::ParchmentSurface_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ParchmentSurface_Mars_T());
+    }
+    UTexture2D PickleJarIcon_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PickleJarIcon_Mars_T() called before engine init. Use assets::PickleJarIcon_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PickleJarIcon_Mars_T());
+    }
     UTexture2D PlainStone_Bellfold_BaseColor_Mars_T()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -5558,6 +6627,69 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::PlainStone_Spillring_ORM_Mars_T());
+    }
+    UTexture2D PlayerCookbook_CoverStain_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_CoverStain_Mars_T() called before engine init. Use assets::PlayerCookbook_CoverStain_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_CoverStain_Mars_T());
+    }
+    UTexture2D PlayerCookbook_CoverStainMask_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_CoverStainMask_Mars_T() called before engine init. Use assets::PlayerCookbook_CoverStainMask_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_CoverStainMask_Mars_T());
+    }
+    UTexture2D PlayerCookbook_PagesStain_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PagesStain_Mars_T() called before engine init. Use assets::PlayerCookbook_PagesStain_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PagesStain_Mars_T());
+    }
+    UTexture2D PlayerCookbook_PagesStainMask_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlayerCookbook_PagesStainMask_Mars_T() called before engine init. Use assets::PlayerCookbook_PagesStainMask_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlayerCookbook_PagesStainMask_Mars_T());
+    }
+    UTexture2D PlusMark_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PlusMark_Mars_T() called before engine init. Use assets::PlusMark_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PlusMark_Mars_T());
+    }
+    UTexture2D PotEmblem_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PotEmblem_Mars_T() called before engine init. Use assets::PotEmblem_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PotEmblem_Mars_T());
+    }
+    UTexture2D PotUtensils_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::PotUtensils_Mars_T() called before engine init. Use assets::PotUtensils_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::PotUtensils_Mars_T());
     }
     UTexture2D Prompt_Joystick_A_Mars_T()
     {
@@ -6567,6 +7699,78 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::Prompt_PC_Z_Mars_T());
     }
+    UTexture2D ScrollBottom_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ScrollBottom_Mars_T() called before engine init. Use assets::ScrollBottom_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ScrollBottom_Mars_T());
+    }
+    UTexture2D ScrollTop_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::ScrollTop_Mars_T() called before engine init. Use assets::ScrollTop_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::ScrollTop_Mars_T());
+    }
+    UTexture2D SlatePanel_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SlatePanel_Mars_T() called before engine init. Use assets::SlatePanel_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SlatePanel_Mars_T());
+    }
+    UTexture2D SlateSurface_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SlateSurface_Mars_T() called before engine init. Use assets::SlateSurface_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SlateSurface_Mars_T());
+    }
+    UTexture2D SliderFill_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SliderFill_Mars_T() called before engine init. Use assets::SliderFill_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SliderFill_Mars_T());
+    }
+    UTexture2D SliderTrack_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SliderTrack_Mars_T() called before engine init. Use assets::SliderTrack_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SliderTrack_Mars_T());
+    }
+    UTexture2D SlotFrame_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SlotFrame_Mars_T() called before engine init. Use assets::SlotFrame_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SlotFrame_Mars_T());
+    }
+    UTexture2D SpoonMarker_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::SpoonMarker_Mars_T() called before engine init. Use assets::SpoonMarker_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::SpoonMarker_Mars_T());
+    }
     UTexture2D StoneFloor_Bellfold_BaseColor_Mars_T()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -6746,6 +7950,42 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::T_PlayerBackPack_N());
+    }
+    UTexture2D WarningIcon_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::WarningIcon_Mars_T() called before engine init. Use assets::WarningIcon_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::WarningIcon_Mars_T());
+    }
+    UTexture2D Wordmark_Mars_T()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Wordmark_Mars_T() called before engine init. Use assets::Wordmark_Mars_T() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Wordmark_Mars_T());
+    }
+    UUserWidget Loading_Mars_WBP()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Loading_Mars_WBP() called before engine init. Use assets::Loading_Mars_WBP() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::Loading_Mars_WBP());
+    }
+    TSubclassOf<UUserWidget> Loading_Mars_WBP_Class()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::Loading_Mars_WBP_Class() called before engine init. Use assets::Loading_Mars_WBP_Class() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadClassAsset_Blocking(assets::Loading_Mars_WBP_Class());
     }
     UWorld AutoTests_Mars_MAP()
     {

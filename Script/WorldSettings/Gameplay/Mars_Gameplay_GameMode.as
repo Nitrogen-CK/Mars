@@ -7,6 +7,19 @@ class AMars_Gameplay_GameMode : AMars_Master_GameMode
     default PlayerStateClass = AMars_Gameplay_PlayerState;
     default DefaultPawnClass = AMars_PlayerCharacter;
     default HUDClass = AMars_Gameplay_HUD;
+    default GameSessionClass = AMars_GameSession;
+
+    UFUNCTION(BlueprintOverride)
+    void BeginPlay()
+    {
+        TArray<AMars_GameSession> Sessions;
+        GetAllActorsOfClass(Sessions);
+        for (auto Session : Sessions)
+        {
+            if (ck::IsValid(Session) && Session.GetWorld() == GetWorld())
+            { Session.SetAdmissionOpen(false); }
+        }
+    }
 }
 
 class AMars_Gameplay_GameState : AMars_Master_GameState

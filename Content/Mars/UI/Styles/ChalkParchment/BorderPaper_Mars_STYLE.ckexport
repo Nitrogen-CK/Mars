@@ -1,0 +1,105 @@
+{
+	"assetName": "BorderPaper_Mars_STYLE",
+	"assetPath": "/Game/Mars/UI/Styles/ChalkParchment/BorderPaper_Mars_STYLE.BorderPaper_Mars_STYLE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "ac2281ca7c4f439ce32a1cf35caaea2d",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "CommonBorderStyle",
+	"parentClassPath": "/Script/CommonUI.CommonBorderStyle",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "Background",
+			"type": "FSlateBrush",
+			"category": "Properties",
+			"value":
+			{
+				"TintColor":
+				{
+					"SpecifiedColor":
+					{
+						"R": 1,
+						"G": 1,
+						"B": 1,
+						"A": 1
+					},
+					"ColorUseRule": "UseColor_Specified"
+				},
+				"DrawAs": "Box",
+				"Tiling": "NoTile",
+				"Mirroring": "NoMirror",
+				"ImageType": "NoImage",
+				"ImageSize":
+				{
+					"X": 600,
+					"Y": 600
+				},
+				"Margin":
+				{
+					"Left": 0.059999998658895493,
+					"Top": 0.059999998658895493,
+					"Right": 0.059999998658895493,
+					"Bottom": 0.059999998658895493
+				},
+				"ResourceObject": "/Game/Mars/UI/Textures/ChalkParchment/ParchmentPanel_Mars_T.ParchmentPanel_Mars_T",
+				"OutlineSettings":
+				{
+					"CornerRadii":
+					{
+						"X": 0,
+						"Y": 0,
+						"Z": 0,
+						"W": 0
+					},
+					"Color":
+					{
+						"SpecifiedColor":
+						{
+							"R": 0,
+							"G": 0,
+							"B": 0,
+							"A": 0
+						},
+						"ColorUseRule": "UseColor_Specified"
+					},
+					"Width": 0,
+					"RoundingType": "HalfHeightRadius",
+					"bUseBrushTransparency": false
+				},
+				"UVRegion":
+				{
+					"Min":
+					{
+						"X": 0.028708133846521378,
+						"Y": 0.034290272742509842
+					},
+					"Max":
+					{
+						"X": 0.97527909278869629,
+						"Y": 0.9681020975112915
+					},
+					"bIsValid": true
+				},
+				"bIsDynamicallyLoaded": false,
+				"ResourceName": "None"
+			},
+			"tooltip": "The brush for the background of the border"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

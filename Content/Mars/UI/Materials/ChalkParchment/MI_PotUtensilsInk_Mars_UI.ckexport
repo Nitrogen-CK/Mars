@@ -1,0 +1,97 @@
+{
+	"material": "MI_PotUtensilsInk_Mars_UI",
+	"packagePath": "/Game/Mars/UI/Materials/ChalkParchment/MI_PotUtensilsInk_Mars_UI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "86cdcf0ae0f6fe267a00aff562b48dc7",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/UI/Materials/ChalkParchment/PotUtensilsInk_Mars_M.PotUtensilsInk_Mars_M"
+	],
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_UI",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"TextureSampleParameter2D": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "InkColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Silhouette",
+					"Texture": "/Game/Mars/UI/Textures/ChalkParchment/PotUtensils_Mars_T.PotUtensils_Mars_T"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 1,
+				"output": 4,
+				"mask": "a"
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [
+		{
+			"name": "InkColor",
+			"value": "RGBA(0.01764, 0.01444, 0.01096, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "Silhouette",
+			"value": "/Game/Mars/UI/Textures/ChalkParchment/PotUtensils_Mars_T.PotUtensils_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/UI/Textures/ChalkParchment/PotUtensils_Mars_T.PotUtensils_Mars_T"
+	]
+}

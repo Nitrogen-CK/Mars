@@ -1,5 +1,5 @@
-// The native row owns typed values, capture and pending changes. The game
-// supplies the volume suffix and filled-track presentation in AngelScript.
+// The native row owns the typed value, capture and the readout; this subclass owns the filled track, the thumb tint
+// and the focus corners.
 UCLASS(Abstract)
 class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
 {
@@ -15,13 +15,8 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
     UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
     FLinearColor ThumbIdle = FLinearColor(1.0f, 1.0f, 1.0f);
 
-    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
-    FLinearColor ThumbHovered = FLinearColor(0.55f, 0.72f, 0.30f);
-
-    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
-    FLinearColor ThumbPressed = FLinearColor(0.20f, 0.34f, 0.10f);
-
     private bool _Captured = false;
+    private bool _InFocusPath = false;
 
     UFUNCTION(BlueprintOverride)
     void OnInitialized()
@@ -34,11 +29,32 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
 
     UFUNCTION(BlueprintOverride)
     void Construct()
-    { _Captured = false; }
+    {
+        _Captured = false;
+        _InFocusPath = false;
+        RefreshFocusCorners();
+    }
 
     UFUNCTION(BlueprintOverride)
     void Destruct()
-    { _Captured = false; }
+    {
+        _Captured = false;
+        _InFocusPath = false;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void OnAddedToFocusPath(FFocusEvent InFocusEvent)
+    {
+        _InFocusPath = true;
+        RefreshFocusCorners();
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void OnRemovedFromFocusPath(FFocusEvent InFocusEvent)
+    {
+        _InFocusPath = false;
+        RefreshFocusCorners();
+    }
 
     UFUNCTION()
     private void OnCaptureStarted()
@@ -48,35 +64,29 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
     private void OnCaptureStopped()
     { _Captured = false; }
 
+    private void RefreshFocusCorners()
+    {
+        if (ck::Is_NOT_Valid(FocusCorners))
+        { return; }
+
+        FocusCorners.SetVisibility(_InFocusPath
+            ? ESlateVisibility::HitTestInvisible
+            : ESlateVisibility::Collapsed);
+    }
+
+    // Hover has no slider event and the fill follows the laid-out geometry, so both stay per-frame.
     UFUNCTION(BlueprintOverride)
     void Tick(FGeometry MyGeometry, float InDeltaTime)
     {
         if (ck::Is_NOT_Valid(_ValueSlider))
         { return; }
 
-        const float32 Value = _ValueSlider.GetValue();
-        const FName Key = Get_SettingKey();
-        if (ck::IsValid(FocusCorners))
-        { FocusCorners.SetVisibility(ESlateVisibility::Collapsed); }
-        _ValueSlider.SetSliderHandleColor(_Captured ? ThumbPressed :
-            (_ValueSlider.IsHovered() || _ValueSlider.HasAnyUserFocus()) ? ThumbHovered : ThumbIdle);
-        if (ck::IsValid(_ValueText) && Key.ToString().StartsWith("audio."))
-        {
-            const FText Label = FText::FromString(f"{Math::RoundToInt(Value * 100.0f)}%");
-            if (!_ValueText.GetText().EqualTo(Label))
-            { _ValueText.SetText(Label); }
-        }
-        else if (ck::IsValid(_ValueText) && Key == n"controls.look_sensitivity")
-        {
-            const FText Label = FText::FromString(f"{Value :.2}");
-            if (!_ValueText.GetText().EqualTo(Label))
-            { _ValueText.SetText(Label); }
-        }
+        _ValueSlider.SetSliderHandleColor(_Captured ? constants_ui_colors::k_MossDeep :
+            (_ValueSlider.IsHovered() || _InFocusPath) ? constants_ui_colors::k_Moss : ThumbIdle);
 
         if (ck::IsValid(FillSize))
         {
-            // IndentHandle=false: SSlider's thumb centre travels from half a
-            // thumb to width minus half a thumb. Match that actual geometry.
+            // IndentHandle=false: the thumb centre travels from half a thumb to width minus half a thumb.
             const float32 Width = Math::Max(0.0f, float32(_ValueSlider.GetCachedGeometry().GetLocalSize().X) - ThumbSize);
             const float32 Fraction = _ValueSlider.GetNormalizedValue();
             FillSize.SetWidthOverride(Width * Fraction);

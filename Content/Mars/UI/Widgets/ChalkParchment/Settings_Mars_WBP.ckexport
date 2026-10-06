@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "420405dcdfe9f4521f0128a585bbce2b",
+		"sourceHash": "b5443e45ae877d27e4c456ea92a8c53a",
 		"exporterVersion": 3
 	},
 	"blueprintType": "WidgetBlueprint",
@@ -54,11 +54,6 @@
 			"type": "UImage*",
 			"category": "Settings_Mars_WBP",
 			"value": "None"
-		},
-		{
-			"name": "bWorldBoardHost",
-			"type": "bool",
-			"value": false
 		},
 		{
 			"name": "Scrim",
@@ -1988,9 +1983,9 @@
 													{
 														"SpecifiedColor":
 														{
-															"R": 0.090000003576278687,
-															"G": 0.070000000298023224,
-															"B": 0.039999999105930328,
+															"R": 0.017640000209212303,
+															"G": 0.014440000057220459,
+															"B": 0.01095999963581562,
 															"A": 1
 														},
 														"ColorUseRule": "UseColor_Specified"
@@ -2356,12 +2351,6 @@
 													"type": "bool",
 													"category": "Mars",
 													"value": false
-												},
-												{
-													"name": "bAlignLabelLeft",
-													"type": "bool",
-													"category": "Mars",
-													"value": true
 												},
 												{
 													"name": "ClickEvent",
@@ -2888,12 +2877,6 @@
 													"value": false
 												},
 												{
-													"name": "bAlignLabelLeft",
-													"type": "bool",
-													"category": "Mars",
-													"value": true
-												},
-												{
 													"name": "ClickEvent",
 													"type": "FWidgetEventField",
 													"category": "Common Button",
@@ -3418,12 +3401,6 @@
 													"value": false
 												},
 												{
-													"name": "bAlignLabelLeft",
-													"type": "bool",
-													"category": "Mars",
-													"value": true
-												},
-												{
 													"name": "ClickEvent",
 													"type": "FWidgetEventField",
 													"category": "Common Button",
@@ -3943,12 +3920,6 @@
 												},
 												{
 													"name": "bShowSpoonFocus",
-													"type": "bool",
-													"category": "Mars",
-													"value": false
-												},
-												{
-													"name": "bAlignLabelLeft",
 													"type": "bool",
 													"category": "Mars",
 													"value": false
@@ -4478,12 +4449,6 @@
 													"value": false
 												},
 												{
-													"name": "bAlignLabelLeft",
-													"type": "bool",
-													"category": "Mars",
-													"value": false
-												},
-												{
 													"name": "ClickEvent",
 													"type": "FWidgetEventField",
 													"category": "Common Button",
@@ -5003,9 +4968,9 @@
 													{
 														"SpecifiedColor":
 														{
-															"R": 0.090000003576278687,
-															"G": 0.070000000298023224,
-															"B": 0.039999999105930328,
+															"R": 0.017640000209212303,
+															"G": 0.014440000057220459,
+															"B": 0.01095999963581562,
 															"A": 1
 														},
 														"ColorUseRule": "UseColor_Specified"
@@ -6990,7 +6955,7 @@
 															{
 																"Left": 430,
 																"Top": 302,
-																"Right": 700,
+																"Right": 728,
 																"Bottom": 406
 															},
 															"Anchors":
@@ -7543,8 +7508,8 @@
 															"ImageType": "NoImage",
 															"ImageSize":
 															{
-																"X": 32,
-																"Y": 32
+																"X": 12,
+																"Y": 12
 															},
 															"Margin":
 															{
@@ -7614,8 +7579,8 @@
 															"ImageType": "NoImage",
 															"ImageSize":
 															{
-																"X": 32,
-																"Y": 32
+																"X": 12,
+																"Y": 12
 															},
 															"Margin":
 															{
@@ -7685,8 +7650,8 @@
 															"ImageType": "NoImage",
 															"ImageSize":
 															{
-																"X": 32,
-																"Y": 32
+																"X": 12,
+																"Y": 12
 															},
 															"Margin":
 															{
@@ -7756,8 +7721,8 @@
 															"ImageType": "NoImage",
 															"ImageSize":
 															{
-																"X": 32,
-																"Y": 32
+																"X": 12,
+																"Y": 12
 															},
 															"Margin":
 															{
@@ -8175,7 +8140,7 @@
 																{
 																	"Left": 0,
 																	"Top": 0,
-																	"Right": 0,
+																	"Right": 12,
 																	"Bottom": 0
 																},
 																"tooltip": "The padding area between the slot and the content it contains."
@@ -8319,12 +8284,6 @@
 													"type": "bool",
 													"category": "Mars",
 													"value": false
-												},
-												{
-													"name": "bAlignLabelLeft",
-													"type": "bool",
-													"category": "Mars",
-													"value": true
 												},
 												{
 													"name": "ClickEvent",
@@ -8846,12 +8805,6 @@
 												},
 												{
 													"name": "bShowSpoonFocus",
-													"type": "bool",
-													"category": "Mars",
-													"value": false
-												},
-												{
-													"name": "bAlignLabelLeft",
 													"type": "bool",
 													"category": "Mars",
 													"value": false
@@ -9922,12 +9875,6 @@
 														},
 														{
 															"name": "bShowSpoonFocus",
-															"type": "bool",
-															"category": "Mars",
-															"value": false
-														},
-														{
-															"name": "bAlignLabelLeft",
 															"type": "bool",
 															"category": "Mars",
 															"value": false

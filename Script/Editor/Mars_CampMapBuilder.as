@@ -162,9 +162,16 @@ namespace utils_mars_camp
         Spawn_Stations(Cube);
         Spawn_Bedrolls(Cube);
 
-        // Camera-only stations: Title looks north from outside the entry, Cauldron from the entry side at the cauldron.
-        Spawn_StationCamera(EMars_CampStation::Title, FVector(-1300.0, 0.0, 220.0), FRotator(-8.0, 0.0, 0.0));
+        // Title and menu share the entrance-side camera, with the board left of the hearth.
+        Spawn_StationCamera(EMars_CampStation::Title, FVector(-1130.0, 0.0, 165.0), FRotator::ZeroRotator);
         Spawn_StationCamera(EMars_CampStation::Cauldron, FVector(-500.0, 0.0, 200.0), FRotator(-15.0, 0.0, 0.0));
+        Spawn_BoardAnchor(EMars_CampStation::Title, FVector(-650.0, -175.0, 165.0),
+            FRotator(0.0, 160.0, 0.0), 0.33f, FIntPoint(700, 900));
+        Spawn_MenuStand();
+        Spawn_BoardAnchor(EMars_CampStation::Contracts, FVector(0.0, -895.0, 175.0),
+            FRotator(0.0, 90.0, 0.0), 0.27f, FIntPoint(1000, 1000));
+        Spawn_BoardAnchor(EMars_CampStation::Departure, FVector(870.0, 210.0, 155.0),
+            FRotator(0.0, 180.0, 0.0), 0.28f, FIntPoint(700, 650));
 
         auto Actors = UEditorActorSubsystem::Get();
 
@@ -471,7 +478,62 @@ namespace utils_mars_camp
         { return; }
 
         Cam.Station = InStation;
+        if (InStation == EMars_CampStation::Title)
+        { UCameraComponent::Get(Cam).SetFieldOfView(70.0f); }
         Cam.SetActorLabel(Label);
+    }
+
+    // Dressing around the Title board anchor; parts are authored around the anchor centre and rotated with it.
+    void Spawn_MenuStand()
+    {
+        auto Material = System::LoadAsset_Blocking(TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(
+            "/Game/Mars/Environment/Materials/Camp/CampMenuFrame_Mars_MI.CampMenuFrame_Mars_MI")));
+        TArray<FMars_MapBuilder_Block> Parts;
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_Backing", FVector(-641, -175, 165), FVector(0.08, 2.40, 3.06)));
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_LeftPost", FVector(-650, -299, 168), FVector(0.14, 0.12, 3.32)));
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_RightPost", FVector(-650, -51, 168), FVector(0.14, 0.12, 3.32)));
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_Top", FVector(-650, -175, 323), FVector(0.14, 2.60, 0.12)));
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_Bottom", FVector(-650, -175, 12), FVector(0.14, 2.60, 0.12)));
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_LeftFoot", FVector(-628, -299, 6), FVector(0.70, 0.20, 0.12)));
+        Parts.Add(FMars_MapBuilder_Block("Camp_MenuStand_RightFoot", FVector(-628, -51, 6), FVector(0.70, 0.20, 0.12)));
+        for (auto Part : Parts)
+        {
+            auto Block = utils_mars_map_builder::Spawn_Block(engine::load::Cube(), Part);
+            if (ck::Is_NOT_Valid(Block))
+            { continue; }
+            const auto Center = FVector(-650, -175, 165);
+            const auto Angle = FRotator(0.0, -20.0, 0.0);
+            Block.SetActorLocation(Center + Angle.RotateVector(Part.Location - Center));
+            Block.SetActorRotation(Angle);
+            Block.StaticMeshComponent.SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            if (ck::IsValid(Material))
+            { Block.StaticMeshComponent.SetMaterial(0, Material); }
+        }
+        auto Fill = Cast<APointLight>(UEditorActorSubsystem::Get().SpawnActorFromClass(
+            APointLight, FVector(-850, -250, 290)));
+        if (ck::IsValid(Fill))
+        {
+            Fill.SetActorLabel("Camp_MenuStandFill");
+            Fill.PointLightComponent.SetIntensity(12.0f);
+            Fill.PointLightComponent.SetAttenuationRadius(520.0f);
+            Fill.PointLightComponent.SetLightColor(FLinearColor(1.0, 0.74, 0.47));
+            Fill.PointLightComponent.SourceRadius = 70.0f;
+        }
+    }
+
+    void Spawn_BoardAnchor(EMars_CampStation InStation, FVector InLocation, FRotator InRotation,
+        float32 InScale, FIntPoint InDrawSize)
+    {
+        const FString Label = f"Camp_BoardAnchor_{InStation :n}";
+        auto Anchor = Cast<AMars_CampBoardAnchor>(
+            UEditorActorSubsystem::Get().SpawnActorFromClass(AMars_CampBoardAnchor, InLocation, InRotation));
+        if (ck::EnsureIfNot(ck::IsValid(Anchor), f"[Mars.Camp] Failed to place [{Label}]"))
+        { return; }
+
+        Anchor.Station = InStation;
+        Anchor.DrawSize = InDrawSize;
+        Anchor.SetActorScale3D(FVector(InScale));
+        Anchor.SetActorLabel(Label);
     }
 
     // The station's name at the ring radius, facing the centre.

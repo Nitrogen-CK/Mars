@@ -1633,6 +1633,19 @@ namespace UMars_AutoTest_Ladder_SpecValidateRejectsBadDimensions
 }
 
 USTRUCT()
+struct FMars_AutoTest_LanFlow_DirectAddressValidation_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_LanFlow_DirectAddressValidation
+{
+    FMars_AutoTest_LanFlow_DirectAddressValidation_SpawnParams Params()
+    {
+        return FMars_AutoTest_LanFlow_DirectAddressValidation_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals_SpawnParams
 {
 }
@@ -2080,6 +2093,39 @@ namespace UMars_Backpack_EntityScript
     FMars_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_CampUiStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    EMars_CampStation Station = EMars_CampStation::Contracts;
+
+    UPROPERTY()
+    FVector ProbeDimensions = FVector(15.0, 65.0, 70.0);
+
+    FMars_CampUiStation_EntityScript_SpawnParams(FTransform InSpawnTransform, EMars_CampStation InStation, FVector InProbeDimensions)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+        ProbeDimensions = InProbeDimensions;
+    }
+}
+
+namespace UMars_CampUiStation_EntityScript
+{
+    FMars_CampUiStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_CampUiStation_EntityScript_SpawnParams();
+    }
+
+    FMars_CampUiStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, EMars_CampStation InStation, FVector InProbeDimensions)
+    {
+        return FMars_CampUiStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InProbeDimensions);
     }
 }
 
@@ -5775,6 +5821,19 @@ namespace UMars_SmState_Camp_Lobby
 }
 
 USTRUCT()
+struct FMars_SmState_CampUiStation_Open_SpawnParams
+{
+}
+
+namespace UMars_SmState_CampUiStation_Open
+{
+    FMars_SmState_CampUiStation_Open_SpawnParams Params()
+    {
+        return FMars_SmState_CampUiStation_Open_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_CargoSlot_Interact_SpawnParams
 {
 }
@@ -6304,6 +6363,19 @@ namespace UMars_SmTask_AliveSubSm
     FMars_SmTask_AliveSubSm_SpawnParams Params()
     {
         return FMars_SmTask_AliveSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_CampUiStation_Open_SpawnParams
+{
+}
+
+namespace UMars_SmTask_CampUiStation_Open
+{
+    FMars_SmTask_CampUiStation_Open_SpawnParams Params()
+    {
+        return FMars_SmTask_CampUiStation_Open_SpawnParams();
     }
 }
 
