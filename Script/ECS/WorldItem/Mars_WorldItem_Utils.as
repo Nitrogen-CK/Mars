@@ -52,6 +52,27 @@ namespace utils_world_item
         return Pending.Get_EntityUnderConstruction();
     }
 
+    // A World-mode world item seeded from InSpec.Definition, owned by InOwner (ck::TransientEntity() for something that
+    // must outlive its spawner). Uses the definition's Presentation.WorldItem.ScriptClass, else the base script. The
+    // launch goes through the PendingLaunch processor once the body exists. An unresolved definition ensures and spawns
+    // nothing.
+    FCk_Handle Request_SpawnWorld(FCk_Handle& InOwner, const FMars_WorldItem_WorldSpec& InSpec)
+    {
+        const auto Definition = InSpec.Definition.Get();
+        if (ck::EnsureIfNot(ck::IsValid(Definition), f"[WorldItem] Request_SpawnWorld from [{InOwner.ToString()}] has no resolvable definition"))
+        { return FCk_Handle(); }
+
+        auto SpawnParams = UMars_WorldItem_EntityScript::Params();
+        SpawnParams.SpawnTransform = FTransform(InSpec.World.Rotator(), InSpec.World.GetLocation());
+        SpawnParams.Definition = InSpec.Definition;
+        SpawnParams.Mode = EMars_WorldItem_Mode::World;
+        SpawnParams.LaunchVelocity = InSpec.LinearVelocity;
+        SpawnParams.AngularVelocityDeg = InSpec.AngularVelocityDeg;
+
+        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, Get_WorldItemScriptClass(Definition), SpawnParams);
+        return Pending.Get_EntityUnderConstruction();
+    }
+
     // Unset when InPending is older than constants_world_item::k_ArriveFromMaxAgeSeconds.
     FMars_WorldItem_Arrival Get_FreshArrival(const FMars_WorldItem_PendingArrival& InPending)
     {
@@ -76,38 +97,63 @@ namespace utils_world_item
     // The item's Presentation.WorldItem.ScriptClass, else the base WorldItem entity script.
     TSubclassOf<UMars_WorldItem_EntityScript> Get_WorldItemScriptClass(const FCk_Handle_Item& InItem)
     {
+        return Get_WorldItemScriptClass(InItem.Get_Definition());
+    }
+
+    // The definition's Presentation.WorldItem.ScriptClass, else the base WorldItem entity script.
+    TSubclassOf<UMars_WorldItem_EntityScript> Get_WorldItemScriptClass(const UCk_InventoryItem_Definition InDefinition)
+    {
         TSubclassOf<UMars_WorldItem_EntityScript> ScriptClass = UMars_WorldItem_EntityScript;
-        if (InItem.Has_Presentation() == false)
+        if (ck::Is_NOT_Valid(InDefinition))
         { return ScriptClass; }
 
-        const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
-        if (ck::IsValid(Presentation.WorldItem.ScriptClass))
+        const UMars_ItemTrait_Presentation Presentation = InDefinition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+        if (ck::IsValid(Presentation) && ck::IsValid(Presentation.WorldItem.ScriptClass))
         { ScriptClass = Presentation.WorldItem.ScriptClass; }
 
         return ScriptClass;
     }
 
-    // The shape every probe on the item's body uses (the pickup, a backpack's weight probe): a box over the Mesh bounds
-    // (x MeshScale, matching the body), centred on them since a mesh's pivot need not be its centre; a sphere of
-    // WorldItem.PickupProbeRadius at the root when there is no Mesh.
+    // The shape every probe on the item's body uses (the pickup, a backpack's weight probe): the Make_BoundsFit box, or
+    // a sphere of WorldItem.PickupProbeRadius at the root when there is no Mesh.
     FMars_WorldItem_ProbeFit Make_ProbeFit(const UMars_ItemTrait_Presentation InPresentation)
     {
-        UStaticMesh Mesh = nullptr;
-        if (InPresentation.Visual.Mesh.IsNull() == false)
-        { Mesh = System::LoadAsset_Blocking(InPresentation.Visual.Mesh); }
-
-        if (ck::Is_NOT_Valid(Mesh))
+        if (ck::Is_NOT_Valid(TryLoad_Mesh(InPresentation)))
         {
             return FMars_WorldItem_ProbeFit(
                 utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InPresentation.WorldItem.PickupProbeRadius)), FTransform::Identity);
+        }
+
+        const auto Fit = Make_BoundsFit(InPresentation);
+        return FMars_WorldItem_ProbeFit(utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(Fit.HalfExtents)),
+            FTransform(FRotator::ZeroRotator, Fit.Centre));
+    }
+
+    // A box over the Mesh bounds (x MeshScale, matching the body), centred on them since a mesh's pivot need not be its
+    // centre; a cube of half extent WorldItem.PickupProbeRadius at the root when there is no Mesh.
+    FMars_WorldItem_BoundsFit Make_BoundsFit(const UMars_ItemTrait_Presentation InPresentation)
+    {
+        const auto Mesh = TryLoad_Mesh(InPresentation);
+        if (ck::Is_NOT_Valid(Mesh))
+        {
+            const auto Radius = InPresentation.WorldItem.PickupProbeRadius;
+            return FMars_WorldItem_BoundsFit(FVector(Radius, Radius, Radius), FVector::ZeroVector);
         }
 
         const auto Bounds = Mesh.GetBounds();
         const auto Scale = InPresentation.Visual.MeshScale;
         const auto HalfExtents = FVector(Math::Abs(Bounds.BoxExtent.X * Scale.X), Math::Abs(Bounds.BoxExtent.Y * Scale.Y),
                                          Math::Abs(Bounds.BoxExtent.Z * Scale.Z));
-        return FMars_WorldItem_ProbeFit(utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(HalfExtents)),
-            FTransform(FRotator::ZeroRotator, Bounds.Origin * Scale));
+        return FMars_WorldItem_BoundsFit(HalfExtents, Bounds.Origin * Scale);
+    }
+
+    // Null when the Presentation names no mesh or it does not load.
+    UStaticMesh TryLoad_Mesh(const UMars_ItemTrait_Presentation InPresentation)
+    {
+        if (InPresentation.Visual.Mesh.IsNull())
+        { return nullptr; }
+
+        return System::LoadAsset_Blocking(InPresentation.Visual.Mesh);
     }
 
     // Per-channel blend, slerp on rotation so a >180 degree turn takes the short way.

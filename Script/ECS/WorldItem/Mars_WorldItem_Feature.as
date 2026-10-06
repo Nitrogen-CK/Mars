@@ -123,6 +123,42 @@ struct FMars_WorldItem_VisualSpec
     }
 }
 
+// A World-mode world item of Definition seeded from it at World (unit scale), launched when a velocity is set
+// (utils_world_item::Request_SpawnWorld).
+struct FMars_WorldItem_WorldSpec
+{
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition;
+
+    UPROPERTY()
+    FTransform World;
+
+    UPROPERTY()
+    FVector LinearVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    FMars_WorldItem_WorldSpec() {}
+
+    FMars_WorldItem_WorldSpec(TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, const FTransform& InWorld)
+    {
+        Definition = InDefinition;
+        World = InWorld;
+    }
+
+    FMars_WorldItem_WorldSpec(TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition,
+                              const FTransform& InWorld,
+                              FVector InLinearVelocity,
+                              FVector InAngularVelocityDeg)
+    {
+        Definition = InDefinition;
+        World = InWorld;
+        LinearVelocity = InLinearVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Probe fit
 //--------------------------------------------------------------------------------------------------------------------------
@@ -142,6 +178,25 @@ struct FMars_WorldItem_ProbeFit
     {
         Shape = InShape;
         Offset = InOffset;
+    }
+}
+
+// The mesh bounds (x MeshScale) every box fitted to the item uses (utils_world_item::Make_BoundsFit).
+struct FMars_WorldItem_BoundsFit
+{
+    UPROPERTY()
+    FVector HalfExtents;
+
+    // From the world item root.
+    UPROPERTY()
+    FVector Centre;
+
+    FMars_WorldItem_BoundsFit() {}
+
+    FMars_WorldItem_BoundsFit(FVector InHalfExtents, FVector InCentre)
+    {
+        HalfExtents = InHalfExtents;
+        Centre = InCentre;
     }
 }
 
