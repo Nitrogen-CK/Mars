@@ -31,7 +31,6 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
         Spec.Style.RightCell = 4;
         Spec.Style.EmissiveStrength = 6.0f;
         Spec.Style.Color = _StyleColor;
-        Spec.BlinkEnabled = false;
         _Eyes = utils_eyes::Add(_FaceNode, Spec);
 
         _Primitive = MakePrimitive(_FaceNode, n"EyesTest_Primitive");

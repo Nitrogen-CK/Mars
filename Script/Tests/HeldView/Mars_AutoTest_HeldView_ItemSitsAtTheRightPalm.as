@@ -35,15 +35,15 @@ class UMars_AutoTest_HeldView_ItemSitsAtTheRightPalm : UCk_AutoTest_Base
         const auto Spec = FMars_FPHands_Spec();
         const auto Grips = utils_held_view::Get_GripTargets(Spec, View.Grip);
         const auto PalmGap = Grips.Right.GetLocation().Y - View.Grip.RightFaceY;
-        Assert_True(Math::Abs(PalmGap - Spec.PalmSurfaceOffset) < 0.001,
-            f"the right grip sits PalmSurfaceOffset [{Spec.PalmSurfaceOffset}] outside the right face (gap {PalmGap})");
+        Assert_True(Math::Abs(PalmGap - Spec.Rest.PalmSurfaceOffset) < 0.001,
+            f"the right grip sits PalmSurfaceOffset [{Spec.Rest.PalmSurfaceOffset}] outside the right face (gap {PalmGap})");
 
         const auto ItemInGrip = utils_held_view::Get_ItemInGrip(Spec, View);
         const auto Composed = ItemInGrip * Grips.Right;
         Assert_True(Composed.Equals(View.HeldOffset, 0.001), f"item-in-grip composed with the right grip is HeldOffset (got [{Composed}])");
 
         const auto Reach = ItemInGrip.GetLocation().Size();
-        const auto Expected = View.Grip.RightFaceY + Spec.PalmSurfaceOffset;
+        const auto Expected = View.Grip.RightFaceY + Spec.Rest.PalmSurfaceOffset;
         Assert_True(Math::Abs(Reach - Expected) < 0.001, f"the rock's centre is RightFaceY + PalmSurfaceOffset [{Expected}] from the palm (got {Reach})");
         // The palm (grip Z) faces the item: its centre is on the palm side of the grip.
         Assert_True(ItemInGrip.GetLocation().Z > 0.5 * Reach, f"the rock is on the palm side of the right grip ([{ItemInGrip.GetLocation()}])");

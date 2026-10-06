@@ -52,10 +52,10 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         const auto View = utils_held_view::Make(InItem);
 
         Assert_True(View.IsHolding && Hold.Kind != EMars_FPHands_HoldKind::Empty, f"{InName}: the view and the gloves both hold it");
-        Assert_True(View.Mesh == Presentation.Mesh, f"{InName}: the view carries the Presentation mesh");
-        Assert_True(View.Material == Presentation.MaterialOverride, f"{InName}: the view carries the Presentation material");
-        Assert_True(View.MeshScale.Equals(Presentation.MeshScale), f"{InName}: the view carries MeshScale [{View.MeshScale}]");
-        Assert_True(View.HeldOffset.Equals(Presentation.HeldOffset), f"{InName}: the view carries HeldOffset");
+        Assert_True(View.Mesh == Presentation.Visual.Mesh, f"{InName}: the view carries the Presentation mesh");
+        Assert_True(View.Material == Presentation.Visual.MaterialOverride, f"{InName}: the view carries the Presentation material");
+        Assert_True(View.MeshScale.Equals(Presentation.Visual.MeshScale), f"{InName}: the view carries MeshScale [{View.MeshScale}]");
+        Assert_True(View.HeldOffset.Equals(Presentation.Mounting.HeldOffset), f"{InName}: the view carries HeldOffset");
 
         const auto& Grip = View.Grip;
         Assert_True(Grip.IsTwoHanded == (Hold.Kind == EMars_FPHands_HoldKind::TwoHanded), f"{InName}: two-handedness matches ({Grip.IsTwoHanded})");
@@ -66,7 +66,7 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         Assert_True(Grip.RightFaceY > 0.0 && Grip.LeftFaceY < 0.0, f"{InName}: the fitted faces straddle the hand node");
 
         const auto Spec = FMars_FPHands_Spec();
-        const auto Expected = utils_fphands::Get_RestTargets(Spec, Hold, FMars_FPHands_TargetFrame());
+        const auto Expected = utils_fphands::Get_RestTargets(Spec.Rest, Hold, FMars_FPHands_TargetFrame());
         const auto Rebuilt = utils_held_view::Get_GripTargets(Spec, Grip);
         Assert_True(Rebuilt.Right.Equals(Expected.Right.GripInHand, 0.001), f"{InName}: the rebuilt right grip is the gloves' [{Expected.Right.GripInHand}]");
         Assert_True(Rebuilt.Left.Equals(Expected.Left.GripInHand, 0.001), f"{InName}: the rebuilt left grip is the gloves' [{Expected.Left.GripInHand}]");

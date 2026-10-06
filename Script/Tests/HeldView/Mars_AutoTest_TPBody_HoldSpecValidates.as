@@ -76,7 +76,7 @@ class UMars_AutoTest_TPBody_HoldSpecValidates : UCk_AutoTest_Base
 
         // Right grip at hand-node (0, 15 + 2.5, 0) world cm -> component (-17.5 / Scale, 0, 0) + the frame's origin.
         const auto FrameOrigin = Query.Hold.HandFrame.GetLocation();
-        const auto ExpectedRight = FrameOrigin + FVector(-(15.0 + Spec.PalmSurfaceOffset) / BodyScale, 0.0, 0.0);
+        const auto ExpectedRight = FrameOrigin + FVector(-(15.0 + Spec.Rest.PalmSurfaceOffset) / BodyScale, 0.0, 0.0);
         Assert_True(Frame.Right.HandLocation.Equals(ExpectedRight, 0.01), f"the right hand is on the chef's right, in body units [{ExpectedRight}] (got [{Frame.Right.HandLocation}])");
 
         const auto Mirrored = FVector(-Frame.Left.HandLocation.X, Frame.Left.HandLocation.Y, Frame.Left.HandLocation.Z);

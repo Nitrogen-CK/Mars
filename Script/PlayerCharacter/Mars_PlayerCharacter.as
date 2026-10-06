@@ -557,7 +557,7 @@ class AMars_PlayerCharacter : ACk_Character_UE
         const auto& Body = Config.TPBody;
         // The body's own palm thickness replaces the gloves' for the fitted grips; the rest of the layout is the gloves'.
         auto HandsSpec = Config.FPHands;
-        HandsSpec.PalmSurfaceOffset = Body.Hold.PalmSurfaceOffset;
+        HandsSpec.Rest.PalmSurfaceOffset = Body.Hold.PalmSurfaceOffset;
 
         UStaticMesh ItemMesh = nullptr;
         if (View.Mesh.IsNull() == false)

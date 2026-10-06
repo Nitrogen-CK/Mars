@@ -217,10 +217,10 @@ namespace utils_held_view
 
         // As the WorldItem visual reads it: mesh, MeshScale on the visual, MaterialOverride on slot 0.
         const auto Presentation = InItem.Get_Presentation();
-        View.Mesh = Presentation.Mesh;
-        View.Material = Presentation.MaterialOverride;
-        View.MeshScale = Presentation.MeshScale;
-        View.HeldOffset = Presentation.HeldOffset;
+        View.Mesh = Presentation.Visual.Mesh;
+        View.Material = Presentation.Visual.MaterialOverride;
+        View.MeshScale = Presentation.Visual.MeshScale;
+        View.HeldOffset = Presentation.Mounting.HeldOffset;
 
         const auto Hold = utils_fphands::Make_Hold(InItem);
         View.IsHolding = Hold.Kind != EMars_FPHands_HoldKind::Empty;
@@ -257,7 +257,7 @@ namespace utils_held_view
     // Where the gloves grip a held item, in the hand node's space: utils_fphands::Get_RestTargets itself (no arm swing).
     FMars_HeldView_GripTargets Get_GripTargets(const FMars_FPHands_Spec& InSpec, const FMars_HeldView_Grip& InGrip)
     {
-        const auto Targets = utils_fphands::Get_RestTargets(InSpec, To_Hold(InGrip), FMars_FPHands_TargetFrame());
+        const auto Targets = utils_fphands::Get_RestTargets(InSpec.Rest, To_Hold(InGrip), FMars_FPHands_TargetFrame());
         return FMars_HeldView_GripTargets(Targets.Right.GripInHand, Targets.Left.GripInHand);
     }
 
