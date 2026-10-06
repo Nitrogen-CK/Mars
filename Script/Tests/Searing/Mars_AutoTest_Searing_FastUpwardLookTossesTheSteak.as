@@ -1,0 +1,122 @@
+// A fast upward look (40 degrees in one frame, far above LiftFlickSpeedDegreesPerSecond) kicks the pan up; the kinematic
+// push launches the resting steak, which leaves the pan and either lands back on it (one flip) or is lost (a fresh steak
+// follows). Which face lands is the physics' business; the test pins the toss and a legal end, then the lift settling.
+class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Searing
+{
+    default _TimeoutSeconds = 12.0f;
+
+    private int32 _PhasesBeforeToss = 0;
+    private EMars_Searing_Face _DownFaceBefore = EMars_Searing_Face::NegZ;
+    private float32 _TossTime = -1.0f;
+    private float32 _AirborneTime = -1.0f;
+    private float32 _PeakLiftVelocity = 0.0f;
+
+    UFUNCTION(BlueprintOverride)
+    void DoBeginPlay(FCk_Handle InHandle)
+    {
+        auto Spec = Make_TestSpec();
+        auto PanSpec = FMars_Implement_Spec();
+        PanSpec.Tilt.LevelReturnDegreesPerSecond = 45.0f;
+        BuildStation(InHandle, Spec, PanSpec);
+
+        Add_Step("heat the pan", n"Step_Heat");
+        Add_Step_WaitUntil("the steak landed on the pan", n"Check_OnPan", 0, 3.0f);
+        Add_Step_WaitSeconds("the steak settles", 0.3f);
+        Add_Step("flick the look up", n"Step_Flick");
+        Add_Step_WaitUntil("the pan lifted", n"Check_PanLifted", 0, 0.3f);
+        Add_Step_WaitUntil("the steak left the pan", n"Check_TossedAirborne", 0, 0.6f);
+        Add_Step_WaitUntil("the steak landed or was lost", n"Check_LandedOrLost", 0, 3.0f);
+        Add_Step("a legal end: one flip, or one loss", n"Step_AssertOutcome");
+        Add_Step_WaitUntil("a lost steak was replaced", n"Check_FreshSteakIfLost", 0, 2.0f);
+        Add_Step_WaitSeconds("the lift spring settles", 0.6f);
+        Add_Step("the pan is back at rest", n"Step_AssertLiftSettled");
+        Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Step_Flick(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_Searing.Get_IsOnPan(), "the steak rests on the pan before the flick");
+        _PhasesBeforeToss = _ContactPhases.Num();
+        _DownFaceBefore = _Searing.Get_DownFace();
+        _TossTime = Get_Now();
+        Look(FVector(0.0, -40.0, 0.0));
+    }
+
+    UFUNCTION()
+    private void Check_PanLifted(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        Record_PeakLiftVelocity();
+        auto Res = OutResult;
+        Res.Set(_Searing.Get_PanLift() > 2.0f);
+    }
+
+    UFUNCTION()
+    private void Check_TossedAirborne(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        Record_PeakLiftVelocity();
+        const auto Tossed = _ContactPhases.Num() > _PhasesBeforeToss && _ContactPhases.Last() == EMars_Searing_Phase::Airborne;
+        if (Tossed && _AirborneTime < 0.0f)
+        { _AirborneTime = Get_Now(); }
+
+        auto Res = OutResult;
+        Res.Set(Tossed || _Lost.Num() > 0);
+    }
+
+    UFUNCTION()
+    private void Check_LandedOrLost(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_HasLanded() || _Lost.Num() == 1);
+    }
+
+    UFUNCTION()
+    private void Step_AssertOutcome(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_AirborneTime >= 0.0f, "the steak left the pan after the flick");
+
+        const auto Tally = _Searing.Get_Tally();
+        if (Get_HasLanded())
+        {
+            const auto DownFaceAfter = _Searing.Get_DownFace();
+            ck::Trace(f"[Searing] toss outcome: LANDED after {Get_Now() - _AirborneTime :.3} s airborne; peak lift velocity "
+                + f"{_PeakLiftVelocity :.1} uu/s; down face {utils_searing::Get_FaceName(_DownFaceBefore)} -> {utils_searing::Get_FaceName(DownFaceAfter)}");
+            Assert_Equals_Int(Tally.Flips, 1, "the landing counted one flip");
+            Assert_True(_Searing.Get_HasSteak(), "the tossed steak is still the live steak");
+            return;
+        }
+
+        ck::Trace(f"[Searing] toss outcome: LOST {Get_Now() - _AirborneTime :.3} s after leaving the pan; peak lift velocity "
+            + f"{_PeakLiftVelocity :.1} uu/s; down face before {utils_searing::Get_FaceName(_DownFaceBefore)}");
+        Assert_Equals_Int(Tally.Losses, 1, "the lost toss counted one loss");
+    }
+
+    UFUNCTION()
+    private void Check_FreshSteakIfLost(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Lost.Num() == 0 || _Spawned.Num() >= 2);
+    }
+
+    UFUNCTION()
+    private void Step_AssertLiftSettled(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto Lift = _Searing.Get_PanLift();
+        Assert_True(Math::Abs(Lift) <= 0.5f, f"the lift spring brought the pan back to rest (got {Lift})");
+    }
+
+    // Landed = an OnPan edge after the toss's Airborne edge.
+    private bool Get_HasLanded()
+    {
+        if (_ContactPhases.Num() < _PhasesBeforeToss + 2)
+        { return false; }
+
+        return _ContactPhases.Last() == EMars_Searing_Phase::OnPan && _Lost.Num() == 0;
+    }
+
+    private void Record_PeakLiftVelocity()
+    {
+        const auto Velocity = _Searing.Get_Pan().Get_LiftVelocity();
+        _PeakLiftVelocity = Math::Max(_PeakLiftVelocity, Velocity);
+    }
+}

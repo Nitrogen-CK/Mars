@@ -752,6 +752,31 @@ class UMars_Processor_Eyes_Resolve_Driver : UMars_Processor_Eyes_Resolve
     }
 }
 
+class UMars_Processor_Forage_HandleRequests_Driver : UMars_Processor_Forage_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Forage_Requests);
+        Query.ReadWrite(FMars_Fragment_Forage);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Forage_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Forage_Requests& P0 = Batch.Get(i, FMars_Fragment_Forage_Requests);
+            FMars_Fragment_Forage& P1 = Batch.Get(i, FMars_Fragment_Forage);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
 class UMars_Processor_FPHands_HandleRequests_Driver : UMars_Processor_FPHands_HandleRequests
 {
     UFUNCTION(BlueprintOverride)
@@ -1058,6 +1083,54 @@ class UMars_Processor_Hotbar_Sync_Driver : UMars_Processor_Hotbar_Sync
         {
             auto Handle = Batch.GetHandle(i);
             FMars_Fragment_Hotbar& P0 = Batch.Get(i, FMars_Fragment_Hotbar);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_Implement_HandleRequests_Driver : UMars_Processor_Implement_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Implement_Requests);
+        Query.ReadWrite(FMars_Fragment_Implement);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Implement_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Implement_Requests& P0 = Batch.Get(i, FMars_Fragment_Implement_Requests);
+            FMars_Fragment_Implement& P1 = Batch.Get(i, FMars_Fragment_Implement);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_Implement_Tick_Driver : UMars_Processor_Implement_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Implement);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Implement_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Implement& P0 = Batch.Get(i, FMars_Fragment_Implement);
             ForEachEntity(InDeltaT, Handle, P0);
         }
     }
@@ -1437,6 +1510,100 @@ class UMars_Processor_Pendulum_Setup_Driver : UMars_Processor_Pendulum_Setup
         {
             auto Handle = Batch.GetHandle(i);
             ForEachEntity(InDeltaT, Handle);
+        }
+    }
+}
+
+class UMars_Processor_Resting_Setup_Driver : UMars_Processor_Resting_Setup
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Resting);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Resting_Setup_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Resting& P0 = Batch.Get(i, FMars_Fragment_Resting);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_Resting_Tick_Driver : UMars_Processor_Resting_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Resting);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Resting_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Resting& P0 = Batch.Get(i, FMars_Fragment_Resting);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
+class UMars_Processor_Searing_HandleRequests_Driver : UMars_Processor_Searing_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Searing_Requests);
+        Query.ReadWrite(FMars_Fragment_Searing);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Searing_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Searing_Requests& P0 = Batch.Get(i, FMars_Fragment_Searing_Requests);
+            FMars_Fragment_Searing& P1 = Batch.Get(i, FMars_Fragment_Searing);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_Searing_Tick_Driver : UMars_Processor_Searing_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_Searing);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Searing_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_Searing& P0 = Batch.Get(i, FMars_Fragment_Searing);
+            ForEachEntity(InDeltaT, Handle, P0);
         }
     }
 }
