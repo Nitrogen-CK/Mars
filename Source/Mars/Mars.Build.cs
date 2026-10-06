@@ -12,6 +12,11 @@ public class Mars : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] {  });
 
+        if (Target.bBuildEditor)
+        {
+            PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "Sockets" });
+        }
+
         SetupIrisSupport(Target, true);
 
         // Uncomment if you are using Slate UI
