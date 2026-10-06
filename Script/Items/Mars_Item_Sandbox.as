@@ -136,6 +136,33 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
     _ItemTraits.Add(Throwable);
 }
 
+// The foraging tool: blunt, so it cracks husks and knocks the censer.
+asset Mars_ItemDef_Pan of UCk_InventoryItem_Definition
+{
+    _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Pan"));
+
+    auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
+    Presentation.Visual.Mesh = engine::Cube();
+    Presentation.Visual.MeshScale = FVector(0.35, 0.35, 0.04);
+    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Grip.Pose = EMars_HandGripPose::Power;
+    _ItemTraits.Add(Presentation);
+
+    auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
+    UseAction.UseStateClass = UMars_SmState_ItemUse_Strike;
+    UseAction.HintText = FText::FromString("swing");
+    UseAction.CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
+    _ItemTraits.Add(UseAction);
+
+    auto Strike = Cast<UMars_ItemTrait_Strike>(NewObject(this, UMars_ItemTrait_Strike));
+    Strike.Damage = 25.0f;
+    Strike.DamageType = GameplayTags::DamageType_Mars_Blunt;
+    _ItemTraits.Add(Strike);
+
+    auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
+    _ItemTraits.Add(Throwable);
+}
+
 namespace mars_items
 {
     UCk_InventoryItem_Definition Rock()       { return Mars_ItemDef_Rock;       }
@@ -144,4 +171,5 @@ namespace mars_items
     UCk_InventoryItem_Definition Backpack()   { return Mars_ItemDef_Backpack;   }
     UCk_InventoryItem_Definition Cleaver()    { return Mars_ItemDef_Cleaver;    }
     UCk_InventoryItem_Definition Tenderizer() { return Mars_ItemDef_Tenderizer; }
+    UCk_InventoryItem_Definition Pan()        { return Mars_ItemDef_Pan;        }
 }
