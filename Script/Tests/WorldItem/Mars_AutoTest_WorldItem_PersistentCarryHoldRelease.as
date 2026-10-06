@@ -1,33 +1,16 @@
 // A Persistent (backpack) world item survives being stowed, then moves between its carrier's Back (Carried, Kinematic),
 // its Hand (Held) and the world (Released: Dynamic, the item back in its holder, the launch drained). Isolated Z band:
 // -51000.
-class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UCk_AutoTest_Base
+class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle _Carrier;
-    private FCk_Handle_Transform _HandNode;
-    private FCk_Handle_Transform _BackNode;
-    private FCk_Handle_Hotbar _Hotbar;
     private FCk_Handle_WorldItem _WorldItem;
     private FCk_Handle_Item _Item;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Carrier = InHandle;
-        auto Root = utils_transform::Add(_Carrier, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -51000.0)),
-            ECk_Replication::DoesNotReplicate);
-
-        _HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
-        _BackNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0))).As_Transform();
-
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, _BackNode));
-        utils_attach_points::Add(_Carrier, AttachPointsSpec);
-
-        auto HotbarSpec = FMars_Hotbar_Spec();
-        HotbarSpec.BagSlotCount = 1;
-        _Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
+        Add_CarrierBodyWithBack(InHandle, FVector(0.0, 0.0, -51000.0));
+        Add_Hotbar(_Carrier, 1);
 
         auto SpawnParams = UMars_WorldItem_EntityScript::Params();
         SpawnParams.Definition = mars_items::Backpack();

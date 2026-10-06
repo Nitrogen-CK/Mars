@@ -1,25 +1,17 @@
 // A timed target that becomes the resolver's best while the gloves are busy (here: pushing) is not lost: when the gloves
 // come back to Rest they re-read the resolver and, the target's interaction from this player still being live, reach
-// for it and hold. Rig: hands + Hands SM + resolver on the test entity, and a Timed lever (a long hold, so the
+// for it and hold. Beside the hands rig: a resolver on the test entity, and a Timed lever (a long hold, so the
 // interaction stays live) with a transform-only interactable. The best-target change lands while the phase is Push.
-class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Base
+class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UMars_AutoTestRig_Hands
 {
-    private FCk_Handle_FPHands _Hands;
-    private FCk_Handle_StateMachine _Sm;
     private FCk_Handle_InteractionResolver _Resolver;
     private FCk_Handle_InteractTarget _Target;
-    private FCk_Handle _Player;
     // The gloves' phase when the lever first became the resolver's best; unset until it does.
     private TOptional<EMars_FPHands_Phase> _PhaseAtBestChange;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Player = InHandle;
-        auto RootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(RootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
-
         auto Spec = FMars_FPHands_Spec();
         Spec.Reach.Grab.OutSeconds = 0.2f;
         Spec.Reach.Grab.GripSeconds = 0.2f;
@@ -28,15 +20,13 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
         // A push long enough that the target is added well inside it.
         Spec.Push.OutSeconds = 0.2f;
         Spec.Push.BackSeconds = 0.4f;
-
-        Spec.HandNode = HandNode.As_Transform();
-        _Hands = utils_fphands::Add(_Player, Spec);
+        Add_Hands(InHandle, Spec);
         _Resolver = utils_interaction_resolver::Add(_Player, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
         _Resolver.BindTo_OnBestTargetsChanged(FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
         BuildLever(InHandle);
-        _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
+        Add_HandsSm();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a push", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a push", n"Check_RestListeningForPush", 0, 5.0f);
         Add_Step("request a push", n"Step_RequestPush");
         Add_Step_WaitUntil("the gloves are busy pushing", n"Check_IsPush", 0, 5.0f);
         Add_Step("while pushing: add the lever to the resolver, open Use, start the interaction", n"Step_TargetWhileBusy");
@@ -100,15 +90,6 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
     }
 
     UFUNCTION()
-    private void Check_RestListening(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Rest
-            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
-            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPushRequested._Inner.IsBound());
-    }
-
-    UFUNCTION()
     private void Step_RequestPush(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Hands.Request_StartPush(FMars_Request_FPHands_StartPush(FMars_FPHands_Hold(), EMars_LaunchKind::Drop));
@@ -134,13 +115,6 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UCk_AutoTest_Ba
     {
         auto Res = OutResult;
         Res.Set(ck::IsValid(utils_interact_target::TryGet_Interaction(_Target, _Player)));
-    }
-
-    UFUNCTION()
-    private void Check_IsHold(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold);
     }
 
     UFUNCTION()

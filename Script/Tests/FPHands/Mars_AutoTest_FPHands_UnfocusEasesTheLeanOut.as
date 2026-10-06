@@ -1,8 +1,7 @@
 // Looking away from an interactable eases the gloves' lean back out instead of snapping: after the unfocus the focus
 // target is kept while the lean decays, and only cleared once it has reached zero.
-class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UCk_AutoTest_Base
+class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UMars_AutoTestRig_Hands
 {
-    private FCk_Handle_FPHands _Hands;
     private FCk_Handle_Interactable _Interactable;
     private FCk_Handle _Owner;
     private float32 _LeanAtUnfocus = 0.0f;
@@ -11,13 +10,7 @@ class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto HandRootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto HandRoot = utils_transform::Add(HandRootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
-        auto Player = InHandle;
-        auto Spec = FMars_FPHands_Spec();
-        Spec.HandNode = HandNode.As_Transform();
-        _Hands = utils_fphands::Add(Player, Spec);
+        Add_Hands(InHandle, FMars_FPHands_Spec());
 
         // A plain interactable ahead and to the right: a point grip, one glove.
         _Owner = utils_entity_lifetime::Request_CreateEntity(InHandle);

@@ -1,7 +1,7 @@
 // FMars_Gaze_Spec::Validate rejects each bad field with its own message and accepts the edge values, and a rejected
 // utils_gaze::Add returns an invalid handle without adding a fragment or a child node to the eye node. Isolated Z band:
 // -55000.
-class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
+class UMars_AutoTest_Gaze_SpecRejectsBadInput : UMars_AutoTestRig_Gaze
 {
     private FCk_Handle_Transform _EyeNode;
     private int32 _DependentsBeforeAdd = 0;
@@ -10,9 +10,7 @@ class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto EyeEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _EyeNode = utils_transform::Add(EyeEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -55000.0)),
-            ECk_Replication::DoesNotReplicate);
+        _EyeNode = Make_EyeNode(InHandle, FVector(0.0, 0.0, -55000.0));
 
         Add_Step("each bad field fails Validate() with its own message", n"Step_AssertRules");
         Add_Step("the edge values pass Validate()", n"Step_AssertEdgesValid");
@@ -129,15 +127,6 @@ class UMars_AutoTest_Gaze_SpecRejectsBadInput : UCk_AutoTest_Base
         Assert_False(Validation.IsValid(), f"Validate() rejects {InWhat}");
         Assert_True(Error.StartsWith(InField, ESearchCase::CaseSensitive) && Error.Contains("is not finite"),
             f"Validate() on {InWhat} reports [{InField} ... is not finite] (got [{Error}])");
-    }
-
-    private FMars_Gaze_Spec MakeSpec() const
-    {
-        auto Spec = FMars_Gaze_Spec();
-        Spec.DetectionFilter.AddTag(GameplayTags::Probe_Mars_Player);
-        Spec.AimPoint = GameplayTags::AttachPoint_Mars_Head;
-        Spec.RangeCm = 300.0f;
-        return Spec;
     }
 }
 

@@ -1,16 +1,8 @@
 // A pull chain (ManuallyCompleted, ReturnsToRest): a pull past EngageAlpha ends the interaction and the handle springs
 // back to rest; IsActive never moves the handle; and a second pull while the control is active still runs toward the end
 // pose, from rest, and engages again.
-class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_AutoTest_Base
+class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UMars_AutoTestRig_Lever
 {
-    private FCk_Handle_Control _Control;
-    private FCk_Handle_Mover _Mover;
-    private FCk_Handle_InteractTarget _Target;
-    private FCk_Handle_Interaction _Interaction;
-    private FCk_Handle _Player;
-    private int32 _NewInteractions = 0;
-    private TArray<ECk_SucceededFailed> _FinishedResults;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
@@ -22,7 +14,7 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
         Add_Step_WaitUntil("the chain is gripped", n"Check_IsManipulating", 0, 5.0f);
         Add_Step_WaitUntil("pull until the manipulation ends", n"Check_PullUntilEnded", 0, 5.0f);
         Add_Step_WaitUntil("the first interaction finishes", n"Check_FirstFinished", 0, 5.0f);
-        Add_Step_WaitUntil("the handle springs back to rest", n"Check_AtRest", 0, 5.0f);
+        Add_Step_WaitUntil("the handle springs back to rest", n"Check_SettledToRest", 0, 5.0f);
         Add_Step("the first pull engaged and left the target at rest", n"Step_AssertFirstPull");
         Add_Step("make the control active, as a momentary pull would", n"Step_SetActive");
         Add_Step_WaitUntil("the control is active", n"Check_IsActive", 0, 5.0f);
@@ -35,11 +27,12 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
         Add_Step("the second grip starts from rest", n"Step_AssertGripFromRest");
         Add_Step_WaitUntil("pull until the manipulation ends again", n"Check_PullUntilEnded", 0, 5.0f);
         Add_Step_WaitUntil("the second interaction finishes", n"Check_SecondFinished", 0, 5.0f);
-        Add_Step_WaitUntil("the handle springs back to rest again", n"Check_AtRest", 0, 5.0f);
+        Add_Step_WaitUntil("the handle springs back to rest again", n"Check_SettledToRest", 0, 5.0f);
         Add_Step("the second pull engaged too", n"Step_AssertSecondPull");
         Run_Steps(InHandle);
     }
 
+    // The rig's lever, rebuilt as a momentary pull chain that slides 40 uu down and springs back.
     private void BuildChain(FCk_Handle InHandle)
     {
         _Player = InHandle;
@@ -61,68 +54,25 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
         ControlSpec.Manipulation.ReturnsToRest = true;
         _Control = utils_control::Add(RootEntity, ControlSpec, _Mover);
 
-        // No ProbeInfo: a transform-only child; the test drives the interaction without focus.
         auto Spec = FMars_Interactable_Spec();
         Spec.Targets.Add(_Control.Make_InteractTarget(FText::FromString("Pull chain")));
-        auto Interactable = utils_interactable::Create(Root, Spec);
-        _Target = Interactable.Get_AllInteractTargets()[0];
-        _Target.BindTo_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
-        _Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnFinished"));
-    }
-
-    UFUNCTION()
-    private void OnNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
-    {
-        _Interaction = InInteraction;
-        _NewInteractions += 1;
-    }
-
-    UFUNCTION()
-    private void OnFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
-    {
-        _FinishedResults.Add(InResult);
-    }
-
-    UFUNCTION()
-    private void Step_StartInteraction(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Player, _Player));
+        _Interactable = utils_interactable::Create(Root, Spec);
+        _Target = _Interactable.Get_AllInteractTargets()[0];
+        BindTargetSignals();
     }
 
     UFUNCTION()
     private void Check_FirstInteraction(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_NewInteractions >= 1);
+        Res.Set(_NewInteractionCount >= 1);
     }
 
     UFUNCTION()
     private void Check_SecondInteraction(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_NewInteractions >= 2);
-    }
-
-    UFUNCTION()
-    private void Step_BeginManipulation(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(_Interaction, _Player));
-    }
-
-    UFUNCTION()
-    private void Check_IsManipulating(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Control.Get_IsManipulating());
-    }
-
-    UFUNCTION()
-    private void Check_PullUntilEnded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        _Control.Request_Nudge(FMars_Request_Control_Nudge(4.0f));
-
-        auto Res = OutResult;
-        Res.Set(_Control.Get_IsManipulating() == false);
+        Res.Set(_NewInteractionCount >= 2);
     }
 
     UFUNCTION()
@@ -137,13 +87,6 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UCk_Aut
     {
         auto Res = OutResult;
         Res.Set(_FinishedResults.Num() >= 2);
-    }
-
-    UFUNCTION()
-    private void Check_AtRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Mover.Get_Alpha() < 0.01f);
     }
 
     UFUNCTION()

@@ -2,7 +2,7 @@
 // colour, at the constants_eyes::k_Slot_* slots); a played expression rewrites the cell slots, keeping the previous
 // cells for the crossfade; a new style's colour rewrites the colour slots; and a second plate set later receives every
 // group. The plates are bare engine planes; no material is needed to read the data back. Isolated Z band: -68000.
-class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_ApplyWritesPlate : UMars_AutoTestRig_Eyes
 {
     private const int32 LeftCellSlot = constants_eyes::k_Slot_Cells;
     private const int32 RightCellSlot = constants_eyes::k_Slot_Cells + 1;
@@ -13,7 +13,6 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
     private const int32 LookXSlot = constants_eyes::k_Slot_Look;
     private const int32 LookYSlot = constants_eyes::k_Slot_Look + 1;
 
-    private FCk_Handle_Eyes _Eyes;
     private FCk_Handle_Transform _FaceNode;
     private FCk_Handle_UnrealComponent _Plate;
     private FCk_Handle_UnrealComponent _SecondPlate;
@@ -24,9 +23,7 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -68000.0)),
-            ECk_Replication::DoesNotReplicate);
+        _FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -68000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;

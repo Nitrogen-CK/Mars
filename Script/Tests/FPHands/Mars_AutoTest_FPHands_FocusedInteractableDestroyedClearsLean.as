@@ -2,9 +2,8 @@
 // a glove leaning. The focus target's anchor freezes where the item lay, so the lean would otherwise hold the glove a
 // fixed world offset from its grip until something else is looked at. The feature drops a dead focus on its own; the
 // lean needs no state machine, so none is added here.
-class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UCk_AutoTest_Base
+class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UMars_AutoTestRig_Hands
 {
-    private FCk_Handle_FPHands _Hands;
     private FCk_Handle_Interactable _Interactable;
     private FCk_Handle _Anchor;
     private float32 _FocusLean = 0.0f;
@@ -12,21 +11,15 @@ class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UCk_AutoTe
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto Player = InHandle;
-        auto RootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(RootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
+        auto Spec = FMars_FPHands_Spec();
+        _FocusLean = Spec.Reach.Focus.Lean;
+        auto Root = Add_Hands(InHandle, Spec);
 
         // Something to look at, ahead of and below the hand node: a transform-only interactable (no probe, no targets).
         auto AnchorNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(80.0, 0.0, -40.0)));
         _Anchor = AnchorNode;
         auto AnchorTransform = AnchorNode.As_Transform();
         _Interactable = utils_interactable::Create(AnchorTransform, FMars_Interactable_Spec());
-
-        auto Spec = FMars_FPHands_Spec();
-        _FocusLean = Spec.Reach.Focus.Lean;
-        Spec.HandNode = HandNode.As_Transform();
-        _Hands = utils_fphands::Add(Player, Spec);
 
         Add_Step("focus the interactable", n"Step_Focus");
         Add_Step_WaitUntil("a glove leans toward it", n"Check_IsLeaning", 0, 5.0f);

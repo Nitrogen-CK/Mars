@@ -3,14 +3,10 @@
 // lethal hit and a direct Die request change nothing (still one OnDied, the first cause kept). The monster's drain sheds
 // nothing itself; the crawler HFSM's Dead state does (all 4 legs severed), and the severed limbs - world-owned, debris
 // lifetime 1.0 s here - die on their own timer inside the test.
-//
-// Isolated origin (130000, 96000, 600): the Mars autotest map has no floor of its own there.
-class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
+class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 15.0f;
-
-    private FVector _Origin = FVector(130000.0, 96000.0, 600.0);
-    private FCk_Handle_Crawler _Crawler;
+    default _Origin = FVector(130000.0, 96000.0, 600.0);
 
     private TArray<FMars_DamageEvent> _DiedCauses;
     private TArray<FCk_Handle_BodyPart> _Legs;
@@ -32,58 +28,10 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UCk_AutoTest_Base
 
     private FMars_Crawler_Spec Make_Spec()
     {
-        const auto Half = FVector(400.0, 400.0, 200.0);
-        auto Spec = FMars_Crawler_Spec(4, FBox(_Origin - Half, _Origin + Half));
+        auto Spec = Make_CrawlerSpec(FVector(400.0, 400.0, 200.0));
         // The Dead state severs every leg; the world-owned limbs must die before the test ends (no leak).
         Spec.Vitals.LegDebris.LifetimeSeconds = 1.0f;
         return Spec;
-    }
-
-    private void SpawnFloorAndCrawler(FCk_Handle InHandle, FMars_Crawler_Spec InSpec)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, _Origin - FVector(0.0, 0.0, 10.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(1500.0, 1500.0, 10.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-
-        auto SpawnParams = UMars_Crawler_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0));
-        SpawnParams.Spec = InSpec;
-        SpawnParams.WithVisuals = false;
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
-        utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
-    }
-
-    UFUNCTION()
-    private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
-    {
-        _Crawler = InEntityScriptHandle.As_Crawler();
-    }
-
-    UFUNCTION()
-    private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        if (ck::Is_NOT_Valid(_Crawler))
-        {
-            Res.Set(false);
-            return;
-        }
-
-        const auto Gait = _Crawler.Get_Gait();
-        if (utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Failed)
-        {
-            FinishFailure(f"the crawler's gait failed: {utils_procedural_gait::Get_Failure(Gait) :n}");
-            return;
-        }
-
-        Res.Set(utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Ready &&
-            _Crawler.Get_Monster().Get_Parts().Num() == 4);
     }
 
     UFUNCTION()

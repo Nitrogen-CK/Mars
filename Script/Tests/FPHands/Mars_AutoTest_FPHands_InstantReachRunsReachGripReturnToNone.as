@@ -1,32 +1,21 @@
 // An instant reach runs the Hands sub-SM Rest -> Reach -> Grip -> Return -> Rest: the feature's phase goes Reach, Grip,
 // Return, None in that order, and every change resets PhaseTime. The test entity carries FPHands and the Hands state
 // machine; the reach is a bare one (no interactable), which the requests processor turns into a hand-node reach.
-class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UCk_AutoTest_Base
+class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UMars_AutoTestRig_Hands
 {
-    private FCk_Handle_FPHands _Hands;
-    private FCk_Handle_StateMachine _Sm;
-    private FCk_Handle _Player;
-    private TArray<EMars_FPHands_Phase> _Phases;
     private TArray<float32> _PhaseTimesAtChange;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Player = InHandle;
-        auto RootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(RootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
-
         auto Spec = FMars_FPHands_Spec();
         Spec.Reach.Grab.OutSeconds = 0.2f;
         Spec.Reach.Grab.GripSeconds = 0.2f;
         Spec.Reach.Grab.BackSeconds = 0.2f;
         Spec.Reach.Hold.ReleaseSeconds = 0.2f;
-
-        Spec.HandNode = HandNode.As_Transform();
-        _Hands = utils_fphands::Add(_Player, Spec);
-        _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
-        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
+        Add_Hands(InHandle, Spec);
+        Add_HandsSm();
+        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChangedRecordingPhaseTime"));
 
         Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
         Add_Step("request an instant reach", n"Step_RequestInstantReach");
@@ -36,19 +25,10 @@ class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UCk_AutoTes
     }
 
     UFUNCTION()
-    private void OnPhaseChanged(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
+    private void OnPhaseChangedRecordingPhaseTime(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
     {
         _Phases.Add(InNew);
         _PhaseTimesAtChange.Add(InHands.Get_PhaseTime());
-    }
-
-    UFUNCTION()
-    private void Check_RestListening(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Rest
-            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
-            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound());
     }
 
     UFUNCTION()

@@ -2,12 +2,11 @@
 // (45 / Look.MaxYawDeg 60); an expression with AllowLook = false brings it back to ~0 while the target is still there,
 // clearing it restores the look, and destroying the target returns it to ~0. A target in front and 100 cm above the
 // node then gives a positive LookOffset.Y, and one 100 cm below a negative one. Isolated Z band: -67000.
-class UMars_AutoTest_Eyes_LookFollowsGaze : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_LookFollowsGaze : UMars_AutoTestRig_Eyes
 {
     // Six eased convergences plus the probe detecting each target.
     default _TimeoutSeconds = 14.0f;
 
-    private FCk_Handle_Eyes _Eyes;
     private FCk_Handle_Gaze _Gaze;
     private FCk_Handle _TargetOwner;
 
@@ -21,9 +20,7 @@ class UMars_AutoTest_Eyes_LookFollowsGaze : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -67000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -67000.0));
 
         auto GazeSpec = FMars_Gaze_Spec();
         GazeSpec.DetectionFilter.AddTag(GameplayTags::Probe_Mars_Player);
@@ -102,12 +99,6 @@ class UMars_AutoTest_Eyes_LookFollowsGaze : UCk_AutoTest_Base
         Res.Set(_Gaze.Get_HasTarget()
             && Math::Abs(Look.X) < _LookTolerance
             && Math::Abs(Look.Y) < _LookTolerance);
-    }
-
-    UFUNCTION()
-    private void Step_ClearEmote(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Eyes.Request_ClearExpression(FMars_Request_Eyes_ClearExpression(EMars_Eyes_Layer::Emote));
     }
 
     UFUNCTION()

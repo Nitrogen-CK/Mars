@@ -1,6 +1,6 @@
 // One station per operator: while operator A holds station S1, S2's reserve for A is rejected AlreadyOperating and S1
 // keeps A. Once S1 releases A, S2's reserve for A is confirmed and A's back-ref moves to S2.
-class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTest_Base
+class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UMars_AutoTestRig_Station
 {
     private FCk_Handle_Station _StationOne;
     private FCk_Handle_Station _StationTwo;
@@ -14,17 +14,9 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UCk_AutoTe
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        // Each station on its own child entity: composing both on one entity would alias them.
-        auto OneEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto OneRoot = utils_transform::Add(OneEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _StationOne = utils_station::Add(OneRoot, FMars_Station_Spec(), FMars_Station_Setup());
-
-        auto TwoEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto TwoRoot = utils_transform::Add(TwoEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _StationTwo = utils_station::Add(TwoRoot, FMars_Station_Spec(), FMars_Station_Setup());
-
-        auto OperatorEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _Operator = utils_operator::Add(OperatorEntity);
+        _StationOne = AddStation(InHandle, FMars_Station_Spec());
+        _StationTwo = AddStation(InHandle, FMars_Station_Spec());
+        _Operator = AddOperator(InHandle);
 
         _StationOne.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnOneReserved"));
         _StationOne.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnOneReleased"));

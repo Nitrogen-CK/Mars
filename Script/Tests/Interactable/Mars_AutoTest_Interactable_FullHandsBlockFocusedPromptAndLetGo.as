@@ -15,11 +15,8 @@ class UMars_AutoTestState_FullHandsCarrierRig : UCk_SmState_EntityScript
 // Selecting the rock's slot blocks the prompt (the hands-full reason in the blocked colour, "Pull" kept underneath) and
 // the re-resolve drops the lever from the best Use targets, so the glue cancels the live interaction. Selecting the
 // empty slot again clears the block. Isolated Z band: -82000.
-class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_AutoTest_Base
+class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle _Carrier;
-    private FCk_Handle_Hotbar _Hotbar;
-    private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_InteractionResolver _Resolver;
     private FCk_Handle_StateMachine _Sm;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
@@ -32,18 +29,8 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Carrier = InHandle;
-        auto Root = utils_transform::Add(_Carrier, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -82000.0)),
-            ECk_Replication::DoesNotReplicate);
-
-        auto HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, HandNode));
-        utils_attach_points::Add(_Carrier, AttachPointsSpec);
-
-        auto HotbarSpec = FMars_Hotbar_Spec();
-        HotbarSpec.BagSlotCount = 2;
-        _Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
+        Add_CarrierBody(InHandle, FVector(0.0, 0.0, -82000.0));
+        Add_Hotbar(_Carrier, 2);
         _HeldItem = utils_held_item::Add(_Carrier);
         utils_held_item_use::Add(_Carrier);
         _Resolver = utils_interaction_resolver::Add(_Carrier, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
@@ -124,19 +111,6 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0) && _HeldItem.Get_CurrentItem() == _Rock);
-    }
-
-    UFUNCTION()
-    private void Step_SelectEmptySlot(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(1));
-    }
-
-    UFUNCTION()
-    private void Check_HandsEmpty(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(ck::Is_NOT_Valid(_HeldItem.Get_CurrentItem()));
     }
 
     // What the player HFSM's InteractionFocus and UseIntentToResolver tasks do for a focused lever with Use held.
@@ -248,20 +222,5 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UCk_Auto
         _Target = Targets[0];
         _Prompt = _Target.As_InteractPrompt();
         _Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnFinished"));
-    }
-
-    private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
-    {
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
-            FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
-
-        auto Request = FCk_Request_Inventory_AddItemByDefinition(InDefinition, 1);
-        Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        Holder.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-        return Holder;
     }
 }

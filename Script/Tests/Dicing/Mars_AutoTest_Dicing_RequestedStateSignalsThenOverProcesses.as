@@ -1,40 +1,20 @@
 // RequestedState = CoarseChop with one chop per state: the first aligned chop reaches the requested texture
 // (OnRequestedStateReached, Get_HasReachedRequested), two more over-process it to FineFlecks then GreenPaste, and a fourth
 // leaves the pile at GreenPaste while still resolving aligned.
-class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTest_Base
+class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UMars_AutoTestRig_Dicing
 {
-    private FCk_Handle_Dicing _Dicing;
-    private FMars_Dicing_Spec _Spec;
-
-    private int32 _ChopsIssued = 0;
-    private TArray<bool> _Resolved;
-    private TArray<EMars_Dicing_State> _States;
     private int32 _RequestedReached = 0;
     private bool _HasReachedAfterFirst = false;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Spec = FMars_Dicing_Spec();
-        _Spec.RequestedState = EMars_Dicing_State::CoarseChop;
-        _Spec.ChopsPerState = 1;
+        auto Spec = FMars_Dicing_Spec();
+        Spec.RequestedState = EMars_Dicing_State::CoarseChop;
+        Spec.ChopsPerState = 1;
+        BuildStation(InHandle, Spec);
 
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto LateralNode = utils_scene_node::Create(Root, FTransform::Identity);
-        auto LateralTransform = LateralNode.As_Transform();
-        auto CleaverNode = utils_scene_node::Create(LateralTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 25.0)));
-
-        auto MoverSpec = FMars_Mover_Spec();
-        MoverSpec.StartLocation = FVector(0.0, 0.0, 25.0);
-        MoverSpec.EndLocation = FVector::ZeroVector;
-        MoverSpec.Duration = 0.05f;
-        auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
-
-        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
-        _Dicing = utils_dicing::Add(StationEntity, _Spec);
-
-        _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
+        _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolvedLatchingReached"));
         _Dicing.BindTo_OnStateChanged(FMars_Delegate_Dicing_OnStateChanged(this, n"OnStateChanged"));
         _Dicing.BindTo_OnRequestedStateReached(FMars_Delegate_Dicing_OnRequestedStateReached(this, n"OnRequestedStateReached"));
 
@@ -50,18 +30,13 @@ class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTes
         Run_Steps(InHandle);
     }
 
+    // The rig's recorder, plus Get_HasReachedRequested latched as the first chop resolves.
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
+    private void OnChopResolvedLatchingReached(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
     {
         _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
         if (_Resolved.Num() == 1)
         { _HasReachedAfterFirst = _Dicing.Get_HasReachedRequested(); }
-    }
-
-    UFUNCTION()
-    private void OnStateChanged(FCk_Handle_Dicing InDicing, EMars_Dicing_State InState)
-    {
-        _States.Add(InState);
     }
 
     UFUNCTION()
@@ -78,30 +53,10 @@ class UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses : UCk_AutoTes
     }
 
     UFUNCTION()
-    private void Step_AimAtBand(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Dicing.Request_Nudge(FMars_Request_Dicing_Nudge((_Dicing.Get_BandCenter() - _Dicing.Get_HandLateral()) / _Spec.LateralPerDegree));
-    }
-
-    UFUNCTION()
-    private void Check_HandOnBand(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(Math::Abs(_Dicing.Get_HandLateral() - _Dicing.Get_BandCenter()) < 0.01f);
-    }
-
-    UFUNCTION()
     private void Step_Chop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _ChopsIssued += 1;
         _Dicing.Request_Chop(FMars_Request_Dicing_Chop());
-    }
-
-    UFUNCTION()
-    private void Check_ChopDone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Resolved.Num() == _ChopsIssued && _Dicing.Get_IsChopping() == false);
     }
 
     UFUNCTION()

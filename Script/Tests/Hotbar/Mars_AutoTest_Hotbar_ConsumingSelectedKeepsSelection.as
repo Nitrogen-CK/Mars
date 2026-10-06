@@ -1,17 +1,11 @@
 // Removing the held item leaves its slot selected with empty hands: SelectedIndex never follows the item out.
-class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UCk_AutoTest_Base
+class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle_Hotbar _Hotbar;
-    private TArray<FCk_Handle_Inventory_DataOnly> _Holders;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LocalHandle = InHandle;
-        auto Spec = FMars_Hotbar_Spec();
-        Spec.BagSlotCount = 2;
-        _Hotbar = utils_hotbar::Add(LocalHandle, Spec);
-        _Holders.Add(MakeSeededHolder(InHandle));
+        Add_Hotbar(InHandle, 2);
+        _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
 
         Add_Step_WaitUntil("the holder holds its rock", n"Check_HolderSeeded");
         Add_Step("stow the rock", n"Step_Stow");
@@ -64,39 +58,5 @@ class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UCk_AutoTest_Base
     {
         Assert_True(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0), "slot 0 stays selected after the held item was removed");
         Assert_Invalid(_Hotbar.Get_SelectedItem(), "the hands are empty after the held item was removed");
-    }
-
-    private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle)
-    {
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
-            FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
-
-        auto Request = FCk_Request_Inventory_AddItemByDefinition(mars_items::Rock(), 1);
-        Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        Holder.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-        return Holder;
-    }
-
-    // What the pickup task does: transfer into whatever the hotbar names as the stow target.
-    private void StowFrom(FCk_Handle_Inventory_DataOnly InHolder)
-    {
-        auto Items = InHolder.Get_Items();
-        auto Target = FCk_Handle_Inventory_DataOnly();
-        if (Items.Num() == 1)
-        { Target = _Hotbar.TryGet_StowTarget(Items[0]); }
-
-        if (ck::Is_NOT_Valid(Target) || Items.Num() != 1)
-        {
-            FinishFailure("stow precondition: a valid stow target and a holder with one item");
-            return;
-        }
-
-        auto Holder = InHolder;
-        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Items[0], Target),
-            FCk_Delegate_Inventory_OnOperationResult_Transfer());
     }
 }

@@ -2,28 +2,19 @@
 // release request anywhere) frees the station with OnReleased(A, OperatorLost), and the Use prompt goes back from
 // Prompt.OccupiedText to Prompt.Text with the Use target enabled again. Uses the real reserve path (a direct Operator stamp would
 // bypass the watch under test).
-class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
+class UMars_AutoTest_Station_OperatorDestroyedReleases : UMars_AutoTestRig_Station
 {
     private FCk_Handle_Station _Station;
     private FCk_Handle _Operator;
     private FMars_Station_Spec _Spec;
-
-    private int32 _ReservedCount = 0;
-    private TArray<FCk_Handle> _Released;
-    private TArray<EMars_Station_ReleaseReason> _ReleaseReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
         _Spec = FMars_Station_Spec();
         _Spec.Prompt = FMars_Station_PromptSpec(FText::FromString("Use test station"), FText::FromString("Test station in use"));
-
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _Station = utils_station::Add(Root, _Spec, FMars_Station_Setup());
-
-        _Operator = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_operator::Add(_Operator);
+        _Station = AddStation(InHandle, _Spec);
+        _Operator = AddOperator(InHandle);
 
         _Station.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnReserved"));
         _Station.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnReleased"));
@@ -36,19 +27,6 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
         Add_Step_WaitUntil("the prompt reads the prompt text again", n"Check_PromptRestored", 0, 2.0f);
         Add_Step("the Use target is enabled again", n"Step_AssertEnabled");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void OnReserved(FCk_Handle_Station InStation, FCk_Handle InOperator)
-    {
-        _ReservedCount += 1;
-    }
-
-    UFUNCTION()
-    private void OnReleased(FCk_Handle_Station InStation, FCk_Handle InOperator, EMars_Station_ReleaseReason InReason)
-    {
-        _Released.Add(InOperator);
-        _ReleaseReasons.Add(InReason);
     }
 
     // The Use target and its prompt are composed with the station, so their absence fails the test.
@@ -76,7 +54,7 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
     private void Check_ReservedAndOccupied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_ReservedCount > 0 && Get_PromptText() == _Spec.Prompt.OccupiedText.ToString());
+        Res.Set(_Reserved.Num() > 0 && Get_PromptText() == _Spec.Prompt.OccupiedText.ToString());
     }
 
     UFUNCTION()
@@ -87,13 +65,6 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UCk_AutoTest_Base
             "the Use target is disabled while reserved");
 
         utils_entity_lifetime::Request_DestroyEntity(_Operator);
-    }
-
-    UFUNCTION()
-    private void Check_Released(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Released.Num() > 0);
     }
 
     UFUNCTION()
