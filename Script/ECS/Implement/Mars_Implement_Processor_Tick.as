@@ -8,7 +8,8 @@ struct FMars_Implement_Frame
 
 // Every frame: the pending look (dropped unless Driven) is split into the slow part, which steers the tilt target, and the
 // fast upward excess, which kicks the lift; the target relaxes and clamps, the tilt tracks it at a bounded rate, the lift
-// spring settles, and ONE offset write of the node (only when the pose changed) moves the kinematic bodies under it.
+// spring settles, the orbit eases with the drive and turns, and ONE offset write of the node (only when the pose changed)
+// moves the kinematic bodies under it.
 class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -31,6 +32,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
 
         Advance_Tilt(Frame, InState);
         Advance_LiftSpring(Frame, InState);
+        Advance_Orbit(Frame, InState);
         Write_PoseIfChanged(Frame, InState);
     }
 
@@ -38,16 +40,39 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
     // lift spring only approaches rest) issues no write.
     private void Write_PoseIfChanged(FMars_Implement_Frame& InFrame, FMars_Fragment_Implement& InState)
     {
+        const auto OrbitOffset = utils_implement::Make_OrbitOffset(InFrame.Spec.Orbit, InState);
         const auto Changed = Math::Abs(InState.Pitch - InState.WrittenPitch) > k_PoseTolerance
             || Math::Abs(InState.Roll - InState.WrittenRoll) > k_PoseTolerance
-            || Math::Abs(InState.Lift - InState.WrittenLift) > k_PoseTolerance;
+            || Math::Abs(InState.Lift - InState.WrittenLift) > k_PoseTolerance
+            || (OrbitOffset - InState.WrittenOrbit).Size() > k_PoseTolerance;
         if (Changed == false)
         { return; }
 
-        utils_implement::Apply_Pose(InFrame.Spec.Nodes.Node, InState);
+        utils_implement::Apply_Pose(InFrame.Spec.Nodes.Node, InState, OrbitOffset);
         InState.WrittenPitch = InState.Pitch;
         InState.WrittenRoll = InState.Roll;
         InState.WrittenLift = InState.Lift;
+        InState.WrittenOrbit = OrbitOffset;
+    }
+
+    // The orbit's share eases toward 1 while Driven and toward 0 while Idle over EaseSeconds; the phase turns while any of
+    // it shows, so an eased-out implement holds still.
+    private void Advance_Orbit(FMars_Implement_Frame& InFrame, FMars_Fragment_Implement& InState)
+    {
+        const auto& OrbitSpec = InFrame.Spec.Orbit;
+        const auto Step = InFrame.DeltaSeconds / OrbitSpec.EaseSeconds;
+        const auto Goal = InState.Drive == EMars_Implement_Drive::Driven ? 1.0f : 0.0f;
+        InState.OrbitAlpha = InState.OrbitAlpha < Goal
+            ? Math::Min(Goal, InState.OrbitAlpha + Step)
+            : Math::Max(Goal, InState.OrbitAlpha - Step);
+
+        if (InState.OrbitAlpha <= 0.0f)
+        { return; }
+
+        const auto FullTurn = 2.0f * float32(Math::DegreesToRadians(180.0));
+        InState.OrbitPhase += FullTurn * OrbitSpec.Hz * InFrame.DeltaSeconds;
+        if (InState.OrbitPhase >= FullTurn)
+        { InState.OrbitPhase -= FullTurn * float32(Math::FloorToInt(InState.OrbitPhase / FullTurn)); }
     }
 
     // An idle implement drops the look. The upward look is split first: the degrees beyond what FlickSpeedDegreesPerSecond

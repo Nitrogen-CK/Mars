@@ -6,12 +6,16 @@ struct FMars_Searing_Frame
     float32 DeltaSeconds = 0.0f;
 }
 
-// Every frame, in order: the steak's spawn, whether it is on the pan (on/off edges), its loss (and the lingering lost
-// bodies), the sear of the face on the pan, the tally, and the sizzle edge last. The pan moves itself (an Implement);
-// Jolt owns the steak's pose; the kernel reads it back through the entity transform and never writes it.
+// Every frame, in order: the steak's spawn, whether it is on the pan (on/off edges), the face it rests on (flips), its loss
+// (and the lingering lost bodies), the sear of the face on the pan, the tally, and the sizzle edge last. The pan moves
+// itself (an Implement); Jolt owns the steak's pose; the kernel reads it back through the entity transform and never
+// writes it.
 class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+
+    // The steak's Resting counts a landing after this long apart as a hop (its own default; the kernel does not read hops).
+    private const float32 k_HopMinSeconds = 0.12f;
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -28,6 +32,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 
         Advance_Spawn(Frame, InState);
         Advance_Contact(Frame, InState);
+        Advance_RestingFace(Frame, InState);
         Advance_Loss(Frame, InState);
         Advance_Sear(Frame, InState);
         Advance_Tally(Frame, InState);
@@ -39,8 +44,8 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     //----------------------------------------------------------------------------------------------------------------------
 
     // NoSteak counts down, then a fresh steak entity (a lifetime child of the station) appears HalfSize + SpawnLift above
-    // the pan base top with a dynamic box body and a Resting on the pan base body (which tells whether it lies on the pan
-    // and reports its landings). It starts Airborne and becomes OnPan once it rests on the base.
+    // the pan base top, flat (NegZ down, its resting face), with a dynamic box body and a Resting on the pan base body
+    // (which tells whether it lies on the pan). It starts Airborne and becomes OnPan once it rests on the base.
     private void Advance_Spawn(FMars_Searing_Frame& InFrame, FMars_Fragment_Searing& InState)
     {
         if (InState.Phase != EMars_Searing_Phase::NoSteak)
@@ -75,12 +80,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         BodySpec.Set_PersistContacts(ECk_EnableDisable::Enable);
         auto Body = utils_jolt_body::Add(Entity, BodySpec);
 
-        auto Link = FMars_Fragment_Searing_SteakLink();
-        Link.Searing = InFrame.Searing;
-        Entity.Add_Fragment(Link);
-
-        auto Resting = utils_resting::Add(Entity, FMars_Resting_Spec(InFrame.Spec.Nodes.PanBaseBody));
-        Resting.BindTo_OnLanded(FMars_Delegate_Resting_OnLanded(this, n"OnSteakLanded"));
+        utils_resting::Add(Entity, FMars_Resting_Spec(InFrame.Spec.Nodes.PanBaseBody, SteakSpec.ContactGraceSeconds, k_HopMinSeconds));
 
         InState.Steak = FMars_Searing_SteakState();
         InState.Steak.Entity = Entity;
@@ -110,7 +110,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
             InState.LastProgressStep = -1;
             InState.Phase = EMars_Searing_Phase::OnPan;
 
-            ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] steak on the pan (flips {InState.Tally.Flips})");
+            ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] steak on the pan");
             Broadcast_PanContactChanged(InFrame, EMars_Searing_Phase::OnPan);
             return;
         }
@@ -122,6 +122,34 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
             ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] steak off the pan");
             Broadcast_PanContactChanged(InFrame, EMars_Searing_Phase::Airborne);
         }
+    }
+
+    // A flip is the resting face changing: while on the pan, a down face other than the resting one that stays down for
+    // k_FaceSettleSeconds becomes the resting face. Nothing is sampled at the on/off edges (a tumbling cube shows passing
+    // faces there), and a tumble on the pan without leaving it counts too.
+    private void Advance_RestingFace(FMars_Searing_Frame& InFrame, FMars_Fragment_Searing& InState)
+    {
+        if (InState.Phase != EMars_Searing_Phase::OnPan)
+        { return; }
+
+        const auto Down = InFrame.Searing.Get_DownFace();
+        if (Down == InState.Steak.RestingFace)
+        {
+            InState.Steak.CandidateSeconds = 0.0f;
+            return;
+        }
+
+        InState.Steak.CandidateSeconds += InFrame.DeltaSeconds;
+        if (InState.Steak.CandidateSeconds < utils_searing::k_FaceSettleSeconds)
+        { return; }
+
+        const auto Previous = InState.Steak.RestingFace;
+        InState.Steak.RestingFace = Down;
+        InState.Steak.CandidateSeconds = 0.0f;
+        InState.Tally.Flips += 1;
+
+        ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] flipped {utils_searing::Get_FaceName(Previous)} -> "
+            + f"{utils_searing::Get_FaceName(Down)} (flips {InState.Tally.Flips})");
     }
 
     // The steak's centre, in the pan base's frame, within PanRadius of the axis and between HalfSize below and three
@@ -258,32 +286,5 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     {
         if (InFrame.Searing.Has_Fragment(FMars_Fragment_Searing_Signals))
         { InFrame.Searing.Get_Fragment(FMars_Fragment_Searing_Signals).OnPanContactChanged.Broadcast(InFrame.Searing, InPhase); }
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Landings
-    //----------------------------------------------------------------------------------------------------------------------
-
-    // Bound to the Resting of every steak the kernel spawns. A landing of the live steak after at least k_FlipAirSeconds
-    // apart is a flip; a lingering lost steak lands too and does not count.
-    UFUNCTION()
-    private void OnSteakLanded(FCk_Handle_Resting InResting, float32 InApartSeconds)
-    {
-        if (ck::EnsureIfNot(InResting.Has_Fragment(FMars_Fragment_Searing_SteakLink),
-            f"[Searing] landed steak [{InResting.ToString()}] carries no SteakLink"))
-        { return; }
-
-        // The station is being torn down with its steaks.
-        auto Searing = InResting.Get_Fragment(FMars_Fragment_Searing_SteakLink).Searing;
-        if (ck::Is_NOT_Valid(Searing))
-        { return; }
-
-        auto& State = Searing.Get_Fragment(FMars_Fragment_Searing);
-        const FCk_Handle Landed = InResting;
-        if (State.Steak.Entity != Landed || InApartSeconds < utils_searing::k_FlipAirSeconds)
-        { return; }
-
-        State.Tally.Flips += 1;
-        ck::Trace(f"[Searing] [{Searing.ToString()}] steak landed after {InApartSeconds :.3} s apart (flips {State.Tally.Flips})");
     }
 }

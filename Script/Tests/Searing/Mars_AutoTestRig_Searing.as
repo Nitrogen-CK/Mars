@@ -1,14 +1,20 @@
 // The searing rig: a Searing station on a transform-only root at an isolated origin, its pan node 100 uu up carrying the
-// pan Implement and a flat oiled griddle: one kinematic base disc on its own child node (the station script builds the
-// same pan). There is no table or floor: a lost steak falls into the void until the kernel destroys it. The handlers
-// record every signal; the steps heat the pan, look, and wait on the steak.
+// pan Implement (no swirl: the tests pin the ledger) and an oiled pan: a kinematic base disc and a lip of kinematic
+// segments, each on its own child node (the station script builds the same pan). There is no table or floor: a lost steak
+// falls into the void until the kernel destroys it. The handlers record every signal; the steps heat the pan, look, and
+// wait on the steak.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
 {
     protected const FVector k_Origin = FVector(-60000.0, 16000.0, -60000.0);
-    // The oiled pan: the steak's 0.6 combines to sqrt(0.6 * 0.3) = 0.42.
-    protected const float32 k_PanFriction = 0.3f;
+    // The oiled pan: the steak's 0.6 combines to sqrt(0.6 * 0.15) = 0.3.
+    protected const float32 k_PanFriction = 0.15f;
     protected const float32 k_PanRestitution = 0.1f;
+    // The lip, as the station script builds it: eight 3 uu boxes standing on the disc's edge.
+    protected const int32 k_RimSegments = 8;
+    protected const float64 k_LipHalfThickness = 1.5;
+    protected const float64 k_LipHeight = 3.0;
+    protected const float64 k_LipHalfLengthPerRadius = 0.42;
 
     protected FCk_Handle_Searing _Searing;
     // The specs the station was built from, nodes included.
@@ -42,7 +48,7 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         return Spec;
     }
 
-    // InPanSpec is the pan Implement's (tilt and lift); its default is the station's.
+    // InPanSpec is the pan Implement's (tilt, lift, orbit); its default has no orbit.
     protected void BuildStation(FCk_Handle InHandle, FMars_Searing_Spec InSpec, FMars_Implement_Spec InPanSpec = FMars_Implement_Spec())
     {
         _Spec = InSpec;
@@ -55,6 +61,7 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         _PanSpec.Nodes = FMars_Implement_Nodes(_PanNode);
         _Pan = utils_implement::Add(_PanNode.H(), _PanSpec);
         _PanBaseBody = Build_Pan(_PanNode);
+        Build_Lip(_PanNode);
 
         _Spec.Nodes = FMars_Searing_Nodes(_Pan, _PanBaseBody);
         _Searing = utils_searing::Add(StationEntity, _Spec);
@@ -69,8 +76,7 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         _Searing.BindTo_OnCompleted(FMars_Delegate_Searing_OnCompleted(this, n"OnCompleted"));
     }
 
-    // The base disc (its top k_PanBaseHalfHeight above the pan node), kinematic so the pan node's motion moves it. No rim:
-    // a cube on a slope only tips over a rim past 45 degrees, so at a 30-degree clamp a rim would keep the steak on.
+    // The base disc (its top k_PanBaseHalfHeight above the pan node), kinematic so the pan node's motion moves it.
     protected FCk_Handle_JoltBody Build_Pan(FCk_Handle_SceneNode InPanNode)
     {
         auto PanTransform = InPanNode.As_Transform();
@@ -81,6 +87,27 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         BaseShape.Set_Radius(PanRadius);
         BaseShape.Set_HalfHeight(utils_searing::k_PanBaseHalfHeight);
         return utils_jolt_body::Add(BaseNode.H(), Make_PanBodySpec(BaseShape));
+    }
+
+    // k_RimSegments kinematic boxes around the disc's edge, standing on its top (the station script's AddLip). A 6 uu cube
+    // tips over the 3 uu lip only past 63 degrees of tilt, so a held tilt parks the steak against it.
+    protected void Build_Lip(FCk_Handle_SceneNode InPanNode)
+    {
+        auto PanTransform = InPanNode.As_Transform();
+        const auto PanRadius = float64(_Spec.Loss.PanRadius);
+        const auto CenterZ = float64(utils_searing::k_PanBaseHalfHeight) + k_LipHeight * 0.5;
+
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(k_LipHalfThickness, PanRadius * k_LipHalfLengthPerRadius, k_LipHeight * 0.5));
+        const auto BodySpec = Make_PanBodySpec(Shape);
+
+        for (int32 Index = 0; Index < k_RimSegments; ++Index)
+        {
+            const auto Yaw = FRotator(0.0, 360.0 * float64(Index) / float64(k_RimSegments), 0.0);
+            const auto Segment = FTransform(Yaw, Yaw.RotateVector(FVector(PanRadius + k_LipHalfThickness, 0.0, CenterZ)));
+            auto SegmentNode = utils_scene_node::Create(PanTransform, Segment);
+            utils_jolt_body::Add(SegmentNode.H(), BodySpec);
+        }
     }
 
     protected FCk_JoltBody_Spec Make_PanBodySpec(FCk_Jolt_ShapeDimensions InShape)

@@ -1,6 +1,6 @@
 // A fast upward look (40 degrees in one frame, far above LiftFlickSpeedDegreesPerSecond) kicks the pan up; the kinematic
-// push launches the resting steak, which leaves the pan and either lands back on it (one flip) or is lost (a fresh steak
-// follows). Which face lands is the physics' business; the test pins the toss and a legal end, then the lift settling.
+// push launches the resting steak, which leaves the pan and either lands back on it (a flip if it settled on another face)
+// or is lost (a fresh steak follows). Which face lands is the physics' business; the test pins the toss and a legal end, then the lift settling.
 class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Searing
 {
     default _TimeoutSeconds = 12.0f;
@@ -10,6 +10,9 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
     private float32 _TossTime = -1.0f;
     private float32 _AirborneTime = -1.0f;
     private float32 _PeakLiftVelocity = 0.0f;
+    // Recorded when the toss ended: landed (else lost), and after how long in the air.
+    private bool _Landed = false;
+    private float32 _EndAirSeconds = -1.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -26,7 +29,10 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
         Add_Step_WaitUntil("the pan lifted", n"Check_PanLifted", 0, 0.3f);
         Add_Step_WaitUntil("the steak left the pan", n"Check_TossedAirborne", 0, 0.6f);
         Add_Step_WaitUntil("the steak landed or was lost", n"Check_LandedOrLost", 0, 3.0f);
-        Add_Step("a legal end: one flip, or one loss", n"Step_AssertOutcome");
+        Add_Step("record how the toss ended", n"Step_RecordOutcome");
+        // A landed face counts as a flip only once it stayed down for utils_searing::k_FaceSettleSeconds.
+        Add_Step_WaitSeconds("the resting face settles", 0.3f);
+        Add_Step("a legal end: a landing, or one loss", n"Step_AssertOutcome");
         Add_Step_WaitUntil("a lost steak was replaced", n"Check_FreshSteakIfLost", 0, 2.0f);
         Add_Step_WaitSeconds("the lift spring settles", 0.6f);
         Add_Step("the pan is back at rest", n"Step_AssertLiftSettled");
@@ -71,22 +77,32 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
     }
 
     UFUNCTION()
+    private void Step_RecordOutcome(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _Landed = Get_HasLanded();
+        _EndAirSeconds = Get_Now() - _AirborneTime;
+    }
+
+    UFUNCTION()
     private void Step_AssertOutcome(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_AirborneTime >= 0.0f, "the steak left the pan after the flick");
 
         const auto Tally = _Searing.Get_Tally();
-        if (Get_HasLanded())
+        if (_Landed)
         {
             const auto DownFaceAfter = _Searing.Get_DownFace();
-            ck::Trace(f"[Searing] toss outcome: LANDED after {Get_Now() - _AirborneTime :.3} s airborne; peak lift velocity "
-                + f"{_PeakLiftVelocity :.1} uu/s; down face {utils_searing::Get_FaceName(_DownFaceBefore)} -> {utils_searing::Get_FaceName(DownFaceAfter)}");
-            Assert_Equals_Int(Tally.Flips, 1, "the landing counted one flip");
+            ck::Trace(f"[Searing] toss outcome: LANDED after {_EndAirSeconds :.3} s airborne; peak lift velocity "
+                + f"{_PeakLiftVelocity :.1} uu/s; down face {utils_searing::Get_FaceName(_DownFaceBefore)} -> {utils_searing::Get_FaceName(DownFaceAfter)} "
+                + f"after the settle (flips {Tally.Flips})");
             Assert_True(_Searing.Get_HasSteak(), "the tossed steak is still the live steak");
+            Assert_Equals_Int(Tally.Losses, 0, "the landed steak was not lost while it settled");
+            const auto ExpectedFlips = DownFaceAfter != _DownFaceBefore ? 1 : 0;
+            Assert_Equals_Int(Tally.Flips, ExpectedFlips, "a landing counts a flip exactly when it settled the steak onto another face");
             return;
         }
 
-        ck::Trace(f"[Searing] toss outcome: LOST {Get_Now() - _AirborneTime :.3} s after leaving the pan; peak lift velocity "
+        ck::Trace(f"[Searing] toss outcome: LOST {_EndAirSeconds :.3} s after leaving the pan; peak lift velocity "
             + f"{_PeakLiftVelocity :.1} uu/s; down face before {utils_searing::Get_FaceName(_DownFaceBefore)}");
         Assert_Equals_Int(Tally.Losses, 1, "the lost toss counted one loss");
     }

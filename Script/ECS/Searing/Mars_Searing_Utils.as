@@ -2,10 +2,11 @@ namespace utils_searing
 {
     const int32 k_FaceCount = 6;
     const int32 k_SearSignalSteps = 10;
-    // A landing after at least this long off the pan counts as a flip.
-    const float32 k_FlipAirSeconds = 0.12f;
     // The pan base disc's half height; the steak spawns and is judged relative to the disc top.
     const float32 k_PanBaseHalfHeight = 1.5f;
+    // How long a new down face must stay down on the pan before it is the resting face (a flip): a tumbling cube passes
+    // other faces down for a frame or two, and neither the liftoff nor the first contact shows the face it settles on.
+    const float32 k_FaceSettleSeconds = 0.1f;
 
     // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature). The spec's
     // Nodes are built by the caller: Nodes.Pan is the Implement on the pan node (the kernel makes it Driven while hot and

@@ -1,11 +1,12 @@
 // Validate() accepts the default implement spec and rejects a tilt that cannot steer, cannot move or tilts past 80
-// degrees, a negative level return, a lift spring with no stiffness or damping, no headroom, and a floor above rest.
+// degrees, a negative level return, a lift spring with no stiffness or damping, a floor above rest, and an orbit with a
+// negative radius, no frequency or an instant ease.
 class UMars_AutoTest_Implement_SpecValidateRejectsBadTilts : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("validate the default spec and eight bad ones", n"Step_Validate");
+        Add_Step("validate the default spec and eleven bad ones", n"Step_Validate");
         Run_Steps(InHandle);
     }
 
@@ -46,6 +47,18 @@ class UMars_AutoTest_Implement_SpecValidateRejectsBadTilts : UCk_AutoTest_Base
         auto Raised = FMars_Implement_Spec();
         Raised.Lift.MinLift = 1.0f;
         AssertRejected(Raised.Validate(), "MinLift > 0");
+
+        auto Inverted = FMars_Implement_Spec();
+        Inverted.Orbit = FMars_Implement_OrbitSpec(-1.0f, 1.0f);
+        AssertRejected(Inverted.Validate(), "Orbit.Radius < 0");
+
+        auto Still = FMars_Implement_Spec();
+        Still.Orbit = FMars_Implement_OrbitSpec(3.0f, 0.0f);
+        AssertRejected(Still.Validate(), "Orbit.Hz <= 0");
+
+        auto Snapping = FMars_Implement_Spec();
+        Snapping.Orbit = FMars_Implement_OrbitSpec(3.0f, 1.0f, 0.0f);
+        AssertRejected(Snapping.Validate(), "Orbit.EaseSeconds <= 0");
     }
 
     private void AssertRejected(const FMars_Validation& InValidation, const FString& InRule)

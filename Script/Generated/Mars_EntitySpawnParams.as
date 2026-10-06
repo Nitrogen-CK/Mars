@@ -1698,6 +1698,19 @@ namespace UMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut
 }
 
 USTRUCT()
+struct FMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut
+{
+    FMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Implement_SpecValidateRejectsBadTilts_SpawnParams
 {
 }
@@ -1880,15 +1893,15 @@ namespace UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace
 }
 
 USTRUCT()
-struct FMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_SpawnParams
+struct FMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip_SpawnParams
 {
 }
 
-namespace UMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears
+namespace UMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip
 {
-    FMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_SpawnParams Params()
+    FMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip_SpawnParams Params()
     {
-        return FMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_SpawnParams();
+        return FMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip_SpawnParams();
     }
 }
 
@@ -1928,6 +1941,19 @@ namespace UMars_AutoTest_Searing_SpecValidateRejectsBadPans
     FMars_AutoTest_Searing_SpecValidateRejectsBadPans_SpawnParams Params()
     {
         return FMars_AutoTest_Searing_SpecValidateRejectsBadPans_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears
+{
+    FMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears_SpawnParams();
     }
 }
 

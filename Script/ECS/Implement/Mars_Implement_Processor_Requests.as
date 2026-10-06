@@ -1,4 +1,4 @@
-// Drains Reset -> SetDrive -> Look. Reset levels the implement, zeroes the lift and idles it; SetDrive is last-wins; looks
+// Drains Reset -> SetDrive -> Look. Reset levels the implement, zeroes the lift and the orbit and idles it; SetDrive is last-wins; looks
 // only collect into the pending look while Driven. The drain collects and the Tick measures: a dirty-marked processor is
 // also pumped with a zero DeltaT, so nothing here integrates over time.
 class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
@@ -56,12 +56,15 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.Lift = 0.0f;
         InState.LiftVelocity = 0.0f;
         InState.PendingLook = FVector::ZeroVector;
+        InState.OrbitPhase = 0.0f;
+        InState.OrbitAlpha = 0.0f;
 
-        utils_implement::Apply_Pose(InImplement.Get_Node(), InState);
+        utils_implement::Apply_Pose(InImplement.Get_Node(), InState, FVector::ZeroVector);
         InState.WrittenPitch = 0.0f;
         InState.WrittenRoll = 0.0f;
         InState.WrittenLift = 0.0f;
+        InState.WrittenOrbit = FVector::ZeroVector;
 
-        ck::Trace(f"[Implement] [{InImplement.ToString()}] reset: level, no lift, idle");
+        ck::Trace(f"[Implement] [{InImplement.ToString()}] reset: level, no lift, no orbit, idle");
     }
 }
