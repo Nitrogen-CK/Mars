@@ -4,29 +4,70 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "149b878c4531d5417c3a2dc4ec825cd9",
+		"sourceHash": "34413124a64bd1601b8c02705e033577",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
 	"twoSided": false,
 	"unlit": false,
-	"shadingModel": "MSM_DefaultLit",
+	"shadingModel": "MSM_Subsurface",
 	"domain": "MD_Surface",
 	"connectedOutputs": [
-		"BaseColor"
+		"BaseColor",
+		"Opacity"
 	],
 	"expressions":
 	{
+		"Add": 1,
+		"Constant": 1,
 		"Constant3Vector": 1,
+		"DotProduct": 1,
 		"Fresnel": 1,
 		"LinearInterpolate": 1,
-		"VectorParameter": 1
+		"MaterialFunctionCall": 2,
+		"Multiply": 1,
+		"NamedRerouteDeclaration": 1,
+		"OneMinus": 1,
+		"SkyAtmosphereLightDirection": 1,
+		"SmoothStep": 1,
+		"StaticBool": 1,
+		"Step": 1,
+		"TextureObject": 1,
+		"VectorParameter": 2,
+		"VertexNormalWS": 1
 	},
 	"graph":
 	{
 		"nodes": [
 			{
 				"id": 0,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 3,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 8,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 1,
 				"class": "VectorParameter",
 				"name": "MaterialExpressionVectorParameter_0",
 				"outputs": [
@@ -39,44 +80,17 @@
 				],
 				"props":
 				{
-					"DefaultValue": "(R=0.630208,G=0.000000,B=0.000000,A=1.000000)"
-				}
-			},
-			{
-				"id": 1,
-				"class": "Fresnel",
-				"name": "MaterialExpressionFresnel_0",
-				"props":
-				{
-					"Exponent": 0.20000000298023224
+					"DefaultValue": "(R=1.000000,G=0.000000,B=0.000000,A=1.000000)"
 				}
 			},
 			{
 				"id": 2,
-				"class": "LinearInterpolate",
-				"name": "MaterialExpressionLinearInterpolate_0",
-				"inputs": [
-					{
-						"index": 0,
-						"name": "A",
-						"node": 3,
-						"output": 0,
-						"mask": "rgb"
-					},
-					{
-						"index": 1,
-						"name": "B",
-						"node": 0,
-						"output": 0,
-						"mask": "rgb"
-					},
-					{
-						"index": 2,
-						"name": "Alpha",
-						"node": 1,
-						"output": 0
-					}
-				]
+				"class": "Fresnel",
+				"name": "MaterialExpressionFresnel_0",
+				"props":
+				{
+					"Exponent": 2
+				}
 			},
 			{
 				"id": 3,
@@ -92,23 +106,297 @@
 				{
 					"Constant": "(R=0.781250,G=0.184330,B=0.054509,A=1.000000)"
 				}
+			},
+			{
+				"id": 4,
+				"class": "DotProduct",
+				"name": "MaterialExpressionDotProduct_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "SkyAtmosphereLightDirection",
+				"name": "MaterialExpressionSkyAtmosphereLightDirection_0"
+			},
+			{
+				"id": 6,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 7,
+				"class": "Step",
+				"name": "MaterialExpressionStep_0",
+				"inputs": [
+					{
+						"index": 1,
+						"name": "X",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstY": 0.94999998807907104,
+					"ConstX": 0.20000000298023224
+				}
+			},
+			{
+				"id": 8,
+				"class": "SmoothStep",
+				"name": "MaterialExpressionSmoothStep_0",
+				"inputs": [
+					{
+						"index": 2,
+						"name": "Value",
+						"node": 4,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 9,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseNormal (V3)",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "AdditionalNormal (V3)",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions02/Utility/BlendAngleCorrectedNormals.BlendAngleCorrectedNormals"
+				}
+			},
+			{
+				"id": 10,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Texture Object (T2d)",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Tiling (S)",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Is Normalmap (SB)",
+						"node": 14,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Engine/Functions/Engine_MaterialFunctions01/Texturing/Texture_Bombing.Texture_Bombing"
+				}
+			},
+			{
+				"id": 11,
+				"class": "TextureObject",
+				"name": "MaterialExpressionTextureObject_0",
+				"props":
+				{
+					"Texture": "/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Normal_Mars_T.Paint_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 12,
+				"class": "Add",
+				"name": "MaterialExpressionAdd_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 0,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 13,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 7,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"ConstB": 0.10000000149011612
+				}
+			},
+			{
+				"id": 14,
+				"class": "StaticBool",
+				"name": "MaterialExpressionStaticBool_0",
+				"props":
+				{
+					"Value": true
+				}
+			},
+			{
+				"id": 15,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 10
+				}
+			},
+			{
+				"id": 16,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.500000,B=0.600000,A=1.000000)",
+					"ParameterName": "MSR"
+				}
+			},
+			{
+				"id": 17,
+				"class": "OneMinus",
+				"name": "MaterialExpressionOneMinus_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 2,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 18,
+				"class": "NamedRerouteDeclaration",
+				"name": "MaterialExpressionNamedRerouteDeclaration_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Name": "LightDir",
+					"NodeColor": "(R=0.312500,G=1.000000,B=0.000000,A=1.000000)",
+					"VariableGuid": "E7A2E553430F82F3AF6DA99F70F64994"
+				}
 			}
 		],
 		"outputs": [
 			{
-				"property": "MP_BaseColor",
-				"node": 2,
+				"property": "MP_Opacity",
+				"node": 17,
 				"output": 0
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 16,
+				"output": 1,
+				"mask": "r"
+			},
+			{
+				"property": "MP_Specular",
+				"node": 16,
+				"output": 2,
+				"mask": "g"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 16,
+				"output": 3,
+				"mask": "b"
+			},
+			{
+				"property": "MP_SubsurfaceColor",
+				"node": 1,
+				"output": 0,
+				"mask": "rgb"
 			}
 		]
 	},
-	"scalarParams": [],
+	"scalarParams": [
+		{
+			"name": "Max Expensive Steps Debug Color",
+			"value": 32
+		},
+		{
+			"name": "Param",
+			"value": 0
+		}
+	],
 	"vectorParams": [
 		{
 			"name": "Param",
-			"value": "RGBA(0.630208, 0, 0, 1)"
+			"value": "RGBA(1, 0, 0, 1)"
+		},
+		{
+			"name": "t",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "MSR",
+			"value": "RGBA(0, 0.5, 0.6, 1)"
 		}
 	],
 	"textureParams": [],
-	"usedTextures": []
+	"usedTextures": [
+		"/Game/Mars/Environment/Textures/Surfaces/Paint/Paint_Normal_Mars_T.Paint_Normal_Mars_T"
+	]
 }
