@@ -62,15 +62,15 @@ struct FMars_Searing_CookSpec
 }
 
 // The steak body: a box of HalfSize, explicit mass and surface. Spawned HalfSize + SpawnLift above the base top.
-// Friction combines with the pan's as sqrt(a * b): 0.6 on the pan's 0.3 (an oiled pan) gives 0.42, so a resting steak
-// starts sliding past a 23-degree tilt and is well on its way at a 30-degree tilt; 0.8 on 0.8 would need 39 degrees.
+// Friction combines with the pan's as sqrt(a * b): 0.6 on an oiled pan's 0.15 gives 0.3, so a resting steak starts
+// sliding past a 17-degree tilt (into the pan's lip) and glides on a pan swirling a few uu at 1.5 Hz.
 struct FMars_Searing_SteakSpec
 {
     UPROPERTY()
-    float32 HalfSize = 12.0f;
+    float32 HalfSize = 6.0f;
 
     UPROPERTY()
-    float32 MassKg = 0.4f;
+    float32 MassKg = 0.1f;
 
     UPROPERTY()
     float32 Friction = 0.6f;
@@ -86,6 +86,11 @@ struct FMars_Searing_SteakSpec
 
     UPROPERTY()
     float32 SpawnLift = 2.0f;
+
+    // How long the steak counts as resting on the pan after its last contact with the base (its Resting's grace). A steak
+    // gliding on a swirling, oiled pan can lose contact for a moment without leaving it.
+    UPROPERTY()
+    float32 ContactGraceSeconds = 0.1f;
 
     FMars_Searing_SteakSpec() {}
 
@@ -206,6 +211,9 @@ mixin FMars_Validation Validate(const FMars_Searing_Spec& Self)
     if (Self.Steak.SpawnLift < 0.0f)
     { return FMars_Validation(f"Searing has a negative Steak.SpawnLift [{Self.Steak.SpawnLift}]"); }
 
+    if (Self.Steak.ContactGraceSeconds <= 0.0f)
+    { return FMars_Validation(f"Searing has a non-positive Steak.ContactGraceSeconds [{Self.Steak.ContactGraceSeconds}]"); }
+
     if (Self.Loss.PanRadius <= Self.Steak.HalfSize)
     { return FMars_Validation(f"Searing has Loss.PanRadius [{Self.Loss.PanRadius}] not above Steak.HalfSize [{Self.Steak.HalfSize}]"); }
 
@@ -246,6 +254,14 @@ struct FMars_Searing_SteakState
     UPROPERTY()
     TArray<float32> FaceSear;
 
+    // The face that last counted as resting on the pan (NegZ at spawn: it spawns flat); a change is a flip.
+    UPROPERTY()
+    EMars_Searing_Face RestingFace = EMars_Searing_Face::NegZ;
+
+    // How long another face has been down while on the pan; it becomes the resting face at k_FaceSettleSeconds.
+    UPROPERTY()
+    float32 CandidateSeconds = 0.0f;
+
     // NoSteak only: seconds until the next steak.
     UPROPERTY()
     float32 RespawnCountdown = 0.0f;
@@ -274,7 +290,7 @@ struct FMars_Searing_Tally
     UPROPERTY()
     float32 Seconds = 0.0f;
 
-    // Landings of the live steak after at least utils_searing::k_FlipAirSeconds apart from the pan.
+    // Changes of the face the live steak rests on (a new down face held for utils_searing::k_FaceSettleSeconds).
     UPROPERTY()
     int32 Flips = 0;
 
@@ -306,14 +322,6 @@ struct FMars_Fragment_Searing
     // The last tenth OnSearProgress reported for the face on the pan; -1 forces the next report.
     UPROPERTY()
     int32 LastProgressStep = -1;
-}
-
-// On the steak body's entity: the Searing it belongs to (the landing handler resolves the kernel through it).
-// Written only by the kernel when it spawns a steak.
-struct FMars_Fragment_Searing_SteakLink
-{
-    UPROPERTY()
-    FCk_Handle_Searing Searing;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 // The searing station: a table (width along local Y, depth along local X) with a stove slab and a burner on top, and over
-// the burner a flat oiled pan the operator's look tilts and, flicked up, tosses. The pan node carries an Implement (the
-// tilt and lift) and, on its own child node, the kinematic Jolt disc the steak rests on; every mesh part under the pan
-// node is a NoCollision visual. The Searing feature lives on the station entity and its own state machine
+// the burner an oiled pan with a low lip that swirls while operated and that the operator's look tilts and, flicked up,
+// tosses. The pan node carries an Implement (the tilt, the lift and the swirl) and, on their own child nodes, the
+// kinematic Jolt disc the steak rests on and the lip segments; every mesh part under the pan node is a NoCollision visual. The Searing feature lives on the station entity and its own state machine
 // (UMars_SmState_Searing_Idle) reads the operator; the feature spawns the steak (a dynamic body on its own entity) and
 // this script only builds the nodes and dresses the steak and the station from the Searing signals. While operating, the
 // right glove holds the pan handle (riding the tilt and the toss) and the left rests flat on the table's left side.
@@ -35,8 +35,25 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float64 PanLift = 6.0;
     private const float64 HandleLength = 30.0;
     private const float64 HandleThickness = 3.0;
+    // Oiled: the steak's friction combines with this one as sqrt(a * b).
+    private const float32 PanFriction = 0.15f;
+    private const float32 PanRestitution = 0.1f;
+    // The lip: k_RimSegments boxes standing on the disc's edge. A cube of HalfSize tips over a lip of LipHeight only past
+    // tan(tilt) = HalfSize / (HalfSize - LipHeight) (63 degrees for the 6 uu steak), so a held tilt parks the steak against
+    // it and only a launch carries it over.
+    private const int32 k_RimSegments = 8;
+    private const float64 LipHalfThickness = 1.5;
+    private const float64 LipHeight = 3.0;
+    // Each segment's half length as a share of the pan radius: eight of them close the ring.
+    private const float64 LipHalfLengthPerRadius = 0.42;
+    // The swirl while operated: the disc's centripetal pull (w^2 r) beats the combined friction's mu g, so the steak glides.
+    private const float32 SwirlRadius = 4.0f;
+    private const float32 SwirlHz = 1.5f;
+    // The swirl on the oiled pan breaks a gliding steak's contact for just over 0.1 s now and then; a longer grace keeps it
+    // on the pan (and the sizzle steady) through those gaps.
+    private const float32 SteakContactGraceSeconds = 0.15f;
     // Each steak face is a thin slab on the cube's face plane.
-    private const float64 FaceThickness = 1.2;
+    private const float64 FaceThickness = 0.8;
 
     // The left glove's grip, in from the table's left (-Y) edge, a palm's thickness above the top.
     private const float64 LeftGripEdgeInset = 6.0;
@@ -97,6 +114,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     {
         // Before the base: its AddVisuals reads the pan radius from it.
         _SearingSpec = Searing;
+        _SearingSpec.Steak.ContactGraceSeconds = SteakContactGraceSeconds;
 
         const auto Flow = Super::DoConstruct(InHandle);
 
@@ -105,8 +123,10 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         if (ck::Is_NOT_Valid(StationHandle))
         { return Flow; }
 
-        // A rejected pan spec already ensured in utils_implement::Add.
+        // A rejected pan spec already ensured in utils_implement::Add. The swirl is tuned to this pan's geometry, so it is
+        // set here rather than in the struct's defaults.
         auto PanSpec = Implement;
+        PanSpec.Orbit = FMars_Implement_OrbitSpec(SwirlRadius, SwirlHz);
         PanSpec.Nodes = FMars_Implement_Nodes(_PanNode);
         _PanImplement = utils_implement::Add(_PanNode.H(), PanSpec);
         if (ck::Is_NOT_Valid(_PanImplement))
@@ -247,10 +267,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     }
 
     // The pan node is the base disc's centre; the Implement (composed in DoConstruct) writes its offset. Under it: the disc
-    // visual, the kinematic disc body on its own child node (the only collision under the pan: a moving baked part would
-    // re-bake every frame, and a static body never imparts velocity), the handle toward the operator and its grip node.
-    // No rim: a cube on a slope only tips over a rim past 45 degrees, so at the 30-degree tilt clamp a rim would keep the
-    // steak on; it slides off the disc's edge instead.
+    // visual, the kinematic disc body on its own child node, the lip, the handle toward the operator and its grip node. The
+    // only collisions under the pan are those kinematic bodies: a moving baked part would re-bake every frame, and a static
+    // body never imparts velocity.
     private void AddPan(FCk_Handle_Transform& InRoot)
     {
         const auto PanRadius = float64(_SearingSpec.Loss.PanRadius);
@@ -270,18 +289,12 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Cylinder);
         Shape.Set_Radius(_SearingSpec.Loss.PanRadius);
         Shape.Set_HalfHeight(utils_searing::k_PanBaseHalfHeight);
-        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BodySpec.Set_ShapeDimensions(Shape);
-        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
-        // Oiled: the steak's friction combines with this one as sqrt(a * b).
-        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
-        BodySpec.Set_Friction(0.3f);
-        BodySpec.Set_Restitution(0.1f);
-        BodySpec.Set_CollisionProfileName(n"BlockAll");
-        _PanBaseBody = utils_jolt_body::Add(BodyNode.H(), BodySpec);
+        _PanBaseBody = utils_jolt_body::Add(BodyNode.H(), Make_PanBodySpec(Shape));
 
-        // The handle runs from the disc's edge toward the operator (-X) at the disc's mid height.
-        const auto HandleCenter = FVector(-(PanRadius + HandleLength * 0.5), 0.0, 0.0);
+        AddLip(PanTransform);
+
+        // The handle runs from outside the lip toward the operator (-X) at the disc's mid height.
+        const auto HandleCenter = FVector(-(PanRadius + 2.0 * LipHalfThickness + HandleLength * 0.5), 0.0, 0.0);
         auto Handle = FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, HandleCenter, FVector(HandleLength, HandleThickness, HandleThickness) * 0.01),
             engine::load::Cube(), assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"SearingStation_PanHandle");
@@ -292,6 +305,47 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         // palm facing the operator's left (-Y) - a handshake grip on a horizontal handle.
         _HandleGripNode = utils_scene_node::Create(PanTransform,
             FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), HandleCenter)).As_Transform();
+    }
+
+    // k_RimSegments kinematic boxes around the disc's edge, standing on its top, each with a matching visual; same surface
+    // as the disc. The steak's Resting counts the disc only: a steak sitting on the lip alone is not on the pan.
+    private void AddLip(FCk_Handle_Transform& InPanTransform)
+    {
+        const auto PanRadius = float64(_SearingSpec.Loss.PanRadius);
+        const auto HalfLength = PanRadius * LipHalfLengthPerRadius;
+        const auto CenterZ = float64(utils_searing::k_PanBaseHalfHeight) + LipHeight * 0.5;
+
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(LipHalfThickness, HalfLength, LipHeight * 0.5));
+        auto BodySpec = Make_PanBodySpec(Shape);
+
+        for (int32 Index = 0; Index < k_RimSegments; ++Index)
+        {
+            const auto Yaw = FRotator(0.0, 360.0 * float64(Index) / float64(k_RimSegments), 0.0);
+            const auto Segment = FTransform(Yaw, Yaw.RotateVector(FVector(PanRadius + LipHalfThickness, 0.0, CenterZ)));
+
+            auto Visual = FMars_MeshPart(
+                FTransform(Yaw, Segment.GetLocation(), FVector(LipHalfThickness * 2.0, HalfLength * 2.0, LipHeight) * 0.01),
+                engine::load::Cube(), assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"SearingStation_PanLip");
+            Visual.PrimaryColor = TOptional<FLinearColor>(k_PanColor);
+            InPanTransform.Add_MeshPart(this, Visual);
+
+            auto BodyNode = utils_scene_node::Create(InPanTransform, Segment);
+            utils_jolt_body::Add(BodyNode.H(), BodySpec);
+        }
+    }
+
+    // A kinematic body under the pan node: the node's motion moves it and gives it velocity.
+    private FCk_JoltBody_Spec Make_PanBodySpec(FCk_Jolt_ShapeDimensions InShape) const
+    {
+        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        BodySpec.Set_ShapeDimensions(InShape);
+        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
+        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
+        BodySpec.Set_Friction(PanFriction);
+        BodySpec.Set_Restitution(PanRestitution);
+        BodySpec.Set_CollisionProfileName(n"BlockAll");
+        return BodySpec;
     }
 
     // The steak's look: six thin face slabs on a visual node under its entity (Jolt owns the entity's pose; the kernel

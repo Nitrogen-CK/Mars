@@ -1,5 +1,6 @@
 // Teleporting the steak onto the hot pan with each face down in turn (utils_searing::Make_FaceDownRotation) lands that
-// face on the pan (Get_DownFace agrees) and sears it; the sixth seared face completes the steak once.
+// face on the pan (Get_DownFace agrees) and sears it; the sixth seared face completes the steak once. Each teleport after
+// the first (NegZ, the spawn's resting face) changes the resting face, so it counts a flip.
 class UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes : UMars_AutoTestRig_Searing
 {
     default _TimeoutSeconds = 25.0f;
@@ -75,6 +76,10 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes : UMars_AutoTestRi
         Assert_True(Phase == EMars_Searing_Phase::Done, f"the steak is done (got {Phase :n})");
         Assert_Equals_Int(_Searing.Get_SearedFaceCount(), 6, "six faces seared");
         Assert_Equals_Int(_Seared.Num(), 6, "OnFaceSeared fired once per face");
+
+        const auto Flips = _Searing.Get_Tally().Flips;
+        ck::Trace(f"[Searing] teleported each face down: flips {Flips}");
+        Assert_True(Flips >= 5, f"each teleport onto another face counted a flip (got {Flips}, want >= 5)");
         Assert_True(_Sizzles.Num() > 0 && _Sizzles.Last() == EMars_Searing_Sizzle::Quiet, "a done steak does not sizzle");
     }
 }

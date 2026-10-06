@@ -24,17 +24,26 @@ namespace utils_implement
         return InHandle.As_Implement();
     }
 
-    // ONE offset write: the tilt composed onto the rest rotation (rest x tilt, about the rest frame's axes) and the lift
-    // along the rest frame's up. An invalid node is an implement being torn down.
-    void Apply_Pose(FCk_Handle_SceneNode InNode, const FMars_Fragment_Implement& InState)
+    // ONE offset write: the tilt composed onto the rest rotation (rest x tilt, about the rest frame's axes), the orbit
+    // offset in the rest frame's XY plane and the lift along the rest frame's up. An invalid node is an implement being
+    // torn down.
+    void Apply_Pose(FCk_Handle_SceneNode InNode, const FMars_Fragment_Implement& InState, FVector InOrbitOffset)
     {
         if (ck::Is_NOT_Valid(InNode))
         { return; }
 
         const auto& Rest = InState.RestOffset;
         const auto Rotation = FQuat(Rest.Rotator()) * FQuat(FRotator(InState.Pitch, 0.0f, InState.Roll));
-        const auto Offset = FTransform(Rotation, Rest.GetLocation() + FVector(0.0, 0.0, InState.Lift), Rest.GetScale3D());
+        const auto Location = Rest.GetLocation() + InOrbitOffset + FVector(0.0, 0.0, InState.Lift);
+        const auto Offset = FTransform(Rotation, Location, Rest.GetScale3D());
         utils_scene_node::Request_UpdateOffset(InNode, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
+    }
+
+    // The orbit's XY offset in the rest frame: (cos, sin, 0) of the phase times the radius the eased alpha shows.
+    FVector Make_OrbitOffset(const FMars_Implement_OrbitSpec& InOrbit, const FMars_Fragment_Implement& InState)
+    {
+        const auto Radius = float64(InOrbit.Radius * InState.OrbitAlpha);
+        return FVector(Math::Cos(InState.OrbitPhase) * Radius, Math::Sin(InState.OrbitPhase) * Radius, 0.0);
     }
 }
 
@@ -79,6 +88,12 @@ mixin float32 Get_Lift(const FCk_Handle_Implement& Self)
 mixin float32 Get_LiftVelocity(const FCk_Handle_Implement& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Implement).LiftVelocity;
+}
+
+// The orbit's current XY offset from the rest location (zero without an orbit, or once it eased out).
+mixin FVector Get_OrbitOffset(const FCk_Handle_Implement& Self)
+{
+    return utils_implement::Make_OrbitOffset(Self.Get_Spec().Orbit, Self.Get_Fragment(FMars_Fragment_Implement));
 }
 
 mixin FTransform Get_RestOffset(const FCk_Handle_Implement& Self)

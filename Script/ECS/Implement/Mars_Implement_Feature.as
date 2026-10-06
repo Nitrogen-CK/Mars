@@ -99,6 +99,36 @@ struct FMars_Implement_LiftSpec
     }
 }
 
+// A constant circular motion of the node in its rest frame's XY plane while Driven (the stirring of a pan); the radius
+// eases in and out over EaseSeconds so drive changes never snap. Radius 0 = no orbit.
+struct FMars_Implement_OrbitSpec
+{
+    // uu.
+    UPROPERTY()
+    float32 Radius = 0.0f;
+
+    UPROPERTY()
+    float32 Hz = 1.0f;
+
+    UPROPERTY()
+    float32 EaseSeconds = 0.3f;
+
+    FMars_Implement_OrbitSpec() {}
+
+    FMars_Implement_OrbitSpec(float32 InRadius, float32 InHz)
+    {
+        Radius = InRadius;
+        Hz = InHz;
+    }
+
+    FMars_Implement_OrbitSpec(float32 InRadius, float32 InHz, float32 InEaseSeconds)
+    {
+        Radius = InRadius;
+        Hz = InHz;
+        EaseSeconds = InEaseSeconds;
+    }
+}
+
 // Built by the placing script before Add. Node's current offset is the implement's rest pose; the feature writes its
 // offset every frame. Kinematic Jolt bodies under it carry the motion into the physics world.
 struct FMars_Implement_Nodes
@@ -122,6 +152,9 @@ struct FMars_Implement_Spec
     UPROPERTY()
     FMars_Implement_LiftSpec Lift;
 
+    UPROPERTY()
+    FMars_Implement_OrbitSpec Orbit;
+
     // Built by the placing script before Add. Not a UPROPERTY: the spawn params never carry handles.
     FMars_Implement_Nodes Nodes;
 
@@ -132,10 +165,17 @@ struct FMars_Implement_Spec
         Tilt = InTilt;
         Lift = InLift;
     }
+
+    FMars_Implement_Spec(FMars_Implement_TiltSpec InTilt, FMars_Implement_LiftSpec InLift, FMars_Implement_OrbitSpec InOrbit)
+    {
+        Tilt = InTilt;
+        Lift = InLift;
+        Orbit = InOrbit;
+    }
 }
 
-// An implement that cannot tilt (or tilts past a usable angle, or at no rate), or a lift spring with no stiffness,
-// damping or headroom, or a floor above rest, is unusable.
+// An implement that cannot tilt (or tilts past a usable angle, or at no rate), a lift spring with no stiffness, damping
+// or headroom, a floor above rest, or an orbit with a negative radius, no frequency or an instant ease, is unusable.
 mixin FMars_Validation Validate(const FMars_Implement_Spec& Self)
 {
     if (Self.Tilt.TiltPerLookDegree <= 0.0f)
@@ -167,6 +207,15 @@ mixin FMars_Validation Validate(const FMars_Implement_Spec& Self)
 
     if (Self.Lift.MinLift > 0.0f)
     { return FMars_Validation(f"Implement has a positive Lift.MinLift [{Self.Lift.MinLift}]"); }
+
+    if (Self.Orbit.Radius < 0.0f)
+    { return FMars_Validation(f"Implement has a negative Orbit.Radius [{Self.Orbit.Radius}]"); }
+
+    if (Self.Orbit.Hz <= 0.0f)
+    { return FMars_Validation(f"Implement has a non-positive Orbit.Hz [{Self.Orbit.Hz}]"); }
+
+    if (Self.Orbit.EaseSeconds <= 0.0f)
+    { return FMars_Validation(f"Implement has a non-positive Orbit.EaseSeconds [{Self.Orbit.EaseSeconds}]"); }
 
     return FMars_Validation();
 }
@@ -222,7 +271,16 @@ struct FMars_Fragment_Implement
     UPROPERTY()
     FTransform RestOffset = FTransform::Identity;
 
-    // The tilt and lift the node's offset was last written with (the rest pose at Add): an implement at rest writes nothing.
+    // Radians, wrapped to [0, 2 pi); advances while the orbit shows (OrbitAlpha > 0).
+    UPROPERTY()
+    float32 OrbitPhase = 0.0f;
+
+    // 0..1, the share of Orbit.Radius the node shows: eases toward 1 while Driven and toward 0 while Idle.
+    UPROPERTY()
+    float32 OrbitAlpha = 0.0f;
+
+    // The tilt, lift and orbit offset the node's offset was last written with (the rest pose at Add): an implement at rest
+    // writes nothing.
     UPROPERTY()
     float32 WrittenPitch = 0.0f;
 
@@ -231,6 +289,9 @@ struct FMars_Fragment_Implement
 
     UPROPERTY()
     float32 WrittenLift = 0.0f;
+
+    UPROPERTY()
+    FVector WrittenOrbit = FVector::ZeroVector;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -283,7 +344,7 @@ struct FMars_Request_Implement_SetDrive
     }
 }
 
-// Levels the implement (targets and tilt), zeroes the lift, clears the pending look and idles it.
+// Levels the implement (targets and tilt), zeroes the lift and the orbit, clears the pending look and idles it.
 // Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Implement_Reset
 {

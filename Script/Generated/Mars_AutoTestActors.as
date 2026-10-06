@@ -1359,6 +1359,19 @@ class AMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut_Actor : ACk_AutoT
     }
 }
 
+class AMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 6.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Implement_SpecValidateRejectsBadTilts_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -1531,13 +1544,13 @@ class AMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace_Actor : 
     }
 }
 
-class AMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_Actor : ACk_AutoTestRunner
+class AMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip_Actor : ACk_AutoTestRunner
 {
-    default _TimeoutSeconds = 12.0f;
+    default _TimeoutSeconds = 10.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears");
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -1575,6 +1588,19 @@ class AMars_AutoTest_Searing_SpecValidateRejectsBadPans_Actor : ACk_AutoTestRunn
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Searing_SpecValidateRejectsBadPans");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 10.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
