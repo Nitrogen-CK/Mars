@@ -996,6 +996,110 @@ namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
 }
 
 USTRUCT()
+struct FMars_AutoTest_Forage_CenserSpillsPerHitThenRefills_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_CenserSpillsPerHitThenRefills
+{
+    FMars_AutoTest_Forage_CenserSpillsPerHitThenRefills_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_CenserSpillsPerHitThenRefills_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_DestroyedTearsDownPlainHost_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_DestroyedTearsDownPlainHost
+{
+    FMars_AutoTest_Forage_DestroyedTearsDownPlainHost_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_DestroyedTearsDownPlainHost_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_ExhaustedRegrows_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_ExhaustedRegrows
+{
+    FMars_AutoTest_Forage_ExhaustedRegrows_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_ExhaustedRegrows_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_HuskWorldItemCracksIntoKernel_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_HuskWorldItemCracksIntoKernel
+{
+    FMars_AutoTest_Forage_HuskWorldItemCracksIntoKernel_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_HuskWorldItemCracksIntoKernel_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_ReleasesPerRequestThenExhausts_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_ReleasesPerRequestThenExhausts
+{
+    FMars_AutoTest_Forage_ReleasesPerRequestThenExhausts_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_ReleasesPerRequestThenExhausts_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_SpecValidateRejectsBadSpecs_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_SpecValidateRejectsBadSpecs
+{
+    FMars_AutoTest_Forage_SpecValidateRejectsBadSpecs_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_SpecValidateRejectsBadSpecs_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_VineKnockFromThrownItemReleases_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_VineKnockFromThrownItemReleases
+{
+    FMars_AutoTest_Forage_VineKnockFromThrownItemReleases_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_VineKnockFromThrownItemReleases_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Forage_VineStrikeDepletesThenRegrows_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Forage_VineStrikeDepletesThenRegrows
+{
+    FMars_AutoTest_Forage_VineStrikeDepletesThenRegrows_SpawnParams Params()
+    {
+        return FMars_AutoTest_Forage_VineStrikeDepletesThenRegrows_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_SpawnParams
 {
 }
@@ -1568,6 +1672,45 @@ namespace UMars_AutoTest_Hotbar_TakeTargetPrefersSelectedEmptyBagSlot
 }
 
 USTRUCT()
+struct FMars_AutoTest_Implement_FastUpwardLookKicksTheLiftAndItSettles_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Implement_FastUpwardLookKicksTheLiftAndItSettles
+{
+    FMars_AutoTest_Implement_FastUpwardLookKicksTheLiftAndItSettles_SpawnParams Params()
+    {
+        return FMars_AutoTest_Implement_FastUpwardLookKicksTheLiftAndItSettles_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut
+{
+    FMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Implement_SpecValidateRejectsBadTilts_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Implement_SpecValidateRejectsBadTilts
+{
+    FMars_AutoTest_Implement_SpecValidateRejectsBadTilts_SpawnParams Params()
+    {
+        return FMars_AutoTest_Implement_SpecValidateRejectsBadTilts_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain_SpawnParams
 {
 }
@@ -1681,6 +1824,123 @@ namespace UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle
     FMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_SpawnParams Params()
     {
         return FMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps
+{
+    FMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps_SpawnParams Params()
+    {
+        return FMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Resting_SpecValidateRejectsNoTarget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Resting_SpecValidateRejectsNoTarget
+{
+    FMars_AutoTest_Resting_SpecValidateRejectsNoTarget_SpawnParams Params()
+    {
+        return FMars_AutoTest_Resting_SpecValidateRejectsNoTarget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_FastUpwardLookTossesTheSteak_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak
+{
+    FMars_AutoTest_Searing_FastUpwardLookTossesTheSteak_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_FastUpwardLookTossesTheSteak_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace
+{
+    FMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears
+{
+    FMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_HeldTiltSlidesTheSteakOffAndAFreshOneAppears_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut
+{
+    FMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills
+{
+    FMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_SpecValidateRejectsBadPans_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_SpecValidateRejectsBadPans
+{
+    FMars_AutoTest_Searing_SpecValidateRejectsBadPans_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_SpecValidateRejectsBadPans_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_TeleportingEachFaceDownCompletes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes
+{
+    FMars_AutoTest_Searing_TeleportingEachFaceDownCompletes_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_TeleportingEachFaceDownCompletes_SpawnParams();
     }
 }
 
@@ -2221,6 +2481,206 @@ namespace UMars_EyesDummy_EntityScript
     FMars_EyesDummy_EntityScript_SpawnParams Params(FTransform InSpawnTransform)
     {
         return FMars_EyesDummy_EntityScript_SpawnParams(InSpawnTransform);
+    }
+}
+
+USTRUCT()
+struct FMars_Forage_BellnutVine_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    float32 HangHeight = 220.0f;
+
+    UPROPERTY()
+    float32 FruitRadius = 22.0f;
+
+    UPROPERTY()
+    float32 HitPoints = 1.0f;
+
+    UPROPERTY()
+    float32 RegrowSeconds = 30.0f;
+
+    UPROPERTY()
+    float32 KnockMinSpeed = 300.0f;
+
+    UPROPERTY()
+    bool WithVisuals = true;
+
+    FMars_Forage_BellnutVine_EntityScript_SpawnParams(FTransform InSpawnTransform, float32 InHangHeight, float32 InFruitRadius, float32 InHitPoints, float32 InRegrowSeconds, float32 InKnockMinSpeed, bool InWithVisuals)
+    {
+        SpawnTransform = InSpawnTransform;
+        HangHeight = InHangHeight;
+        FruitRadius = InFruitRadius;
+        HitPoints = InHitPoints;
+        RegrowSeconds = InRegrowSeconds;
+        KnockMinSpeed = InKnockMinSpeed;
+        WithVisuals = InWithVisuals;
+    }
+}
+
+namespace UMars_Forage_BellnutVine_EntityScript
+{
+    FMars_Forage_BellnutVine_EntityScript_SpawnParams Params()
+    {
+        return FMars_Forage_BellnutVine_EntityScript_SpawnParams();
+    }
+
+    FMars_Forage_BellnutVine_EntityScript_SpawnParams Params(FTransform InSpawnTransform, float32 InHangHeight, float32 InFruitRadius, float32 InHitPoints, float32 InRegrowSeconds, float32 InKnockMinSpeed, bool InWithVisuals)
+    {
+        return FMars_Forage_BellnutVine_EntityScript_SpawnParams(InSpawnTransform, InHangHeight, InFruitRadius, InHitPoints, InRegrowSeconds, InKnockMinSpeed, InWithVisuals);
+    }
+}
+
+USTRUCT()
+struct FMars_Forage_FigVine_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    float32 HangHeight = 220.0f;
+
+    UPROPERTY()
+    float32 FruitRadius = 22.0f;
+
+    UPROPERTY()
+    float32 HitPoints = 1.0f;
+
+    UPROPERTY()
+    float32 RegrowSeconds = 30.0f;
+
+    UPROPERTY()
+    float32 KnockMinSpeed = 300.0f;
+
+    UPROPERTY()
+    bool WithVisuals = true;
+
+    FMars_Forage_FigVine_EntityScript_SpawnParams(FTransform InSpawnTransform, float32 InHangHeight, float32 InFruitRadius, float32 InHitPoints, float32 InRegrowSeconds, float32 InKnockMinSpeed, bool InWithVisuals)
+    {
+        SpawnTransform = InSpawnTransform;
+        HangHeight = InHangHeight;
+        FruitRadius = InFruitRadius;
+        HitPoints = InHitPoints;
+        RegrowSeconds = InRegrowSeconds;
+        KnockMinSpeed = InKnockMinSpeed;
+        WithVisuals = InWithVisuals;
+    }
+}
+
+namespace UMars_Forage_FigVine_EntityScript
+{
+    FMars_Forage_FigVine_EntityScript_SpawnParams Params()
+    {
+        return FMars_Forage_FigVine_EntityScript_SpawnParams();
+    }
+
+    FMars_Forage_FigVine_EntityScript_SpawnParams Params(FTransform InSpawnTransform, float32 InHangHeight, float32 InFruitRadius, float32 InHitPoints, float32 InRegrowSeconds, float32 InKnockMinSpeed, bool InWithVisuals)
+    {
+        return FMars_Forage_FigVine_EntityScript_SpawnParams(InSpawnTransform, InHangHeight, InFruitRadius, InHitPoints, InRegrowSeconds, InKnockMinSpeed, InWithVisuals);
+    }
+}
+
+USTRUCT()
+struct FMars_ForageCenser_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    float32 SwingAmplitudeDegrees = 18.0f;
+
+    UPROPERTY()
+    float32 SwingPeriodSeconds = 2.200000047683716f;
+
+    UPROPERTY()
+    float32 SwingSettleSeconds = 0.800000011920929f;
+
+    UPROPERTY()
+    float32 SwingSeconds = 3.0f;
+
+    UPROPERTY()
+    float32 ArmLength = 160.0f;
+
+    UPROPERTY()
+    int Charges = 3;
+
+    UPROPERTY()
+    float32 RefillSeconds = 20.0f;
+
+    UPROPERTY()
+    float32 KnockMinSpeed = 500.0f;
+
+    UPROPERTY()
+    bool WithVisuals = true;
+
+    FMars_ForageCenser_EntityScript_SpawnParams(FTransform InSpawnTransform, float32 InSwingAmplitudeDegrees, float32 InSwingPeriodSeconds, float32 InSwingSettleSeconds, float32 InSwingSeconds, float32 InArmLength, int InCharges, float32 InRefillSeconds, float32 InKnockMinSpeed, bool InWithVisuals)
+    {
+        SpawnTransform = InSpawnTransform;
+        SwingAmplitudeDegrees = InSwingAmplitudeDegrees;
+        SwingPeriodSeconds = InSwingPeriodSeconds;
+        SwingSettleSeconds = InSwingSettleSeconds;
+        SwingSeconds = InSwingSeconds;
+        ArmLength = InArmLength;
+        Charges = InCharges;
+        RefillSeconds = InRefillSeconds;
+        KnockMinSpeed = InKnockMinSpeed;
+        WithVisuals = InWithVisuals;
+    }
+}
+
+namespace UMars_ForageCenser_EntityScript
+{
+    FMars_ForageCenser_EntityScript_SpawnParams Params()
+    {
+        return FMars_ForageCenser_EntityScript_SpawnParams();
+    }
+
+    FMars_ForageCenser_EntityScript_SpawnParams Params(FTransform InSpawnTransform, float32 InSwingAmplitudeDegrees, float32 InSwingPeriodSeconds, float32 InSwingSettleSeconds, float32 InSwingSeconds, float32 InArmLength, int InCharges, float32 InRefillSeconds, float32 InKnockMinSpeed, bool InWithVisuals)
+    {
+        return FMars_ForageCenser_EntityScript_SpawnParams(InSpawnTransform, InSwingAmplitudeDegrees, InSwingPeriodSeconds, InSwingSettleSeconds, InSwingSeconds, InArmLength, InCharges, InRefillSeconds, InKnockMinSpeed, InWithVisuals);
+    }
+}
+
+USTRUCT()
+struct FMars_ForageDebris_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UStaticMesh> Mesh = nullptr;
+
+    UPROPERTY()
+    TSoftObjectPtr<UMaterialInterface> Material = nullptr;
+
+    UPROPERTY()
+    FVector Scale = FVector(0.2, 0.2, 0.1);
+
+    UPROPERTY()
+    float32 LifetimeSeconds = 8.0f;
+
+    FMars_ForageDebris_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UStaticMesh> InMesh, TSoftObjectPtr<UMaterialInterface> InMaterial, FVector InScale, float32 InLifetimeSeconds)
+    {
+        SpawnTransform = InSpawnTransform;
+        Mesh = InMesh;
+        Material = InMaterial;
+        Scale = InScale;
+        LifetimeSeconds = InLifetimeSeconds;
+    }
+}
+
+namespace UMars_ForageDebris_EntityScript
+{
+    FMars_ForageDebris_EntityScript_SpawnParams Params()
+    {
+        return FMars_ForageDebris_EntityScript_SpawnParams();
+    }
+
+    FMars_ForageDebris_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UStaticMesh> InMesh, TSoftObjectPtr<UMaterialInterface> InMaterial, FVector InScale, float32 InLifetimeSeconds)
+    {
+        return FMars_ForageDebris_EntityScript_SpawnParams(InSpawnTransform, InMesh, InMaterial, InScale, InLifetimeSeconds);
     }
 }
 
@@ -5086,6 +5546,43 @@ namespace UMars_Seal_EntityScript
 }
 
 USTRUCT()
+struct FMars_SearingStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    UPROPERTY()
+    FMars_Searing_Spec Searing = FMars_Searing_Spec();
+
+    UPROPERTY()
+    FMars_Implement_Spec Implement = FMars_Implement_Spec();
+
+    FMars_SearingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Searing_Spec InSearing, FMars_Implement_Spec InImplement)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+        Searing = InSearing;
+        Implement = InImplement;
+    }
+}
+
+namespace UMars_SearingStation_EntityScript
+{
+    FMars_SearingStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_SearingStation_EntityScript_SpawnParams();
+    }
+
+    FMars_SearingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Searing_Spec InSearing, FMars_Implement_Spec InImplement)
+    {
+        return FMars_SearingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InSearing, InImplement);
+    }
+}
+
+USTRUCT()
 struct FMars_SequenceNode_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -6302,6 +6799,32 @@ namespace UMars_SmState_Operating
 }
 
 USTRUCT()
+struct FMars_SmState_Searing_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Searing_Idle
+{
+    FMars_SmState_Searing_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Searing_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Searing_Operated_SpawnParams
+{
+}
+
+namespace UMars_SmState_Searing_Operated
+{
+    FMars_SmState_Searing_Operated_SpawnParams Params()
+    {
+        return FMars_SmState_Searing_Operated_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Station_Grip_SpawnParams
 {
 }
@@ -7121,6 +7644,58 @@ namespace UMars_SmTask_PrimaryIntentToResolver
 }
 
 USTRUCT()
+struct FMars_SmTask_Searing_HeatOnEnter_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Searing_HeatOnEnter
+{
+    FMars_SmTask_Searing_HeatOnEnter_SpawnParams Params()
+    {
+        return FMars_SmTask_Searing_HeatOnEnter_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Searing_OperatorHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Searing_OperatorHints
+{
+    FMars_SmTask_Searing_OperatorHints_SpawnParams Params()
+    {
+        return FMars_SmTask_Searing_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Searing_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Searing_OperatorInput
+{
+    FMars_SmTask_Searing_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_Searing_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Searing_ResetOnEnter_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Searing_ResetOnEnter
+{
+    FMars_SmTask_Searing_ResetOnEnter_SpawnParams Params()
+    {
+        return FMars_SmTask_Searing_ResetOnEnter_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_Station_RequestReserve_SpawnParams
 {
 }
@@ -7575,6 +8150,128 @@ namespace UMars_WorldItem_EntityScript
     FMars_WorldItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_WorldItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_WorldItem_Husk_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_Husk_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_WorldItem_Husk_EntityScript
+{
+    FMars_WorldItem_Husk_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_Husk_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_Husk_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_WorldItem_Husk_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_WorldItem_Pan_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_WorldItem_Pan_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_WorldItem_Pan_EntityScript
+{
+    FMars_WorldItem_Pan_EntityScript_SpawnParams Params()
+    {
+        return FMars_WorldItem_Pan_EntityScript_SpawnParams();
+    }
+
+    FMars_WorldItem_Pan_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_WorldItem_Pan_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
