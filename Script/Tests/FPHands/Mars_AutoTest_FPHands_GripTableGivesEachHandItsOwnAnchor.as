@@ -1,13 +1,9 @@
 // An owner's grip table gives each glove its own anchor: a timed reach for an interactable whose owner declares a right
 // grip on node R and a left grip on node L holds with the right glove anchored to R and the left to L, each with its own
-// pose. R rides a Mover; when it moves, only the right glove's anchor follows. Rig: hands + Hands SM on the test entity,
-// and an owner root with the two nodes, the grip table and a transform-only interactable (no targets: the reach is
-// requested directly).
-class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_Base
+// pose. R rides a Mover; when it moves, only the right glove's anchor follows. Beside the hands rig: an owner root with
+// the two nodes, the grip table and a transform-only interactable (no targets: the reach is requested directly).
+class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UMars_AutoTestRig_Hands
 {
-    private FCk_Handle_FPHands _Hands;
-    private FCk_Handle_StateMachine _Sm;
-    private FCk_Handle _Player;
     private FCk_Handle _Owner;
     private FCk_Handle_Interactable _Interactable;
     private FCk_Handle_Transform _NodeR;
@@ -19,20 +15,14 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Player = InHandle;
-        auto HandRootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto HandRoot = utils_transform::Add(HandRootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(HandRoot, FTransform::Identity);
-
         auto Spec = FMars_FPHands_Spec();
         Spec.Reach.Hold.ReachSeconds = 0.1f;
-        Spec.HandNode = HandNode.As_Transform();
-        _Hands = utils_fphands::Add(_Player, Spec);
+        Add_Hands(InHandle, Spec);
         BuildOwner(InHandle);
-        _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
+        Add_HandsSm();
 
         Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
-        Add_Step("request a timed reach for the owner's interactable", n"Step_RequestTimedReach");
+        Add_Step("request a timed reach for the owner's interactable", n"Step_RequestTimedReachForOwner");
         Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 5.0f);
         Add_Step("each glove has its own anchor, both are used, the left takes its own pose", n"Step_AssertPerHandAnchors");
         Add_Step("move node R to the Mover's end", n"Step_MoveR");
@@ -65,25 +55,9 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UCk_AutoTest_B
     }
 
     UFUNCTION()
-    private void Check_RestListening(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Rest
-            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
-            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound());
-    }
-
-    UFUNCTION()
-    private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_RequestTimedReachForOwner(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(FMars_FPHands_ReachSubject(_Interactable, _Owner), ECk_Interaction_CompletionPolicy::Timed));
-    }
-
-    UFUNCTION()
-    private void Check_IsHold(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold);
     }
 
     UFUNCTION()

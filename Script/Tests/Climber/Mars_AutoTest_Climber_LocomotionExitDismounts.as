@@ -21,23 +21,17 @@ class UMars_AutoTestState_LeftLocomotion : UCk_SmState_EntityScript
     }
 }
 
-class UMars_AutoTest_Climber_LocomotionExitDismounts : UCk_AutoTest_Base
+class UMars_AutoTest_Climber_LocomotionExitDismounts : UMars_AutoTestRig_Climber
 {
-    private FCk_Handle_Ladder _Ladder;
-    private FCk_Handle_Climber _Climber;
     private FCk_Handle_StateMachine _Machine;
-    private TArray<bool> _ClimbingChanges;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LadderEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(LadderEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _Ladder = utils_ladder::Add(Root, FMars_Ladder_Spec());
+        BuildLadderAndClimber(InHandle, FMars_Ladder_Spec());
+        _Climber.BindTo_OnClimbingChanged(FMars_Delegate_Climber_OnClimbingChanged(this, n"OnClimbingChanged"));
 
         auto LocalHandle = InHandle;
-        _Climber = utils_climber::Add(LocalHandle, FMars_Climber_Spec(300.0f));
-        _Climber.BindTo_OnClimbingChanged(FMars_Delegate_Climber_OnClimbingChanged(this, n"OnClimbingChanged"));
         _Machine = utils_state_machine::Add(LocalHandle, FCk_StateMachine_Spec(UMars_AutoTestState_BareLocomotion));
 
         Add_Step_WaitUntil("the machine is in Locomotion", n"Check_InLocomotion", 0, 2.0f);
@@ -48,12 +42,6 @@ class UMars_AutoTest_Climber_LocomotionExitDismounts : UCk_AutoTest_Base
         Add_Step_WaitUntil("the machine left Locomotion and the climber is off the ladder", n"Check_LeftAndDismounted", 0, 2.0f);
         Add_Step("the climb ended Lost, mid-ladder", n"Step_AssertLost");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void OnClimbingChanged(FCk_Handle_Climber InClimber, EMars_Climber_ClimbState InClimbState)
-    {
-        _ClimbingChanges.Add(InClimbState == EMars_Climber_ClimbState::Climbing);
     }
 
     UFUNCTION()
@@ -69,21 +57,6 @@ class UMars_AutoTest_Climber_LocomotionExitDismounts : UCk_AutoTest_Base
         Assert_True(ck::IsValid(_Ladder), "the ladder composed");
         Assert_True(ck::IsValid(_Climber), "the climber composed");
         _Climber.Request_Mount(FMars_Request_Climber_Mount(_Ladder, EMars_Ladder_Zone::Front));
-    }
-
-    UFUNCTION()
-    private void Check_Climbing(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Climber.Get_IsClimbing());
-    }
-
-    UFUNCTION()
-    private void Check_AboveFoot(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        _Climber.Request_Climb(FMars_Request_Climber_Climb(1.0f));
-        Res.Set(_Climber.Get_Alpha() >= 0.3f);
     }
 
     UFUNCTION()
@@ -103,13 +76,7 @@ class UMars_AutoTest_Climber_LocomotionExitDismounts : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertLost(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
-        if (LastDismount.IsSet())
-        {
-            const auto Reason = LastDismount.GetValue();
-            Assert_True(Reason == EMars_Climber_Dismount::Lost, f"the climb ended Lost (dismount {Reason :n})");
-        }
+        AssertDismount(EMars_Climber_Dismount::Lost, "Lost");
 
         Assert_Equals_Int(_ClimbingChanges.Num(), 2, "OnClimbingChanged fired twice: on, then off");
         if (_ClimbingChanges.Num() == 2)

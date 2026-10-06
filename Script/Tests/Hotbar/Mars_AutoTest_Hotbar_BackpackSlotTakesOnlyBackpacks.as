@@ -1,14 +1,8 @@
 // The backpack slot takes only backpack items and a backpack item fits nowhere else: stow targets are item-aware, a
 // backpack arrival never changes the selection (the pack goes on the back), a second backpack has nowhere to go, and the
 // slot's accept policy refuses a forced transfer that bypasses the stow target.
-class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UCk_AutoTest_Base
+class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle_Hotbar _Hotbar;
-
-    // [0] Rock, [1] Backpack, [2] second Backpack, [3] Cog.
-    private TArray<FCk_Handle_Inventory_DataOnly> _Holders;
-    private TArray<FCk_Handle_Item> _Items;
-
     // Unset until the forced transfer reports.
     private TOptional<ECk_Inventory_OperationResult_Transfer> _CogTransferResult;
     private TOptional<ECk_Inventory_OperationResult_Transfer> _Backpack2TransferResult;
@@ -16,10 +10,7 @@ class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LocalHandle = InHandle;
-        auto Spec = FMars_Hotbar_Spec();
-        Spec.BagSlotCount = 1;
-        _Hotbar = utils_hotbar::Add(LocalHandle, Spec);
+        Add_Hotbar(InHandle, 1);
 
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Backpack()));
@@ -42,26 +33,6 @@ class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UCk_AutoTest_Base
         Add_Step_WaitUntil("the forced backpack transfer reported", n"Check_Backpack2TransferRecorded");
         Add_Step("the occupied backpack slot refused it", n"Step_AssertBackpack2Refused");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void Check_HoldersSeeded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto AllSeeded = true;
-        for (const auto& Holder : _Holders)
-        { AllSeeded = AllSeeded && Holder.Get_NumItems() == 1; }
-
-        if (AllSeeded && _Items.Num() == 0)
-        {
-            for (const auto& Holder : _Holders)
-            {
-                auto Items = Holder.Get_Items();
-                _Items.Add(Items[0]);
-            }
-        }
-
-        auto Res = OutResult;
-        Res.Set(AllSeeded);
     }
 
     UFUNCTION()
@@ -186,40 +157,6 @@ class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UCk_AutoTest_Base
             f"a second backpack forced into the occupied backpack slot reports a non-Success result (got [{Backpack2Result :n}])");
         Assert_Equals_Int(_Holders[2].Get_NumItems(), 1, "the second backpack's holder still holds it after the refused transfer");
         Assert_True(_Hotbar.Get_BackpackItem() == _Items[1], "the backpack slot still holds the first backpack");
-    }
-
-    private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
-    {
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
-            FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
-
-        auto Request = FCk_Request_Inventory_AddItemByDefinition(InDefinition, 1);
-        Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        Holder.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-        return Holder;
-    }
-
-    // What the pickup task does: transfer into whatever the hotbar names as the stow target for the item.
-    private void StowFrom(FCk_Handle_Inventory_DataOnly InHolder)
-    {
-        auto Items = InHolder.Get_Items();
-        auto Target = FCk_Handle_Inventory_DataOnly();
-        if (Items.Num() == 1)
-        { Target = _Hotbar.TryGet_StowTarget(Items[0]); }
-
-        if (ck::Is_NOT_Valid(Target) || Items.Num() != 1)
-        {
-            FinishFailure("stow precondition: a valid stow target and a holder with one item");
-            return;
-        }
-
-        auto Holder = InHolder;
-        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Items[0], Target),
-            FCk_Delegate_Inventory_OnOperationResult_Transfer());
     }
 }
 

@@ -2,12 +2,11 @@
 // fire the gaze's ensure and are never selected, although both are nearer than a third owner with a Head, which the
 // gaze looks at. Each is reported once while it stays sensed (two reported owners, not a report per pass), and moving
 // them out of range clears the reports. Isolated Z band: -57500.
-class UMars_AutoTest_Gaze_TargetWithoutHeadEnsures : UCk_AutoTest_Base
+class UMars_AutoTest_Gaze_TargetWithoutHeadEnsures : UMars_AutoTestRig_Gaze
 {
     default _TimeoutSeconds = 8.0f;
 
     private FVector _Origin = FVector(0.0, 0.0, -57500.0);
-    private FCk_Handle_Gaze _Gaze;
     private FCk_Handle _NoAttachPoints;
     private FCk_Handle _BackOnly;
     private FCk_Handle _WithHead;
@@ -16,8 +15,7 @@ class UMars_AutoTest_Gaze_TargetWithoutHeadEnsures : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto EyeEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto EyeNode = utils_transform::Add(EyeEntity, FTransform(FRotator::ZeroRotator, _Origin), ECk_Replication::DoesNotReplicate);
+        auto EyeNode = Make_EyeNode(InHandle, _Origin);
         _Gaze = utils_gaze::Add(EyeNode, MakeSpec());
         _Gaze.BindTo_OnTargetChanged(FMars_Delegate_Gaze_OnTargetChanged(this, n"OnTargetChanged"));
 
@@ -80,58 +78,6 @@ class UMars_AutoTest_Gaze_TargetWithoutHeadEnsures : UCk_AutoTest_Base
     {
         Assert_True(_Gaze.Get_Target() == DoGet_Head(_WithHead), "the gaze looks at the owner with a Head after the others left");
         Assert_Equals_Int(_TargetChangedCount, 1, "OnTargetChanged did not fire again after the headless owners left");
-    }
-
-    // Its own owner and context (so the gaze's probe may overlap it) with a kinematic Silent Probe.Mars.Player sphere like
-    // the player's body probe, and no attach points.
-    private FCk_Handle MakeOwner(FCk_Handle InHandle, FVector InLocation)
-    {
-        auto Owner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        Owner.Request_OverrideToSelf();
-        auto Root = utils_transform::Add(Owner, FTransform(FRotator::ZeroRotator, InLocation), ECk_Replication::DoesNotReplicate);
-
-        auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Player);
-        BodyProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
-                     .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
-        utils_prefab::Create_ProbeNode_Sphere(Root, 20.0f, BodyProbeSpec);
-        return Owner;
-    }
-
-    // Publishes a single attach point at the owner's origin.
-    private void PublishPoint(FCk_Handle& InOwner, FGameplayTag InTag)
-    {
-        auto Root = InOwner.As_Transform();
-        auto Node = utils_scene_node::Create(Root, FTransform::Identity).As_Transform();
-
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(InTag, Node));
-        utils_attach_points::Add(InOwner, AttachPointsSpec);
-    }
-
-    private FCk_Handle_Transform DoGet_Head(const FCk_Handle& InOwner) const
-    {
-        return InOwner.As_AttachPoints().Get_AttachPoint(GameplayTags::AttachPoint_Mars_Head);
-    }
-
-    // True when one of InOwner's probes is inside the gaze's sense trigger.
-    private bool DoGet_IsSensed(const FCk_Handle& InOwner) const
-    {
-        const auto& State = _Gaze.Get_Fragment(FMars_Fragment_Gaze);
-        for (auto Entity : State.Sense.Get_EntitiesInside())
-        {
-            if (ck::Ctx(Entity) == InOwner)
-            { return true; }
-        }
-        return false;
-    }
-
-    private FMars_Gaze_Spec MakeSpec() const
-    {
-        auto Spec = FMars_Gaze_Spec();
-        Spec.DetectionFilter.AddTag(GameplayTags::Probe_Mars_Player);
-        Spec.AimPoint = GameplayTags::AttachPoint_Mars_Head;
-        Spec.RangeCm = 300.0f;
-        return Spec;
     }
 }
 

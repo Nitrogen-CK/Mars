@@ -1,23 +1,14 @@
 // A Front mount starts at the foot (no character: Alpha seeds 0), climbing up moves Alpha at the climber's ClimbSpeed /
 // the ladder's Height, and holding up past the top ends the climb with a Top dismount. OnClimbingChanged reports Climbing, then
 // NotClimbing. Also: the climber spec accepts the default speed and rejects a zero one.
-class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
+class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UMars_AutoTestRig_Climber
 {
-    private FCk_Handle_Ladder _Ladder;
-    private FCk_Handle_Climber _Climber;
-    private TArray<bool> _ClimbingChanges;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LadderEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(LadderEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         auto Spec = FMars_Ladder_Spec();
         Spec.Height = 300.0f;
-        _Ladder = utils_ladder::Add(Root, Spec);
-
-        auto LocalHandle = InHandle;
-        _Climber = utils_climber::Add(LocalHandle, FMars_Climber_Spec(300.0f));
+        BuildLadderAndClimber(InHandle, Spec);
         _Climber.BindTo_OnClimbingChanged(FMars_Delegate_Climber_OnClimbingChanged(this, n"OnClimbingChanged"));
 
         Add_Step("the climber spec rejects a zero climb speed", n"Step_ValidateSpec");
@@ -29,12 +20,6 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
         Add_Step_WaitUntil("climbing up past the top ends the climb", n"Check_ToppedOut", 0, 5.0f);
         Add_Step("the climb ended at the top and was signalled", n"Step_AssertToppedOut");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void OnClimbingChanged(FCk_Handle_Climber InClimber, EMars_Climber_ClimbState InClimbState)
-    {
-        _ClimbingChanges.Add(InClimbState == EMars_Climber_ClimbState::Climbing);
     }
 
     UFUNCTION()
@@ -54,13 +39,6 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
     {
         Assert_True(ck::IsValid(_Ladder), "the ladder composed");
         _Climber.Request_Mount(FMars_Request_Climber_Mount(_Ladder, EMars_Ladder_Zone::Front));
-    }
-
-    UFUNCTION()
-    private void Check_Climbing(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Climber.Get_IsClimbing());
     }
 
     UFUNCTION()
@@ -86,29 +64,9 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void Check_ToppedOut(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        if (_Climber.Get_IsClimbing() == false)
-        {
-            Res.Set(true);
-            return;
-        }
-
-        _Climber.Request_Climb(FMars_Request_Climber_Climb(1.0f));
-        Res.Set(false);
-    }
-
-    UFUNCTION()
     private void Step_AssertToppedOut(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
-        if (LastDismount.IsSet())
-        {
-            const auto Reason = LastDismount.GetValue();
-            Assert_True(Reason == EMars_Climber_Dismount::Top, f"the climb ended at the top (dismount {Reason :n})");
-        }
+        AssertDismount(EMars_Climber_Dismount::Top, "at the top");
         Assert_False(ck::IsValid(_Climber.Get_Ladder()), "no ladder after the dismount");
         Assert_True(_ClimbingChanges.Num() == 2, f"OnClimbingChanged fired twice (fired {_ClimbingChanges.Num()})");
         if (_ClimbingChanges.Num() == 2)

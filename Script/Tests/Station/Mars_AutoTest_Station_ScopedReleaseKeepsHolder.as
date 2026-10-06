@@ -1,27 +1,18 @@
 // Releases are scoped: with operator A holding the station, a release naming operator B (a rejected or stale caller) is
 // a no-op - no OnReleased, A keeps it. A release naming A frees the station with OnReleased(A, OperatorRequested) and
 // clears both ends of the link.
-class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
+class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UMars_AutoTestRig_Station
 {
     private FCk_Handle_Station _Station;
     private FCk_Handle_Operator _OperatorA;
     private FCk_Handle_Operator _OperatorB;
 
-    private int32 _ReservedCount = 0;
-    private TArray<FCk_Handle> _Released;
-    private TArray<EMars_Station_ReleaseReason> _ReleaseReasons;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _Station = utils_station::Add(Root, FMars_Station_Spec(), FMars_Station_Setup());
-
-        auto OperatorAEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _OperatorA = utils_operator::Add(OperatorAEntity);
-        auto OperatorBEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _OperatorB = utils_operator::Add(OperatorBEntity);
+        _Station = AddStation(InHandle, FMars_Station_Spec());
+        _OperatorA = AddOperator(InHandle);
+        _OperatorB = AddOperator(InHandle);
 
         _Station.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnReserved"));
         _Station.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnReleased"));
@@ -37,30 +28,10 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void OnReserved(FCk_Handle_Station InStation, FCk_Handle InOperator)
-    {
-        _ReservedCount += 1;
-    }
-
-    UFUNCTION()
-    private void OnReleased(FCk_Handle_Station InStation, FCk_Handle InOperator, EMars_Station_ReleaseReason InReason)
-    {
-        _Released.Add(InOperator);
-        _ReleaseReasons.Add(InReason);
-    }
-
-    UFUNCTION()
     private void Step_ReserveA(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Valid(_Station, "utils_station::Add composed the station");
         _Station.Request_Reserve(FMars_Request_Station_Reserve(_OperatorA));
-    }
-
-    UFUNCTION()
-    private void Check_Reserved(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_ReservedCount > 0);
     }
 
     UFUNCTION()
@@ -78,13 +49,6 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UCk_AutoTest_Base
         Assert_True(_OperatorA.Get_Station() == _Station, "operator A's back-ref is intact");
 
         _Station.Request_Release(FMars_Request_Station_Release(_OperatorA, EMars_Station_ReleaseReason::OperatorRequested));
-    }
-
-    UFUNCTION()
-    private void Check_Released(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Released.Num() > 0);
     }
 
     UFUNCTION()

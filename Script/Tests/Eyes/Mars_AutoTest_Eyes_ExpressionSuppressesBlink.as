@@ -2,11 +2,9 @@
 // with AllowBlink = false played right after a first blink (its double blink pending) keeps them fully open and the
 // blink count still over a window that would otherwise hold two blinks. Once it is cleared the pending double blink is
 // gone: the next blink completes no sooner than a full interval later. Isolated Z band: -66000.
-class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UMars_AutoTestRig_Eyes
 {
     default _TimeoutSeconds = 8.0f;
-
-    private FCk_Handle_Eyes _Eyes;
 
     private float32 _IntervalSeconds = 0.6f;
 
@@ -28,9 +26,7 @@ class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -66000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -66000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
@@ -52,14 +48,6 @@ class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UCk_AutoTest_Base
         Add_Step_WaitUntil("the eyes completed a blink again", n"Check_Resumed", 0, 3.0f);
         Add_Step("the first blink after the expression came no sooner than a full interval", n"Step_AssertNoOrphanBlink");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void Step_AssertPresentation(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Assert_Valid(_Eyes, "Add with a valid spec returns a valid handle");
-        if (_Eyes.Get_HasPresentation() == false)
-        { FinishFailure("the eyes have no presentation in this world - Get_CanExecuteCosmeticEvents was false"); }
     }
 
     UFUNCTION()

@@ -3,11 +3,8 @@
 // slot - the hotbar holds it and the slot and its visual are gone. Get_ActionFor reads Stow on the empty slot while the
 // rock is held; once the hands are empty an empty slot reads Blocked_NothingHeld and the occupied slot 0 reads Take.
 // Isolated Z band: -53000.
-class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
+class UMars_AutoTest_Backpack_CargoStowThenTake : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle _Carrier;
-    private FCk_Handle_Hotbar _Hotbar;
-    private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_Backpack _Backpack;
     private FCk_Handle_CargoSlot _Slot0;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
@@ -16,26 +13,10 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Carrier = InHandle;
-        auto Root = utils_transform::Add(_Carrier, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -53000.0)),
-            ECk_Replication::DoesNotReplicate);
-
-        auto HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
-        auto BackNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0))).As_Transform();
-
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, HandNode));
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, BackNode));
-        utils_attach_points::Add(_Carrier, AttachPointsSpec);
-
-        auto HotbarSpec = FMars_Hotbar_Spec();
-        HotbarSpec.BagSlotCount = 1;
-        _Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
+        Add_CarrierBodyWithBack(InHandle, FVector(0.0, 0.0, -53000.0));
+        Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-
-        // What the player HFSM's HotbarDrivesHeldItem task does: push the selection into HeldItem on every change.
-        _Hotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
-        _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
+        Bind_PushSelection();
 
         auto SpawnParams = UMars_Backpack_EntityScript::Params();
         SpawnParams.Definition = mars_items::Backpack();
@@ -66,29 +47,6 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     private void OnBackpackConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
     {
         _Backpack = InEntityScriptHandle.As_Backpack();
-    }
-
-    UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
-    {
-        PushSelection();
-    }
-
-    UFUNCTION()
-    private void OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        PushSelection();
-    }
-
-    private void PushSelection()
-    {
-        if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
-        {
-            FinishFailure("the carrier's Hotbar or HeldItem did not compose");
-            return;
-        }
-
-        _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
     }
 
     UFUNCTION()
@@ -157,13 +115,6 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void Check_HandsEmpty(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(ck::Is_NOT_Valid(_HeldItem.Get_CurrentItem()));
-    }
-
-    UFUNCTION()
     private void Step_AssertAfterStow(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto EmptySlotAction = _Backpack.Get_CargoSlot(1).Get_ActionFor(_Carrier);
@@ -195,20 +146,5 @@ class UMars_AutoTest_Backpack_CargoStowThenTake : UCk_AutoTest_Base
         Res.Set(_Hotbar.Get_ItemAt(0) == _Rock &&
                 _Slot0.Get_IsOccupied() == false &&
                 ck::Is_NOT_Valid(_Slot0.Get_Visual()));
-    }
-
-    private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
-    {
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
-            FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
-
-        auto Request = FCk_Request_Inventory_AddItemByDefinition(InDefinition, 1);
-        Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        Holder.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-        return Holder;
     }
 }

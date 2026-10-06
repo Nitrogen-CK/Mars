@@ -1,20 +1,17 @@
 // With blinking off, the catalog's Happy played until cleared overrides both cells and its crossfade completes;
 // clearing it crossfades back to the style's cells. Played as authored (timed), Happy runs out on its own and the eyes
 // return to the style's cells. Isolated Z band: -61000.
-class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UMars_AutoTestRig_Eyes
 {
     // The timed Happy lasts 2 s.
     default _TimeoutSeconds = 8.0f;
 
-    private FCk_Handle_Eyes _Eyes;
     private FMars_Eyes_ExpressionDef _Happy;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -61000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -61000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
@@ -37,12 +34,8 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertComposed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Valid(_Eyes, "Add with a valid spec returns a valid handle");
-        if (_Eyes.Get_HasPresentation() == false)
-        {
-            FinishFailure("the eyes have no presentation in this world - Get_CanExecuteCosmeticEvents was false");
-            return;
-        }
+        if (Assert_HasPresentation() == false)
+        { return; }
 
         Assert_Equals_Int(_Eyes.Get_ResolvedLeftCell(), 3, "the left cell after Add");
         Assert_Equals_Int(_Eyes.Get_ResolvedRightCell(), 3, "the right cell after Add");
@@ -69,22 +62,9 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void Step_ClearEmote(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Eyes.Request_ClearExpression(FMars_Request_Eyes_ClearExpression(EMars_Eyes_Layer::Emote));
-    }
-
-    UFUNCTION()
     private void Step_PlayTimedHappy(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Eyes.Request_PlayExpression(FMars_Request_Eyes_PlayExpression(_Happy));
-    }
-
-    UFUNCTION()
-    private void Check_EmotePlaying(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Eyes.Get_HasEmote());
     }
 
     UFUNCTION()

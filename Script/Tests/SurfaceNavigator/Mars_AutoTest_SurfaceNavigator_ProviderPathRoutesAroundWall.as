@@ -6,28 +6,22 @@
 // A field over runtime static Jolt bodies bakes them, but only once they are in the Jolt world: the field
 // (utils_surface_navigator::Make_NavFieldSpec) has AutoBuildOnSetup disabled and an explicit Request_Build follows the
 // floor and wall being added, so the bake waited on is the one that sees them.
-// The body is a plain SurfaceMotion body (no legs, so it rides its rays).
-// Isolated origin (140000, 92000, 600): the Mars autotest map has no floor of its own there.
-class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTest_Base
+class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UMars_AutoTestRig_SurfaceNavigator
 {
     default _TimeoutSeconds = 30.0f;
+    default _Origin = FVector(140000.0, 92000.0, 600.0);
 
-    private FVector _Origin = FVector(140000.0, 92000.0, 600.0);
     private FVector _Goal;
     private FCk_Handle_JoltBody _FloorBody;
     private FCk_Handle_JoltBody _WallBody;
     private FCk_Handle_GroundNavVolume _Volume;
-    private FCk_Handle_SurfaceMotion _Motion;
-    private FCk_Handle_SurfaceNavigator _Nav;
 
-    private int32 _ArrivedCount = 0;
-    private int32 _FailedCount = 0;
     private float64 _MaxAbsY = 0.0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _FloorBody = SpawnStaticBox(InHandle, _Origin - FVector(0.0, 0.0, 10.0), FVector(1500.0, 1500.0, 10.0));
+        _FloorBody = SpawnFloor(InHandle);
         _WallBody = SpawnStaticBox(InHandle, _Origin + FVector(200.0, 0.0, 100.0), FVector(10.0, 300.0, 100.0));
         SpawnVolume(InHandle);
         SpawnBody(InHandle);
@@ -44,38 +38,6 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
         Run_Steps(InHandle);
     }
 
-    private FCk_SurfaceMotion_Spec Make_MotionSpec()
-    {
-        auto Contact = FCk_SurfaceMotion_Contact();
-        Contact.Set_Clearance(65.0f);
-        Contact.Set_ProbeReach(180.0f);
-        Contact.Set_HeightSource(ECk_SurfaceMotion_HeightSource::Rays);
-        Contact.Set_WallPolicy(ECk_SurfaceMotion_WallPolicy::Slide);
-        Contact.Set_MaxStepHeight(85.0f);
-
-        auto Movement = FCk_SurfaceMotion_Movement();
-        Movement.Set_MaxSpeed(180.0f);
-        Movement.Set_SurfaceTurnRate(180.0f);
-
-        auto Spec = FCk_SurfaceMotion_Spec();
-        Spec.Set_Contact(Contact);
-        Spec.Set_Movement(Movement);
-        return Spec;
-    }
-
-    private FCk_Handle_JoltBody SpawnStaticBox(FCk_Handle InHandle, FVector InCentre, FVector InHalfExtents)
-    {
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(Entity, FTransform(FRotator::ZeroRotator, InCentre), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(InHalfExtents);
-        auto BoxSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BoxSpec.Set_ShapeDimensions(Shape);
-        BoxSpec.Set_MotionType(ECk_MotionType::Static);
-        BoxSpec.Set_CollisionProfileName(n"BlockAll");
-        return utils_jolt_body::Add(Entity, BoxSpec);
-    }
-
     // 2000 x 2000 uu over the 3000 uu floor, from 100 below its top to 400 above.
     private void SpawnVolume(FCk_Handle InHandle)
     {
@@ -88,37 +50,12 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
         _Volume = utils_ground_nav_volume::Add(VolumeEntity, Spec);
     }
 
-    private void SpawnBody(FCk_Handle InHandle)
-    {
-        auto BodyEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Body = utils_transform::Add(BodyEntity, FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0)), ECk_Replication::DoesNotReplicate);
-        _Motion = utils_surface_motion::Add(Body, Make_MotionSpec());
-        _Nav = utils_surface_navigator::Add(_Motion, FMars_SurfaceNavigator_Spec());
-    }
-
-    private FVector Get_BodyLocation() const
-    {
-        return utils_transform::Get_EntityCurrentLocation(_Motion.As_Transform());
-    }
-
     UFUNCTION()
     private void Check_WorldReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
         Res.Set(utils_jolt_body::Get_IsBodyAdded(_FloorBody) && utils_jolt_body::Get_IsBodyAdded(_WallBody) &&
             ck::IsValid(_Motion) && utils_surface_motion::Get_Status(_Motion) == ECk_ProceduralAnimation_Status::Ready);
-    }
-
-    UFUNCTION()
-    private void OnArrived(FCk_Handle_SurfaceNavigator InNavigator, FVector InGoal)
-    {
-        ++_ArrivedCount;
-    }
-
-    UFUNCTION()
-    private void OnFailed(FCk_Handle_SurfaceNavigator InNavigator, FVector InGoal, EMars_SurfaceNavigator_FailReason InReason)
-    {
-        ++_FailedCount;
     }
 
     UFUNCTION()
@@ -138,8 +75,7 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UCk_AutoTes
     UFUNCTION()
     private void Step_MoveTo(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Nav.BindTo_OnArrived(FMars_Delegate_SurfaceNavigator_OnArrived(this, n"OnArrived"));
-        _Nav.BindTo_OnFailed(FMars_Delegate_SurfaceNavigator_OnFailed(this, n"OnFailed"));
+        BindNavigatorSignals();
         _Nav.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(_Goal));
     }
 

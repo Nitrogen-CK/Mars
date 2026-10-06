@@ -1,35 +1,14 @@
 // A chop with the hand just outside the band (BandCenter + BandHalfWidth + 5) resolves not aligned: no useful chop, the
 // pile and the band stay put.
-class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
+class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UMars_AutoTestRig_Dicing
 {
-    private FCk_Handle_Dicing _Dicing;
-    private FMars_Dicing_Spec _Spec;
-
     private float32 _BandBefore = 0.0f;
     private float32 _HandTarget = 0.0f;
-    private TArray<bool> _Resolved;
-    private TArray<EMars_Dicing_State> _States;
-    private TArray<float32> _BandMoves;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Spec = FMars_Dicing_Spec();
-
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto LateralNode = utils_scene_node::Create(Root, FTransform::Identity);
-        auto LateralTransform = LateralNode.As_Transform();
-        auto CleaverNode = utils_scene_node::Create(LateralTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 25.0)));
-
-        auto MoverSpec = FMars_Mover_Spec();
-        MoverSpec.StartLocation = FVector(0.0, 0.0, 25.0);
-        MoverSpec.EndLocation = FVector::ZeroVector;
-        MoverSpec.Duration = 0.05f;
-        auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
-
-        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
-        _Dicing = utils_dicing::Add(StationEntity, _Spec);
+        BuildStation(InHandle, FMars_Dicing_Spec());
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
         _Dicing.BindTo_OnStateChanged(FMars_Delegate_Dicing_OnStateChanged(this, n"OnStateChanged"));
@@ -38,27 +17,9 @@ class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
         Add_Step("nudge the hand just past the band edge", n"Step_AimOffBand");
         Add_Step_WaitUntil("the hand is off the band", n"Check_HandAtTarget", 0, 2.0f);
         Add_Step("chop", n"Step_Chop");
-        Add_Step_WaitUntil("the chop resolved and the cleaver is back up", n"Check_ChopDone", 0, 2.0f);
+        Add_Step_WaitUntil("the chop resolved and the cleaver is back up", n"Check_FirstChopDone", 0, 2.0f);
         Add_Step("the chop was not aligned and nothing advanced", n"Step_AssertNothingAdvanced");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
-    {
-        _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
-    }
-
-    UFUNCTION()
-    private void OnStateChanged(FCk_Handle_Dicing InDicing, EMars_Dicing_State InState)
-    {
-        _States.Add(InState);
-    }
-
-    UFUNCTION()
-    private void OnBandMoved(FCk_Handle_Dicing InDicing, float32 InCenter)
-    {
-        _BandMoves.Add(InCenter);
     }
 
     UFUNCTION()
@@ -82,13 +43,6 @@ class UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance : UCk_AutoTest_Base
     {
         Assert_False(_Dicing.Get_IsAligned(), "the hand is outside the band before the chop");
         _Dicing.Request_Chop(FMars_Request_Dicing_Chop());
-    }
-
-    UFUNCTION()
-    private void Check_ChopDone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Resolved.Num() > 0 && _Dicing.Get_IsChopping() == false);
     }
 
     UFUNCTION()

@@ -1,27 +1,20 @@
 // Single-slot contract: while operator A holds the station, operator B's reserve is rejected Occupied, and A keeps the
-// station on BOTH ends of the link while B stays free. Rig: a station on a transform-only root (no probe), two operator
-// child entities.
-class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UCk_AutoTest_Base
+// station on BOTH ends of the link while B stays free.
+class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UMars_AutoTestRig_Station
 {
     private FCk_Handle_Station _Station;
     private FCk_Handle_Operator _OperatorA;
     private FCk_Handle_Operator _OperatorB;
 
-    private TArray<FCk_Handle> _Reserved;
     private TArray<FCk_Handle> _Rejected;
     private TArray<EMars_Station_RejectReason> _RejectReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        _Station = utils_station::Add(Root, FMars_Station_Spec(), FMars_Station_Setup());
-
-        auto OperatorAEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _OperatorA = utils_operator::Add(OperatorAEntity);
-        auto OperatorBEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _OperatorB = utils_operator::Add(OperatorBEntity);
+        _Station = AddStation(InHandle, FMars_Station_Spec());
+        _OperatorA = AddOperator(InHandle);
+        _OperatorB = AddOperator(InHandle);
 
         _Station.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnReserved"));
         _Station.BindTo_OnReserveRejected(FMars_Delegate_Station_OnReserveRejected(this, n"OnReserveRejected"));
@@ -32,12 +25,6 @@ class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UCk_AutoTest_Base
         Add_Step_WaitUntil("operator B is rejected", n"Check_Rejected", 0, 2.0f);
         Add_Step("B was rejected Occupied and A still holds the station", n"Step_AssertRejected");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void OnReserved(FCk_Handle_Station InStation, FCk_Handle InOperator)
-    {
-        _Reserved.Add(InOperator);
     }
 
     UFUNCTION()
@@ -52,13 +39,6 @@ class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UCk_AutoTest_Base
     {
         Assert_Valid(_Station, "utils_station::Add composed the station");
         _Station.Request_Reserve(FMars_Request_Station_Reserve(_OperatorA));
-    }
-
-    UFUNCTION()
-    private void Check_Reserved(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Reserved.Num() > 0);
     }
 
     UFUNCTION()

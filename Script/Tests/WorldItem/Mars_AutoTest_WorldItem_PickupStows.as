@@ -1,17 +1,13 @@
 // A World-mode item seeds its holder from its definition; stowing that item the way the pickup task does lands it in
 // the hotbar (auto-held, hands were empty), and the emptied world item destroys itself. Isolated Z band: -50000.
-class UMars_AutoTest_WorldItem_PickupStows : UCk_AutoTest_Base
+class UMars_AutoTest_WorldItem_PickupStows : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle_Hotbar _Hotbar;
     private FCk_Handle_WorldItem _WorldItem;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LocalHandle = InHandle;
-        auto HotbarSpec = FMars_Hotbar_Spec();
-        HotbarSpec.BagSlotCount = 1;
-        _Hotbar = utils_hotbar::Add(LocalHandle, HotbarSpec);
+        Add_Hotbar(InHandle, 1);
 
         auto SpawnParams = UMars_WorldItem_EntityScript::Params();
         SpawnParams.Definition = mars_items::Rock();

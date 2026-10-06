@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "controller": "Ck_GauntletAsBridgeController",
+  "defaultMap": "/Game/Mars/Maps/Camp_Mars_MAP",
+  "classPrefix": "Mars_GauntletAsTest_",
+  "heartbeatMarker": "[MarsGauntletAs]",
+  "defaultTimeoutSec": 300,
+  "tests": [
+    {
+      "name": "HostServiceTravelReturn",
+      "timeoutSec": 300,
+      "note": "Single-process LAN host: reject invalid address and service, host camp, commit Sandbox, close admission on departure, travel to Sandbox and back, then leave to standalone camp. Does not exercise a remote client."
+    }
+  ]
+}

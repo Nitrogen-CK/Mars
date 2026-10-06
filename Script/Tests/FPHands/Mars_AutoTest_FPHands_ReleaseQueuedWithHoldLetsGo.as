@@ -2,32 +2,20 @@
 // enter request and a lost target landing in one drain), lets go: the drain applies the phase first and the release
 // then sees Hold. The Hands SM is put in Hold by a timed reach, the committed phase is moved back to None under it, and
 // SetPhase(Hold) and Release are queued together.
-class UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo : UCk_AutoTest_Base
+class UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo : UMars_AutoTestRig_Hands
 {
-    private FCk_Handle_FPHands _Hands;
-    private FCk_Handle_StateMachine _Sm;
-    private FCk_Handle _Player;
-    private TArray<EMars_FPHands_Phase> _Phases;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Player = InHandle;
-        auto RootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(RootEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(Root, FTransform::Identity);
-
         auto Spec = FMars_FPHands_Spec();
         Spec.Reach.Grab.OutSeconds = 0.2f;
         Spec.Reach.Grab.GripSeconds = 0.2f;
         Spec.Reach.Grab.BackSeconds = 0.2f;
         // A release long enough that the Hands SM is still in Release when the sequence is asserted.
         Spec.Reach.Hold.ReleaseSeconds = 1.0f;
-
-        Spec.HandNode = HandNode.As_Transform();
-        _Hands = utils_fphands::Add(_Player, Spec);
-        _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
-        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
+        Add_Hands(InHandle, Spec);
+        Add_HandsSm();
+        Log_Phases();
 
         Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
         Add_Step("request a timed reach", n"Step_RequestTimedReach");
@@ -38,27 +26,6 @@ class UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo : UCk_AutoTest_Base
         Add_Step_WaitUntil("the phase leaves Hold for Release", n"Check_IsRelease", 0, 5.0f);
         Add_Step("the queued Hold was applied, then let go", n"Step_AssertSequence");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void OnPhaseChanged(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
-    {
-        _Phases.Add(InNew);
-    }
-
-    UFUNCTION()
-    private void Check_RestListening(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Rest
-            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
-            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound());
-    }
-
-    UFUNCTION()
-    private void Step_RequestTimedReach(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(ECk_Interaction_CompletionPolicy::Timed));
     }
 
     UFUNCTION()
@@ -90,13 +57,6 @@ class UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo : UCk_AutoTest_Base
         _Phases.Empty();
         _Hands.Request_SetPhase(FMars_Request_FPHands_SetPhase(EMars_FPHands_Phase::Hold));
         _Hands.Request_Release();
-    }
-
-    UFUNCTION()
-    private void Check_IsRelease(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Hands.Get_Phase() == EMars_FPHands_Phase::Release);
     }
 
     UFUNCTION()

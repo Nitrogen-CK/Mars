@@ -1,16 +1,13 @@
 // The catalog's Wink overrides only the right eye: played until cleared, it changes the right cell and leaves the left
 // eye on the style's cell. Isolated Z band: -63000.
-class UMars_AutoTest_Eyes_WinkKeepsOneEye : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_WinkKeepsOneEye : UMars_AutoTestRig_Eyes
 {
-    private FCk_Handle_Eyes _Eyes;
     private FMars_Eyes_ExpressionDef _Wink;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -63000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -63000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
@@ -26,16 +23,8 @@ class UMars_AutoTest_Eyes_WinkKeepsOneEye : UCk_AutoTest_Base
         Run_Steps(InHandle);
     }
 
-    UFUNCTION()
-    private void Step_AssertPresentation(FCk_Handle InHandle, FInstancedStruct InPayload)
+    protected void Assert_AfterPresentation() override
     {
-        Assert_Valid(_Eyes, "Add with a valid spec returns a valid handle");
-        if (_Eyes.Get_HasPresentation() == false)
-        {
-            FinishFailure("the eyes have no presentation in this world - Get_CanExecuteCosmeticEvents was false");
-            return;
-        }
-
         Assert_False(_Wink.LeftCell.IsSet(), "the catalog's Wink keeps the left eye");
         Assert_True(_Wink.RightCell.Get(3) != 3, "the catalog's Wink changes the right eye away from the style");
     }

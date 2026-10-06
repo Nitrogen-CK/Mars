@@ -1,19 +1,15 @@
 // A change of cells that lands while a crossfade is still mostly showing the previous cells fades from those previous
 // cells, not from the in-flight destination: from the style (3) toward A (13) over 1 s, B (16) played while Blend is
 // still between 0.1 and 0.4 makes the previous cells 3 again, so nothing on screen jumps. Isolated Z band: -73000.
-class UMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell : UMars_AutoTestRig_Eyes
 {
-    private FCk_Handle_Eyes _Eyes;
-
     private float32 _BlendSeconds = 1.0f;
     private float32 _BlendAtRetarget = 0.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -73000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -73000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
@@ -31,12 +27,8 @@ class UMars_AutoTest_Eyes_RetargetMidFadeKeepsDominantCell : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertComposed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Valid(_Eyes, "Add with a valid spec returns a valid handle");
-        if (_Eyes.Get_HasPresentation() == false)
-        {
-            FinishFailure("the eyes have no presentation in this world - Get_CanExecuteCosmeticEvents was false");
-            return;
-        }
+        if (Assert_HasPresentation() == false)
+        { return; }
 
         Assert_Equals_Int(_Eyes.Get_ResolvedLeftCell(), 3, "the left cell after Add");
         Assert_Equals_Int(_Eyes.Get_ResolvedRightCell(), 3, "the right cell after Add");

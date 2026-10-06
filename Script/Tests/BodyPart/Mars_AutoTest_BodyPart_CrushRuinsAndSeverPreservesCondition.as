@@ -3,14 +3,10 @@
 // below the ruin threshold (0.5 x 30 = 15), so Pristine -> Damaged; a second Crush 6 brings the ruin damage to 18 >= 15,
 // so Damaged -> Ruined. OnConditionChanged fires exactly for the three changes and Get_Condition agrees. Each hit also
 // spills half its scaled amount to the body; the body's value proves each hit's ledger entry drained.
-//
-// Isolated origin (130000, 92000, 600): the Mars autotest map has no floor of its own there.
-class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTest_Base
+class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 15.0f;
-
-    private FVector _Origin = FVector(130000.0, 92000.0, 600.0);
-    private FCk_Handle_Crawler _Crawler;
+    default _Origin = FVector(130000.0, 92000.0, 600.0);
 
     private FCk_Handle_BodyPart _Part0;
     private FCk_Handle_BodyPart _Part1;
@@ -21,7 +17,7 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        SpawnFloorAndCrawler(InHandle, Make_Spec());
+        SpawnFloorAndCrawler(InHandle, Make_CrawlerSpec(FVector(400.0, 400.0, 200.0)));
 
         Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
         Add_Step("bind OnConditionChanged on legs 0 and 1; Sever 10 on leg 0", n"Step_BindAndSeverLeg0");
@@ -34,59 +30,6 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UCk_AutoTes
         Add_Step_WaitUntil("the body reads 101", n"Check_BodyAt101", 0, 2.0f);
         Add_Step("leg 1 is Ruined; leg 0 is still Damaged", n"Step_AssertRuined");
         Run_Steps(InHandle);
-    }
-
-    private FMars_Crawler_Spec Make_Spec()
-    {
-        const auto Half = FVector(400.0, 400.0, 200.0);
-        return FMars_Crawler_Spec(4, FBox(_Origin - Half, _Origin + Half));
-    }
-
-    private void SpawnFloorAndCrawler(FCk_Handle InHandle, FMars_Crawler_Spec InSpec)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, _Origin - FVector(0.0, 0.0, 10.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(1500.0, 1500.0, 10.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-
-        auto SpawnParams = UMars_Crawler_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0));
-        SpawnParams.Spec = InSpec;
-        SpawnParams.WithVisuals = false;
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
-        utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
-    }
-
-    UFUNCTION()
-    private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
-    {
-        _Crawler = InEntityScriptHandle.As_Crawler();
-    }
-
-    UFUNCTION()
-    private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        if (ck::Is_NOT_Valid(_Crawler))
-        {
-            Res.Set(false);
-            return;
-        }
-
-        const auto Gait = _Crawler.Get_Gait();
-        if (utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Failed)
-        {
-            FinishFailure(f"the crawler's gait failed: {utils_procedural_gait::Get_Failure(Gait) :n}");
-            return;
-        }
-
-        Res.Set(utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Ready &&
-            _Crawler.Get_Monster().Get_Parts().Num() == 4);
     }
 
     //----------------------------------------------------------------------------------------------------------------------

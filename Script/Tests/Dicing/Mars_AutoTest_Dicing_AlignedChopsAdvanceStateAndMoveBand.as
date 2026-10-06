@@ -1,34 +1,11 @@
 // ChopsPerState aligned chops advance the pile one state, and the band steps through the band table after each useful
 // chop. Before each chop the hand is nudged onto the band, which moved after the previous chop.
-class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_Base
+class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UMars_AutoTestRig_Dicing
 {
-    private FCk_Handle_Dicing _Dicing;
-    private FMars_Dicing_Spec _Spec;
-
-    private int32 _ChopsIssued = 0;
-    private TArray<bool> _Resolved;
-    private TArray<EMars_Dicing_State> _States;
-    private TArray<float32> _BandMoves;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Spec = FMars_Dicing_Spec();
-
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
-        auto LateralNode = utils_scene_node::Create(Root, FTransform::Identity);
-        auto LateralTransform = LateralNode.As_Transform();
-        auto CleaverNode = utils_scene_node::Create(LateralTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 25.0)));
-
-        auto MoverSpec = FMars_Mover_Spec();
-        MoverSpec.StartLocation = FVector(0.0, 0.0, 25.0);
-        MoverSpec.EndLocation = FVector::ZeroVector;
-        MoverSpec.Duration = 0.05f;
-        auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
-
-        _Spec.Nodes = FMars_Dicing_Nodes(LateralNode, Mover);
-        _Dicing = utils_dicing::Add(StationEntity, _Spec);
+        BuildStation(InHandle, FMars_Dicing_Spec());
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
         _Dicing.BindTo_OnStateChanged(FMars_Delegate_Dicing_OnStateChanged(this, n"OnStateChanged"));
@@ -47,24 +24,6 @@ class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_B
     }
 
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
-    {
-        _Resolved.Add(InResult == EMars_Dicing_ChopResult::Aligned);
-    }
-
-    UFUNCTION()
-    private void OnStateChanged(FCk_Handle_Dicing InDicing, EMars_Dicing_State InState)
-    {
-        _States.Add(InState);
-    }
-
-    UFUNCTION()
-    private void OnBandMoved(FCk_Handle_Dicing InDicing, float32 InCenter)
-    {
-        _BandMoves.Add(InCenter);
-    }
-
-    UFUNCTION()
     private void Step_AssertComposed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(ck::IsValid(_Dicing), "the feature composed");
@@ -75,32 +34,11 @@ class UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand : UCk_AutoTest_B
     }
 
     UFUNCTION()
-    private void Step_AimAtBand(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        const auto Degrees = (_Dicing.Get_BandCenter() - _Dicing.Get_HandLateral()) / _Spec.LateralPerDegree;
-        _Dicing.Request_Nudge(FMars_Request_Dicing_Nudge(Degrees));
-    }
-
-    UFUNCTION()
-    private void Check_HandOnBand(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(Math::Abs(_Dicing.Get_HandLateral() - _Dicing.Get_BandCenter()) < 0.01f);
-    }
-
-    UFUNCTION()
     private void Step_Chop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Dicing.Get_IsAligned(), f"the hand is aligned before chop {_ChopsIssued + 1}");
         _ChopsIssued += 1;
         _Dicing.Request_Chop(FMars_Request_Dicing_Chop());
-    }
-
-    UFUNCTION()
-    private void Check_ChopDone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Resolved.Num() == _ChopsIssued && _Dicing.Get_IsChopping() == false);
     }
 
     UFUNCTION()

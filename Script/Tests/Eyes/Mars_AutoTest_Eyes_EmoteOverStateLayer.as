@@ -2,21 +2,18 @@
 // instead, fully blended, and clearing it returns the eyes to Downed, not to the style; Happy played as authored
 // (timed) over Downed also runs out back to Downed; clearing the State layer returns the eyes to the style. Isolated Z
 // band: -62000.
-class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_EmoteOverStateLayer : UMars_AutoTestRig_Eyes
 {
     // The timed Happy lasts 2 s.
     default _TimeoutSeconds = 8.0f;
 
-    private FCk_Handle_Eyes _Eyes;
     private FMars_Eyes_ExpressionDef _Happy;
     private FMars_Eyes_ExpressionDef _Downed;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -62000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -62000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
@@ -41,16 +38,8 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
         Run_Steps(InHandle);
     }
 
-    UFUNCTION()
-    private void Step_AssertPresentation(FCk_Handle InHandle, FInstancedStruct InPayload)
+    protected void Assert_AfterPresentation() override
     {
-        Assert_Valid(_Eyes, "Add with a valid spec returns a valid handle");
-        if (_Eyes.Get_HasPresentation() == false)
-        {
-            FinishFailure("the eyes have no presentation in this world - Get_CanExecuteCosmeticEvents was false");
-            return;
-        }
-
         Assert_True(_Downed.DurationSeconds.IsSet() == false, "the catalog's Downed stays until cleared");
         Assert_True(_Happy.DurationSeconds.IsSet() && _Happy.DurationSeconds.GetValue() >= 1.0f,
             f"the catalog's Happy is timed for at least 1 s (set [{_Happy.DurationSeconds.IsSet()}], got [{_Happy.DurationSeconds.Get(0.0f)}])");
@@ -93,28 +82,9 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void Step_ClearEmote(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Eyes.Request_ClearExpression(FMars_Request_Eyes_ClearExpression(EMars_Eyes_Layer::Emote));
-    }
-
-    UFUNCTION()
     private void Step_PlayTimedHappy(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Eyes.Request_PlayExpression(FMars_Request_Eyes_PlayExpression(_Happy));
-    }
-
-    UFUNCTION()
-    private void Check_EmotePlaying(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Eyes.Get_HasEmote());
-    }
-
-    UFUNCTION()
-    private void Step_ClearState(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Eyes.Request_ClearExpression(FMars_Request_Eyes_ClearExpression(EMars_Eyes_Layer::State));
     }
 
     UFUNCTION()

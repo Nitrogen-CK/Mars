@@ -2,12 +2,11 @@
 // CanWalk true, Settled false, goal Settled: the leaf settles on Roam; IsHurt true -> Flinch (OnLeafChanged carries
 // Roam -> Flinch); IsHurt false -> Roam; CanWalk false -> Cower; CanWalk true -> Roam, and Get_Fact reads CanWalk true.
 // Disabled, the brain keeps its leaf: IsHurt true leaves the leaf on Roam for 0.5 s. The spec rejects empty facts and
-// an empty goal. MinReplanIntervalSeconds 0 so every flip replans at once.
-class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
+// an empty goal.
+class UMars_AutoTest_Brain_FactsDriveLeaf : UMars_AutoTestRig_Brain
 {
     default _TimeoutSeconds = 20.0f;
 
-    private FCk_Handle_Brain _Brain;
     private TArray<FString> _LeafChanges;
     private bool _SawRoamToFlinch = false;
     private float64 _DisabledHurtAt = 0.0;
@@ -15,9 +14,7 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        Entity.Request_OverrideToSelf();
-        _Brain = utils_brain::Add(Entity, Make_Spec());
+        AddBrainEntity(InHandle);
         _Brain.BindTo_OnLeafChanged(FMars_Delegate_Brain_OnLeafChanged(this, n"OnLeafChanged"));
 
         Add_Step("the spec rules hold and the brain composed", n"Step_AssertValidation");
@@ -36,45 +33,6 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UCk_AutoTest_Base
         Add_Step("IsHurt true while disabled", n"Step_HurtWhileDisabled");
         Add_Step_WaitUntil("the leaf stays on Roam for 0.5 s", n"Check_LeafHoldsWhileDisabled", 0, 3.0f);
         Run_Steps(InHandle);
-    }
-
-    private FGameplayTag IsHurt() const
-    {
-        return GameplayTags::Mars_WS_Crawler_IsHurt;
-    }
-
-    private FGameplayTag CanWalk() const
-    {
-        return GameplayTags::Mars_WS_Crawler_CanWalk;
-    }
-
-    private FGameplayTag Settled() const
-    {
-        return GameplayTags::Mars_WS_Crawler_Settled;
-    }
-
-    private FMars_Brain_Spec Make_Spec() const
-    {
-        auto Facts = TArray<FMars_Brain_Fact>();
-        Facts.Add(FMars_Brain_Fact(IsHurt(), false));
-        Facts.Add(FMars_Brain_Fact(CanWalk(), true));
-        Facts.Add(FMars_Brain_Fact(Settled(), false));
-
-        auto Goal = TArray<FCk_GoapWS_Condition_Authored>();
-        Goal.Add(FCk_GoapWS_Condition_Authored(Settled(), true));
-
-        auto Spec = FMars_Brain_Spec(GameplayTags::Mars_Goap_Crawler, GameplayTags::Mars_WS_Crawler,
-            Facts, Goal, 0.0f);
-        Spec.AddAction(UMars_GoapAction_Crawler_Roam);
-        Spec.AddAction(UMars_GoapAction_Crawler_Flinch);
-        Spec.AddAction(UMars_GoapAction_Crawler_Cower);
-        Spec.AddAction(UMars_GoapAction_Crawler_Idle);
-        return Spec;
-    }
-
-    private void SetFact(FGameplayTag InKey, bool InValue)
-    {
-        _Brain.Request_SetFact(FMars_Request_Brain_SetFact(InKey, InValue));
     }
 
     //----------------------------------------------------------------------------------------------------------------------

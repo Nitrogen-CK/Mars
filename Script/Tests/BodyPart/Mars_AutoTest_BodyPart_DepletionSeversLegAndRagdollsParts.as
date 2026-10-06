@@ -6,13 +6,10 @@
 // its parts, and only then does the body's record drop to 3 legs.
 //
 // The debris lifetime is shortened to 2.5 s through the spawn params (the default is 8 s).
-// Isolated origin (130000, 84000, 600): the Mars autotest map has no floor of its own there.
-class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_Base
+class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTestRig_Crawler
 {
     default _TimeoutSeconds = 25.0f;
-
-    private FVector _Origin = FVector(130000.0, 84000.0, 600.0);
-    private FCk_Handle_Crawler _Crawler;
+    default _Origin = FVector(130000.0, 84000.0, 600.0);
 
     private FCk_Handle_BodyPart _Part;
     private FCk_Handle_ProceduralLeg _Leg;
@@ -48,57 +45,9 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
 
     private FMars_Crawler_Spec Make_Spec()
     {
-        const auto Half = FVector(400.0, 400.0, 200.0);
-        auto Spec = FMars_Crawler_Spec(4, FBox(_Origin - Half, _Origin + Half));
+        auto Spec = Make_CrawlerSpec(FVector(400.0, 400.0, 200.0));
         Spec.Vitals.LegDebris.LifetimeSeconds = 2.5f;
         return Spec;
-    }
-
-    private void SpawnFloorAndCrawler(FCk_Handle InHandle, FMars_Crawler_Spec InSpec)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, _Origin - FVector(0.0, 0.0, 10.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(1500.0, 1500.0, 10.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-
-        auto SpawnParams = UMars_Crawler_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0));
-        SpawnParams.Spec = InSpec;
-        SpawnParams.WithVisuals = false;
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
-        utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
-    }
-
-    UFUNCTION()
-    private void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
-    {
-        _Crawler = InEntityScriptHandle.As_Crawler();
-    }
-
-    UFUNCTION()
-    private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        if (ck::Is_NOT_Valid(_Crawler))
-        {
-            Res.Set(false);
-            return;
-        }
-
-        const auto Gait = _Crawler.Get_Gait();
-        if (utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Failed)
-        {
-            FinishFailure(f"the crawler's gait failed: {utils_procedural_gait::Get_Failure(Gait) :n}");
-            return;
-        }
-
-        Res.Set(utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Ready &&
-            _Crawler.Get_Monster().Get_Parts().Num() == 4);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -132,7 +81,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
         _Part.BindTo_OnSevered(FMars_Delegate_BodyPart_OnSevered(this, n"OnSevered"));
         utils_procedural_gait::BindTo_OnLegSetChanged(_Crawler.Get_Gait(), FCk_Delegate_ProceduralGait_OnLegSetChanged(this, n"OnLegSetChanged"));
         _WalkStart = System::GetGameTimeInSeconds();
-        _WalkStartLocation = utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform());
+        _WalkStartLocation = BodyLocation();
     }
 
     UFUNCTION()
@@ -147,7 +96,7 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UCk_AutoTest_
     UFUNCTION()
     private void Step_Deplete(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Walked = (utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform()) - _WalkStartLocation).Size2D();
+        const auto Walked = (BodyLocation() - _WalkStartLocation).Size2D();
         Assert_True(Walked > 30.0, f"the crawler walked before the sever (moved {Walked} uu in the 1 s walk)");
 
         _Hurtboxes = _Part.Get_Zone().Get_Hurtboxes();

@@ -1,16 +1,11 @@
 // Selecting the selected slot deselects it; cycling steps through the bag slots only, wrapping past the overflow slot,
 // and from empty hands starts at the first (next) or last (previous) bag slot.
-class UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow : UCk_AutoTest_Base
+class UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle_Hotbar _Hotbar;
-
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LocalHandle = InHandle;
-        auto Spec = FMars_Hotbar_Spec();
-        Spec.BagSlotCount = 2;
-        _Hotbar = utils_hotbar::Add(LocalHandle, Spec);
+        Add_Hotbar(InHandle, 2);
 
         Add_Step("select slot 0", n"Step_SelectZero");
         Add_Step_WaitUntil("slot 0 is selected", n"Check_SelectedZero");
@@ -27,12 +22,6 @@ class UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow : UCk_AutoTest_Ba
         Add_Step("cycle previous from empty hands", n"Step_CyclePrevious");
         Add_Step_WaitUntil("the last bag slot is selected", n"Check_SelectedOne");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void Step_SelectZero(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(0));
     }
 
     UFUNCTION()
@@ -58,13 +47,6 @@ class UMars_AutoTest_Hotbar_SelectTogglesAndCycleSkipsOverflow : UCk_AutoTest_Ba
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_SelectedIndex().IsSet() == false);
-    }
-
-    UFUNCTION()
-    private void Check_SelectedZero(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0));
     }
 
     UFUNCTION()

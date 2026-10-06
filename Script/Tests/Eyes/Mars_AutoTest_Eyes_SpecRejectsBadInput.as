@@ -23,7 +23,7 @@ struct FMars_AutoTest_EyesRejection
 // FMars_Eyes_Spec::Validate() (and the expression def's) rejects each bad input with its own message, prefixed with its
 // group; the default spec and the default blink and look groups pass; and a rejected utils_eyes::Add returns an invalid
 // handle without adding any eyes fragment. Isolated Z band: -60000.
-class UMars_AutoTest_Eyes_SpecRejectsBadInput : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_SpecRejectsBadInput : UMars_AutoTestRig_Eyes
 {
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -208,19 +208,17 @@ class UMars_AutoTest_Eyes_SpecRejectsBadInput : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertAddRejected(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -60000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -60000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = constants_eyes::k_CellCount;
 
         auto Rejected = utils_eyes::Add(FaceNode, Spec);
         Assert_Invalid(Rejected, "Add with a style cell past the atlas returns an invalid handle");
-        Assert_False(FaceEntity.Is_Eyes(), "a rejected spec adds no feature fragment");
-        Assert_False(FaceEntity.Has_Fragment(FMars_Fragment_Eyes_Params), "a rejected spec adds no params fragment");
-        Assert_False(FaceEntity.Has_Fragment(FMars_Fragment_Eyes), "a rejected spec adds no logic fragment");
-        Assert_False(FaceEntity.Has_Fragment(FMars_Fragment_Eyes_Presentation), "a rejected spec adds no presentation fragment");
+        Assert_False(FaceNode.Is_Eyes(), "a rejected spec adds no feature fragment");
+        Assert_False(FaceNode.Has_Fragment(FMars_Fragment_Eyes_Params), "a rejected spec adds no params fragment");
+        Assert_False(FaceNode.Has_Fragment(FMars_Fragment_Eyes), "a rejected spec adds no logic fragment");
+        Assert_False(FaceNode.Has_Fragment(FMars_Fragment_Eyes_Presentation), "a rejected spec adds no presentation fragment");
     }
 
     private FMars_Eyes_Spec Make_SpecWithBlink(const FMars_Eyes_BlinkSpec& InBlink) const

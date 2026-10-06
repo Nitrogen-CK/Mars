@@ -1,18 +1,16 @@
 // With two targets in range and in the cone, the gaze looks at the nearer one's Head: A ahead-right-above (yaw and pitch
 // positive). Once A is moved out of range it looks at B ahead-left-below (yaw and pitch negative). Isolated Z band:
 // -55500.
-class UMars_AutoTest_Gaze_PicksNearestInCone : UCk_AutoTest_Base
+class UMars_AutoTest_Gaze_PicksNearestInCone : UMars_AutoTestRig_Gaze
 {
     private FVector _Origin = FVector(0.0, 0.0, -55500.0);
-    private FCk_Handle_Gaze _Gaze;
     private FCk_Handle _TargetA;
     private FCk_Handle _TargetB;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto EyeEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto EyeNode = utils_transform::Add(EyeEntity, FTransform(FRotator::ZeroRotator, _Origin), ECk_Replication::DoesNotReplicate);
+        auto EyeNode = Make_EyeNode(InHandle, _Origin);
         _Gaze = utils_gaze::Add(EyeNode, MakeSpec());
 
         _TargetA = MakeTarget(InHandle, _Origin + FVector(150.0, 80.0, 60.0));
@@ -66,52 +64,5 @@ class UMars_AutoTest_Gaze_PicksNearestInCone : UCk_AutoTest_Base
         Assert_True(Aim.Y < 0.0, f"pitch toward a target below is negative (got [{Aim.Y}])");
         Assert_Equals_Float(Aim.X, Math::RadiansToDegrees(Math::Atan2(-80.0, 250.0)), 0.1, "the yaw points at B");
         Assert_Equals_Float(Aim.Y, Math::RadiansToDegrees(Math::Atan2(-60.0, Math::Sqrt(250.0 * 250.0 + 80.0 * 80.0))), 0.1, "the pitch points at B");
-    }
-
-    // Its own owner and context (so the gaze's probe may overlap it), a kinematic Silent Probe.Mars.Player sphere like the
-    // player's body probe, and a Head attach point at the owner's origin.
-    private FCk_Handle MakeTarget(FCk_Handle InHandle, FVector InLocation)
-    {
-        auto Owner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        Owner.Request_OverrideToSelf();
-        auto Root = utils_transform::Add(Owner, FTransform(FRotator::ZeroRotator, InLocation), ECk_Replication::DoesNotReplicate);
-
-        auto BodyProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Player);
-        BodyProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
-                     .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
-        utils_prefab::Create_ProbeNode_Sphere(Root, 20.0f, BodyProbeSpec);
-
-        auto Head = utils_scene_node::Create(Root, FTransform::Identity).As_Transform();
-
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Head, Head));
-        utils_attach_points::Add(Owner, AttachPointsSpec);
-        return Owner;
-    }
-
-    private FCk_Handle_Transform DoGet_Head(const FCk_Handle& InOwner) const
-    {
-        return InOwner.As_AttachPoints().Get_AttachPoint(GameplayTags::AttachPoint_Mars_Head);
-    }
-
-    // True when one of InOwner's probes is inside the gaze's sense trigger.
-    private bool DoGet_IsSensed(const FCk_Handle& InOwner) const
-    {
-        const auto& State = _Gaze.Get_Fragment(FMars_Fragment_Gaze);
-        for (auto Entity : State.Sense.Get_EntitiesInside())
-        {
-            if (ck::Ctx(Entity) == InOwner)
-            { return true; }
-        }
-        return false;
-    }
-
-    private FMars_Gaze_Spec MakeSpec() const
-    {
-        auto Spec = FMars_Gaze_Spec();
-        Spec.DetectionFilter.AddTag(GameplayTags::Probe_Mars_Player);
-        Spec.AimPoint = GameplayTags::AttachPoint_Mars_Head;
-        Spec.RangeCm = 300.0f;
-        return Spec;
     }
 }

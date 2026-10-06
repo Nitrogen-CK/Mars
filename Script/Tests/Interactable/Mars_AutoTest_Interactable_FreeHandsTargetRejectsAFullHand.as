@@ -13,11 +13,8 @@ class UMars_AutoTestState_FreeHandsCarrierRig : UCk_SmState_EntityScript
 // CustomValidationFailed and a StartInteraction creates nothing, while the same lever without the flag reads
 // CanInteractWith. Selecting the empty bag slot frees the hands; the gated lever then reads CanInteractWith and the same
 // StartInteraction creates the interaction. Isolated Z band: -81000.
-class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest_Base
+class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UMars_AutoTestRig_Carrier
 {
-    private FCk_Handle _Carrier;
-    private FCk_Handle_Hotbar _Hotbar;
-    private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_StateMachine _Sm;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
     private FCk_Handle_Item _Rock;
@@ -27,18 +24,8 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Carrier = InHandle;
-        auto Root = utils_transform::Add(_Carrier, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -81000.0)),
-            ECk_Replication::DoesNotReplicate);
-
-        auto HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
-        auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, HandNode));
-        utils_attach_points::Add(_Carrier, AttachPointsSpec);
-
-        auto HotbarSpec = FMars_Hotbar_Spec();
-        HotbarSpec.BagSlotCount = 2;
-        _Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
+        Add_CarrierBody(InHandle, FVector(0.0, 0.0, -81000.0));
+        Add_Hotbar(_Carrier, 2);
         _HeldItem = utils_held_item::Add(_Carrier);
         utils_held_item_use::Add(_Carrier);
 
@@ -120,19 +107,6 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
     }
 
     UFUNCTION()
-    private void Step_SelectEmptySlot(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(1));
-    }
-
-    UFUNCTION()
-    private void Check_HandsEmpty(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(ck::Is_NOT_Valid(_HeldItem.Get_CurrentItem()));
-    }
-
-    UFUNCTION()
     private void Step_AssertAcceptedAndStart(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(utils_interactable::Get_HandsAreFree(_Carrier), "selecting the empty slot frees the hands");
@@ -179,20 +153,5 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UCk_AutoTest
         }
 
         return Targets[0];
-    }
-
-    private FCk_Handle_Inventory_DataOnly MakeSeededHolder(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
-    {
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
-            FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);
-
-        auto Request = FCk_Request_Inventory_AddItemByDefinition(InDefinition, 1);
-        Request.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        Holder.Request_AddItemByDefinition(Request, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-        return Holder;
     }
 }

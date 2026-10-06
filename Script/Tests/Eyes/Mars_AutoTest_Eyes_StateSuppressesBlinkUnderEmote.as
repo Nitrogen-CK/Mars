@@ -1,11 +1,9 @@
 // Blinking needs every active layer to allow it: with a no-blink State expression set and a blink-allowing emote played
 // on top, the eyes stay open and the blink count stays still over a window that would otherwise hold two blinks; once
 // the State layer is cleared (the emote still playing) the eyes blink again. Isolated Z band: -74000.
-class UMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote : UMars_AutoTestRig_Eyes
 {
     default _TimeoutSeconds = 6.0f;
-
-    private FCk_Handle_Eyes _Eyes;
 
     // Two 0.43 s blink cycles (0.2 s wait + 0.07 close + 0.04 hold + 0.12 open) fit inside it.
     private float _WindowSeconds = 1.0;
@@ -17,9 +15,7 @@ class UMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto FaceEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto FaceNode = utils_transform::Add(FaceEntity, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -74000.0)),
-            ECk_Replication::DoesNotReplicate);
+        auto FaceNode = Make_FaceNode(InHandle, FVector(0.0, 0.0, -74000.0));
 
         auto Spec = FMars_Eyes_Spec();
         Spec.Style.LeftCell = 3;
@@ -39,14 +35,6 @@ class UMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote : UCk_AutoTest_Base
         Add_Step("clear the State layer", n"Step_ClearState");
         Add_Step_WaitUntil("the eyes blink again under the emote", n"Check_BlinkResumed");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void Step_AssertPresentation(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Assert_Valid(_Eyes, "Add with a valid spec returns a valid handle");
-        if (_Eyes.Get_HasPresentation() == false)
-        { FinishFailure("the eyes have no presentation in this world - Get_CanExecuteCosmeticEvents was false"); }
     }
 
     UFUNCTION()
@@ -100,12 +88,6 @@ class UMars_AutoTest_Eyes_StateSuppressesBlinkUnderEmote : UCk_AutoTest_Base
         Assert_False(_BlinkSeenWhileSuppressed, "a blink was seen while the State expression forbade blinking");
         Assert_Equals_Int(_Eyes.Get_BlinkCount(), _CountAtSuppress, "the blink count after the suppressed window");
         Assert_True(_Eyes.Get_HasEmote(), "the until-cleared emote is still active");
-    }
-
-    UFUNCTION()
-    private void Step_ClearState(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Eyes.Request_ClearExpression(FMars_Request_Eyes_ClearExpression(EMars_Eyes_Layer::State));
     }
 
     UFUNCTION()

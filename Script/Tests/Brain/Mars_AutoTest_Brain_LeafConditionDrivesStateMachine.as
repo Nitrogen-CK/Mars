@@ -58,21 +58,17 @@ class UMars_AutoTestState_BrainFlinch : UCk_SmState_EntityScript
     }
 }
 
-class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UCk_AutoTest_Base
+class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UMars_AutoTestRig_Brain
 {
     default _TimeoutSeconds = 15.0f;
 
-    private FCk_Handle_Brain _Brain;
     private FCk_Handle_StateMachine _Machine;
     private TArray<FString> _States;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        // First: the conditions resolve ck::Ctx to this entity only if the override precedes every child.
-        Entity.Request_OverrideToSelf();
-        _Brain = utils_brain::Add(Entity, Make_Spec());
+        auto Entity = AddBrainEntity(InHandle);
         _Machine = utils_state_machine::Add(Entity, FCk_StateMachine_Spec(UMars_AutoTestState_BrainIdle));
         utils_state_machine::BindTo_OnStateChanged(_Machine, FCk_Delegate_Sm_OnStateChanged(this, n"OnStateChanged"));
 
@@ -84,32 +80,6 @@ class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UCk_AutoTest_Base
         Add_Step("IsHurt false", n"Step_Heal");
         Add_Step_WaitUntil("the machine returns to BrainRoam", n"Check_InRoam", 0, 3.0f);
         Run_Steps(InHandle);
-    }
-
-    private FGameplayTag IsHurt() const
-    {
-        return GameplayTags::Mars_WS_Crawler_IsHurt;
-    }
-
-    private FMars_Brain_Spec Make_Spec() const
-    {
-        const auto Settled = GameplayTags::Mars_WS_Crawler_Settled;
-
-        auto Facts = TArray<FMars_Brain_Fact>();
-        Facts.Add(FMars_Brain_Fact(IsHurt(), false));
-        Facts.Add(FMars_Brain_Fact(GameplayTags::Mars_WS_Crawler_CanWalk, true));
-        Facts.Add(FMars_Brain_Fact(Settled, false));
-
-        auto Goal = TArray<FCk_GoapWS_Condition_Authored>();
-        Goal.Add(FCk_GoapWS_Condition_Authored(Settled, true));
-
-        auto Spec = FMars_Brain_Spec(GameplayTags::Mars_Goap_Crawler, GameplayTags::Mars_WS_Crawler,
-            Facts, Goal, 0.0f);
-        Spec.AddAction(UMars_GoapAction_Crawler_Roam);
-        Spec.AddAction(UMars_GoapAction_Crawler_Flinch);
-        Spec.AddAction(UMars_GoapAction_Crawler_Cower);
-        Spec.AddAction(UMars_GoapAction_Crawler_Idle);
-        return Spec;
     }
 
     private FString StateName(TSubclassOf<UCk_SmState_EntityScript> InState) const
@@ -143,13 +113,13 @@ class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UCk_AutoTest_Base
     private void Step_Hurt(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _States.Empty();
-        _Brain.Request_SetFact(FMars_Request_Brain_SetFact(IsHurt(), true));
+        SetFact(IsHurt(), true);
     }
 
     UFUNCTION()
     private void Step_Heal(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Brain.Request_SetFact(FMars_Request_Brain_SetFact(IsHurt(), false));
+        SetFact(IsHurt(), false);
     }
 
     UFUNCTION()

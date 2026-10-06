@@ -1,22 +1,15 @@
 // A Top mount starts at the top and holding up there does not top straight back out: the climber must first go below
 // 0.95. Then: down at the foot of a fresh Front mount steps off (Bottom), and a jump mid-climb leaves the ladder (Jump).
-class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Base
+class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UMars_AutoTestRig_Climber
 {
-    private FCk_Handle_Ladder _Ladder;
-    private FCk_Handle_Climber _Climber;
     private float64 _HoldUpStartSeconds = 0.0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        auto LadderEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto Root = utils_transform::Add(LadderEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         auto Spec = FMars_Ladder_Spec();
         Spec.Height = 300.0f;
-        _Ladder = utils_ladder::Add(Root, Spec);
-
-        auto LocalHandle = InHandle;
-        _Climber = utils_climber::Add(LocalHandle, FMars_Climber_Spec(300.0f));
+        BuildLadderAndClimber(InHandle, Spec);
 
         Add_Step("mount from the top", n"Step_MountTop");
         Add_Step_WaitUntil("the climber is climbing", n"Check_Climbing", 0, 2.0f);
@@ -54,13 +47,6 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     private void Step_MountFront(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Climber.Request_Mount(FMars_Request_Climber_Mount(_Ladder, EMars_Ladder_Zone::Front));
-    }
-
-    UFUNCTION()
-    private void Check_Climbing(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Climber.Get_IsClimbing());
     }
 
     UFUNCTION()
@@ -108,37 +94,9 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     }
 
     UFUNCTION()
-    private void Check_ToppedOut(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        if (_Climber.Get_IsClimbing() == false)
-        {
-            Res.Set(true);
-            return;
-        }
-
-        _Climber.Request_Climb(FMars_Request_Climber_Climb(1.0f));
-        Res.Set(false);
-    }
-
-    UFUNCTION()
-    private void Check_AboveFoot(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        _Climber.Request_Climb(FMars_Request_Climber_Climb(1.0f));
-        Res.Set(_Climber.Get_Alpha() >= 0.3f);
-    }
-
-    UFUNCTION()
     private void Step_AssertTop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
-        if (LastDismount.IsSet())
-        {
-            const auto Reason = LastDismount.GetValue();
-            Assert_True(Reason == EMars_Climber_Dismount::Top, f"the climb ended at the top (dismount {Reason :n})");
-        }
+        AssertDismount(EMars_Climber_Dismount::Top, "at the top");
     }
 
     UFUNCTION()
@@ -150,13 +108,7 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_AssertBottom(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
-        if (LastDismount.IsSet())
-        {
-            const auto Reason = LastDismount.GetValue();
-            Assert_True(Reason == EMars_Climber_Dismount::Bottom, f"the climb ended at the bottom (dismount {Reason :n})");
-        }
+        AssertDismount(EMars_Climber_Dismount::Bottom, "at the bottom");
     }
 
     UFUNCTION()
@@ -169,12 +121,6 @@ class UMars_AutoTest_Climber_TopMountNeedsDescentBeforeTopOut : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_AssertJump(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastDismount = _Climber.Get_LastDismount();
-        Assert_True(LastDismount.IsSet(), "the climb recorded how it ended");
-        if (LastDismount.IsSet())
-        {
-            const auto Reason = LastDismount.GetValue();
-            Assert_True(Reason == EMars_Climber_Dismount::Jump, f"the climb ended in a jump (dismount {Reason :n})");
-        }
+        AssertDismount(EMars_Climber_Dismount::Jump, "in a jump");
     }
 }
