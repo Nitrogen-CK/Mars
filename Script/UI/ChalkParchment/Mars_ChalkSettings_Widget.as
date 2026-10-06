@@ -1,40 +1,76 @@
-// The native settings screen builds and binds rows from the CkGameSettings registry.
-// This subclass owns the game's catalogue and presentation, not persistence.
-enum EMars_ChalkSettingsGroup
+// The scalability levels UGameUserSettings holds before a preset is previewed.
+struct FMars_ScalabilityLevels
 {
-    Audio,
-    Video,
-    Controls
+    UPROPERTY()
+    int32 ViewDistance = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 Shadow = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 GlobalIllumination = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 Reflection = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 AntiAliasing = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 Texture = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 VisualEffect = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 PostProcessing = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 Foliage = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 Shading = constants_settings::k_EpicQualityLevel;
+
+    UPROPERTY()
+    int32 Landscape = constants_settings::k_EpicQualityLevel;
+}
+
+struct FMars_QualityBaseline
+{
+    UPROPERTY()
+    int32 Preset = constants_settings::k_MixedQualityPreset;
+
+    UPROPERTY()
+    float32 ResolutionScale = 1.0f;
+
+    UPROPERTY()
+    FMars_ScalabilityLevels Levels;
+}
+
+enum EMars_SettingsPresentation
+{
+    // Pushed on a CkUI layer over the game, behind the scrim; Back removes it.
+    Screen,
+    // Rendered on a vestibule world board; the presenter activates it, and Back only deactivates it.
+    WorldBoard
 }
 
 event void FMars_ChalkSettingsWorldBoardClosed();
 
+// The native screen builds and binds rows from the CkGameSettings registry; this subclass owns the tab rail, the help
+// panel and the pending-changes presentation.
 UCLASS(Abstract)
 class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
 {
     default bIsFocusable = true;
     default bIsBackHandler = true;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    bool bWorldBoardHost = false;
+    EMars_SettingsPresentation Presentation = EMars_SettingsPresentation::Screen;
 
     FMars_ChalkSettingsWorldBoardClosed OnWorldBoardClosed;
 
     UPROPERTY(meta = (BindWidgetOptional))
     UImage Scrim;
-
-    UFUNCTION(BlueprintOverride)
-    void OnActivated()
-    {
-        utils_game_settings::BindTo_OnSettingChanged(NAME_None,
-            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnRowDescriptionChanged"));
-        CaptureQualityBaseline();
-        _QualityPreviewed = false;
-        utils_game_settings::BindTo_OnSettingChanged(n"video.quality_preset",
-            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnQualityChanged"));
-        if (ck::IsValid(Scrim))
-        { Scrim.SetVisibility(bWorldBoardHost ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible); }
-    }
 
     UPROPERTY(meta = (BindWidgetOptional))
     UMars_Button_Widget TabAudio;
@@ -69,14 +105,86 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
     UPROPERTY(meta = (BindWidgetOptional))
     UCommonTextBlock PendingText;
 
-    private EMars_ChalkSettingsGroup _SelectedGroup = EMars_ChalkSettingsGroup::Audio;
+    private TArray<FName> _TabOrder;
+    private TArray<UMars_Button_Widget> _TabButtons;
     private UCommonButtonGroupBase _TabGroup;
+    private FName _ActiveCategory;
     private TArray<UCk_GameSettingsUI_RowWidgetBase> _Rows;
     private FName _HelpKey;
     private bool _QualityPreviewed = false;
-    private TArray<int> _QualityBaseline;
-    private float32 _ResolutionBaseline = 1.0f;
-    private int _LandscapeBaseline = 3;
+    private FMars_QualityBaseline _QualityBaseline;
+
+    UFUNCTION(BlueprintOverride)
+    void OnInitialized()
+    {
+        _TabGroup = Cast<UCommonButtonGroupBase>(NewObject(this, UCommonButtonGroupBase));
+        _TabGroup.SetSelectionRequired(true);
+        _TabGroup.OnSelectedButtonBaseChanged.AddUFunction(this, n"OnTabSelectionChanged");
+
+        AddTab(TabAudio, constants_settings::k_Category_Audio);
+        AddTab(TabVideo, constants_settings::k_Category_Video);
+        AddTab(TabControls, constants_settings::k_Category_Controls);
+        if (ck::IsValid(TabAccessibility))
+        { TabAccessibility.SetIsEnabled(false); }
+        if (ck::IsValid(ViewBindings))
+        { ViewBindings.SetIsEnabled(false); }
+        if (ck::IsValid(RestoreDefaults))
+        { RestoreDefaults.OnButtonBaseClicked.AddUFunction(this, n"OnRestoreDefaults"); }
+        if (ck::IsValid(_ApplyButton))
+        { _ApplyButton.OnButtonBaseClicked.AddUFunction(this, n"OnApplyClicked"); }
+
+        SelectCategory(constants_settings::k_Category_Audio);
+        if (ck::IsValid(PendingText))
+        { PendingText.SetText(NSLOCTEXT("MarsSettings", "PendingChanges", "Unsaved changes")); }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void OnActivated()
+    {
+        utils_game_settings::BindTo_OnSettingChanged(NAME_None,
+            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnAnySettingChanged"));
+        utils_game_settings::BindTo_OnSettingChanged(constants_settings::k_VideoQualityPreset,
+            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnQualityChanged"));
+        CaptureQualityBaseline();
+        _QualityPreviewed = false;
+        RefreshPendingStatus();
+        if (ck::IsValid(Scrim))
+        {
+            Scrim.SetVisibility(Presentation == EMars_SettingsPresentation::WorldBoard
+                ? ESlateVisibility::Collapsed
+                : ESlateVisibility::HitTestInvisible);
+        }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void OnDeactivated()
+    {
+        utils_game_settings::UnbindFrom_OnSettingChanged(NAME_None,
+            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnAnySettingChanged"));
+        utils_game_settings::UnbindFrom_OnSettingChanged(constants_settings::k_VideoQualityPreset,
+            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnQualityChanged"));
+        // The native cancel has already re-applied the prior preset through the video pack, which ignores a mixed
+        // prior; only a mixed group needs restoring here.
+        if (_QualityPreviewed && _QualityBaseline.Preset == constants_settings::k_MixedQualityPreset)
+        { RestoreQualityBaseline(); }
+        _QualityPreviewed = false;
+        if (Presentation == EMars_SettingsPresentation::WorldBoard)
+        { OnWorldBoardClosed.Broadcast(); }
+    }
+
+    // A dropdown open on a world board; its popup menu consumes Escape, so the presenter forwards Back to it.
+    UComboBoxString GetOpenDropdown() const
+    {
+        for (auto Row : _Rows)
+        {
+            auto DropdownRow = Cast<UCk_GameSettingsUI_RowWidget_Dropdown>(Row);
+            if (ck::IsValid(DropdownRow) && DropdownRow.IsVisible() && ck::IsValid(DropdownRow._ValueComboBox) &&
+                DropdownRow._ValueComboBox.IsOpen())
+            { return DropdownRow._ValueComboBox; }
+        }
+
+        return nullptr;
+    }
 
     UFUNCTION(BlueprintOverride)
     void OnRowGenerated(UCk_GameSettingsUI_RowWidgetBase InRow, FName InCategory)
@@ -85,27 +193,23 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
         InRow.SetToolTipText(FText());
     }
 
+    // The native row re-applies the definition's description as its tooltip on every refresh; the help panel shows it.
     UFUNCTION()
-    private void OnRowDescriptionChanged(FName InKey, FString InValue)
+    private void OnAnySettingChanged(FName InKey, FString InValue)
     {
-        // The registry broadcasts wildcard listeners after per-key listeners,
-        // so native row refresh has finished writing its default tooltip.
         for (auto Row : _Rows)
         {
             if (ck::IsValid(Row) && Row.Get_SettingKey() == InKey)
             { Row.SetToolTipText(FText()); }
         }
+        RefreshPendingStatus();
     }
 
-    // Observe the small native row pool; never move focus or change capture.
-    // Native Apply has no public pending-state event, so sample its truth here.
     UFUNCTION(BlueprintOverride)
     void Tick(FGeometry MyGeometry, float InDeltaTime)
     {
         if (!IsActivated())
         { return; }
-        if (ck::IsValid(PendingText))
-        { PendingText.SetVisibility(Get_PendingStatusVisibility()); }
 
         FName FocusKey;
         for (auto Row : _Rows)
@@ -125,127 +229,58 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
     }
 
     UFUNCTION(BlueprintOverride)
-    void OnInitialized()
-    {
-        _TabGroup = Cast<UCommonButtonGroupBase>(NewObject(this, UCommonButtonGroupBase));
-        _TabGroup.SetSelectionRequired(true);
-        _TabGroup.OnSelectedButtonBaseChanged.AddUFunction(this, n"OnTabSelectionChanged");
-
-        AddTab(TabAudio);
-        AddTab(TabVideo);
-        AddTab(TabControls);
-        if (ck::IsValid(TabAccessibility))
-        { TabAccessibility.SetIsEnabled(false); }
-        if (ck::IsValid(ViewBindings))
-        { ViewBindings.SetIsEnabled(false); }
-        if (ck::IsValid(RestoreDefaults))
-        { RestoreDefaults.OnButtonBaseClicked.AddUFunction(this, n"OnRestoreDefaults"); }
-        if (ck::IsValid(_ApplyButton))
-        { _ApplyButton.OnButtonBaseClicked.AddUFunction(this, n"OnApplyQualityBaseline"); }
-
-        Request_SetActiveCategory(n"General");
-        RefreshGroupPresentation();
-        if (ck::IsValid(PendingText))
-        { PendingText.SetText(NSLOCTEXT("MarsSettings", "PendingChanges", "Unsaved changes")); }
-    }
-
-    UFUNCTION(BlueprintOverride)
     UWidget BP_GetDesiredFocusTarget() const
     { return GetPreferredFocusTarget(); }
 
     UWidget GetPreferredFocusTarget() const
     {
-        if (_SelectedGroup == EMars_ChalkSettingsGroup::Video)
-        { return TabVideo; }
-        if (_SelectedGroup == EMars_ChalkSettingsGroup::Controls)
-        { return TabControls; }
-        return TabAudio;
-    }
-
-    UComboBoxString GetOpenDropdown() const
-    {
-        for (auto Row : _Rows)
-        {
-            if (ck::Is_NOT_Valid(Row) || !Row.IsVisible())
-            { continue; }
-            auto DropdownRow = Cast<UCk_GameSettingsUI_RowWidget_Dropdown>(Row);
-            if (ck::Is_NOT_Valid(DropdownRow))
-            { continue; }
-            auto Combo = DropdownRow._ValueComboBox;
-            if (ck::IsValid(Combo) && Combo.IsOpen())
-            { return Combo; }
-        }
-        return nullptr;
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void OnDeactivated()
-    {
-        utils_game_settings::UnbindFrom_OnSettingChanged(NAME_None,
-            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnRowDescriptionChanged"));
-        utils_game_settings::UnbindFrom_OnSettingChanged(n"video.quality_preset",
-            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnQualityChanged"));
-        // Native cancellation precedes this event. Its scalar preset cannot
-        // restore a mixed (-1) configuration, so restore the captured group.
-        if (_QualityPreviewed)
-        { RestoreQualityBaseline(); }
-        _QualityPreviewed = false;
-        if (bWorldBoardHost)
-        { OnWorldBoardClosed.Broadcast(); }
+        const int32 Index = _TabOrder.FindIndex(_ActiveCategory);
+        return _TabButtons.IsValidIndex(Index) ? _TabButtons[Index] : nullptr;
     }
 
     UFUNCTION(BlueprintOverride)
     TArray<FName> Get_CuratedKeysForCategory(FName InCategory)
-    { return InCategory == n"General" ? GetGroupKeys() : TArray<FName>(); }
+    { return Get_CuratedKeys(InCategory); }
 
-    private TArray<FName> GetGroupKeys() const
+    private TArray<FName> Get_CuratedKeys(FName InCategory) const
     {
         TArray<FName> Keys;
 
-        if (_SelectedGroup == EMars_ChalkSettingsGroup::Audio)
+        if (InCategory == constants_settings::k_Category_Audio)
         {
-            Keys.Add(n"audio.master");
-            Keys.Add(n"audio.music");
-            Keys.Add(n"audio.sfx");
-            Keys.Add(n"audio.voice");
+            Keys.Add(constants_settings::k_AudioMaster);
+            Keys.Add(constants_settings::k_AudioMusic);
+            Keys.Add(constants_settings::k_AudioSfx);
+            Keys.Add(constants_settings::k_AudioVoice);
         }
-        else if (_SelectedGroup == EMars_ChalkSettingsGroup::Video)
+        else if (InCategory == constants_settings::k_Category_Video)
         {
-            Keys.Add(n"video.quality_preset");
-            Keys.Add(n"video.vsync");
-            Keys.Add(n"video.fps_cap");
-            Keys.Add(n"video.sg.view_distance");
+            Keys.Add(constants_settings::k_VideoQualityPreset);
+            Keys.Add(constants_settings::k_VideoViewDistance);
+            Keys.Add(constants_settings::k_VideoShadow);
+            Keys.Add(constants_settings::k_VideoEffects);
+            Keys.Add(constants_settings::k_VideoVSync);
+            Keys.Add(constants_settings::k_VideoFpsCap);
         }
-        else
+        else if (InCategory == constants_settings::k_Category_Controls)
         {
-            Keys.Add(n"controls.look_sensitivity");
-            Keys.Add(n"controls.invert_y");
-            Keys.Add(n"controls.sprint_toggle");
+            Keys.Add(constants_settings::k_LookSensitivity);
+            Keys.Add(constants_settings::k_InvertY);
+            Keys.Add(constants_settings::k_SprintToggle);
         }
+
         return Keys;
     }
 
-    private void SetGroup(EMars_ChalkSettingsGroup InGroup)
-    {
-        bool bChanged = _SelectedGroup != InGroup;
-        _SelectedGroup = InGroup;
-        if (bChanged)
-        {
-            RefreshGroupPresentation();
-            Request_RebuildRows();
-        }
-    }
-
-    // Row WBPs may call this on hover or when a child control gains focus.
-    // Pooled rows from another tab cannot change the visible help panel.
     UFUNCTION(BlueprintCallable)
     void ShowHelpForKey(FName InKey)
     {
-        if (_HelpKey == InKey || !Get_IsKeyVisible(InKey))
+        if (_HelpKey == InKey || !Get_HasRowForKey(InKey))
         { return; }
 
         FCk_GameSettings_SettingDefinition Definition;
-        if (!utils_game_settings::Get_SettingDefinition(InKey, Definition))
+        if (ck::EnsureIfNot(utils_game_settings::Get_SettingDefinition(InKey, Definition),
+            f"[Settings] a visible row is bound to unregistered key {InKey.ToString()}"))
         { return; }
         _HelpKey = InKey;
 
@@ -254,13 +289,13 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
         if (ck::IsValid(HelpDescription))
         {
             auto Description = Definition.Get_Description();
-            if (InKey == n"audio.master")
+            if (InKey == constants_settings::k_AudioMaster)
             { Description = NSLOCTEXT("MarsSettings", "MasterHelp", "Adjusts the volume of all game audio."); }
-            else if (InKey == n"audio.music")
+            else if (InKey == constants_settings::k_AudioMusic)
             { Description = NSLOCTEXT("MarsSettings", "MusicHelp", "Adjusts music in menus, camp and expeditions. Sound effects and voices are unchanged."); }
-            else if (InKey == n"audio.sfx")
+            else if (InKey == constants_settings::k_AudioSfx)
             { Description = NSLOCTEXT("MarsSettings", "SfxHelp", "Adjusts footsteps, interactions and other sound effects."); }
-            else if (InKey == n"audio.voice")
+            else if (InKey == constants_settings::k_AudioVoice)
             { Description = NSLOCTEXT("MarsSettings", "VoiceHelp", "Adjusts audio routed through the voice channel."); }
             HelpDescription.SetText(Description.IsEmpty()
                 ? NSLOCTEXT("MarsSettings", "NoSettingDescription", "Apply saves this setting. Cancel restores its previous value.")
@@ -268,38 +303,44 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
         }
     }
 
-    private bool Get_IsKeyVisible(FName InKey)
+    private void RefreshPendingStatus()
     {
-        return GetGroupKeys().Contains(InKey);
-    }
+        if (ck::Is_NOT_Valid(PendingText))
+        { return; }
 
-    // Apply, Cancel and reactivation share the native pending-changes session.
-    UFUNCTION(BlueprintPure)
-    ESlateVisibility Get_PendingStatusVisibility() const
-    {
-        return utils_game_settings::Get_HasPendingChanges()
+        PendingText.SetVisibility(utils_game_settings::Get_HasPendingChanges()
             ? ESlateVisibility::SelfHitTestInvisible
-            : ESlateVisibility::Collapsed;
+            : ESlateVisibility::Collapsed);
     }
 
-    private void RefreshGroupPresentation()
+    private void SelectCategory(FName InCategory)
+    {
+        if (_ActiveCategory == InCategory)
+        { return; }
+
+        _ActiveCategory = InCategory;
+        Request_SetActiveCategory(InCategory);
+        RefreshCategoryPresentation();
+    }
+
+    private void RefreshCategoryPresentation()
     {
         _HelpKey = NAME_None;
-        FText GroupTitle;
+        FText CategoryTitle;
         FText RestoreText;
-        if (_SelectedGroup == EMars_ChalkSettingsGroup::Audio)
+        if (_ActiveCategory == constants_settings::k_Category_Audio)
         {
-            GroupTitle = NSLOCTEXT("MarsSettings", "AudioGroup", "AUDIO");
+            CategoryTitle = NSLOCTEXT("MarsSettings", "AudioGroup", "AUDIO");
             RestoreText = NSLOCTEXT("MarsSettings", "RestoreAudio", "Restore audio defaults");
         }
-        else if (_SelectedGroup == EMars_ChalkSettingsGroup::Video)
+        else if (_ActiveCategory == constants_settings::k_Category_Video)
         {
-            GroupTitle = NSLOCTEXT("MarsSettings", "VideoGroup", "VIDEO");
+            CategoryTitle = NSLOCTEXT("MarsSettings", "VideoGroup", "VIDEO");
             RestoreText = NSLOCTEXT("MarsSettings", "RestoreVideo", "Restore video defaults");
         }
         else
         {
-            GroupTitle = NSLOCTEXT("MarsSettings", "ControlsGroup", "CONTROLS");
+            CategoryTitle = NSLOCTEXT("MarsSettings", "ControlsGroup", "CONTROLS");
             RestoreText = NSLOCTEXT("MarsSettings", "RestoreControls", "Restore controls defaults");
         }
 
@@ -309,109 +350,133 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
             RestoreDefaults.RefreshLabel();
         }
         if (ck::IsValid(BindingsRow))
-        { BindingsRow.SetVisibility(_SelectedGroup == EMars_ChalkSettingsGroup::Controls
+        { BindingsRow.SetVisibility(_ActiveCategory == constants_settings::k_Category_Controls
             ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed); }
 
         if (ck::IsValid(SectionText))
-        { SectionText.SetText(GroupTitle); }
+        { SectionText.SetText(CategoryTitle); }
         if (ck::IsValid(HelpTitle))
-        { HelpTitle.SetText(GroupTitle); }
+        { HelpTitle.SetText(CategoryTitle); }
         if (ck::IsValid(HelpDescription))
         { HelpDescription.SetText(NSLOCTEXT("MarsSettings", "SelectSettingHelp", "Select a setting for details.")); }
     }
 
     UFUNCTION()
-    private void OnTabSelectionChanged(UCommonButtonBase InButton, int ButtonIndex)
+    private void OnTabSelectionChanged(UCommonButtonBase InButton, int32 ButtonIndex)
     {
-        if (ButtonIndex == 0)
-        { SetGroup(EMars_ChalkSettingsGroup::Audio); }
-        else if (ButtonIndex == 1)
-        { SetGroup(EMars_ChalkSettingsGroup::Video); }
-        else if (ButtonIndex == 2)
-        { SetGroup(EMars_ChalkSettingsGroup::Controls); }
+        if (!_TabOrder.IsValidIndex(ButtonIndex))
+        { return; }
+
+        SelectCategory(_TabOrder[ButtonIndex]);
     }
 
-    private void AddTab(UMars_Button_Widget InTab)
+    private void AddTab(UMars_Button_Widget InTab, FName InCategory)
     {
         if (ck::Is_NOT_Valid(InTab))
         { return; }
+
         InTab.SetIsSelectable(true);
+        _TabOrder.Add(InCategory);
+        _TabButtons.Add(InTab);
         _TabGroup.AddWidget(InTab);
     }
 
     UFUNCTION()
     private void OnRestoreDefaults(UCommonButtonBase InButton)
     {
-        // Reset participates in the same pending session as a row edit;
-        // Cancel must also undo a whole-category reset.
-        if (_SelectedGroup == EMars_ChalkSettingsGroup::Video)
+        for (auto Key : Get_CuratedKeys(_ActiveCategory))
+        { ResetToDeclaredDefault(Key); }
+    }
+
+    // The registry refuses to reset an External key (UGameUserSettings owns its value), so a video key is set to the
+    // default its Mars definition declares through the same request a row commit uses.
+    private void ResetToDeclaredDefault(FName InKey)
+    {
+        FCk_GameSettings_SettingDefinition Definition;
+        if (ck::EnsureIfNot(utils_game_settings::Get_SettingDefinition(InKey, Definition),
+            f"[Settings] cannot reset unregistered key {InKey.ToString()}"))
+        { return; }
+
+        if (Definition.Get_PersistencePolicy() == ECk_GameSettings_PersistencePolicy::Provider)
         {
-            // External values are owned by GameUserSettings: request explicit
-            // game defaults through their setters, never the provider reset API.
-            utils_game_settings::Request_SetSettingValue_Int32(FCk_Request_GameSettings_SetValue_Int32(n"video.quality_preset", 3));
-            utils_game_settings::Request_SetSettingValue_Bool(FCk_Request_GameSettings_SetValue_Bool(n"video.vsync", false));
-            utils_game_settings::Request_SetSettingValue_Float(FCk_Request_GameSettings_SetValue_Float(n"video.fps_cap", 60.0f));
-            utils_game_settings::Request_SetSettingValue_Int32(FCk_Request_GameSettings_SetValue_Int32(n"video.sg.view_distance", 3));
-            Request_RebuildRows();
+            utils_game_settings::Request_ResetToDefault(FCk_Request_GameSettings_ResetToDefault(InKey));
+            return;
         }
-        else
+
+        const FString Default = Definition.Get_DefaultValue();
+        switch (Definition.Get_ValueType())
         {
-            for (auto Key : GetGroupKeys())
-            { utils_game_settings::Request_ResetToDefault(FCk_Request_GameSettings_ResetToDefault(Key)); }
+            case ECk_GameSettings_ValueType::Bool:
+                utils_game_settings::Request_SetSettingValue_Bool(
+                    FCk_Request_GameSettings_SetValue_Bool(InKey, Default == "true"));
+                break;
+            case ECk_GameSettings_ValueType::Int32:
+                utils_game_settings::Request_SetSettingValue_Int32(
+                    FCk_Request_GameSettings_SetValue_Int32(InKey, int32(String::Conv_StringToInt64(Default))));
+                break;
+            case ECk_GameSettings_ValueType::Float:
+                utils_game_settings::Request_SetSettingValue_Float(
+                    FCk_Request_GameSettings_SetValue_Float(InKey, float32(String::Conv_StringToDouble(Default))));
+                break;
+            case ECk_GameSettings_ValueType::String:
+                utils_game_settings::Request_SetSettingValue_String(
+                    FCk_Request_GameSettings_SetValue_String(InKey, Default));
+                break;
         }
     }
 
     UFUNCTION()
     private void OnQualityChanged(FName InKey, FString InValue)
     {
-        if (utils_game_settings::Get_HasPendingChanges())
+        if (utils_game_settings::Get_HasUnappliedChange(constants_settings::k_VideoQualityPreset))
         { _QualityPreviewed = true; }
     }
 
     UFUNCTION()
-    private void OnApplyQualityBaseline(UCommonButtonBase InButton)
+    private void OnApplyClicked(UCommonButtonBase InButton)
     {
         CaptureQualityBaseline();
         _QualityPreviewed = false;
+        RefreshPendingStatus();
     }
 
     private void CaptureQualityBaseline()
     {
         auto Settings = UGameUserSettings::GetGameUserSettings();
-        _QualityBaseline.Reset();
-        _QualityBaseline.Add(Settings.GetViewDistanceQuality());
-        _QualityBaseline.Add(Settings.GetShadowQuality());
-        _QualityBaseline.Add(Settings.GetGlobalIlluminationQuality());
-        _QualityBaseline.Add(Settings.GetReflectionQuality());
-        _QualityBaseline.Add(Settings.GetAntiAliasingQuality());
-        _QualityBaseline.Add(Settings.GetTextureQuality());
-        _QualityBaseline.Add(Settings.GetVisualEffectQuality());
-        _QualityBaseline.Add(Settings.GetPostProcessingQuality());
-        _QualityBaseline.Add(Settings.GetFoliageQuality());
-        _QualityBaseline.Add(Settings.GetShadingQuality());
-        _ResolutionBaseline = Settings.GetResolutionScaleNormalized();
-        // Landscape has no reflected GameUserSettings accessor. Capture the
-        // applied scalability level without raising its console priority.
-        _LandscapeBaseline = FConsoleVariable("sg.LandscapeQuality", 3).GetInt();
+        _QualityBaseline.Preset = Settings.GetOverallScalabilityLevel();
+        _QualityBaseline.ResolutionScale = Settings.GetResolutionScaleNormalized();
+        _QualityBaseline.Levels.ViewDistance = Settings.GetViewDistanceQuality();
+        _QualityBaseline.Levels.Shadow = Settings.GetShadowQuality();
+        _QualityBaseline.Levels.GlobalIllumination = Settings.GetGlobalIlluminationQuality();
+        _QualityBaseline.Levels.Reflection = Settings.GetReflectionQuality();
+        _QualityBaseline.Levels.AntiAliasing = Settings.GetAntiAliasingQuality();
+        _QualityBaseline.Levels.Texture = Settings.GetTextureQuality();
+        _QualityBaseline.Levels.VisualEffect = Settings.GetVisualEffectQuality();
+        _QualityBaseline.Levels.PostProcessing = Settings.GetPostProcessingQuality();
+        _QualityBaseline.Levels.Foliage = Settings.GetFoliageQuality();
+        _QualityBaseline.Levels.Shading = Settings.GetShadingQuality();
+        // Landscape has no GameUserSettings accessor; the console variable holds the applied level.
+        _QualityBaseline.Levels.Landscape = FConsoleVariable("sg.LandscapeQuality", constants_settings::k_EpicQualityLevel).GetInt();
     }
 
+    // Saved as well as applied: the previewed preset already reached GameUserSettings.ini through the video pack.
     private void RestoreQualityBaseline()
     {
         auto Settings = UGameUserSettings::GetGameUserSettings();
-        // Seed the inaccessible landscape field through the engine preset,
-        // then restore each exposed field before applying the group once.
-        Settings.SetOverallScalabilityLevel(_LandscapeBaseline);
-        Settings.SetViewDistanceQuality(_QualityBaseline[0]);
-        Settings.SetShadowQuality(_QualityBaseline[1]);
-        Settings.SetGlobalIlluminationQuality(_QualityBaseline[2]);
-        Settings.SetReflectionQuality(_QualityBaseline[3]);
-        Settings.SetAntiAliasingQuality(_QualityBaseline[4]);
-        Settings.SetTextureQuality(_QualityBaseline[5]);
-        Settings.SetVisualEffectQuality(_QualityBaseline[6]);
-        Settings.SetPostProcessingQuality(_QualityBaseline[7]);
-        Settings.SetFoliageQuality(_QualityBaseline[8]);
-        Settings.SetShadingQuality(_QualityBaseline[9]);
-        Settings.SetResolutionScaleNormalized(_ResolutionBaseline);
+        const auto Levels = _QualityBaseline.Levels;
+        // The preset is the only writer of the landscape level; every exposed group is overwritten below.
+        Settings.SetOverallScalabilityLevel(Levels.Landscape);
+        Settings.SetViewDistanceQuality(Levels.ViewDistance);
+        Settings.SetShadowQuality(Levels.Shadow);
+        Settings.SetGlobalIlluminationQuality(Levels.GlobalIllumination);
+        Settings.SetReflectionQuality(Levels.Reflection);
+        Settings.SetAntiAliasingQuality(Levels.AntiAliasing);
+        Settings.SetTextureQuality(Levels.Texture);
+        Settings.SetVisualEffectQuality(Levels.VisualEffect);
+        Settings.SetPostProcessingQuality(Levels.PostProcessing);
+        Settings.SetFoliageQuality(Levels.Foliage);
+        Settings.SetShadingQuality(Levels.Shading);
+        Settings.SetResolutionScaleNormalized(_QualityBaseline.ResolutionScale);
         Settings.ApplyNonResolutionSettings();
         Settings.SaveSettings();
     }
@@ -419,7 +484,7 @@ class UMars_ChalkSettings_Widget : UCk_GameSettingsUI_ScreenWidget
     UFUNCTION(BlueprintOverride)
     bool OnHandleBackAction()
     {
-        if (bWorldBoardHost)
+        if (Presentation == EMars_SettingsPresentation::WorldBoard)
         { DeactivateWidget(); }
         else
         { utils_u_i_layout::RemoveWidgetSelf(this); }

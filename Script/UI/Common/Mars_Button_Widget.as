@@ -1,3 +1,11 @@
+enum EMars_ButtonState
+{
+    Enabled,
+    Disabled,
+    // Disabled with the busy marker shown: the action is already in flight.
+    Busy
+}
+
 // Unstyled CommonUI button for menus. Style is picked per instance/WBP (Style property); the label collapses when empty.
 UCLASS(Abstract)
 class UMars_Button_Widget : UCommonButtonBase
@@ -22,9 +30,6 @@ class UMars_Button_Widget : UCommonButtonBase
 
     UPROPERTY(EditAnywhere, Category = "Mars")
     bool bShowSpoonFocus = false;
-
-    UPROPERTY(EditAnywhere, Category = "Mars")
-    bool bAlignLabelLeft = false;
 
     private bool _HasFocus = false;
     private bool _IsHovered = false;
@@ -73,10 +78,10 @@ class UMars_Button_Widget : UCommonButtonBase
     void OnCurrentTextStyleChanged()
     { RefreshTextStyle(); }
 
-    void SetActionState(bool InAvailable, bool InBusy)
+    void SetActionState(EMars_ButtonState InState)
     {
-        _IsBusy = InBusy;
-        SetIsEnabled(InAvailable && InBusy == false);
+        _IsBusy = InState == EMars_ButtonState::Busy;
+        SetIsEnabled(InState == EMars_ButtonState::Enabled);
         RefreshIndicators();
     }
 
@@ -87,13 +92,6 @@ class UMars_Button_Widget : UCommonButtonBase
         { return; }
 
         Text.SetText(ButtonText);
-        auto LabelSlot = Cast<UOverlaySlot>(Text.Slot);
-        if (ck::IsValid(LabelSlot))
-        {
-            LabelSlot.SetHorizontalAlignment(bAlignLabelLeft
-                ? EHorizontalAlignment::HAlign_Left : EHorizontalAlignment::HAlign_Center);
-            LabelSlot.SetPadding(bAlignLabelLeft ? FMargin(40.0f, 0.0f, 16.0f, 0.0f) : FMargin(0.0f));
-        }
         Text.SetVisibility(ButtonText.IsEmpty()
             ? ESlateVisibility::Collapsed
             : ESlateVisibility::SelfHitTestInvisible);

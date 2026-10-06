@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "2dd2d56772b7e2366f87532887dfbb5e",
+		"sourceHash": "697ebe5cc39c99ee15faa90fb5d6ed8b",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -16,7 +16,7 @@
 			"name": "_CookVersion",
 			"type": "uint32",
 			"category": "Ck_Jolt_CookedWorldIndex_UE",
-			"value": 6
+			"value": 7
 		},
 		{
 			"name": "_JoltVersionId",
@@ -58,13 +58,37 @@
 						},
 						"Max":
 						{
-							"X": 1050,
-							"Y": 742.4621364729004,
-							"Z": 270
+							"X": 1025.304832720494,
+							"Y": 1145,
+							"Z": 310
 						},
 						"IsValid": true
 					},
 					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": 0,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -2.1033308775355791e-13,
+							"Y": -1145,
+							"Z": 39.5
+						},
+						"Max":
+						{
+							"X": 1050,
+							"Y": -200,
+							"Z": 310
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
 				},
 				{
 					"_CellId":
@@ -76,15 +100,15 @@
 					{
 						"Min":
 						{
-							"X": -742.4621689269502,
-							"Y": 494.97471437653087,
-							"Z": 45
+							"X": -1988.8142631828894,
+							"Y": 0,
+							"Z": -12
 						},
 						"Max":
 						{
-							"X": -3.0597973022850056e-05,
-							"Y": 1049.9999999999989,
-							"Z": 150
+							"X": -459.61940777125585,
+							"Y": 1025.304832720494,
+							"Z": 315
 						},
 						"IsValid": true
 					},
@@ -100,43 +124,19 @@
 					{
 						"Min":
 						{
-							"X": -798.73869942879719,
-							"Y": -837.08660869902701,
+							"X": -1988.8142613456164,
+							"Y": -1050,
 							"Z": 10
 						},
 						"Max":
 						{
 							"X": -147.60084531181371,
-							"Y": -290.71719941343952,
-							"Z": 150
+							"Y": -4.6095325473730231,
+							"Z": 310
 						},
 						"IsValid": true
 					},
 					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1"
-				},
-				{
-					"_CellId":
-					{
-						"X": 0,
-						"Y": -1
-					},
-					"_Bounds":
-					{
-						"Min":
-						{
-							"X": 9.1793918954863329e-05,
-							"Y": -1049.9999999999911,
-							"Z": 45
-						},
-						"Max":
-						{
-							"X": 1050,
-							"Y": -275,
-							"Z": 150
-						},
-						"IsValid": true
-					},
-					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_0_-1.JoltCell_0_-1"
 				}
 			]
 		}

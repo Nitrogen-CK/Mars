@@ -1,0 +1,83 @@
+{
+	"material": "CampCloth_Mars_M",
+	"packagePath": "/Game/Mars/Environment/Materials/Camp/CampCloth_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "efe0aca58243207585057c9cd5b008b7",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ScalarParameter": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.080000,G=0.115000,B=0.075000,A=1.000000)",
+					"ParameterName": "ClothColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.93999999761581421,
+					"ParameterName": "ClothRoughness"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "ClothRoughness",
+			"value": 0.93999999761581421
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "ClothColor",
+			"value": "RGBA(0.08, 0.115, 0.075, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

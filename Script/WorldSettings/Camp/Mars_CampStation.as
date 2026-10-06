@@ -1,4 +1,3 @@
-// One entry per camp station. Title and Cauldron are camera-only stations.
 enum EMars_CampStation
 {
     Title,
@@ -8,12 +7,16 @@ enum EMars_CampStation
     Wardrobe,
     Guests,
     Contracts,
-    Workbench
+    Workbench,
+    // The vestibule's world boards. Append only: station values are serialized in the camp map.
+    FrontendHost,
+    FrontendJoin,
+    FrontendSettings,
+    FrontendQuit
 }
 
 namespace utils_camp_station
 {
-    // The placed camera for a station, or null. Cameras are level content; callers gather them once with GetAllActorsOfClass.
     AMars_CampStationCamera TryGet_Camera(const TArray<AMars_CampStationCamera>& InCameras, EMars_CampStation InStation)
     {
         for (auto Camera : InCameras)

@@ -1,0 +1,95 @@
+{
+	"material": "OpenSlotDash_Mars_MI",
+	"packagePath": "/Game/Mars/UI/Materials/ChalkParchment/OpenSlotDash_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e96df5d42cf29d01ff90934dd85c06a6",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/UI/Materials/ChalkParchment/OpenSlotDash_Mars_M.OpenSlotDash_Mars_M"
+	],
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_UI",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"Custom": 1,
+		"TextureCoordinate": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "InkColor"
+				}
+			},
+			{
+				"id": 1,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 2,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float2 p = UV * float2(420.0, 108.0); float d = min(min(p.x, 420.0 - p.x), min(p.y, 108.0 - p.y)); float edge = 1.0 - smoothstep(0.25, 1.25, d); float along = (p.y < 1.0 || p.y > 107.0) ? p.x : p.y; float phase = fmod(along, 9.0); float mark = 1.0 - smoothstep(4.5, 5.5, phase); return saturate(edge * mark);",
+					"OutputType": "CMOT_Float1"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 2,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [
+		{
+			"name": "InkColor",
+			"value": "RGBA(0.01764, 0.01444, 0.01096, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

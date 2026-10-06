@@ -1,8 +1,11 @@
-// Level-placed view point for one camp station. AMars_Camp_PlayerController blends the local view between these
-// (FocusStation); Mars.Camp.Build places one per EMars_CampStation. Not under Script/Editor: that code is editor-only,
-// and the camp map needs this class at runtime.
+// Level-placed view point for one camp station (AMars_Camp_PlayerController::FocusStation). Runtime class, so not
+// under Script/Editor even though Mars.Camp.Build places them.
 class AMars_CampStationCamera : ACameraActor
 {
     UPROPERTY(EditAnywhere, Category = "Camp")
     EMars_CampStation Station = EMars_CampStation::Title;
+
+    // Disabled endpoints can remain in the level as migration/authoring backups.
+    UPROPERTY(EditAnywhere, Category = "Camp")
+    bool bStationEnabled = true;
 }

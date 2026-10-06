@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "638c569fd8650400a7c68e56e277b29d",
+		"sourceHash": "b82ff97cacf1ca33327b27651abbe830",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -78,9 +78,7 @@
 					{
 						"_Seconds": 0
 					},
-					"_StartingWidgetClasses": [
-						"/Game/Mars/UI/Widgets/Camp/CampMenu_Mars_WBP.CampMenu_Mars_WBP_C"
-					]
+					"_StartingWidgetClasses": []
 				},
 				{
 					"_LayerTag": "UI.Layer.Modal",

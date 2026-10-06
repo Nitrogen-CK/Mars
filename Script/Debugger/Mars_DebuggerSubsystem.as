@@ -131,13 +131,13 @@ class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
     {
         for (auto RegisteredSubsystem : RegisteredSubsystems)
         {
-            auto World = Get_GameWorld(RegisteredSubsystem);
-            if (ck::Is_NOT_Valid(World))
+            auto GameWorld = Get_GameWorld(RegisteredSubsystem);
+            if (ck::Is_NOT_Valid(GameWorld))
             { continue; }
 
-            const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(World);
+            const auto WorldContext = FAngelscriptGameThreadScopeWorldContext(GameWorld);
             if (System::IsServer())
-            { return World; }
+            { return GameWorld; }
         }
 
         return nullptr;
@@ -148,9 +148,9 @@ class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
     {
         for (auto RegisteredSubsystem : RegisteredSubsystems)
         {
-            auto World = Get_GameWorld(RegisteredSubsystem);
-            if (ck::IsValid(World))
-            { return World; }
+            auto GameWorld = Get_GameWorld(RegisteredSubsystem);
+            if (ck::IsValid(GameWorld))
+            { return GameWorld; }
         }
 
         return nullptr;
@@ -162,8 +162,8 @@ class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
         if (ck::Is_NOT_Valid(InSubsystem))
         { return nullptr; }
 
-        auto World = InSubsystem.GetWorld();
-        if (ck::Is_NOT_Valid(World) || World.IsGameWorld() == false)
+        auto GameWorld = InSubsystem.GetWorld();
+        if (ck::Is_NOT_Valid(GameWorld) || GameWorld.IsGameWorld() == false)
         { return nullptr; }
 
         return World;
