@@ -199,10 +199,12 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
         }
     }
 
+    // Restoring the yaw limits creates an attribute-modifier entity; when the exit is the world being torn down (PIE stopped
+    // while operating) the ECS world refuses new entities, so the restore is skipped: there is no camera left to free.
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        if (ck::IsValid(_Camera))
+        if (ck::IsValid(_Camera) && _Camera.Get_CanCreateEntity())
         {
             _Camera.Request_Set_OrientationYawLimits(-180.0f, 180.0f);
             if (_Frozen)
