@@ -1,0 +1,1647 @@
+{
+	"material": "Pan_Steel_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Materials/Instances/Pan_Steel_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "d074a05476e726086960f6cd8fb77fef",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Cooking/Materials/Pan_Mars_M.Pan_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_ClearCoat",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 3,
+		"MakeMaterialAttributes": 1,
+		"ScalarParameter": 47,
+		"Time": 1,
+		"Transform": 2,
+		"TransformPosition": 1,
+		"VectorParameter": 7,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "How much oil is in the pan: pool size, drop and bead count.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Oil Amount",
+					"Group": "01 Driven",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Bubbling in the oil around the meat.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Sizzle",
+					"Group": "01 Driven",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Burnt-on residue built up over this cook; adds to the pan's Seasoning.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Fond",
+					"Group": "01 Driven",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Radius",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Meat Footprint",
+					"Group": "01 Driven",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Oil Trail",
+					"Group": "01 Driven",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Radius of the flat cooking base, cm.",
+				"props":
+				{
+					"DefaultValue": 9.5,
+					"SliderMin": 2,
+					"SliderMax": 40,
+					"ParameterName": "Base Radius",
+					"Group": "02 Pan Shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Inner radius at the rim, cm.",
+				"props":
+				{
+					"DefaultValue": 14.5,
+					"SliderMin": 2,
+					"SliderMax": 50,
+					"ParameterName": "Rim Radius",
+					"Group": "02 Pan Shape",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.620000,G=0.630000,B=0.640000,A=1.000000)",
+					"ParameterName": "Metal Color",
+					"Group": "03 Metal",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Metallic",
+					"Group": "03 Metal",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "Keep at or under 0.1: above that the engine fades reflection captures by the indirect light at the pixel (r.ReflectionEnvironmentLightmapMixing), which blackens chrome in a dark room.",
+				"props":
+				{
+					"DefaultValue": 0.10000000149011612,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "03 Metal",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "Lathe rings per cm of radius.",
+				"props":
+				{
+					"DefaultValue": 9,
+					"SliderMax": 40,
+					"ParameterName": "Ring Frequency",
+					"Group": "03 Metal",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 0.035000000149011612,
+					"SliderMax": 0.5,
+					"ParameterName": "Ring Strength",
+					"Group": "03 Metal",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"desc": "The pan's permanent burnt-on patina. Thin it bronzes the steel, thick it is a dark matte skin.",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"SliderMax": 1.5,
+					"ParameterName": "Seasoning",
+					"Group": "04 Seasoning",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"desc": "Radius the patina covers, cm.",
+				"props":
+				{
+					"DefaultValue": 9.1999998092651367,
+					"SliderMax": 40,
+					"ParameterName": "Seasoning Radius",
+					"Group": "04 Seasoning",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"desc": "How ragged the patina's outline is.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 1.5,
+					"ParameterName": "Seasoning Edge Breakup",
+					"Group": "04 Seasoning",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"desc": "Concentric lighter / darker rings in the patina.",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 1,
+					"ParameterName": "Scorch Bands",
+					"Group": "04 Seasoning",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"desc": "Small black burnt spots.",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Carbon Specks",
+					"Group": "04 Seasoning",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 17,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"desc": "Tint a thin patina multiplies onto the steel.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.800000,G=0.500000,B=0.220000,A=1.000000)",
+					"ParameterName": "Seasoning Thin Color",
+					"Group": "04 Seasoning",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 18,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"desc": "Colour of the thick, opaque skin.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.050000,G=0.024000,B=0.012000,A=1.000000)",
+					"ParameterName": "Seasoning Thick Color",
+					"Group": "04 Seasoning",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"desc": "Roughness of the thick skin. Higher is more matte, so the oil's gloss stands out more.",
+				"props":
+				{
+					"DefaultValue": 0.25999999046325684,
+					"SliderMax": 1,
+					"ParameterName": "Seasoning Roughness",
+					"Group": "04 Seasoning",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"desc": "Metallic of the thick skin.",
+				"props":
+				{
+					"DefaultValue": 0.10000000149011612,
+					"SliderMax": 1,
+					"ParameterName": "Seasoning Metallic",
+					"Group": "04 Seasoning",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 21,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_5",
+				"desc": "What the film does to the surface under it.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.740000,B=0.320000,A=1.000000)",
+					"ParameterName": "Oil Tint",
+					"Group": "05 Oil Look",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"props":
+				{
+					"DefaultValue": 0.039999999105930328,
+					"SliderMax": 0.5,
+					"ParameterName": "Oil Roughness",
+					"Group": "05 Oil Look",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"desc": "Clear coat strength of the oil.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Oil Coat",
+					"Group": "05 Oil Look",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"desc": "How far the pool's surface flattens to level.",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"SliderMax": 1,
+					"ParameterName": "Oil Level",
+					"Group": "05 Oil Look",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 25,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_6",
+				"desc": "The oil's own amber.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.140000,G=0.055000,B=0.008000,A=1.000000)",
+					"ParameterName": "Oil Body",
+					"Group": "05 Oil Look",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"desc": "How much the pool shows its own amber instead of the surface under it. 0 is clear oil, which on bare chrome is almost invisible.",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 1,
+					"ParameterName": "Oil Opacity",
+					"Group": "05 Oil Look",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"desc": "Darkening of the line where the pool meets the pan.",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 1,
+					"ParameterName": "Oil Edge",
+					"Group": "05 Oil Look",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 28,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_21",
+				"desc": "Centre puddle radius at Oil Amount 1, cm. About 1.1 x the cube's half extent so the puddle stays close to the meat's pool.",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"SliderMax": 20,
+					"ParameterName": "Pool Radius",
+					"Group": "06 Oil Pool",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 29,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_22",
+				"desc": "Oil showing around the meat footprint at Oil Amount 1, cm (0.6 x the cube's half extent: the pool is just wider than the cube).",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"SliderMax": 6,
+					"ParameterName": "Pool Margin",
+					"Group": "06 Oil Pool",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_23",
+				"desc": "How softly the puddle and the meat's blob merge, cm.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 6,
+					"ParameterName": "Pool Blend",
+					"Group": "06 Oil Pool",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 31,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_24",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMin": 0.019999999552965164,
+					"SliderMax": 2,
+					"ParameterName": "Pool Edge Softness",
+					"Group": "06 Oil Pool",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 32,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_25",
+				"desc": "Irregularity of the pool outline, cm.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 3,
+					"ParameterName": "Pool Wobble",
+					"Group": "06 Oil Pool",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 33,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_26",
+				"desc": "Normal tilt at the pool edge.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 2,
+					"ParameterName": "Meniscus",
+					"Group": "06 Oil Pool",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 34,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_27",
+				"desc": "Lanes around the pan the running drops use.",
+				"props":
+				{
+					"DefaultValue": 26,
+					"SliderMin": 3,
+					"SliderMax": 80,
+					"ParameterName": "Drop Columns",
+					"Group": "07 Oil Drops",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 35,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_28",
+				"desc": "Spacing of drops down a lane, cm.",
+				"props":
+				{
+					"DefaultValue": 3.5,
+					"SliderMin": 0.5,
+					"SliderMax": 12,
+					"ParameterName": "Drop Row Length",
+					"Group": "07 Oil Drops",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 36,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_29",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Drop Density",
+					"Group": "07 Oil Drops",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 37,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_30",
+				"desc": "Drop radius, cm.",
+				"props":
+				{
+					"DefaultValue": 0.2199999988079071,
+					"SliderMin": 0.019999999552965164,
+					"SliderMax": 1,
+					"ParameterName": "Drop Size",
+					"Group": "07 Oil Drops",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 38,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_31",
+				"desc": "cm per second. Not for runtime driving: changing it shifts every drop.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 6,
+					"ParameterName": "Drop Speed",
+					"Group": "07 Oil Drops",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 39,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_32",
+				"desc": "Length of the wet streak behind a drop, cm.",
+				"props":
+				{
+					"DefaultValue": 1.6000000238418579,
+					"SliderMax": 6,
+					"ParameterName": "Drop Trail",
+					"Group": "07 Oil Drops",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 40,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_33",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"SliderMax": 3,
+					"ParameterName": "Drop Normal",
+					"Group": "07 Oil Drops",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 41,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_34",
+				"desc": "Spacing of the still beads, cm.",
+				"props":
+				{
+					"DefaultValue": 1.1000000238418579,
+					"SliderMin": 0.20000000298023224,
+					"SliderMax": 5,
+					"ParameterName": "Bead Cell",
+					"Group": "08 Oil Beads",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 42,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_35",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Bead Density",
+					"Group": "08 Oil Beads",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 43,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_36",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Bead Size",
+					"Group": "08 Oil Beads",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 44,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_37",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 3,
+					"ParameterName": "Bead Normal",
+					"Group": "08 Oil Beads",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 45,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_38",
+				"desc": "Share of the simmer cells alive at Sizzle 1. The whole oil film bubbles; Sizzle scales the count and the rate.",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Simmer Density",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 46,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_39",
+				"desc": "Width of the band around the meat that bubbles harder, cm.",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 6,
+					"ParameterName": "Simmer Width",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 47,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_40",
+				"desc": "Extra bubbling in the band around the meat.",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 2,
+					"ParameterName": "Simmer Near Meat",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 48,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_41",
+				"desc": "Bubble spacing, cm (the largest bead radius is 0.3 x this).",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 3,
+					"ParameterName": "Simmer Cell",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 49,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_42",
+				"desc": "Bubble cycles per second at Sizzle 0.5 (Sizzle 1 runs 1.25x).",
+				"props":
+				{
+					"DefaultValue": 2.2000000476837158,
+					"SliderMax": 10,
+					"ParameterName": "Simmer Rate",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 50,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_43",
+				"desc": "Dome tilt of a bead: where its highlight lands.",
+				"props":
+				{
+					"DefaultValue": 1.3999999761581421,
+					"SliderMax": 3,
+					"ParameterName": "Simmer Strength",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 51,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_44",
+				"desc": "Dark outline of a bead.",
+				"props":
+				{
+					"DefaultValue": 0.75,
+					"SliderMax": 1,
+					"ParameterName": "Simmer Rim Darken",
+					"Group": "09 Oil Simmer",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 52,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_45",
+				"desc": "Darkening under the meat (stands in for its reflection).",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Contact Shadow",
+					"Group": "10 Contact",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 53,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_46",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 6,
+					"ParameterName": "Contact Softness",
+					"Group": "10 Contact",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 54,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 55,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 54,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 56,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 57,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 56,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_World",
+					"TransformType": "TRANSFORM_Local"
+				}
+			},
+			{
+				"id": 58,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 59,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 55,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "T",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Meat",
+						"node": 3,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 3,
+						"name": "Trail",
+						"node": 4,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 4,
+						"name": "OilAmount",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Sizzle",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "BaseR",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "PoolR",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Margin",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Blend",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "EdgeSoft",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Wobble",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "Meniscus",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "SimW",
+						"node": 46,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "SimCell",
+						"node": 48,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "SimRate",
+						"node": 49,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "SimStrength",
+						"node": 50,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SimDensity",
+						"node": 45,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "SimNear",
+						"node": 47,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Bubble",
+					"BubbleRim"
+				],
+				"props":
+				{
+					"Code": "struct FPanPool\n{\n    float2 MeatPos; float MeatR; float2 TrailPos;\n    float Amount; float PoolR; float Margin; float Blend; float Wobble; float BaseR;\n\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float Noise(float2 p)\n    {\n        float2 i = floor(p);\n        float2 f = frac(p);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),\n                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);\n    }\n    // signed distance to the pool edge (cm, negative inside)\n    float Sdf(float2 p)\n    {\n        float d = length(p) - PoolR * sqrt(saturate(Amount));\n        if (MeatR > 0.01)\n        {\n            float2 pa = p - MeatPos;\n            float2 ba = TrailPos - MeatPos;\n            float h = saturate(dot(pa, ba) / max(dot(ba, ba), 1e-4));\n            float dm = length(pa - ba * h) - (MeatR + Margin * Amount);\n            float k = max(Blend, 1e-3);\n            float t = saturate(0.5 + 0.5 * (dm - d) / k);\n            d = lerp(dm, d, t) - k * t * (1.0 - t);\n        }\n        d += (Noise(p * 0.9) - 0.5) * Wobble;\n        return max(d, length(p) - BaseR - 0.6);          // the pool cannot climb the wall\n    }\n};\nFPanPool pool;\npool.MeatPos = Meat.xy; pool.MeatR = Meat.z; pool.TrailPos = Trail.xy;\npool.Amount = OilAmount; pool.PoolR = PoolR; pool.Margin = Margin; pool.Blend = Blend; pool.Wobble = Wobble; pool.BaseR = BaseR;\n\nfloat2 p = P.xy;\nfloat d = pool.Sdf(p);\nfloat on = saturate(OilAmount * 20.0);\nfloat soft = max(EdgeSoft, 1e-3);\nfloat film = (1.0 - smoothstep(-soft, 0.0, d)) * on;\n\n// meniscus: the film's edge leans outward, which is where the highlight catches\nfloat2 e = float2(0.06, 0.0);\nfloat2 g = float2(pool.Sdf(p + e.xy) - pool.Sdf(p - e.xy), pool.Sdf(p + e.yx) - pool.Sdf(p - e.yx));\ng /= max(length(g), 1e-4);\nfloat rim = smoothstep(-soft * 2.5, -soft * 0.5, d) * (1.0 - smoothstep(-soft * 0.5, soft * 0.5, d)) * on;\nfloat2 nxy = g * rim * Meniscus;\n\n// simmer: small domes that swell and pop wherever there is oil. Sizzle sets how many cells are alive and speeds\n// them up; a band around the meat (Simmer Width) bubbles harder; nothing bubbles under the meat.\nfloat bubble = 0.0;\nfloat bubbleRim = 0.0;\nif (Sizzle > 0.001)\n{\n    float nearMeat = 0.0;\n    float under = 1.0;\n    if (Meat.z > 0.01)\n    {\n        float dm = length(p - Meat.xy) - Meat.z;\n        nearMeat = smoothstep(-0.4, 0.0, dm) * (1.0 - smoothstep(SimW * 0.4, SimW, dm));\n        under = smoothstep(-0.5, 0.0, dm);\n    }\n    float gate = film * under * saturate(0.75 + 0.25 * Sizzle + SimNear * nearMeat);\n    float2 gc = p / SimCell;\n    float2 id = floor(gc);\n    float r1 = pool.Hash(id + 3.7);\n    float ph = T * SimRate * (0.75 + 0.5 * saturate(Sizzle)) * (0.6 + 0.8 * r1) + pool.Hash(id + 11.3);\n    float cyc = floor(ph);\n    ph -= cyc;\n    float2 c = 0.3 + 0.4 * float2(pool.Hash(id + cyc * 1.37), pool.Hash(id.yx + cyc * 2.11 + 5.0));\n    float alive = step(pool.Hash(id + cyc * 0.73 + 9.0), saturate(Sizzle * SimDensity * (1.0 + SimNear * nearMeat)));\n    float rad = max(SimCell * 0.3 * (0.4 + 0.6 * r1) * sqrt(ph), 1e-3);\n    float2 dv = (frac(gc) - c) * SimCell;\n    float dist = length(dv);\n    float x = saturate(dist / rad);                                   // 0 at the dome's top, 1 at its foot\n    float live = (1.0 - smoothstep(0.8, 1.0, ph)) * alive * gate;\n    bubble = smoothstep(0.0, 0.2, 1.0 - x) * live;\n    bubbleRim = smoothstep(0.45, 0.8, x) * (1.0 - smoothstep(0.92, 1.0, x)) * live;   // the dark bead outline\n    nxy += dv / max(dist, 1e-4) * x * bubble * SimStrength;\n}\nBubbleRim = bubbleRim;\nBubble = bubble;\nreturn float3(nxy, film);",
+					"Description": "PanPool: oil pool, meniscus, simmer"
+				}
+			},
+			{
+				"id": 60,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 55,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 57,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "T",
+						"node": 58,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "OilAmount",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "BaseR",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "RimR",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Cols",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "RowLen",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Density",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Size",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Speed",
+						"node": 38,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Trail",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "BeadCell",
+						"node": 41,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "BeadDensity",
+						"node": 42,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "BeadSize",
+						"node": 43,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "BeadNormal",
+						"node": 44,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "struct FPanDrops\n{\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float2 Hash2(float2 p)\n    {\n        return frac(sin(float2(dot(p, float2(127.1, 311.7)), dot(p, float2(269.5, 183.3)))) * 43758.5453);\n    }\n    // one layer of still beads on a jittered grid: xy = normal tilt, z = mask\n    float3 Beads(float2 p, float cell, float density, float size)\n    {\n        float2 g = p / cell;\n        float2 id = floor(g);\n        float2 k = Hash2(id + cell * 13.0);\n        float2 c = 0.32 + 0.36 * Hash2(id + 5.3);\n        float rad = max(cell * 0.3 * size * (0.35 + 0.65 * k.y), 1e-3);\n        float2 dv = (frac(g) - c) * cell;\n        float dist = length(dv);\n        float m = smoothstep(0.0, 0.3, saturate(1.0 - dist / rad)) * step(k.x, density);\n        return float3(dv / max(dist, 1e-4) * (dist / rad) * m, m);\n    }\n};\nFPanDrops o;\nfloat2 p = P.xy;\nfloat r = length(p);\nfloat2 rdir = p / max(r, 1e-3);\nfloat2 tdir = float2(-rdir.y, rdir.x);\nfloat up = saturate(normalize(N).z * 3.0);\nfloat amount = saturate(OilAmount * 3.0);\nfloat wall = smoothstep(BaseR - 1.0, BaseR + 1.5, r) * (1.0 - smoothstep(RimR - 1.2, RimR - 0.3, r)) * up;\n\n// running drops: a polar grid that scrolls toward the centre, one drop per live cell. Downhill is -r.\nfloat cols = max(round(Cols), 3.0);\nfloat x = (atan2(p.y, p.x) / 6.2831853 + 0.5) * cols;\nfloat ci = min(floor(x), cols - 1.0);\nfloat fx = x - ci;\nfloat c1 = o.Hash(float2(ci, 1.7));\nfloat speed = Speed * (0.45 + 1.1 * c1);\nfloat y = (r + T * speed) / RowLen + o.Hash(float2(ci, 9.1)) * 31.0;\nfloat ri = floor(y);\nfloat fy = y - ri;\nfloat2 k = o.Hash2(float2(ci, ri));\nfloat live = step(k.x, Density * amount);\nfloat cx = 0.5 + (k.y - 0.5) * 0.4;\nfloat cy = 0.32 + 0.14 * sin(T * speed / RowLen * 3.0 + k.x * 6.2831853);     // stop-and-go, never uphill\nfloat2 dv = float2((fx - cx) * 6.2831853 * r / cols, (fy - cy) * RowLen);       // cm; +y is uphill\nfloat size = max(Size * (0.6 + 0.8 * k.y), 1e-3);\nfloat2 dh = float2(dv.x, dv.y > 0.0 ? dv.y * 0.55 : dv.y);                      // teardrop: longer uphill\nfloat dist = length(dh);\nfloat head = smoothstep(0.0, 0.25, saturate(1.0 - dist / size)) * live;\nfloat2 nt = dh / max(dist, 1e-4) * (dist / size) * head;\nfloat along = saturate(dv.y / max(Trail, 1e-3));\nfloat tw = size * 0.5 * (1.0 - 0.7 * along);\nfloat streak = (1.0 - smoothstep(tw * 0.4, tw, abs(dv.x))) * step(0.0, dv.y) * (1.0 - along)\n             * (1.0 - smoothstep(0.85, 1.0, fy)) * live;\nnt.x += sign(dv.x) * smoothstep(0.0, tw, abs(dv.x)) * streak * 0.5;\nfloat run = max(head, streak * 0.7) * wall;\nfloat2 nxy = (tdir * nt.x + rdir * nt.y) * wall;\n\n// still beads, two sizes\nfloat still = (1.0 - smoothstep(RimR - 1.0, RimR - 0.2, r)) * up;\nfloat3 b1 = o.Beads(p, BeadCell, BeadDensity * amount, BeadSize);\nfloat3 b2 = o.Beads(p + 3.7, BeadCell * 0.46, BeadDensity * amount * 0.5, BeadSize);\nfloat3 beads = (b1.z > b2.z ? b1 : b2) * still;\nnxy += beads.xy * BeadNormal;\nreturn float3(nxy, max(run, beads.z));",
+					"Description": "PanDrops: running drops + beads"
+				}
+			},
+			{
+				"id": 61,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 55,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 57,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Pool",
+						"node": 59,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Bubble",
+						"node": 59,
+						"output": 1
+					},
+					{
+						"index": 4,
+						"name": "BubbleRim",
+						"node": 59,
+						"output": 2
+					},
+					{
+						"index": 5,
+						"name": "SimRimDark",
+						"node": 51,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Drops",
+						"node": 60,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "MetalColor",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "Metallic",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Rough",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "RingFreq",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "RingStrength",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "Fond",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "Seasoning",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "SeasonRadius",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "SeasonBreakup",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "SeasonBands",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SeasonSpecks",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "SeasonThin",
+						"node": 17,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 19,
+						"name": "SeasonThick",
+						"node": 18,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 20,
+						"name": "SeasonRough",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "SeasonMetal",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "OilTint",
+						"node": 21,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 23,
+						"name": "OilBody",
+						"node": 25,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 24,
+						"name": "OilOpacity",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "OilEdge",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "OilCoat",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "OilLevel",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "DropNormal",
+						"node": 40,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "Meat",
+						"node": 3,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 30,
+						"name": "Contact",
+						"node": 52,
+						"output": 0
+					},
+					{
+						"index": 31,
+						"name": "ContactSoft",
+						"node": 53,
+						"output": 0
+					},
+					{
+						"index": 32,
+						"name": "RimR",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"OutRoughness",
+					"OutMetallic",
+					"OutCoat",
+					"OutNormal"
+				],
+				"props":
+				{
+					"Code": "struct FPanSurf\n{\n    float Hash1(float x) { return frac(sin(x * 127.1) * 43758.5453); }\n    float Noise1(float x)\n    {\n        float i = floor(x);\n        float f = frac(x);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(Hash1(i), Hash1(i + 1.0), f);\n    }\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float Noise(float2 p)\n    {\n        float2 i = floor(p);\n        float2 f = frac(p);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),\n                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);\n    }\n};\nFPanSurf s;\nfloat2 p = P.xy;\nfloat r = length(p);\nfloat3 n = normalize(N);\nfloat inside = saturate(n.z * 3.0) * (1.0 - smoothstep(RimR + 0.1, RimR + 0.4, r));   // the cooking surface\n\n// lathe rings: roughness streaks and a faint radial tilt, faded out before they alias\nfloat rf = r * RingFreq;\nfloat ring = (s.Noise1(rf) - 0.5) + 0.5 * (s.Noise1(rf * 3.1 + 7.0) - 0.5);\nring *= saturate(1.0 - fwidth(rf) * 1.5);\nfloat rough = Rough + ring * RingStrength;\n\n// seasoning: burnt-on oil. Thin, it bronzes the steel; thick, it is a near-black matte skin. Fond adds to it.\nfloat amount = Seasoning + Fond;\nfloat blotch = s.Noise(p * 0.3) * 0.55 + s.Noise(p * 0.95 + 4.0) * 0.3 + s.Noise(p * 2.7 + 9.0) * 0.15;\nfloat bands = s.Noise1(r * 1.7 + 3.0 + blotch * 2.5) * 0.6 + s.Noise1(r * 4.3 + blotch * 4.0) * 0.4;   // wobbly scorch rings\nfloat reach = r + (blotch - 0.5) * SeasonRadius * 0.7 * SeasonBreakup;\nfloat cover = (1.0 - smoothstep(SeasonRadius * 0.6, SeasonRadius * 1.15, reach)) * inside;\nfloat thick = cover * lerp(0.6, 1.3, blotch) * lerp(1.0 - 0.6 * SeasonBands, 1.0, bands) * amount;\nfloat bronze = smoothstep(0.0, 0.25, thick);\nfloat skin = smoothstep(0.2, 0.7, thick);\nfloat speck = smoothstep(0.8, 0.9, s.Noise(p * 5.5 + 2.0)) * cover * saturate(amount * 2.0) * SeasonSpecks;\nskin = saturate(max(skin, speck));\nfloat3 col = lerp(MetalColor * lerp(1.0, SeasonThin, bronze), SeasonThick, skin);\nfloat metal = lerp(Metallic, SeasonMetal, skin);\nrough = lerp(rough + 0.08 * bronze, SeasonRough, skin);\n\n// oil: a clear film. It wets and warms what is under it, carries a darker line at its edge, and is the clear coat.\nfloat film = Pool.z * inside;\nfloat drops = Drops.z * (1.0 - film) * inside;\nfloat wet = saturate(film + drops * 0.6);\ncol *= lerp(1.0, OilTint, wet);\nfloat body = film * OilOpacity;                                // the oil's own amber hides part of what is under it\ncol = lerp(col, OilBody, body);\nmetal = lerp(metal, 0.0, body);\ncol *= 1.0 - film * (1.0 - film) * 4.0 * OilEdge;              // the meniscus is thicker, so darker\nrough = lerp(rough, rough * 0.55, wet);\n\n// simmer beads: a dark outline (the bead's side refracts the dark pan) around a clear dome that keeps the\n// highlight; the dome's tilt comes in through Pool.xy\ncol *= 1.0 - saturate(BubbleRim * SimRimDark) * inside;\ncol = lerp(col, col * OilTint, Bubble * inside * 0.5);\n\n// the meat's dark reflection, which the reflection capture cannot give\nif (Meat.z > 0.01)\n{\n    col *= 1.0 - (1.0 - smoothstep(Meat.z * 0.6, Meat.z + ContactSoft, length(p - Meat.xy))) * Contact * inside;\n}\n\nn.xy += p / max(r, 1e-3) * ring * RingStrength * 0.25 * (1.0 - film);\nn = lerp(n, float3(0.0, 0.0, 1.0), film * OilLevel);                                   // a liquid lies level\nn.xy += (Pool.xy + Drops.xy * DropNormal * (1.0 - film)) * inside;\n\nOutRoughness = saturate(rough);\nOutMetallic = saturate(metal);\nOutCoat = saturate(max(max(film, drops), Bubble * inside)) * OilCoat;\nOutNormal = normalize(n);\nreturn col;",
+					"Description": "PanSurface: metal + seasoning + oil"
+				}
+			},
+			{
+				"id": 62,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 61,
+						"output": 4
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 63,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 61,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Metallic",
+						"node": 61,
+						"output": 2
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 61,
+						"output": 1
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 62,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "ClearCoat",
+						"node": 61,
+						"output": 3
+					},
+					{
+						"index": 13,
+						"name": "ClearCoatRoughness",
+						"node": 22,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 63,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Oil Amount",
+			"value": 1
+		},
+		{
+			"name": "Sizzle",
+			"value": 1
+		},
+		{
+			"name": "Fond",
+			"value": 0
+		},
+		{
+			"name": "Base Radius",
+			"value": 9.5
+		},
+		{
+			"name": "Rim Radius",
+			"value": 14.5
+		},
+		{
+			"name": "Metallic",
+			"value": 1
+		},
+		{
+			"name": "Roughness",
+			"value": 0.10000000149011612
+		},
+		{
+			"name": "Ring Frequency",
+			"value": 9
+		},
+		{
+			"name": "Ring Strength",
+			"value": 0.035000000149011612
+		},
+		{
+			"name": "Seasoning",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "Seasoning Radius",
+			"value": 9.1999998092651367
+		},
+		{
+			"name": "Seasoning Edge Breakup",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Scorch Bands",
+			"value": 0.25
+		},
+		{
+			"name": "Carbon Specks",
+			"value": 0.5
+		},
+		{
+			"name": "Seasoning Roughness",
+			"value": 0.25999999046325684
+		},
+		{
+			"name": "Seasoning Metallic",
+			"value": 0.10000000149011612
+		},
+		{
+			"name": "Oil Roughness",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Oil Coat",
+			"value": 1
+		},
+		{
+			"name": "Oil Level",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "Oil Opacity",
+			"value": 0.25
+		},
+		{
+			"name": "Oil Edge",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Pool Radius",
+			"value": 5.4266672134399414
+		},
+		{
+			"name": "Pool Margin",
+			"value": 1.6000000238418579
+		},
+		{
+			"name": "Pool Blend",
+			"value": 2
+		},
+		{
+			"name": "Pool Edge Softness",
+			"value": 0.25
+		},
+		{
+			"name": "Pool Wobble",
+			"value": 2.9855990409851074
+		},
+		{
+			"name": "Meniscus",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Drop Columns",
+			"value": 20.863998413085938
+		},
+		{
+			"name": "Drop Row Length",
+			"value": 3.5
+		},
+		{
+			"name": "Drop Density",
+			"value": 0.5
+		},
+		{
+			"name": "Drop Size",
+			"value": 0.2199999988079071
+		},
+		{
+			"name": "Drop Speed",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Drop Trail",
+			"value": 5.9247632026672363
+		},
+		{
+			"name": "Drop Normal",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "Bead Cell",
+			"value": 1.1000000238418579
+		},
+		{
+			"name": "Bead Density",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Bead Size",
+			"value": 0.5
+		},
+		{
+			"name": "Bead Normal",
+			"value": 1
+		},
+		{
+			"name": "Simmer Density",
+			"value": 0.5
+		},
+		{
+			"name": "Simmer Width",
+			"value": 1.6000000238418579
+		},
+		{
+			"name": "Simmer Near Meat",
+			"value": 0.5
+		},
+		{
+			"name": "Simmer Cell",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Simmer Rate",
+			"value": 2.2000000476837158
+		},
+		{
+			"name": "Simmer Strength",
+			"value": 1.3999999761581421
+		},
+		{
+			"name": "Simmer Rim Darken",
+			"value": 0.75
+		},
+		{
+			"name": "Contact Shadow",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Contact Softness",
+			"value": 0.80000001192092896
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Meat Footprint",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Oil Trail",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Metal Color",
+			"value": "RGBA(0.62, 0.63, 0.64, 1)"
+		},
+		{
+			"name": "Seasoning Thin Color",
+			"value": "RGBA(0.8, 0.5, 0.22, 1)"
+		},
+		{
+			"name": "Seasoning Thick Color",
+			"value": "RGBA(0.05, 0.024, 0.012, 1)"
+		},
+		{
+			"name": "Oil Tint",
+			"value": "RGBA(1, 0.74, 0.32, 1)"
+		},
+		{
+			"name": "Oil Body",
+			"value": "RGBA(0.14, 0.055, 0.008, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

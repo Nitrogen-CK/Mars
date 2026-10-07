@@ -1,0 +1,494 @@
+{
+	"materialFunction": "FoodCook_Mars_MF",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/FoodCook_Mars_MF",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "cd9adfa94c5e985c4fa7c530e67e121f",
+		"exporterVersion": 1
+	},
+	"description": "Mars food cook model: Sear XY (+X -X +Y -Y), Sear Z + Cook (+Z -Z Penetration OilCoat), Mask (R cook-first, B break-up, A edge), Cavity -> Cook (time, crust, burn, oil).",
+	"expressions":
+	{
+		"Constant": 1,
+		"Custom": 2,
+		"FunctionInput": 4,
+		"FunctionOutput": 1,
+		"ObjectLocalBounds": 1,
+		"ScalarParameter": 9,
+		"Transform": 1,
+		"TransformPosition": 1,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Sear value that reaches full browning time.",
+				"props":
+				{
+					"DefaultValue": 2,
+					"SliderMin": 0.5,
+					"SliderMax": 4,
+					"ParameterName": "Sear Range",
+					"Group": "04 Sear",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "How strictly a sear value stays on its own side. Lower blends around round shapes.",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 1,
+					"SliderMax": 16,
+					"ParameterName": "Face Sharpness",
+					"Group": "04 Sear",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Patchiness of the browning (mask B).",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1.5,
+					"ParameterName": "Crust Breakup",
+					"Group": "04 Sear",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Extra sear on edges (mask A).",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Edge Boost",
+					"Group": "04 Sear",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Centimetres the cooked band reaches in from the bounds at Penetration 1.",
+				"props":
+				{
+					"DefaultValue": 1.5,
+					"SliderMax": 6,
+					"ParameterName": "Band Depth",
+					"Group": "04 Sear",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Softness of the band's leading edge.",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 1,
+					"ParameterName": "Band Softness",
+					"Group": "04 Sear",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "Centimetres of irregularity on the band edge.",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 2,
+					"ParameterName": "Band Wobble",
+					"Group": "04 Sear",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "Browning time the cooked band shows.",
+				"props":
+				{
+					"DefaultValue": 0.23999999463558197,
+					"SliderMax": 0.5,
+					"ParameterName": "Band Ramp Position",
+					"Group": "04 Sear",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "How much later the crevices brown (cook-first = mask R x vertex cavity). 0 = everything browns together.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Crevice Lag",
+					"Group": "04 Sear",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 9,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_0",
+				"props":
+				{
+					"InputName": "Sear XY",
+					"Description": "Sear +X -X +Y -Y (0 raw, 1 crust, 2 burnt).",
+					"Id": "C8A65C1148EB9462BCA6219A3FF0B943",
+					"InputType": "FunctionInput_Vector4",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true
+				}
+			},
+			{
+				"id": 10,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_1",
+				"props":
+				{
+					"InputName": "Sear Z + Cook",
+					"Description": "Sear +Z -Z, Penetration, Oil Coat.",
+					"Id": "84DA79F8471361EC73C6ADB90C296B1F",
+					"InputType": "FunctionInput_Vector4",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 11,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_2",
+				"props":
+				{
+					"InputName": "Mask",
+					"Description": "R cook-first, G grain, B break-up, A edge.",
+					"Id": "D7E9C3CB42C8B7856AF1C69641558429",
+					"InputType": "FunctionInput_Vector4",
+					"PreviewValue": "(X=1.000000,Y=0.500000,Z=0.500000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 12,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_3",
+				"props":
+				{
+					"InputName": "Cavity",
+					"Description": "Vertex-colour cavity (1 open).",
+					"Id": "6B4A99BA43E075CC80AC77B77EE81DDB",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=1.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 13,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0"
+			},
+			{
+				"id": 14,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 15,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 14,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 16,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 17,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_World",
+					"TransformType": "TRANSFORM_Local"
+				}
+			},
+			{
+				"id": 18,
+				"class": "ObjectLocalBounds",
+				"name": "MaterialExpressionObjectLocalBounds_0",
+				"outputs": [
+					"Half Extents",
+					"Extents",
+					"Min",
+					"Max"
+				]
+			},
+			{
+				"id": 19,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "SearA",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "SearB",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "DbgA",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "DbgB",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "UseDebug",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Mask",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Cavity",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Lag",
+						"node": 8,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"SearZ"
+				],
+				"props":
+				{
+					"Code": "float4 sa = lerp(SearA, DbgA, UseDebug);\nfloat4 sb = lerp(SearB, DbgB, UseDebug);\nfloat cf = saturate(Mask.r * Cavity);\nfloat k = lerp(1.0 - saturate(Lag), 1.0, cf);\nSearZ = float4(sb.xy * k, sb.z, sb.w);\nreturn sa * k;",
+					"OutputType": "CMOT_Float4",
+					"Description": "FoodCookFirst: crevices sear later"
+				}
+			},
+			{
+				"id": 20,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "N",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "BMin",
+						"node": 18,
+						"output": 2,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "BMax",
+						"node": 18,
+						"output": 3,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "SearA",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "SearB",
+						"node": 19,
+						"output": 1
+					},
+					{
+						"index": 6,
+						"name": "DbgA",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "DbgB",
+						"node": 19,
+						"output": 1
+					},
+					{
+						"index": 8,
+						"name": "UseDebug",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Mask",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Sharp",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Breakup",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "EdgeBoost",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "BandDepth",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "BandSoft",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "BandWobble",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "BandRamp",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "SearRange",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float4 sa = lerp(SearA, DbgA, UseDebug);\nfloat4 sb = lerp(SearB, DbgB, UseDebug);\nfloat3 he = max((BMax - BMin) * 0.5, 1e-3);\nfloat3 q = (P - (BMax + BMin) * 0.5) / he;\nfloat3 n = normalize(N);\n\n// how much each seared axis faces this pixel (per-face on a cube, a smooth blend on round shapes)\nfloat3 wp = pow(saturate(n), Sharp);\nfloat3 wn = pow(saturate(-n), Sharp);\nfloat wsum = wp.x + wp.y + wp.z + wn.x + wn.y + wn.z + 1e-5;\nfloat face = (wp.x * sa.x + wn.x * sa.y + wp.y * sa.z + wn.y * sa.w + wp.z * sb.x + wn.z * sb.y) / wsum;\n\n// the cooked band creeping in from every seared face (distance to that face, cm)\nfloat wobble = (Mask.b - 0.5) * BandWobble;\nfloat3 dpos = (1.0 - q) * he + wobble;\nfloat3 dneg = (1.0 + q) * he + wobble;\nfloat s6[6] = { sa.x, sa.y, sa.z, sa.w, sb.x, sb.y };\nfloat d6[6] = { dpos.x, dneg.x, dpos.y, dneg.y, dpos.z, dneg.z };\nfloat reach = BandDepth * sb.z;\nfloat band = 0.0;\nfor (int i = 0; i < 6; i++)\n{\n    float depth = max(saturate(s6[i]) * reach, 1e-3);\n    band = max(band, (1.0 - smoothstep(depth * (1.0 - BandSoft), depth, d6[i])) * saturate(s6[i] * 6.0));\n}\nband *= saturate(reach * 20.0);\n\n// the crust comes up in patches and a little faster on the edges\nfloat sear = face * (1.0 + Mask.a * EdgeBoost);\nsear = max(0.0, sear + (Mask.b - 0.5) * Breakup * saturate(sear * 3.0));\nfloat u = max(sear / max(SearRange, 1e-3), band * BandRamp);\nreturn float4(saturate(u), smoothstep(0.2, 0.9, sear), saturate((sear - 1.25) / 0.6), sb.w);",
+					"OutputType": "CMOT_Float4",
+					"Description": "MeatCook (mars_cooking_hlsl): sear -> time, crust, burn, oil"
+				}
+			},
+			{
+				"id": 21,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_0",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 20,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "Cook",
+					"Description": "Browning time, crust, burn, oil coat.",
+					"Id": "F9517EC64EB969908DE58CAF6321C81B"
+				}
+			}
+		]
+	}
+}

@@ -1,0 +1,229 @@
+{
+	"materialFunction": "OilCoat_Mars_MF",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/OilCoat_Mars_MF",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "1de67c70038f799d159b694e6a830118",
+		"exporterVersion": 1
+	},
+	"description": "Shared oil / glaze coat of the Mars food masters: clear coat amount, coat roughness and the roughness under the coat.",
+	"expressions":
+	{
+		"Custom": 1,
+		"FunctionInput": 3,
+		"FunctionOutput": 3,
+		"ScalarParameter": 4
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Clear coat at oil 1 (oil, glaze and raw wetness all come through here).",
+				"props":
+				{
+					"DefaultValue": 0.80000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Oil Coat Strength",
+					"Group": "10 Oil Coat (shared)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Roughness of the coat.",
+				"props":
+				{
+					"DefaultValue": 0.11999999731779099,
+					"SliderMax": 0.5,
+					"ParameterName": "Oil Coat Roughness",
+					"Group": "10 Oil Coat (shared)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "How patchy the coat sits (the Breakup mask).",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1,
+					"ParameterName": "Oil Coat Breakup",
+					"Group": "10 Oil Coat (shared)",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Roughness multiplier under a full coat: oil wets and glosses what it covers.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Oil Base Gloss",
+					"Group": "10 Oil Coat (shared)",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_0",
+				"props":
+				{
+					"InputName": "Oil",
+					"Description": "Oil / glaze / wetness amount 0..1.",
+					"Id": "00CD22064C8C5C2875684AB4576B7CF4",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true
+				}
+			},
+			{
+				"id": 5,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_1",
+				"props":
+				{
+					"InputName": "Breakup",
+					"Description": "Coat break-up mask (mask B), 0.5 neutral.",
+					"Id": "5680F3A94A3BF52EB942028B19FABB79",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.500000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 6,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_2",
+				"props":
+				{
+					"InputName": "Roughness In",
+					"Description": "Surface roughness before the coat.",
+					"Id": "FEDED2BE4404254EE446F38733743893",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.500000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 7,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Oil",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Breakup",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "RoughIn",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Strength",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "CoatBreakup",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "BaseGloss",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"RoughOut"
+				],
+				"props":
+				{
+					"Code": "float patchy = lerp(1.0, saturate(Breakup.x * 1.6), saturate(CoatBreakup));\nfloat coat = saturate(Oil.x) * patchy;\nRoughOut = saturate(lerp(RoughIn.x, RoughIn.x * BaseGloss, coat));\nreturn saturate(coat * Strength);",
+					"OutputType": "CMOT_Float1",
+					"Description": "OilCoat: oil -> clear coat, gloss under it"
+				}
+			},
+			{
+				"id": 8,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_0",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 7,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "ClearCoat",
+					"Id": "78FEB603401F70ABC3297DBE1BADB16A"
+				}
+			},
+			{
+				"id": 9,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_1",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 1,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "ClearCoatRoughness",
+					"SortPriority": 1,
+					"Id": "16C501FE4616FE92772850AC9C03555F"
+				}
+			},
+			{
+				"id": 10,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_2",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 7,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"OutputName": "Roughness Out",
+					"SortPriority": 2,
+					"Id": "52D465E94B559CE0B72DF8B89C0CEDE0"
+				}
+			}
+		]
+	}
+}

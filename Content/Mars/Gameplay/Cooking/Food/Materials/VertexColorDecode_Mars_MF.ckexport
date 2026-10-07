@@ -1,0 +1,160 @@
+{
+	"materialFunction": "VertexColorDecode_Mars_MF",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/VertexColorDecode_Mars_MF",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "c129118b3e35df0cdd559c7ce149d0d8",
+		"exporterVersion": 1
+	},
+	"description": "Mars food vertex colours: RGB painted albedo (as the FBX holds it) and A cavity. sRGB Decode 1 treats RGB as sRGB-encoded (pow 2.2); the food exports are linear, so callers pass 0.",
+	"expressions":
+	{
+		"Custom": 1,
+		"FunctionInput": 2,
+		"FunctionOutput": 3,
+		"VertexColor": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_0",
+				"props":
+				{
+					"InputName": "sRGB Decode",
+					"Description": "1 = decode sRGB-encoded vertex colour.",
+					"Id": "C55A2EA14761FE09769A2D9FC158CF6E",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true
+				}
+			},
+			{
+				"id": 1,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_1",
+				"props":
+				{
+					"InputName": "Cavity AO",
+					"Description": "How much the cavity (alpha) occludes.",
+					"Id": "B9E75C0447675F39633A9DB2E51482A2",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.400000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 3,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VC",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Cavity",
+						"node": 2,
+						"output": 4,
+						"mask": "a"
+					},
+					{
+						"index": 2,
+						"name": "SrgbDecode",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "CavityAO",
+						"node": 1,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"AO"
+				],
+				"props":
+				{
+					"Code": "float3 c = saturate(VC);\nAO = lerp(1.0, saturate(Cavity), saturate(CavityAO));\nreturn lerp(c, pow(max(c, 1e-6), 2.2), saturate(SrgbDecode));",
+					"Description": "VertexDecode: vertex colour -> base, cavity -> AO"
+				}
+			},
+			{
+				"id": 4,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_0",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "Base Colour",
+					"Id": "C605917B453437CC3F774EA537C97CE1"
+				}
+			},
+			{
+				"id": 5,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_1",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 3,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"OutputName": "AO",
+					"SortPriority": 1,
+					"Id": "F210CCED4B324F998B87D792DD9E7CBE"
+				}
+			},
+			{
+				"id": 6,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_2",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 2,
+						"output": 4,
+						"mask": "a"
+					}
+				],
+				"props":
+				{
+					"OutputName": "Cavity",
+					"SortPriority": 2,
+					"Id": "C9FD44B0460AFB3827CE3DA9146BFF97"
+				}
+			}
+		]
+	}
+}

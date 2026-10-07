@@ -1,0 +1,218 @@
+{
+	"material": "SwatchTint50_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Lookdev/SwatchTint50_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "0a733df5ca919506fd7681b01360e5af",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/Accent_Mars_M.Accent_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"MakeMaterialAttributes": 1,
+		"MaterialFunctionCall": 1,
+		"Multiply": 1,
+		"ScalarParameter": 4,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "1 = treat the vertex colour as sRGB-encoded and decode it (pow 2.2). The FBX importer hands the material exactly the values in the FBX, and the food FBXs are exported with linear colours, so 0 should be right; the lookdev swatch row checks it.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Vertex Colour sRGB",
+					"Group": "01 Base Colour",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Multiplier on the vertex colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint",
+					"Group": "01 Base Colour",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Ambient occlusion from the vertex-colour cavity (alpha).",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Cavity AO",
+					"Group": "01 Base Colour",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "02 Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "02 Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 5,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "sRGB Decode (S)",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cavity AO (S)",
+						"node": 2,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"AO",
+					"Cavity"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/VertexColorDecode_Mars_MF.VertexColorDecode_Mars_MF"
+				}
+			},
+			{
+				"id": 6,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 7,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Specular",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "AmbientOcclusion",
+						"node": 5,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 7,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Vertex Colour sRGB",
+			"value": 0
+		},
+		{
+			"name": "Cavity AO",
+			"value": 0.5
+		},
+		{
+			"name": "Roughness",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Specular",
+			"value": 0.5
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(0.5, 0.5, 0.5, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

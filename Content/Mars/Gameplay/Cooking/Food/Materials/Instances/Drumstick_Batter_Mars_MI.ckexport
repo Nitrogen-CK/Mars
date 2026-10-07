@@ -1,0 +1,788 @@
+{
+	"material": "Drumstick_Batter_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/Drumstick_Batter_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "8312735aea48fb90670616bd26025c5e",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/Batter_Mars_M.Batter_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_ClearCoat",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 2,
+		"MakeMaterialAttributes": 1,
+		"MaterialFunctionCall": 2,
+		"ScalarParameter": 13,
+		"TextureCoordinate": 1,
+		"TextureSampleParameter2D": 2,
+		"VectorParameter": 6
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Only Oil Coat (alpha) is read here. Custom Primitive Data 4-7.",
+				"outputs": [
+					"RGB",
+					"+Z",
+					"-Z",
+					"Penetration",
+					"Oil Coat",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Sear Z + Cook",
+					"Group": "01 Driven (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "Fry (blue) 0 raw batter, 1 golden, 2 burnt. Custom Primitive Data 8-11.",
+				"outputs": [
+					"RGB",
+					"Glaze",
+					"Shape",
+					"Fry",
+					"Wet",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 8,
+					"ParameterName": "Finish",
+					"Group": "01 Driven (Custom Primitive Data)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "1 = ignore Custom Primitive Data and use the vectors below.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Debug Use Sliders",
+					"Group": "02 Debug Override",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 3,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"+Z",
+					"-Z",
+					"Penetration",
+					"Oil Coat",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
+					"ParameterName": "Debug Sear Z + Cook",
+					"Group": "02 Debug Override",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 4,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"outputs": [
+					"RGB",
+					"Glaze",
+					"Shape",
+					"Fry",
+					"Wet",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
+					"ParameterName": "Debug Finish",
+					"Group": "02 Debug Override",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "1 = treat the vertex colour as sRGB-encoded and decode it (pow 2.2). The FBX importer hands the material exactly the values in the FBX, and the food FBXs are exported with linear colours, so 0 should be right; the lookdev swatch row checks it.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Vertex Colour sRGB",
+					"Group": "03 Base Colour",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Ambient occlusion from the vertex-colour cavity (alpha).",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 1,
+					"ParameterName": "Cavity AO",
+					"Group": "03 Base Colour",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"desc": "Multiplier the pale raw batter goes to at Fry 1.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.850000,G=0.580000,B=0.280000,A=1.000000)",
+					"ParameterName": "Golden Tint",
+					"Group": "04 Fry",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_5",
+				"desc": "Colour at Fry 2.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.050000,G=0.030000,B=0.015000,A=1.000000)",
+					"ParameterName": "Burnt Colour",
+					"Group": "04 Fry",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Drips and edges (mask A) colour first.",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 1,
+					"ParameterName": "Edge Boost",
+					"Group": "04 Fry",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "Patchiness of the frying (mask B).",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"SliderMax": 1.5,
+					"ParameterName": "Fry Breakup",
+					"Group": "04 Fry",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Crumb light / dark in the colour (mask G).",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 1,
+					"ParameterName": "Crumb Contrast",
+					"Group": "04 Fry",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 12,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 13,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"desc": "G crumb (0.5 neutral), B fry break-up (0.5 neutral), A drips / edges.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 12,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Mask",
+					"Group": "05 Textures",
+					"SortPriority": 0,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/FoodNeutral_Mask_Mars_T.FoodNeutral_Mask_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 14,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"desc": "Optional crumb relief; flat by default.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 12,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Normal",
+					"Group": "05 Textures",
+					"SortPriority": 1,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/FoodFlat_Normal_Mars_T.FoodFlat_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 0.15000000596046448,
+					"SliderMax": 2,
+					"ParameterName": "Normal Raw",
+					"Group": "05 Textures",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"DefaultValue": 0.69999998807907104,
+					"SliderMax": 3,
+					"ParameterName": "Normal Fried",
+					"Group": "05 Textures",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "Wet raw batter.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Roughness Raw",
+					"Group": "06 Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.62000000476837158,
+					"SliderMax": 1,
+					"ParameterName": "Roughness Golden",
+					"Group": "06 Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Roughness Burnt",
+					"Group": "06 Surface",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"desc": "Roughness swing of the crumb (mask G) once fried.",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 1,
+					"ParameterName": "Crumb Roughness",
+					"Group": "06 Surface",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"desc": "Coat of the wet raw batter (fades as it fries).",
+				"props":
+				{
+					"DefaultValue": 0.85000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Raw Coat",
+					"Group": "06 Surface",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 22,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "sRGB Decode (S)",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cavity AO (S)",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"AO",
+					"Cavity"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/VertexColorDecode_Mars_MF.VertexColorDecode_Mars_MF"
+				}
+			},
+			{
+				"id": 23,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Mask",
+						"node": 13,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 2,
+						"name": "Fin",
+						"node": 1,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 3,
+						"name": "DbgFin",
+						"node": 4,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 4,
+						"name": "SearB",
+						"node": 0,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "DbgB",
+						"node": 3,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 6,
+						"name": "UseDebug",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "GoldenTint",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "BurntColor",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 9,
+						"name": "EdgeBoost",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "FryBreakup",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "CrumbContrast",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "RoughRaw",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "RoughGolden",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "RoughBurnt",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "CrumbRough",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "RawCoat",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "NrmRaw",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "NrmFried",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Roughness",
+					"Oil",
+					"Patch",
+					"NormalStrength"
+				],
+				"props":
+				{
+					"Code": "float4 fin = lerp(Fin, DbgFin, UseDebug);\nfloat4 sb = lerp(SearB, DbgB, UseDebug);\nfloat fry = clamp(fin.z, 0.0, 2.0);\nfloat golden = saturate(fry);\nfloat burnt = saturate(fry - 1.0);\nfloat crumb = Mask.g - 0.5;\n\nfloat brown = saturate(golden * (1.0 + Mask.a * EdgeBoost) + (Mask.b - 0.5) * FryBreakup * golden * (1.0 - golden) * 2.0);\nfloat scorch = saturate(burnt * (1.0 + Mask.a * EdgeBoost) + (Mask.b - 0.5) * FryBreakup * burnt);\nfloat3 col = Base * lerp(float3(1.0, 1.0, 1.0), GoldenTint, brown);\ncol *= 1.0 + crumb * 2.0 * CrumbContrast * golden;\ncol = lerp(col, BurntColor, scorch);\n\nfloat rough = lerp(RoughRaw, RoughGolden + crumb * CrumbRough, golden);\nrough = lerp(rough, RoughBurnt, burnt);\n\nRoughness = saturate(rough);\nOil = saturate(RawCoat * (1.0 - golden) + sb.w) * (1.0 - 0.6 * burnt);\nPatch = Mask.b;\nNormalStrength = lerp(NrmRaw, NrmFried, golden);\nreturn max(col, 0.0);",
+					"Description": "BatterSurface: raw -> golden -> burnt"
+				}
+			},
+			{
+				"id": 24,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Oil (S)",
+						"node": 23,
+						"output": 2
+					},
+					{
+						"index": 1,
+						"name": "Breakup (S)",
+						"node": 23,
+						"output": 3
+					},
+					{
+						"index": 2,
+						"name": "Roughness In (S)",
+						"node": 23,
+						"output": 1
+					}
+				],
+				"outputs": [
+					"ClearCoat",
+					"ClearCoatRoughness",
+					"Roughness Out"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/OilCoat_Mars_MF.OilCoat_Mars_MF"
+				}
+			},
+			{
+				"id": 25,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Nrm",
+						"node": 14,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Strength",
+						"node": 23,
+						"output": 4
+					}
+				],
+				"props":
+				{
+					"Code": "return normalize(float3(Nrm.xy * Strength, Nrm.z));",
+					"Description": "MeatNormal (mars_cooking_hlsl)"
+				}
+			},
+			{
+				"id": 26,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 24,
+						"output": 2
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "ClearCoat",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "ClearCoatRoughness",
+						"node": 24,
+						"output": 1
+					},
+					{
+						"index": 14,
+						"name": "AmbientOcclusion",
+						"node": 22,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 26,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Debug Use Sliders",
+			"value": 0
+		},
+		{
+			"name": "Vertex Colour sRGB",
+			"value": 0
+		},
+		{
+			"name": "Cavity AO",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Edge Boost",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Fry Breakup",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Crumb Contrast",
+			"value": 0.25
+		},
+		{
+			"name": "Normal Raw",
+			"value": 0.15000000596046448
+		},
+		{
+			"name": "Normal Fried",
+			"value": 0.69999998807907104
+		},
+		{
+			"name": "Roughness Raw",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Roughness Golden",
+			"value": 0.62000000476837158
+		},
+		{
+			"name": "Roughness Burnt",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "Crumb Roughness",
+			"value": 0.25
+		},
+		{
+			"name": "Raw Coat",
+			"value": 0.85000002384185791
+		},
+		{
+			"name": "Oil Coat Strength",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Oil Coat Roughness",
+			"value": 0.11999999731779099
+		},
+		{
+			"name": "Oil Coat Breakup",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Oil Base Gloss",
+			"value": 0.60000002384185791
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Sear Z + Cook",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Finish",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Debug Sear Z + Cook",
+			"value": "RGBA(0, 0, 1, 0)"
+		},
+		{
+			"name": "Debug Finish",
+			"value": "RGBA(0, 0, 1, 0)"
+		},
+		{
+			"name": "Golden Tint",
+			"value": "RGBA(0.85, 0.58, 0.28, 1)"
+		},
+		{
+			"name": "Burnt Colour",
+			"value": "RGBA(0.05, 0.03, 0.015, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "Mask",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/Drumstick_Batter_Mask_Mars_T.Drumstick_Batter_Mask_Mars_T"
+		},
+		{
+			"name": "Normal",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/FoodFlat_Normal_Mars_T.FoodFlat_Normal_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/FoodFlat_Normal_Mars_T.FoodFlat_Normal_Mars_T",
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/Drumstick_Batter_Mask_Mars_T.Drumstick_Batter_Mask_Mars_T"
+	]
+}
