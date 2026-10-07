@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "5d20832f34d554a139a964309e8d0fce",
+		"sourceHash": "bc05433cc1ea69d74005f26b0151a63e",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -1157,11 +1157,11 @@
 		},
 		{
 			"name": "Fibre Contrast",
-			"value": 0.10000000149011612
+			"value": 0.20000000298023224
 		},
 		{
 			"name": "Normal Raw",
-			"value": 0.10000000149011612
+			"value": 0.20000000298023224
 		},
 		{
 			"name": "Normal Crust",
@@ -1169,11 +1169,11 @@
 		},
 		{
 			"name": "Roughness Lean",
-			"value": 0.36000001430511475
+			"value": 0.46000000834465027
 		},
 		{
 			"name": "Roughness Fat",
-			"value": 0.40000000596046448
+			"value": 0.41999998688697815
 		},
 		{
 			"name": "Roughness Crust",
@@ -1189,7 +1189,7 @@
 		},
 		{
 			"name": "Raw Wetness",
-			"value": 0.69999998807907104
+			"value": 0.44999998807907104
 		},
 		{
 			"name": "Oil Coat Strength",
@@ -1201,7 +1201,7 @@
 		},
 		{
 			"name": "Coat Roughness",
-			"value": 0.15000000596046448
+			"value": 0.20000000298023224
 		},
 		{
 			"name": "Coat Breakup",

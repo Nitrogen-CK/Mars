@@ -1580,10 +1580,11 @@ def _spawn_attached(system_name, label, host, local, user, folder):
 def attach_pan_bubbles(actor_label="Meat_InPan", outer_cm=3.5, rate=25.0, oil_lift_cm=0.1, splatter=True):
     """The steak pan's oil bubbles (and splatter) in the meat cube's local space: OilBubbles_Mars_NS actors attached
     to the cube actor `actor_label`, in four strips around the cube's footprint (a 2 * outer_cm square minus the cube),
-    SpawnRate split by strip area; SurfaceZ = the pan surface relative to the cube's centre pivot (-CUBE_HALF_CM) plus
-    oil_lift_cm. With splatter, one OilSplatter_Mars_NS at the cube's footprint edge. Existing PanBubbles_* /
-    PanSplatter actors are replaced. Call from the cooking lookdev after it places the cube (the open map must be it);
-    the caller saves the map."""
+    SpawnRate split by strip area; SurfaceZ = the pan surface relative to the cube's centre pivot (minus the mesh's
+    half extent: cooking_spec.CUBE_MESH_HALF_CM for the hand-authored cube, else CUBE_HALF_CM) plus oil_lift_cm.
+    With splatter, one OilSplatter_Mars_NS at the cube's footprint edge. Existing PanBubbles_* /
+    PanSplatter actors are replaced. mars_cooking_ue.build_lookdev_map calls this after it places the cube (the
+    open map must be it); the caller saves the map."""
     eas = unreal.get_editor_subsystem(unreal.EditorActorSubsystem)
     actors = eas.get_all_level_actors()
     host = next((a for a in actors if a.get_actor_label() == actor_label), None)
@@ -1592,7 +1593,7 @@ def attach_pan_bubbles(actor_label="Meat_InPan", outer_cm=3.5, rate=25.0, oil_li
     old = [a for a in actors if a.get_actor_label().startswith(("PanBubbles_", "PanSplatter"))]
     if old:
         eas.destroy_actors(old)
-    half = mc.spec.CUBE_HALF_CM
+    half = getattr(mc.spec, "CUBE_MESH_HALF_CM", mc.spec.CUBE_HALF_CM)
     inner = half + 0.3
     surface = -half + oil_lift_cm
     strips = {"E": ((inner + outer_cm) * 0.5, 0.0, outer_cm - inner, 2.0 * outer_cm),

@@ -9,6 +9,14 @@ the sear ramps, Meat_Mars_M, Pan_Mars_M, their instances and the lookdev map. Ru
 
 The masters are generated: a rebuild replaces them, so tune looks in the material instances (their overrides and
 the sear ramp curves survive a rebuild).
+
+MeatCube_Mars_SM is hand-authored since 2026-10-07: Stephen's D:\Repo\Content\Cooking\CookingProps.blend is its source
+and export\MeatCube_Mars_SM.fbx is exported from there (build_cooking_meshes.py only rewrites it with --cube).
+import_meshes just re-imports whatever FBX is in the export folder; cooking_spec.CUBE_MESH_HALF_CM is the mesh's measured
+half extent (cube heights in the lookdev map, the pan's Meat Footprint).
+
+The lookdev map also carries the pan's Niagara oil bubbles and splatter from the food library
+(mars_food_ue.attach_pan_bubbles, attached to Meat_InPan); without that module the map builds without them.
 """
 import importlib
 import os
@@ -119,7 +127,8 @@ def import_textures(export_dir=None):
 # ------------------------------------------------------------------ meshes
 def import_meshes(export_dir=None):
     """Legacy FBX importer (it honours FbxImportUI); normals come from the file, no lightmap UVs so the cube's
-    shape offsets stay in UV1 / UV2."""
+    shape offsets stay in UV1 / UV2. The cube FBX is hand-authored (see the module docstring): keep its UVMap /
+    ShapeXY / ShapeZ layers and the Meat slot when re-exporting it."""
     export_dir = export_dir or spec.EXPORT_DIR
     if _in_pie():
         raise RuntimeError("stop PIE before importing (assets imported during PIE vanish)")
@@ -611,10 +620,10 @@ def build_pan_master():
 # (name, folder, parent name, scalars, vectors). Listed values are set on every build; anything else an artist
 # overrides in the instance is kept.
 INSTANCES = (
-    # the stylized (Mario-Party) cube: clean lean, broad pale fat, faint grain, flat raw normal, glossy raw coat
+    # stylized but believable: broad pale fat, faint branching veins, lean mottling + grain, a wet raw coat
     ("Meat_Wagyu_Mars_MI", F_INST, "Meat_Mars_M",
-     {"Fibre Contrast": 0.1, "Normal Raw": 0.1, "Normal Crust": 0.45, "Raw Wetness": 0.7, "Coat Roughness": 0.15,
-      "Roughness Lean": 0.36, "Roughness Fat": 0.4, "Crust Breakup": 0.15, "Edge Boost": 0.3,
+     {"Fibre Contrast": 0.2, "Normal Raw": 0.2, "Normal Crust": 0.45, "Raw Wetness": 0.45, "Coat Roughness": 0.2,
+      "Roughness Lean": 0.46, "Roughness Fat": 0.42, "Crust Breakup": 0.15, "Edge Boost": 0.3,
       "Oil Coat Strength": 0.15, "Glaze Strength": 0.12, "Coat Breakup": 0.6,     # a crust is not a mirror
       "Band Depth": 0.55 * spec.CUBE_HALF_CM, "Band Wobble": 0.125 * spec.CUBE_HALF_CM}, {}),
     ("Pan_Steel_Mars_MI", F_INST, "Pan_Mars_M", {}, {}),
@@ -635,8 +644,9 @@ INSTANCES = (
 )
 
 
-LOOKDEV_POOL_NOTE = ("Pool matched to the meat cube (half extent h = cooking_spec.CUBE_HALF_CM, 2 cm): Meat Footprint "
-                     "radius = h * sqrt(2) * 0.9 (gameplay sets it the same way), Pool Radius = 1.1 h, Pool Margin = "
+LOOKDEV_POOL_NOTE = ("Pool matched to the meat cube (h = cooking_spec.CUBE_HALF_CM, 2 cm; the hand-authored mesh "
+                     "measures 2.2): Meat Footprint radius = mesh half extent * sqrt(2) * 0.9 = 2.8 (gameplay sets it "
+                     "the same way), Pool Radius = 1.1 h, Pool Margin = "
                      "0.6 h, Pool Blend / Simmer Width / Contact Softness = 0.5 / 0.4 / 0.4 h. Written by "
                      "mars_cooking_ue.build_instances; the listed values are overwritten on every build.")
 DESCRIPTIONS = {"Pan_Steel_LookdevCooking_Mars_MI": LOOKDEV_POOL_NOTE}
@@ -741,10 +751,25 @@ def _set_cpd(actor, sear_xy, sear_z, finish):
     comp.set_default_custom_primitive_data_vector4(8, unreal.Vector4(*finish))
 
 
+def _attach_pan_fx():
+    """The pan's Niagara oil bubbles + splatter, attached to Meat_InPan by the food library. Optional: if
+    mars_food_ue does not import (or its Niagara systems are missing) the map is built without them."""
+    try:
+        import mars_food_ue as mf                    # lazy: the food module imports this one
+    except Exception as exc:
+        _warn("pan FX skipped, mars_food_ue did not import: %s" % exc)
+        return []
+    try:
+        return mf.attach_pan_bubbles(actor_label="Meat_InPan", outer_cm=3.5, rate=25, oil_lift_cm=0.1, splatter=True)
+    except Exception as exc:
+        _warn("pan FX skipped: %s" % exc)
+        return []
+
+
 def build_lookdev_map(stay=False):
-    """Two pans (one mid-cook with a cube, one just oiled), a row of cubes from raw to burnt, and the studio
-    lighting / reflection the look is tuned under. Rebuilt from scratch on every call; returns to the map that was
-    open unless stay is set."""
+    """Two pans (one mid-cook with a cube and its Niagara oil bubbles / splatter, one just oiled), a row of cubes
+    from raw to burnt, and the studio lighting / reflection the look is tuned under. Rebuilt from scratch on every
+    call (every actor is replaced, the pan FX included); returns to the map that was open unless stay is set."""
     if _in_pie():
         raise RuntimeError("stop PIE before building the lookdev map")
     les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
@@ -784,8 +809,9 @@ def build_lookdev_map(stay=False):
     comp.set_material(0, _asset(F_LOOK, "Pan_Steel_LookdevCooking_Mars_MI"))
     comp.set_material(1, handle)
     # the cube sits where the instance's Meat Footprint says (pan-local 1.5, -1.0; the pan is yawed 90)
-    meat = _spawn(cube, (1.0, 1.5, PAN_Z + spec.CUBE_HALF_CM), (0, 0, 20), "Meat_InPan")
+    meat = _spawn(cube, (1.0, 1.5, PAN_Z + spec.CUBE_MESH_HALF_CM), (0, 0, 20), "Meat_InPan")
     _set_cpd(meat, (0.05, 0.05, 0.05, 0.05), (0.0, 1.0, 1.0, 0.8), (0, 0.3, 0, 0))
+    _attach_pan_fx()
 
     oiled = _spawn(pan, (48, 0, PAN_Z), (0, 0, 90), "Pan_Oiled")
     comp = oiled.get_component_by_class(unreal.StaticMeshComponent)
@@ -793,7 +819,7 @@ def build_lookdev_map(stay=False):
     comp.set_material(1, handle)
 
     for label, x, sear_xy, sear_z, finish in CUBE_STATES:
-        a = _spawn(cube, (x, -34, spec.CUBE_HALF_CM), (0, 0, 25), "Meat_%s" % label)
+        a = _spawn(cube, (x, -34, spec.CUBE_MESH_HALF_CM), (0, 0, 25), "Meat_%s" % label)
         _set_cpd(a, sear_xy, sear_z, finish)
 
     # lighting: a warm key through the "window", the studio map for reflections and ambient
