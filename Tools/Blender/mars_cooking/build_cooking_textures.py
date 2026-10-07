@@ -2,13 +2,13 @@
 
     python build_cooking_textures.py [--out <dir>]
 
-MeatCube_Wagyu_Mask_Mars_T.png    R fat marbling, G fibre grain, B crust break-up, A edge mask
+MeatCube_Wagyu_Mask_Mars_T.png    R fat marbling, G fibre grain + lean mottling, B crust break-up, A edge mask
 MeatCube_Wagyu_Normal_Mars_T.png  tangent-space normal (DirectX, green down) of the grain + crust bumps
 CookingStudio_Mars_HDR.hdr        long-lat studio environment for the station's reflection capture
 SearRamp_*.csv                    sear colour ramps (time, r, g, b, a; linear colour) for the curve atlas
 
-The meat fields are 3D functions sampled where each UV island sits on the cube, so marbling runs unbroken over
-the edges and the grain (stretched along local Z) shows as streaks on the sides and end grain on top and bottom.
+The meat fields are 3D functions sampled where each UV island sits on the cube (and wrapped around the edges into
+the island margins), so marbling runs unbroken over the edges and the grain (stretched along local Z) shows as streaks on the sides and end grain on top and bottom.
 """
 import math
 import os
@@ -77,7 +77,11 @@ def above(x, fraction, soft):
 
 # ---------------------------------------------------------------- meat cube
 def cube_points(size):
-    """Per-texel 3D position (cm, Blender axes) on the cube, plus the in-plane coords a, b of its island."""
+    """Per-texel 3D position (cm, Blender axes) on the cube, plus the in-plane coords a, b of its island.
+
+    Texels in an island's margin (|a| or |b| > 1) wrap around the edge onto the neighbouring face (the excess walks
+    down that face), so the margin holds what lies just across the edge: bilinear fetches and mips at the island
+    border blend matching content instead of a continuation of this face's plane."""
     px = (np.arange(size) + 0.5) / size
     u, v = np.meshgrid(px, px)
     col = np.minimum((u * spec.ATLAS_COLS).astype(int), spec.ATLAS_COLS - 1)
@@ -87,29 +91,56 @@ def cube_points(size):
     b = (v - (row + 0.5) / spec.ATLAS_ROWS) / (spec.ISLAND * 0.5)
     frames = np.array(spec.FACES, dtype=np.float64)                  # (6, 3 axes, 3)
     nrm, ua, va = frames[face, 0], frames[face, 1], frames[face, 2]
-    p = (nrm + a[..., None] * ua + b[..., None] * va) * spec.CUBE_HALF_CM
+    ea = np.clip(np.abs(a) - 1.0, 0.0, 1.0)
+    eb = np.clip(np.abs(b) - 1.0, 0.0, 1.0)
+    ac = np.clip(a, -1.0, 1.0)
+    bc = np.clip(b, -1.0, 1.0)
+    p = (nrm * (1.0 - ea - eb)[..., None] + ac[..., None] * ua + bc[..., None] * va) * spec.CUBE_HALF_CM
     return p, a, b
 
 
+def iso_distance(field, p, eps=0.01):
+    """|field(p) - 0.5| / |grad field| with the gradient taken in 3D (forward differences, cm): the distance to the
+    field's 0.5 iso-surface depends on the 3D point only, so a streak keeps its width across a cube edge (a gradient
+    measured in each face's texture plane differs between the two faces and breaks the streak at the edge)."""
+    f0 = field(p)
+    g2 = 0.0
+    for k in range(3):
+        step = np.zeros(3)
+        step[k] = eps
+        g2 = g2 + ((field(p + step) - f0) / eps) ** 2
+    return f0, np.abs(f0 - 0.5) / np.maximum(np.sqrt(g2), 0.02)
+
+
 FAT_FREQ = 0.45         # marbling field frequency, cycles per cm (2-3 streaks across a 4 cm face)
-FAT_WIDTH_CM = 0.26     # half width of a fat streak, cm
+FAT_WIDTH_CM = 0.30     # half width of a fat streak, cm
+VEIN_FREQ = 1.3         # secondary veins: a finer field, kept near the main streaks so they read as branches
+VEIN_WIDTH_CM = 0.09
+VEIN_REACH_CM = 1.5     # how far from a main streak a branch can run
+VEIN_STRENGTH = 0.34    # of the main streak's paleness
+MOTTLE = 0.55           # share of mask G given to low-frequency lean mottling (the rest is fibre grain)
 
 
 def build_meat(out_dir, size=spec.TEX_SIZE):
-    """Stylized (Mario-Party) cut: a clean lean body with a few broad, soft fat streaks, a faint grain and smooth
-    bumps. Feature sizes are in cm, tuned on the 4 cm cube (CUBE_HALF_CM 2)."""
+    """Stylized but believable cut: a few broad, soft fat streaks carry the read, faint finer veins branch off them,
+    and the lean has a little mottling and grain. Feature sizes are in cm, tuned on the 4 cm cube (CUBE_HALF_CM 2)."""
     p, a, b = cube_points(size)
     grain = np.array([1.0, 1.0, 1.0 / 2.2])                          # streaks run 2.2x longer along Z
-    warp = np.stack([fbm(p * 0.3 + k * 9.7, 300 + k, 2) for k in range(3)], axis=-1) - 0.5
 
-    # marbling: the 0.5 contour of one low-frequency field makes a handful of broad streaks per face. The width
-    # comes from the distance to that contour (value / gradient, in cm), so a streak keeps its width instead of
-    # pooling into blobs where the field is flat; a second field swells and thins it along its length.
-    n1 = fbm(p * grain * FAT_FREQ + warp * 0.7, 1, 2, gain=0.3)
-    texel_cm = 2.0 * spec.CUBE_HALF_CM / (spec.ISLAND * size)
-    gy, gx = np.gradient(n1.astype(np.float64))
-    slope = np.maximum(np.hypot(gx, gy) / texel_cm, 0.02)           # field change per cm along the surface
-    dist = np.abs(n1 - 0.5) / slope                                  # cm to the streak's centre line
+    # marbling: where the 0.5 iso-surface of one low-frequency 3D field cuts the cube, a handful of broad streaks run
+    # over each face and on across the edges (closed curves on the surface). The width comes from the 3D distance to
+    # that iso-surface (value / 3D gradient, cm), so a streak keeps its width instead of pooling into blobs where the
+    # field is flat; a second field swells and thins it along its length.
+    def warp_at(q):
+        return np.stack([fbm(q * 0.3 + k * 9.7, 300 + k, 2) for k in range(3)], axis=-1) - 0.5
+
+    def streak_field(q):
+        return fbm(q * grain * FAT_FREQ + warp_at(q) * 0.7, 1, 2, gain=0.3)
+
+    def vein_field(q):
+        return fbm(q * grain * VEIN_FREQ + warp_at(q) * 0.9 + 7.0, 8, 2, gain=0.35)
+
+    _, dist = iso_distance(streak_field, p)                          # cm to the streak's centre surface
     swell = fbm(p * 0.7 + 13.0, 2, 2)
     width = FAT_WIDTH_CM * (0.5 + 1.0 * smoothstep(0.25, 0.75, swell))
     core = 1.0 - smoothstep(width * 0.2, width, dist)                # soft-edged, no hard outline
@@ -117,11 +148,21 @@ def build_meat(out_dir, size=spec.TEX_SIZE):
     fat = np.maximum(core, halo * 0.22)
     fat = fat * (0.8 + 0.2 * smoothstep(0.2, 0.7, swell))            # some streaks stay a touch pinker
 
+    # secondary veins: contours of a finer field, faded out away from the main streaks (so they branch off them
+    # instead of netting the whole face) and broken along their length (so they never close into a web)
+    _, dist2 = iso_distance(vein_field, p)
+    near = 1.0 - smoothstep(VEIN_REACH_CM * 0.35, VEIN_REACH_CM, dist)
+    broken = smoothstep(0.3, 0.55, fbm(p * 1.2 + 21.0, 9, 2))
+    vein = (1.0 - smoothstep(VEIN_WIDTH_CM * 0.25, VEIN_WIDTH_CM, dist2)) * near * broken
+    fat = np.maximum(fat, vein * VEIN_STRENGTH)
+
     fibre = unit(fbm(p * np.array([1.0, 1.0, 1.0 / 7.0]) * 2.6, 4, 2))
+    mottle = unit(fbm(p * 0.8 + 41.0, 10, 2))                         # low-frequency lean value variation
+    grain_mottle = (1.0 - MOTTLE) * fibre + MOTTLE * mottle           # mask G: Fibre Contrast drives both
     breakup = unit(fbm(p * 1.3 + 31.0, 5, 4, gain=0.55))
     edge = smoothstep(0.80, 1.0, np.maximum(np.abs(a), np.abs(b)) + (fbm(p * 2.2, 6, 3) - 0.5) * 0.18)
 
-    mask = np.stack([fat, fibre, breakup, edge], axis=-1)
+    mask = np.stack([fat, grain_mottle, breakup, edge], axis=-1)
     Image.fromarray((mask * 255.0 + 0.5).astype(np.uint8), "RGBA").save(
         os.path.join(out_dir, "MeatCube_Wagyu_Mask_Mars_T.png"))
 
@@ -213,15 +254,15 @@ def _lin(c):
 
 
 # time 0..1 spans sear 0..2 (the material's Sear Range): 0 raw, 0.5 a full crust, 1 burnt. sRGB 8-bit keys.
-# Stylized (Mario-Party) look: a clean saturated pink-red raw cut with pale pink fat, a tan cooked band, a clean
+# Stylized but believable: a beef-red raw cut with warm pink fat, a tan cooked band, a clean
 # caramel crust and a burnt end that is dark brown, never black. The burnt keys look light on paper: the lookdev
 # exposure puts a linear albedo under ~0.1 into the tonemapper's toe, where it renders pure black.
 RAMPS = {
     "SearRamp_WagyuLean_Mars_Curve": (
-        (0.00, 222, 60, 90), (0.08, 200, 100, 104), (0.16, 170, 108, 88), (0.24, 160, 100, 72),
+        (0.00, 186, 56, 64), (0.08, 182, 92, 90), (0.16, 170, 108, 88), (0.24, 160, 100, 72),
         (0.36, 188, 120, 62), (0.50, 160, 96, 48), (0.62, 146, 90, 50), (0.78, 132, 84, 52), (1.00, 112, 74, 52)),
     "SearRamp_WagyuFat_Mars_Curve": (
-        (0.00, 248, 208, 206), (0.08, 242, 212, 198), (0.16, 232, 202, 164), (0.24, 220, 178, 120),
+        (0.00, 232, 184, 170), (0.08, 232, 196, 180), (0.16, 232, 202, 164), (0.24, 220, 178, 120),
         (0.36, 214, 154, 88), (0.50, 190, 122, 62), (0.62, 156, 98, 56), (0.78, 140, 92, 58), (1.00, 120, 82, 58)),
 }
 

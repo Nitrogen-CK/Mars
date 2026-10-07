@@ -1,6 +1,11 @@
 """Builds the Mars cooking props and exports them as FBX. Re-runnable headless:
 
-    blender -b --factory-startup --python build_cooking_meshes.py -- [--out <dir>] [--save <file.blend>] [--sheet <png>]
+    blender -b --factory-startup --python build_cooking_meshes.py -- [--out <dir>] [--sheet <png>] [--cube [--save <blend>]]
+
+A plain run builds and exports the PAN ONLY. Since 2026-10-07 MeatCube_Mars_SM is hand-authored: Stephen's
+D:\Repo\Content\Cooking\CookingProps.blend (this builder's cube plus a geometry-nodes noise) is its source and
+export\MeatCube_Mars_SM.fbx is exported from there. --cube regenerates the procedural cube and overwrites that FBX;
+--save is only honoured with --cube, because saving a pan-only scene would replace his .blend.
 
 MeatCube_Mars_SM  the imperfect wagyu cube. UV0 = one island per face (cooking_spec.face_uv); UV1 / UV2 carry the
                   raw -> cooked shape offset in Unreal local centimetres (UV1 = x, y; UV2.x = z), blended in by the
@@ -22,11 +27,13 @@ import cooking_spec as spec  # noqa: E402
 
 def _args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-    out = {"out": spec.EXPORT_DIR, "save": None, "sheet": None}
+    out = {"out": spec.EXPORT_DIR, "save": None, "sheet": None, "cube": False}
     i = 0
     while i < len(argv):
         key = argv[i].lstrip("-")
-        if key in out and i + 1 < len(argv):
+        if key == "cube":
+            out["cube"] = True
+        elif key in out and i + 1 < len(argv):
             out[key] = argv[i + 1]
             i += 1
         i += 1
@@ -309,18 +316,23 @@ def main():
         bpy.data.objects.remove(o)
     cube, raw, cooked = build_cube()
     pan = build_pan()
-    _export(cube, os.path.join(args["out"], "MeatCube_Mars_SM.fbx"))
+    if args["cube"]:
+        _export(cube, os.path.join(args["out"], "MeatCube_Mars_SM.fbx"))
+    else:
+        print("cube not exported: MeatCube_Mars_SM is hand-authored in CookingProps.blend (pass --cube to overwrite)")
     _export(pan, os.path.join(args["out"], "FryPan_Mars_SM.fbx"))
     if args["sheet"]:
         _sheet(args["sheet"], cube, cooked, pan)
     cube.location = (0.0, 0.0, 0.0)
     pan.location = (0.3, 0.0, 0.0)
-    if args["save"]:
+    if args["save"] and not args["cube"]:
+        print("--save ignored without --cube: it would replace the hand-authored cube in %s" % args["save"])
+    elif args["save"]:
         os.makedirs(os.path.dirname(args["save"]), exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=args["save"])
-    print("cube verts %d tris %d  offset max %.3f cm  bounds %s" % (
+    print("cube verts %d tris %d  offset max %.3f cm  bounds %s%s" % (
         len(cube.data.vertices), sum(len(p.vertices) - 2 for p in cube.data.polygons),
-        cube["cooking_offset_max_cm"], np.round(np.abs(raw).max(axis=0), 3)))
+        cube["cooking_offset_max_cm"], np.round(np.abs(raw).max(axis=0), 3), "" if args["cube"] else " (not exported)"))
     print("pan verts %d tris %d" % (len(pan.data.vertices), sum(len(p.vertices) - 2 for p in pan.data.polygons)))
     print("COOKING_MESHES_OK")
 
