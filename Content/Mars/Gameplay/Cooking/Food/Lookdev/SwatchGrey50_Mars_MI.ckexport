@@ -1,0 +1,86 @@
+{
+	"material": "SwatchGrey50_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Lookdev/SwatchGrey50_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "2803929bbb5b0fb86de84a031d0d5c24",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"ScalarParameter": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.900000,G=0.900000,B=0.900000,A=1.000000)",
+					"ParameterName": "Color"
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"DefaultValue": 0.64069998264312744,
+					"ParameterName": "Roughness"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Roughness",
+			"value": 0.64069998264312744
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Color",
+			"value": "RGBA(0.5, 0.5, 0.5, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

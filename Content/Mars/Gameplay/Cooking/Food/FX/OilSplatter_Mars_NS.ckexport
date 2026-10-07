@@ -1,0 +1,600 @@
+{
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "23c8daea343739b1d4dec0639936e2ca",
+		"exporterVersion": 3
+	},
+	"system": "OilSplatter_Mars_NS",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/FX/OilSplatter_Mars_NS",
+	"userParameters": [
+		{
+			"name": "User.BurstsPerSecond",
+			"type": "NiagaraFloat",
+			"value": "3"
+		},
+		{
+			"name": "User.FlingMax",
+			"type": "NiagaraFloat",
+			"value": "8"
+		},
+		{
+			"name": "User.FlingMin",
+			"type": "NiagaraFloat",
+			"value": "2"
+		},
+		{
+			"name": "User.SplatterArc",
+			"type": "NiagaraFloat",
+			"value": "0.8"
+		},
+		{
+			"name": "User.SplatterColour",
+			"type": "LinearColor",
+			"value": "RGBA(0.06, 0.03, 0.01, 1)"
+		},
+		{
+			"name": "User.SplatterLife",
+			"type": "NiagaraFloat",
+			"value": "2"
+		},
+		{
+			"name": "User.SplatterRadius",
+			"type": "NiagaraFloat",
+			"value": "2.6"
+		},
+		{
+			"name": "User.SplatterRate",
+			"type": "NiagaraFloat",
+			"value": "14"
+		},
+		{
+			"name": "User.SplatterSizeMax",
+			"type": "NiagaraFloat",
+			"value": "0.7"
+		},
+		{
+			"name": "User.SplatterSizeMin",
+			"type": "NiagaraFloat",
+			"value": "0.25"
+		},
+		{
+			"name": "User.SurfaceZ",
+			"type": "NiagaraFloat",
+			"value": "0"
+		}
+	],
+	"systemState":
+	{
+		"stacks": [
+			{
+				"stage": "System Update",
+				"modules": [
+					{
+						"name": "System State",
+						"id": "SystemState",
+						"inputs": [
+							{
+								"name": "Inactive Response",
+								"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+							},
+							{
+								"name": "Loop Behavior",
+								"value": "NewEnumerator0 (Infinite)"
+							},
+							{
+								"name": "UseLoopDelay",
+								"value": "false"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "Splatter.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Splatter.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Splatter.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Splatter.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Splatter.SpawnRate.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "Splatter.SpawnRate.SpawnGroup",
+						"value": "0"
+					},
+					{
+						"name": "Splatter.SpawnRate.SpawnRate",
+						"value": "1"
+					},
+					{
+						"name": "SystemState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "SystemState.Loop Duration",
+						"value": "5"
+					}
+				]
+			}
+		],
+		"systemStateModule":
+		{
+			"found": true,
+			"module": "SystemState",
+			"name": "System State",
+			"enabled": true,
+			"inputs": [
+				{
+					"name": "Inactive Response",
+					"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+				},
+				{
+					"name": "Loop Behavior",
+					"value": "NewEnumerator0 (Infinite)"
+				},
+				{
+					"name": "UseLoopDelay",
+					"value": "false"
+				}
+			],
+			"values": [
+				{
+					"name": "Loop Delay",
+					"value": "0"
+				},
+				{
+					"name": "Loop Duration",
+					"value": "5"
+				}
+			]
+		}
+	},
+	"emitters": [
+		{
+			"name": "Splatter",
+			"enabled": true,
+			"sim": "CPU",
+			"localSpace": true,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Rate",
+							"id": "SpawnRate",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "SpawnRate",
+									"kind": "linked",
+									"value": "User.SplatterRate"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Splatter.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Splatter.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Splatter.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.SpawnRate.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "Splatter.SpawnRate.SpawnGroup",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.SpawnRate.SpawnRate",
+							"value": "1"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Splatter Spawn Mars NM",
+							"id": "MarsSplatterSpawn_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "SplatterRadius",
+									"kind": "linked",
+									"value": "User.SplatterRadius"
+								},
+								{
+									"path": "BurstsPerSecond",
+									"kind": "linked",
+									"value": "User.BurstsPerSecond"
+								},
+								{
+									"path": "SurfaceZ",
+									"kind": "linked",
+									"value": "User.SurfaceZ"
+								},
+								{
+									"path": "SplatterSizeMin",
+									"kind": "linked",
+									"value": "User.SplatterSizeMin"
+								},
+								{
+									"path": "SplatterSizeMax",
+									"kind": "linked",
+									"value": "User.SplatterSizeMax"
+								},
+								{
+									"path": "SplatterLife",
+									"kind": "linked",
+									"value": "User.SplatterLife"
+								},
+								{
+									"path": "SplatterColour",
+									"kind": "linked",
+									"value": "User.SplatterColour"
+								},
+								{
+									"path": "Time",
+									"kind": "linked",
+									"value": "Emitter.Age"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Splatter.InitializeParticle.Lifetime",
+							"value": "5"
+						},
+						{
+							"name": "Splatter.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.BurstsPerSecond",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.SplatterColour",
+							"value": "RGBA(1, 1, 1, 1)"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.SplatterLife",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.SplatterRadius",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.SplatterSizeMax",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.SplatterSizeMin",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.SurfaceZ",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterSpawn_Mars_NM.Time",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.DeltaTime",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.FlingMax",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.FlingMin",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.SplatterArc",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.SurfaceZ",
+							"value": "0"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Splatter Update Mars NM",
+							"id": "MarsSplatterUpdate_Mars_NM",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "FlingMin",
+									"kind": "linked",
+									"value": "User.FlingMin"
+								},
+								{
+									"path": "FlingMax",
+									"kind": "linked",
+									"value": "User.FlingMax"
+								},
+								{
+									"path": "SurfaceZ",
+									"kind": "linked",
+									"value": "User.SurfaceZ"
+								},
+								{
+									"path": "SplatterArc",
+									"kind": "linked",
+									"value": "User.SplatterArc"
+								},
+								{
+									"path": "DeltaTime",
+									"kind": "linked",
+									"value": "Engine.DeltaTime"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.DeltaTime",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.FlingMax",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.FlingMin",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.SplatterArc",
+							"value": "0"
+						},
+						{
+							"name": "Splatter.MarsSplatterUpdate_Mars_NM.SurfaceZ",
+							"value": "0"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "5"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraMeshRendererProperties",
+					"facingMode": "Default",
+					"sortMode": "None",
+					"meshes": [
+						{
+							"mesh": "/Engine/BasicShapes/Plane.Plane",
+							"scale": "(1, 1, 1)"
+						}
+					],
+					"overrideMaterials": [
+						"/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/OilSplatter_Mars_MI.OilSplatter_Mars_MI"
+					]
+				}
+			]
+		}
+	]
+}

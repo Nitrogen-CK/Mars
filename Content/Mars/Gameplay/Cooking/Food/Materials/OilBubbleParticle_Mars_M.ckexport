@@ -1,0 +1,369 @@
+{
+	"material": "OilBubbleParticle_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/OilBubbleParticle_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "0cd90f81aca2f42558ceb7b2b7f1f822",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Masked",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 2,
+		"DynamicParameter": 1,
+		"MakeMaterialAttributes": 1,
+		"MaterialFunctionCall": 1,
+		"ParticleColor": 1,
+		"ScalarParameter": 4,
+		"TextureCoordinate": 1,
+		"VectorParameter": 1,
+		"VertexNormalWS": 1
+	},
+	"dynamicParameters": [
+		"Param1",
+		"Param2",
+		"Param3",
+		"Param4"
+	],
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "1 = the Niagara particle colour (the system's Liquid Colour user parameter); 0 = Liquid Colour below.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Use Particle Colour",
+					"Group": "01 Liquid",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Bubble colour while Use Particle Colour is 0.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.950000,G=0.580000,B=0.140000,A=1.000000)",
+					"ParameterName": "Liquid Colour",
+					"Group": "01 Liquid",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Width of the dithered edge where the dome dissolves.",
+				"props":
+				{
+					"DefaultValue": 0.039999999105930328,
+					"SliderMin": 0.0010000000474974513,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Pop Edge",
+					"Group": "03 Pop",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "How far down the bubble the dissolve sweeps at pop 1.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 1,
+					"ParameterName": "Pop Reach",
+					"Group": "03 Pop",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Ripple of the dissolve edge around the ring.",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Pop Wobble",
+					"Group": "03 Pop",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 5,
+				"class": "ParticleColor",
+				"name": "MaterialExpressionParticleColor_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				]
+			},
+			{
+				"id": 6,
+				"class": "DynamicParameter",
+				"name": "MaterialExpressionDynamicParameter_0",
+				"outputs": [
+					"Param1",
+					"Param2",
+					"Param3",
+					"Param4",
+					"RGB",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=0.000000,A=0.000000)"
+				}
+			},
+			{
+				"id": 7,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "LiquidColor",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "PC",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "UsePC",
+						"node": 0,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return lerp(LiquidColor, PC, saturate(UsePC));",
+					"Description": "Particle liquid colour"
+				}
+			},
+			{
+				"id": 8,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0",
+				"props":
+				{
+					"CoordinateIndex": 2
+				}
+			},
+			{
+				"id": 9,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BubbleUV",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Phase",
+						"node": 6,
+						"output": 1,
+						"mask": "g"
+					}
+				],
+				"props":
+				{
+					"Code": "return float2(BubbleUV.x, Phase);",
+					"OutputType": "CMOT_Float2",
+					"Description": "BubbleLocal + particle phase"
+				}
+			},
+			{
+				"id": 10,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 11,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Liquid Colour (V3)",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Pop (S)",
+						"node": 6,
+						"output": 0,
+						"mask": "r"
+					},
+					{
+						"index": 2,
+						"name": "Pop Reach (S)",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Pop Edge (S)",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Pop Wobble (S)",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "BubbleLocal (V2)",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Normal WS (V3)",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"Opacity Mask",
+					"Roughness",
+					"Specular",
+					"Normal WS"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/BubbleGlass_Mars_MF.BubbleGlass_Mars_MF"
+				}
+			},
+			{
+				"id": 12,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Specular",
+						"node": 11,
+						"output": 3
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 11,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 11,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 12,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Use Particle Colour",
+			"value": 1
+		},
+		{
+			"name": "Pop Edge",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Pop Reach",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Pop Wobble",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Rim Darken",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Centre Brighten",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Thin Film",
+			"value": 0.25
+		},
+		{
+			"name": "Back Darken",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Roughness",
+			"value": 0.05000000074505806
+		},
+		{
+			"name": "Specular",
+			"value": 1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Liquid Colour",
+			"value": "RGBA(0.95, 0.58, 0.14, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

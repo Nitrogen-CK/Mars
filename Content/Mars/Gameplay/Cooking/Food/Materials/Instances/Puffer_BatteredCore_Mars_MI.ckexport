@@ -1,0 +1,1179 @@
+{
+	"material": "Puffer_BatteredCore_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/Puffer_BatteredCore_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "4d70f9699e23f0cd33838d73568aa971",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/Puffer_Mars_MI.Puffer_Mars_MI",
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/Food_Mars_M.Food_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_ClearCoat",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 3,
+		"LinearInterpolate": 2,
+		"MakeMaterialAttributes": 1,
+		"MaterialFunctionCall": 3,
+		"ScalarParameter": 16,
+		"TextureCoordinate": 3,
+		"TextureSampleParameter2D": 2,
+		"Transform": 1,
+		"VectorParameter": 10
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Sear per local axis: 0 raw, 1 full crust, 2 burnt. Custom Primitive Data 0-3.",
+				"outputs": [
+					"RGB",
+					"+X",
+					"-X",
+					"+Y",
+					"-Y",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Sear XY",
+					"Group": "01 Driven (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "Sear on +Z / -Z, Penetration 0..1 and Oil Coat 0..1. Custom Primitive Data 4-7.",
+				"outputs": [
+					"RGB",
+					"+Z",
+					"-Z",
+					"Penetration",
+					"Oil Coat",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Sear Z + Cook",
+					"Group": "01 Driven (Custom Primitive Data)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"desc": "Glaze 0..1, Shape 0..1 (raw -> cooked morph), Fry 0..2 (batter only), Wet 0..1 (stew / soup soak). Custom Primitive Data 8-11.",
+				"outputs": [
+					"RGB",
+					"Glaze",
+					"Shape",
+					"Fry",
+					"Wet",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 8,
+					"ParameterName": "Finish",
+					"Group": "01 Driven (Custom Primitive Data)",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "1 = ignore Custom Primitive Data and use the three vectors below (look tuning in an instance; leave 0 in game).",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Debug Use Sliders",
+					"Group": "02 Debug Override",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 4,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"outputs": [
+					"RGB",
+					"+X",
+					"-X",
+					"+Y",
+					"-Y",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Debug Sear XY",
+					"Group": "02 Debug Override",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 5,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_4",
+				"outputs": [
+					"RGB",
+					"+Z",
+					"-Z",
+					"Penetration",
+					"Oil Coat",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
+					"ParameterName": "Debug Sear Z + Cook",
+					"Group": "02 Debug Override",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_5",
+				"outputs": [
+					"RGB",
+					"Glaze",
+					"Shape",
+					"Fry",
+					"Wet",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Debug Finish",
+					"Group": "02 Debug Override",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "1 = treat the vertex colour as sRGB-encoded and decode it (pow 2.2). The FBX importer hands the material exactly the values in the FBX, and the food FBXs are exported with linear colours, so 0 should be right; the lookdev swatch row checks it.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Vertex Colour sRGB",
+					"Group": "03 Base Colour",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Ambient occlusion from the vertex-colour cavity (alpha).",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 1,
+					"ParameterName": "Cavity AO",
+					"Group": "03 Base Colour",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_6",
+				"desc": "Multiplier the cooked-through state puts on the base colour.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.880000,G=0.780000,B=0.680000,A=1.000000)",
+					"ParameterName": "Cooked Tint",
+					"Group": "05 Browning",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Browning time at which the cooked tint is complete.",
+				"props":
+				{
+					"DefaultValue": 0.23999999463558197,
+					"SliderMin": 0.0099999997764825821,
+					"SliderMax": 1,
+					"ParameterName": "Cooked At",
+					"Group": "05 Browning",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 11,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_7",
+				"desc": "Multiplier at full crust (darkens and warms).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.750000,G=0.600000,B=0.450000,A=1.000000)",
+					"ParameterName": "Crust Colour",
+					"Group": "05 Browning",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 12,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_8",
+				"desc": "Browned-crust colour the crust pulls toward.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.170000,G=0.080000,B=0.035000,A=1.000000)",
+					"ParameterName": "Crust Albedo",
+					"Group": "05 Browning",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "How far full crust pulls the colour to Crust Albedo (a saturated painted base otherwise only gets redder).",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Crust Replace",
+					"Group": "05 Browning",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 14,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"desc": "Colour burnt food goes to (replaces, not multiplies).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.025000,G=0.018000,B=0.014000,A=1.000000)",
+					"ParameterName": "Char Colour",
+					"Group": "05 Browning",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Strength of the grain / speckle in the colour (mask G).",
+				"props":
+				{
+					"DefaultValue": 0.20000000298023224,
+					"SliderMax": 1,
+					"ParameterName": "Grain Contrast",
+					"Group": "05 Browning",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 16,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			},
+			{
+				"id": 17,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"desc": "R cook-first, G grain (0.5 neutral), B crust break-up (0.5 neutral), A edge.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Mask",
+					"Group": "06 Textures",
+					"SortPriority": 0,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/FoodNeutral_Mask_Mars_T.FoodNeutral_Mask_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Masks"
+				}
+			},
+			{
+				"id": 18,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"desc": "Optional fine relief; flat by default.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 16,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Normal",
+					"Group": "06 Textures",
+					"SortPriority": 1,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/FoodFlat_Normal_Mars_T.FoodFlat_Normal_Mars_T",
+					"SamplerType": "SAMPLERTYPE_Normal"
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "Normal strength while raw.",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"SliderMax": 2,
+					"ParameterName": "Normal Raw",
+					"Group": "06 Textures",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "Normal strength of the crust.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 3,
+					"ParameterName": "Normal Crust",
+					"Group": "06 Textures",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "Roughness Raw",
+					"Group": "07 Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.72000002861022949,
+					"SliderMax": 1,
+					"ParameterName": "Roughness Crust",
+					"Group": "07 Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"DefaultValue": 0.89999997615814209,
+					"SliderMax": 1,
+					"ParameterName": "Roughness Burnt",
+					"Group": "07 Surface",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"desc": "Coat of the raw, moist surface (fades as the crust forms).",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"SliderMax": 1,
+					"ParameterName": "Raw Wetness",
+					"Group": "08 Wet + Glaze",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"desc": "Coat at Glaze 1.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Glaze Strength",
+					"Group": "08 Wet + Glaze",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"desc": "How much darker Wet 1 makes the colour.",
+				"props":
+				{
+					"DefaultValue": 0.15000000596046448,
+					"SliderMax": 0.5,
+					"ParameterName": "Wet Darken",
+					"Group": "08 Wet + Glaze",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"desc": "Roughness multiplier at Wet 1.",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Wet Gloss",
+					"Group": "08 Wet + Glaze",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 28,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"desc": "Multiplier on the baked raw -> cooked offset (UV1 / UV2). The build sets 0 on ingredients exported without a morph.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 2,
+					"ParameterName": "Shape Scale",
+					"Group": "09 Shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 29,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "sRGB Decode (S)",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cavity AO (S)",
+						"node": 8,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"AO",
+					"Cavity"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/VertexColorDecode_Mars_MF.VertexColorDecode_Mars_MF"
+				}
+			},
+			{
+				"id": 30,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 4,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 31,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 1,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 32,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Sear XY (V4)",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Sear Z + Cook (V4)",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Mask (V4)",
+						"node": 17,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 3,
+						"name": "Cavity (S)",
+						"node": 29,
+						"output": 2
+					}
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/FoodCook_Mars_MF.FoodCook_Mars_MF"
+				}
+			},
+			{
+				"id": 33,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Base",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cook",
+						"node": 32,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Mask",
+						"node": 17,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 3,
+						"name": "Fin",
+						"node": 2,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 4,
+						"name": "DbgFin",
+						"node": 6,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "UseDebug",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "CookedTint",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 7,
+						"name": "CookedAt",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "CrustColor",
+						"node": 11,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 9,
+						"name": "CrustAlbedo",
+						"node": 12,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 10,
+						"name": "CrustReplace",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "CharColor",
+						"node": 14,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 12,
+						"name": "GrainContrast",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "RoughRaw",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "RoughCrust",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "RoughBurnt",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 16,
+						"name": "RawWet",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "GlazeStrength",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "WetDarken",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "WetGloss",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 20,
+						"name": "NrmRaw",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "NrmCrust",
+						"node": 20,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Roughness",
+					"Oil",
+					"Patch",
+					"NormalStrength"
+				],
+				"props":
+				{
+					"Code": "float t = Cook.x;\nfloat crust = Cook.y;\nfloat burn = Cook.z;\nfloat4 fin = lerp(Fin, DbgFin, UseDebug);\nfloat glaze = saturate(fin.x);\nfloat wet = saturate(fin.w);\n\nfloat cooked = smoothstep(0.0, max(CookedAt, 1e-3), t);\nfloat3 col = Base * lerp(float3(1.0, 1.0, 1.0), CookedTint, cooked);\ncol *= lerp(float3(1.0, 1.0, 1.0), CrustColor, crust);\ncol = lerp(col, CrustAlbedo, crust * CrustReplace);\ncol *= 1.0 + (Mask.g - 0.5) * 2.0 * GrainContrast * lerp(0.4, 1.0, crust);\ncol = lerp(col, CharColor, burn);\ncol *= 1.0 - WetDarken * wet;                              // soaked food reads ~15 % darker\n\nfloat rough = lerp(RoughRaw, RoughCrust, crust);\nrough = lerp(rough, RoughBurnt, burn);\nrough = lerp(rough, rough * WetGloss, wet);\n\nRoughness = saturate(rough);\nOil = saturate(RawWet * (1.0 - crust) + Cook.w + glaze * GlazeStrength + wet * 0.5) * (1.0 - 0.7 * burn);\nPatch = Mask.b;\nNormalStrength = lerp(NrmRaw, NrmCrust, crust);\nreturn max(col, 0.0);",
+					"Description": "FoodSurface: browning chain, roughness, coat amount"
+				}
+			},
+			{
+				"id": 34,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Oil (S)",
+						"node": 33,
+						"output": 2
+					},
+					{
+						"index": 1,
+						"name": "Breakup (S)",
+						"node": 33,
+						"output": 3
+					},
+					{
+						"index": 2,
+						"name": "Roughness In (S)",
+						"node": 33,
+						"output": 1
+					}
+				],
+				"outputs": [
+					"ClearCoat",
+					"ClearCoatRoughness",
+					"Roughness Out"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/OilCoat_Mars_MF.OilCoat_Mars_MF"
+				}
+			},
+			{
+				"id": 35,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Nrm",
+						"node": 18,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Strength",
+						"node": 33,
+						"output": 4
+					}
+				],
+				"props":
+				{
+					"Code": "return normalize(float3(Nrm.xy * Strength, Nrm.z));",
+					"Description": "MeatNormal (mars_cooking_hlsl)"
+				}
+			},
+			{
+				"id": 36,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_1",
+				"props":
+				{
+					"CoordinateIndex": 1
+				}
+			},
+			{
+				"id": 37,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_2",
+				"props":
+				{
+					"CoordinateIndex": 2
+				}
+			},
+			{
+				"id": 38,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "UV1",
+						"node": 36,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "UV2",
+						"node": 37,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Fin",
+						"node": 2,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 3,
+						"name": "DbgFin",
+						"node": 6,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 4,
+						"name": "UseDebug",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Scale",
+						"node": 28,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float shape = lerp(Fin.y, DbgFin.y, UseDebug);\nreturn float3(UV1.x, UV1.y, UV2.x) * saturate(shape) * Scale;",
+					"Description": "MeatShape (mars_cooking_hlsl): raw -> cooked offset (local cm)"
+				}
+			},
+			{
+				"id": 39,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 38,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 40,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 34,
+						"output": 2
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 35,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "WorldPositionOffset",
+						"node": 39,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "ClearCoat",
+						"node": 34,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "ClearCoatRoughness",
+						"node": 34,
+						"output": 1
+					},
+					{
+						"index": 14,
+						"name": "AmbientOcclusion",
+						"node": 29,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 40,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Debug Use Sliders",
+			"value": 0
+		},
+		{
+			"name": "Vertex Colour sRGB",
+			"value": 0
+		},
+		{
+			"name": "Cavity AO",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Cooked At",
+			"value": 0.23999999463558197
+		},
+		{
+			"name": "Crust Replace",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Grain Contrast",
+			"value": 0.20000000298023224
+		},
+		{
+			"name": "Normal Raw",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Normal Crust",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Roughness Raw",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Roughness Crust",
+			"value": 0.72000002861022949
+		},
+		{
+			"name": "Roughness Burnt",
+			"value": 0.89999997615814209
+		},
+		{
+			"name": "Raw Wetness",
+			"value": 0.25
+		},
+		{
+			"name": "Glaze Strength",
+			"value": 1
+		},
+		{
+			"name": "Wet Darken",
+			"value": 0.15000000596046448
+		},
+		{
+			"name": "Wet Gloss",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Shape Scale",
+			"value": 0
+		},
+		{
+			"name": "Sear Range",
+			"value": 2
+		},
+		{
+			"name": "Face Sharpness",
+			"value": 4
+		},
+		{
+			"name": "Crust Breakup",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "Edge Boost",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Band Depth",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Band Softness",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Band Wobble",
+			"value": 0.5
+		},
+		{
+			"name": "Band Ramp Position",
+			"value": 0.23999999463558197
+		},
+		{
+			"name": "Crevice Lag",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Oil Coat Strength",
+			"value": 0.80000001192092896
+		},
+		{
+			"name": "Oil Coat Roughness",
+			"value": 0.11999999731779099
+		},
+		{
+			"name": "Oil Coat Breakup",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Oil Base Gloss",
+			"value": 0.60000002384185791
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Sear XY",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Sear Z + Cook",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Finish",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Debug Sear XY",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Debug Sear Z + Cook",
+			"value": "RGBA(0, 0, 1, 0)"
+		},
+		{
+			"name": "Debug Finish",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Cooked Tint",
+			"value": "RGBA(0.92, 0.86, 0.76, 1)"
+		},
+		{
+			"name": "Crust Colour",
+			"value": "RGBA(0.78, 0.62, 0.45, 1)"
+		},
+		{
+			"name": "Crust Albedo",
+			"value": "RGBA(0.17, 0.08, 0.035, 1)"
+		},
+		{
+			"name": "Char Colour",
+			"value": "RGBA(0.025, 0.018, 0.014, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "Mask",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/Puffer_Batter_Mask_Mars_T.Puffer_Batter_Mask_Mars_T"
+		},
+		{
+			"name": "Normal",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/FoodFlat_Normal_Mars_T.FoodFlat_Normal_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/FoodFlat_Normal_Mars_T.FoodFlat_Normal_Mars_T",
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/Puffer_Batter_Mask_Mars_T.Puffer_Batter_Mask_Mars_T"
+	]
+}

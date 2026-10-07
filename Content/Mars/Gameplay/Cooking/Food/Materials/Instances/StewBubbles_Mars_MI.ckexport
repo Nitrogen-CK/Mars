@@ -1,0 +1,799 @@
+{
+	"material": "StewBubbles_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/StewBubbles_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "678159a5dbeafa396da774da8ce96fd5",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/OilBubbles_Mars_MI.OilBubbles_Mars_MI",
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/OilBubble_Mars_M.OilBubble_Mars_M"
+	],
+	"blendMode": "BLEND_Masked",
+	"twoSided": true,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 5,
+		"MakeMaterialAttributes": 1,
+		"MaterialFunctionCall": 2,
+		"ScalarParameter": 11,
+		"TextureCoordinate": 2,
+		"TextureSampleParameter2D": 2,
+		"Time": 1,
+		"Transform": 2,
+		"VectorParameter": 3,
+		"VertexInterpolator": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Playback rate (1 = the baked loop length).",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMin": -4,
+					"SliderMax": 4,
+					"ParameterName": "Speed",
+					"Group": "01 Playback",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Loop length (OilVAT_Mars.json).",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 30,
+					"ParameterName": "Seconds",
+					"Group": "01 Playback",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Rows in the VAT (OilVAT_Mars.json).",
+				"props":
+				{
+					"DefaultValue": 120,
+					"SliderMin": 1,
+					"SliderMax": 2048,
+					"ParameterName": "Frames",
+					"Group": "01 Playback",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "1 when frame 0 is on the bottom row of the texture.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Flip V",
+					"Group": "01 Playback",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0",
+				"props":
+				{
+					"CoordinateIndex": 1
+				}
+			},
+			{
+				"id": 5,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 6,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Column",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "T",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Speed",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Seconds",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Frames",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "FlipV",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float frames = max(round(Frames), 1.0);\nfloat phase = frac(T * Speed / max(Seconds, 1e-3));\nfloat v = (floor(phase * frames) + 0.5) / frames;\nv = lerp(v, 1.0 - v, saturate(FlipV));\nreturn float2(Column.x, v);",
+					"OutputType": "CMOT_Float2",
+					"Description": "OilVatUV: column + frame row"
+				}
+			},
+			{
+				"id": 7,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"desc": "RGB = offset from the rest mesh, normalised over Pos Min .. Pos Max. Alpha = pop progress (v2 bubbles).",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "VAT Position",
+					"Group": "02 VAT",
+					"SortPriority": 0,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilBubbles_VATPos_Mars_T.OilBubbles_VATPos_Mars_T",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 8,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"desc": "RGB = normal * 0.5 + 0.5, local axes.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "VAT Normal",
+					"Group": "02 VAT",
+					"SortPriority": 1,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilBubbles_VATNrm_Mars_T.OilBubbles_VATNrm_Mars_T",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Local cm.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Z",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=-3.520801,G=-3.520801,B=-3.520801,A=0.000000)",
+					"ParameterName": "Pos Min",
+					"Group": "02 VAT",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 10,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "Local cm.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Z",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=5.381686,G=5.381686,B=5.381686,A=0.000000)",
+					"ParameterName": "Pos Max",
+					"Group": "02 VAT",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 11,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Pos",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Nrm",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "PosMin",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "PosMax",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"outputs": [
+					"return",
+					"VatNormal"
+				],
+				"props":
+				{
+					"Code": "VatNormal = normalize(Nrm * 2.0 - 1.0 + float3(0.0, 0.0, 1e-4));\nreturn PosMin + Pos * (PosMax - PosMin);",
+					"Description": "OilVatDecode: offset + normal"
+				}
+			},
+			{
+				"id": 12,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 13,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "1 = VAT Position alpha is pop progress (OilVAT_Mars.json carries a pop block); 0 ignores the alpha and masks nothing.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Use Pop",
+					"Group": "03 Pop",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Width of the dithered edge where the dome dissolves (BubbleLocal height units).",
+				"props":
+				{
+					"DefaultValue": 0.039999999105930328,
+					"SliderMin": 0.0010000000474974513,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Pop Edge",
+					"Group": "03 Pop",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 16,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "How far down the dome the dissolve sweeps at pop 1 (BubbleLocal height); below 1 keeps the ring above the oil for the whole pop window.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMin": 0.05000000074505806,
+					"SliderMax": 1,
+					"ParameterName": "Pop Reach",
+					"Group": "03 Pop",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"desc": "Ripple of the dissolve edge around the ring (0 = a flat cut).",
+				"props":
+				{
+					"DefaultValue": 0.059999998658895493,
+					"SliderMax": 0.30000001192092896,
+					"ParameterName": "Pop Wobble",
+					"Group": "03 Pop",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 18,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Pos",
+						"node": 7,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 2,
+						"name": "UsePop",
+						"node": 14,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(N, saturate(UsePop) * Pos.a);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Pack: world normal + pop"
+				}
+			},
+			{
+				"id": 19,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 18,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 20,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"desc": "Bubble colour (multiplies the vertex colour while Use Vertex Colour is 1).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Liquid Colour",
+					"Group": "04 Liquid",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "1 = multiply the painted vertex colour in; 0 = Liquid Colour alone.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Use Vertex Colour",
+					"Group": "04 Liquid",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"desc": "1 = treat the vertex colour as sRGB-encoded and decode it (pow 2.2). The FBX importer hands the material exactly the values in the FBX, and the food FBXs are exported with linear colours, so 0 should be right; the lookdev swatch row checks it.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Vertex Colour sRGB",
+					"Group": "05 Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Cavity AO",
+					"Group": "05 Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 24,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "sRGB Decode (S)",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cavity AO (S)",
+						"node": 23,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"AO",
+					"Cavity"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/VertexColorDecode_Mars_MF.VertexColorDecode_Mars_MF"
+				}
+			},
+			{
+				"id": 25,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Packed",
+						"node": 19,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Pop"
+				],
+				"props":
+				{
+					"Code": "Pop = Packed.w;\nreturn normalize(Packed.xyz + float3(0.0, 0.0, 1e-6));",
+					"Description": "Unpack: world normal + pop"
+				}
+			},
+			{
+				"id": 26,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_4",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "LiquidColor",
+						"node": 20,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "VC",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "UseVC",
+						"node": 21,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return LiquidColor * lerp(float3(1.0, 1.0, 1.0), VC, saturate(UseVC));",
+					"Description": "Liquid colour"
+				}
+			},
+			{
+				"id": 27,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_1",
+				"props":
+				{
+					"CoordinateIndex": 2
+				}
+			},
+			{
+				"id": 28,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Liquid Colour (V3)",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Pop (S)",
+						"node": 25,
+						"output": 1
+					},
+					{
+						"index": 2,
+						"name": "Pop Reach (S)",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Pop Edge (S)",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Pop Wobble (S)",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "BubbleLocal (V2)",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Normal WS (V3)",
+						"node": 25,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"Opacity Mask",
+					"Roughness",
+					"Specular",
+					"Normal WS"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/BubbleGlass_Mars_MF.BubbleGlass_Mars_MF"
+				}
+			},
+			{
+				"id": 29,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Specular",
+						"node": 28,
+						"output": 3
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 28,
+						"output": 2
+					},
+					{
+						"index": 7,
+						"name": "OpacityMask",
+						"node": 28,
+						"output": 1
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 28,
+						"output": 4
+					},
+					{
+						"index": 10,
+						"name": "WorldPositionOffset",
+						"node": 12,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 29,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Speed",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Seconds",
+			"value": 4
+		},
+		{
+			"name": "Frames",
+			"value": 120
+		},
+		{
+			"name": "Flip V",
+			"value": 0
+		},
+		{
+			"name": "Use Pop",
+			"value": 1
+		},
+		{
+			"name": "Pop Edge",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Pop Reach",
+			"value": 0.60000002384185791
+		},
+		{
+			"name": "Pop Wobble",
+			"value": 0.059999998658895493
+		},
+		{
+			"name": "Use Vertex Colour",
+			"value": 0
+		},
+		{
+			"name": "Vertex Colour sRGB",
+			"value": 0
+		},
+		{
+			"name": "Cavity AO",
+			"value": 0
+		},
+		{
+			"name": "Rim Darken",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Centre Brighten",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "Thin Film",
+			"value": 0.40000000596046448
+		},
+		{
+			"name": "Back Darken",
+			"value": 0.94999998807907104
+		},
+		{
+			"name": "Roughness",
+			"value": 0.039999999105930328
+		},
+		{
+			"name": "Specular",
+			"value": 1
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Pos Min",
+			"value": "RGBA(-3.5208, -3.5208, -3.5208, 0)"
+		},
+		{
+			"name": "Pos Max",
+			"value": "RGBA(5.38169, 5.38169, 5.38169, 0)"
+		},
+		{
+			"name": "Liquid Colour",
+			"value": "RGBA(0.52, 0.21, 0.06, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "VAT Position",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilBubbles_VATPos_Mars_T.OilBubbles_VATPos_Mars_T"
+		},
+		{
+			"name": "VAT Normal",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilBubbles_VATNrm_Mars_T.OilBubbles_VATNrm_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/OilBubbles_VATPos_Mars_T.OilBubbles_VATPos_Mars_T",
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/OilBubbles_VATNrm_Mars_T.OilBubbles_VATNrm_Mars_T"
+	]
+}

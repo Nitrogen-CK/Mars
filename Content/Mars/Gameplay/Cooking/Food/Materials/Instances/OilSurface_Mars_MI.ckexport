@@ -1,0 +1,705 @@
+{
+	"material": "OilSurface_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/Instances/OilSurface_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "503feed36363fa6fef122aa912d8051c",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Cooking/Food/Materials/OilVAT_Mars_M.OilVAT_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"Custom": 4,
+		"MakeMaterialAttributes": 1,
+		"MaterialFunctionCall": 1,
+		"ScalarParameter": 10,
+		"TextureCoordinate": 1,
+		"TextureSampleParameter2D": 2,
+		"Time": 1,
+		"Transform": 2,
+		"VectorParameter": 4,
+		"VertexInterpolator": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "Playback rate (1 = the baked loop length).",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMin": -4,
+					"SliderMax": 4,
+					"ParameterName": "Speed",
+					"Group": "01 Playback",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "Loop length (OilVAT_Mars.json).",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 30,
+					"ParameterName": "Seconds",
+					"Group": "01 Playback",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Rows in the VAT (OilVAT_Mars.json).",
+				"props":
+				{
+					"DefaultValue": 120,
+					"SliderMin": 1,
+					"SliderMax": 2048,
+					"ParameterName": "Frames",
+					"Group": "01 Playback",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "1 when frame 0 is on the bottom row of the texture.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Flip V",
+					"Group": "01 Playback",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0",
+				"props":
+				{
+					"CoordinateIndex": 1
+				}
+			},
+			{
+				"id": 5,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 6,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Column",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "T",
+						"node": 5,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Speed",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Seconds",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Frames",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "FlipV",
+						"node": 3,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float frames = max(round(Frames), 1.0);\nfloat phase = frac(T * Speed / max(Seconds, 1e-3));\nfloat v = (floor(phase * frames) + 0.5) / frames;\nv = lerp(v, 1.0 - v, saturate(FlipV));\nreturn float2(Column.x, v);",
+					"OutputType": "CMOT_Float2",
+					"Description": "OilVatUV: column + frame row"
+				}
+			},
+			{
+				"id": 7,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_0",
+				"desc": "RGB = offset from the rest mesh, normalised over Pos Min .. Pos Max. Alpha = pop progress (v2 bubbles).",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "VAT Position",
+					"Group": "02 VAT",
+					"SortPriority": 0,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilSurface_VATPos_Mars_T.OilSurface_VATPos_Mars_T",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 8,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_1",
+				"desc": "RGB = normal * 0.5 + 0.5, local axes.",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Coordinates",
+						"node": 6,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "VAT Normal",
+					"Group": "02 VAT",
+					"SortPriority": 1,
+					"Texture": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilSurface_VATNrm_Mars_T.OilSurface_VATNrm_Mars_T",
+					"SamplerType": "SAMPLERTYPE_LinearColor"
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"desc": "Local cm.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Z",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=-2.223565,G=-2.223565,B=-2.223565,A=0.000000)",
+					"ParameterName": "Pos Min",
+					"Group": "02 VAT",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 10,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"desc": "Local cm.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Z",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=3.708930,G=3.708930,B=3.708930,A=0.000000)",
+					"ParameterName": "Pos Max",
+					"Group": "02 VAT",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 11,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Pos",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "Nrm",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "PosMin",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "PosMax",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"outputs": [
+					"return",
+					"VatNormal"
+				],
+				"props":
+				{
+					"Code": "VatNormal = normalize(Nrm * 2.0 - 1.0 + float3(0.0, 0.0, 1e-4));\nreturn PosMin + Pos * (PosMax - PosMin);",
+					"Description": "OilVatDecode: offset + normal"
+				}
+			},
+			{
+				"id": 12,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 13,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_Local"
+				}
+			},
+			{
+				"id": 14,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Offset",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "return float4(N, Offset.z);",
+					"OutputType": "CMOT_Float4",
+					"Description": "Pack: world normal + height"
+				}
+			},
+			{
+				"id": 15,
+				"class": "VertexInterpolator",
+				"name": "MaterialExpressionVertexInterpolator_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "VS",
+						"node": 14,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 16,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"desc": "Crest colour (multiplies the vertex colour while Use Vertex Colour is 1; white = the painted oil).",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Liquid Colour",
+					"Group": "03 Liquid",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 17,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_3",
+				"desc": "Trough colour, blended in by the depth below rest.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Liquid Colour Deep",
+					"Group": "03 Liquid",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"desc": "1 = multiply the painted vertex colour in; 0 = the liquid colours alone (stew and other liquids).",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Use Vertex Colour",
+					"Group": "03 Liquid",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"desc": "Centimetres below rest at which the trough reaches Liquid Colour Deep.",
+				"props":
+				{
+					"DefaultValue": 2,
+					"SliderMin": 0.10000000149011612,
+					"SliderMax": 10,
+					"ParameterName": "Deep Range",
+					"Group": "03 Liquid",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"desc": "1 = treat the vertex colour as sRGB-encoded and decode it (pow 2.2). The FBX importer hands the material exactly the values in the FBX, and the food FBXs are exported with linear colours, so 0 should be right; the lookdev swatch row checks it.",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Vertex Colour sRGB",
+					"Group": "04 Surface",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Cavity AO",
+					"Group": "04 Surface",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"desc": "Keep low: oil is a mirror.",
+				"props":
+				{
+					"DefaultValue": 0.079999998211860657,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "04 Surface",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "04 Surface",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 24,
+				"class": "MaterialFunctionCall",
+				"name": "MaterialExpressionMaterialFunctionCall_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "sRGB Decode (S)",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Cavity AO (S)",
+						"node": 21,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"Base Colour",
+					"AO",
+					"Cavity"
+				],
+				"props":
+				{
+					"MaterialFunction": "/Game/Mars/Gameplay/Cooking/Food/Materials/VertexColorDecode_Mars_MF.VertexColorDecode_Mars_MF"
+				}
+			},
+			{
+				"id": 25,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Packed",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "VC",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "LiquidColor",
+						"node": 16,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "LiquidDeep",
+						"node": 17,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "UseVC",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "DeepRange",
+						"node": 19,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"WorldN"
+				],
+				"props":
+				{
+					"Code": "float depth = saturate(-Packed.w / max(DeepRange, 1e-3));\nfloat3 liquid = lerp(LiquidColor, LiquidDeep, depth);\nWorldN = normalize(Packed.xyz + float3(0.0, 0.0, 1e-6));\nreturn liquid * lerp(float3(1.0, 1.0, 1.0), VC, saturate(UseVC));",
+					"Description": "OilSurface: liquid colour + normal"
+				}
+			},
+			{
+				"id": 26,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "BaseColor",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Specular",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Roughness",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "Normal",
+						"node": 25,
+						"output": 1
+					},
+					{
+						"index": 10,
+						"name": "WorldPositionOffset",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "AmbientOcclusion",
+						"node": 24,
+						"output": 1
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 26,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Speed",
+			"value": 1
+		},
+		{
+			"name": "Seconds",
+			"value": 4
+		},
+		{
+			"name": "Frames",
+			"value": 120
+		},
+		{
+			"name": "Flip V",
+			"value": 0
+		},
+		{
+			"name": "Use Vertex Colour",
+			"value": 1
+		},
+		{
+			"name": "Deep Range",
+			"value": 2
+		},
+		{
+			"name": "Vertex Colour sRGB",
+			"value": 0
+		},
+		{
+			"name": "Cavity AO",
+			"value": 0
+		},
+		{
+			"name": "Roughness",
+			"value": 0.079999998211860657
+		},
+		{
+			"name": "Specular",
+			"value": 0.5
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Pos Min",
+			"value": "RGBA(-2.22357, -2.22357, -2.22357, 0)"
+		},
+		{
+			"name": "Pos Max",
+			"value": "RGBA(3.70893, 3.70893, 3.70893, 0)"
+		},
+		{
+			"name": "Liquid Colour",
+			"value": "RGBA(1, 1, 1, 1)"
+		},
+		{
+			"name": "Liquid Colour Deep",
+			"value": "RGBA(1, 1, 1, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "VAT Position",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilSurface_VATPos_Mars_T.OilSurface_VATPos_Mars_T"
+		},
+		{
+			"name": "VAT Normal",
+			"value": "/Game/Mars/Gameplay/Cooking/Food/Textures/OilSurface_VATNrm_Mars_T.OilSurface_VATNrm_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/OilSurface_VATPos_Mars_T.OilSurface_VATPos_Mars_T",
+		"/Game/Mars/Gameplay/Cooking/Food/Textures/OilSurface_VATNrm_Mars_T.OilSurface_VATNrm_Mars_T"
+	]
+}

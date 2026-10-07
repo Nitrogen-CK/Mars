@@ -1,0 +1,408 @@
+{
+	"materialFunction": "BubbleGlass_Mars_MF",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/BubbleGlass_Mars_MF",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "f4fa68b168489e36811f4160655dd183",
+		"exporterVersion": 1
+	},
+	"description": "Mars bubble look: opaque fake glass (fresnel rim, centre brighten, thin film, liquid backfaces) and the pop mask (dissolve from the apex down to 1 - Pop Reach; Pop >= 0.999 hides).",
+	"expressions":
+	{
+		"CameraVectorWS": 1,
+		"Custom": 1,
+		"FunctionInput": 7,
+		"FunctionOutput": 5,
+		"ScalarParameter": 6,
+		"Time": 1,
+		"TwoSidedSign": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"desc": "How much darker the dome gets toward its silhouette (fresnel).",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMax": 1,
+					"ParameterName": "Rim Darken",
+					"Group": "04 Glass",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"desc": "How much brighter the dome gets where it faces the camera.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 3,
+					"ParameterName": "Centre Brighten",
+					"Group": "04 Glass",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "Iridescent tint on the rim.",
+				"props":
+				{
+					"DefaultValue": 0.25,
+					"SliderMax": 1,
+					"ParameterName": "Thin Film",
+					"Group": "04 Glass",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "Backfaces (the inside of a popping dome) as the liquid colour times this.",
+				"props":
+				{
+					"DefaultValue": 0.60000002384185791,
+					"SliderMax": 1,
+					"ParameterName": "Back Darken",
+					"Group": "04 Glass",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 0.05000000074505806,
+					"SliderMax": 1,
+					"ParameterName": "Roughness",
+					"Group": "04 Glass",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 1,
+					"ParameterName": "Specular",
+					"Group": "04 Glass",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_0",
+				"props":
+				{
+					"InputName": "Liquid Colour",
+					"Id": "B826958D49BB59E116141AB600FA9B70",
+					"PreviewValue": "(X=1.000000,Y=1.000000,Z=1.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true
+				}
+			},
+			{
+				"id": 7,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_1",
+				"props":
+				{
+					"InputName": "Pop",
+					"Id": "C72C96A049CBE2C0B1C08BA9FED05365",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 8,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_2",
+				"props":
+				{
+					"InputName": "Pop Reach",
+					"Id": "469DEA5A4111AA209FB0B6A82B130CFC",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.600000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 9,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_3",
+				"props":
+				{
+					"InputName": "Pop Edge",
+					"Id": "C0011000434131F57775299A7E110A86",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.040000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 10,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_4",
+				"props":
+				{
+					"InputName": "Pop Wobble",
+					"Id": "075ACEE748D74E1CDF5F49B3D3CE404D",
+					"InputType": "FunctionInput_Scalar",
+					"PreviewValue": "(X=0.060000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 11,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_5",
+				"props":
+				{
+					"InputName": "BubbleLocal",
+					"Id": "AA702EDE4004DC072BA1489E33C47A3C",
+					"InputType": "FunctionInput_Vector2",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 12,
+				"class": "FunctionInput",
+				"name": "MaterialExpressionFunctionInput_6",
+				"props":
+				{
+					"InputName": "Normal WS",
+					"Id": "FDF508694B726E67A38ABB8F31E82B6C",
+					"PreviewValue": "(X=0.000000,Y=0.000000,Z=1.000000,W=0.000000)",
+					"bUsePreviewValueAsDefault": true,
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 13,
+				"class": "CameraVectorWS",
+				"name": "MaterialExpressionCameraVectorWS_0"
+			},
+			{
+				"id": 14,
+				"class": "TwoSidedSign",
+				"name": "MaterialExpressionTwoSidedSign_0"
+			},
+			{
+				"id": 15,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 16,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "N",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Pop",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "CamV",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Side",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "BubbleUV",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "LiquidColor",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "RimDarken",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "CentreBrighten",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "ThinFilm",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "BackDarken",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "PopEdge",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "PopReach",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "PopWobble",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "T",
+						"node": 15,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"Mask",
+					"WorldN"
+				],
+				"props":
+				{
+					"Code": "float3 n = normalize(N + float3(0.0, 0.0, 1e-6));\nfloat pop = saturate(Pop);\nfloat facing = saturate(dot(n * Side, CamV));\nfloat fres = 1.0 - facing;\nfloat3 col = LiquidColor * (1.0 + CentreBrighten * facing * facing * facing) * (1.0 - RimDarken * fres * fres);\nfloat3 film = 0.5 + 0.5 * cos(6.2831853 * (fres * 1.5 + float3(0.0, 0.33, 0.67)));\ncol = lerp(col, col * film * 1.6, saturate(ThinFilm) * fres * fres * fres);\ncol = Side > 0.0 ? col : LiquidColor * BackDarken;\nfloat edge = max(PopEdge, 1e-3);\nfloat wobble = PopWobble * sin(atan2(n.y, n.x + 1e-5) * 5.0 + BubbleUV.y * 40.0 + T * 2.0) * saturate(pop * 4.0);\nfloat level = (1.0 + edge) - pop * (saturate(PopReach) + 2.0 * edge);\nfloat keep = smoothstep(-edge, edge, level + wobble - BubbleUV.x) * step(pop, 0.999);\nfloat dither = frac(52.9829189 * frac(dot(Parameters.SvPosition.xy, float2(0.06711056, 0.00583715))));\nMask = keep - dither + 0.5;\nWorldN = n;\nreturn max(col, 0.0);",
+					"Description": "BubbleGlass: fake glass + pop mask"
+				}
+			},
+			{
+				"id": 17,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_0",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 16,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "Base Colour",
+					"Id": "8F860A124DD2979CCAA75AA42C59DE77"
+				}
+			},
+			{
+				"id": 18,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_1",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 16,
+						"output": 1
+					}
+				],
+				"props":
+				{
+					"OutputName": "Opacity Mask",
+					"SortPriority": 1,
+					"Id": "1975E2394DC17139044507B45DF4D087"
+				}
+			},
+			{
+				"id": 19,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_2",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 4,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "Roughness",
+					"SortPriority": 2,
+					"Id": "D53E79D84B62DE19A59AFAB32F1CCD63"
+				}
+			},
+			{
+				"id": 20,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_3",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"OutputName": "Specular",
+					"SortPriority": 3,
+					"Id": "0A89736A47C6F977E35DCDBF1F55B7D9"
+				}
+			},
+			{
+				"id": 21,
+				"class": "FunctionOutput",
+				"name": "MaterialExpressionFunctionOutput_4",
+				"inputs": [
+					{
+						"index": 0,
+						"node": 16,
+						"output": 2
+					}
+				],
+				"props":
+				{
+					"OutputName": "Normal WS",
+					"SortPriority": 4,
+					"Id": "57EC0AA34C2EB07013F5499B7B591A8D"
+				}
+			}
+		]
+	}
+}

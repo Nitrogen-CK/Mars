@@ -1,0 +1,1120 @@
+{
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "230f7b95b779ccb18b3ccecf125865d9",
+		"exporterVersion": 3
+	},
+	"system": "Meat_Oil_Mars_NS",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/FX/Meat_Oil_Mars_NS",
+	"userParameters": [
+		{
+			"name": "User.ApexSink",
+			"type": "NiagaraFloat",
+			"value": "0.7"
+		},
+		{
+			"name": "User.BubbleRadiusMax",
+			"type": "NiagaraFloat",
+			"value": "3"
+		},
+		{
+			"name": "User.BubbleRadiusMin",
+			"type": "NiagaraFloat",
+			"value": "1.5"
+		},
+		{
+			"name": "User.LifetimeMax",
+			"type": "NiagaraFloat",
+			"value": "0.3"
+		},
+		{
+			"name": "User.LifetimeMin",
+			"type": "NiagaraFloat",
+			"value": "0.1"
+		},
+		{
+			"name": "User.LiquidColour",
+			"type": "LinearColor",
+			"value": "RGBA(0.154514, 0.0631182, 0.0282298, 1)"
+		},
+		{
+			"name": "User.PopFraction",
+			"type": "NiagaraFloat",
+			"value": "0.2"
+		},
+		{
+			"name": "User.RingScale",
+			"type": "NiagaraFloat",
+			"value": "1.35"
+		},
+		{
+			"name": "User.RiseFraction",
+			"type": "NiagaraFloat",
+			"value": "0.1"
+		},
+		{
+			"name": "User.ScalePulse",
+			"type": "NiagaraFloat",
+			"value": "0.05"
+		},
+		{
+			"name": "User.SpawnExtent",
+			"type": "Vector2f",
+			"value": "(0, 0)"
+		},
+		{
+			"name": "User.SpawnRadius",
+			"type": "NiagaraFloat",
+			"value": "45"
+		},
+		{
+			"name": "User.SpawnRate",
+			"type": "NiagaraFloat",
+			"value": "40"
+		},
+		{
+			"name": "User.StartDepth",
+			"type": "NiagaraFloat",
+			"value": "3"
+		},
+		{
+			"name": "User.SurfaceSink",
+			"type": "NiagaraFloat",
+			"value": "1"
+		},
+		{
+			"name": "User.SurfaceZ",
+			"type": "NiagaraFloat",
+			"value": "0"
+		},
+		{
+			"name": "User.WobbleAmplitude",
+			"type": "NiagaraFloat",
+			"value": "0.3"
+		},
+		{
+			"name": "User.WobbleFrequency",
+			"type": "NiagaraFloat",
+			"value": "1.5"
+		}
+	],
+	"systemState":
+	{
+		"stacks": [
+			{
+				"stage": "System Update",
+				"modules": [
+					{
+						"name": "System State",
+						"id": "SystemState",
+						"inputs": [
+							{
+								"name": "Inactive Response",
+								"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+							},
+							{
+								"name": "Loop Behavior",
+								"value": "NewEnumerator0 (Infinite)"
+							},
+							{
+								"name": "UseLoopDelay",
+								"value": "false"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "Bubbles.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "Bubbles.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "Bubbles.EmitterState.MaxDistance",
+						"value": "5000"
+					},
+					{
+						"name": "Bubbles.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "Bubbles.SpawnRate.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "Bubbles.SpawnRate.SpawnGroup",
+						"value": "0"
+					},
+					{
+						"name": "Bubbles.SpawnRate.SpawnRate",
+						"value": "1"
+					},
+					{
+						"name": "SystemState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "SystemState.Loop Duration",
+						"value": "5"
+					}
+				]
+			}
+		],
+		"systemStateModule":
+		{
+			"found": true,
+			"module": "SystemState",
+			"name": "System State",
+			"enabled": true,
+			"inputs": [
+				{
+					"name": "Inactive Response",
+					"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+				},
+				{
+					"name": "Loop Behavior",
+					"value": "NewEnumerator0 (Infinite)"
+				},
+				{
+					"name": "UseLoopDelay",
+					"value": "false"
+				}
+			],
+			"values": [
+				{
+					"name": "Loop Delay",
+					"value": "0"
+				},
+				{
+					"name": "Loop Duration",
+					"value": "5"
+				}
+			]
+		}
+	},
+	"emitters": [
+		{
+			"name": "Bubbles",
+			"enabled": true,
+			"sim": "GPU",
+			"localSpace": true,
+			"determinism": false,
+			"boundsMode": "Fixed",
+			"fixedBounds": "X=-100.000 Y=-100.000 Z=-100.000 to X=100.000 Y=100.000 Z=100.000",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "false"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator0 (Infinite)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator0 (System)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Spawn Rate",
+							"id": "SpawnRate",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "SpawnRate",
+									"kind": "linked",
+									"value": "User.SpawnRate"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Bubbles.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.EmitterState.MaxDistance",
+							"value": "5000"
+						},
+						{
+							"name": "Bubbles.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.SpawnRate.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.SpawnRate.SpawnGroup",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.SpawnRate.SpawnRate",
+							"value": "1"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator1 (Direct Set)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator1 (Random)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator1 (Random Uniform)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator3 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Color",
+									"kind": "linked",
+									"value": "User.LiquidColour"
+								}
+							]
+						},
+						{
+							"name": "Mars Bubble Spawn Mars NM",
+							"id": "MarsBubbleSpawn_Mars_NM",
+							"enabled": false,
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "SpawnRadius",
+									"kind": "linked",
+									"value": "User.SpawnRadius"
+								},
+								{
+									"path": "SpawnExtent",
+									"kind": "linked",
+									"value": "User.SpawnExtent"
+								},
+								{
+									"path": "SurfaceZ",
+									"kind": "linked",
+									"value": "User.SurfaceZ"
+								},
+								{
+									"path": "StartDepth",
+									"kind": "linked",
+									"value": "User.StartDepth"
+								},
+								{
+									"path": "BubbleRadiusMin",
+									"kind": "linked",
+									"value": "User.BubbleRadiusMin"
+								},
+								{
+									"path": "BubbleRadiusMax",
+									"kind": "linked",
+									"value": "User.BubbleRadiusMax"
+								},
+								{
+									"path": "LifetimeMin",
+									"kind": "linked",
+									"value": "User.LifetimeMin"
+								},
+								{
+									"path": "LifetimeMax",
+									"kind": "linked",
+									"value": "User.LifetimeMax"
+								},
+								{
+									"path": "LiquidColour",
+									"kind": "linked",
+									"value": "User.LiquidColour"
+								}
+							]
+						},
+						{
+							"name": "Shape Location",
+							"id": "ShapeLocation",
+							"inputs": [
+								{
+									"name": "LatheCurve",
+									"value": ""
+								},
+								{
+									"name": "Additional Quaternion Rotation",
+									"value": "false"
+								},
+								{
+									"name": "Apply To Particle Position",
+									"value": "NewEnumerator0 (Apply)"
+								},
+								{
+									"name": "Box / Plane Mode",
+									"value": "NewEnumerator1 (Plane)"
+								},
+								{
+									"name": "Cone Angle Type",
+									"value": "NewEnumerator0 (Degrees)"
+								},
+								{
+									"name": "Cone Mode",
+									"value": "NewEnumerator0 (Spherical Cone)"
+								},
+								{
+									"name": "Cylinder Distribution",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Enable Lathe Profile",
+									"value": "false"
+								},
+								{
+									"name": "Enable Torus Knot Radius",
+									"value": "false"
+								},
+								{
+									"name": "Evaluation Type",
+									"value": "NewEnumerator0 (Spawn Only)"
+								},
+								{
+									"name": "Fixed Random Seed",
+									"value": "false"
+								},
+								{
+									"name": "Flatten Endcaps",
+									"value": "false"
+								},
+								{
+									"name": "Hemicircle Internal Cap",
+									"value": "true"
+								},
+								{
+									"name": "Hemicircle X",
+									"value": "false"
+								},
+								{
+									"name": "Hemicircle Y",
+									"value": "false"
+								},
+								{
+									"name": "Hemisphere Angle Type",
+									"value": "NewEnumerator1 (Normalized Angle (0-1))"
+								},
+								{
+									"name": "MaskSpawnGroup",
+									"value": "false"
+								},
+								{
+									"name": "Offset Mode",
+									"value": "NewEnumerator1 (None)"
+								},
+								{
+									"name": "Override Seed",
+									"value": "false"
+								},
+								{
+									"name": "Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Ring / Disc Distribution Mode",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Ring / Disc Mode",
+									"value": "NewEnumerator0 (Circle)"
+								},
+								{
+									"name": "Rotation Angle Type",
+									"value": "NewEnumerator1 (Normalized Angle (0-1))"
+								},
+								{
+									"name": "Rotation Mode",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Scale Mode",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Shape Primitive",
+									"value": "NewEnumerator2 (Box / Plane)"
+								},
+								{
+									"name": "Sphere Distribution",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Surface Only",
+									"value": "false"
+								},
+								{
+									"name": "Torus Distribution Mode",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Torus Mode",
+									"value": "NewEnumerator0 (Torus)"
+								},
+								{
+									"name": "Transform Method",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Transform Order",
+									"value": "NewEnumerator0 (Scale / Rotate / Offset)"
+								},
+								{
+									"name": "Use Endcaps In Surface Only Mode",
+									"value": "true"
+								},
+								{
+									"name": "UseOwnerScale",
+									"value": "true"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Bubbles.InitializeParticle.Lifetime",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.InitializeParticle.Lifetime Max",
+							"value": "0.3"
+						},
+						{
+							"name": "Bubbles.InitializeParticle.Lifetime Min",
+							"value": "0.15"
+						},
+						{
+							"name": "Bubbles.InitializeParticle.Mesh Uniform Scale Max",
+							"value": "0.5"
+						},
+						{
+							"name": "Bubbles.InitializeParticle.Mesh Uniform Scale Min",
+							"value": "0.15"
+						},
+						{
+							"name": "Bubbles.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.BubbleRadiusMax",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.BubbleRadiusMin",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.LifetimeMax",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.LifetimeMin",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.LiquidColour",
+							"value": "RGBA(1, 1, 1, 1)"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.SpawnExtent",
+							"value": "(0, 0)"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.SpawnRadius",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.StartDepth",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleSpawn_Mars_NM.SurfaceZ",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Additional Yaw / Pitch / Roll",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Apply Owner Scale",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Box Midpoint",
+							"value": "(0.5, 0.5, 0.5)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Box Size",
+							"value": "(100, 100, 100)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Disc Coverage",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Hemisphere Distribution",
+							"value": "(1, 1)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Non Uniform Scale",
+							"value": "(1, 1, 1)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Plane Midpoint",
+							"value": "(0.5, 0.5)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Plane Size",
+							"value": "(10, 10)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Radius Position",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Random Seed",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Ring Radius",
+							"value": "5"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Rotation Angle",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Rotation Axis",
+							"value": "(1, 0, 0)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Rotation Quaternion",
+							"value": "quat(0, 0, 0, 1)"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Spawn Group Mask",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Sphere Radius",
+							"value": "100"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Sphere Surface Distribution",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Surface Only Band Thickness",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.U Distribution",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.U Position",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Uniform Count",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Uniform Spiral Amount",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Uniform Spiral Falloff",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.ShapeLocation.Yaw / Pitch / Roll",
+							"value": "(0, 0, 0)"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Scale Mesh Size",
+							"id": "ScaleMeshSize",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Scale Factor",
+									"kind": "dynamicInput",
+									"value": "Vector from Float",
+									"id": "VectorFromFloat",
+									"overrides": [
+										{
+											"path": "Value",
+											"kind": "dynamicInput",
+											"value": "Float from Curve",
+											"id": "FloatFromCurve",
+											"overrides": [
+												{
+													"path": "FloatCurve",
+													"kind": "curve",
+													"diClass": "NiagaraDataInterfaceCurve",
+													"channels": [
+														{
+															"name": "None",
+															"keys": [
+																{
+																	"t": 0,
+																	"v": 0.5,
+																	"i": "C"
+																},
+																{
+																	"t": 1,
+																	"v": 1,
+																	"i": "L"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Dynamic Material Parameters",
+							"id": "DynamicMaterialParameters",
+							"inputs": [
+								{
+									"name": "Write Parameter Index 0",
+									"value": "NewEnumerator1 (Float)"
+								},
+								{
+									"name": "Write Parameter Index 1",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 2",
+									"value": "NewEnumerator0 (Off)"
+								},
+								{
+									"name": "Write Parameter Index 3",
+									"value": "NewEnumerator0 (Off)"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Index 0 Param 1",
+									"kind": "dynamicInput",
+									"value": "Float from Curve 001",
+									"id": "FloatFromCurve001",
+									"overrides": [
+										{
+											"path": "FloatCurve",
+											"kind": "curve",
+											"diClass": "NiagaraDataInterfaceCurve",
+											"channels": [
+												{
+													"name": "None",
+													"keys": [
+														{
+															"t": 0.20000000298023224,
+															"v": 0,
+															"i": "C"
+														},
+														{
+															"t": 1,
+															"v": 1,
+															"i": "L"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"path": "Index 0 Param 2",
+									"kind": "dynamicInput",
+									"value": "Float from Curve 002",
+									"id": "FloatFromCurve002",
+									"overrides": [
+										{
+											"path": "FloatCurve",
+											"kind": "curve",
+											"diClass": "NiagaraDataInterfaceCurve",
+											"channels": [
+												{
+													"name": "None",
+													"keys": [
+														{
+															"t": 0.10000000149011612,
+															"v": 0,
+															"i": "C"
+														},
+														{
+															"t": 1,
+															"v": 1,
+															"i": "L"
+														}
+													]
+												}
+											]
+										}
+									]
+								},
+								{
+									"path": "Index0Float0Write",
+									"kind": "value",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Mars Bubble Update Mars NM",
+							"id": "MarsBubbleUpdate_Mars_NM",
+							"enabled": false,
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "SurfaceZ",
+									"kind": "linked",
+									"value": "User.SurfaceZ"
+								},
+								{
+									"path": "StartDepth",
+									"kind": "linked",
+									"value": "User.StartDepth"
+								},
+								{
+									"path": "BubbleRadiusMin",
+									"kind": "linked",
+									"value": "User.BubbleRadiusMin"
+								},
+								{
+									"path": "BubbleRadiusMax",
+									"kind": "linked",
+									"value": "User.BubbleRadiusMax"
+								},
+								{
+									"path": "RiseFraction",
+									"kind": "linked",
+									"value": "User.RiseFraction"
+								},
+								{
+									"path": "PopFraction",
+									"kind": "linked",
+									"value": "User.PopFraction"
+								},
+								{
+									"path": "SurfaceSink",
+									"kind": "linked",
+									"value": "User.SurfaceSink"
+								},
+								{
+									"path": "WobbleAmplitude",
+									"kind": "linked",
+									"value": "User.WobbleAmplitude"
+								},
+								{
+									"path": "WobbleFrequency",
+									"kind": "linked",
+									"value": "User.WobbleFrequency"
+								},
+								{
+									"path": "ScalePulse",
+									"kind": "linked",
+									"value": "User.ScalePulse"
+								},
+								{
+									"path": "ApexSink",
+									"kind": "linked",
+									"value": "User.ApexSink"
+								},
+								{
+									"path": "DeltaTime",
+									"kind": "linked",
+									"value": "Engine.DeltaTime"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "Bubbles.DynamicMaterialParameters.Index 0 Param 3",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.DynamicMaterialParameters.Index 0 Param 4",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.FloatFromCurve.Scale Curve",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.FloatFromCurve001.Scale Curve",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.FloatFromCurve002.Scale Curve",
+							"value": "1"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.ApexSink",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.BubbleRadiusMax",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.BubbleRadiusMin",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.DeltaTime",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.PopFraction",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.RingScale",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.RiseFraction",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.ScalePulse",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.StartDepth",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.SurfaceSink",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.SurfaceZ",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.WobbleAmplitude",
+							"value": "0"
+						},
+						{
+							"name": "Bubbles.MarsBubbleUpdate_Mars_NM.WobbleFrequency",
+							"value": "0"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator1 (Random)",
+				"source": "minmax",
+				"values": [
+					{
+						"name": "Lifetime Min",
+						"value": "0.15"
+					},
+					{
+						"name": "Lifetime Max",
+						"value": "0.3"
+					}
+				],
+				"inertValues": [
+					{
+						"name": "Lifetime",
+						"value": "1"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraMeshRendererProperties",
+					"facingMode": "Default",
+					"sortMode": "None",
+					"meshes": [
+						{
+							"mesh": "/Game/Mars/Gameplay/Cooking/Food/Meshes/OilBubble_Mars_SM.OilBubble_Mars_SM",
+							"scale": "(1, 1, 1)"
+						}
+					]
+				}
+			]
+		}
+	]
+}
