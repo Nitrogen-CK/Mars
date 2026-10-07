@@ -1,12 +1,13 @@
 // Validate() accepts the default searing spec and rejects a pan disc no wider than the steak and a face that never sears;
 // the pan's own spec (its Implement) accepts its default and rejects a tilt past 80 degrees, a tilt that cannot move and a
-// lift spring with no stiffness.
+// lift spring with no stiffness; the pan body spec accepts the pan mesh at scale 1 and rejects no mesh, a zero scale and a
+// restitution past 1.
 class UMars_AutoTest_Searing_SpecValidateRejectsBadPans : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("validate the default specs and five bad ones", n"Step_Validate");
+        Add_Step("validate the default specs and eight bad ones", n"Step_Validate");
         Run_Steps(InHandle);
     }
 
@@ -38,6 +39,17 @@ class UMars_AutoTest_Searing_SpecValidateRejectsBadPans : UCk_AutoTest_Base
         auto Slack = FMars_Implement_Spec();
         Slack.Lift.SpringHz = 0.0f;
         AssertRejected(Slack.Validate(), "SpringHz <= 0");
+
+        const auto PanMesh = assets::FryPan_Mars_SM();
+        const auto PanBody = FMars_Searing_PanBodySpec(PanMesh, 1.0f).Validate();
+        Assert_True(PanBody.IsValid(), f"the pan mesh at scale 1 is accepted (error: {PanBody.Get_Error()})");
+
+        AssertRejected(FMars_Searing_PanBodySpec().Validate(), "no pan Mesh");
+        AssertRejected(FMars_Searing_PanBodySpec(PanMesh, 0.0f).Validate(), "pan body Scale <= 0");
+
+        auto Bouncy = FMars_Searing_PanBodySpec(PanMesh, 1.0f);
+        Bouncy.Restitution = 1.5f;
+        AssertRejected(Bouncy.Validate(), "pan body Restitution > 1");
     }
 
     private void AssertRejected(const FMars_Validation& InValidation, const FString& InRule)

@@ -136,3 +136,9 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
         _PeakLiftVelocity = Math::Max(_PeakLiftVelocity, Velocity);
     }
 }
+
+class AMars_AutoTest_Searing_FastUpwardLookTossesTheSteak_Actor : AMars_AutoTestRunner_SearingPan
+{
+    default _TimeoutSeconds = 12.0f;
+    default _TestEntityScriptClass = UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak;
+}

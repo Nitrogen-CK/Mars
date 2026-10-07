@@ -44,11 +44,15 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     //----------------------------------------------------------------------------------------------------------------------
 
     // NoSteak counts down, then a fresh steak entity (a lifetime child of the station) appears HalfSize + SpawnLift above
-    // the pan base top, flat (NegZ down, its resting face), with a dynamic box body and a Resting on the pan base body
+    // the cooking surface, flat (NegZ down, its resting face), with a dynamic box body and a Resting on the pan base body
     // (which tells whether it lies on the pan). It starts Airborne and becomes OnPan once it rests on the base.
     private void Advance_Spawn(FMars_Searing_Frame& InFrame, FMars_Fragment_Searing& InState)
     {
         if (InState.Phase != EMars_Searing_Phase::NoSteak)
+        { return; }
+
+        // The pan body cooks from its mesh after a preload; a steak spawned over a pan that is not there yet falls through it.
+        if (utils_jolt_body::Get_IsBodyAdded(InFrame.Spec.Nodes.PanBaseBody) == false)
         { return; }
 
         InState.Steak.RespawnCountdown -= InFrame.DeltaSeconds;
@@ -57,7 +61,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 
         const auto& SteakSpec = InFrame.Spec.Steak;
         const auto PanBaseWorld = InFrame.Searing.Get_PanBaseWorld();
-        const auto SpawnLocal = FVector(0.0, 0.0, utils_searing::k_PanBaseHalfHeight + SteakSpec.HalfSize + SteakSpec.SpawnLift);
+        const auto SpawnLocal = FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + SteakSpec.HalfSize + SteakSpec.SpawnLift);
 
         auto Entity = utils_entity_lifetime::Request_CreateEntity(InFrame.Searing);
         utils_transform::Add(Entity, FTransform(PanBaseWorld.Rotator(), PanBaseWorld.TransformPosition(SpawnLocal)),
@@ -153,16 +157,16 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     }
 
     // The steak's centre, in the pan base's frame, within PanRadius of the axis and between HalfSize below and three
-    // HalfSizes above the base top (a steak hovering over the pan is not on it).
+    // HalfSizes above the cooking surface (a steak hovering over the pan is not on it).
     private bool Get_IsOverDisc(const FMars_Searing_Frame& InFrame)
     {
         const auto Local = InFrame.Searing.Get_SteakPanLocal();
-        const auto AboveTop = Local.Z - utils_searing::k_PanBaseHalfHeight;
+        const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
         const auto HalfSize = InFrame.Spec.Steak.HalfSize;
         return Local.Size2D() <= InFrame.Spec.Loss.PanRadius && AboveTop >= -HalfSize && AboveTop <= 3.0 * HalfSize;
     }
 
-    // A live steak whose centre left the disc (past PanRadius + HalfSize, or HalfSize below the base top) is lost: it
+    // A live steak whose centre left the disc (past PanRadius + HalfSize, or HalfSize below the cooking surface) is lost: it
     // keeps simulating as a lingering body, the pan empties and a fresh steak follows RespawnSeconds later. Lingering
     // bodies are destroyed at LingerSeconds.
     private void Advance_Loss(FMars_Searing_Frame& InFrame, FMars_Fragment_Searing& InState)
@@ -173,7 +177,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Local = InFrame.Searing.Get_SteakPanLocal();
-        const auto AboveTop = Local.Z - utils_searing::k_PanBaseHalfHeight;
+        const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
         const auto HalfSize = InFrame.Spec.Steak.HalfSize;
         const auto OffTheDisc = Local.Size2D() > InFrame.Spec.Loss.PanRadius + HalfSize;
         const auto BelowTheTop = AboveTop < -HalfSize;

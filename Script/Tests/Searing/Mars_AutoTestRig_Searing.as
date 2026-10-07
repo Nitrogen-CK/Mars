@@ -1,20 +1,18 @@
 // The searing rig: a Searing station on a transform-only root at an isolated origin, its pan node 100 uu up carrying the
-// pan Implement (no swirl: the tests pin the ledger) and an oiled pan: a kinematic base disc and a lip of kinematic
-// segments, each on its own child node (the station script builds the same pan). There is no table or floor: a lost steak
-// falls into the void until the kernel destroys it. The handlers record every signal; the steps heat the pan, look, and
-// wait on the steak.
+// pan Implement (no swirl: the tests pin the ledger) and the pan: the pan mesh at the station's scale, a kinematic
+// triangle-mesh body on its own child node (built by utils_searing::Add_PanBody, as the station builds it). There is no
+// table or floor: a lost steak falls into the void until the kernel destroys it. The handlers record every signal; the
+// steps heat the pan, look, and wait on the steak.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
 {
     protected const FVector k_Origin = FVector(-60000.0, 16000.0, -60000.0);
-    // The oiled pan: the steak's 0.6 combines to sqrt(0.6 * 0.15) = 0.3.
-    protected const float32 k_PanFriction = 0.15f;
-    protected const float32 k_PanRestitution = 0.1f;
-    // The lip, as the station script builds it: eight 3 uu boxes standing on the disc's edge.
-    protected const int32 k_RimSegments = 8;
-    protected const float64 k_LipHalfThickness = 1.5;
-    protected const float64 k_LipHeight = 3.0;
-    protected const float64 k_LipHalfLengthPerRadius = 0.42;
+    // The station's pan: cooking_spec.py's pan (base radius 9.5, rim radius 14.5 at height 4.6, in the mesh's own cm) at
+    // the station's scale, and its 4 cm cube at the station's own cube scale.
+    protected const float32 k_PanScale = 2.5f;
+    protected const float32 k_CubeScale = 3.0f;
+    protected const float32 k_PanRimRadius = 14.5f;
+    protected const float32 k_CubeHalf = 2.0f;
 
     protected FCk_Handle_Searing _Searing;
     // The specs the station was built from, nodes included.
@@ -45,6 +43,9 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         Spec.Cook.SecondsPerFace = 0.2f;
         Spec.Loss.RespawnSeconds = 0.2f;
         Spec.Loss.LingerSeconds = 0.5f;
+        // The station's values, so the kernel is tested on the pan it ships with.
+        Spec.Loss.PanRadius = k_PanRimRadius * k_PanScale;
+        Spec.Steak.HalfSize = k_CubeHalf * k_CubeScale;
         return Spec;
     }
 
@@ -61,7 +62,6 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         _PanSpec.Nodes = FMars_Implement_Nodes(_PanNode);
         _Pan = utils_implement::Add(_PanNode.H(), _PanSpec);
         _PanBaseBody = Build_Pan(_PanNode);
-        Build_Lip(_PanNode);
 
         _Spec.Nodes = FMars_Searing_Nodes(_Pan, _PanBaseBody);
         _Searing = utils_searing::Add(StationEntity, _Spec);
@@ -76,50 +76,10 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
         _Searing.BindTo_OnCompleted(FMars_Delegate_Searing_OnCompleted(this, n"OnCompleted"));
     }
 
-    // The base disc (its top k_PanBaseHalfHeight above the pan node), kinematic so the pan node's motion moves it.
     protected FCk_Handle_JoltBody Build_Pan(FCk_Handle_SceneNode InPanNode)
     {
-        auto PanTransform = InPanNode.As_Transform();
-        const auto PanRadius = _Spec.Loss.PanRadius;
-
-        auto BaseNode = utils_scene_node::Create(PanTransform, FTransform::Identity);
-        auto BaseShape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Cylinder);
-        BaseShape.Set_Radius(PanRadius);
-        BaseShape.Set_HalfHeight(utils_searing::k_PanBaseHalfHeight);
-        return utils_jolt_body::Add(BaseNode.H(), Make_PanBodySpec(BaseShape));
-    }
-
-    // k_RimSegments kinematic boxes around the disc's edge, standing on its top (the station script's AddLip). A 6 uu cube
-    // tips over the 3 uu lip only past 63 degrees of tilt, so a held tilt parks the steak against it.
-    protected void Build_Lip(FCk_Handle_SceneNode InPanNode)
-    {
-        auto PanTransform = InPanNode.As_Transform();
-        const auto PanRadius = float64(_Spec.Loss.PanRadius);
-        const auto CenterZ = float64(utils_searing::k_PanBaseHalfHeight) + k_LipHeight * 0.5;
-
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(k_LipHalfThickness, PanRadius * k_LipHalfLengthPerRadius, k_LipHeight * 0.5));
-        const auto BodySpec = Make_PanBodySpec(Shape);
-
-        for (int32 Index = 0; Index < k_RimSegments; ++Index)
-        {
-            const auto Yaw = FRotator(0.0, 360.0 * float64(Index) / float64(k_RimSegments), 0.0);
-            const auto Segment = FTransform(Yaw, Yaw.RotateVector(FVector(PanRadius + k_LipHalfThickness, 0.0, CenterZ)));
-            auto SegmentNode = utils_scene_node::Create(PanTransform, Segment);
-            utils_jolt_body::Add(SegmentNode.H(), BodySpec);
-        }
-    }
-
-    protected FCk_JoltBody_Spec Make_PanBodySpec(FCk_Jolt_ShapeDimensions InShape)
-    {
-        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BodySpec.Set_ShapeDimensions(InShape);
-        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
-        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
-        BodySpec.Set_Friction(k_PanFriction);
-        BodySpec.Set_Restitution(k_PanRestitution);
-        BodySpec.Set_CollisionProfileName(n"BlockAll");
-        return BodySpec;
+        auto PanNode = InPanNode;
+        return utils_searing::Add_PanBody(PanNode, FMars_Searing_PanBodySpec(assets::FryPan_Mars_SM(), k_PanScale));
     }
 
     protected void Heat()
@@ -260,5 +220,20 @@ class UMars_AutoTestRig_Searing : UCk_AutoTest_Base
 
         auto Res = OutResult;
         Res.Set(AllGone);
+    }
+}
+
+// The runner for every test that builds the pan: it REQUIRES the one warning CkJolt logs while baking the pan mesh (the
+// two handle sweeps are inconsistently wound and get flipped), so the tests pass on the mesh as shipped and fail the day
+// the mesh is fixed, which is when this class and the wrappers below it go.
+UCLASS(Abstract)
+class AMars_AutoTestRunner_SearingPan : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TArray<FString> Get_RequiredLogErrors() const
+    {
+        TArray<FString> Errors;
+        Errors.Add("had 2 individually inside-out component(s) and 0 aggregate no-verdict component(s) normalized during the Jolt bake (1 healthy, 0 no-verdict, 0 open, 0 non-manifold, 2 inconsistent, 0 malformed)");
+        return Errors;
     }
 }

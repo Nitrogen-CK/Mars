@@ -1,10 +1,11 @@
-// The searing station: a table (width along local Y, depth along local X) with a stove slab and a burner on top, and over
-// the burner an oiled pan with a low lip that swirls while operated and that the operator's look tilts and, flicked up,
-// tosses. The pan node carries an Implement (the tilt, the lift and the swirl) and, on their own child nodes, the
-// kinematic Jolt disc the steak rests on and the lip segments; every mesh part under the pan node is a NoCollision visual. The Searing feature lives on the station entity and its own state machine
-// (UMars_SmState_Searing_Idle) reads the operator; the feature spawns the steak (a dynamic body on its own entity) and
-// this script only builds the nodes and dresses the steak and the station from the Searing signals. While operating, the
-// right glove holds the pan handle (riding the tilt and the toss) and the left rests flat on the table's left side.
+// The searing station: a table (width along local Y, depth along local X) with a stove slab and a burner on top, and on
+// the burner the modelled frying pan, which swirls while operated and which the operator's look tilts and, flicked up,
+// tosses. The pan node carries an Implement (the tilt, the lift and the swirl); under it, on a node yawed so the handle
+// points at the operator, sit the pan mesh (a NoCollision visual) and its kinematic triangle-mesh body, the one collision
+// of the pan. The Searing feature lives on the station entity and its own state machine (UMars_SmState_Searing_Idle)
+// reads the operator; the feature spawns the steak (a dynamic body on its own entity, worn as the meat cube) and this
+// script builds the nodes and, every frame, dresses the pan, the cube and the oil from the Searing state. While operating,
+// the right glove holds the pan handle (riding the tilt and the toss) and the left rests flat on the table's left side.
 class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 {
     default _ShowInPlaceActors = true;
@@ -23,41 +24,111 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float64 StandGap = 43.0;
     // The operating view, pitched hard onto the pan from ViewGap uu off the table edge and ViewAboveStove uu over the stove
     // top. It lives in the station frame (Camera.ViewLocal), so the framing holds whatever the operator's eye height.
-    private const float32 CameraPitch = -48.0f;
+    private const float32 CameraPitch = -54.0f;
     private const float64 ViewGap = 38.0;
-    private const float64 ViewAboveStove = 54.0;
+    private const float64 ViewAboveStove = 71.0;
     // The Use probe's margin around the table.
     private const float64 ProbePadding = 5.0;
 
     private const float64 StoveSize = 50.0;
-    private const float64 StoveHeight = 8.0;
+    private const float64 StoveHeight = 4.0;
     private const float64 StoveX = 0.0;
     // Engine cylinder scales (100 uu across and tall): a burner ring 36 across and 2 tall on the slab.
     private const float64 BurnerRadiusScale = 0.36;
     private const float64 BurnerHeightScale = 0.02;
-    // The pan base's bottom above the stove slab.
-    private const float64 PanLift = 6.0;
-    private const float64 HandleLength = 30.0;
-    private const float64 HandleThickness = 3.0;
+    // The pan rests clear of the burner ring so a tilt does not cut into the blockout stove; a stove prop or a held lift
+    // while operated decides the final rest.
+    private const float64 PanHoverAboveBurner = 7.0;
+
+    // The pan, the cube and the oil pool as cooking_spec.py authors them (FOOD_LIBRARY.md), in the meshes' own centimetres;
+    // the pan and every oil length are multiplied by PanScale on this station (see the design for why not 1).
+    private const float32 PanScale = 2.5f;
+    // The cube is a fifth larger than the art's ratio to the pan (the maintainer's call), so it has its own scale; the pool
+    // parameters below follow the cube's half extent so the oil still hugs it.
+    private const float32 CubeScale = 3.0f;
+    private const float32 PanRimRadius = 14.5f;
+    private const float32 PanRimHeight = 4.6f;
+    private const float32 PanUndersideDepth = 0.3f;
+    private const float32 CubeHalf = 2.0f;
+    // The pool as ratios of the cube's half extent h in pan cm (mars_cooking_ue.py LOOKDEV_POOL_NOTE): the footprint radius
+    // is h * sqrt(2) * 0.9; Pool Radius, Pool Margin, Pool Blend, Simmer Width and Contact Softness are 1.1 / 0.6 / 0.5 /
+    // 0.4 / 0.4 h.
+    private const float32 FootprintPerHalf = 1.41421356f * 0.9f;
+    private const float32 PoolRadiusPerHalf = 1.1f;
+    private const float32 PoolMarginPerHalf = 0.6f;
+    private const float32 PoolBlendPerHalf = 0.5f;
+    private const float32 SimmerWidthPerHalf = 0.4f;
+    private const float32 ContactSoftnessPerHalf = 0.4f;
+    // The handle grip, in pan cm: the near end of the grip sweep (x 19.7..34.2, z 5.8..8.4 behind the rim along +X); a
+    // glove further out along the handle sits right under the operating camera and fills the view.
+    private const FVector HandleGripLocal = FVector(21.0, 0.0, 6.0);
+    private const float32 HandleGripPitchDegrees = 10.2f;
     // Oiled: the steak's friction combines with this one as sqrt(a * b).
     private const float32 PanFriction = 0.15f;
     private const float32 PanRestitution = 0.1f;
-    // The lip: k_RimSegments boxes standing on the disc's edge. A cube of HalfSize tips over a lip of LipHeight only past
-    // tan(tilt) = HalfSize / (HalfSize - LipHeight) (63 degrees for the 6 uu steak), so a held tilt parks the steak against
-    // it and only a launch carries it over.
-    private const int32 k_RimSegments = 8;
-    private const float64 LipHalfThickness = 1.5;
-    private const float64 LipHeight = 3.0;
-    // Each segment's half length as a share of the pan radius: eight of them close the ring.
-    private const float64 LipHalfLengthPerRadius = 0.42;
-    // The swirl while operated: the disc's centripetal pull (w^2 r) beats the combined friction's mu g, so the steak glides.
+    // The oil level above the cooking surface, where the beads and the splatter live.
+    private const float32 OilLevel = 0.1f;
+
+    // The swirl while operated: the pan's centripetal pull (w^2 r) beats the combined friction's mu g, so the steak glides.
     private const float32 SwirlRadius = 4.0f;
     private const float32 SwirlHz = 1.5f;
     // The swirl on the oiled pan breaks a gliding steak's contact for just over 0.1 s now and then; a longer grace keeps it
     // on the pan (and the sizzle steady) through those gaps.
     private const float32 SteakContactGraceSeconds = 0.15f;
-    // Each steak face is a thin slab on the cube's face plane.
-    private const float64 FaceThickness = 0.8;
+
+    // The dressing: the pan material's driven group, the oil trail behind the cube, the sizzle ramp and the fond.
+    private const float32 OilAmountHot = 0.7f;
+    private const float32 OilAmountCold = 0.6f;
+    private const float32 SizzleFull = 1.0f;
+    // A seared face still hisses a little.
+    private const float32 SizzleSearedFace = 0.4f;
+    private const float32 SizzleRiseRate = 2.0f;
+    private const float32 SizzleFallRate = 1.0f;
+    private const float32 FondStart = 0.1f;
+    private const float32 FondRate = 0.02f;
+    private const float32 TrailLagSeconds = 0.25f;
+    private const float32 OilCoatOnPan = 0.7f;
+    private const float32 OilCoatOffPan = 0.3f;
+    // Per second toward the target.
+    private const float32 OilCoatRate = 1.0f;
+
+    // The oil beads (OilBubbles_Mars_NS): one box over the whole pool, lengths in art cm (times PanScale).
+    private const float32 BubbleRate = 25.0f;
+    // The box half extent per cube half extent (the art's 3.5 cm around its 2 cm half cube).
+    private const float32 BubbleOuterPerHalf = 1.75f;
+    private const float32 BubbleStartDepth = 0.3f;
+    private const float32 BubbleRadiusMin = 0.12f;
+    private const float32 BubbleRadiusMax = 0.25f;
+    private const float32 BubbleLifetimeMin = 0.6f;
+    private const float32 BubbleLifetimeMax = 1.0f;
+    private const float32 BubbleWobble = 0.05f;
+    private const float32 BubbleRise = 0.5f;
+    private const FLinearColor OilColour = FLinearColor(0.22f, 0.1f, 0.02f, 1.0f);
+
+    // The oil splatter (OilSplatter_Mars_NS), lengths in art cm (times PanScale).
+    private const float32 SplatterRate = 14.0f;
+    private const float32 SplatterBursts = 3.0f;
+    private const float32 SplatterFlingMin = 2.0f;
+    private const float32 SplatterFlingMax = 8.0f;
+    private const float32 SplatterSizeMin = 0.15f;
+    private const float32 SplatterSizeMax = 0.4f;
+    private const float32 SplatterLife = 2.0f;
+    private const float32 SplatterArc = 0.8f;
+    private const FLinearColor SplatterColour = FLinearColor(0.1f, 0.045f, 0.012f, 1.0f);
+    // The beads run while the sizzle ramp is above this.
+    private const float32 FxActiveThreshold = 0.05f;
+    // uu the steak must move before the footprint node is written again.
+    private const float64 k_FootprintWriteTolerance = 0.01;
+
+    // The pan's cooking look, set once on its dynamic instance.
+    private const float32 LookSeasoning = 0.25f;
+    private const float32 LookCarbonSpecks = 0.2f;
+    private const float32 LookOilOpacity = 0.7f;
+    private const float32 LookPoolWobble = 0.5f;
+    private const float32 LookPoolEdgeSoftness = 0.15f;
+    private const float32 LookSimmerCell = 0.6f;
+    private const float32 LookSimmerDensity = 0.85f;
+    private const float32 LookSimmerRimDarken = 0.95f;
 
     // The left glove's grip, in from the table's left (-Y) edge, a palm's thickness above the top.
     private const float64 LeftGripEdgeInset = 6.0;
@@ -65,23 +136,13 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
     // The state label above the table's far edge.
     private const float64 LabelInset = 5.0;
-    private const float64 LabelHeight = 40.0;
+    private const float64 LabelHeight = 44.0;
     private const float32 LabelWorldSize = 10.0f;
     private const FColor LabelColor = FColor(255, 238, 0, 255);
 
-    private const FLinearColor k_RawColor = FLinearColor(0.85f, 0.35f, 0.40f, 1.0f);
-    private const FLinearColor k_SearedColor = FLinearColor(0.35f, 0.17f, 0.08f, 1.0f);
-    private const FLinearColor k_PanColor = FLinearColor(0.12f, 0.12f, 0.13f, 1.0f);
     private const FLinearColor k_StoveColor = FLinearColor(0.22f, 0.22f, 0.24f, 1.0f);
     private const FLinearColor k_BurnerHot = FLinearColor(0.9f, 0.3f, 0.1f, 1.0f);
     private const FLinearColor k_BurnerCold = FLinearColor(0.3f, 0.3f, 0.3f, 1.0f);
-
-    private const int32 k_SizzleBehavior = 47; // SteamJet
-    private const float64 SizzleLift = 2.0;
-    private const float32 SizzleSize = 0.5f;
-    private const float32 SizzleColorIntensity = 1.0f;
-    private const float32 SizzleAlpha = 0.6f;
-    private const float32 SizzlePlaybackSpeed = 1.0f;
 
     private const int32 k_SearedBurstBehavior = 13; // SparksBurst
     private const float32 SearedBurstSize = 0.35f;
@@ -89,36 +150,64 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 SearedBurstPlaybackSpeed = 1.6f;
 
     private FCk_Handle_Transform _Root;
-    // Searing as exposed, with the nodes set (DoConstruct); what the feature and the visuals read.
+    // Searing as exposed, with the steak and pan sizes and the nodes set (DoConstruct); what the feature and the visuals read.
     private FMars_Searing_Spec _SearingSpec;
     private FCk_Handle_Searing _SearingHandle;
     private FCk_Handle_SceneNode _PanNode;
+    // Under the pan node, yawed so the mesh's handle (+X) points at the operator: the pan mesh, its body and the footprint
+    // node live in this frame, which is therefore the frame of Get_SteakPanLocal and of the pan material's parameters.
+    private FCk_Handle_SceneNode _PanMeshNode;
     private FCk_Handle_Implement _PanImplement;
     private FCk_Handle_JoltBody _PanBaseBody;
     private FCk_Handle_UnrealComponent _BurnerPart;
+    private FCk_Handle_UnrealComponent _PanPart;
+    // At the steak's pan-local XY on the cooking surface, unit scale: the oil FX ride it.
+    private FCk_Handle_SceneNode _FootprintNode;
+    private FCk_Handle_UnrealComponent _BubblesPart;
+    private FCk_Handle_UnrealComponent _SplatterPart;
     // The right glove's grip: the pan handle, under the pan node so it rides the tilt and the toss.
     private FCk_Handle_Transform _HandleGripNode;
     // The left glove's grip: flat on the table's left side.
     private FCk_Handle_Transform _SurfaceGripNode;
-    // The live steak's six face slabs, indexed by int32(EMars_Searing_Face); empty while there is no live steak (a lost
-    // steak keeps its parts, which die with its entity).
-    private TArray<FCk_Handle_UnrealComponent> _FaceParts;
+    // The live steak's cube; invalid while there is no live steak (a lost cube keeps its last cook state and dies with
+    // its entity).
+    private FCk_Handle_UnrealComponent _SteakPart;
     private FCk_Handle_UnrealComponent _Label;
-    // The entity script is a UObject, not a fragment, so it may hold the components. Null under nullrhi.
-    private UNiagaraComponent _Sizzle;
-    private bool _SizzleActive = false;
+    private FCk_Handle_Timer _DressingTick;
+
+    // The entity script is a UObject, not a fragment, so it may hold the components. Each is null until its hosted
+    // component exists.
+    private UMaterialInstanceDynamic _PanMaterial;
+    private UNiagaraComponent _Bubbles;
+    private UNiagaraComponent _Splatter;
+    private bool _BubblesActive = false;
+    private bool _SplatterActive = false;
     private UNiagaraComponent _SearedBurst;
 
-    // The base composes the transform, the visuals and nodes (AddVisuals: the pan node and its base body) and the Station
+    // The dressing's own lag state, advanced every frame whether or not the components exist (the footprint node moves
+    // under nullrhi too).
+    // Art cm in the pan mesh's frame: (x, y, radius, 0); radius 0 while no cube rests on the pan.
+    private FVector4 _Footprint = FVector4(0.0, 0.0, 0.0, 0.0);
+    private FVector2D _Trail = FVector2D(0.0, 0.0);
+    // The footprint node's last written offset (it is created at the origin): an idle station writes nothing.
+    private FVector _WrittenFootprint = FVector::ZeroVector;
+    private float32 _SizzleRamp = 0.0f;
+    private float32 _Fond = FondStart;
+    private FMars_CookState _CookState;
+
+    // The base composes the transform, the visuals and nodes (AddVisuals: the pan node and its body) and the Station
     // (Configure_Spec, grips on the registered nodes); the pan Implement and the minigame need them, so they come after.
     // The Searing signals are bound here, not at begin play: the first steak spawns on the kernel's first tick and its
     // visuals must not miss it.
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        // Before the base: its AddVisuals reads the pan radius from it.
+        // Before the base: its AddVisuals reads the pan radius from it. The steak is the cube mesh and the pan is the pan
+        // mesh, so the exposed spec cannot size them.
         _SearingSpec = Searing;
         _SearingSpec.Steak.ContactGraceSeconds = SteakContactGraceSeconds;
+        _SearingSpec.Steak.HalfSize = CubeHalf * CubeScale;
+        _SearingSpec.Loss.PanRadius = PanRimRadius * PanScale;
 
         const auto Flow = Super::DoConstruct(InHandle);
 
@@ -150,6 +239,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _SearingHandle.BindTo_OnSizzleChanged(FMars_Delegate_Searing_OnSizzleChanged(this, n"OnSizzleChanged"));
         _SearingHandle.BindTo_OnSteakLost(FMars_Delegate_Searing_OnSteakLost(this, n"OnSteakLost"));
         _SearingHandle.BindTo_OnCompleted(FMars_Delegate_Searing_OnCompleted(this, n"OnCompleted"));
+
+        // The timer dies with the entity; nothing to unbind.
+        _DressingTick = utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDressingTick"));
         return Flow;
     }
 
@@ -162,9 +254,19 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         if (ck::IsValid(_Label))
         { utils_unreal_component::BindTo_OnAdded(_Label, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
 
+        if (ck::IsValid(_PanPart))
+        { utils_unreal_component::BindTo_OnAdded(_PanPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPanPartAdded")); }
+
+        if (ck::IsValid(_BubblesPart))
+        { utils_unreal_component::BindTo_OnAdded(_BubblesPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnFxPartAdded")); }
+
+        if (ck::IsValid(_SplatterPart))
+        { utils_unreal_component::BindTo_OnAdded(_SplatterPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnFxPartAdded")); }
+
         Refresh_All();
     }
 
+    // The oil FX and the pan are hosted components: they die with their entities. Only the seared burst is spawned loose.
     UFUNCTION(BlueprintOverride)
     void DoEndPlay(FCk_Handle InHandle)
     {
@@ -180,11 +282,11 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
             _SearingHandle.UnbindFrom_OnCompleted(FMars_Delegate_Searing_OnCompleted(this, n"OnCompleted"));
         }
 
-        if (ck::IsValid(_Sizzle))
-        { _Sizzle.DestroyComponent(); }
-
-        _Sizzle = nullptr;
-        _SizzleActive = false;
+        _PanMaterial = nullptr;
+        _Bubbles = nullptr;
+        _Splatter = nullptr;
+        _BubblesActive = false;
+        _SplatterActive = false;
 
         if (ck::IsValid(_SearedBurst))
         { _SearedBurst.DestroyComponent(); }
@@ -201,8 +303,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         InOutSpec.StandLocal = FTransform(FRotator::ZeroRotator, FVector(-(TableDepth * 0.5 + StandGap), 0.0, 0.0));
 
         auto Grips = TArray<FMars_Station_Grip>();
-        // Both grips take their node's frame: the handle node wraps the right glove around the horizontal handle, the
-        // table node lays the left glove flat on the table.
+        // Both grips take their node's frame: the handle node wraps the right glove around the handle, the table node
+        // lays the left glove flat on the table.
         Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
             EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         Grips.Add(FMars_Station_Grip(EMars_Hand::Left, GameplayTags::Station_Node_Surface, NAME_None,
@@ -254,6 +356,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _BurnerPart = InRoot.Add_MeshPart(this, Burner);
 
         AddPan(InRoot);
+        AddOilFx();
 
         _Label = AddLabel(InRoot,
             FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - LabelInset, 0.0, StoveTop + LabelHeight)));
@@ -272,120 +375,83 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         OutNodes.Add(FMars_Station_GripNode(GameplayTags::Station_Node_Surface, _SurfaceGripNode));
     }
 
-    // The pan node is the base disc's centre; the Implement (composed in DoConstruct) writes its offset. Under it: the disc
-    // visual, the kinematic disc body on its own child node, the lip, the handle toward the operator and its grip node. The
-    // only collisions under the pan are those kinematic bodies: a moving baked part would re-bake every frame, and a static
-    // body never imparts velocity.
+    // The pan node is the centre of the cooking surface (the mesh's pivot), its underside resting on the burner; the
+    // Implement (composed in DoConstruct) writes its offset, so its own frame stays the operator's (the tilt's axes).
+    // Everything of the pan hangs off one child yawed 180 degrees, so the mesh's handle (+X) points at the operator and
+    // every pan-local quantity (Get_SteakPanLocal, the footprint node's offset, the material's Meat Footprint) is in one
+    // frame, the mesh's own: the pan mesh (its own two material instances), the kinematic triangle-mesh body of the same
+    // mesh (the only collision under the pan: a moving baked part would re-bake every frame, and a static body never
+    // imparts velocity), the footprint node and the handle's grip node (the glove rides the tilt and the toss). The pan
+    // part and the footprint node are tagged so a test can read the dressing back.
     private void AddPan(FCk_Handle_Transform& InRoot)
     {
-        const auto PanRadius = float64(_SearingSpec.Loss.PanRadius);
-        const auto BaseHalfHeight = float64(utils_searing::k_PanBaseHalfHeight);
+        const auto Scale = float64(PanScale);
 
         _PanNode = utils_scene_node::Create(InRoot,
-            FTransform(FRotator::ZeroRotator, FVector(StoveX, 0.0, Get_StoveTop() + PanLift + BaseHalfHeight)));
+            FTransform(FRotator::ZeroRotator, FVector(StoveX, 0.0, Get_BurnerTop() + PanHoverAboveBurner + PanUndersideDepth * Scale)));
         auto PanTransform = _PanNode.As_Transform();
 
-        auto Disc = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(PanRadius * 0.02, PanRadius * 0.02, BaseHalfHeight * 0.02)),
-            engine::load::Cylinder(), assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"SearingStation_PanDisc");
-        Disc.PrimaryColor = TOptional<FLinearColor>(k_PanColor);
-        PanTransform.Add_MeshPart(this, Disc);
+        _PanMeshNode = utils_scene_node::Create(PanTransform, FTransform(FRotator(0.0, 180.0, 0.0), FVector::ZeroVector));
+        auto PanMeshTransform = _PanMeshNode.As_Transform();
 
-        auto BodyNode = utils_scene_node::Create(PanTransform, FTransform::Identity);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Cylinder);
-        Shape.Set_Radius(_SearingSpec.Loss.PanRadius);
-        Shape.Set_HalfHeight(utils_searing::k_PanBaseHalfHeight);
-        _PanBaseBody = utils_jolt_body::Add(BodyNode.H(), Make_PanBodySpec(Shape));
+        _PanPart = PanMeshTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(Scale, Scale, Scale)),
+            assets::load::FryPan_Mars_SM(), nullptr, collision::profile::NoCollision, n"SearingStation_Pan"));
+        if (ck::IsValid(_PanPart))
+        { utils_entity_tag::Add(_PanPart, n"TAG_MarsSearingPan"); }
 
-        AddLip(PanTransform);
+        auto PanBodySpec = FMars_Searing_PanBodySpec(assets::FryPan_Mars_SM(), PanScale);
+        PanBodySpec.Friction = PanFriction;
+        PanBodySpec.Restitution = PanRestitution;
+        _PanBaseBody = utils_searing::Add_PanBody(_PanMeshNode, PanBodySpec);
 
-        // The handle runs from outside the lip toward the operator (-X) at the disc's mid height.
-        const auto HandleCenter = FVector(-(PanRadius + 2.0 * LipHalfThickness + HandleLength * 0.5), 0.0, 0.0);
-        auto Handle = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, HandleCenter, FVector(HandleLength, HandleThickness, HandleThickness) * 0.01),
-            engine::load::Cube(), assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"SearingStation_PanHandle");
-        Handle.PrimaryColor = TOptional<FLinearColor>(k_PanColor);
-        PanTransform.Add_MeshPart(this, Handle);
+        _FootprintNode = utils_scene_node::Create(PanMeshTransform, FTransform::Identity);
+        utils_entity_tag::Add(_FootprintNode, n"TAG_MarsSearingFootprint");
 
-        // Grip frame (X across the palm toward the index finger, Z out of the palm): along the handle toward the pan (+X),
-        // palm facing the operator's left (-Y) - a handshake grip on a horizontal handle.
-        _HandleGripNode = utils_scene_node::Create(PanTransform,
-            FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), HandleCenter)).As_Transform();
+        // Grip frame (X across the palm toward the index finger, Z out of the palm), in the mesh's frame: along the handle
+        // toward the pan (-X, descending toward it), palm facing the operator's left (the mesh's +Y) - a handshake grip.
+        const auto PitchRadians = Math::DegreesToRadians(float64(HandleGripPitchDegrees));
+        const auto HandleDirection = FVector(-Math::Cos(PitchRadians), 0.0, -Math::Sin(PitchRadians));
+        _HandleGripNode = utils_scene_node::Create(PanMeshTransform,
+            FTransform(FRotator::MakeFromXZ(HandleDirection, FVector::RightVector), HandleGripLocal * Scale)).As_Transform();
     }
 
-    // k_RimSegments kinematic boxes around the disc's edge, standing on its top, each with a matching visual; same surface
-    // as the disc. The steak's Resting counts the disc only: a steak sitting on the lip alone is not on the pan.
-    private void AddLip(FCk_Handle_Transform& InPanTransform)
+    // The beads and the splatter, hosted on the footprint node (unit scale: Niagara would inherit a scaled parent's scale).
+    // Created inactive; the dressing tick runs them.
+    private void AddOilFx()
     {
-        const auto PanRadius = float64(_SearingSpec.Loss.PanRadius);
-        const auto HalfLength = PanRadius * LipHalfLengthPerRadius;
-        const auto CenterZ = float64(utils_searing::k_PanBaseHalfHeight) + LipHeight * 0.5;
-
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(LipHalfThickness, HalfLength, LipHeight * 0.5));
-        auto BodySpec = Make_PanBodySpec(Shape);
-
-        for (int32 Index = 0; Index < k_RimSegments; ++Index)
-        {
-            const auto Yaw = FRotator(0.0, 360.0 * float64(Index) / float64(k_RimSegments), 0.0);
-            const auto Segment = FTransform(Yaw, Yaw.RotateVector(FVector(PanRadius + LipHalfThickness, 0.0, CenterZ)));
-
-            auto Visual = FMars_MeshPart(
-                FTransform(Yaw, Segment.GetLocation(), FVector(LipHalfThickness * 2.0, HalfLength * 2.0, LipHeight) * 0.01),
-                engine::load::Cube(), assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"SearingStation_PanLip");
-            Visual.PrimaryColor = TOptional<FLinearColor>(k_PanColor);
-            InPanTransform.Add_MeshPart(this, Visual);
-
-            auto BodyNode = utils_scene_node::Create(InPanTransform, Segment);
-            utils_jolt_body::Add(BodyNode.H(), BodySpec);
-        }
+        _BubblesPart = AddFx(assets::load::OilBubbles_Mars_NS(), n"SearingStation_OilBubbles");
+        _SplatterPart = AddFx(assets::load::OilSplatter_Mars_NS(), n"SearingStation_OilSplatter");
     }
 
-    // A kinematic body under the pan node: the node's motion moves it and gives it velocity.
-    private FCk_JoltBody_Spec Make_PanBodySpec(FCk_Jolt_ShapeDimensions InShape) const
+    private FCk_Handle_UnrealComponent AddFx(UNiagaraSystem InSystem, FName InDebugName)
     {
-        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BodySpec.Set_ShapeDimensions(InShape);
-        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
-        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
-        BodySpec.Set_Friction(PanFriction);
-        BodySpec.Set_Restitution(PanRestitution);
-        BodySpec.Set_CollisionProfileName(n"BlockAll");
-        return BodySpec;
+        auto Archetype = NewObject(this, UNiagaraComponent);
+        Archetype.SetMobility(EComponentMobility::Movable);
+        Archetype.SetAsset(InSystem);
+        Archetype.SetAutoActivate(false);
+
+        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
+            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
+        return utils_unreal_component::Add(_FootprintNode, ComponentParams);
     }
 
-    // The steak's look: six thin face slabs on a visual node under its entity (Jolt owns the entity's pose; the kernel
-    // never writes the node), painted from the ledger.
+    // The steak's look: the meat cube at its own scale on the steak entity (Jolt owns the entity's pose; the kernel
+    // never writes it), its Custom Primitive Data written from the cook state. Tagged so a test can read that data back.
     private void AddSteakVisuals(FCk_Handle InSteak)
     {
         auto SteakTransform = InSteak.As_Transform();
-        auto VisualNode = utils_scene_node::Create(SteakTransform, FTransform::Identity);
-        auto VisualTransform = VisualNode.As_Transform();
+        const auto Scale = float64(CubeScale);
 
-        const auto HalfSize = float64(_SearingSpec.Steak.HalfSize);
-        const auto Side = HalfSize * 2.0;
-        auto CubeMesh = engine::load::Cube();
-        auto ItemMaterial = assets::load::ProtoGrid_Item_Mars_MI();
+        _SteakPart = SteakTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(Scale, Scale, Scale)),
+            assets::load::MeatCube_Mars_SM(), nullptr, collision::profile::NoCollision, n"SearingStation_Steak"));
 
-        _FaceParts.Empty();
-        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
-        {
-            const auto Normal = utils_searing::Get_FaceNormal(EMars_Searing_Face(Index));
-            // Thin along the face's normal, Side across it.
-            const auto Scale = FVector(
-                Math::Abs(Normal.X) > 0.5 ? FaceThickness : Side,
-                Math::Abs(Normal.Y) > 0.5 ? FaceThickness : Side,
-                Math::Abs(Normal.Z) > 0.5 ? FaceThickness : Side) * 0.01;
+        if (ck::Is_NOT_Valid(_SteakPart))
+        { return; }
 
-            auto Face = FMars_MeshPart(FTransform(FRotator::ZeroRotator, Normal * HalfSize, Scale),
-                CubeMesh, ItemMaterial, collision::profile::NoCollision, n"SearingStation_SteakFace");
-            Face.PrimaryColor = TOptional<FLinearColor>(k_RawColor);
-            auto Part = VisualTransform.Add_MeshPart(this, Face);
-            if (ck::IsValid(Part))
-            { utils_unreal_component::BindTo_OnAdded(Part, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
-
-            _FaceParts.Add(Part);
-        }
+        utils_entity_tag::Add(_SteakPart, n"TAG_MarsSearingSteak");
+        utils_unreal_component::BindTo_OnAdded(_SteakPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnSteakPartAdded"));
     }
 
     // The state label above the table's far edge, yawed to face the operator. Its text is set once the component exists.
@@ -407,7 +473,270 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // Visuals (the Searing feature is the source of truth)
+    // The dressing (every frame; the Searing feature is the source of truth)
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The Advance_ steps update the lag state and the footprint node (under nullrhi too); the Apply_ steps write the
+    // components and skip any that does not exist yet.
+    UFUNCTION()
+    private void OnDressingTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        if (ck::Is_NOT_Valid(_SearingHandle))
+        { return; }
+
+        const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
+        Advance_Footprint(DeltaSeconds);
+        Advance_Sizzle(DeltaSeconds);
+        Advance_CookState(DeltaSeconds);
+        Apply_PanMaterial();
+        Apply_SteakCpd();
+        Apply_OilFx();
+    }
+
+    // The footprint follows the steak's pan-local XY (in art cm, the pan material's units); it has a radius only while a
+    // cube lies on the pan (no pool hugs a flying or absent cube). The trail lags it by TrailLagSeconds.
+    private void Advance_Footprint(float32 InDeltaSeconds)
+    {
+        const auto Local = _SearingHandle.Get_SteakPanLocal();
+        const auto Phase = _SearingHandle.Get_Phase();
+        const auto HasPool = Phase == EMars_Searing_Phase::OnPan || Phase == EMars_Searing_Phase::Done;
+        const auto Scale = float64(PanScale);
+        _Footprint = FVector4(Local.X / Scale, Local.Y / Scale, HasPool ? float64(Get_CubeFootprint()) : 0.0, 0.0);
+
+        const auto Alpha = 1.0 - Math::Exp(-float64(InDeltaSeconds) / float64(TrailLagSeconds));
+        _Trail = FVector2D(_Trail.X + (_Footprint.X - _Trail.X) * Alpha, _Trail.Y + (_Footprint.Y - _Trail.Y) * Alpha);
+
+        const auto FootprintLocation = FVector(Local.X, Local.Y, 0.0);
+        if (FootprintLocation.Distance(_WrittenFootprint) <= k_FootprintWriteTolerance)
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(_FootprintNode,
+            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator::ZeroRotator, FootprintLocation)));
+        _WrittenFootprint = FootprintLocation;
+    }
+
+    // Full while the kernel sizzles, a little while a seared face lies on the hot pan, silent otherwise; the fond builds
+    // while it sizzles.
+    private void Advance_Sizzle(float32 InDeltaSeconds)
+    {
+        const auto IsSizzling = _SearingHandle.Get_Sizzle() == EMars_Searing_Sizzle::Sizzling;
+        auto Target = 0.0f;
+        if (IsSizzling)
+        { Target = SizzleFull; }
+        else if (_SearingHandle.Get_IsHot() && _SearingHandle.Get_IsOnPan() && _SearingHandle.Get_IsDownFaceSeared())
+        { Target = SizzleSearedFace; }
+
+        const auto Rate = Target > _SizzleRamp ? SizzleRiseRate : SizzleFallRate;
+        _SizzleRamp = MoveToward(_SizzleRamp, Target, Rate * InDeltaSeconds);
+
+        if (IsSizzling)
+        { _Fond = Math::Min(1.0f, _Fond + FondRate * InDeltaSeconds); }
+    }
+
+    // The live steak's cook state from the ledger; a lost or absent steak leaves the last one (a new steak resets it).
+    private void Advance_CookState(float32 InDeltaSeconds)
+    {
+        if (_SearingHandle.Get_HasSteak() == false)
+        { return; }
+
+        auto SearSum = 0.0f;
+        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
+        {
+            const auto Sear = _SearingHandle.Get_FaceSear(EMars_Searing_Face(Index));
+            _CookState.FaceSear[Index] = Sear;
+            SearSum += Sear;
+        }
+
+        _CookState.Penetration = Math::Min(1.0f, SearSum);
+        _CookState.Shape = SearSum / float32(utils_searing::k_FaceCount);
+
+        const auto OnHotPan = _SearingHandle.Get_IsHot() && _SearingHandle.Get_IsOnPan();
+        _CookState.OilCoat = MoveToward(_CookState.OilCoat, OnHotPan ? OilCoatOnPan : OilCoatOffPan, OilCoatRate * InDeltaSeconds);
+    }
+
+    // The driven group on the pan's dynamic instance, in the pan mesh's own cm.
+    private void Apply_PanMaterial()
+    {
+        if (Resolve_PanMaterial() == false)
+        { return; }
+
+        _PanMaterial.SetScalarParameterValue(n"Oil Amount", _SearingHandle.Get_IsHot() ? OilAmountHot : OilAmountCold);
+        _PanMaterial.SetScalarParameterValue(n"Sizzle", _SizzleRamp);
+        _PanMaterial.SetScalarParameterValue(n"Fond", _Fond);
+        _PanMaterial.SetVectorParameterValue(n"Meat Footprint",
+            FLinearColor(float32(_Footprint.X), float32(_Footprint.Y), float32(_Footprint.Z), 0.0f));
+        _PanMaterial.SetVectorParameterValue(n"Oil Trail", FLinearColor(float32(_Trail.X), float32(_Trail.Y), 0.0f, 0.0f));
+    }
+
+    // Only on the live steak's cube, once its component exists.
+    private void Apply_SteakCpd()
+    {
+        if (ck::Is_NOT_Valid(_SteakPart) || _SearingHandle.Get_HasSteak() == false)
+        { return; }
+
+        auto Cube = Cast<UPrimitiveComponent>(utils_unreal_component::Get_Component(_SteakPart));
+        if (ck::Is_NOT_Valid(Cube))
+        { return; }
+
+        utils_cookstate::Write_CustomPrimitiveData(Cube, _CookState);
+    }
+
+    // The beads run while the sizzle ramp is up, at a rate that follows it; the splatter only while the kernel sizzles.
+    private void Apply_OilFx()
+    {
+        Resolve_OilFx();
+
+        if (ck::IsValid(_Bubbles))
+        {
+            _Bubbles.SetVariableFloat(n"SpawnRate", BubbleRate * _SizzleRamp);
+            _BubblesActive = Set_FxActive(_Bubbles, _BubblesActive, _SizzleRamp > FxActiveThreshold);
+        }
+
+        if (ck::IsValid(_Splatter))
+        {
+            const auto IsSizzling = _SearingHandle.Get_Sizzle() == EMars_Searing_Sizzle::Sizzling;
+            _SplatterActive = Set_FxActive(_Splatter, _SplatterActive, IsSizzling);
+        }
+    }
+
+    // Activate(true) restarts the system, so it runs only on an off -> on edge. Returns the new state.
+    private bool Set_FxActive(UNiagaraComponent InFx, bool InWasActive, bool InActive)
+    {
+        if (InActive == InWasActive)
+        { return InWasActive; }
+
+        if (InActive)
+        { InFx.Activate(true); }
+        else
+        { InFx.Deactivate(); }
+
+        return InActive;
+    }
+
+    // InValue moved toward InTarget by at most InMaxStep.
+    private float32 MoveToward(float32 InValue, float32 InTarget, float32 InMaxStep) const
+    {
+        if (InValue < InTarget)
+        { return Math::Min(InTarget, InValue + InMaxStep); }
+
+        return Math::Max(InTarget, InValue - InMaxStep);
+    }
+
+    // The pan part's slot-0 dynamic instance, created (and given the cooking look) the first time the component exists.
+    private bool Resolve_PanMaterial()
+    {
+        if (ck::IsValid(_PanMaterial))
+        { return true; }
+
+        if (ck::Is_NOT_Valid(_PanPart))
+        { return false; }
+
+        auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(_PanPart));
+        if (ck::Is_NOT_Valid(Mesh))
+        { return false; }
+
+        _PanMaterial = Mesh.CreateDynamicMaterialInstance(0);
+        if (ck::Is_NOT_Valid(_PanMaterial))
+        { return false; }
+
+        Apply_PanLook();
+        return true;
+    }
+
+    private void Apply_PanLook()
+    {
+        _PanMaterial.SetScalarParameterValue(n"Seasoning", LookSeasoning);
+        _PanMaterial.SetScalarParameterValue(n"Carbon Specks", LookCarbonSpecks);
+        _PanMaterial.SetScalarParameterValue(n"Oil Opacity", LookOilOpacity);
+        _PanMaterial.SetScalarParameterValue(n"Pool Wobble", LookPoolWobble);
+        _PanMaterial.SetScalarParameterValue(n"Pool Edge Softness", LookPoolEdgeSoftness);
+        _PanMaterial.SetScalarParameterValue(n"Simmer Cell", LookSimmerCell);
+        _PanMaterial.SetScalarParameterValue(n"Simmer Density", LookSimmerDensity);
+        _PanMaterial.SetScalarParameterValue(n"Simmer Rim Darken", LookSimmerRimDarken);
+
+        const auto Half = Get_CubeHalfInPanCm();
+        _PanMaterial.SetScalarParameterValue(n"Pool Radius", PoolRadiusPerHalf * Half);
+        _PanMaterial.SetScalarParameterValue(n"Pool Margin", PoolMarginPerHalf * Half);
+        _PanMaterial.SetScalarParameterValue(n"Pool Blend", PoolBlendPerHalf * Half);
+        _PanMaterial.SetScalarParameterValue(n"Simmer Width", SimmerWidthPerHalf * Half);
+        _PanMaterial.SetScalarParameterValue(n"Contact Softness", ContactSoftnessPerHalf * Half);
+    }
+
+    // The cube's half extent in the pan mesh's cm (the pan material's units): the pool is sized from it.
+    private float32 Get_CubeHalfInPanCm() const
+    {
+        return CubeHalf * CubeScale / PanScale;
+    }
+
+    // The footprint radius in the pan mesh's cm.
+    private float32 Get_CubeFootprint() const
+    {
+        return Get_CubeHalfInPanCm() * FootprintPerHalf;
+    }
+
+    // Each FX component gets its static parameters and is stopped the first time it exists (from its OnAdded or, if that
+    // fired before the bind, from the tick).
+    private void Resolve_OilFx()
+    {
+        if (ck::Is_NOT_Valid(_Bubbles) && ck::IsValid(_BubblesPart))
+        {
+            _Bubbles = Cast<UNiagaraComponent>(utils_unreal_component::Get_Component(_BubblesPart));
+            if (ck::IsValid(_Bubbles))
+            {
+                Apply_BubbleParameters(_Bubbles);
+                _Bubbles.Deactivate();
+                _BubblesActive = false;
+            }
+        }
+
+        if (ck::Is_NOT_Valid(_Splatter) && ck::IsValid(_SplatterPart))
+        {
+            _Splatter = Cast<UNiagaraComponent>(utils_unreal_component::Get_Component(_SplatterPart));
+            if (ck::IsValid(_Splatter))
+            {
+                Apply_SplatterParameters(_Splatter);
+                _Splatter.Deactivate();
+                _SplatterActive = false;
+            }
+        }
+    }
+
+    // One box over the whole pool around the cube (the cube hides what spawns under it); the oil surface is the
+    // footprint node's Z 0 plus OilLevel.
+    private void Apply_BubbleParameters(UNiagaraComponent InBubbles)
+    {
+        const auto Extent = float64(2.0f * BubbleOuterPerHalf * Get_CubeHalfInPanCm() * PanScale);
+        InBubbles.SetVariableVec2(n"SpawnExtent", FVector2D(Extent, Extent));
+        InBubbles.SetVariableFloat(n"SpawnRate", 0.0f);
+        InBubbles.SetVariableFloat(n"SurfaceZ", OilLevel * PanScale);
+        InBubbles.SetVariableFloat(n"StartDepth", BubbleStartDepth * PanScale);
+        InBubbles.SetVariableFloat(n"BubbleRadiusMin", BubbleRadiusMin * PanScale);
+        InBubbles.SetVariableFloat(n"BubbleRadiusMax", BubbleRadiusMax * PanScale);
+        InBubbles.SetVariableFloat(n"LifetimeMin", BubbleLifetimeMin);
+        InBubbles.SetVariableFloat(n"LifetimeMax", BubbleLifetimeMax);
+        InBubbles.SetVariableFloat(n"WobbleAmplitude", BubbleWobble * PanScale);
+        InBubbles.SetVariableFloat(n"RiseFraction", BubbleRise);
+        InBubbles.SetVariableLinearColor(n"LiquidColour", OilColour);
+    }
+
+    // Flung from the cube's footprint edge on the oil surface.
+    private void Apply_SplatterParameters(UNiagaraComponent InSplatter)
+    {
+        InSplatter.SetVariableFloat(n"SplatterRate", SplatterRate);
+        InSplatter.SetVariableFloat(n"BurstsPerSecond", SplatterBursts);
+        InSplatter.SetVariableFloat(n"SplatterRadius", Get_CubeFootprint() * PanScale);
+        InSplatter.SetVariableFloat(n"SurfaceZ", OilLevel * PanScale);
+        InSplatter.SetVariableFloat(n"FlingMin", SplatterFlingMin * PanScale);
+        InSplatter.SetVariableFloat(n"FlingMax", SplatterFlingMax * PanScale);
+        InSplatter.SetVariableFloat(n"SplatterSizeMin", SplatterSizeMin * PanScale);
+        InSplatter.SetVariableFloat(n"SplatterSizeMax", SplatterSizeMax * PanScale);
+        InSplatter.SetVariableFloat(n"SplatterLife", SplatterLife);
+        InSplatter.SetVariableFloat(n"SplatterArc", SplatterArc);
+        InSplatter.SetVariableLinearColor(n"SplatterColour", SplatterColour);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Station visuals
     //----------------------------------------------------------------------------------------------------------------------
 
     private float64 Get_StoveTop() const
@@ -415,10 +744,14 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         return TableHeight + StoveHeight;
     }
 
+    private float64 Get_BurnerTop() const
+    {
+        return Get_StoveTop() + BurnerHeightScale * 100.0;
+    }
+
     private void Refresh_All()
     {
         Refresh_Burner();
-        Refresh_Faces();
         Refresh_Label();
     }
 
@@ -428,22 +761,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         { return; }
 
         _BurnerPart.Paint_MeshPart(_SearingHandle.Get_IsHot() ? k_BurnerHot : k_BurnerCold);
-    }
-
-    private void Refresh_Faces()
-    {
-        for (int32 Index = 0; Index < _FaceParts.Num(); ++Index)
-        { Refresh_Face(EMars_Searing_Face(Index)); }
-    }
-
-    // Raw to seared by the face's sear.
-    private void Refresh_Face(EMars_Searing_Face InFace)
-    {
-        const auto Index = int32(InFace);
-        if (ck::Is_NOT_Valid(_SearingHandle) || _FaceParts.IsValidIndex(Index) == false)
-        { return; }
-
-        _FaceParts[Index].Paint_MeshPart(Math::Lerp(k_RawColor, k_SearedColor, _SearingHandle.Get_FaceSear(InFace)));
     }
 
     private void Refresh_Label()
@@ -456,46 +773,34 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         if (ck::Is_NOT_Valid(Text))
         { return; }
 
-        Text.SetText(utils_searing::Get_StateLabel(_SearingHandle));
+        Text.SetText(Get_StateLabel());
     }
 
-    // One steam component at the pan centre aimed up: spawned at the first sizzle whose template is ready (a cold template
-    // never stalls the game thread; that sizzle just goes without steam), then moved to the pan and re-activated on each
-    // Quiet -> Sizzling edge. Activate(true) resets the system, so it only runs on an edge. Null under nullrhi.
-    private void Set_SizzleActive(bool InActive)
+    // What the label reads, by phase and heat.
+    private FText Get_StateLabel() const
     {
-        if (InActive == _SizzleActive)
-        { return; }
+        const auto Seared = _SearingHandle.Get_SearedFaceCount();
+        const auto Phase = _SearingHandle.Get_Phase();
 
-        if (InActive == false)
+        if (Phase == EMars_Searing_Phase::Done)
         {
-            _SizzleActive = false;
-            if (ck::IsValid(_Sizzle))
-            { _Sizzle.Deactivate(); }
-
-            return;
+            const auto Tally = _SearingHandle.Get_Tally();
+            return FText::FromString(f"Seared in {Tally.Seconds :.1} s ({Tally.Losses} lost)");
         }
 
-        const auto PanBaseWorld = utils_transform::Get_EntityCurrentTransform(_PanBaseBody.As_Transform());
-        const auto Location = PanBaseWorld.GetLocation()
-            + PanBaseWorld.GetRotation().GetUpVector() * (float64(utils_searing::k_PanBaseHalfHeight) + SizzleLift);
-        // The jet fires along its local +X.
-        const auto Up = FRotator(90.0, 0.0, 0.0);
+        if (Phase == EMars_Searing_Phase::NoSteak)
+        { return FText::FromString("Lost it! Fresh steak..."); }
 
-        if (ck::Is_NOT_Valid(_Sizzle))
-        {
-            if (utils_particles::Get_IsBehaviorTemplateReady(k_SizzleBehavior) == false)
-            { return; }
+        if (Phase == EMars_Searing_Phase::Airborne)
+        { return FText::FromString("..."); }
 
-            _Sizzle = utils_particles::Spawn_BehaviorAtLocation(k_SizzleBehavior, Location, Up);
-            if (ck::Is_NOT_Valid(_Sizzle))
-            { return; }
-        }
+        if (_SearingHandle.Get_IsHot() == false)
+        { return FText::FromString(f"Steak: {Seared}/6 seared"); }
 
-        _SizzleActive = true;
-        _Sizzle.SetWorldLocationAndRotation(Location, Up);
-        _Sizzle.Activate(true);
-        utils_particles::Request_ApplyTuningValues(_Sizzle, SizzleSize, SizzleColorIntensity, SizzleAlpha, SizzlePlaybackSpeed);
+        if (_SearingHandle.Get_IsDownFaceSeared())
+        { return FText::FromString(f"Tilt or toss! {Seared}/6"); }
+
+        return FText::FromString(f"Searing... {Seared}/6");
     }
 
     // One reused burst component at the steak: spawned at the first seared face whose template is ready, then moved and
@@ -537,8 +842,30 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     }
 
     UFUNCTION()
+    private void OnPanPartAdded(FCk_Handle_UnrealComponent InHandle)
+    {
+        Resolve_PanMaterial();
+    }
+
+    UFUNCTION()
+    private void OnFxPartAdded(FCk_Handle_UnrealComponent InHandle)
+    {
+        Resolve_OilFx();
+    }
+
+    // Writes the current cook state once, so a cube never shows raw for a frame (or after a reload).
+    UFUNCTION()
+    private void OnSteakPartAdded(FCk_Handle_UnrealComponent InHandle)
+    {
+        Apply_SteakCpd();
+    }
+
+    UFUNCTION()
     private void OnHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat)
     {
+        if (InHeat == EMars_Searing_Heat::Hot)
+        { _Fond = FondStart; }
+
         Refresh_Burner();
         Refresh_Label();
     }
@@ -546,8 +873,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     UFUNCTION()
     private void OnSteakSpawned(FCk_Handle_Searing InSearing, FCk_Handle InSteak)
     {
+        _CookState = FMars_CookState();
         AddSteakVisuals(InSteak);
-        Refresh_Faces();
         Refresh_Label();
     }
 
@@ -560,13 +887,12 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     UFUNCTION()
     private void OnSearProgress(FCk_Handle_Searing InSearing, EMars_Searing_Face InFace, float32 InAlpha)
     {
-        Refresh_Face(InFace);
+        Refresh_Label();
     }
 
     UFUNCTION()
     private void OnFaceSeared(FCk_Handle_Searing InSearing, EMars_Searing_Face InFace)
     {
-        Refresh_Faces();
         Play_SearedBurst();
         Refresh_Label();
     }
@@ -574,15 +900,14 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     UFUNCTION()
     private void OnSizzleChanged(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle)
     {
-        Set_SizzleActive(InSizzle == EMars_Searing_Sizzle::Sizzling);
         Refresh_Label();
     }
 
-    // The lost steak flies on with its parts (they die with its entity); the next steak gets its own.
+    // The lost cube flies on with its last cook state (its part dies with its entity); the next steak gets its own.
     UFUNCTION()
     private void OnSteakLost(FCk_Handle_Searing InSearing, FCk_Handle InSteak)
     {
-        _FaceParts.Empty();
+        _SteakPart = FCk_Handle_UnrealComponent();
         Refresh_Label();
     }
 

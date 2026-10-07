@@ -72,3 +72,9 @@ class UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears : UMa
         Assert_Equals_Int(_Lost.Num(), 1, "no second loss");
     }
 }
+
+class AMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears_Actor : AMars_AutoTestRunner_SearingPan
+{
+    default _TimeoutSeconds = 10.0f;
+    default _TestEntityScriptClass = UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears;
+}

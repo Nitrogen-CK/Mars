@@ -31,8 +31,9 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
         Assert_True(ck::IsValid(_Searing.Get_Steak()), "the steak entity is live");
 
         const auto Local = _Searing.Get_SteakPanLocal();
-        Assert_Equals_Float(Local.Z, utils_searing::k_PanBaseHalfHeight + _Spec.Steak.HalfSize, 3.0,
-            "the steak's centre rests HalfSize above the pan base top");
+        ck::Trace(f"[Searing] resting steak at pan-local Z {Local.Z :.3} (HalfSize {_Spec.Steak.HalfSize})");
+        Assert_Equals_Float(Local.Z, utils_searing::k_PanSurfaceZ + _Spec.Steak.HalfSize, 3.0,
+            "the steak's centre rests HalfSize above the cooking surface");
 
         const auto Down = _Searing.Get_DownFace();
         Assert_True(Down == EMars_Searing_Face::NegZ, f"the steak lies on its -Z face (got {Down :n})");
@@ -71,4 +72,10 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
         Assert_Equals_Int(_Seared.Num(), 1, "no second OnFaceSeared");
         Assert_Equals_Int(_Searing.Get_SearedFaceCount(), 1, "one face seared");
     }
+}
+
+class AMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace_Actor : AMars_AutoTestRunner_SearingPan
+{
+    default _TimeoutSeconds = 8.0f;
+    default _TestEntityScriptClass = UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace;
 }

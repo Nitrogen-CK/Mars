@@ -81,3 +81,8 @@ class UMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut : UMars_AutoTestRig_S
         Assert_Equals_Float(NodeRoll, 0.0, 0.5, "the pan node's offset is level again");
     }
 }
+
+class AMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut_Actor : AMars_AutoTestRunner_SearingPan
+{
+    default _TestEntityScriptClass = UMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut;
+}

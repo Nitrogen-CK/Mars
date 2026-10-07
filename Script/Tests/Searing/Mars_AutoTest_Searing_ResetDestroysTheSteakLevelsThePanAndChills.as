@@ -78,3 +78,9 @@ class UMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills : UMars_
         Assert_Equals_Int(_Searing.Get_LostSteakCount(), 0, "nothing lingers");
     }
 }
+
+class AMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills_Actor : AMars_AutoTestRunner_SearingPan
+{
+    default _TimeoutSeconds = 8.0f;
+    default _TestEntityScriptClass = UMars_AutoTest_Searing_ResetDestroysTheSteakLevelsThePanAndChills;
+}

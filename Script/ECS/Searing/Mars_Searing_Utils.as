@@ -2,8 +2,11 @@ namespace utils_searing
 {
     const int32 k_FaceCount = 6;
     const int32 k_SearSignalSteps = 10;
-    // The pan base disc's half height; the steak spawns and is judged relative to the disc top.
-    const float32 k_PanBaseHalfHeight = 1.5f;
+    // The cooking surface's height in the pan body's frame: the pan node sits at the centre of that surface (the pan mesh's
+    // pivot), so the steak spawns and is judged relative to Z 0.
+    const float32 k_PanSurfaceZ = 0.0f;
+    // The pan body's mass: see Add_PanBody.
+    const float32 k_PanBodyMassKg = 1.0f;
     // How long a new down face must stay down on the pan before it is the resting face (a flip): a tumbling cube passes
     // other faces down for a frame or two, and neither the liftoff nor the first contact shows the face it settles on.
     const float32 k_FaceSettleSeconds = 0.1f;
@@ -33,6 +36,31 @@ namespace utils_searing
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
         return InHandle.As_Searing();
+    }
+
+    // The kinematic pan body on its own child node at the pan node's origin (a body needs its own entity). The body is
+    // created after its mesh preloads: callers that need it read utils_jolt_body::Get_IsBodyAdded. A rejected spec ensures
+    // and returns an invalid handle.
+    FCk_Handle_JoltBody Add_PanBody(FCk_Handle_SceneNode& InPanNode, const FMars_Searing_PanBodySpec& InSpec)
+    {
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Searing] [{InPanNode.ToString()}] rejected the pan body spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_JoltBody(); }
+
+        auto BodyNode = utils_scene_node::Create(InPanNode.As_Transform(), FTransform::Identity);
+
+        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::StaticMeshAsset);
+        BodySpec.Set_StaticMesh(InSpec.Mesh);
+        BodySpec.Set_ShapeScale(FVector(InSpec.Scale, InSpec.Scale, InSpec.Scale));
+        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
+        // Jolt asserts a positive mass even on a kinematic body, and a mesh shape computes none; the value is never used.
+        BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
+        BodySpec.Set_MassKg(k_PanBodyMassKg);
+        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
+        BodySpec.Set_Friction(InSpec.Friction);
+        BodySpec.Set_Restitution(InSpec.Restitution);
+        BodySpec.Set_CollisionProfileName(n"BlockAll");
+        return utils_jolt_body::Add(BodyNode.H(), BodySpec);
     }
 
     // The face's outward normal in the steak's own frame.
@@ -102,33 +130,6 @@ namespace utils_searing
             case EMars_Searing_Face::PosZ: return "+Z";
             default: return "-Z";
         }
-    }
-
-    // What the station's label reads, by phase and heat.
-    FText Get_StateLabel(const FCk_Handle_Searing& InSearing)
-    {
-        const auto Seared = InSearing.Get_SearedFaceCount();
-        const auto Phase = InSearing.Get_Phase();
-
-        if (Phase == EMars_Searing_Phase::Done)
-        {
-            const auto Tally = InSearing.Get_Tally();
-            return FText::FromString(f"Seared in {Tally.Seconds :.1} s ({Tally.Losses} lost)");
-        }
-
-        if (Phase == EMars_Searing_Phase::NoSteak)
-        { return FText::FromString("Lost it! Fresh steak..."); }
-
-        if (Phase == EMars_Searing_Phase::Airborne)
-        { return FText::FromString("..."); }
-
-        if (InSearing.Get_IsHot() == false)
-        { return FText::FromString(f"Steak: {Seared}/6 seared"); }
-
-        if (InSearing.Get_IsDownFaceSeared())
-        { return FText::FromString(f"Tilt or toss! {Seared}/6"); }
-
-        return FText::FromString(f"Searing... {Seared}/6");
     }
 }
 
@@ -200,7 +201,7 @@ mixin FVector Get_PanUp(const FCk_Handle_Searing& Self)
     return Self.Get_PanBaseWorld().GetRotation().GetUpVector();
 }
 
-// The steak's centre in the pan base body's frame (the base top is at Z = utils_searing::k_PanBaseHalfHeight); zero
+// The steak's centre in the pan base body's frame (the cooking surface is at Z = utils_searing::k_PanSurfaceZ); zero
 // without a steak.
 mixin FVector Get_SteakPanLocal(const FCk_Handle_Searing& Self)
 {

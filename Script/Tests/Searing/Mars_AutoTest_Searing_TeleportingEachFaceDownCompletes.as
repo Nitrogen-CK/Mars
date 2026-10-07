@@ -47,7 +47,7 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes : UMars_AutoTestRi
         Assert_True(utils_jolt_body::Get_IsBodyAdded(Body), "the steak's body is in the simulation");
 
         const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        const auto Location = PanBaseWorld.TransformPosition(FVector(0.0, 0.0, utils_searing::k_PanBaseHalfHeight + _Spec.Steak.HalfSize + 1.0));
+        const auto Location = PanBaseWorld.TransformPosition(FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + _Spec.Steak.HalfSize + 1.0));
         const auto Rotation = (FQuat(PanBaseWorld.Rotator()) * FQuat(utils_searing::Make_FaceDownRotation(Face))).Rotator();
         utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Location, Rotation));
     }
@@ -82,4 +82,10 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes : UMars_AutoTestRi
         Assert_True(Flips >= 5, f"each teleport onto another face counted a flip (got {Flips}, want >= 5)");
         Assert_True(_Sizzles.Num() > 0 && _Sizzles.Last() == EMars_Searing_Sizzle::Quiet, "a done steak does not sizzle");
     }
+}
+
+class AMars_AutoTest_Searing_TeleportingEachFaceDownCompletes_Actor : AMars_AutoTestRunner_SearingPan
+{
+    default _TimeoutSeconds = 25.0f;
+    default _TestEntityScriptClass = UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes;
 }

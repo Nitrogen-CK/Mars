@@ -136,9 +136,54 @@ struct FMars_Searing_LossSpec
     }
 }
 
+// The pan's collision: the pan mesh itself (a triangle mesh; no simple collision on the asset, so CkJolt cooks the
+// triangles), kinematic under the pan node so the node's motion moves it and gives it velocity. The mesh's own
+// centimetres are multiplied by Scale at build time (a live body never rescales). Oiled: a steak's friction combines with
+// Friction as sqrt(a * b).
+struct FMars_Searing_PanBodySpec
+{
+    UPROPERTY()
+    TSoftObjectPtr<UStaticMesh> Mesh;
+
+    UPROPERTY()
+    float32 Scale = 1.0f;
+
+    UPROPERTY()
+    float32 Friction = 0.15f;
+
+    UPROPERTY()
+    float32 Restitution = 0.1f;
+
+    FMars_Searing_PanBodySpec() {}
+
+    FMars_Searing_PanBodySpec(TSoftObjectPtr<UStaticMesh> InMesh, float32 InScale)
+    {
+        Mesh = InMesh;
+        Scale = InScale;
+    }
+}
+
+// No mesh means no pan; a non-positive scale collapses it; a negative friction or a restitution outside [0, 1] is unphysical.
+mixin FMars_Validation Validate(const FMars_Searing_PanBodySpec& Self)
+{
+    if (Self.Mesh.IsNull())
+    { return FMars_Validation("Searing pan body has no Mesh"); }
+
+    if (Self.Scale <= 0.0f)
+    { return FMars_Validation(f"Searing pan body has a non-positive Scale [{Self.Scale}]"); }
+
+    if (Self.Friction < 0.0f)
+    { return FMars_Validation(f"Searing pan body has a negative Friction [{Self.Friction}]"); }
+
+    if (Self.Restitution < 0.0f || Self.Restitution > 1.0f)
+    { return FMars_Validation(f"Searing pan body has Restitution [{Self.Restitution}] outside [0, 1]"); }
+
+    return FMars_Validation();
+}
+
 // Built by the placing script before Add: the pan is an Implement already composed on the pan node (the kernel drives it
-// from the heat and forwards the looks to it), and PanBaseBody is the kinematic disc under that node whose contacts count
-// as "on the pan".
+// from the heat and forwards the looks to it), and PanBaseBody is the kinematic pan body (the pan mesh) under that node
+// whose contacts count as "on the pan".
 struct FMars_Searing_Nodes
 {
     UPROPERTY()
