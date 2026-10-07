@@ -81,20 +81,6 @@ namespace utils_dicing
             default: return "Green paste";
         }
     }
-
-    // What the station's label reads: the texture, "stop here" once it is exactly the requested one, "over-processed"
-    // past it.
-    FText Get_StateLabel(EMars_Dicing_State InState, EMars_Dicing_State InRequested)
-    {
-        const auto Name = Get_StateName(InState);
-        if (InState == InRequested)
-        { return FText::FromString(f"{Name}: stop here"); }
-
-        if (int32(InState) > int32(InRequested))
-        { return FText::FromString(f"{Name}: over-processed"); }
-
-        return FText::FromString(Name);
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

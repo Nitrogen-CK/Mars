@@ -344,7 +344,20 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         if (ck::Is_NOT_Valid(Text))
         { return; }
 
-        Text.SetText(utils_dicing::Get_StateLabel(_DicingHandle.Get_MaterialState(), _DicingHandle.Get_RequestedState()));
+        Text.SetText(Get_StateLabel(_DicingHandle.Get_MaterialState(), _DicingHandle.Get_RequestedState()));
+    }
+
+    // What the label reads: the texture, "stop here" once it is exactly the requested one, "over-processed" past it.
+    private FText Get_StateLabel(EMars_Dicing_State InState, EMars_Dicing_State InRequested) const
+    {
+        const auto StateName = utils_dicing::Get_StateName(InState);
+        if (InState == InRequested)
+        { return FText::FromString(f"{StateName}: stop here"); }
+
+        if (int32(InState) > int32(InRequested))
+        { return FText::FromString(f"{StateName}: over-processed"); }
+
+        return FText::FromString(StateName);
     }
 
     private void Move_Band(float32 InCenter)
@@ -395,7 +408,7 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         Archetype.SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
         Archetype.SetWorldSize(LabelWorldSize);
         Archetype.SetTextRenderColor(LabelColor);
-        Archetype.SetText(utils_dicing::Get_StateLabel(EMars_Dicing_State::WholeLeaves, _DicingSpec.RequestedState));
+        Archetype.SetText(Get_StateLabel(EMars_Dicing_State::WholeLeaves, _DicingSpec.RequestedState));
 
         auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
             Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"DicingStation_Label");

@@ -1,12 +1,12 @@
-// The searing station's own state machine (FMars_Station_Spec.MinigameStateClass = UMars_SmState_Searing_Idle). It runs on
-// the STATION entity (context = the station, which also carries the Searing feature) and reads the station's operator; it
-// only issues Searing requests and registers the operator's legend rows.
+// The searing station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
+// UMars_SmState_Searing_Idle). It runs on the STATION entity (context = the station, which also carries the Searing
+// feature) and reads the station's operator; it only issues Searing requests and registers the operator's legend rows.
 //
 //   Idle      ->Operated [StationIsOperated]      task: Searing_ResetOnEnter (a fresh, cold steak for the next operator)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Searing_HeatOnEnter, Searing_OperatorInput (Tick), Searing_OperatorHints
 //
-// The conditions are the dicing station's (Mars_Dicing_Hfsm.as). The player's Operating state owns the pose, the camera
-// (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
+// The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
+// the camera (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
 
 class UMars_SmState_Searing_Idle : UCk_SmState_EntityScript
 {
@@ -102,7 +102,9 @@ class UMars_SmTask_Searing_OperatorInput : UCk_SmTask_EntityScript
         if (Sequence != _SeenLookSequence)
         {
             _SeenLookSequence = Sequence;
-            _Searing.Request_Look(FMars_Request_Searing_Look(_Intents.Get_LookDelta()));
+            const auto Delta = _Intents.Get_LookDelta();
+            ck::Trace(f"[Searing] operator look {Delta}");
+            _Searing.Request_Look(FMars_Request_Searing_Look(Delta));
         }
 
         return ECk_SmTaskResult::Running;

@@ -1,31 +1,12 @@
-// The dicing station's own state machine (FMars_Station_Spec.MinigameStateClass = UMars_SmState_Dicing_Idle). It runs on
-// the STATION entity (context = the station, which also carries the Dicing feature) and reads the station's operator; it
-// only issues Dicing requests and registers the operator's legend rows.
+// The dicing station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
+// UMars_SmState_Dicing_Idle). It runs on the STATION entity (context = the station, which also carries the Dicing feature)
+// and reads the station's operator; it only issues Dicing requests and registers the operator's legend rows.
 //
 //   Idle      ->Operated [StationIsOperated]      task: Dicing_ResetOnEnter (a fresh pile for the next operator)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Dicing_OperatorInput (Tick), Dicing_OperatorHints
 //
-// The player's Operating state owns the pose, the camera (Captured: the view stays still, the look delta is ours), the
-// glove grip and the Leave intent.
-
-// Polled on the context entity's Station; false without one.
-class UMars_SmCondition_StationIsOperated : UCk_SmCondition_Polled
-{
-    UFUNCTION(BlueprintOverride)
-    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
-    {
-        auto Station = ck::Ctx(InHandle).As_Station(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Station))
-        { return false; }
-
-        return Station.Get_IsOperated();
-    }
-}
-
-class UMars_SmCondition_StationIsNotOperated : UMars_SmCondition_StationIsOperated
-{
-    default _NegateResult = true;
-}
+// The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
+// the camera (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
 
 class UMars_SmState_Dicing_Idle : UCk_SmState_EntityScript
 {
