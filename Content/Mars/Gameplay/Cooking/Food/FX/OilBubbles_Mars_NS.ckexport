@@ -2,7 +2,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "83e4d5bf8516c6878ff5bb3dcb1d3400",
+		"sourceHash": "3ce3c6a43be9787465f8c118776626bc",
 		"exporterVersion": 3
 	},
 	"system": "OilBubbles_Mars_NS",
@@ -26,12 +26,12 @@
 		{
 			"name": "User.LifetimeMax",
 			"type": "NiagaraFloat",
-			"value": "1.8"
+			"value": "0.3"
 		},
 		{
 			"name": "User.LifetimeMin",
 			"type": "NiagaraFloat",
-			"value": "1.2"
+			"value": "0.1"
 		},
 		{
 			"name": "User.LiquidColour",
@@ -41,7 +41,7 @@
 		{
 			"name": "User.PopFraction",
 			"type": "NiagaraFloat",
-			"value": "0.15"
+			"value": "0.2"
 		},
 		{
 			"name": "User.RingScale",
@@ -51,7 +51,7 @@
 		{
 			"name": "User.RiseFraction",
 			"type": "NiagaraFloat",
-			"value": "0.55"
+			"value": "0.1"
 		},
 		{
 			"name": "User.ScalePulse",
@@ -492,7 +492,7 @@
 						},
 						{
 							"name": "Bubbles.InitializeParticle.Lifetime",
-							"value": "5"
+							"value": "1"
 						},
 						{
 							"name": "Bubbles.InitializeParticle.Position Offset",
@@ -777,7 +777,7 @@
 				"values": [
 					{
 						"name": "Lifetime",
-						"value": "5"
+						"value": "1"
 					}
 				]
 			},
