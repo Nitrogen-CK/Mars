@@ -33,6 +33,12 @@ struct FMars_PlayerCharacter_Movement
 
     UPROPERTY()
     float32 AirControl = 0.35f;
+
+    // How far (cm) the server lets the owner's reported position stray from its own before it corrects the owner
+    // (UMars_CharacterMovementComponent::ClientAuthMaxError). Co-op, not competitive: within it the owner's position is
+    // taken as truth, so latency never rubber-bands the owner. 0 = stock server-authoritative correction.
+    UPROPERTY()
+    float32 ClientAuthMaxError = 750.0f;
 }
 
 // The capsule is the chef's size: 1.5 m tall (Config.TPBody.Scale stands the 1 m SK_Chef at 1.5 m), ~78 cm across (the

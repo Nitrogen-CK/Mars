@@ -4,6 +4,26 @@
 // active, and leaving a parent tears down its subtree - so Alive->Downed interrupts any locomotion or operating state,
 // and Locomotion->Operating tears down every free-roam task (focus cleared, intents closed, manipulation ended, hints
 // unregistered) before the station's enter.
+//
+// The SM is owning-client authoritative (Mars_PlayerCharacter::TryStartPlayerSm): the owner's transitions replicate, so
+// every copy (the server's, the other clients') enters the owner's states and runs their tasks' enter and exit; only the
+// owner ticks tasks and evaluates conditions. A task whose enter or exit touches the owner's local world (camera, UI,
+// gloves, stations, the interaction resolver) or drives the movement component's stance gates on
+// utils_player_sm::Get_IsOwningCopy.
+
+namespace utils_player_sm
+{
+    // Standalone (also every DoesNotReplicate test SM), the owning client, or the listen host for its own pawn. Probes the
+    // context (the pawn's entity): a sub-SM handle has no owning pawn.
+    bool Get_IsOwningCopy(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (InNetContext == ECk_Sm_NetContext::Standalone)
+        { return true; }
+
+        return utils_net::Get_IsEntityLocallyControlled_ByPlayer(ck::Ctx(InHandle))
+            == ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled;
+    }
+}
 
 class UMars_SmCondition_IsDowned : UMars_SmCondition_ByteAttribute
 {
@@ -37,6 +57,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         auto ToDowned = AddTransition(InHandle, UMars_SmState_Downed);
         AddCondition(ToDowned, UMars_SmCondition_IsDowned);
 
+        AddTask(InHandle, UMars_SmTask_MovementSpeedSync);
         AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
         AddTask(InHandle, UMars_SmTask_AliveSubSm);
         AddTask(InHandle, UMars_SmTask_HandsSubSm);

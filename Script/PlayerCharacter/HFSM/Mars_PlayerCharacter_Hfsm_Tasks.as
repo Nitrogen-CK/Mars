@@ -14,6 +14,9 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         _Player = ck::Ctx(InHandle);
         _Trace = _Player.As_PlayerViewpoint().Get_InteractionTrace();
         _Resolver = _Player.As_InteractionResolver();

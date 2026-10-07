@@ -1139,32 +1139,6 @@ namespace UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone
 }
 
 USTRUCT()
-struct FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold
-{
-    FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams Params()
-    {
-        return FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
-{
-    FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams Params()
-    {
-        return FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams();
-    }
-}
-
-USTRUCT()
 struct FMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow_SpawnParams
 {
 }
@@ -1187,6 +1161,32 @@ namespace UMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne
     FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams Params()
     {
         return FMars_AutoTest_FPHands_PitchSpecRejectsFollowOutsideZeroToOne_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold
+{
+    FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha
+{
+    FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha_SpawnParams();
     }
 }
 
@@ -1945,6 +1945,45 @@ namespace UMars_AutoTest_Searing_SpecValidateRejectsBadPans
 }
 
 USTRUCT()
+struct FMars_AutoTest_Searing_SwirlAfterASleepingSteak_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_SwirlAfterASleepingSteak
+{
+    FMars_AutoTest_Searing_SwirlAfterASleepingSteak_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_SwirlAfterASleepingSteak_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat
+{
+    FMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall
+{
+    FMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndAFreshOneAppears_SpawnParams
 {
 }
@@ -1967,6 +2006,19 @@ namespace UMars_AutoTest_Searing_TeleportingEachFaceDownCompletes
     FMars_AutoTest_Searing_TeleportingEachFaceDownCompletes_SpawnParams Params()
     {
         return FMars_AutoTest_Searing_TeleportingEachFaceDownCompletes_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SearingStation_DressingFollowsTheSteak_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SearingStation_DressingFollowsTheSteak
+{
+    FMars_AutoTest_SearingStation_DressingFollowsTheSteak_SpawnParams Params()
+    {
+        return FMars_AutoTest_SearingStation_DressingFollowsTheSteak_SpawnParams();
     }
 }
 
@@ -2045,6 +2097,19 @@ namespace UMars_AutoTest_Station_ScopedReleaseKeepsHolder
     FMars_AutoTest_Station_ScopedReleaseKeepsHolder_SpawnParams Params()
     {
         return FMars_AutoTest_Station_ScopedReleaseKeepsHolder_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Station_ViewLocalMakesAViewNode_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_ViewLocalMakesAViewNode
+{
+    FMars_AutoTest_Station_ViewLocalMakesAViewNode_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_ViewLocalMakesAViewNode_SpawnParams();
     }
 }
 
@@ -2379,6 +2444,19 @@ namespace UMars_Backpack_EntityScript
     FMars_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_CameraLayer_Station_SpawnParams
+{
+}
+
+namespace UMars_CameraLayer_Station
+{
+    FMars_CameraLayer_Station_SpawnParams Params()
+    {
+        return FMars_CameraLayer_Station_SpawnParams();
     }
 }
 
@@ -7575,6 +7653,19 @@ namespace UMars_SmTask_Movement
     FMars_SmTask_Movement_SpawnParams Params()
     {
         return FMars_SmTask_Movement_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_MovementSpeedSync_SpawnParams
+{
+}
+
+namespace UMars_SmTask_MovementSpeedSync
+{
+    FMars_SmTask_MovementSpeedSync_SpawnParams Params()
+    {
+        return FMars_SmTask_MovementSpeedSync_SpawnParams();
     }
 }
 

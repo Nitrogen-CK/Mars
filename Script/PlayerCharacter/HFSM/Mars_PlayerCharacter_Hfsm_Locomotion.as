@@ -91,40 +91,6 @@ class UMars_SmCondition_IsNotClimbing : UMars_SmCondition_IsClimbing
     default _NegateResult = true;
 }
 
-enum EMars_LocomotionSpeed
-{
-    Walk,
-    Sprint
-}
-
-class UMars_SmTask_LocomotionSpeed : UCk_SmTask_EntityScript
-{
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    protected EMars_LocomotionSpeed Speed = EMars_LocomotionSpeed::Walk;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        auto Player = Cast<AMars_PlayerCharacter>(ck::ToActor(ck::Ctx(InHandle)));
-        if (ck::EnsureIfNot(ck::IsValid(Player), "Context actor is not an AMars_PlayerCharacter"))
-        { return; }
-
-        const auto& Speeds = Player.Config.Movement.Speeds;
-        Player.CharacterMovement.MaxWalkSpeed = Speed == EMars_LocomotionSpeed::Sprint ? Speeds.Sprint : Speeds.Walk;
-    }
-}
-
-class UMars_SmTask_LocomotionSpeed_Walk : UMars_SmTask_LocomotionSpeed
-{
-    default Speed = EMars_LocomotionSpeed::Walk;
-}
-
-class UMars_SmTask_LocomotionSpeed_Sprint : UMars_SmTask_LocomotionSpeed
-{
-    default Speed = EMars_LocomotionSpeed::Sprint;
-}
-
 class UMars_SmState_Loco_Idle : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
@@ -355,7 +321,7 @@ class UMars_SmTask_ClimbInput : UMars_SmTask_IntentEdges
         _MoveIntents = Player.As_InputIntents(ECk_SanityCheck::UnChecked);
 
         auto Character = Cast<ACharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
-        if (ck::IsValid(Character) && Character.bIsCrouched)
+        if (ck::IsValid(Character) && Character.bIsCrouched && utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext))
         { Character.UnCrouch(); }
 
         Super::DoEnterTask(InHandle, InNetContext);

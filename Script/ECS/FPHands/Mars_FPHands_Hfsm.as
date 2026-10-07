@@ -75,6 +75,9 @@ class UMars_SmTask_Hands_SetPhase : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         auto Hands = ck::Ctx(InHandle).As_FPHands();
         Hands.Request_SetPhase(FMars_Request_FPHands_SetPhase(Phase));
     }
@@ -161,6 +164,9 @@ class UMars_SmTask_Hands_StopEmote : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         utils_fphands::Stop_Emote(ck::Ctx(InHandle).As_FPHands());
     }
 }

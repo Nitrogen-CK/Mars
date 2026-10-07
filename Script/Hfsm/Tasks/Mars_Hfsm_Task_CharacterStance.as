@@ -1,5 +1,6 @@
 // ACharacter refuses to jump while crouched, and UnCrouch only lands on the next movement tick, so a
-// crouched jump stands up first and jumps on the first tick it is standing.
+// crouched jump stands up first and jumps on the first tick it is standing. The stance tasks run on the owning copy only:
+// jump and crouch reach the server through the movement component's own replication.
 class UMars_SmTask_Jump : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -10,8 +11,11 @@ class UMars_SmTask_Jump : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        _Character = Cast<ACharacter>(ck::ToActor(ck::Ctx(InHandle)));
         _HasJumped = false;
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
+        _Character = Cast<ACharacter>(ck::ToActor(ck::Ctx(InHandle)));
         if (ck::EnsureIfNot(ck::IsValid(_Character), "Context actor is not an ACharacter"))
         { return; }
 
@@ -54,6 +58,9 @@ class UMars_SmTask_Crouch : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         auto Character = Cast<ACharacter>(ck::ToActor(ck::Ctx(InHandle)));
         if (ck::EnsureIfNot(ck::IsValid(Character), "Context actor is not an ACharacter"))
         { return; }
@@ -64,6 +71,9 @@ class UMars_SmTask_Crouch : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         auto Character = Cast<ACharacter>(ck::ToActor(ck::Ctx(InHandle), ECk_SanityCheck::UnChecked));
         if (ck::IsValid(Character))
         { Character.UnCrouch(); }

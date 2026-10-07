@@ -81,6 +81,8 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Gliding = false;
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
 
         auto Player = ck::Ctx(InHandle);
         _Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(Player));
@@ -173,6 +175,8 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
     {
         _Frozen = false;
         _HasStationView = false;
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
 
         auto Player = ck::Ctx(InHandle);
         auto Viewpoint = Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
@@ -270,6 +274,9 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         _Player = ck::Ctx(InHandle);
         _Resolver = _Player.As_InteractionResolver();
 
@@ -358,6 +365,9 @@ class UMars_SmTask_Operating_Hints : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         _Display = ck::Ctx(InHandle).As_ActionHintDisplay(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(_Display))
         { return; }

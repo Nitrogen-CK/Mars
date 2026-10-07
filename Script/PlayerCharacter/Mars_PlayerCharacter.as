@@ -1,4 +1,4 @@
-class AMars_PlayerCharacter : ACk_Character_UE
+class AMars_PlayerCharacter : AMars_Character
 {
     default bUseControllerRotationYaw = true;
     default bUseControllerRotationPitch = false;
@@ -11,6 +11,16 @@ class AMars_PlayerCharacter : ACk_Character_UE
     default CharacterMovement.bOrientRotationToMovement = false;
     default CharacterMovement.NavAgentProps.bCanCrouch = true;
     default CharacterMovement.bCanWalkOffLedgesWhenCrouching = true;
+
+    // Co-op correction tuning: smooth (rather than snap) corrections up to 20 m, correct the owner at most every 1.5 s
+    // (0.5 s past 5 m off), and acknowledge good moves at most every 0.5 s. The client-authority radius
+    // (Config.Movement.ClientAuthMaxError) keeps most moves from needing a correction at all.
+    default CharacterMovement.NetworkMaxSmoothUpdateDistance = 2000.0f;
+    default CharacterMovement.NetworkNoSmoothUpdateDistance = 5000.0f;
+    default CharacterMovement.NetworkMinTimeBetweenClientAckGoodMoves = 0.5f;
+    default CharacterMovement.NetworkMinTimeBetweenClientAdjustments = 1.5f;
+    default CharacterMovement.NetworkMinTimeBetweenClientAdjustmentsLargeCorrection = 0.5f;
+    default CharacterMovement.NetworkLargeClientCorrectionDistance = 500.0f;
 
     // The third-person chef body (Config.TPBody): everyone but its owner sees it; the owner sees the gloves below. Its
     // emote and strike montages must play on simulated proxies and the listen host (their notifies included), so it
@@ -69,6 +79,10 @@ class AMars_PlayerCharacter : ACk_Character_UE
     private FCk_Handle_Transform _HandNode;
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
+
+    // The player SM (UMars_SmState_Alive) and whether this copy started it (TryStartPlayerSm).
+    private FCk_Handle_StateMachine _Sm;
+    private bool _SmStarted = false;
     // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
     private UAnimMontage _BodyEmoteMontage;
 
@@ -125,6 +139,13 @@ class AMars_PlayerCharacter : ACk_Character_UE
         { FPHands.SetAnimInstanceClass(System::LoadClassAsset_Blocking(Visual.AnimClass)); }
 
         ConstructBody();
+
+        // The native base (AMars_Character) installs it; CharacterMovement is statically the engine type.
+        auto MarsMovement = Cast<UMars_CharacterMovementComponent>(CharacterMovement);
+        if (ck::EnsureIfNot(ck::IsValid(MarsMovement), "[Mars_PlayerCharacter] the movement component is not a UMars_CharacterMovementComponent"))
+        { return; }
+
+        MarsMovement.ClientAuthMaxError = Movement.ClientAuthMaxError;
     }
 
     // Before PostInitializeComponents, so ACharacter caches this placement as the mesh's base (crouch offsets it).
@@ -280,10 +301,49 @@ class AMars_PlayerCharacter : ACk_Character_UE
         utils_emote_wheel::Add(Player, Config.EmoteWheel);
         utils_climber::Add(Player, FMars_Climber_Spec(Config.Movement.Speeds.Climb));
         utils_operator::Add(Player);
+        utils_locomotion_speed::Add(Player, Config.Movement.Speeds.Walk);
 
-        utils_state_machine::Add(Player, FCk_StateMachine_Spec(UMars_SmState_Alive));
+        // Owning-client authoritative: the owner evaluates the conditions against its input and its transitions replicate
+        // to the server and the other clients, so every copy runs the owner's states. It must not auto-start: the start
+        // (TryStartPlayerSm) waits for local control, or the nested sub-SMs snapshot their net identity as a non-owning
+        // client and freeze.
+        auto SmSpec = FCk_StateMachine_Spec(UMars_SmState_Alive);
+        SmSpec.Set_Replication(ECk_Replication::Replicates);
+        SmSpec.Set_ReplicationModel(ECk_Sm_ReplicationModel::WithHistory);
+        SmSpec.Set_AuthorityModel(ECk_Sm_AuthorityModel::OwningClientAuthoritative);
+        SmSpec.Set_AutoStart(ECk_SmAutoStart::Disabled);
+        _Sm = utils_state_machine::Add(Player, SmSpec);
 
         ConstructEyes(PlayerTransform);
+
+        TryStartPlayerSm();
+    }
+
+    // The owning client (or the listen host, for its own pawn) is the SM's only start authority. Called when the entity is
+    // ready, when the controller changes, and every tick until it starts: local control only resolves a few frames after
+    // possession. One-shot.
+    private void TryStartPlayerSm()
+    {
+        if (_SmStarted || ck::Is_NOT_Valid(_Sm))
+        { return; }
+
+        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(_Sm) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+        { return; }
+
+        utils_state_machine::Request_Start(_Sm);
+        _SmStarted = true;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ControllerChanged(AController OldController, AController NewController)
+    {
+        TryStartPlayerSm();
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void Tick(float DeltaSeconds)
+    {
+        TryStartPlayerSm();
     }
 
     //----------------------------------------------------------------------------------------------------------------------
