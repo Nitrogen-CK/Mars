@@ -1,3 +1,10 @@
+namespace constants_station
+{
+    // Every station's work surface height, sized to the 1.5 m chef (a station with Camera.ViewLocal frames its view in
+    // its own frame, so this moves the table under the view, not the view).
+    const float64 k_CounterHeight = 70.0;
+}
+
 // Base placeable station: composes the transform and the Station feature (see FMars_Station_Spec for the frame: the root
 // is the station's origin on the floor; the operator stands at StandLocal facing its +X). Concrete stations fill in the
 // geometry-bound spec fields (stand, grips), the Use probe, the visuals and the nodes their grips name. The visuals are

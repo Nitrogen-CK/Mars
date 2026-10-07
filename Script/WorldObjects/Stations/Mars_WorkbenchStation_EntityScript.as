@@ -7,7 +7,7 @@ class UMars_WorkbenchStation_EntityScript : UMars_Station_EntityScript
 
     private const float64 TableWidth = 120.0;
     private const float64 TableDepth = 60.0;
-    private const float64 TableHeight = 90.0;
+    private const float64 TableHeight = constants_station::k_CounterHeight;
     private const float64 StandGap = 70.0;
     // From the table's near (-X) edge toward its middle.
     private const float64 GripInset = 15.0;

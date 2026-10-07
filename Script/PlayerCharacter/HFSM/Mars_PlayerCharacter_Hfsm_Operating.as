@@ -156,19 +156,23 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Snaps the view to the stand's facing pitched by Camera.PitchOffset. Free: the yaw is fenced to Camera.YawHalfAngle each
-// side of the stand's facing. Captured: the orientation control is frozen (the station reads the look delta). Exit restores
-// the full yaw range and the orientation control. No PlayerViewpoint (headless) = nothing to do.
+// side of the stand's facing. Captured: the orientation control is frozen (the station reads the look delta). A station
+// with a View node also gets UMars_CameraLayer_Station, which blends the view to that node so the framing is the station's
+// and not the operator's eye height. Exit removes the layer and restores the full yaw range and the orientation control.
+// No PlayerViewpoint (headless) = nothing to do.
 class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private FCk_Handle_Camera _Camera;
     private bool _Frozen = false;
+    private bool _HasStationView = false;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         _Frozen = false;
+        _HasStationView = false;
 
         auto Player = ck::Ctx(InHandle);
         auto Viewpoint = Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
@@ -186,6 +190,17 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
         const auto CameraSpec = Station.Get_Spec().Camera;
         const auto StandYaw = Station.Get_StandWorld().Rotator().Yaw;
         _Camera.Request_SnapBoomRotation(FRotator(CameraSpec.PitchOffset, StandYaw, 0.0));
+
+        const auto View = Station.Get_View();
+        if (ck::IsValid(View))
+        {
+            auto Request = FCk_Request_Camera_AddLayer(UMars_CameraLayer_Station);
+            Request.Set_StackingBehavior(ECk_Camera_StackingBehavior::OneOnly);
+            Request.Set_BlendInTime(FCk_Time(utils_station::k_ViewBlendSeconds));
+            Request.Set_CameraTarget(FCk_Camera_Target(View, ECk_Camera_TargetMode::ViewTarget));
+            _Camera.Request_AddLayer(Request);
+            _HasStationView = true;
+        }
 
         if (CameraSpec.LookControl == EMars_Station_LookControl::Free)
         {
@@ -206,14 +221,28 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
     {
         if (ck::IsValid(_Camera) && _Camera.Get_CanCreateEntity())
         {
+            if (_HasStationView)
+            {
+                auto Request = FCk_Request_Camera_RemoveLayer(UMars_CameraLayer_Station);
+                Request.Set_BlendOutTime(FCk_Time(utils_station::k_ViewBlendSeconds));
+                _Camera.Request_RemoveLayer(Request);
+            }
+
             _Camera.Request_Set_OrientationYawLimits(-180.0f, 180.0f);
             if (_Frozen)
             { _Camera.Request_Set_HasOrientationControl(true); }
         }
 
         _Frozen = false;
+        _HasStationView = false;
         _Camera = FCk_Handle_Camera();
     }
+}
+
+// The station view layer: its camera target (the station's View node, ViewTarget) carries the framing. The task above owns
+// the orientation control, so the layer does nothing on enter or exit.
+class UMars_CameraLayer_Station : UCk_CameraLayer_EntityScript
+{
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

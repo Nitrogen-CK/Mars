@@ -129,13 +129,20 @@ struct FMars_Station_CameraSpec
     UPROPERTY()
     float32 PitchOffset = -25.0f;
 
+    // Set, the view is held at this pose in the station frame while operating (a camera layer blends to the station's
+    // View node), so the framing does not depend on the operator's eye height. Unset = the operator's own eye.
+    UPROPERTY()
+    TOptional<FTransform> ViewLocal;
+
     FMars_Station_CameraSpec() {}
 
-    FMars_Station_CameraSpec(EMars_Station_LookControl InLookControl, float32 InYawHalfAngle, float32 InPitchOffset)
+    FMars_Station_CameraSpec(EMars_Station_LookControl InLookControl, float32 InYawHalfAngle, float32 InPitchOffset,
+                             TOptional<FTransform> InViewLocal)
     {
         LookControl = InLookControl;
         YawHalfAngle = InYawHalfAngle;
         PitchOffset = InPitchOffset;
+        ViewLocal = InViewLocal;
     }
 }
 
@@ -272,6 +279,10 @@ struct FMars_Fragment_Station
     // Child scene node at StandLocal: the world pose the operator glides to.
     UPROPERTY()
     FCk_Handle_Transform Stand;
+
+    // Child scene node at Camera.ViewLocal: the operator's view while operating. Invalid when the spec leaves it unset.
+    UPROPERTY()
+    FCk_Handle_Transform View;
 
     // The Use interactable (one Instant target that reserves the station).
     UPROPERTY()

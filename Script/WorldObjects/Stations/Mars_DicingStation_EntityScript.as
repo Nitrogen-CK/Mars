@@ -15,10 +15,14 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
 
     private const float64 TableWidth = 140.0;
     private const float64 TableDepth = 80.0;
-    private const float64 TableHeight = 90.0;
-    // Close in: the capsule (radius 34) stands almost touching the table edge, the view pitched hard onto the board.
-    private const float64 StandGap = 38.0;
+    private const float64 TableHeight = constants_station::k_CounterHeight;
+    // Close in: the capsule (radius 39) stands almost touching the table edge.
+    private const float64 StandGap = 43.0;
+    // The operating view, pitched hard onto the board from ViewGap uu off the table edge and ViewAboveBoard uu over the
+    // board top. It lives in the station frame (Camera.ViewLocal), so the framing holds whatever the operator's eye height.
     private const float32 CameraPitch = -48.0f;
+    private const float64 ViewGap = 38.0;
+    private const float64 ViewAboveBoard = 58.0;
     // The Use probe's margin around the table.
     private const float64 ProbePadding = 5.0;
 
@@ -173,6 +177,8 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
 
         InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
         InOutSpec.Camera.PitchOffset = CameraPitch;
+        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(FTransform(FRotator(CameraPitch, 0.0, 0.0),
+            FVector(-(TableDepth * 0.5 + ViewGap), 0.0, Get_BoardTop() + ViewAboveBoard)));
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "DiceHerbsPrompt", "Dice herbs"),
             NSLOCTEXT("MarsInteraction", "DicingStationInUsePrompt", "In use"));

@@ -6,13 +6,15 @@ namespace utils_station
     const float32 k_EngageGlideSpeed = 600.0f;
     const float32 k_EngageMaxTurnRate = 220.0f;
     const float32 k_EngageMinSeconds = 0.15f;
+    // How long the operator's view takes to blend to (and back from) the station's View node.
+    const float32 k_ViewBlendSeconds = 0.3f;
 
     // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
-    // Use interactable (probe-driven focus when InSetup.Probe is set, else a transform-only child) with its one reserving
-    // target, the grip table on the root (each spec grip on the node InSetup.GripNodes registers under its tag), the grip
-    // interactable on the root, and the minigame state machine when the spec names one. A rejected spec, a grip naming a
-    // node tag nothing registers, or a minigame class that does not load ensures and returns an invalid handle with nothing
-    // composed.
+    // View child node when Camera.ViewLocal is set, the Use interactable (probe-driven focus when InSetup.Probe is set,
+    // else a transform-only child) with its one reserving target, the grip table on the root (each spec grip on the node
+    // InSetup.GripNodes registers under its tag), the grip interactable on the root, and the minigame state machine when
+    // the spec names one. A rejected spec, a grip naming a node tag nothing registers, or a minigame class that does not
+    // load ensures and returns an invalid handle with nothing composed.
     FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec, FMars_Station_Setup InSetup)
     {
         const auto Validation = InSpec.Validate();
@@ -49,6 +51,8 @@ namespace utils_station
         auto State = FMars_Fragment_Station();
         State.Engagement = InSpec.AllowEngagement ? ECk_EnableDisable::Enable : ECk_EnableDisable::Disable;
         State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
+        if (InSpec.Camera.ViewLocal.IsSet())
+        { State.View = utils_scene_node::Create(InRoot, InSpec.Camera.ViewLocal.GetValue()).As_Transform(); }
 
         InRoot.Add_Fragment(FMars_Feature_Station());
         InRoot.Add_Fragment(Params);
@@ -199,6 +203,12 @@ mixin ECk_EnableDisable Get_Engagement(const FCk_Handle_Station& Self)
 mixin FCk_Handle_Transform Get_Stand(const FCk_Handle_Station& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Station).Stand;
+}
+
+// The operator's view node; invalid when the spec leaves Camera.ViewLocal unset.
+mixin FCk_Handle_Transform Get_View(const FCk_Handle_Station& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Station).View;
 }
 
 // The stand's world pose (Z at the floor, +X facing the station); the station root's pose when the Stand node is gone.
