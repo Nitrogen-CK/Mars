@@ -9,9 +9,15 @@ class AMars_Gameplay_GameMode : AMars_Master_GameMode
     default HUDClass = AMars_Gameplay_HUD;
     default GameSessionClass = AMars_GameSession;
 
+    // A party that departed camp arrives by seamless travel and needs no login, so its dungeon closes to joiners. A
+    // map opened directly (a PIE listen server, a "?listen" launch) has no camp session and stays open.
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
+        auto Flow = Subsystem::GetGameInstanceSubsystem(UMars_LanFlow_Subsystem);
+        if (ck::Is_NOT_Valid(Flow) || Flow.IsSessionActive() == false)
+        { return; }
+
         TArray<AMars_GameSession> Sessions;
         GetAllActorsOfClass(Sessions);
         for (auto Session : Sessions)
