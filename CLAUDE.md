@@ -249,6 +249,26 @@ These are maintainer rulings; they override defaults from the framework skills w
   (`Script/Common/Mars_Validation.as`); `Add` wraps it in `ck::EnsureIfNot`. No `DoGet_SpecError`-style helpers.
 - **Fragments hold no strong `UObject`/`UClass` refs** (`Schema.IsSafe` rejects the fragment): use
   `TSoftObjectPtr`/`TSoftClassPtr`/`TWeakObjectPtr`/handles.
+- **Stations are three layers, and a designer should be able to make a new station by writing only the entity script.**
+  1. *Kernel* (`Script/ECS/<Feature>/`): the simulation and its ledger only: fragments, requests, processors, signals
+     (edges or quantized), the typed handle, `Add(Handle, Spec)`, `Validate`. It owns every clock and every rule that must
+     hold headless and deterministically (what cooks, what counts as a flip, when a piece is lost). It knows no mesh,
+     material, particle, text, colour, input action, hint, camera or grip; a mesh reference may appear only as a physics
+     source (a collision shape). Construction inputs the kernel needs (nodes, bodies, implements) arrive as handles in
+     the Spec, built by the caller; a shared builder for such a body may live in the kernel's utils when the test rig
+     needs the same geometry.
+  2. *Control* (`Script/WorldObjects/Stations/Mars_<Station>Station_Hfsm.as`): the operator's state machine. It reads
+     the station and the kernel, reads the operator's intents and looks, issues kernel requests, registers hint rows,
+     and sequences phases (Idle / Operated / sub-SMs). It owns no clock the simulation depends on and draws nothing.
+     Shared station conditions (`StationIsOperated`) live in `Mars_Station_SmConditions.as` beside them.
+  3. *Assembly* (`Script/WorldObjects/Stations/Mars_<Station>Station_EntityScript.as`): the actor-like assembler. It builds
+     nodes, parts and bodies, composes the features, binds their signals, and owns everything seen or heard: meshes,
+     materials and their parameters, custom primitive data, Niagara, labels and their text, colours, scale constants,
+     grips, camera framing, prompts, and any per-frame dressing (a `utils_timer::Create_Tick` on the script). It reads
+     kernel state through mixins and writes nothing but requests and its own components.
+  The test for a line of code: *runs every frame whoever is operating and must be testable headless* → kernel;
+  *depends on an operator being present or on their input, or sequences the interaction* → control; *is seen or heard*
+  → assembly. A `Get_StateLabel`, a hint string or an `Mars_IA_*` reference inside `Script/ECS/` is a leak.
 - **Behaviour lives in HFSM tasks; actors are composition.** Sequences with phases are state machines (sub-SMs under
   the owning state), with enter tasks issuing requests and polled/event-driven conditions deciding transitions.
 - **Widgets** are `UCLASS(Abstract)` with `meta = (BindWidget)` members and logic only; child widget classes are
