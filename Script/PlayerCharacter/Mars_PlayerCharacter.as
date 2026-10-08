@@ -655,6 +655,7 @@ class AMars_PlayerCharacter : AMars_Character
         auto Query = FMars_TPBody_HoldQuery();
         Query.Grips = utils_held_view::Get_GripTargets(HandsSpec, View.Grip);
         Query.IsTwoHanded = View.Grip.IsTwoHanded;
+        Query.IsSocketGrip = View.Grip.HasSocketGrips;
         Query.Hold = Body.Hold;
         Query.BodyScale = Body.Scale;
         Query.HandInGrip_R = Get_HandInGrip(BodyGripBone_R);

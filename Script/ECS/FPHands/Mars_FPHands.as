@@ -394,6 +394,28 @@ namespace utils_fphands
         return Targets;
     }
 
+    // A HeldOffset that stands a handle-along-+X tool on end: pitched InStandDeg toward +Z (90 is straight up; the
+    // tool's -Z face, an edge or a toothed face, turns to face forward), then leaned InLeanDeg about the view's
+    // forward axis so the top tips toward screen centre (positive leans a tool held on the right to the left). The
+    // tool's pivot (its rear grip) lands at InPivot in the hand node's space. Composed as quaternions: a rotator's
+    // roll would spin the tool about its own handle instead of leaning it.
+    FTransform Make_UprightHeldOffset(const FVector& InPivot, float32 InStandDeg, float32 InLeanDeg)
+    {
+        const auto Stand = FQuat(FVector::RightVector, Math::DegreesToRadians(-InStandDeg));
+        const auto Lean = FQuat(FVector::ForwardVector, Math::DegreesToRadians(InLeanDeg));
+        return FTransform(Lean * Stand, InPivot, FVector::OneVector);
+    }
+
+    // A socket grip turned InDegrees about its own X (the handle), in place: the glove keeps its spot on the handle and
+    // the forearm swings round it (FMars_ItemPresentation_Grip::SocketTwist_R / _L).
+    FTransform Twist_AboutHandle(const FTransform& InSocket, float32 InDegrees)
+    {
+        if (Math::IsNearlyZero(InDegrees))
+        { return InSocket; }
+
+        return FTransform(FQuat(FVector::ForwardVector, Math::DegreesToRadians(InDegrees)), FVector::ZeroVector, FVector::OneVector) * InSocket;
+    }
+
     // Hand node rest offset for a hold: right-side for one-handed items, centred otherwise.
     FTransform Get_HandRestOffset(const FMars_FPHands_RestSpec& InRest, const FMars_FPHands_Hold& InHold)
     {
@@ -456,11 +478,11 @@ namespace utils_fphands
         {
             const auto Grips = Sockets.GetValue();
             auto SocketGrips = FMars_FPHands_SocketGrips();
-            SocketGrips.Right = Grips.Right * Presentation.Mounting.HeldOffset;
+            SocketGrips.Right = Twist_AboutHandle(Grips.Right, Presentation.Grip.SocketTwist_R) * Presentation.Mounting.HeldOffset;
             Hold.Kind = EMars_FPHands_HoldKind::OneHanded;
             if (Grips.Left.IsSet())
             {
-                SocketGrips.Left = Grips.Left.GetValue() * Presentation.Mounting.HeldOffset;
+                SocketGrips.Left = Twist_AboutHandle(Grips.Left.GetValue(), Presentation.Grip.SocketTwist_L) * Presentation.Mounting.HeldOffset;
                 Hold.Kind = EMars_FPHands_HoldKind::TwoHanded;
             }
 

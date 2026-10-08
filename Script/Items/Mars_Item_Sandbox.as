@@ -96,6 +96,13 @@ asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
     Presentation.Visual.Mesh = assets::MeatCleaver_Mars_SM();
     Presentation.Grip.Pose = EMars_HandGripPose::Power;
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
+    // Carried upright at the ready: the handle stands on end (+X up, so the hands stack on it and the edge faces
+    // forward), its top leaning a little outward, with the rear grip low and to the right of the view. The left glove
+    // (the front grip, the upper hand) is turned so its arm comes across the body from the left; the right glove bends
+    // in from the lower right.
+    Presentation.Mounting.HeldOffset = utils_fphands::Make_UprightHeldOffset(FVector(-4.0, 22.0, -14.0), 80.0f, -8.0f);
+    Presentation.Grip.SocketTwist_L = 120.0f;
+    Presentation.Grip.SocketTwist_R = -25.0f;
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
@@ -124,6 +131,10 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
     Presentation.Visual.Mesh = assets::MeatTenderizer_Mars_SM();
     Presentation.Grip.Pose = EMars_HandGripPose::Power;
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
+    // Carried upright at the ready like the cleaver, the head up and the teeth forward, the arms turned the same way.
+    Presentation.Mounting.HeldOffset = utils_fphands::Make_UprightHeldOffset(FVector(-4.0, 22.0, -14.0), 80.0f, -8.0f);
+    Presentation.Grip.SocketTwist_L = 120.0f;
+    Presentation.Grip.SocketTwist_R = -25.0f;
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));

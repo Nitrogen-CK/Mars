@@ -38,6 +38,15 @@ struct FMars_ItemPresentation_Grip
     // The primitive the gloves' fingers close on, fitted to the Mesh bounds (finger contact).
     UPROPERTY()
     EMars_FPHands_GripShape Shape = EMars_FPHands_GripShape::Auto;
+
+    // Authored socket grips only: turns that glove about the handle (the socket's X axis), degrees, right-handed about
+    // the direction toward the tool's head. The palm stays on the handle; what moves is which side the forearm comes
+    // from, so a stacked two-handed hold can bring the left arm across the body and bend the right in from its side.
+    UPROPERTY()
+    float32 SocketTwist_R = 0.0f;
+
+    UPROPERTY()
+    float32 SocketTwist_L = 0.0f;
 }
 
 // Where the item sits on whatever holds it, and how it gets there.

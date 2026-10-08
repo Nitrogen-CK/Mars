@@ -130,6 +130,12 @@ struct FMars_TPBody_Hold
     // windup and drop through the blow instead of pinning the arms to their hold pose.
     UPROPERTY()
     float32 SwingElbowFollow = 0.5f;
+
+    // Socket-gripped tools (both hands stacked on one handle) are centred in the hand frame and pushed this far
+    // forward along it (body units): the first-person offset that frames them low and to the right of the view is
+    // screen framing, and at the frame itself the chunky gloves would sit in the robe.
+    UPROPERTY()
+    float32 SocketGripForward = 5.0f;
 }
 
 mixin FMars_Validation Validate(const FMars_TPBody_Hold& Self)
@@ -156,6 +162,9 @@ mixin FMars_Validation Validate(const FMars_TPBody_Hold& Self)
 
     if ((Self.SwingElbowFollow >= 0.0f && Self.SwingElbowFollow <= 1.0f) == false)
     { return FMars_Validation(f"SwingElbowFollow [{Self.SwingElbowFollow}] is outside [0, 1]"); }
+
+    if (Math::IsFinite(Self.SocketGripForward) == false)
+    { return FMars_Validation(f"SocketGripForward [{Self.SocketGripForward}] is not finite"); }
 
     return FMars_Validation();
 }
@@ -197,6 +206,11 @@ struct FMars_TPBody_HoldQuery
 
     UPROPERTY()
     bool IsTwoHanded = false;
+
+    // The grips come from the tool's authored sockets (a handle hold) rather than its fitted sides: they are centred in
+    // the hand frame, their first-person framing offset dropped.
+    UPROPERTY()
+    bool IsSocketGrip = false;
 
     UPROPERTY()
     FMars_TPBody_Hold Hold;
@@ -294,8 +308,9 @@ namespace utils_held_view
 
     // Both arms' targets at full alpha (the character eases them): each grip target, shrunk to body units, laid out in
     // the hand frame (moved by OneHandedOffset for a one-handed hold, then swung by the swing offset, as the first-person
-    // swing node moves the gloves and the item together), then converted to its hand bone. The elbows follow a share of
-    // the swing's displacement. A one-handed hold only raises the right arm.
+    // swing node moves the gloves and the item together), then converted to its hand bone. Socket grips are centred
+    // on the frame first (Get_CentredGrips). The elbows follow a share of the swing's displacement. A one-handed hold
+    // only raises the right arm.
     FMars_TPBody_HoldFrame Make_HoldFrame(const FMars_TPBody_HoldQuery& InQuery)
     {
         const auto& Hold = InQuery.Hold;
@@ -303,11 +318,16 @@ namespace utils_held_view
         if (InQuery.IsTwoHanded == false)
         { RestFrame = Get_InBodyUnits(FTransform(FRotator::ZeroRotator, Hold.OneHandedOffset), InQuery.BodyScale) * Hold.HandFrame; }
 
+        // The frame's own X is the hand node's forward (component +Y).
+        if (InQuery.IsSocketGrip)
+        { RestFrame = FTransform(FRotator::ZeroRotator, FVector(Hold.SocketGripForward, 0.0, 0.0), FVector::OneVector) * RestFrame; }
+
         const auto Frame = Get_InBodyUnits(InQuery.Swing, InQuery.BodyScale) * RestFrame;
         const auto ElbowFollow = RestFrame.TransformVector(InQuery.Swing.GetLocation() / float(InQuery.BodyScale)) * Hold.SwingElbowFollow;
 
-        const auto GripR = Get_InBodyUnits(InQuery.Grips.Right, InQuery.BodyScale) * Frame;
-        const auto GripL = Get_InBodyUnits(InQuery.Grips.Left, InQuery.BodyScale) * Frame;
+        const auto Grips = InQuery.IsSocketGrip ? Get_CentredGrips(InQuery.Grips, InQuery.IsTwoHanded) : InQuery.Grips;
+        const auto GripR = Get_InBodyUnits(Grips.Right, InQuery.BodyScale) * Frame;
+        const auto GripL = Get_InBodyUnits(Grips.Left, InQuery.BodyScale) * Frame;
 
         auto Result = FMars_TPBody_HoldFrame();
         Result.Right = Make_ArmTarget(InQuery.HandInGrip_R * GripR, Hold.ElbowOffset_R + ElbowFollow);
@@ -315,6 +335,21 @@ namespace utils_held_view
         Result.Right.Alpha = 1.0f;
         Result.Left.Alpha = InQuery.IsTwoHanded ? 1.0f : 0.0f;
         return Result;
+    }
+
+    // The grips with their first-person framing removed: the midpoint of both (or the right grip alone, one-handed) is
+    // moved to the hand node's origin, rotations and the hands' spacing kept. A tool the owner carries low and to the
+    // right of its view is held in front of the body's chest, where its arms reach.
+    FMars_HeldView_GripTargets Get_CentredGrips(const FMars_HeldView_GripTargets& InGrips, bool InIsTwoHanded)
+    {
+        const auto Centre = InIsTwoHanded
+            ? (InGrips.Right.GetLocation() + InGrips.Left.GetLocation()) * 0.5
+            : InGrips.Right.GetLocation();
+
+        auto Grips = InGrips;
+        Grips.Right.SetLocation(InGrips.Right.GetLocation() - Centre);
+        Grips.Left.SetLocation(InGrips.Left.GetLocation() - Centre);
+        return Grips;
     }
 
     // A transform measured in world cm (first-person hand node space) as body component units: its location shrinks by

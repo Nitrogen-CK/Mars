@@ -2634,6 +2634,19 @@ namespace UMars_AutoTest_TPBody_HoldSpecValidates
 }
 
 USTRUCT()
+struct FMars_AutoTest_TPBody_SocketGripsCentreInTheHandFrame_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_TPBody_SocketGripsCentreInTheHandFrame
+{
+    FMars_AutoTest_TPBody_SocketGripsCentreInTheHandFrame_SpawnParams Params()
+    {
+        return FMars_AutoTest_TPBody_SocketGripsCentreInTheHandFrame_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_TPBody_SwingMovesTheHoldFrame_SpawnParams
 {
 }

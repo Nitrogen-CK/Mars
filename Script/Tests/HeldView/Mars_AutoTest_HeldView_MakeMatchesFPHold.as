@@ -63,7 +63,13 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         Assert_True(Grip.HasSocketGrips == Hold.SocketGrips.IsSet(), f"{InName}: socket grips match");
         Assert_True(Math::Abs(Grip.RightFaceY - Hold.Faces.RightY) < 0.001, f"{InName}: RightFaceY [{Grip.RightFaceY}] matches [{Hold.Faces.RightY}]");
         Assert_True(Math::Abs(Grip.LeftFaceY - Hold.Faces.LeftY) < 0.001, f"{InName}: LeftFaceY [{Grip.LeftFaceY}] matches [{Hold.Faces.LeftY}]");
-        Assert_True(Grip.RightFaceY > 0.0 && Grip.LeftFaceY < 0.0, f"{InName}: the fitted faces straddle the hand node");
+        if (Grip.HasSocketGrips == false)
+        { Assert_True(Grip.RightFaceY > 0.0 && Grip.LeftFaceY < 0.0, f"{InName}: the fitted faces straddle the hand node"); }
+        else
+        {
+            Assert_True(Grip.SocketGrip_R.Equals(Hold.SocketGrips.GetValue().Right, 0.001), f"{InName}: the right socket grip matches the gloves'");
+            Assert_True(Grip.SocketGrip_L.Equals(Hold.SocketGrips.GetValue().Left, 0.001), f"{InName}: the left socket grip matches the gloves'");
+        }
 
         const auto Spec = FMars_FPHands_Spec();
         const auto Expected = utils_fphands::Get_RestTargets(Spec.Rest, Hold, FMars_FPHands_TargetFrame());
