@@ -134,6 +134,17 @@ namespace mars
         Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
     }
 
+    // Pressed while operating a cooking station: the free hand adds one raw piece (a press while the hand is busy does
+    // nothing). Shares Q with the emote wheel, which only runs outside a station.
+    asset Mars_IA_StationAddFood of UCk_Boolean_InputAction
+    {
+        PlayerMappableKeySettings = NewObject(Mars_IA_StationAddFood, UCk_PlayerMappableKeySettings_UE);
+        PlayerMappableKeySettings.Name = n"IA_StationAddFood";
+        PlayerMappableKeySettings.DisplayName = NSLOCTEXT("MarsSettingsUI", "KeybindStationAddFood", "Add food (station)");
+        PlayerMappableKeySettings.DisplayCategory = NSLOCTEXT("MarsSettingsUI", "KeybindCategoryGameplay", "Gameplay");
+        Cast<UCk_PlayerMappableKeySettings_UE>(PlayerMappableKeySettings).Set_ScopeTags(GameplayTag::MakeContainerFromTag(GameplayTags::Input_Scope_Gameplay));
+    }
+
     asset Mars_IA_Emote_Wave of UCk_Boolean_InputAction
     {
         PlayerMappableKeySettings = NewObject(Mars_IA_Emote_Wave, UCk_PlayerMappableKeySettings_UE);

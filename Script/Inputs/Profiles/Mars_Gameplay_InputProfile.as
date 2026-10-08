@@ -213,6 +213,8 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Context.MapKey(mars::Mars_IA_Drop, EKeys::R);
         Context.MapKey(mars::Mars_IA_Back, EKeys::Tab);
         Context.MapKey(mars::Mars_IA_EmoteWheel, EKeys::Q);
+        // Shares Q: the wheel only runs in Locomotion, this row is read only while operating a feeding station.
+        Context.MapKey(mars::Mars_IA_StationAddFood, EKeys::Q);
         Context.MapKey(mars::Mars_IA_Emote_Wave, EKeys::Five);
         Context.MapKey(mars::Mars_IA_Emote_ThumbsUp, EKeys::Six);
         Context.MapKey(mars::Mars_IA_Emote_Point, EKeys::Seven);
@@ -387,6 +389,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         Rows.Add(FMars_Gameplay_IntentRow("DR", n"IA_Drop", GameplayTags::Mars_Intent_Drop));
         Rows.Add(FMars_Gameplay_IntentRow("BK", n"IA_Back", GameplayTags::Mars_Intent_Back));
         Rows.Add(FMars_Gameplay_IntentRow("EM", n"IA_EmoteWheel", GameplayTags::Mars_Intent_EmoteWheel));
+        Rows.Add(FMars_Gameplay_IntentRow("AF", n"IA_StationAddFood", GameplayTags::Mars_Intent_StationAddFood));
         Rows.Add(FMars_Gameplay_IntentRow("EW", n"IA_Emote_Wave", GameplayTags::Mars_Intent_Emote_Wave));
         Rows.Add(FMars_Gameplay_IntentRow("ET", n"IA_Emote_ThumbsUp", GameplayTags::Mars_Intent_Emote_ThumbsUp));
         Rows.Add(FMars_Gameplay_IntentRow("EP", n"IA_Emote_Point", GameplayTags::Mars_Intent_Emote_Point));
