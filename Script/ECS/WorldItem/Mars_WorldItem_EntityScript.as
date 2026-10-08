@@ -286,8 +286,9 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (_MaterialOverride.IsNull() == false)
         { MeshComponent.SetMaterial(0, System::LoadAsset_Blocking(_MaterialOverride)); }
 
-        // A visual attached under the local player's hand is drawn with the first-person gloves holding it.
-        MeshComponent.SetFirstPersonPrimitiveType(utils_fphands::Get_FirstPersonType(InHandle));
+        // A visual attached under the local player's hand is drawn with the first-person gloves holding it. The walk
+        // starts at this item's root (the scene node under the hand): the component's own entity is no scene node.
+        MeshComponent.SetFirstPersonPrimitiveType(utils_fphands::Get_FirstPersonType(_SelfEntity));
     }
 
     // A persistent item moving into or out of the local player's hand switches how it, and what it carries, is drawn.
