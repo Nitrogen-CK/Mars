@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "3e0cf0e527726e4de61a082fb3c49b6c",
+		"sourceHash": "0ce62fdae6b23c8aac30f55d292d68bf",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -18,10 +18,12 @@
 		"Custom": 2,
 		"MakeMaterialAttributes": 1,
 		"MaterialFunctionCall": 2,
-		"ScalarParameter": 13,
+		"ScalarParameter": 14,
 		"TextureCoordinate": 1,
 		"TextureSampleParameter2D": 2,
-		"VectorParameter": 6
+		"Transform": 1,
+		"VectorParameter": 8,
+		"VertexNormalWS": 1
 	},
 	"graph":
 	{
@@ -30,7 +32,7 @@
 				"id": 0,
 				"class": "VectorParameter",
 				"name": "MaterialExpressionVectorParameter_0",
-				"desc": "Only Oil Coat (alpha) is read here. Custom Primitive Data 4-7.",
+				"desc": "Sear on +Z / -Z (0 pale, 1 golden, 2 burnt) and Oil Coat (alpha); Penetration is not read. Custom Primitive Data 4-7.",
 				"outputs": [
 					"RGB",
 					"+Z",
@@ -45,7 +47,7 @@
 					"PrimitiveDataIndex": 4,
 					"ParameterName": "Sear Z + Cook",
 					"Group": "01 Driven (Custom Primitive Data)",
-					"SortPriority": 0
+					"SortPriority": 1
 				}
 			},
 			{
@@ -67,7 +69,7 @@
 					"PrimitiveDataIndex": 8,
 					"ParameterName": "Finish",
 					"Group": "01 Driven (Custom Primitive Data)",
-					"SortPriority": 1
+					"SortPriority": 2
 				}
 			},
 			{
@@ -100,7 +102,7 @@
 					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
 					"ParameterName": "Debug Sear Z + Cook",
 					"Group": "02 Debug Override",
-					"SortPriority": 1
+					"SortPriority": 2
 				}
 			},
 			{
@@ -120,7 +122,7 @@
 					"DefaultValue": "(R=0.000000,G=0.000000,B=1.000000,A=0.000000)",
 					"ParameterName": "Debug Finish",
 					"Group": "02 Debug Override",
-					"SortPriority": 2
+					"SortPriority": 3
 				}
 			},
 			{
@@ -546,6 +548,32 @@
 						"name": "NrmFried",
 						"node": 16,
 						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "SearA",
+						"node": 27,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 20,
+						"name": "DbgA",
+						"node": 28,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 21,
+						"name": "N",
+						"node": 31,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "Sharp",
+						"node": 29,
+						"output": 0
 					}
 				],
 				"outputs": [
@@ -557,7 +585,7 @@
 				],
 				"props":
 				{
-					"Code": "float4 fin = lerp(Fin, DbgFin, UseDebug);\nfloat4 sb = lerp(SearB, DbgB, UseDebug);\nfloat fry = clamp(fin.z, 0.0, 2.0);\nfloat golden = saturate(fry);\nfloat burnt = saturate(fry - 1.0);\nfloat crumb = Mask.g - 0.5;\n\nfloat brown = saturate(golden * (1.0 + Mask.a * EdgeBoost) + (Mask.b - 0.5) * FryBreakup * golden * (1.0 - golden) * 2.0);\nfloat scorch = saturate(burnt * (1.0 + Mask.a * EdgeBoost) + (Mask.b - 0.5) * FryBreakup * burnt);\nfloat3 col = Base * lerp(float3(1.0, 1.0, 1.0), GoldenTint, brown);\ncol *= 1.0 + crumb * 2.0 * CrumbContrast * golden;\ncol = lerp(col, BurntColor, scorch);\n\nfloat rough = lerp(RoughRaw, RoughGolden + crumb * CrumbRough, golden);\nrough = lerp(rough, RoughBurnt, burnt);\n\nRoughness = saturate(rough);\nOil = saturate(RawCoat * (1.0 - golden) + sb.w) * (1.0 - 0.6 * burnt);\nPatch = Mask.b;\nNormalStrength = lerp(NrmRaw, NrmFried, golden);\nreturn max(col, 0.0);",
+					"Code": "float4 fin = lerp(Fin, DbgFin, UseDebug);\nfloat4 sb = lerp(SearB, DbgB, UseDebug);\nfloat4 sa = lerp(SearA, DbgA, UseDebug);\nfloat3 n = normalize(N);\nfloat3 wp = pow(saturate(n), Sharp);\nfloat3 wn = pow(saturate(-n), Sharp);\nfloat wsum = wp.x + wp.y + wp.z + wn.x + wn.y + wn.z + 1e-5;\nfloat face = (wp.x * sa.x + wn.x * sa.y + wp.y * sa.z + wn.y * sa.w + wp.z * sb.x + wn.z * sb.y) / wsum;\nfloat fry = clamp(max(fin.z, face), 0.0, 2.0);\nfloat golden = saturate(fry);\nfloat burnt = saturate(fry - 1.0);\nfloat crumb = Mask.g - 0.5;\n\nfloat brown = saturate(golden * (1.0 + Mask.a * EdgeBoost) + (Mask.b - 0.5) * FryBreakup * golden * (1.0 - golden) * 2.0);\nfloat scorch = saturate(burnt * (1.0 + Mask.a * EdgeBoost) + (Mask.b - 0.5) * FryBreakup * burnt);\nfloat3 col = Base * lerp(float3(1.0, 1.0, 1.0), GoldenTint, brown);\ncol *= 1.0 + crumb * 2.0 * CrumbContrast * golden;\ncol = lerp(col, BurntColor, scorch);\n\nfloat rough = lerp(RoughRaw, RoughGolden + crumb * CrumbRough, golden);\nrough = lerp(rough, RoughBurnt, burnt);\n\nRoughness = saturate(rough);\nOil = saturate(RawCoat * (1.0 - golden) + sb.w) * (1.0 - 0.6 * burnt);\nPatch = Mask.b;\nNormalStrength = lerp(NrmRaw, NrmFried, golden);\nreturn max(col, 0.0);",
 					"Description": "BatterSurface: raw -> golden -> burnt"
 				}
 			},
@@ -662,6 +690,84 @@
 						"output": 1
 					}
 				]
+			},
+			{
+				"id": 27,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_6",
+				"desc": "Sear +X -X +Y -Y (0 pale, 1 golden, 2 burnt). Custom Primitive Data 0-3.",
+				"outputs": [
+					"RGB",
+					"+X",
+					"-X",
+					"+Y",
+					"-Y",
+					"RGBA"
+				],
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Sear XY",
+					"Group": "01 Driven (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 28,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_7",
+				"outputs": [
+					"RGB",
+					"+X",
+					"-X",
+					"+Y",
+					"-Y",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Debug Sear XY",
+					"Group": "02 Debug Override",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 29,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"desc": "How crisply the six face patches separate. Lower blends them around a rounded piece.",
+				"props":
+				{
+					"DefaultValue": 4,
+					"SliderMin": 1,
+					"SliderMax": 16,
+					"ParameterName": "Face Sharpness",
+					"Group": "04 Fry",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 30,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 31,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 30,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_World",
+					"TransformType": "TRANSFORM_Local"
+				}
 			}
 		],
 		"outputs": [
@@ -740,6 +846,10 @@
 		{
 			"name": "Oil Base Gloss",
 			"value": 0.60000002384185791
+		},
+		{
+			"name": "Face Sharpness",
+			"value": 4
 		}
 	],
 	"vectorParams": [
@@ -766,6 +876,14 @@
 		{
 			"name": "Burnt Colour",
 			"value": "RGBA(0.05, 0.03, 0.015, 1)"
+		},
+		{
+			"name": "Sear XY",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Debug Sear XY",
+			"value": "RGBA(0, 0, 0, 0)"
 		}
 	],
 	"textureParams": [

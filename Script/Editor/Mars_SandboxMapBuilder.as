@@ -138,6 +138,14 @@ void Mars_PlaceSandboxSearingStationFunc(const TArray<FString>& Args)
 
 const FConsoleCommand Mars_PlaceSandboxSearingStationCommand("Mars.Sandbox.PlaceSearingStation", n"Mars_PlaceSandboxSearingStationFunc");
 
+UFUNCTION()
+void Mars_PlaceSandboxFryStationFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceFryStation();
+}
+
+const FConsoleCommand Mars_PlaceSandboxFryStationCommand("Mars.Sandbox.PlaceFryStation", n"Mars_PlaceSandboxFryStationFunc");
+
 // One of the sandbox items PlaceItems places.
 struct FMars_Sandbox_ItemPlacement
 {
@@ -169,6 +177,7 @@ namespace utils_mars_sandbox
     const FString k_WorkbenchLabel = "Sandbox_Workbench";
     const FString k_DicingStationLabel = "Sandbox_DicingStation";
     const FString k_SearingStationLabel = "Sandbox_SearingStation";
+    const FString k_FryStationLabel = "Sandbox_FryStation";
     const FString k_EyesDummyLabel = "EyesDummy";
 
     void Build()
@@ -226,6 +235,7 @@ namespace utils_mars_sandbox
         Spawn_Workbench();
         Spawn_DicingStation();
         Spawn_SearingStation();
+        Spawn_FryStation();
         Spawn_Gauntlets();
 
         Apply_ProtoGridMaterials();
@@ -454,6 +464,22 @@ namespace utils_mars_sandbox
     void Spawn_SearingStation()
     {
         Spawn_Mechanism(UMars_SearingStation_EntityScript, FMars_MapBuilder_Placement(k_SearingStationLabel, FVector(-800.0, -1600.0, 0.0)));
+    }
+
+    void PlaceFryStation()
+    {
+        const FString Command = "Mars.Sandbox.PlaceFryStation";
+        if (Get_CanAdd(Command, k_FryStationLabel, "Delete it first to re-place.") == false)
+        { return; }
+
+        Spawn_FryStation();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // Beside the searing station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
+    void Spawn_FryStation()
+    {
+        Spawn_Mechanism(UMars_FryStation_EntityScript, FMars_MapBuilder_Placement(k_FryStationLabel, FVector(-400.0, -1600.0, 0.0)));
     }
 
     // The ladder stands at the middle of the platform's south face, yawed so its local +X points away from the platform;

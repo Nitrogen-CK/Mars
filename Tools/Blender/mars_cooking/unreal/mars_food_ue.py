@@ -881,13 +881,16 @@ def build_batter_master(fns):
     g = mc._Graph(m, x0=-5200)
 
     g.group("01 Driven (Custom Primitive Data)")
-    sear_b = g.vector("Sear Z + Cook", (0, 0, 0, 0), "Only Oil Coat (alpha) is read here. Custom Primitive Data 4-7.",
-                      SEAR_Z, cpd=fs.CPD["SearZCook"])
+    sear_a = g.vector("Sear XY", (0, 0, 0, 0), "Sear +X -X +Y -Y (0 pale, 1 golden, 2 burnt). Custom Primitive Data 0-3.",
+                      SEAR_XY, cpd=fs.CPD["SearXY"])
+    sear_b = g.vector("Sear Z + Cook", (0, 0, 0, 0), "Sear on +Z / -Z (0 pale, 1 golden, 2 burnt) and Oil Coat (alpha); "
+                      "Penetration is not read. Custom Primitive Data 4-7.", SEAR_Z, cpd=fs.CPD["SearZCook"])
     fin = g.vector("Finish", (0, 0, 0, 0), "Fry (blue) 0 raw batter, 1 golden, 2 burnt. Custom Primitive Data 8-11.",
                    FINISH, cpd=fs.CPD["Finish"])
 
     g.group("02 Debug Override")
     use_dbg = g.scalar("Debug Use Sliders", 0.0, 0.0, 1.0, "1 = ignore Custom Primitive Data and use the vectors below.")
+    dbg_a = g.vector("Debug Sear XY", (0, 0, 0, 0), "", SEAR_XY)
     dbg_b = g.vector("Debug Sear Z + Cook", (0, 0, 1, 0), "", SEAR_Z)
     dbg_f = g.vector("Debug Finish", (0, 0, 1, 0), "", FINISH)
 
@@ -901,6 +904,8 @@ def build_batter_master(fns):
     edge_boost = g.scalar("Edge Boost", 0.4, 0.0, 1.0, "Drips and edges (mask A) colour first.")
     fry_breakup = g.scalar("Fry Breakup", 0.35, 0.0, 1.5, "Patchiness of the frying (mask B).")
     crumb = g.scalar("Crumb Contrast", 0.25, 0.0, 1.0, "Crumb light / dark in the colour (mask G).")
+    sharp = g.scalar("Face Sharpness", 4.0, 1.0, 16.0, "How crisply the six face patches separate. Lower blends them "
+                     "around a rounded piece.")
 
     g.group("05 Textures")
     uv0 = g.expr(unreal.MaterialExpressionTextureCoordinate, g.x0 + g.col * g.COL_W - 260, g.y0)
@@ -919,12 +924,14 @@ def build_batter_master(fns):
 
     x = -1500
     vtx = _vertex_base(g, srgb, cav_ao, x - 700, -1300, fns.get("decode"))
+    _, ln = g.local_space(x - 700, -500)                  # local vertex normal: the six faces are the piece's own axes
     surf = g.custom("BatterSurface: raw -> golden -> burnt", hlsl.BATTER_SURFACE, (
         ("Base",) + vtx["base"], ("Mask", mask, "RGBA"), ("Fin", fin, "RGBA"), ("DbgFin", dbg_f, "RGBA"),
         ("SearB", sear_b, "RGBA"), ("DbgB", dbg_b, "RGBA"), ("UseDebug", use_dbg, ""), ("GoldenTint", golden, ""),
         ("BurntColor", burnt, ""), ("EdgeBoost", edge_boost, ""), ("FryBreakup", fry_breakup, ""),
         ("CrumbContrast", crumb, ""), ("RoughRaw", r_raw, ""), ("RoughGolden", r_golden, ""), ("RoughBurnt", r_burnt, ""),
-        ("CrumbRough", crumb_rough, ""), ("RawCoat", raw_coat, ""), ("NrmRaw", nrm_raw, ""), ("NrmFried", nrm_fried, "")),
+        ("CrumbRough", crumb_rough, ""), ("RawCoat", raw_coat, ""), ("NrmRaw", nrm_raw, ""), ("NrmFried", nrm_fried, ""),
+        ("SearA", sear_a, "RGBA"), ("DbgA", dbg_a, "RGBA"), ("N", ln, ""), ("Sharp", sharp, "")),
         x, -900, FLOAT3, (("Roughness", FLOAT1), ("Oil", FLOAT1), ("Patch", FLOAT1), ("NormalStrength", FLOAT1)))
     oil = _coat(g, coat, surf, x + 450, -800)
     normal = g.custom("MeatNormal (mars_cooking_hlsl)", mhlsl.MEAT_NORMAL,

@@ -70,13 +70,21 @@ NormalStrength = lerp(NrmRaw, NrmCrust, crust);
 return max(col, 0.0);"""
 
 # ====================================================================================== batter (Batter_Mars_M)
-# Fry = Finish.z: 0 raw pale wet batter (glossy, high clear coat), 1 golden crisp (crumb roughness from mask G),
-# 2 burnt. Drips / edges (mask A) colour first, mask B makes it patchy. Oil = the CPD Oil Coat (Sear Z + Cook .w)
-# plus the raw batter's own wetness. Base = decoded vertex colour (the shell is painted pale raw batter).
+# fry 0 raw pale wet batter (glossy, high clear coat), 1 golden crisp (crumb roughness from mask G), 2 burnt. Finish.z
+# (Fry) is the floor under the six per-face sears (Sear XY = +X -X +Y -Y, Sear Z + Cook .xy = +Z -Z), blended by the
+# local normal as MEAT_COOK does (Sharp = how crisply the six patches separate), so a face that was under the oil browns
+# alone. Drips / edges (mask A) colour first, mask B makes it patchy. Oil = the CPD Oil Coat (Sear Z + Cook .w) plus
+# the raw batter's own wetness. Base = decoded vertex colour (the shell is painted pale raw batter); N = local normal.
 # Outputs: Roughness, Oil, Patch, NormalStrength.
 BATTER_SURFACE = """float4 fin = lerp(Fin, DbgFin, UseDebug);
 float4 sb = lerp(SearB, DbgB, UseDebug);
-float fry = clamp(fin.z, 0.0, 2.0);
+float4 sa = lerp(SearA, DbgA, UseDebug);
+float3 n = normalize(N);
+float3 wp = pow(saturate(n), Sharp);
+float3 wn = pow(saturate(-n), Sharp);
+float wsum = wp.x + wp.y + wp.z + wn.x + wn.y + wn.z + 1e-5;
+float face = (wp.x * sa.x + wn.x * sa.y + wp.y * sa.z + wn.y * sa.w + wp.z * sb.x + wn.z * sb.y) / wsum;
+float fry = clamp(max(fin.z, face), 0.0, 2.0);
 float golden = saturate(fry);
 float burnt = saturate(fry - 1.0);
 float crumb = Mask.g - 0.5;
