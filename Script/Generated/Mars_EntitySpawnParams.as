@@ -372,6 +372,19 @@ namespace UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold
 }
 
 USTRUCT()
+struct FMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease
+{
+    FMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Control_ManipulationWaitsForTheGrip_SpawnParams
 {
 }
@@ -485,6 +498,19 @@ namespace UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack
     FMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack_SpawnParams Params()
     {
         return FMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Control_ViewStaysHeldUntilUseReleases_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Control_ViewStaysHeldUntilUseReleases
+{
+    FMars_AutoTest_Control_ViewStaysHeldUntilUseReleases_SpawnParams Params()
+    {
+        return FMars_AutoTest_Control_ViewStaysHeldUntilUseReleases_SpawnParams();
     }
 }
 
@@ -2660,6 +2686,97 @@ namespace UMars_AutoTest_TPBody_SwingMovesTheHoldFrame
 }
 
 USTRUCT()
+struct FMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes
+{
+    FMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode
+{
+    FMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls
+{
+    FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch
+{
+    FMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer
+{
+    FMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_SpecValidateRejectsBadSpecs_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_SpecValidateRejectsBadSpecs
+{
+    FMars_AutoTest_Tumbler_SpecValidateRejectsBadSpecs_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_SpecValidateRejectsBadSpecs_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_TheHatchTogglesOnlyAtHomeAndSettled_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_TheHatchTogglesOnlyAtHomeAndSettled
+{
+    FMars_AutoTest_Tumbler_TheHatchTogglesOnlyAtHomeAndSettled_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_TheHatchTogglesOnlyAtHomeAndSettled_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams
 {
 }
@@ -3253,35 +3370,6 @@ namespace UMars_ForageDebris_EntityScript
     FMars_ForageDebris_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UStaticMesh> InMesh, TSoftObjectPtr<UMaterialInterface> InMaterial, FVector InScale, float32 InLifetimeSeconds)
     {
         return FMars_ForageDebris_EntityScript_SpawnParams(InSpawnTransform, InMesh, InMaterial, InScale, InLifetimeSeconds);
-    }
-}
-
-USTRUCT()
-struct FMars_FryerStation_EntityScript_SpawnParams
-{
-    UPROPERTY()
-    FTransform SpawnTransform = FTransform::Identity;
-
-    UPROPERTY()
-    FMars_Station_Spec Station;
-
-    FMars_FryerStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
-    {
-        SpawnTransform = InSpawnTransform;
-        Station = InStation;
-    }
-}
-
-namespace UMars_FryerStation_EntityScript
-{
-    FMars_FryerStation_EntityScript_SpawnParams Params()
-    {
-        return FMars_FryerStation_EntityScript_SpawnParams();
-    }
-
-    FMars_FryerStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation)
-    {
-        return FMars_FryerStation_EntityScript_SpawnParams(InSpawnTransform, InStation);
     }
 }
 
@@ -7536,6 +7624,32 @@ namespace UMars_SmState_TestLamp_Toggle
 }
 
 USTRUCT()
+struct FMars_SmState_Tumbler_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Tumbler_Idle
+{
+    FMars_SmState_Tumbler_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Tumbler_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Tumbler_Operated_SpawnParams
+{
+}
+
+namespace UMars_SmState_Tumbler_Operated
+{
+    FMars_SmState_Tumbler_Operated_SpawnParams Params()
+    {
+        return FMars_SmState_Tumbler_Operated_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_WorldItem_PickUp_SpawnParams
 {
 }
@@ -8524,6 +8638,71 @@ namespace UMars_SmTask_TestLamp_Toggle
 }
 
 USTRUCT()
+struct FMars_SmTask_Tumbler_CancelOnExit_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Tumbler_CancelOnExit
+{
+    FMars_SmTask_Tumbler_CancelOnExit_SpawnParams Params()
+    {
+        return FMars_SmTask_Tumbler_CancelOnExit_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Tumbler_FeedGate_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Tumbler_FeedGate
+{
+    FMars_SmTask_Tumbler_FeedGate_SpawnParams Params()
+    {
+        return FMars_SmTask_Tumbler_FeedGate_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Tumbler_OperatorHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Tumbler_OperatorHints
+{
+    FMars_SmTask_Tumbler_OperatorHints_SpawnParams Params()
+    {
+        return FMars_SmTask_Tumbler_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Tumbler_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Tumbler_OperatorInput
+{
+    FMars_SmTask_Tumbler_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_Tumbler_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_TumblerFeed_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_TumblerFeed_OperatorInput
+{
+    FMars_SmTask_TumblerFeed_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_TumblerFeed_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_UseIntentToResolver_SpawnParams
 {
 }
@@ -8690,6 +8869,47 @@ namespace UMars_TestLamp_EntityScript
     FMars_TestLamp_EntityScript_SpawnParams Params(const TObjectPtr<AActor> In_OwningActor)
     {
         return FMars_TestLamp_EntityScript_SpawnParams(In_OwningActor);
+    }
+}
+
+USTRUCT()
+struct FMars_TumblerStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    UPROPERTY()
+    FMars_Tumbler_Spec Tumbler = FMars_Tumbler_Spec();
+
+    UPROPERTY()
+    FMars_Control_Spec LeverControl = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::ManuallyCompleted, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.012000000104308128f, 0.8500000238418579f, 60.0f, 12.0f, false));
+
+    UPROPERTY()
+    FMars_CookingFeed_Spec Feed = FMars_CookingFeed_Spec();
+
+    FMars_TumblerStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Tumbler_Spec InTumbler, FMars_Control_Spec InLeverControl, FMars_CookingFeed_Spec InFeed)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+        Tumbler = InTumbler;
+        LeverControl = InLeverControl;
+        Feed = InFeed;
+    }
+}
+
+namespace UMars_TumblerStation_EntityScript
+{
+    FMars_TumblerStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_TumblerStation_EntityScript_SpawnParams();
+    }
+
+    FMars_TumblerStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Tumbler_Spec InTumbler, FMars_Control_Spec InLeverControl, FMars_CookingFeed_Spec InFeed)
+    {
+        return FMars_TumblerStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InTumbler, InLeverControl, InFeed);
     }
 }
 

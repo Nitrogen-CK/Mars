@@ -496,6 +496,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Tumbler",
+			"ShortName": "Tumbler",
+			"Description": "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever and drum together), and admitted pieces that tumble kinematically in the drum and gain coating with every degree it turns while shut",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_TumblerHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Tumbler"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_WorldItem",
 			"ShortName": "WorldItem",
 			"Description": "An item presented outside an inventory: pickable with physics in the world, or a visual in the player's hand",

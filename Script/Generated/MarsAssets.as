@@ -240,6 +240,7 @@ namespace assets
     TSoftObjectPtr<UMaterial> RedCloak() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/RedCloak.RedCloak")); }
     TSoftObjectPtr<UMaterial> Salt_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Gameplay/Cooking/Food/Materials/Salt_Mars_M.Salt_Mars_M")); }
     TSoftObjectPtr<UMaterial> Surface_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Environment/Materials/Surface_Mars_M.Surface_Mars_M")); }
+    TSoftObjectPtr<UMaterial> TumblerCrumb_Mars_M() { return TSoftObjectPtr<UMaterial>(FSoftObjectPath("/Game/Mars/Gameplay/Cooking/Food/Materials/TumblerCrumb_Mars_M.TumblerCrumb_Mars_M")); }
     TSoftObjectPtr<UMaterialFunction> BubbleGlass_Mars_MF() { return TSoftObjectPtr<UMaterialFunction>(FSoftObjectPath("/Game/Mars/Gameplay/Cooking/Food/Materials/BubbleGlass_Mars_MF.BubbleGlass_Mars_MF")); }
     TSoftObjectPtr<UMaterialFunction> FoodCook_Mars_MF() { return TSoftObjectPtr<UMaterialFunction>(FSoftObjectPath("/Game/Mars/Gameplay/Cooking/Food/Materials/FoodCook_Mars_MF.FoodCook_Mars_MF")); }
     TSoftObjectPtr<UMaterialFunction> OilCoat_Mars_MF() { return TSoftObjectPtr<UMaterialFunction>(FSoftObjectPath("/Game/Mars/Gameplay/Cooking/Food/Materials/OilCoat_Mars_MF.OilCoat_Mars_MF")); }
@@ -3157,6 +3158,15 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Surface_Mars_M());
+    }
+    UMaterial TumblerCrumb_Mars_M()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::TumblerCrumb_Mars_M() called before engine init. Use assets::TumblerCrumb_Mars_M() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::TumblerCrumb_Mars_M());
     }
     UMaterialFunction BubbleGlass_Mars_MF()
     {

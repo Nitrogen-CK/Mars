@@ -1,0 +1,212 @@
+{
+	"material": "TumblerCrumb_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/TumblerCrumb_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "2478a0979bc85580d2d15a2acfa5b38f",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 1,
+		"LinearInterpolate": 1,
+		"LocalPosition": 1,
+		"Noise": 1,
+		"OneMinus": 1,
+		"ScalarParameter": 1,
+		"Step": 1,
+		"VectorParameter": 2
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 12,
+					"ParameterName": "Coverage",
+					"Group": "Crumb"
+				}
+			},
+			{
+				"id": 1,
+				"class": "OneMinus",
+				"name": "MaterialExpressionOneMinus_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 0,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 2,
+				"class": "LocalPosition",
+				"name": "MaterialExpressionLocalPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 3,
+				"class": "Noise",
+				"name": "MaterialExpressionNoise_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "World Position",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"Scale": 0.15000000596046448,
+					"Levels": 4,
+					"OutputMin": 0
+				}
+			},
+			{
+				"id": 4,
+				"class": "Step",
+				"name": "MaterialExpressionStep_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Y",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "X",
+						"node": 3,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.860000,G=0.780000,B=0.620000,A=1.000000)",
+					"ParameterName": "PaleColour",
+					"Group": "Crumb"
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.800000,G=0.450000,B=0.120000,A=1.000000)",
+					"ParameterName": "CrumbColour",
+					"Group": "Crumb"
+				}
+			},
+			{
+				"id": 7,
+				"class": "LinearInterpolate",
+				"name": "MaterialExpressionLinearInterpolate_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Alpha",
+						"node": 4,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 8,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.80000001192092896
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 7,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 8,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Coverage",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "PaleColour",
+			"value": "RGBA(0.86, 0.78, 0.62, 1)"
+		},
+		{
+			"name": "CrumbColour",
+			"value": "RGBA(0.8, 0.45, 0.12, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}

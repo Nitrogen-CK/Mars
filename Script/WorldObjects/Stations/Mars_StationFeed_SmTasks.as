@@ -23,9 +23,10 @@ class UMars_SmTask_StationFeed_ResetOnEnter : UCk_SmTask_EntityScript
 }
 
 // The operator's add-food presses, read off its InputIntents: each fresh activation of the StationAddFood row is one
-// BeginTransfer, which the feed refuses while the hand is busy or the platter is empty. Every edge is consumed whether or not
-// the feed takes it (nothing is queued), and the seen frame is seeded on enter, so a press held from before the station was
-// taken never counts. No operator intents (headless) = nothing to read.
+// BeginTransfer, which the feed refuses while the hand is busy or the platter is empty. A station may refuse the edge before
+// the feed sees it (a subclass overrides Get_CanBeginTransfer). Every edge is consumed whether or not it is taken (nothing is
+// queued), and the seen frame is seeded on enter, so a press held from before the station was taken never counts. No
+// operator intents (headless) = nothing to read.
 class UMars_SmTask_StationFeed_OperatorInput : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -66,6 +67,12 @@ class UMars_SmTask_StationFeed_OperatorInput : UCk_SmTask_EntityScript
         if (AddFoodFrame.IsSet() == false)
         { return ECk_SmTaskResult::Running; }
 
+        if (Get_CanBeginTransfer() == false)
+        {
+            ck::Trace(f"[StationFeed] [{_Feed.ToString()}] operator pressed add food; press refused by the station");
+            return ECk_SmTaskResult::Running;
+        }
+
         ck::Trace(f"[StationFeed] [{_Feed.ToString()}] operator pressed add food ({_Feed.Get_Phase() :n}, {_Feed.Get_Available()} left)");
         _Feed.Request_BeginTransfer(FMars_Request_CookingFeed_BeginTransfer());
         return ECk_SmTaskResult::Running;
@@ -78,11 +85,14 @@ class UMars_SmTask_StationFeed_OperatorInput : UCk_SmTask_EntityScript
         _Intents = FCk_Handle_InputIntents();
         _SeenAddFoodFrame.Reset();
     }
+
+    // The station's own gate on a fresh press, ahead of the feed's (a tumbler refuses while its hatch is shut).
+    protected bool Get_CanBeginTransfer() const { return true; }
 }
 
-// Routes each release to the cooking kernel on the station by its typed handle (Searing, then Fry) and forwards that
-// kernel's admission answer back to the feed; leaving mid-transfer cancels it, so no reservation outlives the operator (the
-// Idle state's reset follows anyway). Both bindings live exactly as long as the Operated state.
+// Routes each release to the cooking kernel on the station by its typed handle (Searing, then Fry, then Tumbler) and
+// forwards that kernel's admission answer back to the feed; leaving mid-transfer cancels it, so no reservation outlives the
+// operator (the Idle state's reset follows anyway). The bindings live exactly as long as the Operated state.
 class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -93,6 +103,8 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
     private FCk_Handle_Searing _Searing;
     // Invalid on a station without a Fry.
     private FCk_Handle_Fry _Fry;
+    // Invalid on a station without a Tumbler.
+    private FCk_Handle_Tumbler _Tumbler;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -108,6 +120,10 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         _Fry = _Station.As_Fry(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(_Fry))
         { _Fry.BindTo_OnPieceAdmission(FMars_Delegate_Fry_OnPieceAdmission(this, n"OnFryPieceAdmission")); }
+
+        _Tumbler = _Station.As_Tumbler(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(_Tumbler))
+        { _Tumbler.BindTo_OnPieceAdmission(FMars_Delegate_Tumbler_OnPieceAdmission(this, n"OnTumblerPieceAdmission")); }
     }
 
     UFUNCTION(BlueprintOverride)
@@ -118,6 +134,9 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
 
         if (ck::IsValid(_Fry))
         { _Fry.UnbindFrom_OnPieceAdmission(FMars_Delegate_Fry_OnPieceAdmission(this, n"OnFryPieceAdmission")); }
+
+        if (ck::IsValid(_Tumbler))
+        { _Tumbler.UnbindFrom_OnPieceAdmission(FMars_Delegate_Tumbler_OnPieceAdmission(this, n"OnTumblerPieceAdmission")); }
 
         if (ck::IsValid(_Feed))
         {
@@ -130,6 +149,7 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         _Feed = FCk_Handle_CookingFeed();
         _Searing = FCk_Handle_Searing();
         _Fry = FCk_Handle_Fry();
+        _Tumbler = FCk_Handle_Tumbler();
     }
 
     UFUNCTION()
@@ -160,8 +180,19 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         _Feed.Request_ResolveAdmission(FMars_Request_CookingFeed_ResolveAdmission(InPieceId, InAdmission, InReason));
     }
 
-    // Searing, else Fry, admits through its AddPiece (answered by its OnPieceAdmission above). A station with neither has
-    // its releases refused, so the hand carries, restores the slot and returns, and no stock is spent.
+    // The Tumbler kernel's answer goes to the feed as it is, as the Searing one's does.
+    UFUNCTION()
+    private void OnTumblerPieceAdmission(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId,
+        EMars_CookingFeed_Admission InAdmission, FString InReason)
+    {
+        if (ck::Is_NOT_Valid(_Feed))
+        { return; }
+
+        _Feed.Request_ResolveAdmission(FMars_Request_CookingFeed_ResolveAdmission(InPieceId, InAdmission, InReason));
+    }
+
+    // Searing, else Fry, else Tumbler admits through its AddPiece (answered by its OnPieceAdmission above). A station with
+    // none of them has its releases refused, so the hand carries, restores the slot and returns, and no stock is spent.
     private void Forward_Release(const FMars_CookingFeed_Release& InRelease)
     {
         if (ck::IsValid(_Searing))
@@ -173,6 +204,12 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         if (ck::IsValid(_Fry))
         {
             _Fry.Request_AddPiece(FMars_Request_Fry_AddPiece(InRelease));
+            return;
+        }
+
+        if (ck::IsValid(_Tumbler))
+        {
+            _Tumbler.Request_AddPiece(FMars_Request_Tumbler_AddPiece(InRelease));
             return;
         }
 

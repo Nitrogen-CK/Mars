@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "8fa698ba4d8d557ad1f0c3da8bcac7c8",
+		"sourceHash": "7e73742aac0bd18b59e51200ae433b36",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -38,7 +38,7 @@
 			"name": "_ShapeCount",
 			"type": "int32",
 			"category": "Ck_Jolt_CookedCell_UE",
-			"value": 18
+			"value": 19
 		},
 		{
 			"name": "_ActorGroups",
@@ -859,7 +859,7 @@
 							{
 								"X": 3200,
 								"Y": -1400,
-								"Z": 230
+								"Z": 110
 							},
 							"_Rotation":
 							{
@@ -870,33 +870,7 @@
 							},
 							"_Signature":
 							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 15,
-							"_Position":
-							{
-								"X": 3200,
-								"Y": -1290,
-								"Z": 120
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
+								"_ObjectChannel": "ECC_WorldDynamic",
 								"_ResponseMask": -6.1489148630353398e+18,
 								"_CollisionEnabled": "QueryAndPhysics",
 								"_Domain": "Static"
@@ -937,7 +911,7 @@
 							{
 								"X": 3200,
 								"Y": -1400,
-								"Z": 110
+								"Z": 230
 							},
 							"_Rotation":
 							{
@@ -948,7 +922,33 @@
 							},
 							"_Signature":
 							{
-								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": 3200,
+								"Y": -1290,
+								"Z": 120
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
 								"_ResponseMask": -6.1489148630353398e+18,
 								"_CollisionEnabled": "QueryAndPhysics",
 								"_Domain": "Static"
@@ -1064,12 +1064,12 @@
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 16,
+							"_ShapeIndex": 15,
 							"_Position":
 							{
 								"X": 3500,
-								"Y": -460,
-								"Z": 110
+								"Y": -350,
+								"Z": 120
 							},
 							"_Rotation":
 							{
@@ -1080,7 +1080,7 @@
 							},
 							"_Signature":
 							{
-								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ObjectChannel": "ECC_WorldStatic",
 								"_ResponseMask": -6.1489148630353398e+18,
 								"_CollisionEnabled": "QueryAndPhysics",
 								"_Domain": "Static"
@@ -1090,7 +1090,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 14,
+							"_ShapeIndex": 16,
 							"_Position":
 							{
 								"X": 3500,
@@ -1120,7 +1120,7 @@
 							"_Position":
 							{
 								"X": 3500,
-								"Y": -350,
+								"Y": -570,
 								"Z": 120
 							},
 							"_Rotation":
@@ -1142,12 +1142,56 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 15,
+							"_ShapeIndex": 14,
 							"_Position":
 							{
 								"X": 3500,
-								"Y": -570,
-								"Z": 120
+								"Y": -460,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_72",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
+							"AssetName": "Sandbox_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_72"
+					},
+					"_SourceHash": 6.6187225896337981e+18,
+					"_RuntimeCheckHash": 6.4667607668865352e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 18,
+							"_Position":
+							{
+								"X": 0,
+								"Y": -1600,
+								"Z": 35
 							},
 							"_Rotation":
 							{

@@ -56,7 +56,7 @@ mf.run_all()          # import_textures, import_meshes, build_materials, build_l
 - Vertex colour `Col`: linear RGB base albedo with per-facet jitter and warmer crevices, A = cavity.
 - Mask textures (linear RGBA, TC_MASKS): R cook-first, G grain / speckle, B crust break-up, A rim.
 - Custom Primitive Data: 0-3 sear +X -X +Y -Y, 4-7 sear +Z -Z / penetration / oil coat, 8-11 glaze / shape /
-  fry / wet. Same first ten floats as `Meat_Mars_M`, so gameplay drives every cooking mesh the same way.
+  fry / wet, 12 crumb coverage. Same first ten floats as `Meat_Mars_M`, so gameplay drives every cooking mesh the same way.
 - Material slots: cooking slots `Flesh`, `Skin`, `Batter`; static accents `Horn`, `Bone`, `Leaf`, `Stem`, `Salt`,
   `Pepper`, `Stone`, `Wood`, `Oil`.
 
