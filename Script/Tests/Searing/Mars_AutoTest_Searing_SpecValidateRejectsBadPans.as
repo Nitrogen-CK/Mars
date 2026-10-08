@@ -1,4 +1,5 @@
-// Validate() accepts the default searing spec and rejects a pan disc no wider than the steak and a face that never sears;
+// Validate() accepts the default searing spec and rejects a pan that takes no piece, a pan disc no wider than a piece and a
+// face that never sears;
 // the pan's own spec (its Implement) accepts its default and rejects a tilt past 80 degrees, a tilt that cannot move and a
 // lift spring with no stiffness; the pan body spec accepts the pan mesh at scale 1 and rejects no mesh, a zero scale and a
 // restitution past 1.
@@ -7,7 +8,7 @@ class UMars_AutoTest_Searing_SpecValidateRejectsBadPans : UCk_AutoTest_Base
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("validate the default specs and eight bad ones", n"Step_Validate");
+        Add_Step("validate the default specs and nine bad ones", n"Step_Validate");
         Run_Steps(InHandle);
     }
 
@@ -19,6 +20,10 @@ class UMars_AutoTest_Searing_SpecValidateRejectsBadPans : UCk_AutoTest_Base
 
         const auto DefaultPan = FMars_Implement_Spec().Validate();
         Assert_True(DefaultPan.IsValid(), f"the default pan spec is accepted (error: {DefaultPan.Get_Error()})");
+
+        auto NoRoom = FMars_Searing_Spec();
+        NoRoom.Supply.MaxPieces = 0;
+        AssertRejected(NoRoom.Validate(), "MaxPieces <= 0");
 
         auto NarrowPan = FMars_Searing_Spec();
         NarrowPan.Loss.PanRadius = NarrowPan.Steak.HalfSize;

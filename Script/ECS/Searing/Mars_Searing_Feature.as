@@ -6,7 +6,7 @@ asset Mars_SearingHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Searing";
     RequiredFragments.Add(FMars_Feature_Searing);
-    Description = "A searing minigame on a station: a steak cube (a dynamic body) on a hot pan (kinematic bodies the operator's look tilts and lifts); the face on the pan sears";
+    Description = "A searing minigame on a station: admitted pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears";
 }
 struct FMars_Feature_Searing {}
 
@@ -14,7 +14,7 @@ struct FMars_Feature_Searing {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The steak's six faces, by their outward normal in the steak's own frame. int32(Face) indexes the sear ledger.
+// A piece's six faces, by their outward normal in the piece's own frame. int32(Face) indexes the sear ledger.
 enum EMars_Searing_Face
 {
     PosX,
@@ -37,14 +37,35 @@ enum EMars_Searing_Sizzle
     Sizzling
 }
 
-// NoSteak: between a loss and the respawn (and before the first spawn). OnPan / Airborne: a live steak resting / not
-// resting on the pan base. Done: six faces seared; the steak stays, inert, until Reset.
-enum EMars_Searing_Phase
+// A piece resting on the pan base (and over the disc), or not.
+enum EMars_Searing_Contact
 {
-    NoSteak,
-    OnPan,
     Airborne,
-    Done
+    OnPan
+}
+
+// Cooking: on its way to six seared faces. Ready: six faces seared; it stays on the pan, inert (a spill still loses it).
+// Lost: it left the pan; its body lingers until Loss.LingerSeconds, then it is destroyed. Nothing replaces it.
+enum EMars_Searing_PieceStatus
+{
+    Cooking,
+    Ready,
+    Lost
+}
+
+// How many bodies the pan takes at once (lost pieces that still linger do not count). The feed's own stock is the real
+// limit; this refuses a body a misbehaving caller would add past it.
+struct FMars_Searing_SupplySpec
+{
+    UPROPERTY()
+    int32 MaxPieces = 6;
+
+    FMars_Searing_SupplySpec() {}
+
+    FMars_Searing_SupplySpec(int32 InMaxPieces)
+    {
+        MaxPieces = InMaxPieces;
+    }
 }
 
 struct FMars_Searing_CookSpec
@@ -61,8 +82,9 @@ struct FMars_Searing_CookSpec
     }
 }
 
-// The steak body: a box of HalfSize, explicit mass and surface. Spawned HalfSize + SpawnLift above the base top.
-// Friction combines with the pan's as sqrt(a * b): 0.6 on an oiled pan's 0.15 gives 0.3, so a resting steak starts
+// Each piece's body: a box of HalfSize, explicit mass and surface. SpawnLift is the clearance a caller leaves under a piece
+// it adds right over the cooking surface (its centre HalfSize + SpawnLift above it).
+// Friction combines with the pan's as sqrt(a * b): 0.6 on an oiled pan's 0.15 gives 0.3, so a resting piece starts
 // sliding past a 17-degree tilt (into the pan's lip) and glides on a pan swirling a few uu at 1.5 Hz.
 struct FMars_Searing_SteakSpec
 {
@@ -87,7 +109,7 @@ struct FMars_Searing_SteakSpec
     UPROPERTY()
     float32 SpawnLift = 2.0f;
 
-    // How long the steak counts as resting on the pan after its last contact with the base (its Resting's grace). A steak
+    // How long a piece counts as resting on the pan after its last contact with the base (its Resting's grace). A piece
     // gliding on a swirling, oiled pan can lose contact for a moment without leaving it.
     UPROPERTY()
     float32 ContactGraceSeconds = 0.1f;
@@ -113,8 +135,8 @@ struct FMars_Searing_SteakSpec
     }
 }
 
-// The pan's disc, where a steak counts as on it and beyond which it is lost; how long a lost body keeps flying and
-// bouncing before it is destroyed; how long the pan stays empty before a fresh steak.
+// The pan's disc, where a piece counts as on it and beyond which it is lost; how long a lost body keeps flying and
+// bouncing before it is destroyed.
 struct FMars_Searing_LossSpec
 {
     UPROPERTY()
@@ -123,22 +145,18 @@ struct FMars_Searing_LossSpec
     UPROPERTY()
     float32 LingerSeconds = 2.5f;
 
-    UPROPERTY()
-    float32 RespawnSeconds = 0.8f;
-
     FMars_Searing_LossSpec() {}
 
-    FMars_Searing_LossSpec(float32 InPanRadius, float32 InLingerSeconds, float32 InRespawnSeconds)
+    FMars_Searing_LossSpec(float32 InPanRadius, float32 InLingerSeconds)
     {
         PanRadius = InPanRadius;
         LingerSeconds = InLingerSeconds;
-        RespawnSeconds = InRespawnSeconds;
     }
 }
 
 // The pan's collision: the pan mesh itself (a triangle mesh; no simple collision on the asset, so CkJolt cooks the
 // triangles), kinematic under the pan node so the node's motion moves it and gives it velocity. The mesh's own
-// centimetres are multiplied by Scale at build time (a live body never rescales). Oiled: a steak's friction combines with
+// centimetres are multiplied by Scale at build time (a live body never rescales). Oiled: a piece's friction combines with
 // Friction as sqrt(a * b).
 struct FMars_Searing_PanBodySpec
 {
@@ -204,6 +222,9 @@ struct FMars_Searing_Nodes
 struct FMars_Searing_Spec
 {
     UPROPERTY()
+    FMars_Searing_SupplySpec Supply;
+
+    UPROPERTY()
     FMars_Searing_CookSpec Cook;
 
     UPROPERTY()
@@ -218,20 +239,25 @@ struct FMars_Searing_Spec
     FMars_Searing_Spec() {}
 
     FMars_Searing_Spec(
+        FMars_Searing_SupplySpec InSupply,
         FMars_Searing_CookSpec InCook,
         FMars_Searing_SteakSpec InSteak,
         FMars_Searing_LossSpec InLoss)
     {
+        Supply = InSupply;
         Cook = InCook;
         Steak = InSteak;
         Loss = InLoss;
     }
 }
 
-// A face that never sears, a steak with no size or mass, a restitution outside the physical range, or a pan disc no wider
-// than the steak (it would be lost the moment it spawned) each make the minigame unplayable.
+// A pan that takes no piece, a face that never sears, a piece with no size or mass, a restitution outside the physical
+// range, or a pan disc no wider than a piece (it would be lost the moment it landed) each make the minigame unplayable.
 mixin FMars_Validation Validate(const FMars_Searing_Spec& Self)
 {
+    if (Self.Supply.MaxPieces <= 0)
+    { return FMars_Validation(f"Searing has a non-positive Supply.MaxPieces [{Self.Supply.MaxPieces}]"); }
+
     if (Self.Cook.SecondsPerFace <= 0.0f)
     { return FMars_Validation(f"Searing has a non-positive Cook.SecondsPerFace [{Self.Cook.SecondsPerFace}]"); }
 
@@ -265,9 +291,6 @@ mixin FMars_Validation Validate(const FMars_Searing_Spec& Self)
     if (Self.Loss.LingerSeconds < 0.0f)
     { return FMars_Validation(f"Searing has a negative Loss.LingerSeconds [{Self.Loss.LingerSeconds}]"); }
 
-    if (Self.Loss.RespawnSeconds < 0.0f)
-    { return FMars_Validation(f"Searing has a negative Loss.RespawnSeconds [{Self.Loss.RespawnSeconds}]"); }
-
     return FMars_Validation();
 }
 
@@ -285,10 +308,13 @@ struct FMars_Fragment_Searing_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The live steak (invalid handles while NoSteak). Its entity carries a Resting on the pan base body.
-struct FMars_Searing_SteakState
+// One admitted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity (a lifetime
+// child of the station) carries the dynamic body and a Resting on the pan base body.
+struct FMars_Searing_PieceState
 {
-    // The steak entity (a lifetime child of the station).
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
     UPROPERTY()
     FCk_Handle Entity;
 
@@ -299,7 +325,7 @@ struct FMars_Searing_SteakState
     UPROPERTY()
     TArray<float32> FaceSear;
 
-    // The face that last counted as resting on the pan (NegZ at spawn: it spawns flat); a change is a flip.
+    // The face that last counted as resting on the pan (NegZ at admission: a piece arrives flat); a change is a flip.
     UPROPERTY()
     EMars_Searing_Face RestingFace = EMars_Searing_Face::NegZ;
 
@@ -307,35 +333,28 @@ struct FMars_Searing_SteakState
     UPROPERTY()
     float32 CandidateSeconds = 0.0f;
 
-    // NoSteak only: seconds until the next steak.
     UPROPERTY()
-    float32 RespawnCountdown = 0.0f;
-}
-
-// A steak that left the pan and is still flying/bouncing; destroyed when Age reaches Loss.LingerSeconds.
-struct FMars_Searing_LostSteak
-{
-    UPROPERTY()
-    FCk_Handle Entity;
+    EMars_Searing_Contact Contact = EMars_Searing_Contact::Airborne;
 
     UPROPERTY()
-    float32 Age = 0.0f;
+    EMars_Searing_PieceStatus Status = EMars_Searing_PieceStatus::Cooking;
 
-    FMars_Searing_LostSteak() {}
+    // The last tenth OnSearProgress reported for this piece's face on the pan; -1 forces the next report.
+    UPROPERTY()
+    int32 LastProgressStep = -1;
 
-    FMars_Searing_LostSteak(FCk_Handle InEntity)
-    {
-        Entity = InEntity;
-    }
+    // Lost only: seconds since the loss; the piece is removed and its entity destroyed at Loss.LingerSeconds.
+    UPROPERTY()
+    float32 LingerSeconds = 0.0f;
 }
 
 struct FMars_Searing_Tally
 {
-    // Hot and not Done since the last reset.
+    // Hot while any piece is Cooking, since the last reset.
     UPROPERTY()
     float32 Seconds = 0.0f;
 
-    // Changes of the face the live steak rests on (a new down face held for utils_searing::k_FaceSettleSeconds).
+    // Changes of the face a cooking piece rests on (a new down face held for utils_searing::k_FaceSettleSeconds), all pieces.
     UPROPERTY()
     int32 Flips = 0;
 
@@ -343,17 +362,29 @@ struct FMars_Searing_Tally
     int32 Losses = 0;
 }
 
-// Written only by the Searing processors (and Add). The station SM and the operator only issue requests.
-struct FMars_Fragment_Searing
+// Every piece admitted since the last reset is in exactly one of Cooking / Ready / Lost (a lost one stays counted after
+// its body is destroyed): Admitted = Cooking + Ready + Lost.
+struct FMars_Searing_Summary
 {
     UPROPERTY()
-    EMars_Searing_Phase Phase = EMars_Searing_Phase::NoSteak;
+    int32 Admitted = 0;
 
     UPROPERTY()
-    FMars_Searing_SteakState Steak;
+    int32 Cooking = 0;
 
     UPROPERTY()
-    TArray<FMars_Searing_LostSteak> LostSteaks;
+    int32 Ready = 0;
+
+    UPROPERTY()
+    int32 Lost = 0;
+}
+
+// Written only by the Searing processors (and Add). The station SM, the feed bridge and the operator only issue requests.
+struct FMars_Fragment_Searing
+{
+    // In admission order. Lost pieces stay while they linger (one array, one identity space).
+    UPROPERTY()
+    TArray<FMars_Searing_PieceState> Pieces;
 
     UPROPERTY()
     FMars_Searing_Tally Tally;
@@ -361,58 +392,61 @@ struct FMars_Fragment_Searing
     UPROPERTY()
     EMars_Searing_Heat Heat = EMars_Searing_Heat::Cold;
 
+    // Aggregate over every piece.
     UPROPERTY()
     EMars_Searing_Sizzle Sizzle = EMars_Searing_Sizzle::Quiet;
-
-    // The last tenth OnSearProgress reported for the face on the pan; -1 forces the next report.
-    UPROPERTY()
-    int32 LastProgressStep = -1;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-// A SetHeat that changed it; a Reset that found it Hot.
+// A SetHeat that changed it; a Reset that found it Hot. Station-level: no piece.
 delegate void FMars_Delegate_Searing_OnHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 event void FMars_Delegate_Searing_OnHeatChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 
-// A fresh steak entity exists (its body requested, not yet added): the placing script adds its visuals here.
-delegate void FMars_Delegate_Searing_OnSteakSpawned(FCk_Handle_Searing InSearing, FCk_Handle InSteak);
-event void FMars_Delegate_Searing_OnSteakSpawned_MC(FCk_Handle_Searing InSearing, FCk_Handle InSteak);
+// The answer to every AddPiece: Accepted (the body exists; OnPieceAdded follows) or Rejected with a reason (nothing made).
+delegate void FMars_Delegate_Searing_OnPieceAdmission(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
+event void FMars_Delegate_Searing_OnPieceAdmission_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 
-// OnPan <-> Airborne edges (the toss and the landing).
-delegate void FMars_Delegate_Searing_OnPanContactChanged(FCk_Handle_Searing InSearing, EMars_Searing_Phase InPhase);
-event void FMars_Delegate_Searing_OnPanContactChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Phase InPhase);
+// An admitted piece's entity exists (its body requested, not yet added): the placing script adds its visuals here.
+delegate void FMars_Delegate_Searing_OnPieceAdded(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
+event void FMars_Delegate_Searing_OnPieceAdded_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
-// Quantized at tenths, for the face on the pan.
-delegate void FMars_Delegate_Searing_OnSearProgress(FCk_Handle_Searing InSearing, EMars_Searing_Face InFace, float32 InAlpha);
-event void FMars_Delegate_Searing_OnSearProgress_MC(FCk_Handle_Searing InSearing, EMars_Searing_Face InFace, float32 InAlpha);
+// One piece's OnPan <-> Airborne edges (the toss and the landing).
+delegate void FMars_Delegate_Searing_OnPanContactChanged(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Contact InContact);
+event void FMars_Delegate_Searing_OnPanContactChanged_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Contact InContact);
 
-delegate void FMars_Delegate_Searing_OnFaceSeared(FCk_Handle_Searing InSearing, EMars_Searing_Face InFace);
-event void FMars_Delegate_Searing_OnFaceSeared_MC(FCk_Handle_Searing InSearing, EMars_Searing_Face InFace);
+// Quantized at tenths, for one piece's face on the pan.
+delegate void FMars_Delegate_Searing_OnSearProgress(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, float32 InAlpha);
+event void FMars_Delegate_Searing_OnSearProgress_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, float32 InAlpha);
 
-// Edge only: Sizzling while Hot, on the pan and the face on the pan is not yet seared.
+delegate void FMars_Delegate_Searing_OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace);
+event void FMars_Delegate_Searing_OnFaceSeared_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace);
+
+// A piece's sixth seared face: that piece is Ready (the others keep cooking). InTally is the kernel's tally at that moment.
+delegate void FMars_Delegate_Searing_OnPieceReady(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FMars_Searing_Tally InTally);
+event void FMars_Delegate_Searing_OnPieceReady_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FMars_Searing_Tally InTally);
+
+// A piece left the pan; InPiece lingers and is destroyed later. Nothing replaces it.
+delegate void FMars_Delegate_Searing_OnPieceLost(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
+event void FMars_Delegate_Searing_OnPieceLost_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
+
+// Edge only, aggregate: Sizzling while Hot and any cooking piece lies on the pan on a face not yet seared.
 delegate void FMars_Delegate_Searing_OnSizzleChanged(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle);
 event void FMars_Delegate_Searing_OnSizzleChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle);
-
-// The steak left the pan; InSteak lingers and is destroyed later.
-delegate void FMars_Delegate_Searing_OnSteakLost(FCk_Handle_Searing InSearing, FCk_Handle InSteak);
-event void FMars_Delegate_Searing_OnSteakLost_MC(FCk_Handle_Searing InSearing, FCk_Handle InSteak);
-
-delegate void FMars_Delegate_Searing_OnCompleted(FCk_Handle_Searing InSearing, FMars_Searing_Tally InTally);
-event void FMars_Delegate_Searing_OnCompleted_MC(FCk_Handle_Searing InSearing, FMars_Searing_Tally InTally);
 
 struct FMars_Fragment_Searing_Signals
 {
     FMars_Delegate_Searing_OnHeatChanged_MC OnHeatChanged;
-    FMars_Delegate_Searing_OnSteakSpawned_MC OnSteakSpawned;
+    FMars_Delegate_Searing_OnPieceAdmission_MC OnPieceAdmission;
+    FMars_Delegate_Searing_OnPieceAdded_MC OnPieceAdded;
     FMars_Delegate_Searing_OnPanContactChanged_MC OnPanContactChanged;
     FMars_Delegate_Searing_OnSearProgress_MC OnSearProgress;
     FMars_Delegate_Searing_OnFaceSeared_MC OnFaceSeared;
+    FMars_Delegate_Searing_OnPieceReady_MC OnPieceReady;
+    FMars_Delegate_Searing_OnPieceLost_MC OnPieceLost;
     FMars_Delegate_Searing_OnSizzleChanged_MC OnSizzleChanged;
-    FMars_Delegate_Searing_OnSteakLost_MC OnSteakLost;
-    FMars_Delegate_Searing_OnCompleted_MC OnCompleted;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -447,8 +481,8 @@ struct FMars_Request_Searing_SetHeat
     }
 }
 
-// Destroys every steak, resets the pan (level, idle), chills it and zeroes the tally; a fresh steak appears next frame.
-// Payload-less: one placeholder field (request doctrine).
+// Destroys every piece (the lingering lost ones too), resets the pan (level, idle), chills it and zeroes the tally; the pan
+// stays empty until the next AddPiece. Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Searing_Reset
 {
     UPROPERTY()
@@ -457,7 +491,24 @@ struct FMars_Request_Searing_Reset
     FMars_Request_Searing_Reset() {}
 }
 
-// Applied Reset -> SetHeat -> Look, so a reset and the first heat and looks of a new session can share a drain.
+// One released piece to admit, answered by OnPieceAdmission. Rejected (nothing made) while the pan body is not yet in the
+// simulation, when a piece on the pan (lingering lost ones included) already carries the Id, or when Supply.MaxPieces live
+// pieces are on it. A cold pan accepts (it just does not sear).
+struct FMars_Request_Searing_AddPiece
+{
+    UPROPERTY()
+    FMars_CookingFeed_Release Release;
+
+    FMars_Request_Searing_AddPiece() {}
+
+    FMars_Request_Searing_AddPiece(FMars_CookingFeed_Release InRelease)
+    {
+        Release = InRelease;
+    }
+}
+
+// Applied Reset -> SetHeat -> AddPiece -> Look, so a reset and the first heat, pieces and looks of a new session can share
+// a drain.
 struct FMars_Fragment_Searing_Requests
 {
     UPROPERTY()
@@ -465,6 +516,9 @@ struct FMars_Fragment_Searing_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Searing_SetHeat> SetHeatRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Searing_AddPiece> AddPieceRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Searing_Look> LookRequests;

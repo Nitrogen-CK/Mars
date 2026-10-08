@@ -3,7 +3,7 @@ namespace utils_searing
     const int32 k_FaceCount = 6;
     const int32 k_SearSignalSteps = 10;
     // The cooking surface's height in the pan body's frame: the pan node sits at the centre of that surface (the pan mesh's
-    // pivot), so the steak spawns and is judged relative to Z 0.
+    // pivot), so a piece is judged relative to Z 0.
     const float32 k_PanSurfaceZ = 0.0f;
     // The pan body's mass: see Add_PanBody.
     const float32 k_PanBodyMassKg = 1.0f;
@@ -13,8 +13,9 @@ namespace utils_searing
 
     // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature). The spec's
     // Nodes are built by the caller: Nodes.Pan is the Implement on the pan node (the kernel makes it Driven while hot and
-    // forwards the looks to it), and the steak counts as on the pan only while it rests on Nodes.PanBaseBody. The first
-    // steak spawns on the next Tick. A rejected spec or a missing node ensures and returns an invalid handle.
+    // forwards the looks to it), and a piece counts as on the pan only while it rests on Nodes.PanBaseBody. The pan starts
+    // empty: pieces arrive only through Request_AddPiece. A rejected spec or a missing node ensures and returns an invalid
+    // handle.
     FCk_Handle_Searing Add(FCk_Handle& InHandle, FMars_Searing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -28,13 +29,9 @@ namespace utils_searing
         auto Params = FMars_Fragment_Searing_Params();
         Params.Spec = InSpec;
 
-        auto State = FMars_Fragment_Searing();
-        State.Phase = EMars_Searing_Phase::NoSteak;
-        State.Steak.RespawnCountdown = 0.0f;
-
         InHandle.Add_Fragment(FMars_Feature_Searing());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(FMars_Fragment_Searing());
         return InHandle.As_Searing();
     }
 
@@ -63,7 +60,45 @@ namespace utils_searing
         return utils_jolt_body::Add(BodyNode.H(), BodySpec);
     }
 
-    // The face's outward normal in the steak's own frame.
+    // The index of the piece carrying InPieceId (lingering lost ones included); -1 = none. Internal to the kernel: callers
+    // outside it address pieces by identity through the getters.
+    int32 Find_PieceIndex(const TArray<FMars_Searing_PieceState>& InPieces, const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        for (int32 Index = 0; Index < InPieces.Num(); ++Index)
+        {
+            if (InPieces[Index].Id.Get_IsSame(InPieceId))
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // Pieces not Lost (cooking or ready).
+    int32 Get_LivePieceCount(const TArray<FMars_Searing_PieceState>& InPieces)
+    {
+        auto Count = 0;
+        for (const auto& Piece : InPieces)
+        {
+            if (Piece.Status != EMars_Searing_PieceStatus::Lost)
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
+    int32 Get_SearedFaceCount(const TArray<float32>& InFaceSear)
+    {
+        auto Count = 0;
+        for (const auto Sear : InFaceSear)
+        {
+            if (Sear >= 1.0f)
+            { Count += 1; }
+        }
+
+        return Count;
+    }
+
+    // The face's outward normal in the piece's own frame.
     FVector Get_FaceNormal(EMars_Searing_Face InFace)
     {
         switch (InFace)
@@ -90,15 +125,15 @@ namespace utils_searing
         }
     }
 
-    // The face whose world normal (InSteakRotation applied to its body normal) has the smallest dot with InPanUp.
-    EMars_Searing_Face Get_DownFace(const FQuat& InSteakRotation, const FVector& InPanUp)
+    // The face whose world normal (InPieceRotation applied to its body normal) has the smallest dot with InPanUp.
+    EMars_Searing_Face Get_DownFace(const FQuat& InPieceRotation, const FVector& InPanUp)
     {
         auto Best = EMars_Searing_Face::NegZ;
         auto BestDot = 2.0;
         for (int32 Index = 0; Index < k_FaceCount; ++Index)
         {
             const auto Face = EMars_Searing_Face(Index);
-            const auto Dot = InSteakRotation.RotateVector(Get_FaceNormal(Face)).DotProduct(InPanUp);
+            const auto Dot = InPieceRotation.RotateVector(Get_FaceNormal(Face)).DotProduct(InPanUp);
             if (Dot < BestDot)
             {
                 BestDot = Dot;
@@ -109,7 +144,7 @@ namespace utils_searing
         return Best;
     }
 
-    // The steak rotation that lays InFace against -Z. MakeFromXZ(X, -N) turns the body's +Z onto -N (X is any body axis
+    // The piece rotation that lays InFace against -Z. MakeFromXZ(X, -N) turns the body's +Z onto -N (X is any body axis
     // perpendicular to N); its inverse is the rotation that turns N onto -Z.
     FRotator Make_FaceDownRotation(EMars_Searing_Face InFace)
     {
@@ -142,11 +177,6 @@ mixin FMars_Searing_Spec Get_Spec(const FCk_Handle_Searing& Self)
     return Self.Get_Fragment(FMars_Fragment_Searing_Params).Spec;
 }
 
-mixin EMars_Searing_Phase Get_Phase(const FCk_Handle_Searing& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Searing).Phase;
-}
-
 mixin EMars_Searing_Heat Get_Heat(const FCk_Handle_Searing& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Searing).Heat;
@@ -155,22 +185,6 @@ mixin EMars_Searing_Heat Get_Heat(const FCk_Handle_Searing& Self)
 mixin bool Get_IsHot(const FCk_Handle_Searing& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Searing).Heat == EMars_Searing_Heat::Hot;
-}
-
-// Invalid while NoSteak.
-mixin FCk_Handle Get_Steak(const FCk_Handle_Searing& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Searing).Steak.Entity;
-}
-
-mixin FCk_Handle_JoltBody Get_SteakBody(const FCk_Handle_Searing& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Searing).Steak.Body;
-}
-
-mixin bool Get_HasSteak(const FCk_Handle_Searing& Self)
-{
-    return ck::IsValid(Self.Get_Fragment(FMars_Fragment_Searing).Steak.Entity);
 }
 
 // The Implement the pan node carries.
@@ -201,62 +215,7 @@ mixin FVector Get_PanUp(const FCk_Handle_Searing& Self)
     return Self.Get_PanBaseWorld().GetRotation().GetUpVector();
 }
 
-// The steak's centre in the pan base body's frame (the cooking surface is at Z = utils_searing::k_PanSurfaceZ); zero
-// without a steak.
-mixin FVector Get_SteakPanLocal(const FCk_Handle_Searing& Self)
-{
-    const auto Steak = Self.Get_Steak();
-    if (ck::Is_NOT_Valid(Steak))
-    { return FVector::ZeroVector; }
-
-    const auto SteakWorld = utils_transform::Get_EntityCurrentTransform(Steak.As_Transform());
-    return Self.Get_PanBaseWorld().InverseTransformPosition(SteakWorld.GetLocation());
-}
-
-// The steak face pointing most against the pan's up; NegZ without a steak.
-mixin EMars_Searing_Face Get_DownFace(const FCk_Handle_Searing& Self)
-{
-    const auto Steak = Self.Get_Steak();
-    if (ck::Is_NOT_Valid(Steak))
-    { return EMars_Searing_Face::NegZ; }
-
-    const auto SteakWorld = utils_transform::Get_EntityCurrentTransform(Steak.As_Transform());
-    return utils_searing::Get_DownFace(SteakWorld.GetRotation(), Self.Get_PanUp());
-}
-
-// 0 raw .. 1 seared; 0 without a steak.
-mixin float32 Get_FaceSear(const FCk_Handle_Searing& Self, EMars_Searing_Face InFace)
-{
-    const auto& FaceSear = Self.Get_Fragment(FMars_Fragment_Searing).Steak.FaceSear;
-    const auto Index = int32(InFace);
-    if (FaceSear.IsValidIndex(Index) == false)
-    { return 0.0f; }
-
-    return FaceSear[Index];
-}
-
-mixin int32 Get_SearedFaceCount(const FCk_Handle_Searing& Self)
-{
-    auto Count = 0;
-    for (const auto Sear : Self.Get_Fragment(FMars_Fragment_Searing).Steak.FaceSear)
-    {
-        if (Sear >= 1.0f)
-        { Count += 1; }
-    }
-
-    return Count;
-}
-
-mixin bool Get_IsOnPan(const FCk_Handle_Searing& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Searing).Phase == EMars_Searing_Phase::OnPan;
-}
-
-mixin bool Get_IsDownFaceSeared(const FCk_Handle_Searing& Self)
-{
-    return Self.Get_FaceSear(Self.Get_DownFace()) >= 1.0f;
-}
-
+// Aggregate over every piece.
 mixin EMars_Searing_Sizzle Get_Sizzle(const FCk_Handle_Searing& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Searing).Sizzle;
@@ -267,9 +226,118 @@ mixin FMars_Searing_Tally Get_Tally(const FCk_Handle_Searing& Self)
     return Self.Get_Fragment(FMars_Fragment_Searing).Tally;
 }
 
-mixin int32 Get_LostSteakCount(const FCk_Handle_Searing& Self)
+// Admitted = Cooking + Ready + Lost since the last reset (a lost piece stays counted after its body is destroyed).
+mixin FMars_Searing_Summary Get_Summary(const FCk_Handle_Searing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Searing).LostSteaks.Num();
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Searing);
+    auto Summary = FMars_Searing_Summary();
+    for (const auto& Piece : State.Pieces)
+    {
+        if (Piece.Status == EMars_Searing_PieceStatus::Cooking)
+        { Summary.Cooking += 1; }
+        else if (Piece.Status == EMars_Searing_PieceStatus::Ready)
+        { Summary.Ready += 1; }
+    }
+
+    Summary.Lost = State.Tally.Losses;
+    Summary.Admitted = Summary.Cooking + Summary.Ready + Summary.Lost;
+    return Summary;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Piece getters (by identity). An unknown Id ensures and answers the zero value; Get_HasPiece asks first.
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Every piece on the pan in admission order, the lingering lost ones included.
+mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Searing& Self)
+{
+    TArray<FMars_CookingFeed_PieceId> Ids;
+    for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Searing).Pieces)
+    { Ids.Add(Piece.Id); }
+
+    return Ids;
+}
+
+// From admission until the piece is destroyed (a lost one, at the end of its linger) or reset.
+mixin bool Get_HasPiece(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return utils_searing::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Searing).Pieces, InPieceId) >= 0;
+}
+
+// A copy of the piece's state; an unknown Id ensures and answers a default state.
+mixin FMars_Searing_PieceState Get_PieceState(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto& Pieces = Self.Get_Fragment(FMars_Fragment_Searing).Pieces;
+    const auto Index = utils_searing::Find_PieceIndex(Pieces, InPieceId);
+    if (ck::EnsureIfNot(Index >= 0,
+        f"[Searing] [{Self.ToString()}] has no piece {utils_cooking_feed::Get_PieceName(InPieceId)} ({Pieces.Num()} on the pan)"))
+    { return FMars_Searing_PieceState(); }
+
+    return Pieces[Index];
+}
+
+mixin FCk_Handle Get_PieceEntity(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_PieceState(InPieceId).Entity;
+}
+
+mixin FCk_Handle_JoltBody Get_PieceBody(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_PieceState(InPieceId).Body;
+}
+
+mixin EMars_Searing_PieceStatus Get_PieceStatus(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_PieceState(InPieceId).Status;
+}
+
+mixin EMars_Searing_Contact Get_PieceContact(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_PieceState(InPieceId).Contact;
+}
+
+// 0 raw .. 1 seared.
+mixin float32 Get_FaceSear(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_Searing_Face InFace)
+{
+    const auto Piece = Self.Get_PieceState(InPieceId);
+    const auto Index = int32(InFace);
+    if (Piece.FaceSear.IsValidIndex(Index) == false)
+    { return 0.0f; }
+
+    return Piece.FaceSear[Index];
+}
+
+mixin int32 Get_SearedFaceCount(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return utils_searing::Get_SearedFaceCount(Self.Get_PieceState(InPieceId).FaceSear);
+}
+
+// The piece's centre in the pan base body's frame (the cooking surface is at Z = utils_searing::k_PanSurfaceZ); zero once
+// its entity is gone.
+mixin FVector Get_PiecePanLocal(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto Entity = Self.Get_PieceEntity(InPieceId);
+    if (ck::Is_NOT_Valid(Entity))
+    { return FVector::ZeroVector; }
+
+    const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+    return Self.Get_PanBaseWorld().InverseTransformPosition(PieceWorld.GetLocation());
+}
+
+// The piece face pointing most against the pan's up; NegZ once its entity is gone.
+mixin EMars_Searing_Face Get_DownFace(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto Entity = Self.Get_PieceEntity(InPieceId);
+    if (ck::Is_NOT_Valid(Entity))
+    { return EMars_Searing_Face::NegZ; }
+
+    const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+    return utils_searing::Get_DownFace(PieceWorld.GetRotation(), Self.Get_PanUp());
+}
+
+mixin bool Get_IsDownFaceSeared(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_FaceSear(InPieceId, Self.Get_DownFace(InPieceId)) >= 1.0f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -294,6 +362,12 @@ mixin void Request_Reset(FCk_Handle_Searing& Self, const FMars_Request_Searing_R
     Requests.ResetRequests.Add(InRequest);
 }
 
+mixin void Request_AddPiece(FCk_Handle_Searing& Self, const FMars_Request_Searing_AddPiece& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Requests);
+    Requests.AddPieceRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
@@ -312,18 +386,32 @@ mixin void UnbindFrom_OnHeatChanged(FCk_Handle_Searing& Self, FMars_Delegate_Sea
     Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnHeatChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
-mixin void BindTo_OnSteakSpawned(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnSteakSpawned InDelegate)
+mixin void BindTo_OnPieceAdmission(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdmission InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
-    Fragment.OnSteakSpawned.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    Fragment.OnPieceAdmission.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
-mixin void UnbindFrom_OnSteakSpawned(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnSteakSpawned InDelegate)
+mixin void UnbindFrom_OnPieceAdmission(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdmission InDelegate)
 {
     if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
     { return; }
 
-    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnSteakSpawned.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceAdmission.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnPieceAdded(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdded InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
+    Fragment.OnPieceAdded.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPieceAdded(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdded InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceAdded.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnPanContactChanged(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPanContactChanged InDelegate)
@@ -368,6 +456,34 @@ mixin void UnbindFrom_OnFaceSeared(FCk_Handle_Searing& Self, FMars_Delegate_Sear
     Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnFaceSeared.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
+mixin void BindTo_OnPieceReady(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceReady InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
+    Fragment.OnPieceReady.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPieceReady(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceReady InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceReady.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnPieceLost(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceLost InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
+    Fragment.OnPieceLost.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPieceLost(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceLost InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceLost.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
 mixin void BindTo_OnSizzleChanged(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnSizzleChanged InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
@@ -380,32 +496,4 @@ mixin void UnbindFrom_OnSizzleChanged(FCk_Handle_Searing& Self, FMars_Delegate_S
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnSizzleChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnSteakLost(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnSteakLost InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
-    Fragment.OnSteakLost.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnSteakLost(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnSteakLost InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnSteakLost.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnCompleted(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnCompleted InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
-    Fragment.OnCompleted.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnCompleted(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnCompleted InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnCompleted.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

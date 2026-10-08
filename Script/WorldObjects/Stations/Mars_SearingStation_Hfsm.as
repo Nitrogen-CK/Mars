@@ -1,9 +1,12 @@
 // The searing station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Searing_Idle). It runs on the STATION entity (context = the station, which also carries the Searing
-// feature) and reads the station's operator; it only issues Searing requests and registers the operator's legend rows.
+// feature and the platter's CookingFeed) and reads the station's operator; it only issues Searing and CookingFeed requests
+// and registers the operator's legend rows. The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
 //
-//   Idle      ->Operated [StationIsOperated]      task: Searing_ResetOnEnter (a fresh, cold steak for the next operator)
-//   Operated  ->Idle     [StationIsNotOperated]   tasks: Searing_HeatOnEnter, Searing_OperatorInput (Tick), Searing_OperatorHints
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a full platter, a new generation),
+//                                                 Searing_ResetOnEnter (an empty, cold pan for the next operator)
+//   Operated  ->Idle     [StationIsNotOperated]   tasks: Searing_HeatOnEnter, Searing_OperatorInput (Tick), Searing_OperatorHints,
+//                                                 StationFeed_OperatorInput (Tick), StationFeed_Bridge, StationFeed_OperatorHints
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
@@ -16,6 +19,7 @@ class UMars_SmState_Searing_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Searing_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
+        AddTask(InHandle, UMars_SmTask_StationFeed_ResetOnEnter);
         AddTask(InHandle, UMars_SmTask_Searing_ResetOnEnter);
     }
 }
@@ -31,11 +35,15 @@ class UMars_SmState_Searing_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Searing_HeatOnEnter);
         AddTask(InHandle, UMars_SmTask_Searing_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Searing_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_StationFeed_OperatorInput);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
+        AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
     }
 }
 
-// Destroys every steak, levels and idles the pan and chills it; a fresh steak follows. No Searing on the context yet (the SM
-// can enter before the entity script composes it) = nothing to reset.
+// Destroys every piece, levels and idles the pan and chills it; the pan stays empty until the feed admits a piece. Added
+// after the feed's reset, so the generation bump comes first. No Searing on the context yet (the SM can enter before the
+// entity script composes it) = nothing to reset.
 class UMars_SmTask_Searing_ResetOnEnter : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -120,7 +128,7 @@ class UMars_SmTask_Searing_OperatorInput : UCk_SmTask_EntityScript
 }
 
 // The operator's legend row while operating, under owner key k_OwnerKey: "tilt the pan, flick up to toss" (IA_Look). The
-// steak's state is the station's world label, not a row. An operator without a display (headless) gets no rows.
+// pieces' state is the station's world label, not a row. An operator without a display (headless) gets no rows.
 class UMars_SmTask_Searing_OperatorHints : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
