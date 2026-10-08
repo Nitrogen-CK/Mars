@@ -105,13 +105,14 @@ enum EMars_ItemUse_StrikePhase
     Recovery
 }
 
-// On enter the player's third-person body starts its strike montage (AMars_PlayerCharacter::Request_Strike; an entity
-// with no character, as in tests, has no body). After the trait's WindupSeconds, one sphere sweep from the player's
-// viewpoint along its forward out to Reach through
+// On enter the player's hand starts the trait's swing arc (HandSwing), timed so the blow lands on the sweep: through
+// AMars_PlayerCharacter::Request_Strike, which swings the owner's gloves and carries the swing to every machine's body;
+// an entity with no character (tests) swings its own HandSwing when it has one. After the trait's WindupSeconds, one
+// sphere sweep from the player's viewpoint along its forward out to Reach through
 // utils_damage_dealer::Try_StrikeSweep (filtered on Probe.Mars.HitZone; Blocking world policy, so a wall in front of a
 // hurtbox stops the swing; Silent overlap notify). The first hurtbox hit is dealt through the player's DamageDealer,
 // which resolves it to its zone. Succeeds RecoverySeconds after the sweep. Fails when the player has no dealer or
-// viewpoint, or the held item has no Strike trait.
+// viewpoint, or the held item has no Strike trait. Exiting mid-swing (the use torn down) cancels the local swing.
 class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -181,9 +182,25 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         _Dealer = Dealer;
         _Item = Item;
 
+        const auto SwingRequest = FMars_Request_HandSwing_Start(Strike.Swing, Strike.WindupSeconds, Strike.RecoverySeconds);
         auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
         if (ck::IsValid(Character))
-        { Character.Request_Strike(); }
+        { Character.Request_Strike(SwingRequest); }
+        else if (Player.Is_HandSwing())
+        {
+            auto Swing = Player.As_HandSwing();
+            Swing.Request_Start(SwingRequest);
+        }
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (_Outcome != ECk_SmTaskResult::Running || ck::Is_NOT_Valid(_Player) || _Player.Is_HandSwing() == false)
+        { return; }
+
+        auto Swing = _Player.As_HandSwing();
+        Swing.Request_Cancel();
     }
 
     UFUNCTION(BlueprintOverride)

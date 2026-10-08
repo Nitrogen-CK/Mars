@@ -1425,6 +1425,45 @@ namespace UMars_AutoTest_Gaze_TargetWithoutHeadEnsures
 }
 
 USTRUCT()
+struct FMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose
+{
+    FMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose_SpawnParams Params()
+    {
+        return FMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HandSwing_StartRequestValidates_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HandSwing_StartRequestValidates
+{
+    FMars_AutoTest_HandSwing_StartRequestValidates_SpawnParams Params()
+    {
+        return FMars_AutoTest_HandSwing_StartRequestValidates_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone
+{
+    FMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone_SpawnParams Params()
+    {
+        return FMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_HangingChain_CatenaryLaysLinksAndSags_SpawnParams
 {
 }
@@ -2188,6 +2227,19 @@ namespace UMars_AutoTest_TPBody_HoldSpecValidates
     FMars_AutoTest_TPBody_HoldSpecValidates_SpawnParams Params()
     {
         return FMars_AutoTest_TPBody_HoldSpecValidates_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_TPBody_SwingMovesTheHoldFrame_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_TPBody_SwingMovesTheHoldFrame
+{
+    FMars_AutoTest_TPBody_SwingMovesTheHoldFrame_SpawnParams Params()
+    {
+        return FMars_AutoTest_TPBody_SwingMovesTheHoldFrame_SpawnParams();
     }
 }
 

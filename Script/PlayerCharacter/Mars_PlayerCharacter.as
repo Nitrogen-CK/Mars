@@ -79,6 +79,9 @@ class AMars_PlayerCharacter : AMars_Character
     private FCk_Handle_Transform _HandNode;
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
+    // The melee swing of the hand (HandSwing): offsets the swing node the gloves and held item hang off, and is read by
+    // Update_BodyHold to swing the body's arms.
+    private FCk_Handle_HandSwing _HandSwing;
 
     // The player SM (UMars_SmState_Alive) and whether this copy started it (TryStartPlayerSm).
     private FCk_Handle_StateMachine _Sm;
@@ -91,7 +94,9 @@ class AMars_PlayerCharacter : AMars_Character
     UPROPERTY(Replicated, ReplicatedUsing = OnRep_HeldView)
     private FMars_HeldView _HeldView;
 
-    // The arms' targets for _HeldView at full alpha, and the eased frame the anim instance reads (Update_BodyHold).
+    // The query the arms' targets for _HeldView were built from (rebuilt around the swing's pose while the hand swings),
+    // those targets at full alpha, and the eased frame the anim instance reads (Update_BodyHold).
+    private FMars_TPBody_HoldQuery _BodyHoldQuery;
     private FMars_TPBody_HoldFrame _BodyHoldTarget;
     private FMars_TPBody_HoldFrame _BodyHoldFrame;
 
@@ -270,13 +275,21 @@ class AMars_PlayerCharacter : AMars_Character
         // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; _HandRestOffset is its rest.
         _HandSway = utils_sway::Add(Hand, Config.HandSway);
 
-        // Locomotion bob under the swaying hand, in phase with the head; the held item and both gloves hang off it.
+        // Locomotion bob under the swaying hand, in phase with the head; the swing node, the held item and both gloves
+        // hang off it.
         auto HandTransform = Hand.As_Transform();
         auto HandBobSpec = Config.FPHands.Bob;
         HandBobSpec.Set_Gait(_Gait);
         auto HandBob = utils_bob::Create(HandTransform, FTransform::Identity, HandBobSpec);
         utils_handle::Set_DebugName(HandBob.H(), n"Player.HandBob");
-        _HandNode = HandBob.As_Transform();
+
+        // The melee swing under the bob: everything that hangs off the hand (both gloves and the held item) swings with
+        // it. HandSwing owns the node's offset; identity at rest.
+        auto HandBobTransform = HandBob.As_Transform();
+        auto SwingNode = utils_scene_node::Create(HandBobTransform, FTransform::Identity);
+        utils_handle::Set_DebugName(SwingNode.H(), n"Player.HandSwing");
+        _HandSwing = utils_hand_swing::Add(Player, FMars_HandSwing_Spec(SwingNode));
+        _HandNode = SwingNode.As_Transform();
         auto HandsSpec = Config.FPHands;
         HandsSpec.HandNode = _HandNode;
         HandsSpec.Pitch.Node = HandPitch;
@@ -402,10 +415,10 @@ class AMars_PlayerCharacter : AMars_Character
 
     //----------------------------------------------------------------------------------------------------------------------
     // Emotes and the strike. The HFSM tasks decide when (emote keys, the emote wheel, a held item's strike); the character
-    // only plays the montages and carries them over the network. The machine that asks plays at once - the owner's
-    // gloves, and its body for a listen host's view - and, when it is the owner, forwards to the server, which
-    // multicasts. Each multicast skips the locally controlled copy (the owner already played it), so every machine
-    // plays an emote exactly once. A call on a machine that does not control this character stays local.
+    // only plays the emote montages or starts the hand swing, and carries them over the network. The machine that asks
+    // plays at once - the owner's gloves, and its body for a listen host's view - and, when it is the owner, forwards to
+    // the server, which multicasts. Each multicast skips the locally controlled copy (the owner already played it), so
+    // every machine plays each exactly once. A call on a machine that does not control this character stays local.
     //----------------------------------------------------------------------------------------------------------------------
 
     // The one emote entry point. False while the gloves are busy (holding an item, or out of Rest), or when neither the
@@ -437,15 +450,19 @@ class AMars_PlayerCharacter : AMars_Character
         { Server_StopEmote(); }
     }
 
-    // A held item's strike starts (UMars_SmTask_ItemUse_Strike): the body swings. The first-person swing is the item's.
+    // A held item's strike starts (UMars_SmTask_ItemUse_Strike): the hand swings InRequest's arc. Here that moves the
+    // owner's gloves and held item (the swing node) and, through Update_BodyHold, this copy's body; the request is
+    // carried to the other machines, whose bodies swing the same arc. Nothing swings before the entity is composed.
     UFUNCTION()
-    void Request_Strike()
+    void Request_Strike(FMars_Request_HandSwing_Start InRequest)
     {
-        if (ck::Is_NOT_Valid(PlayBodyMontage(Config.TPBody.Montages.StrikeMontage)))
+        if (ck::Is_NOT_Valid(_HandSwing))
         { return; }
 
+        _HandSwing.Request_Start(InRequest);
+
         if (IsLocallyControlled())
-        { Server_PlayStrike(); }
+        { Server_PlayStrike(InRequest); }
     }
 
     UFUNCTION(Server)
@@ -480,18 +497,19 @@ class AMars_PlayerCharacter : AMars_Character
     }
 
     UFUNCTION(Server)
-    void Server_PlayStrike()
+    void Server_PlayStrike(FMars_Request_HandSwing_Start InRequest)
     {
-        Multicast_PlayStrike();
+        Multicast_PlayStrike(InRequest);
     }
 
+    // A copy whose entity is not composed yet (the swing arrived before its construction) shows no swing.
     UFUNCTION(NetMulticast)
-    void Multicast_PlayStrike()
+    void Multicast_PlayStrike(FMars_Request_HandSwing_Start InRequest)
     {
-        if (IsLocallyControlled())
+        if (IsLocallyControlled() || ck::Is_NOT_Valid(_HandSwing))
         { return; }
 
-        PlayBodyMontage(Config.TPBody.Montages.StrikeMontage);
+        _HandSwing.Request_Start(InRequest);
     }
 
     private bool PlayBodyEmote(EMars_FPEmote InEmote)
@@ -582,20 +600,21 @@ class AMars_PlayerCharacter : AMars_Character
 
     // Eases the arms toward _HeldView's hold. Driven by UMars_Chef_AnimInstance's update (the body's anim always ticks,
     // see Mesh's VisibilityBasedAnimTickOption), so the arms move exactly as often as the pose is evaluated and the
-    // character needs no actor tick. A body montage while holding is the strike (emotes refuse while holding): the arms
-    // let go of the IK for its duration and the swing carries the item on grip_r.
+    // character needs no actor tick. While the hand swings (a held item's strike), the hold is rebuilt around the
+    // swing's pose every update and taken as is: the swing is the motion, and easing it would blunt the blow.
     void Update_BodyHold(float32 InDeltaSeconds)
     {
         auto Target = _BodyHoldTarget;
-        auto AnimInstance = Mesh.GetAnimInstance();
-        if (ck::IsValid(AnimInstance) && AnimInstance.IsAnyMontagePlaying())
+        const auto Speed = Config.TPBody.Hold.InterpSpeed;
+        auto Step = Speed <= 0.0f ? 1.0f : Math::Clamp(InDeltaSeconds * Speed, 0.0f, 1.0f);
+        if (_HeldView.IsHolding && ck::IsValid(_HandSwing) && _HandSwing.Get_IsSwinging())
         {
-            Target.Left.Alpha = 0.0f;
-            Target.Right.Alpha = 0.0f;
+            auto Query = _BodyHoldQuery;
+            Query.Swing = _HandSwing.Get_Pose();
+            Target = utils_held_view::Make_HoldFrame(Query);
+            Step = 1.0f;
         }
 
-        const auto Speed = Config.TPBody.Hold.InterpSpeed;
-        const auto Step = Speed <= 0.0f ? 1.0f : Math::Clamp(InDeltaSeconds * Speed, 0.0f, 1.0f);
         _BodyHoldFrame.Left = utils_held_view::Ease_Arm(_BodyHoldFrame.Left, Target.Left, Step);
         _BodyHoldFrame.Right = utils_held_view::Ease_Arm(_BodyHoldFrame.Right, Target.Right, Step);
     }
@@ -640,6 +659,7 @@ class AMars_PlayerCharacter : AMars_Character
         Query.BodyScale = Body.Scale;
         Query.HandInGrip_R = Get_HandInGrip(BodyGripBone_R);
         Query.HandInGrip_L = Get_HandInGrip(BodyGripBone_L);
+        _BodyHoldQuery = Query;
         _BodyHoldTarget = utils_held_view::Make_HoldFrame(Query);
     }
 

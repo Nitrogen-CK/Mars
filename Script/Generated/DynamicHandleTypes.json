@@ -208,6 +208,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_HandSwing",
+			"ShortName": "HandSwing",
+			"Description": "A procedural melee swing of the player's hand: windup, strike and recovery poses on a timeline, as an offset in the hand's space",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_HandSwingHandle",
+			"RequiredFragments": [
+				"Mars_Feature_HandSwing"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Hazard",
 			"ShortName": "Hazard",
 			"Description": "An entity that, while armed, hits whatever is inside its trigger and optionally pushes characters",

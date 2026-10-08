@@ -894,6 +894,54 @@ class UMars_Processor_Gaze_Select_Driver : UMars_Processor_Gaze_Select
     }
 }
 
+class UMars_Processor_HandSwing_HandleRequests_Driver : UMars_Processor_HandSwing_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_HandSwing_Requests);
+        Query.ReadWrite(FMars_Fragment_HandSwing);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_HandSwing_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_HandSwing_Requests& P0 = Batch.Get(i, FMars_Fragment_HandSwing_Requests);
+            FMars_Fragment_HandSwing& P1 = Batch.Get(i, FMars_Fragment_HandSwing);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_HandSwing_Tick_Driver : UMars_Processor_HandSwing_Tick
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_HandSwing);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_HandSwing_Tick_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_HandSwing& P0 = Batch.Get(i, FMars_Fragment_HandSwing);
+            ForEachEntity(InDeltaT, Handle, P0);
+        }
+    }
+}
+
 class UMars_Processor_Hazard_HandleRequests_Driver : UMars_Processor_Hazard_HandleRequests
 {
     UFUNCTION(BlueprintOverride)

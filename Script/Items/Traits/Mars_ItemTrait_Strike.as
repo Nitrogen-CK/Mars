@@ -1,10 +1,15 @@
 // What a held melee item deals when its use swings it (UMars_SmState_ItemUse_Strike): after WindupSeconds, one sphere
 // sweep of Radius from the player's viewpoint out to Reach, filtered on Probe.Mars.HitZone with a Blocking world policy
 // (a wall stops the swing); the first hurtbox hit takes Damage of DamageType through the player's DamageDealer. The use
-// completes RecoverySeconds after the sweep.
+// completes RecoverySeconds after the sweep. Swing is the arc the hand draws meanwhile (HandSwing), timed so the blow
+// lands on the sweep.
 UCLASS(Meta = (DisplayName = "🗡️ Strike"))
 class UMars_ItemTrait_Strike : UCk_ItemTrait
 {
+    // The hand's path through the swing, in the hand's space. Shown on the owner's gloves and on everyone's body.
+    UPROPERTY()
+    FMars_HandSwing_Arc Swing;
+
     UPROPERTY()
     float32 Damage = 20.0f;
 

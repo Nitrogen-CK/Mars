@@ -125,6 +125,11 @@ struct FMars_TPBody_Hold
     // How quickly the arms take or leave a hold, 1/s (FPHands.ReachInterpSpeed's feel). 0 = snap.
     UPROPERTY()
     float32 InterpSpeed = 14.0f;
+
+    // How much of a swing's hand displacement the elbow pole targets follow, 0..1: the elbows rise with an overhead
+    // windup and drop through the blow instead of pinning the arms to their hold pose.
+    UPROPERTY()
+    float32 SwingElbowFollow = 0.5f;
 }
 
 mixin FMars_Validation Validate(const FMars_TPBody_Hold& Self)
@@ -148,6 +153,9 @@ mixin FMars_Validation Validate(const FMars_TPBody_Hold& Self)
 
     if ((Self.InterpSpeed >= 0.0f) == false)
     { return FMars_Validation(f"InterpSpeed [{Self.InterpSpeed}] must not be negative"); }
+
+    if ((Self.SwingElbowFollow >= 0.0f && Self.SwingElbowFollow <= 1.0f) == false)
+    { return FMars_Validation(f"SwingElbowFollow [{Self.SwingElbowFollow}] is outside [0, 1]"); }
 
     return FMars_Validation();
 }
@@ -203,6 +211,10 @@ struct FMars_TPBody_HoldQuery
 
     UPROPERTY()
     FTransform HandInGrip_L;
+
+    // The hand's melee swing offset (the HandSwing pose), hand space, world cm. Identity at rest.
+    UPROPERTY()
+    FTransform Swing;
 }
 
 namespace utils_held_view
@@ -281,21 +293,25 @@ namespace utils_held_view
     }
 
     // Both arms' targets at full alpha (the character eases them): each grip target, shrunk to body units, laid out in
-    // the hand frame (moved by OneHandedOffset for a one-handed hold), then converted to its hand bone. A one-handed hold
-    // only raises the right arm.
+    // the hand frame (moved by OneHandedOffset for a one-handed hold, then swung by the swing offset, as the first-person
+    // swing node moves the gloves and the item together), then converted to its hand bone. The elbows follow a share of
+    // the swing's displacement. A one-handed hold only raises the right arm.
     FMars_TPBody_HoldFrame Make_HoldFrame(const FMars_TPBody_HoldQuery& InQuery)
     {
         const auto& Hold = InQuery.Hold;
-        auto Frame = Hold.HandFrame;
+        auto RestFrame = Hold.HandFrame;
         if (InQuery.IsTwoHanded == false)
-        { Frame = Get_InBodyUnits(FTransform(FRotator::ZeroRotator, Hold.OneHandedOffset), InQuery.BodyScale) * Hold.HandFrame; }
+        { RestFrame = Get_InBodyUnits(FTransform(FRotator::ZeroRotator, Hold.OneHandedOffset), InQuery.BodyScale) * Hold.HandFrame; }
+
+        const auto Frame = Get_InBodyUnits(InQuery.Swing, InQuery.BodyScale) * RestFrame;
+        const auto ElbowFollow = RestFrame.TransformVector(InQuery.Swing.GetLocation() / float(InQuery.BodyScale)) * Hold.SwingElbowFollow;
 
         const auto GripR = Get_InBodyUnits(InQuery.Grips.Right, InQuery.BodyScale) * Frame;
         const auto GripL = Get_InBodyUnits(InQuery.Grips.Left, InQuery.BodyScale) * Frame;
 
         auto Result = FMars_TPBody_HoldFrame();
-        Result.Right = Make_ArmTarget(InQuery.HandInGrip_R * GripR, Hold.ElbowOffset_R);
-        Result.Left = Make_ArmTarget(InQuery.HandInGrip_L * GripL, Hold.ElbowOffset_L);
+        Result.Right = Make_ArmTarget(InQuery.HandInGrip_R * GripR, Hold.ElbowOffset_R + ElbowFollow);
+        Result.Left = Make_ArmTarget(InQuery.HandInGrip_L * GripL, Hold.ElbowOffset_L + ElbowFollow);
         Result.Right.Alpha = 1.0f;
         Result.Left.Alpha = InQuery.IsTwoHanded ? 1.0f : 0.0f;
         return Result;

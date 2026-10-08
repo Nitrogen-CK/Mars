@@ -1,7 +1,8 @@
 // Parent class of ABP_Chef, the third-person chef body other players see. Reads the owning character's movement
 // (velocity and falling state replicate, so this is valid on simulated proxies) and exposes what the anim graph
 // needs: ground speed and travel direction for the locomotion blend space, and whether the character is airborne for
-// the jump states. Emotes and the strike play as montages on the ABP's DefaultSlot (see AMars_PlayerCharacter).
+// the jump states. Emotes play as montages on the ABP's DefaultSlot; a held item's strike rides the hold IK below (see
+// AMars_PlayerCharacter).
 class UMars_Chef_AnimInstance : UAnimInstance
 {
     // Horizontal speed, uu/s (blend space Y).
@@ -26,6 +27,7 @@ class UMars_Chef_AnimInstance : UAnimInstance
     // DefaultSlot. Pulled each update from AMars_PlayerCharacter::Get_BodyHoldFrame (see Mars_HeldView.as). Locations
     // and rotations are the hand_l / hand_r bones' (already converted from the grip targets); the elbow targets are the
     // IK joint targets. Alpha 0 = the arm keeps the locomotion/montage pose; one-handed items only raise the right alpha.
+    // A held item's strike moves these targets along its HandSwing arc.
     UPROPERTY(BlueprintReadOnly, NotEditable, Category = "Chef|Hold")
     float32 HoldAlpha_L = 0.0f;
 

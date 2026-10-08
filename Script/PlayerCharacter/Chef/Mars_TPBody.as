@@ -1,6 +1,7 @@
 // The third-person chef body: the character's inherited Mesh, hidden from its owner (who sees the first-person gloves)
-// and seen by everyone else. Composed by AMars_PlayerCharacter from Config.TPBody; its emotes and strike are montages
-// played on the ABP's DefaultSlot (AMars_PlayerCharacter::Request_Emote / Request_Strike).
+// and seen by everyone else. Composed by AMars_PlayerCharacter from Config.TPBody; its emotes are montages played on the
+// ABP's DefaultSlot (AMars_PlayerCharacter::Request_Emote), its held-item strike is the procedural HandSwing carried
+// through the arms' IK (Mars_HeldView.as, AMars_PlayerCharacter::Request_Strike).
 
 // The body's montages. EmoteMontages is indexed by EMars_FPEmote (the gloves' FMars_FPHands_EmoteSpec::Montages maps it).
 struct FMars_TPBody_Montages
@@ -8,11 +9,7 @@ struct FMars_TPBody_Montages
     UPROPERTY()
     TArray<TSoftObjectPtr<UAnimMontage>> EmoteMontages;
 
-    // Played on the body as a held item's strike starts (UMars_SmTask_ItemUse_Strike).
-    UPROPERTY()
-    TSoftObjectPtr<UAnimMontage> StrikeMontage;
-
-    // The ABP_Chef slot the emote and strike montages play through.
+    // The ABP_Chef slot the emote montages play through.
     UPROPERTY()
     FName EmoteSlot = n"DefaultSlot";
 
