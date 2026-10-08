@@ -112,23 +112,23 @@ namespace utils_hand_swing
         return FMars_HandSwing_Arc();
     }
 
-    // A mallet: raised high overhead, then brought straight down.
+    // A mallet: drawn back and high overhead, then brought down far out in front.
     FMars_HandSwing_Arc Make_OverheadArc()
     {
         auto Arc = FMars_HandSwing_Arc();
-        Arc.Windup = FMars_HandSwing_Key(FVector(-10.0, 2.0, 22.0), FRotator(60.0, -5.0, 0.0), ECk_TweenEasing::OutCubic);
-        Arc.Strike = FMars_HandSwing_Key(FVector(16.0, -2.0, -20.0), FRotator(-70.0, 5.0, 0.0), ECk_TweenEasing::InQuad);
+        Arc.Windup = FMars_HandSwing_Key(FVector(-18.0, 4.0, 26.0), FRotator(70.0, -8.0, 0.0), ECk_TweenEasing::OutCubic);
+        Arc.Strike = FMars_HandSwing_Key(FVector(40.0, -4.0, -22.0), FRotator(-85.0, 6.0, 0.0), ECk_TweenEasing::InQuad);
         Arc.StrikeSeconds = 0.14f;
         Arc.ImpactFraction = 0.7f;
         return Arc;
     }
 
-    // A pan: cocked to the right, then swiped across to the left.
+    // A pan: cocked back to the right, then swiped out and across to the left.
     FMars_HandSwing_Arc Make_SwipeArc()
     {
         auto Arc = FMars_HandSwing_Arc();
-        Arc.Windup = FMars_HandSwing_Key(FVector(-6.0, 14.0, 4.0), FRotator(5.0, 40.0, -15.0), ECk_TweenEasing::OutCubic);
-        Arc.Strike = FMars_HandSwing_Key(FVector(10.0, -18.0, -2.0), FRotator(-5.0, -50.0, 15.0), ECk_TweenEasing::InQuad);
+        Arc.Windup = FMars_HandSwing_Key(FVector(-10.0, 20.0, 6.0), FRotator(6.0, 50.0, -18.0), ECk_TweenEasing::OutCubic);
+        Arc.Strike = FMars_HandSwing_Key(FVector(32.0, -28.0, -4.0), FRotator(-10.0, -65.0, 18.0), ECk_TweenEasing::InQuad);
         Arc.StrikeSeconds = 0.13f;
         Arc.ImpactFraction = 0.6f;
         return Arc;

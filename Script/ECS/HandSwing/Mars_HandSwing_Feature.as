@@ -52,14 +52,16 @@ struct FMars_HandSwing_Key
 
 // The shape of a swing, authored per item (UMars_ItemTrait_Strike::Swing). Rest -> Windup -> Strike -> Rest; the blow lands
 // ImpactFraction of the way through the strike travel's time. The windup and recovery take whatever time the request
-// leaves around the strike travel (Make_Timeline). Default: a right-handed chop.
+// leaves around the strike travel (Make_Timeline). Default: a right-handed chop. The travel runs mostly along X, the
+// camera's depth: the hands rest about 60 cm out, so a windup drawn back toward the camera and a strike pushed well
+// past the rest plane read as a swing through the world rather than a slide across the screen.
 struct FMars_HandSwing_Arc
 {
     UPROPERTY()
-    FMars_HandSwing_Key Windup = FMars_HandSwing_Key(FVector(-8.0, 3.0, 12.0), FRotator(35.0, -8.0, 0.0), ECk_TweenEasing::OutCubic);
+    FMars_HandSwing_Key Windup = FMars_HandSwing_Key(FVector(-16.0, 6.0, 14.0), FRotator(45.0, -15.0, 8.0), ECk_TweenEasing::OutCubic);
 
     UPROPERTY()
-    FMars_HandSwing_Key Strike = FMars_HandSwing_Key(FVector(14.0, -4.0, -14.0), FRotator(-55.0, 8.0, 0.0), ECk_TweenEasing::InQuad);
+    FMars_HandSwing_Key Strike = FMars_HandSwing_Key(FVector(34.0, -8.0, -16.0), FRotator(-70.0, 12.0, -6.0), ECk_TweenEasing::InQuad);
 
     UPROPERTY()
     ECk_TweenEasing RecoverEasing = ECk_TweenEasing::OutCubic;
