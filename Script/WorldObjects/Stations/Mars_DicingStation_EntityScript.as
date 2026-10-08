@@ -13,11 +13,18 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_Dicing_Spec Dicing;
 
-    private const float64 TableWidth = 140.0;
+    // PrepTable_Mars_SM: 160 wide (the blockout was 140), the extra 10 cm a side making room for the ingredient bowl and
+    // the finished tray beside the 90 cm board (station_spec.py PROPS["PrepTable"], CuttingStation_Layout.json).
+    private const float64 TableWidth = 160.0;
     private const float64 TableDepth = 80.0;
     private const float64 TableHeight = constants_station::k_CounterHeight;
     // Close in: the capsule (radius 39) stands almost touching the table edge.
     private const float64 StandGap = 43.0;
+    // The ingredient bowl (left, -Y) and the finished tray (right, +Y) sit beside the board at the table's Input / Output
+    // sockets; both meshes pivot at the centre of their inner floor, so they are placed their floor thickness above the top.
+    private const float64 BowlY = 62.0;
+    private const float64 BowlFloor = 3.0;
+    private const float64 TrayFloor = 1.5;
     // The operating view, pitched hard onto the board from ViewGap uu off the table edge and ViewAboveBoard uu over the
     // board top. It lives in the station frame (Camera.ViewLocal), so the framing holds whatever the operator's eye height.
     private const float32 CameraPitch = -48.0f;
@@ -202,13 +209,22 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         auto CubeMesh = engine::load::Cube();
         const auto BoardTop = Get_BoardTop();
 
-        InRoot.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TableHeight * 0.5), FVector(TableDepth, TableWidth, TableHeight) * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"DicingStation_Table"));
+        // The station props (station_spec.py): the table pivots at its floor contact, the board at the centre of its
+        // underside (exactly the blockout board's 50 x 90 x 4 at BoardX), the bowl and the tray at their inner floor.
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform::Identity,
+            assets::load::PrepTable_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_Table"));
 
         InRoot.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(BoardX, 0.0, TableHeight + BoardThickness * 0.5), FVector(BoardDepth, BoardWidth, BoardThickness) * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Platform_Mars_MI(), collision::profile::BlockAll, n"DicingStation_Board"));
+            FTransform(FRotator::ZeroRotator, FVector(BoardX, 0.0, TableHeight)),
+            assets::load::CuttingBoard_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_Board"));
+
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(BoardX, -BowlY, TableHeight + BowlFloor)),
+            assets::load::PrepBowl_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_InputBowl"));
+
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, FVector(BoardX, BowlY, TableHeight + TrayFloor)),
+            assets::load::PrepTray_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_OutputTray"));
 
         // The pile node is yawed 90 so its scale's X spans the board (local Y); its scale is the pile's size per state.
         _PileNode = utils_scene_node::Create(InRoot,

@@ -3231,6 +3231,35 @@ namespace UMars_ForageDebris_EntityScript
 }
 
 USTRUCT()
+struct FMars_FryerStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    FMars_FryerStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+    }
+}
+
+namespace UMars_FryerStation_EntityScript
+{
+    FMars_FryerStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_FryerStation_EntityScript_SpawnParams();
+    }
+
+    FMars_FryerStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        return FMars_FryerStation_EntityScript_SpawnParams(InSpawnTransform, InStation);
+    }
+}
+
+USTRUCT()
 struct FMars_FryStation_EntityScript_SpawnParams
 {
     UPROPERTY()

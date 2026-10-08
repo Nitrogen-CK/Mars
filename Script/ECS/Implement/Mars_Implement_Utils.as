@@ -25,18 +25,33 @@ namespace utils_implement
     }
 
     // ONE offset write: the tilt composed onto the rest rotation (rest x tilt, about the rest frame's axes), the orbit
-    // offset and the slide in the rest frame's XY plane and the lift along the rest frame's up. An invalid node is an
-    // implement being torn down.
-    void Apply_Pose(FCk_Handle_SceneNode InNode, const FMars_Fragment_Implement& InState, FVector InOrbitOffset)
+    // offset and the slide in the rest frame's XY plane and the lift along the rest frame's up, plus the ring-pivot rise
+    // (Tilt.RestRadius x sin of the tilt angle, so a tilted implement rolls on its rest ring rather than through it). An
+    // invalid node is an implement being torn down.
+    void Apply_Pose(FCk_Handle_SceneNode InNode, const FMars_Fragment_Implement& InState, FVector InOrbitOffset, float32 InRestRadius)
     {
         if (ck::Is_NOT_Valid(InNode))
         { return; }
 
         const auto& Rest = InState.RestOffset;
-        const auto Rotation = FQuat(Rest.Rotator()) * FQuat(FRotator(InState.Pitch, InState.Yaw, InState.Roll));
-        const auto Location = Rest.GetLocation() + InOrbitOffset + FVector(InState.Slide.X, InState.Slide.Y, float64(InState.Lift));
+        const auto Tilt = FQuat(FRotator(InState.Pitch, InState.Yaw, InState.Roll));
+        const auto Rotation = FQuat(Rest.Rotator()) * Tilt;
+        const auto Location = Rest.GetLocation() + InOrbitOffset
+            + FVector(InState.Slide.X, InState.Slide.Y, float64(InState.Lift) + Get_RingPivotRise(Tilt, InRestRadius));
         const auto Offset = FTransform(Rotation, Location, Rest.GetScale3D());
         utils_scene_node::Request_UpdateOffset(InNode, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
+    }
+
+    // How far the node rises so an implement tilted by InTilt keeps the low side of its base on a rest ring of InRestRadius:
+    // the ring point on the low side drops by RestRadius x sin(tilt angle), where the tilt angle is between the tilted up
+    // vector and the rest up (pitch and roll combined; a pure yaw tilts nothing).
+    float64 Get_RingPivotRise(const FQuat& InTilt, float32 InRestRadius)
+    {
+        if (InRestRadius <= 0.0f)
+        { return 0.0; }
+
+        const auto UpZ = Math::Clamp(InTilt.GetUpVector().Z, -1.0, 1.0);
+        return float64(InRestRadius) * Math::Sqrt(Math::Max(0.0, 1.0 - UpZ * UpZ));
     }
 
     // InTarget held inside the slide's reachable area: the disc of Radius about Centre, else the box of the half extents

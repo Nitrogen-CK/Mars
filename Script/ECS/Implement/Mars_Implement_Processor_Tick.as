@@ -61,7 +61,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         if (Changed == false)
         { return; }
 
-        utils_implement::Apply_Pose(InFrame.Spec.Nodes.Node, InState, OrbitOffset);
+        utils_implement::Apply_Pose(InFrame.Spec.Nodes.Node, InState, OrbitOffset, InFrame.Spec.Tilt.RestRadius);
         InState.WrittenPitch = InState.Pitch;
         InState.WrittenRoll = InState.Roll;
         InState.WrittenYaw = InState.Yaw;

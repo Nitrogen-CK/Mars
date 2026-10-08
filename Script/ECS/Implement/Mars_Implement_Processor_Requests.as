@@ -79,7 +79,7 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.OrbitPhase = 0.0f;
         InState.OrbitAlpha = 0.0f;
 
-        utils_implement::Apply_Pose(InImplement.Get_Node(), InState, FVector::ZeroVector);
+        utils_implement::Apply_Pose(InImplement.Get_Node(), InState, FVector::ZeroVector, InImplement.Get_Spec().Tilt.RestRadius);
         InState.WrittenPitch = 0.0f;
         InState.WrittenRoll = 0.0f;
         InState.WrittenYaw = 0.0f;

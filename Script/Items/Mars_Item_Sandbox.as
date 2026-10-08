@@ -90,10 +90,12 @@ asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Cleaver"));
 
+    // MeatCleaver_Mars_SM (station_spec.py): pivot at the rear grip, blade along +X, edge down; its Grip_R / Grip_L sockets
+    // are the two-handed authored grips the gloves take (Mars_FPHands_Grips.as), Strike / EdgeHeel / EdgeToe mark the edge.
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Cube();
-    Presentation.Visual.MeshScale = FVector(0.08, 0.5, 0.25);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = assets::MeatCleaver_Mars_SM();
+    Presentation.Grip.Pose = EMars_HandGripPose::Power;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));
@@ -116,10 +118,12 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
 {
     _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Tenderizer"));
 
+    // MeatTenderizer_Mars_SM (station_spec.py): pivot at the rear grip, head along +X, teeth down; Grip_R / Grip_L are the
+    // two-handed authored grips, Strike the centre of the toothed face.
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
-    Presentation.Visual.Mesh = engine::Cylinder();
-    Presentation.Visual.MeshScale = FVector(0.25, 0.25, 0.5);
-    Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Visual.Mesh = assets::MeatTenderizer_Mars_SM();
+    Presentation.Grip.Pose = EMars_HandGripPose::Power;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto UseAction = Cast<UMars_ItemTrait_UseAction>(NewObject(this, UMars_ItemTrait_UseAction));

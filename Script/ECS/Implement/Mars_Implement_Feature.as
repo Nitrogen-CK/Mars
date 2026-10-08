@@ -75,6 +75,12 @@ struct FMars_Implement_TiltSpec
     UPROPERTY()
     float32 LevelReturnDegreesPerSecond = 45.0f;
 
+    // uu: the implement rests on a ring of this radius about its node (a pan on a trivet). A tilt then pivots on that ring,
+    // not about the node: the node rises by RestRadius x sin(tilt) along the rest frame's up, so the low side of the base
+    // stays on the ring instead of cutting through whatever is under it. 0 = tilt about the node.
+    UPROPERTY()
+    float32 RestRadius = 0.0f;
+
     FMars_Implement_TiltSpec() {}
 
     FMars_Implement_TiltSpec(
@@ -283,6 +289,9 @@ mixin FMars_Validation Validate(const FMars_Implement_Spec& Self)
 
     if (Self.Tilt.LevelReturnDegreesPerSecond < 0.0f)
     { return FMars_Validation(f"Implement has a negative Tilt.LevelReturnDegreesPerSecond [{Self.Tilt.LevelReturnDegreesPerSecond}]"); }
+
+    if (Self.Tilt.RestRadius < 0.0f)
+    { return FMars_Validation(f"Implement has a negative Tilt.RestRadius [{Self.Tilt.RestRadius}]"); }
 
     if (Self.Lift.FlickSpeedDegreesPerSecond < 0.0f)
     { return FMars_Validation(f"Implement has a negative Lift.FlickSpeedDegreesPerSecond [{Self.Lift.FlickSpeedDegreesPerSecond}]"); }

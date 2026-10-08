@@ -54,15 +54,20 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     // The Use probe's margin around the table.
     private const float64 ProbePadding = 5.0;
 
-    private const float64 StoveSize = 50.0;
-    private const float64 StoveHeight = 4.0;
+    // The hearth (Hearth_Mars_SM + EmberBed_Mars_SM, pivot at the centre of the underside, on the table top at StoveX): a
+    // 56 cm chiselled slab HearthSlabHeight tall, an iron fire bowl, and a trivet whose ring (radius HearthTrivetRingRadius,
+    // top at HearthTrivetTop above the table: the mesh's SOCKET_Pan) carries the pan. SOCKET_Flame is HearthFlameHeight up,
+    // inside the bowl above the coals with a clear 30 cm column to the pan: a flame Niagara system attaches there. The
+    // bellows (dressing) sits with its nozzle tip at the hearth's SOCKET_Bellows, pointing into the bowl.
     private const float64 StoveX = 0.0;
-    // Engine cylinder scales (100 uu across and tall): a burner ring 36 across and 2 tall on the slab.
-    private const float64 BurnerRadiusScale = 0.36;
-    private const float64 BurnerHeightScale = 0.02;
-    // The pan rests clear of the burner ring so a tilt does not cut into the blockout stove; a stove prop or a held lift
-    // while operated decides the final rest.
-    private const float64 PanHoverAboveBurner = 7.0;
+    private const float64 HearthSlabHeight = 6.0;
+    private const float64 HearthTrivetTop = 20.0;
+    private const float64 HearthTrivetRingRadius = 22.0;
+    private const float64 HearthFlameHeight = 8.0;
+    private const FVector BellowsLocal = FVector(0.0, 34.0, 6.0);
+    // The pan rests on the trivet ring; a tilt pivots on the ring (the pan Implement's Tilt.RestRadius), so no hover is
+    // needed to keep a tilted pan out of the iron. A held lift while operated decides any further rise.
+    private const float64 PanHoverAboveBurner = 0.0;
 
     // The pan, the cube and the oil pool as cooking_spec.py authors them (FOOD_LIBRARY.md), in the meshes' own centimetres;
     // the pan and every oil length are multiplied by PanScale on this station (see the design for why not 1).
@@ -176,8 +181,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const FColor LabelColor = FColor(255, 238, 0, 255);
 
     private const FLinearColor k_StoveColor = FLinearColor(0.22f, 0.22f, 0.24f, 1.0f);
-    private const FLinearColor k_BurnerHot = FLinearColor(0.9f, 0.3f, 0.1f, 1.0f);
-    private const FLinearColor k_BurnerCold = FLinearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    // The ember bed's emissive Strength (Ember_Mars_MI on Emissive_Mars_M): glowing coals when hot, a dull bed when cold.
+    private const float32 EmberStrengthHot = 8.0f;
+    private const float32 EmberStrengthCold = 0.4f;
 
     private const int32 k_SearedBurstBehavior = 13; // SparksBurst
     private const float32 SearedBurstSize = 0.35f;
@@ -194,7 +200,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_SceneNode _PanMeshNode;
     private FCk_Handle_Implement _PanImplement;
     private FCk_Handle_JoltBody _PanBaseBody;
-    private FCk_Handle_UnrealComponent _BurnerPart;
+    private FCk_Handle_UnrealComponent _EmberPart;
+    private UMaterialInstanceDynamic _EmberMaterial;
     private FCk_Handle_UnrealComponent _PanPart;
     // At the steak's pan-local XY on the cooking surface, unit scale: the oil FX ride it.
     private FCk_Handle_SceneNode _FootprintNode;
@@ -261,6 +268,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         // set here rather than in the struct's defaults.
         auto PanSpec = Implement;
         PanSpec.Orbit = FMars_Implement_OrbitSpec(SwirlRadius, SwirlHz);
+        // The pan rests on the trivet ring: a tilt pivots on it (the node rises by ring radius x sin tilt), so the low side of
+        // the base rolls along the iron instead of cutting through the hearth.
+        PanSpec.Tilt.RestRadius = float32(HearthTrivetRingRadius);
         PanSpec.Nodes = FMars_Implement_Nodes(_PanNode);
         _PanImplement = utils_implement::Add(_PanNode.H(), PanSpec);
         if (ck::Is_NOT_Valid(_PanImplement))
@@ -291,8 +301,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        if (ck::IsValid(_BurnerPart))
-        { utils_unreal_component::BindTo_OnAdded(_BurnerPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
+        if (ck::IsValid(_EmberPart))
+        { utils_unreal_component::BindTo_OnAdded(_EmberPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
 
         if (ck::IsValid(_Label))
         { utils_unreal_component::BindTo_OnAdded(_Label, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
@@ -386,25 +396,27 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     protected void AddVisuals(FCk_Handle_Transform& InRoot) override
     {
         _Root = InRoot;
-        auto CubeMesh = engine::load::Cube();
         const auto StoveTop = Get_StoveTop();
+        const auto HearthLocal = FVector(StoveX, 0.0, TableHeight);
 
-        InRoot.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TableHeight * 0.5), FVector(TableDepth, TableWidth, TableHeight) * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"SearingStation_Table"));
+        // The station props (station_spec.py): the prep table (pivot at its floor contact), the hearth and its ember bed
+        // (both pivot at the hearth's underside centre, on the table top), the bellows (pivot at its nozzle tip).
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform::Identity,
+            assets::load::PrepTable_Mars_SM(), nullptr, collision::profile::BlockAll, n"SearingStation_Table"));
 
-        auto Stove = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(StoveX, 0.0, TableHeight + StoveHeight * 0.5), FVector(StoveSize, StoveSize, StoveHeight) * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Platform_Mars_MI(), collision::profile::NoCollision, n"SearingStation_Stove");
-        Stove.PrimaryColor = TOptional<FLinearColor>(k_StoveColor);
-        InRoot.Add_MeshPart(this, Stove);
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, HearthLocal),
+            assets::load::Hearth_Mars_SM(), nullptr, collision::profile::NoCollision, n"SearingStation_Hearth"));
 
-        auto Burner = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(StoveX, 0.0, StoveTop + BurnerHeightScale * 50.0),
-                FVector(BurnerRadiusScale, BurnerRadiusScale, BurnerHeightScale)),
-            engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"SearingStation_Burner");
-        Burner.PrimaryColor = TOptional<FLinearColor>(k_BurnerCold);
-        _BurnerPart = InRoot.Add_MeshPart(this, Burner);
+        _EmberPart = InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, HearthLocal),
+            assets::load::EmberBed_Mars_SM(), nullptr, collision::profile::NoCollision, n"SearingStation_Embers"));
+
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, HearthLocal + BellowsLocal),
+            assets::load::Bellows_Mars_SM(), nullptr, collision::profile::NoCollision, n"SearingStation_Bellows"));
+
+        // The flame socket: a flame Niagara system goes on this node (+Z up, clear air to the pan through the trivet bars).
+        auto FlameNode = utils_scene_node::Create(InRoot,
+            FTransform(FRotator::ZeroRotator, HearthLocal + FVector(0.0, 0.0, HearthFlameHeight)));
+        utils_entity_tag::Add(FlameNode, n"TAG_MarsSearingFlame");
 
         AddPan(InRoot);
         AddOilFx();
@@ -941,14 +953,16 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     // Station visuals
     //----------------------------------------------------------------------------------------------------------------------
 
+    // The hearth slab's top (the label and the view key off it).
     private float64 Get_StoveTop() const
     {
-        return TableHeight + StoveHeight;
+        return TableHeight + HearthSlabHeight;
     }
 
+    // The trivet ring's top: the pan's rest (the hearth's SOCKET_Pan).
     private float64 Get_BurnerTop() const
     {
-        return Get_StoveTop() + BurnerHeightScale * 100.0;
+        return TableHeight + HearthTrivetTop;
     }
 
     private void Refresh_All()
@@ -957,12 +971,24 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         Refresh_Label();
     }
 
+    // The ember bed glows with the heat: its slot 0 gets a dynamic instance once the component exists (OnPartAdded).
     private void Refresh_Burner()
     {
         if (ck::Is_NOT_Valid(_SearingHandle))
         { return; }
 
-        _BurnerPart.Paint_MeshPart(_SearingHandle.Get_IsHot() ? k_BurnerHot : k_BurnerCold);
+        if (ck::Is_NOT_Valid(_EmberMaterial))
+        {
+            auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(_EmberPart));
+            if (ck::Is_NOT_Valid(Mesh))
+            { return; }
+
+            _EmberMaterial = Mesh.CreateDynamicMaterialInstance(0);
+            if (ck::Is_NOT_Valid(_EmberMaterial))
+            { return; }
+        }
+
+        _EmberMaterial.SetScalarParameterValue(n"Strength", _SearingHandle.Get_IsHot() ? EmberStrengthHot : EmberStrengthCold);
     }
 
     // Rewritten only when the text changes.
