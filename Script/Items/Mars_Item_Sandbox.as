@@ -101,7 +101,7 @@ asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
     // (the front grip, the upper hand) is turned so its arm comes across the body from the left; the right glove bends
     // in from the lower right.
     Presentation.Mounting.HeldOffset = utils_fphands::Make_UprightHeldOffset(FVector(-4.0, 22.0, -14.0), 80.0f, -8.0f);
-    Presentation.Grip.SocketTwist_L = 120.0f;
+    Presentation.Grip.SocketTwist_L = -60.0f;
     Presentation.Grip.SocketTwist_R = -25.0f;
     _ItemTraits.Add(Presentation);
 
@@ -133,7 +133,7 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     // Carried upright at the ready like the cleaver, the head up and the teeth forward, the arms turned the same way.
     Presentation.Mounting.HeldOffset = utils_fphands::Make_UprightHeldOffset(FVector(-4.0, 22.0, -14.0), 80.0f, -8.0f);
-    Presentation.Grip.SocketTwist_L = 120.0f;
+    Presentation.Grip.SocketTwist_L = -60.0f;
     Presentation.Grip.SocketTwist_R = -25.0f;
     _ItemTraits.Add(Presentation);
 
