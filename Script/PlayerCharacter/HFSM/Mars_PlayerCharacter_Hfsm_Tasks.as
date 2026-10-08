@@ -243,6 +243,14 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
     }
 }
 
+// When a held view is handed back: the moment the manipulation ends (the threshold, a cancel), or - the default - not
+// before the Use row releases, so the drag that pulled the lever cannot turn the view the frame the lever lands.
+enum EMars_ManipulateControl_ViewLock
+{
+    UntilManipulationEnds,
+    UntilUseReleases
+}
+
 // Resolver -> a gripped control. When the Use intent's best target is a ManuallyCompleted interact target whose owner is
 // a Control, this task watches the target's OnNewInteraction and begins the control's manipulation once the gloves grip
 // the target (the control only moves while the hand is on it) - or straight away without gloves (headless), or after
@@ -252,15 +260,18 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
 //
 // The camera's orientation holds still from the interaction's START, not from the grip: a drag during the reach would
 // otherwise turn the view off the lever and unfocus it. A pending interaction that ends before it began (cancelled, lost)
-// hands the view back; once begun, the manipulation's end does. The look delta drained before the grip is still not a
-// pull (_SeenLookSequence is captured at begin). Stateful like UMars_SmTask_InteractionFocus; leaving Locomotion ends any
-// manipulation and restores the camera.
+// hands the view back; once begun, the manipulation's end does - by default not before the Use row releases (ViewLock),
+// since the drag that pulled a lever over its threshold would otherwise turn the view the frame the lever lands. The look
+// delta drained before the grip is still not a pull (_SeenLookSequence is captured at begin). Stateful like
+// UMars_SmTask_InteractionFocus; leaving Locomotion ends any manipulation and restores the camera at once.
 class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
     // Longest the manipulation waits for the gloves to grip after the interaction started (seconds).
     protected float32 GripWaitSeconds = 1.0f;
+
+    protected EMars_ManipulateControl_ViewLock ViewLock = EMars_ManipulateControl_ViewLock::UntilUseReleases;
 
     private FCk_Handle _Player;
     private FCk_Handle_InteractionResolver _Resolver;
@@ -278,6 +289,8 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     private float32 _PendingSeconds = 0.0f;
     private bool _IsManipulating = false;
     private bool _CameraFrozen = false;
+    // The view was handed back while Use was still held: it stays frozen until the row releases.
+    private bool _ViewHeldForUseRelease = false;
     private int32 _SeenLookSequence = 0;
 
     UFUNCTION(BlueprintOverride)
@@ -304,6 +317,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     {
         EndManipulation();
         StopWatching();
+        UnfreezeView();
 
         if (ck::IsValid(_Resolver))
         {
@@ -323,6 +337,9 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
+        if (_ViewHeldForUseRelease && Get_IsUseHeld() == false)
+        { UnfreezeView(); }
+
         Tick_PendingInteraction(float32(InDeltaT.Get_Seconds()));
 
         if (_IsManipulating == false)
@@ -506,9 +523,11 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _Control = FCk_Handle_Control();
     }
 
-    // The camera's orientation stops following the look input.
+    // The camera's orientation stops following the look input. A new hold owns the view: a pending hand-back is dropped.
     private void HoldView()
     {
+        _ViewHeldForUseRelease = false;
+
         if (_CameraFrozen)
         { return; }
 
@@ -518,8 +537,25 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         { _Camera.Request_Set_HasOrientationControl(false); }
     }
 
+    // Hands the view back, unless ViewLock keeps it until the Use row releases (DoTick then unfreezes it).
     private void ReleaseView()
     {
+        if (_CameraFrozen == false)
+        { return; }
+
+        if (ViewLock == EMars_ManipulateControl_ViewLock::UntilUseReleases && Get_IsUseHeld())
+        {
+            _ViewHeldForUseRelease = true;
+            return;
+        }
+
+        UnfreezeView();
+    }
+
+    private void UnfreezeView()
+    {
+        _ViewHeldForUseRelease = false;
+
         if (_CameraFrozen == false)
         { return; }
 
@@ -527,6 +563,12 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 
         if (ck::IsValid(_Camera))
         { _Camera.Request_Set_HasOrientationControl(true); }
+    }
+
+    // False without operator intents (headless), so the view is handed back exactly when the manipulation ends.
+    private bool Get_IsUseHeld() const
+    {
+        return ck::IsValid(_Intents) && _Intents.Get_IsIntentActive(GameplayTags::Mars_Intent_Interact_Use);
     }
 }
 

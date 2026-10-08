@@ -131,6 +131,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
         auto Manipulation = FMars_Control_Manipulation();
         Manipulation.Interaction = InRequest.Interaction;
         Manipulation.Manipulator = InRequest.Manipulator;
+        Manipulation.Completion = InRequest.Completion;
         Manipulation.Alpha = HasMover ? Mover.Get_Alpha() : RestAlpha;
         Manipulation.Pull = Manipulation.Alpha;
         InState.Manipulation = Manipulation;

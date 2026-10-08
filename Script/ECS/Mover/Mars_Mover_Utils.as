@@ -59,6 +59,15 @@ mixin float32 Get_Alpha(const FCk_Handle_Mover& Self)
     return Self.Get_Fragment(FMars_Fragment_Mover).Alpha;
 }
 
+// At the target pose with no tween running: a scrub that left the handle off the target, or a tween still taking it
+// there, is not rest.
+mixin bool Get_IsResting(const FCk_Handle_Mover& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Mover);
+    const auto TargetAlpha = State.Target == EMars_Mover_Pose::End ? 1.0f : 0.0f;
+    return ck::Is_NOT_Valid(State.Tween) && State.Alpha == TargetAlpha;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------

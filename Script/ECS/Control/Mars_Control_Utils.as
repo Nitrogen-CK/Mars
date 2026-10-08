@@ -138,6 +138,16 @@ mixin float32 Get_ManipulationProgress(const FCk_Handle_Control& Self)
     return utils_control::Get_ProgressTowardEngage(Self.Get_PullDirection(), Self.Get_ManipulationAlpha(), EngageAlpha);
 }
 
+// How the current grip ends; AtEngageAlpha when not manipulating.
+mixin EMars_Control_ManipulationCompletion Get_ManipulationCompletion(const FCk_Handle_Control& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
+    if (State.Manipulation.IsSet() == false)
+    { return EMars_Control_ManipulationCompletion::AtEngageAlpha; }
+
+    return State.Manipulation.GetValue().Completion;
+}
+
 // A ManuallyCompleted control whose handle springs back to rest after every pull instead of following IsActive (a pull
 // chain). Every pull then runs toward the end pose.
 mixin bool Get_ReturnsToRest(const FCk_Handle_Control& Self)

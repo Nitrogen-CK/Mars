@@ -34,6 +34,15 @@ enum EMars_Control_PullDirection
     TowardStart
 }
 
+// How a grip ends: at EngageAlpha (a lever, a pull chain: the threshold ends the manipulation and its interaction), or
+// only on EndManipulation (a held crank: the handle rocks inside [0, 1] until the manipulator lets go; nothing engages).
+// Chosen per grip by the BeginManipulation request, so a placed lever's spec is untouched.
+enum EMars_Control_ManipulationCompletion
+{
+    AtEngageAlpha,
+    OnRelease
+}
+
 // How a ManuallyCompleted control is pulled: the player grips it (Use) and swings the look input along PullAxis. The
 // spawn-params generator emits a non-default value as the positional constructor call.
 struct FMars_Control_Manipulation_Spec
@@ -203,6 +212,10 @@ struct FMars_Control_Manipulation
     // Alpha per second.
     UPROPERTY()
     float32 Velocity = 0.0f;
+
+    // From the BeginManipulation request: OnRelease never crosses the threshold.
+    UPROPERTY()
+    EMars_Control_ManipulationCompletion Completion = EMars_Control_ManipulationCompletion::AtEngageAlpha;
 }
 
 // Written only by the two Control processors.
@@ -295,12 +308,23 @@ struct FMars_Request_Control_BeginManipulation
     UPROPERTY()
     FCk_Handle Manipulator;
 
+    UPROPERTY()
+    EMars_Control_ManipulationCompletion Completion = EMars_Control_ManipulationCompletion::AtEngageAlpha;
+
     FMars_Request_Control_BeginManipulation() {}
 
     FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction, FCk_Handle InManipulator)
     {
         Interaction = InInteraction;
         Manipulator = InManipulator;
+    }
+
+    FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction, FCk_Handle InManipulator,
+                                            EMars_Control_ManipulationCompletion InCompletion)
+    {
+        Interaction = InInteraction;
+        Manipulator = InManipulator;
+        Completion = InCompletion;
     }
 }
 
