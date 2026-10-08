@@ -1,7 +1,8 @@
 // A piece released at the shut hatch is rejected (the reason names Closed) and makes nothing. With the hatch open a piece is
-// accepted as a node under the drum at coverage 0; the same Id again is rejected, and past Drum.Capacity (6) a seventh slot
-// is rejected naming the capacity, after which the drum cannot load. A transfer in flight refuses a press on the open hatch
-// (LoadingInFlight) and on the lever; once it lands the hatch may toggle again.
+// accepted as a lifetime child of the station at coverage 0, its body joins the simulation and it comes to rest inside the
+// shell within 2 s; the same Id again is rejected, and past Drum.Capacity (6) a seventh slot is rejected naming the
+// capacity, after which the drum cannot load. A transfer in flight refuses a press on the open hatch (LoadingInFlight) and on
+// the lever; once it lands the hatch may toggle again.
 class UMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer : UMars_AutoTestRig_Tumbler
 {
     default _TimeoutSeconds = 10.0f;
@@ -13,7 +14,7 @@ class UMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer : UMa
     {
         BuildStation(InHandle, Make_TestSpec());
 
-        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
+        Add_Steps_StationReady();
         Add_Step("release slot 0 at the shut hatch", n"Step_AddFirst");
         Add_Step_WaitUntil("the release is answered", n"Check_Answered1", 0, 1.0f);
         Add_Step_WaitFrames("anything made would show", 2);
@@ -21,7 +22,8 @@ class UMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer : UMa
         Add_Steps_OpenHatch();
         Add_Step("release slot 0 at the open hatch", n"Step_AddFirst");
         Add_Step_WaitUntil("the release is answered", n"Check_Answered2", 0, 1.0f);
-        Add_Step("accepted as a node under the drum at coverage 0", n"Step_AssertAccepted");
+        Add_Step("accepted as a lifetime child of the station at coverage 0", n"Step_AssertAccepted");
+        Add_Step_WaitUntil("its body is in the simulation and it rests inside the shell", n"Check_AllAtRest", 0, 2.0f);
         Add_Step("release slot 0 again, then slots 1 to 6", n"Step_AddTheRest");
         Add_Step_WaitUntil("all eight releases are answered", n"Check_Answered9", 0, 1.0f);
         Add_Step("the duplicate and the seventh are rejected", n"Step_AssertFull");
@@ -87,10 +89,11 @@ class UMars_AutoTest_Tumbler_LoadingIsGatedByTheHatchTheDrumAndTheTransfer : UMa
         { return; }
 
         const auto Piece = _Added[0];
-        Assert_Valid(Piece, "the piece node is valid");
+        Assert_Valid(Piece, "the piece entity is valid");
         Assert_True(_AddedIds[0].Get_IsSame(Make_Id(0)), "the added piece carries slot 0's Id");
-        const FCk_Handle Drum = _Spec.Nodes.Drum;
-        Assert_True(utils_entity_lifetime::Get_LifetimeOwner(Piece) == Drum, "the piece node is a lifetime child of the drum");
+        const FCk_Handle Station = _Tumbler;
+        Assert_True(utils_entity_lifetime::Get_LifetimeOwner(Piece) == Station, "the piece entity is a lifetime child of the station");
+        Assert_True(ck::IsValid(_Tumbler.Get_PieceBody(Make_Id(0))), "the piece carries a body");
         Assert_Equals_Float(_Tumbler.Get_PieceCoverage(Make_Id(0)), 0.0, 0.0, "a new piece has no coverage");
         Assert_Equals_Int(_Tumbler.Get_PieceCount(), 1, "one piece in the drum");
     }

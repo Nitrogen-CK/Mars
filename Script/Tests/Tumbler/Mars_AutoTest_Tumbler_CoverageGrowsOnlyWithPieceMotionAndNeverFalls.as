@@ -1,16 +1,17 @@
-// Two pieces shut in the drum gain coverage while the gripped lever rocks it (every reported step non-decreasing) and slide
-// relative to the drum as it turns; held still the coverage does not move; let go, the return adds more. A piece added later
-// starts at 0 and the others keep theirs. Rocked long enough, the first two reach exactly 1.0 and stay there.
-class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMars_AutoTestRig_Tumbler
+// Two pieces loaded and come to rest, shut in uncoated, gain coverage while the gripped lever rocks the drum and they tumble
+// (every reported step non-decreasing); held still at the end of the arc once they rest, the coverage does not move; let go,
+// the return adds more. A piece added later starts at 0 and the others keep theirs (the hatch is open: nothing coats).
+// Rocked long enough, the first two reach exactly 1.0 and stay there. Coverage grows a 300th per cm here: at the rig's
+// hundredth the first rock alone coats half way and the return would find nothing left to add.
+class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMars_AutoTestRig_Tumbler
 {
-    default _TimeoutSeconds = 50.0f;
+    default _TimeoutSeconds = 60.0f;
 
+    private const float32 k_CoveragePerCm = 1.0f / 300.0f;
     private const int32 k_LongRockCycles = 20;
     private const int32 k_RockHalfCycleFrames = 20;
     private const float32 k_StillTolerance = 0.0001f;
 
-    private float32 _Orbit0BeforeRock = 0.0f;
-    private float32 _Orbit1BeforeRock = 0.0f;
     private float32 _Coverage0Held = 0.0f;
     private float32 _Coverage1Held = 0.0f;
     private float32 _Coverage0BeforeRelease = 0.0f;
@@ -22,20 +23,24 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMar
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        BuildStation(InHandle, Make_TestSpec());
+        auto Spec = Make_TestSpec();
+        Spec.Coating.CoveragePerCm = k_CoveragePerCm;
+        BuildStation(InHandle, Spec);
 
-        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
+        Add_Steps_StationReady();
         Add_Steps_OpenHatch();
         Add_Step("load pieces 0 and 1", n"Step_AddTwo");
         Add_Step_WaitUntil("both are answered", n"Check_Answered2", 0, 1.0f);
+        Add_Step_WaitUntil("both rest inside the shell", n"Check_AllAtRest", 0, 3.0f);
         Add_Steps_CloseHatch();
-        Add_Step("both are in, uncoated; remember their orbits", n"Step_SampleBeforeRock");
+        Add_Step("both are in, uncoated", n"Step_AssertUncoated");
         Add_Steps_Grip();
         Add_Step_Rock("rock down for 60 frames", k_RockDegrees, 60);
         Add_Step_Rock("rock up for 40 frames", -k_RockDegrees, 40);
-        Add_Step("both gained coverage and slid in the drum", n"Step_AssertRocked");
+        Add_Step("both gained coverage, never falling", n"Step_AssertRocked");
         Add_Step_Rock("rock down to the end of the arc", k_RockDegrees, 60);
         Add_Step_WaitSeconds("the lever settles against the end stop", 0.5f);
+        Add_Step_WaitUntil("the pieces come to rest against the held drum", n"Check_AllAtRest", 0, 4.0f);
         Add_Step("remember the held coverage", n"Step_SampleHeld");
         Add_Step_WaitSeconds("hold the grip still", 1.0f);
         Add_Step("held still, the coverage did not move", n"Step_AssertHeld");
@@ -46,6 +51,7 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMar
         Add_Step("load piece 2", n"Step_AddThird");
         Add_Step_WaitUntil("it is answered", n"Check_Answered3", 0, 1.0f);
         Add_Step("the new piece starts uncoated, the others keep theirs", n"Step_AssertThird");
+        Add_Step_WaitUntil("all three rest inside the shell", n"Check_AllAtRest", 0, 3.0f);
         Add_Steps_CloseHatch();
         Add_Steps_Grip();
         for (int32 Cycle = 0; Cycle < k_LongRockCycles; ++Cycle)
@@ -92,14 +98,13 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMar
         Res.Set(_Admissions.Num() >= 3);
     }
 
+    // Loaded and settled with the hatch open, the pieces were never coated.
     UFUNCTION()
-    private void Step_SampleBeforeRock(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertUncoated(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Tumbler.Get_PieceCount(), 2, "two pieces in the drum");
         Assert_Equals_Float(_Tumbler.Get_PieceCoverage(Make_Id(0)), 0.0, 0.0, "piece 0 starts uncoated");
         Assert_Equals_Float(_Tumbler.Get_PieceCoverage(Make_Id(1)), 0.0, 0.0, "piece 1 starts uncoated");
-        _Orbit0BeforeRock = _Tumbler.Get_PieceOrbitDegrees(Make_Id(0));
-        _Orbit1BeforeRock = _Tumbler.Get_PieceOrbitDegrees(Make_Id(1));
     }
 
     UFUNCTION()
@@ -107,15 +112,12 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMar
     {
         const auto Coverage0 = _Tumbler.Get_PieceCoverage(Make_Id(0));
         const auto Coverage1 = _Tumbler.Get_PieceCoverage(Make_Id(1));
+        Log(f"[Mars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls] after the first rock: {Coverage0 :.4}, {Coverage1 :.4}");
         Assert_True(Coverage0 > 0.0f, f"piece 0 gained coverage ({Coverage0 :.4})");
         Assert_True(Coverage1 > 0.0f, f"piece 1 gained coverage ({Coverage1 :.4})");
         Assert_True(Get_IsMonotonic(Make_Id(0)), "every coverage step of piece 0 is non-decreasing");
         Assert_True(Get_IsMonotonic(Make_Id(1)), "every coverage step of piece 1 is non-decreasing");
-
-        const auto Moved0 = Math::Abs(_Tumbler.Get_PieceOrbitDegrees(Make_Id(0)) - _Orbit0BeforeRock);
-        const auto Moved1 = Math::Abs(_Tumbler.Get_PieceOrbitDegrees(Make_Id(1)) - _Orbit1BeforeRock);
-        Assert_True(Moved0 > 1.0f, f"piece 0 slid relative to the drum ({Moved0 :.2} degrees)");
-        Assert_True(Moved1 > 1.0f, f"piece 1 slid relative to the drum ({Moved1 :.2} degrees)");
+        Assert_True(Check_PieceInside(Make_Id(0)) && Check_PieceInside(Make_Id(1)), "both stayed inside the shell");
     }
 
     UFUNCTION()
@@ -157,8 +159,9 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMar
     UFUNCTION()
     private void Step_AssertReturnCoated(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_RoseWhileReturning, "piece 0's coverage rose while the drum returned");
         const auto After = _Tumbler.Get_PieceCoverage(Make_Id(0));
+        Log(f"[Mars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls] the return: {_Coverage0BeforeRelease :.4} -> {After :.4}");
+        Assert_True(_RoseWhileReturning, "piece 0's coverage rose while the drum returned");
         Assert_True(After > _Coverage0BeforeRelease, f"the return added coverage ({_Coverage0BeforeRelease :.4} -> {After :.4})");
     }
 
@@ -185,24 +188,7 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls : UMar
         Assert_True(_Tumbler.Get_PieceCoverage(Make_Id(1)) == 1.0f, "piece 1 stays fully coated");
         for (int32 Slot = 0; Slot < 3; ++Slot)
         { Assert_True(Get_IsMonotonic(Make_Id(Slot)), f"no coverage of piece {Slot} ever fell or passed 1"); }
-    }
 
-    // Every OnCoverageChanged for InPieceId is at least the one before it and at most 1.
-    private bool Get_IsMonotonic(const FMars_CookingFeed_PieceId& InPieceId) const
-    {
-        auto Last = 0.0f;
-        for (int32 Index = 0; Index < _CoverageIds.Num(); ++Index)
-        {
-            if (_CoverageIds[Index].Get_IsSame(InPieceId) == false)
-            { continue; }
-
-            const auto Coverage = _Coverages[Index];
-            if (Coverage < Last || Coverage > 1.0f)
-            { return false; }
-
-            Last = Coverage;
-        }
-
-        return true;
+        Log(f"[Mars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls] reseats over the run: {_Tumbler.Get_Reseats()}");
     }
 }

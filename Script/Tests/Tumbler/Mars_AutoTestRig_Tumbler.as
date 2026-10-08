@@ -1,10 +1,12 @@
 // The tumbler rig: a Tumbler station on a transform-only root at an isolated origin. The axle node (k_AxleLocal) carries the
-// drum Mover (pitch 0 to 90 over 0.4 s) and the lever Control (ManuallyCompleted, pulled along the axle's -X); under it the
-// lever grip node (k_LeverGripLocal) and the hatch hinge node, whose Mover swings the hatch up and open (pitch 0 to -70
-// over 0.2 s) with the hatch tab node under it (k_HatchTabLocal). The hand node sits on the root at the workspace centre and
-// a view node on the root looks down at the drum. No meshes and no physics: the kernel is headless. The rig is the
-// operator and the test feed: it looks, presses, releases and cancels, and AddPiece releases piece {1, Slot}. The handlers
-// record every signal.
+// drum Mover (pitch 0 to 90 over 0.4 s), the lever Control (ManuallyCompleted, pulled along the axle's -X) and the kernel's
+// kinematic shell (utils_tumbler::Add_DrumBodies); under it the lever grip node (k_LeverGripLocal) and the hatch hinge node
+// at utils_tumbler::Get_HatchHingeLocal, whose Mover swings the hatch up and open (pitch 0 to k_HatchOpenPitch over 0.2 s)
+// and which carries the hatch plate's bodies (utils_tumbler::Add_HatchBody) and the hatch tab node at
+// utils_tumbler::Get_HatchTabLocal. The hand node sits on the root at the workspace centre and a view node on the root looks
+// down at the drum. No meshes and no floor: an escaped piece falls into the void until the kernel reseats it. The rig is the
+// operator and the test feed: it looks, presses, releases and cancels, and AddPiece releases piece {1, Slot} at rest inside
+// the shell. The handlers record every signal.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
 {
@@ -12,18 +14,25 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     protected const FVector k_AxleLocal = FVector(0.0, 0.0, 112.0);
     // Under the axle: the top of the lever arm, out +Y and up.
     protected const FVector k_LeverGripLocal = FVector(0.0, 30.0, 38.0);
-    // Under the hinge (at the axle): the hatch plate's bottom centre, in front of the drum.
-    protected const FVector k_HatchTabLocal = FVector(-30.0, 0.0, -20.0);
     protected const FVector k_WorkspaceCentre = FVector(-42.0, 0.0, 112.0);
+    // The station's numbers: the open tab lands about 48 cm above the axle, inside the reach.
+    protected const float32 k_WorkspaceHalfZ = 56.0f;
+    protected const float64 k_HatchOpenPitch = -100.0;
     protected const FVector k_ViewLocal = FVector(-110.0, 0.0, 185.0);
     protected const float64 k_ViewPitchDegrees = -35.0;
-    // The release pose the rig's feed hands over (the kernel places pieces by slot and ignores it).
+    // The release pose the rig's feed hands over: inside the shell, in front of the axle.
     protected const FVector k_ReleaseLocal = FVector(-20.0, 0.0, 112.0);
     // The generation every rig piece carries.
     protected const int32 k_Generation = 1;
     // Degrees of look pitch per rocking frame (down is +).
     protected const float32 k_RockDegrees = 4.0f;
     protected const float64 k_PoseTolerance = 0.5;
+    // A piece moving slower than this (cm/s) for k_RestFrames frames in a row is at rest: one slow frame is often only the
+    // top of a tumble.
+    protected const float64 k_RestSpeed = 2.0;
+    protected const int32 k_RestFrames = 20;
+    // Coverage grows a hundredth per cm of a piece's path: a long rock coats fully within a test's time.
+    protected const float32 k_TestCoveragePerCm = 1.0f / 100.0f;
 
     protected FCk_Handle_Tumbler _Tumbler;
     // The spec the station was built from, nodes included.
@@ -31,6 +40,7 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     protected FCk_Handle_Control _Lever;
     protected FCk_Handle_Mover _Axle;
     protected FCk_Handle_Mover _HatchMover;
+    protected FCk_Handle_JoltBody _HatchBody;
 
     // One entry per signal, in order (parallel arrays where a signal carries more than one value).
     protected TArray<EMars_Tumbler_HandMode> _HandModes;
@@ -45,6 +55,7 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     protected TArray<FCk_Handle> _Added;
     protected TArray<FMars_CookingFeed_PieceId> _CoverageIds;
     protected TArray<float32> _Coverages;
+    protected TArray<FMars_CookingFeed_PieceId> _ReseatIds;
     protected int32 _LeverEngagedCount = 0;
 
     // The rocking plan Add_Step_Rock queues: each wait consumes the next entry, looking that many frames at that pitch.
@@ -53,11 +64,15 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     private int32 _RockNext = 0;
     private int32 _RockLeft = 0;
     private float32 _RockPitch = 0.0f;
+    // Consecutive frames Check_AllAtRest has seen every piece inside and slow.
+    private int32 _RestFramesSeen = 0;
 
     protected FMars_Tumbler_Spec Make_TestSpec()
     {
         auto Spec = FMars_Tumbler_Spec();
         Spec.Hand.WorkspaceCentreLocal = k_WorkspaceCentre;
+        Spec.Hand.HalfExtentZ = k_WorkspaceHalfZ;
+        Spec.Coating.CoveragePerCm = k_TestCoveragePerCm;
         return Spec;
     }
 
@@ -89,24 +104,31 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _Lever = utils_control::Add(AxleEntity, LeverSpec, _Axle);
         _Lever.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnLeverEngaged"));
 
+        const auto DrumBody = utils_tumbler::Add_DrumBodies(AxleNode, _Spec);
+
         auto Axle = AxleNode.As_Transform();
         auto GripNode = utils_scene_node::Create(Axle,
             FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), k_LeverGripLocal));
 
-        auto HingeNode = utils_scene_node::Create(Axle, FTransform::Identity);
+        // The hinge at the gap's upper edge; the Mover writes its whole offset, so both poses keep it there.
+        const auto HingeLocal = utils_tumbler::Get_HatchHingeLocal(_Spec);
+        auto HingeNode = utils_scene_node::Create(Axle, FTransform(HingeLocal));
         auto HatchSpec = FMars_Mover_Spec();
-        HatchSpec.EndRotation = FRotator(-70.0, 0.0, 0.0);
+        HatchSpec.StartLocation = HingeLocal;
+        HatchSpec.EndLocation = HingeLocal;
+        HatchSpec.EndRotation = FRotator(k_HatchOpenPitch, 0.0, 0.0);
         HatchSpec.Duration = 0.2f;
         _HatchMover = utils_mover::Add(HingeNode, HatchSpec);
+        _HatchBody = utils_tumbler::Add_HatchBody(HingeNode, _Spec);
 
         auto Hinge = HingeNode.As_Transform();
-        auto TabNode = utils_scene_node::Create(Hinge, FTransform(FRotator::ZeroRotator, k_HatchTabLocal));
+        auto TabNode = utils_scene_node::Create(Hinge, FTransform(utils_tumbler::Get_HatchTabLocal(_Spec)));
 
         auto HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, k_WorkspaceCentre));
         auto ViewNode = utils_scene_node::Create(Root, FTransform(FRotator(k_ViewPitchDegrees, 0.0, 0.0), k_ViewLocal));
 
         _Spec.Nodes = FMars_Tumbler_Nodes(HandNode, TabNode.As_Transform(), GripNode.As_Transform(), _Lever, _HatchMover,
-            Axle, ViewNode.As_Transform());
+            Axle, DrumBody, ViewNode.As_Transform());
         _Tumbler = utils_tumbler::Add(StationEntity, _Spec);
 
         _Tumbler.BindTo_OnHandModeChanged(FMars_Delegate_Tumbler_OnHandModeChanged(this, n"OnHandModeChanged"));
@@ -117,6 +139,7 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _Tumbler.BindTo_OnPieceAdmission(FMars_Delegate_Tumbler_OnPieceAdmission(this, n"OnPieceAdmission"));
         _Tumbler.BindTo_OnPieceAdded(FMars_Delegate_Tumbler_OnPieceAdded(this, n"OnPieceAdded"));
         _Tumbler.BindTo_OnCoverageChanged(FMars_Delegate_Tumbler_OnCoverageChanged(this, n"OnCoverageChanged"));
+        _Tumbler.BindTo_OnPieceReseated(FMars_Delegate_Tumbler_OnPieceReseated(this, n"OnPieceReseated"));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -148,7 +171,7 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _Tumbler.Request_SetLoading(FMars_Request_Tumbler_SetLoading(InLoading));
     }
 
-    // Piece {k_Generation, InSlot} released at the rig's release pose with preset InSlot.
+    // Piece {k_Generation, InSlot} released at rest at the rig's release pose with preset InSlot.
     protected FMars_CookingFeed_PieceId AddPiece(int32 InSlot)
     {
         const auto PieceId = FMars_CookingFeed_PieceId(k_Generation, InSlot);
@@ -161,6 +184,47 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     protected FMars_CookingFeed_PieceId Make_Id(int32 InSlot) const
     {
         return FMars_CookingFeed_PieceId(k_Generation, InSlot);
+    }
+
+    // Moves the piece's body to InRootLocal (station frame), level with the root and at rest.
+    protected void Teleport(const FMars_CookingFeed_PieceId& InPieceId, FVector InRootLocal)
+    {
+        const auto RootWorld = _Tumbler.Get_RootWorld();
+        auto Body = _Tumbler.Get_PieceBody(InPieceId);
+        utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(RootWorld.TransformPosition(InRootLocal), RootWorld.Rotator()));
+    }
+
+    // The piece's centre is inside the shell: within the inner radius of the axis and between the end discs.
+    protected bool Check_PieceInside(const FMars_CookingFeed_PieceId& InPieceId) const
+    {
+        if (_Tumbler.Get_HasPiece(InPieceId) == false)
+        { return false; }
+
+        const auto Local = _Tumbler.Get_PieceAxleLocal(InPieceId);
+        const auto Radial = FVector2D(Local.X, Local.Z).Size();
+        return Radial < float64(_Spec.Drum.InnerRadius) && Math::Abs(Local.Y) < float64(_Spec.Drum.HalfLength + _Spec.Shell.DiscGap);
+    }
+
+    // The piece's body is in the simulation and moving slower than k_RestSpeed.
+    protected bool Check_PieceAtRest(const FMars_CookingFeed_PieceId& InPieceId) const
+    {
+        if (_Tumbler.Get_HasPiece(InPieceId) == false)
+        { return false; }
+
+        const auto Body = _Tumbler.Get_PieceBody(InPieceId);
+        return utils_jolt_body::Get_IsBodyAdded(Body) && utils_jolt_body::Get_LinearVelocity(Body).Size() < k_RestSpeed;
+    }
+
+    // Every piece in the drum is inside the shell and at rest.
+    protected bool Check_AllInsideAtRest() const
+    {
+        for (const auto& PieceId : _Tumbler.Get_PieceIds())
+        {
+            if (Check_PieceInside(PieceId) == false || Check_PieceAtRest(PieceId) == false)
+            { return false; }
+        }
+
+        return true;
     }
 
     // One look that puts the cursor on InAnchor's YZ projection (station frame) from the workspace centre; the kernel clamps
@@ -200,6 +264,14 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _RockPitches.Add(InPitchDegrees);
         _RockFrames.Add(InFrames);
         Add_Step_WaitUntil(InDisplayName, n"Check_Rocked", InFrames + 10);
+    }
+
+    // The scene nodes composed their world poses, then the shell's and the hatch plate's bodies joined the simulation (a
+    // piece admitted before them would be rejected).
+    protected void Add_Steps_StationReady()
+    {
+        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
+        Add_Step_WaitUntil("the shell's bodies are in the simulation", n"Check_BodiesAdded", 0, 2.0f);
     }
 
     // The hatch opened: aim at the tab, wait for the hover, press, wait for Open.
@@ -263,6 +335,25 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         return Count;
     }
 
+    // Every OnCoverageChanged for InPieceId is at least the one before it and at most 1.
+    protected bool Get_IsMonotonic(const FMars_CookingFeed_PieceId& InPieceId) const
+    {
+        auto Last = 0.0f;
+        for (int32 Index = 0; Index < _CoverageIds.Num(); ++Index)
+        {
+            if (_CoverageIds[Index].Get_IsSame(InPieceId) == false)
+            { continue; }
+
+            const auto Coverage = _Coverages[Index];
+            if (Coverage < Last || Coverage > 1.0f)
+            { return false; }
+
+            Last = Coverage;
+        }
+
+        return true;
+    }
+
     //----------------------------------------------------------------------------------------------------------------------
     // Handlers
     //----------------------------------------------------------------------------------------------------------------------
@@ -321,6 +412,12 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     }
 
     UFUNCTION()
+    protected void OnPieceReseated(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId)
+    {
+        _ReseatIds.Add(InPieceId);
+    }
+
+    UFUNCTION()
     protected void OnLeverEngaged(FCk_Handle_Control InControl)
     {
         _LeverEngagedCount += 1;
@@ -343,6 +440,24 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
 
         const auto Expected = _Tumbler.Get_RootWorld().TransformPosition(k_AxleLocal + k_LeverGripLocal);
         Res.Set((Get_GripWorld() - Expected).Size() <= 0.01);
+    }
+
+    UFUNCTION()
+    protected void Check_BodiesAdded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(utils_jolt_body::Get_IsBodyAdded(_Spec.Nodes.DrumBody) && utils_jolt_body::Get_IsBodyAdded(_HatchBody));
+    }
+
+    // Every piece inside the shell and slow for k_RestFrames frames in a row.
+    UFUNCTION()
+    protected void Check_AllAtRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        _RestFramesSeen = Check_AllInsideAtRest() ? _RestFramesSeen + 1 : 0;
+        auto Res = OutResult;
+        Res.Set(_RestFramesSeen >= k_RestFrames);
+        if (_RestFramesSeen >= k_RestFrames)
+        { _RestFramesSeen = 0; }
     }
 
     UFUNCTION()

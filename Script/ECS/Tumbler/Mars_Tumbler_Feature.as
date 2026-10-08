@@ -6,7 +6,7 @@ asset Mars_TumblerHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Tumbler";
     RequiredFragments.Add(FMars_Feature_Tumbler);
-    Description = "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever and drum together), and admitted pieces that tumble kinematically in the drum and gain coating with every degree it turns while shut";
+    Description = "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever, drum and its kinematic shell together), and admitted pieces that tumble as dynamic bodies in the shell and gain coating with the distance they move while it is shut";
 }
 struct FMars_Feature_Tumbler {}
 
@@ -135,23 +135,20 @@ struct FMars_Tumbler_DrumSpec
     UPROPERTY()
     float32 ArcDegrees = 90.0f;
 
-    // The pieces' orbit radius.
+    // The shell's inner faces sit this far from the axis.
     UPROPERTY()
     float32 InnerRadius = 28.0f;
 
-    // The pieces' axial spread.
+    // The baffles' half length along the axis; the panels reach Shell.DiscGap past it to the end discs.
     UPROPERTY()
     float32 HalfLength = 22.0f;
 
-    // A piece is carried until its world angle from the bottom is this far from its rest offset, then it slides.
-    UPROPERTY()
-    float32 ReposeDegrees = 35.0f;
-
-    UPROPERTY()
-    float32 SlideDegreesPerSecond = 120.0f;
-
     UPROPERTY()
     int32 Capacity = 6;
+
+    // A piece whose centre is this far past the shell's inner radius or its end discs has escaped and is reseated.
+    UPROPERTY()
+    float32 EscapeMarginCm = 6.0f;
 
     FMars_Tumbler_DrumSpec() {}
 
@@ -159,37 +156,163 @@ struct FMars_Tumbler_DrumSpec
         float32 InArcDegrees,
         float32 InInnerRadius,
         float32 InHalfLength,
-        float32 InReposeDegrees,
-        float32 InSlideDegreesPerSecond,
-        int32 InCapacity)
+        int32 InCapacity,
+        float32 InEscapeMarginCm)
     {
         ArcDegrees = InArcDegrees;
         InnerRadius = InInnerRadius;
         HalfLength = InHalfLength;
-        ReposeDegrees = InReposeDegrees;
-        SlideDegreesPerSecond = InSlideDegreesPerSecond;
         Capacity = InCapacity;
+        EscapeMarginCm = InEscapeMarginCm;
     }
 }
 
-// Useful travel: every degree the drum turns while the hatch is Closed, gripped or returning.
+// The hatch gap in the shell, drum frame degrees from the bottom at home (-90 is the operator's side): it spans
+// CentreDegrees +/- HalfDegrees, the hinge at its upper edge (CentreDegrees - HalfDegrees); the hatch body is PlateSegments
+// boxes across it.
+struct FMars_Tumbler_GapSpec
+{
+    UPROPERTY()
+    float32 CentreDegrees = -120.0f;
+
+    UPROPERTY()
+    float32 HalfDegrees = 35.0f;
+
+    UPROPERTY()
+    int32 PlateSegments = 3;
+
+    FMars_Tumbler_GapSpec() {}
+
+    FMars_Tumbler_GapSpec(float32 InCentreDegrees, float32 InHalfDegrees, int32 InPlateSegments)
+    {
+        CentreDegrees = InCentreDegrees;
+        HalfDegrees = InHalfDegrees;
+        PlateSegments = InPlateSegments;
+    }
+}
+
+// Ribs on the shell's inner face, spread evenly over the closed arc: what lifts the pieces as the drum turns.
+struct FMars_Tumbler_BafflesSpec
+{
+    UPROPERTY()
+    int32 Count = 3;
+
+    UPROPERTY()
+    float32 Height = 4.0f;
+
+    FMars_Tumbler_BafflesSpec() {}
+
+    FMars_Tumbler_BafflesSpec(int32 InCount, float32 InHeight)
+    {
+        Count = InCount;
+        Height = InHeight;
+    }
+}
+
+struct FMars_Tumbler_SurfaceSpec
+{
+    UPROPERTY()
+    float32 Friction = 0.6f;
+
+    UPROPERTY()
+    float32 Restitution = 0.05f;
+
+    FMars_Tumbler_SurfaceSpec() {}
+
+    FMars_Tumbler_SurfaceSpec(float32 InFriction, float32 InRestitution)
+    {
+        Friction = InFriction;
+        Restitution = InRestitution;
+    }
+}
+
+// The kinematic shell utils_tumbler::Add_DrumBodies and Add_HatchBody build: end discs DiscGap past the baffles' half
+// length, PanelCount tangent boxes WallThickness thick around the closed arc, the baffles and the hatch plate.
+struct FMars_Tumbler_ShellSpec
+{
+    UPROPERTY()
+    float32 WallThickness = 2.0f;
+
+    UPROPERTY()
+    int32 PanelCount = 14;
+
+    UPROPERTY()
+    float32 DiscGap = 4.0f;
+
+    UPROPERTY()
+    FMars_Tumbler_GapSpec Gap;
+
+    UPROPERTY()
+    FMars_Tumbler_BafflesSpec Baffles;
+
+    UPROPERTY()
+    FMars_Tumbler_SurfaceSpec Surface;
+}
+
+// Each admitted piece is a dynamic box body of this size and feel.
+struct FMars_Tumbler_PieceSpec
+{
+    UPROPERTY()
+    float32 HalfSize = 6.0f;
+
+    UPROPERTY()
+    float32 MassKg = 0.1f;
+
+    UPROPERTY()
+    float32 Friction = 0.6f;
+
+    UPROPERTY()
+    float32 Restitution = 0.1f;
+
+    UPROPERTY()
+    float32 LinearDamping = 0.05f;
+
+    UPROPERTY()
+    float32 AngularDamping = 0.15f;
+
+    FMars_Tumbler_PieceSpec() {}
+
+    FMars_Tumbler_PieceSpec(
+        float32 InHalfSize,
+        float32 InMassKg,
+        float32 InFriction,
+        float32 InRestitution,
+        float32 InLinearDamping,
+        float32 InAngularDamping)
+    {
+        HalfSize = InHalfSize;
+        MassKg = InMassKg;
+        Friction = InFriction;
+        Restitution = InRestitution;
+        LinearDamping = InLinearDamping;
+        AngularDamping = InAngularDamping;
+    }
+}
+
+// Useful travel: the distance each piece's own centre moves while the hatch is Closed. A step under MinStepCm is solver
+// jitter, not tumbling, and coats nothing.
 struct FMars_Tumbler_CoatingSpec
 {
     UPROPERTY()
-    float32 CoveragePerDegree = 1.0f / 540.0f;
+    float32 CoveragePerCm = 1.0f / 900.0f;
+
+    UPROPERTY()
+    float32 MinStepCm = 0.05f;
 
     FMars_Tumbler_CoatingSpec() {}
 
-    FMars_Tumbler_CoatingSpec(float32 InCoveragePerDegree)
+    FMars_Tumbler_CoatingSpec(float32 InCoveragePerCm, float32 InMinStepCm)
     {
-        CoveragePerDegree = InCoveragePerDegree;
+        CoveragePerCm = InCoveragePerCm;
+        MinStepCm = InMinStepCm;
     }
 }
 
 // Built by the placing script before Add. Hand is a scene node on the station root (the kernel writes its offset); HatchTab
-// is a child of the hatch plate and LeverGrip a child of the axle (both read as hover anchors); Lever is the axle's
+// is a child of the hatch hinge and LeverGrip a child of the axle (both read as hover anchors); Lever is the axle's
 // ManuallyCompleted Control, whose Mover is the drum; Hatch is the hinge Mover (Start = closed, End = open); Drum is the
-// axle node (pieces are scene nodes under it); View gives screen right and up for the pull projection.
+// axle node (the kernel reads every piece in its frame); DrumBody is the shell utils_tumbler::Add_DrumBodies built under it
+// (admission waits for it to be in the simulation); View gives screen right and up for the pull projection.
 struct FMars_Tumbler_Nodes
 {
     UPROPERTY()
@@ -211,6 +334,9 @@ struct FMars_Tumbler_Nodes
     FCk_Handle_Transform Drum;
 
     UPROPERTY()
+    FCk_Handle_JoltBody DrumBody;
+
+    UPROPERTY()
     FCk_Handle_Transform View;
 
     FMars_Tumbler_Nodes() {}
@@ -222,6 +348,7 @@ struct FMars_Tumbler_Nodes
         FCk_Handle_Control InLever,
         FCk_Handle_Mover InHatch,
         FCk_Handle_Transform InDrum,
+        FCk_Handle_JoltBody InDrumBody,
         FCk_Handle_Transform InView)
     {
         Hand = InHand;
@@ -230,6 +357,7 @@ struct FMars_Tumbler_Nodes
         Lever = InLever;
         Hatch = InHatch;
         Drum = InDrum;
+        DrumBody = InDrumBody;
         View = InView;
     }
 }
@@ -246,15 +374,22 @@ struct FMars_Tumbler_Spec
     FMars_Tumbler_DrumSpec Drum;
 
     UPROPERTY()
+    FMars_Tumbler_ShellSpec Shell;
+
+    UPROPERTY()
+    FMars_Tumbler_PieceSpec Piece;
+
+    UPROPERTY()
     FMars_Tumbler_CoatingSpec Coating;
 
     // Built by the placing script before Add. Not a UPROPERTY: the spawn params never carry handles.
     FMars_Tumbler_Nodes Nodes;
 }
 
-// A reach with no extent or no look, a hand that never arrives, a target nobody can hover, a drum that never turns or has no
-// orbit, a repose that never carries or carries past the side, a slide that never moves, a drum with no room, or a coating
-// that never grows each make the minigame unplayable.
+// A reach with no extent or no look, a hand that never arrives, a target nobody can hover, a drum that never turns, has no
+// room or never notices an escape, a shell with no wall, too few panels to close, a gap that swallows the drum or a hatch
+// with no plate, a baffle with no height, a piece with no size or mass or one that cannot fit, or a coating that never grows
+// each make the minigame unplayable.
 mixin FMars_Validation Validate(const FMars_Tumbler_Spec& Self)
 {
     const auto& Hand = Self.Hand;
@@ -286,20 +421,70 @@ mixin FMars_Validation Validate(const FMars_Tumbler_Spec& Self)
     if (Drum.InnerRadius <= 0.0f)
     { return FMars_Validation(f"Tumbler has a non-positive Drum.InnerRadius [{Drum.InnerRadius}]"); }
 
-    if (Drum.HalfLength < 0.0f)
-    { return FMars_Validation(f"Tumbler has a negative Drum.HalfLength [{Drum.HalfLength}]"); }
-
-    if (Drum.ReposeDegrees <= 0.0f || Drum.ReposeDegrees > 90.0f)
-    { return FMars_Validation(f"Tumbler has Drum.ReposeDegrees [{Drum.ReposeDegrees}] outside (0, 90]"); }
-
-    if (Drum.SlideDegreesPerSecond <= 0.0f)
-    { return FMars_Validation(f"Tumbler has a non-positive Drum.SlideDegreesPerSecond [{Drum.SlideDegreesPerSecond}]"); }
+    if (Drum.HalfLength <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Drum.HalfLength [{Drum.HalfLength}]"); }
 
     if (Drum.Capacity <= 0)
     { return FMars_Validation(f"Tumbler has a non-positive Drum.Capacity [{Drum.Capacity}]"); }
 
-    if (Self.Coating.CoveragePerDegree <= 0.0f)
-    { return FMars_Validation(f"Tumbler has a non-positive Coating.CoveragePerDegree [{Self.Coating.CoveragePerDegree}]"); }
+    if (Drum.EscapeMarginCm <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Drum.EscapeMarginCm [{Drum.EscapeMarginCm}]"); }
+
+    const auto& Shell = Self.Shell;
+    if (Shell.WallThickness <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Shell.WallThickness [{Shell.WallThickness}]"); }
+
+    if (Shell.PanelCount < 6)
+    { return FMars_Validation(f"Tumbler has Shell.PanelCount [{Shell.PanelCount}] under 6"); }
+
+    if (Shell.DiscGap <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Shell.DiscGap [{Shell.DiscGap}]"); }
+
+    if (Shell.Gap.HalfDegrees <= 0.0f || Shell.Gap.HalfDegrees >= 90.0f)
+    { return FMars_Validation(f"Tumbler has Shell.Gap.HalfDegrees [{Shell.Gap.HalfDegrees}] outside (0, 90)"); }
+
+    if (Shell.Gap.PlateSegments < 1)
+    { return FMars_Validation(f"Tumbler has Shell.Gap.PlateSegments [{Shell.Gap.PlateSegments}] under 1"); }
+
+    if (Shell.Baffles.Count < 0)
+    { return FMars_Validation(f"Tumbler has a negative Shell.Baffles.Count [{Shell.Baffles.Count}]"); }
+
+    if (Shell.Baffles.Height <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Shell.Baffles.Height [{Shell.Baffles.Height}]"); }
+
+    if (Shell.Surface.Friction <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Shell.Surface.Friction [{Shell.Surface.Friction}]"); }
+
+    if (Shell.Surface.Restitution <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Shell.Surface.Restitution [{Shell.Surface.Restitution}]"); }
+
+    const auto& Piece = Self.Piece;
+    if (Piece.HalfSize <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Piece.HalfSize [{Piece.HalfSize}]"); }
+
+    if (Piece.HalfSize >= Drum.InnerRadius)
+    { return FMars_Validation(f"Tumbler has Piece.HalfSize [{Piece.HalfSize}] not under Drum.InnerRadius [{Drum.InnerRadius}]"); }
+
+    if (Piece.MassKg <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Piece.MassKg [{Piece.MassKg}]"); }
+
+    if (Piece.Friction <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Piece.Friction [{Piece.Friction}]"); }
+
+    if (Piece.Restitution <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Piece.Restitution [{Piece.Restitution}]"); }
+
+    if (Piece.LinearDamping <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Piece.LinearDamping [{Piece.LinearDamping}]"); }
+
+    if (Piece.AngularDamping <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Piece.AngularDamping [{Piece.AngularDamping}]"); }
+
+    if (Self.Coating.CoveragePerCm <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Coating.CoveragePerCm [{Self.Coating.CoveragePerCm}]"); }
+
+    if (Self.Coating.MinStepCm <= 0.0f)
+    { return FMars_Validation(f"Tumbler has a non-positive Coating.MinStepCm [{Self.Coating.MinStepCm}]"); }
 
     return FMars_Validation();
 }
@@ -346,16 +531,9 @@ struct FMars_Tumbler_HandState
     FQuat ReachFromRotation = FQuat::Identity;
 }
 
-// One admitted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity is a scene
-// node under the drum, posed by the kernel.
-// A piece rides the drum (Carried) until its world angle is more than ReposeDegrees from its rest offset; it then
-// avalanches (Sliding) all the way back to rest, whatever the drum does meanwhile, and is carried again from there.
-enum EMars_Tumbler_PieceMotion
-{
-    Carried,
-    Sliding
-}
-
+// One admitted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity is a
+// lifetime child of the station carrying a dynamic box body: the simulation moves it, the kernel only reads it (and
+// reseats it when it escapes).
 struct FMars_Tumbler_PieceState
 {
     UPROPERTY()
@@ -368,19 +546,12 @@ struct FMars_Tumbler_PieceState
     UPROPERTY()
     FCk_Handle Entity;
 
-    // Drum frame, 0 = the drum's bottom at home.
     UPROPERTY()
-    float32 OrbitDegrees = 0.0f;
+    FCk_Handle_JoltBody Body;
 
-    // The world angle the piece settles toward (spread by slot so the batch does not stack).
+    // The piece's world location as of the last tick: the next tick's step is measured from it.
     UPROPERTY()
-    float32 RestOffsetDegrees = 0.0f;
-
-    UPROPERTY()
-    float32 AxialCm = 0.0f;
-
-    UPROPERTY()
-    EMars_Tumbler_PieceMotion Motion = EMars_Tumbler_PieceMotion::Carried;
+    FVector LastWorld = FVector::ZeroVector;
 
     // 0..1, never decreases.
     UPROPERTY()
@@ -412,6 +583,10 @@ struct FMars_Fragment_Tumbler
     // In admission order.
     UPROPERTY()
     TArray<FMars_Tumbler_PieceState> Pieces;
+
+    // Escaped pieces put back since the last Reset.
+    UPROPERTY()
+    int32 Reseats = 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -434,16 +609,21 @@ event void FMars_Delegate_Tumbler_OnDrumChanged_MC(FCk_Handle_Tumbler InTumbler,
 delegate void FMars_Delegate_Tumbler_OnPressRefused(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal);
 event void FMars_Delegate_Tumbler_OnPressRefused_MC(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal);
 
-// The answer to every AddPiece: Accepted (the node exists; OnPieceAdded follows) or Rejected with a reason (nothing made).
+// The answer to every AddPiece: Accepted (the piece entity exists; OnPieceAdded follows) or Rejected with a reason (nothing
+// made).
 delegate void FMars_Delegate_Tumbler_OnPieceAdmission(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 event void FMars_Delegate_Tumbler_OnPieceAdmission_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 
-// An admitted piece's node exists under the drum: the placing script adds its visuals here.
+// An admitted piece's entity (its body's) exists: the placing script adds its visuals here.
 delegate void FMars_Delegate_Tumbler_OnPieceAdded(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Tumbler_OnPieceAdded_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
 delegate void FMars_Delegate_Tumbler_OnCoverageChanged(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, float32 InCoverage);
 event void FMars_Delegate_Tumbler_OnCoverageChanged_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, float32 InCoverage);
+
+// A piece escaped the shell and was put back at the drum's bottom (no failure state): the assembly may cue it.
+delegate void FMars_Delegate_Tumbler_OnPieceReseated(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId);
+event void FMars_Delegate_Tumbler_OnPieceReseated_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId);
 
 struct FMars_Fragment_Tumbler_Signals
 {
@@ -455,14 +635,15 @@ struct FMars_Fragment_Tumbler_Signals
     FMars_Delegate_Tumbler_OnPieceAdmission_MC OnPieceAdmission;
     FMars_Delegate_Tumbler_OnPieceAdded_MC OnPieceAdded;
     FMars_Delegate_Tumbler_OnCoverageChanged_MC OnCoverageChanged;
+    FMars_Delegate_Tumbler_OnPieceReseated_MC OnPieceReseated;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Debug and tests only: destroys every piece node, frees the hand, closes the hatch and lets go of the lever.
-// Payload-less: one placeholder field (request doctrine).
+// Debug and tests only: destroys every piece entity (its body with it), zeroes the reseat count, frees the hand, closes the
+// hatch and lets go of the lever. Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Tumbler_Reset
 {
     UPROPERTY()
@@ -495,8 +676,9 @@ struct FMars_Request_Tumbler_SetLoading
     }
 }
 
-// One released piece to admit, answered by OnPieceAdmission. Accepted only with the hatch Open, the drum Home, no piece with
-// that Id and fewer than Drum.Capacity pieces in. The release's pose is not used: the kernel places the piece by its slot.
+// One released piece to admit, answered by OnPieceAdmission. Accepted only with the drum body in the simulation, the hatch
+// Open, the drum Home, no piece with that Id and fewer than Drum.Capacity pieces in. The piece's body starts at the
+// release's pose and velocities.
 struct FMars_Request_Tumbler_AddPiece
 {
     UPROPERTY()

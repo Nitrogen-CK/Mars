@@ -1,6 +1,6 @@
 // With two pieces in, a grip rocked part way and then cancelled (the operator left) frees the hand, lets go of the lever and
-// returns the drum home; both pieces stay in with their coverage kept (the return only adds to it). A press on the lever
-// released before the reach arrives (ReachSeconds 1.0) frees the hand and never grips.
+// returns the drum home; the same two pieces stay in with their coverage kept (non-decreasing: the return may coat them). A
+// press on the lever released before the reach arrives (ReachSeconds 1.0) frees the hand and never grips.
 class UMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch : UMars_AutoTestRig_Tumbler
 {
     default _TimeoutSeconds = 15.0f;
@@ -18,7 +18,7 @@ class UMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch : UMars_AutoT
         Spec.Hand.ReachSeconds = k_SlowReachSeconds;
         BuildStation(InHandle, Spec);
 
-        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
+        Add_Steps_StationReady();
         Add_Steps_OpenHatch();
         Add_Step("load pieces 0 and 1", n"Step_AddTwo");
         Add_Step_WaitUntil("both are answered", n"Check_Answered2", 0, 1.0f);
@@ -87,8 +87,9 @@ class UMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch : UMars_AutoT
         Assert_True(_Tumbler.Get_HasPiece(Make_Id(0)) && _Tumbler.Get_HasPiece(Make_Id(1)), "the same two pieces");
         const auto Coverage0 = _Tumbler.Get_PieceCoverage(Make_Id(0));
         const auto Coverage1 = _Tumbler.Get_PieceCoverage(Make_Id(1));
-        Assert_True(Coverage0 >= _Coverage0AtCancel && Coverage0 > 0.0f, f"piece 0 kept its coverage ({_Coverage0AtCancel :.4} -> {Coverage0 :.4})");
-        Assert_True(Coverage1 >= _Coverage1AtCancel && Coverage1 > 0.0f, f"piece 1 kept its coverage ({_Coverage1AtCancel :.4} -> {Coverage1 :.4})");
+        Assert_True(Coverage0 >= _Coverage0AtCancel, f"piece 0 kept its coverage ({_Coverage0AtCancel :.4} -> {Coverage0 :.4})");
+        Assert_True(Coverage1 >= _Coverage1AtCancel, f"piece 1 kept its coverage ({_Coverage1AtCancel :.4} -> {Coverage1 :.4})");
+        Assert_True(Get_IsMonotonic(Make_Id(0)) && Get_IsMonotonic(Make_Id(1)), "no coverage step of either piece ever fell");
         Assert_Equals_Float(_Axle.Get_Alpha(), 0.0, 0.0, "the drum is back at alpha 0");
         Assert_Equals_Int(_LeverEngagedCount, 0, "the Control never engaged");
     }

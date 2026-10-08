@@ -1,19 +1,21 @@
 // The tumbler station: a counter (depth along local X, width along local Y; the operator at -X, +Y their right) with a cage
 // drum on an axle above its centre, the raw platter on the LEFT and an empty output tray on the RIGHT. The axle node carries
-// one Mover (home to a quarter turn) and the lever Control that scrubs it: the cage, the hatch hinge and the lever arm all
-// hang off the axle, so gripping the lever and rocking it turns the drum, and letting go settles both home. The hatch swings
-// up and open on its hinge node (its own Mover); the right glove rides a hand node on the root that the Tumbler kernel moves
-// (a free cursor over a reach plane in front of the drum, a reach to the lever grip, the grip itself). The Tumbler feature
-// lives on the station entity and its own state machine (UMars_SmState_Tumbler_Idle) reads the operator. A CookingFeed on
-// the same entity holds the platter's six raw pieces; its station-feed tasks turn the operator's add-food press into a
-// left-hand transfer that this script presents, released inside the drum behind the open hatch, where the kernel admits it
-// as a node under the axle. This script builds the nodes and, every frame, dresses every piece (its crumb coverage), the
-// label, the hover cue and the right glove's pose.
+// one Mover (home to a quarter turn) and the lever Control that scrubs it: the visible cage, the kernel's invisible
+// kinematic shell (utils_tumbler::Add_DrumBodies), the hatch hinge and the lever arm all hang off the axle, so gripping the
+// lever and rocking it turns the drum and its shell, and letting go settles both home. The hatch swings up and open on its
+// hinge node (its own Mover), carrying the plate's kinematic body (utils_tumbler::Add_HatchBody); the right glove rides a
+// hand node on the root that the Tumbler kernel moves (a free cursor over a reach plane in front of the drum, a reach to
+// the lever grip, the grip itself). The Tumbler feature lives on the station entity and its own state machine
+// (UMars_SmState_Tumbler_Idle) reads the operator. A CookingFeed on the same entity holds the platter's six raw pieces; its
+// station-feed tasks turn the operator's add-food press into a left-hand transfer that this script presents, released
+// inside the drum behind the open hatch, where the kernel admits it as a dynamic Jolt body that the shell tumbles. This
+// script builds the nodes and, every frame, dresses every piece (its crumb coverage), the label, the hover cue and the right
+// glove's pose.
 
 struct FMars_TumblerStation_PieceVisual
 {
     FMars_CookingFeed_PieceId Id;
-    // The piece node: its mesh dies with it.
+    // The piece's body entity: its mesh dies with it.
     FCk_Handle Entity;
     FCk_Handle_UnrealComponent Part;
     FMars_CookState CookState;
@@ -23,7 +25,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
 {
     default _ShowInPlaceActors = true;
 
-    // The minigame's reach, targets, drum and coating; its geometry-bound fields and its Nodes are set here.
+    // The minigame's reach, targets, drum, shell, pieces and coating; its geometry-bound fields and its Nodes are set here.
     UPROPERTY(ExposeOnSpawn)
     FMars_Tumbler_Spec Tumbler;
 
@@ -53,7 +55,8 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     private const float64 ProbePadding = 5.0;
 
     // The drum: the axle AxleAboveCounter over the counter. DrumArcDegrees is both the kernel's arc and the axle Mover's end
-    // pitch (they must match); the pieces orbit DrumInnerRadius from the axis and spread DrumHalfLength along it.
+    // pitch (they must match); the shell's inner faces are DrumInnerRadius from the axis and its baffles DrumHalfLength long
+    // either side of the middle.
     private const float64 AxleAboveCounter = 42.0;
     private const float64 AxleZ = CounterHeight + AxleAboveCounter;
     private const float32 DrumArcDegrees = 90.0f;
@@ -61,33 +64,33 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     private const float32 DrumHalfLength = 22.0f;
     // A full-arc return in this long, decelerating into home.
     private const float32 AxleReturnSeconds = 0.7f;
-    // The cage's bars sit CageClearance outside the orbit; its end discs CageEndGap past the axial spread.
-    private const float64 CageClearance = 2.0;
+    // The visible cage over the invisible shell: its bars' inner faces on the shell's inner radius (CageClearance is half a
+    // bar), CageBarCount of them, closer than a piece is wide so nothing shows through between them; its end discs'
+    // inner faces CageEndGap past the baffles, where the shell's discs are.
+    private const float64 CageBarSize = 2.0;
+    private const float64 CageClearance = CageBarSize * 0.5;
     private const float64 CageEndGap = 4.0;
     private const float64 CageDiscThickness = 2.0;
-    private const float64 CageBarSize = 2.0;
-    private const int32 CageBarCount = 10;
-    // Three short ribs inside the cage (drum frame degrees from the bottom at home), clear of the hatch gap.
-    private const float64 BaffleHeight = 4.0;
+    private const int32 CageBarCount = 20;
+    // The visible ribs over the shell's baffles (their count and height are the spec's Shell.Baffles).
     private const float64 BaffleThickness = 1.5;
-    private const float64 BaffleFirstDegrees = 10.0;
-    private const float64 BaffleStepDegrees = 90.0;
     private const float64 AxleRadius = 1.5;
     // The axle posts stand PostWidth wide on the counter, one outside each end disc (the right one past the lever arm).
     private const float64 PostWidth = 4.0;
     private const float64 PostGap = 1.0;
 
-    // The hatch: the front gap of the cage spans HatchHalfDegrees either side of the operator's side (drum frame -90), the
-    // hinge at its top edge; the plate (HatchSegments boxes along the arc, HatchThickness thick) swings up and out by
-    // HatchOpenPitch over HatchSeconds. The tab (the hover anchor) is at the plate's bottom centre.
-    private const float64 HatchHalfDegrees = 40.0;
-    // Drum frame degrees from the bottom (the kernel's convention: +90 is away from the operator): the operator's side.
-    private const float64 FrontDegrees = -90.0;
+    // The hatch: the front gap of the cage spans HatchHalfDegrees either side of HatchCentreDegrees (drum frame degrees from
+    // the bottom, the kernel's convention: -90 is the operator's side, so -120 is up the front), its lower edge 25 cm above
+    // the drum's floor so a pile does not spill through it; the hinge is at its upper edge. The plate (HatchSegments boxes
+    // along the arc, HatchThickness thick) swings up and out by HatchOpenPitch over HatchSeconds. The tab (the hover anchor)
+    // is at the plate's lower edge, about axle height. These are the kernel shell's gap numbers (copied into the spec).
+    private const float32 HatchCentreDegrees = -120.0f;
+    private const float32 HatchHalfDegrees = 35.0f;
     private const int32 HatchSegments = 3;
     private const float64 HatchThickness = 1.5;
-    // Past vertical: the open plate stands up and back over the gap's top edge, above the operating view's line of sight
-    // to the drum's floor (at -70 it lay across that line and hid the pieces it was opened to inspect).
-    private const float32 HatchOpenPitch = -120.0f;
+    // The open plate stands up over the gap's upper edge, its tab about 48 cm above the axle: inside the reach (WorkspaceHalfZ)
+    // so the hand can close it again.
+    private const float32 HatchOpenPitch = -100.0f;
     private const float32 HatchSeconds = 0.35f;
     private const FVector HatchTabSize = FVector(3.0, 8.0, 3.0);
 
@@ -97,12 +100,12 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     private const float64 LeverRodThickness = 2.5;
     private const float64 GripLength = 12.0;
 
-    // The free hand's reach plane is WorkspaceGap in front of the orbit, at the axle's height; it reaches WorkspaceHalfZ up
+    // The free hand's reach plane is WorkspaceGap in front of the shell, at the axle's height; it reaches WorkspaceHalfZ up
     // and down from there, enough for the lever grip (LeverArmHeight up) and the open hatch's raised tab.
     private const float64 WorkspaceGap = 14.0;
-    private const float32 WorkspaceHalfZ = 44.0f;
+    private const float32 WorkspaceHalfZ = 56.0f;
 
-    // Inside the drum, ReleaseInset in from the orbit on the operator's side, level with the axle: behind the open hatch.
+    // Inside the drum, ReleaseInset in from the shell at the gap's centre: behind the open hatch, so a piece drops in.
     private const float64 ReleaseInset = 8.0;
 
     // The decorative crumb bed on the root at the drum's bottom, inside the cage.
@@ -156,6 +159,8 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_Tumbler _TumblerHandle;
     // The axle node (the drum frame): its Mover is the drum's turn and its Control is the lever.
     private FCk_Handle_SceneNode _AxleNode;
+    // The kernel's shell under the axle (its first panel): admission waits for it to be in the simulation.
+    private FCk_Handle_JoltBody _DrumBody;
     private FCk_Handle_Mover _AxleMover;
     private FCk_Handle_Control _Lever;
     private FCk_Handle_Transform _LeverGripNode;
@@ -177,7 +182,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     private TArray<FCk_Handle_UnrealComponent> _CarryProxyParts;
     private FCk_Handle_CookingFeed _FeedHandle;
     private FMars_StationFeed_Presentation _FeedPresentation;
-    // One per piece node still alive, in admission order.
+    // One per piece entity still alive, in admission order.
     private TArray<FMars_TumblerStation_PieceVisual> _PieceVisuals;
     private FCk_Handle_UnrealComponent _Label;
     // The text last written to the label: it is rewritten only when it changes.
@@ -200,12 +205,17 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        // Before the base: its AddVisuals sizes the cage and places the hand from them. The drum's arc, orbit and spread and
-        // the reach plane are this station's geometry, so the exposed spec cannot set them.
+        // Before the base: its AddVisuals builds the cage, the shell and the hatch from them and places the hand. The drum's
+        // arc, radius and length, the hatch gap, the end discs' gap, the piece size the meshes are scaled to and the reach
+        // plane are this station's geometry, so the exposed spec cannot set them.
         _TumblerSpec = Tumbler;
         _TumblerSpec.Drum.ArcDegrees = DrumArcDegrees;
         _TumblerSpec.Drum.InnerRadius = DrumInnerRadius;
         _TumblerSpec.Drum.HalfLength = DrumHalfLength;
+        _TumblerSpec.Shell.Gap.CentreDegrees = HatchCentreDegrees;
+        _TumblerSpec.Shell.Gap.HalfDegrees = HatchHalfDegrees;
+        _TumblerSpec.Shell.DiscGap = float32(CageEndGap);
+        _TumblerSpec.Piece.HalfSize = PieceSize * 0.5f;
         _TumblerSpec.Hand.WorkspaceCentreLocal = Get_WorkspaceCentreLocal();
         _TumblerSpec.Hand.HalfExtentZ = WorkspaceHalfZ;
 
@@ -226,7 +236,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
 
         // A rejected Tumbler spec or node already ensured in utils_tumbler::Add.
         _TumblerSpec.Nodes = FMars_Tumbler_Nodes(_HandNode, _HatchTabNode, _LeverGripNode, _Lever, _HatchMover,
-            _AxleNode.As_Transform(), StationHandle.Get_View());
+            _AxleNode.As_Transform(), _DrumBody, StationHandle.Get_View());
         _TumblerHandle = utils_tumbler::Add(InHandle, _TumblerSpec);
         if (ck::Is_NOT_Valid(_TumblerHandle))
         { return Flow; }
@@ -284,7 +294,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
 
         _FeedPresentation.Clear(FCk_Handle());
         Clear_RightPose();
-        // The meshes are hosted on the piece nodes and die with them; only the records go.
+        // The meshes are hosted on the piece entities and die with them; only the records go.
         _PieceVisuals.Empty();
     }
 
@@ -348,8 +358,9 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         // The kernel writes its offset (station frame) from the first tick; it starts at the reach plane's centre.
         _HandNode = utils_scene_node::Create(InRoot, FTransform(utils_tumbler::Get_FreeRotation(), Get_WorkspaceCentreLocal()));
 
-        _ReleaseNode = utils_scene_node::Create(InRoot,
-            FTransform(FVector(-(float64(DrumInnerRadius) - ReleaseInset), 0.0, AxleZ))).As_Transform();
+        const auto ReleaseLocal = FVector(0.0, 0.0, AxleZ)
+            + Get_CagePoint(float64(HatchCentreDegrees), float64(DrumInnerRadius) - ReleaseInset);
+        _ReleaseNode = utils_scene_node::Create(InRoot, FTransform(ReleaseLocal)).As_Transform();
 
         _Label = AddLabel(InRoot,
             FTransform(FRotator(0.0, 180.0, 0.0), FVector(LabelBack, 0.0, AxleZ + Get_CageRadius() + LabelHeight)));
@@ -390,26 +401,27 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
             k_IronColor);
     }
 
-    // Under the axle: the two end discs, CageBarCount bars around the axis leaving the front gap for the hatch, and the
-    // baffles inside.
+    // Under the axle: the visible cage (the two end discs, CageBarCount bars around the axis leaving the hatch gap, and a rib
+    // over each of the shell's baffles) and the kernel's invisible kinematic shell inside it, which the pieces collide with.
     private void AddCage()
     {
         auto Axle = _AxleNode.As_Transform();
         const auto Radius = Get_CageRadius();
         const auto HalfLength = Get_CageHalfLength();
 
+        // Each disc's inner face where the shell's disc is.
         for (int32 Side = -1; Side <= 1; Side += 2)
         {
             AddTintedPart(Axle, FMars_MeshPart(
-                FTransform(FRotator(0.0, 0.0, 90.0), FVector(0.0, float64(Side) * HalfLength, 0.0),
+                FTransform(FRotator(0.0, 0.0, 90.0), FVector(0.0, float64(Side) * (HalfLength + CageDiscThickness * 0.5), 0.0),
                     FVector(Radius * 0.02, Radius * 0.02, CageDiscThickness * 0.01)),
                 engine::load::Cylinder(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"TumblerStation_CageDisc"),
                 k_CageColor);
         }
 
         // The bars share the arc outside the gap evenly, half a step in from each gap edge.
-        const auto GapEnd = FrontDegrees + HatchHalfDegrees;
-        const auto BarStep = (360.0 - 2.0 * HatchHalfDegrees) / float64(CageBarCount);
+        const auto GapEnd = float64(HatchCentreDegrees + HatchHalfDegrees);
+        const auto BarStep = (360.0 - 2.0 * float64(HatchHalfDegrees)) / float64(CageBarCount);
         for (int32 Index = 0; Index < CageBarCount; ++Index)
         {
             const auto Degrees = GapEnd + (float64(Index) + 0.5) * BarStep;
@@ -417,24 +429,30 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
                 FVector(CageBarSize, 2.0 * HalfLength, CageBarSize), k_CageColor);
         }
 
-        // Pitched by their angle, so each rib's local Z runs radially (inward).
-        for (int32 Index = 0; Index < 3; ++Index)
+        // Pitched by their angle, so each rib's local Z runs radially (inward), standing on the shell's inner face where the
+        // kernel's baffle bodies are.
+        const auto& Baffles = _TumblerSpec.Shell.Baffles;
+        const auto BaffleHeight = float64(Baffles.Height);
+        for (int32 Index = 0; Index < Baffles.Count; ++Index)
         {
-            const auto Degrees = BaffleFirstDegrees + float64(Index) * BaffleStepDegrees;
-            AddRod(Axle, FTransform(FRotator(Degrees, 0.0, 0.0), Get_CagePoint(Degrees, Radius - BaffleHeight * 0.5)),
-                FVector(BaffleThickness, 2.0 * HalfLength, BaffleHeight), k_IronColor);
+            const auto Degrees = float64(utils_tumbler::Get_BaffleDegrees(_TumblerSpec, Index));
+            AddRod(Axle, FTransform(FRotator(Degrees, 0.0, 0.0), Get_CagePoint(Degrees, float64(DrumInnerRadius) - BaffleHeight * 0.5)),
+                FVector(BaffleThickness, 2.0 * float64(DrumHalfLength), BaffleHeight), k_IronColor);
         }
+
+        _DrumBody = utils_tumbler::Add_DrumBodies(_AxleNode, _TumblerSpec);
     }
 
-    // The hinge node at the gap's top edge with the hatch Mover (closed at rest, pitched HatchOpenPitch open; both poses keep
-    // the hinge where it stands), the curved plate across the gap and the tab node at its bottom centre with its handle.
+    // The hinge node at the gap's upper edge (the kernel's hinge) with the hatch Mover (closed at rest, pitched
+    // HatchOpenPitch open; both poses keep the hinge where it stands), the kernel's plate bodies under it, the visible curved
+    // plate across the gap just outside the bars, and the tab node at its lower edge with its handle.
     private void AddHatch()
     {
         auto Axle = _AxleNode.As_Transform();
         const auto PlateRadius = Get_CageRadius() + CageBarSize * 0.5 + HatchThickness * 0.5;
-        const auto TopDegrees = FrontDegrees - HatchHalfDegrees;
-        const auto BottomDegrees = FrontDegrees + HatchHalfDegrees;
-        const auto HingeLocal = Get_CagePoint(TopDegrees, PlateRadius);
+        const auto TopDegrees = float64(HatchCentreDegrees - HatchHalfDegrees);
+        const auto BottomDegrees = float64(HatchCentreDegrees + HatchHalfDegrees);
+        const auto HingeLocal = utils_tumbler::Get_HatchHingeLocal(_TumblerSpec);
 
         auto HingeNode = utils_scene_node::Create(Axle, FTransform(HingeLocal));
         auto HatchSpec = FMars_Mover_Spec();
@@ -443,9 +461,10 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         HatchSpec.EndRotation = FRotator(float64(HatchOpenPitch), 0.0, 0.0);
         HatchSpec.Duration = HatchSeconds;
         _HatchMover = utils_mover::Add(HingeNode, HatchSpec);
+        utils_tumbler::Add_HatchBody(HingeNode, _TumblerSpec);
 
         auto Hinge = HingeNode.As_Transform();
-        const auto SegmentDegrees = 2.0 * HatchHalfDegrees / float64(HatchSegments);
+        const auto SegmentDegrees = 2.0 * float64(HatchHalfDegrees) / float64(HatchSegments);
         const auto SegmentLength = Math::DegreesToRadians(SegmentDegrees) * PlateRadius * 1.05;
         for (int32 Index = 0; Index < HatchSegments; ++Index)
         {
@@ -454,18 +473,16 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
                 FVector(SegmentLength, 2.0 * Get_CageHalfLength(), HatchThickness), k_HandleColor);
         }
 
-        const auto TabLocal = Get_CagePoint(BottomDegrees, PlateRadius) - HingeLocal;
-        _HatchTabNode = utils_scene_node::Create(Hinge, FTransform(TabLocal)).As_Transform();
+        _HatchTabNode = utils_scene_node::Create(Hinge, FTransform(utils_tumbler::Get_HatchTabLocal(_TumblerSpec))).As_Transform();
 
-        // The handle stands out of the plate, below its bottom edge.
+        // The handle stands out of the plate, below its lower edge.
         _HatchTabPart = Hinge.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator(BottomDegrees, 0.0, 0.0), Get_CagePoint(BottomDegrees, PlateRadius + HatchTabSize.Z * 0.5) - HingeLocal,
                 HatchTabSize * 0.01),
             engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"TumblerStation_HatchTab"));
     }
 
-    // Under the axle on its +Y end: the stub out to the arm, the arm up, the grip bar on top and the grip node (handshake
-    // frame: X along the bar away from the operator, Z out of the palm toward -Y, as the fry skimmer's bar).
+    // Under the axle on its +Y end: the stub out to the arm, the arm up, the grip bar on top and the grip node.
     private void AddLever()
     {
         auto Axle = _AxleNode.As_Transform();
@@ -480,8 +497,10 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
             FTransform(FRotator::ZeroRotator, GripLocal, FVector(GripLength, LeverRodThickness * 1.2, LeverRodThickness * 1.2) * 0.01),
             engine::load::Cube(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"TumblerStation_LeverGrip"));
 
+        // A right-hand handshake grip on the bar: palm facing the operator's left (-Y), fingers curling down round it, the
+        // hand leading away from the operator along the bar.
         _LeverGripNode = utils_scene_node::Create(Axle,
-            FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), GripLocal)).As_Transform();
+            FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, -FVector::UpVector, -FVector::RightVector), GripLocal)).As_Transform();
     }
 
     // The axle's posts on the counter: one outside the left disc, one outside the lever arm.
@@ -497,7 +516,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         }
     }
 
-    // On the root (it does not turn), just under the orbit's bottom: the pieces at rest sit on it.
+    // On the root (it does not turn), just under the shell's floor: the pieces at rest show sitting on it.
     private void AddCrumbBed(FCk_Handle_Transform& InRoot)
     {
         const auto TopZ = AxleZ - float64(DrumInnerRadius);
@@ -505,10 +524,9 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     }
 
     // The raw platter: a slab on the counter's left with one raw proxy per slot (each on its RawSlot node, tagged so a test
-    // can find them; the kind by the slot's preset), the feed node the left glove follows (at rest in front of the platter;
-    // palm down, fingers forward: grip frame X across the palm toward the index finger, Z out of the palm) and one proxy per
-    // kind riding that glove, in its palm, hidden until a piece of that kind is grasped. The presentation's geometry is
-    // authored here, in the station frame.
+    // can find them; the kind by the slot's preset), the feed node the left glove follows (at rest in front of the platter,
+    // palm down, fingers forward) and one proxy per kind riding that glove, in its palm, hidden until a piece of that kind
+    // is grasped. The presentation's geometry is authored here, in the station frame.
     private void AddPlatter(FCk_Handle_Transform& InRoot)
     {
         const auto HalfSize = float64(PieceSize) * 0.5;
@@ -523,11 +541,11 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         Platter.PrimaryColor = TOptional<FLinearColor>(k_PlatterColor);
         InRoot.Add_MeshPart(this, Platter);
 
-        const auto HandRotation = FQuat(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector));
+        const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
         auto& Geometry = _FeedPresentation.Geometry;
         Geometry.RestLocal = FTransform(HandRotation,
             FVector(FeedRestFromPlatter.X, PlatterCentreY + FeedRestFromPlatter.Y, CounterHeight + PalmLift));
-        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent along the glove's Z.
+        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
         Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + HalfSize));
         Geometry.SlotsLocal.Empty();
 
@@ -640,7 +658,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     // Geometry
     //----------------------------------------------------------------------------------------------------------------------
 
-    // The free hand's reach plane: WorkspaceGap in front of the orbit, level with the axle.
+    // The free hand's reach plane: WorkspaceGap in front of the shell, level with the axle.
     private FVector Get_WorkspaceCentreLocal() const
     {
         return FVector(-(float64(DrumInnerRadius) + WorkspaceGap), 0.0, AxleZ);
@@ -728,8 +746,8 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         Component.SetVisibility(InVisible);
     }
 
-    // Each piece's crumb from its coverage. A record whose piece the kernel no longer holds (reset) or whose node is gone is
-    // dropped (its mesh dies with the node).
+    // Each piece's crumb from its coverage. A record whose piece the kernel no longer holds (reset) or whose entity is gone is
+    // dropped (its mesh dies with the entity).
     private void Advance_PieceVisuals()
     {
         for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
@@ -837,9 +855,9 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     // Pieces and the label
     //----------------------------------------------------------------------------------------------------------------------
 
-    // A piece's look: the raw mesh of its preset's kind on the piece node, in the crumb material (every slot), its Custom
-    // Primitive Data written from its coverage. The node's local -Z points out of the drum (the kernel pitches it by its
-    // orbit), so the mesh stands on the orbit with its base and rises inward. Tagged so a test can read it back.
+    // A piece's look: the raw mesh of its preset's kind on the piece's body entity, in the crumb material (every slot), its
+    // Custom Primitive Data written from its coverage. The entity is the body's centre and the meshes' pivots are at their
+    // base, so the mesh is lowered by half the piece's size to fill the body's box. Tagged so a test can read it back.
     private void AddPieceVisuals(const FMars_CookingFeed_PieceId& InPieceId, FCk_Handle InPiece)
     {
         auto PieceTransform = InPiece.As_Transform();
@@ -851,7 +869,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         Visual.Entity = InPiece;
         Visual.CookState.Crumb = _TumblerHandle.Get_PieceCoverage(InPieceId);
         Visual.Part = PieceTransform.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector(Scale, Scale, Scale)),
+            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -float64(PieceSize) * 0.5), FVector(Scale, Scale, Scale)),
             Get_PieceMesh(Preset), assets::load::TumblerCrumb_Mars_M(), collision::profile::NoCollision, n"TumblerStation_Piece"));
         _PieceVisuals.Add(Visual);
 

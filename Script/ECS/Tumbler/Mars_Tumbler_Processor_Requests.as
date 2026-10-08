@@ -4,7 +4,7 @@ struct FMars_Tumbler_AdmissionResult
     FMars_CookingFeed_PieceId Id;
     EMars_CookingFeed_Admission Admission = EMars_CookingFeed_Admission::Rejected;
     FString Reason;
-    // Accepted only: the new piece node.
+    // Accepted only: the new piece entity (its body's).
     FCk_Handle Entity;
 }
 
@@ -20,8 +20,9 @@ struct FMars_Tumbler_DrainEdges
 }
 
 // Drains Reset -> Cancel -> SetLoading -> AddPiece -> Release -> Press -> Look (see FMars_Fragment_Tumbler_Requests). Reset
-// destroys every piece node, frees the hand, closes the hatch and lets go of the lever; Cancel ends a grip (the drum
-// returns) or a reach; SetLoading is last-wins; AddPiece admits or rejects each release; Release lets go; each Press toggles
+// destroys every piece entity (its body with it), frees the hand, closes the hatch and lets go of the lever; Cancel ends a
+// grip (the drum returns) or a reach; SetLoading is last-wins; AddPiece admits (a dynamic body at the release) or rejects
+// each release; Release lets go; each Press toggles
 // the hovered hatch, starts a reach to the hovered lever, or is refused (consumed, nothing queued); the summed look moves
 // the free cursor or rocks the gripped lever. The hand, hatch and drum edges, the refusals, then every admission answer (and
 // OnPieceAdded for an accepted one) are broadcast last. The drain decides and the Tick moves: nothing here integrates over
@@ -124,7 +125,8 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         }
     }
 
-    // Every piece node this kernel made is destroyed here, never left to the station's teardown alone.
+    // Every piece entity this kernel made is destroyed here (its body dies with it), never left to the station's teardown
+    // alone.
     private void Apply_Reset(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState)
     {
         for (const auto& Piece : InState.Pieces)
@@ -135,6 +137,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto Destroyed = InState.Pieces.Num();
         InState.Pieces.Empty();
+        InState.Reseats = 0;
 
         const auto Spec = InTumbler.Get_Spec();
         auto Lever = Spec.Nodes.Lever;
@@ -261,8 +264,8 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         Lever.Request_Nudge(FMars_Request_Control_Nudge(PullDegrees));
     }
 
-    // Accepted: a scene node under the drum at the piece's rest pose on the orbit (its slot sets the rest offset and the
-    // axial lane), coverage 0. Rejected: nothing made, the reason naming the gate.
+    // Accepted: a piece entity (a lifetime child of the station) at the release pose with a dynamic box body moving at the
+    // release's velocities, coverage 0. Rejected: nothing made, the reason naming the gate.
     private FMars_Tumbler_AdmissionResult Apply_AddPiece(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState,
         const FMars_CookingFeed_Release& InRelease)
     {
@@ -272,7 +275,11 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Spec = InTumbler.Get_Spec();
         const auto PieceName = utils_cooking_feed::Get_PieceName(InRelease.PieceId);
 
-        if (InState.Hatch != EMars_Tumbler_Hatch::Open)
+        // The shell's bodies are added to the simulation a frame or more after they are built; a piece added before them
+        // falls through the drum.
+        if (utils_jolt_body::Get_IsBodyAdded(Spec.Nodes.DrumBody) == false)
+        { Result.Reason = "the drum body is not in the simulation yet"; }
+        else if (InState.Hatch != EMars_Tumbler_Hatch::Open)
         { Result.Reason = f"hatch is {InState.Hatch :n}"; }
         else if (InState.Drum != EMars_Tumbler_Drum::Home)
         { Result.Reason = f"drum is {InState.Drum :n}"; }
@@ -287,21 +294,44 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
             return Result;
         }
 
-        const auto Slot = InRelease.PieceId.StockIndex;
+        const auto& PieceSpec = Spec.Piece;
+        const auto ReleaseLocation = InRelease.WorldTransform.GetLocation();
+        auto Entity = utils_entity_lifetime::Request_CreateEntity(InTumbler);
+        utils_transform::Add(Entity, FTransform(InRelease.WorldTransform.GetRotation(), ReleaseLocation), ECk_Replication::DoesNotReplicate);
+
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(PieceSpec.HalfSize, PieceSpec.HalfSize, PieceSpec.HalfSize));
+        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        BodySpec.Set_ShapeDimensions(Shape);
+        BodySpec.Set_MotionType(ECk_MotionType::Dynamic);
+        BodySpec.Set_MotionQuality(ECk_MotionQuality::LinearCast);
+        BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
+        BodySpec.Set_MassKg(PieceSpec.MassKg);
+        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
+        BodySpec.Set_Friction(PieceSpec.Friction);
+        BodySpec.Set_Restitution(PieceSpec.Restitution);
+        BodySpec.Set_LinearDamping(PieceSpec.LinearDamping);
+        BodySpec.Set_AngularDamping(PieceSpec.AngularDamping);
+        BodySpec.Set_PersistContacts(ECk_EnableDisable::Enable);
+        auto Body = utils_jolt_body::Add(Entity, BodySpec);
+
+        // The body handles its requests only once it is set up and added (the same frame or later), so these wait for it.
+        if (InRelease.LinearVelocity.IsNearlyZero() == false)
+        { utils_jolt_body::Request_SetLinearVelocity(Body, FCk_Request_JoltBody_SetLinearVelocity(InRelease.LinearVelocity)); }
+
+        if (InRelease.AngularVelocity.IsNearlyZero() == false)
+        { utils_jolt_body::Request_SetAngularVelocity(Body, FCk_Request_JoltBody_SetAngularVelocity(InRelease.AngularVelocity)); }
+
         auto Piece = FMars_Tumbler_PieceState();
         Piece.Id = InRelease.PieceId;
         Piece.PresetIndex = InRelease.PresetIndex;
-        Piece.RestOffsetDegrees = utils_tumbler::Get_RestOffsetDegrees(Slot, Spec.Drum.Capacity);
-        Piece.OrbitDegrees = Piece.RestOffsetDegrees;
-        Piece.AxialCm = utils_tumbler::Get_AxialCm(Slot, Spec.Drum.HalfLength);
-
-        auto Drum = Spec.Nodes.Drum;
-        const auto Offset = utils_tumbler::Get_PieceOffset(Piece.OrbitDegrees, Piece.AxialCm, Spec.Drum.InnerRadius);
-        auto Node = utils_scene_node::Create(Drum, Offset);
-        Piece.Entity = Node.H();
+        Piece.Entity = Entity;
+        Piece.Body = Body;
+        // The admission frame coats nothing: the first step is measured from where the piece was released.
+        Piece.LastWorld = ReleaseLocation;
         InState.Pieces.Add(Piece);
 
-        ck::Trace(f"[Tumbler] [{InTumbler.ToString()}] admitted piece {PieceName} as [{Node.ToString()}] at orbit {Piece.OrbitDegrees :.1} "
+        ck::Trace(f"[Tumbler] [{InTumbler.ToString()}] admitted piece {PieceName} as [{Entity.ToString()}] at {ReleaseLocation} "
             + f"({InState.Pieces.Num()} in the drum)");
 
         Result.Admission = EMars_CookingFeed_Admission::Accepted;
