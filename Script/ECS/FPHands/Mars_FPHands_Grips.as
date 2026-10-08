@@ -52,7 +52,8 @@ enum EMars_FPHands_GripFrame
     // A point grip at the node: the glove keeps its own rotation, turned partly toward the grip (ReachSpec.Stretch.AimFraction).
     Aimed,
     // The node's own axes are the grip, authored like a socket (X across the palm toward the index finger, Z out of the
-    // palm): rotate the node to pose the glove.
+    // palm, a handed frame): build it with utils_fphands::Make_GripRotation(hand, fingers, palm) and rotate the node to
+    // pose the glove.
     Node
 }
 

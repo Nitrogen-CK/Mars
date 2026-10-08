@@ -28,6 +28,33 @@ namespace utils_fphands
 
         return EMars_FPHands_ReachKind::Hold;
     }
+
+    // A glove's grip frame from what the hand does: InFingers is where the fingers point and InPalm is what the palm faces
+    // (any frame, not necessarily perpendicular: the fingers are flattened onto the palm's plane). The frame the glove reads
+    // (EMars_FPHands_GripFrame::Node, item sockets) has X across the palm toward the index finger and Z out of the palm,
+    // which is handed: a right hand's index side is palm x fingers, a left hand's is fingers x palm (palm down, fingers
+    // forward: -Y for the right glove, +Y for the left). Author grips through this, never a raw MakeFromXZ, so the
+    // intent reads at the call site and the hand's side is never guessed. Parallel or zero inputs ensure and give identity.
+    FQuat Make_GripRotation(EMars_Hand InHand, FVector InFingers, FVector InPalm)
+    {
+        const auto Palm = InPalm.GetSafeNormal();
+        const auto Fingers = (InFingers - Palm * InFingers.DotProduct(Palm)).GetSafeNormal();
+        const auto FrameIsValid = Palm.IsNearlyZero() == false && Fingers.IsNearlyZero() == false;
+        if (ck::EnsureIfNot(FrameIsValid,
+            f"[FPHands] a {InHand :n} grip needs a palm direction [{InPalm}] and fingers [{InFingers}] that are neither zero nor parallel"))
+        { return FQuat::Identity; }
+
+        const auto IndexSide = InHand == EMars_Hand::Right ? Palm.CrossProduct(Fingers) : Fingers.CrossProduct(Palm);
+        return FQuat(FRotator::MakeFromXZ(IndexSide, Palm));
+    }
+
+    // Where a glove's fingers point in InGrip's frame (the inverse of Make_GripRotation): a right hand's fingers run down the
+    // frame's -Y, a left hand's up its +Y.
+    FVector Get_GripFingers(EMars_Hand InHand, const FQuat& InGrip)
+    {
+        const auto Fingers = InGrip.GetRightVector();
+        return InHand == EMars_Hand::Right ? -Fingers : Fingers;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

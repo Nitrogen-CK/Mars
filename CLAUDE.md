@@ -278,4 +278,7 @@ These are maintainer rulings; they override defaults from the framework skills w
 - **View.** The player's view is the CkCamera director on `Player.Head` (a CkGait bob node at eye height); the hand chain
   hangs off the director's view anchor; the interaction trace rides the anchor. Never add a `UCameraComponent` or read
   `GetPlayerViewPoint` — go through `utils_player_viewpoint`. The gait (`utils_gait`) is the one stride clock for every bob.
+- **Glove grips.** A grip node's frame (`EMars_FPHands_GripFrame::Node`, feed rest poses, item sockets) is handed: build it
+  with `utils_fphands::Make_GripRotation(hand, fingers, palm)`, never a raw `MakeFromXZ`, so the call site states where the
+  fingers point and what the palm faces. A changed glove pose is done only once it has been seen in PIE; no lane sees it.
 - **Surfaces** use the CkUsf ProtoGrid material instances under `/Game/Mars/Materials/ProtoGrid`.
