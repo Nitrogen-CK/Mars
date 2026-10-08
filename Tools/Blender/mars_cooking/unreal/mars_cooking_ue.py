@@ -502,12 +502,16 @@ def build_pan_master():
     oil = g.scalar("Oil Amount", 0.0, 0.0, 1.0, "How much oil is in the pan: pool size, drop and bead count.")
     sizzle = g.scalar("Sizzle", 0.0, 0.0, 1.0, "Bubbling in the oil around the meat.")
     fond = g.scalar("Fond", 0.0, 0.0, 1.0, "Burnt-on residue built up over this cook; adds to the pan's Seasoning.")
-    meat = g.vector("Meat Footprint", (0, 0, 0, 0), "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. "
-                    "For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for "
-                    "the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
-                    ("X", "Y", "Radius", "-"))
-    trail = g.vector("Oil Trail", (0, 0, 0, 0), "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
-                     ("X", "Y", "-", "-"))
+    meat_desc = ("Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. "
+                 "For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for "
+                 "the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.")
+    trail_desc = "Pan-local cm position that lags behind the meat; the pool stretches between the two."
+    meat = g.vector("Meat Footprint", (0, 0, 0, 0), meat_desc, ("X", "Y", "Radius", "-"))
+    trail = g.vector("Oil Trail", (0, 0, 0, 0), trail_desc, ("X", "Y", "-", "-"))
+    # Five more meats, so every piece on the searing station's pan (six at most) gets its own pool; the unsuffixed pair
+    # is slot 0, kept so existing instances keep working. A slot with radius 0 draws nothing.
+    meats = [g.vector("Meat Footprint %d" % i, (0, 0, 0, 0), meat_desc, ("X", "Y", "Radius", "-")) for i in range(1, 6)]
+    trails = [g.vector("Oil Trail %d" % i, (0, 0, 0, 0), trail_desc, ("X", "Y", "-", "-")) for i in range(1, 6)]
 
     g.group("02 Pan Shape")
     base_r = g.scalar("Base Radius", spec.PAN_BASE_R, 2.0, 40.0, "Radius of the flat cooking base, cm.")
@@ -589,7 +593,9 @@ def build_pan_master():
         ("Sizzle", sizzle, ""), ("BaseR", base_r, ""), ("PoolR", pool_r, ""), ("Margin", margin, ""), ("Blend", blend, ""),
         ("EdgeSoft", edge_soft, ""), ("Wobble", wobble, ""), ("Meniscus", meniscus, ""), ("SimW", sim_w, ""),
         ("SimCell", sim_cell, ""), ("SimRate", sim_rate, ""), ("SimStrength", sim_strength, ""),
-        ("SimDensity", sim_density, ""), ("SimNear", sim_near, "")), x, -1100, FLOAT3,
+        ("SimDensity", sim_density, ""), ("SimNear", sim_near, ""))
+        + tuple(("Meat%d" % i, e, "RGBA") for i, e in enumerate(meats, 1))
+        + tuple(("Trail%d" % i, e, "RGBA") for i, e in enumerate(trails, 1)), x, -1100, FLOAT3,
         (("Bubble", FLOAT1), ("BubbleRim", FLOAT1)))
     drops = g.custom("PanDrops: running drops + beads", hlsl.PAN_DROPS, (
         ("P", lp, ""), ("N", ln, ""), ("T", time, ""), ("OilAmount", oil, ""), ("BaseR", base_r, ""), ("RimR", rim_r, ""),
@@ -606,7 +612,8 @@ def build_pan_master():
         ("SeasonRough", season_rough, ""), ("SeasonMetal", season_metal, ""),
         ("OilTint", oil_tint, ""), ("OilBody", oil_body, ""), ("OilOpacity", oil_opacity, ""), ("OilEdge", oil_edge, ""), ("OilCoat", oil_coat, ""),
         ("OilLevel", oil_level, ""), ("DropNormal", drop_normal, ""),
-        ("Meat", meat, "RGBA"), ("Contact", contact, ""), ("ContactSoft", contact_soft, ""), ("RimR", rim_r, "")),
+        ("Meat", meat, "RGBA"), ("Contact", contact, ""), ("ContactSoft", contact_soft, ""), ("RimR", rim_r, ""))
+        + tuple(("Meat%d" % i, e, "RGBA") for i, e in enumerate(meats, 1)),
         x + 600, -800, FLOAT3,
         (("OutRoughness", FLOAT1), ("OutMetallic", FLOAT1), ("OutCoat", FLOAT1), ("OutNormal", FLOAT3)))
     world_n = g.to_world(surf, "OutNormal", x + 1050, -300)

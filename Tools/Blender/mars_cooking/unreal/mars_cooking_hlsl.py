@@ -74,7 +74,8 @@ return float3(UV1.x, UV1.y, UV2.x) * saturate(shape) * Scale;"""
 # simmer comes out as Bubble (dome mask) and BubbleRim (its outline).
 PAN_POOL = """struct FPanPool
 {
-    float2 MeatPos; float MeatR; float2 TrailPos;
+    float4 M0; float4 M1; float4 M2; float4 M3; float4 M4; float4 M5;     // each meat: pan-local xy, footprint radius
+    float2 T0; float2 T1; float2 T2; float2 T3; float2 T4; float2 T5;     // each meat's lagging trail
     float Amount; float PoolR; float Margin; float Blend; float Wobble; float BaseR;
 
     float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
@@ -86,26 +87,47 @@ PAN_POOL = """struct FPanPool
         return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),
                     lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);
     }
-    // signed distance to the pool edge (cm, negative inside)
-    float Sdf(float2 p)
+    // one meat's blob (its footprint stretched back to its trail) smoothly merged into the pool; radius 0 = no meat
+    void BlendMeat(inout float d, float2 p, float4 M, float2 T)
     {
-        float d = length(p) - PoolR * sqrt(saturate(Amount));
-        if (MeatR > 0.01)
+        if (M.z > 0.01)
         {
-            float2 pa = p - MeatPos;
-            float2 ba = TrailPos - MeatPos;
+            float2 pa = p - M.xy;
+            float2 ba = T - M.xy;
             float h = saturate(dot(pa, ba) / max(dot(ba, ba), 1e-4));
-            float dm = length(pa - ba * h) - (MeatR + Margin * Amount);
+            float dm = length(pa - ba * h) - (M.z + Margin * Amount);
             float k = max(Blend, 1e-3);
             float t = saturate(0.5 + 0.5 * (dm - d) / k);
             d = lerp(dm, d, t) - k * t * (1.0 - t);
         }
+    }
+    // signed distance to the pool edge (cm, negative inside)
+    float Sdf(float2 p)
+    {
+        float d = length(p) - PoolR * sqrt(saturate(Amount));
+        BlendMeat(d, p, M0, T0);
+        BlendMeat(d, p, M1, T1);
+        BlendMeat(d, p, M2, T2);
+        BlendMeat(d, p, M3, T3);
+        BlendMeat(d, p, M4, T4);
+        BlendMeat(d, p, M5, T5);
         d += (Noise(p * 0.9) - 0.5) * Wobble;
         return max(d, length(p) - BaseR - 0.6);          // the pool cannot climb the wall
     }
+    // the simmer near one meat: the band around it bubbles harder (the strongest band wins), nothing bubbles under it
+    void Near(float2 p, float4 M, float SimW, inout float nearMeat, inout float under)
+    {
+        if (M.z > 0.01)
+        {
+            float dm = length(p - M.xy) - M.z;
+            nearMeat = max(nearMeat, smoothstep(-0.4, 0.0, dm) * (1.0 - smoothstep(SimW * 0.4, SimW, dm)));
+            under = min(under, smoothstep(-0.5, 0.0, dm));
+        }
+    }
 };
 FPanPool pool;
-pool.MeatPos = Meat.xy; pool.MeatR = Meat.z; pool.TrailPos = Trail.xy;
+pool.M0 = Meat; pool.M1 = Meat1; pool.M2 = Meat2; pool.M3 = Meat3; pool.M4 = Meat4; pool.M5 = Meat5;
+pool.T0 = Trail.xy; pool.T1 = Trail1.xy; pool.T2 = Trail2.xy; pool.T3 = Trail3.xy; pool.T4 = Trail4.xy; pool.T5 = Trail5.xy;
 pool.Amount = OilAmount; pool.PoolR = PoolR; pool.Margin = Margin; pool.Blend = Blend; pool.Wobble = Wobble; pool.BaseR = BaseR;
 
 float2 p = P.xy;
@@ -122,19 +144,19 @@ float rim = smoothstep(-soft * 2.5, -soft * 0.5, d) * (1.0 - smoothstep(-soft * 
 float2 nxy = g * rim * Meniscus;
 
 // simmer: small domes that swell and pop wherever there is oil. Sizzle sets how many cells are alive and speeds
-// them up; a band around the meat (Simmer Width) bubbles harder; nothing bubbles under the meat.
+// them up; a band around each meat (Simmer Width) bubbles harder; nothing bubbles under a meat.
 float bubble = 0.0;
 float bubbleRim = 0.0;
 if (Sizzle > 0.001)
 {
     float nearMeat = 0.0;
     float under = 1.0;
-    if (Meat.z > 0.01)
-    {
-        float dm = length(p - Meat.xy) - Meat.z;
-        nearMeat = smoothstep(-0.4, 0.0, dm) * (1.0 - smoothstep(SimW * 0.4, SimW, dm));
-        under = smoothstep(-0.5, 0.0, dm);
-    }
+    pool.Near(p, Meat, SimW, nearMeat, under);
+    pool.Near(p, Meat1, SimW, nearMeat, under);
+    pool.Near(p, Meat2, SimW, nearMeat, under);
+    pool.Near(p, Meat3, SimW, nearMeat, under);
+    pool.Near(p, Meat4, SimW, nearMeat, under);
+    pool.Near(p, Meat5, SimW, nearMeat, under);
     float gate = film * under * saturate(0.75 + 0.25 * Sizzle + SimNear * nearMeat);
     float2 gc = p / SimCell;
     float2 id = floor(gc);
@@ -244,6 +266,15 @@ PAN_SURFACE = """struct FPanSurf
         return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),
                     lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);
     }
+    // what one meat's dark reflection leaves of the colour at p (1 away from it; radius 0 = no meat)
+    float MeatShade(float2 p, float4 M, float Strength, float ContactSoft)
+    {
+        if (M.z <= 0.01)
+        {
+            return 1.0;
+        }
+        return 1.0 - (1.0 - smoothstep(M.z * 0.6, M.z + ContactSoft, length(p - M.xy))) * Strength;
+    }
 };
 FPanSurf s;
 float2 p = P.xy;
@@ -288,11 +319,10 @@ rough = lerp(rough, rough * 0.55, wet);
 col *= 1.0 - saturate(BubbleRim * SimRimDark) * inside;
 col = lerp(col, col * OilTint, Bubble * inside * 0.5);
 
-// the meat's dark reflection, which the reflection capture cannot give
-if (Meat.z > 0.01)
-{
-    col *= 1.0 - (1.0 - smoothstep(Meat.z * 0.6, Meat.z + ContactSoft, length(p - Meat.xy))) * Contact * inside;
-}
+// each meat's dark reflection, which the reflection capture cannot give
+float shade = Contact * inside;
+col *= s.MeatShade(p, Meat, shade, ContactSoft) * s.MeatShade(p, Meat1, shade, ContactSoft) * s.MeatShade(p, Meat2, shade, ContactSoft)
+     * s.MeatShade(p, Meat3, shade, ContactSoft) * s.MeatShade(p, Meat4, shade, ContactSoft) * s.MeatShade(p, Meat5, shade, ContactSoft);
 
 n.xy += p / max(r, 1e-3) * ring * RingStrength * 0.25 * (1.0 - film);
 n = lerp(n, float3(0.0, 0.0, 1.0), film * OilLevel);                                   // a liquid lies level

@@ -11,11 +11,21 @@
 // tilt and the toss) and the left follows the feed node, resting in front of the platter between transfers.
 //
 // Per piece: its own cube, its own cook state and Custom Primitive Data (from that piece's face sears only, never another's),
-// its own seared burst. Aggregate (the pan material has ONE meat footprint): the footprint, and so the oil pool and the FX
-// riding the footprint node, follows the most recently admitted piece that lies on the pan (Cooking or Ready); with none on
-// the pan there is no pool and the footprint stays where it was. The oil trail lags that footprint, and the sizzle ramp
-// follows the kernel's aggregate sizzle (full while any cooking piece sizzles; a hiss while only seared faces lie on the
-// hot pan). Face values are never averaged across pieces.
+// its own seared burst and its own oil pool. The pan material has k_PoolSlots meat footprints and oil trails; the pieces
+// that lie on the pan (Cooking or Ready) fill them in admission order and an unused slot has radius 0 (no pool). Each
+// piece's trail lags its own footprint, and a piece that leaves the pan keeps its last footprint while its slot goes dark.
+// The beads' box covers every piece on the pan; the footprint node, and the splatter on it, follows the most recently
+// admitted piece that lies on the pan and stays where it was with none there. The sizzle ramp follows the kernel's
+// aggregate sizzle (full while any cooking piece sizzles; a hiss while only seared faces lie on the hot pan). Face values
+// are never averaged across pieces. The sizzle loop plays from the pan while the ramp is up, at the ramp's volume.
+
+// Whether a piece's visual holds one of the pan material's oil pools.
+enum EMars_SearingStation_Pool
+{
+    None,
+    Pooled
+}
+
 struct FMars_SearingStation_PieceVisual
 {
     FMars_CookingFeed_PieceId Id;
@@ -24,6 +34,12 @@ struct FMars_SearingStation_PieceVisual
     FCk_Handle_UnrealComponent Part;
     // This piece's look; a lost piece keeps its last one.
     FMars_CookState CookState;
+    // Art cm in the pan mesh's frame (the pan material's units): where the piece last lay on the pan, and its oil trail
+    // lagging that. A piece off the pan keeps both.
+    FVector2D Footprint;
+    FVector2D Trail;
+    // Pooled while it lies on the pan and is not lost: only then does it fill a pool slot and widen the beads' box.
+    EMars_SearingStation_Pool Pool = EMars_SearingStation_Pool::None;
 }
 
 class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
@@ -117,14 +133,18 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 FondStart = 0.1f;
     private const float32 FondRate = 0.02f;
     private const float32 TrailLagSeconds = 0.25f;
+    // The pan material's Meat Footprint / Oil Trail pairs (slot 0 unsuffixed, then 1..5): one pool per piece the Searing
+    // spec's Supply.MaxPieces lets onto the pan (6 by default); DoConstruct ensures it allows no more.
+    private const int32 k_PoolSlots = 6;
     private const float32 OilCoatOnPan = 0.7f;
     private const float32 OilCoatOffPan = 0.3f;
     // Per second toward the target.
     private const float32 OilCoatRate = 1.0f;
 
-    // The oil beads (OilBubbles_Mars_NS): one box over the whole pool, lengths in art cm (times PanScale).
+    // The oil beads (OilBubbles_Mars_NS): one box over every pool, lengths in art cm (times PanScale).
     private const float32 BubbleRate = 25.0f;
-    // The box half extent per cube half extent (the art's 3.5 cm around its 2 cm half cube).
+    // The box half extent around one cube per cube half extent (the art's 3.5 cm around its 2 cm half cube); the spread of
+    // the pieces on the pan widens it.
     private const float32 BubbleOuterPerHalf = 1.75f;
     private const float32 BubbleStartDepth = 0.3f;
     private const float32 BubbleRadiusMin = 0.12f;
@@ -145,9 +165,14 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 SplatterLife = 2.0f;
     private const float32 SplatterArc = 0.8f;
     private const FLinearColor SplatterColour = FLinearColor(0.1f, 0.045f, 0.012f, 1.0f);
-    // The beads run while the sizzle ramp is above this.
+    // The beads run, and the sizzle loop plays, while the sizzle ramp is above this.
     private const float32 FxActiveThreshold = 0.05f;
-    // uu the steak must move before the footprint node is written again.
+    // The sizzle loop (FryingPanSizzle_Looping_Cue, which carries its own close-range attenuation and sound class) plays at
+    // the ramp times SizzleSoundVolume; its volume is rewritten only past SizzleSoundVolumeTolerance. The ramp's rise and
+    // fall are its fades.
+    private const float32 SizzleSoundVolume = 1.0f;
+    private const float32 SizzleSoundVolumeTolerance = 0.01f;
+    // uu the steak must move before the footprint node (or the beads' node or box) is written again.
     private const float64 k_FootprintWriteTolerance = 0.01;
 
     // The pan's cooking look, set once on its dynamic instance.
@@ -204,8 +229,10 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_UnrealComponent _EmberPart;
     private UMaterialInstanceDynamic _EmberMaterial;
     private FCk_Handle_UnrealComponent _PanPart;
-    // At the steak's pan-local XY on the cooking surface, unit scale: the oil FX ride it.
+    // At the newest piece's pan-local XY on the cooking surface, unit scale: the splatter rides it.
     private FCk_Handle_SceneNode _FootprintNode;
+    // At the middle of every piece on the pan, on the cooking surface, unit scale: the beads ride it.
+    private FCk_Handle_SceneNode _BubblesNode;
     private FCk_Handle_UnrealComponent _BubblesPart;
     private FCk_Handle_UnrealComponent _SplatterPart;
     // The right glove's grip: the pan handle, under the pan node so it rides the tilt and the toss.
@@ -235,15 +262,27 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private bool _SplatterActive = false;
     private UNiagaraComponent _SearedBurst;
 
-    // The dressing's own lag state, advanced every frame whether or not the components exist (the footprint node moves
-    // under nullrhi too).
-    // Art cm in the pan mesh's frame: (x, y, radius, 0); radius 0 while no cube rests on the pan.
-    private FVector4 _Footprint = FVector4(0.0, 0.0, 0.0, 0.0);
-    private FVector2D _Trail = FVector2D(0.0, 0.0);
-    // The footprint node's last written offset (it is created at the origin): an idle station writes nothing.
+    // The pan material's pool slot names, slot 0 first (DoConstruct builds them once).
+    private TArray<FName> _FootprintParameterNames;
+    private TArray<FName> _TrailParameterNames;
+
+    // The dressing's own lag state, advanced every frame whether or not the components exist (the nodes move under nullrhi
+    // too); each piece's footprint and trail live on its visual.
+    // The footprint node's and the beads' node's last written offsets (both are created at the origin): an idle station
+    // writes nothing.
     private FVector _WrittenFootprint = FVector::ZeroVector;
+    private FVector _WrittenBubblesCentre = FVector::ZeroVector;
+    // uu: how far apart the pieces on the pan lie (their footprints' bounding box), and the bead box size last written.
+    private FVector2D _BubbleSpread = FVector2D(0.0, 0.0);
+    private FVector2D _WrittenBubbleExtent = FVector2D(0.0, 0.0);
     private float32 _SizzleRamp = 0.0f;
     private float32 _Fond = FondStart;
+
+    // The sizzle loop: local only, spawned on the pan mesh's component the first time the pan sizzles (so it rides the tilt
+    // and the toss), then played and stopped with the ramp. Unset until the playing loop's volume is first written.
+    private USoundBase _SizzleSound;
+    private UAudioComponent _SizzleAudio;
+    private TOptional<float32> _WrittenSizzleVolume;
 
     // The base composes the transform, the visuals and nodes (AddVisuals: the pan node and its body) and the Station
     // (Configure_Spec, grips on the registered nodes); the pan Implement and the minigame need them, so they come after.
@@ -257,6 +296,10 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _SearingSpec.Steak.ContactGraceSeconds = SteakContactGraceSeconds;
         _SearingSpec.Steak.HalfSize = CubeHalf * CubeScale;
         _SearingSpec.Loss.PanRadius = PanRimRadius * PanScale;
+        // A piece past the material's last pool slot would sear without any oil around it.
+        ck::EnsureIfNot(_SearingSpec.Supply.MaxPieces <= k_PoolSlots,
+            f"[SearingStation] lets {_SearingSpec.Supply.MaxPieces} pieces onto the pan but its material has only {k_PoolSlots} pools");
+        Build_PoolParameterNames();
 
         const auto Flow = Super::DoConstruct(InHandle);
 
@@ -329,7 +372,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         Refresh_All();
     }
 
-    // The oil FX and the pan are hosted components: they die with their entities. Only the seared burst is spawned loose.
+    // The oil FX and the pan are hosted components: they die with their entities. Only the seared burst and the sizzle loop
+    // are spawned loose.
     UFUNCTION(BlueprintOverride)
     void DoEndPlay(FCk_Handle InHandle)
     {
@@ -354,6 +398,15 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         { _SearedBurst.DestroyComponent(); }
 
         _SearedBurst = nullptr;
+
+        if (ck::IsValid(_SizzleAudio))
+        {
+            _SizzleAudio.Stop();
+            _SizzleAudio.DestroyComponent();
+        }
+
+        _SizzleAudio = nullptr;
+        _WrittenSizzleVolume.Reset();
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -423,6 +476,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         AddPan(InRoot);
         AddOilFx();
+        _SizzleSound = assets::load::FryingPanSizzle_Looping_Cue();
         AddPlatter(InRoot);
 
         _Label = AddLabel(InRoot,
@@ -466,13 +520,16 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         _FootprintNode = utils_scene_node::Create(PanMeshTransform, FTransform::Identity);
         utils_entity_tag::Add(_FootprintNode, n"TAG_MarsSearingFootprint");
+        _BubblesNode = utils_scene_node::Create(PanMeshTransform, FTransform::Identity);
 
-        // Grip frame (X across the palm toward the index finger, Z out of the palm), in the mesh's frame: along the handle
-        // toward the pan (-X, descending toward it), palm facing the operator's left (the mesh's +Y) - a handshake grip.
+        // A right-hand handshake grip on the handle, which descends toward the pan (-X) in the mesh's frame: palm facing the
+        // operator's left (the mesh's +Y), fingers curling down round the handle square to it, the hand leading to the pan.
         const auto PitchRadians = Math::DegreesToRadians(float64(HandleGripPitchDegrees));
         const auto HandleDirection = FVector(-Math::Cos(PitchRadians), 0.0, -Math::Sin(PitchRadians));
+        const auto HandleFingers = HandleDirection.CrossProduct(FVector::RightVector);
         _HandleGripNode = utils_scene_node::Create(PanMeshTransform,
-            FTransform(FRotator::MakeFromXZ(HandleDirection, FVector::RightVector), HandleGripLocal * Scale)).As_Transform();
+            FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, HandleFingers, FVector::RightVector),
+                HandleGripLocal * Scale)).As_Transform();
 
         // Over the pan's centre, clear of the rim by a cube's half extent and ReleaseClearance: it tilts and tosses with the
         // pan, so a release lands where the pan is.
@@ -481,9 +538,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     }
 
     // The raw platter: a slab on the table's left with one raw cube per slot (each on its RawSlot node, tagged so a test can
-    // find them), the feed node the left glove follows (at rest in front of the platter; palm down, fingers forward: grip
-    // frame X across the palm toward the index finger, Z out of the palm) and the cube that rides that glove, in its palm,
-    // hidden until a piece is grasped. The presentation's geometry is authored here, in the station frame.
+    // find them), the feed node the left glove follows (at rest in front of the platter, palm down, fingers forward) and the
+    // cube that rides that glove, in its palm, hidden until a piece is grasped. The presentation's geometry is authored here,
+    // in the station frame.
     private void AddPlatter(FCk_Handle_Transform& InRoot)
     {
         const auto CubeExtent = float64(CubeHalf * CubeScale);
@@ -498,10 +555,10 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         Platter.PrimaryColor = TOptional<FLinearColor>(k_StoveColor);
         InRoot.Add_MeshPart(this, Platter);
 
-        const auto HandRotation = FQuat(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector));
+        const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
         auto& Geometry = _FeedPresentation.Geometry;
         Geometry.RestLocal = FTransform(HandRotation, FVector(FeedRestLocal.X, FeedRestLocal.Y, TableHeight + PalmLift));
-        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent along the glove's Z.
+        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
         Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + CubeExtent));
         Geometry.SlotsLocal.Empty();
 
@@ -537,15 +594,15 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         { utils_entity_tag::Add(_CarryProxyPart, n"TAG_MarsSearingCarriedPiece"); }
     }
 
-    // The beads and the splatter, hosted on the footprint node (unit scale: Niagara would inherit a scaled parent's scale).
-    // Created inactive; the dressing tick runs them.
+    // The beads on their own node (over every piece) and the splatter on the footprint node (the newest piece), both unit
+    // scale: Niagara would inherit a scaled parent's scale. Created inactive; the dressing tick runs them.
     private void AddOilFx()
     {
-        _BubblesPart = AddFx(assets::load::OilBubbles_Mars_NS(), n"SearingStation_OilBubbles");
-        _SplatterPart = AddFx(assets::load::OilSplatter_Mars_NS(), n"SearingStation_OilSplatter");
+        _BubblesPart = AddFx(_BubblesNode, assets::load::OilBubbles_Mars_NS(), n"SearingStation_OilBubbles");
+        _SplatterPart = AddFx(_FootprintNode, assets::load::OilSplatter_Mars_NS(), n"SearingStation_OilSplatter");
     }
 
-    private FCk_Handle_UnrealComponent AddFx(UNiagaraSystem InSystem, FName InDebugName)
+    private FCk_Handle_UnrealComponent AddFx(FCk_Handle_SceneNode& InNode, UNiagaraSystem InSystem, FName InDebugName)
     {
         auto Archetype = NewObject(this, UNiagaraComponent);
         Archetype.SetMobility(EComponentMobility::Movable);
@@ -554,7 +611,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
             Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        return utils_unreal_component::Add(_FootprintNode, ComponentParams);
+        return utils_unreal_component::Add(InNode, ComponentParams);
     }
 
     // A piece's look: the meat cube at its own scale on the piece entity (Jolt owns the entity's pose; the kernel never
@@ -611,12 +668,15 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
         Advance_Feed(DeltaSeconds);
-        Advance_Footprint(DeltaSeconds);
+        Advance_Pools(DeltaSeconds);
+        Advance_FootprintNode();
+        Advance_BubblesNode();
         Advance_Sizzle(DeltaSeconds);
         Advance_PieceVisuals(DeltaSeconds);
         Apply_PanMaterial();
         Apply_PieceCpd();
         Apply_OilFx();
+        Apply_SizzleSound();
         Refresh_Label();
     }
 
@@ -650,33 +710,87 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         Component.SetVisibility(InVisible);
     }
 
-    // The aggregate footprint (see the file header): the pan-local XY (in art cm, the pan material's units) of the most
-    // recently admitted piece lying on the pan, with the cube's radius; no such piece = radius 0 (no pool hugs a flying or
-    // absent cube) and the footprint stays where it was. The trail lags it by TrailLagSeconds.
-    private void Advance_Footprint(float32 InDeltaSeconds)
+    // Every piece's pool (see the file header): a piece that lies on the pan and is not lost has its footprint at its
+    // pan-local XY (in art cm, the pan material's units); one off the pan (flying, lost, or gone from the kernel and about
+    // to be dropped) keeps its last footprint and fills no slot, so no pool hugs a flying or absent cube. Each trail lags its
+    // own footprint by TrailLagSeconds.
+    private void Advance_Pools(float32 InDeltaSeconds)
     {
         const auto Scale = float64(PanScale);
-        auto Local = FVector(_Footprint.X * Scale, _Footprint.Y * Scale, 0.0);
-        auto HasPool = false;
-        const auto PieceId = TryGet_FootprintPiece();
-        if (PieceId.IsSet())
-        {
-            Local = _SearingHandle.Get_PiecePanLocal(PieceId.GetValue());
-            HasPool = true;
-        }
-
-        _Footprint = FVector4(Local.X / Scale, Local.Y / Scale, HasPool ? float64(Get_CubeFootprint()) : 0.0, 0.0);
-
         const auto Alpha = 1.0 - Math::Exp(-float64(InDeltaSeconds) / float64(TrailLagSeconds));
-        _Trail = FVector2D(_Trail.X + (_Footprint.X - _Trail.X) * Alpha, _Trail.Y + (_Footprint.Y - _Trail.Y) * Alpha);
+        for (int32 Index = 0; Index < _PieceVisuals.Num(); ++Index)
+        {
+            auto Visual = _PieceVisuals[Index];
+            const auto Pooled = _SearingHandle.Get_HasPiece(Visual.Id) && Get_IsLiveOnPan(Visual.Id);
+            Visual.Pool = Pooled ? EMars_SearingStation_Pool::Pooled : EMars_SearingStation_Pool::None;
+            if (Pooled)
+            {
+                const auto Local = _SearingHandle.Get_PiecePanLocal(Visual.Id);
+                Visual.Footprint = FVector2D(Local.X / Scale, Local.Y / Scale);
+            }
 
-        const auto FootprintLocation = FVector(Local.X, Local.Y, 0.0);
-        if (FootprintLocation.Distance(_WrittenFootprint) <= k_FootprintWriteTolerance)
+            Visual.Trail = FVector2D(Visual.Trail.X + (Visual.Footprint.X - Visual.Trail.X) * Alpha,
+                Visual.Trail.Y + (Visual.Footprint.Y - Visual.Trail.Y) * Alpha);
+            _PieceVisuals[Index] = Visual;
+        }
+    }
+
+    // The splatter's node follows the newest piece on the pan; with none there it stays where it was.
+    private void Advance_FootprintNode()
+    {
+        const auto PieceId = TryGet_FootprintPiece();
+        if (PieceId.IsSet() == false)
         { return; }
 
-        utils_scene_node::Request_UpdateOffset(_FootprintNode,
-            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator::ZeroRotator, FootprintLocation)));
-        _WrittenFootprint = FootprintLocation;
+        const auto Local = _SearingHandle.Get_PiecePanLocal(PieceId.GetValue());
+        _WrittenFootprint = Write_NodeOffset(_FootprintNode, FVector(Local.X, Local.Y, 0.0), _WrittenFootprint);
+    }
+
+    // The beads' node sits at the middle of the footprints of every piece on the pan and their spread widens the bead box;
+    // with none there both stay as they were.
+    private void Advance_BubblesNode()
+    {
+        auto Min = FVector2D(0.0, 0.0);
+        auto Max = FVector2D(0.0, 0.0);
+        auto OnPanCount = 0;
+        for (const auto& Visual : _PieceVisuals)
+        {
+            if (Visual.Pool == EMars_SearingStation_Pool::None)
+            { continue; }
+
+            if (OnPanCount == 0)
+            {
+                Min = Visual.Footprint;
+                Max = Visual.Footprint;
+            }
+            else
+            {
+                Min = FVector2D(Math::Min(Min.X, Visual.Footprint.X), Math::Min(Min.Y, Visual.Footprint.Y));
+                Max = FVector2D(Math::Max(Max.X, Visual.Footprint.X), Math::Max(Max.Y, Visual.Footprint.Y));
+            }
+
+            OnPanCount += 1;
+        }
+
+        if (OnPanCount == 0)
+        { return; }
+
+        const auto Scale = float64(PanScale);
+        _BubbleSpread = FVector2D((Max.X - Min.X) * Scale, (Max.Y - Min.Y) * Scale);
+        const auto Centre = FVector((Min.X + Max.X) * 0.5 * Scale, (Min.Y + Max.Y) * 0.5 * Scale, 0.0);
+        _WrittenBubblesCentre = Write_NodeOffset(_BubblesNode, Centre, _WrittenBubblesCentre);
+    }
+
+    // Moves InNode to InOffset (pan mesh frame) unless it is within k_FootprintWriteTolerance of InWritten, the offset
+    // last written; returns the offset now written.
+    private FVector Write_NodeOffset(FCk_Handle_SceneNode& InNode, FVector InOffset, FVector InWritten)
+    {
+        if (InOffset.Distance(InWritten) <= k_FootprintWriteTolerance)
+        { return InWritten; }
+
+        utils_scene_node::Request_UpdateOffset(InNode,
+            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator::ZeroRotator, InOffset)));
+        return InOffset;
     }
 
     // The newest piece (admission order) that is not lost and lies on the pan; unset when none does.
@@ -714,6 +828,62 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         if (IsSizzling)
         { _Fond = Math::Min(1.0f, _Fond + FondRate * InDeltaSeconds); }
+    }
+
+    // The loop plays while the ramp is above FxActiveThreshold, at the ramp's volume, and stops at once under it (near silent
+    // by then). It plays again whenever it should be and is not, so a voice the engine dropped comes back. It waits for the
+    // pan mesh's component, and nothing spawns where there is no audio device.
+    private void Apply_SizzleSound()
+    {
+        if (_SizzleRamp <= FxActiveThreshold)
+        {
+            if (ck::IsValid(_SizzleAudio) && _SizzleAudio.IsPlaying())
+            { _SizzleAudio.Stop(); }
+
+            _WrittenSizzleVolume.Reset();
+            return;
+        }
+
+        const auto Volume = _SizzleRamp * SizzleSoundVolume;
+        if (ck::Is_NOT_Valid(_SizzleAudio))
+        {
+            _SizzleAudio = Spawn_SizzleAudio(Volume);
+            _WrittenSizzleVolume = Volume;
+            return;
+        }
+
+        if (_SizzleAudio.IsPlaying() == false)
+        {
+            _SizzleAudio.SetVolumeMultiplier(Volume);
+            _SizzleAudio.Play();
+            _WrittenSizzleVolume = Volume;
+            return;
+        }
+
+        if (_WrittenSizzleVolume.IsSet() && Math::Abs(Volume - _WrittenSizzleVolume.GetValue()) <= SizzleSoundVolumeTolerance)
+        { return; }
+
+        _SizzleAudio.SetVolumeMultiplier(Volume);
+        _WrittenSizzleVolume = Volume;
+    }
+
+    // Kept after it stops (a loop never completes) and destroyed in DoEndPlay. Null until the pan mesh's component exists,
+    // and under -nosound.
+    private UAudioComponent Spawn_SizzleAudio(float32 InVolume) const
+    {
+        if (ck::Is_NOT_Valid(_SizzleSound) || ck::Is_NOT_Valid(_PanPart))
+        { return nullptr; }
+
+        auto Pan = Cast<USceneComponent>(utils_unreal_component::Get_Component(_PanPart));
+        if (ck::Is_NOT_Valid(Pan))
+        { return nullptr; }
+
+        const auto StopWhenAttachedToDestroyed = true;
+        const auto AutoDestroy = false;
+        const auto Pitch = 1.0f;
+        const auto StartTime = 0.0f;
+        return Gameplay::SpawnSoundAttached(_SizzleSound, Pan, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator,
+            EAttachLocation::KeepRelativeOffset, StopWhenAttachedToDestroyed, InVolume, Pitch, StartTime, nullptr, nullptr, AutoDestroy);
     }
 
     private bool Get_IsAnySearedFaceOnPan() const
@@ -764,7 +934,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         }
     }
 
-    // The driven group on the pan's dynamic instance, in the pan mesh's own cm.
+    // The driven group on the pan's dynamic instance, in the pan mesh's own cm: the pieces on the pan fill the pool slots
+    // in admission order, each with its footprint (x, y, the cube's radius) and its trail; every other slot keeps its xy
+    // and gets radius 0.
     private void Apply_PanMaterial()
     {
         if (Resolve_PanMaterial() == false)
@@ -773,9 +945,42 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _PanMaterial.SetScalarParameterValue(n"Oil Amount", _SearingHandle.Get_IsHot() ? OilAmountHot : OilAmountCold);
         _PanMaterial.SetScalarParameterValue(n"Sizzle", _SizzleRamp);
         _PanMaterial.SetScalarParameterValue(n"Fond", _Fond);
-        _PanMaterial.SetVectorParameterValue(n"Meat Footprint",
-            FLinearColor(float32(_Footprint.X), float32(_Footprint.Y), float32(_Footprint.Z), 0.0f));
-        _PanMaterial.SetVectorParameterValue(n"Oil Trail", FLinearColor(float32(_Trail.X), float32(_Trail.Y), 0.0f, 0.0f));
+
+        const auto Radius = Get_CubeFootprint();
+        auto Slot = 0;
+        for (const auto& Visual : _PieceVisuals)
+        {
+            if (Visual.Pool == EMars_SearingStation_Pool::None || Slot >= k_PoolSlots)
+            { continue; }
+
+            _PanMaterial.SetVectorParameterValue(_FootprintParameterNames[Slot],
+                FLinearColor(float32(Visual.Footprint.X), float32(Visual.Footprint.Y), Radius, 0.0f));
+            _PanMaterial.SetVectorParameterValue(_TrailParameterNames[Slot],
+                FLinearColor(float32(Visual.Trail.X), float32(Visual.Trail.Y), 0.0f, 0.0f));
+            Slot += 1;
+        }
+
+        while (Slot < k_PoolSlots)
+        {
+            const auto Footprint = _PanMaterial.GetVectorParameterValue(_FootprintParameterNames[Slot]);
+            _PanMaterial.SetVectorParameterValue(_FootprintParameterNames[Slot], FLinearColor(Footprint.R, Footprint.G, 0.0f, 0.0f));
+            Slot += 1;
+        }
+    }
+
+    // "Meat Footprint" / "Oil Trail" for slot 0 (the names the material had before it had slots), then "Meat Footprint 1" /
+    // "Oil Trail 1" up to k_PoolSlots - 1.
+    private void Build_PoolParameterNames()
+    {
+        _FootprintParameterNames.Empty();
+        _TrailParameterNames.Empty();
+        _FootprintParameterNames.Add(n"Meat Footprint");
+        _TrailParameterNames.Add(n"Oil Trail");
+        for (int32 Slot = 1; Slot < k_PoolSlots; ++Slot)
+        {
+            _FootprintParameterNames.Add(FName(f"Meat Footprint {Slot}"));
+            _TrailParameterNames.Add(FName(f"Oil Trail {Slot}"));
+        }
     }
 
     // Every piece's cube with its own cook state, once its component exists.
@@ -804,6 +1009,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         if (ck::IsValid(_Bubbles))
         {
+            Write_BubbleExtent(_Bubbles);
             _Bubbles.SetVariableFloat(n"SpawnRate", BubbleRate * _SizzleRamp);
             _BubblesActive = Set_FxActive(_Bubbles, _BubblesActive, _SizzleRamp > FxActiveThreshold);
         }
@@ -917,12 +1123,11 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         }
     }
 
-    // One box over the whole pool around the cube (the cube hides what spawns under it); the oil surface is the
-    // footprint node's Z 0 plus OilLevel.
+    // The oil surface is the beads' node's Z 0 plus OilLevel; the box (Write_BubbleExtent) follows the pieces.
     private void Apply_BubbleParameters(UNiagaraComponent InBubbles)
     {
-        const auto Extent = float64(2.0f * BubbleOuterPerHalf * Get_CubeHalfInPanCm() * PanScale);
-        InBubbles.SetVariableVec2(n"SpawnExtent", FVector2D(Extent, Extent));
+        _WrittenBubbleExtent = FVector2D(0.0, 0.0);
+        Write_BubbleExtent(InBubbles);
         InBubbles.SetVariableFloat(n"SpawnRate", 0.0f);
         InBubbles.SetVariableFloat(n"SurfaceZ", OilLevel * PanScale);
         InBubbles.SetVariableFloat(n"StartDepth", BubbleStartDepth * PanScale);
@@ -933,6 +1138,20 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         InBubbles.SetVariableFloat(n"WobbleAmplitude", BubbleWobble * PanScale);
         InBubbles.SetVariableFloat(n"RiseFraction", BubbleRise);
         InBubbles.SetVariableLinearColor(n"LiquidColour", OilColour);
+    }
+
+    // One box over every pool (the cubes hide what spawns under them): the box around one cube, widened by the pieces'
+    // spread. Written only when it changes.
+    private void Write_BubbleExtent(UNiagaraComponent InBubbles)
+    {
+        const auto Single = float64(2.0f * BubbleOuterPerHalf * Get_CubeHalfInPanCm() * PanScale);
+        const auto Extent = FVector2D(Single + _BubbleSpread.X, Single + _BubbleSpread.Y);
+        if (Math::Abs(Extent.X - _WrittenBubbleExtent.X) <= k_FootprintWriteTolerance
+            && Math::Abs(Extent.Y - _WrittenBubbleExtent.Y) <= k_FootprintWriteTolerance)
+        { return; }
+
+        InBubbles.SetVariableVec2(n"SpawnExtent", Extent);
+        _WrittenBubbleExtent = Extent;
     }
 
     // Flung from the cube's footprint edge on the oil surface.

@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "52646de668c2d305c6d2d67c99c45e9c",
+		"sourceHash": "76e301e9c8bf343e4c128ad6686a43a0",
 		"exporterVersion": 3
 	},
 	"blendMode": "BLEND_Opaque",
@@ -21,7 +21,7 @@
 		"Time": 1,
 		"Transform": 2,
 		"TransformPosition": 1,
-		"VectorParameter": 7,
+		"VectorParameter": 17,
 		"VertexNormalWS": 1,
 		"WorldPosition": 1
 	},
@@ -1006,6 +1006,76 @@
 						"name": "SimNear",
 						"node": 47,
 						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "Meat1",
+						"node": 64,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 20,
+						"name": "Meat2",
+						"node": 65,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 21,
+						"name": "Meat3",
+						"node": 66,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 22,
+						"name": "Meat4",
+						"node": 67,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 23,
+						"name": "Meat5",
+						"node": 68,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 24,
+						"name": "Trail1",
+						"node": 69,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 25,
+						"name": "Trail2",
+						"node": 70,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 26,
+						"name": "Trail3",
+						"node": 71,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 27,
+						"name": "Trail4",
+						"node": 72,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 28,
+						"name": "Trail5",
+						"node": 73,
+						"output": 5,
+						"mask": "rgba"
 					}
 				],
 				"outputs": [
@@ -1015,7 +1085,7 @@
 				],
 				"props":
 				{
-					"Code": "struct FPanPool\n{\n    float2 MeatPos; float MeatR; float2 TrailPos;\n    float Amount; float PoolR; float Margin; float Blend; float Wobble; float BaseR;\n\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float Noise(float2 p)\n    {\n        float2 i = floor(p);\n        float2 f = frac(p);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),\n                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);\n    }\n    // signed distance to the pool edge (cm, negative inside)\n    float Sdf(float2 p)\n    {\n        float d = length(p) - PoolR * sqrt(saturate(Amount));\n        if (MeatR > 0.01)\n        {\n            float2 pa = p - MeatPos;\n            float2 ba = TrailPos - MeatPos;\n            float h = saturate(dot(pa, ba) / max(dot(ba, ba), 1e-4));\n            float dm = length(pa - ba * h) - (MeatR + Margin * Amount);\n            float k = max(Blend, 1e-3);\n            float t = saturate(0.5 + 0.5 * (dm - d) / k);\n            d = lerp(dm, d, t) - k * t * (1.0 - t);\n        }\n        d += (Noise(p * 0.9) - 0.5) * Wobble;\n        return max(d, length(p) - BaseR - 0.6);          // the pool cannot climb the wall\n    }\n};\nFPanPool pool;\npool.MeatPos = Meat.xy; pool.MeatR = Meat.z; pool.TrailPos = Trail.xy;\npool.Amount = OilAmount; pool.PoolR = PoolR; pool.Margin = Margin; pool.Blend = Blend; pool.Wobble = Wobble; pool.BaseR = BaseR;\n\nfloat2 p = P.xy;\nfloat d = pool.Sdf(p);\nfloat on = saturate(OilAmount * 20.0);\nfloat soft = max(EdgeSoft, 1e-3);\nfloat film = (1.0 - smoothstep(-soft, 0.0, d)) * on;\n\n// meniscus: the film's edge leans outward, which is where the highlight catches\nfloat2 e = float2(0.06, 0.0);\nfloat2 g = float2(pool.Sdf(p + e.xy) - pool.Sdf(p - e.xy), pool.Sdf(p + e.yx) - pool.Sdf(p - e.yx));\ng /= max(length(g), 1e-4);\nfloat rim = smoothstep(-soft * 2.5, -soft * 0.5, d) * (1.0 - smoothstep(-soft * 0.5, soft * 0.5, d)) * on;\nfloat2 nxy = g * rim * Meniscus;\n\n// simmer: small domes that swell and pop wherever there is oil. Sizzle sets how many cells are alive and speeds\n// them up; a band around the meat (Simmer Width) bubbles harder; nothing bubbles under the meat.\nfloat bubble = 0.0;\nfloat bubbleRim = 0.0;\nif (Sizzle > 0.001)\n{\n    float nearMeat = 0.0;\n    float under = 1.0;\n    if (Meat.z > 0.01)\n    {\n        float dm = length(p - Meat.xy) - Meat.z;\n        nearMeat = smoothstep(-0.4, 0.0, dm) * (1.0 - smoothstep(SimW * 0.4, SimW, dm));\n        under = smoothstep(-0.5, 0.0, dm);\n    }\n    float gate = film * under * saturate(0.75 + 0.25 * Sizzle + SimNear * nearMeat);\n    float2 gc = p / SimCell;\n    float2 id = floor(gc);\n    float r1 = pool.Hash(id + 3.7);\n    float ph = T * SimRate * (0.75 + 0.5 * saturate(Sizzle)) * (0.6 + 0.8 * r1) + pool.Hash(id + 11.3);\n    float cyc = floor(ph);\n    ph -= cyc;\n    float2 c = 0.3 + 0.4 * float2(pool.Hash(id + cyc * 1.37), pool.Hash(id.yx + cyc * 2.11 + 5.0));\n    float alive = step(pool.Hash(id + cyc * 0.73 + 9.0), saturate(Sizzle * SimDensity * (1.0 + SimNear * nearMeat)));\n    float rad = max(SimCell * 0.3 * (0.4 + 0.6 * r1) * sqrt(ph), 1e-3);\n    float2 dv = (frac(gc) - c) * SimCell;\n    float dist = length(dv);\n    float x = saturate(dist / rad);                                   // 0 at the dome's top, 1 at its foot\n    float live = (1.0 - smoothstep(0.8, 1.0, ph)) * alive * gate;\n    bubble = smoothstep(0.0, 0.2, 1.0 - x) * live;\n    bubbleRim = smoothstep(0.45, 0.8, x) * (1.0 - smoothstep(0.92, 1.0, x)) * live;   // the dark bead outline\n    nxy += dv / max(dist, 1e-4) * x * bubble * SimStrength;\n}\nBubbleRim = bubbleRim;\nBubble = bubble;\nreturn float3(nxy, film);",
+					"Code": "struct FPanPool\n{\n    float4 M0; float4 M1; float4 M2; float4 M3; float4 M4; float4 M5;     // each meat: pan-local xy, footprint radius\n    float2 T0; float2 T1; float2 T2; float2 T3; float2 T4; float2 T5;     // each meat's lagging trail\n    float Amount; float PoolR; float Margin; float Blend; float Wobble; float BaseR;\n\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float Noise(float2 p)\n    {\n        float2 i = floor(p);\n        float2 f = frac(p);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),\n                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);\n    }\n    // one meat's blob (its footprint stretched back to its trail) smoothly merged into the pool; radius 0 = no meat\n    void BlendMeat(inout float d, float2 p, float4 M, float2 T)\n    {\n        if (M.z > 0.01)\n        {\n            float2 pa = p - M.xy;\n            float2 ba = T - M.xy;\n            float h = saturate(dot(pa, ba) / max(dot(ba, ba), 1e-4));\n            float dm = length(pa - ba * h) - (M.z + Margin * Amount);\n            float k = max(Blend, 1e-3);\n            float t = saturate(0.5 + 0.5 * (dm - d) / k);\n            d = lerp(dm, d, t) - k * t * (1.0 - t);\n        }\n    }\n    // signed distance to the pool edge (cm, negative inside)\n    float Sdf(float2 p)\n    {\n        float d = length(p) - PoolR * sqrt(saturate(Amount));\n        BlendMeat(d, p, M0, T0);\n        BlendMeat(d, p, M1, T1);\n        BlendMeat(d, p, M2, T2);\n        BlendMeat(d, p, M3, T3);\n        BlendMeat(d, p, M4, T4);\n        BlendMeat(d, p, M5, T5);\n        d += (Noise(p * 0.9) - 0.5) * Wobble;\n        return max(d, length(p) - BaseR - 0.6);          // the pool cannot climb the wall\n    }\n    // the simmer near one meat: the band around it bubbles harder (the strongest band wins), nothing bubbles under it\n    void Near(float2 p, float4 M, float SimW, inout float nearMeat, inout float under)\n    {\n        if (M.z > 0.01)\n        {\n            float dm = length(p - M.xy) - M.z;\n            nearMeat = max(nearMeat, smoothstep(-0.4, 0.0, dm) * (1.0 - smoothstep(SimW * 0.4, SimW, dm)));\n            under = min(under, smoothstep(-0.5, 0.0, dm));\n        }\n    }\n};\nFPanPool pool;\npool.M0 = Meat; pool.M1 = Meat1; pool.M2 = Meat2; pool.M3 = Meat3; pool.M4 = Meat4; pool.M5 = Meat5;\npool.T0 = Trail.xy; pool.T1 = Trail1.xy; pool.T2 = Trail2.xy; pool.T3 = Trail3.xy; pool.T4 = Trail4.xy; pool.T5 = Trail5.xy;\npool.Amount = OilAmount; pool.PoolR = PoolR; pool.Margin = Margin; pool.Blend = Blend; pool.Wobble = Wobble; pool.BaseR = BaseR;\n\nfloat2 p = P.xy;\nfloat d = pool.Sdf(p);\nfloat on = saturate(OilAmount * 20.0);\nfloat soft = max(EdgeSoft, 1e-3);\nfloat film = (1.0 - smoothstep(-soft, 0.0, d)) * on;\n\n// meniscus: the film's edge leans outward, which is where the highlight catches\nfloat2 e = float2(0.06, 0.0);\nfloat2 g = float2(pool.Sdf(p + e.xy) - pool.Sdf(p - e.xy), pool.Sdf(p + e.yx) - pool.Sdf(p - e.yx));\ng /= max(length(g), 1e-4);\nfloat rim = smoothstep(-soft * 2.5, -soft * 0.5, d) * (1.0 - smoothstep(-soft * 0.5, soft * 0.5, d)) * on;\nfloat2 nxy = g * rim * Meniscus;\n\n// simmer: small domes that swell and pop wherever there is oil. Sizzle sets how many cells are alive and speeds\n// them up; a band around each meat (Simmer Width) bubbles harder; nothing bubbles under a meat.\nfloat bubble = 0.0;\nfloat bubbleRim = 0.0;\nif (Sizzle > 0.001)\n{\n    float nearMeat = 0.0;\n    float under = 1.0;\n    pool.Near(p, Meat, SimW, nearMeat, under);\n    pool.Near(p, Meat1, SimW, nearMeat, under);\n    pool.Near(p, Meat2, SimW, nearMeat, under);\n    pool.Near(p, Meat3, SimW, nearMeat, under);\n    pool.Near(p, Meat4, SimW, nearMeat, under);\n    pool.Near(p, Meat5, SimW, nearMeat, under);\n    float gate = film * under * saturate(0.75 + 0.25 * Sizzle + SimNear * nearMeat);\n    float2 gc = p / SimCell;\n    float2 id = floor(gc);\n    float r1 = pool.Hash(id + 3.7);\n    float ph = T * SimRate * (0.75 + 0.5 * saturate(Sizzle)) * (0.6 + 0.8 * r1) + pool.Hash(id + 11.3);\n    float cyc = floor(ph);\n    ph -= cyc;\n    float2 c = 0.3 + 0.4 * float2(pool.Hash(id + cyc * 1.37), pool.Hash(id.yx + cyc * 2.11 + 5.0));\n    float alive = step(pool.Hash(id + cyc * 0.73 + 9.0), saturate(Sizzle * SimDensity * (1.0 + SimNear * nearMeat)));\n    float rad = max(SimCell * 0.3 * (0.4 + 0.6 * r1) * sqrt(ph), 1e-3);\n    float2 dv = (frac(gc) - c) * SimCell;\n    float dist = length(dv);\n    float x = saturate(dist / rad);                                   // 0 at the dome's top, 1 at its foot\n    float live = (1.0 - smoothstep(0.8, 1.0, ph)) * alive * gate;\n    bubble = smoothstep(0.0, 0.2, 1.0 - x) * live;\n    bubbleRim = smoothstep(0.45, 0.8, x) * (1.0 - smoothstep(0.92, 1.0, x)) * live;   // the dark bead outline\n    nxy += dv / max(dist, 1e-4) * x * bubble * SimStrength;\n}\nBubbleRim = bubbleRim;\nBubble = bubble;\nreturn float3(nxy, film);",
 					"Description": "PanPool: oil pool, meniscus, simmer"
 				}
 			},
@@ -1335,6 +1405,41 @@
 						"name": "RimR",
 						"node": 6,
 						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "Meat1",
+						"node": 64,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 34,
+						"name": "Meat2",
+						"node": 65,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 35,
+						"name": "Meat3",
+						"node": 66,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 36,
+						"name": "Meat4",
+						"node": 67,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 37,
+						"name": "Meat5",
+						"node": 68,
+						"output": 5,
+						"mask": "rgba"
 					}
 				],
 				"outputs": [
@@ -1346,7 +1451,7 @@
 				],
 				"props":
 				{
-					"Code": "struct FPanSurf\n{\n    float Hash1(float x) { return frac(sin(x * 127.1) * 43758.5453); }\n    float Noise1(float x)\n    {\n        float i = floor(x);\n        float f = frac(x);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(Hash1(i), Hash1(i + 1.0), f);\n    }\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float Noise(float2 p)\n    {\n        float2 i = floor(p);\n        float2 f = frac(p);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),\n                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);\n    }\n};\nFPanSurf s;\nfloat2 p = P.xy;\nfloat r = length(p);\nfloat3 n = normalize(N);\nfloat inside = saturate(n.z * 3.0) * (1.0 - smoothstep(RimR + 0.1, RimR + 0.4, r));   // the cooking surface\n\n// lathe rings: roughness streaks and a faint radial tilt, faded out before they alias\nfloat rf = r * RingFreq;\nfloat ring = (s.Noise1(rf) - 0.5) + 0.5 * (s.Noise1(rf * 3.1 + 7.0) - 0.5);\nring *= saturate(1.0 - fwidth(rf) * 1.5);\nfloat rough = Rough + ring * RingStrength;\n\n// seasoning: burnt-on oil. Thin, it bronzes the steel; thick, it is a near-black matte skin. Fond adds to it.\nfloat amount = Seasoning + Fond;\nfloat blotch = s.Noise(p * 0.3) * 0.55 + s.Noise(p * 0.95 + 4.0) * 0.3 + s.Noise(p * 2.7 + 9.0) * 0.15;\nfloat bands = s.Noise1(r * 1.7 + 3.0 + blotch * 2.5) * 0.6 + s.Noise1(r * 4.3 + blotch * 4.0) * 0.4;   // wobbly scorch rings\nfloat reach = r + (blotch - 0.5) * SeasonRadius * 0.7 * SeasonBreakup;\nfloat cover = (1.0 - smoothstep(SeasonRadius * 0.6, SeasonRadius * 1.15, reach)) * inside;\nfloat thick = cover * lerp(0.6, 1.3, blotch) * lerp(1.0 - 0.6 * SeasonBands, 1.0, bands) * amount;\nfloat bronze = smoothstep(0.0, 0.25, thick);\nfloat skin = smoothstep(0.2, 0.7, thick);\nfloat speck = smoothstep(0.8, 0.9, s.Noise(p * 5.5 + 2.0)) * cover * saturate(amount * 2.0) * SeasonSpecks;\nskin = saturate(max(skin, speck));\nfloat3 col = lerp(MetalColor * lerp(1.0, SeasonThin, bronze), SeasonThick, skin);\nfloat metal = lerp(Metallic, SeasonMetal, skin);\nrough = lerp(rough + 0.08 * bronze, SeasonRough, skin);\n\n// oil: a clear film. It wets and warms what is under it, carries a darker line at its edge, and is the clear coat.\nfloat film = Pool.z * inside;\nfloat drops = Drops.z * (1.0 - film) * inside;\nfloat wet = saturate(film + drops * 0.6);\ncol *= lerp(1.0, OilTint, wet);\nfloat body = film * OilOpacity;                                // the oil's own amber hides part of what is under it\ncol = lerp(col, OilBody, body);\nmetal = lerp(metal, 0.0, body);\ncol *= 1.0 - film * (1.0 - film) * 4.0 * OilEdge;              // the meniscus is thicker, so darker\nrough = lerp(rough, rough * 0.55, wet);\n\n// simmer beads: a dark outline (the bead's side refracts the dark pan) around a clear dome that keeps the\n// highlight; the dome's tilt comes in through Pool.xy\ncol *= 1.0 - saturate(BubbleRim * SimRimDark) * inside;\ncol = lerp(col, col * OilTint, Bubble * inside * 0.5);\n\n// the meat's dark reflection, which the reflection capture cannot give\nif (Meat.z > 0.01)\n{\n    col *= 1.0 - (1.0 - smoothstep(Meat.z * 0.6, Meat.z + ContactSoft, length(p - Meat.xy))) * Contact * inside;\n}\n\nn.xy += p / max(r, 1e-3) * ring * RingStrength * 0.25 * (1.0 - film);\nn = lerp(n, float3(0.0, 0.0, 1.0), film * OilLevel);                                   // a liquid lies level\nn.xy += (Pool.xy + Drops.xy * DropNormal * (1.0 - film)) * inside;\n\nOutRoughness = saturate(rough);\nOutMetallic = saturate(metal);\nOutCoat = saturate(max(max(film, drops), Bubble * inside)) * OilCoat;\nOutNormal = normalize(n);\nreturn col;",
+					"Code": "struct FPanSurf\n{\n    float Hash1(float x) { return frac(sin(x * 127.1) * 43758.5453); }\n    float Noise1(float x)\n    {\n        float i = floor(x);\n        float f = frac(x);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(Hash1(i), Hash1(i + 1.0), f);\n    }\n    float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }\n    float Noise(float2 p)\n    {\n        float2 i = floor(p);\n        float2 f = frac(p);\n        f = f * f * (3.0 - 2.0 * f);\n        return lerp(lerp(Hash(i), Hash(i + float2(1.0, 0.0)), f.x),\n                    lerp(Hash(i + float2(0.0, 1.0)), Hash(i + float2(1.0, 1.0)), f.x), f.y);\n    }\n    // what one meat's dark reflection leaves of the colour at p (1 away from it; radius 0 = no meat)\n    float MeatShade(float2 p, float4 M, float Strength, float ContactSoft)\n    {\n        if (M.z <= 0.01)\n        {\n            return 1.0;\n        }\n        return 1.0 - (1.0 - smoothstep(M.z * 0.6, M.z + ContactSoft, length(p - M.xy))) * Strength;\n    }\n};\nFPanSurf s;\nfloat2 p = P.xy;\nfloat r = length(p);\nfloat3 n = normalize(N);\nfloat inside = saturate(n.z * 3.0) * (1.0 - smoothstep(RimR + 0.1, RimR + 0.4, r));   // the cooking surface\n\n// lathe rings: roughness streaks and a faint radial tilt, faded out before they alias\nfloat rf = r * RingFreq;\nfloat ring = (s.Noise1(rf) - 0.5) + 0.5 * (s.Noise1(rf * 3.1 + 7.0) - 0.5);\nring *= saturate(1.0 - fwidth(rf) * 1.5);\nfloat rough = Rough + ring * RingStrength;\n\n// seasoning: burnt-on oil. Thin, it bronzes the steel; thick, it is a near-black matte skin. Fond adds to it.\nfloat amount = Seasoning + Fond;\nfloat blotch = s.Noise(p * 0.3) * 0.55 + s.Noise(p * 0.95 + 4.0) * 0.3 + s.Noise(p * 2.7 + 9.0) * 0.15;\nfloat bands = s.Noise1(r * 1.7 + 3.0 + blotch * 2.5) * 0.6 + s.Noise1(r * 4.3 + blotch * 4.0) * 0.4;   // wobbly scorch rings\nfloat reach = r + (blotch - 0.5) * SeasonRadius * 0.7 * SeasonBreakup;\nfloat cover = (1.0 - smoothstep(SeasonRadius * 0.6, SeasonRadius * 1.15, reach)) * inside;\nfloat thick = cover * lerp(0.6, 1.3, blotch) * lerp(1.0 - 0.6 * SeasonBands, 1.0, bands) * amount;\nfloat bronze = smoothstep(0.0, 0.25, thick);\nfloat skin = smoothstep(0.2, 0.7, thick);\nfloat speck = smoothstep(0.8, 0.9, s.Noise(p * 5.5 + 2.0)) * cover * saturate(amount * 2.0) * SeasonSpecks;\nskin = saturate(max(skin, speck));\nfloat3 col = lerp(MetalColor * lerp(1.0, SeasonThin, bronze), SeasonThick, skin);\nfloat metal = lerp(Metallic, SeasonMetal, skin);\nrough = lerp(rough + 0.08 * bronze, SeasonRough, skin);\n\n// oil: a clear film. It wets and warms what is under it, carries a darker line at its edge, and is the clear coat.\nfloat film = Pool.z * inside;\nfloat drops = Drops.z * (1.0 - film) * inside;\nfloat wet = saturate(film + drops * 0.6);\ncol *= lerp(1.0, OilTint, wet);\nfloat body = film * OilOpacity;                                // the oil's own amber hides part of what is under it\ncol = lerp(col, OilBody, body);\nmetal = lerp(metal, 0.0, body);\ncol *= 1.0 - film * (1.0 - film) * 4.0 * OilEdge;              // the meniscus is thicker, so darker\nrough = lerp(rough, rough * 0.55, wet);\n\n// simmer beads: a dark outline (the bead's side refracts the dark pan) around a clear dome that keeps the\n// highlight; the dome's tilt comes in through Pool.xy\ncol *= 1.0 - saturate(BubbleRim * SimRimDark) * inside;\ncol = lerp(col, col * OilTint, Bubble * inside * 0.5);\n\n// each meat's dark reflection, which the reflection capture cannot give\nfloat shade = Contact * inside;\ncol *= s.MeatShade(p, Meat, shade, ContactSoft) * s.MeatShade(p, Meat1, shade, ContactSoft) * s.MeatShade(p, Meat2, shade, ContactSoft)\n     * s.MeatShade(p, Meat3, shade, ContactSoft) * s.MeatShade(p, Meat4, shade, ContactSoft) * s.MeatShade(p, Meat5, shade, ContactSoft);\n\nn.xy += p / max(r, 1e-3) * ring * RingStrength * 0.25 * (1.0 - film);\nn = lerp(n, float3(0.0, 0.0, 1.0), film * OilLevel);                                   // a liquid lies level\nn.xy += (Pool.xy + Drops.xy * DropNormal * (1.0 - film)) * inside;\n\nOutRoughness = saturate(rough);\nOutMetallic = saturate(metal);\nOutCoat = saturate(max(max(film, drops), Bubble * inside)) * OilCoat;\nOutNormal = normalize(n);\nreturn col;",
 					"Description": "PanSurface: metal + seasoning + oil"
 				}
 			},
@@ -1409,6 +1514,206 @@
 						"output": 0
 					}
 				]
+			},
+			{
+				"id": 64,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_7",
+				"desc": "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Radius",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Meat Footprint 1",
+					"Group": "01 Driven",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 65,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_8",
+				"desc": "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Radius",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Meat Footprint 2",
+					"Group": "01 Driven",
+					"SortPriority": 6
+				}
+			},
+			{
+				"id": 66,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"desc": "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Radius",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Meat Footprint 3",
+					"Group": "01 Driven",
+					"SortPriority": 7
+				}
+			},
+			{
+				"id": 67,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"desc": "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Radius",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Meat Footprint 4",
+					"Group": "01 Driven",
+					"SortPriority": 8
+				}
+			},
+			{
+				"id": 68,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_11",
+				"desc": "Meat position in pan-local cm and its footprint radius. Radius 0 = no meat. For a cube of half extent h the radius is h * sqrt(2) * 0.9 (cooking_spec.CUBE_FOOTPRINT_CM: 2.55 for the 4 cm cube), so the oil pool (that radius + Pool Margin * Oil Amount) hugs the cube.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"Radius",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Meat Footprint 5",
+					"Group": "01 Driven",
+					"SortPriority": 9
+				}
+			},
+			{
+				"id": 69,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_12",
+				"desc": "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Oil Trail 1",
+					"Group": "01 Driven",
+					"SortPriority": 10
+				}
+			},
+			{
+				"id": 70,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_13",
+				"desc": "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Oil Trail 2",
+					"Group": "01 Driven",
+					"SortPriority": 11
+				}
+			},
+			{
+				"id": 71,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_14",
+				"desc": "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Oil Trail 3",
+					"Group": "01 Driven",
+					"SortPriority": 12
+				}
+			},
+			{
+				"id": 72,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_15",
+				"desc": "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Oil Trail 4",
+					"Group": "01 Driven",
+					"SortPriority": 13
+				}
+			},
+			{
+				"id": 73,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_16",
+				"desc": "Pan-local cm position that lags behind the meat; the pool stretches between the two.",
+				"outputs": [
+					"RGB",
+					"X",
+					"Y",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "Oil Trail 5",
+					"Group": "01 Driven",
+					"SortPriority": 14
+				}
 			}
 		],
 		"outputs": [
@@ -1637,6 +1942,46 @@
 		{
 			"name": "Oil Body",
 			"value": "RGBA(0.14, 0.055, 0.008, 1)"
+		},
+		{
+			"name": "Meat Footprint 1",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Meat Footprint 2",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Meat Footprint 3",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Meat Footprint 4",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Meat Footprint 5",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Oil Trail 1",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Oil Trail 2",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Oil Trail 3",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Oil Trail 4",
+			"value": "RGBA(0, 0, 0, 0)"
+		},
+		{
+			"name": "Oil Trail 5",
+			"value": "RGBA(0, 0, 0, 0)"
 		}
 	],
 	"textureParams": [],
