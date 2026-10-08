@@ -25,18 +25,40 @@ namespace utils_implement
     }
 
     // ONE offset write: the tilt composed onto the rest rotation (rest x tilt, about the rest frame's axes), the orbit
-    // offset in the rest frame's XY plane and the lift along the rest frame's up. An invalid node is an implement being
-    // torn down.
+    // offset and the slide in the rest frame's XY plane and the lift along the rest frame's up. An invalid node is an
+    // implement being torn down.
     void Apply_Pose(FCk_Handle_SceneNode InNode, const FMars_Fragment_Implement& InState, FVector InOrbitOffset)
     {
         if (ck::Is_NOT_Valid(InNode))
         { return; }
 
         const auto& Rest = InState.RestOffset;
-        const auto Rotation = FQuat(Rest.Rotator()) * FQuat(FRotator(InState.Pitch, 0.0f, InState.Roll));
-        const auto Location = Rest.GetLocation() + InOrbitOffset + FVector(0.0, 0.0, InState.Lift);
+        const auto Rotation = FQuat(Rest.Rotator()) * FQuat(FRotator(InState.Pitch, InState.Yaw, InState.Roll));
+        const auto Location = Rest.GetLocation() + InOrbitOffset + FVector(InState.Slide.X, InState.Slide.Y, float64(InState.Lift));
         const auto Offset = FTransform(Rotation, Location, Rest.GetScale3D());
         utils_scene_node::Request_UpdateOffset(InNode, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
+    }
+
+    // InTarget held inside the slide's reachable area: the disc of Radius about Centre, else the box of the half extents
+    // about it.
+    FVector2D Clamp_SlideTarget(const FMars_Implement_SlideSpec& InSlide, FVector2D InTarget)
+    {
+        const auto Centre = InSlide.Centre;
+        if (InSlide.Radius > 0.0f)
+        {
+            const auto Offset = InTarget - Centre;
+            const auto Radius = float64(InSlide.Radius);
+            if (Offset.Size() <= Radius)
+            { return InTarget; }
+
+            return Centre + Offset * (Radius / Offset.Size());
+        }
+
+        const auto HalfX = float64(InSlide.HalfExtentX);
+        const auto HalfY = float64(InSlide.HalfExtentY);
+        return FVector2D(
+            Math::Clamp(InTarget.X, Centre.X - HalfX, Centre.X + HalfX),
+            Math::Clamp(InTarget.Y, Centre.Y - HalfY, Centre.Y + HalfY));
     }
 
     // The orbit's XY offset in the rest frame: (cos, sin, 0) of the phase times the radius the eased alpha shows.
@@ -66,18 +88,18 @@ mixin bool Get_IsDriven(const FCk_Handle_Implement& Self)
     return Self.Get_Fragment(FMars_Fragment_Implement).Drive == EMars_Implement_Drive::Driven;
 }
 
-// FRotator(Pitch, 0, Roll), degrees, on top of the rest rotation: what the node shows.
+// FRotator(Pitch, Yaw, Roll), degrees, on top of the rest rotation: what the node shows.
 mixin FRotator Get_Tilt(const FCk_Handle_Implement& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_Implement);
-    return FRotator(State.Pitch, 0.0f, State.Roll);
+    return FRotator(State.Pitch, State.Yaw, State.Roll);
 }
 
-// FRotator(TargetPitch, 0, TargetRoll): where the look is steering the tilt.
+// FRotator(TargetPitch, TargetYaw, TargetRoll): where the look is steering the tilt.
 mixin FRotator Get_TargetTilt(const FCk_Handle_Implement& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_Implement);
-    return FRotator(State.TargetPitch, 0.0f, State.TargetRoll);
+    return FRotator(State.TargetPitch, State.TargetYaw, State.TargetRoll);
 }
 
 mixin float32 Get_Lift(const FCk_Handle_Implement& Self)
@@ -88,6 +110,24 @@ mixin float32 Get_Lift(const FCk_Handle_Implement& Self)
 mixin float32 Get_LiftVelocity(const FCk_Handle_Implement& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Implement).LiftVelocity;
+}
+
+// uu above rest: where the lift spring is carrying the node (rest unless the lift is Commanded).
+mixin float32 Get_TargetLift(const FCk_Handle_Implement& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Implement).TargetLift;
+}
+
+// uu from the rest location in its XY plane: where the slide's spring has carried the node (zero without a slide).
+mixin FVector2D Get_Slide(const FCk_Handle_Implement& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Implement).Slide;
+}
+
+// uu from the rest location in its XY plane: where the look (or a Commanded slide's SetSlideTarget) is steering the slide.
+mixin FVector2D Get_TargetSlide(const FCk_Handle_Implement& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Implement).TargetSlide;
 }
 
 // The orbit's current XY offset from the rest location (zero without an orbit, or once it eased out).
@@ -126,6 +166,24 @@ mixin void Request_SetDrive(FCk_Handle_Implement& Self, const FMars_Request_Impl
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
     Requests.SetDriveRequests.Add(InRequest);
+}
+
+mixin void Request_SetLiftTarget(FCk_Handle_Implement& Self, const FMars_Request_Implement_SetLiftTarget& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
+    Requests.SetLiftTargetRequests.Add(InRequest);
+}
+
+mixin void Request_SetTiltTarget(FCk_Handle_Implement& Self, const FMars_Request_Implement_SetTiltTarget& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
+    Requests.SetTiltTargetRequests.Add(InRequest);
+}
+
+mixin void Request_SetSlideTarget(FCk_Handle_Implement& Self, const FMars_Request_Implement_SetSlideTarget& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Implement_Requests);
+    Requests.SetSlideTargetRequests.Add(InRequest);
 }
 
 mixin void Request_Reset(FCk_Handle_Implement& Self, const FMars_Request_Implement_Reset& InRequest)
