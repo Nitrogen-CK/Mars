@@ -1256,6 +1256,19 @@ namespace UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean
 }
 
 USTRUCT()
+struct FMars_AutoTest_FPHands_GripRotationPutsTheIndexSideWhereTheHandSays_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_GripRotationPutsTheIndexSideWhereTheHandSays
+{
+    FMars_AutoTest_FPHands_GripRotationPutsTheIndexSideWhereTheHandSays_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_GripRotationPutsTheIndexSideWhereTheHandSays_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor_SpawnParams
 {
 }
@@ -2491,6 +2504,19 @@ namespace UMars_AutoTest_SearingStation_DressingFollowsTheSteak
 }
 
 USTRUCT()
+struct FMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool
+{
+    FMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool_SpawnParams Params()
+    {
+        return FMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Smoke_Boots_SpawnParams
 {
 }
@@ -2699,28 +2725,41 @@ namespace UMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes
 }
 
 USTRUCT()
-struct FMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_SpawnParams
+struct FMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum_SpawnParams
 {
 }
 
-namespace UMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode
+namespace UMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum
 {
-    FMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_SpawnParams Params()
+    FMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum_SpawnParams Params()
     {
-        return FMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_SpawnParams();
+        return FMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_SpawnParams
+struct FMars_AutoTest_Tumbler_AResetDestroysEveryPiece_SpawnParams
 {
 }
 
-namespace UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls
+namespace UMars_AutoTest_Tumbler_AResetDestroysEveryPiece
 {
-    FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_SpawnParams Params()
+    FMars_AutoTest_Tumbler_AResetDestroysEveryPiece_SpawnParams Params()
     {
-        return FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_SpawnParams();
+        return FMars_AutoTest_Tumbler_AResetDestroysEveryPiece_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls
+{
+    FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls_SpawnParams Params()
+    {
+        return FMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls_SpawnParams();
     }
 }
 

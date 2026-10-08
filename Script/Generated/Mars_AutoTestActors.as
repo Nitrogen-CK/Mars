@@ -1087,6 +1087,18 @@ class AMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean_Actor : ACk_
     }
 }
 
+class AMars_AutoTest_FPHands_GripRotationPutsTheIndexSideWhereTheHandSays_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FPHands_GripRotationPutsTheIndexSideWhereTheHandSays");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)
@@ -2218,26 +2230,39 @@ class AMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes_Actor :
     }
 }
 
-class AMars_AutoTest_Tumbler_AResetDestroysEveryPieceNode_Actor : ACk_AutoTestRunner
+class AMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum_Actor : ACk_AutoTestRunner
 {
-    default _TimeoutSeconds = 10.0f;
+    default _TimeoutSeconds = 12.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Tumbler_AResetDestroysEveryPieceNode");
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
     }
 }
 
-class AMars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls_Actor : ACk_AutoTestRunner
+class AMars_AutoTest_Tumbler_AResetDestroysEveryPiece_Actor : ACk_AutoTestRunner
 {
-    default _TimeoutSeconds = 50.0f;
+    default _TimeoutSeconds = 10.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Tumbler_CoverageGrowsOnlyWithDrumTravelAndNeverFalls");
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Tumbler_AResetDestroysEveryPiece");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 60.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;

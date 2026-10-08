@@ -498,7 +498,7 @@
 		{
 			"TypeName": "FCk_Handle_Tumbler",
 			"ShortName": "Tumbler",
-			"Description": "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever and drum together), and admitted pieces that tumble kinematically in the drum and gain coating with every degree it turns while shut",
+			"Description": "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever, drum and its kinematic shell together), and admitted pieces that tumble as dynamic bodies in the shell and gain coating with the distance they move while it is shut",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_TumblerHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Tumbler"

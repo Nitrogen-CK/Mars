@@ -343,8 +343,14 @@ namespace assets
     TSoftObjectPtr<USoundCue> CarpetWalking() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Carpet/cue/CarpetWalking.CarpetWalking")); }
     TSoftObjectPtr<USoundCue> Dirt_Footstep_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Gravel/cue/Dirt_Footstep_Mars_SND.Dirt_Footstep_Mars_SND")); }
     TSoftObjectPtr<USoundCue> Dirt_Landed_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Gravel/cue/Dirt_Landed_Mars_SND.Dirt_Landed_Mars_SND")); }
+    TSoftObjectPtr<USoundCue> FryingPanSizzle2_Cue() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/FryingPanSizzle/FryingPanSizzle2_Cue.FryingPanSizzle2_Cue")); }
+    TSoftObjectPtr<USoundCue> FryingPanSizzle2_Looping_Cue() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/FryingPanSizzle/FryingPanSizzle2_Looping_Cue.FryingPanSizzle2_Looping_Cue")); }
+    TSoftObjectPtr<USoundCue> FryingPanSizzle_Cue() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/FryingPanSizzle/FryingPanSizzle_Cue.FryingPanSizzle_Cue")); }
+    TSoftObjectPtr<USoundCue> FryingPanSizzle_Looping_Cue() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/FryingPanSizzle/FryingPanSizzle_Looping_Cue.FryingPanSizzle_Looping_Cue")); }
     TSoftObjectPtr<USoundCue> Grass_Footstep_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Grass/cue/Grass_Footstep_Mars_SND.Grass_Footstep_Mars_SND")); }
     TSoftObjectPtr<USoundCue> Grass_Landed_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Grass/cue/Grass_Landed_Mars_SND.Grass_Landed_Mars_SND")); }
+    TSoftObjectPtr<USoundCue> KnifeChop_Cue() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/KnifeChop/KnifeChop_Cue.KnifeChop_Cue")); }
+    TSoftObjectPtr<USoundCue> MeatSlap_Cue() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/MeatSlap/MeatSlap_Cue.MeatSlap_Cue")); }
     TSoftObjectPtr<USoundCue> Mud_Footstep_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/WaterandMud/cue/Mud_Footstep_Mars_SND.Mud_Footstep_Mars_SND")); }
     TSoftObjectPtr<USoundCue> Mud_Landed_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/WaterandMud/cue/Mud_Landed_Mars_SND.Mud_Landed_Mars_SND")); }
     TSoftObjectPtr<USoundCue> Sand_Footstep_Mars_SND() { return TSoftObjectPtr<USoundCue>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Sand/cue/Sand_Footstep_Mars_SND.Sand_Footstep_Mars_SND")); }
@@ -452,6 +458,8 @@ namespace assets
     TSoftObjectPtr<USoundWave> concrete_normal_walking_2_7() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Concrete/Normal/wav/concrete_normal_walking_2_7.concrete_normal_walking_2_7")); }
     TSoftObjectPtr<USoundWave> concrete_normal_walking_2_8() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Concrete/Normal/wav/concrete_normal_walking_2_8.concrete_normal_walking_2_8")); }
     TSoftObjectPtr<USoundWave> concrete_normal_walking_2_9() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Concrete/Normal/wav/concrete_normal_walking_2_9.concrete_normal_walking_2_9")); }
+    TSoftObjectPtr<USoundWave> FryingPanSizzle2_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/FryingPanSizzle/FryingPanSizzle2_SND.FryingPanSizzle2_SND")); }
+    TSoftObjectPtr<USoundWave> FryingPanSizzle_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/FryingPanSizzle/FryingPanSizzle_SND.FryingPanSizzle_SND")); }
     TSoftObjectPtr<USoundWave> grass_running_1_1() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Grass/wav/grass_running_1_1.grass_running_1_1")); }
     TSoftObjectPtr<USoundWave> grass_running_1_10() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Grass/wav/grass_running_1_10.grass_running_1_10")); }
     TSoftObjectPtr<USoundWave> grass_running_1_2() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Grass/wav/grass_running_1_2.grass_running_1_2")); }
@@ -532,6 +540,12 @@ namespace assets
     TSoftObjectPtr<USoundWave> gravel_walking_2_7() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Gravel/wav/gravel_walking_2_7.gravel_walking_2_7")); }
     TSoftObjectPtr<USoundWave> gravel_walking_2_8() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Gravel/wav/gravel_walking_2_8.gravel_walking_2_8")); }
     TSoftObjectPtr<USoundWave> gravel_walking_2_9() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/Gravel/wav/gravel_walking_2_9.gravel_walking_2_9")); }
+    TSoftObjectPtr<USoundWave> KnifeChop2_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/KnifeChop/KnifeChop2_SND.KnifeChop2_SND")); }
+    TSoftObjectPtr<USoundWave> KnifeChop3_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/KnifeChop/KnifeChop3_SND.KnifeChop3_SND")); }
+    TSoftObjectPtr<USoundWave> KnifeChop4_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/KnifeChop/KnifeChop4_SND.KnifeChop4_SND")); }
+    TSoftObjectPtr<USoundWave> KnifeChop5_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/KnifeChop/KnifeChop5_SND.KnifeChop5_SND")); }
+    TSoftObjectPtr<USoundWave> KnifeChop_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/KnifeChop/KnifeChop_SND.KnifeChop_SND")); }
+    TSoftObjectPtr<USoundWave> MeatSlap_SND() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/Cooking/MeatSlap/MeatSlap_SND.MeatSlap_SND")); }
     TSoftObjectPtr<USoundWave> mud_running_1_1() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/WaterandMud/wav/mud_running_1_1.mud_running_1_1")); }
     TSoftObjectPtr<USoundWave> mud_running_1_10() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/WaterandMud/wav/mud_running_1_10.mud_running_1_10")); }
     TSoftObjectPtr<USoundWave> mud_running_1_2() { return TSoftObjectPtr<USoundWave>(FSoftObjectPath("/Game/Mars/Audio/WAVsCUEs/FootstepsSoundsPack/WaterandMud/wav/mud_running_1_2.mud_running_1_2")); }
@@ -4086,6 +4100,42 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::Dirt_Landed_Mars_SND());
     }
+    USoundCue FryingPanSizzle2_Cue()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FryingPanSizzle2_Cue() called before engine init. Use assets::FryingPanSizzle2_Cue() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FryingPanSizzle2_Cue());
+    }
+    USoundCue FryingPanSizzle2_Looping_Cue()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FryingPanSizzle2_Looping_Cue() called before engine init. Use assets::FryingPanSizzle2_Looping_Cue() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FryingPanSizzle2_Looping_Cue());
+    }
+    USoundCue FryingPanSizzle_Cue()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FryingPanSizzle_Cue() called before engine init. Use assets::FryingPanSizzle_Cue() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FryingPanSizzle_Cue());
+    }
+    USoundCue FryingPanSizzle_Looping_Cue()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FryingPanSizzle_Looping_Cue() called before engine init. Use assets::FryingPanSizzle_Looping_Cue() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FryingPanSizzle_Looping_Cue());
+    }
     USoundCue Grass_Footstep_Mars_SND()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -4103,6 +4153,24 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::Grass_Landed_Mars_SND());
+    }
+    USoundCue KnifeChop_Cue()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::KnifeChop_Cue() called before engine init. Use assets::KnifeChop_Cue() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::KnifeChop_Cue());
+    }
+    USoundCue MeatSlap_Cue()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::MeatSlap_Cue() called before engine init. Use assets::MeatSlap_Cue() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::MeatSlap_Cue());
     }
     USoundCue Mud_Footstep_Mars_SND()
     {
@@ -5067,6 +5135,24 @@ namespace assets::load
         }
         return System::LoadAsset_Blocking(assets::concrete_normal_walking_2_9());
     }
+    USoundWave FryingPanSizzle2_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FryingPanSizzle2_SND() called before engine init. Use assets::FryingPanSizzle2_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FryingPanSizzle2_SND());
+    }
+    USoundWave FryingPanSizzle_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::FryingPanSizzle_SND() called before engine init. Use assets::FryingPanSizzle_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::FryingPanSizzle_SND());
+    }
     USoundWave grass_running_1_1()
     {
         if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
@@ -5786,6 +5872,60 @@ namespace assets::load
             return nullptr;
         }
         return System::LoadAsset_Blocking(assets::gravel_walking_2_9());
+    }
+    USoundWave KnifeChop2_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::KnifeChop2_SND() called before engine init. Use assets::KnifeChop2_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::KnifeChop2_SND());
+    }
+    USoundWave KnifeChop3_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::KnifeChop3_SND() called before engine init. Use assets::KnifeChop3_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::KnifeChop3_SND());
+    }
+    USoundWave KnifeChop4_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::KnifeChop4_SND() called before engine init. Use assets::KnifeChop4_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::KnifeChop4_SND());
+    }
+    USoundWave KnifeChop5_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::KnifeChop5_SND() called before engine init. Use assets::KnifeChop5_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::KnifeChop5_SND());
+    }
+    USoundWave KnifeChop_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::KnifeChop_SND() called before engine init. Use assets::KnifeChop_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::KnifeChop_SND());
+    }
+    USoundWave MeatSlap_SND()
+    {
+        if (UCk_Utils_IO_UE::IsEngineSafeForBlockingLoads() == false)
+        {
+            ck::EnsureIfNot_PrematureAssetLoad(UCk_Utils_IO_UE::Get_IsRunningCommandlet(), "assets::load::MeatSlap_SND() called before engine init. Use assets::MeatSlap_SND() (soft ref) with UCk_DeferredConfig_UE instead.");
+            return nullptr;
+        }
+        return System::LoadAsset_Blocking(assets::MeatSlap_SND());
     }
     USoundWave mud_running_1_1()
     {
