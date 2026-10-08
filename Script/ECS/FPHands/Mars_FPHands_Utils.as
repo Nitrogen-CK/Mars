@@ -91,6 +91,16 @@ mixin float32 Get_FocusAlpha(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
     return Focus.Alpha_L;
 }
 
+// One glove's finger pose override; unset = none. Applied only while that glove is on a reach target.
+mixin TOptional<EMars_HandGripPose> TryGet_PoseOverride(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_FPHands);
+    if (InHand == EMars_Hand::Right)
+    { return State.PoseOverride_R; }
+
+    return State.PoseOverride_L;
+}
+
 mixin FMars_FPHands_Hold Get_Hold(const FCk_Handle_FPHands& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FPHands).Hold;
@@ -168,6 +178,12 @@ mixin void Request_SetHold(FCk_Handle_FPHands& Self, const FMars_Request_FPHands
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
     Requests.SetHoldRequests.Add(InRequest);
+}
+
+mixin void Request_SetPoseOverride(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_SetPoseOverride& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
+    Requests.SetPoseOverrideRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

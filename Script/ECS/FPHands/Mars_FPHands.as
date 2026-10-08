@@ -496,8 +496,8 @@ mixin void Get_HandTargets(const FCk_Handle_FPHands& Self, const FMars_FPHands_T
     Self.Apply_HandReach(InFrame.HandWorld, EMars_Hand::Left, OutTargets.Left);
 }
 
-// A glove takes the larger of its focus lean and its reach (to its own grip on the target); the reach's finger pose
-// wins while it plays.
+// A glove takes the larger of its focus lean and its reach (to its own grip on the target); the reach's finger pose (or
+// that glove's pose override) wins while it plays.
 mixin void Apply_HandReach(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, EMars_Hand InHand,
                            FMars_FPHands_HandTarget& InOutHand)
 {
@@ -510,9 +510,15 @@ mixin void Apply_HandReach(const FCk_Handle_FPHands& Self, const FTransform& InH
     if (Alpha <= 0.001f)
     { return; }
 
+    // A glove on a reach target plays its override (a station feed's grasp) over the reach's own pose.
     auto Pose = TOptional<EMars_HandGripPose>();
     if (IsReaching)
-    { Pose = Self.TryGet_ReachPose(InHand); }
+    {
+        Pose = Self.TryGet_ReachPose(InHand);
+        const auto Override = Self.TryGet_PoseOverride(InHand);
+        if (Override.IsSet())
+        { Pose = Override; }
+    }
 
     if (Pose.IsSet() == false && FocusAlpha > Spec.Reach.Focus.Lean * 0.5f)
     { Pose = TOptional<EMars_HandGripPose>(Spec.Reach.Poses.Approach); }

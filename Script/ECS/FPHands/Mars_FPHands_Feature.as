@@ -126,6 +126,14 @@ struct FMars_Fragment_FPHands
     // pitch node.
     UPROPERTY()
     TOptional<float32> ViewPitchDeg;
+
+    // Per-glove finger pose overrides (a station's feed closes the free glove on the food). Each applies only while that
+    // glove is on a reach target; both clear when the phase returns to None.
+    UPROPERTY()
+    TOptional<EMars_HandGripPose> PoseOverride_R;
+
+    UPROPERTY()
+    TOptional<EMars_HandGripPose> PoseOverride_L;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -256,6 +264,25 @@ struct FMars_Request_FPHands_StartPush
     }
 }
 
+// One glove's finger pose while it is on a reach target; an unset Pose clears the override. The last one per glove in a
+// drain wins.
+struct FMars_Request_FPHands_SetPoseOverride
+{
+    UPROPERTY()
+    EMars_Hand Hand = EMars_Hand::Left;
+
+    UPROPERTY()
+    TOptional<EMars_HandGripPose> Pose;
+
+    FMars_Request_FPHands_SetPoseOverride() {}
+
+    FMars_Request_FPHands_SetPoseOverride(EMars_Hand InHand, TOptional<EMars_HandGripPose> InPose)
+    {
+        Hand = InHand;
+        Pose = InPose;
+    }
+}
+
 struct FMars_Fragment_FPHands_Requests
 {
     UPROPERTY()
@@ -263,6 +290,9 @@ struct FMars_Fragment_FPHands_Requests
 
     UPROPERTY()
     TArray<FMars_Request_FPHands_SetFocus> SetFocusRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_FPHands_SetPoseOverride> SetPoseOverrideRequests;
 
     UPROPERTY()
     TArray<FMars_Request_FPHands_Release> ReleaseRequests;

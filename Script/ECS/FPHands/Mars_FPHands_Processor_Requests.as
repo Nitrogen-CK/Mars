@@ -1,4 +1,4 @@
-// Drains SetHold, SetFocus, SetPhase, Release, StartPush, then StartReach. The phase itself only moves through SetPhase
+// Drains SetHold, SetFocus, SetPoseOverride, SetPhase, Release, StartPush, then StartReach. The phase itself only moves through SetPhase
 // (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the sub-SM's conditions
 // turn those broadcasts into transitions.
 //
@@ -31,6 +31,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         TArray<FMars_Request_FPHands_SetHold> SetHoldRequests = InRequests.SetHoldRequests;
         TArray<FMars_Request_FPHands_SetFocus> SetFocusRequests = InRequests.SetFocusRequests;
+        TArray<FMars_Request_FPHands_SetPoseOverride> SetPoseOverrideRequests = InRequests.SetPoseOverrideRequests;
         TArray<FMars_Request_FPHands_StartReach> StartReachRequests = InRequests.StartReachRequests;
         TArray<FMars_Request_FPHands_Release> ReleaseRequests = InRequests.ReleaseRequests;
         TArray<FMars_Request_FPHands_SetPhase> SetPhaseRequests = InRequests.SetPhaseRequests;
@@ -44,6 +45,9 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : SetFocusRequests)
         { HandleSetFocus(Params, InState, Request); }
+
+        for (const auto& Request : SetPoseOverrideRequests)
+        { HandleSetPoseOverride(InState, Request); }
 
         if (SetPhaseRequests.Num() > 0)
         { HandleSetPhase(InHandle, InState, SetPhaseRequests.Last().Phase); }
@@ -102,6 +106,18 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         InState.Focus.FocusedFor = InRequest.Interactable;
         InState.Focus.Target = Resolve_Target(InParams, InState, FMars_FPHands_ReachSubject(InRequest.Interactable, InRequest.Owner));
+    }
+
+    // Last wins per glove.
+    private void HandleSetPoseOverride(FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_SetPoseOverride& InRequest)
+    {
+        if (InRequest.Hand == EMars_Hand::Right)
+        {
+            InState.PoseOverride_R = InRequest.Pose;
+            return;
+        }
+
+        InState.PoseOverride_L = InRequest.Pose;
     }
 
     private void HandleStartReach(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartReach& InRequest)
@@ -225,6 +241,8 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         if (InNewPhase == EMars_FPHands_Phase::None)
         {
             InState.Carry.Reset();
+            InState.PoseOverride_R.Reset();
+            InState.PoseOverride_L.Reset();
 
             // The grab ended without the item landing in the hands: don't let a later equip spawn at the pickup spot.
             auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
