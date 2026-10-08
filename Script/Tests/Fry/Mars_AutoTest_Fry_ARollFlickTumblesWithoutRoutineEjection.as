@@ -1,5 +1,5 @@
 // A piece floats over the dipped scoop (its bottom above the dipped lip). A flick - Carry, and 0.12 s later Dip again (a
-// tap of Interact_Secondary) - kicks the disc up through the piece's float and drops it back: the scoop's lift rises at
+// tap of Interact_Primary) - kicks the disc up through the piece's float and drops it back: the scoop's lift rises at
 // least 5 above the dip (it reaches the piece), and within 1.5 s of the flick the piece is never lost: it lands back in the
 // oil or on the scoop. Whether it turned over (its down face changed) is traced, not asserted: it is a tuning question.
 class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTestRig_Fry

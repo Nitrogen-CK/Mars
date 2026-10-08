@@ -75,8 +75,8 @@ class UMars_SmTask_Fry_DriveOnEnter : UCk_SmTask_EntityScript
 }
 
 // The operator's input, read off its InputIntents: one look per drained look delta (degrees; X yaw right+, Y pitch down+),
-// which moves the skimmer; Interact_Secondary's rising edge asks for a dip (the kernel pours instead over the basket, and
-// ignores it in the corridor) and its falling edge carries. Interact_Primary is not read. Both are seeded on enter, so a
+// which moves the skimmer; Interact_Primary's rising edge asks for a dip (the kernel pours instead over the basket, and
+// ignores it in the corridor) and its falling edge carries. Interact_Secondary is not read. Both are seeded on enter, so a
 // delta or a hold from before the station was taken does not count. No operator intents (headless) = nothing to read.
 class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
 {
@@ -85,8 +85,8 @@ class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
     private FCk_Handle_Fry _Fry;
     private FCk_Handle_InputIntents _Intents;
     private int32 _SeenLookSequence = 0;
-    // The activation frame of the Interact_Secondary hold last seen; unset while it is not held.
-    private TOptional<int32> _SeenSecondaryFrame;
+    // The activation frame of the Interact_Primary hold last seen; unset while it is not held.
+    private TOptional<int32> _SeenPrimaryFrame;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -102,7 +102,7 @@ class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
         { return; }
 
         _SeenLookSequence = _Intents.Get_LookDeltaSequence();
-        _SeenSecondaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
+        _SeenPrimaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
     }
 
     // Must return Running every frame: a Succeeded/Failed result would end the task while Operated is still active.
@@ -121,11 +121,11 @@ class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
             _Fry.Request_Look(FMars_Request_Fry_Look(Delta));
         }
 
-        const auto SecondaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Secondary);
-        if (SecondaryFrame != _SeenSecondaryFrame)
+        const auto PrimaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
+        if (PrimaryFrame != _SeenPrimaryFrame)
         {
-            _SeenSecondaryFrame = SecondaryFrame;
-            const auto Skim = SecondaryFrame.IsSet() ? EMars_Fry_Skim::Dip : EMars_Fry_Skim::Carry;
+            _SeenPrimaryFrame = PrimaryFrame;
+            const auto Skim = PrimaryFrame.IsSet() ? EMars_Fry_Skim::Dip : EMars_Fry_Skim::Carry;
             _Fry.Request_Skim(FMars_Request_Fry_Skim(Skim));
         }
 
@@ -138,12 +138,12 @@ class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
         _Fry = FCk_Handle_Fry();
         _Intents = FCk_Handle_InputIntents();
         _SeenLookSequence = 0;
-        _SeenSecondaryFrame.Reset();
+        _SeenPrimaryFrame.Reset();
     }
 }
 
 // The operator's legend rows while operating, under owner key k_OwnerKey: "move the skimmer" (IA_Look) and the dip row
-// (IA_Interact_Secondary), re-texted on every skim edge: "hold to dip · press over the basket to pour" while carrying,
+// (IA_Interact_Primary), re-texted on every skim edge: "hold to dip · press over the basket to pour" while carrying,
 // "release to lift" while dipped, "pouring · release to level" while pouring. Registered once on enter (the display drains
 // registers before unregisters, so the rows are re-texted, never re-registered). The batch's state is the station's world
 // label, not a row. An operator without a display (headless) gets no rows.
@@ -153,11 +153,11 @@ class UMars_SmTask_Fry_OperatorHints : UCk_SmTask_EntityScript
 
     private const FName k_OwnerKey = n"Fry";
     private const int32 k_LookSortOrder = 7;
-    private const int32 k_SecondarySortOrder = 8;
+    private const int32 k_PrimarySortOrder = 8;
 
     private FCk_Handle_Fry _Fry;
     private FCk_Handle_ActionHintDisplay _Display;
-    private FCk_Handle_ActionHintRow _SecondaryRow;
+    private FCk_Handle_ActionHintRow _PrimaryRow;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -173,8 +173,8 @@ class UMars_SmTask_Fry_OperatorHints : UCk_SmTask_EntityScript
 
         _Fry = StationEntity.As_Fry();
         _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Look, FText::FromString("move the skimmer"), k_LookSortOrder, k_OwnerKey));
-        _SecondaryRow = _Display.Request_RegisterHint(
-            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Secondary, Get_SecondaryText(_Fry.Get_Skim()), k_SecondarySortOrder, k_OwnerKey));
+        _PrimaryRow = _Display.Request_RegisterHint(
+            FMars_ActionHint_Spec(mars::Mars_IA_Interact_Primary, Get_PrimaryText(_Fry.Get_Skim()), k_PrimarySortOrder, k_OwnerKey));
         _Fry.BindTo_OnSkimChanged(FMars_Delegate_Fry_OnSkimChanged(this, n"OnSkimChanged"));
     }
 
@@ -189,19 +189,19 @@ class UMars_SmTask_Fry_OperatorHints : UCk_SmTask_EntityScript
 
         _Fry = FCk_Handle_Fry();
         _Display = FCk_Handle_ActionHintDisplay();
-        _SecondaryRow = FCk_Handle_ActionHintRow();
+        _PrimaryRow = FCk_Handle_ActionHintRow();
     }
 
     UFUNCTION()
     private void OnSkimChanged(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim)
     {
-        if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_SecondaryRow))
+        if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_PrimaryRow))
         { return; }
 
-        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_SecondaryRow, Get_SecondaryText(InSkim)));
+        _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_PrimaryRow, Get_PrimaryText(InSkim)));
     }
 
-    private FText Get_SecondaryText(EMars_Fry_Skim InSkim) const
+    private FText Get_PrimaryText(EMars_Fry_Skim InSkim) const
     {
         if (InSkim == EMars_Fry_Skim::Dip)
         { return FText::FromString("release to lift"); }
