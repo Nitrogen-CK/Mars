@@ -1,6 +1,7 @@
 // The resting rig, at an isolated origin: a kinematic plate (a thin box) on its own child node under a plate node 100 uu
 // above a transform-only root, and a dynamic box dropped 2 uu onto it with a Resting on the plate body. Moving the plate
-// node moves the plate (the kinematic push), which is how a test hops the box. The handlers record both signals.
+// node moves the plate (the kinematic push), which is how a test hops the box. The handlers record both signals. Build_Plate
+// and Build_Box let a test lay out more plates and boxes of the same make.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Resting : UCk_AutoTest_Base
 {
@@ -23,8 +24,21 @@ class UMars_AutoTestRig_Resting : UCk_AutoTest_Base
         auto RootEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(RootEntity, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
         _PlateNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, k_PlateRestZ)));
+        _PlateBody = Build_Plate(_PlateNode);
 
-        auto PlateTransform = _PlateNode.As_Transform();
+        _Box = Build_Box(InHandle, k_Origin + Get_BoxDropLocal());
+        _BoxBody = _Box.As_JoltBody();
+
+        _Resting = utils_resting::Add(_Box, FMars_Resting_Spec(_PlateBody));
+        _Resting.BindTo_OnRestingChanged(FMars_Delegate_Resting_OnRestingChanged(this, n"OnRestingChanged"));
+        _Resting.BindTo_OnLanded(FMars_Delegate_Resting_OnLanded(this, n"OnLanded"));
+    }
+
+    // A kinematic plate (120 x 120, 2 * k_PlateHalfHeight thick) on its own child node of InPlateNode; moving that node
+    // moves it.
+    protected FCk_Handle_JoltBody Build_Plate(FCk_Handle_SceneNode InPlateNode)
+    {
+        auto PlateTransform = InPlateNode.As_Transform();
         auto PlateBodyNode = utils_scene_node::Create(PlateTransform, FTransform::Identity);
         auto PlateShape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
         PlateShape.Set_HalfExtents(FVector(60.0, 60.0, k_PlateHalfHeight));
@@ -34,11 +48,14 @@ class UMars_AutoTestRig_Resting : UCk_AutoTest_Base
         PlateSpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
         PlateSpec.Set_Friction(0.6f);
         PlateSpec.Set_CollisionProfileName(n"BlockAll");
-        _PlateBody = utils_jolt_body::Add(PlateBodyNode.H(), PlateSpec);
+        return utils_jolt_body::Add(PlateBodyNode.H(), PlateSpec);
+    }
 
-        _Box = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        const auto BoxStart = k_Origin + FVector(0.0, 0.0, k_PlateRestZ + k_PlateHalfHeight + k_BoxHalfSize + 2.0);
-        utils_transform::Add(_Box, FTransform(FRotator::ZeroRotator, BoxStart), ECk_Replication::DoesNotReplicate);
+    // A dynamic box entity (half size k_BoxHalfSize, 0.4 kg) at InWorld with contacts persisted, so a Resting can be put on it.
+    protected FCk_Handle Build_Box(FCk_Handle InHandle, FVector InWorld)
+    {
+        auto Box = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        utils_transform::Add(Box, FTransform(FRotator::ZeroRotator, InWorld), ECk_Replication::DoesNotReplicate);
 
         auto BoxShape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
         BoxShape.Set_HalfExtents(FVector(k_BoxHalfSize, k_BoxHalfSize, k_BoxHalfSize));
@@ -51,11 +68,14 @@ class UMars_AutoTestRig_Resting : UCk_AutoTest_Base
         BoxSpec.Set_Friction(0.6f);
         // The Resting needs a Persisted contact every step from a resting awake box.
         BoxSpec.Set_PersistContacts(ECk_EnableDisable::Enable);
-        _BoxBody = utils_jolt_body::Add(_Box, BoxSpec);
+        utils_jolt_body::Add(Box, BoxSpec);
+        return Box;
+    }
 
-        _Resting = utils_resting::Add(_Box, FMars_Resting_Spec(_PlateBody));
-        _Resting.BindTo_OnRestingChanged(FMars_Delegate_Resting_OnRestingChanged(this, n"OnRestingChanged"));
-        _Resting.BindTo_OnLanded(FMars_Delegate_Resting_OnLanded(this, n"OnLanded"));
+    // Where a box starts over a plate at rest, relative to the plate node's parent: 2 uu above the plate's top.
+    protected FVector Get_BoxDropLocal() const
+    {
+        return FVector(0.0, 0.0, k_PlateRestZ + k_PlateHalfHeight + k_BoxHalfSize + 2.0);
     }
 
     // The plate node's height above its rest (uu).

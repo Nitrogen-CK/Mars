@@ -1,6 +1,7 @@
-// Every frame: resting = a contact with the target within GraceSeconds, or asleep while already resting (Jolt reports no
-// contacts for a sleeping pair, and a sleeping body has not moved, so the last verdict stands). A landing after at least
-// HopMinSeconds apart is a hop. Writes land first, then OnLanded, then OnRestingChanged.
+// Every frame, per target: resting on it = a contact with it within GraceSeconds, or asleep while already resting on it (Jolt
+// reports no contacts for a sleeping pair, and a sleeping body has not moved, so the last verdict stands). Resting = resting
+// on any target. A landing after at least HopMinSeconds apart is a hop. Writes land first, then OnLanded, then
+// OnRestingChanged.
 class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -17,12 +18,18 @@ class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
         const auto Spec = Self.Get_Spec();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
-        InState.ContactAge += DeltaSeconds;
+        const auto IsAsleep = utils_jolt_body::Get_SleepState(InState.Body) == ECk_Jolt_SleepState::Asleep;
+        auto IsResting = false;
+        for (int32 Index = 0; Index < InState.ContactAges.Num(); ++Index)
+        {
+            const auto Age = InState.ContactAges[Index] + DeltaSeconds;
+            InState.ContactAges[Index] = Age;
 
-        const auto Recent = InState.ContactAge <= Spec.GraceSeconds;
-        const auto SleepingWhileResting = InState.State == EMars_Resting_State::Resting
-            && utils_jolt_body::Get_SleepState(InState.Body) == ECk_Jolt_SleepState::Asleep;
-        const auto IsResting = Recent || SleepingWhileResting;
+            const auto IsOn = Age <= Spec.GraceSeconds || (InState.RestingOn[Index] && IsAsleep);
+            InState.RestingOn[Index] = IsOn;
+            if (IsOn)
+            { IsResting = true; }
+        }
 
         if (InState.State == EMars_Resting_State::Apart && IsResting)
         {

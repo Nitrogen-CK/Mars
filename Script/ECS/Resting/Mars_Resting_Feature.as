@@ -9,7 +9,7 @@ asset Mars_RestingHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Resting";
     RequiredFragments.Add(FMars_Feature_Resting);
-    Description = "Whether this entity's dynamic body rests on one target body: a recent contact, or asleep while resting; apart/resting edges and landings";
+    Description = "Whether this entity's dynamic body rests on any of its target bodies (and on which): a recent contact, or asleep while resting; apart/resting edges and landings";
 }
 struct FMars_Feature_Resting {}
 
@@ -25,9 +25,10 @@ enum EMars_Resting_State
 
 struct FMars_Resting_Spec
 {
-    // The entity whose body counts (compared with the contact payload's other entity).
+    // The entities whose bodies count, each compared with the contact payload's other entity. Resting on any of them is
+    // resting; Get_IsRestingOn tells them apart.
     UPROPERTY()
-    FCk_Handle Target;
+    TArray<FCk_Handle> Targets;
 
     // A contact this old still counts (contact events arrive from the previous physics step).
     UPROPERTY()
@@ -41,22 +42,42 @@ struct FMars_Resting_Spec
 
     FMars_Resting_Spec(FCk_Handle InTarget)
     {
-        Target = InTarget;
+        Targets.Add(InTarget);
     }
 
     FMars_Resting_Spec(FCk_Handle InTarget, float32 InGraceSeconds, float32 InHopMinSeconds)
     {
-        Target = InTarget;
+        Targets.Add(InTarget);
+        GraceSeconds = InGraceSeconds;
+        HopMinSeconds = InHopMinSeconds;
+    }
+
+    FMars_Resting_Spec(const TArray<FCk_Handle>& InTargets, float32 InGraceSeconds, float32 InHopMinSeconds)
+    {
+        Targets = InTargets;
         GraceSeconds = InGraceSeconds;
         HopMinSeconds = InHopMinSeconds;
     }
 }
 
-// Without a target nothing can be rested on; a zero grace drops every contact at once; a negative hop time is meaningless.
+// Without a target nothing can be rested on, and an invalid or repeated one cannot be told apart; a zero grace drops every
+// contact at once; a negative hop time is meaningless.
 mixin FMars_Validation Validate(const FMars_Resting_Spec& Self)
 {
-    if (ck::Is_NOT_Valid(Self.Target))
-    { return FMars_Validation(f"Resting has an invalid Target [{Self.Target.ToString()}]"); }
+    if (Self.Targets.Num() == 0)
+    { return FMars_Validation("Resting has no Targets"); }
+
+    for (int32 Index = 0; Index < Self.Targets.Num(); ++Index)
+    {
+        if (ck::Is_NOT_Valid(Self.Targets[Index]))
+        { return FMars_Validation(f"Resting has an invalid Targets[{Index}] [{Self.Targets[Index].ToString()}]"); }
+
+        for (int32 Earlier = 0; Earlier < Index; ++Earlier)
+        {
+            if (Self.Targets[Earlier] == Self.Targets[Index])
+            { return FMars_Validation(f"Resting has Targets[{Index}] [{Self.Targets[Index].ToString()}] repeating Targets[{Earlier}]"); }
+        }
+    }
 
     if (Self.GraceSeconds <= 0.0f)
     { return FMars_Validation(f"Resting has a non-positive GraceSeconds [{Self.GraceSeconds}]"); }
@@ -84,12 +105,18 @@ struct FMars_Fragment_Resting_Params
 // Written only by the Resting processors (and Add).
 struct FMars_Fragment_Resting
 {
+    // Resting on any target.
     UPROPERTY()
     EMars_Resting_State State = EMars_Resting_State::Apart;
 
-    // Seconds since the last contact with the target; 0 on each Added / Persisted event.
+    // Parallel to the spec's Targets: seconds since the last contact with that target (0 on each Added / Persisted event;
+    // k_NoContactAge before the first).
     UPROPERTY()
-    float32 ContactAge = 999.0f;
+    TArray<float32> ContactAges;
+
+    // Parallel to the spec's Targets: the last verdict for that target (a recent contact, or asleep while resting on it).
+    UPROPERTY()
+    TArray<bool> RestingOn;
 
     // Consecutive seconds Apart.
     UPROPERTY()

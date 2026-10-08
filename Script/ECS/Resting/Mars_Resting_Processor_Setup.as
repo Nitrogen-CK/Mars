@@ -1,5 +1,5 @@
-// One-shot per Resting entity: binds the body's Added and Persisted contacts, where a contact with the target refreshes the
-// contact age. The handler finds the Resting on the body's own entity.
+// One-shot per Resting entity: binds the body's Added and Persisted contacts, where a contact with one of the targets refreshes
+// that target's contact age. The handler finds the Resting on the body's own entity.
 class UMars_Processor_Resting_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -31,9 +31,11 @@ class UMars_Processor_Resting_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Resting))
         { return; }
 
-        if (InPayload.Get_OtherEntity() != Resting.Get_Target())
+        const auto Index = utils_resting::Find_TargetIndex(Resting.Get_Targets(), InPayload.Get_OtherEntity());
+        if (Index < 0)
         { return; }
 
-        Resting.Get_Fragment(FMars_Fragment_Resting).ContactAge = 0.0f;
+        auto& State = Resting.Get_Fragment(FMars_Fragment_Resting);
+        State.ContactAges[Index] = 0.0f;
     }
 }
