@@ -100,6 +100,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_CookingFeed",
+			"ShortName": "CookingFeed",
+			"Description": "A finite raw-food supply beside a cooking vessel: one left-hand transfer at a time, reserved then admitted by the cooking kernel",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CookingFeedHandle",
+			"RequiredFragments": [
+				"Mars_Feature_CookingFeed"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Countdown",
 			"ShortName": "Countdown",
 			"Description": "A logic node that a rising input charges to full and that drains one step at a time, asserting its mechanism source while charged",
@@ -187,6 +196,15 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_FPHandsHandle",
 			"RequiredFragments": [
 				"Mars_Feature_FPHands"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_Fry",
+			"ShortName": "Fry",
+			"Description": "A frying minigame on a station: admitted battered pieces (dynamic bodies keyed by their feed identity) that float, tumble and fry face by face below the oil line, a skimmer (a kinematic body) the operator dips, carries and pours, and a fixed drain basket outside the oil where a supported piece drains",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_FryHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Fry"
 			]
 		},
 		{
@@ -417,7 +435,7 @@
 		{
 			"TypeName": "FCk_Handle_Resting",
 			"ShortName": "Resting",
-			"Description": "Whether this entity's dynamic body rests on one target body: a recent contact, or asleep while resting; apart/resting edges and landings",
+			"Description": "Whether this entity's dynamic body rests on any of its target bodies (and on which): a recent contact, or asleep while resting; apart/resting edges and landings",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_RestingHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Resting"
@@ -426,7 +444,7 @@
 		{
 			"TypeName": "FCk_Handle_Searing",
 			"ShortName": "Searing",
-			"Description": "A searing minigame on a station: a steak cube (a dynamic body) on a hot pan (kinematic bodies the operator's look tilts and lifts); the face on the pan sears",
+			"Description": "A searing minigame on a station: admitted pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_SearingHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Searing"
