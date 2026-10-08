@@ -713,6 +713,19 @@ class AMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_Actor : ACk_Au
     }
 }
 
+class AMars_AutoTest_DicingStation_ChopsSliceTheSlab_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_ChopsSliceTheSlab");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

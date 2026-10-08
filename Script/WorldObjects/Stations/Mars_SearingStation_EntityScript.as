@@ -46,11 +46,12 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float64 TableHeight = constants_station::k_CounterHeight;
     // Close in: the capsule (radius 39) stands almost touching the table edge.
     private const float64 StandGap = 43.0;
-    // The operating view, pitched hard onto the pan from ViewGap uu off the table edge and ViewAboveStove uu over the stove
-    // top. It lives in the station frame (Camera.ViewLocal), so the framing holds whatever the operator's eye height.
-    private const float32 CameraPitch = -54.0f;
-    private const float64 ViewGap = 38.0;
-    private const float64 ViewAboveStove = 71.0;
+    // The operating view: the eye sits ViewDistance uu from the pan's rest pivot along the CameraPitch line, so the pan
+    // centre is the centre of the screen by construction (the reference: the pan fills the middle of the frame, seen
+    // steeply from above, the handle and the glove at the bottom). It lives in the station frame (Camera.ViewLocal), so
+    // the framing holds whatever the operator's eye height.
+    private const float32 CameraPitch = -58.0f;
+    private const float64 ViewDistance = 99.0;
     // The Use probe's margin around the table.
     private const float64 ProbePadding = 5.0;
 
@@ -374,8 +375,10 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
         InOutSpec.Camera.PitchOffset = CameraPitch;
+        // Back along the pitched view line from the pan's rest pivot, so the pan is dead centre on screen.
+        const auto PitchRadians = Math::DegreesToRadians(float64(-CameraPitch));
         InOutSpec.Camera.ViewLocal = TOptional<FTransform>(FTransform(FRotator(CameraPitch, 0.0, 0.0),
-            FVector(-(TableDepth * 0.5 + ViewGap), 0.0, Get_StoveTop() + ViewAboveStove)));
+            FVector(StoveX - ViewDistance * Math::Cos(PitchRadians), 0.0, Get_PanRestZ() + ViewDistance * Math::Sin(PitchRadians))));
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "SearSteakPrompt", "Sear steak"),
             NSLOCTEXT("MarsInteraction", "SearingStationInUsePrompt", "In use"));
@@ -444,8 +447,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     {
         const auto Scale = float64(PanScale);
 
-        _PanNode = utils_scene_node::Create(InRoot,
-            FTransform(FRotator::ZeroRotator, FVector(StoveX, 0.0, Get_BurnerTop() + PanHoverAboveBurner + PanUndersideDepth * Scale)));
+        _PanNode = utils_scene_node::Create(InRoot, FTransform(FRotator::ZeroRotator, FVector(StoveX, 0.0, Get_PanRestZ())));
         auto PanTransform = _PanNode.As_Transform();
 
         _PanMeshNode = utils_scene_node::Create(PanTransform, FTransform(FRotator(0.0, 180.0, 0.0), FVector::ZeroVector));
@@ -963,6 +965,12 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private float64 Get_BurnerTop() const
     {
         return TableHeight + HearthTrivetTop;
+    }
+
+    // The pan pivot (the centre of its cooking surface) at rest: the underside on the ring, plus any hover.
+    private float64 Get_PanRestZ() const
+    {
+        return Get_BurnerTop() + PanHoverAboveBurner + PanUndersideDepth * float64(PanScale);
     }
 
     private void Refresh_All()

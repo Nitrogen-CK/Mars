@@ -61,6 +61,8 @@ INGREDIENTS = {
                       ref="a cartoon drumstick (reference 5): fat teardrop of meat, exposed pale bone with a knuckle"),
     "Tentacle": dict(category="meats", size_cm=28.0, slots=("Flesh",), morph=True, fryable=True,
                      ref="a curled purple tentacle (reference 1): tapering spiral with a row of round suckers, tip curling up"),
+    "MeatSlab": dict(category="meats", size_cm=36.0, slots=("Flesh", "Skin"), morph=False, fryable=False, cpu_access=True,
+                     ref="a large raw joint for the cutting board: a thick loin / brisket slab with a fat cap, chopped into pieces at runtime"),
     # produce: same cook model (the sear ramp browns anything); morph where the reference shows a shape change
     "Puffer": dict(category="produce", size_cm=14.0, slots=("Skin", "Horn"), morph=True, fryable=True,
                    ref="the spiked orange puffer (reference 2): ball with short conical spikes and two bead eyes; morph = puffs up ~15% when fried"),

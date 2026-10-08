@@ -840,6 +840,19 @@ namespace UMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest
 }
 
 USTRUCT()
+struct FMars_AutoTest_DicingStation_ChopsSliceTheSlab_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DicingStation_ChopsSliceTheSlab
+{
+    FMars_AutoTest_DicingStation_ChopsSliceTheSlab_SpawnParams Params()
+    {
+        return FMars_AutoTest_DicingStation_ChopsSliceTheSlab_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams
 {
 }

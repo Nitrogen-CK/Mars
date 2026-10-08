@@ -64,7 +64,10 @@ class UMars_Processor_Dicing_HandleRequests : UCk_Processor_Script_Base_UE
         if (Self.Has_Fragment(FMars_Fragment_Dicing_Signals) == false)
         { return; }
 
-        if (NewState != StartState)
+        if (HasReset)
+        { Self.Get_Fragment(FMars_Fragment_Dicing_Signals).OnReset.Broadcast(Self); }
+
+        if (NewState != StartState && Self.Has_Fragment(FMars_Fragment_Dicing_Signals))
         { Self.Get_Fragment(FMars_Fragment_Dicing_Signals).OnStateChanged.Broadcast(Self, NewState); }
 
         if (NewBand != StartBand && Self.Has_Fragment(FMars_Fragment_Dicing_Signals))

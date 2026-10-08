@@ -44,7 +44,7 @@ if HERE not in sys.path:
 import food_common as fc  # noqa: E402
 
 spec = fc.spec
-NAMES = ("RoastHorned", "Drumstick", "Tentacle")
+NAMES = ("RoastHorned", "Drumstick", "Tentacle", "MeatSlab")
 BLEND_PATH = os.path.join(spec.BLEND_DIR, spec.CATEGORIES["meats"][0])
 UP = np.array([0.0, 0.0, 1.0])
 TRI_RANGE = (600, 2500)
@@ -1076,6 +1076,363 @@ def build_tentacle():
     return dict(obj=obj, raw=raw, cooked=ck, masks=masks, static=np.zeros(len(raw), bool))
 
 
+# ================================================================ MeatSlab
+# A radial (star-shaped) map from the unit sphere: a boxy super-ellipsoid (planform exponent SLAB_P, vertical SLAB_M)
+# with low lumps and shallow dents, clamped by half-spaces (the flat floor and two tilted butcher cuts at the ends).
+# Every vertex is (direction, radius), so the hull triangulation of the directions is one closed shell that cannot
+# self-intersect, and the planes stay exactly planar. The fat cap is the region above one wavy ring of fixed
+# directions (locked edges, so the Flesh | Skin border is a clean edge loop, not a staircase); two sinew strips are
+# pairs of close fixed lines. Both slots are faces of the same shell.
+SLAB_A, SLAB_B = 22.0, (10.4, 9.8)        # planform half axes (the end cuts set the length); B for +Y / -Y
+SLAB_C = (6.9, 6.2)                       # half height above / below the centre (the floor plane clamps below)
+SLAB_P, SLAB_M = 3.0, 4.0
+SLAB_FLOOR = 4.9                          # floor plane z = -SLAB_FLOOR (centred frame)
+SLAB_PLANES = (((0.0, 0.0, -1.0), SLAB_FLOOR, "floor"),
+               ((1.0, 0.10, 0.16), 17.1, "cut_px"),          # +X cut, top leaning back
+               ((-1.0, -0.07, 0.10), 17.4, "cut_nx"))        # -X cut
+SLAB_DENTS = (((4.0, -3.0, 7.0), 3.4, 0.55), ((-9.5, 3.5, 7.2), 3.0, 0.45), ((-5.0, -10.0, 1.0), 3.2, 0.5),
+              ((9.0, 9.5, 0.5), 3.0, 0.45), ((12.0, 2.5, 6.4), 2.6, 0.4))          # (centre, radius, depth) cm
+SLAB_SPACING = 1.75
+SLAB_RING_SP = 1.3                        # fat boundary ring spacing
+SLAB_FIXED_SP = 1.55                      # keeps blue-noise points this far (mean with theirs) off fixed points
+SLAB_LEDGE = 0.35                         # lean under the cap is inset this much (the fat overhangs a touch)
+# sinew strips: control points (centred frame, near the surface), width cm
+SLAB_SINEWS = ((((-12.0, -10.0, -1.6), (-5.0, -10.5, 0.2), (2.0, -10.4, -0.8), (8.0, -9.8, 0.6)), 0.45),
+               (((18.0, -4.5, -3.6), (18.0, -1.5, -1.2), (18.0, 2.0, -0.6), (18.0, 4.5, 1.4)), 0.45))
+
+
+def slab_zb(phi):
+    """Fat-cap boundary height (centred frame) by direction azimuth: wavy, a touch higher toward -X."""
+    phi = np.asarray(phi, float)
+    return (3.65 - 0.3 * np.cos(phi) + 0.36 * np.sin(3.0 * phi + 0.7) + 0.24 * np.sin(5.0 * phi + 2.1)
+            + 0.14 * np.sin(9.0 * phi + 0.4))
+
+
+def slab_radius(d, with_planes=True):
+    """Radius along unit directions d (n, 3) and the index of the clamping plane (-1 = free surface)."""
+    d = unit(np.atleast_2d(d))
+    dx, dy, dz = d[:, 0], d[:, 1], d[:, 2]
+    B = np.where(dy >= 0.0, SLAB_B[0], SLAB_B[1]) * (1.0 + 0.04 * dx)
+    C = np.where(dz >= 0.0, SLAB_C[0] * (1.0 - 0.07 * dx), SLAB_C[1])
+    g = (np.abs(dx / SLAB_A) ** SLAB_P + np.abs(dy / B) ** SLAB_P) ** (SLAB_M / SLAB_P) + np.abs(dz / C) ** SLAB_M
+    t = g ** (-1.0 / SLAB_M)
+    p0 = t[:, None] * d
+    t = t + 0.32 * fc.lumps(p0, 61, 0.16) + 0.09 * fc.lumps(p0, 62, 0.42)
+    for c, r, depth in SLAB_DENTS:
+        t = t - depth * np.exp(-np.sum((t[:, None] * d - np.array(c)) ** 2, axis=1) / (r * r))
+    which = np.full(len(d), -1)
+    if with_planes:
+        for k, (n, h, _) in enumerate(SLAB_PLANES):
+            n = unit(np.array(n, float))
+            nd = d @ n
+            lim = np.where(nd > 1e-6, h / np.maximum(nd, 1e-6), np.inf)
+            hit = lim < t
+            t = np.where(hit, lim, t)
+            which[hit] = k
+    return t, which
+
+
+def slab_surface(d):
+    d = unit(np.atleast_2d(d))
+    return slab_radius(d)[0][:, None] * d
+
+
+def slab_ring_dirs(n_phi=1440):
+    """Directions of the fat boundary ring: per azimuth, bisect the polar angle where the surface height equals
+    slab_zb, then resample evenly by arc length on the surface."""
+    phi = np.arange(n_phi) * math.tau / n_phi
+    zb = slab_zb(phi)
+    lo, hi = np.full(n_phi, 0.02), np.full(n_phi, math.pi * 0.5)        # z falls as the direction leaves +Z
+
+    def dirs(th):
+        return np.stack([np.sin(th) * np.cos(phi), np.sin(th) * np.sin(phi), np.cos(th)], axis=1)
+
+    for _ in range(48):
+        mid = 0.5 * (lo + hi)
+        z = slab_surface(dirs(mid))[:, 2]
+        up = z > zb
+        lo = np.where(up, mid, lo)
+        hi = np.where(up, hi, mid)
+    d = dirs(0.5 * (lo + hi))
+    p = slab_surface(d)
+    seg = np.linalg.norm(np.roll(p, -1, axis=0) - p, axis=1)
+    s = np.concatenate([[0.0], np.cumsum(seg)])
+    n = int(round(s[-1] / SLAB_RING_SP))
+    target = np.arange(n) * s[-1] / n
+    dd = np.concatenate([d, d[:1]])
+    out = np.stack([np.interp(target, s, dd[:, k]) for k in range(3)], axis=1)
+    return unit(out)
+
+
+def slab_sinew_dirs(ctrl, width, step=0.7):
+    """Two staggered lines of directions `width` cm apart along a surface curve through ctrl (centred cm)."""
+    ctrl = np.asarray(ctrl, float)
+    u = np.linspace(0.0, 1.0, len(ctrl))
+    uu = np.linspace(0.0, 1.0, 400)
+    q = np.stack([np.interp(uu, u, ctrl[:, k]) for k in range(3)], axis=1)
+    k = np.ones(9) / 9.0                                                     # soften the polyline corners
+    q = np.stack([np.convolve(np.pad(q[:, j], 4, mode="edge"), k, mode="valid") for j in range(3)], axis=1)
+    dq = unit(q)
+    p = slab_surface(dq)
+    s = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(p, axis=0), axis=1))])
+    n = max(int(s[-1] / step), 2)
+    ta = np.linspace(0.0, s[-1], n + 1)
+    da = unit(np.stack([np.interp(ta, s, dq[:, j]) for j in range(3)], axis=1))
+    pa = slab_surface(da)
+    nrm = surface_normal(slab_surface, da)
+    tan = unit(np.gradient(pa, axis=0))
+    side = unit(np.cross(nrm, tan))
+    tb = 0.5 * (ta[:-1] + ta[1:])
+    db = unit(np.stack([np.interp(tb, s, dq[:, j]) for j in range(3)], axis=1))
+    pb = slab_surface(db) + 0.5 * (side[:-1] + side[1:]) * width
+    return da, unit(pb)
+
+
+def slab_constraint_fix(P, faces, edges, max_iter=400):
+    """Make every edge in `edges` exist: flip the edge whose two opposite vertices are the missing pair (one flip
+    recovers a constraint crossed by a single edge). Returns faces and the edges still missing."""
+    faces = [list(f) for f in faces]
+    for _ in range(max_iter):
+        emap = {}
+        for fi, f in enumerate(faces):
+            for k in range(3):
+                a, b = f[k], f[(k + 1) % 3]
+                emap.setdefault((min(a, b), max(a, b)), []).append(fi)
+        missing = [e for e in edges if (min(e), max(e)) not in emap]
+        if not missing:
+            return faces, []
+        fixed_any = False
+        want = {(min(e), max(e)) for e in missing}
+        for (a, b), fl in emap.items():
+            if len(fl) != 2:
+                continue
+            f1, f2 = fl
+            c = next(v for v in faces[f1] if v != a and v != b)
+            d = next(v for v in faces[f2] if v != a and v != b)
+            if (min(c, d), max(c, d)) not in want:
+                continue
+            i = faces[f1].index(a)
+            if faces[f1][(i + 1) % 3] != b:
+                a, b = b, a
+            faces[f1], faces[f2] = [a, d, c], [d, b, c]
+            fixed_any = True
+            break
+        if not fixed_any:
+            return faces, missing
+    return faces, missing
+
+
+def tri_height(P, f):
+    """Smallest altitude of triangle f (cm): twice the area over the longest edge."""
+    a, b, c = P[f[0]], P[f[1]], P[f[2]]
+    longest = max(np.linalg.norm(b - a), np.linalg.norm(c - b), np.linalg.norm(a - c))
+    return float(np.linalg.norm(np.cross(b - a, c - a)) / max(longest, 1e-9))
+
+
+def slab_crease_flips(P, faces, locks, on_plane, min_deg=12.0, max_pass=20, min_height=0.4):
+    """Where a clamp plane meets the free surface (a convex crease) a Delaunay diagonal can fold the strip into a
+    notch. Flip every concave edge touching a plane vertex whose other diagonal is convex (and not a lock)."""
+    P = np.asarray(P, float)
+    faces = [list(f) for f in faces]
+    locked = {(min(a, b), max(a, b)) for a, b in locks}
+
+    def nrm(f):
+        return unit(np.cross(P[f[1]] - P[f[0]], P[f[2]] - P[f[0]]))
+
+    def concave_deg(f1, f2, c, d):          # dihedral at the shared edge, > 0 when concave
+        n1, n2 = nrm(f1), nrm(f2)
+        ang = math.degrees(math.acos(float(np.clip(n1 @ n2, -1.0, 1.0))))
+        return ang if (P[d] - P[c]) @ n1 > 0.0 else -ang
+
+    total = 0
+    for _ in range(max_pass):
+        emap = {}
+        for fi, f in enumerate(faces):
+            for k in range(3):
+                a, b = f[k], f[(k + 1) % 3]
+                emap.setdefault((min(a, b), max(a, b)), []).append(fi)
+        touched, flips = set(), 0
+        for (a, b), fl in emap.items():
+            if len(fl) != 2 or (a, b) in locked or fl[0] in touched or fl[1] in touched:
+                continue
+            if not (on_plane[a] or on_plane[b]):
+                continue
+            f1, f2 = fl
+            c = next(v for v in faces[f1] if v != a and v != b)
+            d = next(v for v in faces[f2] if v != a and v != b)
+            if (min(c, d), max(c, d)) in emap:
+                continue
+            if concave_deg(faces[f1], faces[f2], c, d) < min_deg:
+                continue
+            i = faces[f1].index(a)
+            if faces[f1][(i + 1) % 3] != b:
+                a, b = b, a
+            g1, g2 = [a, d, c], [d, b, c]
+            if nrm(g1) @ nrm(g2) < 0.2 or nrm(g1) @ nrm(faces[f1]) < 0.0 or nrm(g2) @ nrm(faces[f2]) < 0.0:
+                continue
+            if concave_deg(g1, g2, a, b) > -2.0:                      # the new edge must be convex
+                continue
+            if min(tri_height(P, g1), tri_height(P, g2)) < min_height:   # never trade a notch for a sliver
+                continue
+            faces[f1], faces[f2] = g1, g2
+            touched.update((f1, f2))
+            flips += 1
+        total += flips
+        if not flips:
+            break
+    return faces, total
+
+
+def build_meatslab():
+    name = "MeatSlab"
+    ring = slab_ring_dirs()
+    sinews = [slab_sinew_dirs(c, w) for c, w in SLAB_SINEWS]
+    fixed = np.concatenate([ring] + [np.concatenate([a, b]) for a, b in sinews])
+    nr = len(ring)
+    ring_idx = np.arange(nr)
+    k = nr
+    strip_sets = []
+    for a, b in sinews:
+        ia = np.arange(k, k + len(a))
+        ib = np.arange(k + len(a), k + len(a) + len(b))
+        strip_sets.append((ia, ib))
+        k += len(a) + len(b)
+
+    def spacing(p):
+        return np.full(len(p), SLAB_SPACING)
+
+    dirs = blue_noise_dirs(slab_surface, spacing, 760, seed=71, fixed=fixed, fixed_spacing=SLAB_FIXED_SP)
+    t, which = slab_radius(dirs)
+    body = t[:, None] * unit(dirs)
+
+    # ---- the ledge: the lean under the cap (off the cut faces) is inset horizontally; the fat overhangs a touch
+    phi_v = np.arctan2(unit(dirs)[:, 1], unit(dirs)[:, 0])
+    below = fc.smoothstep(0.0, 0.6, slab_zb(phi_v) - body[:, 2])
+    below[:nr] = 0.0
+    on_cut = np.isin(which, (1, 2))
+    inset = SLAB_LEDGE * below * (~on_cut)
+    rxy = np.hypot(body[:, 0], body[:, 1])
+    body[:, :2] *= (1.0 - inset / np.maximum(rxy, 3.0))[:, None]
+    for ia, ib in strip_sets:                                       # the sinew strips sit 0.12 cm proud
+        idx = np.concatenate([ia, ib])
+        body[idx] += surface_normal(slab_surface, dirs[idx]) * 0.12
+
+    locks = [(int(ring_idx[i]), int(ring_idx[(i + 1) % nr])) for i in range(nr)]
+    for ia, ib in strip_sets:
+        locks += [(int(ia[i]), int(ia[i + 1])) for i in range(len(ia) - 1)]
+        locks += [(int(ib[i]), int(ib[i + 1])) for i in range(len(ib) - 1)]
+    hull = hull_faces(dirs)
+    hull, _ = delaunay_flips(body, hull, (), max_pass=80, fold_cos=0.3)
+    hull, missing = slab_constraint_fix(body, hull, locks)
+    hull, _ = delaunay_flips(body, hull, locks, max_pass=80, fold_cos=0.3)
+    hull, n_crease = slab_crease_flips(body, hull, locks, which >= 0)
+    print("meatslab: %d crease flips" % n_crease)
+    print("meatslab: %d dirs (%d fixed), ring %d, constraint edges missing %d" % (len(dirs), len(fixed), nr, len(missing)))
+    if missing:
+        raise RuntimeError("MeatSlab: fat ring / sinew edges missing after flips: %s" % missing[:8])
+
+    # ---- slots: flood the faces from the top without crossing the ring -> Skin (fat cap); the rest Flesh
+    ring_edges = {(min(a, b), max(a, b)) for a, b in locks[:nr]}
+    emap = {}
+    for fi, f in enumerate(hull):
+        for j in range(3):
+            a, b = f[j], f[(j + 1) % 3]
+            emap.setdefault((min(a, b), max(a, b)), []).append(fi)
+    fcent = np.array([body[f].mean(axis=0) for f in hull])
+    start = int(np.argmax(fcent[:, 2]))
+    fat = np.zeros(len(hull), bool)
+    fat[start] = True
+    stack = [start]
+    while stack:
+        fi = stack.pop()
+        f = hull[fi]
+        for j in range(3):
+            e = (min(f[j], f[(j + 1) % 3]), max(f[j], f[(j + 1) % 3]))
+            if e in ring_edges:
+                continue
+            for g in emap[e]:
+                if not fat[g]:
+                    fat[g] = True
+                    stack.append(g)
+    if fat.all() or fcent[fat, 2].min() < -SLAB_FLOOR + 1.0:
+        raise RuntimeError("MeatSlab: the fat flood leaked past the ring")
+    slots = np.where(fat, 1, 0)                                     # 0 Flesh, 1 Skin (spec slot order)
+
+    shift = rest_shift(body)
+    raw = body + shift
+    obj = fc.new_object(spec.mesh_name(name), raw, hull, slots=spec.INGREDIENTS[name]["slots"], face_slots=slots)
+
+    # ---- paint: saturated monster-red lean with pale marbling streaks, cream fat cap, silver sinew strips
+    faces = [list(p.vertices) for p in obj.data.polygons]           # new_object may re-wind, keep its order
+    fslot = np.array([p.material_index for p in obj.data.polygons])
+    fcent, fnrm, farea = face_geo(raw, faces)
+    vplane = which
+    fplane = np.array([vplane[f[0]] if vplane[f[0]] == vplane[f[1]] == vplane[f[2]] else -1 for f in faces])
+    cut = np.isin(fplane, (1, 2)) & (fslot == 0)
+    cut_fat = np.isin(fplane, (1, 2)) & (fslot == 1)
+    floor = fplane == 0
+    sinew_v = np.zeros(len(raw), int)
+    for ia, ib in strip_sets:
+        sinew_v[ia] = 1
+        sinew_v[ib] = 2
+    sinew = np.array([all(sinew_v[v] > 0 for v in f) and {1, 2} <= {int(sinew_v[v]) for v in f} for f in faces])
+    near_ring = np.array([any(v < nr for v in f) for f in faces])
+    pc = fcent - shift                                               # centred frame for the noise fields
+
+    lean, lean_dark, lean_cut = col(192, 28, 46), col(150, 18, 38), col(212, 36, 56)
+    marb, fat_c, fat_warm, silver = col(238, 186, 186), col(240, 224, 192), col(234, 202, 170), col(234, 216, 222)
+    rgb = lerp(lean_dark, lean, fc.smoothstep(-0.9, 0.6, fnrm[:, 2]))
+    rgb = lerp(rgb, lean_dark, fc.smoothstep(0.1, 0.7, fc.lumps(pc, 81, 0.3)) * 0.45)
+    rgb[cut] = lerp(lean_cut, lean, fc.smoothstep(0.0, 0.6, fc.lumps(pc[cut], 82, 0.5)))
+    streak = fc.fbm(pc * np.array([0.06, 0.26, 0.34]) + np.array([0.0, 0.0, 0.12]) * pc[:, :1], 83, octaves=2)
+    streak = np.abs(streak - 0.5) * 2.0                              # ridged: thin bands where the fbm crosses 0.5
+    band = (1.0 - fc.smoothstep(0.05, 0.24, streak)) * (fslot == 0)          # soft pink band, 2-3 facets wide
+    core = (1.0 - fc.smoothstep(0.0, 0.07, streak)) * (fslot == 0)           # pale core along its middle
+    rng = np.random.default_rng(84)
+    fleck = (rng.random(len(faces)) < 0.02) & (fslot == 0)
+    rgb = lerp(rgb, col(222, 104, 116), band * 0.55)
+    rgb = lerp(rgb, marb, np.clip(core * 0.6 + fleck * 0.25, 0.0, 0.7))
+    rgb[floor] = lerp(rgb[floor], lean_dark, 0.35)
+    fat_rgb = lerp(fat_c, fat_warm, fc.smoothstep(-0.2, 0.6, fc.lumps(pc, 85, 0.35)))
+    fat_rgb = np.where((near_ring & (fslot == 1))[:, None], lerp(fat_rgb, col(232, 180, 166), 0.4), fat_rgb)
+    rgb[fslot == 1] = fat_rgb[fslot == 1]
+    rgb[cut_fat] = lerp(rgb[cut_fat], col(250, 238, 214), 0.5)
+    rgb[sinew] = silver
+    paint_object(obj, rgb, seed=17, value=0.06, hue=0.03, cavity_darken=0.3)
+    finish_object(obj)
+    obj["fat_faces"] = int((fslot == 1).sum())
+    obj["sinew_faces"] = int(sinew.sum())
+    obj["cut_faces"] = int(cut.sum() + cut_fat.sum())
+
+    ring_pts = raw[:nr]
+    plane_n = [unit(np.array(n, float)) for n, _, _ in SLAB_PLANES[1:]]
+
+    def masks(fields):
+        p, nrm, ao = fields["position_cm"], fields["normal"], fields["ao"]
+        cov = fields["coverage"] > 0.5
+        fatm = np.zeros(p.shape[:2], np.float32)
+        pts = p[cov]
+        best_d = np.full(len(pts), np.inf)
+        best_z = np.zeros(len(pts))
+        for q in ring_pts:                                          # nearest ring point in plan -> its height
+            dd = (pts[:, 0] - q[0]) ** 2 + (pts[:, 1] - q[1]) ** 2
+            closer = dd < best_d
+            best_d = np.where(closer, dd, best_d)
+            best_z = np.where(closer, q[2], best_z)
+        fatm[cov] = fc.smoothstep(-0.3, 0.3, pts[:, 2] - best_z)
+        cutm = np.zeros(p.shape[:2])
+        for n in plane_n:
+            cutm = np.maximum(cutm, fc.smoothstep(0.96, 0.995, nrm @ n))
+        top = fc.smoothstep(-0.35, 0.85, nrm[..., 2])
+        under = fc.smoothstep(0.15, 2.0, p[..., 2])
+        outer = (0.2 + 0.45 * top) * under * (1.0 - 0.45 * cutm)
+        r = (fatm * 0.9 + (1.0 - fatm) * outer) * fc.smoothstep(0.25, 0.9, ao)
+        edges = edge_raster(obj, ao.shape[0])
+        return assemble_masks(fields, r + 0.2 * edges, edges, grain_freq=0.8, seed=330)
+
+    return dict(obj=obj, raw=raw, cooked=raw.copy(), masks=masks, static=np.ones(len(raw), bool))
+
+
 # ================================================================ masks
 def _segment(img, a, b, w, val):
     h, wd = img.shape
@@ -1140,7 +1497,8 @@ def assemble_masks(fields, r, edges, grain_freq, seed):
 
 
 # ================================================================ verification / output
-BUILDERS = {"RoastHorned": build_roast, "Drumstick": build_drumstick, "Tentacle": build_tentacle}
+BUILDERS = {"RoastHorned": build_roast, "Drumstick": build_drumstick, "Tentacle": build_tentacle,
+            "MeatSlab": build_meatslab}
 
 
 def mesh_stats(obj):
@@ -1151,6 +1509,66 @@ def mesh_stats(obj):
     loose = sum(1 for v in bm.verts if not v.link_faces)
     bm.free()
     return nonman, degen, loose
+
+
+def want_uvs(name):
+    return ["UVMap"] + (list(spec.MORPH_UV) if spec.INGREDIENTS[name]["morph"] else [])
+
+
+def manifold_report(obj):
+    """Closed-manifold check for the runtime slicer (same fields as build_food_produce's sidecars) plus what a
+    plane slicer also needs: no doubles, no self-intersections, no sliver faces."""
+    from mathutils.bvhtree import BVHTree
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.verts.ensure_lookup_table()
+    boundary = sum(1 for e in bm.edges if e.is_boundary)
+    nonman = sum(1 for e in bm.edges if not e.is_manifold)
+    noncontig = sum(1 for e in bm.edges if not e.is_contiguous)
+    loose_v = sum(1 for v in bm.verts if not v.link_faces)
+    doubles = len(bmesh.ops.find_doubles(bm, verts=bm.verts[:], dist=1e-5)["targetmap"])
+    parent = list(range(len(bm.verts)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for e in bm.edges:
+        a, b = find(e.verts[0].index), find(e.verts[1].index)
+        if a != b:
+            parent[a] = b
+    comps = {}
+    for f in bm.faces:
+        comps.setdefault(find(f.verts[0].index), []).append([v.index for v in f.verts])
+    co = np.array([v.co[:] for v in bm.verts]) * 100.0
+    vols = []
+    for fs in comps.values():
+        vol = 0.0
+        for f in fs:
+            for j in range(1, len(f) - 1):
+                vol += np.dot(co[f[0]], np.cross(co[f[j]], co[f[j + 1]])) / 6.0
+        vols.append(vol)
+    alt = []
+    for f in bm.faces:
+        p = co[[v.index for v in f.verts]]
+        for j in range(1, len(p) - 1):
+            tri = np.array([p[0], p[j], p[j + 1]])
+            a2 = np.linalg.norm(np.cross(tri[1] - tri[0], tri[2] - tri[0]))
+            longest = max(np.linalg.norm(tri[(i + 1) % 3] - tri[i]) for i in range(3))
+            alt.append(a2 / max(longest, 1e-9))
+    tree = BVHTree.FromBMesh(bm, epsilon=0.0)
+    fverts = [set(v.index for v in f.verts) for f in bm.faces]
+    selfx = sum(1 for i, j in tree.overlap(tree) if i < j and not (fverts[i] & fverts[j]))
+    bm.free()
+    rep = dict(components=len(comps), boundary_edges=boundary, nonmanifold_edges=nonman,
+               inconsistent_winding_edges=noncontig, loose_verts=loose_v, doubles=doubles,
+               self_intersections=selfx, negative_volume_components=int(sum(1 for v in vols if v <= 0.0)),
+               min_volume_cm3=round(float(min(vols)), 4), min_face_height_cm=round(float(min(alt)), 4))
+    rep["ok"] = (boundary == 0 and nonman == 0 and noncontig == 0 and loose_v == 0 and doubles == 0
+                 and selfx == 0 and rep["negative_volume_components"] == 0 and len(comps) == 1)
+    return rep
 
 
 def verify(name, res):
@@ -1166,25 +1584,35 @@ def verify(name, res):
     slots = [m.name for m in mesh.materials]
     centred = abs(lo[0] + hi[0]) < 0.02 and abs(lo[1] + hi[1]) < 0.02 and abs(lo[2]) < 1e-3
     ck_lo = res["cooked"][:, 2].min()
+    ing = spec.INGREDIENTS[name]
     checks = {
         "tris": TRI_RANGE[0] <= tris <= TRI_RANGE[1],
         "size": size_ok,
         "flat": flat,
-        "uv_layers": uv == ["UVMap", spec.MORPH_UV[0], spec.MORPH_UV[1]],
+        "uv_layers": uv == want_uvs(name),
         "col": spec.COLOR_ATTR in mesh.color_attributes,
-        "slots": tuple(slots) == tuple(spec.INGREDIENTS[name]["slots"]),
-        "morph": MORPH_RANGE_CM[0] <= morph <= MORPH_RANGE_CM[1],
+        "slots": tuple(slots) == tuple(ing["slots"]),
+        "morph": (MORPH_RANGE_CM[0] <= morph <= MORPH_RANGE_CM[1]) if ing["morph"] else morph == 0.0,
         "static_offset0": bool(np.all(np.abs(res["cooked"][res["static"]] - res["raw"][res["static"]]) < 1e-9)),
         "rest_pose": centred,
         "cooked_on_floor": abs(ck_lo) < 0.05,
         "no_degenerate": degen == 0 and loose == 0,
     }
+    manifold = None
+    if ing.get("cpu_access"):                                   # runtime-sliced: one closed clean shell
+        manifold = manifold_report(obj)
+        checks["manifold"] = manifold["ok"]
+        checks["face_height"] = manifold["min_face_height_cm"] >= 0.3
+        print("MANIFOLD %s %s" % (name, json.dumps(manifold)))
     size = hi - lo
     print("CHECK %-12s tris %4d  size %.1f x %.1f x %.1f cm  slots %s  morph_max %.2f cm  non-manifold edges %d  %s" % (
         name, tris, size[0], size[1], size[2], slots, morph, nonman,
         " ".join("%s=%s" % (k, "ok" if v else "FAIL") for k, v in checks.items())))
-    return checks, dict(tris=tris, size_cm=[round(float(s), 2) for s in size], slots=slots, morph_max_cm=round(morph, 3),
-                        nonmanifold_edges=nonman, cooked_min_z_cm=round(float(ck_lo), 4))
+    info = dict(tris=tris, size_cm=[round(float(s), 2) for s in size], slots=slots, morph_max_cm=round(morph, 3),
+                nonmanifold_edges=nonman, cooked_min_z_cm=round(float(ck_lo), 4))
+    if manifold is not None:
+        info["manifold"] = manifold
+    return checks, info
 
 
 def isolate(obj):
@@ -1294,7 +1722,7 @@ def run_reimport(fbx_paths, expected):
             for r in rec["report"]:
                 key = r["name"].replace("_Mars_SM", "").split(".")[0]
                 exp = expected.get(key, {})
-                good = (r["uv_layers"] == ["UVMap", spec.MORPH_UV[0], spec.MORPH_UV[1]]
+                good = (r["uv_layers"] == want_uvs(key)
                         and spec.COLOR_ATTR in r["colors"] and r["flat"] and r["tris"] == exp.get("tris")
                         and r["slots"] == exp.get("slots"))
                 ok &= good
@@ -1327,7 +1755,8 @@ def main():
         res = BUILDERS[name]()
         obj = res["obj"]
         fc.smart_uv(obj)
-        fc.write_morph_uvs(obj, res["raw"], res["cooked"])
+        if spec.INGREDIENTS[name]["morph"]:
+            fc.write_morph_uvs(obj, res["raw"], res["cooked"])
         results[name] = res
         print("built %s in %.1fs" % (name, time.time() - t0))
 
@@ -1344,13 +1773,29 @@ def main():
                     mask_path, _ = fc.bake_masks(obj, res["masks"])
                     info["mask"] = mask_path
                     print("mask %s (%.1fs)" % (mask_path, time.time() - t0))
-                fbx = fc.export_fbx(obj, extra={"category": "meats", "builder": os.path.basename(__file__),
-                                                "cooked_min_z_cm": info["cooked_min_z_cm"]})
+                extra = {"category": "meats", "builder": os.path.basename(__file__),
+                         "cooked_min_z_cm": info["cooked_min_z_cm"], "size_spec_cm": spec.INGREDIENTS[name]["size_cm"],
+                         "ref": spec.INGREDIENTS[name]["ref"]}
+                if "manifold" in info:
+                    extra["manifold"] = info["manifold"]
+                    extra["cpu_access"] = True
+                    extra["rest_pose"] = "lying on its flat underside, long axis along X, centred XY, base z = 0"
+                fbx = fc.export_fbx(obj, extra=extra)
                 fbx_paths.append(fbx)
                 info["fbx"] = fbx
             finally:
                 unisolate(others)
-        if args["sheets"]:
+        if args["sheets"] and not spec.INGREDIENTS[name]["morph"]:
+            others = isolate(obj)
+            try:
+                info["sheet"] = fc.review_sheet([obj], name, views=("iso", "front", "side", "top"), color="VERTEX",
+                                                size=(1600, 1100))
+                print("sheet %s" % info["sheet"])
+                info["sheet_ortho"] = meats_sheet([obj], name + "_Ortho", views=("iso", "iso_back", "low", "back"))
+                print("sheet %s" % info["sheet_ortho"])
+            finally:
+                unisolate(others)
+        elif args["sheets"]:
             ghost = cooked_copy(res)
             try:
                 views = tuple(v.strip() for v in str(args["views"]).split(",") if v.strip())

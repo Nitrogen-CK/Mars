@@ -1,10 +1,10 @@
 {
-	"material": "Rope_Mars_MI",
-	"packagePath": "/Game/Mars/Gameplay/Cooking/Stations/Materials/Rope_Mars_MI",
+	"material": "MeatSlabCut_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Stations/Materials/MeatSlabCut_Mars_MI",
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "52f17b85d20e2171687116446469dab4",
+		"sourceHash": "ed1aa9e7f7dd8c7ce53753282ab2b8c6",
 		"exporterVersion": 3
 	},
 	"parentChain": [
@@ -200,17 +200,17 @@
 		},
 		{
 			"name": "Roughness",
-			"value": 0.89999997615814209
+			"value": 0.44999998807907104
 		},
 		{
 			"name": "Specular",
-			"value": 0.30000001192092896
+			"value": 0.44999998807907104
 		}
 	],
 	"vectorParams": [
 		{
 			"name": "Tint",
-			"value": "RGBA(1, 1, 1, 1)"
+			"value": "RGBA(0.78, 0.16, 0.14, 1)"
 		}
 	],
 	"textureParams": [],

@@ -70,24 +70,27 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     // The Use probe's margin around the counter.
     private const float64 ProbePadding = 5.0;
 
-    // The pot: an iron cauldron on the counter, its floor disc 5 thick, its wall PotSegments boxes around the axis.
-    private const float64 PotInnerRadius = 45.0;
-    private const float64 PotWallThickness = 3.0;
-    private const float64 PotHeight = 45.0;
-    private const float64 PotFloorZ = CounterHeight + 5.0;
-    private const float64 PotRimZ = CounterHeight + PotHeight;
-    private const float64 OilSurfaceZ = PotRimZ - 12.0;
-    private const int32 PotSegments = 12;
-    // A wall box is its arc length plus this much, so neighbouring segments overlap at their corners.
-    private const float64 PotSegmentOverlap = 1.05;
+    // The pot is FryerVat_Mars_SM (station_spec.py): a stone-ring vat standing on the FLOOR at the station's origin, inner
+    // radius 48, wall 14 (outer 62), rim top 76, cavity floor 40, oil at 66 (its SOCKET_Oil). The counter is split into two
+    // halves flanking it (CounterGap off the ring) for the platter and the basket. Its UCX hulls are the pot's collision.
+    private const float64 PotInnerRadius = 48.0;
+    private const float64 PotWallThickness = 14.0;
+    private const float64 PotFloorZ = 40.0;
+    private const float64 PotRimZ = 76.0;
+    private const float64 OilSurfaceZ = 66.0;
+    private const float64 CounterGap = 4.0;
 
     // The drain basket to the right of the pot, on a stand: its interior's -Y edge BasketGap off the pot's outer wall, its
     // floor top just under the pot rim so a pour drops a piece a hand's width (the carried disc is 17 over the rim), not the
     // half metre a counter-level basket would (a piece poured from that height bounced over the wall); its walls
     // BasketWallHeight tall, still under the carried scoop's underside.
+    // FryerBasket_Mars_SM (inner 44 x 26 x 16, pivot at its inner floor centre) stretched along Y to a 44 x 44 interior,
+    // the square the pour window needs (k_MinPourWindow both ways); the kinematic boxes follow the same spec.
     private const float64 BasketGap = 6.0;
     private const float64 BasketFloorTopZ = PotRimZ - 2.0;
-    private const float64 BasketWallHeight = 12.0;
+    private const float64 BasketWallHeight = 16.0;
+    private const float32 BasketInnerHalf = 22.0f;
+    private const float64 BasketMeshInnerY = 26.0;
     private const float64 RodThickness = 1.2;
     // cm: the narrowest the pour window (where the whole bowl is over the basket interior) may be on either axis: twice the
     // pour's 11 cm.
@@ -100,10 +103,11 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     // top keeps the glove above the oil while the scoop is dipped.
     private const FVector ScoopPark = FVector(30.0, 6.0, PotRimZ + 17.0);
     private const float64 ScoopDipTopZ = OilSurfaceZ - 13.0;
-    private const float64 SkimmerHandleEndY = 24.0;
-    private const float64 SkimmerHandleZ = 2.0;
-    private const float64 SkimmerStemHeight = 20.0;
-    private const float64 SkimmerGripLength = 12.0;
+    // FryerSkimmer_Mars_SM (station_spec.py): a wire bowl of inner radius 10 and depth 7, pivot at the bowl's lowest inner
+    // point, handle along its +X with SOCKET_Grip at (49.67, 0, 14.75). Scaled so the bowl matches the scoop spec's
+    // BowlRadius and yawed so the handle runs to the operator's right (+Y); the grip node sits on its grip.
+    private const float64 SkimmerMeshBowlRadius = 10.0;
+    private const FVector SkimmerMeshGrip = FVector(49.67, 0.0, 14.75);
     // A slow, critically damped dip and carry: the scoop's deceleration at the top of a carry stays under gravity, so a
     // piece on it is not thrown off.
     private const float32 SkimmerLiftSpringHz = 1.5f;
@@ -216,6 +220,8 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         _FrySpec.Zones.RimZ = float32(PotRimZ);
         _FrySpec.Zones.PotRadius = float32(PotInnerRadius);
         _FrySpec.Basket.WallHeight = float32(BasketWallHeight);
+        _FrySpec.Basket.InnerHalfX = BasketInnerHalf;
+        _FrySpec.Basket.InnerHalfY = BasketInnerHalf;
         _FrySpec.Scoop.CarryLift = 0.0f;
         _FrySpec.Scoop.DipLift = float32(ScoopDipTopZ - ScoopPark.Z);
         _FrySpec.Reach = Make_Reach();
@@ -340,11 +346,17 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     protected void AddVisuals(FCk_Handle_Transform& InRoot) override
     {
         _Root = InRoot;
+        // Two counter halves flanking the vat: from CounterGap off the ring out to the counter's edge on each side.
         auto CubeMesh = engine::load::Cube();
-
-        InRoot.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, CounterHeight * 0.5), FVector(CounterDepth, CounterWidth, CounterHeight) * 0.01),
-            CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"FryStation_Counter"));
+        const auto HalfInner = PotInnerRadius + PotWallThickness + CounterGap;
+        const auto HalfWidth = CounterWidth * 0.5 - HalfInner;
+        for (int32 Side = -1; Side <= 1; Side += 2)
+        {
+            InRoot.Add_MeshPart(this, FMars_MeshPart(
+                FTransform(FRotator::ZeroRotator, FVector(0.0, float64(Side) * (HalfInner + HalfWidth * 0.5), CounterHeight * 0.5),
+                    FVector(CounterDepth, HalfWidth, CounterHeight) * 0.01),
+                CubeMesh, assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"FryStation_Counter"));
+        }
 
         AddPot(InRoot);
         AddOil(InRoot);
@@ -369,29 +381,11 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     // wall bounces back into the oil and one that clears the rim lands on the counter or the floor.
     private void AddPot(FCk_Handle_Transform& InRoot)
     {
-        const auto OuterRadius = PotInnerRadius + PotWallThickness;
-        auto Floor = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, (CounterHeight + PotFloorZ) * 0.5),
-                FVector(OuterRadius * 0.02, OuterRadius * 0.02, (PotFloorZ - CounterHeight) * 0.01)),
-            engine::load::Cylinder(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::BlockAll, n"FryStation_PotFloor");
-        AddTintedPart(InRoot, Floor, k_IronColor);
-
-        const auto WallRadius = PotInnerRadius + PotWallThickness * 0.5;
-        const auto FullTurn = 2.0 * Math::DegreesToRadians(180.0);
-        const auto SegmentLength = FullTurn * WallRadius / float64(PotSegments) * PotSegmentOverlap;
-        auto CubeMesh = engine::load::Cube();
-        auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();
-        for (int32 Index = 0; Index < PotSegments; ++Index)
-        {
-            const auto AngleDegrees = 360.0 * float64(Index) / float64(PotSegments);
-            const auto Angle = Math::DegreesToRadians(AngleDegrees);
-            auto Wall = FMars_MeshPart(
-                FTransform(FRotator(0.0, AngleDegrees, 0.0),
-                    FVector(Math::Cos(Angle) * WallRadius, Math::Sin(Angle) * WallRadius, CounterHeight + PotHeight * 0.5),
-                    FVector(PotWallThickness, SegmentLength, PotHeight) * 0.01),
-                CubeMesh, WallMaterial, collision::profile::BlockAll, n"FryStation_PotWall");
-            AddTintedPart(InRoot, Wall, k_IronColor);
-        }
+        // The vat's authored hulls (ring wedges from the cavity floor to the rim, the floor slab, the plinth) are the static
+        // world the physics mirrors: a piece flung against the wall bounces back into the oil, one that clears the rim lands
+        // on a counter or the floor.
+        InRoot.Add_MeshPart(this, FMars_MeshPart(FTransform::Identity,
+            assets::load::FryerVat_Mars_SM(), nullptr, collision::profile::BlockAll, n"FryStation_Vat"));
     }
 
     // The oil surface (the 1 m disc scaled to the pot) and the boil mesh, both static visuals at the oil line, and the hosted
@@ -445,29 +439,12 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
             engine::load::Cube(), assets::load::ProtoGrid_Wall_Mars_MI(), collision::profile::NoCollision, n"FryStation_BasketStand");
         AddTintedPart(InRoot, Stand, k_IronColor);
 
-        for (int32 Level = 0; Level < 2; ++Level)
-        {
-            const auto Z = Level == 0 ? 0.0 : Height;
-            AddRod(BasketTransform, FMars_FryStation_Rod(FVector(0.0, OuterY, Z), FVector(2.0 * OuterX, RodThickness, RodThickness)), k_WireColor);
-            AddRod(BasketTransform, FMars_FryStation_Rod(FVector(0.0, -OuterY, Z), FVector(2.0 * OuterX, RodThickness, RodThickness)), k_WireColor);
-            AddRod(BasketTransform, FMars_FryStation_Rod(FVector(OuterX, 0.0, Z), FVector(RodThickness, 2.0 * OuterY, RodThickness)), k_WireColor);
-            AddRod(BasketTransform, FMars_FryStation_Rod(FVector(-OuterX, 0.0, Z), FVector(RodThickness, 2.0 * OuterY, RodThickness)), k_WireColor);
-        }
-
-        for (int32 CornerX = -1; CornerX <= 1; CornerX += 2)
-        {
-            for (int32 CornerY = -1; CornerY <= 1; CornerY += 2)
-            {
-                AddRod(BasketTransform, FMars_FryStation_Rod(FVector(float64(CornerX) * OuterX, float64(CornerY) * OuterY, Height * 0.5),
-                    FVector(RodThickness, RodThickness, Height)), k_WireColor);
-            }
-        }
-
-        for (int32 Rod = -1; Rod <= 1; ++Rod)
-        {
-            AddRod(BasketTransform, FMars_FryStation_Rod(FVector(0.0, float64(Rod) * OuterY * 0.5, 0.0), FVector(2.0 * OuterX, RodThickness, RodThickness)), k_WireColor);
-            AddRod(BasketTransform, FMars_FryStation_Rod(FVector(float64(Rod) * OuterX * 0.5, 0.0, 0.0), FVector(RodThickness, 2.0 * OuterY, RodThickness)), k_WireColor);
-        }
+        // The wire basket mesh over the kinematic boxes: its pivot is its inner floor centre (the basket frame), its 44 cm
+        // long side along X matches InnerHalfX and its 26 cm short side is stretched to InnerHalfY.
+        InRoot.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator::ZeroRotator, Get_BasketLocal(),
+                FVector(1.0, 2.0 * float64(Basket.InnerHalfY) / BasketMeshInnerY, Height / BasketWallHeight)),
+            assets::load::FryerBasket_Mars_SM(), nullptr, collision::profile::NoCollision, n"FryStation_Basket"));
 
         _BasketBody = utils_fry::Add_BasketBodies(_BasketNode, Basket);
     }
@@ -485,43 +462,22 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         _ScoopNode = utils_scene_node::Create(SkimmerTransform, FTransform::Identity);
         auto ScoopTransform = _ScoopNode.As_Transform();
 
-        const auto DiscRadius = float64(Scoop.BowlRadius + Scoop.LipThickness);
-        auto Disc = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -float64(Scoop.DiscThickness) * 0.5),
-                FVector(DiscRadius * 0.02, DiscRadius * 0.02, float64(Scoop.DiscThickness) * 0.01)),
-            engine::load::Cylinder(), assets::load::ProtoGrid_Platform_Mars_MI(), collision::profile::NoCollision, n"FryStation_ScoopDisc");
-        AddTintedPart(ScoopTransform, Disc, k_IronColor);
-
-        // The lip as the bodies lay it: utils_fry::k_LipSegments tangent boxes at the middle of the lip's thickness.
-        const auto LipRadius = float64(Scoop.BowlRadius + Scoop.LipThickness * 0.5f);
-        const auto FullTurn = 2.0 * Math::DegreesToRadians(180.0);
-        const auto LipLength = FullTurn * LipRadius / float64(utils_fry::k_LipSegments) * float64(utils_fry::k_LipOverlap);
-        for (int32 Index = 0; Index < utils_fry::k_LipSegments; ++Index)
-        {
-            const auto AngleDegrees = 360.0 * float64(Index) / float64(utils_fry::k_LipSegments);
-            const auto Angle = Math::DegreesToRadians(AngleDegrees);
-            auto Lip = FMars_MeshPart(
-                FTransform(FRotator(0.0, AngleDegrees, 0.0),
-                    FVector(Math::Cos(Angle) * LipRadius, Math::Sin(Angle) * LipRadius, float64(Scoop.LipHeight) * 0.5),
-                    FVector(float64(Scoop.LipThickness), LipLength, float64(Scoop.LipHeight)) * 0.01),
-                engine::load::Cube(), assets::load::ProtoGrid_Platform_Mars_MI(), collision::profile::NoCollision, n"FryStation_ScoopLip");
-            AddTintedPart(ScoopTransform, Lip, k_WireColor);
-        }
+        // The skimmer mesh over the kinematic disc and lip: its pivot (the bowl's lowest inner point) at the scoop frame's
+        // origin (the disc's top), scaled so its bowl is the spec's BowlRadius, yawed 90 so its handle runs along +Y.
+        const auto MeshScale = float64(Scoop.BowlRadius) / SkimmerMeshBowlRadius;
+        ScoopTransform.Add_MeshPart(this, FMars_MeshPart(
+            FTransform(FRotator(0.0, 90.0, 0.0), FVector::ZeroVector, FVector(MeshScale, MeshScale, MeshScale)),
+            assets::load::FryerSkimmer_Mars_SM(), nullptr, collision::profile::NoCollision, n"FryStation_Skimmer"));
 
         _ScoopBody = utils_fry::Add_ScoopBodies(_ScoopNode, Scoop);
 
-        AddRod(SkimmerTransform, FMars_FryStation_Rod(FVector(0.0, (DiscRadius + SkimmerHandleEndY) * 0.5, SkimmerHandleZ),
-            FVector(RodThickness, SkimmerHandleEndY - DiscRadius, RodThickness)), k_IronColor);
-        AddRod(SkimmerTransform, FMars_FryStation_Rod(FVector(0.0, SkimmerHandleEndY, SkimmerHandleZ + SkimmerStemHeight * 0.5),
-            FVector(RodThickness, RodThickness, SkimmerStemHeight)), k_IronColor);
+        // The grip: the mesh's SOCKET_Grip, carried into the yawed, scaled frame (its +X handle is the skimmer's +Y).
+        const auto GripLocal = FVector(-SkimmerMeshGrip.Y, SkimmerMeshGrip.X, SkimmerMeshGrip.Z) * MeshScale;
 
-        const auto GripLocal = FVector(0.0, SkimmerHandleEndY, SkimmerHandleZ + SkimmerStemHeight);
-        AddRod(SkimmerTransform, FMars_FryStation_Rod(GripLocal, FVector(SkimmerGripLength, RodThickness * 2.0, RodThickness * 2.0)), k_HandleColor);
-
-        // Grip frame (X across the palm toward the index finger, Z out of the palm): along the grip bar away from the
-        // operator (+X), palm to the bar's left (-Y) - a handshake grip.
+        // Grip frame (X across the palm toward the index finger, Z out of the palm): along the handle away from the bowl
+        // (+Y, to the operator's right), palm down on the raked handle - a right hand closed over a bar that runs to its side.
         _SkimmerHandleNode = utils_scene_node::Create(SkimmerTransform,
-            FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), GripLocal)).As_Transform();
+            FTransform(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector), GripLocal)).As_Transform();
     }
 
     // The raw platter: a slab on the counter's left with one battered proxy per slot (each on its RawSlot node, tagged so a

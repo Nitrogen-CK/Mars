@@ -52,6 +52,11 @@ STATION_LOOK = {
     "Wire": (ACCENT_MASTER, {"Roughness": 0.55, "Specular": 0.5}, {}),
     "Rope": (ACCENT_MASTER, {"Roughness": 0.9, "Specular": 0.3}, {}),
     "Ember": (EMISSIVE_MASTER, {"Strength": 8.0}, {"Color": (1.0, 0.40, 0.08, 1.0)}),
+    # The cutting station's sliceable MeatSlab lives as a procedural mesh copy (no vertex colours survive the copy), so its
+    # flesh, fat cap and the cut faces the slicing caps with are flat Accent tints rather than the food master.
+    "MeatSlabFlesh": (ACCENT_MASTER, {"Roughness": 0.5, "Specular": 0.4}, {"Tint": (0.55, 0.06, 0.05, 1.0)}),
+    "MeatSlabFat": (ACCENT_MASTER, {"Roughness": 0.55, "Specular": 0.35}, {"Tint": (0.86, 0.76, 0.6, 1.0)}),
+    "MeatSlabCut": (ACCENT_MASTER, {"Roughness": 0.45, "Specular": 0.45}, {"Tint": (0.78, 0.16, 0.14, 1.0)}),
 }
 FOOD_SLOTS = ("Stone", "Wood")
 

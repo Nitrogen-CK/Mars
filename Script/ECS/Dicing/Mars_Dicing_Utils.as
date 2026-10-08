@@ -193,6 +193,20 @@ mixin void UnbindFrom_OnStateChanged(FCk_Handle_Dicing& Self, FMars_Delegate_Dic
     Self.Get_Fragment(FMars_Fragment_Dicing_Signals).OnStateChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
+mixin void BindTo_OnReset(FCk_Handle_Dicing& Self, FMars_Delegate_Dicing_OnReset InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Dicing_Signals);
+    Fragment.OnReset.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnReset(FCk_Handle_Dicing& Self, FMars_Delegate_Dicing_OnReset InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Dicing_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Dicing_Signals).OnReset.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
 mixin void BindTo_OnBandMoved(FCk_Handle_Dicing& Self, FMars_Delegate_Dicing_OnBandMoved InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Dicing_Signals);

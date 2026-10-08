@@ -208,6 +208,11 @@ event void FMars_Delegate_Dicing_OnHandMoved_MC(FCk_Handle_Dicing InDicing, floa
 delegate void FMars_Delegate_Dicing_OnRequestedStateReached(FCk_Handle_Dicing InDicing);
 event void FMars_Delegate_Dicing_OnRequestedStateReached_MC(FCk_Handle_Dicing InDicing);
 
+// A Reset put a fresh pile on the board (broadcast even when the state was already WholeLeaves: the chops so far are
+// undone whether or not they had changed the texture).
+delegate void FMars_Delegate_Dicing_OnReset(FCk_Handle_Dicing InDicing);
+event void FMars_Delegate_Dicing_OnReset_MC(FCk_Handle_Dicing InDicing);
+
 struct FMars_Fragment_Dicing_Signals
 {
     FMars_Delegate_Dicing_OnChopResolved_MC OnChopResolved;
@@ -215,6 +220,7 @@ struct FMars_Fragment_Dicing_Signals
     FMars_Delegate_Dicing_OnBandMoved_MC OnBandMoved;
     FMars_Delegate_Dicing_OnHandMoved_MC OnHandMoved;
     FMars_Delegate_Dicing_OnRequestedStateReached_MC OnRequestedStateReached;
+    FMars_Delegate_Dicing_OnReset_MC OnReset;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
