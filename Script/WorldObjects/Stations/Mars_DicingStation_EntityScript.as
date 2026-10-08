@@ -103,6 +103,9 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     private const float32 ChopBurstPlaybackSpeed = 1.6f;
 
     private FCk_Handle_Transform _Root;
+    // The cleaver's knock on the board (KnifeChop_Cue, which carries its own close-range attenuation and sound class): a
+    // local one-shot at the blade's contact on every chop.
+    private USoundBase _ChopSound;
     // Dicing with the geometry-bound fields set (DoConstruct); what the feature and the visuals read.
     private FMars_Dicing_Spec _DicingSpec;
     private FCk_Handle_Dicing _DicingHandle;
@@ -143,6 +146,7 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         // A rejected Dicing spec already ensured in utils_dicing::Add.
         _DicingSpec.Nodes = FMars_Dicing_Nodes(_LateralNode, _ChopMover);
         _DicingHandle = utils_dicing::Add(InHandle, _DicingSpec);
+        _ChopSound = assets::load::KnifeChop_Cue();
         return Flow;
     }
 
@@ -288,11 +292,9 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         _Label = AddLabel(InRoot,
             FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - LabelInset, 0.0, BoardTop + LabelHeight)));
 
-        // Grip frame (X across the palm toward the index finger, Z out of the palm): a left hand flat on the board with its
-        // fingers forward has its index side to the right (+Y) and its palm down (-Z); the grip bone sits a palm's
-        // thickness above the surface.
+        // A left hand flat on the board: fingers forward, palm down, the grip bone a palm's thickness above the wood.
         _BoardGripNode = utils_scene_node::Create(InRoot,
-            FTransform(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector),
+            FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector),
                 FVector(BoardX, -BoardWidth * 0.5 + LeftGripEdgeInset, BoardTop + PalmLift))).As_Transform();
 
         AddCleaver(InRoot);
@@ -329,10 +331,10 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         CleaverTransform.Add_MeshPart(this, FMars_MeshPart(FTransform(FRotator::ZeroRotator, GripLocal),
             assets::load::MeatCleaver_Mars_SM(), nullptr, collision::profile::NoCollision, n"DicingStation_Cleaver"));
 
-        // Grip frame (X across the palm toward the index finger, Z out of the palm): along the handle toward the blade
-        // (+X), palm facing the operator's left (-Y) - a handshake grip on the rear grip, blade edge down.
+        // A right-hand handshake grip on the rear grip, blade edge down: palm facing the operator's left (-Y), fingers curling
+        // down round the handle, the hand leading toward the blade.
         _HandleGripNode = utils_scene_node::Create(CleaverTransform,
-            FTransform(FRotator::MakeFromXZ(FVector::ForwardVector, -FVector::RightVector), GripLocal)).As_Transform();
+            FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, -FVector::UpVector, -FVector::RightVector), GripLocal)).As_Transform();
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -715,6 +717,16 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         utils_scene_node::Request_UpdateOffset_Location(_BandNode, FVector(BandX, InCenter, Get_BoardTop() + BandLift), ECk_RelativeAbsolute::Absolute);
     }
 
+    private void Play_ChopSound()
+    {
+        if (ck::Is_NOT_Valid(_ChopSound) || ck::Is_NOT_Valid(_DicingHandle) || ck::Is_NOT_Valid(_Root))
+        { return; }
+
+        const auto RootWorld = utils_transform::Get_EntityCurrentTransform(_Root);
+        const auto Contact = RootWorld.TransformPosition(FVector(CleaverX, _DicingHandle.Get_HandLateral(), Get_BoardTop()));
+        Gameplay::PlaySoundAtLocation(_ChopSound, Contact, RootWorld.Rotator());
+    }
+
     // One reused burst component: spawned at the first aligned chop whose template is ready (a cold template never stalls
     // the game thread; the chop just goes without a burst), then moved and re-activated per chop. Null under nullrhi.
     private void Play_ChopBurst()
@@ -795,8 +807,10 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     UFUNCTION()
     private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
     {
-        // The blade cuts whatever meat lies under it wherever it lands; only an aligned chop counts (and sparks).
+        // The blade cuts whatever meat lies under it and knocks on the board wherever it lands; only an aligned chop counts
+        // (and sparks).
         Slice_Slab(InDicing.Get_HandLateral());
+        Play_ChopSound();
         if (InResult == EMars_Dicing_ChopResult::Aligned)
         { Play_ChopBurst(); }
     }
