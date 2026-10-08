@@ -407,10 +407,12 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         }
     }
 
-    // Unreal winds front faces clockwise seen from outside: for such a triangle (B - A) x (C - A) points out.
+    // Unreal is left-handed and winds front faces clockwise seen from outside: for such a triangle (C - A) x (B - A)
+    // points out (the stock ProceduralMesh floor quad (0,0,0) (0,100,0) (100,0,0) faces +Z). (B - A) x (C - A) is the
+    // right-handed habit and turned the whole joint inside out.
     private FVector Get_FaceNormal(FVector InA, FVector InB, FVector InC) const
     {
-        return (InB - InA).CrossProduct(InC - InA).GetSafeNormal();
+        return (InC - InA).CrossProduct(InB - InA).GetSafeNormal();
     }
 
     // The piece's soup into its component: one section per material, every triangle flat (its own three corners).
