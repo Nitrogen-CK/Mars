@@ -1,5 +1,5 @@
 // The carried skimmer slid into the corridor (out of the pot, short of the basket) and a Dip asked there: the skim stays
-// Carry, no skim edge is broadcast, the lift target stays at the carry and the roll target level (a dip there would drop the
+// Carry, no skim edge is broadcast, the lift target stays at the carry and the pitch target level (a dip there would drop the
 // disc into the counter; a pour would empty the scoop onto it).
 class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
 {
@@ -48,6 +48,6 @@ class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
         Assert_True(_Fry.Get_Skim() == EMars_Fry_Skim::Carry, f"the skim stays Carry (got {_Fry.Get_Skim() :n})");
         Assert_Equals_Int(_SkimChanges.Num(), _SkimEdgesBeforeDip, "no skim edge");
         Assert_Equals_Float(_Skimmer.Get_TargetLift(), _Spec.Scoop.CarryLift, 0.0001, "the lift target stays at the carry");
-        Assert_Equals_Float(_Skimmer.Get_TargetTilt().Roll, 0.0, 0.001, "the roll target stays level");
+        Assert_Equals_Float(_Skimmer.Get_TargetTilt().Pitch, 0.0, 0.001, "the pitch target stays level");
     }
 }

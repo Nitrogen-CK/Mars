@@ -172,10 +172,11 @@ struct FMars_Fry_ScoopSpec
     UPROPERTY()
     float32 DipLift = -42.0f;
 
-    // Degrees of roll toward the operator's right (+Y down) the pour tips the scoop to: steep enough that a piece slides
-    // over the low lip. The skimmer's implement must be able to tilt this far.
+    // Degrees of pitch toward the operator (the near lip down, the far side up: the skimmer turns about its handle) the
+    // pour tips the scoop to: steep enough that a piece slides over the low lip. The skimmer's implement must be able to
+    // tilt this far.
     UPROPERTY()
-    float32 PourRollDegrees = 55.0f;
+    float32 PourPitchDegrees = 55.0f;
 
     FMars_Fry_ScoopSpec() {}
 
@@ -395,8 +396,8 @@ mixin FMars_Validation Validate(const FMars_Fry_Spec& Self)
     if (Scoop.DipLift >= Scoop.CarryLift)
     { return FMars_Validation(f"Fry has a scoop DipLift [{Scoop.DipLift}] not below its CarryLift [{Scoop.CarryLift}]"); }
 
-    if (Scoop.PourRollDegrees <= 0.0f || Scoop.PourRollDegrees > 80.0f)
-    { return FMars_Validation(f"Fry has a scoop PourRollDegrees [{Scoop.PourRollDegrees}] outside (0, 80]"); }
+    if (Scoop.PourPitchDegrees <= 0.0f || Scoop.PourPitchDegrees > 80.0f)
+    { return FMars_Validation(f"Fry has a scoop PourPitchDegrees [{Scoop.PourPitchDegrees}] outside (0, 80]"); }
 
     if (Self.Oil.BuoyancyAccel <= 0.0f || Self.Oil.Drag < 0.0f)
     { return FMars_Validation(f"Fry has a non-positive Oil.BuoyancyAccel [{Self.Oil.BuoyancyAccel}] or a negative Oil.Drag [{Self.Oil.Drag}]"); }

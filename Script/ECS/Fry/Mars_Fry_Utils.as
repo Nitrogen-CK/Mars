@@ -51,8 +51,8 @@ namespace utils_fry
 
         // The implement clamps a tilt target to its MaxTiltDegrees: a shallower skimmer would pour at less than the spec says.
         const auto SkimmerSpec = Nodes.Skimmer.Get_Spec();
-        if (ck::EnsureIfNot(SkimmerSpec.Tilt.MaxTiltDegrees >= InSpec.Scoop.PourRollDegrees,
-            f"[Fry] [{InHandle.ToString()}] needs a skimmer that tilts to the pour's {InSpec.Scoop.PourRollDegrees} degrees (it tilts at most {SkimmerSpec.Tilt.MaxTiltDegrees})"))
+        if (ck::EnsureIfNot(SkimmerSpec.Tilt.MaxTiltDegrees >= InSpec.Scoop.PourPitchDegrees,
+            f"[Fry] [{InHandle.ToString()}] needs a skimmer that tilts to the pour's {InSpec.Scoop.PourPitchDegrees} degrees (it tilts at most {SkimmerSpec.Tilt.MaxTiltDegrees})"))
         { return FCk_Handle_Fry(); }
 
         if (ck::EnsureIfNot(SkimmerSpec.Slide.Mode == EMars_Implement_SlideMode::Commanded,

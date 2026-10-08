@@ -15,7 +15,7 @@ class UMars_AutoTestRig_Fry : UCk_AutoTest_Base
     protected const FVector k_ScoopPark = FVector(30.0, 6.0, 132.0);
     // Over the oil, left of the park (the station's rule: park X - 20, Y -10, 25 over the oil line).
     protected const FVector k_ReleaseLocal = FVector(10.0, -10.0, 128.0);
-    // Room for the pour's roll (the scoop spec's PourRollDegrees).
+    // Room for the pour's pitch (the scoop spec's PourPitchDegrees).
     protected const float32 k_SkimmerMaxTiltDegrees = 60.0f;
     // A slow, critically damped dip and carry: the scoop's deceleration at the top of a carry stays under gravity, so a
     // piece on it is not thrown.

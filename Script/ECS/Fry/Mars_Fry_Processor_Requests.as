@@ -281,15 +281,16 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     // The skimmer implement's commanded lift and tilt follow the skim: its spring lowers or raises the scoop, its tilt tips
-    // it to the pour or levels it.
+    // it toward the operator for the pour (a positive pitch raises the far side, +X, in the skimmer's rest frame, which Add
+    // ensures is axis-aligned with the root) or levels it.
     private void Set_Skim(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, EMars_Fry_Skim InSkim)
     {
         const auto& Scoop = InFry.Get_Spec().Scoop;
         const auto Lift = InSkim == EMars_Fry_Skim::Dip ? Scoop.DipLift : Scoop.CarryLift;
-        const auto Roll = InSkim == EMars_Fry_Skim::Pour ? float64(Scoop.PourRollDegrees) : 0.0;
+        const auto Pitch = InSkim == EMars_Fry_Skim::Pour ? float64(Scoop.PourPitchDegrees) : 0.0;
         auto Skimmer = InFry.Get_Skimmer();
         Skimmer.Request_SetLiftTarget(FMars_Request_Implement_SetLiftTarget(Lift));
-        Skimmer.Request_SetTiltTarget(FMars_Request_Implement_SetTiltTarget(FRotator(0.0, 0.0, Roll)));
+        Skimmer.Request_SetTiltTarget(FMars_Request_Implement_SetTiltTarget(FRotator(Pitch, 0.0, 0.0)));
         InState.Skim = InSkim;
     }
 

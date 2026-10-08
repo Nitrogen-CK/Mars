@@ -1,6 +1,6 @@
 // The whole fryer loop on one piece: released at its float height, it floats over the dipped scoop; Carry lifts it out of the oil (Oil -> Skimmer: one
 // retrieval); the carried scoop is eased (as a hand moves it, and within the reach: first to a point both in the pot disc
-// and in the corridor, then along the corridor) out of the pot and over the basket, the piece still on it; a Dip there pours (roll target PourRollDegrees, lift target the carry) and the piece slides off into
+// and in the corridor, then along the corridor) out of the pot and over the basket, the piece still on it; a Dip there pours (pitch target PourPitchDegrees, toward the operator; lift target the carry) and the piece slides off into
 // the basket (Skimmer -> DrainBasket, directly or via Airborne; nothing lost); resting on the basket floor it drains and is
 // Drained after Receiver.DrainSeconds, OnPieceDrained once.
 class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMars_AutoTestRig_Fry
@@ -181,7 +181,7 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
     private void Step_AssertPour(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Fry.Get_Skim() == EMars_Fry_Skim::Pour, f"a dip over the basket pours (got {_Fry.Get_Skim() :n})");
-        Assert_Equals_Float(_Skimmer.Get_TargetTilt().Roll, float64(_Spec.Scoop.PourRollDegrees), 0.001, "the scoop's roll target is the pour's");
+        Assert_Equals_Float(_Skimmer.Get_TargetTilt().Pitch, float64(_Spec.Scoop.PourPitchDegrees), 0.001, "the scoop's pitch target is the pour's");
         Assert_Equals_Float(_Skimmer.Get_TargetLift(), _Spec.Scoop.CarryLift, 0.0001, "the pour holds the lift at the carry");
         Assert_True(_SkimChanges.Num() > 0 && _SkimChanges.Last() == EMars_Fry_Skim::Pour, "OnSkimChanged reported the Pour");
     }

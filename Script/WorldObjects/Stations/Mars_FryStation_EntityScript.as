@@ -114,7 +114,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private const float32 SkimmerLiftDampingRatio = 1.0f;
     // uu past the dip and the carry the lift may travel before its clamp (critically damped: never reached).
     private const float32 SkimmerLiftHeadroom = 2.0f;
-    // Room for the kernel's pour (the scoop spec's PourRollDegrees, 55 by default).
+    // Room for the kernel's pour (the scoop spec's PourPitchDegrees, 55 by default).
     private const float32 SkimmerMaxTiltDegrees = 60.0f;
     // uu the skimmer's own slide clamp reaches past the kernel's reach bounds (the kernel's clamp is the real one).
     private const float64 SkimmerSlideMargin = 1.0;
@@ -474,17 +474,16 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         // The grip: the mesh's SOCKET_Grip, carried into the yawed, scaled frame (its +X handle is the skimmer's +Y).
         const auto GripLocal = FVector(-SkimmerMeshGrip.Y, SkimmerMeshGrip.X, SkimmerMeshGrip.Z) * MeshScale;
 
-        // Grip frame (X across the palm toward the index finger, Z out of the palm): along the handle away from the bowl
-        // (+Y, to the operator's right), palm down on the raked handle - a right hand closed over a bar that runs to its side.
+        // A right hand palm down on the raked handle, fingers forward closing round the far side of the bar, so the hand
+        // leads toward the bowl (-Y).
         _SkimmerHandleNode = utils_scene_node::Create(SkimmerTransform,
-            FTransform(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector), GripLocal)).As_Transform();
+            FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, FVector::ForwardVector, -FVector::UpVector), GripLocal)).As_Transform();
     }
 
     // The raw platter: a slab on the counter's left with one battered proxy per slot (each on its RawSlot node, tagged so a
     // test can find them; the kind by the slot's preset), the feed node the left glove follows (at rest in front of the
-    // platter; palm down, fingers forward: grip frame X across the palm toward the index finger, Z out of the palm) and one
-    // proxy per kind riding that glove, in its palm, hidden until a piece of that kind is grasped. The presentation's
-    // geometry is authored here, in the station frame.
+    // platter, palm down, fingers forward) and one proxy per kind riding that glove, in its palm, hidden until a piece of
+    // that kind is grasped. The presentation's geometry is authored here, in the station frame.
     private void AddPlatter(FCk_Handle_Transform& InRoot)
     {
         const auto HalfSize = float64(_FrySpec.Piece.HalfSize);
@@ -499,11 +498,11 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         Platter.PrimaryColor = TOptional<FLinearColor>(k_PlatterColor);
         InRoot.Add_MeshPart(this, Platter);
 
-        const auto HandRotation = FQuat(FRotator::MakeFromXZ(FVector::RightVector, -FVector::UpVector));
+        const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
         auto& Geometry = _FeedPresentation.Geometry;
         Geometry.RestLocal = FTransform(HandRotation,
             FVector(FeedRestFromPlatter.X, PlatterCentreY + FeedRestFromPlatter.Y, CounterHeight + PalmLift));
-        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent along the glove's Z.
+        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
         Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + HalfSize));
         Geometry.SlotsLocal.Empty();
 
