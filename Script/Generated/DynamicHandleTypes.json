@@ -181,6 +181,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_FoodBoard",
+			"ShortName": "FoodBoard",
+			"Description": "The food a station holds: a ledger of FoodPiece handles that a chop cuts within a budget and a sweep releases as physics bodies",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_FoodBoardHandle",
+			"RequiredFragments": [
+				"Mars_Feature_FoodBoard"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_FoodPiece",
 			"ShortName": "FoodPiece",
 			"Description": "One cuttable piece of food: a RuntimeMesh solid with an identity, a lineage, a mass and a cook state; a plane cut replaces it with two pieces that split its mass by volume",
