@@ -1301,7 +1301,9 @@ def build_meatslab():
     def spacing(p):
         return np.full(len(p), SLAB_SPACING)
 
-    dirs = blue_noise_dirs(slab_surface, spacing, 760, seed=71, fixed=fixed, fixed_spacing=SLAB_FIXED_SP)
+    # 158 free + 162 fixed dirs -> 636 tris: runtime slicing (CkRuntimeMesh) caps LOD0 at 2048 render verts and a
+    # flat-shaded, per-facet-painted mesh has 3 per triangle
+    dirs = blue_noise_dirs(slab_surface, spacing, 158, seed=71, fixed=fixed, fixed_spacing=SLAB_FIXED_SP)
     t, which = slab_radius(dirs)
     body = t[:, None] * unit(dirs)
 
