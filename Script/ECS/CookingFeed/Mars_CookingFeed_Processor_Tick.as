@@ -6,11 +6,14 @@ struct FMars_CookingFeed_Frame
     float32 DeltaSeconds = 0.0f;
 }
 
-// The one clock of the transfer. Every positive-dt frame it measures the release node's world velocity; while the hand is in
-// a timed phase it advances the phase time and crosses every boundary the frame reaches, each once and in order (a long
-// frame crosses several, a zero-length phase passes through), carrying the remainder into the next phase. Carry's end
-// samples the release (the node's pose this frame, the spec's local velocity rotated to the node plus the inherited node
-// velocity) and waits for the admission answer; Return's end idles the hand. AwaitAdmission has no clock.
+// The one clock of the transfer. First it guards the reservation: before the release, a reserved piece that is gone or no
+// longer on the source (unloaded by someone, the platter swapped under it) cancels the transfer as a Cancel would. Every
+// positive-dt frame it measures the release node's world velocity; while the hand is in a timed phase it advances the phase
+// time and crosses every boundary the frame reaches, each once and in order (a long frame crosses several, a zero-length
+// phase passes through), carrying the remainder into the next phase. Carry's end samples the release (the reserved piece,
+// the node's pose this frame, the spec's local velocity rotated to the node plus the inherited node velocity) and waits for
+// the admission answer; Return's end idles the hand. AwaitAdmission has no clock. Last, the stock is compared with what was
+// last broadcast: the source changes under the feed without a request, so its edges are found here.
 class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -28,8 +31,34 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Frame.Spec = Frame.Feed.Get_Spec();
         Frame.DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
+        Guard_Reservation(Frame, InState);
         Measure_Release(Frame, InState);
         Advance_Phase(Frame, InState);
+        Broadcast_StockIfChanged(Frame, InState);
+    }
+
+    // From Reach through Carry the reserved piece must still be on the source. In AwaitAdmission it is off the platter by
+    // design (control unloaded it for the release) and only an answer or a Cancel ends the transfer.
+    private void Guard_Reservation(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
+    {
+        const auto IsBeforeRelease = InState.Phase == EMars_CookingFeed_Phase::Reach || InState.Phase == EMars_CookingFeed_Phase::Grasp
+            || InState.Phase == EMars_CookingFeed_Phase::Carry;
+        if (InState.Active.IsSet() == false || IsBeforeRelease == false)
+        { return; }
+
+        const auto Reservation = InState.Active.GetValue();
+        if (utils_cooking_feed::Get_IsOnSource(Reservation.Piece, InState.Source))
+        { return; }
+
+        utils_cooking_feed::Cancel_Active(InState);
+        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] {utils_cooking_feed::Get_PieceName(Reservation.Id)} [{Reservation.Piece.ToString()}] left the source before its release: transfer cancelled");
+
+        auto Feed = InFrame.Feed;
+        if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
+        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnTransferSettled.Broadcast(Feed, Reservation.Id, EMars_CookingFeed_Settle::Cancelled); }
+
+        if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
+        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnPhaseChanged.Broadcast(Feed, EMars_CookingFeed_Phase::Idle); }
     }
 
     // A zero-dt frame cannot estimate motion: it leaves the last velocity and pose.
@@ -98,16 +127,34 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         if (ck::EnsureIfNot(InState.Active.IsSet(), f"[CookingFeed] [{InFrame.Feed.ToString()}] reached the release with no reserved piece"))
         { return false; }
 
-        const auto Piece = InState.Active.GetValue();
+        const auto Reservation = InState.Active.GetValue();
         const auto ReleaseWorld = utils_transform::Get_EntityCurrentTransform(InFrame.Spec.Nodes.Release);
         const auto& Motion = InFrame.Spec.Motion;
         const auto Velocity = ReleaseWorld.GetRotation().RotateVector(Motion.ReleaseVelocityLocal)
             + InState.ReleaseVelocity * float64(Motion.VelocityInheritance);
 
-        InState.PendingRelease = FMars_CookingFeed_Release(Piece, ReleaseWorld, Velocity, Piece.StockIndex % InFrame.Spec.Supply.SlotCapacity);
+        InState.PendingRelease = FMars_CookingFeed_Release(Reservation.Id, ReleaseWorld, Velocity, Reservation.Id.StockIndex);
+        InState.PendingRelease.Piece = Reservation.Piece;
 
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] released {utils_cooking_feed::Get_PieceName(Piece)} at {ReleaseWorld.GetLocation()} moving {Velocity}");
+        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] released {utils_cooking_feed::Get_PieceName(Reservation.Id)} [{Reservation.Piece.ToString()}] at {ReleaseWorld.GetLocation()} moving {Velocity}");
         return true;
+    }
+
+    // One broadcast per edge of (Available, Admitted), after every other step of the frame.
+    private void Broadcast_StockIfChanged(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
+    {
+        const auto Available = utils_cooking_feed::Get_Available(InState);
+        const auto Admitted = InState.Admitted;
+        if (Available == InState.LastStockAvailable && Admitted == InState.LastStockAdmitted)
+        { return; }
+
+        InState.LastStockAvailable = Available;
+        InState.LastStockAdmitted = Admitted;
+        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] stock: {Available} available, {Admitted} admitted");
+
+        auto Feed = InFrame.Feed;
+        if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
+        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnStockChanged.Broadcast(Feed, Available, Admitted); }
     }
 
     private EMars_CookingFeed_Phase Get_NextPhase(EMars_CookingFeed_Phase InPhase) const

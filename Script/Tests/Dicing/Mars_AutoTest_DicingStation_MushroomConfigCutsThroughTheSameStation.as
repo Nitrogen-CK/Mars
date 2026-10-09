@@ -1,8 +1,8 @@
-// The same station class with the mushroom-slice definition instead of the meat: its joint is the slice (53.6 cm3) at the
-// definition's 32 g with the definition's portion tuners and cap. A chop 5.6 cm off centre, 0.37 cm inside the slice's tip,
-// would leave a sliver under the 0.8 cm minimum: the cut is issued, RuntimeMesh rejects it and the slice stays whole, held and
-// untouched. A chop at the centre then cuts it through the same station into two shown, gram-scale halves whose masses add
-// back exactly and whose volumes add back within RuntimeMesh's tolerance.
+// The same station class fed the mushroom slice on its input platter instead of the meat: its joint is the slice (53.6 cm3)
+// at the definition's 32 g with the definition's portion tuners and cap. A chop 5.6 cm off centre, 0.37 cm inside the
+// slice's tip, would leave a sliver under the 0.8 cm minimum: the cut is issued, RuntimeMesh rejects it and the slice stays
+// whole, held and untouched. A chop at the centre then cuts it through the same station into two shown, gram-scale halves
+// whose masses add back exactly and whose volumes add back within RuntimeMesh's tolerance.
 class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMars_AutoTestRig_DicingStation
 {
     private const FVector k_Origin = FVector(13600.0, -9000.0, -30000.0);
@@ -15,13 +15,11 @@ class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMa
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Spawn_Station(InHandle, k_Origin, mars::CuttableFood_MushroomSlice_Mars);
+        Spawn_Station(InHandle, k_Origin);
+        Spawn_InputPlatter(InHandle, mars::Food_MushroomSlice_Mars);
 
-        Add_Step_WaitUntil("the station composed its Dicing and FoodBoard", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the board holds one shown slice", n"Check_JointShown", 0, 10.0f);
+        Add_Steps_IntakeTheJoint();
         Add_Step("the slice has the mushroom's volume, mass, tuners and cap", n"Step_AssertSlice");
-        Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
         Add_Step("move the hand near the slice's tip", n"Step_MoveToEdge");
         Add_Step_WaitUntil("the hand is near the tip", n"Check_HandAtEdge", 0, 2.0f);
         Add_Step("chop near the tip", n"Step_Chop");
@@ -50,12 +48,6 @@ class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMa
         Assert_True(_Slice.Get_Cap().Get_Color().Equals(_Food.Visuals.Cap.Get_Color(), 0.0001), "the slice carries the definition's cap colour");
 
         Watch(_Slice);
-    }
-
-    UFUNCTION()
-    private void Step_Take(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Take();
     }
 
     UFUNCTION()

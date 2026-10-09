@@ -1,5 +1,6 @@
-// AddPiece answers every release through OnPieceAdmission: a fresh Id is Accepted (one body), the same Id released again,
-// in the same drain or a later one, is Rejected with a reason and makes nothing, and a different Id is still Accepted.
+// AddPiece answers every release through OnPieceAdmission: a fresh Id is Accepted (one body), the same Id released again
+// with another piece, in the same drain or a later one, is Rejected with a reason and adopts nothing, and a different Id is
+// still Accepted.
 // (The before-the-pan-exists rejection is not driven here: the pan body cannot be held back from the simulation
 // deterministically, so its rule is covered by reading Apply_AddPiece, not by this test.)
 class UMars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId : UMars_AutoTestRig_Searing
@@ -15,8 +16,11 @@ class UMars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId : UMars_AutoTest
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        // Every release takes its own piece, so the repeats are refused for their Id alone.
+        Build_Pieces(4);
 
         Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release one Id twice in one drain", n"Step_ReleaseTwice");
         Add_Step_WaitUntil("both releases were answered", n"Check_Answered2", 0, 1.0f);
         Add_Step("the first is accepted, the duplicate rejected with a reason", n"Step_AssertFirstDrain");

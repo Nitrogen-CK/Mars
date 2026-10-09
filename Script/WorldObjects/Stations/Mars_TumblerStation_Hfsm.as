@@ -3,10 +3,11 @@
 // and the platter's CookingFeed) and reads the station's operator; it only issues Tumbler and CookingFeed requests and
 // registers the operator's legend rows. The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
 //
-//   Idle      ->Operated [StationIsOperated]      no tasks: the batch, its coverage and the platter persist across a leave
-//                                                 and a re-enter (the platter is filled once, by the feed's InitialCount)
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source, StationFeed_Bridge (a release in flight lands; no
+//                                                 reset: the batch, its coverage and the feed's attempt persist across a
+//                                                 leave and a re-enter)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Tumbler_OperatorInput (Tick), Tumbler_FeedGate, Tumbler_CancelOnExit,
-//                                                 TumblerFeed_OperatorInput (Tick), StationFeed_Bridge,
+//                                                 StationFeed_Source, TumblerFeed_OperatorInput (Tick), StationFeed_Bridge,
 //                                                 StationFeed_OperatorHints, Tumbler_OperatorHints
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
@@ -19,6 +20,9 @@ class UMars_SmState_Tumbler_Idle : UCk_SmState_EntityScript
     {
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Tumbler_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
+
+        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
     }
 }
 
@@ -33,6 +37,7 @@ class UMars_SmState_Tumbler_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Tumbler_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Tumbler_FeedGate);
         AddTask(InHandle, UMars_SmTask_Tumbler_CancelOnExit);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_TumblerFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);

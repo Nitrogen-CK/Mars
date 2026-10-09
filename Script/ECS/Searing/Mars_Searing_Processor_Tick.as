@@ -28,7 +28,8 @@ struct FMars_Searing_PieceEvents
 // whether it is on the pan (on/off edges), the face it rests on (flips), its loss, and the sear of its face on the pan
 // (its sixth seared face makes it Ready); then the tally, the pieces' edges, and the aggregate sizzle edge last. The pan
 // moves itself (an Implement); Jolt owns every piece's pose; the kernel reads it back through the entity transform and
-// never writes it. Nothing is ever spawned here: pieces arrive only through AddPiece.
+// never writes it, and judges an adopted piece only once it has arrived at its release. Nothing is ever spawned here:
+// pieces arrive only through AddPiece.
 class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -58,6 +59,26 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
             // A lost piece only lingers; a piece whose entity is gone is going with a station torn down around it.
             if (Piece.Status == EMars_Searing_PieceStatus::Lost || ck::Is_NOT_Valid(Piece.Entity))
             { continue; }
+
+            // An adopted piece is judged only once it is where it was released, or once it has taken too long to get there.
+            if (Piece.Arriving.IsSet())
+            {
+                Piece.ArrivingSeconds += Frame.DeltaSeconds;
+                if (utils_searing::Get_HasArrived(Piece.Body, Piece.Entity, Piece.Arriving.GetValue()) == false)
+                {
+                    if (Piece.ArrivingSeconds < utils_searing::k_ArrivalMaxSeconds)
+                    {
+                        InState.Pieces[Index] = Piece;
+                        continue;
+                    }
+
+                    ck::EnsureIfNot(false, f"[Searing] [{Frame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}] "
+                        + f"never arrived at its release: {utils_searing::Get_ArrivalDistance(Piece.Entity, Piece.Arriving.GetValue())} cm away "
+                        + f"after {Piece.ArrivingSeconds} s; judged where it is");
+                }
+
+                Piece.Arriving.Reset();
+            }
 
             auto PieceEvents = FMars_Searing_PieceEvents();
             PieceEvents.Id = Piece.Id;
@@ -163,15 +184,15 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         OutEvents.Flipped = true;
     }
 
-    // A piece (cooking or ready) whose centre left the disc (past PanRadius + HalfSize, or HalfSize below the cooking
-    // surface) is lost: it keeps simulating as a lingering body.
+    // A piece (cooking or ready) whose middle left the disc (past PanRadius and its own reach, or its own half height below
+    // the cooking surface) is lost: it keeps simulating as a lingering body.
     private void Advance_Loss(FMars_Searing_Frame& InFrame, FMars_Searing_PieceState& InPiece, FMars_Searing_PieceEvents& OutEvents)
     {
-        const auto Local = Get_PanLocal(InFrame, InPiece);
+        const auto Pose = Get_PanPose(InFrame, InPiece);
+        const auto Local = Pose.GetLocation();
         const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
-        const auto HalfSize = InFrame.Spec.Steak.HalfSize;
-        const auto OffTheDisc = Local.Size2D() > InFrame.Spec.Loss.PanRadius + HalfSize;
-        const auto BelowTheTop = AboveTop < -HalfSize;
+        const auto OffTheDisc = Local.Size2D() > InFrame.Spec.Loss.PanRadius + utils_searing::Get_RadialExtent(InPiece.HalfExtents);
+        const auto BelowTheTop = AboveTop < -utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents);
         if (OffTheDisc == false && BelowTheTop == false)
         { return; }
 
@@ -319,11 +340,11 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     // Piece geometry (as of the last transform update)
     //----------------------------------------------------------------------------------------------------------------------
 
-    // The piece's centre in the pan base body's frame.
-    private FVector Get_PanLocal(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
+    // The piece's middle and rotation in the pan base body's frame.
+    private FTransform Get_PanPose(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
     {
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(InPiece.Entity.As_Transform());
-        return InFrame.PanBaseWorld.InverseTransformPosition(PieceWorld.GetLocation());
+        return utils_searing::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.PanBaseWorld), InPiece.CentreLocal);
     }
 
     private EMars_Searing_Face Get_DownFace(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
@@ -332,13 +353,14 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         return utils_searing::Get_DownFace(PieceWorld.GetRotation(), InFrame.PanUp);
     }
 
-    // The piece's centre, in the pan base's frame, within PanRadius of the axis and between HalfSize below and three
-    // HalfSizes above the cooking surface (a piece hovering over the pan is not on it).
+    // The piece's middle, in the pan base's frame, within PanRadius of the axis and between its half height below and three
+    // half heights above the cooking surface (a piece hovering over the pan is not on it).
     private bool Get_IsOverDisc(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
     {
-        const auto Local = Get_PanLocal(InFrame, InPiece);
+        const auto Pose = Get_PanPose(InFrame, InPiece);
+        const auto Local = Pose.GetLocation();
         const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
-        const auto HalfSize = InFrame.Spec.Steak.HalfSize;
-        return Local.Size2D() <= InFrame.Spec.Loss.PanRadius && AboveTop >= -HalfSize && AboveTop <= 3.0 * HalfSize;
+        const auto HalfHeight = utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents);
+        return Local.Size2D() <= InFrame.Spec.Loss.PanRadius && AboveTop >= -HalfHeight && AboveTop <= 3.0 * HalfHeight;
     }
 }

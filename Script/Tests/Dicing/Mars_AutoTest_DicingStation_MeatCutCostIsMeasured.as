@@ -32,7 +32,8 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Spawn_Station(InHandle, k_Origin, mars::CuttableFood_MeatSlab_Mars);
+        Spawn_Station(InHandle, k_Origin);
+        Spawn_InputPlatter(InHandle, mars::Food_MeatSlab_Mars);
 
         auto MarkerEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Marker = utils_runtime_mesh::Add(MarkerEntity, FCk_RuntimeMesh_Spec(TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
@@ -42,10 +43,8 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
         _Laterals.Add(8.0f);
         _Laterals.Add(-8.0f);
 
-        Add_Step_WaitUntil("the station composed its Dicing and FoodBoard", n"Check_StationReady", 0, 5.0f);
+        Add_Steps_IntakeTheJoint();
         Add_Step_WaitUntil("the board holds one shown joint and the marker mesh is Ready", n"Check_Ready", 0, 10.0f);
-        Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
         for (int32 Cut = 0; Cut < _Laterals.Num(); ++Cut)
         {
             Add_Step("move the hand to the cut", n"Step_MoveHand");
@@ -65,12 +64,6 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
         auto Res = OutResult;
         Res.Set(_Board.Get_HeldCount() == 1 && Get_AllHeldShown()
             && utils_runtime_mesh::Get_SetupState(_Marker) == ECk_RuntimeMesh_SetupState::Ready);
-    }
-
-    UFUNCTION()
-    private void Step_Take(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Take();
     }
 
     UFUNCTION()

@@ -5,12 +5,12 @@ struct FMars_FoodPiece_Drain
     TArray<EMars_FoodPiece_CutOutcome> Refusals;
 }
 
-// Drains Cut requests in order. A piece already cutting refuses RefusedBusy and one that is not Ready RefusedNotReady;
-// otherwise the slice is submitted with portion limits derived from the piece's tuners, the piece is Cutting, and the
-// operation is entered in the PendingCuts ledger on this processor's handle: the world's transient entity, which also
-// owns the halves. Refusals broadcast after the drain. Every submitted slice resolves in OnSliceResolved, exactly once:
-// RuntimeMesh answers a slice it cannot queue (its world-wide queue is full) on the submitting call stack, so that
-// rejection resolves inside this drain and is not retried.
+// Drains SetCookState requests (the last wins), then Cut requests in order. A piece already cutting refuses RefusedBusy
+// and one that is not Ready RefusedNotReady; otherwise the slice is submitted with portion limits derived from the piece's
+// tuners, the piece is Cutting, and the operation is entered in the PendingCuts ledger on this processor's handle: the
+// world's transient entity, which also owns the halves. Refusals broadcast after the drain. Every submitted slice resolves
+// in OnSliceResolved, exactly once: RuntimeMesh answers a slice it cannot queue (its world-wide queue is full) on the
+// submitting call stack, so that rejection resolves inside this drain and is not retried.
 class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -29,10 +29,17 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         auto Drain = FMars_FoodPiece_Drain();
         Drain.Piece = InHandle.As_FoodPiece();
 
+        TArray<FMars_Request_FoodPiece_SetCookState> SetCookStateRequests = InRequests.SetCookStateRequests;
         TArray<FMars_Request_FoodPiece_Cut> CutRequests = InRequests.CutRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Piece.Request_TryRemove(FMars_Fragment_FoodPiece_Requests);
+
+        for (const auto& Request : SetCookStateRequests)
+        { InState.CookState = Request.CookState; }
+
+        if (SetCookStateRequests.Num() > 0)
+        { ck::Trace(f"[FoodPiece] [{Drain.Piece.ToString()}] cook state set"); }
 
         for (const auto& Request : CutRequests)
         { Apply_Cut(Drain, InState, Request); }
@@ -150,8 +157,8 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     // Exactly once per succeeded slice: each half gets the source's current world transform and a FoodPiece of its own
-    // (new Id, ParentId = the source, the source's lineage, cook state, tuners and cap, its share of the mass), then
-    // OnCutResolved reports both and the source is destroyed.
+    // (new Id, ParentId = the source, the source's lineage, cook state, definition, kind, tuners and cap, its share of the
+    // mass), then OnCutResolved reports both and the source is destroyed.
     private void Commit(FCk_Handle_FoodPiece& InSource, const FCk_RuntimeMesh_SliceResult& InResult)
     {
         const auto State = InSource.Get_Fragment(FMars_Fragment_FoodPiece);
@@ -163,6 +170,8 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         HalfSpec.Data.Lineage = State.Lineage;
         HalfSpec.Data.ParentId = State.Id;
         HalfSpec.Data.CookState = State.CookState;
+        HalfSpec.Data.Definition = State.Definition;
+        HalfSpec.Data.Kind = State.Kind;
 
         HalfSpec.Data.MassKg = Split.PositiveKg;
         const auto Positive = Compose_Half(InResult.Get_Positive(), SourceWorld, HalfSpec);

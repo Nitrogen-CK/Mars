@@ -1,5 +1,5 @@
-// Validate() accepts the default searing spec and rejects a pan that takes no piece, a pan disc no wider than a piece and a
-// face that never sears;
+// Validate() accepts the default searing spec and rejects a pan that takes no piece, a pan with no disc and a face that
+// never sears;
 // the pan's own spec (its Implement) accepts its default and rejects a tilt past 80 degrees, a tilt that cannot move and a
 // lift spring with no stiffness; the pan body spec accepts the pan mesh at scale 1 and rejects no mesh, a zero scale and a
 // restitution past 1.
@@ -25,9 +25,9 @@ class UMars_AutoTest_Searing_SpecValidateRejectsBadPans : UCk_AutoTest_Base
         NoRoom.Supply.MaxPieces = 0;
         AssertRejected(NoRoom.Validate(), "MaxPieces <= 0");
 
-        auto NarrowPan = FMars_Searing_Spec();
-        NarrowPan.Loss.PanRadius = NarrowPan.Steak.HalfSize;
-        AssertRejected(NarrowPan.Validate(), "PanRadius <= HalfSize");
+        auto NoDisc = FMars_Searing_Spec();
+        NoDisc.Loss.PanRadius = 0.0f;
+        AssertRejected(NoDisc.Validate(), "PanRadius <= 0");
 
         auto NeverSears = FMars_Searing_Spec();
         NeverSears.Cook.SecondsPerFace = 0.0f;

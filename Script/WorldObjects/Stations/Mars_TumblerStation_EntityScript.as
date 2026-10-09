@@ -6,11 +6,11 @@
 // hinge node (its own Mover), carrying the plate's kinematic body (utils_tumbler::Add_HatchBody); the right glove rides a
 // hand node on the root that the Tumbler kernel moves (a free cursor over a reach plane in front of the drum, a reach to
 // the lever grip, the grip itself). The Tumbler feature lives on the station entity and its own state machine
-// (UMars_SmState_Tumbler_Idle) reads the operator. A CookingFeed on the same entity holds the platter's six raw pieces; its
-// station-feed tasks turn the operator's add-food press into a left-hand transfer that this script presents, released
-// inside the drum behind the open hatch, where the kernel admits it as a dynamic Jolt body that the shell tumbles. This
-// script builds the nodes and, every frame, dresses every piece (its crumb coverage), the label, the hover cue and the right
-// glove's pose.
+// (UMars_SmState_Tumbler_Idle) reads the operator. A CookingFeed on the same entity draws raw pieces from a source
+// platter; its station-feed tasks turn the operator's add-food press into a left-hand transfer that this script
+// presents, released inside the drum behind the open hatch, where the kernel admits it as a dynamic Jolt body that the
+// shell tumbles. This script builds the nodes and, every frame, dresses every piece (its crumb coverage), the label,
+// the hover cue and the right glove's pose.
 
 struct FMars_TumblerStation_PieceVisual
 {
@@ -36,7 +36,7 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
     default LeverControl.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
     default LeverControl.Manipulation.AlphaPerDegree = 0.012f;
 
-    // The raw platter's stock and the transfer's timing; its slot capacity and release node are set here.
+    // The transfer's timing and release motion; its release node is set here. The stock is the feed's source platter.
     UPROPERTY(ExposeOnSpawn)
     FMars_CookingFeed_Spec Feed;
 
@@ -249,7 +249,6 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
 
         // A rejected feed spec already ensured in utils_cooking_feed::Add; the drum still turns without a platter.
         auto FeedSpec = Feed;
-        FeedSpec.Supply.SlotCapacity = _FeedPresentation.Geometry.SlotsLocal.Num();
         FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode);
         _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
 
@@ -547,19 +546,17 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
             FVector(FeedRestFromPlatter.X, PlatterCentreY + FeedRestFromPlatter.Y, CounterHeight + PalmLift));
         // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
         Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + HalfSize));
-        Geometry.SlotsLocal.Empty();
 
         for (int32 Row = 0; Row < RawSlotRows; ++Row)
         {
             for (int32 Column = 0; Column < RawSlotColumns; ++Column)
             {
-                const auto Slot = Geometry.SlotsLocal.Num();
+                const auto Slot = _RawSlotParts.Num();
                 const auto X = (float64(Row) - float64(RawSlotRows - 1) * 0.5) * RawSlotPitch;
                 const auto Y = PlatterCentreY + (float64(Column) - float64(RawSlotColumns - 1) * 0.5) * RawSlotPitch;
                 const auto SlotLocal = FTransform(FVector(X, Y, PlatterTop + HalfSize));
-                Geometry.SlotsLocal.Add(SlotLocal);
 
-                // The slot's piece will be released with preset Slot (the feed's StockIndex modulo its capacity).
+                // The slot's piece will be released with preset Slot (the feed's StockIndex: a slot of its source platter).
                 auto SlotNode = utils_scene_node::Create(InRoot, SlotLocal).As_Transform();
                 auto Part = SlotNode.Add_MeshPart(this, Make_RawPiecePart(FTransform::Identity, Slot, n"TumblerStation_RawSlot"));
                 if (ck::IsValid(Part))
@@ -713,8 +710,8 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         Refresh_Label();
     }
 
-    // The feed's glove node, pose override and carried piece follow the feed; the slot proxies show what the platter still
-    // holds (the reserved one until it is grasped) and the glove's proxy of the carried piece's kind shows while it is carried.
+    // The feed's glove node, pose override and carried piece follow the feed; the slot proxies show how much stock the source
+    // still has and the glove's proxy of the carried piece's kind shows while it is carried.
     private void Advance_Feed(float32 InDeltaSeconds)
     {
         if (ck::Is_NOT_Valid(_FeedHandle))
@@ -725,12 +722,18 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         _FeedPresentation.Advance(FMars_StationFeed_Frame(_FeedHandle, Operator, RootWorld, InDeltaSeconds));
 
         for (int32 Slot = 0; Slot < _RawSlotParts.Num(); ++Slot)
-        { Set_PartVisible(_RawSlotParts[Slot], _FeedPresentation.Get_IsSlotVisible(_FeedHandle, Slot)); }
+        { Set_PartVisible(_RawSlotParts[Slot], Get_IsSlotVisible(Slot)); }
 
         const auto Carried = _FeedPresentation.CarriedPiece;
         const auto CarriedKind = Carried.IsSet() ? Get_PieceKind(Carried.GetValue().StockIndex) : -1;
         for (int32 Kind = 0; Kind < _CarryProxyParts.Num(); ++Kind)
         { Set_PartVisible(_CarryProxyParts[Kind], Kind == CarriedKind); }
+    }
+
+    // The tumbler shows its stock as proxies until it takes real pieces: the first Available slots show their piece.
+    private bool Get_IsSlotVisible(int32 InSlot) const
+    {
+        return InSlot < _FeedHandle.Get_Available();
     }
 
     // Skips a part that was left out or whose component does not exist yet.

@@ -1,13 +1,18 @@
 // The fry station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass = UMars_SmState_Fry_Idle).
-// It runs on the STATION entity (context = the station, which also carries the Fry feature and the platter's CookingFeed)
-// and reads the station's operator; it only issues Fry and CookingFeed requests and registers the operator's legend rows.
+// It runs on the STATION entity (context = the station, which also carries the Fry feature and the raw platter's
+// CookingFeed; its two platter docks are lifetime children of it) and reads the station's operator; it only issues Fry,
+// CookingFeed and Platter requests and registers the operator's legend rows.
 // The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a full platter, a new generation),
-//                                                 Fry_ResetOnEnter (an empty pot, the skimmer parked and idle)
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a new generation for an idle
+//                                                 hand), StationFeed_Source,
+//                                                 StationFeed_Bridge (a release in flight lands),
+//                                                 StationFeed_TakeOutBridge (a take-out in flight lands), Fry_ResetOnEnter
+//                                                 (the skimmer parked and idle; the pieces stay in play)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Fry_DriveOnEnter (the skimmer is in hand), Fry_OperatorInput (Tick),
-//                                                 Fry_OperatorHints, StationFeed_OperatorInput (Tick), StationFeed_Bridge,
-//                                                 StationFeed_OperatorHints
+//                                                 Fry_OperatorHints, StationFeed_Source, StationFeed_OperatorInput (Tick),
+//                                                 StationFeed_Bridge, StationFeed_OperatorHints,
+//                                                 StationFeed_TakeOutInput (Tick), StationFeed_TakeOutBridge
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.
@@ -21,6 +26,9 @@ class UMars_SmState_Fry_Idle : UCk_SmState_EntityScript
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
         AddTask(InHandle, UMars_SmTask_StationFeed_ResetOnEnter);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
         AddTask(InHandle, UMars_SmTask_Fry_ResetOnEnter);
     }
 }
@@ -36,15 +44,18 @@ class UMars_SmState_Fry_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Fry_DriveOnEnter);
         AddTask(InHandle, UMars_SmTask_Fry_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Fry_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
     }
 }
 
-// Destroys every piece (in the oil, on the scoop, in the basket or lost), parks, levels and idles the skimmer and zeroes
-// the tally; the pot stays empty until the feed admits a piece. Added after the feed's reset, so the generation bump comes
-// first. No Fry on the context yet (the SM can enter before the entity script composes it) = nothing to reset.
+// Parks, levels and idles the skimmer and zeroes the tally; the pieces stay where they are with their heat (the player's
+// food is theirs). Added after the feed's reset, so the generation bump comes first. No Fry on the context yet (the SM can
+// enter before the entity script composes it) = nothing to reset.
 class UMars_SmTask_Fry_ResetOnEnter : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -76,8 +87,9 @@ class UMars_SmTask_Fry_DriveOnEnter : UCk_SmTask_EntityScript
 
 // The operator's input, read off its InputIntents: one look per drained look delta (degrees; X yaw right+, Y pitch down+),
 // which moves the skimmer; Interact_Primary's rising edge asks for a dip (the kernel pours instead over the basket, and
-// ignores it in the corridor) and its falling edge carries. Interact_Secondary is not read. Both are seeded on enter, so a
-// delta or a hold from before the station was taken does not count. No operator intents (headless) = nothing to read.
+// ignores it in the corridor) and its falling edge carries (Interact_Secondary is StationFeed_TakeOutInput's). Both are
+// seeded on enter, so a delta or a hold from before the station was taken does not count. No operator intents (headless) =
+// nothing to read.
 class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;

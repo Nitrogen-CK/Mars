@@ -1,21 +1,22 @@
 // Every piece on the searing pan gets its own oil pool. The real searing station (spawned through its entity script, the
-// only station in this world, nobody operating it) has two pieces admitted by hand, as its feed bridge would, and each is
-// teleported to its own point on the cooking surface, one either side of the centre. The pan's material then carries both
-// pools: Meat Footprint (slot 0, the first piece admitted) and Meat Footprint 1 (slot 1, the second) both have the cube's
-// footprint radius and sit at their own piece's pan-local XY in art cm, as far apart as the two points, and slot 2 has no
+// only station in this world, nobody operating it) has two box food pieces admitted by hand, as its feed bridge would, each
+// wearing its own display (the station hangs no part off either), and each is teleported (its middle) to its own point on the cooking surface, one either side of the centre. The pan's material then carries both
+// pools: Meat Footprint (slot 0, the first piece admitted) and Meat Footprint 1 (slot 1, the second) both have their piece's
+// own footprint radius and sit at their own piece's pan-local XY in art cm, as far apart as the two points, and slot 2 has no
 // pool. The second piece is then teleported off the pan, beside the rim over the table: its slot's radius drops to 0 (no
-// pool hugs a cube that is not on the pan) while the first piece's pool stays where it is. The dressing is read back
+// pool hugs a piece that is not on the pan) while the first piece's pool stays where it is. The dressing is read back
 // through the station's tagged pan part. The test destroys the station before it finishes: the table's static-world bake
 // is an entity of the world, removed only when the table's component tears down.
-class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoTest_Base
+class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UMars_AutoTestRig_FoodPiece
 {
     default _TimeoutSeconds = 20.0f;
 
     private const FVector k_Origin = FVector(-60000.0, 16000.0, -60000.0);
-    // The station's pan and cube scales on the art's cm and the cube's half extent in art cm (cooking_spec.py CUBE_HALF_CM).
+    // Where the box pieces wait for their release, beside the station, and their mass.
+    private const FVector k_ParkLocal = FVector(0.0, -300.0, 0.0);
+    private const float k_PieceMassKg = 0.1;
+    // The station's pan scale on the art's cm.
     private const float64 k_PanScale = 2.5;
-    private const float64 k_CubeScale = 3.0;
-    private const float64 k_CubeHalf = 2.0;
     // Where the two pieces are teleported, in the pan body's frame (the pan mesh's own, uu): either side of the centre on
     // the flat base (radius 9.5 art cm = 23.75 uu), clear of each other and of the release point over the centre, a little
     // above the surface.
@@ -32,12 +33,15 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoT
     private FCk_Handle_UnrealComponent _PanPart;
     private FMars_CookingFeed_PieceId _FirstId;
     private FMars_CookingFeed_PieceId _SecondId;
+    // Indexed by the slot each is released for.
+    private TArray<FCk_Handle_FoodPiece> _Pieces;
 
-    // The cube's footprint radius in the pan mesh's cm, as the station derives it (mars_cooking_ue.py LOOKDEV_POOL_NOTE:
-    // the cube's half extent in pan cm * sqrt(2) * 0.9).
-    private float64 Get_CubeFootprint() const
+    // The piece's footprint radius in the pan mesh's cm, as the station derives it (mars_cooking_ue.py LOOKDEV_POOL_NOTE:
+    // the piece's half extent h in pan cm * sqrt(2) * 0.9, h the mean of its two horizontal half extents).
+    private float64 Get_PieceFootprint(const FMars_CookingFeed_PieceId& InPieceId) const
     {
-        return k_CubeHalf * k_CubeScale / k_PanScale * 1.41421 * 0.9;
+        const auto HalfExtents = _Searing.Get_PieceHalfExtents(InPieceId);
+        return (HalfExtents.X + HalfExtents.Y) * 0.5 / k_PanScale * 1.41421 * 0.9;
     }
 
     UFUNCTION(BlueprintOverride)
@@ -47,8 +51,14 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoT
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin);
         auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_SearingStation_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnStationConstructed"));
+        for (int32 Index = 0; Index < 2; ++Index)
+        {
+            const auto Park = k_Origin + k_ParkLocal - FVector(0.0, 20.0 * float64(Index), 0.0);
+            _Pieces.Add(Build_Piece(Get_BoxMesh(), FTransform(FRotator::ZeroRotator, Park), Make_Spec(k_PieceMassKg)));
+        }
 
-        Add_Step_WaitUntil("the station composed its Searing and its feed, and the pan body exists", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Searing and its feed, the pan body exists and the boxes are ready", n"Check_StationReady", 0, 5.0f);
+        Add_Step("dress both boxes with their own displays", n"Step_DressPieces");
         Add_Step_WaitFrames("the station's state machine settles in Idle (its reset empties the pan)", 3);
         Add_Step("heat the pan and admit the first piece at the release node", n"Step_HeatAndAddFirst");
         Add_Step_WaitUntil("the first piece's body is in the simulation", n"Check_FirstBodyAdded", 0, 2.0f);
@@ -80,7 +90,16 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoT
     {
         auto Res = OutResult;
         Res.Set(ck::IsValid(_Searing) && ck::IsValid(_Feed)
-            && utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody));
+            && utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody)
+            && _Pieces[0].Get_Status() == EMars_FoodPiece_Status::Ready && _Pieces[1].Get_Status() == EMars_FoodPiece_Status::Ready);
+    }
+
+    // Whoever makes a piece dresses it: the test made the boxes, so each wears a food's display (the meat's materials).
+    UFUNCTION()
+    private void Step_DressPieces(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        for (const auto& Piece : _Pieces)
+        { mars::Food_MeatSlab_Mars.Add_Display(Piece); }
     }
 
     UFUNCTION()
@@ -144,8 +163,8 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoT
 
         const auto First = Material.GetVectorParameterValue(n"Meat Footprint");
         const auto Second = Material.GetVectorParameterValue(n"Meat Footprint 1");
-        Res.Set(Math::Abs(float64(First.B) - Get_CubeFootprint()) < 0.01
-            && Math::Abs(float64(Second.B) - Get_CubeFootprint()) < 0.01
+        Res.Set(Math::Abs(float64(First.B) - Get_PieceFootprint(_FirstId)) < 0.01
+            && Math::Abs(float64(Second.B) - Get_PieceFootprint(_SecondId)) < 0.01
             && Get_Distance(First, Second) >= Get_PointsApart() - k_SettleTolerance);
     }
 
@@ -161,6 +180,9 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoT
         Assert_Pool(First, _FirstId, "slot 0 (the first piece admitted)");
         Assert_Pool(Second, _SecondId, "slot 1 (the second piece admitted)");
         Assert_True(Third.B == 0.0f, f"slot 2 (no third piece) has no pool (radius {Third.B})");
+
+        for (const auto& Piece : _Pieces)
+        { Assert_Undressed(Piece); }
     }
 
     UFUNCTION()
@@ -198,31 +220,53 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UCk_AutoT
         Res.Set(ck::Is_NOT_Valid(_Station));
     }
 
-    // InFootprint has the cube's footprint radius and sits at the piece's pan-local XY in art cm.
+    // InFootprint has the piece's own footprint radius and sits at the piece's pan-local XY in art cm.
     private void Assert_Pool(FLinearColor InFootprint, const FMars_CookingFeed_PieceId& InPieceId, FString InWhich)
     {
         const auto Local = _Searing.Get_PiecePanLocal(InPieceId);
         const auto Gap = FVector2D(float64(InFootprint.R) - Local.X / k_PanScale, float64(InFootprint.G) - Local.Y / k_PanScale).Size();
-        Assert_True(Math::Abs(float64(InFootprint.B) - Get_CubeFootprint()) < 0.01,
-            f"{InWhich}: the radius [{InFootprint.B}] is the cube's footprint [{Get_CubeFootprint()}]");
+        Assert_True(Math::Abs(float64(InFootprint.B) - Get_PieceFootprint(InPieceId)) < 0.01,
+            f"{InWhich}: the radius [{InFootprint.B}] is the piece's footprint [{Get_PieceFootprint(InPieceId)}]");
         Assert_True(Gap < 0.3, f"{InWhich}: the footprint [{InFootprint}] is the piece's pan-local XY [{Local}] in art cm (gap {Gap})");
     }
 
-    // The bridge's job done by hand: a release at the feed's release node (over the pan's centre, above the rim); the feed
-    // itself is not asked.
-    private void Release(const FMars_CookingFeed_PieceId& InPieceId)
+    // A station part would be a scene node hanging off the piece; the piece keeps its own display.
+    private void Assert_Undressed(const FCk_Handle_FoodPiece& InPiece)
     {
-        const auto ReleaseWorld = utils_transform::Get_EntityCurrentTransform(_Feed.Get_ReleaseNode());
-        _Searing.Request_AddPiece(FMars_Request_Searing_AddPiece(
-            FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector, 0)));
+        FCk_Handle Entity = InPiece;
+        Assert_True(Entity.Is_RuntimeMeshDisplay(), f"[{InPiece.ToString()}] still wears its own display");
+
+        auto Parts = 0;
+        for (const auto& Dependent : utils_entity_lifetime::Get_LifetimeDependents(Entity))
+        {
+            if (ck::IsValid(Dependent) && Dependent.Is_SceneNode())
+            { Parts += 1; }
+        }
+
+        Assert_Equals_Int(Parts, 0, f"the station hung no part off [{InPiece.ToString()}]");
     }
 
-    // InLocal in the pan body's frame, the pan's rotation kept.
+    // The bridge's job done by hand: a release of the box for slot InPieceId.StockIndex, its middle at the feed's release
+    // node (over the pan's centre, above the rim); the feed itself is not asked.
+    private void Release(const FMars_CookingFeed_PieceId& InPieceId)
+    {
+        const auto Piece = _Pieces[InPieceId.StockIndex];
+        const auto NodeWorld = utils_transform::Get_EntityCurrentTransform(_Feed.Get_ReleaseNode());
+        const auto Rotation = NodeWorld.GetRotation();
+        const auto ReleaseWorld = FTransform(Rotation, NodeWorld.GetLocation() - Rotation.RotateVector(Get_BoundsCenter(Piece)));
+
+        auto PieceRelease = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector, 0);
+        PieceRelease.Piece = Piece;
+        _Searing.Request_AddPiece(FMars_Request_Searing_AddPiece(PieceRelease));
+    }
+
+    // The piece's middle to InLocal in the pan body's frame, the pan's rotation kept.
     private void Teleport(const FMars_CookingFeed_PieceId& InPieceId, FVector InLocal)
     {
         const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        utils_jolt_body::Request_Teleport(_Searing.Get_PieceBody(InPieceId),
-            FCk_Request_JoltBody_Teleport(PanBaseWorld.TransformPosition(InLocal), PanBaseWorld.Rotator()));
+        const auto CentreLocal = _Searing.Get_PieceState(InPieceId).CentreLocal;
+        const auto Location = PanBaseWorld.TransformPosition(InLocal) - PanBaseWorld.GetRotation().RotateVector(CentreLocal);
+        utils_jolt_body::Request_Teleport(_Searing.Get_PieceBody(InPieceId), FCk_Request_JoltBody_Teleport(Location, PanBaseWorld.Rotator()));
     }
 
     private bool Get_IsBodyAdded(const FMars_CookingFeed_PieceId& InPieceId) const

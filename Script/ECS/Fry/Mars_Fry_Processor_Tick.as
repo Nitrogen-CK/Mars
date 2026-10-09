@@ -30,7 +30,8 @@ struct FMars_Fry_PieceEvents
 // below the oil line while it is in the oil or on the scoop (stage edges), and its drain while it rests on the basket floor
 // inside the basket; then the lingering lost bodies age (and are destroyed at Zones.LingerSeconds), the frying time, and the
 // pieces' edges last. The skimmer moves itself (an Implement); Jolt owns every piece's pose; the kernel reads it back through
-// the entity transform and only pushes on it. Nothing is ever spawned here: pieces arrive only through AddPiece.
+// the entity transform and only pushes on it, and only once an adopted piece has arrived at its release. Nothing is ever
+// spawned here: pieces arrive only through AddPiece.
 class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -65,6 +66,26 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
             if (Piece.Whereabouts == EMars_Fry_Whereabouts::Lost || ck::Is_NOT_Valid(Piece.Entity))
             { continue; }
 
+            // An adopted piece is judged only once it is where it was released, or once it has taken too long to get there.
+            if (Piece.Arriving.IsSet())
+            {
+                Piece.ArrivingSeconds += Frame.DeltaSeconds;
+                if (utils_searing::Get_HasArrived(Piece.Body, Piece.Entity, Piece.Arriving.GetValue()) == false)
+                {
+                    if (Piece.ArrivingSeconds < utils_searing::k_ArrivalMaxSeconds)
+                    {
+                        InState.Pieces[Index] = Piece;
+                        continue;
+                    }
+
+                    ck::EnsureIfNot(false, f"[Fry] [{Frame.Fry.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}] "
+                        + f"never arrived at its release: {utils_searing::Get_ArrivalDistance(Piece.Entity, Piece.Arriving.GetValue())} cm away "
+                        + f"after {Piece.ArrivingSeconds} s; judged where it is");
+                }
+
+                Piece.Arriving.Reset();
+            }
+
             auto PieceEvents = FMars_Fry_PieceEvents();
             PieceEvents.Id = Piece.Id;
             PieceEvents.Entity = Piece.Entity;
@@ -98,23 +119,24 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
 
         const auto Up = InFrame.RootWorld.GetRotation().GetUpVector();
         const auto& Oil = InFrame.Spec.Oil;
-        const auto& PieceSpec = InFrame.Spec.Piece;
-        const auto Mass = float64(PieceSpec.MassKg);
         const auto StepSeconds = Math::Min(InFrame.DeltaSeconds, k_MaxPhysicsStepSeconds);
 
         for (const auto& Piece : InState.Pieces)
         {
-            if (Piece.Whereabouts == EMars_Fry_Whereabouts::Lost || ck::Is_NOT_Valid(Piece.Entity))
+            if (Piece.Whereabouts == EMars_Fry_Whereabouts::Lost || ck::Is_NOT_Valid(Piece.Entity) || Piece.Arriving.IsSet())
             { continue; }
 
-            const auto Centre = Get_RootLocal(InFrame, Piece.Entity);
+            const auto Pose = Get_RootPose(InFrame, Piece);
+            const auto Centre = Pose.GetLocation();
             if (float32(Centre.Size2D()) > InFrame.Spec.Zones.PotRadius)
             { continue; }
 
-            const auto Immersion = utils_fry::Get_Immersion(float32(Centre.Z), PieceSpec.HalfSize, Oil.SurfaceZ);
+            const auto HalfHeight = float32(utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), Piece.HalfExtents));
+            const auto Immersion = utils_fry::Get_Immersion(float32(Centre.Z), HalfHeight, Oil.SurfaceZ);
             if (Immersion <= 0.0f)
             { continue; }
 
+            const auto Mass = float64(Piece.Piece.Get_MassKg());
             auto Body = Piece.Body;
             const auto Velocity = utils_jolt_body::Get_LinearVelocity(Body);
             const auto Force = Up * (Mass * float64(Oil.BuoyancyAccel * Immersion)) - Velocity * (Mass * float64(Oil.Drag * Immersion));
@@ -135,23 +157,23 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
     {
         const auto& Spec = InFrame.Spec;
         const auto& Zones = Spec.Zones;
-        const auto HalfSize = Spec.Piece.HalfSize;
-        const auto PieceWorld = utils_transform::Get_EntityCurrentLocation(InPiece.Entity.As_Transform());
-        const auto Root = InFrame.RootWorld.InverseTransformPosition(PieceWorld);
+        const auto Pose = Get_RootPose(InFrame, InPiece);
+        const auto HalfHeight = float32(utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents));
+        const auto Root = Pose.GetLocation();
+        const auto PieceWorld = InFrame.RootWorld.TransformPosition(Root);
         const auto BasketLocal = InFrame.BasketWorld.InverseTransformPosition(PieceWorld);
         const auto InsidePot = float32(Root.Size2D()) <= Zones.PotRadius;
-        const auto Resting = InPiece.Entity.As_Resting();
 
         auto To = EMars_Fry_Whereabouts::Airborne;
         if (float32(Root.Z) < Zones.FloorZ
             || (InsidePot == false && float32(Root.Z) < Zones.RimZ && utils_fry::Get_IsOverBasketFootprint(Spec.Basket, BasketLocal) == false))
         { To = EMars_Fry_Whereabouts::Lost; }
-        else if (Resting.Get_IsRestingOn(Spec.Nodes.ScoopBody)
-            && utils_fry::Get_IsInsideBowl(Spec.Scoop, InFrame.ScoopWorld.InverseTransformPosition(PieceWorld), HalfSize))
+        else if (Get_IsRestingOn(InPiece, Spec.Nodes.ScoopBody)
+            && utils_fry::Get_IsInsideBowl(Spec.Scoop, InFrame.ScoopWorld.InverseTransformPosition(PieceWorld), HalfHeight))
         { To = EMars_Fry_Whereabouts::Skimmer; }
-        else if (utils_fry::Get_IsInsideBasket(Spec.Basket, BasketLocal, HalfSize))
+        else if (utils_fry::Get_IsInsideBasket(Spec.Basket, BasketLocal, HalfHeight))
         { To = EMars_Fry_Whereabouts::DrainBasket; }
-        else if (float32(Root.Z) - HalfSize < Spec.Oil.SurfaceZ && InsidePot)
+        else if (float32(Root.Z) - HalfHeight < Spec.Oil.SurfaceZ && InsidePot)
         { To = EMars_Fry_Whereabouts::Oil; }
 
         const auto From = InPiece.Whereabouts;
@@ -248,14 +270,13 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto& Heat = InFrame.Spec.Heat;
-        const auto HalfSize = InFrame.Spec.Piece.HalfSize;
         const auto SurfaceZ = InFrame.Spec.Oil.SurfaceZ;
-        const auto PieceRoot = utils_transform::Get_EntityCurrentTransform(InPiece.Entity.As_Transform()).GetRelativeTransform(InFrame.RootWorld);
+        const auto Pose = Get_RootPose(InFrame, InPiece);
 
         for (int32 FaceIndex = 0; FaceIndex < utils_searing::k_FaceCount; ++FaceIndex)
         {
             const auto Face = EMars_Searing_Face(FaceIndex);
-            if (utils_fry::Get_FaceCentreZ(PieceRoot, Face, HalfSize) >= SurfaceZ)
+            if (utils_fry::Get_FaceCentreZ(Pose, Face, InPiece.HalfExtents) >= SurfaceZ)
             { continue; }
 
             const auto Before = InPiece.FaceHeat[FaceIndex];
@@ -283,7 +304,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         if (InPiece.Whereabouts != EMars_Fry_Whereabouts::DrainBasket || InPiece.Drain == EMars_Fry_Drain::Drained)
         { return; }
 
-        if (InPiece.Entity.As_Resting().Get_IsRestingOn(InFrame.Spec.Nodes.BasketBody) == false)
+        if (Get_IsRestingOn(InPiece, InFrame.Spec.Nodes.BasketBody) == false)
         { return; }
 
         InPiece.Drain = EMars_Fry_Drain::Draining;
@@ -346,9 +367,21 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         }
     }
 
-    private FVector Get_RootLocal(const FMars_Fry_Frame& InFrame, FCk_Handle InEntity) const
+    // The piece's middle and rotation in the station frame.
+    private FTransform Get_RootPose(const FMars_Fry_Frame& InFrame, const FMars_Fry_PieceState& InPiece) const
     {
-        const auto PieceWorld = utils_transform::Get_EntityCurrentLocation(InEntity.As_Transform());
-        return InFrame.RootWorld.InverseTransformPosition(PieceWorld);
+        const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(InPiece.Entity.As_Transform());
+        return utils_searing::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.RootWorld), InPiece.CentreLocal);
+    }
+
+    // A piece adopted from another station has its Resting retargeted onto the scoop and the basket by a request: until that
+    // drains it does not yet name them, and it rests on neither.
+    private bool Get_IsRestingOn(const FMars_Fry_PieceState& InPiece, const FCk_Handle& InSupport) const
+    {
+        const auto Resting = InPiece.Entity.As_Resting();
+        if (utils_resting::Find_TargetIndex(Resting.Get_Targets(), InSupport) < 0)
+        { return false; }
+
+        return Resting.Get_IsRestingOn(InSupport);
     }
 }

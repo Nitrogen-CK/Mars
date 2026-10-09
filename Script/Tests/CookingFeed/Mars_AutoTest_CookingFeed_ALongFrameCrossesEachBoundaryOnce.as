@@ -9,6 +9,7 @@ class UMars_AutoTest_CookingFeed_ALongFrameCrossesEachBoundaryOnce : UMars_AutoT
         auto Spec = Make_TestSpec();
         Spec.Timing = FMars_CookingFeed_TimingSpec(0.001f, 0.0f, 0.001f, 0.001f);
         BuildFeed(InHandle, Spec);
+        Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
         Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 4, 1.0f);

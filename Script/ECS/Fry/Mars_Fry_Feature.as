@@ -51,15 +51,9 @@ enum EMars_Fry_Skim
     Pour
 }
 
-// Every admitted piece's body: a box of HalfSize with explicit mass and surface.
+// The surface of the body an adopted piece is given (its shape is the piece's own mesh, its mass the piece's own).
 struct FMars_Fry_PieceSpec
 {
-    UPROPERTY()
-    float32 HalfSize = 6.0f;
-
-    UPROPERTY()
-    float32 MassKg = 0.08f;
-
     UPROPERTY()
     float32 Friction = 0.5f;
 
@@ -77,10 +71,10 @@ struct FMars_Fry_PieceSpec
 
     FMars_Fry_PieceSpec() {}
 
-    FMars_Fry_PieceSpec(float32 InHalfSize, float32 InMassKg)
+    FMars_Fry_PieceSpec(float32 InFriction, float32 InRestitution)
     {
-        HalfSize = InHalfSize;
-        MassKg = InMassKg;
+        Friction = InFriction;
+        Restitution = InRestitution;
     }
 }
 
@@ -359,19 +353,16 @@ struct FMars_Fry_Spec
     FMars_Fry_Nodes Nodes;
 }
 
-// A kernel that takes no piece, a piece, basket or scoop with no size or mass, a restitution outside the physical range, a
-// skimmer whose dip is not below its carry or whose pour does not tip (or tips past a usable angle), a face that never goes
-// golden, a pot too narrow for the bowl, a receiver that never drains or drops its contact at once, or a reach with no
-// extent or no look each make the minigame unplayable.
+// A kernel that takes no piece, a basket or scoop with no size, a body surface outside the physical range, a skimmer whose
+// dip is not below its carry or whose pour does not tip (or tips past a usable angle), a face that never goes golden, a pot
+// too narrow for the bowl, a receiver that never drains or drops its contact at once, or a reach with no extent or no look
+// each make the minigame unplayable.
 mixin FMars_Validation Validate(const FMars_Fry_Spec& Self)
 {
     if (Self.Supply.MaxPieces <= 0)
     { return FMars_Validation(f"Fry has a non-positive Supply.MaxPieces [{Self.Supply.MaxPieces}]"); }
 
     const auto& Piece = Self.Piece;
-    if (Piece.HalfSize <= 0.0f || Piece.MassKg <= 0.0f)
-    { return FMars_Validation(f"Fry has a non-positive Piece.HalfSize [{Piece.HalfSize}] or MassKg [{Piece.MassKg}]"); }
-
     if (Piece.Friction < 0.0f || Piece.LinearDamping < 0.0f || Piece.AngularDamping < 0.0f || Piece.GravityFactor < 0.0f)
     { return FMars_Validation("Fry has a negative Piece.Friction, LinearDamping, AngularDamping or GravityFactor"); }
 
@@ -440,8 +431,9 @@ struct FMars_Fragment_Fry_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One admitted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity (a lifetime
-// child of the station) carries the dynamic body and a Resting on the scoop disc and the basket floor.
+// One adopted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity is the food
+// piece's own (the kernel's guest: it keeps its lifetime) and carries the dynamic body and a Resting on the scoop disc and
+// the basket floor. Its geometry is read once, at admission, from its mesh's metrics.
 struct FMars_Fry_PieceState
 {
     UPROPERTY()
@@ -452,12 +444,34 @@ struct FMars_Fry_PieceState
     int32 PresetIndex = 0;
 
     UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    // The piece's entity, as a plain handle.
+    UPROPERTY()
     FCk_Handle Entity;
 
     UPROPERTY()
     FCk_Handle_JoltBody Body;
 
-    // Six, 0 pale .. 1 golden .. 2 overdone; indexed by int32(EMars_Searing_Face).
+    // The middle of the piece's bounds in its own frame.
+    UPROPERTY()
+    FVector CentreLocal = FVector::ZeroVector;
+
+    // Half the piece's bounds along its own axes.
+    UPROPERTY()
+    FVector HalfExtents = FVector::ZeroVector;
+
+    // The release location while the piece is still arriving: its transform reads where it was before admission until its
+    // pose request or teleport lands, so the Tick neither judges nor pushes it until it is there
+    // (utils_searing::Get_HasArrived).
+    UPROPERTY()
+    TOptional<FVector> Arriving;
+
+    // How long the piece has been arriving; past utils_searing::k_ArrivalMaxSeconds it is judged where it is.
+    UPROPERTY()
+    float32 ArrivingSeconds = 0.0f;
+
+    // Six, 0 pale .. 1 golden .. 2 overdone, seeded from the piece's sear; indexed by int32(EMars_Searing_Face).
     UPROPERTY()
     TArray<float32> FaceHeat;
 
@@ -505,11 +519,15 @@ struct FMars_Fry_Tally
 
     UPROPERTY()
     int32 Lost = 0;
+
+    // Pieces handed back by TakeOut.
+    UPROPERTY()
+    int32 TakenOut = 0;
 }
 
-// Every piece admitted since the last reset is in exactly one whereabouts (a lost one stays counted after its body is
-// destroyed): Admitted = InOil + OnSkimmer + Airborne + InBasket + Lost. Drained counts the InBasket pieces that drained.
-// The face counts are over the pieces not Lost.
+// Every piece in play is in exactly one whereabouts, and every piece lost or taken out since the last reset stays counted
+// (a reset keeps the pieces in play): Admitted = InOil + OnSkimmer + Airborne + InBasket + Lost + TakenOut. Drained counts
+// the InBasket pieces that drained. The face counts are over the pieces not Lost.
 struct FMars_Fry_Summary
 {
     UPROPERTY()
@@ -532,6 +550,9 @@ struct FMars_Fry_Summary
 
     UPROPERTY()
     int32 Lost = 0;
+
+    UPROPERTY()
+    int32 TakenOut = 0;
 
     UPROPERTY()
     int32 PaleFaces = 0;
@@ -575,11 +596,13 @@ struct FMars_Fragment_Fry
 delegate void FMars_Delegate_Fry_OnDriveChanged(FCk_Handle_Fry InFry, EMars_Implement_Drive InDrive);
 event void FMars_Delegate_Fry_OnDriveChanged_MC(FCk_Handle_Fry InFry, EMars_Implement_Drive InDrive);
 
-// The answer to every AddPiece: Accepted (the body exists; OnPieceAdded follows) or Rejected with a reason (nothing made).
+// The answer to every AddPiece: Accepted (the piece is in play; OnPieceAdded follows) or Rejected with a reason (the piece is
+// left as it was).
 delegate void FMars_Delegate_Fry_OnPieceAdmission(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 event void FMars_Delegate_Fry_OnPieceAdmission_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 
-// An admitted piece's entity exists (its body requested, not yet added): the placing script adds its visuals here.
+// An adopted piece is in play (its body requested or switched back to Dynamic, not yet moving): the placing script adds its
+// visuals here.
 delegate void FMars_Delegate_Fry_OnPieceAdded(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Fry_OnPieceAdded_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
@@ -601,6 +624,11 @@ event void FMars_Delegate_Fry_OnPieceLost_MC(FCk_Handle_Fry InFry, FMars_Cooking
 delegate void FMars_Delegate_Fry_OnSkimChanged(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim);
 event void FMars_Delegate_Fry_OnSkimChanged_MC(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim);
 
+// A TakeOut handed InPiece back: out of play, its cook state written, its body Kinematic. Control loads it where it goes
+// next.
+delegate void FMars_Delegate_Fry_OnPieceTakenOut(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+event void FMars_Delegate_Fry_OnPieceTakenOut_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+
 struct FMars_Fragment_Fry_Signals
 {
     FMars_Delegate_Fry_OnDriveChanged_MC OnDriveChanged;
@@ -611,6 +639,7 @@ struct FMars_Fragment_Fry_Signals
     FMars_Delegate_Fry_OnPieceDrained_MC OnPieceDrained;
     FMars_Delegate_Fry_OnPieceLost_MC OnPieceLost;
     FMars_Delegate_Fry_OnSkimChanged_MC OnSkimChanged;
+    FMars_Delegate_Fry_OnPieceTakenOut_MC OnPieceTakenOut;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -663,9 +692,10 @@ struct FMars_Request_Fry_Skim
     }
 }
 
-// One released piece to admit, answered by OnPieceAdmission. Rejected (nothing made) in a drain that also resets, while the
-// scoop or basket body is not yet in the simulation, when a piece (lingering lost ones included) already carries the Id, or
-// when Supply.MaxPieces live pieces are in play.
+// One released piece to adopt (Release.Piece), answered by OnPieceAdmission. Rejected (the piece left as it was) in a drain
+// that also resets, while the scoop or basket body is not yet in the simulation, when the release names no live piece, a
+// piece not Ready, one already in play, one still on its platter or still attached, when a piece (lingering lost ones
+// included) already carries the Id, or when Supply.MaxPieces live pieces are in play.
 struct FMars_Request_Fry_AddPiece
 {
     UPROPERTY()
@@ -679,8 +709,28 @@ struct FMars_Request_Fry_AddPiece
     }
 }
 
-// Destroys every piece (the lingering lost ones too), resets the skimmer (carry, level, at its park, idle) and zeroes the
-// tally; nothing is in play until the next AddPiece. Payload-less: one placeholder field (request doctrine).
+// Hands pieces back, each with its cook state written and its body Kinematic, answered by OnPieceTakenOut per piece. Piece
+// set: that piece, if it is in play and not lost; unset: every Drained piece in admission order. MaxPieces set: at most
+// that many leave.
+struct FMars_Request_Fry_TakeOut
+{
+    UPROPERTY()
+    TOptional<FCk_Handle_FoodPiece> Piece;
+
+    UPROPERTY()
+    TOptional<int32> MaxPieces;
+
+    FMars_Request_Fry_TakeOut() {}
+
+    FMars_Request_Fry_TakeOut(TOptional<FCk_Handle_FoodPiece> InPiece, TOptional<int32> InMaxPieces)
+    {
+        Piece = InPiece;
+        MaxPieces = InMaxPieces;
+    }
+}
+
+// Resets the skimmer (carry, level, at its park, idle) and zeroes the tally; every piece stays in play with its heat (the
+// player's food is theirs). Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Fry_Reset
 {
     UPROPERTY()
@@ -689,8 +739,9 @@ struct FMars_Request_Fry_Reset
     FMars_Request_Fry_Reset() {}
 }
 
-// Applied Reset -> SetDrive -> AddPiece -> Skim -> Look, so a reset and the first drive, pieces, dip and looks of a new
-// session can share a drain (an AddPiece sharing a drain with a Reset is rejected).
+// Applied Reset -> SetDrive -> TakeOut -> AddPiece -> Skim -> Look, so a reset and the first drive, pieces, dip and looks of
+// a new session can share a drain (an AddPiece sharing a drain with a Reset is rejected), and a take-out frees its place
+// before the next admission.
 struct FMars_Fragment_Fry_Requests
 {
     UPROPERTY()
@@ -698,6 +749,9 @@ struct FMars_Fragment_Fry_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Fry_SetDrive> SetDriveRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Fry_TakeOut> TakeOutRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Fry_AddPiece> AddPieceRequests;

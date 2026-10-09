@@ -1,4 +1,4 @@
-// Validate() accepts the rig's spec and rejects a kernel that takes no piece, a piece with no size, a basket with no
+// Validate() accepts the rig's spec and rejects a kernel that takes no piece, a negative piece friction, a basket with no
 // interior, a scoop with no bowl, a dip not below the carry, a face that never goes golden, a piece restitution of 1.5, a
 // pot too narrow for the scoop, a receiver that never drains or drops its contact at once, and a reach with no corridor,
 // no basket box or no look.
@@ -21,9 +21,9 @@ class UMars_AutoTest_Fry_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Fry
         NoPieces.Supply.MaxPieces = 0;
         AssertRejected(NoPieces.Validate(), "Supply.MaxPieces 0");
 
-        auto NoSize = Make_TestSpec();
-        NoSize.Piece.HalfSize = 0.0f;
-        AssertRejected(NoSize.Validate(), "a Piece.HalfSize <= 0");
+        auto Sticky = Make_TestSpec();
+        Sticky.Piece.Friction = -1.0f;
+        AssertRejected(Sticky.Validate(), "a negative Piece.Friction");
 
         auto NoInterior = Make_TestSpec();
         NoInterior.Basket.InnerHalfX = 0.0f;

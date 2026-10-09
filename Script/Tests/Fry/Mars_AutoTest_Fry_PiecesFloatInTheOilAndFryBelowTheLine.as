@@ -23,8 +23,10 @@ class UMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine : UMars_AutoTestR
         // No face reaches Overdone in this test's time: every report is a Golden one.
         Spec.Heat.OverdoneSeconds = 100.0f;
         BuildStation(InHandle, Spec);
+        Build_Pieces(3);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release three pieces just above the oil", n"Step_Release");
         Add_Step_WaitUntil("all three float in the oil", n"Check_AllInOil", 0, 3.0f);
         Add_Step("start the clock", n"Step_StartClock");
@@ -35,7 +37,7 @@ class UMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine : UMars_AutoTestR
 
     private FVector Get_ReleaseAt(FVector2D InSpot) const
     {
-        return FVector(InSpot.X, InSpot.Y, float64(_Spec.Oil.SurfaceZ + _Spec.Piece.HalfSize + 1.0f));
+        return FVector(InSpot.X, InSpot.Y, float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0);
     }
 
     UFUNCTION()

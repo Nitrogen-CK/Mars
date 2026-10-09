@@ -23,6 +23,7 @@ class UMars_AutoTest_Searing_SwirlAfterASleepingSteak : UMars_AutoTestRig_Searin
         auto PanSpec = FMars_Implement_Spec();
         PanSpec.Orbit = FMars_Implement_OrbitSpec(k_SwirlRadius, k_SwirlHz);
         BuildStation(InHandle, Spec, PanSpec);
+        Build_Pieces(1);
 
         Add_Steps_AddPieceAndLand();
         Add_Step_WaitSeconds("the piece rests on the cold pan", k_ColdRestSeconds);

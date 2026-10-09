@@ -1,10 +1,9 @@
-// Only an answer for exactly the awaited piece counts: a wrong slot and a newer generation are ignored while awaiting, the
-// right answer spends once, the same answer again spends nothing. After a reset mid-admission, an Accepted answer for the
-// old piece neither spends nor restores anything in the new attempt.
+// Only an answer for exactly the awaited piece counts: a slot the reservation does not name and a newer generation are
+// ignored while awaiting, the right answer spends once, the same answer again spends nothing. After a reset mid-admission
+// (the released piece goes back on the platter, as the bridge would put it), an Accepted answer for the old piece spends
+// nothing in the new attempt.
 class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing : UMars_AutoTestRig_CookingFeed
 {
-    default _TimeoutSeconds = 8.0f;
-
     private FMars_CookingFeed_PieceId _Awaited;
     private FMars_CookingFeed_PieceId _Stale;
 
@@ -12,6 +11,7 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildFeed(InHandle, Make_TestSpec());
+        Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
         Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
@@ -28,6 +28,7 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
         Add_Step_WaitUntil("the second piece awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
         Add_Step("reset mid-admission", n"Step_ResetMidAdmission");
         Add_Step_WaitUntil("the reset applied", n"Check_ResetApplied", 0, 1.0f);
+        Add_Step_WaitUntil("the released piece is back on the platter", n"Check_StaleBack", 0, 1.0f);
         Add_Step("accept the old piece", n"Step_AcceptStale");
         Add_Step_WaitFrames("the stale answer drains", 3);
         Add_Step("the new attempt is untouched", n"Step_AssertFreshAttempt");
@@ -80,6 +81,13 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     }
 
     UFUNCTION()
+    private void Check_StaleBack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Platter.Get_HeldCount() == k_Stock - 1 && _Platter.Get_PendingCount() == 0);
+    }
+
+    UFUNCTION()
     private void Step_AcceptStale(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Resolve(_Stale, EMars_CookingFeed_Admission::Accepted);
@@ -88,13 +96,11 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     UFUNCTION()
     private void Step_AssertFreshAttempt(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Ledger(k_Stock, 0, "after the stale answer");
+        Assert_Ledger(k_Stock - 1, 0, "after the stale answer (the first piece stays spent)");
         Assert_True(_Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle, "the hand stays at rest");
         Assert_Equals_Int(_Settles.Num(), 2, "the reset settled the reservation; the stale answer settled nothing");
         Assert_True(_Settles.Num() == 2 && _Settles[1] == EMars_CookingFeed_Settle::Cancelled, "the reservation settled Cancelled");
         Assert_True(_SettledPieces.Num() == 2 && _SettledPieces[1].Get_IsSame(_Stale), "under its old id");
-
-        for (int32 Slot = 0; Slot < k_Stock; ++Slot)
-        { Assert_False(_Feed.Get_IsSlotTaken(Slot), f"slot {Slot} is free in the new attempt"); }
+        Assert_Equals_Int(_Platter.Get_HeldCount(), k_Stock - 1, "the platter holds every piece but the admitted one");
     }
 }

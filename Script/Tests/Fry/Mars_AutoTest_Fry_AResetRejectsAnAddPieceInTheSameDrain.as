@@ -1,5 +1,5 @@
 // A Reset and an AddPiece issued in one frame share a drain: the piece is Rejected with the reason "reset in the same drain"
-// and nothing is made (a release broadcast the frame the operator leaves must not land in the fresh attempt). A release in
+// and the piece is left as it was (a release broadcast the frame the operator leaves must not land in the fresh attempt). A release in
 // a later drain is admitted as usual.
 class UMars_AutoTest_Fry_AResetRejectsAnAddPieceInTheSameDrain : UMars_AutoTestRig_Fry
 {
@@ -9,8 +9,10 @@ class UMars_AutoTest_Fry_AResetRejectsAnAddPieceInTheSameDrain : UMars_AutoTestR
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Pieces(2);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("reset and release one piece in the same frame", n"Step_ResetAndRelease");
         Add_Step_WaitUntil("the release was answered", n"Check_Answered1", 0, 1.0f);
         Add_Step_WaitFrames("anything made would show", 2);

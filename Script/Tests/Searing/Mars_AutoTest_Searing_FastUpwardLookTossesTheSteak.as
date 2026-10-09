@@ -22,6 +22,7 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
         auto PanSpec = FMars_Implement_Spec();
         PanSpec.Tilt.LevelReturnDegreesPerSecond = 45.0f;
         BuildStation(InHandle, Spec, PanSpec);
+        Build_Pieces(1);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();

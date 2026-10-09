@@ -6,7 +6,7 @@ asset Mars_SearingHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Searing";
     RequiredFragments.Add(FMars_Feature_Searing);
-    Description = "A searing minigame on a station: admitted pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears";
+    Description = "A searing minigame on a station: adopted food pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears";
 }
 struct FMars_Feature_Searing {}
 
@@ -44,8 +44,9 @@ enum EMars_Searing_Contact
     OnPan
 }
 
-// Cooking: on its way to six seared faces. Ready: six faces seared; it stays on the pan, inert (a spill still loses it).
-// Lost: it left the pan; its body lingers until Loss.LingerSeconds, then it is destroyed. Nothing replaces it.
+// Cooking: on its way to six seared faces. Ready: six faces seared; it stays on the pan, inert, until it is taken out (a
+// spill still loses it). Lost: it left the pan; its body lingers until Loss.LingerSeconds, then it is destroyed. Nothing
+// replaces it.
 enum EMars_Searing_PieceStatus
 {
     Cooking,
@@ -82,18 +83,11 @@ struct FMars_Searing_CookSpec
     }
 }
 
-// Each piece's body: a box of HalfSize, explicit mass and surface. SpawnLift is the clearance a caller leaves under a piece
-// it adds right over the cooking surface (its centre HalfSize + SpawnLift above it).
+// The surface of the body an adopted piece is given (its shape is the piece's own mesh, its mass the piece's own).
 // Friction combines with the pan's as sqrt(a * b): 0.6 on an oiled pan's 0.15 gives 0.3, so a resting piece starts
 // sliding past a 17-degree tilt (into the pan's lip) and glides on a pan swirling a few uu at 1.5 Hz.
-struct FMars_Searing_SteakSpec
+struct FMars_Searing_PieceSpec
 {
-    UPROPERTY()
-    float32 HalfSize = 6.0f;
-
-    UPROPERTY()
-    float32 MassKg = 0.1f;
-
     UPROPERTY()
     float32 Friction = 0.6f;
 
@@ -106,32 +100,19 @@ struct FMars_Searing_SteakSpec
     UPROPERTY()
     float32 AngularDamping = 0.15f;
 
-    UPROPERTY()
-    float32 SpawnLift = 2.0f;
-
     // How long a piece counts as resting on the pan after its last contact with the base (its Resting's grace). A piece
     // gliding on a swirling, oiled pan can lose contact for a moment without leaving it.
     UPROPERTY()
     float32 ContactGraceSeconds = 0.1f;
 
-    FMars_Searing_SteakSpec() {}
+    FMars_Searing_PieceSpec() {}
 
-    FMars_Searing_SteakSpec(
-        float32 InHalfSize,
-        float32 InMassKg,
-        float32 InFriction,
-        float32 InRestitution,
-        float32 InLinearDamping,
-        float32 InAngularDamping,
-        float32 InSpawnLift)
+    FMars_Searing_PieceSpec(float32 InFriction, float32 InRestitution, float32 InLinearDamping, float32 InAngularDamping)
     {
-        HalfSize = InHalfSize;
-        MassKg = InMassKg;
         Friction = InFriction;
         Restitution = InRestitution;
         LinearDamping = InLinearDamping;
         AngularDamping = InAngularDamping;
-        SpawnLift = InSpawnLift;
     }
 }
 
@@ -228,7 +209,7 @@ struct FMars_Searing_Spec
     FMars_Searing_CookSpec Cook;
 
     UPROPERTY()
-    FMars_Searing_SteakSpec Steak;
+    FMars_Searing_PieceSpec Piece;
 
     UPROPERTY()
     FMars_Searing_LossSpec Loss;
@@ -241,18 +222,18 @@ struct FMars_Searing_Spec
     FMars_Searing_Spec(
         FMars_Searing_SupplySpec InSupply,
         FMars_Searing_CookSpec InCook,
-        FMars_Searing_SteakSpec InSteak,
+        FMars_Searing_PieceSpec InPiece,
         FMars_Searing_LossSpec InLoss)
     {
         Supply = InSupply;
         Cook = InCook;
-        Steak = InSteak;
+        Piece = InPiece;
         Loss = InLoss;
     }
 }
 
-// A pan that takes no piece, a face that never sears, a piece with no size or mass, a restitution outside the physical
-// range, or a pan disc no wider than a piece (it would be lost the moment it landed) each make the minigame unplayable.
+// A pan that takes no piece, a face that never sears, a body surface outside the physical range, a contact that drops at
+// once or a pan with no disc each make the minigame unplayable.
 mixin FMars_Validation Validate(const FMars_Searing_Spec& Self)
 {
     if (Self.Supply.MaxPieces <= 0)
@@ -261,32 +242,23 @@ mixin FMars_Validation Validate(const FMars_Searing_Spec& Self)
     if (Self.Cook.SecondsPerFace <= 0.0f)
     { return FMars_Validation(f"Searing has a non-positive Cook.SecondsPerFace [{Self.Cook.SecondsPerFace}]"); }
 
-    if (Self.Steak.HalfSize <= 0.0f)
-    { return FMars_Validation(f"Searing has a non-positive Steak.HalfSize [{Self.Steak.HalfSize}]"); }
+    if (Self.Piece.Friction < 0.0f)
+    { return FMars_Validation(f"Searing has a negative Piece.Friction [{Self.Piece.Friction}]"); }
 
-    if (Self.Steak.MassKg <= 0.0f)
-    { return FMars_Validation(f"Searing has a non-positive Steak.MassKg [{Self.Steak.MassKg}]"); }
+    if (Self.Piece.Restitution < 0.0f || Self.Piece.Restitution > 1.0f)
+    { return FMars_Validation(f"Searing has Piece.Restitution [{Self.Piece.Restitution}] outside [0, 1]"); }
 
-    if (Self.Steak.Friction < 0.0f)
-    { return FMars_Validation(f"Searing has a negative Steak.Friction [{Self.Steak.Friction}]"); }
+    if (Self.Piece.LinearDamping < 0.0f)
+    { return FMars_Validation(f"Searing has a negative Piece.LinearDamping [{Self.Piece.LinearDamping}]"); }
 
-    if (Self.Steak.Restitution < 0.0f || Self.Steak.Restitution > 1.0f)
-    { return FMars_Validation(f"Searing has Steak.Restitution [{Self.Steak.Restitution}] outside [0, 1]"); }
+    if (Self.Piece.AngularDamping < 0.0f)
+    { return FMars_Validation(f"Searing has a negative Piece.AngularDamping [{Self.Piece.AngularDamping}]"); }
 
-    if (Self.Steak.LinearDamping < 0.0f)
-    { return FMars_Validation(f"Searing has a negative Steak.LinearDamping [{Self.Steak.LinearDamping}]"); }
+    if (Self.Piece.ContactGraceSeconds <= 0.0f)
+    { return FMars_Validation(f"Searing has a non-positive Piece.ContactGraceSeconds [{Self.Piece.ContactGraceSeconds}]"); }
 
-    if (Self.Steak.AngularDamping < 0.0f)
-    { return FMars_Validation(f"Searing has a negative Steak.AngularDamping [{Self.Steak.AngularDamping}]"); }
-
-    if (Self.Steak.SpawnLift < 0.0f)
-    { return FMars_Validation(f"Searing has a negative Steak.SpawnLift [{Self.Steak.SpawnLift}]"); }
-
-    if (Self.Steak.ContactGraceSeconds <= 0.0f)
-    { return FMars_Validation(f"Searing has a non-positive Steak.ContactGraceSeconds [{Self.Steak.ContactGraceSeconds}]"); }
-
-    if (Self.Loss.PanRadius <= Self.Steak.HalfSize)
-    { return FMars_Validation(f"Searing has Loss.PanRadius [{Self.Loss.PanRadius}] not above Steak.HalfSize [{Self.Steak.HalfSize}]"); }
+    if (Self.Loss.PanRadius <= 0.0f)
+    { return FMars_Validation(f"Searing has a non-positive Loss.PanRadius [{Self.Loss.PanRadius}]"); }
 
     if (Self.Loss.LingerSeconds < 0.0f)
     { return FMars_Validation(f"Searing has a negative Loss.LingerSeconds [{Self.Loss.LingerSeconds}]"); }
@@ -308,20 +280,42 @@ struct FMars_Fragment_Searing_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One admitted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity (a lifetime
-// child of the station) carries the dynamic body and a Resting on the pan base body.
+// One adopted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity is the food
+// piece's own (the kernel's guest: it keeps its lifetime) and carries the dynamic body and a Resting on the pan base body.
+// Its geometry is read once, at admission, from its mesh's metrics: a cut piece's origin need not be its middle.
 struct FMars_Searing_PieceState
 {
     UPROPERTY()
     FMars_CookingFeed_PieceId Id;
 
     UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    // The piece's entity, as a plain handle.
+    UPROPERTY()
     FCk_Handle Entity;
 
     UPROPERTY()
     FCk_Handle_JoltBody Body;
 
-    // Six, 0 raw .. 1 seared, clamped; indexed by int32(EMars_Searing_Face).
+    // The middle of the piece's bounds in its own frame.
+    UPROPERTY()
+    FVector CentreLocal = FVector::ZeroVector;
+
+    // Half the piece's bounds along its own axes.
+    UPROPERTY()
+    FVector HalfExtents = FVector::ZeroVector;
+
+    // The release location while the piece is still arriving: its transform reads where it was before admission until its
+    // pose request or teleport lands, so the Tick judges nothing about it until it is there (utils_searing::Get_HasArrived).
+    UPROPERTY()
+    TOptional<FVector> Arriving;
+
+    // How long the piece has been arriving; past utils_searing::k_ArrivalMaxSeconds it is judged where it is.
+    UPROPERTY()
+    float32 ArrivingSeconds = 0.0f;
+
+    // Six, 0 raw .. 1 seared, clamped, seeded from the piece's cook state; indexed by int32(EMars_Searing_Face).
     UPROPERTY()
     TArray<float32> FaceSear;
 
@@ -360,10 +354,14 @@ struct FMars_Searing_Tally
 
     UPROPERTY()
     int32 Losses = 0;
+
+    // Pieces handed back by TakeOut.
+    UPROPERTY()
+    int32 TakenOut = 0;
 }
 
-// Every piece admitted since the last reset is in exactly one of Cooking / Ready / Lost (a lost one stays counted after
-// its body is destroyed): Admitted = Cooking + Ready + Lost.
+// Every piece on the pan is Cooking or Ready, and every piece lost or taken out since the last reset stays counted
+// (a reset keeps the pan's pieces): Admitted = Cooking + Ready + Lost + TakenOut.
 struct FMars_Searing_Summary
 {
     UPROPERTY()
@@ -377,6 +375,9 @@ struct FMars_Searing_Summary
 
     UPROPERTY()
     int32 Lost = 0;
+
+    UPROPERTY()
+    int32 TakenOut = 0;
 }
 
 // Written only by the Searing processors (and Add). The station SM, the feed bridge and the operator only issue requests.
@@ -405,11 +406,13 @@ struct FMars_Fragment_Searing
 delegate void FMars_Delegate_Searing_OnHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 event void FMars_Delegate_Searing_OnHeatChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 
-// The answer to every AddPiece: Accepted (the body exists; OnPieceAdded follows) or Rejected with a reason (nothing made).
+// The answer to every AddPiece: Accepted (the piece is on the pan's books; OnPieceAdded follows) or Rejected with a reason
+// (the piece is left as it was).
 delegate void FMars_Delegate_Searing_OnPieceAdmission(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 event void FMars_Delegate_Searing_OnPieceAdmission_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 
-// An admitted piece's entity exists (its body requested, not yet added): the placing script adds its visuals here.
+// An adopted piece is on the pan's books (its body requested or switched back to Dynamic, not yet moving): the placing
+// script adds its visuals here.
 delegate void FMars_Delegate_Searing_OnPieceAdded(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Searing_OnPieceAdded_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
@@ -436,6 +439,11 @@ event void FMars_Delegate_Searing_OnPieceLost_MC(FCk_Handle_Searing InSearing, F
 delegate void FMars_Delegate_Searing_OnSizzleChanged(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle);
 event void FMars_Delegate_Searing_OnSizzleChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle);
 
+// A TakeOut handed InPiece back: off the pan's books, its cook state written, its body Kinematic. Control loads it where it
+// goes next.
+delegate void FMars_Delegate_Searing_OnPieceTakenOut(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+event void FMars_Delegate_Searing_OnPieceTakenOut_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+
 struct FMars_Fragment_Searing_Signals
 {
     FMars_Delegate_Searing_OnHeatChanged_MC OnHeatChanged;
@@ -447,6 +455,7 @@ struct FMars_Fragment_Searing_Signals
     FMars_Delegate_Searing_OnPieceReady_MC OnPieceReady;
     FMars_Delegate_Searing_OnPieceLost_MC OnPieceLost;
     FMars_Delegate_Searing_OnSizzleChanged_MC OnSizzleChanged;
+    FMars_Delegate_Searing_OnPieceTakenOut_MC OnPieceTakenOut;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -481,8 +490,8 @@ struct FMars_Request_Searing_SetHeat
     }
 }
 
-// Destroys every piece (the lingering lost ones too), resets the pan (level, idle), chills it and zeroes the tally; the pan
-// stays empty until the next AddPiece. Payload-less: one placeholder field (request doctrine).
+// Resets the pan (level, idle), chills it and zeroes the tally; every piece stays on the pan with its sear (the player's
+// food is theirs). Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Searing_Reset
 {
     UPROPERTY()
@@ -491,9 +500,30 @@ struct FMars_Request_Searing_Reset
     FMars_Request_Searing_Reset() {}
 }
 
-// One released piece to admit, answered by OnPieceAdmission. Rejected (nothing made) while the pan body is not yet in the
-// simulation, when a piece on the pan (lingering lost ones included) already carries the Id, or when Supply.MaxPieces live
-// pieces are on it. A cold pan accepts (it just does not sear).
+// Hands pieces back, each with its cook state written and its body Kinematic, answered by OnPieceTakenOut per piece. Piece
+// set: that piece, if it is on the pan and not lost; unset: every Ready piece in admission order. MaxPieces set: at most
+// that many leave.
+struct FMars_Request_Searing_TakeOut
+{
+    UPROPERTY()
+    TOptional<FCk_Handle_FoodPiece> Piece;
+
+    UPROPERTY()
+    TOptional<int32> MaxPieces;
+
+    FMars_Request_Searing_TakeOut() {}
+
+    FMars_Request_Searing_TakeOut(TOptional<FCk_Handle_FoodPiece> InPiece, TOptional<int32> InMaxPieces)
+    {
+        Piece = InPiece;
+        MaxPieces = InMaxPieces;
+    }
+}
+
+// One released piece to adopt (Release.Piece), answered by OnPieceAdmission. Rejected (the piece left as it was) while the
+// pan body is not yet in the simulation, when the release names no live piece, a piece not Ready, one already on the pan,
+// one still on its platter or still attached, when a piece on the pan (lingering lost ones included) already carries the
+// Id, or when Supply.MaxPieces live pieces are on it. A cold pan accepts (it just does not sear).
 struct FMars_Request_Searing_AddPiece
 {
     UPROPERTY()
@@ -507,8 +537,8 @@ struct FMars_Request_Searing_AddPiece
     }
 }
 
-// Applied Reset -> SetHeat -> AddPiece -> Look, so a reset and the first heat, pieces and looks of a new session can share
-// a drain.
+// Applied Reset -> SetHeat -> TakeOut -> AddPiece -> Look, so a reset and the first heat, pieces and looks of a new session
+// can share a drain, and a take-out frees its place before the next admission.
 struct FMars_Fragment_Searing_Requests
 {
     UPROPERTY()
@@ -516,6 +546,9 @@ struct FMars_Fragment_Searing_Requests
 
     UPROPERTY()
     TArray<FMars_Request_Searing_SetHeat> SetHeatRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Searing_TakeOut> TakeOutRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Searing_AddPiece> AddPieceRequests;

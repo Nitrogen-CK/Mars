@@ -25,8 +25,10 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Pieces(1);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("drive the skimmer", n"Step_Drive");
         Add_Step("dip it at its park", n"Step_Dip");
         Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", 0, 3.0f);
@@ -44,7 +46,7 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
     private void Step_ReleaseOverScoop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto ScoopRoot = _Fry.Get_ScoopRoot();
-        _Piece = AddPiece(FVector(ScoopRoot.X, ScoopRoot.Y - 2.0, float64(_Spec.Oil.SurfaceZ + _Spec.Piece.HalfSize + 1.0f)));
+        _Piece = AddPiece(FVector(ScoopRoot.X, ScoopRoot.Y - 2.0, float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0));
     }
 
     UFUNCTION()
@@ -57,7 +59,7 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
             return;
         }
 
-        const auto Bottom = Get_PieceRootLocal(_Piece).Z - float64(_Spec.Piece.HalfSize);
+        const auto Bottom = Get_PieceRootLocal(_Piece).Z - _Fry.Get_PieceHalfExtents(_Piece).Z;
         const auto LipTop = _Fry.Get_ScoopRoot().Z + float64(_Spec.Scoop.LipHeight + k_LipClearanceCm);
         Res.Set(_Fry.Get_PieceWhereabouts(_Piece) == EMars_Fry_Whereabouts::Oil && Get_PieceSpeed(_Piece) < float64(k_CalmSpeed) && Bottom > LipTop);
     }

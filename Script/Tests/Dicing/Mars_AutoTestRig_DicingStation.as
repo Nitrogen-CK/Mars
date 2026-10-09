@@ -1,7 +1,10 @@
-// The dicing-station rig: the real station, spawned at an isolated origin with a given food, and a bare operator (no input,
-// no display) that takes and leaves it, so the station's own state machine runs Idle and Operated and its cut bridge turns
-// every chop into a board cut. Chops and nudges are the Dicing requests the operator's input task would issue. The handlers
-// record the board's signals and every cut outcome of a piece the test watches.
+// The dicing-station rig: the real station, spawned at an isolated origin, and a bare operator (no input, no display) that
+// takes and leaves it, so the station's own state machine runs Idle and Operated: its intake takes the joint off the docked
+// input platter, its cut bridge turns every chop into a board cut and its sweep bridge loads what a sweep hands off onto
+// the docked finished tray. Chops and nudges are the Dicing requests the operator's input task would issue; a sweep is the
+// control's own utils_dicing::Request_Sweep. Platters are World-mode platter world items under the test, lying beside the
+// station until a test docks them. The handlers record the board's signals and every cut outcome of a piece the test
+// watches.
 UCLASS(Abstract)
 class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
 {
@@ -9,13 +12,27 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
 
     // Pieces farther than this from the station's origin are not the station's.
     protected const float64 k_StationRadius = 300.0;
+    // Where the platters lie before they dock, from the station's origin.
+    protected const FVector k_InputPlatterOffset = FVector(0.0, -300.0, 0.0);
+    protected const FVector k_OutputPlatterOffset = FVector(0.0, 300.0, 0.0);
 
     protected FVector _Origin;
-    protected UMars_CuttableFood_Def _Food;
+    // The input platter's food.
+    protected UMars_Food_Def _Food;
     protected FCk_Handle_Station _Station;
     protected FCk_Handle_Dicing _Dicing;
     protected FCk_Handle_FoodBoard _Board;
+    protected FCk_Handle_PlatterDock _InputDock;
+    protected FCk_Handle_PlatterDock _OutputDock;
     protected FCk_Handle_Operator _Operator;
+
+    // Under construction until the Check_*PlatterReady that resolves them.
+    protected FCk_Handle _InputPlatterEntity;
+    protected FCk_Handle _OutputPlatterEntity;
+    protected FCk_Handle_Platter _InputPlatter;
+    protected FCk_Handle_Item _InputPlatterItem;
+    protected FCk_Handle_Platter _OutputPlatter;
+    protected FCk_Handle_Item _OutputPlatterItem;
 
     protected int32 _ChopsIssued = 0;
     protected int32 _ChopsResolved = 0;
@@ -28,15 +45,20 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     protected TArray<FCk_Handle_FoodPiece> _CutSources;
     protected TArray<EMars_FoodPiece_CutOutcome> _CutOutcomes;
 
-    protected void Spawn_Station(FCk_Handle InHandle, FVector InOrigin, UMars_CuttableFood_Def InFood)
+    protected void Spawn_Station(FCk_Handle InHandle, FVector InOrigin)
+    {
+        Spawn_StationOfClass(InHandle, InOrigin, UMars_DicingStation_EntityScript);
+    }
+
+    // InClass is the station or a test's subclass of it with other class defaults (its docks' policies); the station's
+    // spawn params fit both, as they are injected by property name.
+    protected void Spawn_StationOfClass(FCk_Handle InHandle, FVector InOrigin, TSubclassOf<UMars_DicingStation_EntityScript> InClass)
     {
         _Origin = InOrigin;
-        _Food = InFood;
 
         auto SpawnParams = UMars_DicingStation_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InOrigin);
-        SpawnParams.Food = TWeakObjectPtr<UMars_CuttableFood_Def>(InFood);
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_DicingStation_EntityScript, SpawnParams);
+        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, InClass, SpawnParams);
         // As the map's entity spawner does: the station is its own context, so its state machine's ck::Ctx is the station.
         auto Station = Pending.Get_EntityUnderConstruction();
         Station.Request_OverrideToSelf();
@@ -44,6 +66,65 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
 
         auto OperatorEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Operator = utils_operator::Add(OperatorEntity);
+    }
+
+    // A platter with InFood's whole joint on it, beside the station (after Spawn_Station); Check_InputPlatterReady resolves
+    // it once the joint has landed.
+    protected void Spawn_InputPlatter(FCk_Handle InHandle, UMars_Food_Def InFood)
+    {
+        _Food = InFood;
+
+        auto Owner = InHandle;
+        _InputPlatterEntity = utils_platter::Request_SpawnWorld(Owner,
+            FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, _Origin + k_InputPlatterOffset), InFood));
+    }
+
+    // An empty platter beside the station (after Spawn_Station); Check_OutputPlatterReady resolves it.
+    protected void Spawn_OutputPlatter(FCk_Handle InHandle)
+    {
+        auto Owner = InHandle;
+        _OutputPlatterEntity = utils_platter::Request_SpawnWorld(Owner,
+            FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, _Origin + k_OutputPlatterOffset)));
+    }
+
+    protected void Dock_Input()
+    {
+        _InputDock.Request_Dock(FMars_Request_PlatterDock_Dock(_InputPlatterItem));
+    }
+
+    protected void Dock_Output()
+    {
+        _OutputDock.Request_Dock(FMars_Request_PlatterDock_Dock(_OutputPlatterItem));
+    }
+
+    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with no kind and no definition: Transform, RuntimeMesh
+    // and FoodPiece on a new entity under the world's transient entity, tracked for cleanup.
+    protected FCk_Handle_FoodPiece Build_Box(FTransform InWorld)
+    {
+        auto Spec = FMars_FoodPiece_Spec();
+        Spec.Data.MassKg = 0.8;
+        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
+
+        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
+        Track_ForCleanup(Entity);
+        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
+        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
+            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
+        return utils_foodpiece::Add(Entity, Spec);
+    }
+
+    // The common opening: the station and the input platter's joint are ready, the platter docks (the intake lays the joint
+    // on the board whoever operates), an operator takes the station and the joint is on the board, its pose landed.
+    protected void Add_Steps_IntakeTheJoint()
+    {
+        Add_Step_WaitUntil("the station composed its Dicing, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", 0, 10.0f);
+        Add_Step("dock the input platter", n"Step_DockInput");
+        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", 0, 5.0f);
+        Add_Step("an operator takes the station", n"Step_Take");
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
+        Add_Step_WaitUntil("the intake laid one shown joint on the board", n"Check_JointOnBoard", 0, 5.0f);
+        Add_Step_WaitFrames("the pile pose has landed", 2);
     }
 
     protected void Take()
@@ -151,6 +232,37 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
         return Pieces;
     }
 
+    // A WorldItem and a Platter whose holder holds its item.
+    protected bool Get_IsPlatterConstructed(FCk_Handle InEntity) const
+    {
+        return ck::IsValid(InEntity) && InEntity.Is_WorldItem() && InEntity.Is_Platter() && ck::IsValid(InEntity.As_WorldItem().Get_HeldItem());
+    }
+
+    // The node InPiece hangs off; invalid while it is not a scene node.
+    protected FCk_Handle_Transform Get_Parent(FCk_Handle_FoodPiece InPiece) const
+    {
+        FCk_Handle Entity = InPiece;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Node))
+        { return FCk_Handle_Transform(); }
+
+        return utils_scene_node::Get_Parent(Node);
+    }
+
+    // Carried and no longer lerping onto its carrier.
+    protected bool Get_HasArrived(FCk_Handle_Platter InPlatter) const
+    {
+        FCk_Handle Entity = InPlatter;
+        const auto WorldItem = Entity.As_WorldItem();
+        return WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried && Entity.Has_Fragment(FMars_Fragment_WorldItem_Arrival) == false;
+    }
+
+    protected bool Get_HasBody(FCk_Handle_FoodPiece InPiece) const
+    {
+        FCk_Handle Entity = InPiece;
+        return Entity.Is_JoltBody();
+    }
+
     protected int32 Get_LineageCount(FGuid InLineage) const
     {
         auto Count = 0;
@@ -188,6 +300,40 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     }
 
     //----------------------------------------------------------------------------------------------------------------------
+    // Steps
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION()
+    protected void Step_DockInput(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Dock_Input();
+    }
+
+    UFUNCTION()
+    protected void Step_DockOutput(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Dock_Output();
+    }
+
+    UFUNCTION()
+    protected void Step_Take(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Take();
+    }
+
+    UFUNCTION()
+    protected void Step_Leave(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Leave();
+    }
+
+    UFUNCTION()
+    protected void Step_Sweep(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        utils_dicing::Request_Sweep(_Station);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
     // Checks
     //----------------------------------------------------------------------------------------------------------------------
 
@@ -195,15 +341,68 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     protected void Check_StationReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Dicing) && ck::IsValid(_Board));
+        Res.Set(ck::IsValid(_Dicing) && ck::IsValid(_Board) && ck::IsValid(_InputDock) && ck::IsValid(_OutputDock));
     }
 
-    // One Ready, shown joint on the board.
+    // Constructed, its holder holds its item, and its joint has landed (the input dock takes only a platter with food).
     UFUNCTION()
-    protected void Check_JointShown(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    protected void Check_InputPlatterReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto IsReady = Get_IsPlatterConstructed(_InputPlatterEntity) && _InputPlatterEntity.As_Platter().Get_HeldCount() == 1;
+        if (IsReady && ck::Is_NOT_Valid(_InputPlatter))
+        {
+            _InputPlatter = _InputPlatterEntity.As_Platter();
+            _InputPlatterItem = _InputPlatterEntity.As_WorldItem().Get_HeldItem();
+            Track_ForCleanup(_InputPlatter.Get_Held()[0]);
+        }
+
+        auto Res = OutResult;
+        Res.Set(IsReady);
+    }
+
+    UFUNCTION()
+    protected void Check_OutputPlatterReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto IsReady = Get_IsPlatterConstructed(_OutputPlatterEntity);
+        if (IsReady && ck::Is_NOT_Valid(_OutputPlatter))
+        {
+            _OutputPlatter = _OutputPlatterEntity.As_Platter();
+            _OutputPlatterItem = _OutputPlatterEntity.As_WorldItem().Get_HeldItem();
+        }
+
+        auto Res = OutResult;
+        Res.Set(IsReady);
+    }
+
+    // Docked and arrived on the dock: a station torn down under a platter still lerping onto its dock leaves the arrival
+    // writing an offset under a dead parent.
+    UFUNCTION()
+    protected void Check_InputDocked(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(_InputPlatter) && _InputDock.Get_Platter() == _InputPlatter && Get_HasArrived(_InputPlatter));
+    }
+
+    UFUNCTION()
+    protected void Check_OutputDocked(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(_OutputPlatter) && _OutputDock.Get_Platter() == _OutputPlatter && Get_HasArrived(_OutputPlatter));
+    }
+
+    // One Ready, shown joint on the board (the intake runs in Idle and Operated).
+    UFUNCTION()
+    protected void Check_JointOnBoard(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
         Res.Set(_Board.Get_HeldCount() == 1 && Get_AllHeldShown());
+    }
+
+    UFUNCTION()
+    protected void Check_Idle(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm()) == UMars_SmState_Dicing_Idle);
     }
 
     UFUNCTION()
@@ -233,6 +432,8 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
         _Station = InEntityScriptHandle.As_Station();
         _Dicing = InEntityScriptHandle.As_Dicing();
         _Board = InEntityScriptHandle.As_FoodBoard();
+        _InputDock = utils_platter_dock::Find_OnStation(InEntityScriptHandle, EMars_PlatterDock_Role::Input);
+        _OutputDock = utils_platter_dock::Find_OnStation(InEntityScriptHandle, EMars_PlatterDock_Role::Output);
 
         _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
         _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
@@ -255,9 +456,13 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     }
 
     UFUNCTION()
+    // Pieces live under the world's transient entity: one that ends on a platter (owned by the test) would outlive the
+    // test's leak check, so every half is tracked, as the joint is.
     private void OnBoardPieceCut(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative)
     {
         ++_PieceCuts;
+        Track_ForCleanup(InPositive);
+        Track_ForCleanup(InNegative);
     }
 
     UFUNCTION()

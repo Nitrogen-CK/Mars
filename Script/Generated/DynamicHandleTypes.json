@@ -102,7 +102,7 @@
 		{
 			"TypeName": "FCk_Handle_CookingFeed",
 			"ShortName": "CookingFeed",
-			"Description": "A finite raw-food supply beside a cooking vessel: one left-hand transfer at a time, reserved then admitted by the cooking kernel",
+			"Description": "A transfer hand between a docked platter and a cooking vessel: one left-hand transfer at a time, reserved from the platter, released, then admitted by the cooking kernel",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_CookingFeedHandle",
 			"RequiredFragments": [
 				"Mars_Feature_CookingFeed"
@@ -442,6 +442,24 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Platter",
+			"ShortName": "Platter",
+			"Description": "A carried tray of food: a ledger of FoodPiece handles riding the platter root as scene-node children, one per slot",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlatterHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Platter"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_PlatterDock",
+			"ShortName": "PlatterDock",
+			"Description": "A station's mount for one platter: a child of the station with a capacity-1 inventory, an attach point, a probe interactable and a policy on what the platter may bring",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlatterDockHandle",
+			"RequiredFragments": [
+				"Mars_Feature_PlatterDock"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_PlayerViewpoint",
 			"ShortName": "PlayerViewpoint",
 			"Description": "A player's view: the CkCamera director, its view anchor (the rendered view's transform) and the interaction trace cast from it",
@@ -462,7 +480,7 @@
 		{
 			"TypeName": "FCk_Handle_Searing",
 			"ShortName": "Searing",
-			"Description": "A searing minigame on a station: admitted pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears",
+			"Description": "A searing minigame on a station: adopted food pieces (dynamic bodies keyed by their feed identity) on a hot pan (a kinematic body the operator's look tilts and lifts); each piece's face on the pan sears",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_SearingHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Searing"

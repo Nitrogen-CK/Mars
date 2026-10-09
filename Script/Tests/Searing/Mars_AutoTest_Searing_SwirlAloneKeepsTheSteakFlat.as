@@ -22,6 +22,7 @@ class UMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat : UMars_AutoTestRig_Sea
         auto PanSpec = FMars_Implement_Spec();
         PanSpec.Orbit = FMars_Implement_OrbitSpec(k_SwirlRadius, k_SwirlHz);
         BuildStation(InHandle, Spec, PanSpec);
+        Build_Pieces(1);
 
         Add_Steps_AddPieceAndLand();
         Add_Step("heat the pan: the swirl runs", n"Step_Heat");

@@ -1,15 +1,16 @@
 // A reset in each busy phase (Reach, Grasp, Carry, AwaitAdmission, and Return after an admission) starts a new attempt: the
-// generation moves on, the hand is idle, all six pieces are back and nothing is admitted. A reservation the reset finds
-// settles Cancelled once under its old id; the Return round's piece already settled Admitted and settles nothing more.
-class UMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger : UMars_AutoTestRig_CookingFeed
+// generation moves on, the hand is idle and nothing is admitted; the platter is the stock and nothing refills it. Before
+// the release the reserved piece never left the platter, so all six are still there. At AwaitAdmission the released piece
+// was off the platter; the reset settles it Cancelled under its old id and it goes back (as the bridge would), so six are
+// there again. The Return round's piece already settled Admitted, settles nothing more and stays spent: five are left.
+class UMars_AutoTest_CookingFeed_ResetAtEveryPhaseLeavesTheStockOnThePlatter : UMars_AutoTestRig_CookingFeed
 {
-    default _TimeoutSeconds = 12.0f;
-
     private TArray<EMars_CookingFeed_Phase> _Targets;
     private int32 _Round = 0;
     private int32 _GenerationBefore = 0;
     private int32 _SettlesBefore = 0;
     private TOptional<FMars_CookingFeed_PieceId> _ActiveBefore;
+    private FCk_Handle_FoodPiece _ActivePieceBefore;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -18,6 +19,7 @@ class UMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger : UMars_Aut
         auto Spec = Make_TestSpec();
         Spec.Timing = FMars_CookingFeed_TimingSpec(0.25f, 0.25f, 0.25f, 0.25f);
         BuildFeed(InHandle, Spec);
+        Add_Steps_SourceTheFeed();
 
         _Targets.Add(EMars_CookingFeed_Phase::Reach);
         _Targets.Add(EMars_CookingFeed_Phase::Grasp);
@@ -37,10 +39,17 @@ class UMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger : UMars_Aut
             Add_Step_WaitUntil(f"the hand is in {Target :n}", n"Check_AtTarget", 0, 2.0f);
             Add_Step(f"reset in {Target :n}", n"Step_Reset");
             Add_Step_WaitUntil("the reset applied", n"Check_ResetApplied", 0, 1.0f);
+            Add_Step_WaitUntil("the stock is back on the platter", n"Check_StockSettled", 0, 1.0f);
             Add_Step(f"the ledger after the reset in {Target :n}", n"Step_AssertReset");
         }
 
         Run_Steps(InHandle);
+    }
+
+    // Only the Return round has spent a piece.
+    private int32 Get_ExpectedStock() const
+    {
+        return _Targets[_Round] == EMars_CookingFeed_Phase::Return ? k_Stock - 1 : k_Stock;
     }
 
     UFUNCTION()
@@ -56,6 +65,7 @@ class UMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger : UMars_Aut
         _GenerationBefore = _Feed.Get_Generation();
         _SettlesBefore = _Settles.Num();
         _ActiveBefore = _Feed.TryGet_ActivePiece();
+        _ActivePieceBefore = _Feed.TryGet_ActiveFoodPiece();
         Reset();
     }
 
@@ -67,16 +77,23 @@ class UMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger : UMars_Aut
     }
 
     UFUNCTION()
+    private void Check_StockSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Platter.Get_HeldCount() == Get_ExpectedStock() && _Platter.Get_PendingCount() == 0);
+    }
+
+    UFUNCTION()
     private void Step_AssertReset(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Target = _Targets[_Round];
+        const auto ExpectedStock = Get_ExpectedStock();
         _Round += 1;
 
         Assert_True(_Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle, f"idle after the reset in {Target :n} (got {_Feed.Get_Phase() :n})");
-        Assert_Ledger(k_Stock, 0, f"after the reset in {Target :n}");
+        Assert_Ledger(ExpectedStock, 0, f"after the reset in {Target :n}");
+        Assert_Equals_Int(_Platter.Get_HeldCount(), ExpectedStock, f"the platter holds {ExpectedStock} after the reset in {Target :n}");
         Assert_False(_Feed.TryGet_ActivePiece().IsSet(), "no reservation is left");
-        for (int32 Slot = 0; Slot < k_Stock; ++Slot)
-        { Assert_False(_Feed.Get_IsSlotTaken(Slot), f"slot {Slot} is free"); }
 
         const auto NewSettles = _Settles.Num() - _SettlesBefore;
         if (Target == EMars_CookingFeed_Phase::Return)
@@ -87,6 +104,7 @@ class UMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger : UMars_Aut
         }
 
         Assert_True(_ActiveBefore.IsSet(), f"a piece was reserved in {Target :n}");
+        Assert_True(_ActivePieceBefore.TryGet_Platter() == _Platter, f"the piece reserved in {Target :n} is on the platter");
         Assert_Equals_Int(NewSettles, 1, "the reset settled the reservation once");
         if (NewSettles != 1 || _ActiveBefore.IsSet() == false)
         { return; }

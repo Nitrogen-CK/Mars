@@ -8,6 +8,7 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Pieces(1);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();
@@ -33,9 +34,10 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
         Assert_True(_Searing.Get_PieceStatus(PieceId) == EMars_Searing_PieceStatus::Cooking, "the piece is cooking");
 
         const auto Local = _Searing.Get_PiecePanLocal(PieceId);
-        ck::Trace(f"[Searing] resting piece at pan-local Z {Local.Z :.3} (HalfSize {_Spec.Steak.HalfSize})");
-        Assert_Equals_Float(Local.Z, utils_searing::k_PanSurfaceZ + _Spec.Steak.HalfSize, 3.0,
-            "the piece's centre rests HalfSize above the cooking surface");
+        const auto HalfHeight = _Searing.Get_PieceHalfExtents(PieceId).Z;
+        ck::Trace(f"[Searing] resting piece at pan-local Z {Local.Z :.3} (half height {HalfHeight})");
+        Assert_Equals_Float(Local.Z, utils_searing::k_PanSurfaceZ + HalfHeight, 3.0,
+            "the piece's middle rests its half height above the cooking surface");
 
         const auto Down = _Searing.Get_DownFace(PieceId);
         Assert_True(Down == EMars_Searing_Face::NegZ, f"the piece lies on its -Z face (got {Down :n})");

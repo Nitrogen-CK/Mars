@@ -1,5 +1,5 @@
 // Seven different pieces released in one drain into a kernel of Supply.MaxPieces 6 (the default): the first six are
-// Accepted (six bodies), the seventh is Rejected with a reason naming the limit and makes nothing.
+// Accepted (six bodies), the seventh is Rejected with a reason naming the limit and left as it was.
 class UMars_AutoTest_Fry_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_Fry
 {
     default _TimeoutSeconds = 8.0f;
@@ -8,8 +8,10 @@ class UMars_AutoTest_Fry_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_Fry
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Pieces(7);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release seven different pieces over the oil", n"Step_ReleaseSeven");
         Add_Step_WaitUntil("all seven releases were answered", n"Check_Answered7", 0, 1.0f);
         Add_Step_WaitFrames("anything made would show", 2);
@@ -30,7 +32,7 @@ class UMars_AutoTest_Fry_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_Fry
         Spots.Add(FVector2D(-30.0, 20.0));
         Spots.Add(FVector2D(0.0, 25.0));
 
-        const auto Z = float64(_Spec.Oil.SurfaceZ + _Spec.Piece.HalfSize + 1.0f);
+        const auto Z = float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0;
         for (const auto& Spot : Spots)
         { AddPiece(FVector(Spot.X, Spot.Y, Z)); }
     }

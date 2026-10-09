@@ -1,19 +1,19 @@
 // The fry station: a counter (depth along local X, width along local Y; the operator at -X, +Y their right) with an iron pot
-// of hot oil on its centre, the raw platter on the LEFT and a fixed wire drain basket on the RIGHT, on the counter, out of
-// the oil. A skimmer is parked over the oil: its node carries an Implement (no look tilt, a pour roll and a commanded lift
+// of hot oil on its centre, the raw platter's dock on the LEFT and a fixed wire drain basket on the RIGHT, on the counter,
+// out of the oil, with the finished tray's dock beyond it. A skimmer is parked over the oil: its node carries an Implement (no look tilt, a pour roll and a commanded lift
 // the skim sets, a commanded slide the kernel steers across the pot, a corridor and the basket) and, at its origin, the
 // scoop's disc and lip bodies, with the handle, a stem and the grip bar beside it; the basket node carries the basket's
 // five kinematic boxes. Every part under those nodes is a NoCollision visual. The Fry feature lives on the station entity
 // and its own state machine (UMars_SmState_Fry_Idle) reads the operator. The pot starts empty: a CookingFeed on the same
-// entity holds the platter's six battered pieces, and its station-feed tasks turn the operator's add-food press into a
-// left-hand transfer that this script presents (the glove node, the slot proxies, the piece in the glove) and whose release
-// over the oil the Fry kernel admits as a piece (a dynamic body on its own entity, worn here as a battered mesh). This script
-// builds the nodes and, every frame, dresses every piece and the label from the Fry state. While operating, the right glove
-// holds the skimmer's grip bar (riding its slide, dip and pour roll) and the left follows the feed node, resting in front of
-// the platter between transfers.
+// entity draws the pieces of the docked raw platter, and its station-feed tasks turn the operator's add-food press into a
+// left-hand transfer that this script presents (the glove node and a battered proxy in the glove; the hand reaches for the
+// reserved piece where it lies) and whose release over the oil the Fry kernel admits (the piece itself, wearing its own
+// display, on a dynamic body). This script builds the nodes and the docks and, every frame, keeps every piece's record and
+// the label from the Fry state. While operating, the right glove holds the skimmer's grip bar (riding its slide, dip and
+// pour roll) and the left follows the feed node, resting in front of the raw platter between transfers.
 //
-// Per piece (keyed by its feed identity): its own battered mesh by preset, its own cook state and Custom Primitive Data
-// (its six face heats; the oil coat ramps up in the oil and falls with the drain in the basket: the visible dripping).
+// Per piece (keyed by its feed identity): its own cook state (its six face heats; the oil coat ramps up in the oil and falls
+// with the drain in the basket: the visible dripping).
 // A wire or handle rod's box in its parent's frame: its centre and its size (cm).
 struct FMars_FryStation_Rod
 {
@@ -29,14 +29,25 @@ struct FMars_FryStation_Rod
     }
 }
 
+// The station's record of one admitted piece. The piece wears its own display; the station adds no part to it.
 struct FMars_FryStation_PieceVisual
 {
+    UPROPERTY()
     FMars_CookingFeed_PieceId Id;
-    // The piece entity: its mesh dies with it.
+
+    UPROPERTY()
     FCk_Handle Entity;
-    FCk_Handle_UnrealComponent Part;
+
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
     // This piece's look; a lost piece keeps its last one.
+    UPROPERTY()
     FMars_CookState CookState;
+
+    // The look last sent to the piece's display.
+    UPROPERTY()
+    FMars_CookState Written;
 }
 
 class UMars_FryStation_EntityScript : UMars_Station_EntityScript
@@ -50,9 +61,14 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_Implement_Spec SkimmerImplement;
 
-    // The raw platter's stock and the transfer's timing; its slot capacity and release node are set here.
+    // The transfer's timing and release motion; its release node is set here. The stock is the feed's source platter.
     UPROPERTY(ExposeOnSpawn)
     FMars_CookingFeed_Spec Feed;
+
+    // The raw platter brings any food; the finished tray docks empty.
+    UPROPERTY(EditDefaultsOnly, Category = "Docks")
+    FMars_Station_DockPolicies Docks;
+    default Docks.Output.RequireEmpty = TOptional<bool>(true);
 
     // cm, in the station frame (the root; Z 0 is the floor).
     private const float64 CounterWidth = 230.0;
@@ -125,16 +141,12 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private const float64 ReleaseY = -10.0;
     private const float64 ReleaseAboveOil = 25.0;
 
-    // The raw platter on the counter's left (-Y), PlatterGap off the pot's outer wall: a slab with RawSlotRows x
-    // RawSlotColumns battered pieces (rows along X, away from the operator; columns along Y), and the free glove's rest in
-    // front of it.
-    private const int32 RawSlotRows = 3;
-    private const int32 RawSlotColumns = 2;
-    private const float64 RawSlotPitch = 15.0;
-    private const float64 PlatterGap = 6.0;
-    private const float64 PlatterHeight = 2.0;
-    private const float64 PlatterMargin = 2.0;
-    // The glove's rest from the platter's centre: in front of its near row, a little to its left.
+    // The docks on the counter top (Z is the counter's): the raw platter on the left (-Y), its tray's edge a few cm off the
+    // pot's outer wall, and the finished tray on the right, beyond the basket's stand along X (the basket fills the right
+    // half from the pot's wall to the counter's edge at X 0).
+    private const FVector InputDockLocal = FVector(0.0, -85.0, 0.0);
+    private const FVector OutputDockLocal = FVector(40.0, 90.0, 0.0);
+    // The glove's rest from the raw platter's dock: in front of it, a little to its left.
     private const FVector FeedRestFromPlatter = FVector(-32.0, -2.0, 0.0);
     // A palm's thickness: the glove's grip bone above what its palm rests on.
     private const float64 PalmLift = 2.5;
@@ -144,6 +156,8 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private const float32 MushroomSize = 14.4f;
     private const float32 SpikedBerrySize = 11.7f;
     private const int32 k_PieceKinds = 3;
+    // The half size of the box the glove's battered proxy is scaled to.
+    private const float64 CarriedHalfSize = 6.0;
 
     // The cook state the dressing writes: the oil coat ramps up toward OilCoatInOil while a piece floats in the oil (at
     // OilCoatRate per second) and, in the basket, falls with its drain progress to OilCoatDrained.
@@ -164,7 +178,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private const FLinearColor k_IronColor = FLinearColor(0.08f, 0.08f, 0.09f, 1.0f);
     private const FLinearColor k_WireColor = FLinearColor(0.55f, 0.42f, 0.2f, 1.0f);
     private const FLinearColor k_HandleColor = FLinearColor(0.5f, 0.35f, 0.2f, 1.0f);
-    private const FLinearColor k_PlatterColor = FLinearColor(0.22f, 0.22f, 0.24f, 1.0f);
 
     private FCk_Handle_Transform _Root;
     // Fry as exposed, with the geometry-bound fields, the reach and the nodes set (DoConstruct); what the feature and the
@@ -185,11 +198,14 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_SceneNode _FeedHandNode;
     // Over the oil: where a carried piece is released.
     private FCk_Handle_Transform _ReleaseNode;
-    // One battered proxy per platter slot, and one per kind riding the glove (the carried piece's kind shows).
-    private TArray<FCk_Handle_UnrealComponent> _RawSlotParts;
+    // One battered proxy per kind riding the glove (the carried piece's kind shows): the hand mimes the transfer, the piece
+    // itself teleports at its admission.
     private TArray<FCk_Handle_UnrealComponent> _CarryProxyParts;
     private FCk_Handle_CookingFeed _FeedHandle;
     private FMars_StationFeed_Presentation _FeedPresentation;
+    private FCk_Handle_PlatterDock _InputDock;
+    // The label reads it: without a tray, a take-out has nowhere to go.
+    private FCk_Handle_PlatterDock _OutputDock;
     // At the pot's axis on the oil line, unit scale: the boil FX rides it (Niagara would inherit a scaled parent's scale).
     private FCk_Handle_SceneNode _FxNode;
     private FCk_Handle_UnrealComponent _BubblesPart;
@@ -207,7 +223,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private UNiagaraComponent _Bubbles;
 
     // The base composes the transform, the visuals and nodes (AddVisuals: the basket and skimmer nodes and their bodies, the
-    // platter and the release node) and the Station (Configure_Spec, grips on the registered nodes); the skimmer Implement,
+    // feed hand and the release node) and the Station (Configure_Spec, grips on the registered nodes); the skimmer Implement,
     // the minigame and the feed need them, so they come after. The Fry signals are bound here, not at begin play, so no
     // piece's visuals can miss its OnPieceAdded.
     UFUNCTION(BlueprintOverride)
@@ -258,9 +274,9 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
 
         // A rejected feed spec already ensured in utils_cooking_feed::Add; the station still fries without a platter.
         auto FeedSpec = Feed;
-        FeedSpec.Supply.SlotCapacity = _FeedPresentation.Geometry.SlotsLocal.Num();
         FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode);
         _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
+        Add_Docks();
 
         // The timer dies with the entity; nothing to unbind.
         _DressingTick = utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDressingTick"));
@@ -276,16 +292,10 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         if (ck::IsValid(_BubblesPart))
         { utils_unreal_component::BindTo_OnAdded(_BubblesPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnFxPartAdded")); }
 
-        for (const auto& Part : _RawSlotParts)
-        {
-            if (ck::IsValid(Part))
-            { utils_unreal_component::BindTo_OnAdded(Part, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnRawPartAdded")); }
-        }
-
         for (const auto& Part : _CarryProxyParts)
         {
             if (ck::IsValid(Part))
-            { utils_unreal_component::BindTo_OnAdded(Part, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnRawPartAdded")); }
+            { utils_unreal_component::BindTo_OnAdded(Part, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnCarryProxyAdded")); }
         }
 
         Refresh_Label();
@@ -299,7 +309,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         { _FryHandle.UnbindFrom_OnPieceAdded(FMars_Delegate_Fry_OnPieceAdded(this, n"OnPieceAdded")); }
 
         _FeedPresentation.Clear(FCk_Handle());
-        // The meshes are hosted on the piece entities and die with them; only the records go.
+        // The pieces wear their own displays; only the records go.
         _PieceVisuals.Empty();
         _Bubbles = nullptr;
     }
@@ -362,7 +372,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         AddOil(InRoot);
         AddBasket(InRoot);
         AddSkimmer(InRoot);
-        AddPlatter(InRoot);
+        AddFeedHand(InRoot);
 
         _ReleaseNode = utils_scene_node::Create(InRoot,
             FTransform(FVector(ScoopPark.X - ReleaseBack, ReleaseY, OilSurfaceZ + ReleaseAboveOil))).As_Transform();
@@ -480,51 +490,17 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
             FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, FVector::ForwardVector, -FVector::UpVector), GripLocal)).As_Transform();
     }
 
-    // The raw platter: a slab on the counter's left with one battered proxy per slot (each on its RawSlot node, tagged so a
-    // test can find them; the kind by the slot's preset), the feed node the left glove follows (at rest in front of the
-    // platter, palm down, fingers forward) and one proxy per kind riding that glove, in its palm, hidden until a piece of
-    // that kind is grasped. The presentation's geometry is authored here, in the station frame.
-    private void AddPlatter(FCk_Handle_Transform& InRoot)
+    // The feed node the left glove follows (at rest in front of the raw platter's dock, palm down, fingers forward) and one
+    // battered proxy per kind riding that glove, in its palm, hidden until a piece of that kind is grasped. The docked raw
+    // platter is the stock's only visual. The presentation's geometry is authored here, in the station frame.
+    private void AddFeedHand(FCk_Handle_Transform& InRoot)
     {
-        const auto HalfSize = float64(_FrySpec.Piece.HalfSize);
-        const auto PlatterTop = CounterHeight + PlatterHeight;
-        const auto PlatterDepth = float64(RawSlotRows) * RawSlotPitch + PlatterMargin * 2.0;
-        const auto PlatterCentreY = Get_PlatterCentreY();
-
-        auto Platter = FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(0.0, PlatterCentreY, CounterHeight + PlatterHeight * 0.5),
-                FVector(PlatterDepth, Get_PlatterWidth(), PlatterHeight) * 0.01),
-            engine::load::Cube(), assets::load::ProtoGrid_Platform_Mars_MI(), collision::profile::NoCollision, n"FryStation_Platter");
-        Platter.PrimaryColor = TOptional<FLinearColor>(k_PlatterColor);
-        InRoot.Add_MeshPart(this, Platter);
-
         const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
         auto& Geometry = _FeedPresentation.Geometry;
         Geometry.RestLocal = FTransform(HandRotation,
-            FVector(FeedRestFromPlatter.X, PlatterCentreY + FeedRestFromPlatter.Y, CounterHeight + PalmLift));
+            FVector(InputDockLocal.X + FeedRestFromPlatter.X, InputDockLocal.Y + FeedRestFromPlatter.Y, CounterHeight + PalmLift));
         // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
-        Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + HalfSize));
-        Geometry.SlotsLocal.Empty();
-
-        for (int32 Row = 0; Row < RawSlotRows; ++Row)
-        {
-            for (int32 Column = 0; Column < RawSlotColumns; ++Column)
-            {
-                const auto Slot = Geometry.SlotsLocal.Num();
-                const auto X = (float64(Row) - float64(RawSlotRows - 1) * 0.5) * RawSlotPitch;
-                const auto Y = PlatterCentreY + (float64(Column) - float64(RawSlotColumns - 1) * 0.5) * RawSlotPitch;
-                const auto SlotLocal = FTransform(FVector(X, Y, PlatterTop + HalfSize));
-                Geometry.SlotsLocal.Add(SlotLocal);
-
-                // The slot's piece will be released with preset Slot (the feed's StockIndex modulo its capacity).
-                auto SlotNode = utils_scene_node::Create(InRoot, SlotLocal).As_Transform();
-                auto Part = SlotNode.Add_MeshPart(this, Make_PiecePart(FTransform::Identity, Slot, n"FryStation_RawSlot"));
-                if (ck::IsValid(Part))
-                { utils_entity_tag::Add(Part, n"TAG_MarsFryRawSlot"); }
-
-                _RawSlotParts.Add(Part);
-            }
-        }
+        Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + CarriedHalfSize));
 
         _FeedHandNode = utils_scene_node::Create(InRoot, Geometry.RestLocal);
         _FeedPresentation.HandNode = _FeedHandNode;
@@ -565,11 +541,11 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         return Handle;
     }
 
-    // A battered mesh of InPreset's kind with its centre at InCentre (its frame: the mesh is scaled to the piece's box and
+    // A battered mesh of InPreset's kind with its centre at InCentre (its frame: the mesh is scaled to the carried box and
     // lowered by the half size, since the meshes' pivots are at their base).
     private FMars_MeshPart Make_PiecePart(const FTransform& InCentre, int32 InPreset, FName InDebugName) const
     {
-        const auto HalfSize = float64(_FrySpec.Piece.HalfSize);
+        const auto HalfSize = CarriedHalfSize;
         const auto Scale = 2.0 * HalfSize / float64(Get_PieceMeshSize(InPreset));
         return FMars_MeshPart(
             FTransform(InCentre.GetRotation(), InCentre.TransformPosition(FVector(0.0, 0.0, -HalfSize)), FVector(Scale, Scale, Scale)),
@@ -653,15 +629,20 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         return Get_BasketLocal().Z + float64(_FrySpec.Basket.WallHeight);
     }
 
-    private float64 Get_PlatterWidth() const
+    // The two docks on the counter top, children of the root (they die with the station), lifted so a docked platter's
+    // underside rests on the top. A rejected spec already ensured in utils_platter_dock::Create.
+    private void Add_Docks()
     {
-        return float64(RawSlotColumns) * RawSlotPitch + PlatterMargin * 2.0;
-    }
+        const auto DockLift = FVector(0.0, 0.0, CounterHeight + constants_platter::k_FloorAboveBase);
+        auto InputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, Docks.Input,
+            FTransform(FRotator::ZeroRotator, InputDockLocal + DockLift));
+        InputSpec.Name = FText::FromString("raw platter");
+        _InputDock = utils_platter_dock::Create(_Root, InputSpec);
 
-    // The platter on the operator's left, PlatterGap off the pot's outer wall.
-    private float64 Get_PlatterCentreY() const
-    {
-        return -(PotInnerRadius + PotWallThickness + PlatterGap + Get_PlatterWidth() * 0.5);
+        auto OutputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Output, Docks.Output,
+            FTransform(FRotator::ZeroRotator, OutputDockLocal + DockLift));
+        OutputSpec.Name = FText::FromString("finished tray");
+        _OutputDock = utils_platter_dock::Create(_Root, OutputSpec);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -679,13 +660,12 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
         Advance_Feed(DeltaSeconds);
         Advance_PieceVisuals(DeltaSeconds);
-        Apply_PieceCpd();
         Apply_PendingTints();
         Refresh_Label();
     }
 
-    // The feed's glove node, pose override and carried piece follow the feed; the slot proxies show what the platter still
-    // holds (the reserved one until it is grasped) and the glove's proxy of the carried piece's kind shows while it is carried.
+    // The feed's glove node, pose override and carried piece follow the feed; the glove's proxy of the carried piece's kind
+    // shows while it is carried.
     private void Advance_Feed(float32 InDeltaSeconds)
     {
         if (ck::Is_NOT_Valid(_FeedHandle))
@@ -694,9 +674,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         const auto RootWorld = utils_transform::Get_EntityCurrentTransform(_Root);
         const auto Operator = _Root.H().As_Station().Get_Operator();
         _FeedPresentation.Advance(FMars_StationFeed_Frame(_FeedHandle, Operator, RootWorld, InDeltaSeconds));
-
-        for (int32 Slot = 0; Slot < _RawSlotParts.Num(); ++Slot)
-        { Set_PartVisible(_RawSlotParts[Slot], _FeedPresentation.Get_IsSlotVisible(_FeedHandle, Slot)); }
 
         const auto Carried = _FeedPresentation.CarriedPiece;
         const auto CarriedKind = Carried.IsSet() ? Get_PieceKind(Carried.GetValue().StockIndex) : -1;
@@ -719,8 +696,8 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
 
     // Each piece's cook state from its own ledger: its six face heats are its six sears, its mean heat the batter's fry
     // floor; its oil coat ramps up while it floats in the oil and, in the basket, falls with its drain progress (never back
-    // up). A record whose piece the kernel no longer holds (destroyed at the end of its linger, or reset) or whose entity is
-    // gone is dropped (its mesh dies with the entity); a lost piece keeps its last cook state.
+    // up). A record whose piece the kernel no longer holds (taken out, or destroyed at the end of its linger) or whose entity
+    // is gone is dropped; a lost piece keeps its last cook state.
     private void Advance_PieceVisuals(float32 InDeltaSeconds)
     {
         for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
@@ -754,27 +731,23 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
                 Visual.CookState.OilCoat = Math::Min(Visual.CookState.OilCoat, Dripped);
             }
 
+            Write_PieceCpd(Visual);
             _PieceVisuals[Index] = Visual;
         }
     }
 
-    // Every piece's mesh with its own cook state, once its component exists.
-    private void Apply_PieceCpd()
+    // The display follows the look on its edges, never per frame: a write once any float has moved by the threshold since
+    // the last one. A piece without a display (a bare test piece) is legal and gets none.
+    private void Write_PieceCpd(FMars_FryStation_PieceVisual& InVisual)
     {
-        for (const auto& Visual : _PieceVisuals)
-        { Write_PieceCpd(Visual); }
-    }
-
-    private void Write_PieceCpd(const FMars_FryStation_PieceVisual& InVisual)
-    {
-        if (ck::Is_NOT_Valid(InVisual.Part))
+        if (InVisual.Entity.Is_RuntimeMeshDisplay() == false)
         { return; }
 
-        auto Mesh = Cast<UPrimitiveComponent>(utils_unreal_component::Get_Component(InVisual.Part));
-        if (ck::Is_NOT_Valid(Mesh))
+        if (utils_cookstate::Get_HasMovedBeyond(InVisual.Written, InVisual.CookState, constants_cookstate::k_WriteThreshold) == false)
         { return; }
 
-        utils_cookstate::Write_CustomPrimitiveData(Mesh, InVisual.CookState);
+        utils_cookstate::Request_Write(InVisual.Entity.As_RuntimeMeshDisplay(), InVisual.CookState);
+        InVisual.Written = InVisual.CookState;
     }
 
     // Every tinted part whose component now exists, once.
@@ -825,24 +798,22 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     // Pieces and the label
     //----------------------------------------------------------------------------------------------------------------------
 
-    // A piece's look: the battered mesh of its preset's kind on the piece entity (Jolt owns the entity's pose; the kernel
-    // never writes it), its Custom Primitive Data written from that piece's own cook state. Tagged so a test can read it back.
+    // A piece's record: the piece wears its own display (whoever made the piece dressed it); Jolt owns its pose. The cook
+    // state starts as the piece arrived with it, and the display gets it at once.
     private void AddPieceVisuals(const FMars_CookingFeed_PieceId& InPieceId, FCk_Handle InPiece)
     {
-        auto PieceTransform = InPiece.As_Transform();
-
         auto Visual = FMars_FryStation_PieceVisual();
         Visual.Id = InPieceId;
         Visual.Entity = InPiece;
-        Visual.Part = PieceTransform.Add_MeshPart(this,
-            Make_PiecePart(FTransform::Identity, _FryHandle.Get_PiecePresetIndex(InPieceId), n"FryStation_Piece"));
+        Visual.Piece = InPiece.As_FoodPiece();
+        Visual.CookState = Visual.Piece.Get_CookState();
+        if (Visual.Entity.Is_RuntimeMeshDisplay())
+        {
+            utils_cookstate::Request_Write(Visual.Entity.As_RuntimeMeshDisplay(), Visual.CookState);
+            Visual.Written = Visual.CookState;
+        }
+
         _PieceVisuals.Add(Visual);
-
-        if (ck::Is_NOT_Valid(Visual.Part))
-        { return; }
-
-        utils_entity_tag::Add(Visual.Part, n"TAG_MarsFryPiece");
-        utils_unreal_component::BindTo_OnAdded(Visual.Part, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPiecePartAdded"));
     }
 
     // The three battered kinds by a preset (or slot) index.
@@ -895,20 +866,29 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         Text.SetText(Label);
     }
 
-    // What the label reads: once the platter is spent, no transfer is under way and nothing is still in the oil, on the
-    // scoop or in the air, the batch is all accounted for; otherwise the batch so far and what is left raw.
+    // What the label reads: once something was admitted, the raw platter is spent, no transfer is under way and nothing is
+    // still in the oil, on the scoop or in the air, the batch is all accounted for (taken out counts); otherwise the batch so
+    // far and what is left raw ("no platter" without one docked). A second line says when no tray is docked to take out onto.
     private FText Get_StateLabel() const
     {
         const auto Summary = _FryHandle.Get_Summary();
         const auto HasFeed = ck::IsValid(_FeedHandle);
-        const auto Raw = HasFeed ? _FeedHandle.Get_Available() : 0;
+        const auto IsSourced = HasFeed && _FeedHandle.Get_IsSourced();
+        const auto Raw = IsSourced ? _FeedHandle.Get_Available() : 0;
         const auto IsFeeding = HasFeed && _FeedHandle.Get_IsBusy();
         const auto InPlay = Summary.InOil + Summary.OnSkimmer + Summary.Airborne;
+        const FString TrayLine = Get_HasTray() ? "" : "\nno tray: dock one to take out";
 
-        if (Raw == 0 && IsFeeding == false && InPlay == 0)
-        { return FText::FromString(f"all accounted for: {Summary.Drained}/{Summary.InBasket} drained, {Summary.Lost} lost"); }
+        if (Summary.Admitted > 0 && Raw == 0 && IsFeeding == false && InPlay == 0)
+        { return FText::FromString(f"all accounted for: {Summary.Drained}/{Summary.InBasket} drained · {Summary.TakenOut} taken out · {Summary.Lost} lost{TrayLine}"); }
 
-        return FText::FromString(f"{Summary.Drained}/{Summary.Admitted} drained · {Summary.InOil} frying · {Summary.Lost} lost · {Raw} raw");
+        const FString RawText = IsSourced ? f"{Raw} raw" : "no platter";
+        return FText::FromString(f"{Summary.Drained}/{Summary.Admitted} drained · {Summary.InOil} frying · {Summary.Lost} lost · {Summary.TakenOut} taken out · {RawText}{TrayLine}");
+    }
+
+    private bool Get_HasTray() const
+    {
+        return ck::IsValid(_OutputDock) && ck::IsValid(_OutputDock.Get_Platter());
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -927,34 +907,16 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         Resolve_Bubbles();
     }
 
-    // A raw proxy (on the platter or in the glove) wears the raw cook state; the dressing tick sets its visibility.
+    // A glove proxy wears the raw cook state and starts hidden; the dressing tick sets its visibility.
     UFUNCTION()
-    private void OnRawPartAdded(FCk_Handle_UnrealComponent InHandle)
+    private void OnCarryProxyAdded(FCk_Handle_UnrealComponent InHandle)
     {
         auto Mesh = Cast<UPrimitiveComponent>(utils_unreal_component::Get_Component(InHandle));
         if (ck::Is_NOT_Valid(Mesh))
         { return; }
 
         utils_cookstate::Write_CustomPrimitiveData(Mesh, FMars_CookState());
-        for (const auto& Part : _CarryProxyParts)
-        {
-            if (Part == InHandle)
-            { Mesh.SetVisibility(false); }
-        }
-    }
-
-    // Writes that piece's cook state once (raw at admission), so a piece never shows a default for a frame.
-    UFUNCTION()
-    private void OnPiecePartAdded(FCk_Handle_UnrealComponent InHandle)
-    {
-        for (const auto& Visual : _PieceVisuals)
-        {
-            if (Visual.Part == InHandle)
-            {
-                Write_PieceCpd(Visual);
-                return;
-            }
-        }
+        Mesh.SetVisibility(false);
     }
 
     UFUNCTION()

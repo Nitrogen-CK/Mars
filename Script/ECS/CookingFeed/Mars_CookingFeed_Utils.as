@@ -1,8 +1,9 @@
 namespace utils_cooking_feed
 {
     // Composes the feed on InHandle (the station entity; the feature does not need the Station feature). The spec's Nodes are
-    // built by the caller: Nodes.Release is sampled at every release. The platter starts with Supply.InitialCount pieces, every
-    // slot free and the hand idle. A rejected spec or a missing release node ensures and returns an invalid handle.
+    // built by the caller: Nodes.Release is sampled at every release. The feed starts unsourced (control sets the source
+    // from the station's input dock) with the hand idle. A rejected spec or a missing release node ensures and returns an
+    // invalid handle.
     FCk_Handle_CookingFeed Add(FCk_Handle& InHandle, FMars_CookingFeed_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -15,15 +16,45 @@ namespace utils_cooking_feed
         auto Params = FMars_Fragment_CookingFeed_Params();
         Params.Spec = InSpec;
 
-        auto State = FMars_Fragment_CookingFeed();
-        State.Available = InSpec.Supply.InitialCount;
-        for (int32 Slot = 0; Slot < InSpec.Supply.SlotCapacity; ++Slot)
-        { State.SlotTaken.Add(false); }
-
         InHandle.Add_Fragment(FMars_Feature_CookingFeed());
         InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(FMars_Fragment_CookingFeed());
         return InHandle.As_CookingFeed();
+    }
+
+    // What the source holds less a reserved piece still on it; 0 without a source. Once the bridge has unloaded the
+    // reserved piece for its release it is already off the count.
+    int32 Get_Available(const FMars_Fragment_CookingFeed& InState)
+    {
+        if (ck::Is_NOT_Valid(InState.Source))
+        { return 0; }
+
+        const auto Reserved = InState.Active.IsSet() && Get_IsOnSource(InState.Active.GetValue().Piece, InState.Source) ? 1 : 0;
+        return InState.Source.Get_HeldCount() - Reserved;
+    }
+
+    // InPiece is alive and InSource (a valid platter) holds it, landed or pending.
+    bool Get_IsOnSource(const FCk_Handle_FoodPiece& InPiece, const FCk_Handle_Platter& InSource)
+    {
+        if (ck::Is_NOT_Valid(InPiece) || ck::Is_NOT_Valid(InSource))
+        { return false; }
+
+        if (utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+        { return false; }
+
+        return InPiece.TryGet_Platter() == InSource;
+    }
+
+    // Drops the reservation (if any) and idles the hand at once: the one cancel path (Reset, Cancel, SetSource, a reservation
+    // whose piece left the source). True when a reservation was dropped; the caller read its id first and settles it
+    // Cancelled.
+    bool Cancel_Active(FMars_Fragment_CookingFeed& InState)
+    {
+        const auto HadReservation = InState.Active.IsSet();
+        InState.Active.Reset();
+        InState.Phase = EMars_CookingFeed_Phase::Idle;
+        InState.PhaseSeconds = 0.0f;
+        return HadReservation;
     }
 
     // A phase length the Tick can advance through: finite and not negative.
@@ -96,20 +127,27 @@ mixin int32 Get_Generation(const FCk_Handle_CookingFeed& Self)
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Generation;
 }
 
-// Unreserved stock: what a hint calls "left".
+// Unreserved stock on the source: what a hint calls "left". Derived, never stored (utils_cooking_feed::Get_Available).
 mixin int32 Get_Available(const FCk_Handle_CookingFeed& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_CookingFeed).Available;
+    return utils_cooking_feed::Get_Available(Self.Get_Fragment(FMars_Fragment_CookingFeed));
 }
 
+// Admissions since the last Reset.
 mixin int32 Get_Admitted(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Admitted;
 }
 
-mixin int32 Get_InitialStock(const FCk_Handle_CookingFeed& Self)
+// The platter the stock is drawn from; invalid while unsourced.
+mixin FCk_Handle_Platter Get_Source(const FCk_Handle_CookingFeed& Self)
 {
-    return Self.Get_Spec().Supply.InitialCount;
+    return Self.Get_Fragment(FMars_Fragment_CookingFeed).Source;
+}
+
+mixin bool Get_IsSourced(const FCk_Handle_CookingFeed& Self)
+{
+    return ck::IsValid(Self.Get_Source());
 }
 
 mixin bool Get_IsBusy(const FCk_Handle_CookingFeed& Self)
@@ -117,20 +155,24 @@ mixin bool Get_IsBusy(const FCk_Handle_CookingFeed& Self)
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Phase != EMars_CookingFeed_Phase::Idle;
 }
 
-// Set from BeginTransfer until the admission answer (or a Cancel / Reset).
+// Set from BeginTransfer until the admission answer (or a Cancel / Reset / SetSource).
 mixin TOptional<FMars_CookingFeed_PieceId> TryGet_ActivePiece(const FCk_Handle_CookingFeed& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
+    const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
+    if (Active.IsSet() == false)
+    { return TOptional<FMars_CookingFeed_PieceId>(); }
+
+    return TOptional<FMars_CookingFeed_PieceId>(Active.GetValue().Id);
 }
 
-// Reserved or spent; false outside [0, SlotCapacity).
-mixin bool Get_IsSlotTaken(const FCk_Handle_CookingFeed& Self, int32 InSlot)
+// The reserved piece; invalid while idle.
+mixin FCk_Handle_FoodPiece TryGet_ActiveFoodPiece(const FCk_Handle_CookingFeed& Self)
 {
-    const auto& SlotTaken = Self.Get_Fragment(FMars_Fragment_CookingFeed).SlotTaken;
-    if (SlotTaken.IsValidIndex(InSlot) == false)
-    { return false; }
+    const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
+    if (Active.IsSet() == false)
+    { return FCk_Handle_FoodPiece(); }
 
-    return SlotTaken[InSlot];
+    return Active.GetValue().Piece;
 }
 
 // The last release sampled (valid through AwaitAdmission; stale afterwards).
@@ -142,14 +184,6 @@ mixin FMars_CookingFeed_Release Get_PendingRelease(const FCk_Handle_CookingFeed&
 mixin FCk_Handle_Transform Get_ReleaseNode(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.Release;
-}
-
-// InitialCount == Available + (an active reservation ? 1 : 0) + Admitted.
-mixin bool Get_IsLedgerConsistent(const FCk_Handle_CookingFeed& Self)
-{
-    const auto& State = Self.Get_Fragment(FMars_Fragment_CookingFeed);
-    const auto Reserved = State.Active.IsSet() ? 1 : 0;
-    return Self.Get_InitialStock() == State.Available + Reserved + State.Admitted;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -172,6 +206,12 @@ mixin void Request_Reset(FCk_Handle_CookingFeed& Self, const FMars_Request_Cooki
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_CookingFeed_Requests);
     Requests.ResetRequests.Add(InRequest);
+}
+
+mixin void Request_SetSource(FCk_Handle_CookingFeed& Self, const FMars_Request_CookingFeed_SetSource& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_CookingFeed_Requests);
+    Requests.SetSourceRequests.Add(InRequest);
 }
 
 mixin void Request_ResolveAdmission(FCk_Handle_CookingFeed& Self, const FMars_Request_CookingFeed_ResolveAdmission& InRequest)

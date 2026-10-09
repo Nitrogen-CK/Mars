@@ -102,7 +102,7 @@ struct FMars_Fragment_Resting_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Resting processors (and Add).
+// Written only by the Resting processors (and Add). A Retarget rewrites the Params' spec too.
 struct FMars_Fragment_Resting
 {
     // Resting on any target.
@@ -150,4 +150,38 @@ struct FMars_Fragment_Resting_Signals
 {
     FMars_Delegate_Resting_OnRestingChanged_MC OnRestingChanged;
     FMars_Delegate_Resting_OnLanded_MC OnLanded;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Requests
+//--------------------------------------------------------------------------------------------------------------------------
+
+// New targets and tuners for a body that moves on to other supports (a piece handed from one station's kernel to another's):
+// the spec is replaced, the tracker starts Apart on every new target with its hops and apart time zeroed, as Add leaves it.
+// A spec Validate rejects ensures and changes nothing. The last one in a drain wins.
+struct FMars_Request_Resting_Retarget
+{
+    UPROPERTY()
+    TArray<FCk_Handle> Targets;
+
+    UPROPERTY()
+    float32 GraceSeconds = 0.1f;
+
+    UPROPERTY()
+    float32 HopMinSeconds = 0.12f;
+
+    FMars_Request_Resting_Retarget() {}
+
+    FMars_Request_Resting_Retarget(const TArray<FCk_Handle>& InTargets, float32 InGraceSeconds, float32 InHopMinSeconds)
+    {
+        Targets = InTargets;
+        GraceSeconds = InGraceSeconds;
+        HopMinSeconds = InHopMinSeconds;
+    }
+}
+
+struct FMars_Fragment_Resting_Requests
+{
+    UPROPERTY()
+    TArray<FMars_Request_Resting_Retarget> RetargetRequests;
 }

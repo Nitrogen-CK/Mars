@@ -6,9 +6,10 @@ class UMars_AutoTest_Fry_AnAirborneCrossingOfTheBasketDoesNotDrain : UMars_AutoT
 {
     default _TimeoutSeconds = 12.0f;
 
-    // Basket frame: near the -X wall, inside the basket's volume (its interior reaches 2 x HalfSize above the wall tops) with
-    // the piece's bottom 4 above the wall tops; flung toward +X.
-    private const FVector k_CrossStartInBasket = FVector(-16.0, 0.0, 20.0);
+    // Basket frame: near the -X wall, inside the basket's volume (its interior reaches the piece's height above the wall
+    // tops) with the piece's bottom k_CrossBottomAboveWalls above the wall tops; flung toward +X.
+    private const float64 k_CrossStartX = -16.0;
+    private const float64 k_CrossBottomAboveWalls = 4.0;
     private const FVector k_CrossVelocity = FVector(700.0, 0.0, 60.0);
     private const float32 k_WatchSeconds = 1.5f;
 
@@ -21,8 +22,10 @@ class UMars_AutoTest_Fry_AnAirborneCrossingOfTheBasketDoesNotDrain : UMars_AutoT
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Pieces(1);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release a piece over the oil", n"Step_Release");
         Add_Step_WaitUntil("its body is in the simulation", n"Check_Added1", 0, 2.0f);
         Add_Step("fling it across the basket", n"Step_Fling");
@@ -34,7 +37,7 @@ class UMars_AutoTest_Fry_AnAirborneCrossingOfTheBasketDoesNotDrain : UMars_AutoT
     UFUNCTION()
     private void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Piece = AddPiece(FVector(-30.0, 0.0, float64(_Spec.Oil.SurfaceZ + _Spec.Piece.HalfSize + 1.0f)));
+        _Piece = AddPiece(FVector(-30.0, 0.0, float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0));
     }
 
     UFUNCTION()
@@ -42,7 +45,8 @@ class UMars_AutoTest_Fry_AnAirborneCrossingOfTheBasketDoesNotDrain : UMars_AutoT
     {
         _EdgesBeforeCross = _WhereaboutsTo.Num();
         _CrossTime = Get_Now();
-        Teleport(_Piece, k_BasketLocal + k_CrossStartInBasket, k_CrossVelocity);
+        const auto Start = FVector(k_CrossStartX, 0.0, float64(_Spec.Basket.WallHeight) + k_CrossBottomAboveWalls + _Fry.Get_PieceHalfExtents(_Piece).Z);
+        Teleport(_Piece, k_BasketLocal + Start, k_CrossVelocity);
     }
 
     UFUNCTION()

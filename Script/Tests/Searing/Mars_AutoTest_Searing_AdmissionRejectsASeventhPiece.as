@@ -1,5 +1,5 @@
 // With Supply.MaxPieces 1 the first release is Accepted and a second, different Id is Rejected with a reason naming the
-// limit: one body, nothing made for the second.
+// limit: one body, the second piece left as it was.
 class UMars_AutoTest_Searing_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_Searing
 {
     default _TimeoutSeconds = 8.0f;
@@ -13,8 +13,10 @@ class UMars_AutoTest_Searing_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_S
         auto Spec = Make_TestSpec();
         Spec.Supply.MaxPieces = 1;
         BuildStation(InHandle, Spec);
+        Build_Pieces(2);
 
         Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release two different pieces", n"Step_ReleaseTwo");
         Add_Step_WaitUntil("both releases were answered", n"Check_Answered2", 0, 1.0f);
         Add_Step_WaitFrames("anything made would show", 2);

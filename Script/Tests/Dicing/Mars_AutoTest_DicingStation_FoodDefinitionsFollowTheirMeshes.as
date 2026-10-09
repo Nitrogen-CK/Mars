@@ -1,8 +1,8 @@
 // Both cuttable-food definitions validate, and their display materials follow their meshes' material slots (a display
 // material per slot, by the slot's name, then the cap's): the meat's Flesh and Skin (fat cap) slots wear MeatSlabFlesh and
 // MeatSlabFat and its cap MeatSlabCut; the mushroom slice's Skin and Flesh slots and its cap wear its Food instance. Each
-// cap's slot is the one after the mesh's last section, so the display covers every material ID a cut can carry. A placed
-// dicing station holds the meat by default.
+// cap's slot is the one after the mesh's last section, so the display covers every material ID a cut can carry. Each
+// carries its kind (the beef is also meat, by hierarchy), and a definition without one does not validate.
 class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -15,7 +15,7 @@ class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTe
     UFUNCTION()
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Meat = mars::CuttableFood_MeatSlab_Mars;
+        auto Meat = mars::Food_MeatSlab_Mars;
         const auto MeatMesh = Assert_Definition(Meat);
         if (ck::IsValid(MeatMesh))
         {
@@ -26,11 +26,7 @@ class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTe
                 assets::MeatSlabCut_Mars_MI().ToSoftObjectPath().ToString(), "the meat's cap wears MeatSlabCut");
         }
 
-        // A placed station is instanced from the class default (the entity spawner's archetype path): it holds the meat.
-        TSubclassOf<UMars_DicingStation_EntityScript> StationClass = UMars_DicingStation_EntityScript;
-        Assert_True(StationClass.GetDefaultObject().Food == Meat, "a placed dicing station holds the meat by default");
-
-        auto Mushroom = mars::CuttableFood_MushroomSlice_Mars;
+        auto Mushroom = mars::Food_MushroomSlice_Mars;
         const auto MushroomMesh = Assert_Definition(Mushroom);
         if (ck::IsValid(MushroomMesh))
         {
@@ -41,10 +37,21 @@ class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTe
             Assert_Equals_String(Materials[Mushroom.Visuals.Cap.Get_MaterialID()].ToSoftObjectPath().ToString(),
                 Slice.ToString(), "the mushroom's cap wears its Food instance");
         }
+
+        Assert_True(Meat.Data.Kind.HasTag(GameplayTags::Food_Meat_Beef), "the meat is beef");
+        Assert_True(Meat.Data.Kind.HasTag(GameplayTags::Food_Meat), "beef is meat (hierarchy)");
+        Assert_True(Mushroom.Data.Kind.HasTag(GameplayTags::Food_Vegetable_Mushroom), "the mushroom slice is a mushroom");
+
+        // The meat with its Kind cleared: everything else validates, so only the missing kind can refuse it.
+        auto Unkinded = NewObject(this, UMars_Food_Def);
+        Unkinded.Data = Meat.Data;
+        Unkinded.Visuals = Meat.Visuals;
+        Unkinded.Data.Kind = FGameplayTagContainer();
+        Assert_False(Unkinded.Validate().IsValid(), "a definition with no Kind does not validate");
     }
 
     // The definition's mesh once it validates and its cap follows the last section; null otherwise.
-    private UStaticMesh Assert_Definition(UMars_CuttableFood_Def InFood)
+    private UStaticMesh Assert_Definition(UMars_Food_Def InFood)
     {
         const auto Validation = InFood.Validate();
         Assert_True(Validation.IsValid(), f"[{InFood.GetName()}] validates: {Validation.Get_Error()}");
@@ -64,7 +71,7 @@ class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTe
     }
 
     // InFood's mesh is loaded (Assert_Definition).
-    private void Assert_Slot(UMars_CuttableFood_Def InFood, FName InSlot, FSoftObjectPath InExpected)
+    private void Assert_Slot(UMars_Food_Def InFood, FName InSlot, FSoftObjectPath InExpected)
     {
         const auto Index = InFood.Data.Mesh.Get().GetMaterialIndex(InSlot);
         const auto Materials = InFood.Visuals.Display.Get_Materials();

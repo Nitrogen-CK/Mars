@@ -102,7 +102,7 @@ struct FMars_FoodPiece_MassSplit
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What the piece is. A cut half carries its source's lineage and cook state and its share of the mass.
+// What the piece is. A cut half carries its source's lineage, cook state, definition and kind, and its share of the mass.
 struct FMars_FoodPiece_Data
 {
     // The root joint's identity, shared by every piece cut from it. Left invalid for a new root: Add assigns one.
@@ -118,6 +118,15 @@ struct FMars_FoodPiece_Data
 
     UPROPERTY()
     FMars_CookState CookState;
+
+    // The food this piece is a portion of; identity for whoever dresses or gates it, never read by the kernel. Unset for a
+    // bare piece (tests).
+    UPROPERTY()
+    TWeakObjectPtr<UMars_Food_Def> Definition;
+
+    // What the food is (Food.Meat.Beef); the gate every station policy reads. Inherited by every half.
+    UPROPERTY(meta = (Categories = "Food"))
+    FGameplayTagContainer Kind;
 
     FMars_FoodPiece_Data() {}
 
@@ -178,6 +187,9 @@ mixin FMars_Validation Validate(const FMars_FoodPiece_Spec& Self)
 
     if (Self.Data.ParentId.IsValid() && Self.Data.Lineage.IsValid() == false)
     { return FMars_Validation("FoodPiece has a Data.ParentId but no Data.Lineage: a cut piece belongs to its root's lineage"); }
+
+    if (Self.Data.Definition.IsValid() && Self.Data.Kind.IsEmpty())
+    { return FMars_Validation("FoodPiece has a Data.Definition but no Data.Kind: a piece nobody can gate is a defect"); }
 
     if (Math::IsFinite(Self.Tuners.MinPortionMassKg) == false || Self.Tuners.MinPortionMassKg <= 0.0)
     { return FMars_Validation(f"FoodPiece has a non-positive or non-finite Tuners.MinPortionMassKg [{Self.Tuners.MinPortionMassKg}]"); }
@@ -246,6 +258,14 @@ struct FMars_Fragment_FoodPiece
 
     UPROPERTY()
     FMars_CookState CookState;
+
+    // Identity, never read by the kernel; unset for a bare piece.
+    UPROPERTY()
+    TWeakObjectPtr<UMars_Food_Def> Definition;
+
+    // The gate station policies read.
+    UPROPERTY(meta = (Categories = "Food"))
+    FGameplayTagContainer Kind;
 
     UPROPERTY()
     EMars_FoodPiece_Status Status = EMars_FoodPiece_Status::Pending;
@@ -325,10 +345,30 @@ struct FMars_Request_FoodPiece_Cut
     }
 }
 
-// Applied in order: the first cut a Ready piece takes in a drain is submitted and every later one is RefusedBusy, unless
-// RuntimeMesh rejects that submission on the spot (its queue is full): the piece is Ready again and the next one submits.
+// Replace the piece's cook state (a heat kernel's write-back when the piece leaves it). Applied before any cut in the same
+// drain, so the halves of that cut carry it.
+struct FMars_Request_FoodPiece_SetCookState
+{
+    UPROPERTY()
+    FMars_CookState CookState;
+
+    FMars_Request_FoodPiece_SetCookState() {}
+
+    FMars_Request_FoodPiece_SetCookState(FMars_CookState InCookState)
+    {
+        CookState = InCookState;
+    }
+}
+
+// Applied SetCookState -> Cut: the last cook state set wins and reaches the halves of a cut in the same drain; cuts then
+// as before, in order: the first cut a Ready piece takes in a drain is submitted and every later one is RefusedBusy,
+// unless RuntimeMesh rejects that submission on the spot (its queue is full): the piece is Ready again and the next one
+// submits.
 struct FMars_Fragment_FoodPiece_Requests
 {
+    UPROPERTY()
+    TArray<FMars_Request_FoodPiece_SetCookState> SetCookStateRequests;
+
     UPROPERTY()
     TArray<FMars_Request_FoodPiece_Cut> CutRequests;
 }

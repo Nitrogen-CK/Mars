@@ -1,4 +1,5 @@
-// A piece teleported beyond the pan (pan-local (PanRadius + 2 HalfSize, 0, 20): outside the lip, over the void) is lost
+// A piece teleported beyond the pan (its middle at pan-local (PanRadius + 2 x its largest half extent, 0, 20): outside the
+// lip, over the void) is lost
 // once: the summary counts it, its Id still answers Lost while its body lingers and falls, the body is destroyed after
 // LingerSeconds and the Id is then gone; nothing is ever added in its place.
 class UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndNothingReplacesIt : UMars_AutoTestRig_Searing
@@ -16,6 +17,7 @@ class UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndNothingReplacesIt : UM
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Pieces(1);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();
@@ -36,12 +38,10 @@ class UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndNothingReplacesIt : UM
         Assert_True(ck::IsValid(_FirstPiece), "a piece rests on the pan");
 
         // On the pan implies the body exists in the simulation; a teleport before that does nothing.
-        auto Body = _Searing.Get_PieceBody(Get_FirstId());
-        Assert_True(utils_jolt_body::Get_IsBodyAdded(Body), "the piece's body is in the simulation");
+        Assert_True(utils_jolt_body::Get_IsBodyAdded(_Searing.Get_PieceBody(Get_FirstId())), "the piece's body is in the simulation");
 
-        const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        const auto Location = PanBaseWorld.TransformPosition(FVector(_Spec.Loss.PanRadius + 2.0 * _Spec.Steak.HalfSize, 0.0, 20.0));
-        utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Location, PanBaseWorld.Rotator()));
+        const auto Reach = _Searing.Get_PieceHalfExtents(Get_FirstId()).GetMax();
+        Teleport_Piece(Get_FirstId(), FVector(_Spec.Loss.PanRadius + 2.0 * Reach, 0.0, 20.0), FRotator::ZeroRotator);
     }
 
     UFUNCTION()

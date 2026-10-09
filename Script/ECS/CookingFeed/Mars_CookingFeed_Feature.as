@@ -6,7 +6,7 @@ asset Mars_CookingFeedHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_CookingFeed";
     RequiredFragments.Add(FMars_Feature_CookingFeed);
-    Description = "A finite raw-food supply beside a cooking vessel: one left-hand transfer at a time, reserved then admitted by the cooking kernel";
+    Description = "A transfer hand between a docked platter and a cooking vessel: one left-hand transfer at a time, reserved from the platter, released, then admitted by the cooking kernel";
 }
 struct FMars_Feature_CookingFeed {}
 
@@ -45,12 +45,13 @@ enum EMars_CookingFeed_Settle
 enum EMars_CookingFeed_Refusal
 {
     Busy,
+    // No source, or nothing on it.
     Empty,
     NoRelease
 }
 
-// One piece's identity: the attempt it belongs to (bumped by every Reset) and its platter slot. An array index is never
-// identity; a piece from an older generation is stale.
+// One piece's identity: the attempt it belongs to (bumped by every Reset and SetSource) and the platter slot the piece was
+// reserved from (StockIndex). An array index is never identity; a piece from an older generation is stale.
 struct FMars_CookingFeed_PieceId
 {
     UPROPERTY()
@@ -73,11 +74,33 @@ mixin bool Get_IsSame(const FMars_CookingFeed_PieceId& Self, const FMars_Cooking
     return Self.Generation == InOther.Generation && Self.StockIndex == InOther.StockIndex;
 }
 
-// The one payload every cooking kernel's AddPiece wraps: who, where (world), how fast, and which mesh variant.
+// The one transfer in flight: its identity and the piece it names on the source platter.
+struct FMars_CookingFeed_Reservation
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId Id;
+
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    FMars_CookingFeed_Reservation() {}
+
+    FMars_CookingFeed_Reservation(FMars_CookingFeed_PieceId InId, FCk_Handle_FoodPiece InPiece)
+    {
+        Id = InId;
+        Piece = InPiece;
+    }
+}
+
+// The one payload every cooking kernel's AddPiece wraps: who, which piece, where (world), how fast, and which mesh variant.
 struct FMars_CookingFeed_Release
 {
     UPROPERTY()
     FMars_CookingFeed_PieceId PieceId;
+
+    // The reserved piece; invalid for a release built by hand. Set by the feed at the release, not by the ctor.
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
 
     UPROPERTY()
     FTransform WorldTransform;
@@ -105,24 +128,6 @@ struct FMars_CookingFeed_Release
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
-
-// How many raw pieces the platter starts with and how many slots it has (a StockIndex is a slot).
-struct FMars_CookingFeed_SupplySpec
-{
-    UPROPERTY()
-    int32 InitialCount = 6;
-
-    UPROPERTY()
-    int32 SlotCapacity = 6;
-
-    FMars_CookingFeed_SupplySpec() {}
-
-    FMars_CookingFeed_SupplySpec(int32 InInitialCount, int32 InSlotCapacity)
-    {
-        InitialCount = InInitialCount;
-        SlotCapacity = InSlotCapacity;
-    }
-}
 
 // Seconds per timed phase. A zero-length phase passes through in the frame it starts, its boundary still crossed once.
 struct FMars_CookingFeed_TimingSpec
@@ -187,9 +192,6 @@ struct FMars_CookingFeed_Nodes
 struct FMars_CookingFeed_Spec
 {
     UPROPERTY()
-    FMars_CookingFeed_SupplySpec Supply;
-
-    UPROPERTY()
     FMars_CookingFeed_TimingSpec Timing;
 
     UPROPERTY()
@@ -200,24 +202,17 @@ struct FMars_CookingFeed_Spec
 
     FMars_CookingFeed_Spec() {}
 
-    FMars_CookingFeed_Spec(FMars_CookingFeed_SupplySpec InSupply, FMars_CookingFeed_TimingSpec InTiming, FMars_CookingFeed_MotionSpec InMotion)
+    FMars_CookingFeed_Spec(FMars_CookingFeed_TimingSpec InTiming, FMars_CookingFeed_MotionSpec InMotion)
     {
-        Supply = InSupply;
         Timing = InTiming;
         Motion = InMotion;
     }
 }
 
-// A platter with no slots, more pieces than slots, a negative or non-finite phase length, or an inheritance outside [0, 1]
-// each make the ledger or the release unsound. The nodes are checked by Add (a missing Release node ensures there).
+// A negative or non-finite phase length, or an inheritance outside [0, 1], makes the clock or the release unsound. The nodes
+// are checked by Add (a missing Release node ensures there).
 mixin FMars_Validation Validate(const FMars_CookingFeed_Spec& Self)
 {
-    if (Self.Supply.SlotCapacity <= 0)
-    { return FMars_Validation(f"CookingFeed has a non-positive Supply.SlotCapacity [{Self.Supply.SlotCapacity}]"); }
-
-    if (Self.Supply.InitialCount < 0 || Self.Supply.InitialCount > Self.Supply.SlotCapacity)
-    { return FMars_Validation(f"CookingFeed has Supply.InitialCount [{Self.Supply.InitialCount}] outside [0, {Self.Supply.SlotCapacity}]"); }
-
     if (utils_cooking_feed::Get_IsValidSeconds(Self.Timing.ReachSeconds) == false)
     { return FMars_Validation(f"CookingFeed has a negative or non-finite Timing.ReachSeconds [{Self.Timing.ReachSeconds}]"); }
 
@@ -250,11 +245,11 @@ struct FMars_Fragment_CookingFeed_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the CookingFeed processors (and Add). The station's control layer only issues requests. At every stable
-// observation Supply.InitialCount == Available + (Active set ? 1 : 0) + Admitted.
+// Written only by the CookingFeed processors (and Add). The station's control layer only issues requests. Available is
+// derived from the source; Admitted counts admissions since the last Reset.
 struct FMars_Fragment_CookingFeed
 {
-    // The attempt every PieceId carries; bumped by Reset before anything is cleared.
+    // The attempt every PieceId carries; bumped by Reset and SetSource before anything is cleared.
     UPROPERTY()
     int32 Generation = 1;
 
@@ -265,21 +260,24 @@ struct FMars_Fragment_CookingFeed
     UPROPERTY()
     float32 PhaseSeconds = 0.0f;
 
-    // Unreserved stock.
+    // The platter the stock is drawn from; invalid = none. The feed only reads it: control loads and unloads.
     UPROPERTY()
-    int32 Available = 0;
+    FCk_Handle_Platter Source;
 
-    // Spent: pieces a cooking kernel accepted.
+    // The one reservation, from BeginTransfer until the admission answer (or a Cancel / Reset / SetSource).
+    UPROPERTY()
+    TOptional<FMars_CookingFeed_Reservation> Active;
+
+    // Spent since the last Reset: pieces a cooking kernel accepted.
     UPROPERTY()
     int32 Admitted = 0;
 
-    // The one reservation, from BeginTransfer until the admission answer (or a Cancel / Reset).
+    // The stock last broadcast: the source changes under the feed without a request, so the Tick compares every frame.
     UPROPERTY()
-    TOptional<FMars_CookingFeed_PieceId> Active;
+    int32 LastStockAvailable = 0;
 
-    // SlotCapacity entries; a slot stays taken while reserved and once its piece is admitted.
     UPROPERTY()
-    TArray<bool> SlotTaken;
+    int32 LastStockAdmitted = 0;
 
     // The sample broadcast at Carry's end, kept through AwaitAdmission.
     UPROPERTY()
@@ -298,7 +296,7 @@ struct FMars_Fragment_CookingFeed
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Edges only: a reservation, an admission, a rejection or cancel that restored a slot, a reset.
+// Edges only, seen by the Tick: a reservation, an admission, a reset, and anything that changes what the source holds.
 delegate void FMars_Delegate_CookingFeed_OnStockChanged(FCk_Handle_CookingFeed InFeed, int32 InAvailable, int32 InAdmitted);
 event void FMars_Delegate_CookingFeed_OnStockChanged_MC(FCk_Handle_CookingFeed InFeed, int32 InAvailable, int32 InAdmitted);
 
@@ -330,8 +328,8 @@ struct FMars_Fragment_CookingFeed_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Reserve the lowest free slot and start the hand; refused (never deferred) while busy, empty or without a release node.
-// Payload-less: one placeholder field (request doctrine).
+// Reserve the source's lowest held piece and start the hand; refused (never deferred) while busy, without a source or
+// anything on it, or without a release node. Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_CookingFeed_BeginTransfer
 {
     UPROPERTY()
@@ -340,7 +338,7 @@ struct FMars_Request_CookingFeed_BeginTransfer
     FMars_Request_CookingFeed_BeginTransfer() {}
 }
 
-// Abandon the active transfer: its slot is restored and the hand is idle at once. A no-op while idle.
+// Abandon the active transfer: the reservation is dropped and the hand is idle at once. A no-op while idle.
 struct FMars_Request_CookingFeed_Cancel
 {
     UPROPERTY()
@@ -349,13 +347,29 @@ struct FMars_Request_CookingFeed_Cancel
     FMars_Request_CookingFeed_Cancel() {}
 }
 
-// A new attempt: the generation is bumped first (every older PieceId goes stale), then the stock refills and the hand idles.
+// A new attempt: the generation is bumped first (every older PieceId goes stale), then the transfer is dropped, the hand
+// idles and Admitted is zeroed. Nothing is refilled: the source platter is the stock.
 struct FMars_Request_CookingFeed_Reset
 {
     UPROPERTY()
     bool Requested = true;
 
     FMars_Request_CookingFeed_Reset() {}
+}
+
+// Draw from Source (invalid = none). A transfer in flight is cancelled first and the generation moves on; the same
+// platter again is a no-op.
+struct FMars_Request_CookingFeed_SetSource
+{
+    UPROPERTY()
+    FCk_Handle_Platter Source;
+
+    FMars_Request_CookingFeed_SetSource() {}
+
+    FMars_Request_CookingFeed_SetSource(FCk_Handle_Platter InSource)
+    {
+        Source = InSource;
+    }
 }
 
 // The cooking kernel's answer to a release. Honoured only while awaiting admission for exactly this PieceId.
@@ -380,12 +394,15 @@ struct FMars_Request_CookingFeed_ResolveAdmission
     }
 }
 
-// Applied Reset -> Cancel -> ResolveAdmission -> BeginTransfer, so a reset and the next attempt's first press can share a
-// drain and no late answer reaches the next attempt.
+// Applied Reset -> SetSource -> Cancel -> ResolveAdmission -> BeginTransfer, so a reset or a new source and the next
+// attempt's first press can share a drain and no late answer reaches the next attempt.
 struct FMars_Fragment_CookingFeed_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_CookingFeed_Reset> ResetRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_CookingFeed_SetSource> SetSourceRequests;
 
     UPROPERTY()
     TArray<FMars_Request_CookingFeed_Cancel> CancelRequests;

@@ -21,8 +21,10 @@ class UMars_AutoTest_Searing_TwoPiecesSearIndependently : UMars_AutoTestRig_Sear
         auto Spec = Make_TestSpec();
         Spec.Cook.SecondsPerFace = k_SecondsPerFace;
         BuildStation(InHandle, Spec);
+        Build_Pieces(2);
 
         Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("add two pieces side by side on the cold pan", n"Step_AddTwo");
         Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", 0, 3.0f);
         Add_Step("two identities, two entities, two bodies; turn the first onto +X", n"Step_AssertDistinctAndTurnFirst");
@@ -56,13 +58,11 @@ class UMars_AutoTest_Searing_TwoPiecesSearIndependently : UMars_AutoTestRig_Sear
         Assert_True(_Searing.Get_PieceEntity(_FirstId) != _Searing.Get_PieceEntity(_SecondId), "two entities");
         Assert_True(_Searing.Get_PieceBody(_FirstId) != _Searing.Get_PieceBody(_SecondId), "two bodies");
 
-        auto Body = _Searing.Get_PieceBody(_FirstId);
-        Assert_True(utils_jolt_body::Get_IsBodyAdded(Body), "the first piece's body is in the simulation");
+        Assert_True(utils_jolt_body::Get_IsBodyAdded(_Searing.Get_PieceBody(_FirstId)), "the first piece's body is in the simulation");
 
-        const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        const auto Location = PanBaseWorld.TransformPosition(FVector(k_FirstLocal.X, k_FirstLocal.Y, utils_searing::k_PanSurfaceZ + _Spec.Steak.HalfSize + 1.0));
-        const auto Rotation = (FQuat(PanBaseWorld.Rotator()) * FQuat(utils_searing::Make_FaceDownRotation(EMars_Searing_Face::PosX))).Rotator();
-        utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Location, Rotation));
+        const auto Reach = _Searing.Get_PieceHalfExtents(_FirstId).GetMax();
+        Teleport_Piece(_FirstId, FVector(k_FirstLocal.X, k_FirstLocal.Y, utils_searing::k_PanSurfaceZ + Reach + 1.0),
+            utils_searing::Make_FaceDownRotation(EMars_Searing_Face::PosX));
     }
 
     UFUNCTION()

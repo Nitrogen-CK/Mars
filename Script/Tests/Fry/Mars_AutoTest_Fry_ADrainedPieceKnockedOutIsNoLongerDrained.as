@@ -15,8 +15,10 @@ class UMars_AutoTest_Fry_ADrainedPieceKnockedOutIsNoLongerDrained : UMars_AutoTe
         auto Spec = Make_TestSpec();
         Spec.Receiver.DrainSeconds = k_DrainSeconds;
         BuildStation(InHandle, Spec);
+        Build_Pieces(1);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release a piece over the basket", n"Step_Release");
         Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", 0, 4.0f);
         Add_Step("drained once; knock it out over the oil", n"Step_AssertDrainedThenKnockOut");
@@ -29,7 +31,7 @@ class UMars_AutoTest_Fry_ADrainedPieceKnockedOutIsNoLongerDrained : UMars_AutoTe
 
     private FVector Get_OverBasket() const
     {
-        return k_BasketLocal + FVector(0.0, 0.0, float64(_Spec.Piece.HalfSize) + 3.0);
+        return k_BasketLocal + FVector(0.0, 0.0, Get_BoxHalfExtents().Z + 3.0);
     }
 
     UFUNCTION()
@@ -45,7 +47,7 @@ class UMars_AutoTest_Fry_ADrainedPieceKnockedOutIsNoLongerDrained : UMars_AutoTe
         Assert_Equals_Int(Count_Ids(_DrainedIds, _Piece), 1, "OnPieceDrained fired once");
         Assert_Equals_Int(_Fry.Get_Summary().Drained, 1, "the summary drains one");
 
-        Teleport(_Piece, FVector(-20.0, 0.0, float64(_Spec.Oil.SurfaceZ + _Spec.Piece.HalfSize + 1.0f)), FVector::ZeroVector);
+        Teleport(_Piece, FVector(-20.0, 0.0, float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0), FVector::ZeroVector);
     }
 
     UFUNCTION()

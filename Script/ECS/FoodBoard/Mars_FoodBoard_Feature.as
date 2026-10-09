@@ -27,6 +27,14 @@ enum EMars_FoodBoard_PlaceRefusal
     Gone
 }
 
+// Loose gives each released piece a body and keeps it in the Released ring; Handoff gives no body and forgets the piece:
+// it is whoever asked for it to hold (a platter) and the board never ends it.
+enum EMars_FoodBoard_ReleaseMode
+{
+    Loose,
+    Handoff
+}
+
 // What one Cut request did. Issued 0 is a knock: nothing straddled the plane, or the board had no room for another half.
 struct FMars_FoodBoard_CutIssue
 {
@@ -160,7 +168,8 @@ struct FMars_Fragment_FoodBoard_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Written only by the FoodBoard processor (and Add). A ledger, not an owner: every piece belongs to the world's transient
-// entity; the board ends the pieces it holds (Clear, its own destruction) and the oldest released past the ring.
+// entity; the board ends the pieces it holds (Clear, its own destruction) and the oldest released past the ring. A piece
+// handed off is in neither list.
 //
 // IsUntouched is true from Add and from every Clear; a placement sets it to whether the board was empty, and a committed cut
 // or a release that releases anything sets it false. So it is true exactly while the board holds nothing it was not handed
@@ -183,15 +192,16 @@ struct FMars_Fragment_FoodBoard
     UPROPERTY()
     TArray<FMars_FoodPiece_WorldPlane> Unparted;
 
-    // Chops that arrived while a parting was owed, oldest first, and whether a sweep waits behind them: the drain that parts
+    // Chops that arrived while a parting was owed, oldest first, and the sweeps waiting behind them: the drain that parts
     // re-queues them ahead of anything newer, so they cut the parted poses and a sweep never overtakes a chop. A Clear turns
-    // them into knocks. (Held here rather than re-queued every pass, which would spin the scheduler's pump while a cut is in
-    // flight. A held piece destroyed elsewhere mid-cut answers nothing: the backlog then waits for the board's next request.)
+    // the chops into knocks and drops the sweeps. (Held here rather than re-queued every pass, which would spin the
+    // scheduler's pump while a cut is in flight. A held piece destroyed elsewhere mid-cut answers nothing: the backlog then
+    // waits for the board's next request.)
     UPROPERTY()
     TArray<FMars_Request_FoodBoard_Cut> WaitingCuts;
 
     UPROPERTY()
-    bool IsReleaseWaiting = false;
+    TArray<FMars_Request_FoodBoard_Release> WaitingReleases;
 }
 
 // On every held piece; written only by the FoodBoard processor. PendingCutPlane (world, unit normal) is the plane of the cut
@@ -225,7 +235,8 @@ event void FMars_Delegate_FoodBoard_OnCutIssued_MC(FCk_Handle_FoodBoard InBoard,
 delegate void FMars_Delegate_FoodBoard_OnPieceCut(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative);
 event void FMars_Delegate_FoodBoard_OnPieceCut_MC(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative);
 
-// The piece has its body (setup may still be pending) and is no longer the board's to cut or clear.
+// The piece is no longer the board's to cut or clear. Loose: it has its body (setup may still be pending); Handoff: it has
+// none and lies where the board left it until its new holder takes it.
 delegate void FMars_Delegate_FoodBoard_OnReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_FoodBoard_OnReleased_MC(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece);
 
@@ -320,14 +331,24 @@ struct FMars_Request_FoodBoard_Cut
     }
 }
 
-// Release every held piece that is Ready and not cutting; a piece still cutting stays held. Several in one drain are one.
-// Payload-less: one placeholder field (request doctrine).
+// Release the held pieces that are Ready and not cutting; a piece still cutting stays held. Several in one drain apply in
+// order, each with its own mode and cap. Default: Loose, every free piece.
 struct FMars_Request_FoodBoard_Release
 {
     UPROPERTY()
-    bool Requested = true;
+    EMars_FoodBoard_ReleaseMode Mode = EMars_FoodBoard_ReleaseMode::Loose;
+
+    // Set: at most this many pieces leave, held order; unset: every free piece.
+    UPROPERTY()
+    TOptional<int32> MaxPieces;
 
     FMars_Request_FoodBoard_Release() {}
+
+    FMars_Request_FoodBoard_Release(EMars_FoodBoard_ReleaseMode InMode, TOptional<int32> InMaxPieces)
+    {
+        Mode = InMode;
+        MaxPieces = InMaxPieces;
+    }
 }
 
 // Applied Clear -> ResolveCut -> (parting) -> Place -> Cut -> Release: a clear and the next joint's placement can share a

@@ -12,6 +12,7 @@ class UMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInherits
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildFeed(InHandle, Make_TestSpec());
+        Add_Steps_SourceTheFeed();
 
         Add_Step("start moving the release node", n"Step_StartMoving");
         Add_Step_WaitUntil("the node has moved for 0.2 s", n"Check_MovedAWhile", 0, 1.0f);

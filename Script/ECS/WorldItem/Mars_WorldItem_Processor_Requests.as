@@ -29,10 +29,16 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
         Self.Request_TryRemove(FMars_Fragment_WorldItem_Requests);
 
         for (const auto& Request : CarryRequests)
-        { HandleMountRequest(Self, InState, FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount::Carried, Request.Carrier)); }
+        {
+            HandleMountRequest(Self, InState, FMars_WorldItem_MountRequest(EMars_WorldItem_Mount::Carried, Request.Carrier,
+                FMars_WorldItem_MountOverride(Request.Point, Request.Offset)));
+        }
 
         for (const auto& Request : HoldRequests)
-        { HandleMountRequest(Self, InState, FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount::Held, Request.Carrier)); }
+        {
+            HandleMountRequest(Self, InState, FMars_WorldItem_MountRequest(EMars_WorldItem_Mount::Held, Request.Carrier,
+                FMars_WorldItem_MountOverride()));
+        }
 
         for (const auto& Request : ReleaseRequests)
         { HandleReleaseRequest(Self, InState, Request); }
@@ -44,27 +50,30 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
     //   Carry: World | Held -> Carried
     //   Hold:  Carried      -> Held
-    // InMount names the mount and the carrier; its attach node and offset are resolved here.
+    // InRequest names the mount and the carrier; its attach node and offset are resolved here, from InRequest.Override where
+    // a Carry set them, else from the definition.
     private void HandleMountRequest(FCk_Handle_WorldItem& InWorldItem,
                                     FMars_Fragment_WorldItem& InState,
-                                    FMars_Fragment_WorldItem_PendingMount InMount)
+                                    const FMars_WorldItem_MountRequest& InRequest)
     {
         const auto TargetMount = InWorldItem.Get_TargetMount();
-        const auto IsCarry = InMount.Mount == EMars_WorldItem_Mount::Carried;
+        const auto IsCarry = InRequest.Mount == EMars_WorldItem_Mount::Carried;
         const auto IsLegal = IsCarry
             ? (TargetMount == EMars_WorldItem_Mount::World || TargetMount == EMars_WorldItem_Mount::Held)
             : TargetMount == EMars_WorldItem_Mount::Carried;
 
-        if (DoEnsureLegal(InWorldItem, InMount.Mount, IsLegal) == false)
+        if (DoEnsureLegal(InWorldItem, InRequest.Mount, IsLegal) == false)
         { return; }
 
+        const auto Override = InRequest.Override;
         const UMars_ItemTrait_Presentation Presentation = utils_world_item::TryGet_Presentation(InWorldItem);
-        const auto PointTag = IsCarry ? Presentation.Mounting.CarryPoint : GameplayTags::AttachPoint_Mars_Hand;
+        const auto PointTag = IsCarry ? (Override.Point.IsSet() ? Override.Point.GetValue() : Presentation.Mounting.CarryPoint)
+                                      : GameplayTags::AttachPoint_Mars_Hand;
 
-        auto AttachPoints = InMount.Carrier.As_AttachPoints(ECk_SanityCheck::UnChecked);
+        auto AttachPoints = InRequest.Carrier.As_AttachPoints(ECk_SanityCheck::UnChecked);
         const auto HasPoint = ck::IsValid(AttachPoints) && AttachPoints.Has_AttachPoint(PointTag);
         if (ck::EnsureIfNot(HasPoint,
-            f"[WorldItem] Mount [{InMount.Mount :n}] of [{InWorldItem.ToString()}]: carrier [{InMount.Carrier.ToString()}] publishes no attach point [{PointTag.ToString()}]"))
+            f"[WorldItem] Mount [{InRequest.Mount :n}] of [{InWorldItem.ToString()}]: carrier [{InRequest.Carrier.ToString()}] publishes no attach point [{PointTag.ToString()}]"))
         { return; }
 
         auto Pickup = InState.Pickup;
@@ -78,9 +87,10 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
                 FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Kinematic));
         }
 
-        auto Mount = InMount;
+        auto Mount = FMars_Fragment_WorldItem_PendingMount(InRequest.Mount, InRequest.Carrier);
         Mount.Node = AttachPoints.Get_AttachPoint(PointTag);
-        Mount.Offset = IsCarry ? Presentation.Mounting.CarryOffset : Presentation.Mounting.HeldOffset;
+        Mount.Offset = IsCarry ? (Override.Offset.IsSet() ? Override.Offset.GetValue() : Presentation.Mounting.CarryOffset)
+                               : Presentation.Mounting.HeldOffset;
 
         auto& Pending = InWorldItem.AddOrGet_Fragment(FMars_Fragment_WorldItem_PendingMount);
         Pending = Mount;

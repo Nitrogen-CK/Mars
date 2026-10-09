@@ -69,7 +69,7 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_FoodBoard_ResolveCut> ResolveCutRequests = InRequests.ResolveCutRequests;
         TArray<FMars_Request_FoodBoard_Place> PlaceRequests = InRequests.PlaceRequests;
         TArray<FMars_Request_FoodBoard_Cut> CutRequests = InRequests.CutRequests;
-        const auto HasRelease = InRequests.ReleaseRequests.Num() > 0;
+        TArray<FMars_Request_FoodBoard_Release> ReleaseRequests = InRequests.ReleaseRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Board.Request_TryRemove(FMars_Fragment_FoodBoard_Requests);
@@ -90,7 +90,7 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         if (InState.Unparted.Num() > 0 && HasChops)
         {
             InState.WaitingCuts.Append(CutRequests);
-            InState.IsReleaseWaiting = InState.IsReleaseWaiting || HasRelease;
+            InState.WaitingReleases.Append(ReleaseRequests);
             if (CutRequests.Num() > 0)
             { ck::Trace(f"[FoodBoard] [{Drain.Board.ToString()}] {CutRequests.Num()} chop(s) wait for the cuts in flight ({InState.WaitingCuts.Num()} waiting)"); }
         }
@@ -98,16 +98,15 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         {
             auto& Next = Drain.Board.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
             Next.CutRequests.Append(CutRequests);
-            if (HasRelease)
-            { Next.ReleaseRequests.Add(FMars_Request_FoodBoard_Release()); }
+            Next.ReleaseRequests.Append(ReleaseRequests);
         }
         else
         {
             for (const auto& Request : CutRequests)
             { Apply_Cut(Drain, InState, Request); }
 
-            if (HasRelease)
-            { Apply_Release(Drain, InState); }
+            for (const auto& Request : ReleaseRequests)
+            { Apply_Release(Drain, InState, Request); }
         }
 
         Broadcast(Drain);
@@ -130,7 +129,7 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto Knocked = InState.WaitingCuts.Num();
         InState.WaitingCuts.Empty();
-        InState.IsReleaseWaiting = false;
+        InState.WaitingReleases.Empty();
 
         ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] cleared: {Held.Num()} held piece(s) destroyed, {InState.Released.Num()} released kept, {Knocked} waiting chop(s) knocked");
     }
@@ -235,22 +234,21 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] parted along {Planes.Num()} cut plane(s) ({InState.Held.Num()} held)");
     }
 
-    // The waiting chops (and a sweep behind them) go back on the queue, oldest first, ahead of anything this drain adds; the
-    // next pass applies them, after the parting moves have landed.
+    // The waiting chops (and the sweeps behind them) go back on the queue, oldest first, ahead of anything this drain adds;
+    // the next pass applies them, after the parting moves have landed.
     private void Flush_Waiting(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
     {
-        if (InState.WaitingCuts.Num() == 0 && InState.IsReleaseWaiting == false)
+        if (InState.WaitingCuts.Num() == 0 && InState.WaitingReleases.Num() == 0)
         { return; }
 
         auto& Next = InDrain.Board.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
         Next.CutRequests.Append(InState.WaitingCuts);
-        if (InState.IsReleaseWaiting)
-        { Next.ReleaseRequests.Add(FMars_Request_FoodBoard_Release()); }
+        Next.ReleaseRequests.Append(InState.WaitingReleases);
 
         ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] the board is quiet: {InState.WaitingCuts.Num()} waiting chop(s) go next");
 
         InState.WaitingCuts.Empty();
-        InState.IsReleaseWaiting = false;
+        InState.WaitingReleases.Empty();
         InDrain.Flushed = true;
     }
 
@@ -387,35 +385,51 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         return true;
     }
 
-    // Every held piece free to move gets a dynamic convex body of its own mesh and mass and the board's release velocity, and
-    // moves to the end of Released. A piece still cutting (or not Ready) stays held, so the halves of a cut in flight land on
-    // the board. Past MaxReleasedPieces the oldest released pieces are destroyed.
-    private void Apply_Release(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
+    // Every held piece free to move leaves, in held order, until MaxPieces have left. A piece still cutting (or not Ready),
+    // or past the cap, stays held, so the halves of a cut in flight land on the board. Loose: the piece gets a dynamic convex
+    // body of its own mesh and mass and the board's release velocity, and moves to the end of Released; past
+    // MaxReleasedPieces the oldest released pieces are destroyed. Handoff: the piece is only let go, where it lies.
+    private void Apply_Release(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, const FMars_Request_FoodBoard_Release& InRequest)
     {
         const auto Tuners = InDrain.Board.Get_Tuners();
         FCk_Handle BoardEntity = InDrain.Board;
         const auto BoardWorld = utils_transform::Get_EntityCurrentTransform(BoardEntity.As_Transform());
         const auto Velocity = BoardWorld.GetRotation().RotateVector(Tuners.Release.VelocityLocal);
+        const auto IsLoose = InRequest.Mode == EMars_FoodBoard_ReleaseMode::Loose;
 
         TArray<FCk_Handle_FoodPiece> StillHeld;
+        auto ReleasedCount = 0;
         for (const auto& Held : InState.Held)
         {
             auto Piece = Held;
-            if (Get_IsFree(Piece) == false)
+            const auto IsCapped = InRequest.MaxPieces.IsSet() && ReleasedCount >= InRequest.MaxPieces.GetValue();
+            if (IsCapped || Get_IsFree(Piece) == false)
             {
                 StillHeld.Add(Piece);
                 continue;
             }
 
-            Loosen(Piece, Tuners.Release, Velocity);
-            InState.Released.Add(Piece);
+            if (IsLoose)
+            {
+                Loosen(Piece, Tuners.Release, Velocity);
+                InState.Released.Add(Piece);
+            }
+            else
+            { Let_Go(Piece); }
+
             InDrain.Released.Add(Piece);
+            ++ReleasedCount;
         }
 
-        const auto ReleasedCount = InState.Held.Num() - StillHeld.Num();
         InState.Held = StillHeld;
         if (ReleasedCount > 0)
         { InState.IsUntouched = false; }
+
+        if (IsLoose == false)
+        {
+            ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] handed off {ReleasedCount} piece(s) ({StillHeld.Num()} still held)");
+            return;
+        }
 
         const auto Destroyed = Trim_Released(InState, Tuners.MaxReleasedPieces);
 
@@ -447,6 +461,12 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         const auto IsObserved = utils_jolt_body::TryPromise_OnSetupResolved(Body, FCk_Delegate_JoltBody_OnSetupResolved(this, n"OnReleasedBodySetupResolved"));
         ck::EnsureIfNot(IsObserved, f"[FoodBoard] released piece [{InPiece.ToString()}] has a body whose setup cannot be observed");
 
+        Let_Go(InPiece);
+    }
+
+    // The board stops watching the piece's cuts and no longer names it.
+    private void Let_Go(FCk_Handle_FoodPiece& InPiece)
+    {
         InPiece.UnbindFrom_OnCutResolved(FMars_Delegate_FoodPiece_OnCutResolved(this, n"OnHeldPieceCutResolved"));
         InPiece.Request_TryRemove(FMars_Fragment_FoodBoard_Membership);
     }

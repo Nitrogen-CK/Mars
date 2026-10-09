@@ -5,11 +5,12 @@
 // the left rests flat near the board's left edge, outside the cleaver's travel (the script sets the Dicing spec's
 // BoardHalfWidth to HandHalfTravel).
 //
-// The station entity carries Dicing (the herb minigame) and FoodBoard (the pieces on the board); the station's state machine
-// (Mars_DicingStation_Hfsm.as) turns every chop into a board cut and the sweep into a release. This script assembles what
-// is seen and heard: it builds the Food definition's joint whenever the board is cleared (a FoodPiece on RuntimeMesh under
-// the world's transient entity, laid at the pile point), gives every piece the food's display, and gives the furniture
-// static bodies so released pieces land on it.
+// The station entity carries Dicing (the herb minigame) and FoodBoard (the pieces on the board), and two platter docks sit
+// beside the board: the input platter (-Y) the food arrives on and the finished tray (+Y) the sweep fills. The station's
+// state machine (Mars_DicingStation_Hfsm.as) takes the joint off the input platter onto the board, turns every chop into a
+// board cut and hands the swept pieces to the tray. This script assembles what is seen and heard: it dresses the halves of
+// every cut from the cut piece's own food definition, gives the furniture static bodies so loose pieces land on it, and
+// keeps the label in step with the board and the tray.
 class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
 {
     default _ShowInPlaceActors = true;
@@ -17,12 +18,16 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_Dicing_Spec Dicing;
 
-    // A Params() spawn must set it: the generated spawn params carry an object default as null.
-    UPROPERTY(ExposeOnSpawn)
-    UMars_CuttableFood_Def Food = mars::CuttableFood_MeatSlab_Mars;
+    // The input platter brings one whole piece; the finished tray docks empty.
+    UPROPERTY(EditDefaultsOnly, Category = "Docks")
+    FMars_Station_DockPolicies Docks;
+    default Docks.Input.WholeOnly = true;
+    default Docks.Input.MaxPieces = TOptional<int32>(1);
+    default Docks.Input.RequireEmpty = TOptional<bool>(false);
+    default Docks.Output.RequireEmpty = TOptional<bool>(true);
 
-    // The cut halves part 0.75 cm each way; a sweep slides the pieces toward the finished tray (+Y). A full board only
-    // knocks (the label says so); released pieces stay at least two sweeps' worth before the oldest go.
+    // The cut halves part 0.75 cm each way; a loose release slides the pieces toward the finished tray (+Y). A full board
+    // only knocks (the label says so); released pieces stay at least two sweeps' worth before the oldest go.
     UPROPERTY(EditDefaultsOnly, Category = "Board")
     FMars_FoodBoard_Tuners BoardTuners;
     default BoardTuners.MaxHeldPieces = 32;
@@ -30,18 +35,16 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     default BoardTuners.SeparationCm = 1.5f;
     default BoardTuners.Release = FMars_FoodBoard_ReleaseTuners(n"PhysicsActor", 0.6f, 0.1f, FVector(0.0, 240.0, 0.0));
 
-    // PrepTable_Mars_SM: 160 wide (the blockout was 140), the extra 10 cm a side making room for the ingredient bowl and
-    // the finished tray beside the 90 cm board (station_spec.py PROPS["PrepTable"], CuttingStation_Layout.json).
+    // PrepTable_Mars_SM: 160 wide (the blockout was 140), the extra 10 cm a side making room for the input platter and the
+    // finished tray beside the 90 cm board (station_spec.py PROPS["PrepTable"], CuttingStation_Layout.json).
     private const float64 TableWidth = 160.0;
     private const float64 TableDepth = 80.0;
     private const float64 TableHeight = constants_station::k_CounterHeight;
     // Close in: the capsule (radius 39) stands almost touching the table edge.
     private const float64 StandGap = 43.0;
-    // The ingredient bowl (left, -Y) and the finished tray (right, +Y) sit beside the board at the table's Input / Output
-    // sockets; both meshes pivot at the centre of their inner floor, so they are placed their floor thickness above the top.
+    // The input platter's dock (left, -Y) and the finished tray's (right, +Y) sit beside the board at the table's Input /
+    // Output sockets.
     private const float64 BowlY = 62.0;
-    private const float64 BowlFloor = 3.0;
-    private const float64 TrayFloor = 1.5;
     // The operating view, pitched hard onto the board from ViewGap uu off the table edge and ViewAboveBoard uu over the
     // board top. It lives in the station frame (Camera.ViewLocal), so the framing holds whatever the operator's eye height.
     private const float32 CameraPitch = -48.0f;
@@ -65,9 +68,8 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     // The left glove's grip bone above the board (the palm's thickness, FMars_FPHands_Spec.PalmSurfaceOffset).
     private const float64 PalmLift = 2.5;
 
-    // The food and the cleaver sit over the board's middle; the band marks the strip in front of the food (operator side),
-    // just above the board so it never z-fights it.
-    private const float64 PileX = 0.0;
+    // The food (utils_dicing::Get_PileLocal) and the cleaver sit over the board's middle; the band marks the strip in front of
+    // the food (operator side), just above the board so it never z-fights it.
     private const float64 BandX = -24.0;
     private const float64 BandDepth = 10.0;
     private const float64 BandLift = 0.5;
@@ -103,10 +105,11 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     // Dicing with the geometry-bound fields set (DoConstruct); what the feature and the visuals read.
     private FMars_Dicing_Spec _DicingSpec;
     private FCk_Handle_Dicing _DicingHandle;
-    // Invalid when the station has no usable Food.
     private FCk_Handle_FoodBoard _Board;
-    // The joint built for the last clear, until the board places it: a clear meanwhile must not build a second.
-    private FCk_Handle_FoodPiece _PendingJoint;
+    private FCk_Handle_PlatterDock _InputDock;
+    private FCk_Handle_PlatterDock _OutputDock;
+    // The finished tray docked on _OutputDock, watched while it is there so the label follows its room.
+    private FCk_Handle_Platter _OutputPlatter;
     private FCk_Handle_SceneNode _BandNode;
     private FCk_Handle_SceneNode _LateralNode;
     private FCk_Handle_Mover _ChopMover;
@@ -119,7 +122,7 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     private bool _OutlineClaimed = false;
 
     // The base composes the transform, the visuals and nodes (AddVisuals) and the Station (Configure_Spec, grips on the
-    // registered nodes); the minigame and the board need the station, so they are composed after.
+    // registered nodes); the minigame, the board and the docks need the station, so they are composed after.
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
@@ -138,7 +141,10 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         _DicingSpec.Nodes = FMars_Dicing_Nodes(_LateralNode, _ChopMover);
         _DicingHandle = utils_dicing::Add(InHandle, _DicingSpec);
         _ChopSound = assets::load::KnifeChop_Cue();
-        _Board = Add_Board(InHandle);
+
+        // A rejected spec already ensured in utils_foodboard::Add.
+        _Board = utils_foodboard::Add(InHandle, FMars_FoodBoard_Spec(BoardTuners));
+        Add_Docks();
         return Flow;
     }
 
@@ -158,14 +164,15 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         if (ck::IsValid(_Board))
         {
             _Board.BindTo_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
-            _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
-            _Board.BindTo_OnPlaceRefused(FMars_Delegate_FoodBoard_OnPlaceRefused(this, n"OnBoardPlaceRefused"));
             _Board.BindTo_OnPieceCut(FMars_Delegate_FoodBoard_OnPieceCut(this, n"OnBoardPieceCut"));
             _Board.BindTo_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnBoardCutIssued"));
             _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+        }
 
-            // The joint is built only on OnCleared, so this clear and the first Idle enter's cannot build two.
-            _Board.Request_Clear(FMars_Request_FoodBoard_Clear());
+        if (ck::IsValid(_OutputDock))
+        {
+            _OutputDock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnOutputDocked"));
+            _OutputDock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnOutputUndocked"));
         }
 
         if (ck::Is_NOT_Valid(_DicingHandle))
@@ -194,18 +201,18 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         if (ck::IsValid(_Board))
         {
             _Board.UnbindFrom_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
-            _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
-            _Board.UnbindFrom_OnPlaceRefused(FMars_Delegate_FoodBoard_OnPlaceRefused(this, n"OnBoardPlaceRefused"));
             _Board.UnbindFrom_OnPieceCut(FMars_Delegate_FoodBoard_OnPieceCut(this, n"OnBoardPieceCut"));
             _Board.UnbindFrom_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnBoardCutIssued"));
             _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
         }
 
-        // The board ends what it holds; a joint it has not placed yet is nobody else's.
-        if (ck::IsValid(_PendingJoint))
-        { utils_entity_lifetime::Request_DestroyEntity(_PendingJoint); }
+        if (ck::IsValid(_OutputDock))
+        {
+            _OutputDock.UnbindFrom_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnOutputDocked"));
+            _OutputDock.UnbindFrom_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnOutputUndocked"));
+        }
 
-        _PendingJoint = FCk_Handle_FoodPiece();
+        Unwatch_OutputPlatter();
 
         if (_OutlineClaimed && ck::IsValid(_BandNode) && ck::IsValid(_Root))
         {
@@ -266,21 +273,13 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         const auto BoardTop = Get_BoardTop();
 
         // The station props (station_spec.py): the table pivots at its floor contact, the board at the centre of its
-        // underside (exactly the blockout board's 50 x 90 x 4 at BoardX), the bowl and the tray at their inner floor.
+        // underside (exactly the blockout board's 50 x 90 x 4 at BoardX). The docked platters are the bowl and the tray.
         AddFurniture(InRoot, FMars_MeshPart(FTransform::Identity,
             assets::load::PrepTable_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_Table"));
 
         AddFurniture(InRoot, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(BoardX, 0.0, TableHeight)),
             assets::load::CuttingBoard_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_Board"));
-
-        AddFurniture(InRoot, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(BoardX, -BowlY, TableHeight + BowlFloor)),
-            assets::load::PrepBowl_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_InputBowl"));
-
-        AddFurniture(InRoot, FMars_MeshPart(
-            FTransform(FRotator::ZeroRotator, FVector(BoardX, BowlY, TableHeight + TrayFloor)),
-            assets::load::PrepTray_Mars_SM(), nullptr, collision::profile::BlockAll, n"DicingStation_OutputTray"));
 
         // The band: a flat slab across the strip in front of the food, centred on the band; outlined in DoBeginPlay.
         _BandNode = utils_scene_node::Create(InRoot,
@@ -357,70 +356,25 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
             FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, -FVector::UpVector, -FVector::RightVector), GripLocal)).As_Transform();
     }
 
-    // No usable food = an herb station without a board.
-    private FCk_Handle_FoodBoard Add_Board(FCk_Handle& InHandle)
+    // The two docks on the table's sockets beside the board, children of the root (they die with the station), lifted so a
+    // docked platter's underside rests on the top. A rejected spec already ensured in utils_platter_dock::Create.
+    private void Add_Docks()
     {
-        if (ck::EnsureIfNot(ck::IsValid(Food), f"[DicingStation] [{InHandle.ToString()}] has no Food: a Params() spawn must set it"))
-        { return FCk_Handle_FoodBoard(); }
+        const auto DockZ = TableHeight + constants_platter::k_FloorAboveBase;
+        auto InputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, Docks.Input,
+            FTransform(FRotator::ZeroRotator, FVector(BoardX, -BowlY, DockZ)));
+        InputSpec.Name = FText::FromString("input platter");
+        _InputDock = utils_platter_dock::Create(_Root, InputSpec);
 
-        const auto Validation = Food.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid(), f"[DicingStation] [{InHandle.ToString()}] rejected its food: {Validation.Get_Error()}"))
-        { return FCk_Handle_FoodBoard(); }
-
-        // A rejected spec already ensured in utils_foodboard::Add.
-        return utils_foodboard::Add(InHandle, FMars_FoodBoard_Spec(BoardTuners));
+        auto OutputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Output, Docks.Output,
+            FTransform(FRotator::ZeroRotator, FVector(BoardX, BowlY, DockZ)));
+        OutputSpec.Name = FText::FromString("finished tray");
+        _OutputDock = utils_platter_dock::Create(_Root, OutputSpec);
     }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Food
-    //----------------------------------------------------------------------------------------------------------------------
 
     private float64 Get_BoardTop() const
     {
         return TableHeight + BoardThickness;
-    }
-
-    // The whole joint, under the world's transient entity (a piece outlives the station's reset; the board ends the ones it
-    // holds), at the pile point in the food's layout and at unit scale (pieces are cut and simulated unscaled). The board
-    // takes it while it still imports; it is shown once Ready.
-    private void Build_Joint()
-    {
-        const auto Layout = FTransform(FRotator(0.0, Food.Layout.YawDegrees, 0.0), FVector(0.0, 0.0, Food.Layout.LiftCm));
-        const auto PileLocal = FTransform(FRotator::ZeroRotator, FVector(PileX, 0.0, Get_BoardTop()));
-        auto JointWorld = Layout * PileLocal * utils_transform::Get_EntityCurrentTransform(_Root);
-        JointWorld.SetScale3D(FVector::OneVector);
-
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        utils_transform::Add(Entity, JointWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(Food.Data.Mesh));
-
-        // A rejected spec already ensured in utils_foodpiece::Add.
-        auto Joint = utils_foodpiece::Add(Entity, FMars_FoodPiece_Spec(FMars_FoodPiece_Data(Food.Data.MassKg), Food.Tuners, Food.Visuals.Cap));
-        if (ck::Is_NOT_Valid(Joint))
-        {
-            utils_entity_lifetime::Request_DestroyEntity(Entity);
-            return;
-        }
-
-        Joint.BindTo_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
-        _PendingJoint = Joint;
-        _Board.Request_Place(FMars_Request_FoodBoard_Place(Joint));
-    }
-
-    // A piece a clear has already ended (it raced its own import) is not shown.
-    private void Add_Display(FCk_Handle_FoodPiece InPiece)
-    {
-        if (utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
-        { return; }
-
-        auto Spec = FCk_RuntimeMeshDisplay_Spec();
-        Spec.Set_Geometry(InPiece.Get_Geometry());
-        Spec.Set_Visuals(Food.Visuals.Display);
-
-        FCk_Handle Entity = InPiece;
-        auto Owner = Entity.As_Transform();
-        // A rejected display already ensured in utils_runtime_mesh_display::Add.
-        utils_runtime_mesh_display::Add(Owner, Spec);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -438,13 +392,26 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         { return; }
 
         const auto StateLabel = Get_StateLabel(_DicingHandle.Get_MaterialState(), _DicingHandle.Get_RequestedState());
-        if (Get_IsBoardFull() == false)
+        const auto Tray = ck::IsValid(_OutputDock) ? _OutputDock.Get_Platter() : FCk_Handle_Platter();
+        if (ck::Is_NOT_Valid(Tray))
         {
-            Text.SetText(StateLabel);
+            Text.SetText(FText::FromString(f"{StateLabel}\nno tray: dock one to sweep"));
             return;
         }
 
-        Text.SetText(FText::FromString(f"{StateLabel}\nboard full: sweep to tray"));
+        if (Tray.Get_IsFull())
+        {
+            Text.SetText(FText::FromString(f"{StateLabel}\ntray full"));
+            return;
+        }
+
+        if (Get_IsBoardFull())
+        {
+            Text.SetText(FText::FromString(f"{StateLabel}\nboard full: sweep to tray"));
+            return;
+        }
+
+        Text.SetText(StateLabel);
     }
 
     // A full board's chops only knock until a sweep clears it.
@@ -572,11 +539,6 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
     private void OnBoardCleared(FCk_Handle_FoodBoard InBoard)
     {
         Refresh_Label();
-
-        if (ck::IsValid(_PendingJoint))
-        { return; }
-
-        Build_Joint();
     }
 
     UFUNCTION()
@@ -591,39 +553,57 @@ class UMars_DicingStation_EntityScript : UMars_Station_EntityScript
         Refresh_Label();
     }
 
-    UFUNCTION()
-    private void OnBoardPlaced(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
-    {
-        if (InPiece == _PendingJoint)
-        { _PendingJoint = FCk_Handle_FoodPiece(); }
-    }
-
-    // An empty board has room for its joint, and nothing else ends a joint before it is placed: a refusal is a defect. The
-    // joint goes, so the next clear builds another.
-    UFUNCTION()
-    private void OnBoardPlaceRefused(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece, EMars_FoodBoard_PlaceRefusal InRefusal)
-    {
-        if (InPiece != _PendingJoint)
-        { return; }
-
-        ck::EnsureIfNot(false, f"[DicingStation] the board [{InBoard.ToString()}] refused its joint [{InPiece.ToString()}]: {InRefusal :n}");
-        _PendingJoint = FCk_Handle_FoodPiece();
-        if (ck::IsValid(InPiece))
-        { utils_entity_lifetime::Request_DestroyEntity(InPiece); }
-    }
-
-    UFUNCTION()
-    private void OnJointReady(FCk_Handle_FoodPiece InPiece)
-    {
-        Add_Display(InPiece);
-    }
-
-    // The halves are born Ready.
+    // The halves are born Ready and inherit the source's definition: they wear its food's display, whatever station built it.
     UFUNCTION()
     private void OnBoardPieceCut(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InSource, FCk_Handle_FoodPiece InPositive, FCk_Handle_FoodPiece InNegative)
     {
-        Add_Display(InPositive);
-        Add_Display(InNegative);
+        const UMars_Food_Def Def = InPositive.Get_Definition().Get();
+        if (ck::EnsureIfNot(ck::IsValid(Def), "[DicingStation] a cut piece has no definition to dress its halves with"))
+        { return; }
+
+        Def.Add_Display(InPositive);
+        Def.Add_Display(InNegative);
         Refresh_Label();
+    }
+
+    UFUNCTION()
+    private void OnOutputDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    {
+        Unwatch_OutputPlatter();
+
+        _OutputPlatter = InPlatter;
+        _OutputPlatter.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));
+        _OutputPlatter.BindTo_OnUnloaded(FMars_Delegate_Platter_OnUnloaded(this, n"OnTrayUnloaded"));
+        Refresh_Label();
+    }
+
+    UFUNCTION()
+    private void OnOutputUndocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    {
+        Unwatch_OutputPlatter();
+        Refresh_Label();
+    }
+
+    UFUNCTION()
+    private void OnTrayLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, int32 InSlot)
+    {
+        Refresh_Label();
+    }
+
+    UFUNCTION()
+    private void OnTrayUnloaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
+    {
+        Refresh_Label();
+    }
+
+    private void Unwatch_OutputPlatter()
+    {
+        if (ck::IsValid(_OutputPlatter))
+        {
+            _OutputPlatter.UnbindFrom_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));
+            _OutputPlatter.UnbindFrom_OnUnloaded(FMars_Delegate_Platter_OnUnloaded(this, n"OnTrayUnloaded"));
+        }
+
+        _OutputPlatter = FCk_Handle_Platter();
     }
 }

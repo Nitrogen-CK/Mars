@@ -1,10 +1,8 @@
 // What one drain changed, broadcast after every request is applied: the transfers it settled, the presses it refused, and
-// the stock and phase it started from (their edges are the difference).
+// the phase it started from (its edge is the difference). The stock edge is the Tick's: it changes without a request.
 struct FMars_CookingFeed_Drain
 {
     FCk_Handle_CookingFeed Feed;
-    int32 StartAvailable = 0;
-    int32 StartAdmitted = 0;
     EMars_CookingFeed_Phase StartPhase = EMars_CookingFeed_Phase::Idle;
     // In parallel: one entry per settled transfer.
     TArray<FMars_CookingFeed_PieceId> SettledPieces;
@@ -12,12 +10,13 @@ struct FMars_CookingFeed_Drain
     TArray<EMars_CookingFeed_Refusal> Refusals;
 }
 
-// Drains Reset -> Cancel -> ResolveAdmission -> BeginTransfer, then broadcasts: every settle and refusal in order, the stock
-// edge, the phase edge. Reset bumps the generation before clearing anything (a reservation it finds settles Cancelled under
-// its old id); Cancel restores a reserved slot and idles the hand; ResolveAdmission spends (Accepted) or restores (Rejected)
-// the reservation only while awaiting admission for exactly that piece, every other answer is a traced no-op; BeginTransfer
-// reserves the lowest free slot, and every press beyond the first in a drain, or while busy or empty, is refused, never
-// deferred. Nothing is spent before an Accepted answer.
+// Drains Reset -> SetSource -> Cancel -> ResolveAdmission -> BeginTransfer, then broadcasts: every settle and refusal in
+// order, the phase edge. Reset bumps the generation before clearing anything (a reservation it finds settles Cancelled under
+// its old id); SetSource cancels a transfer in flight, bumps the generation and swaps the platter; Cancel drops a
+// reservation and idles the hand; ResolveAdmission counts (Accepted) or drops (Rejected) the reservation only while
+// awaiting admission for exactly that piece, every other answer is a traced no-op; BeginTransfer reserves the source's
+// lowest held piece, and every press beyond the first in a drain, or while busy or empty, is refused, never deferred. The
+// feed never loads or unloads the source: control does.
 class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -35,11 +34,10 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Drain = FMars_CookingFeed_Drain();
         Drain.Feed = InHandle.As_CookingFeed();
-        Drain.StartAvailable = InState.Available;
-        Drain.StartAdmitted = InState.Admitted;
         Drain.StartPhase = InState.Phase;
 
         const auto HasReset = InRequests.ResetRequests.Num() > 0;
+        TArray<FMars_Request_CookingFeed_SetSource> SetSourceRequests = InRequests.SetSourceRequests;
         const auto HasCancel = InRequests.CancelRequests.Num() > 0;
         TArray<FMars_Request_CookingFeed_ResolveAdmission> ResolveRequests = InRequests.ResolveAdmissionRequests;
         const auto BeginCount = InRequests.BeginTransferRequests.Num();
@@ -49,6 +47,9 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (HasReset)
         { Apply_Reset(Drain, InState); }
+
+        for (const auto& Request : SetSourceRequests)
+        { Apply_SetSource(Drain, InState, Request); }
 
         if (HasCancel)
         { Apply_Cancel(Drain, InState); }
@@ -62,28 +63,39 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         Broadcast(Drain, InState);
     }
 
-    // The generation moves first: an answer for any older piece is stale from here on.
+    // The generation moves first: an answer for any older piece is stale from here on. The source keeps what it holds.
     private void Apply_Reset(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState)
     {
-        const auto Spec = InDrain.Feed.Get_Spec();
         InState.Generation += 1;
 
         if (InState.Active.IsSet())
-        { Record_Settle(InDrain, InState.Active.GetValue(), EMars_CookingFeed_Settle::Cancelled); }
+        { Record_Settle(InDrain, InState.Active.GetValue().Id, EMars_CookingFeed_Settle::Cancelled); }
 
-        InState.Active.Reset();
-        InState.Phase = EMars_CookingFeed_Phase::Idle;
-        InState.PhaseSeconds = 0.0f;
-        InState.Available = Spec.Supply.InitialCount;
+        utils_cooking_feed::Cancel_Active(InState);
         InState.Admitted = 0;
         InState.PendingRelease = FMars_CookingFeed_Release();
-        for (int32 Slot = 0; Slot < InState.SlotTaken.Num(); ++Slot)
-        { InState.SlotTaken[Slot] = false; }
 
-        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] reset: generation {InState.Generation}, {InState.Available} pieces, hand idle");
+        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] reset: generation {InState.Generation}, {utils_cooking_feed::Get_Available(InState)} on the source, hand idle");
     }
 
-    // A reservation still held goes back to its slot; a hand already returning (its piece answered) is simply home.
+    // A transfer in flight is drawn from the old platter, so it is cancelled first; then the generation moves on.
+    private void Apply_SetSource(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState,
+                                 const FMars_Request_CookingFeed_SetSource& InRequest)
+    {
+        if (InRequest.Source == InState.Source)
+        { return; }
+
+        if (InState.Active.IsSet())
+        { Apply_Cancel(InDrain, InState); }
+
+        InState.Generation += 1;
+        InState.Source = InRequest.Source;
+
+        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] source -> [{InState.Source.ToString()}]: generation {InState.Generation}, {utils_cooking_feed::Get_Available(InState)} on it");
+    }
+
+    // A reservation still held is dropped (its piece never left the source); a hand already returning (its piece answered) is
+    // simply home.
     private void Apply_Cancel(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState)
     {
         if (InState.Phase == EMars_CookingFeed_Phase::Idle)
@@ -92,21 +104,15 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        if (InState.Active.IsSet())
-        {
-            const auto Piece = InState.Active.GetValue();
-            Restore_Slot(InState, Piece);
-            Record_Settle(InDrain, Piece, EMars_CookingFeed_Settle::Cancelled);
-            InState.Active.Reset();
-        }
+        const auto Active = InState.Active;
+        if (utils_cooking_feed::Cancel_Active(InState))
+        { Record_Settle(InDrain, Active.GetValue().Id, EMars_CookingFeed_Settle::Cancelled); }
 
-        InState.Phase = EMars_CookingFeed_Phase::Idle;
-        InState.PhaseSeconds = 0.0f;
-
-        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] cancelled the transfer: {InState.Available} left");
+        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] cancelled the transfer: {utils_cooking_feed::Get_Available(InState)} left");
     }
 
-    // Honoured only while awaiting admission for exactly this piece (same generation and slot). The hand returns either way.
+    // Honoured only while awaiting admission for exactly this piece (same generation and slot). The hand returns either way;
+    // a rejected piece is control's to put back on the source.
     private void Apply_Resolve(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState,
                                const FMars_Request_CookingFeed_ResolveAdmission& InRequest)
     {
@@ -117,29 +123,28 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        const auto Piece = InState.Active.GetValue();
+        const auto Piece = InState.Active.GetValue().Id;
         if (InRequest.PieceId.Get_IsSame(Piece) == false)
         {
             ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] admission answer for {PieceName} ignored: awaiting {utils_cooking_feed::Get_PieceName(Piece)}");
             return;
         }
 
+        InState.Active.Reset();
+        InState.Phase = EMars_CookingFeed_Phase::Return;
+        InState.PhaseSeconds = 0.0f;
+
         if (InRequest.Admission == EMars_CookingFeed_Admission::Accepted)
         {
             InState.Admitted += 1;
             Record_Settle(InDrain, Piece, EMars_CookingFeed_Settle::Admitted);
-            ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] {PieceName} admitted ({InState.Admitted} admitted, {InState.Available} left)");
+            ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] {PieceName} admitted ({InState.Admitted} admitted, {utils_cooking_feed::Get_Available(InState)} left)");
         }
         else
         {
-            Restore_Slot(InState, Piece);
             Record_Settle(InDrain, Piece, EMars_CookingFeed_Settle::Rejected);
-            ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] {PieceName} rejected: {InRequest.Reason} ({InState.Available} left)");
+            ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] {PieceName} rejected: {InRequest.Reason} ({utils_cooking_feed::Get_Available(InState)} left)");
         }
-
-        InState.Active.Reset();
-        InState.Phase = EMars_CookingFeed_Phase::Return;
-        InState.PhaseSeconds = 0.0f;
     }
 
     private void Apply_Begin(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState)
@@ -150,7 +155,7 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        if (InState.Available <= 0)
+        if (utils_cooking_feed::Get_Available(InState) <= 0)
         {
             InDrain.Refusals.Add(EMars_CookingFeed_Refusal::Empty);
             return;
@@ -162,25 +167,18 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        // Available > 0 leaves a free slot: taken slots are the reservation and the admitted pieces only.
-        const auto Slot = InState.SlotTaken.FindIndex(false);
-        if (ck::EnsureIfNot(Slot >= 0, f"[CookingFeed] [{InDrain.Feed.ToString()}] has {InState.Available} pieces left but no free slot"))
+        // Idle with stock: the lowest held piece is landed and unreserved, so it has a slot.
+        const auto Piece = InState.Source.Get_Held()[0];
+        const auto Slot = Piece.Get_PlatterSlot();
+        if (ck::EnsureIfNot(Slot.IsSet(), f"[CookingFeed] [{InDrain.Feed.ToString()}] reserved [{Piece.ToString()}], which names no platter slot"))
         { return; }
 
-        InState.SlotTaken[Slot] = true;
-        InState.Active = TOptional<FMars_CookingFeed_PieceId>(FMars_CookingFeed_PieceId(InState.Generation, Slot));
-        InState.Available -= 1;
+        InState.Active = TOptional<FMars_CookingFeed_Reservation>(
+            FMars_CookingFeed_Reservation(FMars_CookingFeed_PieceId(InState.Generation, Slot.GetValue()), Piece));
         InState.Phase = EMars_CookingFeed_Phase::Reach;
         InState.PhaseSeconds = 0.0f;
 
-        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] transfer of {utils_cooking_feed::Get_PieceName(InState.Active.GetValue())} started ({InState.Available} left)");
-    }
-
-    private void Restore_Slot(FMars_Fragment_CookingFeed& InState, const FMars_CookingFeed_PieceId& InPiece)
-    {
-        InState.Available += 1;
-        if (InState.SlotTaken.IsValidIndex(InPiece.StockIndex))
-        { InState.SlotTaken[InPiece.StockIndex] = false; }
+        ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] transfer of {utils_cooking_feed::Get_PieceName(InState.Active.GetValue().Id)} [{Piece.ToString()}] started ({utils_cooking_feed::Get_Available(InState)} left)");
     }
 
     private void Record_Settle(FMars_CookingFeed_Drain& InDrain, const FMars_CookingFeed_PieceId& InPiece, EMars_CookingFeed_Settle InSettle)
@@ -195,8 +193,6 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         { ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] refused {InDrain.Refusals.Num()} press(es), the first {InDrain.Refusals[0] :n}"); }
 
         // Read before any handler runs: a handler may issue requests (or tear the station down).
-        const auto Available = InState.Available;
-        const auto Admitted = InState.Admitted;
         const auto Phase = InState.Phase;
         auto Feed = InDrain.Feed;
 
@@ -211,10 +207,6 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
             { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnTransferRefused.Broadcast(Feed, Refusal); }
         }
-
-        const auto StockMoved = Available != InDrain.StartAvailable || Admitted != InDrain.StartAdmitted;
-        if (StockMoved && Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
-        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnStockChanged.Broadcast(Feed, Available, Admitted); }
 
         if (Phase != InDrain.StartPhase && Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
         { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnPhaseChanged.Broadcast(Feed, Phase); }

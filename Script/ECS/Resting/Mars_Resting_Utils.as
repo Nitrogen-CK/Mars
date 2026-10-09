@@ -18,19 +18,25 @@ namespace utils_resting
         auto Params = FMars_Fragment_Resting_Params();
         Params.Spec = InSpec;
 
+        InHandle.Add_Fragment(FMars_Feature_Resting());
+        InHandle.Add_Fragment(Params);
+        InHandle.Add_Fragment(Make_State(InHandle.As_JoltBody(), InSpec.Targets.Num()));
+        InHandle.Add_Fragment(FMars_Tag_Resting_NeedsSetup());
+        return InHandle.As_Resting();
+    }
+
+    // Apart on every one of InTargetCount targets, no contact yet, no hop: the tracker as Add and a Retarget leave it.
+    FMars_Fragment_Resting Make_State(FCk_Handle_JoltBody InBody, int32 InTargetCount)
+    {
         auto State = FMars_Fragment_Resting();
-        State.Body = InHandle.As_JoltBody();
-        for (int32 Index = 0; Index < InSpec.Targets.Num(); ++Index)
+        State.Body = InBody;
+        for (int32 Index = 0; Index < InTargetCount; ++Index)
         {
             State.ContactAges.Add(k_NoContactAge);
             State.RestingOn.Add(false);
         }
 
-        InHandle.Add_Fragment(FMars_Feature_Resting());
-        InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(State);
-        InHandle.Add_Fragment(FMars_Tag_Resting_NeedsSetup());
-        return InHandle.As_Resting();
+        return State;
     }
 
     // The index of InEntity among InTargets; -1 = not a target.
@@ -102,6 +108,16 @@ mixin TArray<FCk_Handle> Get_Targets(const FCk_Handle_Resting& Self)
 mixin FCk_Handle_JoltBody Get_Body(const FCk_Handle_Resting& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Resting).Body;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Requests
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void Request_Retarget(FCk_Handle_Resting& Self, const FMars_Request_Resting_Retarget& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Resting_Requests);
+    Requests.RetargetRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

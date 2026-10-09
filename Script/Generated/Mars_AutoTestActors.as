@@ -407,7 +407,7 @@ class AMars_AutoTest_Control_ViewStaysHeldUntilUseReleases_Actor : ACk_AutoTestR
 
 class AMars_AutoTest_CookingFeed_AFreshPressAfterReturnStartsTheNextAndSixAdmitSix_Actor : ACk_AutoTestRunner
 {
-    default _TimeoutSeconds = 10.0f;
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -420,6 +420,7 @@ class AMars_AutoTest_CookingFeed_AFreshPressAfterReturnStartsTheNextAndSixAdmitS
 
 class AMars_AutoTest_CookingFeed_ALongFrameCrossesEachBoundaryOnce_Actor : ACk_AutoTestRunner
 {
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -430,8 +431,35 @@ class AMars_AutoTest_CookingFeed_ALongFrameCrossesEachBoundaryOnce_Actor : ACk_A
     }
 }
 
+class AMars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTransfer_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTransfer");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_CookingFeed_ChangingTheSourceCancelsAndUnsourcedIsEmpty_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CookingFeed_ChangingTheSourceCancelsAndUnsourcedIsEmpty");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_CookingFeed_DestroyingTheStationMidTransferLeaksNothing_Actor : ACk_AutoTestRunner
 {
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -444,6 +472,7 @@ class AMars_AutoTest_CookingFeed_DestroyingTheStationMidTransferLeaksNothing_Act
 
 class AMars_AutoTest_CookingFeed_RejectedAdmissionRestoresTheSlotAndTheHandReturns_Actor : ACk_AutoTestRunner
 {
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -454,13 +483,13 @@ class AMars_AutoTest_CookingFeed_RejectedAdmissionRestoresTheSlotAndTheHandRetur
     }
 }
 
-class AMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger_Actor : ACk_AutoTestRunner
+class AMars_AutoTest_CookingFeed_ResetAtEveryPhaseLeavesTheStockOnThePlatter_Actor : ACk_AutoTestRunner
 {
-    default _TimeoutSeconds = 12.0f;
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger");
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CookingFeed_ResetAtEveryPhaseLeavesTheStockOnThePlatter");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -469,6 +498,7 @@ class AMars_AutoTest_CookingFeed_ResetAtEveryPhasePreservesTheLedger_Actor : ACk
 
 class AMars_AutoTest_CookingFeed_SixPressesDuringOneTransferAdmitOnePiece_Actor : ACk_AutoTestRunner
 {
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -481,7 +511,7 @@ class AMars_AutoTest_CookingFeed_SixPressesDuringOneTransferAdmitOnePiece_Actor 
 
 class AMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing_Actor : ACk_AutoTestRunner
 {
-    default _TimeoutSeconds = 8.0f;
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -494,6 +524,7 @@ class AMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing_A
 
 class AMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInheritsItsVelocity_Actor : ACk_AutoTestRunner
 {
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -763,13 +794,52 @@ class AMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_Actor : ACk_
     }
 }
 
-class AMars_AutoTest_DicingStation_LeaveMidCutLeavesOneFreshJoint_Actor : ACk_AutoTestRunner
+class AMars_AutoTest_DicingStation_InputDockRefusesACutPlatterAndTwoPieces_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 30.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_LeaveMidCutLeavesOneFreshJoint");
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_InputDockRefusesACutPlatterAndTwoPieces");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DicingStation_IntakeLandsTheJointWhenTheOperatorLeavesInTheUnloadFrame_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_IntakeLandsTheJointWhenTheOperatorLeavesInTheUnloadFrame");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DicingStation_IntakeTakesTheJointFromTheInputPlatter_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_IntakeTakesTheJointFromTheInputPlatter");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DicingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -802,13 +872,52 @@ class AMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_Actor
     }
 }
 
-class AMars_AutoTest_DicingStation_SweepReleasesPiecesOntoTheTable_Actor : ACk_AutoTestRunner
+class AMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 30.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_SweepReleasesPiecesOntoTheTable");
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_SweepHandsPiecesToTheTray");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DicingStation_SweepingTheBoardEmptyTakesTheNextJoint_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_SweepingTheBoardEmptyTakesTheNextJoint");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_DicingStation_SweepWithoutATrayIsRefused");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -1114,6 +1223,19 @@ class AMars_AutoTest_FoodBoard_FullBoardOnlyKnocks_Actor : ACk_AutoTestRunner
     }
 }
 
+class AMars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FoodBoard_PartingKeepsEveryGap_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 15.0f;
@@ -1256,6 +1378,19 @@ class AMars_AutoTest_FoodPiece_ImportReadyRecordsVolume_Actor : ACk_AutoTestRunn
     }
 }
 
+class AMars_AutoTest_FoodPiece_KindAndDefinitionFollowTheCut_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FoodPiece_KindAndDefinitionFollowTheCut");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 15.0f;
@@ -1302,6 +1437,19 @@ class AMars_AutoTest_FoodPiece_SecondCutWhileCuttingIsRefusedBusy_Actor : ACk_Au
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FoodPiece_SecondCutWhileCuttingIsRefusedBusy");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 15.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -1692,6 +1840,19 @@ class AMars_AutoTest_Fry_AdmissionRejectsASeventhPiece_Actor : ACk_AutoTestRunne
     }
 }
 
+class AMars_AutoTest_Fry_AdoptedPieceKeepsItsSearAsHeatAndTakeOutHandsDrainedBack_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fry_AdoptedPieceKeepsItsSearAsHeatAndTakeOutHandsDrainedBack");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Fry_ADrainedPieceKnockedOutIsNoLongerDrained_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 15.0f;
@@ -1757,6 +1918,19 @@ class AMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection_Actor : ACk_Aut
     }
 }
 
+class AMars_AutoTest_Fry_ASearedPieceRetargetsItsResting_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 12.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fry_ASearedPieceRetargetsItsResting");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 15.0f;
@@ -1785,6 +1959,7 @@ class AMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains_Actor
 
 class AMars_AutoTest_Fry_SpecValidateRejectsBadSpecs_Actor : ACk_AutoTestRunner
 {
+    default _TimeoutSeconds = 15.0f;
     UFUNCTION(BlueprintOverride)
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
@@ -1802,6 +1977,32 @@ class AMars_AutoTest_Fry_WhereaboutsFollowTheGeometry_Actor : ACk_AutoTestRunner
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Fry_WhereaboutsFollowTheGeometry");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_FryStation_TakeOutLoadsTheTray_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_FryStation_TakeOutLoadsTheTray");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;
@@ -2362,6 +2563,175 @@ class AMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle_Actor : ACk_AutoTestRun
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_ClearAndDestroyEndHeldPieces");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_LoadFillsLowestSlotAndParentsThePiece_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_LoadFillsLowestSlotAndParentsThePiece");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_PendingPieceLandsOnceReadyAndArrivalLerpsIn_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_PendingPieceLandsOnceReadyAndArrivalLerpsIn");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_SpawnWithFoodLoadsADressedJoint_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_SpawnWithFoodLoadsADressedJoint");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_UnloadKeepsTheWorldPoseAndReloadsAfterAMove_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_UnloadKeepsTheWorldPoseAndReloadsAfterAMove");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 20.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 30.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;

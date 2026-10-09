@@ -215,14 +215,15 @@ namespace utils_fry
     }
 
     // Inside the basket interior (basket frame): over the floor within the walls, from the floor's underside up to a
-    // piece's height above the wall tops (a piece hopping inside the walls is still in the basket).
-    bool Get_IsInsideBasket(const FMars_Fry_BasketSpec& InBasket, FVector InBasketLocal, float32 InHalfSize)
+    // piece's height above the wall tops (a piece hopping inside the walls is still in the basket). InHalfHeight is the
+    // piece's half height as it lies (utils_searing::Get_WorldHalfExtentZ).
+    bool Get_IsInsideBasket(const FMars_Fry_BasketSpec& InBasket, FVector InBasketLocal, float32 InHalfHeight)
     {
         const auto Z = float32(InBasketLocal.Z);
         return Math::Abs(float32(InBasketLocal.X)) <= InBasket.InnerHalfX
             && Math::Abs(float32(InBasketLocal.Y)) <= InBasket.InnerHalfY
             && Z >= -InBasket.FloorThickness
-            && Z <= InBasket.WallHeight + 2.0f * InHalfSize;
+            && Z <= InBasket.WallHeight + 2.0f * InHalfHeight;
     }
 
     // Over the basket's outer footprint (basket frame XY, walls included), at any height: a piece there is not lost even
@@ -234,13 +235,13 @@ namespace utils_fry
     }
 
     // Inside the scoop bowl (scoop frame): within BowlRadius of its axis, from the disc's underside up to a piece's height
-    // above the lip.
-    bool Get_IsInsideBowl(const FMars_Fry_ScoopSpec& InScoop, FVector InScoopLocal, float32 InHalfSize)
+    // above the lip. InHalfHeight is the piece's half height as it lies.
+    bool Get_IsInsideBowl(const FMars_Fry_ScoopSpec& InScoop, FVector InScoopLocal, float32 InHalfHeight)
     {
         const auto Z = float32(InScoopLocal.Z);
         return float32(InScoopLocal.Size2D()) <= InScoop.BowlRadius
             && Z >= -InScoop.DiscThickness
-            && Z <= InScoop.LipHeight + 2.0f * InHalfSize;
+            && Z <= InScoop.LipHeight + 2.0f * InHalfHeight;
     }
 
     // The whole bowl is over the basket interior: InScoopFromBasket (the scoop frame's origin less the basket frame's, in
@@ -252,17 +253,35 @@ namespace utils_fry
             && Math::Abs(float32(InScoopFromBasket.Y)) <= InSpec.Basket.InnerHalfY - BowlRadius;
     }
 
-    // 0..1, the share of a piece's height below the oil line (root frame), treating the box as upright.
-    float32 Get_Immersion(float32 InCentreZ, float32 InHalfSize, float32 InSurfaceZ)
+    // 0..1, the share of a piece's height below the oil line (root frame): InCentreZ its middle, InHalfHeight its half height
+    // as it lies.
+    float32 Get_Immersion(float32 InCentreZ, float32 InHalfHeight, float32 InSurfaceZ)
     {
-        return Math::Clamp((InSurfaceZ - (InCentreZ - InHalfSize)) / (2.0f * InHalfSize), 0.0f, 1.0f);
+        return Math::Clamp((InSurfaceZ - (InCentreZ - InHalfHeight)) / (2.0f * InHalfHeight), 0.0f, 1.0f);
     }
 
-    // The height (root frame) of a face's centre: InPiece is the piece's root-relative transform.
-    float32 Get_FaceCentreZ(const FTransform& InPiece, EMars_Searing_Face InFace, float32 InHalfSize)
+    // The height (root frame) of a face's middle: InCentreFrame is the piece's root-relative frame at its middle
+    // (utils_searing::Get_CentreFrame).
+    float32 Get_FaceCentreZ(const FTransform& InCentreFrame, EMars_Searing_Face InFace, const FVector& InHalfExtents)
     {
-        const auto Normal = InPiece.GetRotation().RotateVector(utils_searing::Get_FaceNormal(InFace));
-        return float32(InPiece.GetLocation().Z + Normal.Z * float64(InHalfSize));
+        return float32(utils_searing::Get_FaceCentre(InCentreFrame, InFace, InHalfExtents).Z);
+    }
+
+    // The cook state InPiece's heat makes of InSeed (the state the piece arrived with): the face sears are the faces' heat
+    // (0 pale, 1 golden, 2 burnt) and the batter's fry their mean. Everything else is the seed's.
+    FMars_CookState Get_CookState(const FMars_Fry_PieceState& InPiece, const FMars_CookState& InSeed)
+    {
+        auto CookState = InSeed;
+        CookState.FaceSear.Empty();
+        auto HeatSum = 0.0f;
+        for (const auto Heat : InPiece.FaceHeat)
+        {
+            CookState.FaceSear.Add(Heat);
+            HeatSum += Heat;
+        }
+
+        CookState.Fry = HeatSum / float32(utils_searing::k_FaceCount);
+        return CookState;
     }
 
     EMars_Fry_HeatStage Get_HeatStage(float32 InHeat)
@@ -283,6 +302,18 @@ namespace utils_fry
         for (int32 Index = 0; Index < InPieces.Num(); ++Index)
         {
             if (InPieces[Index].Id.Get_IsSame(InPieceId))
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // The index of the piece whose entity is InPiece (lingering lost ones included); -1 = none.
+    int32 Find_PieceIndexByHandle(const TArray<FMars_Fry_PieceState>& InPieces, const FCk_Handle_FoodPiece& InPiece)
+    {
+        for (int32 Index = 0; Index < InPieces.Num(); ++Index)
+        {
+            if (InPieces[Index].Piece == InPiece)
             { return Index; }
         }
 
@@ -376,8 +407,8 @@ mixin FMars_Fry_Tally Get_Tally(const FCk_Handle_Fry& Self)
     return Self.Get_Fragment(FMars_Fragment_Fry).Tally;
 }
 
-// Admitted = InOil + OnSkimmer + Airborne + InBasket + Lost since the last reset (a lost piece stays counted after its body
-// is destroyed).
+// Admitted = InOil + OnSkimmer + Airborne + InBasket (in play) + Lost + TakenOut (since the last reset; a lost piece stays
+// counted after its body is destroyed).
 mixin FMars_Fry_Summary Get_Summary(const FCk_Handle_Fry& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_Fry);
@@ -411,8 +442,22 @@ mixin FMars_Fry_Summary Get_Summary(const FCk_Handle_Fry& Self)
     }
 
     Summary.Lost = State.Tally.Lost;
-    Summary.Admitted = Summary.InOil + Summary.OnSkimmer + Summary.Airborne + Summary.InBasket + Summary.Lost;
+    Summary.TakenOut = State.Tally.TakenOut;
+    Summary.Admitted = Summary.InOil + Summary.OnSkimmer + Summary.Airborne + Summary.InBasket + Summary.Lost + Summary.TakenOut;
     return Summary;
+}
+
+// The Drained pieces a TakeOut without a named piece would hand back.
+mixin int32 Get_TakeableCount(const FCk_Handle_Fry& Self)
+{
+    auto Count = 0;
+    for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Fry).Pieces)
+    {
+        if (Piece.Drain == EMars_Fry_Drain::Drained)
+        { Count += 1; }
+    }
+
+    return Count;
 }
 
 // The station root's world transform (the station frame).
@@ -491,7 +536,7 @@ mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Fry& Self)
     return Ids;
 }
 
-// From admission until the piece is destroyed (a lost one, at the end of its linger) or reset.
+// From admission until the piece is taken out or destroyed (a lost one, at the end of its linger).
 mixin bool Get_HasPiece(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     return utils_fry::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Fry).Pieces, InPieceId) >= 0;
@@ -517,6 +562,28 @@ mixin FCk_Handle Get_PieceEntity(const FCk_Handle_Fry& Self, const FMars_Cooking
 mixin FCk_Handle_JoltBody Get_PieceBody(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     return Self.Get_PieceState(InPieceId).Body;
+}
+
+mixin FCk_Handle_FoodPiece Get_PieceHandle(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_PieceState(InPieceId).Piece;
+}
+
+// Half the piece's bounds along its own axes, as read at admission.
+mixin FVector Get_PieceHalfExtents(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return Self.Get_PieceState(InPieceId).HalfExtents;
+}
+
+// The middle of the piece's bounds in the world; zero once its entity is gone.
+mixin FVector Get_PieceCentre(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto Piece = Self.Get_PieceState(InPieceId);
+    if (ck::Is_NOT_Valid(Piece.Entity))
+    { return FVector::ZeroVector; }
+
+    const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Piece.Entity.As_Transform());
+    return PieceWorld.TransformPosition(Piece.CentreLocal);
 }
 
 // The release's preset index the piece arrived with.
@@ -599,6 +666,12 @@ mixin void Request_Reset(FCk_Handle_Fry& Self, const FMars_Request_Fry_Reset& In
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Requests);
     Requests.ResetRequests.Add(InRequest);
+}
+
+mixin void Request_TakeOut(FCk_Handle_Fry& Self, const FMars_Request_Fry_TakeOut& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Requests);
+    Requests.TakeOutRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -715,4 +788,18 @@ mixin void UnbindFrom_OnSkimChanged(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnS
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnSkimChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnPieceTakenOut(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnPieceTakenOut InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Signals);
+    Fragment.OnPieceTakenOut.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPieceTakenOut(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnPieceTakenOut InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceTakenOut.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

@@ -1,12 +1,18 @@
 // The searing station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Searing_Idle). It runs on the STATION entity (context = the station, which also carries the Searing
-// feature and the platter's CookingFeed) and reads the station's operator; it only issues Searing and CookingFeed requests
-// and registers the operator's legend rows. The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
+// feature and the raw platter's CookingFeed; its two platter docks are lifetime children of it) and reads the station's
+// operator; it only issues Searing, CookingFeed and Platter requests and registers the operator's legend rows. The feed
+// tasks are the shared ones (Mars_StationFeed_SmTasks.as).
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a full platter, a new generation),
-//                                                 Searing_ResetOnEnter (an empty, cold pan for the next operator)
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a new generation for an idle
+//                                                 hand), StationFeed_Source,
+//                                                 StationFeed_Bridge (a release in flight lands),
+//                                                 StationFeed_TakeOutBridge (a take-out in flight lands),
+//                                                 Searing_ResetOnEnter (a level, cold pan; the pieces stay on it)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Searing_HeatOnEnter, Searing_OperatorInput (Tick), Searing_OperatorHints,
-//                                                 StationFeed_OperatorInput (Tick), StationFeed_Bridge, StationFeed_OperatorHints
+//                                                 StationFeed_Source, StationFeed_OperatorInput (Tick), StationFeed_Bridge,
+//                                                 StationFeed_OperatorHints, StationFeed_TakeOutInput (Tick),
+//                                                 StationFeed_TakeOutBridge
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
@@ -20,6 +26,9 @@ class UMars_SmState_Searing_Idle : UCk_SmState_EntityScript
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
         AddTask(InHandle, UMars_SmTask_StationFeed_ResetOnEnter);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
         AddTask(InHandle, UMars_SmTask_Searing_ResetOnEnter);
     }
 }
@@ -35,15 +44,18 @@ class UMars_SmState_Searing_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Searing_HeatOnEnter);
         AddTask(InHandle, UMars_SmTask_Searing_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Searing_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
     }
 }
 
-// Destroys every piece, levels and idles the pan and chills it; the pan stays empty until the feed admits a piece. Added
-// after the feed's reset, so the generation bump comes first. No Searing on the context yet (the SM can enter before the
-// entity script composes it) = nothing to reset.
+// Levels and idles the pan and chills it; the pieces stay on it with their sear (the player's food is theirs). Added after
+// the feed's reset, so the generation bump comes first. No Searing on the context yet (the SM can enter before the entity
+// script composes it) = nothing to reset.
 class UMars_SmTask_Searing_ResetOnEnter : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;

@@ -36,7 +36,7 @@ enum EMars_WorldItem_Mount
 {
     // A free Jolt body, pickable.
     World,
-    // On the carrier's CarryPoint attach point (the back).
+    // On the carrier's CarryPoint attach point (the back), or on the point the Carry named (a station dock).
     Carried,
     // On the carrier's Hand attach point.
     Held
@@ -389,17 +389,72 @@ struct FMars_Fragment_WorldItem_Signals
 // Requests (Persistent items only)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// World | Held -> Carried.
+// World | Held -> Carried. Unset Point / Offset = the definition's CarryPoint / CarryOffset (the carrier's back, the hand);
+// set, the carrier publishes Point and the item mounts there at Offset (a station dock).
 struct FMars_Request_WorldItem_Carry
 {
     UPROPERTY()
     FCk_Handle Carrier;
+
+    UPROPERTY()
+    TOptional<FGameplayTag> Point;
+
+    UPROPERTY()
+    TOptional<FTransform> Offset;
 
     FMars_Request_WorldItem_Carry() {}
 
     FMars_Request_WorldItem_Carry(const FCk_Handle& InCarrier)
     {
         Carrier = InCarrier;
+    }
+
+    FMars_Request_WorldItem_Carry(const FCk_Handle& InCarrier, FGameplayTag InPoint, const FTransform& InOffset)
+    {
+        Carrier = InCarrier;
+        Point = TOptional<FGameplayTag>(InPoint);
+        Offset = TOptional<FTransform>(InOffset);
+    }
+}
+
+// What a Carry names instead of the definition's CarryPoint / CarryOffset; unset fields fall back to the definition. A
+// Hold never overrides.
+struct FMars_WorldItem_MountOverride
+{
+    UPROPERTY()
+    TOptional<FGameplayTag> Point;
+
+    UPROPERTY()
+    TOptional<FTransform> Offset;
+
+    FMars_WorldItem_MountOverride() {}
+
+    FMars_WorldItem_MountOverride(TOptional<FGameplayTag> InPoint, TOptional<FTransform> InOffset)
+    {
+        Point = InPoint;
+        Offset = InOffset;
+    }
+}
+
+// What a Carry or Hold asks for before its attach node and offset are resolved (the drain's input, never a fragment).
+struct FMars_WorldItem_MountRequest
+{
+    UPROPERTY()
+    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::Carried;
+
+    UPROPERTY()
+    FCk_Handle Carrier;
+
+    UPROPERTY()
+    FMars_WorldItem_MountOverride Override;
+
+    FMars_WorldItem_MountRequest() {}
+
+    FMars_WorldItem_MountRequest(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier, const FMars_WorldItem_MountOverride& InOverride)
+    {
+        Mount = InMount;
+        Carrier = InCarrier;
+        Override = InOverride;
     }
 }
 

@@ -23,6 +23,7 @@ class UMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip : UMars_AutoTest
         auto PanSpec = FMars_Implement_Spec();
         PanSpec.Tilt.LevelReturnDegreesPerSecond = 0.0f;
         BuildStation(InHandle, Spec, PanSpec);
+        Build_Pieces(1);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();

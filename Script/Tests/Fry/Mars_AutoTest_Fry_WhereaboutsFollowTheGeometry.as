@@ -43,8 +43,10 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
         // Lost bodies linger past the end of the test, so "still Lost" is read off a piece that still exists.
         Spec.Zones.LingerSeconds = 20.0f;
         BuildStation(InHandle, Spec);
+        Build_Pieces(5);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("release A over the scoop, B over the oil, C below the floor, D over the basket, E over the corridor", n"Step_Release");
         Add_Step_WaitUntil("every piece found its whereabouts", n"Check_AllHomed", 0, 4.0f);
         Add_Step("A caught, C and E lost, D in the basket", n"Step_AssertHomes");
@@ -59,7 +61,7 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
     UFUNCTION()
     private void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto HalfSize = float64(_Spec.Piece.HalfSize);
+        const auto HalfSize = Get_BoxHalfExtents().Z;
         const auto ScoopTop = _Fry.Get_ScoopRoot();
         _A = AddPiece(ScoopTop + FVector(0.0, 0.0, HalfSize + float64(k_DropHeight)));
         _B = AddPiece(FVector(k_OilXY.X, k_OilXY.Y, float64(_Spec.Oil.SurfaceZ) + HalfSize + 1.0));
@@ -90,7 +92,7 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
         Log(f"[Mars_AutoTest_Fry_WhereaboutsFollowTheGeometry] A edges{EdgesA}, at root {Get_PieceRootLocal(_A)}");
         Assert_True(Path.Num() == 2 && Path[0] == EMars_Fry_Whereabouts::Airborne && Path[1] == EMars_Fry_Whereabouts::Skimmer,
             f"A went Airborne -> Skimmer (edges{EdgesA})");
-        Assert_Equals_Float(Get_PieceRootLocal(_A).Z, _Fry.Get_ScoopRoot().Z + float64(_Spec.Piece.HalfSize), 1.0, "A rests on the disc");
+        Assert_Equals_Float(Get_PieceRootLocal(_A).Z, _Fry.Get_ScoopRoot().Z + _Fry.Get_PieceHalfExtents(_A).Z, 1.0, "A rests on the disc");
 
         const auto EdgesD = Get_Path(_D, 0, Path);
         Assert_True(Path.Num() == 2 && Path[1] == EMars_Fry_Whereabouts::DrainBasket, f"D went straight into the DrainBasket (edges{EdgesD})");
@@ -142,7 +144,7 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
     UFUNCTION()
     private void Step_AssertFloatThenBeside(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto HalfSize = _Spec.Piece.HalfSize;
+        const auto HalfSize = float32(_Fry.Get_PieceHalfExtents(_B).Z);
         const auto FloatZ = float64(_Spec.Oil.SurfaceZ + HalfSize - 2.0f * HalfSize * k_Gravity / _Spec.Oil.BuoyancyAccel);
         const auto MidZ = (_FloatMin + _FloatMax) * 0.5;
         Log(f"[Mars_AutoTest_Fry_WhereaboutsFollowTheGeometry] oil piece over {k_FloatWindowSeconds} s: Z {_FloatMin :.2} .. {_FloatMax :.2} (mid {MidZ :.2}), predicted float Z {FloatZ :.2}");

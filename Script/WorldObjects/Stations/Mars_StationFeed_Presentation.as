@@ -1,16 +1,13 @@
-// Station-frame authoring of a feeding station: where the free glove rests, the slot poses (where the raw proxies sit; the
-// glove grasps each from above), where a held piece sits in the glove's frame, the clearance it lifts to before and after a
-// grasp, and the arc height of the carry.
+// Station-frame authoring of a feeding station: where the free glove rests, where a held piece sits in the glove's frame,
+// the clearance it lifts to before and after a grasp, and the arc height of the carry. The glove grasps the reserved piece
+// where it lies on the source platter, from above.
 struct FMars_StationFeed_Geometry
 {
     // The glove's rest; its rotation is the glove's for the whole transfer.
     UPROPERTY()
     FTransform RestLocal;
 
-    UPROPERTY()
-    TArray<FTransform> SlotsLocal;
-
-    // The held piece in the glove node's frame: the glove stops where this puts the piece on a slot or on the release node.
+    // The held piece in the glove node's frame: the glove stops where this puts it on the reserved piece's middle or on the release node.
     UPROPERTY()
     FTransform HeldLocal;
 
@@ -63,7 +60,7 @@ struct FMars_StationFeed_Presentation
     FCk_Handle PosedOperator;
 }
 
-// Moves the glove node (rest -> slot -> clearance -> release node -> rest, InOutSine per segment; the release node is
+// Moves the glove node (rest -> reserved piece -> clearance -> release node -> rest, InOutSine per segment; the release node is
 // re-sampled every frame, the pan moves), sets the operator's LEFT pose override (Open while reaching and returning, Cradle
 // from Grasp through AwaitAdmission, cleared once idle) and records which piece rides the glove.
 mixin void Advance(FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
@@ -95,16 +92,6 @@ mixin void Clear(FMars_StationFeed_Presentation& Self, FCk_Handle InOperator)
     { Self.Write_Hand(Self.Geometry.RestLocal); }
 }
 
-// A free slot shows its piece; a taken one hides it, except the reserved slot until the glove grasps its piece.
-mixin bool Get_IsSlotVisible(const FMars_StationFeed_Presentation& Self, const FCk_Handle_CookingFeed& InFeed, int32 InSlot)
-{
-    if (InFeed.Get_IsSlotTaken(InSlot) == false)
-    { return true; }
-
-    const auto Active = InFeed.TryGet_ActivePiece();
-    return Active.IsSet() && Active.GetValue().StockIndex == InSlot && Self.CarriedPiece.IsSet() == false;
-}
-
 // The glove node's offset this frame, in the station frame.
 mixin FTransform Get_HandLocal(const FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
 {
@@ -120,7 +107,7 @@ mixin FTransform Get_HandLocal(const FMars_StationFeed_Presentation& Self, const
 
     // Where the glove puts the held piece on a station-frame point.
     const auto HeldOffset = Rotation.RotateVector(Geometry.HeldLocal.GetLocation());
-    const auto Grasp = Self.Get_SlotLocal(InFrame.Feed) - HeldOffset;
+    const auto Grasp = Self.Get_GraspLocal(InFrame) - HeldOffset;
     const auto Lifted = Grasp + Up * PickupClearance;
     const auto ReleaseWorld = utils_transform::Get_EntityCurrentLocation(InFrame.Feed.Get_ReleaseNode());
     const auto Release = InFrame.RootWorld.InverseTransformPosition(ReleaseWorld) - HeldOffset;
@@ -140,14 +127,23 @@ mixin FTransform Get_HandLocal(const FMars_StationFeed_Presentation& Self, const
     return FTransform(Rotation, Location);
 }
 
-// The reserved slot's centre (station frame); the rest location without a reservation or an authored slot for it.
-mixin FVector Get_SlotLocal(const FMars_StationFeed_Presentation& Self, const FCk_Handle_CookingFeed& InFeed)
+// Where the hand reaches (station frame): the reserved piece's middle as it lies on the source platter, read every frame;
+// the rest location without a reservation, or once the piece is gone.
+mixin FVector Get_GraspLocal(const FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
 {
-    const auto Active = InFeed.TryGet_ActivePiece();
-    if (Active.IsSet() == false || Self.Geometry.SlotsLocal.IsValidIndex(Active.GetValue().StockIndex) == false)
+    const auto Piece = InFrame.Feed.TryGet_ActiveFoodPiece();
+    if (ck::Is_NOT_Valid(Piece) || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
     { return Self.Geometry.RestLocal.GetLocation(); }
 
-    return Self.Geometry.SlotsLocal[Active.GetValue().StockIndex].GetLocation();
+    return InFrame.RootWorld.InverseTransformPosition(Self.Get_PieceCentreWorld(Piece));
+}
+
+// The middle of InPiece's bounds in the world (its origin need not be its middle).
+mixin FVector Get_PieceCentreWorld(const FMars_StationFeed_Presentation& Self, const FCk_Handle_FoodPiece& InPiece)
+{
+    FCk_Handle Entity = InPiece;
+    const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+    return PieceWorld.TransformPosition(utils_searing::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry())));
 }
 
 // Unset = no override (idle).

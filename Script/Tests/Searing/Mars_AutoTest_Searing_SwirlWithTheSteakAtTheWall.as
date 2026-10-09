@@ -23,6 +23,7 @@ class UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall : UMars_AutoTestRig_Sear
         auto PanSpec = FMars_Implement_Spec();
         PanSpec.Orbit = FMars_Implement_OrbitSpec(k_SwirlRadius, k_SwirlHz);
         BuildStation(InHandle, Spec, PanSpec);
+        Build_Pieces(1);
 
         Add_Steps_AddPieceAndLand();
         Add_Step("heat the pan: the swirl runs", n"Step_Heat");
@@ -42,12 +43,8 @@ class UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall : UMars_AutoTestRig_Sear
     private void Step_TeleportToWall(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         // On the pan implies the body exists in the simulation; a teleport before that does nothing.
-        auto Body = _Searing.Get_PieceBody(Get_FirstId());
-        Assert_True(utils_jolt_body::Get_IsBodyAdded(Body), "the piece's body is in the simulation");
-
-        const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        utils_jolt_body::Request_Teleport(Body,
-            FCk_Request_JoltBody_Teleport(PanBaseWorld.TransformPosition(k_WallFootLocal), PanBaseWorld.Rotator()));
+        Assert_True(utils_jolt_body::Get_IsBodyAdded(_Searing.Get_PieceBody(Get_FirstId())), "the piece's body is in the simulation");
+        Teleport_Piece(Get_FirstId(), k_WallFootLocal, FRotator::ZeroRotator);
     }
 
     UFUNCTION()

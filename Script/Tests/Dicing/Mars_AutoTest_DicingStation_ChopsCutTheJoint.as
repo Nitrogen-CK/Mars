@@ -1,10 +1,9 @@
-// The real dicing station with the meat definition. Once it stands, the board holds one whole, untouched, shown joint of the
-// definition's mass and the slab's volume, at the pile point, yawed 90, unscaled. An operator takes the station and a chop at
-// the board's centre goes through the station's cut bridge: two shown halves of the joint's lineage replace it, parted 1.5 cm
-// along the blade's normal (positive half on its side), conserving its mass exactly and its volume within RuntimeMesh's
-// tolerance (a closed, Ready half is a capped one). With the hand at 8 cm a second chop cuts the positive half only: three
-// pieces, mass still exact. When the operator leaves, Idle clears the touched board and one fresh, untouched joint of a new
-// lineage is shown; nothing of the first lineage remains.
+// The real dicing station, fed the meat on a docked input platter. Once an operator takes it, the intake has laid one whole,
+// untouched, shown joint of the definition's mass and the slab's volume on the board, at the pile point, yawed 90, unscaled.
+// A chop at the board's centre goes through the station's cut bridge: two shown halves of the joint's lineage replace it,
+// parted 1.5 cm along the blade's normal (positive half on its side), conserving its mass exactly and its volume within
+// RuntimeMesh's tolerance (a closed, Ready half is a capped one). With the hand at 8 cm a second chop cuts the positive half
+// only: three pieces, mass still exact. When the operator leaves, Idle clears nothing: the three pieces stay on the board.
 class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingStation
 {
     private const FVector k_Origin = FVector(12000.0, -9000.0, -30000.0);
@@ -23,13 +22,11 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Spawn_Station(InHandle, k_Origin, mars::CuttableFood_MeatSlab_Mars);
+        Spawn_Station(InHandle, k_Origin);
+        Spawn_InputPlatter(InHandle, mars::Food_MeatSlab_Mars);
 
-        Add_Step_WaitUntil("the station composed its Dicing and FoodBoard", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the board holds one shown joint", n"Check_JointShown", 0, 10.0f);
+        Add_Steps_IntakeTheJoint();
         Add_Step("the joint is whole and untouched, of the meat's mass and volume, at the pile point", n"Step_AssertJoint");
-        Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
         Add_Step("chop at the board's centre", n"Step_Chop");
         Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
         Add_Step("two halves conserve the joint and part along the blade", n"Step_AssertTwo");
@@ -40,8 +37,9 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
         Add_Step_WaitUntil("the second cut committed and every piece is shown", n"Check_ThreeShown", 0, 5.0f);
         Add_Step("three pieces conserve the joint; only the positive half was cut", n"Step_AssertThree");
         Add_Step("the operator leaves", n"Step_Leave");
-        Add_Step_WaitUntil("Idle cleared the touched board and a fresh joint is shown", n"Check_FreshJointShown", 0, 10.0f);
-        Add_Step("one fresh untouched joint; nothing of the first lineage remains", n"Step_AssertFresh");
+        Add_Step_WaitUntil("the station's state machine is Idle", n"Check_Idle", 0, 2.0f);
+        Add_Step_WaitFrames("a clear would have drained by now", 2);
+        Add_Step("the three pieces stay on the board", n"Step_AssertKept");
         Run_Steps(InHandle);
     }
 
@@ -71,12 +69,6 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
         const auto LongAxis = JointWorld.TransformVectorNoScale(FVector::ForwardVector);
         const auto Travel = StationWorld.TransformVectorNoScale(FVector::RightVector);
         Assert_True(LongAxis.Equals(Travel, 0.0001), f"the joint's long axis runs along the cleaver's travel ({LongAxis} vs {Travel})");
-    }
-
-    UFUNCTION()
-    private void Step_Take(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Take();
     }
 
     UFUNCTION()
@@ -174,27 +166,13 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
     }
 
     UFUNCTION()
-    private void Step_Leave(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertKept(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Leave();
-    }
-
-    UFUNCTION()
-    private void Check_FreshJointShown(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Board.Get_HeldCount() == 1 && _Board.Get_Held()[0].Get_Lineage() != _FirstLineage && Get_AllHeldShown());
-    }
-
-    UFUNCTION()
-    private void Step_AssertFresh(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        const auto Fresh = _Board.Get_Held()[0];
-        Assert_True(_Board.Get_IsUntouched(), "the fresh joint's board is untouched");
-        Assert_False(Fresh.Get_ParentId().IsValid(), "the fresh joint is a root");
-        Assert_Equals_Float(Fresh.Get_MassKg(), _Food.Data.MassKg, 0.000000001, "the fresh joint has the definition's mass");
-        Assert_Equals_Int(Get_LineageCount(_FirstLineage), 0, "no piece of the first lineage remains");
-        Assert_Equals_Int(Get_StationPieces(false).Num(), 1, "the fresh joint is the station's only piece");
+        Assert_Equals_Int(_Cleared, 0, "nothing cleared the board");
+        Assert_Equals_Int(_Board.Get_HeldCount(), 3, "the three pieces are still held");
+        Assert_False(_Board.Get_IsUntouched(), "the board is still touched");
+        Assert_Equals_Int(Get_LineageCount(_FirstLineage), 3, "the three pieces are the joint's");
+        Assert_True(Get_AllHeldShown(), "every piece is still shown");
     }
 
     // The chop issued nothing, or the watched cut resolved other than Cut.

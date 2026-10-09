@@ -41,7 +41,7 @@ struct FMars_Hotbar_Spec
     int32 BagSlotCount = 3;
 
     // Enabled adds the backpack slot after the overflow slot, at index BagSlotCount + 1. Only a backpack item fits it,
-    // and a backpack item fits nowhere else.
+    // and a backpack item fits nowhere else; a hands-only item fits only the overflow slot.
     UPROPERTY()
     ECk_EnableDisable BackpackSlot = ECk_EnableDisable::Enable;
 }
@@ -87,8 +87,9 @@ struct FMars_Hotbar_ParkedSelection
     }
 }
 
-// The overflow slot is only ever occupied while every bag slot is full, and while occupied it is always the selected
-// slot: any selection that would leave it is parked until its item has been dropped.
+// The overflow slot is only ever occupied while every bag slot is full, or by a hands-only item (which fits only the
+// overflow slot), and while occupied it is always the selected slot: any selection that would leave it is parked until
+// its item has been dropped.
 struct FMars_Fragment_Hotbar
 {
     // Layout: [0 .. N-1] bag, [N] overflow, [N+1] backpack (only with a backpack slot), N = BagSlotCount.

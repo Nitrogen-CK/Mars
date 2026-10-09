@@ -23,6 +23,7 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
         auto Spec = Make_TestSpec();
         Spec.Cook.SecondsPerFace = 0.15f;
         BuildStation(InHandle, Spec);
+        Build_Pieces(2);
 
         _Order.Add(EMars_Searing_Face::NegZ);
         _Order.Add(EMars_Searing_Face::PosZ);
@@ -59,13 +60,10 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
         const auto Face = _Order[_FaceIndex];
 
         // On the pan implies the body exists in the simulation; a teleport before that does nothing.
-        auto Body = _Searing.Get_PieceBody(Get_FirstId());
-        Assert_True(utils_jolt_body::Get_IsBodyAdded(Body), "the piece's body is in the simulation");
+        Assert_True(utils_jolt_body::Get_IsBodyAdded(_Searing.Get_PieceBody(Get_FirstId())), "the piece's body is in the simulation");
 
-        const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        const auto Location = PanBaseWorld.TransformPosition(FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + _Spec.Steak.HalfSize + 1.0));
-        const auto Rotation = (FQuat(PanBaseWorld.Rotator()) * FQuat(utils_searing::Make_FaceDownRotation(Face))).Rotator();
-        utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Location, Rotation));
+        const auto Reach = _Searing.Get_PieceHalfExtents(Get_FirstId()).GetMax();
+        Teleport_Piece(Get_FirstId(), FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + Reach + 1.0), utils_searing::Make_FaceDownRotation(Face));
     }
 
     UFUNCTION()

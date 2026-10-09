@@ -5,6 +5,10 @@ class UMars_Hotbar_AcceptPolicy : UObject
 {
     UFUNCTION()
     void OnCanAccept_ItemSlot(FCk_Handle_Inventory InInventory, FCk_Handle_Item InItem, bool& OutCanAccept)
+    { OutCanAccept = InItem.Has_Backpack() == false && InItem.Has_HandsOnly() == false; }
+
+    UFUNCTION()
+    void OnCanAccept_OverflowSlot(FCk_Handle_Inventory InInventory, FCk_Handle_Item InItem, bool& OutCanAccept)
     { OutCanAccept = InItem.Has_Backpack() == false; }
 
     UFUNCTION()
@@ -37,7 +41,10 @@ namespace utils_hotbar
             auto PolicyFunction = n"OnCanAccept_ItemSlot";
             auto SlotTag = FGameplayTag();
             if (Index == InSpec.BagSlotCount)
-            { SlotTag = GameplayTags::Inventory_Mars_Overflow; }
+            {
+                SlotTag = GameplayTags::Inventory_Mars_Overflow;
+                PolicyFunction = n"OnCanAccept_OverflowSlot";
+            }
             else if (Index == InSpec.BagSlotCount + 1)
             {
                 SlotTag = GameplayTags::Inventory_Mars_Backpack;
@@ -205,6 +212,7 @@ mixin TOptional<int32> TryGet_FirstEmptyBagSlot(const FCk_Handle_Hotbar& Self)
 }
 
 // Backpack item: the backpack slot if present and empty, else invalid.
+// Hands-only item: the overflow slot if empty, else invalid (never a bag slot, even a free one).
 // Any other item: first empty bag slot, else overflow if empty, else invalid.
 mixin FCk_Handle_Inventory_DataOnly TryGet_StowTarget(const FCk_Handle_Hotbar& Self, const FCk_Handle_Item& InItem)
 {
@@ -218,6 +226,10 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_StowTarget(const FCk_Handle_Hotbar& S
 
         return Self.Get_BackpackSlot();
     }
+
+    // A hands-only item: the overflow slot (both hands) or nowhere.
+    if (InItem.Has_HandsOnly())
+    { return Self.Get_IsOverflowOccupied() ? FCk_Handle_Inventory_DataOnly() : Self.Get_Slot(Self.Get_OverflowIndex()); }
 
     const auto BagIndex = Self.TryGet_FirstEmptyBagSlot();
     if (BagIndex.IsSet())
@@ -234,7 +246,8 @@ mixin bool Get_CanStow(const FCk_Handle_Hotbar& Self, const FCk_Handle_Item& InI
     return ck::IsValid(Self.TryGet_StowTarget(InItem));
 }
 
-// Where a TAKEN item lands: the selected bag slot when it is empty (into the hands), else TryGet_StowTarget(InItem).
+// Where a TAKEN item lands: the selected bag slot when it is empty (into the hands) and the item fits a bag slot, else
+// TryGet_StowTarget(InItem).
 mixin FCk_Handle_Inventory_DataOnly TryGet_TakeTarget(const FCk_Handle_Hotbar& Self, const FCk_Handle_Item& InItem)
 {
     if (ck::Is_NOT_Valid(InItem))
@@ -242,7 +255,8 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_TakeTarget(const FCk_Handle_Hotbar& S
 
     const auto SelectedIndex = Self.Get_SelectedIndex();
     const auto SelectedIsBagSlot = SelectedIndex.IsSet() && SelectedIndex.GetValue() < Self.Get_BagSlotCount();
-    if (SelectedIsBagSlot && InItem.Has_Backpack() == false && ck::Is_NOT_Valid(Self.Get_ItemAt(SelectedIndex.GetValue())))
+    const auto FitsBagSlot = InItem.Has_Backpack() == false && InItem.Has_HandsOnly() == false;
+    if (SelectedIsBagSlot && FitsBagSlot && ck::Is_NOT_Valid(Self.Get_ItemAt(SelectedIndex.GetValue())))
     { return Self.Get_Slot(SelectedIndex.GetValue()); }
 
     return Self.TryGet_StowTarget(InItem);

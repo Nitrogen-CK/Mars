@@ -37,6 +37,8 @@ namespace utils_foodpiece
 
         State.MassKg = InSpec.Data.MassKg;
         State.CookState = InSpec.Data.CookState;
+        State.Definition = InSpec.Data.Definition;
+        State.Kind = InSpec.Data.Kind;
 
         // A half is published Ready by its cut, so whoever receives the cut never sees it Pending.
         const auto Geometry = InHandle.As_RuntimeMesh();
@@ -171,6 +173,23 @@ mixin FMars_CookState Get_CookState(const FCk_Handle_FoodPiece& Self)
     return Self.Get_Fragment(FMars_Fragment_FoodPiece).CookState;
 }
 
+// Unset for a bare piece.
+mixin TWeakObjectPtr<UMars_Food_Def> Get_Definition(const FCk_Handle_FoodPiece& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece).Definition;
+}
+
+mixin FGameplayTagContainer Get_Kind(const FCk_Handle_FoodPiece& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece).Kind;
+}
+
+// A root (never cut from another piece).
+mixin bool Get_IsWhole(const FCk_Handle_FoodPiece& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece).ParentId.IsValid() == false;
+}
+
 mixin EMars_FoodPiece_Status Get_Status(const FCk_Handle_FoodPiece& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FoodPiece).Status;
@@ -214,6 +233,12 @@ mixin void Request_Cut(FCk_Handle_FoodPiece& Self, const FMars_Request_FoodPiece
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Requests);
     Requests.CutRequests.Add(InRequest);
+}
+
+mixin void Request_SetCookState(FCk_Handle_FoodPiece& Self, const FMars_Request_FoodPiece_SetCookState& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Requests);
+    Requests.SetCookStateRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -40,8 +40,10 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
         auto Spec = Make_TestSpec();
         Spec.Receiver.DrainSeconds = k_DrainSeconds;
         BuildStation(InHandle, Spec);
+        Build_Pieces(1);
 
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
         Add_Step("drive the skimmer", n"Step_Drive");
         Add_Step("dip it at its park", n"Step_Dip");
         Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", 0, 3.0f);
@@ -69,8 +71,8 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
         // At its float height: released higher it would plunge on entry, touch the dipped disc and bob off it again (a
         // retrieval of its own) before the lift.
         const auto ScoopRoot = _Fry.Get_ScoopRoot();
-        const auto HalfSize = _Spec.Piece.HalfSize;
-        const auto FloatZ = _Spec.Oil.SurfaceZ + HalfSize - 2.0f * HalfSize * k_Gravity / _Spec.Oil.BuoyancyAccel;
+        const auto HalfHeight = float32(Get_BoxHalfExtents().Z);
+        const auto FloatZ = _Spec.Oil.SurfaceZ + HalfHeight - 2.0f * HalfHeight * k_Gravity / _Spec.Oil.BuoyancyAccel;
         _Piece = AddPiece(FVector(ScoopRoot.X, ScoopRoot.Y, float64(FloatZ)));
     }
 
@@ -84,7 +86,7 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
             return;
         }
 
-        const auto Bottom = Get_PieceRootLocal(_Piece).Z - float64(_Spec.Piece.HalfSize);
+        const auto Bottom = Get_PieceRootLocal(_Piece).Z - _Fry.Get_PieceHalfExtents(_Piece).Z;
         const auto LipTop = _Fry.Get_ScoopRoot().Z + float64(_Spec.Scoop.LipHeight + k_LipClearanceCm);
         Res.Set(_Fry.Get_PieceWhereabouts(_Piece) == EMars_Fry_Whereabouts::Oil && Get_PieceSpeed(_Piece) < float64(k_CalmSpeed) && Bottom > LipTop);
     }

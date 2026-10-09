@@ -1,12 +1,13 @@
 // Six add-food presses inside one transfer (three in the drain that starts it, three a frame later) start ONE transfer: the
-// other five are refused Busy, never deferred. One release follows; accepted, the hand returns and the platter has spent
-// exactly one piece.
+// other five are refused Busy, never deferred. One release follows; accepted, the hand returns and exactly one piece has
+// left the platter.
 class UMars_AutoTest_CookingFeed_SixPressesDuringOneTransferAdmitOnePiece : UMars_AutoTestRig_CookingFeed
 {
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildFeed(InHandle, Make_TestSpec());
+        Add_Steps_SourceTheFeed();
 
         Add_Step("press add food three times in one drain", n"Step_PressThrice");
         Add_Step("press three more times while the hand reaches", n"Step_PressThrice");
@@ -41,6 +42,7 @@ class UMars_AutoTest_CookingFeed_SixPressesDuringOneTransferAdmitOnePiece : UMar
     private void Step_AssertOnePieceAdmitted(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Ledger(k_Stock - 1, 1, "after the return");
+        Assert_Equals_Int(_Platter.Get_HeldCount(), k_Stock - 1, "one piece left the platter");
         Assert_Equals_Int(_Settles.Num(), 1, "one transfer settled");
         Assert_Equals_Int(Get_SettleCount(EMars_CookingFeed_Settle::Admitted), 1, "it settled Admitted");
         Assert_Equals_Int(_Releases.Num(), 1, "still one release");
