@@ -76,6 +76,10 @@ class AMars_PlayerCharacter : AMars_Character
     UMars_PlayerCharacter_Config Config = mars::Mars_PlayerCharacter_Config;
 
     private FCk_Handle_Gait _Gait;
+    // The gait counters EmitSurfaceFx last played for, and the surface FX table's assets, loaded at composition and held
+    // here so a footstep never loads one.
+    private FMars_SurfaceFx_GaitCounts _SurfaceFxSeen;
+    private TArray<UObject> _SurfaceFxAssets;
     private FCk_Handle_Transform _HandNode;
     private FCk_Handle_Sway _HandSway;
     private FCk_Handle_FPHands _Hands;
@@ -221,6 +225,7 @@ class AMars_PlayerCharacter : AMars_Character
         auto GaitSpec = Config.View.Gait;
         GaitSpec.Set_MovementComponent(CharacterMovement);
         _Gait = utils_gait::Add(Player, GaitSpec);
+        ConstructSurfaceFx(Player);
 
         // The view: a bob node on the eye node is the director's input anchor, so the rendered view bobs with the gait
         // (a positional bob) and eases with the eye across a crouch. The director lives on the head node;
@@ -357,6 +362,67 @@ class AMars_PlayerCharacter : AMars_Character
     void Tick(float DeltaSeconds)
     {
         TryStartPlayerSm();
+        EmitSurfaceFx();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Footsteps and landings (Mars_SurfaceFx.as): the gait is the one stride clock, so a step plays at its footfall, on the
+    // bob's dip. Every copy runs its own gait from its movement component, so every machine hears every player without
+    // anything replicating; Play makes another player's steps quieter and culls them beyond earshot.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    private void ConstructSurfaceFx(FCk_Handle& InPlayer)
+    {
+        _SurfaceFxSeen = utils_surface_fx::Get_GaitCounts(_Gait);
+        if (utils_net::Get_CanExecuteCosmeticEvents(InPlayer) == false)
+        { return; }
+
+        const auto Table = utils_surface_fx::Get_Table();
+        const auto Validation = Table.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[PlayerCharacter] SurfaceFx: {Validation.Get_Error()}"))
+        { return; }
+
+        utils_surface_fx::Load_Assets(Table, _SurfaceFxAssets);
+    }
+
+    // One footstep per gait footfall and one landing per landing since the last tick, on the surface under the capsule.
+    private void EmitSurfaceFx()
+    {
+        if (ck::Is_NOT_Valid(_Gait))
+        { return; }
+
+        const auto Counts = utils_surface_fx::Get_GaitCounts(_Gait);
+        const auto Emits = utils_surface_fx::Get_GaitEmits(_SurfaceFxSeen, Counts);
+        _SurfaceFxSeen = Counts;
+        if (Emits.Footsteps == 0 && Emits.Lands == 0)
+        { return; }
+
+        if (utils_net::Get_CanExecuteCosmeticEvents(_Gait) == false)
+        { return; }
+
+        auto Query = FMars_SurfaceFx_GroundQuery();
+        Query.Origin = GetActorLocation();
+        Query.DepthCm = CapsuleComponent.GetScaledCapsuleHalfHeight() + constants_surface_fx::k_GroundProbeMarginCm;
+        Query.Ignored.Add(this);
+
+        auto Ground = FMars_SurfaceFx_Ground();
+        if (utils_surface_fx::TryGet_SurfaceUnder(Query, Ground) == false)
+        { return; }
+
+        auto Event = FMars_SurfaceFx_Event();
+        Event.SurfaceTags = Ground.SurfaceTags;
+        Event.Contact = Ground.Contact;
+        Event.Instigator = _Gait;
+
+        Event.Kind = GameplayTags::SurfaceFx_Land;
+        Event.Intensity = float32(_Gait.Get_LastLandImpactSpeed());
+        for (int32 Index = 0; Index < Emits.Lands; ++Index)
+        { utils_surface_fx::Play(Event); }
+
+        Event.Kind = GameplayTags::SurfaceFx_Footstep;
+        Event.Intensity = float32(_Gait.Get_SpeedRatio());
+        for (int32 Index = 0; Index < Emits.Footsteps; ++Index)
+        { utils_surface_fx::Play(Event); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
