@@ -866,15 +866,80 @@ namespace UMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest
 }
 
 USTRUCT()
-struct FMars_AutoTest_DicingStation_ChopsSliceTheSlab_SpawnParams
+struct FMars_AutoTest_DicingStation_ChopsCutTheJoint_SpawnParams
 {
 }
 
-namespace UMars_AutoTest_DicingStation_ChopsSliceTheSlab
+namespace UMars_AutoTest_DicingStation_ChopsCutTheJoint
 {
-    FMars_AutoTest_DicingStation_ChopsSliceTheSlab_SpawnParams Params()
+    FMars_AutoTest_DicingStation_ChopsCutTheJoint_SpawnParams Params()
     {
-        return FMars_AutoTest_DicingStation_ChopsSliceTheSlab_SpawnParams();
+        return FMars_AutoTest_DicingStation_ChopsCutTheJoint_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes
+{
+    FMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams Params()
+    {
+        return FMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DicingStation_LeaveMidCutLeavesOneFreshJoint_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DicingStation_LeaveMidCutLeavesOneFreshJoint
+{
+    FMars_AutoTest_DicingStation_LeaveMidCutLeavesOneFreshJoint_SpawnParams Params()
+    {
+        return FMars_AutoTest_DicingStation_LeaveMidCutLeavesOneFreshJoint_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DicingStation_MeatCutCostIsMeasured_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DicingStation_MeatCutCostIsMeasured
+{
+    FMars_AutoTest_DicingStation_MeatCutCostIsMeasured_SpawnParams Params()
+    {
+        return FMars_AutoTest_DicingStation_MeatCutCostIsMeasured_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation
+{
+    FMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams Params()
+    {
+        return FMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DicingStation_SweepReleasesPiecesOntoTheTable_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DicingStation_SweepReleasesPiecesOntoTheTable
+{
+    FMars_AutoTest_DicingStation_SweepReleasesPiecesOntoTheTable_SpawnParams Params()
+    {
+        return FMars_AutoTest_DicingStation_SweepReleasesPiecesOntoTheTable_SpawnParams();
     }
 }
 
@@ -1135,6 +1200,331 @@ namespace UMars_AutoTest_EyesDummy_ComposesAndWrites
     FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams Params()
     {
         return FMars_AutoTest_EyesDummy_ComposesAndWrites_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_ClearDestroysHeldKeepsReleased_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_ClearDestroysHeldKeepsReleased
+{
+    FMars_AutoTest_FoodBoard_ClearDestroysHeldKeepsReleased_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_ClearDestroysHeldKeepsReleased_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_ClearWhileCuttingCommitsNothing_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_ClearWhileCuttingCommitsNothing
+{
+    FMars_AutoTest_FoodBoard_ClearWhileCuttingCommitsNothing_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_ClearWhileCuttingCommitsNothing_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_CutReplacesHeldAndSeparatesHalves_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_CutReplacesHeldAndSeparatesHalves
+{
+    FMars_AutoTest_FoodBoard_CutReplacesHeldAndSeparatesHalves_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_CutReplacesHeldAndSeparatesHalves_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_CutTargetsOnlyStraddlingPiecesWithinBudget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_CutTargetsOnlyStraddlingPiecesWithinBudget
+{
+    FMars_AutoTest_FoodBoard_CutTargetsOnlyStraddlingPiecesWithinBudget_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_CutTargetsOnlyStraddlingPiecesWithinBudget_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly
+{
+    FMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_FullBoardOnlyKnocks_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_FullBoardOnlyKnocks
+{
+    FMars_AutoTest_FoodBoard_FullBoardOnlyKnocks_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_FullBoardOnlyKnocks_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_PartingKeepsEveryGap_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_PartingKeepsEveryGap
+{
+    FMars_AutoTest_FoodBoard_PartingKeepsEveryGap_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_PartingKeepsEveryGap_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_PlaceRefusesPastLimitDuplicateAndForeign_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_PlaceRefusesPastLimitDuplicateAndForeign
+{
+    FMars_AutoTest_FoodBoard_PlaceRefusesPastLimitDuplicateAndForeign_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_PlaceRefusesPastLimitDuplicateAndForeign_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_ReleasedRingDestroysOldest_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_ReleasedRingDestroysOldest
+{
+    FMars_AutoTest_FoodBoard_ReleasedRingDestroysOldest_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_ReleasedRingDestroysOldest_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_ReleaseMakesBodiesWithPieceMass_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_ReleaseMakesBodiesWithPieceMass
+{
+    FMars_AutoTest_FoodBoard_ReleaseMakesBodiesWithPieceMass_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_ReleaseMakesBodiesWithPieceMass_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_RotatedPieceCutsThroughItsCentre_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_RotatedPieceCutsThroughItsCentre
+{
+    FMars_AutoTest_FoodBoard_RotatedPieceCutsThroughItsCentre_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_RotatedPieceCutsThroughItsCentre_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid
+{
+    FMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_CentreCutConservesMassAndLineage_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_CentreCutConservesMassAndLineage
+{
+    FMars_AutoTest_FoodPiece_CentreCutConservesMassAndLineage_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_CentreCutConservesMassAndLineage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_FailedImportIsReported_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_FailedImportIsReported
+{
+    FMars_AutoTest_FoodPiece_FailedImportIsReported_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_FailedImportIsReported_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_FullQueueRejectsWithoutRetry_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_FullQueueRejectsWithoutRetry
+{
+    FMars_AutoTest_FoodPiece_FullQueueRejectsWithoutRetry_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_FullQueueRejectsWithoutRetry_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_GrazeIsTouchingOnly_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_GrazeIsTouchingOnly
+{
+    FMars_AutoTest_FoodPiece_GrazeIsTouchingOnly_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_GrazeIsTouchingOnly_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_HalvesSurviveGarbageCollectionAndRecut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_HalvesSurviveGarbageCollectionAndRecut
+{
+    FMars_AutoTest_FoodPiece_HalvesSurviveGarbageCollectionAndRecut_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_HalvesSurviveGarbageCollectionAndRecut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_ImportReadyRecordsVolume_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_ImportReadyRecordsVolume
+{
+    FMars_AutoTest_FoodPiece_ImportReadyRecordsVolume_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_ImportReadyRecordsVolume_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions
+{
+    FMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_MissLeavesSourceUsable_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_MissLeavesSourceUsable
+{
+    FMars_AutoTest_FoodPiece_MissLeavesSourceUsable_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_MissLeavesSourceUsable_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_OffCentreCutIsProportionalToVolume_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_OffCentreCutIsProportionalToVolume
+{
+    FMars_AutoTest_FoodPiece_OffCentreCutIsProportionalToVolume_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_OffCentreCutIsProportionalToVolume_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_SecondCutWhileCuttingIsRefusedBusy_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_SecondCutWhileCuttingIsRefusedBusy
+{
+    FMars_AutoTest_FoodPiece_SecondCutWhileCuttingIsRefusedBusy_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_SecondCutWhileCuttingIsRefusedBusy_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_SourceDestroyedWhilePendingCommitsNothing_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_SourceDestroyedWhilePendingCommitsNothing
+{
+    FMars_AutoTest_FoodPiece_SourceDestroyedWhilePendingCommitsNothing_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_SourceDestroyedWhilePendingCommitsNothing_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_SpecValidateRejectsInvalid_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_SpecValidateRejectsInvalid
+{
+    FMars_AutoTest_FoodPiece_SpecValidateRejectsInvalid_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_SpecValidateRejectsInvalid_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_TooSmallPortionIsRejected_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_TooSmallPortionIsRejected
+{
+    FMars_AutoTest_FoodPiece_TooSmallPortionIsRejected_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_TooSmallPortionIsRejected_SpawnParams();
     }
 }
 
@@ -2608,6 +2998,97 @@ namespace UMars_AutoTest_Station_ViewLocalMakesAViewNode
 }
 
 USTRUCT()
+struct FMars_AutoTest_SurfaceFx_GaitEmitsOncePerIncrement_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_GaitEmitsOncePerIncrement
+{
+    FMars_AutoTest_SurfaceFx_GaitEmitsOncePerIncrement_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_GaitEmitsOncePerIncrement_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SurfaceFx_GroundTraceReturnsOverridePhysMat_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_GroundTraceReturnsOverridePhysMat
+{
+    FMars_AutoTest_SurfaceFx_GroundTraceReturnsOverridePhysMat_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_GroundTraceReturnsOverridePhysMat_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SurfaceFx_ImpactorOverrideWins_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_ImpactorOverrideWins
+{
+    FMars_AutoTest_SurfaceFx_ImpactorOverrideWins_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_ImpactorOverrideWins_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SurfaceFx_ResolveFallsBackExactParentDefault_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_ResolveFallsBackExactParentDefault
+{
+    FMars_AutoTest_SurfaceFx_ResolveFallsBackExactParentDefault_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_ResolveFallsBackExactParentDefault_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads
+{
+    FMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SurfaceFx_ValidateRejectsInvalid_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_ValidateRejectsInvalid
+{
+    FMars_AutoTest_SurfaceFx_ValidateRejectsInvalid_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_ValidateRejectsInvalid_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SurfaceFx_VariantByIntensity_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SurfaceFx_VariantByIntensity
+{
+    FMars_AutoTest_SurfaceFx_VariantByIntensity_SpawnParams Params()
+    {
+        return FMars_AutoTest_SurfaceFx_VariantByIntensity_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall_SpawnParams
 {
 }
@@ -3166,11 +3647,15 @@ struct FMars_DicingStation_EntityScript_SpawnParams
     UPROPERTY()
     FMars_Dicing_Spec Dicing = FMars_Dicing_Spec();
 
-    FMars_DicingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+    UPROPERTY()
+    TWeakObjectPtr<UMars_CuttableFood_Def> Food = nullptr;
+
+    FMars_DicingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing, UMars_CuttableFood_Def InFood)
     {
         SpawnTransform = InSpawnTransform;
         Station = InStation;
         Dicing = InDicing;
+        Food = TWeakObjectPtr<UMars_CuttableFood_Def>(InFood);
     }
 }
 
@@ -3181,9 +3666,9 @@ namespace UMars_DicingStation_EntityScript
         return FMars_DicingStation_EntityScript_SpawnParams();
     }
 
-    FMars_DicingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+    FMars_DicingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing, UMars_CuttableFood_Def InFood)
     {
-        return FMars_DicingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InDicing);
+        return FMars_DicingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InDicing, InFood);
     }
 }
 
@@ -7854,6 +8339,19 @@ namespace UMars_SmTask_Crouch
     FMars_SmTask_Crouch_SpawnParams Params()
     {
         return FMars_SmTask_Crouch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Dicing_CutBridge_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Dicing_CutBridge
+{
+    FMars_SmTask_Dicing_CutBridge_SpawnParams Params()
+    {
+        return FMars_SmTask_Dicing_CutBridge_SpawnParams();
     }
 }
 
