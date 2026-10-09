@@ -1,0 +1,99 @@
+// A piece destroyed while its slice waits in RuntimeMesh's queue commits nothing: RuntimeMesh cancels the slice, the
+// kernel finds the piece gone, no OnCutResolved fires, no piece of its lineage survives, and the PendingCuts ledger lets go
+// of it. Filler slices of a plain box mesh, queued in the same step ahead of the cut, keep the piece's slice queued for
+// several frames (RuntimeMesh drains two per frame, first in first out); the destroy step asserts the slice is still
+// pending, so a change in that timing fails here instead of passing without exercising the cancel.
+class UMars_AutoTest_FoodPiece_SourceDestroyedWhilePendingCommitsNothing : UMars_AutoTestRig_FoodPiece
+{
+    private int32 _FillerCount = 8;
+
+    private FCk_Handle_FoodPiece _Source;
+    private FGuid _SourceLineage;
+    private FCk_Handle_RuntimeMesh _Filler;
+    private FCk_Handle _FillerOwner;
+    private int32 _FillersResolved = 0;
+
+    UFUNCTION(BlueprintOverride)
+    void DoBeginPlay(FCk_Handle InHandle)
+    {
+        _Source = Build_Piece(Get_BoxMesh(), FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -40700.0)), Make_Spec(1.0));
+
+        auto FillerEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        _Filler = utils_runtime_mesh::Add(FillerEntity, FCk_RuntimeMesh_Spec(Get_BoxMesh()));
+        _FillerOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
+
+        Add_Step_WaitUntil("the piece and the filler mesh are Ready", n"Check_Ready");
+        Add_Step("queue filler slices, then cut the piece", n"Step_QueueThenCut");
+        Add_Step_WaitUntil("the piece's slice is in flight", n"Check_Cutting");
+        Add_Step("destroy the piece while its slice is queued", n"Step_DestroyWhilePending");
+        Add_Step_WaitUntil("every filler resolved and the ledger let go of the piece", n"Check_Settled");
+        Add_Step_WaitSeconds("a late commit would arrive in this window", 0.2f);
+        Add_Step("nothing was committed", n"Step_AssertNothingCommitted");
+        Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_HasReadied(_Source) && utils_runtime_mesh::Get_SetupState(_Filler) == ECk_RuntimeMesh_SetupState::Ready);
+    }
+
+    UFUNCTION()
+    private void Step_QueueThenCut(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        for (int32 Index = 0; Index < _FillerCount; ++Index)
+        {
+            auto Slice = FCk_Request_RuntimeMesh_Slice();
+            Slice.Set_OperationID(FGuid::NewGuid());
+            Slice.Set_ResultOwner(_FillerOwner);
+            Slice.Set_Plane(Make_Plane(Get_BoundsCenter(_Source), FVector::ForwardVector));
+            utils_runtime_mesh::Request_Slice(_Filler, Slice, FCk_Delegate_RuntimeMesh_OnSliceResolved(this, n"OnFillerResolved"));
+        }
+
+        Assert_Equals_Int(_FillersResolved, 0, "every filler slice was queued, none rejected on submission");
+
+        _SourceLineage = _Source.Get_Lineage();
+        Cut(_Source, Get_BoundsCenter(_Source), FVector::ForwardVector);
+    }
+
+    UFUNCTION()
+    private void Check_Cutting(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Source.Get_IsCutting() || _Cuts.Num() > 0);
+    }
+
+    UFUNCTION()
+    private void Step_DestroyWhilePending(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_Cuts.Num(), 0, "the cut has not resolved before the destroy");
+        Assert_True(_Source.Get_IsCutting(), "the piece is still cutting when it is destroyed");
+        Assert_True(utils_foodpiece::Get_HasPendingCut(ck::TransientEntity(), _Source), "the ledger holds the piece's slice when it is destroyed");
+        Assert_True(_FillersResolved < _FillerCount, "filler slices are still queued ahead of the piece's");
+
+        utils_entity_lifetime::Request_DestroyEntity(_Source);
+    }
+
+    UFUNCTION()
+    private void Check_Settled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_FillersResolved == _FillerCount && utils_foodpiece::Get_HasPendingCut(ck::TransientEntity(), _Source) == false);
+    }
+
+    UFUNCTION()
+    private void Step_AssertNothingCommitted(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_Cuts.Num(), 0, "no OnCutResolved for a piece destroyed mid-cut");
+        Assert_True(ck::Is_NOT_Valid(_Source), "the piece is destroyed");
+        Assert_Equals_Int(Get_LineagePieces(_SourceLineage).Num(), 0, "no piece of the lineage survives");
+        Assert_False(utils_foodpiece::Get_HasPendingCut(ck::TransientEntity(), _Source), "the ledger holds nothing for the piece");
+    }
+
+    UFUNCTION()
+    private void OnFillerResolved(FCk_RuntimeMesh_SliceResult InResult)
+    {
+        ++_FillersResolved;
+    }
+}
