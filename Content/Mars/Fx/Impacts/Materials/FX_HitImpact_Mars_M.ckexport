@@ -1,0 +1,146 @@
+{
+	"material": "FX_HitImpact_Mars_M",
+	"packagePath": "/Game/Mars/Fx/Impacts/Materials/FX_HitImpact_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e65dfb429cea920bc1a5b8763946b84d",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Additive",
+	"twoSided": true,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"Opacity"
+	],
+	"expressions":
+	{
+		"Divide": 1,
+		"EyeAdaptation": 1,
+		"Multiply": 2,
+		"ParticleColor": 1,
+		"TextureSample": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 3,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 1,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_3",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 2,
+						"output": 4,
+						"mask": "a"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 3,
+						"output": 5,
+						"mask": "rgba"
+					}
+				]
+			},
+			{
+				"id": 2,
+				"class": "ParticleColor",
+				"name": "MaterialExpressionParticleColor_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				]
+			},
+			{
+				"id": 3,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Fx/Impacts/Textures/FX_StylizedImpact_Mars_T.FX_StylizedImpact_Mars_T"
+				}
+			},
+			{
+				"id": 4,
+				"class": "Divide",
+				"name": "MaterialExpressionDivide_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 5,
+						"output": 0
+					}
+				]
+			},
+			{
+				"id": 5,
+				"class": "EyeAdaptation",
+				"name": "MaterialExpressionEyeAdaptation_0"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Fx/Impacts/Textures/FX_StylizedImpact_Mars_T.FX_StylizedImpact_Mars_T"
+	]
+}

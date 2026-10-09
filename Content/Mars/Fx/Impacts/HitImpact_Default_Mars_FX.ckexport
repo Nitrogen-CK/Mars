@@ -1,0 +1,1636 @@
+{
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "ea4d590de24aeac52409a0fe22f218f7",
+		"exporterVersion": 3
+	},
+	"system": "HitImpact_Default_Mars_FX",
+	"packagePath": "/Game/Mars/Fx/Impacts/HitImpact_Default_Mars_FX",
+	"userParameters": [],
+	"systemState":
+	{
+		"stacks": [
+			{
+				"stage": "System Update",
+				"modules": [
+					{
+						"name": "System State",
+						"id": "SystemState",
+						"inputs": [
+							{
+								"name": "Inactive Response",
+								"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+							},
+							{
+								"name": "Loop Behavior",
+								"value": "NewEnumerator1 (Once)"
+							},
+							{
+								"name": "UseLoopDelay",
+								"value": "false"
+							}
+						]
+					}
+				],
+				"values": [
+					{
+						"name": "OmnidirectionalBurst001.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "OmnidirectionalBurst001.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "OmnidirectionalBurst001.EmitterState.MaxDistance",
+						"value": "2500"
+					},
+					{
+						"name": "OmnidirectionalBurst001.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Age",
+						"value": "0"
+					},
+					{
+						"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Loop Count Limit",
+						"value": "1"
+					},
+					{
+						"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Count",
+						"value": "10"
+					},
+					{
+						"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Group",
+						"value": "0"
+					},
+					{
+						"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Time",
+						"value": "0"
+					},
+					{
+						"name": "SingleLoopingParticle.EmitterState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "SingleLoopingParticle.EmitterState.Loop Duration",
+						"value": "1"
+					},
+					{
+						"name": "SingleLoopingParticle.EmitterState.MaxDistance",
+						"value": "2500"
+					},
+					{
+						"name": "SingleLoopingParticle.EmitterState.MinDistance",
+						"value": "0"
+					},
+					{
+						"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Age",
+						"value": "0"
+					},
+					{
+						"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Loop Count Limit",
+						"value": "1"
+					},
+					{
+						"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Count",
+						"value": "1"
+					},
+					{
+						"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Group",
+						"value": "0"
+					},
+					{
+						"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Probability",
+						"value": "1"
+					},
+					{
+						"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Time",
+						"value": "0"
+					},
+					{
+						"name": "SystemState.Loop Delay",
+						"value": "0"
+					},
+					{
+						"name": "SystemState.Loop Duration",
+						"value": "5"
+					}
+				]
+			}
+		],
+		"systemStateModule":
+		{
+			"found": true,
+			"module": "SystemState",
+			"name": "System State",
+			"enabled": true,
+			"inputs": [
+				{
+					"name": "Inactive Response",
+					"value": "NewEnumerator0 (Complete (Let Emitters Finish then Kill The System))"
+				},
+				{
+					"name": "Loop Behavior",
+					"value": "NewEnumerator1 (Once)"
+				},
+				{
+					"name": "UseLoopDelay",
+					"value": "false"
+				}
+			],
+			"values": [
+				{
+					"name": "Loop Delay",
+					"value": "0"
+				},
+				{
+					"name": "Loop Duration",
+					"value": "5"
+				}
+			]
+		}
+	},
+	"emitters": [
+		{
+			"name": "SingleLoopingParticle",
+			"enabled": true,
+			"sim": "GPU",
+			"localSpace": false,
+			"determinism": false,
+			"boundsMode": "Fixed",
+			"fixedBounds": "X=-100.000 Y=-100.000 Z=-100.000 to X=100.000 Y=100.000 Z=100.000",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "true"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator1 (Self)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator1 (Once)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator1 (Self)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "bUseMinDistance",
+									"kind": "value",
+									"value": "true"
+								},
+								{
+									"path": "bUseMaxDistance",
+									"kind": "value",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Spawn Burst Instantaneous",
+							"id": "SpawnBurst_Instantaneous",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopCountLimit",
+									"value": "false"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "SingleLoopingParticle.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "SingleLoopingParticle.EmitterState.MaxDistance",
+							"value": "2500"
+						},
+						{
+							"name": "SingleLoopingParticle.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Age",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Loop Count Limit",
+							"value": "1"
+						},
+						{
+							"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Count",
+							"value": "1"
+						},
+						{
+							"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Group",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "SingleLoopingParticle.SpawnBurst_Instantaneous.Spawn Time",
+							"value": "0"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator1 (Direct Set)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator0 (Direct Set)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator2 (Random)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator3 (Uniform)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Color",
+							"value": "RGBA(100, 38.9128, 0, 1)"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Lifetime",
+							"value": "0.4"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Lifetime Max",
+							"value": "1.75"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Lifetime Min",
+							"value": "0.8"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Mass Max",
+							"value": "2"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Mass Min",
+							"value": "0.75"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Sprite Rotation Angle Max",
+							"value": "360"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Sprite Rotation Angle Min",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Sprite Size Max",
+							"value": "(3, 14)"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Sprite Size Min",
+							"value": "(2, 6)"
+						},
+						{
+							"name": "SingleLoopingParticle.InitializeParticle.Uniform Sprite Size",
+							"value": "100"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Scale Sprite Size",
+							"id": "ScaleSpriteSize",
+							"inputs": [
+								{
+									"name": "UniformCurve",
+									"value": ""
+								},
+								{
+									"name": "NonUniformCurve",
+									"value": ""
+								},
+								{
+									"name": "Scale Sprite Size Mode",
+									"value": "NewEnumerator1 (Uniform Curve)"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Uniform Curve Sprite Scale",
+									"kind": "curve",
+									"diClass": "NiagaraDataInterfaceCurve",
+									"channels": [
+										{
+											"name": "None",
+											"keys": [
+												{
+													"t": 0,
+													"v": 0,
+													"i": "L"
+												},
+												{
+													"t": 0.48451098799705505,
+													"v": 1,
+													"i": "L"
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Solve Forces and Velocity",
+							"id": "SolveForcesAndVelocity",
+							"inputs": [
+								{
+									"name": "Clamp Velocity",
+									"value": "false"
+								},
+								{
+									"name": "Limit Acceleration",
+									"value": "false"
+								},
+								{
+									"name": "Rotational Solver Is Enabled",
+									"value": "true"
+								},
+								{
+									"name": "Write to Presolve Properties",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Sub UVAnimation",
+							"id": "SubUVAnimation",
+							"inputs": [
+								{
+									"name": "DefaultCurve",
+									"value": ""
+								},
+								{
+									"name": "DefaultScaleCurve",
+									"value": ""
+								},
+								{
+									"name": "Define SubUV Setup Manually",
+									"value": "NewEnumerator0 (Automatic (From Renderer SubImage Size))"
+								},
+								{
+									"name": "Evaluation Type",
+									"value": "NewEnumerator1 (Every Frame)"
+								},
+								{
+									"name": "Fixed Random Seed",
+									"value": "false"
+								},
+								{
+									"name": "Index By X/Y Coordinate",
+									"value": "false"
+								},
+								{
+									"name": "Loop Range Boundary",
+									"value": "NewEnumerator1 (Wrap)"
+								},
+								{
+									"name": "Output Alternate Renderer Binding",
+									"value": "false"
+								},
+								{
+									"name": "Override Seed",
+									"value": "false"
+								},
+								{
+									"name": "Playback Mode",
+									"value": "NewEnumerator0 (Loops Per Second)"
+								},
+								{
+									"name": "Random Start Frame",
+									"value": "false"
+								},
+								{
+									"name": "Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Renderer Type",
+									"value": "NewEnumerator0 (Sprite)"
+								},
+								{
+									"name": "SubUV Animation Mode",
+									"value": "NewEnumerator0 (Linear)"
+								},
+								{
+									"name": "Truncate Y Coordinate",
+									"value": "true"
+								},
+								{
+									"name": "UseEndFrame",
+									"value": "false"
+								},
+								{
+									"name": "UsePlayRateScale",
+									"value": "false"
+								},
+								{
+									"name": "UseStartFrame",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Sprite Renderer ",
+									"kind": "dataInterface",
+									"value": "NiagaraDataInterfaceSpriteRendererInfo"
+								},
+								{
+									"path": "Playback Scale Curve",
+									"kind": "curve",
+									"diClass": "NiagaraDataInterfaceCurve",
+									"channels": [
+										{
+											"name": "None",
+											"keys": [
+												{
+													"t": 0.25,
+													"v": 1,
+													"i": "C"
+												},
+												{
+													"t": 0.34507501125335693,
+													"v": 0,
+													"i": "C"
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Scale Color",
+							"id": "ScaleColor",
+							"inputs": [
+								{
+									"name": "ColorCurve",
+									"value": ""
+								},
+								{
+									"name": "Scale Mode",
+									"value": "NewEnumerator0 (RGB and Alpha Separately)"
+								},
+								{
+									"name": "ScaleA",
+									"value": "true"
+								},
+								{
+									"name": "ScaleRGB",
+									"value": "true"
+								},
+								{
+									"name": "ScaleRGBA",
+									"value": "true"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Scale Alpha",
+									"kind": "dynamicInput",
+									"value": "Float from Curve",
+									"id": "FloatFromCurve",
+									"overrides": [
+										{
+											"path": "FloatCurve",
+											"kind": "curve",
+											"diClass": "NiagaraDataInterfaceCurve",
+											"channels": [
+												{
+													"name": "None",
+													"keys": [
+														{
+															"t": 0,
+															"v": 1,
+															"i": "L"
+														},
+														{
+															"t": 0.65352398157119751,
+															"v": 0,
+															"i": "L"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "SingleLoopingParticle.FloatFromCurve.Scale Curve",
+							"value": "1"
+						},
+						{
+							"name": "SingleLoopingParticle.ScaleColor.Scale RGB",
+							"value": "(1, 1, 1)"
+						},
+						{
+							"name": "SingleLoopingParticle.ScaleSpriteSize.Initial Sprite Size",
+							"value": "(0, 0)"
+						},
+						{
+							"name": "SingleLoopingParticle.ScaleSpriteSize.Uniform Curve Index",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.ScaleSpriteSize.Uniform Curve Scale",
+							"value": "1"
+						},
+						{
+							"name": "SingleLoopingParticle.SolveForcesAndVelocity.Acceleration Limit",
+							"value": "9999"
+						},
+						{
+							"name": "SingleLoopingParticle.SolveForcesAndVelocity.Mesh Orientation",
+							"value": "quat(0, 0, 0, 1)"
+						},
+						{
+							"name": "SingleLoopingParticle.SolveForcesAndVelocity.Rotational Force",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "SingleLoopingParticle.SolveForcesAndVelocity.Rotational Velocity",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "SingleLoopingParticle.SolveForcesAndVelocity.Speed Limit",
+							"value": "1000"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Direct Frame Index",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.End Frame Range Override",
+							"value": "63"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Manual SubImage Size",
+							"value": "(8, 8)"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Play Rate",
+							"value": "3"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Playback Time",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Start Frame Offset",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Start Frame Range Override",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.Start Time Offset",
+							"value": "0"
+						},
+						{
+							"name": "SingleLoopingParticle.SubUVAnimation.SubUV Lookup Index Scale",
+							"value": "0.5"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator0 (Direct Set)",
+				"source": "direct",
+				"values": [
+					{
+						"name": "Lifetime",
+						"value": "0.4"
+					}
+				],
+				"inertValues": [
+					{
+						"name": "Lifetime Min",
+						"value": "0.8"
+					},
+					{
+						"name": "Lifetime Max",
+						"value": "1.75"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraSpriteRendererProperties",
+					"material": "/Game/Mars/Fx/Impacts/Materials/FX_HitImpact_Mars_M.FX_HitImpact_Mars_M",
+					"alignment": "Automatic",
+					"facing": "Automatic",
+					"sortMode": "None",
+					"subImage": "5x4"
+				}
+			]
+		},
+		{
+			"name": "OmnidirectionalBurst001",
+			"enabled": true,
+			"sim": "GPU",
+			"localSpace": false,
+			"determinism": false,
+			"boundsMode": "Dynamic",
+			"stacks": [
+				{
+					"stage": "Emitter Update",
+					"modules": [
+						{
+							"name": "Emitter State",
+							"id": "EmitterState",
+							"inputs": [
+								{
+									"name": "ScaleSpawnCountCurve",
+									"value": ""
+								},
+								{
+									"name": "Enable Distance Culling",
+									"value": "true"
+								},
+								{
+									"name": "Enable Visibility Culling",
+									"value": "false"
+								},
+								{
+									"name": "Inactive Response",
+									"value": "NewEnumerator0 (Complete (Let Particles Finish then Kill Emitter))"
+								},
+								{
+									"name": "Life Cycle Mode",
+									"value": "NewEnumerator1 (Self)"
+								},
+								{
+									"name": "Loop Behavior",
+									"value": "NewEnumerator1 (Once)"
+								},
+								{
+									"name": "Loop Duration Mode",
+									"value": "NewEnumerator0 (Fixed)"
+								},
+								{
+									"name": "Scalability Mode",
+									"value": "NewEnumerator1 (Self)"
+								},
+								{
+									"name": "Scale Spawn Count",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopDelay",
+									"value": "false"
+								}
+							],
+							"overrides": [
+								{
+									"path": "bUseMinDistance",
+									"kind": "value",
+									"value": "true"
+								},
+								{
+									"path": "bUseMaxDistance",
+									"kind": "value",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Spawn Burst Instantaneous",
+							"id": "SpawnBurst_Instantaneous",
+							"inputs": [
+								{
+									"name": "Use Spawn Probability",
+									"value": "false"
+								},
+								{
+									"name": "UseLoopCountLimit",
+									"value": "false"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "OmnidirectionalBurst001.EmitterState.Loop Delay",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.EmitterState.Loop Duration",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.EmitterState.MaxDistance",
+							"value": "2500"
+						},
+						{
+							"name": "OmnidirectionalBurst001.EmitterState.MinDistance",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Age",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Loop Count Limit",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Count",
+							"value": "10"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Group",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Probability",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SpawnBurst_Instantaneous.Spawn Time",
+							"value": "0"
+						}
+					]
+				},
+				{
+					"stage": "Particle Spawn",
+					"modules": [
+						{
+							"name": "Initialize Particle",
+							"id": "InitializeParticle",
+							"inputs": [
+								{
+									"name": "AdjustAlpha",
+									"value": "false"
+								},
+								{
+									"name": "AdjustHue",
+									"value": "true"
+								},
+								{
+									"name": "AdjustSaturation",
+									"value": "false"
+								},
+								{
+									"name": "AdjustValue",
+									"value": "false"
+								},
+								{
+									"name": "Color Channel Mode",
+									"value": "NewEnumerator1 (Link RGB / Link A)"
+								},
+								{
+									"name": "Color Mode",
+									"value": "NewEnumerator1 (Direct Set)"
+								},
+								{
+									"name": "Color Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Lifetime Mode",
+									"value": "NewEnumerator1 (Random)"
+								},
+								{
+									"name": "Lifetime Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mass Mode",
+									"value": "NewEnumerator0 (Unset / (Mass of 1))"
+								},
+								{
+									"name": "Mass Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Mesh Renderer Array Visibility Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Mesh Scale Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Position Mode",
+									"value": "NewEnumerator2 (Simulation Position)"
+								},
+								{
+									"name": "Ribbon Facing Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Twist Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Ribbon Width Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite Rotation Mode",
+									"value": "NewEnumerator2 (Random)"
+								},
+								{
+									"name": "Sprite Rotation Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite Size Mode",
+									"value": "NewEnumerator1 (Random Uniform)"
+								},
+								{
+									"name": "Sprite Size Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Sprite UV Mode",
+									"value": "NewEnumerator0 (Unset)"
+								},
+								{
+									"name": "Sprite UV Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "UsePositionOffset",
+									"value": "false"
+								},
+								{
+									"name": "Wrap Index By Mesh Count",
+									"value": "true"
+								},
+								{
+									"name": "Write Material Random",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Shape Location",
+							"id": "ShapeLocation",
+							"inputs": [
+								{
+									"name": "LatheCurve",
+									"value": ""
+								},
+								{
+									"name": "Additional Quaternion Rotation",
+									"value": "false"
+								},
+								{
+									"name": "Apply To Particle Position",
+									"value": "NewEnumerator0 (Apply)"
+								},
+								{
+									"name": "Box / Plane Mode",
+									"value": "NewEnumerator0 (Box)"
+								},
+								{
+									"name": "Cone Angle Type",
+									"value": "NewEnumerator0 (Degrees)"
+								},
+								{
+									"name": "Cone Mode",
+									"value": "NewEnumerator0 (Spherical Cone)"
+								},
+								{
+									"name": "Cylinder Distribution",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Enable Lathe Profile",
+									"value": "false"
+								},
+								{
+									"name": "Enable Torus Knot Radius",
+									"value": "false"
+								},
+								{
+									"name": "Evaluation Type",
+									"value": "NewEnumerator0 (Spawn Only)"
+								},
+								{
+									"name": "Fixed Random Seed",
+									"value": "false"
+								},
+								{
+									"name": "Flatten Endcaps",
+									"value": "false"
+								},
+								{
+									"name": "Hemicircle Internal Cap",
+									"value": "true"
+								},
+								{
+									"name": "Hemicircle X",
+									"value": "false"
+								},
+								{
+									"name": "Hemicircle Y",
+									"value": "false"
+								},
+								{
+									"name": "Hemisphere Angle Type",
+									"value": "NewEnumerator1 (Normalized Angle (0-1))"
+								},
+								{
+									"name": "MaskSpawnGroup",
+									"value": "false"
+								},
+								{
+									"name": "Offset Mode",
+									"value": "NewEnumerator1 (None)"
+								},
+								{
+									"name": "Override Seed",
+									"value": "false"
+								},
+								{
+									"name": "Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Ring / Disc Distribution Mode",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Ring / Disc Mode",
+									"value": "NewEnumerator0 (Circle)"
+								},
+								{
+									"name": "Rotation Angle Type",
+									"value": "NewEnumerator1 (Normalized Angle (0-1))"
+								},
+								{
+									"name": "Rotation Mode",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Scale Mode",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Shape Primitive",
+									"value": "NewEnumerator0 (Sphere)"
+								},
+								{
+									"name": "Sphere Distribution",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Surface Only",
+									"value": "false"
+								},
+								{
+									"name": "Torus Distribution Mode",
+									"value": "NewEnumerator0 (Random)"
+								},
+								{
+									"name": "Torus Mode",
+									"value": "NewEnumerator0 (Torus)"
+								},
+								{
+									"name": "Transform Method",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Transform Order",
+									"value": "NewEnumerator0 (Scale / Rotate / Offset)"
+								},
+								{
+									"name": "Use Endcaps In Surface Only Mode",
+									"value": "true"
+								},
+								{
+									"name": "UseOwnerScale",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Add Velocity",
+							"id": "AddVelocity",
+							"inputs": [
+								{
+									"name": "Additional Quaternion Rotation",
+									"value": "false"
+								},
+								{
+									"name": "Cone Angle Mode",
+									"value": "NewEnumerator0 (Degrees)"
+								},
+								{
+									"name": "Fixed Random Seed",
+									"value": "false"
+								},
+								{
+									"name": "Override Seed",
+									"value": "false"
+								},
+								{
+									"name": "Randomness Mode",
+									"value": "NewEnumerator0 (Simulation Defaults)"
+								},
+								{
+									"name": "Rotation Angle Type",
+									"value": "NewEnumerator0 (Degrees)"
+								},
+								{
+									"name": "Rotation Mode",
+									"value": "NewEnumerator0 (Default)"
+								},
+								{
+									"name": "Velocity Mode",
+									"value": "NewEnumerator1 (From Point)"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Additional Yaw / Pitch / Roll",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Constrain To Radius",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Default Position",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Origin Offset",
+							"value": "(0, 0, -7)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Radius Falloff Exponent",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Radius Falloff Near / Far",
+							"value": "(1, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Random Seed",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Rotation Angle",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Rotation Axis",
+							"value": "(1, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Rotation Quaternion",
+							"value": "quat(0, 0, 0, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Velocity",
+							"value": "(0, 0, 50)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Velocity Origin",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Velocity Speed",
+							"value": "100"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Velocity Speed Scale",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.AddVelocity.Yaw / Pitch / Roll",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Color",
+							"value": "RGBA(1, 1, 1, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Lifetime Max",
+							"value": "1.8"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Lifetime Min",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Position Offset",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Ribbon Width",
+							"value": "5"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Sprite Rotation Angle Max",
+							"value": "360"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Sprite Rotation Angle Min",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Uniform Sprite Size Max",
+							"value": "25"
+						},
+						{
+							"name": "OmnidirectionalBurst001.InitializeParticle.Uniform Sprite Size Min",
+							"value": "5"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Additional Yaw / Pitch / Roll",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Apply Owner Scale",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Hemisphere Distribution",
+							"value": "(1, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Non Uniform Scale",
+							"value": "(1, 1, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Random Seed",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Rotation Angle",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Rotation Axis",
+							"value": "(1, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Rotation Quaternion",
+							"value": "quat(0, 0, 0, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Spawn Group Mask",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Sphere Radius",
+							"value": "20"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Sphere Surface Distribution",
+							"value": "0"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ShapeLocation.Yaw / Pitch / Roll",
+							"value": "(0, 0, 0)"
+						}
+					]
+				},
+				{
+					"stage": "Particle Update",
+					"modules": [
+						{
+							"name": "Particle State",
+							"id": "ParticleState",
+							"inputs": [
+								{
+									"name": "Kill Particles When Lifetime Has Elapsed",
+									"value": "true"
+								}
+							]
+						},
+						{
+							"name": "Gravity Force",
+							"id": "GravityForce",
+							"enabled": false,
+							"inputs": [
+								{
+									"name": "Coordinate Space",
+									"value": "World"
+								}
+							]
+						},
+						{
+							"name": "Drag",
+							"id": "Drag",
+							"inputs": [
+								{
+									"name": "Use Linear Drag",
+									"value": "true"
+								},
+								{
+									"name": "Use Rotational Drag",
+									"value": "false"
+								}
+							]
+						},
+						{
+							"name": "Scale Sprite Size",
+							"id": "ScaleSpriteSize",
+							"inputs": [],
+							"overrides": [
+								{
+									"path": "Scale Factor",
+									"kind": "dynamicInput",
+									"value": "Vector 2DFrom Float",
+									"id": "Vector2DFromFloat",
+									"overrides": [
+										{
+											"path": "Value",
+											"kind": "dynamicInput",
+											"value": "Float from Curve",
+											"id": "FloatFromCurve",
+											"overrides": [
+												{
+													"path": "FloatCurve",
+													"kind": "curve",
+													"diClass": "NiagaraDataInterfaceCurve",
+													"channels": [
+														{
+															"name": "None",
+															"keys": [
+																{
+																	"t": -0.0045980000868439674,
+																	"v": 1.0113190412521362,
+																	"i": "C"
+																},
+																{
+																	"t": 0.16505800187587738,
+																	"v": 0.87196201086044312,
+																	"i": "C"
+																},
+																{
+																	"t": 0.40878200531005859,
+																	"v": 0,
+																	"i": "L"
+																}
+															]
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Scale Color",
+							"id": "ScaleColor",
+							"inputs": [
+								{
+									"name": "ColorCurve",
+									"value": ""
+								},
+								{
+									"name": "Scale Mode",
+									"value": "NewEnumerator0 (RGB and Alpha Separately)"
+								},
+								{
+									"name": "ScaleA",
+									"value": "true"
+								},
+								{
+									"name": "ScaleRGB",
+									"value": "true"
+								},
+								{
+									"name": "ScaleRGBA",
+									"value": "true"
+								}
+							],
+							"overrides": [
+								{
+									"path": "Scale Alpha",
+									"kind": "dynamicInput",
+									"value": "Float from Curve 001",
+									"id": "FloatFromCurve001",
+									"overrides": [
+										{
+											"path": "FloatCurve",
+											"kind": "curve",
+											"diClass": "NiagaraDataInterfaceCurve",
+											"channels": [
+												{
+													"name": "None",
+													"keys": [
+														{
+															"t": -0.0045977085828781128,
+															"v": 1.0113191604614258,
+															"i": "C"
+														},
+														{
+															"t": 1.0011492967605591,
+															"v": 0.0019557476043701172,
+															"i": "C"
+														}
+													]
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Solve Forces and Velocity",
+							"id": "SolveForcesAndVelocity",
+							"inputs": [
+								{
+									"name": "Clamp Velocity",
+									"value": "false"
+								},
+								{
+									"name": "Limit Acceleration",
+									"value": "false"
+								},
+								{
+									"name": "Rotational Solver Is Enabled",
+									"value": "true"
+								},
+								{
+									"name": "Write to Presolve Properties",
+									"value": "true"
+								}
+							]
+						}
+					],
+					"values": [
+						{
+							"name": "OmnidirectionalBurst001.Drag.Drag",
+							"value": "8.042"
+						},
+						{
+							"name": "OmnidirectionalBurst001.Drag.Rotational Drag",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.FloatFromCurve.Scale Curve",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.FloatFromCurve001.Scale Curve",
+							"value": "1"
+						},
+						{
+							"name": "OmnidirectionalBurst001.GravityForce.Gravity",
+							"value": "(0, 0, -980)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ScaleColor.Scale RGB",
+							"value": "(1, 1, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.ScaleColor.Scale RGBA",
+							"value": "(1, 1, 1, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SolveForcesAndVelocity.Acceleration Limit",
+							"value": "9999"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SolveForcesAndVelocity.Mesh Orientation",
+							"value": "quat(0, 0, 0, 1)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SolveForcesAndVelocity.Rotational Force",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SolveForcesAndVelocity.Rotational Velocity",
+							"value": "(0, 0, 0)"
+						},
+						{
+							"name": "OmnidirectionalBurst001.SolveForcesAndVelocity.Speed Limit",
+							"value": "1000"
+						}
+					]
+				}
+			],
+			"eventHandlers": [],
+			"lifetimeResolved":
+			{
+				"module": "InitializeParticle",
+				"mode": "NewEnumerator1 (Random)",
+				"source": "minmax",
+				"values": [
+					{
+						"name": "Lifetime Min",
+						"value": "1"
+					},
+					{
+						"name": "Lifetime Max",
+						"value": "1.8"
+					}
+				]
+			},
+			"renderers": [
+				{
+					"type": "NiagaraSpriteRendererProperties",
+					"material": "/Niagara/DefaultAssets/DefaultSpriteMaterial.DefaultSpriteMaterial",
+					"alignment": "Automatic",
+					"facing": "Automatic",
+					"sortMode": "None"
+				}
+			]
+		}
+	]
+}
