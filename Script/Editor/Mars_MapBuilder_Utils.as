@@ -2,13 +2,16 @@
 // and the four ProtoGrid MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid (created on first use from the
 // CkUsf master).
 #if EDITOR
-// One static-mesh block: its label, centre, scale and rotation.
+// One static-mesh block: its label, centre, scale, rotation and surface.
 struct FMars_MapBuilder_Block
 {
     FString Label;
     FVector Location;
     FVector Scale = FVector::OneVector;
     FRotator Rotation;
+    // The component's PhysMaterialOverride, which the Jolt bake reads per component (a material instance's phys mat never
+    // reaches it). Null means Stone.
+    TSoftObjectPtr<UPhysicalMaterial> PhysMat;
 
     FMars_MapBuilder_Block() {}
 
@@ -61,6 +64,14 @@ namespace utils_mars_map_builder
 {
     const FString k_MaterialFolder = "/Game/Mars/Materials/ProtoGrid";
     const FString k_ProtoGridMaster = "/CkFoundation/CkUsf/GeneratedLooks/M_CkUsf_Look_ProtoGrid.M_CkUsf_Look_ProtoGrid";
+    const FString k_PhysMatFolder = "/Game/Mars/Physics";
+
+    // The surface phys mat /Game/Mars/Physics/<InSurface>_Mars_PhysMat (Stone, Wood, Carpet, ...).
+    TSoftObjectPtr<UPhysicalMaterial> Get_PhysMat(const FString& InSurface)
+    {
+        const FString Name = f"{InSurface}_Mars_PhysMat";
+        return TSoftObjectPtr<UPhysicalMaterial>(FSoftObjectPath(f"{k_PhysMatFolder}/{Name}.{Name}"));
+    }
 
     // The open editor world when it is the saved map at InMapPath; warns and returns null otherwise.
     UWorld TryGet_OpenMap(const FString& InCommand, const FString& InMapPath)
@@ -130,6 +141,14 @@ namespace utils_mars_map_builder
         Actor.StaticMeshComponent.SetStaticMesh(InMesh);
         Actor.SetActorScale3D(InBlock.Scale);
         Actor.SetActorLabel(InBlock.Label);
+
+        const auto PhysMatSoft = InBlock.PhysMat.IsNull() ? Get_PhysMat("Stone") : InBlock.PhysMat;
+        auto PhysMat = System::LoadAsset_Blocking(PhysMatSoft);
+        if (ck::EnsureIfNot(ck::IsValid(PhysMat),
+            f"[Mars.MapBuilder] Phys mat [{PhysMatSoft.ToSoftObjectPath().ToString()}] for the block [{InBlock.Label}] not found"))
+        { return Actor; }
+
+        Actor.StaticMeshComponent.SetPhysMaterialOverride(PhysMat);
         return Actor;
     }
 

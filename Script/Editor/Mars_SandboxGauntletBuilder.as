@@ -380,8 +380,9 @@ namespace utils_mars_sandbox
         InCell.Block("LoftWall_West", FVector(-310.0, 1000.0, 0.0), FVector(-290.0, 1300.0, Height));
         InCell.Block("LoftWall_East", FVector(290.0, 1000.0, 0.0), FVector(310.0, 1300.0, Height));
         InCell.Block("LoftWall_North", FVector(-300.0, 1290.0, 0.0), FVector(300.0, 1310.0, Height));
-        utils_mars_map_builder::Spawn_Block(engine::load::Cone(),
-            FMars_MapBuilder_Block(f"{InCell.Prefix}_Bell", InCell.Origin + FVector(0.0, 1170.0, 480.0), FVector(2.4, 2.4, 2.4)));
+        auto Bell = FMars_MapBuilder_Block(f"{InCell.Prefix}_Bell", InCell.Origin + FVector(0.0, 1170.0, 480.0), FVector(2.4, 2.4, 2.4));
+        Bell.PhysMat = utils_mars_map_builder::Get_PhysMat("Metal");
+        utils_mars_map_builder::Spawn_Block(engine::load::Cone(), Bell);
         InCell.Block("BellChain", FVector(-5.0, 1165.0, 600.0), FVector(5.0, 1175.0, Height));
         InCell.Block("BellPlaque", FVector(-110.0, 1036.0, 420.0), FVector(110.0, 1044.0, 520.0));
         InCell.Glyph("Glyph_BellCircle", EMars_Seal_Glyph::Circle, FVector(60.0, 1032.0, 470.0));

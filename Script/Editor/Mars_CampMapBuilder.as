@@ -154,9 +154,13 @@ namespace utils_mars_camp
         auto Cylinder = engine::load::Cylinder();
 
         // Top face at Z=0. The fire pit and the cauldron sit on it at the origin.
-        utils_mars_map_builder::Spawn_Block(Cylinder, FMars_MapBuilder_Block("Camp_Floor", FVector(0.0, 0.0, -10.0), FVector(20.0, 20.0, 0.2)));
+        auto Floor = FMars_MapBuilder_Block("Camp_Floor", FVector(0.0, 0.0, -10.0), FVector(20.0, 20.0, 0.2));
+        Floor.PhysMat = utils_mars_map_builder::Get_PhysMat("Dirt");
+        utils_mars_map_builder::Spawn_Block(Cylinder, Floor);
         utils_mars_map_builder::Spawn_Block(Cylinder, FMars_MapBuilder_Block("Camp_FirePit", FVector(0.0, 0.0, 15.0), FVector(3.0, 3.0, 0.3)));
-        utils_mars_map_builder::Spawn_Block(Cylinder, FMars_MapBuilder_Block("Camp_Cauldron", FVector(0.0, 0.0, 60.0), FVector(1.6, 1.6, 1.2)));
+        auto Cauldron = FMars_MapBuilder_Block("Camp_Cauldron", FVector(0.0, 0.0, 60.0), FVector(1.6, 1.6, 1.2));
+        Cauldron.PhysMat = utils_mars_map_builder::Get_PhysMat("Metal");
+        utils_mars_map_builder::Spawn_Block(Cylinder, Cauldron);
 
         Spawn_Walls(Cube);
         Spawn_Stations(Cube);
@@ -402,8 +406,10 @@ namespace utils_mars_camp
         {
             if (Row.Furniture == EMars_CampStationFurniture::Table)
             {
-                utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(f"Camp_Table_{Row.Label}",
-                    Get_RingPoint(Row.AngleDeg, k_StationRadius, 45.0), FVector(2.0, 1.0, 0.9), FRotator(0.0, Row.AngleDeg + 180.0, 0.0)));
+                auto Table = FMars_MapBuilder_Block(f"Camp_Table_{Row.Label}",
+                    Get_RingPoint(Row.AngleDeg, k_StationRadius, 45.0), FVector(2.0, 1.0, 0.9), FRotator(0.0, Row.AngleDeg + 180.0, 0.0));
+                Table.PhysMat = utils_mars_map_builder::Get_PhysMat("Wood");
+                utils_mars_map_builder::Spawn_Block(InCube, Table);
             }
 
             Spawn_StationLabel(Row);
@@ -419,8 +425,10 @@ namespace utils_mars_camp
 
         for (auto Prop : Props)
         {
-            utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(Prop.ActorLabel,
-                Get_RingPoint(Prop.AngleDeg, Prop.Radius, Prop.Z), Prop.Scale, FRotator(0.0, Prop.AngleDeg + 180.0, 0.0)));
+            auto Block = FMars_MapBuilder_Block(Prop.ActorLabel,
+                Get_RingPoint(Prop.AngleDeg, Prop.Radius, Prop.Z), Prop.Scale, FRotator(0.0, Prop.AngleDeg + 180.0, 0.0));
+            Block.PhysMat = utils_mars_map_builder::Get_PhysMat("Wood");
+            utils_mars_map_builder::Spawn_Block(InCube, Block);
         }
     }
 
@@ -441,8 +449,10 @@ namespace utils_mars_camp
         for (int32 Index = 0; Index < Angles.Num(); ++Index)
         {
             const float64 AngleDeg = Angles[Index];
-            utils_mars_map_builder::Spawn_Block(InCube, FMars_MapBuilder_Block(f"Camp_Bedroll_{Index}",
-                Get_RingPoint(AngleDeg, k_BedrollRadius, 10.0), FVector(1.8, 0.7, 0.2), FRotator(0.0, AngleDeg + 180.0, 0.0)));
+            auto Bedroll = FMars_MapBuilder_Block(f"Camp_Bedroll_{Index}",
+                Get_RingPoint(AngleDeg, k_BedrollRadius, 10.0), FVector(1.8, 0.7, 0.2), FRotator(0.0, AngleDeg + 180.0, 0.0));
+            Bedroll.PhysMat = utils_mars_map_builder::Get_PhysMat("Carpet");
+            utils_mars_map_builder::Spawn_Block(InCube, Bedroll);
         }
 
         Spawn_PlayerStarts();
