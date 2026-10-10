@@ -1,0 +1,139 @@
+{
+	"assetName": "JoltCell_-1_-1",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/CookingLookdev_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "ca0fa94edb8ec85b6cff4b6866a4f5ca",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 7
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": -1,
+				"Y": -1
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 1
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "StaticMeshActor_4",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CookingLookdev_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CookingLookdev_Mars_MAP",
+							"AssetName": "CookingLookdev_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_4"
+					},
+					"_SourceHash": -7.5344701070446285e+18,
+					"_RuntimeCheckHash": -4.0037103713058811e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -16,
+								"Y": -34,
+								"Z": 2.2000000000000002
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.21643961393810296,
+								"W": 0.97629600711993347
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_5",
+					"_SourceLevelPackage": "/Game/Mars/Maps/CookingLookdev_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/CookingLookdev_Mars_MAP",
+							"AssetName": "CookingLookdev_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_5"
+					},
+					"_SourceHash": 5.4553336495390648e+18,
+					"_RuntimeCheckHash": 8.1109255645327462e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -8,
+								"Y": -34,
+								"Z": 2.2000000000000002
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.21643961393810296,
+								"W": 0.97629600711993347
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				}
+			]
+		}
+	]
+}
