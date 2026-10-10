@@ -1,9 +1,9 @@
 namespace utils_cooking_feed
 {
     // Composes the feed on InHandle (the station entity; the feature does not need the Station feature). The spec's Nodes are
-    // built by the caller: Nodes.Release is sampled at every release. The feed starts unsourced (control sets the source
-    // from the station's input dock) with the hand idle. A rejected spec or a missing release node ensures and returns an
-    // invalid handle.
+    // built by the caller: Nodes.Release is sampled at every release, and the reserved piece rides Nodes.Hand from its grasp
+    // to its release. The feed starts unsourced (control sets the source from the station's input dock) with the hand idle.
+    // A rejected spec or a missing node ensures and returns an invalid handle.
     FCk_Handle_CookingFeed Add(FCk_Handle& InHandle, FMars_CookingFeed_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -11,6 +11,9 @@ namespace utils_cooking_feed
         { return FCk_Handle_CookingFeed(); }
 
         if (ck::EnsureIfNot(ck::IsValid(InSpec.Nodes.Release), f"[CookingFeed] [{InHandle.ToString()}] needs a release node"))
+        { return FCk_Handle_CookingFeed(); }
+
+        if (ck::EnsureIfNot(ck::IsValid(InSpec.Nodes.Hand), f"[CookingFeed] [{InHandle.ToString()}] needs a hand node to carry its pieces"))
         { return FCk_Handle_CookingFeed(); }
 
         auto Params = FMars_Fragment_CookingFeed_Params();
@@ -22,15 +25,23 @@ namespace utils_cooking_feed
         return InHandle.As_CookingFeed();
     }
 
-    // What the source holds less a reserved piece still on it; 0 without a source. Once the bridge has unloaded the
-    // reserved piece for its release it is already off the count.
+    // What the source holds (frozen, settling or about to drop: a pile re-settling after a piece left is still stock) less a
+    // reserved piece still on it; 0 without a source. Once the feed has unloaded the reserved piece at its grasp it is
+    // already off the count.
     int32 Get_Available(const FMars_Fragment_CookingFeed& InState)
     {
         if (ck::Is_NOT_Valid(InState.Source))
         { return 0; }
 
         const auto Reserved = InState.Active.IsSet() && Get_IsOnSource(InState.Active.GetValue().Piece, InState.Source) ? 1 : 0;
-        return InState.Source.Get_HeldCount() - Reserved;
+        return InState.Source.Get_Occupancy() - Reserved;
+    }
+
+    // The source has stock but its pile is settling: nothing is frozen to reach for, so a press is refused Busy until a
+    // piece freezes.
+    bool Get_IsSettling(const FMars_Fragment_CookingFeed& InState)
+    {
+        return Get_Available(InState) > 0 && InState.Source.Get_HeldCount() == 0;
     }
 
     // InPiece is alive and InSource (a valid platter) holds it, landed or pending.
@@ -45,9 +56,58 @@ namespace utils_cooking_feed
         return InPiece.TryGet_Platter() == InSource;
     }
 
+    // A reserved piece the feed took off its source (unloading, or riding InHand) goes back onto it: detached from the hand
+    // where it is, then loaded (a load queued behind a pending unload drains after it and lands it back). A piece that is
+    // gone, released, re-parented off the hand or held by another ledger stays as it is; without a live source it stays
+    // where it is. Issues requests only: the caller drops the reservation (Cancel_Active).
+    void Return_Piece(const FMars_Fragment_CookingFeed& InState, const FCk_Handle_Transform& InHand)
+    {
+        if (InState.Active.IsSet() == false)
+        { return; }
+
+        const auto Reservation = InState.Active.GetValue();
+        const auto IsTaken = Reservation.Hold == EMars_CookingFeed_PieceHold::Unloading || Reservation.Hold == EMars_CookingFeed_PieceHold::InHand;
+        auto Piece = Reservation.Piece;
+        if (IsTaken == false || ck::Is_NOT_Valid(Piece)
+            || utils_entity_lifetime::Get_IsPendingDestroy(Piece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+        { return; }
+
+        if (Reservation.Hold == EMars_CookingFeed_PieceHold::InHand)
+        {
+            if (Get_IsUnderHand(Piece, InHand) == false)
+            { return; }
+
+            FCk_Handle Entity = Piece;
+            auto Node = Entity.As_SceneNode();
+            utils_scene_node::Request_Detach(Node);
+        }
+
+        const auto Holder = Piece.TryGet_Platter();
+        if (ck::IsValid(Holder) && Holder != InState.Source)
+        { return; }
+
+        auto Source = InState.Source;
+        if (ck::Is_NOT_Valid(Source) || utils_entity_lifetime::Get_IsPendingDestroy(Source, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+        {
+            ck::Trace(f"[CookingFeed] [{Piece.ToString()}] stays where it is: no live source to put it back on");
+            return;
+        }
+
+        Source.Request_Load(FMars_Request_Platter_Load(Piece));
+        ck::Trace(f"[CookingFeed] [{Piece.ToString()}] goes back onto [{Source.ToString()}]");
+    }
+
+    // InPiece is scene-node attached directly under InHand.
+    bool Get_IsUnderHand(const FCk_Handle_FoodPiece& InPiece, const FCk_Handle_Transform& InHand)
+    {
+        FCk_Handle Entity = InPiece;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        return ck::IsValid(Node) && ck::IsValid(InHand) && utils_scene_node::Get_Parent(Node) == InHand;
+    }
+
     // Drops the reservation (if any) and idles the hand at once: the one cancel path (Reset, Cancel, SetSource, a reservation
     // whose piece left the source). True when a reservation was dropped; the caller read its id first and settles it
-    // Cancelled.
+    // Cancelled (and, for a piece the feed took itself, Return_Piece first).
     bool Cancel_Active(FMars_Fragment_CookingFeed& InState)
     {
         const auto HadReservation = InState.Active.IsSet();
@@ -150,6 +210,11 @@ mixin bool Get_IsSourced(const FCk_Handle_CookingFeed& Self)
     return ck::IsValid(Self.Get_Source());
 }
 
+mixin bool Get_IsSettling(const FCk_Handle_CookingFeed& Self)
+{
+    return utils_cooking_feed::Get_IsSettling(Self.Get_Fragment(FMars_Fragment_CookingFeed));
+}
+
 mixin bool Get_IsBusy(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Phase != EMars_CookingFeed_Phase::Idle;
@@ -184,6 +249,21 @@ mixin FMars_CookingFeed_Release Get_PendingRelease(const FCk_Handle_CookingFeed&
 mixin FCk_Handle_Transform Get_ReleaseNode(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.Release;
+}
+
+mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_CookingFeed& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.Hand;
+}
+
+// Where the reserved piece is; unset while idle.
+mixin TOptional<EMars_CookingFeed_PieceHold> TryGet_PieceHold(const FCk_Handle_CookingFeed& Self)
+{
+    const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
+    if (Active.IsSet() == false)
+    { return TOptional<EMars_CookingFeed_PieceHold>(); }
+
+    return TOptional<EMars_CookingFeed_PieceHold>(Active.GetValue().Hold);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

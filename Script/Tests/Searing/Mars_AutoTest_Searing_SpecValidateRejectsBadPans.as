@@ -29,6 +29,10 @@ class UMars_AutoTest_Searing_SpecValidateRejectsBadPans : UCk_AutoTest_Base
         NoDisc.Loss.PanRadius = 0.0f;
         AssertRejected(NoDisc.Validate(), "PanRadius <= 0");
 
+        auto NoFloor = FMars_Searing_Spec();
+        NoFloor.Loss.FallThroughCm = 0.0f;
+        AssertRejected(NoFloor.Validate(), "FallThroughCm <= 0");
+
         auto NeverSears = FMars_Searing_Spec();
         NeverSears.Cook.SecondsPerFace = 0.0f;
         AssertRejected(NeverSears.Validate(), "SecondsPerFace <= 0");

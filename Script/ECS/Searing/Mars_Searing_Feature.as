@@ -126,6 +126,12 @@ struct FMars_Searing_LossSpec
     UPROPERTY()
     float32 LingerSeconds = 2.5f;
 
+    // How far a piece's middle may sink below the cooking surface and still be on the pan, whatever its thickness: a thin
+    // slice sits a few millimetres into the triangle-mesh pan under ordinary contact penetration. Deeper, it fell through
+    // and is lost. 6 cm is the depth the old cube pieces tolerated (their half height).
+    UPROPERTY()
+    float32 FallThroughCm = 6.0f;
+
     FMars_Searing_LossSpec() {}
 
     FMars_Searing_LossSpec(float32 InPanRadius, float32 InLingerSeconds)
@@ -262,6 +268,9 @@ mixin FMars_Validation Validate(const FMars_Searing_Spec& Self)
 
     if (Self.Loss.LingerSeconds < 0.0f)
     { return FMars_Validation(f"Searing has a negative Loss.LingerSeconds [{Self.Loss.LingerSeconds}]"); }
+
+    if (Self.Loss.FallThroughCm <= 0.0f)
+    { return FMars_Validation(f"Searing has a non-positive Loss.FallThroughCm [{Self.Loss.FallThroughCm}]"); }
 
     return FMars_Validation();
 }

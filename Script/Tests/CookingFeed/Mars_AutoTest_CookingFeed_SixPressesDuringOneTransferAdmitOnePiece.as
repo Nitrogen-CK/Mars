@@ -42,7 +42,7 @@ class UMars_AutoTest_CookingFeed_SixPressesDuringOneTransferAdmitOnePiece : UMar
     private void Step_AssertOnePieceAdmitted(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Ledger(k_Stock - 1, 1, "after the return");
-        Assert_Equals_Int(_Platter.Get_HeldCount(), k_Stock - 1, "one piece left the platter");
+        Assert_Equals_Int(_Platter.Get_Occupancy(), k_Stock - 1, "one piece left the platter");
         Assert_Equals_Int(_Settles.Num(), 1, "one transfer settled");
         Assert_Equals_Int(Get_SettleCount(EMars_CookingFeed_Settle::Admitted), 1, "it settled Admitted");
         Assert_Equals_Int(_Releases.Num(), 1, "still one release");

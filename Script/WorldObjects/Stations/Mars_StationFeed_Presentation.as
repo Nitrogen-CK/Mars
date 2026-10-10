@@ -1,13 +1,15 @@
-// Station-frame authoring of a feeding station: where the free glove rests, where a held piece sits in the glove's frame,
-// the clearance it lifts to before and after a grasp, and the arc height of the carry. The glove grasps the reserved piece
-// where it lies on the source platter, from above.
+// Station-frame authoring of a feeding station: where the free glove rests, where a held piece sits in the glove's frame
+// (the station hands it to its feed as Motion.HeldOffset, so the real piece rides the glove there), the clearance it lifts
+// to before and after a grasp, and the arc height of the carry. The glove grasps the reserved piece where it lies on the
+// source platter, from above.
 struct FMars_StationFeed_Geometry
 {
     // The glove's rest; its rotation is the glove's for the whole transfer.
     UPROPERTY()
     FTransform RestLocal;
 
-    // The held piece in the glove node's frame: the glove stops where this puts it on the reserved piece's middle or on the release node.
+    // The held piece's middle in the glove node's frame: the glove stops where this puts it on the reserved piece's middle or
+    // on the release node.
     UPROPERTY()
     FTransform HeldLocal;
 
@@ -39,20 +41,22 @@ struct FMars_StationFeed_Frame
 }
 
 // The station script owns one and advances it from its dressing tick. It samples the feed (never writes it) and keeps no
-// clock of its own: the glove node's offset, the left glove's pose override and which piece rides the glove all follow the
-// feed's phase and progress.
+// clock of its own: the glove node's offset and the left glove's pose override follow the feed's phase and progress. The
+// reserved piece itself rides the glove node (the feed's Nodes.Hand) from the grasp to the release.
 struct FMars_StationFeed_Presentation
 {
     FMars_StationFeed_Geometry Geometry;
 
-    // The Station.Node.Feed node (created by the station under its root): the free glove's grip follows it.
+    // The Station.Node.Feed node (created by the station under its root): the free glove's grip follows it, and the feed
+    // carries its piece under it.
     FCk_Handle_SceneNode HandNode;
 
     // The offset last written (written only on change).
     FTransform WrittenHand;
 
-    // Whose proxy rides the glove: Grasp through AwaitAdmission.
-    TOptional<FMars_CookingFeed_PieceId> CarriedPiece;
+    // Where the reserved piece's middle lay (station frame) the last time it lay on its own: the glove grasps and lifts
+    // from there. Read live until the piece rides the glove (a live read then would chase the glove itself).
+    TOptional<FVector> GraspLocal;
 
     // The override last sent to PosedOperator's left glove.
     TOptional<EMars_HandGripPose> AppliedPose;
@@ -61,32 +65,28 @@ struct FMars_StationFeed_Presentation
 }
 
 // Moves the glove node (rest -> reserved piece -> clearance -> release node -> rest, InOutSine per segment; the release node is
-// re-sampled every frame, the pan moves), sets the operator's LEFT pose override (Open while reaching and returning, Cradle
-// from Grasp through AwaitAdmission, cleared once idle) and records which piece rides the glove.
+// re-sampled every frame, the pan moves) and sets the operator's LEFT pose override (Open while reaching and returning,
+// Cradle from Grasp through AwaitAdmission, cleared once idle).
 mixin void Advance(FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
 {
     if (ck::Is_NOT_Valid(InFrame.Feed))
     { return; }
 
     const auto Phase = InFrame.Feed.Get_Phase();
-    const auto Active = InFrame.Feed.TryGet_ActivePiece();
-    const auto IsHolding = Phase == EMars_CookingFeed_Phase::Grasp || Phase == EMars_CookingFeed_Phase::Carry
-        || Phase == EMars_CookingFeed_Phase::AwaitAdmission;
-
-    Self.CarriedPiece = IsHolding ? Active : TOptional<FMars_CookingFeed_PieceId>();
+    Self.Track_Grasp(InFrame);
     Self.Write_Hand(Self.Get_HandLocal(InFrame));
     Self.Apply_Pose(InFrame.Operator, Self.Get_Pose(Phase));
 }
 
-// Exit or teardown: the override is cleared on the gloves it was sent to (else InOperator's), the glove node parks at rest
-// and nothing rides it.
+// Exit or teardown: the override is cleared on the gloves it was sent to (else InOperator's) and the glove node parks at
+// rest.
 mixin void Clear(FMars_StationFeed_Presentation& Self, FCk_Handle InOperator)
 {
     if (ck::Is_NOT_Valid(Self.PosedOperator))
     { Self.PosedOperator = InOperator; }
 
     Self.Clear_PoseOverride();
-    Self.CarriedPiece.Reset();
+    Self.GraspLocal.Reset();
 
     if (ck::IsValid(Self.HandNode))
     { Self.Write_Hand(Self.Geometry.RestLocal); }
@@ -127,15 +127,32 @@ mixin FTransform Get_HandLocal(const FMars_StationFeed_Presentation& Self, const
     return FTransform(Rotation, Location);
 }
 
-// Where the hand reaches (station frame): the reserved piece's middle as it lies on the source platter, read every frame;
-// the rest location without a reservation, or once the piece is gone.
+// Where the hand reaches (station frame): the reserved piece's middle where it last lay on its own (GraspLocal); the rest
+// location before the first sample and once idle.
 mixin FVector Get_GraspLocal(const FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
 {
-    const auto Piece = InFrame.Feed.TryGet_ActiveFoodPiece();
-    if (ck::Is_NOT_Valid(Piece) || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
+    if (Self.GraspLocal.IsSet() == false)
     { return Self.Geometry.RestLocal.GetLocation(); }
 
-    return InFrame.RootWorld.InverseTransformPosition(Self.Get_PieceCentreWorld(Piece));
+    return Self.GraspLocal.GetValue();
+}
+
+// Samples the reserved piece's middle every frame until it rides the glove (InHand) or is let go; idle forgets it.
+mixin void Track_Grasp(FMars_StationFeed_Presentation& Self, const FMars_StationFeed_Frame& InFrame)
+{
+    const auto Hold = InFrame.Feed.TryGet_PieceHold();
+    if (Hold.IsSet() == false)
+    {
+        Self.GraspLocal.Reset();
+        return;
+    }
+
+    const auto LiesOnItsOwn = Hold == EMars_CookingFeed_PieceHold::OnSource || Hold == EMars_CookingFeed_PieceHold::Unloading;
+    const auto Piece = InFrame.Feed.TryGet_ActiveFoodPiece();
+    if (LiesOnItsOwn == false || ck::Is_NOT_Valid(Piece) || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
+    { return; }
+
+    Self.GraspLocal = TOptional<FVector>(InFrame.RootWorld.InverseTransformPosition(Self.Get_PieceCentreWorld(Piece)));
 }
 
 // The middle of InPiece's bounds in the world (its origin need not be its middle).

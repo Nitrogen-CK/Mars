@@ -44,14 +44,15 @@ enum EMars_CookingFeed_Settle
 // Why a BeginTransfer did nothing.
 enum EMars_CookingFeed_Refusal
 {
+    // The hand is not at rest, or the source's pile is settling (no piece frozen to reach for yet).
     Busy,
     // No source, or nothing on it.
     Empty,
     NoRelease
 }
 
-// One piece's identity: the attempt it belongs to (bumped by every Reset and SetSource) and the platter slot the piece was
-// reserved from (StockIndex). An array index is never identity; a piece from an older generation is stale.
+// One piece's identity: the attempt it belongs to (bumped by every Reset and SetSource) and its place in the pile it was
+// reserved from (StockIndex: the top of the pile, counted from the bottom). A piece from an older generation is stale.
 struct FMars_CookingFeed_PieceId
 {
     UPROPERTY()
@@ -74,7 +75,20 @@ mixin bool Get_IsSame(const FMars_CookingFeed_PieceId& Self, const FMars_Cooking
     return Self.Generation == InOther.Generation && Self.StockIndex == InOther.StockIndex;
 }
 
-// The one transfer in flight: its identity and the piece it names on the source platter.
+// Where the reserved piece is, from the press to the release. The feed takes it off the source itself at the grasp.
+enum EMars_CookingFeed_PieceHold
+{
+    // On the source platter, where the hand reaches for it.
+    OnSource,
+    // Asked off the source at the grasp; not yet off it (or its body not yet Kinematic).
+    Unloading,
+    // Under Nodes.Hand, riding the glove.
+    InHand,
+    // Let go at the release (detached at its world pose); the receiving kernel or control has it now.
+    Released
+}
+
+// The one transfer in flight: its identity, the piece it names on the source platter and where that piece is.
 struct FMars_CookingFeed_Reservation
 {
     UPROPERTY()
@@ -82,6 +96,13 @@ struct FMars_CookingFeed_Reservation
 
     UPROPERTY()
     FCk_Handle_FoodPiece Piece;
+
+    UPROPERTY()
+    EMars_CookingFeed_PieceHold Hold = EMars_CookingFeed_PieceHold::OnSource;
+
+    // InHand: the piece's offset under the hand when it was attached (where the grasp lerps from).
+    UPROPERTY()
+    FTransform HeldFrom;
 
     FMars_CookingFeed_Reservation() {}
 
@@ -102,6 +123,8 @@ struct FMars_CookingFeed_Release
     UPROPERTY()
     FCk_Handle_FoodPiece Piece;
 
+    // The carried piece's own pose where the hand let it go; the release node's pose when no piece rode the hand (a release
+    // built by hand, or a piece whose unload had not landed by the release).
     UPROPERTY()
     FTransform WorldTransform;
 
@@ -156,7 +179,8 @@ struct FMars_CookingFeed_TimingSpec
 }
 
 // Release-node frame. The sampled release velocity = ReleaseVelocityLocal (rotated to world) + VelocityInheritance x the
-// release node's own measured world velocity (the pan is moving).
+// release node's own measured world velocity (the pan is moving). HeldOffset is the pose a carried piece sits at under
+// Nodes.Hand: its bounds centre at HeldOffset's location, its rotation HeldOffset's; the grasp lerps the piece there.
 struct FMars_CookingFeed_MotionSpec
 {
     UPROPERTY()
@@ -164,6 +188,9 @@ struct FMars_CookingFeed_MotionSpec
 
     UPROPERTY()
     float32 VelocityInheritance = 0.5f;
+
+    UPROPERTY()
+    FTransform HeldOffset = FTransform::Identity;
 
     FMars_CookingFeed_MotionSpec() {}
 
@@ -175,17 +202,22 @@ struct FMars_CookingFeed_MotionSpec
 }
 
 // Built by the placing script: the node whose world pose is sampled at release (on the searing station a child of the pan
-// mesh node above the rim; on the fryer a node over the oil).
+// mesh node above the rim; on the fryer a node over the oil), and the glove's carry node the reserved piece rides from the
+// grasp to the release (the station moves it).
 struct FMars_CookingFeed_Nodes
 {
     UPROPERTY()
     FCk_Handle_Transform Release;
 
+    UPROPERTY()
+    FCk_Handle_Transform Hand;
+
     FMars_CookingFeed_Nodes() {}
 
-    FMars_CookingFeed_Nodes(FCk_Handle_Transform InRelease)
+    FMars_CookingFeed_Nodes(FCk_Handle_Transform InRelease, FCk_Handle_Transform InHand)
     {
         Release = InRelease;
+        Hand = InHand;
     }
 }
 
@@ -210,7 +242,7 @@ struct FMars_CookingFeed_Spec
 }
 
 // A negative or non-finite phase length, or an inheritance outside [0, 1], makes the clock or the release unsound. The nodes
-// are checked by Add (a missing Release node ensures there).
+// are checked by Add (a missing Release or Hand node ensures there).
 mixin FMars_Validation Validate(const FMars_CookingFeed_Spec& Self)
 {
     if (utils_cooking_feed::Get_IsValidSeconds(Self.Timing.ReachSeconds) == false)
@@ -260,7 +292,8 @@ struct FMars_Fragment_CookingFeed
     UPROPERTY()
     float32 PhaseSeconds = 0.0f;
 
-    // The platter the stock is drawn from; invalid = none. The feed only reads it: control loads and unloads.
+    // The platter the stock is drawn from; invalid = none. The feed unloads the reserved piece at its grasp and loads it back
+    // when that transfer is cancelled before its release; control loads the rest (a rejected release, the stock).
     UPROPERTY()
     FCk_Handle_Platter Source;
 
@@ -278,6 +311,10 @@ struct FMars_Fragment_CookingFeed
 
     UPROPERTY()
     int32 LastStockAdmitted = 0;
+
+    // Whether the source's pile was settling at the last broadcast (stock, but nothing frozen to reach for).
+    UPROPERTY()
+    bool LastStockSettling = false;
 
     // The sample broadcast at Carry's end, kept through AwaitAdmission.
     UPROPERTY()
@@ -328,7 +365,7 @@ struct FMars_Fragment_CookingFeed_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Reserve the source's lowest held piece and start the hand; refused (never deferred) while busy, without a source or
+// Reserve the top of the source's frozen pile and start the hand; refused (never deferred) while busy, without a source or
 // anything on it, or without a release node. Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_CookingFeed_BeginTransfer
 {
@@ -338,7 +375,8 @@ struct FMars_Request_CookingFeed_BeginTransfer
     FMars_Request_CookingFeed_BeginTransfer() {}
 }
 
-// Abandon the active transfer: the reservation is dropped and the hand is idle at once. A no-op while idle.
+// Abandon the active transfer: the reservation is dropped and the hand is idle at once; a piece the feed already took off
+// the source goes back onto it. A no-op while idle.
 struct FMars_Request_CookingFeed_Cancel
 {
     UPROPERTY()
@@ -347,8 +385,9 @@ struct FMars_Request_CookingFeed_Cancel
     FMars_Request_CookingFeed_Cancel() {}
 }
 
-// A new attempt: the generation is bumped first (every older PieceId goes stale), then the transfer is dropped, the hand
-// idles and Admitted is zeroed. Nothing is refilled: the source platter is the stock.
+// A new attempt: the generation is bumped first (every older PieceId goes stale), then the transfer is dropped (a piece the
+// feed took off the source goes back onto it), the hand idles and Admitted is zeroed. Nothing else is refilled: the source
+// platter is the stock.
 struct FMars_Request_CookingFeed_Reset
 {
     UPROPERTY()

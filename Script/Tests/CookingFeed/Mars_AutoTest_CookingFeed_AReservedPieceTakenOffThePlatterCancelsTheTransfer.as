@@ -20,6 +20,7 @@ class UMars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTrans
         Add_Step("unload the reserved piece from the platter", n"Step_TakeTheReservedPiece");
         Add_Step_WaitUntil("the transfer settles within a frame of the unload", n"Check_Settled", 0, 0.1f);
         Add_Step("cancelled, at rest, five left", n"Step_AssertCancelled");
+        Add_Step_WaitUntil("the pile has re-settled", n"Check_PileSettled", 0, 2.0f);
         Add_Step("press add food again", n"Step_Begin");
         Add_Step_WaitUntil("the hand reaches again", n"Check_Reaching", 0, 1.0f);
         Add_Step("the next piece is reserved", n"Step_AssertNextReserved");

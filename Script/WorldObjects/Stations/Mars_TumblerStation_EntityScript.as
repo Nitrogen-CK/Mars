@@ -249,7 +249,8 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
 
         // A rejected feed spec already ensured in utils_cooking_feed::Add; the drum still turns without a platter.
         auto FeedSpec = Feed;
-        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode);
+        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
+        FeedSpec.Motion.HeldOffset = _FeedPresentation.Geometry.HeldLocal;
         _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
 
         // The timer dies with the entity; nothing to unbind.
@@ -724,8 +725,12 @@ class UMars_TumblerStation_EntityScript : UMars_Station_EntityScript
         for (int32 Slot = 0; Slot < _RawSlotParts.Num(); ++Slot)
         { Set_PartVisible(_RawSlotParts[Slot], Get_IsSlotVisible(Slot)); }
 
-        const auto Carried = _FeedPresentation.CarriedPiece;
-        const auto CarriedKind = Carried.IsSet() ? Get_PieceKind(Carried.GetValue().StockIndex) : -1;
+        // The tumbler's stock is proxies, not pieces: the glove shows the reserved slot's kind from the grasp to the admission.
+        const auto Phase = _FeedHandle.Get_Phase();
+        const auto IsHolding = Phase == EMars_CookingFeed_Phase::Grasp || Phase == EMars_CookingFeed_Phase::Carry
+            || Phase == EMars_CookingFeed_Phase::AwaitAdmission;
+        const auto Carried = _FeedHandle.TryGet_ActivePiece();
+        const auto CarriedKind = IsHolding && Carried.IsSet() ? Get_PieceKind(Carried.GetValue().StockIndex) : -1;
         for (int32 Kind = 0; Kind < _CarryProxyParts.Num(); ++Kind)
         { Set_PartVisible(_CarryProxyParts[Kind], Kind == CarriedKind); }
     }

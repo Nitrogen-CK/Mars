@@ -44,7 +44,7 @@ class UMars_AutoTest_SearingStation_LeavingMidTransferStillAdmits : UMars_AutoTe
         Add_Step("the admission landed with nobody operating", n"Step_AssertAdmitted");
         Add_Step_WaitUntil("the hand is home", n"Check_FeedIdle", 0, 3.0f);
         Add_Step("the operator takes the station again", n"Step_Take");
-        Add_Step_WaitUntil("Operated, and the feed draws from the last box", n"Check_OperatedWithOne", 0, 3.0f);
+        Add_Step_WaitUntil("Operated, and the feed draws from the last box, settled on the platter", n"Check_OperatedWithOne", 0, 3.0f);
         Add_Step("press add food", n"Step_BeginTransfer");
         Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 3.0f);
         Add_Step("leave mid-reach", n"Step_LeaveNow");
@@ -123,7 +123,7 @@ class UMars_AutoTest_SearingStation_LeavingMidTransferStillAdmits : UMars_AutoTe
         Assert_Equals_Int(Get_SettleCount(EMars_CookingFeed_Settle::Admitted), 1, "the carried transfer settled Admitted");
         Assert_Equals_Int(Get_SettleCount(EMars_CookingFeed_Settle::Cancelled), 0, "nothing was cancelled");
         Assert_Equals_Int(Get_PieceIds().Num(), 1, "the pan holds the admitted box");
-        Assert_Equals_Int(_Raw.As_Platter().Get_HeldCount(), 1, "one box is left on the raw platter");
+        Assert_Equals_Int(_Raw.As_Platter().Get_Occupancy(), 1, "one box is left on the raw platter");
     }
 
     UFUNCTION()
@@ -137,7 +137,7 @@ class UMars_AutoTest_SearingStation_LeavingMidTransferStillAdmits : UMars_AutoTe
     private void Check_OperatedWithOne(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsOperated() && _Feed.Get_Available() == 1);
+        Res.Set(Get_IsOperated() && _Feed.Get_Available() == 1 && _Raw.As_Platter().Get_HeldCount() == 1);
     }
 
     UFUNCTION()

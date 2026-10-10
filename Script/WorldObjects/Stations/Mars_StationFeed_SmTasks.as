@@ -1,7 +1,9 @@
-// The shared control layer of a feeding station (a cooking station whose entity carries a CookingFeed): tasks the station's
-// own state machine adds beside its kernel's. They run on the STATION entity (context = the station) and read its operator
-// and its docks; they issue CookingFeed requests, unload and reload the source platter's pieces around a release, take the
-// cooking kernel's finished pieces out onto the docked tray, and register the operator's add-food and take-out rows.
+// The shared control layer of a feeding station (a station whose entity carries a CookingFeed: the cooking stations, and
+// the cutting station, whose feed brings a joint to its board): tasks the station's own state machine adds beside its
+// kernel's. They run on the STATION entity (context = the station) and read its operator and its docks; they issue
+// CookingFeed requests, hand each release (a piece the feed carried off the source platter) to the receiving kernel and put
+// a rejected one back, take the cooking kernel's finished pieces out onto the docked tray, and register the operator's
+// add-food and take-out rows.
 //
 //   Idle      tasks: StationFeed_ResetOnEnter (an idle hand only; before the kernel's own reset: the generation bump
 //                    comes first),
@@ -28,10 +30,11 @@ class UMars_SmTask_StationFeed_ResetOnEnter : UCk_SmTask_EntityScript
     }
 }
 
-// The feed draws from whatever platter sits on the station's input dock: set on enter, and again on every dock and undock
-// (an undock leaves the feed unsourced, which cancels a transfer in flight). The bindings live as long as the state. No
-// feed or no input dock on the context (the SM can enter before the entity script composes them; a station without a dock)
-// = the feed stays unsourced.
+// The feed draws from whatever platter has landed on the station's input dock: set on enter (only a platter that has
+// arrived), and again on every arrival and undock (an undock leaves the feed unsourced, which cancels a transfer in
+// flight). A platter still travelling onto the dock is no source yet. The bindings live as long as the state. No feed or no
+// input dock on the context (the SM can enter before the entity script composes them; a station without a dock) = the
+// feed stays unsourced.
 class UMars_SmTask_StationFeed_Source : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -48,9 +51,10 @@ class UMars_SmTask_StationFeed_Source : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(_Feed) || ck::Is_NOT_Valid(_InputDock))
         { return; }
 
-        _InputDock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnInputDocked"));
+        _InputDock.BindTo_OnArrived(FMars_Delegate_PlatterDock_OnArrived(this, n"OnInputArrived"));
         _InputDock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnInputUndocked"));
-        _Feed.Request_SetSource(FMars_Request_CookingFeed_SetSource(_InputDock.Get_Platter()));
+        const auto Source = _InputDock.Get_HasArrived() ? _InputDock.Get_Platter() : FCk_Handle_Platter();
+        _Feed.Request_SetSource(FMars_Request_CookingFeed_SetSource(Source));
     }
 
     UFUNCTION(BlueprintOverride)
@@ -58,7 +62,7 @@ class UMars_SmTask_StationFeed_Source : UCk_SmTask_EntityScript
     {
         if (ck::IsValid(_InputDock))
         {
-            _InputDock.UnbindFrom_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnInputDocked"));
+            _InputDock.UnbindFrom_OnArrived(FMars_Delegate_PlatterDock_OnArrived(this, n"OnInputArrived"));
             _InputDock.UnbindFrom_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnInputUndocked"));
         }
 
@@ -67,7 +71,7 @@ class UMars_SmTask_StationFeed_Source : UCk_SmTask_EntityScript
     }
 
     UFUNCTION()
-    private void OnInputDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    private void OnInputArrived(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
     {
         if (ck::IsValid(_Feed))
         { _Feed.Request_SetSource(FMars_Request_CookingFeed_SetSource(InPlatter)); }
@@ -137,9 +141,9 @@ class UMars_SmTask_StationFeed_OperatorInput : UCk_SmTask_EntityScript
         return ECk_SmTaskResult::Running;
     }
 
-    // The operator leaving cancels a transfer only while the hand is still reaching for or grasping its piece. A carry
-    // finishes without the operator: its release lands through the bridge, which runs in every state, and until the release
-    // the piece is still on the platter, so nothing strands either way.
+    // The operator leaving cancels a transfer only while the hand is still reaching for or grasping its piece (a piece the
+    // feed already took off the platter goes back onto it). A carry finishes without the operator: the piece rides the hand
+    // to its release, which lands through the bridge running in every state, so nothing strands either way.
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
@@ -160,11 +164,14 @@ class UMars_SmTask_StationFeed_OperatorInput : UCk_SmTask_EntityScript
     protected bool Get_CanBeginTransfer() const { return true; }
 }
 
-// Routes each release to the cooking kernel on the station by its typed handle (Searing, then Fry, then Tumbler) and
-// forwards that kernel's admission answer back to the feed. A release whose piece sits on a platter is unloaded first and
-// goes to the kernel only on that platter's OnUnloaded (a piece another ledger holds is no kernel's to take); a release with
-// no piece, or one already off any platter, goes at once. A rejected piece goes back onto the feed's source before the
-// answer is forwarded. The bridge runs in every state of the station, so a transfer in flight completes whoever operates:
+// Routes each release to the receiving kernel on the station by its typed handle (Searing, then Fry, then Tumbler, then
+// FoodBoard) and forwards that kernel's admission answer back to the feed. The feed itself takes the piece off its platter
+// at the grasp; a release whose piece is still on it (its unload had not landed by the release) goes to the kernel only on
+// that platter's OnUnloaded (a piece another ledger holds is no kernel's to take); a release with no piece, or one already
+// off any platter, goes at once. The board answers by piece rather than by
+// id: its OnPlaced admits the release's own piece, its OnPlaceRefused rejects it. A rejected piece goes back onto the
+// feed's source before the answer is forwarded. The bridge runs in every state of the station, so a transfer in flight
+// completes whoever operates:
 // a bridge entering while the feed awaits an admission takes that release over (and its unload, if the piece is still
 // coming off), and a forwarded piece is always answered through a bridge. The bindings live as long as the state.
 class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
@@ -179,9 +186,11 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
     private FCk_Handle_Fry _Fry;
     // Invalid on a station without a Tumbler.
     private FCk_Handle_Tumbler _Tumbler;
+    // Invalid on a station without a FoodBoard.
+    private FCk_Handle_FoodBoard _Board;
     // The release in flight, from OnReleaseRequested until its admission answer.
     private TOptional<FMars_CookingFeed_Release> _Release;
-    // The platter the released piece is coming off, from the unload until its OnUnloaded.
+    // The platter the released piece is still coming off (the feed's unload), until its OnUnloaded.
     private FCk_Handle_Platter _UnloadingFrom;
 
     // No feed on the context yet (the SM can enter Idle before the entity script composes it) = nothing to bridge.
@@ -207,6 +216,13 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         if (ck::IsValid(_Tumbler))
         { _Tumbler.BindTo_OnPieceAdmission(FMars_Delegate_Tumbler_OnPieceAdmission(this, n"OnTumblerPieceAdmission")); }
 
+        _Board = _Station.As_FoodBoard(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(_Board))
+        {
+            _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
+            _Board.BindTo_OnPlaceRefused(FMars_Delegate_FoodBoard_OnPlaceRefused(this, n"OnBoardPlaceRefused"));
+        }
+
         Resume_InFlight();
     }
 
@@ -223,6 +239,12 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         if (ck::IsValid(_Tumbler))
         { _Tumbler.UnbindFrom_OnPieceAdmission(FMars_Delegate_Tumbler_OnPieceAdmission(this, n"OnTumblerPieceAdmission")); }
 
+        if (ck::IsValid(_Board))
+        {
+            _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
+            _Board.UnbindFrom_OnPlaceRefused(FMars_Delegate_FoodBoard_OnPlaceRefused(this, n"OnBoardPlaceRefused"));
+        }
+
         Unwatch_Platter();
         _Release.Reset();
 
@@ -234,6 +256,7 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         _Searing = FCk_Handle_Searing();
         _Fry = FCk_Handle_Fry();
         _Tumbler = FCk_Handle_Tumbler();
+        _Board = FCk_Handle_FoodBoard();
     }
 
     UFUNCTION()
@@ -251,9 +274,8 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
 
         _UnloadingFrom = Platter;
         _UnloadingFrom.BindTo_OnUnloaded(FMars_Delegate_Platter_OnUnloaded(this, n"OnUnloaded"));
-        _UnloadingFrom.Request_Unload(FMars_Request_Platter_Unload(InRelease.Piece));
 
-        ck::Trace(f"[StationFeed] [{_Feed.ToString()}] {utils_cooking_feed::Get_PieceName(InRelease.PieceId)} [{InRelease.Piece.ToString()}] comes off [{Platter.ToString()}] for its release");
+        ck::Trace(f"[StationFeed] [{_Feed.ToString()}] {utils_cooking_feed::Get_PieceName(InRelease.PieceId)} [{InRelease.Piece.ToString()}] is still coming off [{Platter.ToString()}] at its release");
     }
 
     // A release the previous state's bridge took and nobody has answered yet (the feed still awaits its admission): this
@@ -308,8 +330,30 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         Answer(InPieceId, InAdmission, InReason);
     }
 
+    // Whoever asked for the place, only the release's own piece answers it.
+    UFUNCTION()
+    private void OnBoardPlaced(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
+    {
+        if (_Release.IsSet() == false || InPiece != _Release.GetValue().Piece)
+        { return; }
+
+        const auto PieceId = _Release.GetValue().PieceId;
+        Answer(PieceId, EMars_CookingFeed_Admission::Accepted, "");
+    }
+
+    UFUNCTION()
+    private void OnBoardPlaceRefused(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece, EMars_FoodBoard_PlaceRefusal InRefusal)
+    {
+        if (_Release.IsSet() == false || InPiece != _Release.GetValue().Piece)
+        { return; }
+
+        const auto PieceId = _Release.GetValue().PieceId;
+        Answer(PieceId, EMars_CookingFeed_Admission::Rejected, f"the board refused it: {InRefusal :n}");
+    }
+
     // A kernel's answer goes to the feed as it is; the feed honours it only for the piece it is awaiting. The release's own
-    // answer ends it here, and a rejected piece goes back onto the source first.
+    // answer ends it here: a rejected piece goes back onto the source first; an admitted whole food loses its pickup while
+    // the pan holds it (StationFeed_TakeOutBridge gives it back), since the pan's ledger would not notice a hand taking it.
     private void Answer(const FMars_CookingFeed_PieceId& InPieceId, EMars_CookingFeed_Admission InAdmission, const FString& InReason)
     {
         if (ck::Is_NOT_Valid(_Feed))
@@ -319,6 +363,8 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         {
             if (InAdmission == EMars_CookingFeed_Admission::Rejected)
             { Put_Back(_Release.GetValue().Piece); }
+            else
+            { utils_world_item::Request_SetPickupEnableDisable(_Release.GetValue().Piece, ECk_EnableDisable::Disable); }
 
             _Release.Reset();
         }
@@ -326,8 +372,9 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         _Feed.Request_ResolveAdmission(FMars_Request_CookingFeed_ResolveAdmission(InPieceId, InAdmission, InReason));
     }
 
-    // Searing, else Fry, else Tumbler admits through its AddPiece (answered by its OnPieceAdmission above). A station with
-    // none of them has its releases refused, so the hand carries, the piece goes back and the hand returns.
+    // Searing, else Fry, else Tumbler admits through its AddPiece (answered by its OnPieceAdmission above), else the board
+    // takes the piece (answered by OnBoardPlaced / OnBoardPlaceRefused). A station with none of them has its releases
+    // refused, so the hand carries, the piece goes back and the hand returns.
     private void Forward_Release(const FMars_CookingFeed_Release& InRelease)
     {
         if (ck::IsValid(_Searing))
@@ -348,11 +395,37 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
             return;
         }
 
+        if (ck::IsValid(_Board))
+        {
+            Place_OnBoard(InRelease);
+            return;
+        }
+
         Answer(InRelease.PieceId, EMars_CookingFeed_Admission::Rejected, "no receiver kernel");
     }
 
-    // The rejected piece goes back onto the feed's source, arriving from where it lies. Mid-unload it is still on its
-    // platter: a load queued now drains after that unload (Unload before Load) and lands it back. A piece that is gone, or
+    // The piece lies where the board's food lies: posed at the pile in its food's layout (the release node only marks where
+    // the glove lets go), then placed. A release without a piece has nothing to place.
+    private void Place_OnBoard(const FMars_CookingFeed_Release& InRelease)
+    {
+        if (ck::Is_NOT_Valid(InRelease.Piece))
+        {
+            const auto PieceId = InRelease.PieceId;
+            Answer(PieceId, EMars_CookingFeed_Admission::Rejected, "no piece to place on the board");
+            return;
+        }
+
+        const auto PileWorld = utils_cutting::Get_PileWorld(utils_transform::Get_EntityCurrentTransform(_Station.As_Transform()), InRelease.Piece);
+        FCk_Handle PieceEntity = InRelease.Piece;
+        utils_transform::Request_SetLocation(PieceEntity.As_Transform(), FCk_Request_Transform_SetLocation(PileWorld.GetLocation()));
+        utils_transform::Request_SetRotation(PieceEntity.As_Transform(), FCk_Request_Transform_SetRotation(PileWorld.Rotator()));
+        _Board.Request_Place(FMars_Request_FoodBoard_Place(InRelease.Piece));
+
+        ck::Trace(f"[StationFeed] [{_Feed.ToString()}] {utils_cooking_feed::Get_PieceName(InRelease.PieceId)} [{InRelease.Piece.ToString()}] goes onto [{_Board.ToString()}] at the pile");
+    }
+
+    // The rejected piece goes back onto the feed's source, dropping onto its pile. Mid-unload it is still on its platter: a
+    // load queued now drains after that unload (Unload before Load) and lands it back. A piece that is gone, or
     // already on a platter, stays as it is; without a source it stays where it was released.
     private void Put_Back(const FCk_Handle_FoodPiece& InPiece)
     {
@@ -372,8 +445,7 @@ class UMars_SmTask_StationFeed_Bridge : UCk_SmTask_EntityScript
         if (ck::IsValid(Holder) && IsUnloadingFromSource == false)
         { return; }
 
-        FCk_Handle PieceEntity = InPiece;
-        Source.Request_Load(FMars_Request_Platter_Load(InPiece, utils_transform::Get_EntityCurrentTransform(PieceEntity.As_Transform())));
+        Source.Request_Load(FMars_Request_Platter_Load(InPiece));
         ck::Trace(f"[StationFeed] [{_Feed.ToString()}] [{InPiece.ToString()}] goes back onto [{Source.ToString()}]");
     }
 
@@ -453,8 +525,8 @@ class UMars_SmTask_StationFeed_TakeOutInput : UCk_SmTask_EntityScript
         _SeenTakeOutFrame.Reset();
     }
 
-    // Every ready piece, capped at the tray's free slots; the tray, its room and the ready count are checked here so a
-    // refused press costs the kernel nothing.
+    // Every ready piece, capped at the tray's free room; the tray, its room and the ready count are checked here so a refused
+    // press costs the kernel nothing.
     private void Request_TakeOut()
     {
         const auto Tray = _OutputDock.Get_Platter();
@@ -464,16 +536,16 @@ class UMars_SmTask_StationFeed_TakeOutInput : UCk_SmTask_EntityScript
             return;
         }
 
-        const auto FreeSlots = Tray.Get_FreeSlotCount();
+        const auto Free = Tray.Get_FreeCount();
         const auto Takeable = Get_TakeableCount();
-        if (FreeSlots <= 0 || Takeable <= 0)
+        if (Free <= 0 || Takeable <= 0)
         {
-            ck::Trace(f"[StationFeed] [{Tray.ToString()}] take-out refused: {FreeSlots} free slot(s), {Takeable} ready");
+            ck::Trace(f"[StationFeed] [{Tray.ToString()}] take-out refused: room for {Free}, {Takeable} ready");
             return;
         }
 
-        ck::Trace(f"[StationFeed] [{Tray.ToString()}] take out: {Takeable} ready, {FreeSlots} free slot(s)");
-        const auto MaxPieces = TOptional<int32>(FreeSlots);
+        ck::Trace(f"[StationFeed] [{Tray.ToString()}] take out: {Takeable} ready, room for {Free}");
+        const auto MaxPieces = TOptional<int32>(Free);
         if (ck::IsValid(_Searing))
         {
             _Searing.Request_TakeOut(FMars_Request_Searing_TakeOut(TOptional<FCk_Handle_FoodPiece>(), MaxPieces));
@@ -496,7 +568,7 @@ class UMars_SmTask_StationFeed_TakeOutInput : UCk_SmTask_EntityScript
 }
 
 // Where the taken-out pieces land: every piece the station's cooking kernel (Searing, else Fry) hands back
-// (OnPieceTakenOut, whoever asked for it) is loaded onto the docked finished tray, arriving from where it lies; with no tray
+// (OnPieceTakenOut, whoever asked for it) is loaded onto the docked finished tray, dropping onto its pile; with no tray
 // docked by then it stays where it is. The bridge runs in every state of the station, so a take-out pressed in the frame
 // the operator leaves still lands on the tray. The bindings live as long as the state. No kernel that hands pieces back or
 // no output dock on the context (the SM can enter Idle before the entity script composes them) = nothing to land.
@@ -552,8 +624,11 @@ class UMars_SmTask_StationFeed_TakeOutBridge : UCk_SmTask_EntityScript
         Load_OntoTray(InPiece);
     }
 
+    // A whole food gets its pickup back (the pan no longer holds it), tray or not.
     private void Load_OntoTray(const FCk_Handle_FoodPiece& InPiece)
     {
+        utils_world_item::Request_SetPickupEnableDisable(InPiece, ECk_EnableDisable::Enable);
+
         auto Tray = _OutputDock.Get_Platter();
         if (ck::Is_NOT_Valid(Tray))
         {
@@ -561,13 +636,14 @@ class UMars_SmTask_StationFeed_TakeOutBridge : UCk_SmTask_EntityScript
             return;
         }
 
-        FCk_Handle PieceEntity = InPiece;
-        Tray.Request_Load(FMars_Request_Platter_Load(InPiece, utils_transform::Get_EntityCurrentTransform(PieceEntity.As_Transform())));
+        Tray.Request_Load(FMars_Request_Platter_Load(InPiece));
     }
 }
 
 // The operator's rows while operating. The add-food row (IA_StationAddFood): "add food · N left" while the hand is idle,
-// "adding food… · N left" while it is busy, "no platter" without a source, "platter empty" once nothing is left on it;
+// "adding food… · N left" while it is busy, the station's own refusal while it would refuse a press (a subclass's
+// TryGet_StationRefusal: the cutting station's "board busy"), "no platter" without a source, "platter empty" once nothing
+// is left on it, "settling · N left" while the pile re-settles (a press then is refused until a piece freezes);
 // registered once on enter under the Operating state's owner key (its leave-unregister clears it) and re-texted on every
 // stock and phase edge (the display drains registers before unregisters, so the row is never re-registered). The take-out
 // row (IA_Interact_Secondary), on a station whose kernel hands pieces back (Searing, Fry) and only while a finished tray is
@@ -793,7 +869,8 @@ class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
         Refresh_AddFoodRow();
     }
 
-    private void Refresh_AddFoodRow()
+    // Also for a subclass, on the edges of its own refusal.
+    protected void Refresh_AddFoodRow()
     {
         if (ck::Is_NOT_Valid(_Display) || ck::Is_NOT_Valid(_AddFoodRow))
         { return; }
@@ -801,17 +878,27 @@ class UMars_SmTask_StationFeed_OperatorHints : UCk_SmTask_EntityScript
         _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_AddFoodRow, Get_AddFoodText()));
     }
 
+    // Why the station's own gate would refuse a press now (its OperatorInput's Get_CanBeginTransfer); unset = it would not.
+    protected TOptional<FString> TryGet_StationRefusal() const { return TOptional<FString>(); }
+
     private FText Get_AddFoodText() const
     {
         const auto Available = _Feed.Get_Available();
         if (_Feed.Get_IsBusy())
         { return FText::FromString(f"adding food… · {Available} left"); }
 
+        const auto StationRefusal = TryGet_StationRefusal();
+        if (StationRefusal.IsSet())
+        { return FText::FromString(StationRefusal.GetValue()); }
+
         if (_Feed.Get_IsSourced() == false)
         { return FText::FromString("no platter"); }
 
         if (Available <= 0)
         { return FText::FromString("platter empty"); }
+
+        if (_Feed.Get_IsSettling())
+        { return FText::FromString(f"settling · {Available} left"); }
 
         return FText::FromString(f"add food · {Available} left");
     }

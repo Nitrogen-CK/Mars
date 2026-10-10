@@ -14,9 +14,10 @@ struct FMars_CookingFeed_Drain
 // order, the phase edge. Reset bumps the generation before clearing anything (a reservation it finds settles Cancelled under
 // its old id); SetSource cancels a transfer in flight, bumps the generation and swaps the platter; Cancel drops a
 // reservation and idles the hand; ResolveAdmission counts (Accepted) or drops (Rejected) the reservation only while
-// awaiting admission for exactly that piece, every other answer is a traced no-op; BeginTransfer reserves the source's
-// lowest held piece, and every press beyond the first in a drain, or while busy or empty, is refused, never deferred. The
-// feed never loads or unloads the source: control does.
+// awaiting admission for exactly that piece, every other answer is a traced no-op; BeginTransfer reserves the top of the
+// source's frozen pile, and every press beyond the first in a drain, or while busy or empty, is refused, never deferred.
+// Every cancel before the release puts a piece the feed already took off the source back onto it
+// (utils_cooking_feed::Return_Piece); a released piece is control's (the bridge puts a rejected one back).
 class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -71,6 +72,7 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         if (InState.Active.IsSet())
         { Record_Settle(InDrain, InState.Active.GetValue().Id, EMars_CookingFeed_Settle::Cancelled); }
 
+        utils_cooking_feed::Return_Piece(InState, InDrain.Feed.Get_HandNode());
         utils_cooking_feed::Cancel_Active(InState);
         InState.Admitted = 0;
         InState.PendingRelease = FMars_CookingFeed_Release();
@@ -94,8 +96,8 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] source -> [{InState.Source.ToString()}]: generation {InState.Generation}, {utils_cooking_feed::Get_Available(InState)} on it");
     }
 
-    // A reservation still held is dropped (its piece never left the source); a hand already returning (its piece answered) is
-    // simply home.
+    // A reservation still held is dropped (a piece the feed took off the source goes back onto it); a hand already returning
+    // (its piece answered) is simply home.
     private void Apply_Cancel(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState)
     {
         if (InState.Phase == EMars_CookingFeed_Phase::Idle)
@@ -105,6 +107,7 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         const auto Active = InState.Active;
+        utils_cooking_feed::Return_Piece(InState, InDrain.Feed.Get_HandNode());
         if (utils_cooking_feed::Cancel_Active(InState))
         { Record_Settle(InDrain, Active.GetValue().Id, EMars_CookingFeed_Settle::Cancelled); }
 
@@ -167,14 +170,21 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
             return;
         }
 
-        // Idle with stock: the lowest held piece is landed and unreserved, so it has a slot.
-        const auto Piece = InState.Source.Get_Held()[0];
-        const auto Slot = Piece.Get_PlatterSlot();
-        if (ck::EnsureIfNot(Slot.IsSet(), f"[CookingFeed] [{InDrain.Feed.ToString()}] reserved [{Piece.ToString()}], which names no platter slot"))
-        { return; }
+        // Idle with stock: nothing is reserved, so the top of the pile (the last piece frozen) is free to take. A pile still
+        // settling has nothing frozen to reach for yet: the press is refused, the next one takes the top.
+        const auto Held = InState.Source.Get_Held();
+        if (Held.Num() == 0)
+        {
+            ck::Trace(f"[CookingFeed] [{InDrain.Feed.ToString()}] press refused: the source's pile is settling");
+            InDrain.Refusals.Add(EMars_CookingFeed_Refusal::Busy);
+            return;
+        }
+
+        const auto StockIndex = Held.Num() - 1;
+        const auto Piece = Held[StockIndex];
 
         InState.Active = TOptional<FMars_CookingFeed_Reservation>(
-            FMars_CookingFeed_Reservation(FMars_CookingFeed_PieceId(InState.Generation, Slot.GetValue()), Piece));
+            FMars_CookingFeed_Reservation(FMars_CookingFeed_PieceId(InState.Generation, StockIndex), Piece));
         InState.Phase = EMars_CookingFeed_Phase::Reach;
         InState.PhaseSeconds = 0.0f;
 

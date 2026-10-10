@@ -1,6 +1,6 @@
 // The station entity destroyed while the hand carries a piece takes the feed with it: the handle goes invalid, no release
-// and no settle ever arrive, and nothing ensures. The pieces are the platter's and the platter is the test's: the reserved
-// piece never left it, so the platter still holds all six.
+// and no settle ever arrive, and nothing ensures. The pieces are the platter's and the platter is the test's: the carried
+// piece rode the station's hand node, and the feed's teardown puts it back, so the platter holds all six again.
 class UMars_AutoTest_CookingFeed_DestroyingTheStationMidTransferLeaksNothing : UMars_AutoTestRig_CookingFeed
 {
     private int32 _SignalsAtDestroy = 0;
@@ -16,7 +16,8 @@ class UMars_AutoTest_CookingFeed_DestroyingTheStationMidTransferLeaksNothing : U
         Add_Step("destroy the station", n"Step_DestroyStation");
         Add_Step_WaitUntil("the feed is gone", n"Check_FeedGone", 0, 2.0f);
         Add_Step_WaitSeconds("past the carry's end", 0.3f);
-        Add_Step("no release, no settle, no signal since; the platter still holds the stock", n"Step_AssertNothingLeaked");
+        Add_Step_WaitUntil("the carried piece is back on the platter", n"Check_StockBack", 0, 3.0f);
+        Add_Step("no release, no settle, no signal since; the platter holds the stock again", n"Step_AssertNothingLeaked");
         Run_Steps(InHandle);
     }
 
@@ -28,9 +29,17 @@ class UMars_AutoTest_CookingFeed_DestroyingTheStationMidTransferLeaksNothing : U
     }
 
     UFUNCTION()
+    private void Check_StockBack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Platter.Get_HeldCount() == k_Stock && _Platter.Get_PendingCount() == 0);
+    }
+
+    UFUNCTION()
     private void Step_DestroyStation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Ledger(k_Stock - 1, 0, "carrying");
+        Assert_False(ck::IsValid(_Feed.TryGet_ActiveFoodPiece().TryGet_Platter()), "the carried piece is off the platter");
         _SignalsAtDestroy = _Phases.Num() + _Releases.Num() + _Settles.Num() + _Refusals.Num() + _StockAvailable.Num();
         utils_entity_lifetime::Request_DestroyEntity(_Station);
     }

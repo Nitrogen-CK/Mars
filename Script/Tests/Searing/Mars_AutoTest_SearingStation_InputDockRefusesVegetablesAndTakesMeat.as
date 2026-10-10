@@ -15,8 +15,8 @@ class UMars_AutoTest_SearingStation_InputDockRefusesVegetablesAndTakesMeat : UMa
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Searing(InHandle, k_Origin, FMars_CookingFeed_TimingSpec());
-        _Meat = Spawn_Platter(InHandle, k_MeatOffset, mars::Food_MeatSlab_Mars);
-        _Mushroom = Spawn_Platter(InHandle, k_MushroomOffset, mars::Food_MushroomSlice_Mars);
+        _Meat = Spawn_Platter(InHandle, k_MeatOffset, mars_items::Food_MeatSlab());
+        _Mushroom = Spawn_Platter(InHandle, k_MushroomOffset, mars_items::Food_MushroomSlice());
 
         Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", 0, 5.0f);
         Add_Step_WaitUntil("both platters are constructed and their joints landed", n"Check_PlattersReady", 0, 10.0f);

@@ -38,7 +38,7 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Fry(InHandle, k_Origin, FMars_CookingFeed_TimingSpec());
-        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars::Food_MushroomSlice_Mars);
+        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MushroomSlice());
 
         Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", 0, 5.0f);
         Add_Step_WaitUntil("the platter is constructed and the slice landed on it", n"Check_PlatterReady", 0, 10.0f);

@@ -6,7 +6,7 @@
 // five kinematic boxes. Every part under those nodes is a NoCollision visual. The Fry feature lives on the station entity
 // and its own state machine (UMars_SmState_Fry_Idle) reads the operator. The pot starts empty: a CookingFeed on the same
 // entity draws the pieces of the docked raw platter, and its station-feed tasks turn the operator's add-food press into a
-// left-hand transfer that this script presents (the glove node and a battered proxy in the glove; the hand reaches for the
+// left-hand transfer that this script presents (the glove node the feed carries the real piece under; the hand reaches for the
 // reserved piece where it lies) and whose release over the oil the Fry kernel admits (the piece itself, wearing its own
 // display, on a dynamic body). This script builds the nodes and the docks and, every frame, keeps every piece's record and
 // the label from the Fry state. While operating, the right glove holds the skimmer's grip bar (riding its slide, dip and
@@ -151,12 +151,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     // A palm's thickness: the glove's grip bone above what its palm rests on.
     private const float64 PalmLift = 2.5;
 
-    // The battered meshes' authored sizes (FOOD_LIBRARY.md), cm; each is scaled to the piece's box.
-    private const float32 PufferSize = 16.0f;
-    private const float32 MushroomSize = 14.4f;
-    private const float32 SpikedBerrySize = 11.7f;
-    private const int32 k_PieceKinds = 3;
-    // The half size of the box the glove's battered proxy is scaled to.
+    // A carried piece's nominal half extent: the glove holds a piece's middle this far under its palm.
     private const float64 CarriedHalfSize = 6.0;
 
     // The cook state the dressing writes: the oil coat ramps up toward OilCoatInOil while a piece floats in the oil (at
@@ -194,13 +189,11 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_JoltBody _ScoopBody;
     // The right glove's grip (Station.Node.Tool): the skimmer's grip bar, so the glove rides the slide, the dip and the pour.
     private FCk_Handle_Transform _SkimmerHandleNode;
-    // The left glove's grip (Station.Node.Feed): the presentation moves it through each transfer.
+    // The left glove's grip (Station.Node.Feed): the presentation moves it through each transfer, and the feed carries its
+    // piece under it.
     private FCk_Handle_SceneNode _FeedHandNode;
     // Over the oil: where a carried piece is released.
     private FCk_Handle_Transform _ReleaseNode;
-    // One battered proxy per kind riding the glove (the carried piece's kind shows): the hand mimes the transfer, the piece
-    // itself teleports at its admission.
-    private TArray<FCk_Handle_UnrealComponent> _CarryProxyParts;
     private FCk_Handle_CookingFeed _FeedHandle;
     private FMars_StationFeed_Presentation _FeedPresentation;
     private FCk_Handle_PlatterDock _InputDock;
@@ -274,7 +267,8 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
 
         // A rejected feed spec already ensured in utils_cooking_feed::Add; the station still fries without a platter.
         auto FeedSpec = Feed;
-        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode);
+        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
+        FeedSpec.Motion.HeldOffset = _FeedPresentation.Geometry.HeldLocal;
         _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
         Add_Docks();
 
@@ -291,12 +285,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
 
         if (ck::IsValid(_BubblesPart))
         { utils_unreal_component::BindTo_OnAdded(_BubblesPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnFxPartAdded")); }
-
-        for (const auto& Part : _CarryProxyParts)
-        {
-            if (ck::IsValid(Part))
-            { utils_unreal_component::BindTo_OnAdded(Part, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnCarryProxyAdded")); }
-        }
 
         Refresh_Label();
     }
@@ -490,9 +478,9 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
             FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, FVector::ForwardVector, -FVector::UpVector), GripLocal)).As_Transform();
     }
 
-    // The feed node the left glove follows (at rest in front of the raw platter's dock, palm down, fingers forward) and one
-    // battered proxy per kind riding that glove, in its palm, hidden until a piece of that kind is grasped. The docked raw
-    // platter is the stock's only visual. The presentation's geometry is authored here, in the station frame.
+    // The feed node the left glove follows (at rest in front of the raw platter's dock, palm down, fingers forward); the feed
+    // carries the reserved piece itself under it, in the palm. The docked raw platter is the stock's only visual. The
+    // presentation's geometry is authored here, in the station frame.
     private void AddFeedHand(FCk_Handle_Transform& InRoot)
     {
         const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
@@ -505,16 +493,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         _FeedHandNode = utils_scene_node::Create(InRoot, Geometry.RestLocal);
         _FeedPresentation.HandNode = _FeedHandNode;
         _FeedPresentation.WrittenHand = Geometry.RestLocal;
-
-        auto HandTransform = _FeedHandNode.As_Transform();
-        for (int32 Kind = 0; Kind < k_PieceKinds; ++Kind)
-        {
-            auto Part = HandTransform.Add_MeshPart(this, Make_PiecePart(Geometry.HeldLocal, Kind, n"FryStation_CarriedPiece"));
-            if (ck::IsValid(Part))
-            { utils_entity_tag::Add(Part, n"TAG_MarsFryCarriedPiece"); }
-
-            _CarryProxyParts.Add(Part);
-        }
     }
 
     // A NoCollision cube of InRod's size at its location under InParent, tinted InColor.
@@ -539,17 +517,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         }
 
         return Handle;
-    }
-
-    // A battered mesh of InPreset's kind with its centre at InCentre (its frame: the mesh is scaled to the carried box and
-    // lowered by the half size, since the meshes' pivots are at their base).
-    private FMars_MeshPart Make_PiecePart(const FTransform& InCentre, int32 InPreset, FName InDebugName) const
-    {
-        const auto HalfSize = CarriedHalfSize;
-        const auto Scale = 2.0 * HalfSize / float64(Get_PieceMeshSize(InPreset));
-        return FMars_MeshPart(
-            FTransform(InCentre.GetRotation(), InCentre.TransformPosition(FVector(0.0, 0.0, -HalfSize)), FVector(Scale, Scale, Scale)),
-            Get_PieceMesh(InPreset), nullptr, collision::profile::NoCollision, InDebugName);
     }
 
     // The state label on the pot's far rim, yawed to face the operator, its text centred on the node. Its text is set once
@@ -630,7 +597,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     }
 
     // The two docks on the counter top, children of the root (they die with the station), lifted so a docked platter's
-    // underside rests on the top. A rejected spec already ensured in utils_platter_dock::Create.
+    // underside rests on the top, each with its marker. A rejected spec already ensured in utils_platter_dock::Create.
     private void Add_Docks()
     {
         const auto DockLift = FVector(0.0, 0.0, CounterHeight + constants_platter::k_FloorAboveBase);
@@ -638,11 +605,15 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
             FTransform(FRotator::ZeroRotator, InputDockLocal + DockLift));
         InputSpec.Name = FText::FromString("raw platter");
         _InputDock = utils_platter_dock::Create(_Root, InputSpec);
+        if (ck::IsValid(_InputDock))
+        { _InputDock.Add_Marker(this, n"FryStation_InputDockMarker"); }
 
         auto OutputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Output, Docks.Output,
             FTransform(FRotator::ZeroRotator, OutputDockLocal + DockLift));
         OutputSpec.Name = FText::FromString("finished tray");
         _OutputDock = utils_platter_dock::Create(_Root, OutputSpec);
+        if (ck::IsValid(_OutputDock))
+        { _OutputDock.Add_Marker(this, n"FryStation_OutputDockMarker"); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -664,8 +635,7 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         Refresh_Label();
     }
 
-    // The feed's glove node, pose override and carried piece follow the feed; the glove's proxy of the carried piece's kind
-    // shows while it is carried.
+    // The feed's glove node and pose override follow the feed (the piece rides the node).
     private void Advance_Feed(float32 InDeltaSeconds)
     {
         if (ck::Is_NOT_Valid(_FeedHandle))
@@ -674,24 +644,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         const auto RootWorld = utils_transform::Get_EntityCurrentTransform(_Root);
         const auto Operator = _Root.H().As_Station().Get_Operator();
         _FeedPresentation.Advance(FMars_StationFeed_Frame(_FeedHandle, Operator, RootWorld, InDeltaSeconds));
-
-        const auto Carried = _FeedPresentation.CarriedPiece;
-        const auto CarriedKind = Carried.IsSet() ? Get_PieceKind(Carried.GetValue().StockIndex) : -1;
-        for (int32 Kind = 0; Kind < _CarryProxyParts.Num(); ++Kind)
-        { Set_PartVisible(_CarryProxyParts[Kind], Kind == CarriedKind); }
-    }
-
-    // Skips a part that was left out or whose component does not exist yet.
-    private void Set_PartVisible(const FCk_Handle_UnrealComponent& InPart, bool InVisible)
-    {
-        if (ck::Is_NOT_Valid(InPart))
-        { return; }
-
-        auto Component = Cast<USceneComponent>(utils_unreal_component::Get_Component(InPart));
-        if (ck::Is_NOT_Valid(Component) || Component.IsVisible() == InVisible)
-        { return; }
-
-        Component.SetVisibility(InVisible);
     }
 
     // Each piece's cook state from its own ledger: its six face heats are its six sears, its mean heat the batter's fry
@@ -816,36 +768,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
         _PieceVisuals.Add(Visual);
     }
 
-    // The three battered kinds by a preset (or slot) index.
-    private int32 Get_PieceKind(int32 InPreset) const
-    {
-        return InPreset % k_PieceKinds;
-    }
-
-    private UStaticMesh Get_PieceMesh(int32 InPreset) const
-    {
-        const auto Kind = Get_PieceKind(InPreset);
-        if (Kind == 0)
-        { return assets::load::Puffer_Battered_Mars_SM(); }
-
-        if (Kind == 1)
-        { return assets::load::Mushroom_Battered_Mars_SM(); }
-
-        return assets::load::SpikedBerry_Battered_Mars_SM();
-    }
-
-    private float32 Get_PieceMeshSize(int32 InPreset) const
-    {
-        const auto Kind = Get_PieceKind(InPreset);
-        if (Kind == 0)
-        { return PufferSize; }
-
-        if (Kind == 1)
-        { return MushroomSize; }
-
-        return SpikedBerrySize;
-    }
-
     // Rewritten only when the text changes.
     private void Refresh_Label()
     {
@@ -905,18 +827,6 @@ class UMars_FryStation_EntityScript : UMars_Station_EntityScript
     private void OnFxPartAdded(FCk_Handle_UnrealComponent InHandle)
     {
         Resolve_Bubbles();
-    }
-
-    // A glove proxy wears the raw cook state and starts hidden; the dressing tick sets its visibility.
-    UFUNCTION()
-    private void OnCarryProxyAdded(FCk_Handle_UnrealComponent InHandle)
-    {
-        auto Mesh = Cast<UPrimitiveComponent>(utils_unreal_component::Get_Component(InHandle));
-        if (ck::Is_NOT_Valid(Mesh))
-        { return; }
-
-        utils_cookstate::Write_CustomPrimitiveData(Mesh, FMars_CookState());
-        Mesh.SetVisibility(false);
     }
 
     UFUNCTION()

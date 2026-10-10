@@ -24,6 +24,7 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
         Add_Step_WaitFrames("the duplicate drains", 3);
         Add_Step("admitted exactly once", n"Step_AssertAdmittedOnce");
         Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 0, 2.0f);
+        Add_Step_WaitUntil("the pile has re-settled", n"Check_PileSettled", 0, 2.0f);
         Add_Step("press add food again", n"Step_Begin");
         Add_Step_WaitUntil("the second piece awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
         Add_Step("reset mid-admission", n"Step_ResetMidAdmission");

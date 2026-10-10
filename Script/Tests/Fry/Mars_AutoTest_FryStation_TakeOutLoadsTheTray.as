@@ -22,7 +22,7 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Fry(InHandle, k_Origin, FMars_CookingFeed_TimingSpec());
-        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars::Food_MushroomSlice_Mars);
+        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MushroomSlice());
         _Tray = Spawn_Platter(InHandle, k_TrayOffset, nullptr);
 
         Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", 0, 5.0f);

@@ -9,9 +9,9 @@ enum EMars_AutoTest_HeatStation
 // two platter docks, and a bare operator (no input, no display) that takes and leaves it, so the station's own state
 // machine runs Idle and Operated: the feed draws from the docked raw platter, its bridge hands each release to the kernel,
 // and the take-out bridge loads every piece the kernel hands back onto the docked finished tray. A press is the request the
-// operator's input task would issue. Platters are World-mode platter world items under the test, lying beside the station
-// (falling freely: no floor at these Z bands) until a test docks them. The handlers record the docks' signals, the feed's
-// settles and the kernel's take-outs.
+// operator's input task would issue. Platters are large World-mode platter world items under the test, each lying on a
+// static floor beside the station (a platter drops what it is given only while it lies still) until a test docks them.
+// The handlers record the docks' signals, the feed's settles and the kernel's take-outs.
 UCLASS(Abstract)
 class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
 {
@@ -34,6 +34,8 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
     protected TArray<EMars_PlatterDock_Refusal> _DockRefusals;
     protected TArray<EMars_CookingFeed_Settle> _Settles;
     protected TArray<FCk_Handle_FoodPiece> _TakenOut;
+
+    private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
 
     // The real searing station at InOrigin with InTiming on its feed.
     protected void Spawn_Searing(FCk_Handle InHandle, FVector InOrigin, FMars_CookingFeed_TimingSpec InTiming)
@@ -59,17 +61,42 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
         Spawn_Station(InHandle, utils_entity_script::Request_SpawnEntity(InHandle, UMars_FryStation_EntityScript, SpawnParams));
     }
 
-    // A platter beside the station at InOffset from its origin, with InFood's whole joint on it (null = empty); the entity is
-    // under construction until Get_IsPlatterReady says otherwise.
-    protected FCk_Handle Spawn_Platter(FCk_Handle InHandle, FVector InOffset, UMars_Food_Def InFood)
+    // A large platter (wide enough for the whole meat slab) lying on a floor beside the station at InOffset from its origin,
+    // with InFoodItem's whole joint loaded onto it (null = empty; the kernel path: no hand); the entity is under
+    // construction until Get_IsPlatterReady says otherwise.
+    protected FCk_Handle Spawn_Platter(FCk_Handle InHandle, FVector InOffset, UCk_InventoryItem_Definition InFoodItem)
     {
         auto Owner = InHandle;
-        const auto World = FTransform(FRotator::ZeroRotator, _Origin + InOffset);
-        if (ck::IsValid(InFood))
-        { return utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(World, InFood)); }
+        Spawn_PlatterFloor(Owner, _Origin + InOffset);
+        const auto World = FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
+        auto PlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(World, mars_items::Platter_Large()));
+        if (ck::Is_NOT_Valid(InFoodItem))
+        { return PlatterEntity; }
 
-        return utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(World));
+        if (ck::Is_NOT_Valid(_FoodOnPlatter))
+        { _FoodOnPlatter = Cast<UMars_AutoTestHelper_FoodOnPlatter>(NewObject(this, UMars_AutoTestHelper_FoodOnPlatter)); }
+
+        Track_ForCleanup(_FoodOnPlatter.Spawn_Onto(PlatterEntity, InFoodItem,
+            FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, 60.0))));
+        return PlatterEntity;
     }
+
+    // A static slab whose top is at InTop, for a World-mode platter to lie still on (a platter drops what it is given only
+    // while it lies still); a platter spawned at InTop + the tray's base height rests on it.
+    protected void Spawn_PlatterFloor(FCk_Handle InHandle, FVector InTop)
+    {
+        auto Owner = InHandle;
+        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
+        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
+        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        FloorSpec.Set_ShapeDimensions(Shape);
+        FloorSpec.Set_MotionType(ECk_MotionType::Static);
+        FloorSpec.Set_CollisionProfileName(n"BlockAll");
+        utils_jolt_body::Add(Floor, FloorSpec);
+    }
+
 
     // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with InKind and no definition: Transform, RuntimeMesh
     // and FoodPiece on a new entity under the world's transient entity, tracked for cleanup.

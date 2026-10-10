@@ -184,17 +184,20 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         OutEvents.Flipped = true;
     }
 
-    // A piece (cooking or ready) whose middle left the disc (past PanRadius and its own reach, or its own half height below
-    // the cooking surface) is lost: it keeps simulating as a lingering body.
+    // A piece (cooking or ready) whose middle left the disc (past PanRadius and its own reach, or more than
+    // Loss.FallThroughCm below the cooking surface, whatever its thickness) is lost: it keeps simulating as a lingering body.
     private void Advance_Loss(FMars_Searing_Frame& InFrame, FMars_Searing_PieceState& InPiece, FMars_Searing_PieceEvents& OutEvents)
     {
         const auto Pose = Get_PanPose(InFrame, InPiece);
         const auto Local = Pose.GetLocation();
         const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
         const auto OffTheDisc = Local.Size2D() > InFrame.Spec.Loss.PanRadius + utils_searing::Get_RadialExtent(InPiece.HalfExtents);
-        const auto BelowTheTop = AboveTop < -utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents);
-        if (OffTheDisc == false && BelowTheTop == false)
+        const auto FellThrough = AboveTop < -InFrame.Spec.Loss.FallThroughCm;
+        if (OffTheDisc == false && FellThrough == false)
         { return; }
+
+        ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(InPiece.Id)} leaves the pan: "
+            + f"radius {Local.Size2D() :.2} (off the disc {OffTheDisc}), {AboveTop :.3} cm above the surface (fell through {FellThrough})");
 
         InPiece.Status = EMars_Searing_PieceStatus::Lost;
         InPiece.LingerSeconds = 0.0f;
@@ -267,9 +270,6 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         for (const auto& Event : InEvents)
         {
             const auto PieceName = utils_cooking_feed::Get_PieceName(Event.Id);
-            if (Event.Contact.IsSet())
-            { ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] piece {PieceName} {Event.Contact.GetValue() :n}"); }
-
             if (Event.Seared.IsSet())
             { ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] piece {PieceName} face {utils_searing::Get_FaceName(Event.Seared.GetValue())} seared"); }
 
@@ -353,14 +353,16 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         return utils_searing::Get_DownFace(PieceWorld.GetRotation(), InFrame.PanUp);
     }
 
-    // The piece's middle, in the pan base's frame, within PanRadius of the axis and between its half height below and three
-    // half heights above the cooking surface (a piece hovering over the pan is not on it).
+    // The piece's middle, in the pan base's frame, within PanRadius of the axis and between Loss.FallThroughCm below (a thin
+    // slice sunk into the pan's surface still lies on it) and three half heights above the cooking surface (a piece hovering
+    // over the pan is not on it).
     private bool Get_IsOverDisc(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
     {
         const auto Pose = Get_PanPose(InFrame, InPiece);
         const auto Local = Pose.GetLocation();
         const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
         const auto HalfHeight = utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents);
-        return Local.Size2D() <= InFrame.Spec.Loss.PanRadius && AboveTop >= -HalfHeight && AboveTop <= 3.0 * HalfHeight;
+        return Local.Size2D() <= InFrame.Spec.Loss.PanRadius && AboveTop >= -InFrame.Spec.Loss.FallThroughCm
+            && AboveTop <= 3.0 * HalfHeight;
     }
 }

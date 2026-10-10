@@ -1,24 +1,30 @@
 // The CookingFeed rig, on the FoodPiece rig (pieces under the world's transient entity, tracked for cleanup): a feed on a
-// transform-only station root at an isolated origin, its release node 100 up (a test may move it), and its stock: a
-// platter (a plain Transform entity under the test, 200 to the side, the platter item's eight slots) loaded with k_Stock
-// box pieces. Add_Steps_SourceTheFeed waits for the pieces to land and sources the feed. The rig is the test receiver and
+// transform-only station root at an isolated origin, its release node 100 up (a test may move it), its hand node (which
+// the rig puts on the reserved piece at its grasp, in the piece's own rotation, as a station's glove closes on it: the
+// piece is attached without moving and rides the node from there; a test may move it), and its stock: a
+// platter (a plain Transform entity under the test, 200 to the side, standing on a kinematic floor box, the large platter
+// item's bounds and capacity with quick settle tuners so a pile re-settles within a few frames) loaded with k_Stock box
+// pieces. Add_Steps_SourceTheFeed waits for the pieces to land and sources the feed. The rig is the test receiver and
 // stands in for the station's bridge: it records every signal (phases, releases with the release node's pose at that
-// moment, settles, refusals, stock edges), unloads a released piece from the platter at once, and puts a piece whose
-// release was rejected or cancelled back on it. Its steps answer the last release Accepted or Rejected.
+// moment, settles, refusals, stock edges) and puts a released piece whose answer was a rejection or a cancel back on the
+// platter (the feed itself puts back a piece it cancels before the release). Its steps answer the last release Accepted or
+// Rejected.
 UCLASS(Abstract)
 class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
 {
     protected const FVector k_Origin = FVector(-60000.0, 34000.0, -60000.0);
     protected const FVector k_ReleaseLocal = FVector(0.0, 0.0, 100.0);
+    protected const FVector k_HandLocal = FVector(0.0, 100.0, 60.0);
     protected const FVector k_PlatterLocal = FVector(0.0, 200.0, 0.0);
     protected const int32 k_Stock = 6;
 
     protected FCk_Handle _Station;
     protected FCk_Handle_CookingFeed _Feed;
     protected FCk_Handle_SceneNode _ReleaseNode;
+    protected FCk_Handle_SceneNode _HandNode;
     protected FMars_CookingFeed_Spec _Spec;
     protected FCk_Handle_Platter _Platter;
-    // In load order (slot order once landed).
+    // In load order.
     protected TArray<FCk_Handle_FoodPiece> _Stock;
 
     protected TArray<EMars_CookingFeed_Phase> _Phases;
@@ -27,6 +33,8 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
     protected TArray<FMars_CookingFeed_Release> _Releases;
     // The release node's world pose when each release was broadcast, in parallel.
     protected TArray<FTransform> _ReleaseNodeAtRelease;
+    // The last release is awaiting its answer: a rejection or a cancel of it is the rig's to put back.
+    protected bool _IsReleaseOpen = false;
     // In parallel: one entry per OnTransferSettled.
     protected TArray<FMars_CookingFeed_PieceId> _SettledPieces;
     protected TArray<EMars_CookingFeed_Settle> _Settles;
@@ -49,9 +57,10 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         _Station = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(_Station, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
         _ReleaseNode = utils_scene_node::Create(Root, FTransform(k_ReleaseLocal));
+        _HandNode = utils_scene_node::Create(Root, FTransform(k_HandLocal));
 
         _Spec = InSpec;
-        _Spec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode.As_Transform());
+        _Spec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode.As_Transform(), _HandNode.As_Transform());
         _Feed = utils_cooking_feed::Add(_Station, _Spec);
 
         _Feed.BindTo_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnPhaseChanged"));
@@ -60,12 +69,17 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         _Feed.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnTransferRefused"));
         _Feed.BindTo_OnStockChanged(FMars_Delegate_CookingFeed_OnStockChanged(this, n"OnStockChanged"));
 
-        const UCk_InventoryItem_Definition PlatterItem = mars_items::Platter();
+        const UCk_InventoryItem_Definition PlatterItem = mars_items::Platter_Large();
         const UMars_ItemTrait_Platter PlatterTrait = PlatterItem.Get_ItemTraitByClass(UMars_ItemTrait_Platter);
+        auto PlatterSpec = PlatterTrait.Platter;
+        PlatterSpec.Settle.DropCadenceSeconds = 0.05f;
+        PlatterSpec.Settle.SampleSeconds = 0.05f;
+        PlatterSpec.Settle.DwellSeconds = 0.1f;
 
         auto PlatterEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(PlatterEntity, FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterLocal), ECk_Replication::DoesNotReplicate);
-        _Platter = utils_platter::Add(PlatterEntity, PlatterTrait.Platter);
+        auto PlatterRoot = utils_transform::Add(PlatterEntity, FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterLocal), ECk_Replication::DoesNotReplicate);
+        Add_PlatterFloor(PlatterRoot, PlatterSpec.Bounds);
+        _Platter = utils_platter::Add(PlatterEntity, PlatterSpec);
 
         for (int32 Index = 0; Index < k_Stock; ++Index)
         {
@@ -77,10 +91,28 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         }
     }
 
+    // A kinematic box under the platter's whole floor, its top at the root's Z (a platter item's tray body plays that part).
+    private void Add_PlatterFloor(FCk_Handle_Transform InRoot, const FMars_Platter_Bounds& InBounds)
+    {
+        auto Root = InRoot;
+        auto Node = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -1.0)));
+
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(InBounds.InnerHalfExtents.X + 5.0, InBounds.InnerHalfExtents.Y + 5.0, 1.0));
+
+        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        FloorSpec.Set_ShapeDimensions(Shape);
+        FloorSpec.Set_MotionType(ECk_MotionType::Kinematic);
+        FloorSpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
+        FloorSpec.Set_MassKg(1.0f);
+        FloorSpec.Set_CollisionProfileName(n"BlockAll");
+        utils_jolt_body::Add(Node.H(), FloorSpec);
+    }
+
     // The shared opening: the stock lands on the platter, then the feed draws from it.
     protected void Add_Steps_SourceTheFeed()
     {
-        Add_Step_WaitUntil("the stock lands on the platter", n"Check_StockLanded", 0, 5.0f);
+        Add_Step_WaitUntil("the stock lands on the platter", n"Check_StockLanded", 0, 8.0f);
         Add_Step("source the feed from the platter", n"Step_SetSource");
         Add_Step_WaitUntil("the feed draws from the platter", n"Check_Sourced", 0, 1.0f);
     }
@@ -123,6 +155,14 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
     {
         auto Res = OutResult;
         Res.Set(_Platter.Get_HeldCount() == k_Stock);
+    }
+
+    // Nothing on the platter is queued or settling: a press finds a frozen top to reach for.
+    UFUNCTION()
+    protected void Check_PileSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Platter.Get_PendingCount() == 0);
     }
 
     UFUNCTION()
@@ -236,18 +276,35 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
     {
         _Phases.Add(InPhase);
         _PhaseTimes.Add(float32(System::GetGameTimeInSeconds()));
+
+        if (InPhase == EMars_CookingFeed_Phase::Grasp)
+        { Put_HandOnReservedPiece(InFeed); }
     }
 
-    // What the bridge does: the released piece comes off the platter before any kernel sees it.
+    // The hand node on the reserved piece's middle, in its rotation: with the spec's identity held offset the piece is then
+    // already where it is held, so the grasp moves nothing (a kinematic piece yanked through the pile would scatter it).
+    protected void Put_HandOnReservedPiece(const FCk_Handle_CookingFeed& InFeed)
+    {
+        const auto Piece = InFeed.TryGet_ActiveFoodPiece();
+        if (ck::Is_NOT_Valid(Piece) || ck::Is_NOT_Valid(_HandNode) || ck::Is_NOT_Valid(_Station))
+        { return; }
+
+        FCk_Handle Entity = Piece;
+        const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+        const auto Centre = PieceWorld.TransformPosition(utils_searing::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry())));
+        const auto RootWorld = utils_transform::Get_EntityCurrentTransform(_Station.As_Transform());
+        const auto HandWorld = FTransform(PieceWorld.GetRotation(), Centre);
+        utils_scene_node::Request_UpdateOffset(_HandNode, FCk_Request_SceneNode_UpdateRelativeTransform(HandWorld.GetRelativeTransform(RootWorld)));
+    }
+
+    // The feed took the piece off the platter at its grasp; the release only records.
     UFUNCTION()
     protected void OnReleaseRequested(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease)
     {
         _Releases.Add(InRelease);
         _ReleaseNodeAtRelease.Add(ck::IsValid(_ReleaseNode)
             ? utils_transform::Get_EntityCurrentTransform(_ReleaseNode.As_Transform()) : FTransform::Identity);
-
-        if (ck::IsValid(_Platter) && InRelease.Piece.TryGet_Platter() == _Platter)
-        { _Platter.Request_Unload(FMars_Request_Platter_Unload(InRelease.Piece)); }
+        _IsReleaseOpen = true;
     }
 
     // A released piece that was not admitted goes back on the platter (the bridge's rejection and leave paths). A load
@@ -258,15 +315,19 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         _SettledPieces.Add(InPieceId);
         _Settles.Add(InSettle);
 
-        const auto IsReleasedPiece = _Releases.Num() > 0 && _Releases.Last().PieceId.Get_IsSame(InPieceId);
-        if (InSettle == EMars_CookingFeed_Settle::Admitted || IsReleasedPiece == false || ck::Is_NOT_Valid(_Platter))
+        const auto IsOpenRelease = _IsReleaseOpen && _Releases.Num() > 0 && _Releases.Last().PieceId.Get_IsSame(InPieceId);
+        if (IsOpenRelease == false)
+        { return; }
+
+        _IsReleaseOpen = false;
+        if (InSettle == EMars_CookingFeed_Settle::Admitted || ck::Is_NOT_Valid(_Platter))
         { return; }
 
         auto Piece = _Releases.Last().Piece;
         if (ck::Is_NOT_Valid(Piece))
         { return; }
 
-        _Platter.Request_Load(FMars_Request_Platter_Load(Piece, Get_World(Piece)));
+        _Platter.Request_Load(FMars_Request_Platter_Load(Piece));
     }
 
     UFUNCTION()

@@ -1,5 +1,5 @@
-// A rejected release spends nothing: the piece the release carried off the platter goes back into the slot it was reserved
-// from, the stock is back to six, and the hand still runs its Return to rest.
+// A rejected release spends nothing: the piece the release carried off the platter drops back onto the pile and freezes on
+// top again, the place it was reserved from; the stock is back to six, and the hand still runs its Return to rest.
 class UMars_AutoTest_CookingFeed_RejectedAdmissionRestoresTheSlotAndTheHandReturns : UMars_AutoTestRig_CookingFeed
 {
     private int32 _Slot = -1;
@@ -16,7 +16,7 @@ class UMars_AutoTest_CookingFeed_RejectedAdmissionRestoresTheSlotAndTheHandRetur
         Add_Step_WaitUntil("the released piece is off the platter", n"Check_PieceOff", 0, 1.0f);
         Add_Step("one piece is reserved and off the platter; reject the release", n"Step_AssertReservedAndReject");
         Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 0, 2.0f);
-        Add_Step_WaitUntil("the piece is back on the platter", n"Check_PieceBack", 0, 1.0f);
+        Add_Step_WaitUntil("the piece is back on the platter", n"Check_PieceBack", 0, 2.0f);
         Add_Step("the slot is restored and nothing was spent", n"Step_AssertRestored");
         Run_Steps(InHandle);
     }
@@ -39,7 +39,7 @@ class UMars_AutoTest_CookingFeed_RejectedAdmissionRestoresTheSlotAndTheHandRetur
 
         _Piece = _Feed.TryGet_ActiveFoodPiece();
         Assert_True(ck::IsValid(_Piece) && _Piece == _Releases.Last().Piece, "the release carries the reserved piece");
-        Assert_Equals_Int(_Platter.Get_HeldCount(), k_Stock - 1, "the piece is off the platter");
+        Assert_Equals_Int(_Platter.Get_Occupancy(), k_Stock - 1, "the piece is off the platter");
 
         Step_RejectPending(InHandle, InPayload);
     }
@@ -56,8 +56,8 @@ class UMars_AutoTest_CookingFeed_RejectedAdmissionRestoresTheSlotAndTheHandRetur
     {
         Assert_Ledger(k_Stock, 0, "after the rejection");
         Assert_True(_Piece.TryGet_Platter() == _Platter, "the piece is back on the platter");
-        const auto Slot = _Piece.Get_PlatterSlot();
-        Assert_True(Slot.IsSet() && Slot.GetValue() == _Slot, f"in the slot it was reserved from ({_Slot})");
+        const auto Place = _Platter.Get_Held().FindIndex(_Piece);
+        Assert_True(Place == _Slot, f"on top again, the place it was reserved from ({Place} vs {_Slot})");
         Assert_Equals_Int(_Settles.Num(), 1, "one transfer settled");
         Assert_True(_Settles.Num() == 1 && _Settles[0] == EMars_CookingFeed_Settle::Rejected, "it settled Rejected");
 

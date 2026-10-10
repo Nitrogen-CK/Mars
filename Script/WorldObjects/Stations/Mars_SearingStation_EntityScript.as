@@ -6,7 +6,7 @@
 // reads the operator. Two platter docks sit on the table: the raw platter (left, -Y) the feed draws from and the finished
 // tray (right, +Y) the take-out fills. The pan starts empty: a CookingFeed on the same entity draws the pieces of the docked
 // raw platter, and its station-feed tasks turn the operator's add-food press into a left-hand transfer that this script
-// presents (the glove node and the cube in the glove; the hand reaches for the reserved piece where it lies) and whose
+// presents (the glove node the feed carries the real piece under; the hand reaches for the reserved piece where it lies) and whose
 // release the Searing kernel admits (the piece itself, wearing its own display, on a dynamic body). This script builds the
 // nodes and the docks and, every frame, dresses the pan, the oil and every piece's record from the Searing state. While
 // operating, the right glove holds the pan handle (riding the tilt and the toss) and the left follows the feed node,
@@ -76,8 +76,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_CookingFeed_Spec Feed;
 
-    // The raw platter brings meat, no more pieces than the pan takes (an unset MaxPieces is the Searing spec's
-    // Supply.MaxPieces); the finished tray docks empty.
+    // The raw platter brings meat (the pan admits up to its Supply.MaxPieces of it); the finished tray docks empty.
     UPROPERTY(EditDefaultsOnly, Category = "Docks")
     FMars_Station_DockPolicies Docks;
     default Docks.Input.Kind = FGameplayTagQuery::MakeQuery_MatchTag(GameplayTags::Food_Meat);
@@ -118,10 +117,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 PanRimRadius = 14.5f;
     private const float32 PanRimHeight = 4.6f;
     private const float32 PanUndersideDepth = 0.3f;
-    // The meat cube riding the glove through a transfer (MeatCube_Mars_SM, a 2 cm half cube in the art) at its own scale:
-    // the hand mimes the transfer with it, and the release node clears the rim by its half extent.
-    private const float32 CarriedCubeHalf = 2.0f;
-    private const float32 CarriedCubeScale = 3.0f;
+    // A carried piece's nominal half extent: the glove holds a piece's middle this far under its palm, and the release node
+    // clears the rim by it.
+    private const float32 CarriedHalfExtent = 6.0f;
     // The pool as ratios of a piece's half extent h in pan cm (mars_cooking_ue.py LOOKDEV_POOL_NOTE): the footprint radius
     // is h * sqrt(2) * 0.9; Pool Radius, Pool Margin, Pool Blend, Simmer Width and Contact Softness are 1.1 / 0.6 / 0.5 /
     // 0.4 / 0.4 h. A piece's h is the mean of its two horizontal half extents as it was admitted (a cube's own half).
@@ -220,7 +218,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const FVector InputDockLocal = FVector(0.0, -54.0, 0.0);
     private const FVector OutputDockLocal = FVector(-25.0, 54.0, 0.0);
     private const FVector FeedRestLocal = FVector(-30.0, -56.0, 0.0);
-    // The release node over the pan: this far above the rim plus the carried cube's half extent, so a release clears the rim.
+    // The release node over the pan: this far above the rim plus a carried piece's half extent, so a release clears the rim.
     private const float64 ReleaseClearance = 4.0;
 
     // The state label above the table's far edge.
@@ -259,13 +257,11 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_UnrealComponent _SplatterPart;
     // The right glove's grip: the pan handle, under the pan node so it rides the tilt and the toss.
     private FCk_Handle_Transform _HandleGripNode;
-    // The left glove's grip (Station.Node.Feed): the presentation moves it through each transfer.
+    // The left glove's grip (Station.Node.Feed): the presentation moves it through each transfer, and the feed carries its
+    // piece under it.
     private FCk_Handle_SceneNode _FeedHandNode;
     // Under the pan mesh node, over the rim: where a carried piece is released.
     private FCk_Handle_Transform _ReleaseNode;
-    // The cube riding the glove (hidden unless a piece is carried): the hand mimes the transfer, the piece itself
-    // teleports at its admission.
-    private FCk_Handle_UnrealComponent _CarryProxyPart;
     private FCk_Handle_CookingFeed _FeedHandle;
     private FMars_StationFeed_Presentation _FeedPresentation;
     private FCk_Handle_PlatterDock _InputDock;
@@ -363,7 +359,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         // A rejected feed spec already ensured in utils_cooking_feed::Add; the station still sears without a platter.
         auto FeedSpec = Feed;
-        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode);
+        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
+        FeedSpec.Motion.HeldOffset = _FeedPresentation.Geometry.HeldLocal;
         _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
         Add_Docks();
 
@@ -389,9 +386,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         if (ck::IsValid(_SplatterPart))
         { utils_unreal_component::BindTo_OnAdded(_SplatterPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnFxPartAdded")); }
-
-        if (ck::IsValid(_CarryProxyPart))
-        { utils_unreal_component::BindTo_OnAdded(_CarryProxyPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnCarryProxyAdded")); }
 
         Refresh_All();
     }
@@ -555,35 +549,26 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
             FTransform(utils_fphands::Make_GripRotation(EMars_Hand::Right, HandleFingers, FVector::RightVector),
                 HandleGripLocal * Scale)).As_Transform();
 
-        // Over the pan's centre, clear of the rim by the carried cube's half extent and ReleaseClearance: it tilts and tosses
+        // Over the pan's centre, clear of the rim by a carried piece's half extent and ReleaseClearance: it tilts and tosses
         // with the pan, so a release lands where the pan is.
-        const auto ReleaseZ = float64(PanRimHeight) * Scale + float64(CarriedCubeHalf * CarriedCubeScale) + ReleaseClearance;
+        const auto ReleaseZ = float64(PanRimHeight) * Scale + float64(CarriedHalfExtent) + ReleaseClearance;
         _ReleaseNode = utils_scene_node::Create(PanMeshTransform, FTransform(FVector(0.0, 0.0, ReleaseZ))).As_Transform();
     }
 
-    // The feed node the left glove follows (at rest in front of the raw platter's dock, palm down, fingers forward) and the
-    // cube that rides that glove, in its palm, hidden until a piece is grasped. The docked raw platter is the stock's only
-    // visual. The presentation's geometry is authored here, in the station frame.
+    // The feed node the left glove follows (at rest in front of the raw platter's dock, palm down, fingers forward); the feed
+    // carries the reserved piece itself under it, in the palm. The docked raw platter is the stock's only visual. The
+    // presentation's geometry is authored here, in the station frame.
     private void AddFeedHand(FCk_Handle_Transform& InRoot)
     {
-        const auto CubeExtent = float64(CarriedCubeHalf * CarriedCubeScale);
         const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
         auto& Geometry = _FeedPresentation.Geometry;
         Geometry.RestLocal = FTransform(HandRotation, FVector(FeedRestLocal.X, FeedRestLocal.Y, TableHeight + PalmLift));
         // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
-        Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + CubeExtent));
+        Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + float64(CarriedHalfExtent)));
 
-        const auto CubeScale3D = FVector(float64(CarriedCubeScale), float64(CarriedCubeScale), float64(CarriedCubeScale));
         _FeedHandNode = utils_scene_node::Create(InRoot, Geometry.RestLocal);
         _FeedPresentation.HandNode = _FeedHandNode;
         _FeedPresentation.WrittenHand = Geometry.RestLocal;
-
-        auto HandTransform = _FeedHandNode.As_Transform();
-        _CarryProxyPart = HandTransform.Add_MeshPart(this, FMars_MeshPart(
-            FTransform(Geometry.HeldLocal.GetRotation(), Geometry.HeldLocal.GetLocation(), CubeScale3D),
-            assets::load::MeatCube_Mars_SM(), nullptr, collision::profile::NoCollision, n"SearingStation_CarriedPiece"));
-        if (ck::IsValid(_CarryProxyPart))
-        { utils_entity_tag::Add(_CarryProxyPart, n"TAG_MarsSearingCarriedPiece"); }
     }
 
     // The beads on their own node (over every piece) and the splatter on the footprint node (the newest piece), both unit
@@ -607,24 +592,24 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     }
 
     // The two docks on the table top, children of the root (they die with the station), lifted so a docked platter's
-    // underside rests on the top. A rejected spec already ensured in utils_platter_dock::Create.
+    // underside rests on the top, each with its marker. A rejected spec already ensured in utils_platter_dock::Create.
     private void Add_Docks()
     {
-        auto InputPolicy = Docks.Input;
-        if (InputPolicy.MaxPieces.IsSet() == false)
-        { InputPolicy.MaxPieces = TOptional<int32>(_SearingSpec.Supply.MaxPieces); }
-
         const auto DockLift = FVector(0.0, 0.0, TableHeight + constants_platter::k_FloorAboveBase);
-        auto InputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, InputPolicy,
+        auto InputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, Docks.Input,
             FTransform(FRotator::ZeroRotator, InputDockLocal + DockLift));
         InputSpec.Name = FText::FromString("raw platter");
         InputSpec.KindRejectedText = FText::FromString("Meat only");
         _InputDock = utils_platter_dock::Create(_Root, InputSpec);
+        if (ck::IsValid(_InputDock))
+        { _InputDock.Add_Marker(this, n"SearingStation_InputDockMarker"); }
 
         auto OutputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Output, Docks.Output,
             FTransform(FRotator::ZeroRotator, OutputDockLocal + DockLift));
         OutputSpec.Name = FText::FromString("finished tray");
         _OutputDock = utils_platter_dock::Create(_Root, OutputSpec);
+        if (ck::IsValid(_OutputDock))
+        { _OutputDock.Add_Marker(this, n"SearingStation_OutputDockMarker"); }
     }
 
     // A piece's record: the piece wears its own display (whoever made the piece dressed it); Jolt owns its pose. The cook
@@ -689,8 +674,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         Refresh_Label();
     }
 
-    // The feed's glove node, pose override and carried piece follow the feed; the glove's cube shows while a piece is
-    // carried.
+    // The feed's glove node and pose override follow the feed (the piece rides the node).
     private void Advance_Feed(float32 InDeltaSeconds)
     {
         if (ck::Is_NOT_Valid(_FeedHandle))
@@ -699,21 +683,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         const auto RootWorld = utils_transform::Get_EntityCurrentTransform(_Root);
         const auto Operator = _Root.H().As_Station().Get_Operator();
         _FeedPresentation.Advance(FMars_StationFeed_Frame(_FeedHandle, Operator, RootWorld, InDeltaSeconds));
-
-        Set_PartVisible(_CarryProxyPart, _FeedPresentation.CarriedPiece.IsSet());
-    }
-
-    // Skips a part that was left out or whose component does not exist yet.
-    private void Set_PartVisible(const FCk_Handle_UnrealComponent& InPart, bool InVisible)
-    {
-        if (ck::Is_NOT_Valid(InPart))
-        { return; }
-
-        auto Component = Cast<USceneComponent>(utils_unreal_component::Get_Component(InPart));
-        if (ck::Is_NOT_Valid(Component) || Component.IsVisible() == InVisible)
-        { return; }
-
-        Component.SetVisibility(InVisible);
     }
 
     // Every piece's pool (see the file header): a piece that lies on the pan and is not lost has its footprint at its
@@ -1345,18 +1314,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private void OnFxPartAdded(FCk_Handle_UnrealComponent InHandle)
     {
         Resolve_OilFx();
-    }
-
-    // The glove's cube wears the raw cook state and starts hidden; the dressing tick sets its visibility.
-    UFUNCTION()
-    private void OnCarryProxyAdded(FCk_Handle_UnrealComponent InHandle)
-    {
-        auto Cube = Cast<UPrimitiveComponent>(utils_unreal_component::Get_Component(InHandle));
-        if (ck::Is_NOT_Valid(Cube))
-        { return; }
-
-        utils_cookstate::Write_CustomPrimitiveData(Cube, FMars_CookState());
-        Cube.SetVisibility(false);
     }
 
     UFUNCTION()
