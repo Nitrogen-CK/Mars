@@ -12,8 +12,8 @@ class UMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces : UMars_AutoTestRig_Pl
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _PlatterA = Build_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin), Make_PlatterSpec(2, 0.0f));
-        _PlatterB = Build_Platter(InHandle, FTransform(FRotator(0.0, 90.0, 0.0), k_Origin + FVector(0.0, 200.0, 0.0)), Make_PlatterSpec(2, 0.0f));
+        _PlatterA = Build_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin), Make_PlatterSpec(2));
+        _PlatterB = Build_Platter(InHandle, FTransform(FRotator(0.0, 90.0, 0.0), k_Origin + FVector(0.0, 200.0, 0.0)), Make_PlatterSpec(2));
         for (int32 Index = 0; Index < 2; ++Index)
         {
             _PiecesA.Add(Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 30.0 * Index, 0.0)), 0.5));
@@ -70,7 +70,7 @@ class UMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces : UMars_AutoTestRig_Pl
     {
         Assert_Equals_Int(Get_ClearedCount(_PlatterA), 1, "A announced OnCleared once");
         Assert_Equals_Int(_PlatterA.Get_HeldCount(), 0, "A holds nothing");
-        Assert_Equals_Int(_PlatterA.Get_Occupancy(), 0, "A has no pending load either");
+        Assert_Equals_Int(_PlatterA.Get_Occupancy(), 0, "A has nothing queued or settling either");
         for (const auto& Piece : _PiecesA)
         { Assert_True(Get_IsEnding(Piece), f"A's piece [{Piece.ToString()}] is being destroyed"); }
 

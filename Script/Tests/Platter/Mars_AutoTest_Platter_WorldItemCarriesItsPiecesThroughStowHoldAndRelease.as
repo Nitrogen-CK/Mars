@@ -1,6 +1,7 @@
-// The platter world item carries its pieces through the item path: a loaded piece stays a scene-node child of the platter
-// root while the platter is stowed (into the overflow, as the pickup task does it: transfer, then Carry), held in the hand
-// (the selection) and released into the world, and rests at its slot under the held offset. Isolated Z band: -56000.
+// The platter world item carries its pile through the item path: stowed (into the overflow, as the pickup task does it:
+// transfer, then Carry) and held still in the hand (the selection), it takes a piece dropped between its walls onto its
+// own tray body; the piece freezes on the root, rides the held platter under the held offset and stays a scene-node child
+// of the root when the platter is released into the world. Isolated Z band: -56000.
 class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease : UMars_AutoTestRig_Carrier
 {
     default _TimeoutSeconds = 20.0f;
@@ -29,12 +30,13 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
 
         Add_Step_WaitUntil("the platter world item is constructed and its holder holds its item", n"Check_Constructed");
         Add_Step_WaitUntil("the piece is Ready", n"Check_PieceReady");
-        Add_Step("load the piece", n"Step_Load");
-        Add_Step_WaitUntil("the piece landed on the platter", n"Check_Landed");
         Add_Step("stow the platter into the overflow slot and carry it", n"Step_Stow");
         Add_Step_WaitUntil("the platter is Held", n"Check_Held");
         Add_Step_WaitSeconds("the hold's arrival settles", 1.0f);
-        Add_Step("the piece rides the held platter at its slot", n"Step_AssertRidesInHand");
+        Add_Step("load the piece onto the held platter", n"Step_Load");
+        Add_Step_WaitUntil("the piece landed on the platter", n"Check_Landed");
+        Add_Step_WaitFrames("the attach composes the world pose", 2);
+        Add_Step("the piece rides the held platter inside its walls", n"Step_AssertRidesInHand");
         Add_Step("release the platter", n"Step_Release");
         Add_Step_WaitUntil("the platter is back in the world", n"Check_Released");
         Add_Step("the piece is still on the released platter", n"Step_AssertStillLoaded");
@@ -81,10 +83,9 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
     UFUNCTION()
     private void Step_Load(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Item = _WorldItem.Get_HeldItem();
         Assert_True(_Item.Has_HandsOnly(), "the platter item is hands-only");
         Assert_True(_WorldItem.Get_Persistence() == EMars_WorldItem_Persistence::Persistent, "the platter world item is Persistent");
-        Assert_Equals_Int(_Platter.Get_Capacity(), 8, "the platter has the definition's eight slots");
+        Assert_Equals_Int(_Platter.Get_Capacity(), 4, "the platter has the definition's capacity of four");
 
         _Platter.Request_Load(FMars_Request_Platter_Load(_Piece));
     }
@@ -100,6 +101,7 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
     UFUNCTION()
     private void Step_Stow(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        _Item = _WorldItem.Get_HeldItem();
         auto Target = _Hotbar.TryGet_StowTarget(_Item);
         if (ck::Is_NOT_Valid(Target) || Target != _Hotbar.Get_Slot(_Hotbar.Get_OverflowIndex()))
         {
@@ -147,11 +149,10 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
 
         const UMars_ItemTrait_Presentation Presentation = mars_items::Platter().Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
         const auto HandWorld = utils_transform::Get_EntityCurrentTransform(_HandNode);
-        const auto PlatterWorld = Presentation.Mounting.HeldOffset * HandWorld;
-        const auto Metrics = utils_runtime_mesh::Get_Metrics(_Piece.Get_Geometry());
-        const auto Expected = (utils_platter::Get_SlotPose(Metrics, _Platter.Get_Spec().SlotsLocal[0]) * PlatterWorld).GetLocation();
-        const auto Actual = Get_PieceWorld().GetLocation();
-        Assert_True(Actual.Equals(Expected, 0.5), f"the piece rests at slot 0 of the held platter ({Actual} vs {Expected})");
+        const auto Expected = (Presentation.Mounting.HeldOffset * HandWorld).GetLocation();
+        const auto PlatterWorld = utils_transform::Get_EntityCurrentTransform(Get_Root());
+        Assert_True(PlatterWorld.GetLocation().Equals(Expected, 0.5), f"the platter sits at the held offset ({PlatterWorld.GetLocation()} vs {Expected})");
+        Assert_True(utils_platter::Get_IsInside(_Platter.Get_Spec().Bounds, PlatterWorld, _Piece), f"the piece lies inside the held platter's walls ({Get_PieceWorld().GetLocation()})");
     }
 
     UFUNCTION()

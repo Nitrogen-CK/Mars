@@ -13,8 +13,9 @@ struct FMars_AutoTest_PlatterDock_Refusal
 
 // The PlatterDock rig, on the carrier rig (the test entity is a carrier with a Hand node; tests add the hotbar and HeldItem
 // they need). A station root is a plain Transform entity under the test; docks are created on it with their three signals
-// recorded. Platters are spawned as World-mode platter world items under the test and resolved once constructed; box
-// pieces live under the world's transient entity, tracked for cleanup.
+// recorded. Platters are spawned as World-mode platter world items under the test, each lying on a static floor of its own
+// (a platter drops what it is given only while it lies still), and resolved once constructed; box pieces live under the
+// world's transient entity, tracked for cleanup.
 UCLASS(Abstract)
 class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
 {
@@ -28,8 +29,11 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
     protected TArray<FCk_Handle_WorldItem> _WorldItems;
 
     protected TArray<FMars_AutoTest_PlatterDock_Docked> _Docked;
+    protected TArray<FMars_AutoTest_PlatterDock_Docked> _Arrived;
     protected TArray<FMars_AutoTest_PlatterDock_Docked> _Undocked;
     protected TArray<FMars_AutoTest_PlatterDock_Refusal> _DockRefused;
+
+    private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
 
     // A plain Transform entity under the test: what a station's root is to its docks.
     protected FCk_Handle_Transform Build_StationRoot(FCk_Handle InHandle, FVector InOrigin)
@@ -43,6 +47,7 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         auto Root = InRoot;
         auto Dock = utils_platter_dock::Create(Root, InSpec);
         Dock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDockDocked"));
+        Dock.BindTo_OnArrived(FMars_Delegate_PlatterDock_OnArrived(this, n"OnDockArrived"));
         Dock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnDockUndocked"));
         Dock.BindTo_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefusedItem"));
         return Dock;
@@ -66,14 +71,34 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         return FMars_PlatterDock_Policy(Kind, InWholeOnly);
     }
 
-    // A World-mode platter lying at InWorld, with InFood's whole joint on it when set; resolved by Check_PlattersConstructed.
-    protected void Spawn_Platter(FCk_Handle InOwner, FTransform InWorld, UMars_Food_Def InFood)
+    // InFoodItem's whole joint loaded onto the InPlatterIndex-th spawned platter (the kernel path: no hand); the food item
+    // spawns at InWorld (above the platter: the drop poses it) and is tracked for cleanup.
+    protected void Spawn_FoodOnto(int32 InPlatterIndex, UCk_InventoryItem_Definition InFoodItem, FVector InWorld)
+    {
+        if (ck::Is_NOT_Valid(_FoodOnPlatter))
+        { _FoodOnPlatter = Cast<UMars_AutoTestHelper_FoodOnPlatter>(NewObject(this, UMars_AutoTestHelper_FoodOnPlatter)); }
+
+        Track_ForCleanup(_FoodOnPlatter.Spawn_Onto(_PlatterEntities[InPlatterIndex], InFoodItem, FTransform(FRotator::ZeroRotator, InWorld)));
+    }
+
+    // A World-mode platter lying on a floor whose top is InSpec.World's Z (its pivot, the inner floor, sits the tray's base
+    // above it); resolved by Check_PlattersConstructed.
+    protected void Spawn_Platter(FCk_Handle InOwner, FMars_Platter_SpawnSpec InSpec)
     {
         auto Owner = InOwner;
-        auto Spec = FMars_Platter_SpawnSpec(InWorld);
-        if (ck::IsValid(InFood))
-        { Spec = FMars_Platter_SpawnSpec(InWorld, InFood); }
+        const auto FloorTop = InSpec.World.GetLocation();
+        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
+        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, FloorTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(45.0, 45.0, 1.0));
+        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        FloorSpec.Set_ShapeDimensions(Shape);
+        FloorSpec.Set_MotionType(ECk_MotionType::Static);
+        FloorSpec.Set_CollisionProfileName(n"BlockAll");
+        utils_jolt_body::Add(Floor, FloorSpec);
 
+        auto Spec = InSpec;
+        Spec.World = FTransform(InSpec.World.Rotator(), FloorTop + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
         _PlatterEntities.Add(utils_platter::Request_SpawnWorld(Owner, Spec));
     }
 
@@ -141,6 +166,18 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
     {
         auto Count = 0;
         for (const auto& Event : _Docked)
+        {
+            if (Event.Dock == InDock)
+            { ++Count; }
+        }
+
+        return Count;
+    }
+
+    protected int32 Get_ArrivedCount(FCk_Handle_PlatterDock InDock) const
+    {
+        auto Count = 0;
+        for (const auto& Event : _Arrived)
         {
             if (Event.Dock == InDock)
             { ++Count; }
@@ -231,6 +268,21 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         Event.Dock = InDock;
         Event.Platter = InPlatter;
         _Docked.Add(Event);
+    }
+
+    UFUNCTION()
+    private void OnDockArrived(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    {
+        auto Event = FMars_AutoTest_PlatterDock_Docked();
+        Event.Dock = InDock;
+        Event.Platter = InPlatter;
+        _Arrived.Add(Event);
+        On_Arrived(InDock, InPlatter);
+    }
+
+    // A test's hook into the frame a dock reports its platter landed.
+    protected void On_Arrived(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter)
+    {
     }
 
     UFUNCTION()

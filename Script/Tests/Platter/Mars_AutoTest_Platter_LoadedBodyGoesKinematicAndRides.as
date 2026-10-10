@@ -1,5 +1,6 @@
-// A piece with a Dynamic body lands only once its body reads Kinematic, and then rides the platter: moving the platter moves
-// the piece by the same offset, so the body follows the ECS transform rather than the other way.
+// A piece that already has a Dynamic body keeps it: the drop teleports that body between the walls, it settles and freezes
+// Kinematic, and then rides the platter: moving the platter moves the piece by the same offset, so the body follows the ECS
+// transform rather than the other way.
 class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -13000.0, -30000.0);
@@ -12,7 +13,7 @@ class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, 15.0, 0.0), k_Origin), Make_PlatterSpec(1, 0.0f));
+        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, 15.0, 0.0), k_Origin), Make_PlatterSpec(1));
         _P = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 0.0, 0.0)), 0.8);
 
         Add_Step_WaitUntil("P is Ready", n"Check_Ready");
@@ -70,8 +71,10 @@ class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig
         Assert_True(Landing.IsSet() && Landing.GetValue().BodyMotion.IsSet()
             && Landing.GetValue().BodyMotion.GetValue() == ECk_MotionType::Kinematic, "P's body read Kinematic when it landed");
 
-        const auto Expected = Get_SlotWorld(_Platter, _P, 0).GetLocation();
-        Assert_True(Get_World(_P).GetLocation().Equals(Expected, 0.5), f"P rests at its slot ({Get_World(_P).GetLocation()} vs {Expected})");
+        Assert_True(Get_IsFrozenOn(_Platter, _P), "P is held, Kinematic and a scene-node child of the root");
+        Assert_True(Get_IsInsideWalls(_Platter, _P), f"P rests inside the walls ({Get_World(_P).GetLocation()})");
+        FCk_Handle PEntity = _P;
+        Assert_True(PEntity.As_JoltBody() == _Body, "P kept its own body");
 
         _BeforeMove = Get_World(_P).GetLocation();
         Move_Platter(_Platter, Get_PlatterWorld(_Platter).GetLocation() + FVector(150.0, 0.0, 0.0));

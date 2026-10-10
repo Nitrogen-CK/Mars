@@ -1,7 +1,8 @@
 // Load refuses, without deferring, a piece the platter already holds (AlreadyHeld), one past its capacity (Full), one another
 // platter holds (HeldElsewhere) and one with a cut in flight (Cutting); a refused piece carries no platter. The cut and the
 // load of the cutting piece are requested together: when the piece drains its cut first the load is refused Cutting; when
-// the platter drains first the piece is accepted, and its cut then replaces it with halves no platter holds.
+// the platter drains first the piece is queued (a cutting piece never drops), and its cut then replaces it with halves no
+// platter holds while the reconcile drops the destroyed piece.
 class UMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -10000.0, -30000.0);
@@ -15,8 +16,8 @@ class UMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting : UMars_A
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _PlatterA = Build_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin), Make_PlatterSpec(1, 0.0f));
-        _PlatterB = Build_Platter(InHandle, FTransform(FRotator(0.0, 45.0, 0.0), k_Origin + FVector(0.0, 200.0, 0.0)), Make_PlatterSpec(1, 0.0f));
+        _PlatterA = Build_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin), Make_PlatterSpec(1));
+        _PlatterB = Build_Platter(InHandle, FTransform(FRotator(0.0, 45.0, 0.0), k_Origin + FVector(0.0, 200.0, 0.0)), Make_PlatterSpec(1));
         _P = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 0.0, 0.0)), 0.5);
         _Q = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 50.0, 0.0)), 0.5);
         _R = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 100.0, 0.0)), 0.5);
@@ -75,7 +76,7 @@ class UMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting : UMars_A
         Load(_PlatterB, _R);
     }
 
-    // Settles once R's cut resolved and the platter answered its load: a refusal, a landing, or a pending load dropped when
+    // Settles once R's cut resolved and the platter answered its load: a refusal, a landing, or a queued load dropped when
     // the cut destroyed R.
     UFUNCTION()
     private void Check_RAnswered(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
@@ -116,8 +117,8 @@ class UMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting : UMars_A
         }
 
         Assert_Equals_Int(_PlatterB.Get_PendingCount(), 0, "B waits on nothing");
-        for (const auto& Piece : _PlatterB.Get_Slots())
-        { Assert_True(ck::Is_NOT_Valid(Piece) || Get_IsEnding(Piece), "B holds nothing live: R was replaced by its halves"); }
+        for (const auto& Piece : _PlatterB.Get_Held())
+        { Assert_True(Get_IsEnding(Piece), "B holds nothing live: R was replaced by its halves"); }
         if (IsCut)
         {
             Assert_True(ck::Is_NOT_Valid(_Cuts[0].Positive.TryGet_Platter()) && ck::Is_NOT_Valid(_Cuts[0].Negative.TryGet_Platter()),

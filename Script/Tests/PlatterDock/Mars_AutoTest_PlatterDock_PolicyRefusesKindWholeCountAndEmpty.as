@@ -1,7 +1,8 @@
-// Each policy rule refuses on its own: five docks on one root (A Kind = Food.Meat, B WholeOnly, C MaxPieces 1, D RequireEmpty
-// true, E RequireEmpty false) judge three platters (the whole beef joint; two bare boxes with no kind; empty) through the
-// pure Get_Refusal, every combination. One real Dock proves the signal: the box platter onto A is refused KindRejected,
-// the dock stays empty and the platter stays in the world. Isolated Z band: -58000.
+// Each policy rule refuses on its own, and a count never does: five docks on one root (A Kind = Food.Meat, B WholeOnly, C no
+// rule, D RequireEmpty true, E RequireEmpty false) judge three platters (the whole beef joint on a large platter; two bare
+// boxes with no kind; empty) through the pure Get_Refusal, every combination: the two boxes pass every rule they do not
+// break. Two real Docks prove the signals: the box platter onto A is refused KindRejected, the dock stays empty and the
+// platter stays in the world; the same two-piece platter onto C docks. Isolated Z band: -58000.
 class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_AutoTestRig_PlatterDock
 {
     default _TimeoutSeconds = 30.0f;
@@ -22,9 +23,6 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
     {
         auto Root = Build_StationRoot(InHandle, k_Origin);
 
-        auto MinOne = Make_Policy(TOptional<FGameplayTag>(), false);
-        MinOne.MaxPieces = TOptional<int32>(1);
-
         auto MustBeEmpty = Make_Policy(TOptional<FGameplayTag>(), false);
         MustBeEmpty.RequireEmpty = TOptional<bool>(true);
 
@@ -34,7 +32,7 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
         TArray<FMars_PlatterDock_Policy> Policies;
         Policies.Add(Make_Policy(TOptional<FGameplayTag>(GameplayTags::Food_Meat), false));
         Policies.Add(Make_Policy(TOptional<FGameplayTag>(), true));
-        Policies.Add(MinOne);
+        Policies.Add(Make_Policy(TOptional<FGameplayTag>(), false));
         Policies.Add(MustBeEmpty);
         Policies.Add(MustHaveFood);
 
@@ -44,9 +42,11 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
             _Docks.Add(Build_Dock(Root, Make_DockSpec(Policies[Index], MountLocal, f"dock {Index}")));
         }
 
-        Spawn_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0)), mars::Food_MeatSlab_Mars);
-        Spawn_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 100.0, 0.0)), nullptr);
-        Spawn_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 200.0, 0.0)), nullptr);
+        Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0)),
+            mars_items::Platter_Large()));
+        Spawn_FoodOnto(k_Meat, mars_items::Food_MeatSlab(), k_Origin + FVector(200.0, 0.0, 60.0));
+        Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 100.0, 0.0))));
+        Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 200.0, 0.0))));
 
         _Boxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + FVector(300.0, 100.0, 0.0))));
         _Boxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + FVector(300.0, 150.0, 0.0))));
@@ -60,7 +60,31 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
         Add_Step_WaitUntil("the meat dock refused it", n"Check_Refused");
         Add_Step_WaitFrames("nothing else moves", 2);
         Add_Step("refused KindRejected: the dock is empty and the platter still lies in the world", n"Step_AssertRefused");
+        Add_Step("dock the two-piece box platter onto the rule-less dock", n"Step_DockBoxesOntoNoRule");
+        Add_Step_WaitUntil("the rule-less dock took it", n"Check_DockedOntoNoRule", 0, 5.0f);
+        Add_Step("no count refused it", n"Step_AssertDocked");
         Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Step_DockBoxesOntoNoRule(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Dock(_Docks[2], _PlatterItems[k_Boxes]);
+    }
+
+    UFUNCTION()
+    private void Check_DockedOntoNoRule(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_DockedCount(_Docks[2]) == 1 || Get_Refusals(_Docks[2]).Num() > 0);
+    }
+
+    UFUNCTION()
+    private void Step_AssertDocked(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(Get_Refusals(_Docks[2]).Num(), 0, "the rule-less dock refused nothing");
+        Assert_True(_Docks[2].Get_Platter() == _Platters[k_Boxes], "the rule-less dock holds the two-piece platter");
+        Assert_Equals_Int(_Platters[k_Boxes].Get_Occupancy(), 2, "with both its pieces");
     }
 
     UFUNCTION()
@@ -102,7 +126,6 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
     {
         const auto None = TOptional<EMars_PlatterDock_Refusal>();
         const auto KindRejected = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected);
-        const auto TooMany = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::TooMany);
         const auto MustBeEmpty = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustBeEmpty);
         const auto MustHaveFood = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustHaveFood);
 
@@ -118,7 +141,7 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
 
         AssertCell(k_Boxes, 0, KindRejected);
         AssertCell(k_Boxes, 1, None);
-        AssertCell(k_Boxes, 2, TooMany);
+        AssertCell(k_Boxes, 2, None);
         AssertCell(k_Boxes, 3, MustBeEmpty);
         AssertCell(k_Boxes, 4, None);
 

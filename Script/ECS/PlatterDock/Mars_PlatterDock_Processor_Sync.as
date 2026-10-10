@@ -1,7 +1,10 @@
 // Polls each dock's item against the last pass (the cargo slot's Sync shape). A change records the platter's world item and
-// kernel, then broadcasts OnUndocked for the platter that left and OnDocked for the one that arrived. It never moves the
-// platter: the Dock's Carry and the taker's Hold do. It is also the dock's teardown listener, bound at its first dock: a
-// dock torn down under a docked platter ends that platter, so no platter rides (or still lerps onto) a dead node.
+// kernel, then broadcasts OnUndocked for the platter that left and OnDocked for the one that arrived. A docked platter is
+// then watched every pass until its world item has landed on the dock (Carried by the dock, no mount pending and no
+// arrival in flight): OnArrived fires once and HasArrived stays set until the next undock. A station takes from a platter
+// only once it has landed, never while it is still travelling from the hand. It never moves the platter: the Dock's Carry
+// and the taker's Hold do. It is also the dock's teardown listener, bound at its first dock: a dock torn down under a
+// docked platter ends that platter, so no platter rides (or still lerps onto) a dead node.
 class UMars_Processor_PlatterDock_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -16,7 +19,10 @@ class UMars_Processor_PlatterDock_Sync : UCk_Processor_Script_Base_UE
     {
         auto Now = InState.Inventory.Get_SoleItem();
         if (Now == InState.LastSeen)
-        { return; }
+        {
+            Watch_Arrival(InHandle, InState);
+            return;
+        }
 
         const auto Previous = InState.Platter;
 
@@ -25,8 +31,11 @@ class UMars_Processor_PlatterDock_Sync : UCk_Processor_Script_Base_UE
         InState.LastSeen = Now;
         InState.WorldItem = ck::IsValid(Now) ? Now.Get_PersistentWorldItem() : FCk_Handle_WorldItem();
         InState.Platter = Docked;
+        InState.HasArrived = false;
+        const auto DockedWorldItem = InState.WorldItem;
 
-        // InState is not read past this line: a listener may add a fragment to the dock (a request).
+        // InState is not read past this line: the reach hint and a listener may add a fragment to the dock.
+        Sync_ReachHint(InHandle, Docked, DockedWorldItem);
         auto Self = InHandle.As_PlatterDock();
         if (ck::IsValid(Previous))
         {
@@ -40,6 +49,44 @@ class UMars_Processor_PlatterDock_Sync : UCk_Processor_Script_Base_UE
             Watch_Teardown(InHandle);
             Broadcast_Docked(Self, Docked);
         }
+    }
+
+    // A docked platter is what a Take reaches for: the dock (the interactable's owner) hints the platter's own fit and
+    // handedness, so both gloves take the tray. The platter's root sits on the dock's node, so its fit holds in the dock's
+    // frame as is. An empty dock hints nothing (its Place is a Place reach at a spot).
+    private void Sync_ReachHint(FCk_Handle& InDock, const FCk_Handle_Platter& InDocked, const FCk_Handle_WorldItem& InWorldItem)
+    {
+        const FCk_Handle WorldItemEntity = InWorldItem;
+        if (ck::IsValid(InDocked) && WorldItemEntity.Has_ReachHint())
+        {
+            utils_reach_hint::Set(InDock, WorldItemEntity.Get_ReachHint());
+            return;
+        }
+
+        utils_reach_hint::Remove(InDock);
+    }
+
+    private void Watch_Arrival(FCk_Handle& InDock, FMars_Fragment_PlatterDock& InState)
+    {
+        if (InState.HasArrived || ck::Is_NOT_Valid(InState.Platter) || ck::Is_NOT_Valid(InState.WorldItem))
+        { return; }
+
+        const auto WorldItem = InState.WorldItem;
+        const auto IsLanded = WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried
+            && WorldItem.Get_TargetMount() == EMars_WorldItem_Mount::Carried
+            && WorldItem.Get_Carrier() == InDock
+            && WorldItem.Has_Fragment(FMars_Fragment_WorldItem_Arrival) == false;
+        if (IsLanded == false)
+        { return; }
+
+        InState.HasArrived = true;
+        const auto Platter = InState.Platter;
+
+        // InState is not read past this line: a listener may add a fragment to the dock (a request).
+        auto Self = InDock.As_PlatterDock();
+        ck::Trace(f"[PlatterDock] [{Self.ToString()}] [{Platter.ToString()}] arrived");
+        if (Self.Has_Fragment(FMars_Fragment_PlatterDock_Signals))
+        { Self.Get_Fragment(FMars_Fragment_PlatterDock_Signals).OnArrived.Broadcast(Self, Platter); }
     }
 
     // Unbinding first keeps the watch single across docks.

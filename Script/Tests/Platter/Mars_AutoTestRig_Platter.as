@@ -2,7 +2,6 @@ struct FMars_AutoTest_Platter_Loaded
 {
     FCk_Handle_Platter Platter;
     FCk_Handle_FoodPiece Piece;
-    int32 Slot = -1;
 
     // The piece's body motion type at the landing; unset for a piece without a body.
     TOptional<ECk_MotionType> BodyMotion;
@@ -22,8 +21,9 @@ struct FMars_AutoTest_Platter_Unloaded
 }
 
 // The Platter rig, on the FoodPiece rig (pieces under the world's transient entity, tracked for cleanup, their cuts recorded
-// and their halves tracked). Platters are plain Transform entities under the test entity, recorded per platter: every
-// landing, refusal, unload and clear. Tests rotate and move their platters, so the slot-frame math is exercised.
+// and their halves tracked). Platters are plain Transform entities under the test entity, each standing on a kinematic
+// floor box that rides its root (a platter item's tray body plays that part), recorded per platter: every landing,
+// refusal, unload and clear. Tests rotate and move their platters, so the root-frame math is exercised.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
 {
@@ -34,20 +34,17 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
     protected TArray<FMars_AutoTest_Platter_Unloaded> _Unloaded;
     protected TArray<FCk_Handle_Platter> _Cleared;
 
-    // InSlots slots in a row along Y at 20 cm pitch, Z 0, unrotated.
-    protected FMars_Platter_Spec Make_PlatterSpec(int32 InSlots, float32 InArriveSeconds) const
+    // A 30 x 30 floor between 40 cm walls (the box fixture is a 10 cm cube), the item's settle tuners.
+    protected FMars_Platter_Spec Make_PlatterSpec(int32 InCapacity) const
     {
-        TArray<FTransform> Slots;
-        for (int32 Index = 0; Index < InSlots; ++Index)
-        { Slots.Add(FTransform(FRotator::ZeroRotator, FVector(0.0, 20.0 * Index, 0.0))); }
-
-        return FMars_Platter_Spec(Slots, InArriveSeconds);
+        return FMars_Platter_Spec(InCapacity, FMars_Platter_Bounds(FVector2D(15.0, 15.0), 40.0f, 25.0f));
     }
 
     protected FCk_Handle_Platter Build_Platter(FCk_Handle InOwner, FTransform InWorld, FMars_Platter_Spec InSpec)
     {
         auto Entity = utils_entity_lifetime::Request_CreateEntity(InOwner);
         utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
+        Add_Floor(Entity.As_Transform(), InSpec.Bounds);
         auto Platter = utils_platter::Add(Entity, InSpec);
         Platter.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnPlatterLoaded"));
         Platter.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnPlatterLoadRefused"));
@@ -65,12 +62,6 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
     {
         auto Platter = InPlatter;
         Platter.Request_Load(FMars_Request_Platter_Load(InPiece));
-    }
-
-    protected void Load_From(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, FTransform InArriveFrom)
-    {
-        auto Platter = InPlatter;
-        Platter.Request_Load(FMars_Request_Platter_Load(InPiece, InArriveFrom));
     }
 
     protected void Unload(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
@@ -114,11 +105,45 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
         return Entity.As_Transform();
     }
 
-    // Where InPiece rests in slot InSlot of InPlatter, in the world, by the kernel's own slot pose.
-    protected FTransform Get_SlotWorld(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, int32 InSlot) const
+    // The piece's bounds centre lies between InPlatter's walls and above its floor.
+    protected bool Get_IsInsideWalls(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece) const
     {
-        const auto SlotLocal = InPlatter.Get_Spec().SlotsLocal[InSlot];
-        return utils_platter::Get_SlotPose(Get_Metrics(InPiece), SlotLocal) * Get_PlatterWorld(InPlatter);
+        return utils_platter::Get_IsInside(InPlatter.Get_Spec().Bounds, Get_PlatterWorld(InPlatter), InPiece);
+    }
+
+    // The piece's body motion type; unset while it has no body.
+    protected TOptional<ECk_MotionType> TryGet_Motion(FCk_Handle_FoodPiece InPiece) const
+    {
+        FCk_Handle Entity = InPiece;
+        if (Entity.Is_JoltBody() == false)
+        { return TOptional<ECk_MotionType>(); }
+
+        return TOptional<ECk_MotionType>(utils_jolt_body::Get_MotionType(Entity.As_JoltBody()));
+    }
+
+    // Frozen into the pile: held, Kinematic and a scene-node child of the root.
+    protected bool Get_IsFrozenOn(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece) const
+    {
+        return InPlatter.Get_Held().Contains(InPiece) && TryGet_Motion(InPiece) == ECk_MotionType::Kinematic
+            && Get_Parent(InPiece) == Get_Root(InPlatter);
+    }
+
+    // A kinematic box under the floor's whole area, its top at the root's Z, riding the root.
+    private void Add_Floor(FCk_Handle_Transform InRoot, const FMars_Platter_Bounds& InBounds)
+    {
+        auto Root = InRoot;
+        auto Node = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -1.0)));
+
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(InBounds.InnerHalfExtents.X + 5.0, InBounds.InnerHalfExtents.Y + 5.0, 1.0));
+
+        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        FloorSpec.Set_ShapeDimensions(Shape);
+        FloorSpec.Set_MotionType(ECk_MotionType::Kinematic);
+        FloorSpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
+        FloorSpec.Set_MassKg(1.0f);
+        FloorSpec.Set_CollisionProfileName(n"BlockAll");
+        utils_jolt_body::Add(Node.H(), FloorSpec);
     }
 
     // A dynamic convex body of the piece's own mesh and mass, as a board's sweep gives a released piece.
@@ -146,6 +171,18 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
     protected bool Get_IsEnding(FCk_Handle_FoodPiece InPiece) const
     {
         return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+    }
+
+    protected int32 Get_LoadedCountOf(FCk_Handle_FoodPiece InPiece) const
+    {
+        auto Count = 0;
+        for (const auto& Event : _Loaded)
+        {
+            if (Event.Piece == InPiece)
+            { ++Count; }
+        }
+
+        return Count;
     }
 
     protected int32 Get_LoadedCount(FCk_Handle_Platter InPlatter) const
@@ -225,12 +262,11 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
     //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
-    private void OnPlatterLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, int32 InSlot)
+    private void OnPlatterLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
     {
         auto Event = FMars_AutoTest_Platter_Loaded();
         Event.Platter = InPlatter;
         Event.Piece = InPiece;
-        Event.Slot = InSlot;
 
         FCk_Handle Entity = InPiece;
         if (Entity.Is_JoltBody())

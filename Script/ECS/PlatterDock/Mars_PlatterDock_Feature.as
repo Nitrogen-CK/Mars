@@ -33,15 +33,16 @@ enum EMars_PlatterDock_Refusal
     NotAPlatter,
     KindRejected,
     NotWhole,
-    TooMany,
     MustBeEmpty,
     MustHaveFood,
     // The item is in no inventory, or the transfer was refused.
-    TransferFailed
+    TransferFailed,
+    // A food placed on the docked platter would not fit.
+    PlatterFull
 }
 
-// What interacting would do for a given focuser (Get_ActionFor). Only Place and Take enable the dock's interact target;
-// every Blocked_ reason keeps the prompt visible with the reason and E does nothing.
+// What interacting would do for a given focuser (Get_ActionFor). Only Place, Take and PlaceFood enable the dock's interact
+// target; every Blocked_ reason keeps the prompt visible with the reason and E does nothing.
 enum EMars_PlatterDock_Action
 {
     Place,
@@ -49,7 +50,9 @@ enum EMars_PlatterDock_Action
     Blocked_NothingHeld,
     Blocked_NotAPlatter,
     Blocked_Policy,
-    Blocked_HandsFull
+    Blocked_HandsFull,
+    // The focuser holds food and a platter is docked: the food goes onto the docked platter.
+    PlaceFood
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -66,8 +69,9 @@ namespace constants_platter_dock
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What a dock lets a platter bring. Every held piece must match Kind (an empty query = any); WholeOnly = every piece whole;
-// MaxPieces unset = unlimited; RequireEmpty set = the platter must (true) or must not (false) be empty.
+// What a dock lets a platter bring, never how much: every held piece must match Kind (an empty query = any); WholeOnly =
+// every piece whole; RequireEmpty set = the platter must (true) or must not (false) be empty. How many pieces a station
+// takes is its kernel's own limit.
 struct FMars_PlatterDock_Policy
 {
     UPROPERTY()
@@ -75,9 +79,6 @@ struct FMars_PlatterDock_Policy
 
     UPROPERTY()
     bool WholeOnly = false;
-
-    UPROPERTY()
-    TOptional<int32> MaxPieces;
 
     UPROPERTY()
     TOptional<bool> RequireEmpty;
@@ -89,6 +90,21 @@ struct FMars_PlatterDock_Policy
         Kind = InKind;
         WholeOnly = InWholeOnly;
     }
+}
+
+// What a dock's prompt says to one focuser (utils_platter_dock::Get_PromptText).
+struct FMars_PlatterDock_PromptQuery
+{
+    UPROPERTY()
+    EMars_PlatterDock_Action Action = EMars_PlatterDock_Action::Blocked_NothingHeld;
+
+    // Blocked_Policy: the policy's reason.
+    UPROPERTY()
+    TOptional<EMars_PlatterDock_Refusal> Refusal;
+
+    // PlaceFood: the held food's name.
+    UPROPERTY()
+    FText FoodName;
 }
 
 // What each of a station's two docks lets a platter bring: the input platter it draws from and the finished tray it fills.
@@ -134,8 +150,7 @@ struct FMars_PlatterDock_Spec
     }
 }
 
-// A probe needs a radius and the prompt a name; a non-finite pose has no place to mount, and a cap below one piece admits
-// only an empty platter (RequireEmpty says that).
+// A probe needs a radius and the prompt a name; a non-finite pose has no place to mount.
 mixin FMars_Validation Validate(const FMars_PlatterDock_Spec& Self)
 {
     if (Self.ProbeRadius <= 0.0f)
@@ -146,9 +161,6 @@ mixin FMars_Validation Validate(const FMars_PlatterDock_Spec& Self)
 
     if (Self.MountLocal.ContainsNaN())
     { return FMars_Validation("PlatterDock's MountLocal is not a finite transform"); }
-
-    if (Self.Policy.MaxPieces.IsSet() && Self.Policy.MaxPieces.GetValue() < 1)
-    { return FMars_Validation(f"PlatterDock's MaxPieces [{Self.Policy.MaxPieces.GetValue()}] is below 1: use RequireEmpty"); }
 
     return FMars_Validation();
 }
@@ -167,9 +179,9 @@ struct FMars_Fragment_PlatterDock_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Inventory, Interactable and Node are composed by utils_platter_dock::Create. WorldItem, Platter and LastSeen are written
-// only by UMars_Processor_PlatterDock_Sync from what the inventory holds (polled, as a cargo slot is), LastPromptAction
-// only by UMars_Processor_PlatterDock_Prompt.
+// Inventory, Interactable and Node are composed by utils_platter_dock::Create. WorldItem, Platter, LastSeen and HasArrived
+// are written only by UMars_Processor_PlatterDock_Sync from what the inventory holds and where its world item is (polled,
+// as a cargo slot is), LastPromptAction only by UMars_Processor_PlatterDock_Prompt.
 struct FMars_Fragment_PlatterDock
 {
     UPROPERTY()
@@ -193,6 +205,10 @@ struct FMars_Fragment_PlatterDock
     UPROPERTY()
     FCk_Handle_Item LastSeen;
 
+    // The docked platter's world item has landed on the node (Carried here, no arrival in flight); reset on every undock.
+    UPROPERTY()
+    bool HasArrived = false;
+
     // The action the prompt currently shows; unset while the dock is not focused.
     UPROPERTY()
     TOptional<EMars_PlatterDock_Action> LastPromptAction;
@@ -206,6 +222,11 @@ struct FMars_Fragment_PlatterDock
 delegate void FMars_Delegate_PlatterDock_OnDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 event void FMars_Delegate_PlatterDock_OnDocked_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 
+// The docked platter landed: its world item reads Carried by the dock with no arrival in flight. Once per dock; a station
+// takes from a platter only from here on.
+delegate void FMars_Delegate_PlatterDock_OnArrived(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
+event void FMars_Delegate_PlatterDock_OnArrived_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
+
 // The dock's inventory let the platter's item go.
 delegate void FMars_Delegate_PlatterDock_OnUndocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 event void FMars_Delegate_PlatterDock_OnUndocked_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
@@ -217,6 +238,7 @@ event void FMars_Delegate_PlatterDock_OnDockRefused_MC(FCk_Handle_PlatterDock In
 struct FMars_Fragment_PlatterDock_Signals
 {
     FMars_Delegate_PlatterDock_OnDocked_MC OnDocked;
+    FMars_Delegate_PlatterDock_OnArrived_MC OnArrived;
     FMars_Delegate_PlatterDock_OnUndocked_MC OnUndocked;
     FMars_Delegate_PlatterDock_OnDockRefused_MC OnDockRefused;
 }

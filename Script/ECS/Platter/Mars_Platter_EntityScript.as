@@ -1,18 +1,31 @@
+// What a platter's pickup offers its focuser.
+enum EMars_Platter_PickupAction
+{
+    // Hands empty or holding something other than food: pick the platter up.
+    PickUp,
+    // Holding a food item: place it on the platter.
+    Deposit,
+    // Holding a food item, and the platter is full.
+    Blocked_Full
+}
+
 // A World-mode, Persistent world item whose definition carries UMars_ItemTrait_Platter: the base WorldItem composition,
-// then the Platter kernel on the same entity (its root is what the pieces ride). With InitialFood set, the food's whole
-// joint is built under the world's transient entity, dressed when Ready and loaded into the first slot: a platter that
-// spawns with something on it. The pieces are the kernel's to end (Clear, the platter's destruction).
+// then the Platter kernel on the same entity (its root is what the pile rides). Its pickup does two things
+// (UMars_SmState_Platter_Interact): a focuser holding a food item places it on the platter, anyone else picks the platter
+// up. The prompt follows the focuser: refreshed when the pickup is focused and whenever the focuser's hotbar changes a
+// slot or its selection, never per frame. The small and the large platter items share this script.
 class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
 {
     // A placed platter resolves its item from here; a spawn sets it anyway.
     default Definition = mars_items::Platter();
 
-    // A Params() spawn may set it; a placed platter uses a subclass default. Null = empty.
-    UPROPERTY(ExposeOnSpawn)
-    UMars_Food_Def InitialFood;
-
     private FCk_Handle_Platter _Platter;
-    private FCk_Handle_FoodPiece _Joint;
+
+    // The focuser's hotbar the prompt follows; valid while the pickup is focused by an entity with a hotbar.
+    private FCk_Handle_Hotbar _PromptHotbar;
+
+    // Unset until the first refresh of a focus: the target's enable state changes only with the action.
+    private TOptional<EMars_Platter_PickupAction> _LastAction;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -46,8 +59,9 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
             return ECk_EntityScript_ConstructionFlow::Finished;
         }
 
-        if (ck::IsValid(InitialFood))
-        { Build_InitialJoint(InHandle); }
+        auto Pickup = Get_Pickup();
+        Pickup.BindTo_OnFocused(FMars_Delegate_Interactable_OnFocused(this, n"OnPlatterFocused"));
+        Pickup.BindTo_OnUnfocused(FMars_Delegate_Interactable_OnUnfocused(this, n"OnPlatterUnfocused"));
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
@@ -56,65 +70,102 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
     void DoEndPlay(FCk_Handle InHandle)
     {
         Super::DoEndPlay(InHandle);
+        Stop_FollowingFocuser();
+    }
 
-        if (ck::IsValid(_Joint))
+    protected TSoftClassPtr<UCk_SmState_EntityScript> Get_PickupStateClass() const override
+    {
+        TSoftClassPtr<UCk_SmState_EntityScript> StateClass = UMars_SmState_Platter_Interact;
+        return StateClass;
+    }
+
+    // A focuser holding a food item may have nowhere to stow the platter (food in the overflow slot) but can still place
+    // the food.
+    protected bool DoGet_CanStowSelf(FCk_Handle_Hotbar InHotbar) override
+    {
+        return Super::DoGet_CanStowSelf(InHotbar) || ck::IsValid(InHotbar.TryGet_SelectedFood());
+    }
+
+    UFUNCTION()
+    private void OnPlatterFocused(FCk_Handle_Interactable InInteractable, FCk_Handle InFocusedBy)
+    {
+        Stop_FollowingFocuser();
+
+        _PromptHotbar = InFocusedBy.As_Hotbar(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(_PromptHotbar))
         {
-            _Joint.UnbindFrom_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
-
-            // The platter ends what it accepted; a joint its drain never reached is nobody else's.
-            const auto IsEnding = utils_entity_lifetime::Get_IsPendingDestroy(_Joint, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
-            if (ck::Is_NOT_Valid(_Joint.TryGet_Platter()) && IsEnding == false)
-            { utils_entity_lifetime::Request_DestroyEntity(_Joint); }
+            _PromptHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnFocuserSlotItemChanged"));
+            _PromptHotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnFocuserSelectionChanged"));
         }
 
-        if (ck::IsValid(_Platter))
-        { _Platter.UnbindFrom_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnLoadRefused")); }
-
-        _Joint = FCk_Handle_FoodPiece();
-    }
-
-    private void Build_InitialJoint(FCk_Handle& InHandle)
-    {
-        const auto RootWorld = utils_transform::Get_EntityCurrentTransform(InHandle.As_Transform());
-
-        // A rejected definition or spec already ensured in Build_Joint.
-        _Joint = InitialFood.Build_Joint(ck::TransientEntity(), RootWorld);
-        if (ck::Is_NOT_Valid(_Joint))
-        { return; }
-
-        _Joint.BindTo_OnReady(FMars_Delegate_FoodPiece_OnReady(this, n"OnJointReady"));
-        _Platter.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnLoadRefused"));
-        _Platter.Request_Load(FMars_Request_Platter_Load(_Joint));
+        Refresh_Prompt();
     }
 
     UFUNCTION()
-    private void OnJointReady(FCk_Handle_FoodPiece InPiece)
+    private void OnPlatterUnfocused(FCk_Handle_Interactable InInteractable, FCk_Handle InUnfocusedBy)
     {
-        InitialFood.Add_Display(InPiece);
+        Stop_FollowingFocuser();
     }
 
-    // An empty platter has room for its joint: a refusal is a defect. The joint goes.
     UFUNCTION()
-    private void OnLoadRefused(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal)
+    private void OnFocuserSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
     {
-        if (InPiece != _Joint)
+        Refresh_Prompt();
+    }
+
+    UFUNCTION()
+    private void OnFocuserSelectionChanged(FCk_Handle_Hotbar InHotbar)
+    {
+        Refresh_Prompt();
+    }
+
+    private void Stop_FollowingFocuser()
+    {
+        if (ck::IsValid(_PromptHotbar))
+        {
+            _PromptHotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnFocuserSlotItemChanged"));
+            _PromptHotbar.UnbindFrom_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnFocuserSelectionChanged"));
+        }
+
+        _PromptHotbar = FCk_Handle_Hotbar();
+        _LastAction.Reset();
+    }
+
+    // The prompt's text and colour every refresh; the target is enabled for PickUp / Deposit and disabled for a blocked
+    // action, only when the action changes (utils_interact_target::Set_Enabled cancels the target's interactions).
+    private void Refresh_Prompt()
+    {
+        auto Pickup = Get_Pickup();
+        if (ck::Is_NOT_Valid(Pickup) || ck::Is_NOT_Valid(_Platter))
         { return; }
 
-        ck::EnsureIfNot(false, f"[Platter] [{InPlatter.ToString()}] refused its initial joint [{InPiece.ToString()}]: {InRefusal :n}");
-        auto Joint = InPiece;
-        utils_entity_lifetime::Request_DestroyEntity(Joint);
-        _Joint = FCk_Handle_FoodPiece();
+        const auto Food = ck::IsValid(_PromptHotbar) ? _PromptHotbar.TryGet_SelectedFood() : FCk_Handle_Item();
+        auto Action = EMars_Platter_PickupAction::PickUp;
+        auto Text = FText::FromString(f"Pick up {Get_ItemName()}");
+        if (ck::IsValid(Food))
+        {
+            Action = _Platter.Get_IsFull() ? EMars_Platter_PickupAction::Blocked_Full : EMars_Platter_PickupAction::Deposit;
+            Text = Action == EMars_Platter_PickupAction::Blocked_Full
+                ? FText::FromString("Platter full")
+                : FText::FromString(f"Place {Food.Get_Definition().Get_CoreInfo().Get_Name().ToString()} on platter");
+        }
+
+        const auto IsBlocked = Action == EMars_Platter_PickupAction::Blocked_Full;
+        const auto Color = IsBlocked ? constants_ui_colors::k_PromptText_Blocked : constants_ui_colors::k_PromptText;
+        const auto ActionChanged = _LastAction.IsSet() == false || _LastAction.GetValue() != Action;
+        _LastAction = TOptional<EMars_Platter_PickupAction>(Action);
+
+        auto Target = Pickup.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
+        auto Prompt = Target.As_InteractPrompt();
+        Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(Text, Color));
+
+        if (ActionChanged)
+        { utils_interact_target::Set_Enabled(Target, IsBlocked ? ECk_EnableDisable::Disable : ECk_EnableDisable::Enable); }
     }
 }
 
-// A placed platter holding the meat slab (the sandbox's prep food).
-class UMars_Platter_MeatSlab_EntityScript : UMars_Platter_EntityScript
+// A placed large platter (the sandbox's): a placed entity resolves its definition from a class default.
+class UMars_Platter_Large_EntityScript : UMars_Platter_EntityScript
 {
-    default InitialFood = mars::Food_MeatSlab_Mars;
-}
-
-// A placed platter holding a mushroom slice (the searing station's input refuses it).
-class UMars_Platter_MushroomSlice_EntityScript : UMars_Platter_EntityScript
-{
-    default InitialFood = mars::Food_MushroomSlice_Mars;
+    default Definition = mars_items::Platter_Large();
 }

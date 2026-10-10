@@ -22,7 +22,7 @@ class UMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold : UMa
         auto Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), false),
             FTransform(FRotator::ZeroRotator, FVector(0.0, 60.0, 70.0)), "input platter"));
-        Spawn_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0)), nullptr);
+        Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0))));
 
         Add_Step_WaitUntil("the platter world item is constructed and its holder holds its item", n"Check_PlattersConstructed");
         Add_Step("stow the platter into the overflow and carry it", n"Step_Stow");

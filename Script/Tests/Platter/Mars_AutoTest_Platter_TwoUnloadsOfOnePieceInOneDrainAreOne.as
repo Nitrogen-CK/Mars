@@ -1,6 +1,6 @@
 // Two controls may each ask for the same piece across a state change: two Unloads of one landed piece queued in one step
-// drain as one. The piece comes off once (one OnUnloaded), its slot is free, it names no platter, and nothing ensures. A
-// second piece still on the platter is untouched.
+// drain as one. The piece comes off once (one OnUnloaded), it names no platter, and nothing ensures. A second piece stays
+// on the platter (it re-settles over the hole).
 class UMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -17000.0, -30000.0);
@@ -12,7 +12,7 @@ class UMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne : UMars_AutoTe
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, 25.0, 0.0), k_Origin), Make_PlatterSpec(2, 0.0f));
+        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, 25.0, 0.0), k_Origin), Make_PlatterSpec(2));
         _P = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 0.0, 0.0)), 0.5);
         _Q = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 50.0, 0.0)), 0.5);
 
@@ -22,7 +22,7 @@ class UMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne : UMars_AutoTe
         Add_Step("unload P twice in one step", n"Step_UnloadTwice");
         Add_Step_WaitUntil("P was unloaded", n"Check_Unloaded");
         Add_Step_WaitFrames("a second unload would have drained by now", 3);
-        Add_Step("P came off once; its slot is free; Q stays", n"Step_Assert");
+        Add_Step("P came off once; Q stays", n"Step_Assert");
         Run_Steps(InHandle);
     }
 
@@ -68,10 +68,8 @@ class UMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne : UMars_AutoTe
         Assert_Equals_Int(Get_AllRefusalCount(_Platter), 0, "nothing was refused");
         Assert_Equals_Int(Get_UnloadedCount(_Platter), 1, "one OnUnloaded for the two requests");
         Assert_True(_Unloaded.Num() == 1 && _Unloaded[0].Piece == _P, "the unload named P");
-        Assert_Equals_Int(_Platter.Get_HeldCount(), 1, "only Q is held");
-        Assert_True(_Platter.TryGet_FirstFreeSlot() == 0, "P's slot 0 is the first free slot");
+        Assert_Equals_Int(_Platter.Get_Occupancy(), 1, "only Q is on the platter");
         Assert_True(ck::Is_NOT_Valid(_P.TryGet_Platter()), "P names no platter");
-        Assert_False(_P.Get_PlatterSlot().IsSet(), "P carries no slot");
         Assert_False(Get_IsSceneNode(_P), "P no longer rides the platter");
         Assert_True(_Q.TryGet_Platter() == _Platter, "Q is still on the platter");
     }

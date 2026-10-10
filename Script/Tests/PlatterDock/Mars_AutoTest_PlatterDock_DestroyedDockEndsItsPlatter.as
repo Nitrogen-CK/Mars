@@ -17,7 +17,7 @@ class UMars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter : UMars_AutoTestRig
         _Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(_Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), false),
             FTransform(FRotator::ZeroRotator, FVector(0.0, 60.0, 70.0)), "input platter"));
-        Spawn_Platter(InHandle, FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0)), nullptr);
+        Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0))));
         _Box = Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + FVector(300.0, 0.0, 0.0)));
 
         Add_Step_WaitUntil("the platter is constructed and the box is Ready", n"Check_Ready");
