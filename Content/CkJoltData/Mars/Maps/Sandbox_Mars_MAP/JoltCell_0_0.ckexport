@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "bacb337935d17f5ddb83bf6b20979dad",
+		"sourceHash": "0de537d32caa553195e7551a41552302",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -57,7 +57,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_0"
 					},
-					"_SourceHash": -8.4045131834603315e+18,
+					"_SourceHash": 5.1319375402289336e+18,
 					"_RuntimeCheckHash": -6.3371417846582344e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -85,7 +85,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -101,7 +110,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_3"
 					},
-					"_SourceHash": -6.7970310898716467e+18,
+					"_SourceHash": -3.9814563042807482e+17,
 					"_RuntimeCheckHash": 5.0816260831493304e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -129,7 +138,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -145,7 +163,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_4"
 					},
-					"_SourceHash": 3.8731247266844605e+18,
+					"_SourceHash": 7.5165229737590221e+18,
 					"_RuntimeCheckHash": 4.3235715146264084e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -173,7 +191,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -189,7 +216,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_5"
 					},
-					"_SourceHash": 7.7111357215053752e+18,
+					"_SourceHash": 4.0289065225803054e+18,
 					"_RuntimeCheckHash": 3.9699917273926753e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -217,7 +244,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -233,7 +269,7 @@
 						},
 						"SubPathString": "PersistentLevel.Mars_TestLamp_0"
 					},
-					"_SourceHash": -8.1679696219064351e+18,
+					"_SourceHash": 6.9925117392631409e+18,
 					"_RuntimeCheckHash": 2.271079361467404e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -261,7 +297,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -277,7 +322,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_6"
 					},
-					"_SourceHash": 4.1986005804891756e+18,
+					"_SourceHash": -6.506543213245354e+18,
 					"_RuntimeCheckHash": 5.8419666504906414e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -305,7 +350,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -321,7 +375,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_8"
 					},
-					"_SourceHash": 2.795214388748822e+18,
+					"_SourceHash": 1.1951568549760788e+18,
 					"_RuntimeCheckHash": 6.2900624830072945e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -349,7 +403,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -365,7 +428,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_9"
 					},
-					"_SourceHash": -2.3804088496995988e+18,
+					"_SourceHash": 7.1753035011129638e+17,
 					"_RuntimeCheckHash": 6.9296294494397478e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -393,7 +456,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -409,7 +481,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_14"
 					},
-					"_SourceHash": -6.543236384410793e+18,
+					"_SourceHash": 3.2641646083979423e+18,
 					"_RuntimeCheckHash": -8.2253053617972552e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -437,7 +509,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -453,7 +534,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_15"
 					},
-					"_SourceHash": 4.2526149689493263e+18,
+					"_SourceHash": 2.5599205722794527e+18,
 					"_RuntimeCheckHash": 4.730499947282006e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -481,7 +562,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -497,7 +587,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_17"
 					},
-					"_SourceHash": -4.0181606298014418e+18,
+					"_SourceHash": -2.8046532711247606e+18,
 					"_RuntimeCheckHash": -3.6437347612187274e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -525,7 +615,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -541,7 +640,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_19"
 					},
-					"_SourceHash": 8.5931742332429435e+18,
+					"_SourceHash": 6.2355654286306611e+18,
 					"_RuntimeCheckHash": 3.9220432833059538e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -569,7 +668,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -585,7 +693,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_20"
 					},
-					"_SourceHash": 7.2082840235661988e+18,
+					"_SourceHash": -4.8294685816907899e+18,
 					"_RuntimeCheckHash": -7.5758778534063964e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -613,7 +721,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -629,7 +746,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_21"
 					},
-					"_SourceHash": 2.0107669108940104e+18,
+					"_SourceHash": 1.6645413237701847e+18,
 					"_RuntimeCheckHash": -5.357464477968256e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -657,7 +774,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -673,7 +799,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_22"
 					},
-					"_SourceHash": 5.1206431033827103e+18,
+					"_SourceHash": 3.0269697468842056e+18,
 					"_RuntimeCheckHash": -2.1299381592227651e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -701,7 +827,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -717,7 +852,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_23"
 					},
-					"_SourceHash": -1.6431870811234483e+18,
+					"_SourceHash": -7.7504429807380109e+17,
 					"_RuntimeCheckHash": 5.7810087860688824e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -745,7 +880,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -761,7 +905,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_24"
 					},
-					"_SourceHash": -2.9548782511874514e+18,
+					"_SourceHash": 6.6903670987468698e+18,
 					"_RuntimeCheckHash": 8.5367637437004278e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -789,7 +933,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -805,7 +958,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_25"
 					},
-					"_SourceHash": 2.4322262136789299e+18,
+					"_SourceHash": -3.4837330963012393e+18,
 					"_RuntimeCheckHash": -7.4796061967780198e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -833,7 +986,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -849,7 +1011,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_26"
 					},
-					"_SourceHash": -6.34629530493154e+18,
+					"_SourceHash": -5.8004512577497713e+18,
 					"_RuntimeCheckHash": -4.6629236285965455e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -877,7 +1039,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -893,7 +1064,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_27"
 					},
-					"_SourceHash": 8.6116600525625477e+18,
+					"_SourceHash": -6.5538101238021018e+17,
 					"_RuntimeCheckHash": 4.248781198810092e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -921,7 +1092,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -937,7 +1117,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_28"
 					},
-					"_SourceHash": 6.3891015080911677e+18,
+					"_SourceHash": 8.301025679179649e+18,
 					"_RuntimeCheckHash": 9.2083048715131249e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -965,7 +1145,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -981,7 +1170,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_29"
 					},
-					"_SourceHash": 1.2844269187675041e+18,
+					"_SourceHash": -7.1277032779633654e+18,
 					"_RuntimeCheckHash": 6.5639332722409869e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1009,7 +1198,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1025,7 +1223,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_30"
 					},
-					"_SourceHash": -4.9631284742393375e+18,
+					"_SourceHash": -5.619437415311915e+18,
 					"_RuntimeCheckHash": -6.09357469434608e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1053,7 +1251,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1069,7 +1276,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_31"
 					},
-					"_SourceHash": -2.4794004200544425e+18,
+					"_SourceHash": -4.7632288841660467e+18,
 					"_RuntimeCheckHash": -3.4109407641634964e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1097,7 +1304,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1113,7 +1329,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_32"
 					},
-					"_SourceHash": 4.2515812928439803e+18,
+					"_SourceHash": -8.2471928083223398e+18,
 					"_RuntimeCheckHash": -4.9628800379563633e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1141,7 +1357,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1157,7 +1382,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_33"
 					},
-					"_SourceHash": -7.3506896599091343e+18,
+					"_SourceHash": 4.2412808460330944e+17,
 					"_RuntimeCheckHash": 9.1061682481076449e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1185,7 +1410,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1201,7 +1435,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_34"
 					},
-					"_SourceHash": 4.5355242978871127e+18,
+					"_SourceHash": 2.5763544612450176e+18,
 					"_RuntimeCheckHash": 6.9081655029131018e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1229,7 +1463,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1245,7 +1488,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_35"
 					},
-					"_SourceHash": 6.6715724297800376e+18,
+					"_SourceHash": 8.5773538824399585e+18,
 					"_RuntimeCheckHash": -4.2978648160020659e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1273,7 +1516,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1289,7 +1541,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_36"
 					},
-					"_SourceHash": -7.0582005429086505e+18,
+					"_SourceHash": 5.5576809614260398e+18,
 					"_RuntimeCheckHash": -3.0616391829470874e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1317,7 +1569,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1333,7 +1594,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_37"
 					},
-					"_SourceHash": -4.6616907192202322e+18,
+					"_SourceHash": 1.1908138770728566e+18,
 					"_RuntimeCheckHash": 7.7475972258795397e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1361,7 +1622,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1377,7 +1647,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_60"
 					},
-					"_SourceHash": 2.9761165551344348e+18,
+					"_SourceHash": -7.5531622065820774e+18,
 					"_RuntimeCheckHash": 6.9246664033604219e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1405,7 +1675,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1421,7 +1700,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_63"
 					},
-					"_SourceHash": -8.3947848286357914e+18,
+					"_SourceHash": 4.649504501205927e+17,
 					"_RuntimeCheckHash": -7.4715506725664e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1449,7 +1728,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1465,7 +1753,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_64"
 					},
-					"_SourceHash": 8.9889440471811686e+18,
+					"_SourceHash": 1.3595181048156992e+18,
 					"_RuntimeCheckHash": -4.2952660758477056e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1493,7 +1781,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1509,7 +1806,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_164"
 					},
-					"_SourceHash": 3.2806149019827113e+18,
+					"_SourceHash": -1.1536079957729585e+18,
 					"_RuntimeCheckHash": -4.6629922850803087e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1537,7 +1834,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1553,7 +1859,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_171"
 					},
-					"_SourceHash": 1.864652545157406e+18,
+					"_SourceHash": 1.0357997045520543e+18,
 					"_RuntimeCheckHash": 4.433735390168961e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1581,7 +1887,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1597,7 +1912,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_172"
 					},
-					"_SourceHash": 8.730348140496894e+18,
+					"_SourceHash": -6.9737040418845993e+18,
 					"_RuntimeCheckHash": -2.3782501606905354e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1625,7 +1940,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1641,7 +1965,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_173"
 					},
-					"_SourceHash": 3.978293432113791e+18,
+					"_SourceHash": 2.4185351243601787e+18,
 					"_RuntimeCheckHash": -5.7916337234384968e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1669,7 +1993,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1685,7 +2018,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_174"
 					},
-					"_SourceHash": -9.1859014163383921e+18,
+					"_SourceHash": -8.0873293610210483e+17,
 					"_RuntimeCheckHash": 7.8708527293625426e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1713,7 +2046,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1729,7 +2071,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_175"
 					},
-					"_SourceHash": 8.7254270935890801e+18,
+					"_SourceHash": 3.6706932969310556e+18,
 					"_RuntimeCheckHash": 7.5631858938029066e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1757,7 +2099,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1773,7 +2124,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_176"
 					},
-					"_SourceHash": -3.5828425935705544e+18,
+					"_SourceHash": 7.9796055363702641e+18,
 					"_RuntimeCheckHash": -6.592196856863746e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1801,7 +2152,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1817,7 +2177,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_177"
 					},
-					"_SourceHash": -5.2351128269897052e+18,
+					"_SourceHash": -1.4642173800134246e+17,
 					"_RuntimeCheckHash": 2.3058525087911357e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1845,7 +2205,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1861,7 +2230,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_178"
 					},
-					"_SourceHash": 4.117835752664852e+18,
+					"_SourceHash": -6.2538489650652406e+18,
 					"_RuntimeCheckHash": -8.4579840343643638e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1889,7 +2258,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1905,7 +2283,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_179"
 					},
-					"_SourceHash": 7.3833940288467507e+18,
+					"_SourceHash": -2.1340170881553925e+18,
 					"_RuntimeCheckHash": -6.5401790619898481e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1933,7 +2311,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1949,7 +2336,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_180"
 					},
-					"_SourceHash": -3.3059435242252406e+18,
+					"_SourceHash": 30998765643756532,
 					"_RuntimeCheckHash": -4.0776952014778245e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -1977,7 +2364,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -1993,7 +2389,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_181"
 					},
-					"_SourceHash": -7.8878337600328765e+18,
+					"_SourceHash": -1.9834628398555556e+18,
 					"_RuntimeCheckHash": 2.7597147136225556e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2021,7 +2417,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2037,7 +2442,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_182"
 					},
-					"_SourceHash": -5.9903230231764429e+18,
+					"_SourceHash": 3.3031995143670113e+18,
 					"_RuntimeCheckHash": -8.8036970630340833e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2065,7 +2470,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2081,7 +2495,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_183"
 					},
-					"_SourceHash": -3.0656339087808835e+18,
+					"_SourceHash": 3.4701515319508475e+18,
 					"_RuntimeCheckHash": -5.6291437819151995e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2109,7 +2523,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2125,7 +2548,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_184"
 					},
-					"_SourceHash": -1.7295449310560041e+18,
+					"_SourceHash": -6.7843523824259441e+18,
 					"_RuntimeCheckHash": 2.6283393531429571e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2153,7 +2576,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2169,7 +2601,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_185"
 					},
-					"_SourceHash": -5.1967721914511043e+18,
+					"_SourceHash": -2.1412965254342418e+18,
 					"_RuntimeCheckHash": 5.822507624692821e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2197,7 +2629,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2213,7 +2654,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_186"
 					},
-					"_SourceHash": 5.7171833652811889e+18,
+					"_SourceHash": 6.3680698354481961e+18,
 					"_RuntimeCheckHash": -6.46172994108096e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2241,7 +2682,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2257,7 +2707,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_187"
 					},
-					"_SourceHash": 5.8639053702856878e+18,
+					"_SourceHash": 1.5597763716681472e+18,
 					"_RuntimeCheckHash": 2.8203920329872492e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2285,7 +2735,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2301,7 +2760,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_188"
 					},
-					"_SourceHash": -7.4499156740156406e+18,
+					"_SourceHash": -5.1134049396316755e+17,
 					"_RuntimeCheckHash": -8.1698689334786304e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2329,7 +2788,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2345,7 +2813,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_189"
 					},
-					"_SourceHash": 8.2263934446568202e+18,
+					"_SourceHash": -8.1339136417259971e+18,
 					"_RuntimeCheckHash": -8.8242326358315581e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2373,7 +2841,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2389,7 +2866,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_190"
 					},
-					"_SourceHash": 8.411680491994497e+18,
+					"_SourceHash": -2.8358318332162478e+18,
 					"_RuntimeCheckHash": 2.8381512883310054e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2417,7 +2894,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2433,7 +2919,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_191"
 					},
-					"_SourceHash": 2.6091952800550845e+18,
+					"_SourceHash": 8.5104195043530322e+18,
 					"_RuntimeCheckHash": -5.2422238259971246e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2461,7 +2947,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2477,7 +2972,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_192"
 					},
-					"_SourceHash": -7.8018659706627953e+18,
+					"_SourceHash": -8.6416220158878607e+18,
 					"_RuntimeCheckHash": -5.576394037303808e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2505,7 +3000,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
@@ -2521,7 +3025,7 @@
 						},
 						"SubPathString": "PersistentLevel.StaticMeshActor_193"
 					},
-					"_SourceHash": -1.9990993945246838e+18,
+					"_SourceHash": -6.1457323294785413e+18,
 					"_RuntimeCheckHash": -4.3463152787327601e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2549,12 +3053,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_10",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_13",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -2563,9 +3076,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_10"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_13"
 					},
-					"_SourceHash": 8.9275963331587062e+18,
+					"_SourceHash": -8.7986183123972014e+18,
 					"_RuntimeCheckHash": -6.493108950652672e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2593,33 +3106,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 36,
-							"_Position":
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
 							{
-								"X": 1070,
-								"Y": 3250,
-								"Z": 230
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 35,
@@ -2645,7 +3141,51 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 36,
+							"_Position":
+							{
+								"X": 1070,
+								"Y": 3250,
+								"Z": 230
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 37,
@@ -2671,12 +3211,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_11",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_14",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -2685,9 +3234,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_11"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_14"
 					},
-					"_SourceHash": 4.9939558143757322e+18,
+					"_SourceHash": 6.4543960113055519e+18,
 					"_RuntimeCheckHash": -9.1063406961798226e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -2715,12 +3264,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_16",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_19",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -2729,246 +3287,12 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_16"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_19"
 					},
-					"_SourceHash": -2.1573872688879178e+18,
+					"_SourceHash": -7.9844388610988554e+18,
 					"_RuntimeCheckHash": 3.8003811813752842e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
-						{
-							"_ShapeIndex": 39,
-							"_Position":
-							{
-								"X": 400,
-								"Y": 3100,
-								"Z": 215
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 362.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 312.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 39,
-							"_Position":
-							{
-								"X": 400,
-								"Y": 3100,
-								"Z": 88
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 337.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 437.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 412.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 36,
-							"_Position":
-							{
-								"X": 400,
-								"Y": 3100,
-								"Z": 230
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 387.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
 						{
 							"_ShapeIndex": 35,
 							"_Position":
@@ -2993,59 +3317,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
 							{
-								"X": 462.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
-								"X": 487.5,
-								"Y": 3100,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 35,
@@ -3071,12 +3352,406 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 36,
+							"_Position":
+							{
+								"X": 400,
+								"Y": 3100,
+								"Z": 230
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 487.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 462.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 437.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 412.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 387.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 362.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 337.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 39,
+							"_Position":
+							{
+								"X": 312.5,
+								"Y": 3100,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 40,
+							"_Position":
+							{
+								"X": 400,
+								"Y": 3100,
+								"Z": 215
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 40,
+							"_Position":
+							{
+								"X": 400,
+								"Y": 3100,
+								"Z": 88
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_17",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_20",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3085,9 +3760,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_17"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_20"
 					},
-					"_SourceHash": 1.8015972599658557e+17,
+					"_SourceHash": 3.1759814995855247e+18,
 					"_RuntimeCheckHash": 6.1132460260928061e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3115,7 +3790,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 42,
@@ -3141,7 +3825,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 42,
@@ -3167,33 +3860,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 43,
-							"_Position":
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
 							{
-								"X": 399.99999999999994,
-								"Y": 2985,
-								"Z": 2
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654757
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 43,
@@ -3219,12 +3895,56 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 43,
+							"_Position":
+							{
+								"X": 399.99999999999994,
+								"Y": 2985,
+								"Z": 2
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654757
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_37",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_40",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3233,9 +3953,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_37"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_40"
 					},
-					"_SourceHash": -1.5661260974162941e+18,
+					"_SourceHash": 3.9154579363515223e+18,
 					"_RuntimeCheckHash": 1.3459772123757462e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3243,35 +3963,9 @@
 							"_ShapeIndex": 44,
 							"_Position":
 							{
-								"X": 2535,
-								"Y": 950,
-								"Z": 2
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 45,
-							"_Position":
-							{
 								"X": 2600,
-								"Y": 1015,
-								"Z": 2
+								"Y": 950,
+								"Z": 4
 							},
 							"_Rotation":
 							{
@@ -3289,7 +3983,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 45,
@@ -3315,15 +4018,24 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": 2600,
-								"Y": 950,
-								"Z": 4
+								"Y": 1015,
+								"Z": 2
 							},
 							"_Rotation":
 							{
@@ -3341,10 +4053,54 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 46,
+							"_Position":
+							{
+								"X": 2535,
+								"Y": 950,
+								"Z": 2
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 2665,
@@ -3367,12 +4123,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_53",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_55",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3381,9 +4146,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_53"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_55"
 					},
-					"_SourceHash": 6.6740181481509437e+18,
+					"_SourceHash": -2.6708259420624696e+18,
 					"_RuntimeCheckHash": -5.4129973055710433e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3411,12 +4176,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_54",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_56",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3425,9 +4199,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_54"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_56"
 					},
-					"_SourceHash": 7.0013987805089536e+18,
+					"_SourceHash": 8.2418341561325537e+18,
 					"_RuntimeCheckHash": -6.7337100671174543e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3455,12 +4229,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_55",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_57",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3469,9 +4252,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_55"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_57"
 					},
-					"_SourceHash": -1.4065378276136507e+18,
+					"_SourceHash": -5.5860266148464568e+18,
 					"_RuntimeCheckHash": -9.0563501272483031e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3499,12 +4282,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_56",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_58",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3513,9 +4305,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_56"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_58"
 					},
-					"_SourceHash": 8.5920258550528983e+18,
+					"_SourceHash": 5.2405630109994506e+18,
 					"_RuntimeCheckHash": -7.9642108656548209e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3543,12 +4335,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_57",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_59",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3557,9 +4358,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_57"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_59"
 					},
-					"_SourceHash": 9.1466452313428869e+18,
+					"_SourceHash": -1.1735298337807473e+18,
 					"_RuntimeCheckHash": -5.6806774170600776e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3587,12 +4388,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_58",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_60",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3601,9 +4411,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_58"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_60"
 					},
-					"_SourceHash": 7.7110563138517391e+18,
+					"_SourceHash": 6.921958607695742e+18,
 					"_RuntimeCheckHash": 1.398861675137833e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3631,12 +4441,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_59",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_61",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3645,45 +4464,19 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_59"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_61"
 					},
-					"_SourceHash": -4.7993371388805509e+18,
+					"_SourceHash": 1.6726164816103626e+18,
 					"_RuntimeCheckHash": 4.0551671411572562e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
-								"X": 2250,
+								"X": 2360,
 								"Y": 1600,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654746,
-								"W": 0.70710678118654768
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 36,
-							"_Position":
-							{
-								"X": 2250,
-								"Y": 1600,
-								"Z": 230
+								"Z": 120
 							},
 							"_Rotation":
 							{
@@ -3701,7 +4494,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 35,
@@ -3727,15 +4529,24 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
-							"_ShapeIndex": 35,
+							"_ShapeIndex": 36,
 							"_Position":
 							{
-								"X": 2360,
+								"X": 2250,
 								"Y": 1600,
-								"Z": 120
+								"Z": 230
 							},
 							"_Rotation":
 							{
@@ -3753,12 +4564,56 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 37,
+							"_Position":
+							{
+								"X": 2250,
+								"Y": 1600,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654746,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_60",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_62",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3767,9 +4622,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_60"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_62"
 					},
-					"_SourceHash": 3.4608829975876931e+18,
+					"_SourceHash": 1.1213822937432783e+18,
 					"_RuntimeCheckHash": -8.9056811838368686e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3797,12 +4652,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_61",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_63",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3811,9 +4675,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_61"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_63"
 					},
-					"_SourceHash": 3.1411505452208594e+18,
+					"_SourceHash": -6.0050548414962924e+18,
 					"_RuntimeCheckHash": -2.6356783647870116e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3841,12 +4705,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_62",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_64",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3855,9 +4728,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_62"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_64"
 					},
-					"_SourceHash": -8.7374167994361774e+18,
+					"_SourceHash": 6.3055562393681418e+18,
 					"_RuntimeCheckHash": -8.9225950955807859e+17,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3885,12 +4758,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_63",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_65",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -3899,9 +4781,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_63"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_65"
 					},
-					"_SourceHash": 6.6398302666668165e+18,
+					"_SourceHash": -6.1838502485825772e+18,
 					"_RuntimeCheckHash": 4.0310984408268744e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -3909,61 +4791,9 @@
 							"_ShapeIndex": 44,
 							"_Position":
 							{
-								"X": 2665,
-								"Y": 1250,
-								"Z": 2
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 44,
-							"_Position":
-							{
-								"X": 2535,
-								"Y": 1250,
-								"Z": 2
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 45,
-							"_Position":
-							{
 								"X": 2600,
-								"Y": 1315,
-								"Z": 2
+								"Y": 1250,
+								"Z": 4
 							},
 							"_Rotation":
 							{
@@ -3981,7 +4811,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 45,
@@ -4007,15 +4846,24 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": 2600,
-								"Y": 1250,
-								"Z": 4
+								"Y": 1315,
+								"Z": 2
 							},
 							"_Rotation":
 							{
@@ -4033,12 +4881,91 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 46,
+							"_Position":
+							{
+								"X": 2535,
+								"Y": 1250,
+								"Z": 2
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 46,
+							"_Position":
+							{
+								"X": 2665,
+								"Y": 1250,
+								"Z": 2
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_64",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_66",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -4047,45 +4974,19 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_64"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_66"
 					},
-					"_SourceHash": -8.5353662235638405e+18,
+					"_SourceHash": -8.4990637694172457e+18,
 					"_RuntimeCheckHash": 2.5796755034838231e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
-								"X": 2600,
+								"X": 2710,
 								"Y": 1600,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": -0,
-								"Z": 0.70710678118654746,
-								"W": 0.70710678118654768
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 36,
-							"_Position":
-							{
-								"X": 2600,
-								"Y": 1600,
-								"Z": 230
+								"Z": 120
 							},
 							"_Rotation":
 							{
@@ -4103,7 +5004,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 35,
@@ -4129,15 +5039,24 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
-							"_ShapeIndex": 35,
+							"_ShapeIndex": 36,
 							"_Position":
 							{
-								"X": 2710,
+								"X": 2600,
 								"Y": 1600,
-								"Z": 120
+								"Z": 230
 							},
 							"_Rotation":
 							{
@@ -4155,12 +5074,56 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						},
+						{
+							"_ShapeIndex": 37,
+							"_Position":
+							{
+								"X": 2600,
+								"Y": 1600,
+								"Z": 110
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.70710678118654746,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldDynamic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_65",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_67",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -4169,9 +5132,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_65"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_67"
 					},
-					"_SourceHash": 5.2887312443908639e+18,
+					"_SourceHash": 2.1381139165295324e+18,
 					"_RuntimeCheckHash": 6.5227021200883384e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -4199,12 +5162,21 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_66",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_68",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -4213,45 +5185,19 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_66"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_68"
 					},
-					"_SourceHash": 5.039877379772586e+18,
+					"_SourceHash": -8.8802986975734088e+18,
 					"_RuntimeCheckHash": -4.2038346581118193e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": 3500,
-								"Y": 460,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 36,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": 460,
-								"Z": 230
+								"Y": 350,
+								"Z": 120
 							},
 							"_Rotation":
 							{
@@ -4269,7 +5215,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 35,
@@ -4295,84 +5250,23 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 35,
-							"_Position":
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
 							{
-								"X": 3500,
-								"Y": 350,
-								"Z": 120
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						}
-					]
-				},
-				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_68",
-					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
-					"_SourceActorPath":
-					{
-						"AssetPath":
-						{
-							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
-							"AssetName": "Sandbox_Mars_MAP"
-						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_68"
-					},
-					"_SourceHash": -7.0562687396630948e+18,
-					"_RuntimeCheckHash": 7.3213701045096069e+18,
-					"_DataLayerNames": [],
-					"_Bodies": [
-						{
-							"_ShapeIndex": 37,
-							"_Position":
-							{
-								"X": 3500,
-								"Y": 0,
-								"Z": 110
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldDynamic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
 							"_ShapeIndex": 36,
 							"_Position":
 							{
 								"X": 3500,
-								"Y": 0,
+								"Y": 460,
 								"Z": 230
 							},
 							"_Rotation":
@@ -4391,15 +5285,24 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						},
 						{
-							"_ShapeIndex": 35,
+							"_ShapeIndex": 37,
 							"_Position":
 							{
 								"X": 3500,
-								"Y": 110,
-								"Z": 120
+								"Y": 460,
+								"Z": 110
 							},
 							"_Rotation":
 							{
@@ -4410,45 +5313,28 @@
 							},
 							"_Signature":
 							{
-								"_ObjectChannel": "ECC_WorldStatic",
+								"_ObjectChannel": "ECC_WorldDynamic",
 								"_ResponseMask": -6.1489148630353398e+18,
 								"_CollisionEnabled": "QueryAndPhysics",
 								"_Domain": "Static"
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 35,
-							"_Position":
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
 							{
-								"X": 3500,
-								"Y": -110,
-								"Z": 120
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_71",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_73",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -4457,9 +5343,9 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_71"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_73"
 					},
-					"_SourceHash": -5.3192816561296005e+18,
+					"_SourceHash": -8.3723653536639488e+18,
 					"_RuntimeCheckHash": -4.5718010509982034e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
@@ -4487,7 +5373,16 @@
 							},
 							"_Friction": 0.69999998807907104,
 							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
 						}
 					]
 				}
