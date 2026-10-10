@@ -1,6 +1,6 @@
 // With no finished tray docked the sweep is refused at the control: after a centre chop and a sweep the board still holds
 // both halves, nothing was released (loose or handed off) and nothing gained a body.
-class UMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused : UMars_AutoTestRig_DicingStation
+class UMars_AutoTest_CuttingStation_SweepWithoutATrayIsRefused : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(16800.0, -9000.0, -30000.0);
 
@@ -8,9 +8,9 @@ class UMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused : UMars_AutoTestRi
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Station(InHandle, k_Origin);
-        Spawn_InputPlatter(InHandle, mars::Food_MeatSlab_Mars);
+        Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
 
-        Add_Steps_IntakeTheJoint();
+        Add_Steps_FeedTheJoint();
         Add_Step("chop at the board's centre", n"Step_Chop");
         Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
         Add_Step("sweep with no tray docked", n"Step_Sweep");

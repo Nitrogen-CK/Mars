@@ -3,7 +3,7 @@
 // slice's tip, would leave a sliver under the 0.8 cm minimum: the cut is issued, RuntimeMesh rejects it and the slice stays
 // whole, held and untouched. A chop at the centre then cuts it through the same station into two shown, gram-scale halves
 // whose masses add back exactly and whose volumes add back within RuntimeMesh's tolerance.
-class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMars_AutoTestRig_DicingStation
+class UMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(13600.0, -9000.0, -30000.0);
     private const float64 k_SliceVolumeCm3 = 53.58;
@@ -16,9 +16,9 @@ class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMa
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Station(InHandle, k_Origin);
-        Spawn_InputPlatter(InHandle, mars::Food_MushroomSlice_Mars);
+        Spawn_InputPlatter(InHandle, mars_items::Food_MushroomSlice());
 
-        Add_Steps_IntakeTheJoint();
+        Add_Steps_FeedTheJoint();
         Add_Step("the slice has the mushroom's volume, mass, tuners and cap", n"Step_AssertSlice");
         Add_Step("move the hand near the slice's tip", n"Step_MoveToEdge");
         Add_Step_WaitUntil("the hand is near the tip", n"Check_HandAtEdge", 0, 2.0f);
@@ -60,7 +60,7 @@ class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMa
     private void Check_HandAtEdge(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Math::Abs(_Dicing.Get_HandLateral() - k_EdgeChopLateral) < 0.01f);
+        Res.Set(Math::Abs(_Cutting.Get_HandLateral() - k_EdgeChopLateral) < 0.01f);
     }
 
     UFUNCTION()
@@ -75,7 +75,7 @@ class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMa
     {
         const auto Knocked = _Issues.Num() > 0 && _Issues[0].Issued == 0;
         auto Res = OutResult;
-        Res.Set(Knocked || (Get_OutcomeCountFor(_Slice) > 0 && _Dicing.Get_IsChopping() == false));
+        Res.Set(Knocked || (Get_OutcomeCountFor(_Slice) > 0 && _Cutting.Get_IsChopping() == false));
     }
 
     UFUNCTION()
@@ -100,7 +100,7 @@ class UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation : UMa
     private void Check_HandAtCentre(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Math::Abs(_Dicing.Get_HandLateral()) < 0.01f);
+        Res.Set(Math::Abs(_Cutting.Get_HandLateral()) < 0.01f);
     }
 
     UFUNCTION()

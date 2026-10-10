@@ -6,8 +6,8 @@
 //   OnCutResolved is the slice plus the commit of its halves. Valid only when both fall between the same two frame polls.
 // - the frame delta: the wall-clock length of the frame the slice drained in against the median of the 15 idle frames before
 //   the chop. The lanes pin 60 fps, so a cut cheaper than the frame's slack does not show in it.
-// The numbers are logged ([DicingStation cost]); only a loose sanity bound is asserted.
-class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_DicingStation
+// The numbers are logged ([CuttingStation cost]); only a loose sanity bound is asserted.
+class UMars_AutoTest_CuttingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(15200.0, -9000.0, -30000.0);
     private const int32 k_IdleFrames = 15;
@@ -33,7 +33,7 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Station(InHandle, k_Origin);
-        Spawn_InputPlatter(InHandle, mars::Food_MeatSlab_Mars);
+        Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
 
         auto MarkerEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _Marker = utils_runtime_mesh::Add(MarkerEntity, FCk_RuntimeMesh_Spec(TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
@@ -43,7 +43,7 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
         _Laterals.Add(8.0f);
         _Laterals.Add(-8.0f);
 
-        Add_Steps_IntakeTheJoint();
+        Add_Steps_FeedTheJoint();
         Add_Step_WaitUntil("the board holds one shown joint and the marker mesh is Ready", n"Check_Ready", 0, 10.0f);
         for (int32 Cut = 0; Cut < _Laterals.Num(); ++Cut)
         {
@@ -76,7 +76,7 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
     private void Check_HandReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Math::Abs(_Dicing.Get_HandLateral() - _Laterals[_Cut]) < 0.01f && _Dicing.Get_IsChopping() == false);
+        Res.Set(Math::Abs(_Cutting.Get_HandLateral() - _Laterals[_Cut]) < 0.01f && _Cutting.Get_IsChopping() == false);
     }
 
     UFUNCTION()
@@ -175,7 +175,7 @@ class UMars_AutoTest_DicingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Dic
         const auto BracketIsOneFrame = _LastMarkerSeconds >= FrameStart && FrameStart >= 0.0;
         const FString BracketFrame = BracketIsOneFrame ? "same frame" : "NOT one frame, invalid";
 
-        ck::Trace(f"[DicingStation cost] cut {_Cut} at {_Laterals[_Cut]} cm of a {_SourceTriangles}-triangle piece: bracket {BracketMs :.1} ms "
+        ck::Trace(f"[CuttingStation cost] cut {_Cut} at {_Laterals[_Cut]} cm of a {_SourceTriangles}-triangle piece: bracket {BracketMs :.1} ms "
             + f"({BracketFrame}), drain frame {FrameMs :.1} ms vs idle median {_IdleMedianMs :.1} ms "
             + "(UtcNow wall-clock, ms resolution, headless editor)");
 

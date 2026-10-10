@@ -1,11 +1,11 @@
-// The sweep never strands a piece: it hands off only what the tray has room for. The empty tray docks (its dock takes only
-// an empty platter), then seven bare boxes are loaded onto it through the kernel, leaving one of its eight slots free. Three
-// bare boxes are placed on the station's board and swept: exactly one is handed off and lands on the tray, two stay on the
-// board, and none of the ten has a body.
-class UMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake : UMars_AutoTestRig_DicingStation
+// The sweep never strands a piece: it hands off only what the tray has room for. The empty small tray docks (its dock takes
+// only an empty platter), then three bare boxes are loaded onto it through the kernel, leaving room for one of its four.
+// Three bare boxes are placed on the station's board and swept: exactly one is handed off and lands on the tray, two stay
+// on the board, bodiless; every piece on the tray has its own Kinematic body.
+class UMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(18400.0, -9000.0, -30000.0);
-    private const int32 k_TrayBoxCount = 7;
+    private const int32 k_TrayBoxCount = 3;
     private const int32 k_BoardBoxCount = 3;
 
     private TArray<FCk_Handle_FoodPiece> _TrayBoxes;
@@ -15,32 +15,32 @@ class UMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake : UMars_Auto
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Station(InHandle, k_Origin);
-        Spawn_OutputPlatter(InHandle);
+        Spawn_OutputPlatterOf(InHandle, mars_items::Platter());
 
         for (int32 Index = 0; Index < k_TrayBoxCount; ++Index)
         { _TrayBoxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + k_OutputPlatterOffset + FVector(0.0, 0.0, 20.0 * (Index + 1))))); }
 
         for (int32 Index = 0; Index < k_BoardBoxCount; ++Index)
         {
-            const auto PileLocal = FTransform(FRotator::ZeroRotator, FVector(0.0, 15.0 * (Index - 1), 0.0)) * utils_dicing::Get_PileLocal();
+            const auto PileLocal = FTransform(FRotator::ZeroRotator, FVector(0.0, 15.0 * (Index - 1), 0.0)) * utils_cutting::Get_PileLocal();
             _BoardBoxes.Add(Build_Box(PileLocal * FTransform(FRotator::ZeroRotator, k_Origin)));
         }
 
-        Add_Step_WaitUntil("the station composed its Dicing, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
         Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", 0, 10.0f);
         Add_Step_WaitUntil("every box is Ready", n"Check_BoxesReady", 0, 10.0f);
         Add_Step("dock the empty tray", n"Step_DockOutput");
         Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", 0, 5.0f);
-        Add_Step("load seven boxes onto the tray", n"Step_FillTray");
-        Add_Step_WaitUntil("the seven boxes landed", n"Check_TrayFilled", 0, 5.0f);
+        Add_Step("load three boxes onto the tray", n"Step_FillTray");
+        Add_Step_WaitUntil("the three boxes landed", n"Check_TrayFilled", 0, 8.0f);
         Add_Step("place three boxes on the board", n"Step_PlaceOnBoard");
         Add_Step_WaitUntil("the board holds the three boxes", n"Check_BoardFilled", 0, 5.0f);
         Add_Step("an operator takes the station", n"Step_Take");
         Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
         Add_Step("sweep", n"Step_Sweep");
-        Add_Step_WaitUntil("the tray is full", n"Check_TrayFull", 0, 5.0f);
+        Add_Step_WaitUntil("the tray is full", n"Check_TrayFull", 0, 8.0f);
         Add_Step_WaitFrames("a second hand-off would have landed by now", 10);
-        Add_Step("one box went to the tray; two stay on the board; no bodies", n"Step_Assert");
+        Add_Step("one box went to the tray; two stay on the board, bodiless", n"Step_Assert");
         Run_Steps(InHandle);
     }
 
@@ -96,17 +96,21 @@ class UMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake : UMars_Auto
     UFUNCTION()
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_OutputPlatter.Get_Capacity(), 8, "the tray has eight slots");
+        Assert_Equals_Int(_OutputPlatter.Get_Capacity(), 4, "the small tray takes four");
         Assert_Equals_Int(_Released.Num(), 1, "the board handed off exactly one box");
         Assert_Equals_Int(_Board.Get_HeldCount(), 2, "two boxes stay on the board");
-        Assert_Equals_Int(_OutputPlatter.Get_HeldCount(), 8, "the tray is full");
+        Assert_Equals_Int(_OutputPlatter.Get_HeldCount(), 4, "the tray is full");
         Assert_Equals_Int(_OutputPlatter.Get_PendingCount(), 0, "nothing waits to land on the tray");
         Assert_True(_Released.Num() == 1 && _Released[0] == _BoardBoxes[0], "the first box in board order went");
 
-        for (const auto& Box : _TrayBoxes)
-        { Assert_False(Get_HasBody(Box), f"tray box [{Box.ToString()}] has no body"); }
+        for (const auto& Box : _OutputPlatter.Get_Held())
+        {
+            FCk_Handle Entity = Box;
+            Assert_True(Get_HasBody(Box) && utils_jolt_body::Get_MotionType(Entity.As_JoltBody()) == ECk_MotionType::Kinematic,
+                f"tray box [{Box.ToString()}] froze on its own Kinematic body");
+        }
 
-        for (const auto& Box : _BoardBoxes)
+        for (const auto& Box : _Board.Get_Held())
         { Assert_False(Get_HasBody(Box), f"board box [{Box.ToString()}] has no body"); }
     }
 }

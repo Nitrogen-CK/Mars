@@ -21,14 +21,16 @@ enum EMars_FoodBoard_PlaceRefusal
     Full,
     AlreadyHeld,
     HeldElsewhere,
-    // It has a body: a released piece stays loose.
+    // Its body reads Dynamic: a released piece stays loose. A piece with no body, or a Kinematic one (a piece taken off a
+    // platter keeps the body it dropped with), can be placed.
     Loose,
     // Destroyed before the board drained the request.
     Gone
 }
 
-// Loose gives each released piece a body and keeps it in the Released ring; Handoff gives no body and forgets the piece:
-// it is whoever asked for it to hold (a platter) and the board never ends it.
+// Loose turns each released piece Dynamic (its own body if it has one, a new body otherwise) and keeps it in the Released
+// ring; Handoff gives no body and forgets the piece: it is whoever asked for it to hold (a platter) and the board never
+// ends it.
 enum EMars_FoodBoard_ReleaseMode
 {
     Loose,
@@ -202,6 +204,34 @@ struct FMars_Fragment_FoodBoard
 
     UPROPERTY()
     TArray<FMars_Request_FoodBoard_Release> WaitingReleases;
+
+    // Turns that arrived while a cut was in flight, oldest first: they move every held piece, so they wait until the board
+    // is quiet and go after the parting, ahead of the releases behind them. A Clear drops them.
+    UPROPERTY()
+    TArray<FMars_Request_FoodBoard_Turn> WaitingTurns;
+
+    // Pieces a Loose release turned Dynamic on the body they already had, waiting for the mirror to read Dynamic before they
+    // take the release velocity (a velocity sent beside the switch reaches a Kinematic body and is lost).
+    UPROPERTY()
+    TArray<FMars_FoodBoard_PendingLoosen> PendingLoosens;
+}
+
+// A released piece whose own body is switching to Dynamic, and the velocity it takes once it reads Dynamic.
+struct FMars_FoodBoard_PendingLoosen
+{
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    UPROPERTY()
+    FVector VelocityWorld;
+
+    FMars_FoodBoard_PendingLoosen() {}
+
+    FMars_FoodBoard_PendingLoosen(FCk_Handle_FoodPiece InPiece, FVector InVelocityWorld)
+    {
+        Piece = InPiece;
+        VelocityWorld = InVelocityWorld;
+    }
 }
 
 // On every held piece; written only by the FoodBoard processor. PendingCutPlane (world, unit normal) is the plane of the cut
@@ -244,6 +274,10 @@ event void FMars_Delegate_FoodBoard_OnReleased_MC(FCk_Handle_FoodBoard InBoard, 
 delegate void FMars_Delegate_FoodBoard_OnCleared(FCk_Handle_FoodBoard InBoard);
 event void FMars_Delegate_FoodBoard_OnCleared_MC(FCk_Handle_FoodBoard InBoard);
 
+// Once per applied Turn, an empty board's included.
+delegate void FMars_Delegate_FoodBoard_OnTurned(FCk_Handle_FoodBoard InBoard, float32 InYawDegrees);
+event void FMars_Delegate_FoodBoard_OnTurned_MC(FCk_Handle_FoodBoard InBoard, float32 InYawDegrees);
+
 struct FMars_Fragment_FoodBoard_Signals
 {
     FMars_Delegate_FoodBoard_OnPlaced_MC OnPlaced;
@@ -252,6 +286,7 @@ struct FMars_Fragment_FoodBoard_Signals
     FMars_Delegate_FoodBoard_OnPieceCut_MC OnPieceCut;
     FMars_Delegate_FoodBoard_OnReleased_MC OnReleased;
     FMars_Delegate_FoodBoard_OnCleared_MC OnCleared;
+    FMars_Delegate_FoodBoard_OnTurned_MC OnTurned;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -351,9 +386,41 @@ struct FMars_Request_FoodBoard_Release
     }
 }
 
-// Applied Clear -> ResolveCut -> (parting) -> Place -> Cut -> Release: a clear and the next joint's placement can share a
-// drain, a cut that committed before the clear never reaches the next joint, and a chop sees the halves of every committed
-// cut. Cut and Release wait (whole, in order) while the board owes a parting, so a chop always cuts the parted poses.
+// Yaw every held piece YawDegrees about PivotWorld's location, on the world's vertical axis: each piece's location and
+// rotation turn together, so the food turns as one on the board.
+struct FMars_Request_FoodBoard_Turn
+{
+    UPROPERTY()
+    FTransform PivotWorld;
+
+    UPROPERTY()
+    float32 YawDegrees = 0.0f;
+
+    FMars_Request_FoodBoard_Turn() {}
+
+    FMars_Request_FoodBoard_Turn(FTransform InPivotWorld, float32 InYawDegrees)
+    {
+        PivotWorld = InPivotWorld;
+        YawDegrees = InYawDegrees;
+    }
+}
+
+// A non-finite pivot or yaw would write non-finite poses onto every held piece.
+mixin FMars_Validation Validate(const FMars_Request_FoodBoard_Turn& Self)
+{
+    if (Math::IsFinite(Self.YawDegrees) == false)
+    { return FMars_Validation(f"FoodBoard Turn has a non-finite YawDegrees [{Self.YawDegrees}]"); }
+
+    if (utils_foodboard::Get_IsFinite(Self.PivotWorld.GetLocation()) == false)
+    { return FMars_Validation(f"FoodBoard Turn has a non-finite pivot [{Self.PivotWorld.GetLocation()}]"); }
+
+    return FMars_Validation();
+}
+
+// Applied Clear -> ResolveCut -> (parting) -> Place -> Cut -> Turn -> Release: a clear and the next joint's placement can
+// share a drain, a cut that committed before the clear never reaches the next joint, and a chop sees the halves of every
+// committed cut. Cut and Release wait (whole, in order) while the board owes a parting, so a chop always cuts the parted
+// poses; a Turn (and every Release behind it) waits while any cut is in flight, so it turns the halves, never a source.
 struct FMars_Fragment_FoodBoard_Requests
 {
     UPROPERTY()
@@ -367,6 +434,9 @@ struct FMars_Fragment_FoodBoard_Requests
 
     UPROPERTY()
     TArray<FMars_Request_FoodBoard_Cut> CutRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_FoodBoard_Turn> TurnRequests;
 
     UPROPERTY()
     TArray<FMars_Request_FoodBoard_Release> ReleaseRequests;

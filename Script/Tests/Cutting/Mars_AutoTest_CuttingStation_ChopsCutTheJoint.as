@@ -1,10 +1,11 @@
-// The real dicing station, fed the meat on a docked input platter. Once an operator takes it, the intake has laid one whole,
-// untouched, shown joint of the definition's mass and the slab's volume on the board, at the pile point, yawed 90, unscaled.
+// The real cutting station, fed the meat on a docked input platter. Once an operator takes it and adds food, the feed has laid
+// one whole, untouched, shown joint of the definition's mass and the slab's volume on the board, at the pile point, yawed 90,
+// unscaled.
 // A chop at the board's centre goes through the station's cut bridge: two shown halves of the joint's lineage replace it,
 // parted 1.5 cm along the blade's normal (positive half on its side), conserving its mass exactly and its volume within
 // RuntimeMesh's tolerance (a closed, Ready half is a capped one). With the hand at 8 cm a second chop cuts the positive half
 // only: three pieces, mass still exact. When the operator leaves, Idle clears nothing: the three pieces stay on the board.
-class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingStation
+class UMars_AutoTest_CuttingStation_ChopsCutTheJoint : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(12000.0, -9000.0, -30000.0);
     private const float32 k_SecondChopLateral = 8.0f;
@@ -23,9 +24,9 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Station(InHandle, k_Origin);
-        Spawn_InputPlatter(InHandle, mars::Food_MeatSlab_Mars);
+        Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
 
-        Add_Steps_IntakeTheJoint();
+        Add_Steps_FeedTheJoint();
         Add_Step("the joint is whole and untouched, of the meat's mass and volume, at the pile point", n"Step_AssertJoint");
         Add_Step("chop at the board's centre", n"Step_Chop");
         Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
@@ -116,7 +117,7 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
         Assert_Equals_Float(Parting, k_SeparationCm, 0.01, "the halves part 1.5 cm along the blade's normal, the positive half on its side");
 
         // The plane the control captured at contact separates the halves' centroids.
-        const auto Blade = utils_dicing::Get_BladePlane(Get_StationWorld(), 0.0f);
+        const auto Blade = utils_cutting::Get_BladePlane(Get_StationWorld(), 0.0f);
         Assert_True((Get_WorldCentroid(Held[0]) - Blade.PositionCm).DotProduct(Blade.Normal) > 0.0, "the positive half lies on the blade plane's normal side");
         Assert_True((Get_WorldCentroid(Held[1]) - Blade.PositionCm).DotProduct(Blade.Normal) < 0.0, "the negative half lies behind the blade plane");
 
@@ -133,7 +134,7 @@ class UMars_AutoTest_DicingStation_ChopsCutTheJoint : UMars_AutoTestRig_DicingSt
     private void Check_HandAtSecondChop(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Math::Abs(_Dicing.Get_HandLateral() - k_SecondChopLateral) < 0.01f);
+        Res.Set(Math::Abs(_Cutting.Get_HandLateral() - k_SecondChopLateral) < 0.01f);
     }
 
     UFUNCTION()

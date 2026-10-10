@@ -1,7 +1,8 @@
 // With an empty finished tray docked, a centre chop and a sweep hand both halves to the tray: the board lets them go without
-// bodies (a hand-off) and the sweep bridge loads each onto the tray, arriving from where it lay. Both end on the tray as
-// scene-node children of its root, still shown, with no body; the board is empty and touched and keeps nothing released.
-class UMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRig_DicingStation
+// bodies (a hand-off) and the sweep bridge loads each onto the tray, where it drops between the walls. Both freeze on the
+// tray as scene-node children of its root, still shown, on their own Kinematic bodies; the board is empty and touched and
+// keeps nothing released.
+class UMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(12800.0, -9000.0, -30000.0);
 
@@ -11,19 +12,19 @@ class UMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRig
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Station(InHandle, k_Origin);
-        Spawn_InputPlatter(InHandle, mars::Food_MeatSlab_Mars);
+        Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
         Spawn_OutputPlatter(InHandle);
 
         Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", 0, 10.0f);
-        Add_Steps_IntakeTheJoint();
+        Add_Steps_FeedTheJoint();
         Add_Step("dock the tray", n"Step_DockOutput");
         Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", 0, 5.0f);
         Add_Step("chop at the board's centre", n"Step_Chop");
         Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
         Add_Step("sweep", n"Step_SweepHalves");
-        Add_Step_WaitUntil("both halves landed on the tray", n"Check_OnTray", 0, 5.0f);
+        Add_Step_WaitUntil("both halves landed on the tray", n"Check_OnTray", 0, 8.0f);
         Add_Step_WaitFrames("the landing poses compose", 2);
-        Add_Step("both ride the tray, shown and body-less; the board is empty", n"Step_Assert");
+        Add_Step("both ride the tray, shown and Kinematic; the board is empty", n"Step_Assert");
         Run_Steps(InHandle);
     }
 
@@ -46,7 +47,7 @@ class UMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRig
     {
         _Halves = _Board.Get_Held();
         Assert_Equals_Int(_Halves.Num(), 2, "two halves are on the board");
-        utils_dicing::Request_Sweep(_Station);
+        utils_cutting::Request_Sweep(_Station);
     }
 
     UFUNCTION()
@@ -71,7 +72,9 @@ class UMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRig
         {
             Assert_True(Half.TryGet_Platter() == _OutputPlatter, f"[{Half.ToString()}] is on the tray");
             Assert_True(Get_Parent(Half) == TrayRoot, f"[{Half.ToString()}] is a scene-node child of the tray's root");
-            Assert_False(Get_HasBody(Half), f"[{Half.ToString()}] has no body");
+            FCk_Handle HalfEntity = Half;
+            Assert_True(Get_HasBody(Half) && utils_jolt_body::Get_MotionType(HalfEntity.As_JoltBody()) == ECk_MotionType::Kinematic,
+                f"[{Half.ToString()}] froze on its own Kinematic body");
             Assert_True(ck::Is_NOT_Valid(Half.TryGet_FoodBoard()), f"[{Half.ToString()}] no longer belongs to the board");
             Assert_True(Get_IsShown(Half), f"[{Half.ToString()}] is still shown");
         }

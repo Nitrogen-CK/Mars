@@ -1,12 +1,15 @@
-// The dicing-station rig: the real station, spawned at an isolated origin, and a bare operator (no input, no display) that
-// takes and leaves it, so the station's own state machine runs Idle and Operated: its intake takes the joint off the docked
-// input platter, its cut bridge turns every chop into a board cut and its sweep bridge loads what a sweep hands off onto
-// the docked finished tray. Chops and nudges are the Dicing requests the operator's input task would issue; a sweep is the
-// control's own utils_dicing::Request_Sweep. Platters are World-mode platter world items under the test, lying beside the
-// station until a test docks them. The handlers record the board's signals and every cut outcome of a piece the test
-// watches.
+// The cutting-station rig: the real station, spawned at an isolated origin, and a bare operator (no display; input only when
+// a test arms the add-food key) that takes and leaves it, so the station's own state machine runs Idle and Operated: its
+// feed draws from the docked input platter and its feed bridge lays a released joint on the board, its cut bridge turns
+// every chop into a board cut and its sweep bridge loads what a sweep hands off onto the docked finished tray. Add food,
+// chops and nudges are the CookingFeed and Cutting requests the operator's input tasks would issue (Add_Food bypasses the
+// station's board-busy gate; a test that needs the gate presses the real key: Arm_AddFoodKey); a sweep is the control's own
+// utils_cutting::Request_Sweep. Platters are large World-mode platter world items under the test (a meat joint and its
+// halves lie inside a large tray's walls), each lying on a static floor beside the station until a test docks it (a platter
+// drops what it is given only while it lies still). The handlers record the board's and the feed's signals and every cut
+// outcome of a piece the test watches.
 UCLASS(Abstract)
-class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
+class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
 {
     default _TimeoutSeconds = 30.0f;
 
@@ -19,12 +22,22 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     protected FVector _Origin;
     // The input platter's food.
     protected UMars_Food_Def _Food;
+    private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
     protected FCk_Handle_Station _Station;
-    protected FCk_Handle_Dicing _Dicing;
+    protected FCk_Handle_Cutting _Cutting;
     protected FCk_Handle_FoodBoard _Board;
+    protected FCk_Handle_CookingFeed _Feed;
     protected FCk_Handle_PlatterDock _InputDock;
     protected FCk_Handle_PlatterDock _OutputDock;
     protected FCk_Handle_Operator _Operator;
+
+    // The operator's add-food key (Arm_AddFoodKey): its intents and a private input stack the test presses the key on.
+    protected FCk_Handle_InputIntents _OperatorIntents;
+    private FCk_Handle_InputSource _AddFoodSource;
+    private FCk_Handle_InputButtonMap _AddFoodMap;
+    private FCk_Handle_IntentSampler _AddFoodSampler;
+    private FCk_Handle_IntentMatcher _AddFoodMatcher;
+    private FKey _AddFoodKey;
 
     // Under construction until the Check_*PlatterReady that resolves them.
     protected FCk_Handle _InputPlatterEntity;
@@ -35,7 +48,9 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     protected FCk_Handle_Item _OutputPlatterItem;
 
     protected int32 _ChopsIssued = 0;
-    protected int32 _ChopsResolved = 0;
+    protected int32 _ChopsLanded = 0;
+    // One entry per OnTurned: its yaw.
+    protected TArray<float32> _Turns;
     protected TArray<FCk_Handle_FoodPiece> _Placed;
     protected int32 _PieceCuts = 0;
     protected int32 _Cleared = 0;
@@ -44,19 +59,23 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     // In parallel: one entry per OnCutResolved of a watched piece.
     protected TArray<FCk_Handle_FoodPiece> _CutSources;
     protected TArray<EMars_FoodPiece_CutOutcome> _CutOutcomes;
+    // Every phase the feed entered, in order.
+    protected TArray<EMars_CookingFeed_Phase> _FeedPhases;
+    // Presses the feed itself refused (a press the station refused never reaches it).
+    protected TArray<EMars_CookingFeed_Refusal> _FeedRefusals;
 
     protected void Spawn_Station(FCk_Handle InHandle, FVector InOrigin)
     {
-        Spawn_StationOfClass(InHandle, InOrigin, UMars_DicingStation_EntityScript);
+        Spawn_StationOfClass(InHandle, InOrigin, UMars_CuttingStation_EntityScript);
     }
 
     // InClass is the station or a test's subclass of it with other class defaults (its docks' policies); the station's
     // spawn params fit both, as they are injected by property name.
-    protected void Spawn_StationOfClass(FCk_Handle InHandle, FVector InOrigin, TSubclassOf<UMars_DicingStation_EntityScript> InClass)
+    protected void Spawn_StationOfClass(FCk_Handle InHandle, FVector InOrigin, TSubclassOf<UMars_CuttingStation_EntityScript> InClass)
     {
         _Origin = InOrigin;
 
-        auto SpawnParams = UMars_DicingStation_EntityScript::Params();
+        auto SpawnParams = UMars_CuttingStation_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InOrigin);
         auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, InClass, SpawnParams);
         // As the map's entity spawner does: the station is its own context, so its state machine's ck::Ctx is the station.
@@ -68,24 +87,103 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
         _Operator = utils_operator::Add(OperatorEntity);
     }
 
-    // A platter with InFood's whole joint on it, beside the station (after Spawn_Station); Check_InputPlatterReady resolves
-    // it once the joint has landed.
-    protected void Spawn_InputPlatter(FCk_Handle InHandle, UMars_Food_Def InFood)
+    // The operator gets InputIntents and a private input stack (source, button map, sampler, layer, matcher) whose one level
+    // row is StationAddFood on F10, as the player's input profile feeds the player's (after Spawn_Station, before the
+    // station is taken: its input task reads the operator's intents on enter). Add_Steps_ArmTheAddFoodKey makes the row live.
+    protected void Arm_AddFoodKey(FCk_Handle InHandle)
     {
-        _Food = InFood;
+        FCk_Handle OperatorEntity = _Operator;
+        _OperatorIntents = utils_input_intents::Add(OperatorEntity);
+        _AddFoodKey = EKeys::F10;
 
-        auto Owner = InHandle;
-        _InputPlatterEntity = utils_platter::Request_SpawnWorld(Owner,
-            FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, _Origin + k_InputPlatterOffset), InFood));
+        auto Owner = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        _AddFoodSource = utils_input_source::Add(Owner, FCk_InputSource_Spec(0));
+
+        TArray<FKey> PhysicalButtons;
+        PhysicalButtons.Add(_AddFoodKey);
+        _AddFoodMap = utils_input_button_map::Add(Owner, FCk_InputButtonMap_Spec(PhysicalButtons));
+        _AddFoodSampler = utils_intent_sampler::Add(Owner, FCk_IntentSampler_Spec(120));
+
+        FCk_Handle LayerEntity = utils_input_layer::Create(Owner, FCk_InputLayer_Spec(_AddFoodSource, 50));
+        _AddFoodMatcher = utils_intent_matcher::Add(LayerEntity, FCk_IntentMatcher_Spec());
     }
 
-    // An empty platter beside the station (after Spawn_Station); Check_OutputPlatterReady resolves it.
+    protected void Add_Steps_ArmTheAddFoodKey()
+    {
+        Add_Step_WaitUntil("the add-food key is minted and the sampler records", n"Check_AddFoodKeyRecording", 0, 5.0f);
+        Add_Step("bake the add-food level row and swap it in", n"Step_SwapAddFoodSet");
+        Add_Step_WaitUntil("the add-food row is live on the matcher", n"Check_AddFoodSetActive", 0, 5.0f);
+        Add_Step("the operator's intents read the matcher", n"Step_UseAddFoodMatcher");
+        Add_Step_WaitUntil("the operator reads the matcher", n"Check_OperatorReadsMatcher", 0, 2.0f);
+    }
+
+    protected void Inject_AddFoodKey(ECk_InputSource_EventType InEventType)
+    {
+        auto Event = FCk_InputSource_RawEvent(ECk_InputSource_DeviceClass::Keyboard, _AddFoodKey, InEventType);
+        utils_input_source::Request_InjectRawEvent(_AddFoodSource, FCk_Request_InputSource_InjectRawEvent(Event));
+    }
+
+    // A large platter on a floor beside the station (after Spawn_Station) with InFoodItem's whole joint loaded onto it (the
+    // kernel path: no hand); Check_InputPlatterReady resolves it once the joint has landed.
+    protected void Spawn_InputPlatter(FCk_Handle InHandle, UCk_InventoryItem_Definition InFoodItem)
+    {
+        _InputPlatterEntity = Spawn_LoadedPlatterAt(InHandle, k_InputPlatterOffset, InFoodItem);
+    }
+
+    // A large platter lying on a floor at InOffset from the station's origin, with InFoodItem's food item spawned above it
+    // and loaded onto it once constructed; _Food names the food. Returns the platter entity under construction.
+    protected FCk_Handle Spawn_LoadedPlatterAt(FCk_Handle InHandle, FVector InOffset, UCk_InventoryItem_Definition InFoodItem)
+    {
+        const UMars_ItemTrait_Food FoodTrait = InFoodItem.Get_ItemTraitByClass(UMars_ItemTrait_Food);
+        _Food = FoodTrait.Food;
+
+        auto PlatterEntity = Spawn_PlatterAt(InHandle, InOffset, FMars_Platter_SpawnSpec(FTransform::Identity, mars_items::Platter_Large()));
+        if (ck::Is_NOT_Valid(_FoodOnPlatter))
+        { _FoodOnPlatter = Cast<UMars_AutoTestHelper_FoodOnPlatter>(NewObject(this, UMars_AutoTestHelper_FoodOnPlatter)); }
+
+        Track_ForCleanup(_FoodOnPlatter.Spawn_Onto(PlatterEntity, InFoodItem,
+            FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, 60.0))));
+        return PlatterEntity;
+    }
+
+    // An empty large platter on a floor beside the station (after Spawn_Station); Check_OutputPlatterReady resolves it.
     protected void Spawn_OutputPlatter(FCk_Handle InHandle)
     {
-        auto Owner = InHandle;
-        _OutputPlatterEntity = utils_platter::Request_SpawnWorld(Owner,
-            FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, _Origin + k_OutputPlatterOffset)));
+        Spawn_OutputPlatterOf(InHandle, mars_items::Platter_Large());
     }
+
+    protected void Spawn_OutputPlatterOf(FCk_Handle InHandle, UCk_InventoryItem_Definition InDefinition)
+    {
+        _OutputPlatterEntity = Spawn_PlatterAt(InHandle, k_OutputPlatterOffset, FMars_Platter_SpawnSpec(FTransform::Identity, InDefinition));
+    }
+
+    // InSpec's platter lying on a floor at InOffset from the station's origin (InSpec.World is replaced).
+    protected FCk_Handle Spawn_PlatterAt(FCk_Handle InHandle, FVector InOffset, FMars_Platter_SpawnSpec InSpec)
+    {
+        auto Owner = InHandle;
+        Spawn_PlatterFloor(Owner, _Origin + InOffset);
+
+        auto Spec = InSpec;
+        Spec.World = FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
+        return utils_platter::Request_SpawnWorld(Owner, Spec);
+    }
+
+    // A static slab whose top is at InTop, for a World-mode platter to lie still on (a platter drops what it is given only
+    // while it lies still); a platter spawned at InTop + the tray's base height rests on it.
+    protected void Spawn_PlatterFloor(FCk_Handle InHandle, FVector InTop)
+    {
+        auto Owner = InHandle;
+        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
+        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
+        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
+        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
+        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
+        FloorSpec.Set_ShapeDimensions(Shape);
+        FloorSpec.Set_MotionType(ECk_MotionType::Static);
+        FloorSpec.Set_CollisionProfileName(n"BlockAll");
+        utils_jolt_body::Add(Floor, FloorSpec);
+    }
+
 
     protected void Dock_Input()
     {
@@ -113,18 +211,26 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
         return utils_foodpiece::Add(Entity, Spec);
     }
 
-    // The common opening: the station and the input platter's joint are ready, the platter docks (the intake lays the joint
-    // on the board whoever operates), an operator takes the station and the joint is on the board, its pose landed.
-    protected void Add_Steps_IntakeTheJoint()
+    // The common opening: the station and the input platter's joint are ready, the platter docks and the feed draws from
+    // it, an operator takes the station and adds food: the joint is on the board, its pose landed, the glove back at rest.
+    protected void Add_Steps_FeedTheJoint()
     {
-        Add_Step_WaitUntil("the station composed its Dicing, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 5.0f);
         Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", 0, 10.0f);
         Add_Step("dock the input platter", n"Step_DockInput");
         Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", 0, 5.0f);
         Add_Step("an operator takes the station", n"Step_Take");
         Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
-        Add_Step_WaitUntil("the intake laid one shown joint on the board", n"Check_JointOnBoard", 0, 5.0f);
+        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step("add food", n"Step_AddFood");
+        Add_Step_WaitUntil("the feed laid one shown joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", 0, 5.0f);
         Add_Step_WaitFrames("the pile pose has landed", 2);
+    }
+
+    // What the operator's add-food press issues once the station lets it through.
+    protected void Add_Food()
+    {
+        _Feed.Request_BeginTransfer(FMars_Request_CookingFeed_BeginTransfer());
     }
 
     protected void Take()
@@ -140,12 +246,12 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     protected void Chop()
     {
         ++_ChopsIssued;
-        _Dicing.Request_Chop(FMars_Request_Dicing_Chop());
+        _Cutting.Request_Chop(FMars_Request_Cutting_Chop());
     }
 
     protected void MoveHandTo(float32 InLateral)
     {
-        _Dicing.Request_Nudge(FMars_Request_Dicing_Nudge((InLateral - _Dicing.Get_HandLateral()) / _Dicing.Get_Spec().LateralPerDegree));
+        _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge((InLateral - _Cutting.Get_HandLateral()) / _Cutting.Get_Spec().LateralPerDegree));
     }
 
     protected void Watch(FCk_Handle_FoodPiece InPiece)
@@ -330,7 +436,58 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     UFUNCTION()
     protected void Step_Sweep(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        utils_dicing::Request_Sweep(_Station);
+        utils_cutting::Request_Sweep(_Station);
+    }
+
+    UFUNCTION()
+    protected void Step_AddFood(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Add_Food();
+    }
+
+    UFUNCTION()
+    protected void Step_PressAddFood(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Inject_AddFoodKey(ECk_InputSource_EventType::Pressed);
+    }
+
+    UFUNCTION()
+    protected void Step_ReleaseAddFood(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Inject_AddFoodKey(ECk_InputSource_EventType::Released);
+    }
+
+    UFUNCTION()
+    protected void Step_SwapAddFoodSet(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto AddFoodTag = GameplayTags::Mars_Intent_StationAddFood;
+        auto Parsed = utils_intent_grammar::Parse("AF level", AddFoodTag.TagName, 0, AddFoodTag);
+        if (Parsed.Get_Outcome() != ECk_SucceededFailed::Succeeded)
+        {
+            FinishFailure("the add-food level notation failed to parse");
+            return;
+        }
+
+        TArray<FCk_Intent_Definition> Definitions;
+        Definitions.Add(Parsed.Get_Definition());
+
+        TArray<FCk_Intent_ButtonNameRow> Rows;
+        Rows.Add(FCk_Intent_ButtonNameRow(n"AF", FCk_Input_ButtonId(ECk_Input_ButtonTier::Physical, _AddFoodKey.GetKeyName())));
+
+        auto Baked = utils_intent_grammar::Bake(Definitions, Rows);
+        if (Baked.Get_Outcome() != ECk_SucceededFailed::Succeeded)
+        {
+            FinishFailure("the add-food level row failed to bake");
+            return;
+        }
+
+        utils_intent_matcher::Request_SwapSet(_AddFoodMatcher, FCk_Request_IntentMatcher_SwapSet(Baked.Get_CompiledSet()));
+    }
+
+    UFUNCTION()
+    protected void Step_UseAddFoodMatcher(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _OperatorIntents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(_AddFoodMatcher));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -341,10 +498,10 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     protected void Check_StationReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_Dicing) && ck::IsValid(_Board) && ck::IsValid(_InputDock) && ck::IsValid(_OutputDock));
+        Res.Set(ck::IsValid(_Cutting) && ck::IsValid(_Board) && ck::IsValid(_Feed) && ck::IsValid(_InputDock) && ck::IsValid(_OutputDock));
     }
 
-    // Constructed, its holder holds its item, and its joint has landed (the input dock takes only a platter with food).
+    // Constructed, its holder holds its item, and its joint has landed.
     UFUNCTION()
     protected void Check_InputPlatterReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -374,23 +531,25 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
         Res.Set(IsReady);
     }
 
-    // Docked and arrived on the dock: a station torn down under a platter still lerping onto its dock leaves the arrival
-    // writing an offset under a dead parent.
+    // Docked and arrived on the dock (the dock says so too): a station torn down under a platter still lerping onto its dock
+    // leaves the arrival writing an offset under a dead parent.
     UFUNCTION()
     protected void Check_InputDocked(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_InputPlatter) && _InputDock.Get_Platter() == _InputPlatter && Get_HasArrived(_InputPlatter));
+        Res.Set(ck::IsValid(_InputPlatter) && _InputDock.Get_Platter() == _InputPlatter && Get_HasArrived(_InputPlatter)
+            && _InputDock.Get_HasArrived());
     }
 
     UFUNCTION()
     protected void Check_OutputDocked(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(_OutputPlatter) && _OutputDock.Get_Platter() == _OutputPlatter && Get_HasArrived(_OutputPlatter));
+        Res.Set(ck::IsValid(_OutputPlatter) && _OutputDock.Get_Platter() == _OutputPlatter && Get_HasArrived(_OutputPlatter)
+            && _OutputDock.Get_HasArrived());
     }
 
-    // One Ready, shown joint on the board (the intake runs in Idle and Operated).
+    // One Ready, shown joint on the board (the feed bridge runs in Idle and Operated).
     UFUNCTION()
     protected void Check_JointOnBoard(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -399,25 +558,85 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
     }
 
     UFUNCTION()
+    protected void Check_JointOnBoardAndFeedIdle(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Board.Get_HeldCount() == 1 && Get_AllHeldShown() && _Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle);
+    }
+
+    // The feed draws from the docked input platter and a press finds a frozen top to reach for.
+    UFUNCTION()
+    protected void Check_FeedSourced(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(_InputPlatter) && _Feed.Get_Source() == _InputPlatter && _Feed.Get_Available() > 0
+            && _Feed.Get_IsSettling() == false && _InputPlatter.Get_PendingCount() == 0);
+    }
+
+    UFUNCTION()
+    protected void Check_FeedIdle(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle);
+    }
+
+    UFUNCTION()
+    protected void Check_AddFoodKeyRecording(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(utils_input_button_map::Get_ButtonIdsForKey(_AddFoodMap, _AddFoodKey).Num() >= 1 &&
+                utils_intent_sampler::Get_FrameCount(_AddFoodSampler) >= 1);
+    }
+
+    UFUNCTION()
+    protected void Check_AddFoodSetActive(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(utils_intent_matcher::Get_ActiveIntentCount(_AddFoodMatcher) == 1 &&
+                utils_intent_matcher::Get_RegisteredCaptureKeys(_AddFoodMatcher).Contains(_AddFoodKey));
+    }
+
+    UFUNCTION()
+    protected void Check_OperatorReadsMatcher(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_OperatorIntents.Get_Matcher() == _AddFoodMatcher);
+    }
+
+    UFUNCTION()
+    protected void Check_AddFoodHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_OperatorIntents.Get_IsIntentActive(GameplayTags::Mars_Intent_StationAddFood));
+    }
+
+    UFUNCTION()
+    protected void Check_AddFoodReleased(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_OperatorIntents.Get_IsIntentActive(GameplayTags::Mars_Intent_StationAddFood) == false);
+    }
+
+    UFUNCTION()
     protected void Check_Idle(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm()) == UMars_SmState_Dicing_Idle);
+        Res.Set(utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm()) == UMars_SmState_Cutting_Idle);
     }
 
     UFUNCTION()
     protected void Check_Operated(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm()) == UMars_SmState_Dicing_Operated);
+        Res.Set(utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm()) == UMars_SmState_Cutting_Operated);
     }
 
-    // Every chop resolved and the cleaver is back up.
+    // Every chop landed and the cleaver is back up.
     UFUNCTION()
     protected void Check_ChopDone(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_ChopsResolved == _ChopsIssued && _Dicing.Get_IsChopping() == false);
+        Res.Set(_ChopsLanded == _ChopsIssued && _Cutting.Get_IsChopping() == false);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -430,23 +649,45 @@ class UMars_AutoTestRig_DicingStation : UCk_AutoTest_Base
         // Outside the test's own lifetime subtree: the runner's cascade would leave the station alive into later tests.
         Track_ForCleanup(InEntityScriptHandle);
         _Station = InEntityScriptHandle.As_Station();
-        _Dicing = InEntityScriptHandle.As_Dicing();
+        _Cutting = InEntityScriptHandle.As_Cutting();
         _Board = InEntityScriptHandle.As_FoodBoard();
+        _Feed = InEntityScriptHandle.As_CookingFeed();
         _InputDock = utils_platter_dock::Find_OnStation(InEntityScriptHandle, EMars_PlatterDock_Role::Input);
         _OutputDock = utils_platter_dock::Find_OnStation(InEntityScriptHandle, EMars_PlatterDock_Role::Output);
 
-        _Dicing.BindTo_OnChopResolved(FMars_Delegate_Dicing_OnChopResolved(this, n"OnChopResolved"));
+        _Cutting.BindTo_OnChopLanded(FMars_Delegate_Cutting_OnChopLanded(this, n"OnChopLanded"));
         _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
         _Board.BindTo_OnPieceCut(FMars_Delegate_FoodBoard_OnPieceCut(this, n"OnBoardPieceCut"));
         _Board.BindTo_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
         _Board.BindTo_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnBoardCutIssued"));
         _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+        _Board.BindTo_OnTurned(FMars_Delegate_FoodBoard_OnTurned(this, n"OnBoardTurned"));
+        _Feed.BindTo_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnFeedPhaseChanged"));
+        _Feed.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnFeedTransferRefused"));
     }
 
     UFUNCTION()
-    private void OnChopResolved(FCk_Handle_Dicing InDicing, EMars_Dicing_ChopResult InResult)
+    private void OnFeedPhaseChanged(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Phase InPhase)
     {
-        ++_ChopsResolved;
+        _FeedPhases.Add(InPhase);
+    }
+
+    UFUNCTION()
+    private void OnFeedTransferRefused(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Refusal InRefusal)
+    {
+        _FeedRefusals.Add(InRefusal);
+    }
+
+    UFUNCTION()
+    private void OnChopLanded(FCk_Handle_Cutting InCutting)
+    {
+        ++_ChopsLanded;
+    }
+
+    UFUNCTION()
+    private void OnBoardTurned(FCk_Handle_FoodBoard InBoard, float32 InYawDegrees)
+    {
+        _Turns.Add(InYawDegrees);
     }
 
     UFUNCTION()

@@ -1,5 +1,6 @@
-// Validate() accepts the default spec and the boundary values (one held piece, one and four cuts a chop, no parting, a ring
-// of one, restitution 1), and rejects, each naming its rule: no held piece, zero or five cuts a chop, a negative or
+// Validate() accepts the default spec and the boundary values (one held piece, one and k_MaxCutsPerChop cuts a chop, no
+// parting, a ring of one, restitution 1), and rejects, each naming its rule: no held piece, zero or one past
+// k_MaxCutsPerChop cuts a chop, a negative or
 // non-finite parting, a ring of zero, no collision profile, a negative or non-finite friction, a restitution outside [0, 1]
 // and a non-finite release velocity.
 class UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid : UCk_AutoTest_Base
@@ -26,10 +27,10 @@ class UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid : UCk_AutoTest_Base
         const auto EdgesResult = Edges.Validate();
         Assert_True(EdgesResult.IsValid(), f"the lower boundary values are accepted (error: {EdgesResult.Get_Error()})");
 
-        auto FourCuts = FMars_FoodBoard_Spec();
-        FourCuts.Tuners.MaxCutsPerChop = 4;
-        const auto FourCutsResult = FourCuts.Validate();
-        Assert_True(FourCutsResult.IsValid(), f"four cuts a chop are accepted (error: {FourCutsResult.Get_Error()})");
+        auto MostCuts = FMars_FoodBoard_Spec();
+        MostCuts.Tuners.MaxCutsPerChop = utils_foodboard::k_MaxCutsPerChop;
+        const auto MostCutsResult = MostCuts.Validate();
+        Assert_True(MostCutsResult.IsValid(), f"{utils_foodboard::k_MaxCutsPerChop} cuts a chop are accepted (error: {MostCutsResult.Get_Error()})");
 
         auto NoHeld = FMars_FoodBoard_Spec();
         NoHeld.Tuners.MaxHeldPieces = 0;
@@ -39,9 +40,9 @@ class UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid : UCk_AutoTest_Base
         NoCuts.Tuners.MaxCutsPerChop = 0;
         AssertRejected(NoCuts, "zero cuts a chop");
 
-        auto FiveCuts = FMars_FoodBoard_Spec();
-        FiveCuts.Tuners.MaxCutsPerChop = 5;
-        AssertRejected(FiveCuts, "five cuts a chop");
+        auto TooManyCuts = FMars_FoodBoard_Spec();
+        TooManyCuts.Tuners.MaxCutsPerChop = utils_foodboard::k_MaxCutsPerChop + 1;
+        AssertRejected(TooManyCuts, "one cut a chop past the most");
 
         auto NegativeParting = FMars_FoodBoard_Spec();
         NegativeParting.Tuners.SeparationCm = -0.1f;

@@ -3,7 +3,7 @@
 // MeatSlabFat and its cap MeatSlabCut; the mushroom slice's Skin and Flesh slots and its cap wear its Food instance. Each
 // cap's slot is the one after the mesh's last section, so the display covers every material ID a cut can carry. Each
 // carries its kind (the beef is also meat, by hierarchy), and a definition without one does not validate.
-class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTest_Base
+class UMars_AutoTest_CuttingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -64,7 +64,7 @@ class UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes : UCk_AutoTe
         const auto Sections = Mesh.GetNumSections(0);
         const auto FleshSlot = Mesh.GetMaterialIndex(n"Flesh");
         const auto SkinSlot = Mesh.GetMaterialIndex(n"Skin");
-        ck::Trace(f"[DicingStation test] {Mesh.GetName()}: {Sections} sections, Flesh slot {FleshSlot}, Skin slot {SkinSlot}");
+        ck::Trace(f"[CuttingStation test] {Mesh.GetName()}: {Sections} sections, Flesh slot {FleshSlot}, Skin slot {SkinSlot}");
         Assert_Equals_Int(InFood.Visuals.Display.Get_Materials().Num(), Sections + 1, f"[{InFood.GetName()}] has a material per section and the cap's");
         Assert_Equals_Int(InFood.Visuals.Cap.Get_MaterialID(), Sections, f"[{InFood.GetName()}] caps on the slot after the last section");
         return Mesh;

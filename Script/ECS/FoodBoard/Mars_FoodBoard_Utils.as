@@ -1,7 +1,7 @@
 namespace utils_foodboard
 {
-    // RuntimeMesh drains two slices a frame from a world-wide queue of 16.
-    const int32 k_MaxCutsPerChop = 4;
+    // RuntimeMesh drains two slices a frame from a world-wide queue of 16: one chop may take half of it.
+    const int32 k_MaxCutsPerChop = 8;
 
     // A corner this close to the plane is on it: a piece the plane only touches is not a candidate.
     const float k_StraddleToleranceCm = 0.01;
@@ -181,6 +181,17 @@ mixin void Request_Release(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodB
     Requests.ReleaseRequests.Add(InRequest);
 }
 
+// A rejected Turn ensures and is dropped: nothing moves.
+mixin void Request_Turn(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoard_Turn& InRequest)
+{
+    const auto Validation = InRequest.Validate();
+    if (ck::EnsureIfNot(Validation.IsValid(), f"[FoodBoard] [{Self.ToString()}] rejected a Turn: {Validation.Get_Error()}"))
+    { return; }
+
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
+    Requests.TurnRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
@@ -267,4 +278,18 @@ mixin void UnbindFrom_OnCleared(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodB
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnCleared.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTurned(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnTurned InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Signals);
+    Fragment.OnTurned.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTurned(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnTurned InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FoodBoard_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnTurned.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
