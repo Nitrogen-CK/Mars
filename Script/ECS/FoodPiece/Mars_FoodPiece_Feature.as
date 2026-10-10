@@ -155,6 +155,28 @@ struct FMars_FoodPiece_Tuners
     }
 }
 
+// The surface of a piece's own convex body (utils_foodpiece::Add_Body): whoever gives the piece its body picks these.
+struct FMars_FoodPiece_BodyTuners
+{
+    UPROPERTY()
+    FName CollisionProfileName = n"PhysicsActor";
+
+    UPROPERTY()
+    float32 Friction = 0.6f;
+
+    UPROPERTY()
+    float32 Restitution = 0.1f;
+
+    FMars_FoodPiece_BodyTuners() {}
+
+    FMars_FoodPiece_BodyTuners(FName InCollisionProfileName, float32 InFriction, float32 InRestitution)
+    {
+        CollisionProfileName = InCollisionProfileName;
+        Friction = InFriction;
+        Restitution = InRestitution;
+    }
+}
+
 struct FMars_FoodPiece_Spec
 {
     UPROPERTY()

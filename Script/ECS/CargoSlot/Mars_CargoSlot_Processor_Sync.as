@@ -1,6 +1,7 @@
 // Polls each slot's item against the last pass (the Hotbar sync shape). A change destroys the old cargo visual, spawns
 // one for the new item (a Visual-mode world item under the slot node at Presentation.Mounting.CargoOffset, arriving from where a
-// fresh stow said it was), then broadcasts OnItemChanged.
+// fresh stow said it was), then broadcasts OnItemChanged. A Persistent item gets no visual: the stow carried its own world
+// item onto the slot's node (UMars_Processor_CargoSlot_HandleRequests).
 class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -24,7 +25,7 @@ class UMars_Processor_CargoSlot_Sync : UCk_Processor_Script_Base_UE
 
         InState.Visual = FCk_Handle();
 
-        if (ck::IsValid(Now) && Now.Has_Presentation())
+        if (ck::IsValid(Now) && Now.Has_Presentation() && Now.Has_PersistentWorldItem() == false)
         { InState.Visual = SpawnVisual(InHandle, InState, Now); }
 
         auto Self = InHandle.As_CargoSlot();

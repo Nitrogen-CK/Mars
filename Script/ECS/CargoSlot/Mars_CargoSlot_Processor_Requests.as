@@ -89,16 +89,38 @@ class UMars_Processor_CargoSlot_HandleRequests : UCk_Processor_Script_Base_UE
         ck::EnsureIfNot(Succeeded,
             f"[CargoSlot] Moving [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]");
 
-        if (Succeeded)
-        { return; }
-
         auto TargetSlot = utils_entity_lifetime::Get_LifetimeOwner(InTarget).As_CargoSlot(ECk_SanityCheck::UnChecked);
+        if (Succeeded)
+        {
+            if (ck::IsValid(TargetSlot))
+            { Carry_Stowed(TargetSlot, ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem); }
+
+            return;
+        }
+
         if (ck::IsValid(TargetSlot))
         { Broadcast_TransferFailed(TargetSlot, InItem); }
 
         auto SourceSlot = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_CargoSlot(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(SourceSlot))
         { Broadcast_TransferFailed(SourceSlot, InItem); }
+    }
+
+    // A stowed Persistent item (a food) is its own body: it is carried onto the slot's node at its CargoOffset, as a dock
+    // carries a platter. Issued in the transfer's own answer, before the hotbar's sync empties the hand, so the HeldItem's
+    // re-carry on deselect finds it already headed for the slot. Taken out, the hotbar's take holds it (Carried -> Held).
+    private void Carry_Stowed(FCk_Handle_CargoSlot& InSlot, const FCk_Handle_Item& InItem)
+    {
+        if (ck::Is_NOT_Valid(InItem) || InItem.Has_PersistentWorldItem() == false)
+        { return; }
+
+        auto WorldItem = InItem.Get_PersistentWorldItem();
+        if (ck::EnsureIfNot(ck::IsValid(WorldItem), f"[CargoSlot] Stowed [{InItem.ToString()}] into [{InSlot.ToString()}], but its world item is gone"))
+        { return; }
+
+        const auto CargoOffset = InItem.Get_Presentation().Mounting.CargoOffset;
+        WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(InSlot, constants_cargo_slot::Get_MountPoint(), CargoOffset));
+        ck::Trace(f"[CargoSlot] [{InSlot.ToString()}] took [{InItem.ToString()}]: its world item [{WorldItem.ToString()}] carries onto the slot");
     }
 
     private void Broadcast_TransferFailed(FCk_Handle_CargoSlot& InSlot, const FCk_Handle_Item& InItem)

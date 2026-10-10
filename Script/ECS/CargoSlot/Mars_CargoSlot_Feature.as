@@ -1,6 +1,7 @@
 // One cargo slot of a backpack: a child entity of the pack root with its own capacity-1 inventory, a probe-driven
-// interactable at its mount and a Visual-mode world item of whatever it holds. Anyone who can aim at the slot can stow
-// into it or take out of it; nothing here reads "the local player".
+// interactable at its mount and a Visual-mode world item of whatever it holds; a stowed food item is no visual: its own
+// Persistent world item is carried on the slot's node (the way a dock carries a platter). Anyone who can aim at the slot
+// can stow into it or take out of it; nothing here reads "the local player".
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Dynamic Handle Definition
@@ -39,6 +40,10 @@ namespace constants_cargo_slot
 {
     // Beats the pack's own pickup (0), whose probe sphere encloses the cargo probes under the same view ray.
     const int32 k_FocusPriority = 10;
+
+    // The point a slot publishes on its own node for a stowed Persistent item to be carried on. Attach points are looked up
+    // on the carrier, so the dock's tag names the slot's node here; no slot has a second point.
+    FGameplayTag Get_MountPoint() { return GameplayTags::AttachPoint_Mars_Dock; }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -33,6 +33,10 @@ namespace utils_cargo_slot
         FCk_Handle SlotEntity = SlotNode;
         auto Inventory = utils_inventory_data_only::Add(SlotEntity, InventoryParams, ECk_Replication::DoesNotReplicate);
 
+        auto AttachPointsSpec = FMars_AttachPoints_Spec();
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(constants_cargo_slot::Get_MountPoint(), SlotNode));
+        utils_attach_points::Add(SlotEntity, AttachPointsSpec);
+
         auto Params = FMars_Fragment_CargoSlot_Params();
         Params.Backpack = InSpec.Backpack;
 
@@ -46,13 +50,14 @@ namespace utils_cargo_slot
         return SlotEntity.As_CargoSlot();
     }
 
-    // The accept rule every cargo slot enforces (and Get_ActionFor previews): no backpack, no persistent item.
+    // The accept rule every cargo slot enforces (and Get_ActionFor previews): no backpack, no hands-only item, and no
+    // Persistent item but a food (its own world item rides the slot's node).
     bool Get_CanAccept(const FCk_Handle_Item& InItem)
     {
-        if (ck::Is_NOT_Valid(InItem))
+        if (ck::Is_NOT_Valid(InItem) || InItem.Has_Backpack() || InItem.Has_HandsOnly())
         { return false; }
 
-        return InItem.Has_Backpack() == false && InItem.Has_PersistentWorldItem() == false;
+        return InItem.Has_PersistentWorldItem() == false || InItem.Has_Food();
     }
 
     // InItemName is the held item for Stow and the slot's item for Take; the Blocked_ texts ignore it.

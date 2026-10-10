@@ -123,12 +123,12 @@ void Mars_PlaceSandboxWorkbenchFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxWorkbenchCommand("Mars.Sandbox.PlaceWorkbench", n"Mars_PlaceSandboxWorkbenchFunc");
 
 UFUNCTION()
-void Mars_PlaceSandboxDicingStationFunc(const TArray<FString>& Args)
+void Mars_PlaceSandboxCuttingStationFunc(const TArray<FString>& Args)
 {
-    utils_mars_sandbox::PlaceDicingStation();
+    utils_mars_sandbox::PlaceCuttingStation();
 }
 
-const FConsoleCommand Mars_PlaceSandboxDicingStationCommand("Mars.Sandbox.PlaceDicingStation", n"Mars_PlaceSandboxDicingStationFunc");
+const FConsoleCommand Mars_PlaceSandboxCuttingStationCommand("Mars.Sandbox.PlaceCuttingStation", n"Mars_PlaceSandboxCuttingStationFunc");
 
 UFUNCTION()
 void Mars_PlaceSandboxSearingStationFunc(const TArray<FString>& Args)
@@ -191,13 +191,14 @@ namespace utils_mars_sandbox
     const FString k_ItemLabelPrefix = "Item_";
     const FString k_LadderPlatformLabel = "Sandbox_LadderPlatform";
     const FString k_WorkbenchLabel = "Sandbox_Workbench";
-    const FString k_DicingStationLabel = "Sandbox_DicingStation";
+    const FString k_CuttingStationLabel = "Sandbox_CuttingStation";
     const FString k_SearingStationLabel = "Sandbox_SearingStation";
     const FString k_FryStationLabel = "Sandbox_FryStation";
     const FString k_TumblerStationLabel = "Sandbox_TumblerStation";
-    const FString k_PlatterMeatLabel = "Sandbox_Platter_Meat";
-    const FString k_PlatterEmptyLabel = "Sandbox_Platter_Empty";
-    const FString k_PlatterMushroomLabel = "Sandbox_Platter_Mushroom";
+    const FString k_PlatterLargeLabel = "Sandbox_Platter_Large";
+    const FString k_PlatterSmallLabel = "Sandbox_Platter_Small";
+    const FString k_FoodMeatSlabLabel = "Sandbox_Food_MeatSlab";
+    const FString k_FoodMushroomSliceLabel = "Sandbox_Food_MushroomSlice";
     const FString k_EyesDummyLabel = "EyesDummy";
 
     void Build()
@@ -253,8 +254,8 @@ namespace utils_mars_sandbox
         Spawn_Room5();
         Spawn_Ladder();
         Spawn_Workbench();
-        Spawn_DicingStation();
-        Spawn_Platters();
+        Spawn_CuttingStation();
+        Spawn_Food();
         Spawn_SearingStation();
         Spawn_FryStation();
         Spawn_TumblerStation();
@@ -456,20 +457,20 @@ namespace utils_mars_sandbox
         Spawn_Mechanism(UMars_WorkbenchStation_EntityScript, FMars_MapBuilder_Placement(k_WorkbenchLabel, FVector(-1200.0, -1200.0, 0.0)));
     }
 
-    void PlaceDicingStation()
+    void PlaceCuttingStation()
     {
-        const FString Command = "Mars.Sandbox.PlaceDicingStation";
-        if (Get_CanAdd(Command, k_DicingStationLabel, "Delete it first to re-place.") == false)
+        const FString Command = "Mars.Sandbox.PlaceCuttingStation";
+        if (Get_CanAdd(Command, k_CuttingStationLabel, "Delete it first to re-place.") == false)
         { return; }
 
-        Spawn_DicingStation();
+        Spawn_CuttingStation();
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
     // Beside the workbench; unrotated, it faces +X: the player walks up from -X.
-    void Spawn_DicingStation()
+    void Spawn_CuttingStation()
     {
-        Spawn_Mechanism(UMars_DicingStation_EntityScript, FMars_MapBuilder_Placement(k_DicingStationLabel, FVector(-1200.0, -1600.0, 0.0)));
+        Spawn_Mechanism(UMars_CuttingStation_EntityScript, FMars_MapBuilder_Placement(k_CuttingStationLabel, FVector(-1200.0, -1600.0, 0.0)));
     }
 
     void PlaceSearingStation()
@@ -482,7 +483,7 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // Beside the dicing station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
+    // Beside the cutting station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
     void Spawn_SearingStation()
     {
         Spawn_Mechanism(UMars_SearingStation_EntityScript, FMars_MapBuilder_Placement(k_SearingStationLabel, FVector(-800.0, -1600.0, 0.0)));
@@ -523,23 +524,24 @@ namespace utils_mars_sandbox
     void PlacePlatters()
     {
         const FString Command = "Mars.Sandbox.PlacePlatters";
-        const FString Hint = f"Delete {k_PlatterMeatLabel}, {k_PlatterEmptyLabel} and {k_PlatterMushroomLabel} first to re-place.";
-        if (Get_CanAdd(Command, k_PlatterMeatLabel, Hint) == false || Get_CanAdd(Command, k_PlatterEmptyLabel, Hint) == false
-            || Get_CanAdd(Command, k_PlatterMushroomLabel, Hint) == false)
+        const FString Hint = f"Delete {k_PlatterLargeLabel}, {k_PlatterSmallLabel}, {k_FoodMeatSlabLabel} and {k_FoodMushroomSliceLabel} first to re-place.";
+        if (Get_CanAdd(Command, k_PlatterLargeLabel, Hint) == false || Get_CanAdd(Command, k_PlatterSmallLabel, Hint) == false
+            || Get_CanAdd(Command, k_FoodMeatSlabLabel, Hint) == false || Get_CanAdd(Command, k_FoodMushroomSliceLabel, Hint) == false)
         { return; }
 
-        Spawn_Platters();
+        Spawn_Food();
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // Three platter world items on the dicing station's player side: one with the meat slab on it, one empty and, beyond the
-    // meat, one with a mushroom slice (the searing station's raw platter refuses it). They are placed a little above their
-    // rest height and their bodies settle.
-    void Spawn_Platters()
+    // On the cutting station's player side: an empty large and an empty small platter, a little above their rest height
+    // (their bodies settle), and beyond them the meat slab and a mushroom slice lying loose, as items to pick up and place
+    // on a platter by hand.
+    void Spawn_Food()
     {
-        Spawn_Mechanism(UMars_Platter_MeatSlab_EntityScript, FMars_MapBuilder_Placement(k_PlatterMeatLabel, FVector(-1320.0, -1700.0, 75.0)));
-        Spawn_Mechanism(UMars_Platter_EntityScript, FMars_MapBuilder_Placement(k_PlatterEmptyLabel, FVector(-1320.0, -1500.0, 75.0)));
-        Spawn_Mechanism(UMars_Platter_MushroomSlice_EntityScript, FMars_MapBuilder_Placement(k_PlatterMushroomLabel, FVector(-1320.0, -1900.0, 75.0)));
+        Spawn_Mechanism(UMars_Platter_Large_EntityScript, FMars_MapBuilder_Placement(k_PlatterLargeLabel, FVector(-1320.0, -1700.0, 75.0)));
+        Spawn_Mechanism(UMars_Platter_EntityScript, FMars_MapBuilder_Placement(k_PlatterSmallLabel, FVector(-1320.0, -1500.0, 75.0)));
+        Spawn_Mechanism(UMars_FoodItem_MeatSlab_EntityScript, FMars_MapBuilder_Placement(k_FoodMeatSlabLabel, FVector(-1320.0, -1900.0, 20.0)));
+        Spawn_Mechanism(UMars_FoodItem_MushroomSlice_EntityScript, FMars_MapBuilder_Placement(k_FoodMushroomSliceLabel, FVector(-1320.0, -2100.0, 20.0)));
     }
 
     // The ladder stands at the middle of the platform's south face, yawed so its local +X points away from the platform;

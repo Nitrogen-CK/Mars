@@ -83,35 +83,48 @@ class UMars_Food_Def : UDataAsset
         return FMars_Validation();
     }
 
-    // The whole joint as a FoodPiece on RuntimeMesh under InOwner, at InWorld with the Layout applied (yaw, lift) and unit
-    // scale (pieces are cut and simulated unscaled). Pending until it imports; the caller binds OnReady and dresses it
-    // (Add_Display). A rejected definition or spec ensures and returns an invalid handle (the entity is destroyed). Not
-    // const: the pieces' weak Definition is made from a non-const this.
+    // The whole joint as a FoodPiece on RuntimeMesh under InOwner, at Get_JointWorld(InWorld). Pending until it imports;
+    // the caller binds OnReady and dresses it (Add_Display). A rejected definition or spec ensures and returns an invalid
+    // handle (the entity is destroyed).
     FCk_Handle_FoodPiece Build_Joint(FCk_Handle InOwner, const FTransform& InWorld)
+    {
+        auto Owner = InOwner;
+        auto Entity = utils_entity_lifetime::Request_CreateEntity(Owner);
+        utils_transform::Add(Entity, Get_JointWorld(InWorld), ECk_Replication::DoesNotReplicate);
+
+        auto Joint = Compose_Joint(Entity);
+        if (ck::Is_NOT_Valid(Joint))
+        { utils_entity_lifetime::Request_DestroyEntity(Entity); }
+
+        return Joint;
+    }
+
+    // Build_Joint in place: the RuntimeMesh and the whole joint's FoodPiece on InEntity, which already carries its
+    // Transform (at Get_JointWorld). A rejected definition or spec ensures and returns an invalid handle; the caller ends
+    // the entity. Not const: the pieces' weak Definition is made from a non-const this.
+    FCk_Handle_FoodPiece Compose_Joint(FCk_Handle& InEntity)
     {
         const auto Validation = Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Food] [{GetName()}] rejected: {Validation.Get_Error()}"))
         { return FCk_Handle_FoodPiece(); }
 
-        const auto LayoutLocal = FTransform(FRotator(0.0, Layout.YawDegrees, 0.0), FVector(0.0, 0.0, Layout.LiftCm));
-        auto JointWorld = LayoutLocal * InWorld;
-        JointWorld.SetScale3D(FVector::OneVector);
-
-        auto Owner = InOwner;
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Entity, JointWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(Data.Mesh));
+        utils_runtime_mesh::Add(InEntity, FCk_RuntimeMesh_Spec(Data.Mesh));
 
         auto PieceData = FMars_FoodPiece_Data(Data.MassKg);
         PieceData.Definition = TWeakObjectPtr<UMars_Food_Def>(this);
         PieceData.Kind = Data.Kind;
 
         // A rejected spec already ensured in utils_foodpiece::Add.
-        auto Joint = utils_foodpiece::Add(Entity, FMars_FoodPiece_Spec(PieceData, Tuners, Visuals.Cap));
-        if (ck::Is_NOT_Valid(Joint))
-        { utils_entity_lifetime::Request_DestroyEntity(Entity); }
+        return utils_foodpiece::Add(InEntity, FMars_FoodPiece_Spec(PieceData, Tuners, Visuals.Cap));
+    }
 
-        return Joint;
+    // InWorld with the Layout applied (yaw, lift) and unit scale: pieces are cut and simulated unscaled.
+    FTransform Get_JointWorld(const FTransform& InWorld) const
+    {
+        const auto LayoutLocal = FTransform(FRotator(0.0, Layout.YawDegrees, 0.0), FVector(0.0, 0.0, Layout.LiftCm));
+        auto JointWorld = LayoutLocal * InWorld;
+        JointWorld.SetScale3D(FVector::OneVector);
+        return JointWorld;
     }
 
     // The display every piece of this food wears, on the piece's own entity. A piece already ending (a clear that raced its

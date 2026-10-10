@@ -55,6 +55,31 @@ namespace utils_foodpiece
         return InHandle.As_FoodPiece();
     }
 
+    // A Dynamic convex body of the piece's own mesh and mass with InTuners' surface, on the piece's entity: the one builder
+    // for a loose piece and a piece dropped onto a platter. The piece must be Ready (its geometry gives the hull) and
+    // bodiless; the body reads the piece's transform as it is when the body is set up.
+    FCk_Handle_JoltBody Add_Body(FCk_Handle_FoodPiece& InPiece, const FMars_FoodPiece_BodyTuners& InTuners)
+    {
+        FCk_Handle Entity = InPiece;
+        const auto CanAdd = InPiece.Get_Status() == EMars_FoodPiece_Status::Ready && Entity.Is_JoltBody() == false;
+        if (ck::EnsureIfNot(CanAdd, f"[FoodPiece] [{InPiece.ToString()}] gets a body only once Ready and bodiless (status [{InPiece.Get_Status() :n}], body [{Entity.Is_JoltBody()}])"))
+        { return FCk_Handle_JoltBody(); }
+
+        auto Convex = FCk_JoltBody_RuntimeConvexSpec();
+        Convex.Set_PointsCm(utils_runtime_mesh::Copy_LocalVerticesCm(InPiece.Get_Geometry()));
+
+        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::RuntimeConvex);
+        BodySpec.Set_RuntimeConvex(Convex);
+        BodySpec.Set_MotionType(ECk_MotionType::Dynamic);
+        BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
+        BodySpec.Set_MassKg(float32(InPiece.Get_MassKg()));
+        BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
+        BodySpec.Set_Friction(InTuners.Friction);
+        BodySpec.Set_Restitution(InTuners.Restitution);
+        BodySpec.Set_CollisionProfileName(InTuners.CollisionProfileName);
+        return utils_jolt_body::Add(Entity, BodySpec);
+    }
+
     // InPlane in the local frame of a piece whose world transform is InPieceWorld: the frame a slice is expressed in.
     // RuntimeMesh geometry is never scaled, so a scaled piece frame is a defect: it ensures and there is no plane.
     TOptional<FCk_RuntimeMesh_PlaneLocal> Get_LocalPlane(const FTransform& InPieceWorld, const FMars_FoodPiece_WorldPlane& InPlane)
