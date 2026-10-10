@@ -320,6 +320,19 @@ namespace UMars_AutoTest_CampSession_StartLiveSpecIsLive
 }
 
 USTRUCT()
+struct FMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt
+{
+    FMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt_SpawnParams Params()
+    {
+        return FMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Climber_LocomotionExitDismounts_SpawnParams
 {
 }
@@ -632,6 +645,19 @@ namespace UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothi
 }
 
 USTRUCT()
+struct FMars_AutoTest_CookingFeed_TheCarriedPieceRidesTheHandNode_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CookingFeed_TheCarriedPieceRidesTheHandNode
+{
+    FMars_AutoTest_CookingFeed_TheCarriedPieceRidesTheHandNode_SpawnParams Params()
+    {
+        return FMars_AutoTest_CookingFeed_TheCarriedPieceRidesTheHandNode_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInheritsItsVelocity_SpawnParams
 {
 }
@@ -788,6 +814,266 @@ namespace UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd
 }
 
 USTRUCT()
+struct FMars_AutoTest_Cutting_ChopWhileChoppingIsIgnored_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Cutting_ChopWhileChoppingIsIgnored
+{
+    FMars_AutoTest_Cutting_ChopWhileChoppingIsIgnored_SpawnParams Params()
+    {
+        return FMars_AutoTest_Cutting_ChopWhileChoppingIsIgnored_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Cutting_SpecValidateRejectsANonPositiveBoard_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Cutting_SpecValidateRejectsANonPositiveBoard
+{
+    FMars_AutoTest_Cutting_SpecValidateRejectsANonPositiveBoard_SpawnParams Params()
+    {
+        return FMars_AutoTest_Cutting_SpecValidateRejectsANonPositiveBoard_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles
+{
+    FMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_AChopThatMeetsNoFoodIsMissed_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_AChopThatMeetsNoFoodIsMissed
+{
+    FMars_AutoTest_CuttingStation_AChopThatMeetsNoFoodIsMissed_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_AChopThatMeetsNoFoodIsMissed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_ACrossCutAfterATurnPartsAcrossTheFirstCut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_ACrossCutAfterATurnPartsAcrossTheFirstCut
+{
+    FMars_AutoTest_CuttingStation_ACrossCutAfterATurnPartsAcrossTheFirstCut_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_ACrossCutAfterATurnPartsAcrossTheFirstCut_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard
+{
+    FMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything
+{
+    FMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInTheReleaseFrame_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInTheReleaseFrame
+{
+    FMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInTheReleaseFrame_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInTheReleaseFrame_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_AJointOnTheBoardCannotBePickedUp_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_AJointOnTheBoardCannotBePickedUp
+{
+    FMars_AutoTest_CuttingStation_AJointOnTheBoardCannotBePickedUp_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_AJointOnTheBoardCannotBePickedUp_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_ChopsCutTheJoint_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_ChopsCutTheJoint
+{
+    FMars_AutoTest_CuttingStation_ChopsCutTheJoint_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_ChopsCutTheJoint_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_FoodDefinitionsFollowTheirMeshes
+{
+    FMars_AutoTest_CuttingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter
+{
+    FMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator
+{
+    FMars_AutoTest_CuttingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_MeatCutCostIsMeasured_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_MeatCutCostIsMeasured
+{
+    FMars_AutoTest_CuttingStation_MeatCutCostIsMeasured_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_MeatCutCostIsMeasured_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation
+{
+    FMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray
+{
+    FMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_SweepingTheBoardEmptyTakesTheNextJoint_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_SweepingTheBoardEmptyTakesTheNextJoint
+{
+    FMars_AutoTest_CuttingStation_SweepingTheBoardEmptyTakesTheNextJoint_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_SweepingTheBoardEmptyTakesTheNextJoint_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake
+{
+    FMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_SweepWithoutATrayIsRefused_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_SweepWithoutATrayIsRefused
+{
+    FMars_AutoTest_CuttingStation_SweepWithoutATrayIsRefused_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_SweepWithoutATrayIsRefused_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile
+{
+    FMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_DamageDealer_FriendlyFireRejected_SpawnParams
 {
 }
@@ -823,227 +1109,6 @@ namespace UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox
     FMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox_SpawnParams Params()
     {
         return FMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand
-{
-    FMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dicing_AlignedChopsAdvanceStateAndMoveBand_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored
-{
-    FMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dicing_ChopWhileChoppingIsIgnored_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance
-{
-    FMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dicing_OffTargetChopDoesNotAdvance_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses
-{
-    FMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dicing_RequestedStateSignalsThenOverProcesses_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest
-{
-    FMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_SpawnParams Params()
-    {
-        return FMars_AutoTest_Dicing_SpecValidateRejectsWholeLeavesRequest_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_ChopsCutTheJoint_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_ChopsCutTheJoint
-{
-    FMars_AutoTest_DicingStation_ChopsCutTheJoint_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_ChopsCutTheJoint_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes
-{
-    FMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_FoodDefinitionsFollowTheirMeshes_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_InputDockRefusesACutPlatterAndTwoPieces_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_InputDockRefusesACutPlatterAndTwoPieces
-{
-    FMars_AutoTest_DicingStation_InputDockRefusesACutPlatterAndTwoPieces_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_InputDockRefusesACutPlatterAndTwoPieces_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_IntakeLandsTheJointWhenTheOperatorLeavesInTheUnloadFrame_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_IntakeLandsTheJointWhenTheOperatorLeavesInTheUnloadFrame
-{
-    FMars_AutoTest_DicingStation_IntakeLandsTheJointWhenTheOperatorLeavesInTheUnloadFrame_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_IntakeLandsTheJointWhenTheOperatorLeavesInTheUnloadFrame_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_IntakeTakesTheJointFromTheInputPlatter_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_IntakeTakesTheJointFromTheInputPlatter
-{
-    FMars_AutoTest_DicingStation_IntakeTakesTheJointFromTheInputPlatter_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_IntakeTakesTheJointFromTheInputPlatter_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator
-{
-    FMars_AutoTest_DicingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_MeatCutCostIsMeasured_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_MeatCutCostIsMeasured
-{
-    FMars_AutoTest_DicingStation_MeatCutCostIsMeasured_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_MeatCutCostIsMeasured_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation
-{
-    FMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray
-{
-    FMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_SweepHandsPiecesToTheTray_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_SweepingTheBoardEmptyTakesTheNextJoint_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_SweepingTheBoardEmptyTakesTheNextJoint
-{
-    FMars_AutoTest_DicingStation_SweepingTheBoardEmptyTakesTheNextJoint_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_SweepingTheBoardEmptyTakesTheNextJoint_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake
-{
-    FMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_SweepLeavesWhatTheTrayCannotTake_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused
-{
-    FMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused_SpawnParams Params()
-    {
-        return FMars_AutoTest_DicingStation_SweepWithoutATrayIsRefused_SpawnParams();
     }
 }
 
@@ -1399,6 +1464,19 @@ namespace UMars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces
 }
 
 USTRUCT()
+struct FMars_AutoTest_FoodBoard_KinematicBodiedJointIsPlacedCutAndLoosened_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_KinematicBodiedJointIsPlacedCutAndLoosened
+{
+    FMars_AutoTest_FoodBoard_KinematicBodiedJointIsPlacedCutAndLoosened_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_KinematicBodiedJointIsPlacedCutAndLoosened_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FoodBoard_PartingKeepsEveryGap_SpawnParams
 {
 }
@@ -1473,6 +1551,19 @@ namespace UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid
     FMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid_SpawnParams Params()
     {
         return FMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut
+{
+    FMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut_SpawnParams();
     }
 }
 
@@ -1772,6 +1863,19 @@ namespace UMars_AutoTest_Forage_VineStrikeDepletesThenRegrows
     FMars_AutoTest_Forage_VineStrikeDepletesThenRegrows_SpawnParams Params()
     {
         return FMars_AutoTest_Forage_VineStrikeDepletesThenRegrows_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget
+{
+    FMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget_SpawnParams Params()
+    {
+        return FMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget_SpawnParams();
     }
 }
 
@@ -2491,6 +2595,32 @@ namespace UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth
 }
 
 USTRUCT()
+struct FMars_AutoTest_Hotbar_AStowWhileHoldingKeepsTheSelection_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_AStowWhileHoldingKeepsTheSelection
+{
+    FMars_AutoTest_Hotbar_AStowWhileHoldingKeepsTheSelection_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_AStowWhileHoldingKeepsTheSelection_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Hotbar_AStowWithNoSelectionSelectsTheSlot_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Hotbar_AStowWithNoSelectionSelectsTheSlot
+{
+    FMars_AutoTest_Hotbar_AStowWithNoSelectionSelectsTheSlot_SpawnParams Params()
+    {
+        return FMars_AutoTest_Hotbar_AStowWithNoSelectionSelectsTheSlot_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks_SpawnParams
 {
 }
@@ -2855,6 +2985,45 @@ namespace UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle
 }
 
 USTRUCT()
+struct FMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray
+{
+    FMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack
+{
+    FMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Platter_AMovingTrayDropsNothing_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_AMovingTrayDropsNothing
+{
+    FMars_AutoTest_Platter_AMovingTrayDropsNothing_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_AMovingTrayDropsNothing_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces_SpawnParams
 {
 }
@@ -2864,6 +3033,45 @@ namespace UMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces
     FMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces_SpawnParams Params()
     {
         return FMars_AutoTest_Platter_ClearAndDestroyEndHeldPieces_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Platter_DepositIsBlockedWhenFull_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_DepositIsBlockedWhenFull
+{
+    FMars_AutoTest_Platter_DepositIsBlockedWhenFull_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_DepositIsBlockedWhenFull_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack
+{
+    FMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Platter_FullRefusesTheNext_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_FullRefusesTheNext
+{
+    FMars_AutoTest_Platter_FullRefusesTheNext_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_FullRefusesTheNext_SpawnParams();
     }
 }
 
@@ -2881,19 +3089,6 @@ namespace UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides
 }
 
 USTRUCT()
-struct FMars_AutoTest_Platter_LoadFillsLowestSlotAndParentsThePiece_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_Platter_LoadFillsLowestSlotAndParentsThePiece
-{
-    FMars_AutoTest_Platter_LoadFillsLowestSlotAndParentsThePiece_SpawnParams Params()
-    {
-        return FMars_AutoTest_Platter_LoadFillsLowestSlotAndParentsThePiece_SpawnParams();
-    }
-}
-
-USTRUCT()
 struct FMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting_SpawnParams
 {
 }
@@ -2907,15 +3102,15 @@ namespace UMars_AutoTest_Platter_LoadRefusesFullDuplicateForeignAndCutting
 }
 
 USTRUCT()
-struct FMars_AutoTest_Platter_PendingPieceLandsOnceReadyAndArrivalLerpsIn_SpawnParams
+struct FMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand_SpawnParams
 {
 }
 
-namespace UMars_AutoTest_Platter_PendingPieceLandsOnceReadyAndArrivalLerpsIn
+namespace UMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand
 {
-    FMars_AutoTest_Platter_PendingPieceLandsOnceReadyAndArrivalLerpsIn_SpawnParams Params()
+    FMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand_SpawnParams Params()
     {
-        return FMars_AutoTest_Platter_PendingPieceLandsOnceReadyAndArrivalLerpsIn_SpawnParams();
+        return FMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand_SpawnParams();
     }
 }
 
@@ -2959,6 +3154,19 @@ namespace UMars_AutoTest_Platter_UnloadKeepsTheWorldPoseAndReloadsAfterAMove
 }
 
 USTRUCT()
+struct FMars_AutoTest_Platter_UnloadResettlesTheRest_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Platter_UnloadResettlesTheRest
+{
+    FMars_AutoTest_Platter_UnloadResettlesTheRest_SpawnParams Params()
+    {
+        return FMars_AutoTest_Platter_UnloadResettlesTheRest_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease_SpawnParams
 {
 }
@@ -2968,6 +3176,32 @@ namespace UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRele
     FMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease_SpawnParams Params()
     {
         return FMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn
+{
+    FMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival
+{
+    FMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival_SpawnParams();
     }
 }
 
@@ -3011,6 +3245,58 @@ namespace UMars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow
 }
 
 USTRUCT()
+struct FMars_AutoTest_PlatterDock_OnArrivedFiresOnceTheCarryLands_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_OnArrivedFiresOnceTheCarryLands
+{
+    FMars_AutoTest_PlatterDock_OnArrivedFiresOnceTheCarryLands_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_OnArrivedFiresOnceTheCarryLands_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind
+{
+    FMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter
+{
+    FMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip
+{
+    FMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty_SpawnParams
 {
 }
@@ -3020,6 +3306,32 @@ namespace UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty
     FMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty_SpawnParams Params()
     {
         return FMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlatterDock_TakeReachesWithBothGloves_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves
+{
+    FMars_AutoTest_PlatterDock_TakeReachesWithBothGloves_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlatterDock_TakeReachesWithBothGloves_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget
+{
+    FMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget_SpawnParams Params()
+    {
+        return FMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget_SpawnParams();
     }
 }
 
@@ -3115,6 +3427,19 @@ namespace UMars_AutoTest_Searing_AdoptsAPieceWithItsOwnExtentsAndSeedsItsSear
 }
 
 USTRUCT()
+struct FMars_AutoTest_Searing_APieceTenCentimetresUnderThePanIsLost_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_APieceTenCentimetresUnderThePanIsLost
+{
+    FMars_AutoTest_Searing_APieceTenCentimetresUnderThePanIsLost_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_APieceTenCentimetresUnderThePanIsLost_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout_SpawnParams
 {
 }
@@ -3137,6 +3462,19 @@ namespace UMars_AutoTest_Searing_AResetRejectsAnAddPieceInTheSameDrain
     FMars_AutoTest_Searing_AResetRejectsAnAddPieceInTheSameDrain_SpawnParams Params()
     {
         return FMars_AutoTest_Searing_AResetRejectsAnAddPieceInTheSameDrain_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost
+{
+    FMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost_SpawnParams();
     }
 }
 
@@ -3323,6 +3661,19 @@ namespace UMars_AutoTest_Searing_TwoPiecesSearIndependently
 }
 
 USTRUCT()
+struct FMars_AutoTest_SearingStation_AnAdmittedJointCannotBePickedUp_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SearingStation_AnAdmittedJointCannotBePickedUp
+{
+    FMars_AutoTest_SearingStation_AnAdmittedJointCannotBePickedUp_SpawnParams Params()
+    {
+        return FMars_AutoTest_SearingStation_AnAdmittedJointCannotBePickedUp_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_SearingStation_DressingFollowsTheSteak_SpawnParams
 {
 }
@@ -3410,6 +3761,19 @@ namespace UMars_AutoTest_Smoke_Boots
     FMars_AutoTest_Smoke_Boots_SpawnParams Params()
     {
         return FMars_AutoTest_Smoke_Boots_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Station_DockMarkerIsHostedUnderTheDock_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Station_DockMarkerIsHostedUnderTheDock
+{
+    FMars_AutoTest_Station_DockMarkerIsHostedUnderTheDock_SpawnParams Params()
+    {
+        return FMars_AutoTest_Station_DockMarkerIsHostedUnderTheDock_SpawnParams();
     }
 }
 
@@ -3791,6 +4155,84 @@ namespace UMars_AutoTest_Tumbler_TheHatchTogglesOnlyAtHomeAndSettled
 }
 
 USTRUCT()
+struct FMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased
+{
+    FMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_ACarriedBodyIgnoresPawnsUntilReleased_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_ADroppedItemWithinReachIsPickedUpByATap_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_ADroppedItemWithinReachIsPickedUpByATap
+{
+    FMars_AutoTest_WorldItem_ADroppedItemWithinReachIsPickedUpByATap_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_ADroppedItemWithinReachIsPickedUpByATap_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected
+{
+    FMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_AGripTakenMountArrivesWithTheGlovesReturn_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_AGripTakenMountArrivesWithTheGlovesReturn
+{
+    FMars_AutoTest_WorldItem_AGripTakenMountArrivesWithTheGlovesReturn_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_AGripTakenMountArrivesWithTheGlovesReturn_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_APickupTheGlovesRefuseLandsAtOnce_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_APickupTheGlovesRefuseLandsAtOnce
+{
+    FMars_AutoTest_WorldItem_APickupTheGlovesRefuseLandsAtOnce_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_APickupTheGlovesRefuseLandsAtOnce_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_APickupWaitsForTheGrip_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_APickupWaitsForTheGrip
+{
+    FMars_AutoTest_WorldItem_APickupWaitsForTheGrip_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_APickupWaitsForTheGrip_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams
 {
 }
@@ -3800,6 +4242,32 @@ namespace UMars_AutoTest_WorldItem_ArrivalSettlesAtOffset
     FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams Params()
     {
         return FMars_AutoTest_WorldItem_ArrivalSettlesAtOffset_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_ASecondTapAfterASpentHoldPicksUpAgain_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_ASecondTapAfterASpentHoldPicksUpAgain
+{
+    FMars_AutoTest_WorldItem_ASecondTapAfterASpentHoldPicksUpAgain_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_ASecondTapAfterASpentHoldPicksUpAgain_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_WorldItem_AThrownItemIsPickedUpByATap_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_WorldItem_AThrownItemIsPickedUpByATap
+{
+    FMars_AutoTest_WorldItem_AThrownItemIsPickedUpByATap_SpawnParams Params()
+    {
+        return FMars_AutoTest_WorldItem_AThrownItemIsPickedUpByATap_SpawnParams();
     }
 }
 
@@ -3986,35 +4454,28 @@ namespace UMars_AutoTestState_ManipulateControlRig
 }
 
 USTRUCT()
-struct FMars_AutoTestStation_TwoJointDicing_EntityScript_SpawnParams
+struct FMars_AutoTestState_PickupByPressRig_SpawnParams
 {
-    UPROPERTY()
-    FTransform SpawnTransform = FTransform::Identity;
+}
 
-    UPROPERTY()
-    FMars_Station_Spec Station;
-
-    UPROPERTY()
-    FMars_Dicing_Spec Dicing = FMars_Dicing_Spec();
-
-    FMars_AutoTestStation_TwoJointDicing_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+namespace UMars_AutoTestState_PickupByPressRig
+{
+    FMars_AutoTestState_PickupByPressRig_SpawnParams Params()
     {
-        SpawnTransform = InSpawnTransform;
-        Station = InStation;
-        Dicing = InDicing;
+        return FMars_AutoTestState_PickupByPressRig_SpawnParams();
     }
 }
 
-namespace UMars_AutoTestStation_TwoJointDicing_EntityScript
+USTRUCT()
+struct FMars_AutoTestState_UseIntentRig_SpawnParams
 {
-    FMars_AutoTestStation_TwoJointDicing_EntityScript_SpawnParams Params()
-    {
-        return FMars_AutoTestStation_TwoJointDicing_EntityScript_SpawnParams();
-    }
+}
 
-    FMars_AutoTestStation_TwoJointDicing_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+namespace UMars_AutoTestState_UseIntentRig
+{
+    FMars_AutoTestState_UseIntentRig_SpawnParams Params()
     {
-        return FMars_AutoTestStation_TwoJointDicing_EntityScript_SpawnParams(InSpawnTransform, InStation, InDicing);
+        return FMars_AutoTestState_UseIntentRig_SpawnParams();
     }
 }
 
@@ -4163,7 +4624,7 @@ namespace UMars_Crawler_EntityScript
 }
 
 USTRUCT()
-struct FMars_DicingStation_EntityScript_SpawnParams
+struct FMars_CuttingStation_EntityScript_SpawnParams
 {
     UPROPERTY()
     FTransform SpawnTransform = FTransform::Identity;
@@ -4172,26 +4633,26 @@ struct FMars_DicingStation_EntityScript_SpawnParams
     FMars_Station_Spec Station;
 
     UPROPERTY()
-    FMars_Dicing_Spec Dicing = FMars_Dicing_Spec();
+    FMars_Cutting_Spec Cutting = FMars_Cutting_Spec();
 
-    FMars_DicingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+    FMars_CuttingStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Cutting_Spec InCutting)
     {
         SpawnTransform = InSpawnTransform;
         Station = InStation;
-        Dicing = InDicing;
+        Cutting = InCutting;
     }
 }
 
-namespace UMars_DicingStation_EntityScript
+namespace UMars_CuttingStation_EntityScript
 {
-    FMars_DicingStation_EntityScript_SpawnParams Params()
+    FMars_CuttingStation_EntityScript_SpawnParams Params()
     {
-        return FMars_DicingStation_EntityScript_SpawnParams();
+        return FMars_CuttingStation_EntityScript_SpawnParams();
     }
 
-    FMars_DicingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Dicing_Spec InDicing)
+    FMars_CuttingStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_Cutting_Spec InCutting)
     {
-        return FMars_DicingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InDicing);
+        return FMars_CuttingStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InCutting);
     }
 }
 
@@ -4217,6 +4678,189 @@ namespace UMars_EyesDummy_EntityScript
     FMars_EyesDummy_EntityScript_SpawnParams Params(FTransform InSpawnTransform)
     {
         return FMars_EyesDummy_EntityScript_SpawnParams(InSpawnTransform);
+    }
+}
+
+USTRUCT()
+struct FMars_FoodItem_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_FoodItem_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_FoodItem_EntityScript
+{
+    FMars_FoodItem_EntityScript_SpawnParams Params()
+    {
+        return FMars_FoodItem_EntityScript_SpawnParams();
+    }
+
+    FMars_FoodItem_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_FoodItem_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_FoodItem_MeatSlab_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_FoodItem_MeatSlab_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_FoodItem_MeatSlab_EntityScript
+{
+    FMars_FoodItem_MeatSlab_EntityScript_SpawnParams Params()
+    {
+        return FMars_FoodItem_MeatSlab_EntityScript_SpawnParams();
+    }
+
+    FMars_FoodItem_MeatSlab_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_FoodItem_MeatSlab_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_FoodItem_MushroomSlice_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
+
+    UPROPERTY()
+    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
+
+    UPROPERTY()
+    FCk_Handle AttachTo = FCk_Handle();
+
+    UPROPERTY()
+    FTransform AttachOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FCk_Handle_Item SourceItem = FCk_Handle_Item();
+
+    UPROPERTY()
+    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
+
+    UPROPERTY()
+    FVector LaunchVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector AngularVelocityDeg = FVector::ZeroVector;
+
+    UPROPERTY()
+    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
+
+    FMars_FoodItem_MushroomSlice_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        SpawnTransform = InSpawnTransform;
+        Definition = InDefinition;
+        Mode = InMode;
+        AttachTo = InAttachTo;
+        AttachOffset = InAttachOffset;
+        SourceItem = InSourceItem;
+        SourceInventory = InSourceInventory;
+        LaunchVelocity = InLaunchVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
+        ArriveFrom = InArriveFrom;
+    }
+}
+
+namespace UMars_FoodItem_MushroomSlice_EntityScript
+{
+    FMars_FoodItem_MushroomSlice_EntityScript_SpawnParams Params()
+    {
+        return FMars_FoodItem_MushroomSlice_EntityScript_SpawnParams();
+    }
+
+    FMars_FoodItem_MushroomSlice_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
+    {
+        return FMars_FoodItem_MushroomSlice_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -6074,10 +6718,7 @@ struct FMars_Platter_EntityScript_SpawnParams
     UPROPERTY()
     FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
 
-    UPROPERTY()
-    TWeakObjectPtr<UMars_Food_Def> InitialFood = nullptr;
-
-    FMars_Platter_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom, UMars_Food_Def InInitialFood)
+    FMars_Platter_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         SpawnTransform = InSpawnTransform;
         Definition = InDefinition;
@@ -6089,7 +6730,6 @@ struct FMars_Platter_EntityScript_SpawnParams
         LaunchVelocity = InLaunchVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
         ArriveFrom = InArriveFrom;
-        InitialFood = TWeakObjectPtr<UMars_Food_Def>(InInitialFood);
     }
 }
 
@@ -6100,14 +6740,14 @@ namespace UMars_Platter_EntityScript
         return FMars_Platter_EntityScript_SpawnParams();
     }
 
-    FMars_Platter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom, UMars_Food_Def InInitialFood)
+    FMars_Platter_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
-        return FMars_Platter_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom, InInitialFood);
+        return FMars_Platter_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
 USTRUCT()
-struct FMars_Platter_MeatSlab_EntityScript_SpawnParams
+struct FMars_Platter_Large_EntityScript_SpawnParams
 {
     UPROPERTY()
     FTransform SpawnTransform = FTransform::Identity;
@@ -6139,10 +6779,7 @@ struct FMars_Platter_MeatSlab_EntityScript_SpawnParams
     UPROPERTY()
     FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
 
-    UPROPERTY()
-    TWeakObjectPtr<UMars_Food_Def> InitialFood = nullptr;
-
-    FMars_Platter_MeatSlab_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom, UMars_Food_Def InInitialFood)
+    FMars_Platter_Large_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         SpawnTransform = InSpawnTransform;
         Definition = InDefinition;
@@ -6154,85 +6791,19 @@ struct FMars_Platter_MeatSlab_EntityScript_SpawnParams
         LaunchVelocity = InLaunchVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
         ArriveFrom = InArriveFrom;
-        InitialFood = TWeakObjectPtr<UMars_Food_Def>(InInitialFood);
     }
 }
 
-namespace UMars_Platter_MeatSlab_EntityScript
+namespace UMars_Platter_Large_EntityScript
 {
-    FMars_Platter_MeatSlab_EntityScript_SpawnParams Params()
+    FMars_Platter_Large_EntityScript_SpawnParams Params()
     {
-        return FMars_Platter_MeatSlab_EntityScript_SpawnParams();
+        return FMars_Platter_Large_EntityScript_SpawnParams();
     }
 
-    FMars_Platter_MeatSlab_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom, UMars_Food_Def InInitialFood)
+    FMars_Platter_Large_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
-        return FMars_Platter_MeatSlab_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom, InInitialFood);
-    }
-}
-
-USTRUCT()
-struct FMars_Platter_MushroomSlice_EntityScript_SpawnParams
-{
-    UPROPERTY()
-    FTransform SpawnTransform = FTransform::Identity;
-
-    UPROPERTY()
-    TSoftObjectPtr<UCk_InventoryItem_Definition> Definition = nullptr;
-
-    UPROPERTY()
-    EMars_WorldItem_Mode Mode = EMars_WorldItem_Mode::World;
-
-    UPROPERTY()
-    FCk_Handle AttachTo = FCk_Handle();
-
-    UPROPERTY()
-    FTransform AttachOffset = FTransform::Identity;
-
-    UPROPERTY()
-    FCk_Handle_Item SourceItem = FCk_Handle_Item();
-
-    UPROPERTY()
-    FCk_Handle_Inventory SourceInventory = FCk_Handle_Inventory();
-
-    UPROPERTY()
-    FVector LaunchVelocity = FVector::ZeroVector;
-
-    UPROPERTY()
-    FVector AngularVelocityDeg = FVector::ZeroVector;
-
-    UPROPERTY()
-    FMars_WorldItem_Arrival ArriveFrom = FMars_WorldItem_Arrival();
-
-    UPROPERTY()
-    TWeakObjectPtr<UMars_Food_Def> InitialFood = nullptr;
-
-    FMars_Platter_MushroomSlice_EntityScript_SpawnParams(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom, UMars_Food_Def InInitialFood)
-    {
-        SpawnTransform = InSpawnTransform;
-        Definition = InDefinition;
-        Mode = InMode;
-        AttachTo = InAttachTo;
-        AttachOffset = InAttachOffset;
-        SourceItem = InSourceItem;
-        SourceInventory = InSourceInventory;
-        LaunchVelocity = InLaunchVelocity;
-        AngularVelocityDeg = InAngularVelocityDeg;
-        ArriveFrom = InArriveFrom;
-        InitialFood = TWeakObjectPtr<UMars_Food_Def>(InInitialFood);
-    }
-}
-
-namespace UMars_Platter_MushroomSlice_EntityScript
-{
-    FMars_Platter_MushroomSlice_EntityScript_SpawnParams Params()
-    {
-        return FMars_Platter_MushroomSlice_EntityScript_SpawnParams();
-    }
-
-    FMars_Platter_MushroomSlice_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom, UMars_Food_Def InInitialFood)
-    {
-        return FMars_Platter_MushroomSlice_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom, InInitialFood);
+        return FMars_Platter_Large_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
     }
 }
 
@@ -8411,28 +8982,28 @@ namespace UMars_SmState_Crawler_Roam
 }
 
 USTRUCT()
-struct FMars_SmState_Dicing_Idle_SpawnParams
+struct FMars_SmState_Cutting_Idle_SpawnParams
 {
 }
 
-namespace UMars_SmState_Dicing_Idle
+namespace UMars_SmState_Cutting_Idle
 {
-    FMars_SmState_Dicing_Idle_SpawnParams Params()
+    FMars_SmState_Cutting_Idle_SpawnParams Params()
     {
-        return FMars_SmState_Dicing_Idle_SpawnParams();
+        return FMars_SmState_Cutting_Idle_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_SmState_Dicing_Operated_SpawnParams
+struct FMars_SmState_Cutting_Operated_SpawnParams
 {
 }
 
-namespace UMars_SmState_Dicing_Operated
+namespace UMars_SmState_Cutting_Operated
 {
-    FMars_SmState_Dicing_Operated_SpawnParams Params()
+    FMars_SmState_Cutting_Operated_SpawnParams Params()
     {
-        return FMars_SmState_Dicing_Operated_SpawnParams();
+        return FMars_SmState_Cutting_Operated_SpawnParams();
     }
 }
 
@@ -8801,6 +9372,19 @@ namespace UMars_SmState_Operating
 }
 
 USTRUCT()
+struct FMars_SmState_Platter_Interact_SpawnParams
+{
+}
+
+namespace UMars_SmState_Platter_Interact
+{
+    FMars_SmState_Platter_Interact_SpawnParams Params()
+    {
+        return FMars_SmState_Platter_Interact_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_PlatterDock_Interact_SpawnParams
 {
 }
@@ -9074,80 +9658,93 @@ namespace UMars_SmTask_Crouch
 }
 
 USTRUCT()
-struct FMars_SmTask_Dicing_CutBridge_SpawnParams
+struct FMars_SmTask_Cutting_CutBridge_SpawnParams
 {
 }
 
-namespace UMars_SmTask_Dicing_CutBridge
+namespace UMars_SmTask_Cutting_CutBridge
 {
-    FMars_SmTask_Dicing_CutBridge_SpawnParams Params()
+    FMars_SmTask_Cutting_CutBridge_SpawnParams Params()
     {
-        return FMars_SmTask_Dicing_CutBridge_SpawnParams();
+        return FMars_SmTask_Cutting_CutBridge_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_SmTask_Dicing_Intake_SpawnParams
+struct FMars_SmTask_Cutting_OperatorHints_SpawnParams
 {
 }
 
-namespace UMars_SmTask_Dicing_Intake
+namespace UMars_SmTask_Cutting_OperatorHints
 {
-    FMars_SmTask_Dicing_Intake_SpawnParams Params()
+    FMars_SmTask_Cutting_OperatorHints_SpawnParams Params()
     {
-        return FMars_SmTask_Dicing_Intake_SpawnParams();
+        return FMars_SmTask_Cutting_OperatorHints_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_SmTask_Dicing_OperatorHints_SpawnParams
+struct FMars_SmTask_Cutting_OperatorInput_SpawnParams
 {
 }
 
-namespace UMars_SmTask_Dicing_OperatorHints
+namespace UMars_SmTask_Cutting_OperatorInput
 {
-    FMars_SmTask_Dicing_OperatorHints_SpawnParams Params()
+    FMars_SmTask_Cutting_OperatorInput_SpawnParams Params()
     {
-        return FMars_SmTask_Dicing_OperatorHints_SpawnParams();
+        return FMars_SmTask_Cutting_OperatorInput_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_SmTask_Dicing_OperatorInput_SpawnParams
+struct FMars_SmTask_Cutting_ResetOnEnter_SpawnParams
 {
 }
 
-namespace UMars_SmTask_Dicing_OperatorInput
+namespace UMars_SmTask_Cutting_ResetOnEnter
 {
-    FMars_SmTask_Dicing_OperatorInput_SpawnParams Params()
+    FMars_SmTask_Cutting_ResetOnEnter_SpawnParams Params()
     {
-        return FMars_SmTask_Dicing_OperatorInput_SpawnParams();
+        return FMars_SmTask_Cutting_ResetOnEnter_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_SmTask_Dicing_ResetOnEnter_SpawnParams
+struct FMars_SmTask_Cutting_SweepBridge_SpawnParams
 {
 }
 
-namespace UMars_SmTask_Dicing_ResetOnEnter
+namespace UMars_SmTask_Cutting_SweepBridge
 {
-    FMars_SmTask_Dicing_ResetOnEnter_SpawnParams Params()
+    FMars_SmTask_Cutting_SweepBridge_SpawnParams Params()
     {
-        return FMars_SmTask_Dicing_ResetOnEnter_SpawnParams();
+        return FMars_SmTask_Cutting_SweepBridge_SpawnParams();
     }
 }
 
 USTRUCT()
-struct FMars_SmTask_Dicing_SweepBridge_SpawnParams
+struct FMars_SmTask_CuttingFeed_OperatorHints_SpawnParams
 {
 }
 
-namespace UMars_SmTask_Dicing_SweepBridge
+namespace UMars_SmTask_CuttingFeed_OperatorHints
 {
-    FMars_SmTask_Dicing_SweepBridge_SpawnParams Params()
+    FMars_SmTask_CuttingFeed_OperatorHints_SpawnParams Params()
     {
-        return FMars_SmTask_Dicing_SweepBridge_SpawnParams();
+        return FMars_SmTask_CuttingFeed_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_CuttingFeed_OperatorInput
+{
+    FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams();
     }
 }
 
@@ -9772,6 +10369,32 @@ namespace UMars_SmTask_PerformInteractionSubSm
     FMars_SmTask_PerformInteractionSubSm_SpawnParams Params()
     {
         return FMars_SmTask_PerformInteractionSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_PlaceHeldFood_SpawnParams
+{
+}
+
+namespace UMars_SmTask_PlaceHeldFood
+{
+    FMars_SmTask_PlaceHeldFood_SpawnParams Params()
+    {
+        return FMars_SmTask_PlaceHeldFood_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Platter_PickUp_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Platter_PickUp
+{
+    FMars_SmTask_Platter_PickUp_SpawnParams Params()
+    {
+        return FMars_SmTask_Platter_PickUp_SpawnParams();
     }
 }
 

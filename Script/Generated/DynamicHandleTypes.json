@@ -127,6 +127,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Cutting",
+			"ShortName": "Cutting",
+			"Description": "A cutting station's cleaver: the operator's hand slides it along the board and strikes it down onto the board",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_CuttingHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Cutting"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Cycle",
 			"ShortName": "Cycle",
 			"Description": "An entity that steps through a timed table of gameplay-tagged phases, optionally looping",
@@ -142,15 +151,6 @@
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_DamageDealerHandle",
 			"RequiredFragments": [
 				"Mars_Feature_DamageDealer"
-			]
-		},
-		{
-			"TypeName": "FCk_Handle_Dicing",
-			"ShortName": "Dicing",
-			"Description": "A dicing minigame on a station: the pile's material state, the highlighted band on the board and the cleaver the operator's hand slides and chops with",
-			"SourceAsset": "/Script/AngelscriptAssets.Mars_DicingHandle",
-			"RequiredFragments": [
-				"Mars_Feature_Dicing"
 			]
 		},
 		{
@@ -444,7 +444,7 @@
 		{
 			"TypeName": "FCk_Handle_Platter",
 			"ShortName": "Platter",
-			"Description": "A carried tray of food: a ledger of FoodPiece handles riding the platter root as scene-node children, one per slot",
+			"Description": "A tray of food: a ledger of FoodPiece handles dropped between its walls, settled with physics and frozen into a pile that rides the platter root",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_PlatterHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Platter"
