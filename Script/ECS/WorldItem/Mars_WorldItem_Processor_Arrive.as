@@ -1,5 +1,5 @@
-// Lerps a scene-node-attached world item's offset from FromOffset to ToOffset with OutCubic over Duration, then removes
-// the Arrival fragment.
+// Holds a scene-node-attached world item's offset at FromOffset for DelaySeconds, then lerps it to ToOffset with Easing
+// over Duration, then removes the Arrival fragment.
 //
 // Exactly ONE Request_UpdateOffset per frame: the scene-node request handler assigns the whole offset, so separate
 // location / rotation / scale requests (utils_tween::Create_TweenSceneNodeOffsetTransform) clobber each other.
@@ -30,11 +30,15 @@ class UMars_Processor_WorldItem_Arrive : UCk_Processor_Script_Base_UE
         const auto From = InArrival.FromOffset;
         const auto To = InArrival.ToOffset;
         const auto Duration = InArrival.Duration;
-        const auto Elapsed = InArrival.Elapsed;
+        const auto Elapsed = InArrival.Elapsed - InArrival.DelaySeconds;
+        const auto Easing = InArrival.Easing;
+
+        // Still held where it was (the gloves' grip).
+        if (Elapsed < 0.0f)
+        { return; }
 
         const float32 Alpha = Duration <= 0.0f ? 1.0f : Math::Min(1.0f, Elapsed / Duration);
-        const float32 Remaining = 1.0f - Alpha;
-        const float32 Eased = 1.0f - Remaining * Remaining * Remaining;
+        const float32 Eased = utils_tween::Get_EasedProgress(Easing, FCk_FloatRange_0to1(Alpha));
 
         const auto Offset = Alpha >= 1.0f ? To : utils_world_item::Blend(From, To, Eased);
         utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));

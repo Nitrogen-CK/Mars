@@ -175,6 +175,10 @@ struct FMars_FPHands_ReachTarget
     // Pickups: the item's grip pose. Unset = each grip's own pose, else the spec's.
     UPROPERTY()
     TOptional<EMars_HandGripPose> ContactPose;
+
+    // Place reaches: where the held item's bounds centre is set down, in the anchor's space.
+    UPROPERTY()
+    TOptional<FVector> PlaceAt;
 }
 
 // What the gloves reach for: the interactable, the entity it belongs to, and the interact target when the reach serves
@@ -260,6 +264,13 @@ struct FMars_FPHands_ReachQuery
 
     UPROPERTY()
     FMars_FPHands_HandState Hand;
+
+    UPROPERTY()
+    EMars_FPHands_ReachKind Kind = EMars_FPHands_ReachKind::Grab;
+
+    // Place only (FMars_Request_FPHands_StartReach.PlaceAtWorld).
+    UPROPERTY()
+    TOptional<FTransform> PlaceAtWorld;
 
     FMars_FPHands_ReachQuery() {}
 
@@ -583,6 +594,9 @@ namespace utils_fphands
         if (ck::EnsureIfNot(ck::IsValid(Subject.Owner), "[FPHands] the reach subject has no valid owner"))
         { return TOptional<FMars_FPHands_ReachTarget>(); }
 
+        if (InQuery.Kind == EMars_FPHands_ReachKind::Place)
+        { return Resolve_PlaceTarget(InQuery); }
+
         // Both gloves hold the item.
         if (Hand.Hold.Kind == EMars_FPHands_HoldKind::TwoHanded)
         { return TOptional<FMars_FPHands_ReachTarget>(); }
@@ -647,21 +661,24 @@ namespace utils_fphands
                     }
                     return TOptional<FMars_FPHands_ReachTarget>(Target);
                 }
+            }
+        }
 
-                const auto IsTwoHanded = Presentation.Grip.Handedness == EMars_ItemPresentation_Handedness::TwoHanded;
-                if (ck::IsValid(Mesh) && IsTwoHanded && BothFree)
-                {
-                    const auto Bounds = Mesh.GetBounds();
-                    const auto Extent = Bounds.BoxExtent * Presentation.Visual.MeshScale;
-                    Target.Layout = EMars_FPHands_GripLayout::Sides;
-                    Target.Sides.Center = Bounds.Origin * Presentation.Visual.MeshScale;
-                    Target.Sides.HalfWidth = Presentation.Grip.HalfWidth.IsSet()
-                        ? Presentation.Grip.HalfWidth.GetValue()
-                        : float32(Math::Max(Extent.X, Extent.Y));
-                    Target.Right = TOptional<FMars_FPHands_HandGrip>(Shared);
-                    Target.Left = TOptional<FMars_FPHands_HandGrip>(Shared);
-                    return TOptional<FMars_FPHands_ReachTarget>(Target);
-                }
+        // Sized from the owner's reach hint (a world item's own bounds fit, a dock's docked platter), never from a mesh, so
+        // an item whose body is no Presentation mesh (a food's joint) and a platter taken off a dock are held by both gloves.
+        if (BothFree && Subject.Owner.Has_ReachHint())
+        {
+            const auto Hint = Subject.Owner.Get_ReachHint();
+            if (Hint.Handedness == EMars_ItemPresentation_Handedness::TwoHanded)
+            {
+                Target.Layout = EMars_FPHands_GripLayout::Sides;
+                Target.Sides.Center = Hint.BoundsFit.Centre;
+                Target.Sides.HalfWidth = Hint.HalfWidth.IsSet()
+                    ? Hint.HalfWidth.GetValue()
+                    : float32(Math::Max(Hint.BoundsFit.HalfExtents.X, Hint.BoundsFit.HalfExtents.Y));
+                Target.Right = TOptional<FMars_FPHands_HandGrip>(Shared);
+                Target.Left = TOptional<FMars_FPHands_HandGrip>(Shared);
+                return TOptional<FMars_FPHands_ReachTarget>(Target);
             }
         }
 
@@ -724,6 +741,50 @@ namespace utils_fphands
         else
         { Target.Left = TOptional<FMars_FPHands_HandGrip>(Shared); }
 
+        return TOptional<FMars_FPHands_ReachTarget>(Target);
+    }
+
+    // A Place reach: both gloves carry what they hold over the subject (a world item), the held item's bounds centre set
+    // down its own half height above the top of the subject's bounds fit, in the subject's frame; or at the query's
+    // PlaceAtWorld, anchored to the subject (any entity with a transform). The gloves keep the offset from the item they
+    // hold it at, so the item stays between them. Allowed whatever the gloves hold.
+    TOptional<FMars_FPHands_ReachTarget> Resolve_PlaceTarget(const FMars_FPHands_ReachQuery& InQuery)
+    {
+        const auto& Subject = InQuery.Subject;
+        const auto& Hold = InQuery.Hand.Hold;
+        const auto Anchor = Subject.Owner.As_Transform(ECk_SanityCheck::UnChecked);
+        const auto HasSpot = InQuery.PlaceAtWorld.IsSet();
+        const auto CanAnchor = ck::IsValid(Anchor) && (HasSpot || Subject.Owner.Is_WorldItem());
+        if (ck::EnsureIfNot(CanAnchor, f"[FPHands] a Place reach needs a world item to set down on, or a spot and an anchor, not [{Subject.Owner.ToString()}]"))
+        { return TOptional<FMars_FPHands_ReachTarget>(); }
+
+        auto Shared = FMars_FPHands_HandGrip();
+        Shared.Anchor = Anchor;
+        Shared.AnchorWorld = utils_transform::Get_EntityCurrentTransform(Anchor);
+
+        auto PlaceAt = FVector::ZeroVector;
+        if (HasSpot)
+        { PlaceAt = Shared.AnchorWorld.InverseTransformPosition(InQuery.PlaceAtWorld.GetValue().GetLocation()); }
+        else
+        {
+            const auto SubjectFit = Subject.Owner.As_WorldItem().Get_BoundsFit();
+            PlaceAt = SubjectFit.Centre + FVector(0.0, 0.0, SubjectFit.HalfExtents.Z + Hold.Bounds.HalfExtents.Z);
+        }
+
+        const auto& HandWorld = InQuery.Hand.HandWorld;
+        const auto HeldCentreInHand = Hold.HeldOffset.TransformPosition(Hold.Bounds.Centre);
+        const auto GlovesMidInHand = FVector(0.0, (Hold.Faces.RightY + Hold.Faces.LeftY) * 0.5, 0.0);
+        const auto GlovesFromItem = HandWorld.TransformVector(GlovesMidInHand - HeldCentreInHand);
+        const auto GlovesMidWorld = Shared.AnchorWorld.TransformPosition(PlaceAt) + GlovesFromItem;
+
+        auto Target = FMars_FPHands_ReachTarget();
+        Target.Layout = EMars_FPHands_GripLayout::Sides;
+        Target.Sides.Center = Shared.AnchorWorld.InverseTransformPosition(GlovesMidWorld);
+        Target.Sides.HalfWidth = float32((Hold.Faces.RightY - Hold.Faces.LeftY) * 0.5);
+        Target.Right = TOptional<FMars_FPHands_HandGrip>(Shared);
+        Target.Left = TOptional<FMars_FPHands_HandGrip>(Shared);
+        Target.ContactPose = TOptional<EMars_HandGripPose>(Hold.Pose);
+        Target.PlaceAt = TOptional<FVector>(PlaceAt);
         return TOptional<FMars_FPHands_ReachTarget>(Target);
     }
 

@@ -50,6 +50,12 @@ namespace constants_world_item
 {
     // A pending arrival older than this is dropped unread, so a stale pose never animates a later visual.
     const float64 k_ArriveFromMaxAgeSeconds = 0.5;
+
+    // A Carried or Held body rides its carrier: against the carrier's own capsule it would shove the character every step.
+    const FName k_MountedBodyProfile = n"IgnoreOnlyPawn";
+
+    // What a world item's own body collides as when its script names nothing else.
+    const FName k_DefaultBodyProfile = n"PhysicsActor";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -181,7 +187,8 @@ struct FMars_WorldItem_ProbeFit
     }
 }
 
-// The mesh bounds (x MeshScale) every box fitted to the item uses (utils_world_item::Make_BoundsFit).
+// A box over what the item spans: from its Presentation mesh (x MeshScale, utils_world_item::Make_BoundsFit), or from what
+// a subclass's body is made of (a food item's joint).
 struct FMars_WorldItem_BoundsFit
 {
     UPROPERTY()
@@ -239,6 +246,13 @@ struct FMars_Fragment_WorldItem_PendingMount
     UPROPERTY()
     FTransform Offset;
 
+    // Unset = the presentation's arrival. Aged at the commit by the time since RequestedAtSeconds.
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
+
+    UPROPERTY()
+    float64 RequestedAtSeconds = 0.0;
+
     FMars_Fragment_WorldItem_PendingMount() {}
 
     FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier)
@@ -248,8 +262,8 @@ struct FMars_Fragment_WorldItem_PendingMount
     }
 }
 
-// Drives the scene-node offset FromOffset -> ToOffset with OutCubic over Duration; ONE Request_UpdateOffset per frame.
-// Drained by UMars_Processor_WorldItem_Arrive.
+// Holds the scene-node offset at FromOffset for DelaySeconds, then drives it FromOffset -> ToOffset with Easing over
+// Duration; ONE Request_UpdateOffset per frame. Drained by UMars_Processor_WorldItem_Arrive.
 struct FMars_Fragment_WorldItem_Arrival
 {
     UPROPERTY()
@@ -263,6 +277,64 @@ struct FMars_Fragment_WorldItem_Arrival
 
     UPROPERTY()
     float32 Elapsed = 0.0f;
+
+    UPROPERTY()
+    float32 DelaySeconds = 0.0f;
+
+    UPROPERTY()
+    ECk_TweenEasing Easing = ECk_TweenEasing::OutCubic;
+}
+
+// How a Carry or Hold arrives at its mount: it stays where it was for DelaySeconds, then travels over Seconds with Easing.
+// A mount taken at the gloves' grip passes the grip's remaining time and the gloves' return, so the item rides the gloves
+// home. Unset on a request = the presentation's ArriveSeconds, at once, OutCubic.
+struct FMars_WorldItem_ArriveSpec
+{
+    UPROPERTY()
+    float32 DelaySeconds = 0.0f;
+
+    UPROPERTY()
+    float32 Seconds = 0.25f;
+
+    UPROPERTY()
+    ECk_TweenEasing Easing = ECk_TweenEasing::OutCubic;
+
+    FMars_WorldItem_ArriveSpec() {}
+
+    FMars_WorldItem_ArriveSpec(float32 InDelaySeconds, float32 InSeconds, ECk_TweenEasing InEasing)
+    {
+        DelaySeconds = InDelaySeconds;
+        Seconds = InSeconds;
+        Easing = InEasing;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Composition (a World-mode entity script's input to its shared tail)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// What a World-mode entity script built for its body before the shared tail (holder, pickup, utils_world_item::Add) runs
+// (UMars_WorldItem_EntityScript::Compose_WorldItem).
+struct FMars_WorldItem_Composition
+{
+    // Invalid: the item rests where it was spawned.
+    UPROPERTY()
+    FCk_Handle_JoltBody Body;
+
+    // The collision profile Body was built with: a released item goes back to it.
+    UPROPERTY()
+    FName BodyProfile = constants_world_item::k_DefaultBodyProfile;
+
+    UPROPERTY()
+    FMars_WorldItem_ProbeFit ProbeFit;
+
+    // What the item's body spans, from the root: the gloves size and hand a reach for it from this, never from a mesh.
+    UPROPERTY()
+    FMars_WorldItem_BoundsFit BoundsFit;
+
+    // Needs a Body.
+    UPROPERTY()
+    TOptional<FMars_Fragment_WorldItem_PendingLaunch> Launch;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -288,6 +360,14 @@ struct FMars_WorldItem_Spec
     UPROPERTY()
     FCk_Handle_JoltBody Body;
 
+    // World mode with a Body: the profile it was built with (FMars_WorldItem_Composition.BodyProfile).
+    UPROPERTY()
+    FName BodyProfile = constants_world_item::k_DefaultBodyProfile;
+
+    // World mode: what the body spans (FMars_WorldItem_Composition.BoundsFit).
+    UPROPERTY()
+    FMars_WorldItem_BoundsFit BoundsFit;
+
     // Visual mode: the offset lerp of a visual that arrives from somewhere.
     UPROPERTY()
     TOptional<FMars_Fragment_WorldItem_Arrival> Arrival;
@@ -312,6 +392,9 @@ mixin FMars_Validation Validate(const FMars_WorldItem_Spec& Self)
 
         if (Self.Launch.IsSet() && ck::Is_NOT_Valid(Self.Body))
         { return FMars_Validation("a launch needs a Body"); }
+
+        if (ck::IsValid(Self.Body) && Self.BodyProfile.IsNone())
+        { return FMars_Validation("a Body needs the BodyProfile it was built with"); }
 
         return FMars_Validation();
     }
@@ -353,6 +436,20 @@ struct FMars_Fragment_WorldItem
     UPROPERTY()
     FCk_Handle_JoltBody Body;
 
+    // The profile Body was built with; a Carry or Hold swaps it for constants_world_item::k_MountedBodyProfile and a
+    // Release restores it.
+    UPROPERTY()
+    FName BodyProfile = constants_world_item::k_DefaultBodyProfile;
+
+    // The profile the body last confirmed (a completed SetCollisionProfile request: the body has no read-back); unset
+    // until the first mount.
+    UPROPERTY()
+    TOptional<FName> AppliedBodyProfile;
+
+    // Zero in Visual mode.
+    UPROPERTY()
+    FMars_WorldItem_BoundsFit BoundsFit;
+
     // Persistent only; always World for a Transient item.
     UPROPERTY()
     EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::World;
@@ -390,7 +487,8 @@ struct FMars_Fragment_WorldItem_Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
 // World | Held -> Carried. Unset Point / Offset = the definition's CarryPoint / CarryOffset (the carrier's back, the hand);
-// set, the carrier publishes Point and the item mounts there at Offset (a station dock).
+// set, the carrier publishes Point and the item mounts there at Offset (a station dock). Arrive (set after the ctor):
+// see FMars_WorldItem_ArriveSpec.
 struct FMars_Request_WorldItem_Carry
 {
     UPROPERTY()
@@ -401,6 +499,9 @@ struct FMars_Request_WorldItem_Carry
 
     UPROPERTY()
     TOptional<FTransform> Offset;
+
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
 
     FMars_Request_WorldItem_Carry() {}
 
@@ -448,6 +549,9 @@ struct FMars_WorldItem_MountRequest
     UPROPERTY()
     FMars_WorldItem_MountOverride Override;
 
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
+
     FMars_WorldItem_MountRequest() {}
 
     FMars_WorldItem_MountRequest(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier, const FMars_WorldItem_MountOverride& InOverride)
@@ -458,11 +562,14 @@ struct FMars_WorldItem_MountRequest
     }
 }
 
-// Carried -> Held.
+// Carried -> Held. Arrive (set after the ctor): see FMars_WorldItem_ArriveSpec.
 struct FMars_Request_WorldItem_Hold
 {
     UPROPERTY()
     FCk_Handle Carrier;
+
+    UPROPERTY()
+    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
 
     FMars_Request_WorldItem_Hold() {}
 

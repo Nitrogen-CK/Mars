@@ -97,6 +97,12 @@ mixin void Request_SetNextArrival(FCk_Handle_HeldItem& Self, const FMars_Request
     Requests.SetNextArrivalRequests.Add(InRequest);
 }
 
+mixin void Request_SetNextHoldArrive(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetNextHoldArrive& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
+    Requests.SetNextHoldArriveRequests.Add(InRequest);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------

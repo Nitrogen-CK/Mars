@@ -283,5 +283,9 @@ class UMars_SmTask_PerformInteractionSubSm : UCk_SmTask_SubStateMachine
         StampedContext.Interactable = TargetContext.Interactable;
         StampedContext.InteractableOwner = TargetContext.InteractableOwner;
         StampedContext.Initiator = Initiator;
+
+        const auto StateClass = utils_state_machine::Get_CurrentStateClass(SubSm);
+        const auto StateName = ck::IsValid(StateClass) ? StateClass.Get().GetName().ToString() : FString("- (not entered yet)");
+        ck::Trace(f"[Interactable SM] Interacting started sub-SM [{SubSm.ToString()}] running [{StateName}] for target [{TargetEntity.ToString()}] of [{TargetContext.InteractableOwner.ToString()}], initiator [{Initiator.ToString()}]");
     }
 }

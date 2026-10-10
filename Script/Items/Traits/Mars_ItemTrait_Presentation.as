@@ -20,12 +20,25 @@ struct FMars_ItemPresentation_Visual
     TSoftObjectPtr<UMaterialInterface> MaterialOverride;
 }
 
+// Where a two-handed item's gloves sit (without grip sockets).
+enum EMars_HandGripLayout
+{
+    // Palms on its two side faces (a box carry).
+    Sides,
+    // Palms up under its underside, just inside its side faces (a tray, a slab).
+    Cradle
+}
+
 // How the first-person gloves hold the item.
 struct FMars_ItemPresentation_Grip
 {
     // Finger pose the gloves use while holding this item.
     UPROPERTY()
     EMars_HandGripPose Pose = EMars_HandGripPose::Cradle;
+
+    // Two-handed, no grip sockets: where the gloves sit (FMars_FPHands_RestSpec's Cradle knobs for Cradle).
+    UPROPERTY()
+    EMars_HandGripLayout Layout = EMars_HandGripLayout::Sides;
 
     UPROPERTY()
     EMars_ItemPresentation_Handedness Handedness = EMars_ItemPresentation_Handedness::TwoHanded;

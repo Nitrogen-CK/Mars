@@ -19,12 +19,19 @@ struct FMars_HeldView_Grip
     UPROPERTY()
     EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
 
+    UPROPERTY()
+    EMars_HandGripLayout Layout = EMars_HandGripLayout::Sides;
+
     // Hand-space Y of the item's right and left faces (right is positive), world cm.
     UPROPERTY()
     float RightFaceY = 0.0;
 
     UPROPERTY()
     float LeftFaceY = 0.0;
+
+    // Hand-space Z of the item's underside, world cm (a cradle's palms sit under it).
+    UPROPERTY()
+    float BottomZ = 0.0;
 
     // Authored Grip / Grip_R / Grip_L sockets on the item mesh, as grip bone targets in the hand node's space.
     UPROPERTY()
@@ -252,8 +259,10 @@ namespace utils_held_view
         View.IsHolding = Hold.Kind != EMars_FPHands_HoldKind::Empty;
         View.Grip.IsTwoHanded = Hold.Kind == EMars_FPHands_HoldKind::TwoHanded;
         View.Grip.Pose = Hold.Pose;
+        View.Grip.Layout = Hold.Layout;
         View.Grip.RightFaceY = Hold.Faces.RightY;
         View.Grip.LeftFaceY = Hold.Faces.LeftY;
+        View.Grip.BottomZ = Hold.Faces.BottomZ;
         View.Grip.HasSocketGrips = Hold.SocketGrips.IsSet();
         if (Hold.SocketGrips.IsSet())
         {
@@ -269,7 +278,8 @@ namespace utils_held_view
         auto Hold = FMars_FPHands_Hold();
         Hold.Kind = InGrip.IsTwoHanded ? EMars_FPHands_HoldKind::TwoHanded : EMars_FPHands_HoldKind::OneHanded;
         Hold.Pose = InGrip.Pose;
-        Hold.Faces = FMars_FPHands_HoldFaces(InGrip.RightFaceY, InGrip.LeftFaceY);
+        Hold.Layout = InGrip.Layout;
+        Hold.Faces = FMars_FPHands_HoldFaces(InGrip.RightFaceY, InGrip.LeftFaceY, InGrip.BottomZ);
         if (InGrip.HasSocketGrips)
         {
             auto SocketGrips = FMars_FPHands_SocketGrips();

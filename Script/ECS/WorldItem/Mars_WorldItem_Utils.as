@@ -15,10 +15,13 @@ namespace utils_world_item
         State.Holder = InSpec.Holder;
         State.Pickup = InSpec.Pickup;
         State.Body = InSpec.Body;
+        State.BodyProfile = InSpec.BodyProfile;
+        State.BoundsFit = InSpec.BoundsFit;
 
         InHandle.Add_Fragment(FMars_Feature_WorldItem());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(State);
+        Add_ReachHint(InHandle, InSpec);
 
         // Never applied here: the body is not added for at least one frame. The launch processor drains it.
         if (InSpec.Launch.IsSet())
@@ -28,6 +31,35 @@ namespace utils_world_item
         { InHandle.Add_Fragment(InSpec.Arrival.GetValue()); }
 
         return InHandle.As_WorldItem();
+    }
+
+    // InSpec InElapsedSeconds after it was asked for: the delay shrinks first, then the travel (a travel already over
+    // snaps in the next frame).
+    FMars_WorldItem_ArriveSpec Get_ArriveSpecAfter(const FMars_WorldItem_ArriveSpec& InSpec, float32 InElapsedSeconds)
+    {
+        const auto Elapsed = Math::Max(0.0f, InElapsedSeconds);
+        const auto Overshoot = Math::Max(0.0f, Elapsed - InSpec.DelaySeconds);
+        return FMars_WorldItem_ArriveSpec(Math::Max(0.0f, InSpec.DelaySeconds - Elapsed),
+            Math::Max(0.0f, InSpec.Seconds - Overshoot), InSpec.Easing);
+    }
+
+    // A World-mode item tells a reach what its body spans and how many hands its Presentation takes it with. No
+    // Presentation: no hint (the gloves fall back to sockets or a point).
+    void Add_ReachHint(FCk_Handle& InHandle, const FMars_WorldItem_Spec& InSpec)
+    {
+        if (InSpec.Mode != EMars_WorldItem_Mode::World)
+        { return; }
+
+        auto Definition = System::LoadAsset_Blocking(InSpec.Definition);
+        if (ck::Is_NOT_Valid(Definition))
+        { return; }
+
+        const UMars_ItemTrait_Presentation Presentation = Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+        if (ck::Is_NOT_Valid(Presentation))
+        { return; }
+
+        utils_reach_hint::Add(InHandle,
+            FMars_Fragment_ReachHint(InSpec.BoundsFit, Presentation.Grip.Handedness, Presentation.Grip.HalfWidth));
     }
 
     // A Visual-mode world item of InSpec.Item, owned by InOwner (it dies with it). It spawns where it starts - at
@@ -164,6 +196,20 @@ namespace utils_world_item
         const auto Scale = Math::Lerp(InFrom.GetScale3D(), InTo.GetScale3D(), InAlpha);
         return FTransform(Rot, Loc, Scale);
     }
+
+    // Switches the pickup of InEntity's world item: a ledger that holds an item's entity (a whole food on a board or in a
+    // pan) keeps a hand from taking it. An entity that is no World-mode world item has no pickup and needs nothing.
+    void Request_SetPickupEnableDisable(FCk_Handle InEntity, ECk_EnableDisable InEnableDisable)
+    {
+        if (InEntity.Is_WorldItem() == false)
+        { return; }
+
+        auto Pickup = InEntity.As_WorldItem().Get_Pickup();
+        if (ck::Is_NOT_Valid(Pickup))
+        { return; }
+
+        Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(InEnableDisable));
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -194,10 +240,34 @@ mixin FCk_Handle_Item Get_HeldItem(const FCk_Handle_WorldItem& Self)
     return Holder.Get_SoleItem();
 }
 
+// Invalid in Visual mode.
+mixin FCk_Handle_Interactable Get_Pickup(const FCk_Handle_WorldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).Pickup;
+}
+
 // Invalid in Visual mode, and when the item has no mesh.
 mixin FCk_Handle_JoltBody Get_Body(const FCk_Handle_WorldItem& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_WorldItem).Body;
+}
+
+// The collision profile the body was built with (and goes back to on a Release).
+mixin FName Get_BodyProfile(const FCk_Handle_WorldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).BodyProfile;
+}
+
+// The profile the body last confirmed through a completed request; unset before the first mount.
+mixin TOptional<FName> Get_AppliedBodyProfile(const FCk_Handle_WorldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).AppliedBodyProfile;
+}
+
+// What the body spans, from the root. Zero in Visual mode.
+mixin FMars_WorldItem_BoundsFit Get_BoundsFit(const FCk_Handle_WorldItem& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).BoundsFit;
 }
 
 // From the definition's Presentation trait; Transient when there is none.

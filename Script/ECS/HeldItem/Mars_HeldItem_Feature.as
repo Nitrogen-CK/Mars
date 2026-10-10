@@ -53,6 +53,33 @@ struct FMars_Fragment_HeldItem
     // out of a cargo slot).
     UPROPERTY()
     TOptional<FMars_WorldItem_PendingArrival> NextArrival;
+
+    // One-shot: the next Hold of this Persistent world item arrives this way (taken at the gloves' grip: it rides them home).
+    UPROPERTY()
+    TOptional<FMars_HeldItem_PendingHoldArrive> NextHoldArrive;
+}
+
+// A Persistent item's next Hold arrival, kept until that Hold is issued; aged by the time since StampedAtSeconds and
+// dropped past constants_world_item::k_ArriveFromMaxAgeSeconds.
+struct FMars_HeldItem_PendingHoldArrive
+{
+    UPROPERTY()
+    FCk_Handle_WorldItem WorldItem;
+
+    UPROPERTY()
+    FMars_WorldItem_ArriveSpec Arrive;
+
+    UPROPERTY()
+    float64 StampedAtSeconds = 0.0;
+
+    FMars_HeldItem_PendingHoldArrive() {}
+
+    FMars_HeldItem_PendingHoldArrive(const FCk_Handle_WorldItem& InWorldItem, const FMars_WorldItem_ArriveSpec& InArrive, float64 InStampedAtSeconds)
+    {
+        WorldItem = InWorldItem;
+        Arrive = InArrive;
+        StampedAtSeconds = InStampedAtSeconds;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -127,7 +154,26 @@ struct FMars_Request_HeldItem_SetNextArrival
     }
 }
 
-// Drained ClearNextSpawnFrom -> SetNextSpawnFrom -> SetNextArrival -> SetSlot, the latest of each kind winning. A start pose
+// A Persistent world item about to be held (a take or a pickup at the gloves' grip): its Hold arrives this way.
+struct FMars_Request_HeldItem_SetNextHoldArrive
+{
+    UPROPERTY()
+    FCk_Handle_WorldItem WorldItem;
+
+    UPROPERTY()
+    FMars_WorldItem_ArriveSpec Arrive;
+
+    FMars_Request_HeldItem_SetNextHoldArrive() {}
+
+    FMars_Request_HeldItem_SetNextHoldArrive(const FCk_Handle_WorldItem& InWorldItem, const FMars_WorldItem_ArriveSpec& InArrive)
+    {
+        WorldItem = InWorldItem;
+        Arrive = InArrive;
+    }
+}
+
+// Drained ClearNextSpawnFrom -> SetNextSpawnFrom -> SetNextArrival -> SetNextHoldArrive -> SetSlot, the latest of each kind
+// winning. A start pose
 // is always requested before the slot change it animates, and Request_ClearNextSpawnFrom drops a not-yet-drained
 // SetNextSpawnFrom, so arrival order survives the per-kind drain.
 struct FMars_Fragment_HeldItem_Requests
@@ -140,6 +186,9 @@ struct FMars_Fragment_HeldItem_Requests
 
     UPROPERTY()
     TArray<FMars_Request_HeldItem_SetNextArrival> SetNextArrivalRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_HeldItem_SetNextHoldArrive> SetNextHoldArriveRequests;
 
     UPROPERTY()
     TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests;

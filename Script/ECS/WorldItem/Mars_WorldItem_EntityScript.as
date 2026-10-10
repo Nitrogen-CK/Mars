@@ -8,6 +8,9 @@
 // Visual: a mesh scene-node-parented under AttachTo (the player's hand, a cargo slot). It never composes the item
 // (utils_item::Add), so item traits do not run a second time on the visual. With ArriveFrom set it starts at that world
 // pose and lerps to AttachOffset.
+//
+// A World-mode subclass whose body is not the Presentation mesh builds its own body and probe fit, then runs the shared
+// tail through Compose_WorldItem.
 class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 {
     default _Replication = ECk_Replication::DoesNotReplicate;
@@ -51,6 +54,8 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private const float32 k_AngularDamping = 0.5f;
     private const float32 k_Friction = 0.6f;
     private const float32 k_Restitution = 0.1f;
+    // An item without a Presentation trait: the pickup's sphere and the box the reach sizes from.
+    private const float32 k_BareProbeRadius = 40.0f;
 
     private FCk_Handle _SelfEntity;
     private UCk_InventoryItem_Definition _Definition;
@@ -78,10 +83,6 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         const UMars_ItemTrait_Presentation Presentation = _Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
 
-        auto Spec = FMars_WorldItem_Spec();
-        Spec.Mode = Mode;
-        Spec.Definition = Definition;
-
         if (ck::IsValid(Presentation))
         {
             _Mesh = Presentation.Visual.Mesh;
@@ -91,52 +92,54 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         if (Mode == EMars_WorldItem_Mode::World)
         {
-            Spec.Holder = AddHolder(InHandle);
+            auto Composition = FMars_WorldItem_Composition();
+            Composition.ProbeFit = FMars_WorldItem_ProbeFit(
+                utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(k_BareProbeRadius)), FTransform::Identity);
+            Composition.BoundsFit = FMars_WorldItem_BoundsFit(FVector(k_BareProbeRadius, k_BareProbeRadius, k_BareProbeRadius), FVector::ZeroVector);
             if (ck::IsValid(Presentation))
             {
-                Spec.Body = AddBody(InHandle, Presentation.Visual.MeshScale);
-                Spec.Pickup = AddPickup(Root, utils_world_item::Make_ProbeFit(Presentation));
+                Composition.Body = AddBody(InHandle, Presentation.Visual.MeshScale);
+                Composition.ProbeFit = utils_world_item::Make_ProbeFit(Presentation);
+                Composition.BoundsFit = utils_world_item::Make_BoundsFit(Presentation);
             }
-            else
-            {
-                Spec.Pickup = AddPickup(Root, FMars_WorldItem_ProbeFit(
-                    utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(40.0f)), FTransform::Identity));
-            }
-
-            _Pickup = Spec.Pickup;
 
             const auto Launched = LaunchVelocity.IsNearlyZero() == false || AngularVelocityDeg.IsNearlyZero() == false;
-            if (Launched && ck::IsValid(Spec.Body))
+            if (Launched && ck::IsValid(Composition.Body))
             {
-                Spec.Launch = TOptional<FMars_Fragment_WorldItem_PendingLaunch>(
+                Composition.Launch = TOptional<FMars_Fragment_WorldItem_PendingLaunch>(
                     FMars_Fragment_WorldItem_PendingLaunch(LaunchVelocity, AngularVelocityDeg));
             }
+
+            Compose_WorldItem(InHandle, Composition);
+            return ECk_EntityScript_ConstructionFlow::Finished;
+        }
+
+        auto Spec = FMars_WorldItem_Spec();
+        Spec.Mode = Mode;
+        Spec.Definition = Definition;
+
+        auto AttachTransform = AttachTo.As_Transform(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(ck::IsValid(AttachTransform), f"[WorldItem] Visual [{InHandle.ToString()}] has no transform to attach to"))
+        {
+            utils_entity_lifetime::Request_DestroyEntity(InHandle);
+            return ECk_EntityScript_ConstructionFlow::Finished;
+        }
+
+        if (ArriveFrom.IsSet)
+        {
+            // Start where the item visually was and let the Arrive processor lerp the offset to AttachOffset.
+            const auto AttachWorld = utils_transform::Get_EntityCurrentTransform(AttachTransform);
+            const auto FromOffset = ArriveFrom.World.GetRelativeTransform(AttachWorld);
+            utils_scene_node::Add(Root, AttachTransform, FromOffset);
+
+            auto Arrival = FMars_Fragment_WorldItem_Arrival();
+            Arrival.FromOffset = FromOffset;
+            Arrival.ToOffset = AttachOffset;
+            Arrival.Duration = ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f;
+            Spec.Arrival = TOptional<FMars_Fragment_WorldItem_Arrival>(Arrival);
         }
         else
-        {
-            auto AttachTransform = AttachTo.As_Transform(ECk_SanityCheck::UnChecked);
-            if (ck::EnsureIfNot(ck::IsValid(AttachTransform), f"[WorldItem] Visual [{InHandle.ToString()}] has no transform to attach to"))
-            {
-                utils_entity_lifetime::Request_DestroyEntity(InHandle);
-                return ECk_EntityScript_ConstructionFlow::Finished;
-            }
-
-            if (ArriveFrom.IsSet)
-            {
-                // Start where the item visually was and let the Arrive processor lerp the offset to AttachOffset.
-                const auto AttachWorld = utils_transform::Get_EntityCurrentTransform(AttachTransform);
-                const auto FromOffset = ArriveFrom.World.GetRelativeTransform(AttachWorld);
-                utils_scene_node::Add(Root, AttachTransform, FromOffset);
-
-                auto Arrival = FMars_Fragment_WorldItem_Arrival();
-                Arrival.FromOffset = FromOffset;
-                Arrival.ToOffset = AttachOffset;
-                Arrival.Duration = ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f;
-                Spec.Arrival = TOptional<FMars_Fragment_WorldItem_Arrival>(Arrival);
-            }
-            else
-            { utils_scene_node::Add(Root, AttachTransform, AttachOffset); }
-        }
+        { utils_scene_node::Add(Root, AttachTransform, AttachOffset); }
 
         auto WorldItem = utils_world_item::Add(InHandle, Spec);
         if (ck::Is_NOT_Valid(WorldItem))
@@ -188,6 +191,56 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     // Composition
     //--------------------------------------------------------------------------------------------------------------------------
 
+    // The World-mode tail every world item shares: the holder, the pickup fitted to InComposition.ProbeFit and the WorldItem
+    // feature over InComposition's body and launch. A rejected spec destroys the entity (utils_world_item::Add ensured).
+    protected void Compose_WorldItem(FCk_Handle& InHandle, const FMars_WorldItem_Composition& InComposition)
+    {
+        _SelfEntity = InHandle;
+        _Definition = Definition.Get();
+
+        auto Root = InHandle.As_Transform();
+
+        auto Spec = FMars_WorldItem_Spec();
+        Spec.Mode = EMars_WorldItem_Mode::World;
+        Spec.Definition = Definition;
+        Spec.Holder = AddHolder(InHandle);
+        Spec.Body = InComposition.Body;
+        Spec.BodyProfile = InComposition.BodyProfile;
+        Spec.BoundsFit = InComposition.BoundsFit;
+        Spec.Pickup = AddPickup(Root, InComposition.ProbeFit);
+        Spec.Launch = InComposition.Launch;
+        _Pickup = Spec.Pickup;
+
+        auto WorldItem = utils_world_item::Add(InHandle, Spec);
+        if (ck::Is_NOT_Valid(WorldItem))
+        { utils_entity_lifetime::Request_DestroyEntity(InHandle); }
+    }
+
+    // The name the pickup prompt shows: the item definition's.
+    protected FString Get_ItemName() const
+    {
+        return _Definition.Get_CoreInfo().Get_Name().ToString();
+    }
+
+    // What interacting with the pickup does.
+    protected TSoftClassPtr<UCk_SmState_EntityScript> Get_PickupStateClass() const
+    {
+        TSoftClassPtr<UCk_SmState_EntityScript> StateClass = UMars_SmState_WorldItem_PickUp;
+        return StateClass;
+    }
+
+    // Ranks the pickup against other interactables under the view ray (FMars_Interactable_Spec.FocusPriority).
+    protected int32 Get_PickupFocusPriority() const
+    {
+        return 0;
+    }
+
+    // Invalid before Compose_WorldItem and in Visual mode.
+    protected FCk_Handle_Interactable Get_Pickup() const
+    {
+        return _Pickup;
+    }
+
     // A unit-scale child of the root that carries the mesh and the display scale.
     private void AddVisual(FCk_Handle_Transform& InRoot, FVector InMeshScale)
     {
@@ -231,6 +284,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
         BodySpec.Set_Friction(k_Friction);
         BodySpec.Set_Restitution(k_Restitution);
+        BodySpec.Set_CollisionProfileName(constants_world_item::k_DefaultBodyProfile);
 
         return utils_jolt_body::Add(InHandle, BodySpec);
     }
@@ -248,19 +302,19 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
         TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
-        const auto ItemName = _Definition.Get_CoreInfo().Get_Name().ToString();
         auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = FText::FromString(f"Pick up {ItemName}");
+        Prompt.PromptText = FText::FromString(f"Pick up {Get_ItemName()}");
 
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
         Target.InteractPromptSpec = Prompt;
-        Target.InteractionStateClass = UMars_SmState_WorldItem_PickUp;
+        Target.InteractionStateClass = Get_PickupStateClass();
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
         Spec.Targets.Add(Target);
+        Spec.FocusPriority = Get_PickupFocusPriority();
 
         auto Pickup = utils_interactable::Create(InRoot, Spec);
         Pickup.BindTo_OnFocused(FMars_Delegate_Interactable_OnFocused(this, n"OnPickupFocused"));
@@ -386,6 +440,10 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(Hotbar) || DoGet_CanStowSelf(Hotbar) || ck::IsValid(_GatingHotbar))
         { return; }
 
+        const auto Item = _SelfEntity.As_WorldItem().Get_HeldItem();
+        const auto Reason = ck::IsValid(Item) ? "the hotbar has nowhere to stow it" : "its holder holds no item yet";
+        ck::Trace(f"[WorldItem] [{_SelfEntity.ToString()}] pickup disabled for [{InFocusedBy.ToString()}]: {Reason} (item [{Item.ToString()}]); re-enabled on a hotbar slot change that frees room");
+
         _GatingHotbar = Hotbar;
         _Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Disable));
         _GatingHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
@@ -404,8 +462,9 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         { _Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Enable)); }
     }
 
-    // An item-aware stow check: a second backpack has nowhere to go while one is worn. No held item -> cannot stow.
-    private bool DoGet_CanStowSelf(FCk_Handle_Hotbar InHotbar)
+    // Whether the pickup stays enabled for InHotbar's owner: an item-aware stow check (a second backpack has nowhere to go
+    // while one is worn). No held item -> cannot stow. A subclass whose interactable does more than stow widens it.
+    protected bool DoGet_CanStowSelf(FCk_Handle_Hotbar InHotbar)
     {
         const auto Item = _SelfEntity.As_WorldItem().Get_HeldItem();
         if (ck::Is_NOT_Valid(Item))

@@ -76,6 +76,22 @@ struct FMars_FPHands_RestSpec
     // Grip bone to palm surface; two-handed grips sit this far outside the item's sides.
     UPROPERTY()
     float32 PalmSurfaceOffset = 2.5f;
+
+    // Cradle holds (a tray, a slab): each glove's grip rotation under the item, palm up, fingers pointing away from the
+    // player.
+    UPROPERTY(Category = "Cradle")
+    FQuat CradleGripRotation_R = utils_fphands::Make_GripRotation(EMars_Hand::Right, FVector::ForwardVector, FVector::UpVector);
+
+    UPROPERTY(Category = "Cradle")
+    FQuat CradleGripRotation_L = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, FVector::UpVector);
+
+    // Cradle holds: how far inside each side face the palm sits, under the rim.
+    UPROPERTY(Category = "Cradle")
+    float32 CradlePalmInsetCm = 6.0f;
+
+    // Cradle holds: the grip bone this far under the item's underside (the palm's thickness).
+    UPROPERTY(Category = "Cradle")
+    float32 CradlePalmUnderCm = 2.0f;
 }
 
 // Free hands swing forward/back in opposite phase, like arms, from the character's gait.
@@ -255,7 +271,8 @@ struct FMars_FPHands_SocketGrips
     FTransform Left;
 }
 
-// Hand-space Y of the held item's right and left faces (right is positive); fitted two-handed grips sit outside them.
+// Hand-space Y of the held item's right and left faces (right is positive), where fitted two-handed grips sit outside
+// them, and hand-space Z of its underside, where a cradle's palms sit under it.
 struct FMars_FPHands_HoldFaces
 {
     UPROPERTY()
@@ -264,18 +281,25 @@ struct FMars_FPHands_HoldFaces
     UPROPERTY()
     float LeftY = 0.0;
 
+    UPROPERTY()
+    float BottomZ = 0.0;
+
     FMars_FPHands_HoldFaces() {}
 
-    FMars_FPHands_HoldFaces(float InRightY, float InLeftY)
+    FMars_FPHands_HoldFaces(float InRightY, float InLeftY, float InBottomZ)
     {
         RightY = InRightY;
         LeftY = InLeftY;
+        BottomZ = InBottomZ;
     }
 }
 
 // How the current held item is gripped, measured once per item change.
 struct FMars_FPHands_Hold
 {
+    UPROPERTY()
+    EMars_HandGripLayout Layout = EMars_HandGripLayout::Sides;
+
     UPROPERTY()
     EMars_FPHands_HoldKind Kind = EMars_FPHands_HoldKind::Empty;
 
@@ -295,6 +319,10 @@ struct FMars_FPHands_Hold
 
     UPROPERTY()
     FTransform HeldOffset;
+
+    // What the held item spans, in its own frame: a Place reach sets it down by this.
+    UPROPERTY()
+    FMars_WorldItem_BoundsFit Bounds;
 }
 
 // The glove closes on the held item: both for a two-handed hold, the right alone for a one-handed one.
@@ -368,6 +396,13 @@ namespace utils_fphands
                 GripRight = InHold.SocketGrips.GetValue().Right;
                 GripLeft = InHold.SocketGrips.GetValue().Left;
             }
+            else if (InHold.Layout == EMars_HandGripLayout::Cradle)
+            {
+                // Under the item, palms up, just inside its sides.
+                const auto UnderZ = InHold.Faces.BottomZ - InRest.CradlePalmUnderCm;
+                GripRight = FTransform(InRest.CradleGripRotation_R, FVector(0.0, InHold.Faces.RightY - InRest.CradlePalmInsetCm, UnderZ), FVector::OneVector);
+                GripLeft = FTransform(InRest.CradleGripRotation_L, FVector(0.0, InHold.Faces.LeftY + InRest.CradlePalmInsetCm, UnderZ), FVector::OneVector);
+            }
             else
             {
                 GripRight = FTransform(InRest.GripRotation_R, FVector(0.0, InHold.Faces.RightY + InRest.PalmSurfaceOffset, 0.0), FVector::OneVector);
@@ -425,22 +460,30 @@ namespace utils_fphands
         return InRest.CenteredHandOffset;
     }
 
-    // The item's sides along the Hand node's Y axis: its mesh bounds x InMeshScale, placed by InHeldOffset.
+    // The item's sides along the Hand node's Y axis and its underside along Z: its mesh bounds x InMeshScale, placed by
+    // InHeldOffset.
     FMars_FPHands_HoldFaces Measure_Faces(UStaticMesh InMesh, const FVector& InMeshScale, const FTransform& InHeldOffset)
     {
         const auto Bounds = InMesh.GetBounds();
+        return Measure_BoxFaces(Bounds.Origin * InMeshScale, Bounds.BoxExtent * InMeshScale, InHeldOffset);
+    }
+
+    // A box (in the item's frame) placed by InHeldOffset: its extreme Y either side and its lowest Z, in the Hand node's space.
+    FMars_FPHands_HoldFaces Measure_BoxFaces(const FVector& InCentre, const FVector& InHalfExtents, const FTransform& InHeldOffset)
+    {
         auto MinY = 1.0e10;
         auto MaxY = -1.0e10;
+        auto MinZ = 1.0e10;
         for (int32 Corner = 0; Corner < 8; ++Corner)
         {
             const auto Sign = FVector((Corner & 1) != 0 ? 1.0 : -1.0, (Corner & 2) != 0 ? 1.0 : -1.0, (Corner & 4) != 0 ? 1.0 : -1.0);
-            const auto Local = (Bounds.Origin + Bounds.BoxExtent * Sign) * InMeshScale;
-            const auto InHand = InHeldOffset.TransformPosition(Local);
+            const auto InHand = InHeldOffset.TransformPosition(InCentre + InHalfExtents * Sign);
             MinY = Math::Min(MinY, InHand.Y);
             MaxY = Math::Max(MaxY, InHand.Y);
+            MinZ = Math::Min(MinZ, InHand.Z);
         }
 
-        return FMars_FPHands_HoldFaces(MaxY, MinY);
+        return FMars_FPHands_HoldFaces(MaxY, MinY, MinZ);
     }
 
     // How the gloves grip InItem: authored sockets win (and decide one- vs two-handed), then the presentation's
@@ -455,13 +498,18 @@ namespace utils_fphands
         const auto IsTwoHanded = Presentation.Grip.Handedness == EMars_ItemPresentation_Handedness::TwoHanded;
         Hold.Kind = IsTwoHanded ? EMars_FPHands_HoldKind::TwoHanded : EMars_FPHands_HoldKind::OneHanded;
         Hold.Pose = Presentation.Grip.Pose;
+        Hold.Layout = Presentation.Grip.Layout;
         Hold.HeldOffset = Presentation.Mounting.HeldOffset;
         Hold.Shape.Scale = Presentation.Visual.MeshScale;
         Hold.Shape.Type = Presentation.Grip.Shape;
+        const auto WorldItem = InItem.Get_PersistentWorldItem();
+        Hold.Bounds = ck::IsValid(WorldItem) ? WorldItem.Get_BoundsFit() : utils_world_item::Make_BoundsFit(Presentation);
         if (Presentation.Grip.HalfWidth.IsSet())
         {
+            // The palms' spacing is authored; the underside comes from what the item spans (a meshless food's fit).
             const auto HalfWidth = Presentation.Grip.HalfWidth.GetValue();
-            Hold.Faces = FMars_FPHands_HoldFaces(HalfWidth, -HalfWidth);
+            const auto BottomZ = Measure_BoxFaces(Hold.Bounds.Centre, Hold.Bounds.HalfExtents, Hold.HeldOffset).BottomZ;
+            Hold.Faces = FMars_FPHands_HoldFaces(HalfWidth, -HalfWidth, BottomZ);
         }
 
         if (Presentation.Visual.Mesh.IsNull())

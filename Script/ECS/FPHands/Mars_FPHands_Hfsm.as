@@ -322,6 +322,239 @@ class UMars_SmTask_HandsResolverBinds_NoResync : UMars_SmTask_HandsResolverBinds
     default EnterSync = EMars_FPHands_EnterSync::VerifyTarget;
 }
 
+// Where a task acting at the gloves' Grip stands.
+enum EMars_FPHands_GripWait
+{
+    // Not waiting: the task acted, failed, or never asked.
+    None,
+    // For the gloves to take the reach the resolver starts for the interaction's own target (a pickup, a dock's take).
+    TargetReach,
+    // For the gloves to take the Place reach the task requested (food onto a platter, a platter onto a dock).
+    PlaceReach,
+    // The gloves are on the awaited reach: only its Grip acts from here.
+    Reaching
+}
+
+// The base of an interaction task that moves things at the gloves' Grip rather than on enter, so an item follows the hands
+// (a pickup lands when the gloves close on it, a placed item leaves them where they set it down). A subclass starts the
+// wait with Await_Grip or Await_PlaceGrip and does its work in DoAtGrip; a reach lost, or gloves that Return or let go
+// before their Grip, fail the task through DoFail and nothing moves. Await_Grip acts at once for an initiator without
+// gloves and the moment the gloves refuse the reach for this interaction's target (OnReachRefused, or a refusal they
+// already remember: Get_IsReachRefused); Await_PlaceGrip fails the moment they refuse the Place. Only a reach nobody asked
+// for (a headless rig without a resolver) is bounded by time: not reaching within k_ReachAcceptSeconds, Await_Grip acts
+// and Await_PlaceGrip fails. The task ticks and returns _Outcome; a subclass that overrides DoExitTask calls Super.
+UCLASS(Abstract)
+class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    // A reach is taken or refused in the next requests drain; longer than this, no reach was asked for at all.
+    protected const float32 k_ReachAcceptSeconds = 0.5f;
+
+    protected ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
+
+    private EMars_FPHands_GripWait _GripWait = EMars_FPHands_GripWait::None;
+    private float32 _WaitSeconds = 0.0f;
+    private FCk_Handle_FPHands _GripHands;
+    // TargetReach only: this interaction's target (the state machine's context).
+    private FCk_Handle_InteractTarget _GripTarget;
+    // The last frame's length: the gloves leave their Grip one state-machine step after its seconds run out.
+    private float32 _LastDeltaSeconds = 0.0f;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        _LastDeltaSeconds = float32(InDeltaT.Get_Seconds());
+
+        if (_GripWait == EMars_FPHands_GripWait::TargetReach)
+        { Check_TargetReach(); }
+
+        const auto IsAwaitingReach = _GripWait == EMars_FPHands_GripWait::TargetReach || _GripWait == EMars_FPHands_GripWait::PlaceReach;
+        if (IsAwaitingReach == false)
+        { return _Outcome; }
+
+        _WaitSeconds += float32(InDeltaT.Get_Seconds());
+        if (_WaitSeconds <= k_ReachAcceptSeconds)
+        { return _Outcome; }
+
+        if (_GripWait == EMars_FPHands_GripWait::PlaceReach)
+        {
+            Fail_Grip("no place reach reached the gloves");
+            return _Outcome;
+        }
+
+        ck::Trace(f"[FPHands] [{_GripHands.ToString()}] was asked for no reach for [{_GripTarget.ToString()}]: acting without the grip");
+        Act_AtGrip();
+        return _Outcome;
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        // A task torn down before it acted or failed (its interaction ended under it): nothing moved.
+        if (_Outcome == ECk_SmTaskResult::Running)
+        { ck::Trace(f"[ActAtGrip] [{GetClass().GetName()}] exits for [{_GripTarget.ToString()}] still running (wait {_GripWait :n})"); }
+
+        Stop_Waiting();
+    }
+
+    // Acts at the Grip of the reach InInitiator's gloves make for this interaction's target.
+    protected void Await_Grip(FCk_Handle InInitiator)
+    {
+        _GripHands = InInitiator.As_FPHands(ECk_SanityCheck::UnChecked);
+        _GripTarget = Get_StateMachineContext().As_InteractTarget(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(_GripHands))
+        {
+            Act_AtGrip();
+            return;
+        }
+
+        if (_GripHands.Get_IsReachRefused(_GripTarget))
+        {
+            ck::Trace(f"[FPHands] [{_GripHands.ToString()}] refused the reach for [{_GripTarget.ToString()}]: acting without the grip");
+            Act_AtGrip();
+            return;
+        }
+
+        Start_Waiting(EMars_FPHands_GripWait::TargetReach);
+        Check_TargetReach();
+    }
+
+    // Acts at the Grip of the Place reach the caller requests on InHands right after this.
+    protected void Await_PlaceGrip(FCk_Handle_FPHands InHands)
+    {
+        _GripHands = InHands;
+        _GripTarget = FCk_Handle_InteractTarget();
+        Start_Waiting(EMars_FPHands_GripWait::PlaceReach);
+        _GripHands.BindTo_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnGripReachRequested"));
+    }
+
+    // The work the task waited for. Sets _Outcome.
+    protected void DoAtGrip() {}
+
+    // Called from DoAtGrip: how a mount taken now arrives so the item rides the gloves home: still for what is left of
+    // their Grip (plus the frame the Hands state machine takes to enter Return), then over their return with its easing.
+    // Unset when no gloves are gripping (no gloves, a refused reach, the no-reach fallback): the item arrives as usual.
+    protected TOptional<FMars_WorldItem_ArriveSpec> TryGet_RideHome() const
+    {
+        if (ck::Is_NOT_Valid(_GripHands) || _GripHands.Get_Phase() != EMars_FPHands_Phase::Grip)
+        { return TOptional<FMars_WorldItem_ArriveSpec>(); }
+
+        const auto& Grab = _GripHands.Get_Spec().Reach.Grab;
+        const auto GripLeft = Math::Max(0.0f, Grab.GripSeconds - _GripHands.Get_PhaseTime()) + _LastDeltaSeconds;
+        return TOptional<FMars_WorldItem_ArriveSpec>(FMars_WorldItem_ArriveSpec(GripLeft, Grab.BackSeconds, Grab.BackEasing));
+    }
+
+    // The wait (or the work) failed and nothing moved. Sets _Outcome.
+    protected void DoFail(const FString& InReason)
+    {
+        ck::Warning(f"[FPHands] Acting at the grip failed: {InReason}");
+        _Outcome = ECk_SmTaskResult::Failed;
+    }
+
+    // The gloves took the reach for this target (Reach: wait for its Grip), or already close on it (Grip: act now).
+    private void Check_TargetReach()
+    {
+        if (ck::Is_NOT_Valid(_GripTarget) || _GripHands.Get_IsReachTarget(_GripTarget) == false)
+        { return; }
+
+        const auto Phase = _GripHands.Get_Phase();
+        if (Phase == EMars_FPHands_Phase::Grip)
+        {
+            Act_AtGrip();
+            return;
+        }
+
+        if (Phase == EMars_FPHands_Phase::Reach)
+        { _GripWait = EMars_FPHands_GripWait::Reaching; }
+    }
+
+    private void Start_Waiting(EMars_FPHands_GripWait InWait)
+    {
+        _GripWait = InWait;
+        _WaitSeconds = 0.0f;
+        _GripHands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnGripPhaseChanged"));
+        _GripHands.BindTo_OnReachTargetLost(FMars_Delegate_FPHands_OnReachTargetLost(this, n"OnGripReachTargetLost"));
+        _GripHands.BindTo_OnReachRefused(FMars_Delegate_FPHands_OnReachRefused(this, n"OnGripReachRefused"));
+    }
+
+    private void Stop_Waiting()
+    {
+        if (ck::IsValid(_GripHands))
+        {
+            _GripHands.UnbindFrom_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnGripReachRequested"));
+            _GripHands.UnbindFrom_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnGripPhaseChanged"));
+            _GripHands.UnbindFrom_OnReachTargetLost(FMars_Delegate_FPHands_OnReachTargetLost(this, n"OnGripReachTargetLost"));
+            _GripHands.UnbindFrom_OnReachRefused(FMars_Delegate_FPHands_OnReachRefused(this, n"OnGripReachRefused"));
+        }
+
+        _GripWait = EMars_FPHands_GripWait::None;
+    }
+
+    private void Act_AtGrip()
+    {
+        Stop_Waiting();
+        DoAtGrip();
+    }
+
+    private void Fail_Grip(const FString& InReason)
+    {
+        ck::Trace(f"[ActAtGrip] [{GetClass().GetName()}] fails for [{_GripTarget.ToString()}] (wait was {_GripWait :n}): {InReason}");
+        Stop_Waiting();
+        DoFail(InReason);
+    }
+
+    UFUNCTION()
+    private void OnGripReachRequested(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind)
+    {
+        if (_GripWait == EMars_FPHands_GripWait::PlaceReach && InKind == EMars_FPHands_ReachKind::Place)
+        { _GripWait = EMars_FPHands_GripWait::Reaching; }
+    }
+
+    UFUNCTION()
+    private void OnGripPhaseChanged(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
+    {
+        if (_GripWait == EMars_FPHands_GripWait::TargetReach)
+        {
+            Check_TargetReach();
+            return;
+        }
+
+        if (_GripWait != EMars_FPHands_GripWait::Reaching || InNew == EMars_FPHands_Phase::Reach)
+        { return; }
+
+        if (InNew != EMars_FPHands_Phase::Grip)
+        {
+            Fail_Grip(f"the gloves went to [{InNew :n}] before their grip");
+            return;
+        }
+
+        Act_AtGrip();
+    }
+
+    // A refused reach for this target: the gloves will not come, so the work happens now. A refused Place: nothing is set down.
+    UFUNCTION()
+    private void OnGripReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind)
+    {
+        if (_GripWait == EMars_FPHands_GripWait::TargetReach && ck::IsValid(_GripTarget) && InTarget == _GripTarget)
+        {
+            ck::Trace(f"[FPHands] [{InHands.ToString()}] refused the reach for [{_GripTarget.ToString()}]: acting without the grip");
+            Act_AtGrip();
+            return;
+        }
+
+        if (_GripWait == EMars_FPHands_GripWait::PlaceReach && InKind == EMars_FPHands_ReachKind::Place)
+        { Fail_Grip("the gloves refused the place reach"); }
+    }
+
+    UFUNCTION()
+    private void OnGripReachTargetLost(FCk_Handle_FPHands InHands)
+    {
+        if (_GripWait == EMars_FPHands_GripWait::Reaching)
+        { Fail_Grip("the gloves lost the target"); }
+    }
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Conditions
 //--------------------------------------------------------------------------------------------------------------------------
@@ -396,7 +629,8 @@ class UMars_SmCondition_HandsPushRequested : UCk_SmCondition_EventDriven
     }
 }
 
-// Event-driven: OnReachRequested of the wanted reach kind. Rests at Fail; marks only from the signal handler.
+// Event-driven: OnReachRequested of a reach kind that plays the wanted gesture (Place plays Grab's). Rests at Fail; marks
+// only from the signal handler.
 class UMars_SmCondition_HandsReachRequested : UCk_SmCondition_EventDriven
 {
     protected EMars_FPHands_ReachKind WantedKind = EMars_FPHands_ReachKind::Grab;
@@ -423,9 +657,9 @@ class UMars_SmCondition_HandsReachRequested : UCk_SmCondition_EventDriven
     }
 
     UFUNCTION()
-    private void OnReachRequested(FCk_Handle_FPHands InHands, ECk_Interaction_CompletionPolicy InCompletionPolicy)
+    private void OnReachRequested(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind)
     {
-        if (utils_fphands::Get_ReachKind(InCompletionPolicy) == WantedKind)
+        if (utils_fphands::Get_Gesture(InKind) == WantedKind)
         { MarkSatisfied(); }
     }
 }

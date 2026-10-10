@@ -31,16 +31,18 @@ class UMars_SmState_WorldItem_PickUp : UMars_SmState_InteractTarget_RunTask
     default TaskClass = UMars_SmTask_WorldItem_StowIntoInitiator;
 }
 
-// Transfers the world item's held item into the initiator's hotbar stow target and runs until the transfer reports.
-// A Transient world item destroys itself once its holder empties; a Persistent one is asked to Carry itself onto the
-// initiator once the stow succeeds. A full hotbar fails (the pickup is normally disabled before it gets here).
-class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
+// Transfers the world item's held item into the initiator's hotbar stow target at the Grip of the initiator's gloves on it
+// (UMars_SmTask_ActAtGrip: at once without gloves, or when they do not reach for it), and runs until the transfer reports:
+// the item lands when the gloves close on it, never before they get there. A Transient world item destroys itself once its
+// holder empties; a Persistent one is asked to Carry itself onto the initiator once the stow succeeds. A full hotbar fails
+// (the pickup is normally disabled before it gets here); so do gloves that return or lose it before their Grip.
+class UMars_SmTask_WorldItem_StowIntoInitiator : UMars_SmTask_ActAtGrip
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
-
-    private ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
     private FCk_Handle _Initiator;
     private FCk_Handle_WorldItem _WorldItem;
+    // Set at the grip: the Carry rides the gloves home (aged by the time since _RideAtSeconds).
+    private TOptional<FMars_WorldItem_ArriveSpec> _Ride;
+    private float64 _RideAtSeconds = 0.0;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -48,6 +50,7 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
         _Outcome = ECk_SmTaskResult::Running;
         _Initiator = FCk_Handle();
         _WorldItem = FCk_Handle_WorldItem();
+        _Ride.Reset();
 
         // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
         auto Context = Get_StateMachineContext();
@@ -62,17 +65,18 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
 
         auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
         auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
+
         auto WorldItem = Owner.As_WorldItem();
         auto Hotbar = Initiator.As_Hotbar();
         if (ck::Is_NOT_Valid(WorldItem) || ck::Is_NOT_Valid(Hotbar))
         {
+            ck::Trace(f"[WorldItem] Pickup fails at enter: world item [{WorldItem.ToString()}] or hotbar [{Hotbar.ToString()}] is invalid");
             _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 
         auto Item = WorldItem.Get_HeldItem();
-        auto Target = Hotbar.TryGet_StowTarget(Item);
-        if (ck::Is_NOT_Valid(Item) || ck::Is_NOT_Valid(Target))
+        if (ck::Is_NOT_Valid(Item) || ck::Is_NOT_Valid(Hotbar.TryGet_StowTarget(Item)))
         {
             DoFail("the world item holds nothing, or the hotbar has nowhere to stow it");
             return;
@@ -80,16 +84,37 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
 
         _Initiator = Initiator;
         _WorldItem = WorldItem;
+        Await_Grip(Initiator);
+    }
 
-        auto Holder = WorldItem.Get_Holder();
+    // The hotbar is asked again: its slots may have changed while the gloves reached.
+    protected void DoAtGrip() override
+    {
+        auto Item = _WorldItem.Get_HeldItem();
+        const auto Hotbar = _Initiator.As_Hotbar(ECk_SanityCheck::UnChecked);
+        auto Target = ck::IsValid(Hotbar) ? Hotbar.TryGet_StowTarget(Item) : FCk_Handle_Inventory_DataOnly();
+        if (ck::Is_NOT_Valid(Item) || ck::Is_NOT_Valid(Target))
+        {
+            DoFail("at the grip the world item holds nothing, or the hotbar has nowhere to stow it");
+            return;
+        }
+
+        // A Persistent item taken at the grip rides the gloves home: its Carry here and the Hold that follows its selection.
+        _Ride = TryGet_RideHome();
+        _RideAtSeconds = System::GetGameTimeInSeconds();
+        auto HeldItem = _Initiator.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (_Ride.IsSet() && ck::IsValid(HeldItem))
+        { HeldItem.Request_SetNextHoldArrive(FMars_Request_HeldItem_SetNextHoldArrive(_WorldItem, _Ride.GetValue())); }
+
+        auto Holder = _WorldItem.Get_Holder();
         Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),
             FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnStowComplete"));
     }
 
-    UFUNCTION(BlueprintOverride)
-    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    protected void DoFail(const FString& InReason) override
     {
-        return _Outcome;
+        ck::Warning(f"[WorldItem] Pickup failed: {InReason}");
+        _Outcome = ECk_SmTaskResult::Failed;
     }
 
     UFUNCTION()
@@ -104,18 +129,21 @@ class UMars_SmTask_WorldItem_StowIntoInitiator : UCk_SmTask_EntityScript
         {
             auto Item = ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem;
             if (ck::IsValid(Item) && Item.Has_PersistentWorldItem() && ck::IsValid(_WorldItem))
-            { _WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(_Initiator)); }
+            {
+                auto Carry = FMars_Request_WorldItem_Carry(_Initiator);
+                if (_Ride.IsSet())
+                {
+                    const auto Since = float32(System::GetGameTimeInSeconds() - _RideAtSeconds);
+                    Carry.Arrive = TOptional<FMars_WorldItem_ArriveSpec>(utils_world_item::Get_ArriveSpecAfter(_Ride.GetValue(), Since));
+                }
+
+                _WorldItem.Request_Carry(Carry);
+            }
 
             _Outcome = ECk_SmTaskResult::Succeeded;
             return;
         }
 
         DoFail(f"the stow transfer failed with [{InResult :n}]");
-    }
-
-    private void DoFail(const FString& InReason)
-    {
-        ck::Warning(f"[WorldItem] Pickup failed: {InReason}");
-        _Outcome = ECk_SmTaskResult::Failed;
     }
 }

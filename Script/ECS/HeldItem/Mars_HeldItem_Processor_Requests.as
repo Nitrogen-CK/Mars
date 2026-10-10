@@ -27,6 +27,7 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
         const auto ClearNextSpawnFrom = InRequests.ClearNextSpawnFromRequests.Num() > 0;
         TArray<FMars_Request_HeldItem_SetNextSpawnFrom> SetNextSpawnFromRequests = InRequests.SetNextSpawnFromRequests;
         TArray<FMars_Request_HeldItem_SetNextArrival> SetNextArrivalRequests = InRequests.SetNextArrivalRequests;
+        TArray<FMars_Request_HeldItem_SetNextHoldArrive> SetNextHoldArriveRequests = InRequests.SetNextHoldArriveRequests;
         TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests = InRequests.SetSlotRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
@@ -43,6 +44,13 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
             const auto& Request = SetNextArrivalRequests.Last();
             InState.NextArrival = TOptional<FMars_WorldItem_PendingArrival>(
                 FMars_WorldItem_PendingArrival(Request.Item, Request.World, System::GetGameTimeInSeconds()));
+        }
+
+        if (SetNextHoldArriveRequests.Num() > 0)
+        {
+            const auto& Request = SetNextHoldArriveRequests.Last();
+            InState.NextHoldArrive = TOptional<FMars_HeldItem_PendingHoldArrive>(
+                FMars_HeldItem_PendingHoldArrive(Request.WorldItem, Request.Arrive, System::GetGameTimeInSeconds()));
         }
 
         if (SetSlotRequests.Num() > 0)
@@ -71,7 +79,9 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
             if (HasWorldItem)
             {
-                NewWorldItem.Request_Hold(FMars_Request_WorldItem_Hold(Player));
+                auto Hold = FMars_Request_WorldItem_Hold(Player);
+                Hold.Arrive = Take_NextHoldArrive(InState, NewWorldItem);
+                NewWorldItem.Request_Hold(Hold);
                 InState.PresentationEntity = NewWorldItem;
                 InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
             }
@@ -84,6 +94,22 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InHeldItem.Has_Fragment(FMars_Fragment_HeldItem_Signals))
         { InHeldItem.Get_Fragment(FMars_Fragment_HeldItem_Signals).OnHeldItemChanged.Broadcast(InHeldItem, PrevItem, NewItem); }
+    }
+
+    // The pending Hold arrival for InWorldItem, aged to now; unset for another item or a stale one. Consumed either way.
+    private TOptional<FMars_WorldItem_ArriveSpec> Take_NextHoldArrive(FMars_Fragment_HeldItem& InState, const FCk_Handle_WorldItem& InWorldItem)
+    {
+        if (InState.NextHoldArrive.IsSet() == false)
+        { return TOptional<FMars_WorldItem_ArriveSpec>(); }
+
+        const auto Pending = InState.NextHoldArrive.GetValue();
+        InState.NextHoldArrive.Reset();
+
+        const auto AgeSeconds = System::GetGameTimeInSeconds() - Pending.StampedAtSeconds;
+        if (Pending.WorldItem != InWorldItem || AgeSeconds > constants_world_item::k_ArriveFromMaxAgeSeconds)
+        { return TOptional<FMars_WorldItem_ArriveSpec>(); }
+
+        return TOptional<FMars_WorldItem_ArriveSpec>(utils_world_item::Get_ArriveSpecAfter(Pending.Arrive, float32(AgeSeconds)));
     }
 
     // Owned: destroyed. Borrowed: a world item still in the hand goes back onto its carry point; a released one (dropped

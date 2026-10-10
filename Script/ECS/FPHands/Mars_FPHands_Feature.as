@@ -25,11 +25,13 @@ enum EMars_FPHands_Phase
 }
 
 // The gesture a reach plays: Grab (an instant interaction) runs Reach -> Grip -> Return on its own; Hold (a timed or
-// manually completed one) keeps the gloves on the target until it is lost.
+// manually completed one) keeps the gloves on the target until it is lost. Place runs Grab's phases with whatever the
+// gloves hold carried over the target (the one reach a two-handed hold may make): the Grip phase is where it is let go.
 enum EMars_FPHands_ReachKind
 {
     Grab,
-    Hold
+    Hold,
+    Place
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -67,6 +69,11 @@ struct FMars_FPHands_ReachState
     // Single-handed targets near the centre line stay with this glove; every resolve (focus included) updates it.
     UPROPERTY()
     EMars_Hand PreferredHand = EMars_Hand::Right;
+
+    // The interact target of the last reach the gloves refused; cleared by the next reach they take and by a hold change.
+    // Lets a task that starts after the refusal (an interaction's grip-wait) know the gloves will not come.
+    UPROPERTY()
+    TOptional<FCk_Handle_InteractTarget> RefusedTarget;
 }
 
 // The lean toward what is looked at.
@@ -140,8 +147,13 @@ struct FMars_Fragment_FPHands
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_FPHands_OnReachRequested(FCk_Handle_FPHands InHands, ECk_Interaction_CompletionPolicy InCompletionPolicy);
-event void FMars_Delegate_FPHands_OnReachRequested_MC(FCk_Handle_FPHands InHands, ECk_Interaction_CompletionPolicy InCompletionPolicy);
+delegate void FMars_Delegate_FPHands_OnReachRequested(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind);
+event void FMars_Delegate_FPHands_OnReachRequested_MC(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind);
+
+// A StartReach the gloves did not take (busy, superseded in its drain, the subject gone, nothing to reach). InTarget is the
+// request's interact target (invalid for a reach that served no interaction).
+delegate void FMars_Delegate_FPHands_OnReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind);
+event void FMars_Delegate_FPHands_OnReachRefused_MC(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind);
 
 delegate void FMars_Delegate_FPHands_OnReachTargetLost(FCk_Handle_FPHands InHands);
 event void FMars_Delegate_FPHands_OnReachTargetLost_MC(FCk_Handle_FPHands InHands);
@@ -155,6 +167,7 @@ event void FMars_Delegate_FPHands_OnPushRequested_MC(FCk_Handle_FPHands InHands)
 struct FMars_Fragment_FPHands_Signals
 {
     FMars_Delegate_FPHands_OnReachRequested_MC OnReachRequested;
+    FMars_Delegate_FPHands_OnReachRefused_MC OnReachRefused;
     FMars_Delegate_FPHands_OnReachTargetLost_MC OnReachTargetLost;
     FMars_Delegate_FPHands_OnPhaseChanged_MC OnPhaseChanged;
     FMars_Delegate_FPHands_OnPushRequested_MC OnPushRequested;
@@ -179,7 +192,8 @@ struct FMars_Request_FPHands_SetPhase
 }
 
 // Reach for a subject. The last one in a drain wins; ignored unless the gloves are at rest (Phase None) or letting go
-// (Release, Return), when the subject died before the drain, and when it is unresolvable.
+// (Release, Return), when the subject died before the drain, and when it is unresolvable. Every ignored one (the
+// superseded ones included) is refused out loud: OnReachRefused.
 struct FMars_Request_FPHands_StartReach
 {
     // Unset: a bare reach - the right glove toward the hand node itself, which drives the phase machine without an
@@ -189,6 +203,16 @@ struct FMars_Request_FPHands_StartReach
 
     UPROPERTY()
     ECk_Interaction_CompletionPolicy CompletionPolicy = ECk_Interaction_CompletionPolicy::Instant;
+
+    // Unset: the gesture follows CompletionPolicy (utils_fphands::Get_ReachKind). Place needs a Subject that is a world item,
+    // unless PlaceAtWorld names the spot.
+    UPROPERTY()
+    TOptional<EMars_FPHands_ReachKind> Kind;
+
+    // Place only: where the held item's bounds centre is set down (world; its location is used), instead of over the
+    // subject's bounds top. The subject then only anchors the reach (it may be any entity with a transform: a dock's node).
+    UPROPERTY()
+    TOptional<FTransform> PlaceAtWorld;
 
     FMars_Request_FPHands_StartReach() {}
 
@@ -201,6 +225,13 @@ struct FMars_Request_FPHands_StartReach
     {
         Subject = TOptional<FMars_FPHands_ReachSubject>(InSubject);
         CompletionPolicy = InCompletionPolicy;
+    }
+
+    FMars_Request_FPHands_StartReach(FMars_FPHands_ReachSubject InSubject, ECk_Interaction_CompletionPolicy InCompletionPolicy, EMars_FPHands_ReachKind InKind)
+    {
+        Subject = TOptional<FMars_FPHands_ReachSubject>(InSubject);
+        CompletionPolicy = InCompletionPolicy;
+        Kind = TOptional<EMars_FPHands_ReachKind>(InKind);
     }
 }
 

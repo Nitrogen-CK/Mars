@@ -1,3 +1,18 @@
+namespace utils_player_sm
+{
+    // A target and the entity its interactable belongs to, for the interaction traces.
+    FString Describe_Target(const FCk_Handle_InteractTarget& InTarget)
+    {
+        if (ck::Is_NOT_Valid(InTarget))
+        { return "[none]"; }
+
+        if (InTarget.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+        { return f"[{InTarget.ToString()}]"; }
+
+        return f"[{InTarget.ToString()}] of [{InTarget.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.ToString()}]";
+    }
+}
+
 // View trace -> focus. The nearest overlapped interactable wins; its targets are offered to the
 // player's resolver, it is told who focuses it (which drives its prompt) and the first-person gloves lean toward it.
 class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
@@ -212,6 +227,7 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Target))
             { continue; }
 
+            ck::Trace(f"[ResolverBinds] exit cancels the player's interaction on {utils_player_sm::Describe_Target(Target)} ({InIntent.ToString()})");
             auto MutableTarget = Target;
             MutableTarget.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Player));
         }
@@ -237,6 +253,7 @@ class UMars_SmTask_InteractionResolverBinds : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(NewTarget))
             { continue; }
 
+            ck::Trace(f"[ResolverBinds] starts the player's interaction on {utils_player_sm::Describe_Target(NewTarget)} ({InIntent.ToString()})");
             auto MutableTarget = NewTarget;
             MutableTarget.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Player, _Player));
         }
@@ -628,6 +645,15 @@ class UMars_SmTask_IntentEdges : UCk_SmTask_EntityScript
         return _Intents.Get_IsIntentActive(InIntent);
     }
 
+    // The frame the row's current hold began on; unset while it is not held or no matcher has arrived.
+    protected TOptional<int32> TryGet_RowActivationFrame(FGameplayTag InIntent) const
+    {
+        if (ck::Is_NOT_Valid(_Intents))
+        { return TOptional<int32>(); }
+
+        return _Intents.TryGet_IntentActivationFrame(InIntent);
+    }
+
     private void Rebind(FCk_Handle_IntentMatcher InNewMatcher)
     {
         if (ck::IsValid(_Matcher))
@@ -664,22 +690,38 @@ class UMars_SmTask_IntentEdges : UCk_SmTask_EntityScript
     }
 }
 
-// Mirrors a CkIntent level row onto a resolver intent: a press opens it, a release closes it. A matcher swap re-syncs to
-// the new matcher's level (a key held across the compose opens; the swap to INVALID closes).
+// Mirrors a CkIntent level row onto a resolver intent: a press opens it, a release closes it. One press is one
+// interaction: the first best target the opened intent finds is the one the press was forwarded for, and the intent closes
+// for the rest of the hold once that target's interaction from this player finishes or the target stops being best, so a
+// held press never carries to the next best target (taking an item makes the platter under it best). A fresh press (a new
+// activation frame) opens it again. A matcher swap re-syncs to the new matcher's level (a key held across the compose
+// opens; the swap to INVALID closes); a spent hold does not reopen on it.
 class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
 {
     protected FGameplayTag InputIntent;
     protected FGameplayTag ResolverIntent;
 
+    private FCk_Handle _Player;
     private FCk_Handle_InteractionResolver _Resolver;
     private bool _IntentOpen = false;
+
+    // The activation frame of the hold the open intent was forwarded for; unset without a matcher.
+    private TOptional<int32> _ForwardedFrame;
+    // The hold whose interaction is spent: the intent stays closed until the row's activation frame differs.
+    private TOptional<int32> _SpentFrame;
+    // The best target the open intent was forwarded for; invalid until the resolver names one.
+    private FCk_Handle_InteractTarget _ForwardedFor;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Player = ck::Ctx(InHandle);
-        _Resolver = Player.As_InteractionResolver();
+        _Player = ck::Ctx(InHandle);
+        _Resolver = _Player.As_InteractionResolver();
         _IntentOpen = false;
+        _ForwardedFrame.Reset();
+        _SpentFrame.Reset();
+        _ForwardedFor = FCk_Handle_InteractTarget();
+        _Resolver.BindTo_OnBestTargetsChanged(FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged"));
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -690,7 +732,11 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
         Super::DoExitTask(InHandle, InNetContext);
 
         Close_Intent();
+        if (ck::IsValid(_Resolver))
+        { _Resolver.UnbindFrom_OnBestTargetsChanged(FCk_Delegate_InteractionResolver_OnBestTargetsChanged(this, n"OnBestTargetsChanged")); }
+
         _Resolver = FCk_Handle_InteractionResolver();
+        _Player = FCk_Handle();
     }
 
     protected void OnMatcherRebound() override
@@ -713,13 +759,57 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
         { Close_Intent(); }
     }
 
+    UFUNCTION()
+    private void OnBestTargetsChanged(FCk_Handle_InteractionResolver InResolver, FGameplayTag InIntent,
+                                      const TArray<FCk_Handle_InteractTarget>&in InPreviousTargets,
+                                      const TArray<FCk_Handle_InteractTarget>&in InNewTargets,
+                                      const TArray<FCk_Handle_InteractTarget>&in InRemovedTargets)
+    {
+        if (InIntent != ResolverIntent || _IntentOpen == false)
+        { return; }
+
+        if (ck::Is_NOT_Valid(_ForwardedFor))
+        {
+            if (InNewTargets.Num() == 0 || ck::Is_NOT_Valid(InNewTargets[0]))
+            { return; }
+
+            _ForwardedFor = InNewTargets[0];
+            _ForwardedFor.BindTo_OnInteractionFinished(
+                FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnForwardedInteractionFinished"));
+            return;
+        }
+
+        if (InRemovedTargets.Contains(_ForwardedFor))
+        { Spend_Hold(); }
+    }
+
+    UFUNCTION()
+    private void OnForwardedInteractionFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
+    {
+        // Another source's interaction on the same target leaves this hold alone.
+        if (ck::IsValid(InInteraction) && utils_interaction::Get_InteractionSource(InInteraction) != _Player)
+        { return; }
+
+        Spend_Hold();
+    }
+
     private void Open_Intent()
     {
-        if (_IntentOpen)
+        const auto Frame = TryGet_RowActivationFrame(InputIntent);
+        const auto IsSpent = Frame.IsSet() && _SpentFrame.IsSet() && _SpentFrame.GetValue() == Frame.GetValue();
+        if (_IntentOpen || IsSpent)
         { return; }
 
         _IntentOpen = true;
+        _ForwardedFrame = Frame;
         _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(ResolverIntent));
+    }
+
+    // The hold has had its interaction: closed until a fresh press.
+    private void Spend_Hold()
+    {
+        _SpentFrame = _ForwardedFrame;
+        Close_Intent();
     }
 
     private void Close_Intent()
@@ -728,10 +818,22 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
         { return; }
 
         _IntentOpen = false;
+        Forget_ForwardedTarget();
 
         // The exit of a player being torn down.
         if (ck::IsValid(_Resolver))
         { _Resolver.Request_StopIntent(FCk_Request_InteractionResolver_StopIntent(ResolverIntent)); }
+    }
+
+    private void Forget_ForwardedTarget()
+    {
+        if (ck::IsValid(_ForwardedFor))
+        {
+            _ForwardedFor.UnbindFrom_OnInteractionFinished(
+                FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnForwardedInteractionFinished"));
+        }
+
+        _ForwardedFor = FCk_Handle_InteractTarget();
     }
 }
 

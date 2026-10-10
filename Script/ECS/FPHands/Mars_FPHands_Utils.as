@@ -29,6 +29,30 @@ namespace utils_fphands
         return EMars_FPHands_ReachKind::Hold;
     }
 
+    // The gesture InRequest asks for: its Kind, else what its completion policy implies.
+    EMars_FPHands_ReachKind Get_RequestedKind(const FMars_Request_FPHands_StartReach& InRequest)
+    {
+        return InRequest.Kind.IsSet() ? InRequest.Kind.GetValue() : Get_ReachKind(InRequest.CompletionPolicy);
+    }
+
+    // The interact target InRequest's reach would serve; invalid for a bare or target-less reach.
+    FCk_Handle_InteractTarget Get_RequestedInteractTarget(const FMars_Request_FPHands_StartReach& InRequest)
+    {
+        if (InRequest.Subject.IsSet() == false || InRequest.Subject.GetValue().InteractTarget.IsSet() == false)
+        { return FCk_Handle_InteractTarget(); }
+
+        return InRequest.Subject.GetValue().InteractTarget.GetValue();
+    }
+
+    // The phase sequence InKind plays: Place runs Grab's Reach -> Grip -> Return.
+    EMars_FPHands_ReachKind Get_Gesture(EMars_FPHands_ReachKind InKind)
+    {
+        if (InKind == EMars_FPHands_ReachKind::Place)
+        { return EMars_FPHands_ReachKind::Grab; }
+
+        return InKind;
+    }
+
     // A glove's grip frame from what the hand does: InFingers is where the fingers point and InPalm is what the palm faces
     // (any frame, not necessarily perpendicular: the fingers are flattened onto the palm's plane). The frame the glove reads
     // (EMars_FPHands_GripFrame::Node, item sockets) has X across the palm toward the index finger and Z out of the palm,
@@ -90,6 +114,13 @@ mixin TOptional<FMars_FPHands_ReachTarget> Get_Target(const FCk_Handle_FPHands& 
 mixin TOptional<FCk_Handle_InteractTarget> Get_ReachInteractTarget(const FCk_Handle_FPHands& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FPHands).Reach.InteractTarget;
+}
+
+// The gloves refused the last reach asked for InTarget, and have taken no reach and changed no hold since.
+mixin bool Get_IsReachRefused(const FCk_Handle_FPHands& Self, const FCk_Handle_InteractTarget& InTarget)
+{
+    const auto& Reach = Self.Get_Fragment(FMars_Fragment_FPHands).Reach;
+    return ck::IsValid(InTarget) && Reach.RefusedTarget.IsSet() && Reach.RefusedTarget.GetValue() == InTarget;
 }
 
 // InTarget is the interact target of the gloves' current (or last) reach.
@@ -229,6 +260,20 @@ mixin void UnbindFrom_OnReachRequested(FCk_Handle_FPHands& Self, FMars_Delegate_
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnReachRefused(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Signals);
+    Fragment.OnReachRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnReachRefused(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_FPHands_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnReachTargetLost(FCk_Handle_FPHands& Self, FMars_Delegate_FPHands_OnReachTargetLost InDelegate)

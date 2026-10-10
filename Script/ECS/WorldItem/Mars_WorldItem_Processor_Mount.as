@@ -6,7 +6,9 @@
 // nothing else moves it.
 //
 // The attach keeps the current world pose (the relative transform to the attach point), and an Arrival lerps the offset
-// to the mount offset, so the item visibly travels to the back / hand instead of snapping.
+// to the mount offset, so the item visibly travels to the back / hand instead of snapping. Before the attach the body stops
+// colliding with pawns (constants_world_item::k_MountedBodyProfile): a kinematic item travelling through, then resting
+// against, its carrier's capsule would shove the character every step. A Release restores the body's own profile.
 class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -46,6 +48,8 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         const auto Carrier = InPending.Carrier;
         auto Node = InPending.Node;
         const auto Offset = InPending.Offset;
+        const auto Arrive = InPending.Arrive;
+        const auto RequestedAtSeconds = InPending.RequestedAtSeconds;
 
         Self.Request_TryRemove(FMars_Fragment_WorldItem_PendingMount);
 
@@ -62,6 +66,13 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         const auto NodeWorld = utils_transform::Get_EntityCurrentTransform(Node);
         const auto FromOffset = WorldNow.GetRelativeTransform(NodeWorld);
 
+        if (ck::IsValid(Body))
+        {
+            utils_jolt_body::Request_SetCollisionProfile(Body,
+                FCk_Request_JoltBody_SetCollisionProfile(constants_world_item::k_MountedBodyProfile),
+                FCk_Delegate_Request_OnCompleted(this, n"OnMountedProfileApplied"));
+        }
+
         // utils_scene_node::Add never re-parents an attached node: detach first (immediate, removes the SceneNode
         // fragments, keeps the world pose).
         auto SceneNode = InHandle.As_SceneNode(ECk_SanityCheck::UnChecked);
@@ -72,13 +83,32 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
 
         const UMars_ItemTrait_Presentation Presentation = utils_world_item::TryGet_Presentation(Self);
 
+        // The time this mount waited (the body turning Kinematic) comes off a delayed arrival's schedule.
+        auto Spec = FMars_WorldItem_ArriveSpec(0.0f, ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f, ECk_TweenEasing::OutCubic);
+        if (Arrive.IsSet())
+        { Spec = utils_world_item::Get_ArriveSpecAfter(Arrive.GetValue(), float32(System::GetGameTimeInSeconds() - RequestedAtSeconds)); }
+
         auto& Arrival = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Arrival);
         Arrival.FromOffset = FromOffset;
         Arrival.ToOffset = Offset;
-        Arrival.Duration = ck::IsValid(Presentation) ? Presentation.Mounting.ArriveSeconds : 0.0f;
+        Arrival.Duration = Spec.Seconds;
+        Arrival.DelaySeconds = Spec.DelaySeconds;
+        Arrival.Easing = Spec.Easing;
         Arrival.Elapsed = 0.0f;
 
         if (PrevMount != NewMount && Self.Has_Fragment(FMars_Fragment_WorldItem_Signals))
         { Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountChanged.Broadcast(Self, PrevMount, NewMount); }
+    }
+
+    // The body has no profile read-back: the completed request is the record (the body is the world item's own entity).
+    UFUNCTION()
+    private void OnMountedProfileApplied(FCk_Handle InRequestOwner, ECk_Request_OperationResult InResult)
+    {
+        auto Owner = InRequestOwner;
+        if (InResult != ECk_Request_OperationResult::Succeeded || ck::Is_NOT_Valid(Owner) || Owner.Has_Fragment(FMars_Fragment_WorldItem) == false)
+        { return; }
+
+        auto& State = Owner.Get_Fragment(FMars_Fragment_WorldItem);
+        State.AppliedBodyProfile = TOptional<FName>(constants_world_item::k_MountedBodyProfile);
     }
 }

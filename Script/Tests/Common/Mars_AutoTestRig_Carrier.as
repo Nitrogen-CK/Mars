@@ -1,6 +1,7 @@
 // The item-carrier tests' rig (Hotbar, Interactable, Backpack, WorldItem): a Hotbar on the test entity, one-slot holders
-// seeded from item definitions, the pickup task's stow and the take into the hotbar, the HotbarDrivesHeldItem push, and
-// the carrier's body for the tests whose carrier holds or wears what it picks up.
+// seeded from item definitions, the pickup task's stow and the take into the hotbar, the HotbarDrivesHeldItem push, the
+// carrier's body for the tests whose carrier holds or wears what it picks up, and its gloves for the tests that place
+// what it holds.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
 {
@@ -9,6 +10,10 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
     protected FCk_Handle_Transform _BackNode;
     protected FCk_Handle_Hotbar _Hotbar;
     protected FCk_Handle_HeldItem _HeldItem;
+    // Valid after Add_CarrierHands.
+    protected FCk_Handle_FPHands _Hands;
+    // Every phase the gloves entered since Add_CarrierHands, in order.
+    protected TArray<EMars_FPHands_Phase> _HandPhases;
     protected TArray<FCk_Handle_Inventory_DataOnly> _Holders;
     // The holders' items in holder order, recorded by Check_HoldersSeeded once every holder is seeded.
     protected TArray<FCk_Handle_Item> _Items;
@@ -38,6 +43,33 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, _BackNode));
         utils_attach_points::Add(_Carrier, AttachPointsSpec);
+    }
+
+    // The carrier's gloves on its Hand node and the Hands state machine, as the player composes them (a place is a reach of
+    // the gloves). After Add_CarrierBody*; the selection push then also tells the gloves what they hold, as the player does.
+    protected void Add_CarrierHands()
+    {
+        auto Spec = FMars_FPHands_Spec();
+        Spec.HandNode = _HandNode;
+        _Hands = utils_fphands::Add(_Carrier, Spec);
+        utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
+        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnCarrierHandsPhaseChanged"));
+    }
+
+    UFUNCTION()
+    protected void OnCarrierHandsPhaseChanged(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
+    {
+        _HandPhases.Add(InNew);
+    }
+
+    // The Hands state machine rests, listening for a reach.
+    UFUNCTION()
+    protected void Check_CarrierHandsRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(_Hands) && _Hands.Get_Phase() == EMars_FPHands_Phase::None
+            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
+            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound());
     }
 
     protected void Add_Hotbar(FCk_Handle InCarrier, int32 InBagSlotCount)
@@ -130,6 +162,9 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
         }
 
         _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
+
+        if (ck::IsValid(_Hands))
+        { _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(_Hotbar.Get_SelectedItem())); }
     }
 
     UFUNCTION()

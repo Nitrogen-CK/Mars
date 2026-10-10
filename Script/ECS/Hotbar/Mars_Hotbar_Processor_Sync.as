@@ -35,7 +35,7 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
             const auto IsBackpackSlot = BackpackIndex.IsSet() && BackpackIndex.GetValue() == Index;
             if (Index == OverflowIndex)
             { utils_hotbar::Apply_Selection(Self, InState, TOptional<int32>(OverflowIndex)); }
-            else if (InState.SelectedIndex.IsSet() == false && IsBackpackSlot == false)
+            else if (Get_AreHandsEmpty(InState) && IsBackpackSlot == false)
             { utils_hotbar::Apply_Selection(Self, InState, TOptional<int32>(Index)); }
         }
 
@@ -45,5 +45,14 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
         const auto Parked = InState.ParkedSelection.GetValue().Index;
         InState.ParkedSelection.Reset();
         utils_hotbar::Apply_Selection(Self, InState, Parked);
+    }
+
+    // Nothing selected, or the selected slot holds nothing (it stays selected after its item was thrown, dropped or used).
+    private bool Get_AreHandsEmpty(const FMars_Fragment_Hotbar& InState) const
+    {
+        if (InState.SelectedIndex.IsSet() == false)
+        { return true; }
+
+        return ck::Is_NOT_Valid(InState.Slots[InState.SelectedIndex.GetValue()].Get_SoleItem());
     }
 }

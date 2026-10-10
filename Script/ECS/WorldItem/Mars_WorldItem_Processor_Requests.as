@@ -30,14 +30,17 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : CarryRequests)
         {
-            HandleMountRequest(Self, InState, FMars_WorldItem_MountRequest(EMars_WorldItem_Mount::Carried, Request.Carrier,
-                FMars_WorldItem_MountOverride(Request.Point, Request.Offset)));
+            auto Mount = FMars_WorldItem_MountRequest(EMars_WorldItem_Mount::Carried, Request.Carrier,
+                FMars_WorldItem_MountOverride(Request.Point, Request.Offset));
+            Mount.Arrive = Request.Arrive;
+            HandleMountRequest(Self, InState, Mount);
         }
 
         for (const auto& Request : HoldRequests)
         {
-            HandleMountRequest(Self, InState, FMars_WorldItem_MountRequest(EMars_WorldItem_Mount::Held, Request.Carrier,
-                FMars_WorldItem_MountOverride()));
+            auto Mount = FMars_WorldItem_MountRequest(EMars_WorldItem_Mount::Held, Request.Carrier, FMars_WorldItem_MountOverride());
+            Mount.Arrive = Request.Arrive;
+            HandleMountRequest(Self, InState, Mount);
         }
 
         for (const auto& Request : ReleaseRequests)
@@ -91,6 +94,8 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
         Mount.Node = AttachPoints.Get_AttachPoint(PointTag);
         Mount.Offset = IsCarry ? (Override.Offset.IsSet() ? Override.Offset.GetValue() : Presentation.Mounting.CarryOffset)
                                : Presentation.Mounting.HeldOffset;
+        Mount.Arrive = InRequest.Arrive;
+        Mount.RequestedAtSeconds = System::GetGameTimeInSeconds();
 
         auto& Pending = InWorldItem.AddOrGet_Fragment(FMars_Fragment_WorldItem_PendingMount);
         Pending = Mount;
@@ -100,8 +105,8 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
     // Release
     //--------------------------------------------------------------------------------------------------------------------------
 
-    // Carried | Held -> World: detach (immediate, keeps the world pose), body back to Dynamic plus a PendingLaunch,
-    // transfer the item back into the holder, re-enable the pickup.
+    // Carried | Held -> World: detach (immediate, keeps the world pose), body back to Dynamic and its own collision profile
+    // plus a PendingLaunch, transfer the item back into the holder, re-enable the pickup.
     private void HandleReleaseRequest(FCk_Handle_WorldItem& InWorldItem,
                                       FMars_Fragment_WorldItem& InState,
                                       const FMars_Request_WorldItem_Release& InRequest)
@@ -130,6 +135,9 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
         {
             utils_jolt_body::Request_SetMotionType(Body,
                 FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
+            utils_jolt_body::Request_SetCollisionProfile(Body,
+                FCk_Request_JoltBody_SetCollisionProfile(InState.BodyProfile),
+                FCk_Delegate_Request_OnCompleted(this, n"OnOwnProfileRestored"));
 
             auto& Launch = InWorldItem.AddOrGet_Fragment(FMars_Fragment_WorldItem_PendingLaunch);
             Launch.LinearVelocity = InRequest.LinearVelocity;
@@ -162,6 +170,18 @@ class UMars_Processor_WorldItem_HandleRequests : UCk_Processor_Script_Base_UE
         // A failed return leaves a pickable body in the world whose holder is empty.
         ck::EnsureIfNot(InResult == ECk_Inventory_OperationResult_Transfer::Success,
             f"[WorldItem] Returning [{InItem.ToString()}] from [{InSource.ToString()}] to its holder [{InTarget.ToString()}] failed with [{InResult :n}]");
+    }
+
+    // The body has no profile read-back: the completed request is the record (the body is the world item's own entity).
+    UFUNCTION()
+    private void OnOwnProfileRestored(FCk_Handle InRequestOwner, ECk_Request_OperationResult InResult)
+    {
+        auto Owner = InRequestOwner;
+        if (InResult != ECk_Request_OperationResult::Succeeded || ck::Is_NOT_Valid(Owner) || Owner.Has_Fragment(FMars_Fragment_WorldItem) == false)
+        { return; }
+
+        auto& State = Owner.Get_Fragment(FMars_Fragment_WorldItem);
+        State.AppliedBodyProfile = TOptional<FName>(State.BodyProfile);
     }
 
     //--------------------------------------------------------------------------------------------------------------------------

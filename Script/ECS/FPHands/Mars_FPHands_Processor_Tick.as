@@ -1,6 +1,6 @@
 // Every frame: advances PhaseTime, follows moving reach/focus anchors, eases the focus lean (dropping a focus whose
-// interactable has died), rides a picked-up item in with the gloves and turns the pitch node for the view's pitch. The
-// phase itself is the Hands sub-SM's.
+// interactable has died), rides a picked-up item in with the gloves, carries a held item out with a Place and turns the
+// pitch node for the view's pitch. The phase itself is the Hands sub-SM's.
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -30,7 +30,52 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 
         Tick_FocusLean(Params.Spec.Reach.Focus, InState.Focus, DeltaSeconds);
         Tick_Carry(InHandle, Params, InState);
+        Tick_Place(InHandle, Params, InState);
         Tick_Pitch(Params.Spec.Pitch, InState, DeltaSeconds);
+    }
+
+    // A Place carries the held item with the gloves: its offset from the hand goes from the hold to the point the reach sets
+    // it down at by the reach alpha, rotation kept, and back as the gloves return without letting go. Only while it still
+    // hangs off this carrier's hand and no mount arrival is moving it; one offset request per frame, as the carry.
+    private void Tick_Place(FCk_Handle& InHandle, const FMars_Fragment_FPHands_Params& InParams, const FMars_Fragment_FPHands& InState)
+    {
+        if (InState.Reach.Target.IsSet() == false || InState.Reach.Target.GetValue().PlaceAt.IsSet() == false)
+        { return; }
+
+        auto HeldItem = InHandle.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(HeldItem))
+        { return; }
+
+        auto Presentation = HeldItem.Get_PresentationEntity();
+        if (ck::Is_NOT_Valid(Presentation))
+        { return; }
+
+        auto WorldItem = Presentation.As_WorldItem(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(WorldItem) || WorldItem.Get_Mount() != EMars_WorldItem_Mount::Held || WorldItem.Get_Carrier() != InHandle
+            || WorldItem.Has_Fragment(FMars_Fragment_WorldItem_Arrival))
+        { return; }
+
+        auto Node = WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Node))
+        { return; }
+
+        const auto& Hold = InState.Hold;
+        auto Offset = Hold.HeldOffset;
+        const auto Alpha = utils_fphands::Get_PhaseAlpha(InState.PhaseState, InParams.Spec.Reach);
+        if (Alpha > 0.0f)
+        {
+            const auto Target = InState.Reach.Target.GetValue();
+            const auto HandWorld = utils_transform::Get_EntityCurrentTransform(utils_scene_node::Get_Parent(Node));
+            const auto ItemRotation = (Hold.HeldOffset * HandWorld).GetRotation();
+            const auto PlaceWorld = Target.Get_LeadingGrip().AnchorWorld.TransformPosition(Target.PlaceAt.GetValue());
+            const auto PlacedRoot = PlaceWorld - ItemRotation.RotateVector(Hold.Bounds.Centre);
+            Offset.SetLocation(Math::Lerp(Hold.HeldOffset.GetLocation(), HandWorld.InverseTransformPosition(PlacedRoot), float(Alpha)));
+        }
+
+        if (Offset.Equals(utils_scene_node::Get_Offset(Node)))
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
     }
 
     // Turns the pitch node back by the part of the view's pitch the gloves do not follow. The view is the node's parent;
