@@ -3,7 +3,7 @@
 // a target nobody can hover, a drum that never turns, has no radius or length, no room or no escape margin, a shell with no
 // wall, too few panels or no disc gap, a hatch gap of 0 or a half turn, a hatch with no plate, a negative baffle count or a
 // flat baffle, a surface with no friction or bounce, a piece with no size, one too big for the drum, no mass, friction,
-// bounce or damping, and a coating that never grows or has no dead band.
+// bounce or damping, a coating that never grows or has no dead band, and a take-out threshold of 0 or past 1.
 class UMars_AutoTest_Tumbler_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Tumbler
 {
     UFUNCTION(BlueprintOverride)
@@ -172,6 +172,14 @@ class UMars_AutoTest_Tumbler_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Tum
         auto NoDeadBand = Make_TestSpec();
         NoDeadBand.Coating.MinStepCm = 0.0f;
         AssertRejected(NoDeadBand.Validate(), "Coating.MinStepCm");
+
+        auto NoTakeOut = Make_TestSpec();
+        NoTakeOut.Coating.TakeOutCoverage = 0.0f;
+        AssertRejected(NoTakeOut.Validate(), "Coating.TakeOutCoverage");
+
+        auto UnreachableTakeOut = Make_TestSpec();
+        UnreachableTakeOut.Coating.TakeOutCoverage = 1.5f;
+        AssertRejected(UnreachableTakeOut.Validate(), "Coating.TakeOutCoverage");
     }
 
     private void AssertRejected(const FMars_Validation& InValidation, const FString& InField)

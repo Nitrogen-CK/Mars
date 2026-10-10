@@ -6,6 +6,9 @@
 // Runs in its own band (Y -41000, Z 300) so no other test's hurtbox is in the sweep.
 class UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox : UCk_AutoTest_Base
 {
+    // The hurtbox probe joins the physics world deferred, which can outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
+
     private FCk_Handle _Self;
     private FCk_Handle_Health _Health;
     private FCk_Handle_HitZone _Zone;
@@ -33,9 +36,9 @@ class UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox : UCk_AutoTest_Ba
 
         // Probes join the physics world deferred (and Get_IsEnabledDisabled reads Enable from Add on), so the wait sweeps
         // until the hurtbox is traceable.
-        Add_Step_WaitUntil("a sweep through the hurtbox reports it", n"Check_SweepHits", 0, 3.0f);
+        Add_Step_WaitUntil("a sweep through the hurtbox reports it", n"Check_SweepHits", k_SlowPolls, 0);
         Add_Step("the hit is the Silent hurtbox and resolves to the zone; deal through it", n"Step_AssertHitAndDeal");
-        Add_Step_WaitUntil("Health reads 90", n"Check_At90", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 90", n"Check_At90", 0, 0);
         Add_Step("the swept hit was dealt", n"Step_AssertDealt");
         Run_Steps(InHandle);
     }

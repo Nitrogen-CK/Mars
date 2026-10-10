@@ -1,6 +1,6 @@
 // A Turn requested in the frame of a Cut waits for that cut: it turns the halves once the cut commits, never the source under
-// the blade. A box on a yawed board is cut through its centre and turned 90 degrees about a pivot 10 cm off it, in one
-// step. OnTurned fires once, after the cut committed, with the two halves held; each half's rotation is the source's yawed
+// the blade. A box on a yawed board, off the board's pile node, is cut through its centre and turned 90 degrees (about the
+// pile node), in one step. OnTurned fires once, after the cut committed, with the two halves held; each half's rotation is the source's yawed
 // 90 degrees, and the halves' midpoint (the parting is symmetric about the source) is the source's location yawed about the
 // pivot.
 class UMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut : UMars_AutoTestRig_FoodBoard
@@ -28,7 +28,7 @@ class UMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut : UMars_AutoTestRig_Fo
 
         Add_Step_WaitUntil("the box is Ready and placed", n"Check_ReadyAndPlaced");
         Add_Step("cut the box through its centre and turn the board in the same step", n"Step_CutAndTurn");
-        Add_Step_WaitUntil("the board turned", n"Check_Turned", 0, 3.0f);
+        Add_Step_WaitUntil("the board turned", n"Check_Turned");
         Add_Step_WaitFrames("the turned poses land", 2);
         Add_Step("the halves were turned, not the source", n"Step_AssertHalvesTurned");
         Run_Steps(InHandle);
@@ -45,11 +45,11 @@ class UMars_AutoTest_FoodBoard_TurnWaitsForTheInFlightCut : UMars_AutoTestRig_Fo
     private void Step_CutAndTurn(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _SourceWorld = Get_World(_Source);
-        _Pivot = Get_BoardWorld(_Board).TransformPosition(FVector(10.0, 0.0, 0.0));
+        _Pivot = _Board.Get_PileNodeWorld().GetLocation();
 
         const auto Normal = Get_BoardWorld(_Board).TransformVectorNoScale(FVector::ForwardVector);
         Chop(_Board, Make_WorldPlane(Get_WorldBoundsCenter(_Source), Normal));
-        _Board.Request_Turn(FMars_Request_FoodBoard_Turn(FTransform(FRotator::ZeroRotator, _Pivot), k_YawDegrees));
+        _Board.Request_Turn(FMars_Request_FoodBoard_Turn(k_YawDegrees));
     }
 
     UFUNCTION()

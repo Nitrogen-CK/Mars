@@ -5,6 +5,8 @@
 class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Hotbar_HandleRequests");
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_HeldItem_HandleRequests");
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -34,9 +36,9 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 
             const auto IsBackpackSlot = BackpackIndex.IsSet() && BackpackIndex.GetValue() == Index;
             if (Index == OverflowIndex)
-            { utils_hotbar::Apply_Selection(Self, InState, TOptional<int32>(OverflowIndex)); }
+            { Apply_Selection(Self, InState, TOptional<int32>(OverflowIndex)); }
             else if (Get_AreHandsEmpty(InState) && IsBackpackSlot == false)
-            { utils_hotbar::Apply_Selection(Self, InState, TOptional<int32>(Index)); }
+            { Apply_Selection(Self, InState, TOptional<int32>(Index)); }
         }
 
         if (InState.ParkedSelection.IsSet() == false || ck::IsValid(InState.LastSeen[OverflowIndex]))
@@ -44,7 +46,7 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
 
         const auto Parked = InState.ParkedSelection.GetValue().Index;
         InState.ParkedSelection.Reset();
-        utils_hotbar::Apply_Selection(Self, InState, Parked);
+        Apply_Selection(Self, InState, Parked);
     }
 
     // Nothing selected, or the selected slot holds nothing (it stays selected after its item was thrown, dropped or used).
@@ -54,5 +56,17 @@ class UMars_Processor_Hotbar_Sync : UCk_Processor_Script_Base_UE
         { return true; }
 
         return ck::Is_NOT_Valid(InState.Slots[InState.SelectedIndex.GetValue()].Get_SoleItem());
+    }
+
+    // This processor and UMars_Processor_Hotbar_HandleRequests are SelectedIndex's only writers; each keeps its own copy.
+    private void Apply_Selection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, TOptional<int32> InNewIndex)
+    {
+        if (InState.SelectedIndex == InNewIndex)
+        { return; }
+
+        InState.SelectedIndex = InNewIndex;
+
+        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
+        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar); }
     }
 }

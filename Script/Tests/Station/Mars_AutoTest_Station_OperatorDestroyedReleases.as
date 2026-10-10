@@ -20,11 +20,11 @@ class UMars_AutoTest_Station_OperatorDestroyedReleases : UMars_AutoTestRig_Stati
         _Station.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnReleased"));
 
         Add_Step("reserve for the operator", n"Step_Reserve");
-        Add_Step_WaitUntil("the station is reserved and its prompt reads the occupied text", n"Check_ReservedAndOccupied", 0, 2.0f);
+        Add_Step_WaitUntil("the station is reserved and its prompt reads the occupied text", n"Check_ReservedAndOccupied", 0, 0);
         Add_Step("the Use target is disabled; destroy the operator entity", n"Step_DestroyOperator");
-        Add_Step_WaitUntil("the station is released", n"Check_Released", 0, 2.0f);
+        Add_Step_WaitUntil("the station is released", n"Check_Released", 0, 0);
         Add_Step("the release was OperatorLost and the station is free", n"Step_AssertReleased");
-        Add_Step_WaitUntil("the prompt reads the prompt text again", n"Check_PromptRestored", 0, 2.0f);
+        Add_Step_WaitUntil("the prompt reads the prompt text again", n"Check_PromptRestored", 0, 0);
         Add_Step("the Use target is enabled again", n"Step_AssertEnabled");
         Run_Steps(InHandle);
     }

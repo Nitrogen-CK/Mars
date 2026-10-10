@@ -3,10 +3,13 @@
 // JoltBody setup is deferred by at least one frame (FProcessor_JoltBody_Setup batches the AddBodies pass), so a
 // velocity request issued from DoConstruct would be drained against a body that has not been added and silently do
 // nothing. A released Persistent item's body is switched Kinematic -> Dynamic by a deferred SetMotionType, and a
-// Kinematic body ignores velocity. Get_IsBodyAdded && Get_MotionType == Dynamic is the gate.
+// Kinematic body ignores velocity. Get_IsBodyAdded && Get_MotionType == Dynamic is the gate. A body whose setup failed, or
+// that is still setting up after constants_world_item::k_BodySetupBudgetPasses passes, will never take the launch: it is
+// dropped with an ensure naming the body's setup.
 class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_WorldItem_HandleRequests");
     default _MarkedDirtyBy = FMars_Fragment_WorldItem_PendingLaunch;
 
     UFUNCTION(BlueprintOverride)
@@ -25,8 +28,28 @@ class UMars_Processor_WorldItem_Launch : UCk_Processor_Script_Base_UE
             return;
         }
 
-        // Still waiting on the batched AddBodies pass, or on the switch back to Dynamic - try again next frame.
-        if (utils_jolt_body::Get_IsBodyAdded(Body) == false || utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Dynamic)
+        const auto SetupState = utils_jolt_body::Get_SetupState(Body);
+        if (SetupState == ECk_JoltBody_SetupState::Failed)
+        {
+            ck::EnsureIfNot(false, f"[WorldItem] Launch on [{InHandle.ToString()}]: its body failed setup ({utils_jolt_body::Get_SetupFailure(Body) :n}: {utils_jolt_body::Get_SetupDiagnostic(Body)}) - dropped");
+            InHandle.Request_TryRemove(FMars_Fragment_WorldItem_PendingLaunch);
+            return;
+        }
+
+        if (SetupState == ECk_JoltBody_SetupState::Pending)
+        {
+            // Still waiting on the batched AddBodies pass - try again next frame, within the budget.
+            InPending.WaitedPasses += 1;
+            if (InPending.WaitedPasses <= constants_world_item::k_BodySetupBudgetPasses)
+            { return; }
+
+            ck::EnsureIfNot(false, f"[WorldItem] Launch on [{InHandle.ToString()}]: its body is still setting up after {InPending.WaitedPasses} passes ({utils_jolt_body::Get_SetupDiagnostic(Body)}) - dropped");
+            InHandle.Request_TryRemove(FMars_Fragment_WorldItem_PendingLaunch);
+            return;
+        }
+
+        // Waiting on the switch back to Dynamic - try again next frame.
+        if (utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Dynamic)
         { return; }
 
         // Snapshot before the remove: InPending is invalid once Request_TryRemove returns.

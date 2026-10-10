@@ -1,6 +1,6 @@
 // Drains Reset -> Nudge -> Chop. Reset returns the hand to the board centre; nudges slide the hand (and the lateral node the
-// cleaver hangs from) by the summed degrees, clamped to the board; a chop starts the cleaver's strike unless one is already
-// in flight (one press = one chop). The strike lands at contact in UMars_Processor_Cutting_Setup's OnArrived handler.
+// cleaver hangs from) by the summed centimetres, clamped to the board; a chop starts the chop clock unless one is already
+// running (one press = one chop) and broadcasts OnChopStarted. UMars_Processor_Cutting_Tick runs the clock and lands it.
 class UMars_Processor_Cutting_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -31,52 +31,27 @@ class UMars_Processor_Cutting_HandleRequests : UCk_Processor_Script_Base_UE
         if (HasReset)
         { InState.HandLateral = 0.0f; }
 
-        auto Degrees = 0.0f;
+        auto LateralCm = 0.0f;
         for (const auto& Request : NudgeRequests)
-        { Degrees += Request.LateralDegrees; }
+        { LateralCm += Request.LateralCm; }
 
         if (NudgeRequests.Num() > 0)
-        {
-            InState.HandLateral = Math::Clamp(InState.HandLateral + Degrees * Spec.LateralPerDegree,
-                -Spec.BoardHalfWidth, Spec.BoardHalfWidth);
-        }
+        { InState.HandLateral = Math::Clamp(InState.HandLateral + LateralCm, -Spec.BoardHalfWidth, Spec.BoardHalfWidth); }
 
-        const auto HandMoved = InState.HandLateral != StartHand;
-        if (HandMoved)
+        if (InState.HandLateral != StartHand)
         { Apply_HandToNode(Spec.Nodes.LateralNode, InState.HandLateral); }
 
-        // Only the first chop of the drain can start a strike; the rest are presses during it.
-        if (ChopCount > 0)
-        { Try_StartChop(Self, InState, Spec.Nodes.ChopMover); }
-
-        const auto NewHand = InState.HandLateral;
-
-        if (Self.Has_Fragment(FMars_Fragment_Cutting_Signals) == false)
+        // Only the first chop of the drain can start a chop; the rest are presses during it.
+        if (ChopCount == 0 || InState.ChopPhase != EMars_Cutting_ChopPhase::Idle)
         { return; }
 
-        if (HasReset)
-        { Self.Get_Fragment(FMars_Fragment_Cutting_Signals).OnReset.Broadcast(Self); }
+        InState.ChopPhase = EMars_Cutting_ChopPhase::Striking;
+        InState.ChopSecondsLeft = Spec.ChopSeconds;
+        if (Self.Has_Fragment(FMars_Tag_Cutting_Chopping) == false)
+        { Self.Add_Fragment(FMars_Tag_Cutting_Chopping()); }
 
-        if (HandMoved && Self.Has_Fragment(FMars_Fragment_Cutting_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Cutting_Signals).OnHandMoved.Broadcast(Self, NewHand); }
-    }
-
-    // The cleaver is armed only once its Mover is known to take the strike, so a missing Mover cannot leave chopping
-    // locked.
-    private void Try_StartChop(FCk_Handle_Cutting& InCutting, FMars_Fragment_Cutting& InState, FCk_Handle_Mover InChopMover)
-    {
-        if (InState.IsChopping)
-        {
-            ck::Trace(f"[Cutting] [{InCutting.ToString()}] chop ignored: the cleaver is still moving");
-            return;
-        }
-
-        if (ck::EnsureIfNot(ck::IsValid(InChopMover), f"[Cutting] [{InCutting.ToString()}] has no chop Mover; the chop is dropped"))
-        { return; }
-
-        InState.IsChopping = true;
-        auto ChopMover = InChopMover;
-        ChopMover.Request_MoveTo(FMars_Request_Mover_MoveTo(EMars_Mover_Pose::End));
+        if (Self.Has_Fragment(FMars_Fragment_Cutting_Signals))
+        { Self.Get_Fragment(FMars_Fragment_Cutting_Signals).OnChopStarted.Broadcast(Self); }
     }
 
     // The lateral node's offset Y is the hand; X and Z stay where the entity script put them.

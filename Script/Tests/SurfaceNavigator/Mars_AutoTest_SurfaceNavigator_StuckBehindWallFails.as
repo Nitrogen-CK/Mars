@@ -15,9 +15,9 @@ class UMars_AutoTest_SurfaceNavigator_StuckBehindWallFails : UMars_AutoTestRig_S
         SpawnWall(InHandle);
         _Goal = _Origin + FVector(500.0, 0.0, 65.0);
 
-        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", 0, 5.0f);
+        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", k_SlowPolls, 0);
         Add_Step("bind OnArrived/OnFailed; request a move through the wall", n"Step_MoveTo");
-        Add_Step_WaitUntil("the navigator fails", n"Check_Failed", 0, 10.0f);
+        Add_Step_WaitUntil("the navigator fails", n"Check_Failed", k_SlowPolls, 0);
         Add_Step("the move failed as Stuck in front of the wall", n"Step_AssertStuck");
         Add_Step_WaitSeconds("the cleared steering settles", 1.0f);
         Add_Step("the body is still", n"Step_AssertStill");

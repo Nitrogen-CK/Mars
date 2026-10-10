@@ -131,10 +131,7 @@ class UMars_Vent_EntityScript : UCk_GenericEntityScript_UE
         { return true; }
 
         if (utils_particles::Get_IsBehaviorTemplateReady(k_SteamJetBehaviorId) == false)
-        {
-            ck::Trace("[Vent] steam template compiling; the jet joins at the next phase");
-            return false;
-        }
+        { return false; }
 
         const auto Root = utils_transform::Get_EntityCurrentTransform(VentRoot);
         Steam = utils_particles::Spawn_BehaviorAtLocation(k_SteamJetBehaviorId,

@@ -1,7 +1,20 @@
+// The player's tasks a carrier with gloves runs: the Use row -> resolver intent and its interaction, the held-item -> gloves
+// link and the Hands sub-SM.
+class UMars_AutoTestState_CarrierHands : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
+        AddTask(InHandle, UMars_SmTask_HeldItemDrivesHands);
+        AddTask(InHandle, UMars_SmTask_HandsSubSm);
+    }
+}
+
 // The item-carrier tests' rig (Hotbar, Interactable, Backpack, WorldItem): a Hotbar on the test entity, one-slot holders
-// seeded from item definitions, the pickup task's stow and the take into the hotbar, the HotbarDrivesHeldItem push, the
-// carrier's body for the tests whose carrier holds or wears what it picks up, and its gloves for the tests that place
-// what it holds.
+// seeded from item definitions, the pickup task's stow and the take into the hotbar, the carrier's body for the tests whose
+// carrier holds or wears what it picks up, and its gloves for the tests that place what it holds. HeldItem follows the
+// hotbar on its own (UMars_Processor_HeldItem_Sync).
 UCLASS(Abstract)
 class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
 {
@@ -14,6 +27,8 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
     protected FCk_Handle_FPHands _Hands;
     // Every phase the gloves entered since Add_CarrierHands, in order.
     protected TArray<EMars_FPHands_Phase> _HandPhases;
+    // The interact targets Check_AwaitedFocus waits to see Focused (named by Await_FocusOf in the step that focuses them).
+    protected TArray<FCk_Handle_InteractTarget> _AwaitedFocus;
     protected TArray<FCk_Handle_Inventory_DataOnly> _Holders;
     // The holders' items in holder order, recorded by Check_HoldersSeeded once every holder is seeded.
     protected TArray<FCk_Handle_Item> _Items;
@@ -45,15 +60,55 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
         utils_attach_points::Add(_Carrier, AttachPointsSpec);
     }
 
-    // The carrier's gloves on its Hand node and the Hands state machine, as the player composes them (a place is a reach of
-    // the gloves). After Add_CarrierBody*; the selection push then also tells the gloves what they hold, as the player does.
+    // The carrier's gloves on its Hand node, a Use resolver and InputIntents (no matcher: nothing presses), and the player's
+    // tasks over them (UMars_AutoTestState_CarrierHands): the Use intent task, the held-item -> gloves link and the Hands
+    // sub-SM, whose resolver binds listen as the player's do. A test starts its interactions on the targets itself; the
+    // interactions' own tasks ask the gloves for their reaches. After Add_CarrierBody*.
     protected void Add_CarrierHands()
     {
         auto Spec = FMars_FPHands_Spec();
         Spec.HandNode = _HandNode;
         _Hands = utils_fphands::Add(_Carrier, Spec);
-        utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
+        utils_interaction_resolver::Add(_Carrier, Make_CarrierResolverSpec(), ECk_Replication::DoesNotReplicate);
+        utils_input_intents::Add(_Carrier);
+        utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_CarrierHands));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnCarrierHandsPhaseChanged"));
+    }
+
+    // The Use intent over the Use channel; the carrier's targets are offered one at a time, so no distance sort.
+    private FCk_InteractionResolver_Spec Make_CarrierResolverSpec() const
+    {
+        auto Channels = TArray<FGameplayTag>();
+        Channels.Add(GameplayTags::InteractionChannel_Mars_Use);
+
+        auto Mapping = FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, Channels);
+        Mapping.Set_DistanceSorting(ECk_InteractionResolver_DistanceSorting::Disabled);
+
+        auto Mappings = TArray<FCk_InteractionResolver_IntentChannelMapping>();
+        Mappings.Add(Mapping);
+        return FCk_InteractionResolver_Spec(Mappings);
+    }
+
+    // Check_AwaitedFocus waits for every target of InInteractable (focused by the calling step) to enter Focused.
+    protected void Await_FocusOf(FCk_Handle_Interactable InInteractable)
+    {
+        for (auto Target : InInteractable.Get_AllInteractTargets())
+        { _AwaitedFocus.Add(Target); }
+    }
+
+    // Every awaited target's state machine is Focused; the awaited list empties once it holds.
+    UFUNCTION()
+    protected void Check_AwaitedFocus(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto AllFocused = _AwaitedFocus.Num() > 0;
+        for (auto Target : _AwaitedFocus)
+        { AllFocused = AllFocused && utils_state_machine::Get_CurrentStateClass(Target.As_StateMachine()) == UMars_SmState_Interactable_Focused; }
+
+        if (AllFocused)
+        { _AwaitedFocus.Empty(); }
+
+        auto Res = OutResult;
+        Res.Set(AllFocused);
     }
 
     UFUNCTION()
@@ -132,39 +187,6 @@ class UMars_AutoTestRig_Carrier : UCk_AutoTest_Base
         auto Holder = InHolder;
         Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Items[0], Target),
             FCk_Delegate_Inventory_OnOperationResult_Transfer());
-    }
-
-    // What the player HFSM's HotbarDrivesHeldItem task does: push the selection into HeldItem on every change.
-    protected void Bind_PushSelection()
-    {
-        _Hotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"PushSelection_OnSelectionChanged"));
-        _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"PushSelection_OnSlotItemChanged"));
-    }
-
-    UFUNCTION()
-    protected void PushSelection_OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
-    {
-        PushSelection();
-    }
-
-    UFUNCTION()
-    protected void PushSelection_OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        PushSelection();
-    }
-
-    protected void PushSelection()
-    {
-        if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
-        {
-            FinishFailure("the carrier's Hotbar or HeldItem did not compose");
-            return;
-        }
-
-        _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
-
-        if (ck::IsValid(_Hands))
-        { _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(_Hotbar.Get_SelectedItem())); }
     }
 
     UFUNCTION()

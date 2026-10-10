@@ -8,6 +8,8 @@ class UMars_AutoTest_SearingStation_TakeOutInTheLeaveFrameStillLoadsTheTray : UM
     private const FVector k_Origin = FVector(15200.0, -12000.0, -30000.0);
     private const FVector k_RawOffset = FVector(0.0, -300.0, 0.0);
     private const FVector k_TrayOffset = FVector(0.0, 300.0, 0.0);
+    // A poll budget, not a ceiling: the station composes and platters construct, drop and settle over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Raw;
     private FCk_Handle _Tray;
@@ -20,18 +22,18 @@ class UMars_AutoTest_SearingStation_TakeOutInTheLeaveFrameStillLoadsTheTray : UM
         _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MeatSlab());
         _Tray = Spawn_Platter(InHandle, k_TrayOffset, nullptr);
 
-        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("both platters are constructed and the slab landed on the raw one", n"Check_PlattersReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both platters are constructed and the slab landed on the raw one", n"Check_PlattersReady", k_SlowPolls, 0);
         Add_Step("dock the meat platter as raw and the empty one as the tray", n"Step_Dock");
-        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", 0, 5.0f);
+        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", 0, 3.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", k_SlowPolls, 0);
         Add_Step("one add-food press", n"Step_BeginTransfer");
-        Add_Step_WaitUntil("the kernel admitted the slab", n"Check_Admitted", 0, 5.0f);
-        Add_Step_WaitSeconds("the slab settles on the pan", 0.5f);
+        Add_Step_WaitUntil("the kernel admitted the slab", n"Check_Admitted", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the slab rests on the pan", n"Check_SlabRestsOnThePan", k_SlowPolls, 0);
         Add_Step("take the slab out and leave in the same frame", n"Step_TakeOutAndLeave");
-        Add_Step_WaitUntil("the station is Idle and the slab landed on the tray", n"Check_IdleAndOnTray", 0, 5.0f);
-        Add_Step_WaitSeconds("its arrival on the tray finishes", 0.5f);
+        Add_Step_WaitUntil("the station is Idle and the slab landed on the tray", n"Check_IdleAndOnTray", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the slab rides the tray, a Kinematic scene-node child of its root", n"Check_SlabRidesTheTray", k_SlowPolls, 0);
         Add_Step("the slab rides the tray; the pan holds nothing", n"Step_Assert");
         Run_Steps(InHandle);
     }
@@ -74,6 +76,14 @@ class UMars_AutoTest_SearingStation_TakeOutInTheLeaveFrameStillLoadsTheTray : UM
     }
 
     UFUNCTION()
+    private void Check_SlabRestsOnThePan(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto PieceIds = Get_PieceIds();
+        auto Res = OutResult;
+        Res.Set(PieceIds.Num() == 1 && _Searing.Get_PieceContact(PieceIds[0]) == EMars_Searing_Contact::OnPan);
+    }
+
+    UFUNCTION()
     private void Step_TakeOutAndLeave(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(Get_IsOperated(), "the station is still Operated when the take-out is pressed");
@@ -86,6 +96,14 @@ class UMars_AutoTest_SearingStation_TakeOutInTheLeaveFrameStillLoadsTheTray : UM
     {
         auto Res = OutResult;
         Res.Set(Get_IsIdle() && _Tray.As_Platter().Get_HeldCount() == 1);
+    }
+
+    // The tray's freeze parents the slab under its root and asks its body for Kinematic.
+    UFUNCTION()
+    private void Check_SlabRidesTheTray(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Slab.TryGet_Platter() == _Tray.As_Platter() && Get_Parent(_Slab) == _Tray.As_Transform() && Get_IsKinematic(_Slab));
     }
 
     UFUNCTION()

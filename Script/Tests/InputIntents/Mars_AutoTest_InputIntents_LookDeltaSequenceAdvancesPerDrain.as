@@ -12,12 +12,12 @@ class UMars_AutoTest_InputIntents_LookDeltaSequenceAdvancesPerDrain : UCk_AutoTe
 
         Add_Step("no delta before any request", n"Step_AssertInitial");
         Add_Step("add two deltas in one frame", n"Step_AddTwoDeltas");
-        Add_Step_WaitUntil("the first drain advances the sequence", n"Check_SequenceIsOne", 0, 5.0f);
+        Add_Step_WaitUntil("the first drain advances the sequence", n"Check_SequenceIsOne", 0, 0);
         Add_Step("a drain sums the frame's deltas", n"Step_AssertSummed");
         Add_Step_WaitSeconds("still frames", 0.2f);
         Add_Step("a still frame does not advance the sequence", n"Step_AssertStill");
         Add_Step("add one more delta", n"Step_AddOneDelta");
-        Add_Step_WaitUntil("the second drain advances the sequence", n"Check_SequenceIsTwo", 0, 5.0f);
+        Add_Step_WaitUntil("the second drain advances the sequence", n"Check_SequenceIsTwo", 0, 0);
         Add_Step("the latest drain replaces the delta", n"Step_AssertReplaced");
         Run_Steps(InHandle);
     }

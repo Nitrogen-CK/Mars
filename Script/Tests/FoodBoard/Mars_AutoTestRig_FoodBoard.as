@@ -26,9 +26,9 @@ struct FMars_AutoTest_FoodBoard_PieceCut
 }
 
 // The FoodBoard rig, on the FoodPiece rig (pieces under the world's transient entity, tracked for cleanup, their cuts
-// recorded and their halves tracked). Boards are plain Transform entities under the test entity, recorded per board: every
-// placement, refusal, chop, committed cut, release and clear. Boxes and planes are placed in a board's own frame, and the
-// tests rotate their boards, so the frame math is exercised.
+// recorded and their halves tracked). Boards are plain Transform entities under the test entity, their pile node at their
+// origin, recorded per board: every placement, refusal, chop, committed cut and release. Boxes and planes are placed in a board's own frame, and the tests
+// rotate their boards, so the frame math is exercised.
 UCLASS(Abstract)
 class UMars_AutoTestRig_FoodBoard : UMars_AutoTestRig_FoodPiece
 {
@@ -37,30 +37,28 @@ class UMars_AutoTestRig_FoodBoard : UMars_AutoTestRig_FoodPiece
     protected TArray<FMars_AutoTest_FoodBoard_Issue> _Issues;
     protected TArray<FMars_AutoTest_FoodBoard_PieceCut> _PieceCuts;
     protected TArray<FMars_AutoTest_FoodBoard_PieceEvent> _ReleasedEvents;
-    protected TArray<FCk_Handle_FoodBoard> _Cleared;
 
-    // Room for every test's pieces; four cuts a chop; a visible parting; a release ring no test fills by accident.
+    // Room for every test's pieces; four cuts a chop; a visible parting.
     protected FMars_FoodBoard_Tuners Make_Tuners() const
     {
         auto Tuners = FMars_FoodBoard_Tuners();
         Tuners.MaxHeldPieces = 8;
         Tuners.MaxCutsPerChop = 4;
         Tuners.SeparationCm = 1.0f;
-        Tuners.MaxReleasedPieces = 8;
         return Tuners;
     }
 
     protected FCk_Handle_FoodBoard Build_Board(FCk_Handle InOwner, FTransform InWorld, FMars_FoodBoard_Tuners InTuners)
     {
         auto Entity = utils_entity_lifetime::Request_CreateEntity(InOwner);
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        auto Board = utils_foodboard::Add(Entity, FMars_FoodBoard_Spec(InTuners));
+        auto Root = utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
+        auto PileNode = utils_scene_node::Create(Root, FTransform::Identity).As_Transform();
+        auto Board = utils_foodboard::Add(Entity, FMars_FoodBoard_Spec(InTuners, PileNode));
         Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
         Board.BindTo_OnPlaceRefused(FMars_Delegate_FoodBoard_OnPlaceRefused(this, n"OnBoardPlaceRefused"));
         Board.BindTo_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnBoardCutIssued"));
         Board.BindTo_OnPieceCut(FMars_Delegate_FoodBoard_OnPieceCut(this, n"OnBoardPieceCut"));
         Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
-        Board.BindTo_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
         return Board;
     }
 
@@ -169,18 +167,6 @@ class UMars_AutoTestRig_FoodBoard : UMars_AutoTestRig_FoodPiece
         return Pieces;
     }
 
-    protected int32 Get_ClearedCount(FCk_Handle_FoodBoard InBoard) const
-    {
-        auto Count = 0;
-        for (const auto& Board : _Cleared)
-        {
-            if (Board == InBoard)
-            { ++Count; }
-        }
-
-        return Count;
-    }
-
     protected bool Get_IsSameOrder(TArray<FCk_Handle_FoodPiece> InActual, TArray<FCk_Handle_FoodPiece> InExpected) const
     {
         if (InActual.Num() != InExpected.Num())
@@ -257,11 +243,5 @@ class UMars_AutoTestRig_FoodBoard : UMars_AutoTestRig_FoodPiece
         Event.Board = InBoard;
         Event.Piece = InPiece;
         _ReleasedEvents.Add(Event);
-    }
-
-    UFUNCTION()
-    private void OnBoardCleared(FCk_Handle_FoodBoard InBoard)
-    {
-        _Cleared.Add(InBoard);
     }
 }

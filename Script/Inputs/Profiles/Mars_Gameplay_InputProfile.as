@@ -430,7 +430,7 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         _ComposeAttempts += 1;
         const auto HasSwapped = _SwapState == EMars_GameplayInput_SwapState::Succeeded;
         if (_ComposeAttempts == 50 && HasSwapped == false)
-        { ck::Warning("[GameplayInput] the intent set has not composed after 5s - is every IA_* row's Mapped button minted (IMC registered with user settings)?"); }
+        { ck::EnsureIfNot(false, "[GameplayInput] the intent set has not composed after 5s - is every IA_* row's Mapped button minted (IMC registered with user settings)?"); }
 
         if (HasSwapped == false)
         { return; }

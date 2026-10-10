@@ -12,7 +12,7 @@ class UMars_AutoTest_HeldView_ItemSitsAtTheRightPalm : UCk_AutoTest_Base
     {
         _RockHolder = MakeSeededHolder(InHandle, mars_items::Rock());
 
-        Add_Step_WaitUntil("the holder is seeded with a rock", n"Check_Seeded", 0, 5.0f);
+        Add_Step_WaitUntil("the holder is seeded with a rock", n"Check_Seeded", 0, 0);
         Add_Step("the rock sits between the palms, relative to the right grip as in first person", n"Step_AssertItemInGrip");
         Run_Steps(InHandle);
     }

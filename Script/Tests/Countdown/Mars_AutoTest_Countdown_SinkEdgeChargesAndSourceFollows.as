@@ -3,6 +3,9 @@
 // to the sink, so no mechanism driver or other placeable is involved.
 class UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the countdown drains one step every SecondsPerStep.
+    private const int32 k_SlowPolls = 900;
+
     private FCk_Handle_Countdown _Countdown;
     private FCk_Handle_MechanismSink _Sink;
     private FCk_Handle_MechanismSource _Source;
@@ -27,13 +30,13 @@ class UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows : UCk_AutoTest_Ba
         _Source = utils_mechanism_source::Add(Entity, SourceSpec);
 
         Add_Step("the input channel tag exists", n"Step_AssertChannel");
-        Add_Step_WaitUntil("the link is set up (the sink's edge signal is bound)", n"Check_LinkBound", 0, 5.0f);
+        Add_Step_WaitUntil("the link is set up (the sink's edge signal is bound)", n"Check_LinkBound", 0, 0);
         Add_Step("a falling edge on the input", n"Step_FallingEdge");
         Add_Step_WaitSeconds("let the sink drain it", 0.1f);
         Add_Step("a falling edge does not charge", n"Step_AssertNotCharged");
         Add_Step("a rising edge on the input", n"Step_RisingEdge");
-        Add_Step_WaitUntil("the countdown is charged and its source asserted", n"Check_ChargedAndAsserted", 0, 5.0f);
-        Add_Step_WaitUntil("the countdown drains and its source drops", n"Check_EmptyAndDropped", 0, 5.0f);
+        Add_Step_WaitUntil("the countdown is charged and its source asserted", n"Check_ChargedAndAsserted", 0, 0);
+        Add_Step_WaitUntil("the countdown drains and its source drops", n"Check_EmptyAndDropped", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

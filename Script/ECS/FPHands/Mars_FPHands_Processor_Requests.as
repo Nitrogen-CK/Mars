@@ -6,14 +6,15 @@
 // SetPhase(Hold) lets go, and a StartPush / StartReach beside Rest's SetPhase(None) is honoured. Release is honoured
 // only while holding; StartPush only at rest; StartReach at rest and while letting go (Release, Return), the phases
 // whose states listen for it - a reach requested mid-grab, mid-hold or mid-push leaves the current target alone, so a
-// later release still eases back from the target it was holding. A push accepted in this drain wins over a reach in
-// the same drain (both would leave Rest; the reach would overwrite the target the push does not use). Every StartReach not
-// taken (superseded by a later one in the drain, beaten by a push, busy gloves, a dead subject, nothing to reach) is
-// refused: Reach.RefusedTarget remembers its interact target and OnReachRefused names it, so an interaction waiting on the
-// gloves acts without them at once. A reach that
-// interrupts a release or return starts from the alpha the gloves were at (ReachFromAlpha, recorded by SetPhase). A
-// Return with a picked-up item still riding in is not interrupted - the carry would snap back to where the item lay; a
-// timed target that arrives then is caught by Rest's re-sync once the return ends.
+// later release still eases back from the target it was holding. A StartReach for the interact target the gloves are
+// already reaching, gripping or holding is taken as asked without a restart (an interaction's own task asks for the reach
+// the resolver's binds may already have started): OnReachRequested answers it. A push accepted in this drain wins over a
+// reach in the same drain (both would leave Rest; the reach would overwrite the target the push does not use). Every
+// StartReach not taken (superseded by a later one in the drain, beaten by a push, busy gloves, a dead subject, nothing to
+// reach) is refused: OnReachRefused names its interact target and why (EMars_FPHands_ReachRefusal), so an interaction
+// waiting on the gloves acts without them at once. A reach that interrupts a release or return starts from the alpha the gloves were at (ReachFromAlpha, recorded by
+// SetPhase). A Return with a picked-up item still riding in is not interrupted - the carry would snap back to where the
+// item lay; a timed target that arrives then is caught by Rest's re-sync once the return ends.
 class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -72,15 +73,11 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
                 if (ck::IsValid(Target) && Target == LastTarget)
                 { continue; }
 
-                Log("[FPHands] StartReach ignored: a later reach in the same drain wins");
-                Refuse_Reach(InHandle, InState, StartReachRequests[Index]);
+                Refuse_Reach(InHandle, StartReachRequests[Index], EMars_FPHands_ReachRefusal::Superseded);
             }
 
             if (PushAccepted)
-            {
-                Log("[FPHands] StartReach ignored: a push started in the same drain");
-                Refuse_Reach(InHandle, InState, StartReachRequests.Last());
-            }
+            { Refuse_Reach(InHandle, StartReachRequests.Last(), EMars_FPHands_ReachRefusal::PushStarted); }
             else
             { HandleStartReach(InHandle, InState, StartReachRequests.Last()); }
         }
@@ -94,7 +91,6 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         const auto& Item = InRequest.Item;
         InState.Hold = utils_fphands::Make_Hold(Item);
         InState.Carry.Reset();
-        InState.Reach.RefusedTarget.Reset();
 
         if (utils_fphands::Get_IsGrabbing(InState.PhaseState.Phase) == false || InState.Reach.Target.IsSet() == false)
         { return; }
@@ -143,19 +139,25 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleStartReach(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartReach& InRequest)
     {
         const auto Phase = InState.PhaseState.Phase;
+        if (Get_IsOnRequestedTarget(InState, InRequest))
+        {
+            if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
+            { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Broadcast(InHandle.As_FPHands(), utils_fphands::Get_RequestedKind(InRequest)); }
+
+            return;
+        }
+
         const auto CanReach = Phase == EMars_FPHands_Phase::None || Phase == EMars_FPHands_Phase::Release
             || Phase == EMars_FPHands_Phase::Return;
         if (CanReach == false)
         {
-            Log(f"[FPHands] StartReach ignored: the gloves are busy (phase {Phase :n})");
-            Refuse_Reach(InHandle, InState, InRequest);
+            Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::Busy);
             return;
         }
 
         if (Phase == EMars_FPHands_Phase::Return && InState.Carry.IsSet())
         {
-            Log("[FPHands] StartReach ignored: a picked-up item is still riding in (phase Return)");
-            Refuse_Reach(InHandle, InState, InRequest);
+            Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::Carrying);
             return;
         }
 
@@ -164,7 +166,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         if (ck::EnsureIfNot(InRequest.PlaceAtWorld.IsSet() == false || Kind == EMars_FPHands_ReachKind::Place,
             f"[FPHands] a [{Kind :n}] reach names a place spot: only a Place reach sets something down"))
         {
-            Refuse_Reach(InHandle, InState, InRequest);
+            Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::Malformed);
             return;
         }
 
@@ -178,8 +180,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
             const auto InteractTargetDied = Subject.InteractTarget.IsSet() && ck::Is_NOT_Valid(Subject.InteractTarget.GetValue());
             if (InteractTargetDied || ck::Is_NOT_Valid(Subject.Owner))
             {
-                ck::Trace("[FPHands] StartReach ignored: the subject is gone");
-                Refuse_Reach(InHandle, InState, InRequest);
+                Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::SubjectGone);
                 return;
             }
 
@@ -193,7 +194,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         {
             if (ck::EnsureIfNot(Kind != EMars_FPHands_ReachKind::Place, "[FPHands] a Place reach needs a subject to set down on"))
             {
-                Refuse_Reach(InHandle, InState, InRequest);
+                Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::Malformed);
                 return;
             }
 
@@ -202,12 +203,10 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Target.IsSet() == false)
         {
-            ck::Trace("[FPHands] StartReach ignored: the gloves cannot reach the target");
-            Refuse_Reach(InHandle, InState, InRequest);
+            Refuse_Reach(InHandle, InRequest, EMars_FPHands_ReachRefusal::OutOfReach);
             return;
         }
 
-        InState.Reach.RefusedTarget.Reset();
         InState.Reach.Target = Target;
         InState.Reach.InteractTarget = InteractTarget;
         InState.Reach.CompletionPolicy = InRequest.CompletionPolicy;
@@ -225,14 +224,21 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested.Broadcast(InHandle.As_FPHands(), Kind); }
     }
 
-    // Remembers the refused request's interact target and says so (a reach for no interaction clears the memory).
-    private void Refuse_Reach(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartReach& InRequest)
+    // The gloves are reaching, gripping or holding the interact target InRequest asks for.
+    private bool Get_IsOnRequestedTarget(const FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartReach& InRequest) const
     {
         const auto Target = utils_fphands::Get_RequestedInteractTarget(InRequest);
-        InState.Reach.RefusedTarget = ck::IsValid(Target) ? TOptional<FCk_Handle_InteractTarget>(Target) : TOptional<FCk_Handle_InteractTarget>();
+        const auto Phase = InState.PhaseState.Phase;
+        const auto IsOnAReach = Phase == EMars_FPHands_Phase::Reach || Phase == EMars_FPHands_Phase::Grip || Phase == EMars_FPHands_Phase::Hold;
+        return IsOnAReach && ck::IsValid(Target) && InState.Reach.InteractTarget.IsSet() && InState.Reach.InteractTarget.GetValue() == Target;
+    }
 
+    // Says the gloves will not take InRequest, and why (OnReachRefused names its interact target).
+    private void Refuse_Reach(FCk_Handle& InHandle, const FMars_Request_FPHands_StartReach& InRequest, EMars_FPHands_ReachRefusal InReason)
+    {
+        const auto Target = utils_fphands::Get_RequestedInteractTarget(InRequest);
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
-        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRefused.Broadcast(InHandle.As_FPHands(), Target, utils_fphands::Get_RequestedKind(InRequest)); }
+        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRefused.Broadcast(InHandle.As_FPHands(), Target, utils_fphands::Get_RequestedKind(InRequest), InReason); }
     }
 
     // The right glove toward the hand node itself.
@@ -251,10 +257,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
     private bool HandleStartPush(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_StartPush& InRequest)
     {
         if (InState.PhaseState.Phase != EMars_FPHands_Phase::None)
-        {
-            Log(f"[FPHands] StartPush ignored: the gloves are busy (phase {InState.PhaseState.Phase :n})");
-            return false;
-        }
+        { return false; }
 
         InState.Push.Hold = InRequest.Hold;
         InState.Push.Kind = InRequest.Kind;
@@ -269,16 +272,14 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
     private void HandleRelease(FCk_Handle& InHandle, const FMars_Fragment_FPHands& InState)
     {
         if (InState.PhaseState.Phase != EMars_FPHands_Phase::Hold)
-        {
-            Log(f"[FPHands] Release ignored: the gloves are not holding (phase {InState.PhaseState.Phase :n})");
-            return;
-        }
+        { return; }
 
         Broadcast_ReachTargetLost(InHandle);
     }
 
     // Release records the alpha it eases back from; Reach and Hold record the alpha they ease out from (0 from rest, the
-    // current release or return alpha when they interrupt one).
+    // current release or return alpha when they interrupt one). None (rest, or the sub-SM left) forgets the reach: no
+    // target is left to ease toward or to answer as the one the gloves are on.
     private void HandleSetPhase(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState, EMars_FPHands_Phase InNewPhase)
     {
         const auto Previous = InState.PhaseState.Phase;
@@ -293,6 +294,8 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InNewPhase == EMars_FPHands_Phase::None)
         {
+            InState.Reach.Target.Reset();
+            InState.Reach.InteractTarget.Reset();
             InState.Carry.Reset();
             InState.PoseOverride_R.Reset();
             InState.PoseOverride_L.Reset();
@@ -313,10 +316,10 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPhaseChanged.Broadcast(InHandle.As_FPHands(), Previous, InNewPhase); }
 
         // The interact target died before the Hold state bound its release (between the reach's drain and this one):
-        // nothing would ever remove it now, so the gloves let go.
+        // nothing would ever remove it now, so the gloves let go. Forgotten, so the Tick does not announce it again.
         if (InNewPhase == EMars_FPHands_Phase::Hold && Get_IsInteractTargetGone(InState.Reach))
         {
-            Log("[FPHands] Hold entered for an interact target that is gone; letting go");
+            InState.Reach.InteractTarget.Reset();
             Broadcast_ReachTargetLost(InHandle);
         }
     }

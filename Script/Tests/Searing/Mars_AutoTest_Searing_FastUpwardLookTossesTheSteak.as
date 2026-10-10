@@ -28,9 +28,9 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
         Add_Steps_AddPieceAndLand();
         Add_Step_WaitSeconds("the piece settles", 0.3f);
         Add_Step("flick the look up", n"Step_Flick");
-        Add_Step_WaitUntil("the pan lifted", n"Check_PanLifted", 0, 0.3f);
-        Add_Step_WaitUntil("the piece left the pan", n"Check_TossedAirborne", 0, 0.6f);
-        Add_Step_WaitUntil("the piece landed or was lost", n"Check_LandedOrLost", 0, 3.0f);
+        Add_Step_WaitUntil("the pan lifted", n"Check_PanLifted", 0, 0);
+        Add_Step_WaitUntil("the piece left the pan", n"Check_TossedAirborne", 0, 0);
+        Add_Step_WaitUntil("the piece landed or was lost", n"Check_LandedOrLost", k_SlowPolls, 0);
         Add_Step("record how the toss ended", n"Step_RecordOutcome");
         // A landed face counts as a flip only once it stayed down for utils_searing::k_FaceSettleSeconds.
         Add_Step_WaitSeconds("the resting face settles", 0.3f);

@@ -13,25 +13,25 @@ class UMars_AutoTest_Tumbler_TheHatchTogglesOnlyAtHomeAndSettled : UMars_AutoTes
     {
         BuildStation(InHandle, Make_TestSpec());
 
-        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
+        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 0);
         Add_Step("look at the hatch", n"Step_LookToHatch");
-        Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 2.0f);
+        Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 0);
         Add_Step("press on the hatch", n"Step_Press");
-        Add_Step_WaitUntil("the hatch is opening", n"Check_HatchOpening", 0, 1.0f);
+        Add_Step_WaitUntil("the hatch is opening", n"Check_HatchOpening", 0, 0);
         Add_Step("press again while it swings", n"Step_PressAgain");
-        Add_Step_WaitUntil("the second press is answered", n"Check_Refused", 0, 1.0f);
+        Add_Step_WaitUntil("the second press is answered", n"Check_Refused", 0, 0);
         Add_Step("the second press was refused as HatchMoving", n"Step_AssertMoving");
-        Add_Step_WaitUntil("the hatch is open", n"Check_HatchOpen", 0, 2.0f);
+        Add_Step_WaitUntil("the hatch is open", n"Check_HatchOpen", 0, 0);
         Add_Step_WaitSeconds("nothing queued may toggle it back", 0.5f);
         Add_Step("the hatch rests Open after one opening", n"Step_AssertStillOpen");
         Add_Steps_CloseHatch();
         Add_Steps_Grip();
         Add_Step_Rock("rock down for 20 frames", k_RockDegrees, 20);
         Add_Step("let go", n"Step_Release");
-        Add_Step_WaitUntil("a press lands on the hatch while the drum returns", n"Check_PressedWhileReturning", 0, 2.0f);
-        Add_Step_WaitUntil("the press is answered", n"Check_Refused", 0, 1.0f);
+        Add_Step_WaitUntil("a press lands on the hatch while the drum returns", n"Check_PressedWhileReturning", 0, 0);
+        Add_Step_WaitUntil("the press is answered", n"Check_Refused", 0, 0);
         Add_Step("the press was refused as NotHome and the hatch stayed shut", n"Step_AssertNotHome");
-        Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 2.0f);
+        Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 0);
         Add_Steps_OpenHatch();
         Add_Step("the hatch opened at home", n"Step_AssertOpenedAtHome");
         Run_Steps(InHandle);

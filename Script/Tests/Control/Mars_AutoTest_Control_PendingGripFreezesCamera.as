@@ -1,8 +1,8 @@
 // The player's ManipulateControl task holds the camera still from the moment a lever's interaction starts, not only once
-// the gloves grip it: a look drag during the reach must not turn the view off the lever. A pending interaction cancelled
-// before any grip hands the orientation control back. The camera is a headless director on a CkTests camera helper
-// actor, with a PlayerViewpoint on the test entity pointing at it. The gloves' timed reach is slowed to 2 s so the
-// cancel always lands before the grip (and before the task's 1 s grip-wait fallback).
+// the gloves grip it: a look drag during the reach must not turn the view off the lever. Use released before any grip
+// cancels the pending interaction (the player's Use task cancels a pull it started) and hands the orientation control
+// back. The camera is a headless director on a CkTests camera helper actor, with a PlayerViewpoint on the test entity
+// pointing at it. The gloves' timed reach is slowed to 2 s so the release always lands before the grip.
 class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverThroughPlayer
 {
     private ACkAutoTest_GameplayCamera_Helper _CameraHelper;
@@ -28,13 +28,14 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
         HandsSpec.Reach.Hold.ReachSeconds = 2.0f;
         BuildPlayerAndLever(InHandle, HandsSpec);
 
-        Add_Step_WaitUntil("the camera helper's entity is constructed", n"Check_CameraOwnerReady", 0, 5.0f);
+        Add_Step_WaitUntil("the camera helper's entity is constructed", n"Check_CameraOwnerReady", 0, 0);
         Add_Step("compose the camera, the viewpoint and the rig SM", n"Step_ComposeRig");
-        Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 5.0f);
-        Add_Step("the view is free before any interaction; add the lever and open Use", n"Step_AssertViewFreeAndUseLever");
-        Add_Step_WaitUntil("the lever's interaction started", n"Check_InteractionStarted", 0, 5.0f);
-        Add_Step("the view is held while the gloves are still reaching; cancel before the grip", n"Step_AssertFrozenThenCancel");
-        Add_Step_WaitUntil("the view is free again", n"Check_ViewFree", 0, 2.0f);
+        Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 0);
+        Add_Steps_UseRowLive();
+        Add_Step("the view is free before any interaction; offer the lever and press Use", n"Step_AssertViewFreeAndUseLever");
+        Add_Step_WaitUntil("the lever's interaction started", n"Check_InteractionStarted", 0, 0);
+        Add_Step("the view is held while the gloves are still reaching; release Use before the grip", n"Step_AssertFrozenThenRelease");
+        Add_Step_WaitUntil("the view is free again", n"Check_ViewFree", 0, 0);
         Add_Step("the lever was never manipulated", n"Step_AssertNeverManipulated");
         Run_Steps(InHandle);
     }
@@ -54,7 +55,7 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
         Res.Set(ck::IsValid(_CameraOwner));
     }
 
-    // The viewpoint must exist before the SM starts: ManipulateControl reads the camera on enter.
+    // The viewpoint must exist before the SM starts: ManipulateControl reads it on enter.
     UFUNCTION()
     private void Step_ComposeRig(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -91,7 +92,7 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
 
     // One step after the interaction appeared: its OnNewInteraction has been broadcast whatever the processor order.
     UFUNCTION()
-    private void Step_AssertFrozenThenCancel(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertFrozenThenRelease(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Record_Manipulation();
 
@@ -100,7 +101,7 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
         Assert_False(_Control.Get_IsManipulating(), "the manipulation has not begun");
         Assert_False(Get_HasOrientationControl(), "the view is held from the interaction's start, before the grip");
 
-        _Target.Request_CancelInteraction(FCk_Request_InteractTarget_CancelInteraction(_Player));
+        _UseKey.Release();
     }
 
     UFUNCTION()
@@ -117,7 +118,7 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
     {
         Record_Manipulation();
 
-        Assert_False(_SawManipulation, "the cancelled pending interaction never began a manipulation");
+        Assert_False(_SawManipulation, "the pending interaction the release cancelled never began a manipulation");
         Assert_False(ck::IsValid(utils_interact_target::TryGet_Interaction(_Target, _Player)), "the interaction is gone");
     }
 
@@ -127,7 +128,7 @@ class UMars_AutoTest_Control_PendingGripFreezesCamera : UMars_AutoTestRig_LeverT
         { _SawManipulation = true; }
     }
 
-    // Read from the camera's live state (Request_Set_HasOrientationControl writes it immediately).
+    // Read from the camera's live state (the viewpoint's hold drain writes it).
     private bool Get_HasOrientationControl() const
     {
         return _Camera.Get_Profile().Get_HasOrientationControl();

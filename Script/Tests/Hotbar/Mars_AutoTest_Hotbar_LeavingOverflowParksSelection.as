@@ -26,7 +26,7 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UMars_AutoTestRig_Ca
         Add_Step_WaitUntil("the eject request fired for pending index 0", n"Check_EjectRequested");
         Add_Step("the selection is still parked on the overflow slot", n"Step_AssertStillOnOverflow");
         Add_Step("select bag slot 0 again while parked", n"Step_SelectZero");
-        Add_Step_WaitFrames("settle the re-press", 3);
+        Add_Step_WaitUntil("the re-press has drained", n"Check_RePressDrained", 0, 0);
         Add_Step("a re-press only re-parks", n"Step_AssertSingleEject");
         Add_Step("remove the overflow item", n"Step_RemoveOverflowItem");
         Add_Step_WaitUntil("the parked selection applies", n"Check_SelectedZero");
@@ -53,6 +53,14 @@ class UMars_AutoTest_Hotbar_LeavingOverflowParksSelection : UMars_AutoTestRig_Ca
         auto Res = OutResult;
         const auto Parked = _Hotbar.TryGet_ParkedSelection();
         Res.Set(_EjectCount == 1 && Parked.IsSet() && Parked.GetValue().Index == TOptional<int32>(0));
+    }
+
+    // The hotbar's requests are gone once its drain applied the re-press: a second eject would have fired in it.
+    UFUNCTION()
+    private void Check_RePressDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hotbar.Has_Fragment(FMars_Fragment_Hotbar_Requests) == false);
     }
 
     UFUNCTION()

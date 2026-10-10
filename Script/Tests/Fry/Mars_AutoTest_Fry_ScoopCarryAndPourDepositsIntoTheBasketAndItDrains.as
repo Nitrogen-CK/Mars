@@ -10,7 +10,6 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
     private const float32 k_DrainSeconds = 0.5f;
     // cm/s^2: the world's gravity the float height is predicted from.
     private const float32 k_Gravity = 980.0f;
-    private const float32 k_CalmTimeoutSeconds = 8.0f;
     private const float32 k_CalmSpeed = 4.0f;
     private const float32 k_LipClearanceCm = 1.0f;
     // A carried piece is moved the way a hand moves it: the target eases (smoothstep) leg by leg, not in one jump the slide
@@ -19,6 +18,8 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
     private const FVector2D k_CorridorEntry = FVector2D(15.0, 20.0);
     private const float32 k_EntrySeconds = 1.5f;
     private const float32 k_CarrySeconds = 3.5f;
+    // Past a leg's seconds the slide spring still has to bring the scoop onto the target.
+    private const float32 k_CarrySlackSeconds = 2.0f;
     private const float32 k_CarrySettleSeconds = 0.3f;
     private const float32 k_CarryTolerance = 1.0f;
 
@@ -42,25 +43,25 @@ class UMars_AutoTest_Fry_ScoopCarryAndPourDepositsIntoTheBasketAndItDrains : UMa
         BuildStation(InHandle, Spec);
         Build_Pieces(1);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("drive the skimmer", n"Step_Drive");
         Add_Step("dip it at its park", n"Step_Dip");
-        Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", k_SlowPolls, 0);
         Add_Step("release a piece over the dipped bowl", n"Step_ReleaseOverScoop");
-        Add_Step_WaitUntil("the piece floats calmly over the dipped lip", n"Check_FloatCalm", 0, k_CalmTimeoutSeconds);
+        Add_Step_WaitUntil("the piece floats calmly over the dipped lip", n"Check_FloatCalm", k_SlowPolls, 0);
         Add_Step("lift: carry", n"Step_Lift");
-        Add_Step_WaitUntil("the scoop carried the piece out of the oil", n"Check_Retrieved", 0, 4.0f);
+        Add_Step_WaitUntil("the scoop carried the piece out of the oil", n"Check_Retrieved", k_SlowPolls, 0);
         Add_Step("Oil -> Skimmer, one retrieval; ease the scoop to the corridor's entry", n"Step_AssertRetrievedThenCarry");
-        Add_Step_WaitUntil("the scoop is at the corridor's entry", n"Check_CarryDone", 0, k_EntrySeconds + 2.0f);
+        Add_Step_WaitUntil("the scoop is at the corridor's entry", n"Check_CarryDone", 0, k_EntrySeconds + k_CarrySlackSeconds);
         Add_Step("ease the scoop along the corridor over the basket", n"Step_CarryOverBasket");
-        Add_Step_WaitUntil("the scoop is over the basket", n"Check_CarryDone", 0, k_CarrySeconds + 2.0f);
+        Add_Step_WaitUntil("the scoop is over the basket", n"Check_CarryDone", 0, k_CarrySeconds + k_CarrySlackSeconds);
         Add_Step_WaitSeconds("the carried piece settles", k_CarrySettleSeconds);
         Add_Step("still on the skimmer over the basket; ask for a dip", n"Step_AskDipOverBasket");
-        Add_Step_WaitUntil("the skim answered", n"Check_SkimNotCarry", 0, 0.5f);
+        Add_Step_WaitUntil("the skim answered", n"Check_SkimNotCarry", 0, 0);
         Add_Step("the dip became a pour", n"Step_AssertPour");
-        Add_Step_WaitUntil("the poured piece is in the basket", n"Check_InBasket", 0, 3.0f);
-        Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", 0, 3.0f);
+        Add_Step_WaitUntil("the poured piece is in the basket", n"Check_InBasket", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", k_SlowPolls, 0);
         Add_Step("Skimmer -> DrainBasket, drained once, nothing lost", n"Step_AssertDrained");
         Run_Steps(InHandle);
     }

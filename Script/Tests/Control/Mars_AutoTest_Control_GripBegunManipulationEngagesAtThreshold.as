@@ -1,8 +1,9 @@
 // A lever manipulation begun by the player's ManipulateControl task at the grip engages at the threshold: pulling past
 // EngageAlpha ends the CkInteraction Succeeded and the Interactable's Engage chain toggles the Control on. Regression
 // for the task forwarding an invalid interaction to the Control (the pending slot was cleared before it was passed on):
-// the handle still followed the pull, but the threshold found no interaction to end, so nothing engaged. The lever's
-// Interactable is focused so its HFSM can reach Interacting and run the Engage.
+// the handle still followed the pull, but the threshold found no interaction to end, so nothing engaged. Use is the
+// player's (the player's Use task, the lever offered to the resolver); the lever's Interactable is focused as the player's
+// view would focus it.
 class UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold : UMars_AutoTestRig_LeverThroughPlayer
 {
     UFUNCTION(BlueprintOverride)
@@ -11,19 +12,20 @@ class UMars_AutoTest_Control_GripBegunManipulationEngagesAtThreshold : UMars_Aut
         BuildPlayerAndLever(InHandle, FMars_FPHands_Spec());
         utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_ManipulateControlRig));
 
-        Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 0);
         Add_Step("focus the lever", n"Step_FocusLever");
-        Add_Step_WaitUntil("the lever's interact target is Focused", n"Check_TargetFocused", 0, 5.0f);
-        Add_Step("add the lever to the resolver and open Use", n"Step_UseLever");
-        Add_Step_WaitUntil("the gloves grip and the lever is manipulated", n"Check_IsManipulating", 0, 5.0f);
-        Add_Step_WaitUntil("pull until the manipulation ends", n"Check_PullUntilEnded", 0, 5.0f);
-        Add_Step_WaitUntil("the lever engages", n"Check_Engaged", 0, 5.0f);
+        Add_Step_WaitUntil("the lever's interact target is Focused", n"Check_TargetFocused", 0, 0);
+        Add_Steps_UseRowLive();
+        Add_Step("offer the lever to the resolver and press Use", n"Step_UseLever");
+        Add_Step_WaitUntil("the gloves grip and the lever is manipulated", n"Check_IsManipulating", k_SlowPolls, 0);
+        Add_Step_WaitUntil("pull until the manipulation ends", n"Check_PullUntilEnded", 0, 0);
+        Add_Step_WaitUntil("the lever engages", n"Check_Engaged", 0, 0);
         Add_Step_WaitSeconds("let a second engage or finish land", 0.2f);
         Add_Step("the threshold ended the interaction Succeeded and toggled the lever on once", n"Step_AssertEngaged");
         Run_Steps(InHandle);
     }
 
-    // Stands in for the player's InteractionFocus task: without focus the Interactable's HFSM never reaches Interacting.
+    // Stands in for the player's InteractionFocus task.
     UFUNCTION()
     private void Step_FocusLever(FCk_Handle InHandle, FInstancedStruct InPayload)
     {

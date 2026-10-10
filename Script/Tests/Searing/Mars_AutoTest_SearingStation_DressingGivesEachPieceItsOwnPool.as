@@ -26,6 +26,8 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UMars_Aut
     private const FVector k_OffPanLocal = FVector(0.0, -55.0, 15.0);
     // Art cm a settling piece may slide from its teleport point before the pools are read.
     private const float64 k_SettleTolerance = 2.0;
+    // A poll budget, not a ceiling: the pan's mesh bakes, the boxes import and teleported pieces land over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_EntityScript _Station;
     private FCk_Handle_Searing _Searing;
@@ -57,22 +59,22 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UMars_Aut
             _Pieces.Add(Build_Piece(Get_BoxMesh(), FTransform(FRotator::ZeroRotator, Park), Make_Spec(k_PieceMassKg)));
         }
 
-        Add_Step_WaitUntil("the station composed its Searing and its feed, the pan body exists and the boxes are ready", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Searing and its feed, the pan body exists and the boxes are ready", n"Check_StationReady", k_SlowPolls, 0);
         Add_Step("dress both boxes with their own displays", n"Step_DressPieces");
-        Add_Step_WaitFrames("the station's state machine settles in Idle (its reset empties the pan)", 3);
+        Add_Step_WaitUntil("the station's state machine is Idle and the kernel has no request pending", n"Check_IdleAndDrained", 0, 0);
         Add_Step("heat the pan and admit the first piece at the release node", n"Step_HeatAndAddFirst");
-        Add_Step_WaitUntil("the first piece's body is in the simulation", n"Check_FirstBodyAdded", 0, 2.0f);
+        Add_Step_WaitUntil("the first piece's body is in the simulation", n"Check_FirstBodyAdded", k_SlowPolls, 0);
         Add_Step("teleport the first piece to its point and admit the second", n"Step_PlaceFirstAndAddSecond");
-        Add_Step_WaitUntil("the second piece's body is in the simulation", n"Check_SecondBodyAdded", 0, 2.0f);
+        Add_Step_WaitUntil("the second piece's body is in the simulation", n"Check_SecondBodyAdded", k_SlowPolls, 0);
         Add_Step("teleport the second piece to its point", n"Step_PlaceSecond");
         Add_Step("find the tagged pan part", n"Step_FindPan");
-        Add_Step_WaitUntil("both pieces lie on the pan and the pan's material shows two pools apart", n"Check_TwoPools", 0, 3.0f);
+        Add_Step_WaitUntil("both pieces lie on the pan and the pan's material shows two pools apart", n"Check_TwoPools", k_SlowPolls, 0);
         Add_Step("each pool sits at its own piece", n"Step_AssertTwoPools");
         Add_Step("teleport the second piece off the pan", n"Step_LiftSecond");
-        Add_Step_WaitUntil("the second piece's pool is gone", n"Check_SecondPoolGone", 0, 2.0f);
+        Add_Step_WaitUntil("the second piece's pool is gone", n"Check_SecondPoolGone", 0, 0);
         Add_Step("the first piece's pool stayed", n"Step_AssertFirstPoolStayed");
         Add_Step("destroy the station", n"Step_DestroyStation");
-        Add_Step_WaitUntil("the station is gone", n"Check_StationGone", 0, 2.0f);
+        Add_Step_WaitUntil("the station is gone", n"Check_StationGone", 0, 0);
         Add_Step_WaitFrames("its components tear down", 2);
         Run_Steps(InHandle);
     }
@@ -100,6 +102,16 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UMars_Aut
     {
         for (const auto& Piece : _Pieces)
         { mars::Food_MeatSlab_Mars.Add_Display(Piece); }
+    }
+
+    // Idle's enter task resets the kernel: an admission sharing that drain is rejected, and a reset landing after the
+    // test's heat chills the pan.
+    UFUNCTION()
+    private void Check_IdleAndDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto StateClass = utils_state_machine::Get_CurrentStateClass(_Station.As_Station().Get_MinigameSm());
+        auto Res = OutResult;
+        Res.Set(StateClass == UMars_SmState_Searing_Idle && _Searing.Has_Fragment(FMars_Fragment_Searing_Requests) == false);
     }
 
     UFUNCTION()
@@ -246,18 +258,19 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UMars_Aut
         Assert_Equals_Int(Parts, 0, f"the station hung no part off [{InPiece.ToString()}]");
     }
 
-    // The bridge's job done by hand: a release of the box for slot InPieceId.StockIndex, its middle at the feed's release
-    // node (over the pan's centre, above the rim); the feed itself is not asked.
+    // The bridge's job done by hand: a release of the box for transfer InPieceId.TransferIndex, its middle at the feed's
+    // release node (over the pan's centre, above the rim); the feed itself is not asked.
     private void Release(const FMars_CookingFeed_PieceId& InPieceId)
     {
-        const auto Piece = _Pieces[InPieceId.StockIndex];
+        const auto Piece = _Pieces[InPieceId.TransferIndex];
         const auto NodeWorld = utils_transform::Get_EntityCurrentTransform(_Feed.Get_ReleaseNode());
         const auto Rotation = NodeWorld.GetRotation();
         const auto ReleaseWorld = FTransform(Rotation, NodeWorld.GetLocation() - Rotation.RotateVector(Get_BoundsCenter(Piece)));
 
-        auto PieceRelease = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector, 0);
+        auto PieceRelease = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector);
         PieceRelease.Piece = Piece;
-        _Searing.Request_AddPiece(FMars_Request_Searing_AddPiece(PieceRelease));
+        FCk_Handle Station = _Searing;
+        utils_cooking_feed::Request_Admit(Station, PieceRelease);
     }
 
     // The piece's middle to InLocal in the pan body's frame, the pan's rotation kept.

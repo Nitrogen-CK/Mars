@@ -7,6 +7,9 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UMars_AutoTestRig_Brain
 {
     default _TimeoutSeconds = 20.0f;
 
+    // The disabled hold is timed by its predicate, so its wait gets the slow poll budget.
+    private const int32 k_SlowPolls = 900;
+
     private TArray<FString> _LeafChanges;
     private bool _SawRoamToFlinch = false;
     private float64 _DisabledHurtAt = 0.0;
@@ -18,20 +21,20 @@ class UMars_AutoTest_Brain_FactsDriveLeaf : UMars_AutoTestRig_Brain
         _Brain.BindTo_OnLeafChanged(FMars_Delegate_Brain_OnLeafChanged(this, n"OnLeafChanged"));
 
         Add_Step("the spec rules hold and the brain composed", n"Step_AssertValidation");
-        Add_Step_WaitUntil("the leaf settles on Roam", n"Check_LeafRoam", 0, 3.0f);
+        Add_Step_WaitUntil("the leaf settles on Roam", n"Check_LeafRoam", 0, 0);
         Add_Step("IsHurt true", n"Step_Hurt");
-        Add_Step_WaitUntil("the leaf moves to Flinch", n"Check_LeafFlinch", 0, 3.0f);
+        Add_Step_WaitUntil("the leaf moves to Flinch", n"Check_LeafFlinch", 0, 0);
         Add_Step("OnLeafChanged carried Roam -> Flinch", n"Step_AssertRoamToFlinch");
         Add_Step("IsHurt false", n"Step_Heal");
-        Add_Step_WaitUntil("the leaf returns to Roam", n"Check_LeafRoam", 0, 3.0f);
+        Add_Step_WaitUntil("the leaf returns to Roam", n"Check_LeafRoam", 0, 0);
         Add_Step("CanWalk false", n"Step_Cripple");
-        Add_Step_WaitUntil("the leaf moves to Cower", n"Check_LeafCower", 0, 3.0f);
+        Add_Step_WaitUntil("the leaf moves to Cower", n"Check_LeafCower", 0, 0);
         Add_Step("CanWalk true", n"Step_Uncripple");
-        Add_Step_WaitUntil("the leaf returns to Roam and CanWalk reads true", n"Check_LeafRoamAndCanWalk", 0, 3.0f);
+        Add_Step_WaitUntil("the leaf returns to Roam and CanWalk reads true", n"Check_LeafRoamAndCanWalk", 0, 0);
         Add_Step("disable the brain", n"Step_Disable");
-        Add_Step_WaitUntil("the planner reads disabled", n"Check_PlannerDisabled", 0, 2.0f);
+        Add_Step_WaitUntil("the planner reads disabled", n"Check_PlannerDisabled", 0, 0);
         Add_Step("IsHurt true while disabled", n"Step_HurtWhileDisabled");
-        Add_Step_WaitUntil("the leaf stays on Roam for 0.5 s", n"Check_LeafHoldsWhileDisabled", 0, 3.0f);
+        Add_Step_WaitUntil("the leaf stays on Roam for 0.5 s", n"Check_LeafHoldsWhileDisabled", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

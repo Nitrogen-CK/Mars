@@ -8,6 +8,8 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
     default _TimeoutSeconds = 30.0f;
 
     private const FVector k_Origin = FVector(31600.0, -21000.0, -30000.0);
+    // Item constructions, mount arrivals and the gloves' reaches outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_PlatterDock _Dock;
     private FCk_Handle_InteractTarget _TakeTarget;
@@ -19,23 +21,22 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
         Add_CarrierHands();
-        Bind_PushSelection();
 
         auto Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), false),
             FTransform(FRotator::ZeroRotator, FVector(60.0, 20.0, 50.0)), "input platter"));
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0))));
 
-        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
+        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
         Add_Step("the platter hints two hands; the empty dock hints nothing; dock the platter", n"Step_AssertHintsAndDock");
-        Add_Step_WaitUntil("the platter has landed on the dock", n"Check_Arrived", 0, 10.0f);
+        Add_Step_WaitUntil("the platter has landed on the dock", n"Check_Arrived", k_SlowPolls, 0);
         Add_Step("the dock hints its platter; the carrier's gloves reach for the Take", n"Step_AssertDockHintAndReach");
-        Add_Step_WaitUntil("the gloves took the Take reach", n"Check_ReachTaken", 0, 2.0f);
+        Add_Step_WaitUntil("the gloves took the Take reach", n"Check_ReachTaken", 0, 0);
         Add_Step("both gloves reach for the tray (Sides layout)", n"Step_AssertBothGloves");
-        Add_Step_WaitUntil("the gloves rest again", n"Check_CarrierHandsRest", 0, 5.0f);
+        Add_Step_WaitUntil("the gloves rest again", n"Check_CarrierHandsRest", k_SlowPolls, 0);
         Add_Step("take the platter into the overflow", n"Step_Take");
-        Add_Step_WaitUntil("the dock reports the platter undocked", n"Check_Undocked", 0, 5.0f);
+        Add_Step_WaitUntil("the dock reports the platter undocked", n"Check_Undocked", 0, 0);
         Add_Step("the emptied dock hints nothing", n"Step_AssertNoDockHint");
         Run_Steps(InHandle);
     }
@@ -81,12 +82,12 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
         const auto Action = _Dock.Get_ActionFor(_Carrier);
         Assert_True(Action == EMars_PlatterDock_Action::Take, f"empty-handed, the occupied dock offers Take (got [{Action :n}])");
 
-        // The reach the player's HandsResolverBinds requests for a newly best Use target.
+        // The reach the player's HandsResolverBinds requests for a newly best Use target: its policy and its gesture.
         auto Interactable = _Dock.Get_Interactable();
         _TakeTarget = Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
         const auto& Context = _TakeTarget.Get_Fragment(FMars_Fragment_InteractionContext);
         const auto Subject = FMars_FPHands_ReachSubject(_TakeTarget, Context.Interactable, Context.InteractableOwner);
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, _TakeTarget.Get_InteractionCompletionPolicy()));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, _TakeTarget.Get_InteractionCompletionPolicy(), Context.ReachKind));
     }
 
     UFUNCTION()

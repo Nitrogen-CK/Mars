@@ -17,13 +17,13 @@ class UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo : UMars_AutoTestRig_Han
         Add_HandsSm();
         Log_Phases();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("request a timed reach", n"Step_RequestTimedReach");
-        Add_Step_WaitUntil("the phase is Hold and the Hold state listens for a lost target", n"Check_HoldListening", 0, 5.0f);
+        Add_Step_WaitUntil("the phase is Hold and the Hold state listens for a lost target", n"Check_HoldListening", 0, 0);
         Add_Step("move the committed phase back to None under the Hold state", n"Step_RequestPhaseNone");
-        Add_Step_WaitUntil("the phase is None while the Hands SM is still in Hold", n"Check_NoneUnderHold", 0, 5.0f);
+        Add_Step_WaitUntil("the phase is None while the Hands SM is still in Hold", n"Check_NoneUnderHold", 0, 0);
         Add_Step("queue SetPhase(Hold) and Release in the same frame", n"Step_RequestHoldAndRelease");
-        Add_Step_WaitUntil("the phase leaves Hold for Release", n"Check_IsRelease", 0, 5.0f);
+        Add_Step_WaitUntil("the phase leaves Hold for Release", n"Check_IsRelease", 0, 0);
         Add_Step("the queued Hold was applied, then let go", n"Step_AssertSequence");
         Run_Steps(InHandle);
     }

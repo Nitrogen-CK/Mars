@@ -1,63 +1,34 @@
-// Hands sub-SM (under Alive, sibling of the Alive sub-SM). Rest is the resting glove pose; an instant interaction runs
-// Reach -> Grip -> Return and always finishes on its own (a picked-up item removes its own target mid-grab); a timed one
+// Hands sub-SM (under Alive, sibling of the Alive sub-SM). Rest is the resting glove pose; a Grab reach runs
+// Reach -> Grip -> Return and always finishes on its own (a picked-up item removes its own target mid-grab); a Hold reach
 // holds until the target is lost, then releases; a dropped or thrown item is followed through by a push. The phase itself
-// lives on the FPHands feature: each state's enter task requests it.
+// lives on the FPHands feature: each state's enter task requests it, and leaving the sub-SM puts it back to None.
 //
 // The resolver is listened to in Rest, Hold, Release and Return: a new target interrupts a release or return (the reach
 // continues from the gloves' current alpha) but is ignored mid-grab, mid-hold and mid-push rather than restarting them.
-// Entering Rest, Release or Return re-reads the resolver, so a timed target that became best while the gloves were busy
+// Entering Rest, Release or Return re-reads the resolver, so a Hold target that became best while the gloves were busy
 // and whose interaction is still live is reached for then - the gloves always end up on the device they are using.
 // Entering Hold checks the reached target is still best, so a removal broadcast before Hold bound is not missed. Tasks
 // and conditions only issue FPHands requests and read its getters; ck::Ctx is the player entity (the sub-SM inherits
 // its parent's context).
 
+// Leaving it (Downed, a teardown) puts the gloves back to rest: the phase goes to None, which also forgets the reach
+// target, so nothing is left stretched toward a device. A player already torn down has no gloves to reset.
 class UMars_SmTask_HandsSubSm : UCk_SmTask_SubStateMachine
 {
     default _InitialStateClass = UMars_SmState_Hands_Rest;
     default _CompletionBehavior = ECk_SmTask_SubSm_CompletionBehavior::KeepRunning;
-}
 
-namespace utils_fphands
-{
-    // Hands the gloves back to the procedural placement: stops a playing emote montage (a reach or a newly held item
-    // takes over), and the body's emote with it (AMars_PlayerCharacter::Request_StopEmote). An entity with no character
-    // (tests) plays no emotes.
-    void Stop_Emote(const FCk_Handle_FPHands& InHands)
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(InHands, ECk_SanityCheck::UnChecked));
-        if (ck::Is_NOT_Valid(Character))
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
         { return; }
 
-        auto AnimInstance = Character.FPHands.GetAnimInstance();
-        if (ck::IsValid(AnimInstance) && AnimInstance.IsAnyMontagePlaying())
-        { AnimInstance.Montage_Stop(InHands.Get_Spec().Emotes.CancelBlendSeconds); }
+        auto Hands = ck::Ctx(InHandle).As_FPHands(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Hands))
+        { return; }
 
-        Character.Request_StopEmote();
-    }
-
-    // Plays InEmote's montage on the gloves (both, through the spec's emote slot). Refused while the gloves are busy:
-    // holding an item, or out of Rest (reaching, holding, pushing). An entity with no character (tests) plays no emotes.
-    bool Play_Emote(const FCk_Handle_FPHands& InHands, EMars_FPEmote InEmote)
-    {
-        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(InHands, ECk_SanityCheck::UnChecked));
-        if (ck::Is_NOT_Valid(Character))
-        { return false; }
-
-        if (InHands.Get_Hold().Kind != EMars_FPHands_HoldKind::Empty || InHands.Get_Phase() != EMars_FPHands_Phase::None)
-        { return false; }
-
-        auto Montages = InHands.Get_Spec().Emotes.Montages;
-        if (ck::EnsureIfNot(Montages.Contains(InEmote), f"[Emotes] the gloves have no montage for [{InEmote :n}]"))
-        { return false; }
-
-        auto Montage = System::LoadAsset_Blocking(Montages[InEmote]);
-        auto AnimInstance = Character.FPHands.GetAnimInstance();
-        if (ck::EnsureIfNot(ck::IsValid(Montage) && ck::IsValid(AnimInstance),
-            f"[Emotes] [{InEmote :n}] cannot play: its montage does not load or the gloves have no anim instance"))
-        { return false; }
-
-        AnimInstance.Montage_Play(Montage);
-        return true;
+        Hands.Request_SetPhase(FMars_Request_FPHands_SetPhase(EMars_FPHands_Phase::None));
     }
 }
 
@@ -167,15 +138,15 @@ class UMars_SmTask_Hands_StopEmote : UCk_SmTask_EntityScript
         if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
         { return; }
 
-        utils_fphands::Stop_Emote(ck::Ctx(InHandle).As_FPHands());
+        utils_player_emotes::Stop_Emote(ck::Ctx(InHandle).As_FPHands());
     }
 }
 
 // What the resolver binds do on enter, beyond listening.
 enum EMars_FPHands_EnterSync
 {
-    // Rest, Release, Return: reach for a best target whose non-instant interaction is live (it became best while the
-    // gloves were busy).
+    // Rest, Release, Return: reach for a best Hold target whose interaction is live (it became best while the gloves were
+    // busy).
     Resync,
     // Hold: let go when the reached target is no longer best (its removal may have been broadcast before Hold bound).
     VerifyTarget
@@ -183,8 +154,8 @@ enum EMars_FPHands_EnterSync
 
 // Resolver -> feature requests, in the states that can start or lose a target (Rest, Hold, Release, Return). A new
 // Use- or Operate-intent target (Operate: a station's grip, opened only by the player's Operating state) starts a reach
-// with its completion policy; a removed one that is the current reach target releases. An entity without a resolver
-// (tests) binds nothing.
+// with the gesture its interaction context names (ReachKind); a removed one that is the current reach target releases. An
+// entity without a resolver (tests) binds nothing.
 class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -213,7 +184,7 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             return;
         }
 
-        // Instant targets are never re-reached - a grab always finishes on its own. Use first, then Operate.
+        // Grab targets are never re-reached - a grab always finishes on its own. Use first, then Operate.
         if (TryResync(GameplayTags::InteractionIntent_Mars_Use))
         { return; }
 
@@ -242,14 +213,13 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
             { continue; }
 
-            const auto CompletionPolicy = Target.Get_InteractionCompletionPolicy();
-            if (CompletionPolicy == ECk_Interaction_CompletionPolicy::Instant)
+            if (Target.Get_Fragment(FMars_Fragment_InteractionContext).ReachKind == EMars_FPHands_ReachKind::Grab)
             { continue; }
 
             if (ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, _Player)))
             { continue; }
 
-            Request_Reach(Target, CompletionPolicy);
+            Request_Reach(Target);
             return true;
         }
 
@@ -280,11 +250,11 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
         return false;
     }
 
-    private void Request_Reach(FCk_Handle_InteractTarget InTarget, ECk_Interaction_CompletionPolicy InCompletionPolicy)
+    private void Request_Reach(FCk_Handle_InteractTarget InTarget)
     {
         const auto& Context = InTarget.Get_Fragment(FMars_Fragment_InteractionContext);
         const auto Subject = FMars_FPHands_ReachSubject(InTarget, Context.Interactable, Context.InteractableOwner);
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, InCompletionPolicy));
+        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, InTarget.Get_InteractionCompletionPolicy(), Context.ReachKind));
     }
 
     UFUNCTION()
@@ -309,7 +279,7 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
             { continue; }
 
-            Request_Reach(Target, Target.Get_InteractionCompletionPolicy());
+            Request_Reach(Target);
             return;
         }
     }
@@ -327,9 +297,12 @@ enum EMars_FPHands_GripWait
 {
     // Not waiting: the task acted, failed, or never asked.
     None,
-    // For the gloves to take the reach the resolver starts for the interaction's own target (a pickup, a dock's take).
+    // For the gloves' push to end before the task asks for the reach to its interaction's own target (a press during the
+    // follow-through of a drop or throw).
+    PushEnd,
+    // For the gloves to answer the reach the task asked for its interaction's own target (a pickup, a dock's take).
     TargetReach,
-    // For the gloves to take the Place reach the task requested (food onto a platter, a platter onto a dock).
+    // For the gloves to answer the Place reach the task's caller requested (food onto a platter, a platter onto a dock).
     PlaceReach,
     // The gloves are on the awaited reach: only its Grip acts from here.
     Reaching
@@ -338,26 +311,40 @@ enum EMars_FPHands_GripWait
 // The base of an interaction task that moves things at the gloves' Grip rather than on enter, so an item follows the hands
 // (a pickup lands when the gloves close on it, a placed item leaves them where they set it down). A subclass starts the
 // wait with Await_Grip or Await_PlaceGrip and does its work in DoAtGrip; a reach lost, or gloves that Return or let go
-// before their Grip, fail the task through DoFail and nothing moves. Await_Grip acts at once for an initiator without
-// gloves and the moment the gloves refuse the reach for this interaction's target (OnReachRefused, or a refusal they
-// already remember: Get_IsReachRefused); Await_PlaceGrip fails the moment they refuse the Place. Only a reach nobody asked
-// for (a headless rig without a resolver) is bounded by time: not reaching within k_ReachAcceptSeconds, Await_Grip acts
-// and Await_PlaceGrip fails. The task ticks and returns _Outcome; a subclass that overrides DoExitTask calls Super.
+// before their Grip, fail the task through DoFail and nothing moves. Await_Grip asks the initiator's gloves for the reach to
+// this interaction's target itself (the subject and gesture its interaction context names; once a push in progress has
+// ended, waiting no longer than the push's own seconds plus k_PushEndGraceTicks), and acts at once without gloves or when
+// they refuse that reach (busy with another target). Await_PlaceGrip waits for the Place reach its caller requests and
+// fails when the gloves refuse it. The gloves answer a reach in the drain after it is asked: one neither taken nor refused
+// by k_ReachAnswerTicks ticks after it was asked is a defect (an ensure), after which a target reach acts and a place
+// fails. A failure names its EMars_Interaction_FailReason on the interaction's stamped context (DoFail), which the
+// sub-SM's Failed end reports. The task ticks and returns _Outcome; a subclass that overrides DoTick or DoExitTask calls
+// Super.
 UCLASS(Abstract)
 class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
 
-    // A reach is taken or refused in the next requests drain; longer than this, no reach was asked for at all.
-    protected const float32 k_ReachAcceptSeconds = 0.5f;
+    // The gloves answer a reach in the drain after it is asked, so by this many ticks after the request it was taken or
+    // refused.
+    protected const int32 k_ReachAnswerTicks = 2;
+
+    // The gloves' Push leaves for Rest one state-machine step after its seconds run out (utils_fphands::Get_PushSeconds),
+    // and that phase edge reaches this task in the drain after: a PushEnd wait this many ticks past the push's seconds has
+    // outlived the push (its phase frozen, the gloves' state machine torn down mid-push) and asks for the reach anyway.
+    protected const int32 k_PushEndGraceTicks = 2;
 
     protected ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
 
     private EMars_FPHands_GripWait _GripWait = EMars_FPHands_GripWait::None;
-    private float32 _WaitSeconds = 0.0f;
     private FCk_Handle_FPHands _GripHands;
-    // TargetReach only: this interaction's target (the state machine's context).
+    // PushEnd and TargetReach only: this interaction's target (the state machine's context).
     private FCk_Handle_InteractTarget _GripTarget;
+    // Ticks since the awaited reach was asked for; unset before it is asked and once the gloves answered it.
+    private TOptional<int32> _TicksSinceAsked;
+    // PushEnd only: how long the wait has run, and the ticks it has run past the push's seconds.
+    private float32 _PushWaitSeconds = 0.0f;
+    private int32 _TicksPastPush = 0;
     // The last frame's length: the gloves leave their Grip one state-machine step after its seconds run out.
     private float32 _LastDeltaSeconds = 0.0f;
 
@@ -365,40 +352,19 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
     ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
     {
         _LastDeltaSeconds = float32(InDeltaT.Get_Seconds());
-
-        if (_GripWait == EMars_FPHands_GripWait::TargetReach)
-        { Check_TargetReach(); }
-
-        const auto IsAwaitingReach = _GripWait == EMars_FPHands_GripWait::TargetReach || _GripWait == EMars_FPHands_GripWait::PlaceReach;
-        if (IsAwaitingReach == false)
-        { return _Outcome; }
-
-        _WaitSeconds += float32(InDeltaT.Get_Seconds());
-        if (_WaitSeconds <= k_ReachAcceptSeconds)
-        { return _Outcome; }
-
-        if (_GripWait == EMars_FPHands_GripWait::PlaceReach)
-        {
-            Fail_Grip("no place reach reached the gloves");
-            return _Outcome;
-        }
-
-        ck::Trace(f"[FPHands] [{_GripHands.ToString()}] was asked for no reach for [{_GripTarget.ToString()}]: acting without the grip");
-        Act_AtGrip();
+        Tick_ReachAnswer();
+        Tick_PushEnd();
         return _Outcome;
     }
 
+    // A task torn down before it acted or failed (its interaction ended under it) has moved nothing: it stops listening.
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        // A task torn down before it acted or failed (its interaction ended under it): nothing moved.
-        if (_Outcome == ECk_SmTaskResult::Running)
-        { ck::Trace(f"[ActAtGrip] [{GetClass().GetName()}] exits for [{_GripTarget.ToString()}] still running (wait {_GripWait :n})"); }
-
         Stop_Waiting();
     }
 
-    // Acts at the Grip of the reach InInitiator's gloves make for this interaction's target.
+    // Acts at the Grip of the reach InInitiator's gloves make for this interaction's target, which this task asks for.
     protected void Await_Grip(FCk_Handle InInitiator)
     {
         _GripHands = InInitiator.As_FPHands(ECk_SanityCheck::UnChecked);
@@ -409,15 +375,18 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
             return;
         }
 
-        if (_GripHands.Get_IsReachRefused(_GripTarget))
+        const auto HasContext = ck::IsValid(_GripTarget) && _GripTarget.Has_Fragment(FMars_Fragment_InteractionContext);
+        if (ck::EnsureIfNot(HasContext, f"[ActAtGrip] [{GetClass().GetName()}] awaits the gloves for [{_GripTarget.ToString()}], which is no interact target with an interaction context: acting without the grip"))
         {
-            ck::Trace(f"[FPHands] [{_GripHands.ToString()}] refused the reach for [{_GripTarget.ToString()}]: acting without the grip");
             Act_AtGrip();
             return;
         }
 
-        Start_Waiting(EMars_FPHands_GripWait::TargetReach);
-        Check_TargetReach();
+        Start_Waiting(EMars_FPHands_GripWait::PushEnd);
+        if (_GripHands.Get_Phase() == EMars_FPHands_Phase::Push)
+        { return; }
+
+        Ask_TargetReach();
     }
 
     // Acts at the Grip of the Place reach the caller requests on InHands right after this.
@@ -426,7 +395,7 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
         _GripHands = InHands;
         _GripTarget = FCk_Handle_InteractTarget();
         Start_Waiting(EMars_FPHands_GripWait::PlaceReach);
-        _GripHands.BindTo_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnGripReachRequested"));
+        _TicksSinceAsked = TOptional<int32>(0);
     }
 
     // The work the task waited for. Sets _Outcome.
@@ -434,7 +403,7 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
 
     // Called from DoAtGrip: how a mount taken now arrives so the item rides the gloves home: still for what is left of
     // their Grip (plus the frame the Hands state machine takes to enter Return), then over their return with its easing.
-    // Unset when no gloves are gripping (no gloves, a refused reach, the no-reach fallback): the item arrives as usual.
+    // Unset when no gloves are gripping (no gloves, a refused reach): the item arrives as usual.
     protected TOptional<FMars_WorldItem_ArriveSpec> TryGet_RideHome() const
     {
         if (ck::Is_NOT_Valid(_GripHands) || _GripHands.Get_Phase() != EMars_FPHands_Phase::Grip)
@@ -445,11 +414,67 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
         return TOptional<FMars_WorldItem_ArriveSpec>(FMars_WorldItem_ArriveSpec(GripLeft, Grab.BackSeconds, Grab.BackEasing));
     }
 
-    // The wait (or the work) failed and nothing moved. Sets _Outcome.
-    protected void DoFail(const FString& InReason)
+    // The wait (or the work) failed and nothing moved: InReason is named on the interaction's stamped context, which the
+    // sub-SM's Failed end reports. Sets _Outcome.
+    protected void DoFail(EMars_Interaction_FailReason InReason)
     {
-        ck::Warning(f"[FPHands] Acting at the grip failed: {InReason}");
+        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
         _Outcome = ECk_SmTaskResult::Failed;
+    }
+
+    // The subject and the gesture the resolver's binds would ask for (UMars_SmTask_HandsResolverBinds), so a reach they
+    // already started is the same reach.
+    private void Ask_TargetReach()
+    {
+        _GripWait = EMars_FPHands_GripWait::TargetReach;
+        _TicksSinceAsked = TOptional<int32>(0);
+
+        const auto& Context = _GripTarget.Get_Fragment(FMars_Fragment_InteractionContext);
+        const auto Subject = FMars_FPHands_ReachSubject(_GripTarget, Context.Interactable, Context.InteractableOwner);
+        _GripHands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, _GripTarget.Get_InteractionCompletionPolicy(), Context.ReachKind));
+    }
+
+    // A push still running k_PushEndGraceTicks ticks past its own seconds: the reach is asked for now, and the gloves take or
+    // refuse it.
+    private void Tick_PushEnd()
+    {
+        if (_GripWait != EMars_FPHands_GripWait::PushEnd)
+        { return; }
+
+        _PushWaitSeconds += _LastDeltaSeconds;
+        if (_PushWaitSeconds < utils_fphands::Get_PushSeconds(_GripHands.Get_Spec().Push))
+        { return; }
+
+        _TicksPastPush += 1;
+        if (_TicksPastPush < k_PushEndGraceTicks)
+        { return; }
+
+        Ask_TargetReach();
+    }
+
+    // A reach the gloves have neither taken nor refused k_ReachAnswerTicks ticks after it was asked: they dropped it.
+    private void Tick_ReachAnswer()
+    {
+        if (_TicksSinceAsked.IsSet() == false)
+        { return; }
+
+        const auto Ticks = _TicksSinceAsked.GetValue() + 1;
+        _TicksSinceAsked = TOptional<int32>(Ticks);
+        if (Ticks < k_ReachAnswerTicks)
+        { return; }
+
+        const auto Wait = _GripWait;
+        if (ck::EnsureIfNot(false,
+            f"[ActAtGrip] [{GetClass().GetName()}] the gloves [{_GripHands.ToString()}] neither took nor refused the {Wait :n} reach for [{_GripTarget.ToString()}] within {Ticks} ticks"))
+        {
+            if (Wait == EMars_FPHands_GripWait::PlaceReach)
+            {
+                Fail_Grip(EMars_Interaction_FailReason::PlaceReachUnanswered);
+                return;
+            }
+
+            Act_AtGrip();
+        }
     }
 
     // The gloves took the reach for this target (Reach: wait for its Grip), or already close on it (Grip: act now).
@@ -466,13 +491,19 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
         }
 
         if (Phase == EMars_FPHands_Phase::Reach)
-        { _GripWait = EMars_FPHands_GripWait::Reaching; }
+        {
+            _TicksSinceAsked.Reset();
+            _GripWait = EMars_FPHands_GripWait::Reaching;
+        }
     }
 
     private void Start_Waiting(EMars_FPHands_GripWait InWait)
     {
         _GripWait = InWait;
-        _WaitSeconds = 0.0f;
+        _TicksSinceAsked.Reset();
+        _PushWaitSeconds = 0.0f;
+        _TicksPastPush = 0;
+        _GripHands.BindTo_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnGripReachRequested"));
         _GripHands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnGripPhaseChanged"));
         _GripHands.BindTo_OnReachTargetLost(FMars_Delegate_FPHands_OnReachTargetLost(this, n"OnGripReachTargetLost"));
         _GripHands.BindTo_OnReachRefused(FMars_Delegate_FPHands_OnReachRefused(this, n"OnGripReachRefused"));
@@ -489,6 +520,7 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
         }
 
         _GripWait = EMars_FPHands_GripWait::None;
+        _TicksSinceAsked.Reset();
     }
 
     private void Act_AtGrip()
@@ -497,9 +529,8 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
         DoAtGrip();
     }
 
-    private void Fail_Grip(const FString& InReason)
+    private void Fail_Grip(EMars_Interaction_FailReason InReason)
     {
-        ck::Trace(f"[ActAtGrip] [{GetClass().GetName()}] fails for [{_GripTarget.ToString()}] (wait was {_GripWait :n}): {InReason}");
         Stop_Waiting();
         DoFail(InReason);
     }
@@ -508,12 +539,27 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
     private void OnGripReachRequested(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind)
     {
         if (_GripWait == EMars_FPHands_GripWait::PlaceReach && InKind == EMars_FPHands_ReachKind::Place)
-        { _GripWait = EMars_FPHands_GripWait::Reaching; }
+        {
+            _TicksSinceAsked.Reset();
+            _GripWait = EMars_FPHands_GripWait::Reaching;
+            return;
+        }
+
+        if (_GripWait == EMars_FPHands_GripWait::TargetReach)
+        { Check_TargetReach(); }
     }
 
     UFUNCTION()
     private void OnGripPhaseChanged(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
     {
+        if (_GripWait == EMars_FPHands_GripWait::PushEnd)
+        {
+            if (InNew != EMars_FPHands_Phase::Push)
+            { Ask_TargetReach(); }
+
+            return;
+        }
+
         if (_GripWait == EMars_FPHands_GripWait::TargetReach)
         {
             Check_TargetReach();
@@ -525,7 +571,7 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
 
         if (InNew != EMars_FPHands_Phase::Grip)
         {
-            Fail_Grip(f"the gloves went to [{InNew :n}] before their grip");
+            Fail_Grip(EMars_Interaction_FailReason::GlovesLeftBeforeGrip);
             return;
         }
 
@@ -534,24 +580,24 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
 
     // A refused reach for this target: the gloves will not come, so the work happens now. A refused Place: nothing is set down.
     UFUNCTION()
-    private void OnGripReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind)
+    private void OnGripReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind,
+                                    EMars_FPHands_ReachRefusal InReason)
     {
         if (_GripWait == EMars_FPHands_GripWait::TargetReach && ck::IsValid(_GripTarget) && InTarget == _GripTarget)
         {
-            ck::Trace(f"[FPHands] [{InHands.ToString()}] refused the reach for [{_GripTarget.ToString()}]: acting without the grip");
             Act_AtGrip();
             return;
         }
 
         if (_GripWait == EMars_FPHands_GripWait::PlaceReach && InKind == EMars_FPHands_ReachKind::Place)
-        { Fail_Grip("the gloves refused the place reach"); }
+        { Fail_Grip(EMars_Interaction_FailReason::PlaceReachRefused); }
     }
 
     UFUNCTION()
     private void OnGripReachTargetLost(FCk_Handle_FPHands InHands)
     {
         if (_GripWait == EMars_FPHands_GripWait::Reaching)
-        { Fail_Grip("the gloves lost the target"); }
+        { Fail_Grip(EMars_Interaction_FailReason::GlovesLostTarget); }
     }
 }
 
@@ -727,12 +773,6 @@ class UMars_SmState_Hands_Rest : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_HandsResolverBinds);
         AddTask(InHandle, UMars_SmTask_HandsLaunchBinds);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Rest", n"HandsSM", 2.0f, FLinearColor(0.7f, 0.7f, 0.7f, 1.0f));
-    }
 }
 
 class UMars_SmState_Hands_Reach : UCk_SmState_EntityScript
@@ -746,12 +786,6 @@ class UMars_SmState_Hands_Reach : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Reach);
         AddTask(InHandle, UMars_SmTask_Hands_StopEmote);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Reach", n"HandsSM", 2.0f, FLinearColor(0.3f, 0.8f, 1.0f, 1.0f));
-    }
 }
 
 class UMars_SmState_Hands_Grip : UCk_SmState_EntityScript
@@ -763,12 +797,6 @@ class UMars_SmState_Hands_Grip : UCk_SmState_EntityScript
         AddCondition(ToReturn, UMars_SmCondition_HandsPhaseElapsed_Grip);
 
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Grip);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Grip", n"HandsSM", 2.0f, FLinearColor(1.0f, 0.8f, 0.0f, 1.0f));
     }
 }
 
@@ -789,12 +817,6 @@ class UMars_SmState_Hands_Return : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Return);
         AddTask(InHandle, UMars_SmTask_HandsResolverBinds);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Return", n"HandsSM", 2.0f, FLinearColor(0.3f, 1.0f, 0.6f, 1.0f));
-    }
 }
 
 class UMars_SmState_Hands_Hold : UCk_SmState_EntityScript
@@ -808,12 +830,6 @@ class UMars_SmState_Hands_Hold : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Hold);
         AddTask(InHandle, UMars_SmTask_Hands_StopEmote);
         AddTask(InHandle, UMars_SmTask_HandsResolverBinds_NoResync);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Hold", n"HandsSM", 2.0f, FLinearColor(1.0f, 0.5f, 0.0f, 1.0f));
     }
 }
 
@@ -834,12 +850,6 @@ class UMars_SmState_Hands_Release : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Release);
         AddTask(InHandle, UMars_SmTask_HandsResolverBinds);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Release", n"HandsSM", 2.0f, FLinearColor(1.0f, 0.4f, 0.7f, 1.0f));
-    }
 }
 
 class UMars_SmState_Hands_Push : UCk_SmState_EntityScript
@@ -852,11 +862,5 @@ class UMars_SmState_Hands_Push : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Hands_SetPhase_Push);
         AddTask(InHandle, UMars_SmTask_Hands_StopEmote);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Hands SM: Push", n"HandsSM", 2.0f, FLinearColor(0.4f, 0.6f, 1.0f, 1.0f));
     }
 }

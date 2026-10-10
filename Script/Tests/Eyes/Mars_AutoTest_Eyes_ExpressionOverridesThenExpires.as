@@ -27,7 +27,7 @@ class UMars_AutoTest_Eyes_ExpressionOverridesThenExpires : UMars_AutoTestRig_Eye
         Add_Step_WaitUntil("the style (3) is back, fully blended", n"Check_StyleBack");
         Add_Step("play Happy as authored (timed)", n"Step_PlayTimedHappy");
         Add_Step_WaitUntil("the timed Happy is playing", n"Check_EmotePlaying");
-        Add_Step_WaitUntil("the timed Happy expired and the style (3) is back, fully blended", n"Check_StyleBack", 0, 5.0f);
+        Add_Step_WaitUntil("the timed Happy expired and the style (3) is back, fully blended", n"Check_StyleBack", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

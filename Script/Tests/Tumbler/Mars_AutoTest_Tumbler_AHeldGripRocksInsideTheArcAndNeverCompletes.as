@@ -13,7 +13,7 @@ class UMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes : UMars
     {
         BuildStation(InHandle, Make_TestSpec());
 
-        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
+        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 0);
         Add_Step("remember the lever grip's home pose", n"Step_CaptureHome");
         Add_Steps_Grip();
         Add_Step("the grip went through a reach", n"Step_AssertReached");
@@ -23,7 +23,7 @@ class UMars_AutoTest_Tumbler_AHeldGripRocksInsideTheArcAndNeverCompletes : UMars
         Add_Step("the lever came back inside the arc, still gripped", n"Step_AssertCameBack");
         Add_Step("let go", n"Step_Release");
         Add_Step("the hand is free and the drum returning one pass later", n"Step_AssertLetGo");
-        Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 2.0f);
+        Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 0);
         Add_Step_WaitFrames("the grip node takes the home offset", 2);
         Add_Step("the lever and drum are back at home", n"Step_AssertHome");
         Run_Steps(InHandle);

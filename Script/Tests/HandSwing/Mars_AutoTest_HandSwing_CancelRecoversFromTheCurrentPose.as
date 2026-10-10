@@ -4,6 +4,9 @@
 // cancel at rest changes nothing. Isolated Z band: -84000.
 class UMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the recovery eases home on the swing's own clock.
+    private const int32 k_SlowPolls = 900;
+
     private FVector _Origin = FVector(100.0, 0.0, -84000.0);
     private FCk_Handle_HandSwing _Swing;
     private FCk_Handle_SceneNode _Node;
@@ -21,11 +24,11 @@ class UMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose : UCk_AutoTest_B
         Add_Step_WaitSeconds("let the drain run", 0.1f);
         Add_Step("still at rest", n"Step_AssertStillAtRest");
         Add_Step("start a slow swing", n"Step_Start");
-        Add_Step_WaitUntil("well into the windup", n"Check_IntoWindup", 0, 2.0f);
+        Add_Step_WaitUntil("well into the windup", n"Check_IntoWindup", 0, 0);
         Add_Step("cancel", n"Step_Cancel");
-        Add_Step_WaitUntil("recovering", n"Check_Recovering", 0, 1.0f);
+        Add_Step_WaitUntil("recovering", n"Check_Recovering", 0, 0);
         Add_Step("the recovery leaves from the cancelled pose", n"Step_AssertRecoveringFromPose");
-        Add_Step_WaitUntil("back at rest", n"Check_AtRest", 0, 3.0f);
+        Add_Step_WaitUntil("back at rest", n"Check_AtRest", k_SlowPolls, 0);
         Add_Step("at rest with an identity pose", n"Step_AssertAtRest");
         Run_Steps(InHandle);
     }

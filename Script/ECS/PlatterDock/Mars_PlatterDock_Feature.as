@@ -1,7 +1,8 @@
 // A station's mount for one platter: a child entity of the station root with its own capacity-1 inventory, an attach point
-// the docked platter's world item is carried on, a probe-driven interactable and a policy on what the platter may bring.
-// The dock mounts the platter's one live entity (a Persistent world item); it never spawns a visual, and it ends the
-// platter only when it is torn down with it docked (the platter's item lives in the dock's inventory and dies with it).
+// the docked platter's world item mounts on, a probe-driven interactable and a policy on what the platter may bring. The
+// platter's one live entity (a Persistent world item) mounts on the dock because its item lives in the dock's inventory
+// (UMars_Processor_WorldItem_Reconcile); the dock never spawns a visual, and a dock torn down with a platter docked takes
+// the platter with it (the item dies with the dock's inventory, and its world item with the item).
 // Anyone who can aim at the dock can place onto it or take from it; nothing here reads "the local player".
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -26,19 +27,21 @@ enum EMars_PlatterDock_Role
     Output
 }
 
-// Why a platter was not docked. Never deferred.
+// Why a platter was not docked, or not undocked. Never deferred.
 enum EMars_PlatterDock_Refusal
 {
     Occupied,
     NotAPlatter,
     KindRejected,
     NotWhole,
+    // The Output role's rule: a finished tray docks empty.
     MustBeEmpty,
-    MustHaveFood,
-    // The item is in no inventory, or the transfer was refused.
+    // The item is in no inventory, there is no target to take it, or the transfer was refused.
     TransferFailed,
     // A food placed on the docked platter would not fit.
-    PlatterFull
+    PlatterFull,
+    // An Undock named an item the dock does not hold.
+    NotDocked
 }
 
 // What interacting would do for a given focuser (Get_ActionFor). Only Place, Take and PlaceFood enable the dock's interact
@@ -63,15 +66,18 @@ namespace constants_platter_dock
 {
     // Beats the station's own Use (0), whose probe box encloses the docks.
     const int32 k_FocusPriority = 10;
+
+    // A docked platter that has not settled on the dock this long past its presentation's ArriveSeconds is a defect.
+    const float32 k_SettleGraceSeconds = 1.0f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// What a dock lets a platter bring, never how much: every held piece must match Kind (an empty query = any); WholeOnly =
-// every piece whole; RequireEmpty set = the platter must (true) or must not (false) be empty. How many pieces a station
-// takes is its kernel's own limit.
+// What a dock lets a platter bring, never how much: every piece it holds (held, settling or queued) must match Kind (an
+// empty query = any); WholeOnly = every piece whole. Whether it must be empty is the dock's Role (an Output dock takes an
+// empty tray). How many pieces a station takes is its kernel's own limit.
 struct FMars_PlatterDock_Policy
 {
     UPROPERTY()
@@ -79,9 +85,6 @@ struct FMars_PlatterDock_Policy
 
     UPROPERTY()
     bool WholeOnly = false;
-
-    UPROPERTY()
-    TOptional<bool> RequireEmpty;
 
     FMars_PlatterDock_Policy() {}
 
@@ -179,9 +182,9 @@ struct FMars_Fragment_PlatterDock_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Inventory, Interactable and Node are composed by utils_platter_dock::Create. WorldItem, Platter, LastSeen and HasArrived
-// are written only by UMars_Processor_PlatterDock_Sync from what the inventory holds and where its world item is (polled,
-// as a cargo slot is), LastPromptAction only by UMars_Processor_PlatterDock_Prompt.
+// Inventory, Interactable and Node are composed by utils_platter_dock::Create. WorldItem, Platter, LastSeen and
+// SettleWatchSeconds are written only by UMars_Processor_PlatterDock_Sync from what the inventory holds (polled, as a cargo
+// slot is), LastPromptAction only by UMars_Processor_PlatterDock_Prompt.
 struct FMars_Fragment_PlatterDock
 {
     UPROPERTY()
@@ -205,9 +208,10 @@ struct FMars_Fragment_PlatterDock
     UPROPERTY()
     FCk_Handle_Item LastSeen;
 
-    // The docked platter's world item has landed on the node (Carried here, no arrival in flight); reset on every undock.
+    // Seconds a docked platter has not settled on the dock (the watchdog); unset while the dock is empty, once the platter
+    // settled, and after the watchdog reported it.
     UPROPERTY()
-    bool HasArrived = false;
+    TOptional<float32> SettleWatchSeconds;
 
     // The action the prompt currently shows; unset while the dock is not focused.
     UPROPERTY()
@@ -218,12 +222,12 @@ struct FMars_Fragment_PlatterDock
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The dock's inventory took the platter's item; its world item is on the way to the dock (Carry).
+// The dock's inventory took the platter's item; its world item is on its way onto the dock.
 delegate void FMars_Delegate_PlatterDock_OnDocked(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 event void FMars_Delegate_PlatterDock_OnDocked_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 
-// The docked platter landed: its world item reads Carried by the dock with no arrival in flight. Once per dock; a station
-// takes from a platter only from here on.
+// The docked platter landed: its world item settled on the dock (OnMountSettled, Carried by this dock). Once per dock; a
+// station takes from a platter only from here on (Get_HasArrived).
 delegate void FMars_Delegate_PlatterDock_OnArrived(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 event void FMars_Delegate_PlatterDock_OnArrived_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Platter InPlatter);
 
@@ -235,20 +239,26 @@ event void FMars_Delegate_PlatterDock_OnUndocked_MC(FCk_Handle_PlatterDock InDoc
 delegate void FMars_Delegate_PlatterDock_OnDockRefused(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal);
 event void FMars_Delegate_PlatterDock_OnDockRefused_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal);
 
+// An Undock of InItem was refused (by the drain or by the inventory): this request moved nothing, so no OnUndocked follows
+// from it.
+delegate void FMars_Delegate_PlatterDock_OnUndockRefused(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal);
+event void FMars_Delegate_PlatterDock_OnUndockRefused_MC(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal);
+
 struct FMars_Fragment_PlatterDock_Signals
 {
     FMars_Delegate_PlatterDock_OnDocked_MC OnDocked;
     FMars_Delegate_PlatterDock_OnArrived_MC OnArrived;
     FMars_Delegate_PlatterDock_OnUndocked_MC OnUndocked;
     FMars_Delegate_PlatterDock_OnDockRefused_MC OnDockRefused;
+    FMars_Delegate_PlatterDock_OnUndockRefused_MC OnUndockRefused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Item.Get_ParentInventory() -> this dock's inventory, then the platter's world item is asked to Carry onto the dock's
-// node. Refused (never deferred) with OnDockRefused when the dock, the policy or the inventory says no.
+// Item.Get_ParentInventory() -> this dock's inventory; the platter's world item then mounts on the dock's node. Refused
+// (never deferred) with OnDockRefused when the dock, the policy or the inventory says no.
 struct FMars_Request_PlatterDock_Dock
 {
     UPROPERTY()
@@ -262,7 +272,9 @@ struct FMars_Request_PlatterDock_Dock
     }
 }
 
-// This dock's inventory -> Target (the taker's hotbar stow target). The hotbar's arrival then holds it.
+// This dock's inventory -> Target (the taker's hotbar stow target); the platter's world item then mounts on the taker.
+// Refused (never deferred) with OnUndockRefused when the item is not the docked one, there is no target, or the inventory
+// says no.
 struct FMars_Request_PlatterDock_Undock
 {
     UPROPERTY()

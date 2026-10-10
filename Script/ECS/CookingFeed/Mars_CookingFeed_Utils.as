@@ -1,9 +1,22 @@
+// What utils_cooking_feed::Get_HandLocal poses the hand from: the geometry, where the transfer is (its phase and the 0..1
+// progress through it), and the two points the hand goes to in the hand node's parent frame (the grasped piece's middle,
+// unset until sampled, and the release node).
+struct FMars_CookingFeed_HandQuery
+{
+    FMars_CookingFeed_HandGeometry Geometry;
+    EMars_CookingFeed_Phase Phase = EMars_CookingFeed_Phase::Idle;
+    float32 Progress = 1.0f;
+    TOptional<FVector> GraspPoint;
+    FVector ReleasePoint = FVector::ZeroVector;
+}
+
 namespace utils_cooking_feed
 {
     // Composes the feed on InHandle (the station entity; the feature does not need the Station feature). The spec's Nodes are
     // built by the caller: Nodes.Release is sampled at every release, and the reserved piece rides Nodes.Hand from its grasp
-    // to its release. The feed starts unsourced (control sets the source from the station's input dock) with the hand idle.
-    // A rejected spec or a missing node ensures and returns an invalid handle.
+    // to its release; with hand geometry in the spec the feed moves that node itself, so it must be a scene node under a
+    // parent. The feed starts unsourced (control sets the source from the station's input dock) with the hand idle. A
+    // rejected spec or a missing node ensures and returns an invalid handle.
     FCk_Handle_CookingFeed Add(FCk_Handle& InHandle, FMars_CookingFeed_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -15,6 +28,15 @@ namespace utils_cooking_feed
 
         if (ck::EnsureIfNot(ck::IsValid(InSpec.Nodes.Hand), f"[CookingFeed] [{InHandle.ToString()}] needs a hand node to carry its pieces"))
         { return FCk_Handle_CookingFeed(); }
+
+        if (InSpec.Hand.IsSet())
+        {
+            FCk_Handle HandEntity = InSpec.Nodes.Hand;
+            const auto HandNode = HandEntity.As_SceneNode(ECk_SanityCheck::UnChecked);
+            const auto IsMovable = ck::IsValid(HandNode) && ck::IsValid(utils_scene_node::Get_Parent(HandNode));
+            if (ck::EnsureIfNot(IsMovable, f"[CookingFeed] [{InHandle.ToString()}] has hand geometry, so its hand node must be a scene node under a parent"))
+            { return FCk_Handle_CookingFeed(); }
+        }
 
         auto Params = FMars_Fragment_CookingFeed_Params();
         Params.Spec = InSpec;
@@ -56,45 +78,65 @@ namespace utils_cooking_feed
         return InPiece.TryGet_Platter() == InSource;
     }
 
-    // A reserved piece the feed took off its source (unloading, or riding InHand) goes back onto it: detached from the hand
-    // where it is, then loaded (a load queued behind a pending unload drains after it and lands it back). A piece that is
-    // gone, released, re-parented off the hand or held by another ledger stays as it is; without a live source it stays
-    // where it is. Issues requests only: the caller drops the reservation (Cancel_Active).
-    void Return_Piece(const FMars_Fragment_CookingFeed& InState, const FCk_Handle_Transform& InHand)
+    // The one put-back: a reserved piece the feed took (unloading, riding InHand, or released and not admitted) goes back onto
+    // the platter it was reserved from, else onto the current source (Returned); with neither alive it is let go where it
+    // lies, detached and its body Dynamic (LetGo: the calling processor broadcasts OnPieceLetGo). A piece riding the hand is
+    // detached in this call, before its load (a platter forgets a queued piece that has a scene parent). A piece still coming
+    // off its platter is loaded behind that unload, which lands it back. A piece that is gone, never left the source, was
+    // taken off the hand or out of the release by someone else (it has a scene parent), or that another ledger holds (its
+    // holder fact names anything but the platter it came from: a pan that admitted it while this answer was in flight
+    // included), stays as it is (Kept). Issues requests only: the caller drops the reservation.
+    EMars_CookingFeed_PieceReturn Return_Piece(const FMars_Fragment_CookingFeed& InState, const FCk_Handle_Transform& InHand)
     {
         if (InState.Active.IsSet() == false)
-        { return; }
+        { return EMars_CookingFeed_PieceReturn::Kept; }
 
         const auto Reservation = InState.Active.GetValue();
-        const auto IsTaken = Reservation.Hold == EMars_CookingFeed_PieceHold::Unloading || Reservation.Hold == EMars_CookingFeed_PieceHold::InHand;
         auto Piece = Reservation.Piece;
-        if (IsTaken == false || ck::Is_NOT_Valid(Piece)
-            || utils_entity_lifetime::Get_IsPendingDestroy(Piece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
-        { return; }
+        if (Reservation.Hold == EMars_CookingFeed_PieceHold::OnSource || Get_IsGone(Piece))
+        { return EMars_CookingFeed_PieceReturn::Kept; }
 
+        FCk_Handle Entity = Piece;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        const auto Holder = Piece.TryGet_Holder();
         if (Reservation.Hold == EMars_CookingFeed_PieceHold::InHand)
         {
             if (Get_IsUnderHand(Piece, InHand) == false)
-            { return; }
+            { return EMars_CookingFeed_PieceReturn::Kept; }
 
-            FCk_Handle Entity = Piece;
-            auto Node = Entity.As_SceneNode();
             utils_scene_node::Request_Detach(Node);
         }
+        else if (ck::IsValid(Node) && Holder != Reservation.From)
+        { return EMars_CookingFeed_PieceReturn::Kept; }
 
-        const auto Holder = Piece.TryGet_Platter();
-        if (ck::IsValid(Holder) && Holder != InState.Source)
-        { return; }
+        if (ck::IsValid(Holder) && Holder != Reservation.From)
+        { return EMars_CookingFeed_PieceReturn::Kept; }
 
-        auto Source = InState.Source;
-        if (ck::Is_NOT_Valid(Source) || utils_entity_lifetime::Get_IsPendingDestroy(Source, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+        FCk_Handle_Platter Target = InState.Source;
+        if (Get_IsAlive(Reservation.From))
+        { Target = Reservation.From; }
+
+        if (Get_IsAlive(Target) == false)
         {
-            ck::Trace(f"[CookingFeed] [{Piece.ToString()}] stays where it is: no live source to put it back on");
-            return;
+            Release_WhereItLies(Piece);
+            return EMars_CookingFeed_PieceReturn::LetGo;
         }
 
-        Source.Request_Load(FMars_Request_Platter_Load(Piece));
-        ck::Trace(f"[CookingFeed] [{Piece.ToString()}] goes back onto [{Source.ToString()}]");
+        Target.Request_Load(FMars_Request_Platter_Load(Piece));
+        return EMars_CookingFeed_PieceReturn::Returned;
+    }
+
+    // The declared give-up: no platter is left to take the piece back, so it falls where it is.
+    void Release_WhereItLies(FCk_Handle_FoodPiece& InPiece)
+    {
+        FCk_Handle Entity = InPiece;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Node))
+        { utils_scene_node::Request_Detach(Node); }
+
+        auto Body = Entity.As_JoltBody(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Body))
+        { utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic)); }
     }
 
     // InPiece is scene-node attached directly under InHand.
@@ -105,9 +147,25 @@ namespace utils_cooking_feed
         return ck::IsValid(Node) && ck::IsValid(InHand) && utils_scene_node::Get_Parent(Node) == InHand;
     }
 
-    // Drops the reservation (if any) and idles the hand at once: the one cancel path (Reset, Cancel, SetSource, a reservation
-    // whose piece left the source). True when a reservation was dropped; the caller read its id first and settles it
-    // Cancelled (and, for a piece the feed took itself, Return_Piece first).
+    bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece)
+    {
+        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+    }
+
+    bool Get_IsAlive(const FCk_Handle_Platter& InPlatter)
+    {
+        return ck::IsValid(InPlatter) && utils_entity_lifetime::Get_IsPendingDestroy(InPlatter, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false;
+    }
+
+    // A transfer past its grasp is committed: it lands through the station's bridge, so a Cancel or a Reset leaves it be.
+    bool Get_IsCommitted(EMars_CookingFeed_Phase InPhase)
+    {
+        return InPhase == EMars_CookingFeed_Phase::Carry || InPhase == EMars_CookingFeed_Phase::AwaitAdmission;
+    }
+
+    // Drops the reservation (if any) and idles the hand at once: the one cancel path (Cancel and Reset before the grasp,
+    // SetSource, a reservation whose piece left the source). True when a reservation was dropped; the caller read its id
+    // first and settles it Cancelled (and, for a piece the feed took itself, Return_Piece first).
     bool Cancel_Active(FMars_Fragment_CookingFeed& InState)
     {
         const auto HadReservation = InState.Active.IsSet();
@@ -123,7 +181,7 @@ namespace utils_cooking_feed
         return Math::IsFinite(InSeconds) && InSeconds >= 0.0f;
     }
 
-    // The timed length of InPhase; zero for Idle and AwaitAdmission (no clock).
+    // The timed length of InPhase; zero for Idle and AwaitAdmission (its budget is not a phase length).
     float32 Get_PhaseDuration(const FMars_CookingFeed_TimingSpec& InTiming, EMars_CookingFeed_Phase InPhase)
     {
         switch (InPhase)
@@ -136,7 +194,7 @@ namespace utils_cooking_feed
         }
     }
 
-    // The phases with a clock.
+    // The phases the hand moves through on a clock.
     bool Get_IsTimed(EMars_CookingFeed_Phase InPhase)
     {
         return InPhase == EMars_CookingFeed_Phase::Reach || InPhase == EMars_CookingFeed_Phase::Grasp
@@ -145,7 +203,234 @@ namespace utils_cooking_feed
 
     FString Get_PieceName(const FMars_CookingFeed_PieceId& InPieceId)
     {
-        return f"g{InPieceId.Generation}#{InPieceId.StockIndex}";
+        return f"g{InPieceId.Generation}#{InPieceId.TransferIndex}";
+    }
+
+    // The hand node's offset in its parent's frame for InQuery: the legs FMars_CookingFeed_HandGeometry describes, each eased
+    // in and out over its phase (0.5 - 0.5 cos(pi t)), the reach, the carry and the return arcing up by sin(pi eased).
+    FTransform Get_HandLocal(const FMars_CookingFeed_HandQuery& InQuery)
+    {
+        const auto& Geometry = InQuery.Geometry;
+        const auto Alpha = float64(InQuery.Progress);
+        const auto Eased = 0.5 - 0.5 * Math::Cos(PI * Alpha);
+        const auto Arc = Math::Sin(PI * Eased);
+        const auto Up = FVector::UpVector;
+        const auto Clearance = float64(Geometry.ClearanceCm);
+
+        const auto Rest = Geometry.RestLocal.GetLocation();
+        const auto GraspAt = InQuery.GraspPoint.IsSet() ? InQuery.GraspPoint.GetValue() : Rest;
+        const auto Grasp = GraspAt + Geometry.GraspLocal.GetLocation();
+        const auto Lifted = Grasp + Up * Clearance;
+        const auto Release = InQuery.ReleasePoint + Geometry.ReleaseLocal.GetLocation();
+
+        const auto RestRotation = Geometry.RestLocal.GetRotation();
+        const auto GraspRotation = Geometry.GraspLocal.GetRotation();
+        const auto ReleaseRotation = Geometry.ReleaseLocal.GetRotation();
+
+        if (InQuery.Phase == EMars_CookingFeed_Phase::Reach)
+        { return FTransform(FQuat::Slerp(RestRotation, GraspRotation, Eased), Math::Lerp(Rest, Grasp, Eased) + Up * (Clearance * Arc)); }
+
+        if (InQuery.Phase == EMars_CookingFeed_Phase::Grasp)
+        { return FTransform(GraspRotation, Math::Lerp(Grasp, Lifted, Eased)); }
+
+        if (InQuery.Phase == EMars_CookingFeed_Phase::Carry)
+        {
+            return FTransform(FQuat::Slerp(GraspRotation, ReleaseRotation, Eased),
+                Math::Lerp(Lifted, Release, Eased) + Up * (float64(Geometry.CarryArcCm) * Arc));
+        }
+
+        if (InQuery.Phase == EMars_CookingFeed_Phase::AwaitAdmission)
+        { return FTransform(ReleaseRotation, Release); }
+
+        if (InQuery.Phase == EMars_CookingFeed_Phase::Return)
+        { return FTransform(FQuat::Slerp(ReleaseRotation, RestRotation, Eased), Math::Lerp(Release, Rest, Eased) + Up * (Clearance * Arc)); }
+
+        return Geometry.RestLocal;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // The station contract: the sender's requests, and the helpers a receiving kernel's processors use
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // A receiving kernel's Add composes the station's inbox (and, for a kernel that hands pieces back, Add_TakeOut its
+    // take-out readout): the station is a receiver from then on.
+    void Add_Admission(FCk_Handle& InStation)
+    {
+        InStation.AddOrGet_Fragment(FMars_Fragment_StationAdmission);
+    }
+
+    void Add_TakeOut(FCk_Handle& InStation)
+    {
+        InStation.AddOrGet_Fragment(FMars_Fragment_StationTakeOut);
+    }
+
+    // A kernel on InStation receives releases.
+    bool Get_IsAdmitting(const FCk_Handle& InStation)
+    {
+        return ck::IsValid(InStation) && InStation.Has_Fragment(FMars_Fragment_StationAdmission);
+    }
+
+    // A kernel on InStation hands pieces back (it keeps the take-out readout).
+    bool Get_HasTakeOut(const FCk_Handle& InStation)
+    {
+        return ck::IsValid(InStation) && InStation.Has_Fragment(FMars_Fragment_StationTakeOut);
+    }
+
+    // What a take-out would hand back now; empty on a station whose kernel hands nothing back.
+    TArray<FCk_Handle_FoodPiece> Get_Takeable(const FCk_Handle& InStation)
+    {
+        if (Get_HasTakeOut(InStation) == false)
+        { return TArray<FCk_Handle_FoodPiece>(); }
+
+        return InStation.Get_Fragment(FMars_Fragment_StationTakeOut).Takeable;
+    }
+
+    // InRelease into InStation's inbox, and the kernel woken: it answers on OnAdmission. False (nothing queued) for a station
+    // no kernel receives at.
+    bool Request_Admit(FCk_Handle& InStation, const FMars_CookingFeed_Release& InRelease)
+    {
+        if (Get_IsAdmitting(InStation) == false)
+        { return false; }
+
+        InStation.Get_Fragment(FMars_Fragment_StationAdmission).Inbox.Add(InRelease);
+        Broadcast_Queued(InStation);
+        return true;
+    }
+
+    // A take-out for InStation's kernel, which answers by handing pieces onto InRequest.Tray or by refusing.
+    void Request_StationTakeOut(FCk_Handle& InStation, const FMars_Request_StationTakeOut& InRequest)
+    {
+        if (ck::EnsureIfNot(Get_IsAdmitting(InStation), f"[CookingFeed] [{InStation.ToString()}] has no receiving kernel to take out of"))
+        { return; }
+
+        InStation.AddOrGet_Fragment(FMars_Fragment_StationTakeOut_Requests).TakeOutRequests.Add(InRequest);
+        Broadcast_Queued(InStation);
+    }
+
+    void Broadcast_Queued(FCk_Handle& InStation)
+    {
+        if (InStation.Has_Fragment(FMars_Fragment_StationAdmission_Signals))
+        { InStation.Get_Fragment(FMars_Fragment_StationAdmission_Signals).OnQueued.Broadcast(InStation); }
+    }
+
+    // The receiving kernel's drain takes the whole inbox (empty after), in arrival order.
+    TArray<FMars_CookingFeed_Release> Take_Inbox(FCk_Handle& InStation)
+    {
+        if (Get_IsAdmitting(InStation) == false)
+        { return TArray<FMars_CookingFeed_Release>(); }
+
+        auto& Admission = InStation.Get_Fragment(FMars_Fragment_StationAdmission);
+        TArray<FMars_CookingFeed_Release> Inbox = Admission.Inbox;
+        Admission.Inbox.Empty();
+        return Inbox;
+    }
+
+    // The receiving kernel's drain takes every queued take-out, in arrival order.
+    TArray<FMars_Request_StationTakeOut> Take_TakeOutRequests(FCk_Handle& InStation)
+    {
+        if (InStation.Has_Fragment(FMars_Fragment_StationTakeOut_Requests) == false)
+        { return TArray<FMars_Request_StationTakeOut>(); }
+
+        TArray<FMars_Request_StationTakeOut> Requests = InStation.Get_Fragment(FMars_Fragment_StationTakeOut_Requests).TakeOutRequests;
+        InStation.Request_TryRemove(FMars_Fragment_StationTakeOut_Requests);
+        return Requests;
+    }
+
+    // The receiving kernel's answer to one release from the inbox, broadcast once its drain applied.
+    void Broadcast_Admission(FCk_Handle& InStation, const FMars_CookingFeed_AdmissionAnswer& InAnswer)
+    {
+        if (InStation.Has_Fragment(FMars_Fragment_StationAdmission_Signals))
+        { InStation.Get_Fragment(FMars_Fragment_StationAdmission_Signals).OnAdmission.Broadcast(InStation, InAnswer.PieceId, InAnswer.Admission, InAnswer.Reason); }
+    }
+
+    // The kernel's Tick writes what a take-out would hand back, only on change.
+    void Write_Takeable(FCk_Handle& InStation, const TArray<FCk_Handle_FoodPiece>& InTakeable)
+    {
+        if (Get_HasTakeOut(InStation) == false)
+        { return; }
+
+        auto& TakeOut = InStation.Get_Fragment(FMars_Fragment_StationTakeOut);
+        if (Get_IsSamePieces(TakeOut.Takeable, InTakeable))
+        { return; }
+
+        TakeOut.Takeable = InTakeable;
+    }
+
+    bool Get_IsSamePieces(const TArray<FCk_Handle_FoodPiece>& InA, const TArray<FCk_Handle_FoodPiece>& InB)
+    {
+        if (InA.Num() != InB.Num())
+        { return false; }
+
+        for (int32 Index = 0; Index < InA.Num(); ++Index)
+        {
+            if (InA[Index] != InB[Index])
+            { return false; }
+        }
+
+        return true;
+    }
+
+    // A kernel hands InPiece to InLanding.Tray: detached first if anything holds it attached (a platter forgets a queued
+    // piece that has a scene parent), stamped with its landing, then loaded. The kernel's processor watches the tray's
+    // answer and finds its own pieces by TryGet_Landing.
+    void Send_ToTray(FCk_Handle_FoodPiece& InPiece, const FMars_Fragment_StationLanding& InLanding)
+    {
+        FCk_Handle Entity = InPiece;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Node))
+        { utils_scene_node::Request_Detach(Node); }
+
+        auto& Landing = InPiece.AddOrGet_Fragment(FMars_Fragment_StationLanding);
+        Landing = InLanding;
+        auto Tray = InLanding.Tray;
+        Tray.Request_Load(FMars_Request_Platter_Load(InPiece));
+    }
+
+    // InPiece's landing while it is on its way onto InTray; unset for any other piece or tray.
+    TOptional<FMars_Fragment_StationLanding> TryGet_Landing(const FCk_Handle_FoodPiece& InPiece, const FCk_Handle_Platter& InTray)
+    {
+        if (ck::Is_NOT_Valid(InPiece) || InPiece.Has_Fragment(FMars_Fragment_StationLanding) == false)
+        { return TOptional<FMars_Fragment_StationLanding>(); }
+
+        const auto Landing = InPiece.Get_Fragment(FMars_Fragment_StationLanding);
+        if (Landing.Tray != InTray)
+        { return TOptional<FMars_Fragment_StationLanding>(); }
+
+        return TOptional<FMars_Fragment_StationLanding>(Landing);
+    }
+
+    // The tray answered: the piece is no longer on its way.
+    void Clear_Landing(FCk_Handle_FoodPiece& InPiece)
+    {
+        InPiece.Request_TryRemove(FMars_Fragment_StationLanding);
+    }
+
+    void BindTo_OnAdmission(FCk_Handle& InStation, FMars_Delegate_StationAdmission_OnAdmission InDelegate)
+    {
+        auto& Fragment = InStation.AddOrGet_Fragment(FMars_Fragment_StationAdmission_Signals);
+        Fragment.OnAdmission.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    }
+
+    void UnbindFrom_OnAdmission(FCk_Handle& InStation, FMars_Delegate_StationAdmission_OnAdmission InDelegate)
+    {
+        if (InStation.Has_Fragment(FMars_Fragment_StationAdmission_Signals) == false)
+        { return; }
+
+        InStation.Get_Fragment(FMars_Fragment_StationAdmission_Signals).OnAdmission.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    }
+
+    void BindTo_OnQueued(FCk_Handle& InStation, FMars_Delegate_StationAdmission_OnQueued InDelegate)
+    {
+        auto& Fragment = InStation.AddOrGet_Fragment(FMars_Fragment_StationAdmission_Signals);
+        Fragment.OnQueued.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    }
+
+    void UnbindFrom_OnQueued(FCk_Handle& InStation, FMars_Delegate_StationAdmission_OnQueued InDelegate)
+    {
+        if (InStation.Has_Fragment(FMars_Fragment_StationAdmission_Signals) == false)
+        { return; }
+
+        InStation.Get_Fragment(FMars_Fragment_StationAdmission_Signals).OnQueued.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
     }
 }
 
@@ -163,6 +448,7 @@ mixin EMars_CookingFeed_Phase Get_Phase(const FCk_Handle_CookingFeed& Self)
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Phase;
 }
 
+// Seconds into the current timed phase, or into AwaitAdmission.
 mixin float32 Get_PhaseSeconds(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).PhaseSeconds;
@@ -193,7 +479,7 @@ mixin int32 Get_Available(const FCk_Handle_CookingFeed& Self)
     return utils_cooking_feed::Get_Available(Self.Get_Fragment(FMars_Fragment_CookingFeed));
 }
 
-// Admissions since the last Reset.
+// Admissions since the last SetSource (or a Reset the feed honoured).
 mixin int32 Get_Admitted(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Admitted;
@@ -220,7 +506,7 @@ mixin bool Get_IsBusy(const FCk_Handle_CookingFeed& Self)
     return Self.Get_Fragment(FMars_Fragment_CookingFeed).Phase != EMars_CookingFeed_Phase::Idle;
 }
 
-// Set from BeginTransfer until the admission answer (or a Cancel / Reset / SetSource).
+// Set from BeginTransfer until the transfer settles.
 mixin TOptional<FMars_CookingFeed_PieceId> TryGet_ActivePiece(const FCk_Handle_CookingFeed& Self)
 {
     const auto& Active = Self.Get_Fragment(FMars_Fragment_CookingFeed).Active;
@@ -238,6 +524,13 @@ mixin FCk_Handle_FoodPiece TryGet_ActiveFoodPiece(const FCk_Handle_CookingFeed& 
     { return FCk_Handle_FoodPiece(); }
 
     return Active.GetValue().Piece;
+}
+
+// The release in flight is still the one the feed awaits an answer for: AwaitAdmission under exactly InPieceId.
+mixin bool Get_IsAwaiting(const FCk_Handle_CookingFeed& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_CookingFeed);
+    return State.Phase == EMars_CookingFeed_Phase::AwaitAdmission && State.Active.IsSet() && State.Active.GetValue().Id.Get_IsSame(InPieceId);
 }
 
 // The last release sampled (valid through AwaitAdmission; stale afterwards).
@@ -372,4 +665,18 @@ mixin void UnbindFrom_OnTransferRefused(FCk_Handle_CookingFeed& Self, FMars_Dele
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnTransferRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnPieceLetGo(FCk_Handle_CookingFeed& Self, FMars_Delegate_CookingFeed_OnPieceLetGo InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_CookingFeed_Signals);
+    Fragment.OnPieceLetGo.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnPieceLetGo(FCk_Handle_CookingFeed& Self, FMars_Delegate_CookingFeed_OnPieceLetGo InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_CookingFeed_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnPieceLetGo.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

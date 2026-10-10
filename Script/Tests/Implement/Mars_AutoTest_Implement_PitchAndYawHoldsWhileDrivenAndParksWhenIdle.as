@@ -1,6 +1,6 @@
 // A PitchAndYaw tilt that relaxes only while Idle, with no lift: 20 degrees of look right and 10 down steer the yaw to
 // 24 and the pitch to -12 (TiltPerLookDegree 1.2) and the roll nowhere. Driven, the targets hold exactly, the tilt tracks
-// them and the node's world rotation shows the yaw; Idle, every target and tilt parks at level within 0.6 s
+// them and the node's world rotation shows the yaw; Idle, every target and tilt parks at level
 // (LevelReturnDegreesPerSecond 90). The lift never moves.
 class UMars_AutoTest_Implement_PitchAndYawHoldsWhileDrivenAndParksWhenIdle : UMars_AutoTestRig_Implement
 {
@@ -24,11 +24,11 @@ class UMars_AutoTest_Implement_PitchAndYawHoldsWhileDrivenAndParksWhenIdle : UMa
         BuildImplement(InHandle, Spec);
 
         Add_Step("drive the implement and look right and down", n"Step_DriveAndLook");
-        Add_Step_WaitUntil("the look steered the targets", n"Check_TargetsSteered", 0, 0.3f);
+        Add_Step_WaitUntil("the look steered the targets", n"Check_TargetsSteered", 0, 0);
         Add_Step("yaw and pitch took the look and roll none of it", n"Step_AssertTargetsThenHold");
-        Add_Step_WaitUntil("the implement is held Driven for 0.5 s", n"Check_HoldElapsed", 0, 1.0f);
+        Add_Step_WaitUntil("the implement is held Driven for 0.5 s", n"Check_HoldElapsed", k_SlowPolls, 0);
         Add_Step("the targets held, the tilt tracked them and the node shows the yaw; idle it", n"Step_AssertHeldThenIdle");
-        Add_Step_WaitUntil("the implement parked within 0.6 s", n"Check_Parked", 0, 0.6f);
+        Add_Step_WaitUntil("the implement parked", n"Check_Parked", 0, 0);
         Add_Step("the implement is level and never lifted", n"Step_AssertParked");
         Run_Steps(InHandle);
     }

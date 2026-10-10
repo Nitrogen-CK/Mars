@@ -8,16 +8,16 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UMars_AutoTes
         BuildLever(InHandle, EMars_Control_Activation::Inactive);
 
         Add_Step("start the interaction", n"Step_StartInteraction");
-        Add_Step_WaitUntil("the interaction exists", n"Check_HasInteraction", 0, 5.0f);
+        Add_Step_WaitUntil("the interaction exists", n"Check_HasInteraction", 0, 0);
         Add_Step("grip the lever", n"Step_BeginManipulation");
-        Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 5.0f);
-        Add_Step_WaitUntil("pull a third of the way", n"Check_PullPartWay", 0, 5.0f);
+        Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 0);
+        Add_Step_WaitUntil("pull a third of the way", n"Check_PullPartWay", 0, 0);
         Add_Step("still gripped, nothing finished", n"Step_AssertPartWay");
         Add_Step("let go", n"Step_EndManipulation");
-        Add_Step_WaitUntil("the handle settles back to rest", n"Check_SettledToRest", 0, 5.0f);
+        Add_Step_WaitUntil("the handle settles back to rest", n"Check_SettledToRest", k_SlowPolls, 0);
         Add_Step("released without engaging", n"Step_AssertReleased");
         Add_Step("cancel the still-live interaction", n"Step_CancelInteraction");
-        Add_Step_WaitUntil("the interaction finishes", n"Check_InteractionFinished", 0, 5.0f);
+        Add_Step_WaitUntil("the interaction finishes", n"Check_InteractionFinished", 0, 0);
         Add_Step("a cancel finishes Failed", n"Step_AssertCancelled");
         Run_Steps(InHandle);
     }

@@ -21,15 +21,15 @@ class UMars_AutoTest_Fry_ASearedPieceRetargetsItsResting : UMars_AutoTestRig_Fry
         Build_Pieces(1);
         _Plate = Build_Plate(InHandle);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("give the piece a Kinematic body and a Resting on the plate, as a searing pan leaves it", n"Step_SearedPiece");
-        Add_Step_WaitUntil("its body is in the simulation", n"Check_BodyAdded", 0, 2.0f);
+        Add_Step_WaitUntil("its body is in the simulation", n"Check_BodyAdded", 0, 0);
         Add_Step("admit it just above the oil", n"Step_Admit");
-        Add_Step_WaitUntil("it was admitted", n"Check_Added1", 0, 2.0f);
-        Add_Step_WaitFrames("the retarget and the motion type land", 3);
+        Add_Step_WaitUntil("it was admitted", n"Check_Added1", 0, 0);
+        Add_Step_WaitUntil("the retarget and the motion type landed", n"Check_RetargetedAndDynamic", 0, 0);
         Add_Step("its Resting names the scoop and the basket; its own body is Dynamic", n"Step_AssertRetargeted");
-        Add_Step_WaitUntil("the piece is in the oil", n"Check_InOil", 0, 3.0f);
+        Add_Step_WaitUntil("the piece is in the oil", n"Check_InOil", k_SlowPolls, 0);
         Add_Step("it floats like any piece", n"Step_AssertInOil");
         Run_Steps(InHandle);
     }
@@ -87,6 +87,19 @@ class UMars_AutoTest_Fry_ASearedPieceRetargetsItsResting : UMars_AutoTestRig_Fry
         Assert_True(Targets.Num() == 1 && Targets[0] == Plate, "before admission the piece rests only on the plate's terms");
 
         _Piece = AddPiece(FVector(-30.0, 0.0, float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0));
+    }
+
+    // The Resting names the scoop disc and the basket floor, and the piece's own body reads Dynamic: what the next step reads.
+    UFUNCTION()
+    private void Check_RetargetedAndDynamic(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        FCk_Handle Entity = _Food;
+        const FCk_Handle Scoop = _Spec.Nodes.ScoopBody;
+        const FCk_Handle Basket = _Spec.Nodes.BasketBody;
+        const auto Targets = Entity.As_Resting().Get_Targets();
+        auto Res = OutResult;
+        Res.Set(Targets.Num() == 2 && Targets[0] == Scoop && Targets[1] == Basket
+            && utils_jolt_body::Get_MotionType(_Body) == ECk_MotionType::Dynamic);
     }
 
     UFUNCTION()

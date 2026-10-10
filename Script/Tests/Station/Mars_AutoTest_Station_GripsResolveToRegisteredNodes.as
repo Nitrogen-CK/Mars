@@ -28,7 +28,7 @@ class UMars_AutoTest_Station_GripsResolveToRegisteredNodes : UCk_AutoTest_Base
         _Station = utils_station::Add(Root, Spec, Setup);
 
         Add_Step("the root carries a two-row grip table on the registered nodes", n"Step_AssertGripTable");
-        Add_Step_WaitUntil("the grip target exists", n"Check_HasGripTarget", 0, 2.0f);
+        Add_Step_WaitUntil("the grip target exists", n"Check_HasGripTarget", 0, 0);
         Add_Step("the grip interactable belongs to the station root", n"Step_AssertGripOwner");
         Add_Step("Validate() rejects two grips for one hand and a grip without a node tag", n"Step_AssertValidate");
         Add_Step("a grip naming an unregistered node rejects the station whole", n"Step_AssertUnregisteredRejected");

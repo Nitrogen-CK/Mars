@@ -1,7 +1,7 @@
 // A timed reach requested while the gloves are releasing interrupts the release: the phase goes Release -> Hold with no
-// stop at rest, and the new hold reach starts from the alpha the release had reached (no snap back to zero), then
-// completes. The first hold reaches fully before it is released, so the release starts from 1 and the alpha it is
-// interrupted at is well clear of zero.
+// stop at rest, and the new hold reach starts from the alpha the release had reached (within 0.05 either way: no snap
+// back to zero, no jump out to the target), then completes. The first hold reaches fully before it is released, so the
+// release starts from 1 and the alpha it is interrupted at is well clear of zero.
 class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UMars_AutoTestRig_Hands
 {
     private float32 _AlphaBefore = 0.0f;
@@ -19,15 +19,15 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UMars
         Add_HandsSm();
         Log_Phases();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("request a timed reach", n"Step_RequestTimedReach");
-        Add_Step_WaitUntil("the hold reaches fully and listens for a lost target", n"Check_HoldFullyReached", 0, 5.0f);
+        Add_Step_WaitUntil("the hold reaches fully and listens for a lost target", n"Check_HoldFullyReached", k_SlowPolls, 0);
         Add_Step("request a release", n"Step_RequestRelease");
-        Add_Step_WaitUntil("the release is under way", n"Check_ReleaseUnderWay", 0, 5.0f);
+        Add_Step_WaitUntil("the release is under way", n"Check_ReleaseUnderWay", k_SlowPolls, 0);
         Add_Step("record the release alpha and request a timed reach again", n"Step_RecordAlphaAndReach");
-        Add_Step_WaitUntil("the phase is Hold again", n"Check_SecondHold", 0, 5.0f);
+        Add_Step_WaitUntil("the phase is Hold again", n"Check_SecondHold", 0, 0);
         Add_Step("the new hold starts from the release alpha", n"Step_AssertNoSnap");
-        Add_Step_WaitUntil("the new hold reaches fully", n"Check_FullyReached", 0, 5.0f);
+        Add_Step_WaitUntil("the new hold reaches fully", n"Check_FullyReached", k_SlowPolls, 0);
         Add_Step("the phases ran Hold, Release, Hold", n"Step_AssertSequence");
         Run_Steps(InHandle);
     }
@@ -71,8 +71,8 @@ class UMars_AutoTest_FPHands_ReachDuringReleaseContinuesFromReleaseAlpha : UMars
     private void Step_AssertNoSnap(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto StartAlpha = _SecondHoldStartAlpha.GetValue();
-        Assert_True(StartAlpha >= _AlphaBefore - 0.05f,
-            f"the new hold starts from the release alpha, no snap to zero (first hold alpha {StartAlpha}, release alpha {_AlphaBefore})");
+        Assert_True(Math::Abs(StartAlpha - _AlphaBefore) <= 0.05f,
+            f"the new hold starts from the release alpha, no snap back to zero or out to the target (second hold alpha {StartAlpha}, release alpha {_AlphaBefore})");
     }
 
     UFUNCTION()

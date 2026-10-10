@@ -1,6 +1,16 @@
-// Despite the name, exiting the Hands state machine resets nothing: stopping it mid-Hold leaves the phase at Hold (no
-// state is entered, so nothing requests a phase). It is re-entering it that resets: starting it again re-enters Rest,
-// whose enter task puts the phase back to None - what re-entering Alive does to the gloves.
+// The state the player's Alive is to the gloves here: a root state running the Hands sub-SM task.
+class UMars_AutoTestState_HandsSubSmRig : UCk_SmState_EntityScript
+{
+    UFUNCTION(BlueprintOverride)
+    void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
+    {
+        AddTask(InHandle, UMars_SmTask_HandsSubSm);
+    }
+}
+
+// Leaving the Hands sub-SM puts the gloves back to rest, as leaving Alive (Downed) does: the gloves hold a timed reach
+// under a state that runs the Hands sub-SM task, and stopping that state machine resets the phase to None and forgets the
+// reach target, so nothing is left stretched toward a device.
 class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UMars_AutoTestRig_Hands
 {
     UFUNCTION(BlueprintOverride)
@@ -12,44 +22,31 @@ class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UMars_AutoTestRig_Hands
         Spec.Reach.Grab.BackSeconds = 0.2f;
         Spec.Reach.Hold.ReleaseSeconds = 0.2f;
         Add_Hands(InHandle, Spec);
-        Add_HandsSm();
+        _Sm = utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_HandsSubSmRig));
         Log_Phases();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands sub-SM rests, listening for a reach", n"Check_SubSmRestListening", 0, 0);
         Add_Step("request a timed reach", n"Step_RequestTimedReach");
-        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 5.0f);
-        Add_Step("stop the Hands state machine", n"Step_StopSm");
-        Add_Step_WaitUntil("the Hands state machine is stopped", n"Check_SmStopped", 0, 5.0f);
-        Add_Step("the phase is still Hold: exiting requests no phase", n"Step_AssertStillHold");
-        Add_Step("start the Hands state machine again", n"Step_StartSm");
-        Add_Step_WaitUntil("the phase is None", n"Check_IsNone", 0, 5.0f);
-        Add_Step("the phases ran Hold, None", n"Step_AssertSequence");
+        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
+        Add_Step("stop the state machine that runs the Hands sub-SM", n"Step_StopSm");
+        Add_Step_WaitUntil("the phase is None", n"Check_IsNone", 0, 0);
+        Add_Step("the phases ran Hold, None, and the reach is forgotten", n"Step_AssertResetToNone");
         Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Check_SubSmRestListening(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hands.Get_Phase() == EMars_FPHands_Phase::None
+            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
+            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound());
     }
 
     UFUNCTION()
     private void Step_StopSm(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         utils_state_machine::Request_Stop(_Sm);
-    }
-
-    UFUNCTION()
-    private void Check_SmStopped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(utils_state_machine::Get_RunStatus(_Sm) == ECk_SmRunStatus::Stopped);
-    }
-
-    UFUNCTION()
-    private void Step_AssertStillHold(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the phase is still Hold once the state machine stopped (got {_Hands.Get_Phase() :n})");
-    }
-
-    UFUNCTION()
-    private void Step_StartSm(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        utils_state_machine::Request_Start(_Sm);
     }
 
     UFUNCTION()
@@ -60,9 +57,11 @@ class UMars_AutoTest_FPHands_SubSmExitResetsToNone : UMars_AutoTestRig_Hands
     }
 
     UFUNCTION()
-    private void Step_AssertSequence(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertResetToNone(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Rest, "the restarted state machine is in Rest");
+        Assert_True(utils_state_machine::Get_RunStatus(_Sm) == ECk_SmRunStatus::Stopped, "the state machine is stopped");
+        Assert_False(_Hands.Get_Target().IsSet(), "the reach target is forgotten");
+        Assert_False(_Hands.Get_ReachInteractTarget().IsSet(), "the reach's interact target is forgotten");
 
         Assert_Equals_Int(_Phases.Num(), 2, "two phase changes");
         if (_Phases.Num() != 2)

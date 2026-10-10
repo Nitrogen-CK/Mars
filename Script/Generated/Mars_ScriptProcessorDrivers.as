@@ -562,7 +562,7 @@ class UMars_Processor_Cutting_HandleRequests_Driver : UMars_Processor_Cutting_Ha
     }
 }
 
-class UMars_Processor_Cutting_Setup_Driver : UMars_Processor_Cutting_Setup
+class UMars_Processor_Cutting_Tick_Driver : UMars_Processor_Cutting_Tick
 {
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -574,7 +574,7 @@ class UMars_Processor_Cutting_Setup_Driver : UMars_Processor_Cutting_Setup
     UFUNCTION(BlueprintOverride)
     void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
     {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Cutting_Setup_Driver::ForEachBatch");
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Cutting_Tick_Driver::ForEachBatch");
         const int32 NumEntities = Batch.Num();
         for (int32 i = 0; i < NumEntities; ++i)
         {
@@ -821,29 +821,6 @@ class UMars_Processor_FoodBoard_HandleRequests_Driver : UMars_Processor_FoodBoar
             FMars_Fragment_FoodBoard_Requests& P0 = Batch.Get(i, FMars_Fragment_FoodBoard_Requests);
             FMars_Fragment_FoodBoard& P1 = Batch.Get(i, FMars_Fragment_FoodBoard);
             ForEachEntity(InDeltaT, Handle, P0, P1);
-        }
-    }
-}
-
-class UMars_Processor_FoodBoard_Loosen_Driver : UMars_Processor_FoodBoard_Loosen
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_FoodBoard);
-        Super::Configure(Query);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_FoodBoard_Loosen_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_FoodBoard& P0 = Batch.Get(i, FMars_Fragment_FoodBoard);
-            ForEachEntity(InDeltaT, Handle, P0);
         }
     }
 }
@@ -1226,6 +1203,29 @@ class UMars_Processor_HeldItem_HandleRequests_Driver : UMars_Processor_HeldItem_
             FMars_Fragment_HeldItem_Requests& P0 = Batch.Get(i, FMars_Fragment_HeldItem_Requests);
             FMars_Fragment_HeldItem& P1 = Batch.Get(i, FMars_Fragment_HeldItem);
             ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_HeldItem_Sync_Driver : UMars_Processor_HeldItem_Sync
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_HeldItem);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_HeldItem_Sync_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_HeldItem& P0 = Batch.Get(i, FMars_Fragment_HeldItem);
+            ForEachEntity(InDeltaT, Handle, P0);
         }
     }
 }
@@ -1896,6 +1896,31 @@ class UMars_Processor_PlatterDock_Sync_Driver : UMars_Processor_PlatterDock_Sync
     }
 }
 
+class UMars_Processor_PlayerViewpoint_HandleRequests_Driver : UMars_Processor_PlayerViewpoint_HandleRequests
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_PlayerViewpoint_Requests);
+        Query.ReadWrite(FMars_Fragment_PlayerViewpoint);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_PlayerViewpoint_HandleRequests_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_PlayerViewpoint_Requests& P0 = Batch.Get(i, FMars_Fragment_PlayerViewpoint_Requests);
+            FMars_Fragment_PlayerViewpoint& P1 = Batch.Get(i, FMars_Fragment_PlayerViewpoint);
+            ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
 class UMars_Processor_Resting_HandleRequests_Driver : UMars_Processor_Resting_HandleRequests
 {
     UFUNCTION(BlueprintOverride)
@@ -2333,6 +2358,29 @@ class UMars_Processor_WorldItem_Mount_Driver : UMars_Processor_WorldItem_Mount
             FMars_Fragment_WorldItem_PendingMount& P0 = Batch.Get(i, FMars_Fragment_WorldItem_PendingMount);
             FMars_Fragment_WorldItem& P1 = Batch.Get(i, FMars_Fragment_WorldItem);
             ForEachEntity(InDeltaT, Handle, P0, P1);
+        }
+    }
+}
+
+class UMars_Processor_WorldItem_Reconcile_Driver : UMars_Processor_WorldItem_Reconcile
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.ReadWrite(FMars_Fragment_WorldItem);
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_WorldItem_Reconcile_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            FMars_Fragment_WorldItem& P0 = Batch.Get(i, FMars_Fragment_WorldItem);
+            ForEachEntity(InDeltaT, Handle, P0);
         }
     }
 }

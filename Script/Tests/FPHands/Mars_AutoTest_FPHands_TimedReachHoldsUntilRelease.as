@@ -14,17 +14,17 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UMars_AutoTestRig_Han
         Add_HandsSm();
         Log_Phases();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("request a timed reach", n"Step_RequestTimedReach");
-        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 5.0f);
+        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
         Add_Step_WaitSeconds("hold for longer than any phase timer", 0.6f);
         Add_Step("the phase is still Hold", n"Step_AssertStillHold");
         Add_Step("request a second timed reach while holding", n"Step_RequestTimedReach");
         Add_Step_WaitSeconds("let the drain run", 0.1f);
         Add_Step("a reach requested mid-Hold is ignored", n"Step_AssertHoldIgnoresReach");
-        Add_Step_WaitUntil("the Hold state listens for a lost target", n"Check_HoldListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hold state listens for a lost target", n"Check_HoldListening", 0, 0);
         Add_Step("request a release", n"Step_RequestRelease");
-        Add_Step_WaitUntil("the phase is back to None", n"Check_IsNone", 0, 5.0f);
+        Add_Step_WaitUntil("the phase is back to None", n"Check_IsNone", k_SlowPolls, 0);
         Add_Step("the phases ran Hold, Release, None", n"Step_AssertSequence");
         Run_Steps(InHandle);
     }

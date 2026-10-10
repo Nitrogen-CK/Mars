@@ -32,9 +32,9 @@ class UMars_AutoTest_Gate_UnsourcedSinkClosesStartOpenGate : UCk_AutoTest_Base
         { _Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnPoweredChanged")); }
 
         Add_Step("the gate starts open on a sink with an unsourced channel", n"Step_AssertStart");
-        Add_Step_WaitUntil("the driver evaluates the sink", n"Check_Evaluated", 0, 5.0f);
+        Add_Step_WaitUntil("the driver evaluates the sink", n"Check_Evaluated", 0, 0);
         Add_Step("the first evaluation broadcast unpowered", n"Step_AssertBroadcast");
-        Add_Step_WaitUntil("the unpowered sink closes the gate", n"Check_Closed", 0, 5.0f);
+        Add_Step_WaitUntil("the unpowered sink closes the gate", n"Check_Closed", 0, 0);
         Run_Steps(InHandle);
     }
 

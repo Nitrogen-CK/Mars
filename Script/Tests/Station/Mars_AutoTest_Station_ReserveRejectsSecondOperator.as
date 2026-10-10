@@ -20,9 +20,9 @@ class UMars_AutoTest_Station_ReserveRejectsSecondOperator : UMars_AutoTestRig_St
         _Station.BindTo_OnReserveRejected(FMars_Delegate_Station_OnReserveRejected(this, n"OnReserveRejected"));
 
         Add_Step("reserve for operator A", n"Step_ReserveA");
-        Add_Step_WaitUntil("the station is reserved", n"Check_Reserved", 0, 2.0f);
+        Add_Step_WaitUntil("the station is reserved", n"Check_Reserved", 0, 0);
         Add_Step("operator A holds the station; reserve for operator B", n"Step_ReserveB");
-        Add_Step_WaitUntil("operator B is rejected", n"Check_Rejected", 0, 2.0f);
+        Add_Step_WaitUntil("operator B is rejected", n"Check_Rejected", 0, 0);
         Add_Step("B was rejected Occupied and A still holds the station", n"Step_AssertRejected");
         Run_Steps(InHandle);
     }

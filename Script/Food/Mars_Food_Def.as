@@ -1,6 +1,7 @@
 // A food a station works on, as every layer reads it: what it is (Data: the solid, its mass, its kind), how small a cut may
-// leave it (Tuners, the FoodPiece kernel's own), how it looks whole and cut (Visuals) and how it lies on a board (Layout).
-// A new food is a new asset of this class; the kernels and the stations stay untouched.
+// leave it (Tuners, the FoodPiece kernel's own), the surface of every body its pieces get (Body, the FoodPiece kernel's
+// own), how it looks whole and cut (Visuals) and how it lies on a board (Layout). A new food is a new asset of this class;
+// the kernels and the stations stay untouched.
 
 struct FMars_Food_Data
 {
@@ -47,14 +48,17 @@ class UMars_Food_Def : UDataAsset
     UPROPERTY(Category = "Tuners")
     FMars_FoodPiece_Tuners Tuners;
 
+    UPROPERTY(Category = "Body")
+    FMars_FoodPiece_BodyTuners Body;
+
     UPROPERTY(Category = "Visuals")
     FMars_Food_Visuals Visuals;
 
     UPROPERTY(Category = "Layout")
     FMars_Food_Layout Layout;
 
-    // What only the definition knows. Mass, tuners and cap ranges are the FoodPiece spec's (checked when the joint is
-    // composed); whether the materials cover the mesh's slots is the display's (checked when it is added).
+    // What only the definition knows. Mass, tuners, cap ranges and the body surface are the FoodPiece spec's (checked when
+    // the joint is composed); whether the materials cover the mesh's slots is the display's (checked when it is added).
     FMars_Validation Validate() const
     {
         if (Data.Mesh.IsNull())
@@ -115,7 +119,7 @@ class UMars_Food_Def : UDataAsset
         PieceData.Kind = Data.Kind;
 
         // A rejected spec already ensured in utils_foodpiece::Add.
-        return utils_foodpiece::Add(InEntity, FMars_FoodPiece_Spec(PieceData, Tuners, Visuals.Cap));
+        return utils_foodpiece::Add(InEntity, FMars_FoodPiece_Spec(PieceData, Tuners, Visuals.Cap, Body));
     }
 
     // InWorld with the Layout applied (yaw, lift) and unit scale: pieces are cut and simulated unscaled.
@@ -127,8 +131,9 @@ class UMars_Food_Def : UDataAsset
         return JointWorld;
     }
 
-    // The display every piece of this food wears, on the piece's own entity. A piece already ending (a clear that raced its
-    // import) is not shown.
+    // The display every piece of this food wears, on the piece's own entity, starting from the piece's own cook state (a cut
+    // half or a re-dressed piece looks as cooked as its ledger says). A piece already ending (a clear that raced its import)
+    // is not shown.
     void Add_Display(FCk_Handle_FoodPiece InPiece) const
     {
         if (utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
@@ -141,7 +146,9 @@ class UMars_Food_Def : UDataAsset
         FCk_Handle Entity = InPiece;
         auto Owner = Entity.As_Transform();
         // A rejected display already ensured in utils_runtime_mesh_display::Add.
-        utils_runtime_mesh_display::Add(Owner, Spec);
+        const auto Display = utils_runtime_mesh_display::Add(Owner, Spec);
+        if (ck::IsValid(Display))
+        { utils_cookstate::Request_Write(Display, utils_cookstate::Make_DisplayParams(InPiece.Get_CookState())); }
     }
 }
 

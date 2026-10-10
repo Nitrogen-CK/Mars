@@ -33,11 +33,11 @@ class UMars_AutoTest_DamageDealer_FriendlyFireRejected : UCk_AutoTest_Base
         _Dealer.BindTo_OnDamageRejected(FMars_Delegate_DamageDealer_OnDamageRejected(this, n"OnDamageRejected"));
 
         Add_Step("both on team One: deal Blunt 10", n"Step_DealSameTeam");
-        Add_Step_WaitUntil("the hit is rejected", n"Check_Rejected", 0, 2.0f);
+        Add_Step_WaitUntil("the hit is rejected", n"Check_Rejected", 0, 0);
         Add_Step("rejected Friendly; retag the target Two and deal again", n"Step_AssertFriendlyAndRetag");
-        Add_Step_WaitUntil("Health reads 90", n"Check_At90", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 90", n"Check_At90", 0, 0);
         Add_Step("retag the target One; a friendly-fire attacker on One deals", n"Step_FriendlyFireDeal");
-        Add_Step_WaitUntil("Health reads 80", n"Check_At80", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 80", n"Check_At80", 0, 0);
         Add_Step("only the first hit was rejected", n"Step_AssertFinal");
         Run_Steps(InHandle);
     }

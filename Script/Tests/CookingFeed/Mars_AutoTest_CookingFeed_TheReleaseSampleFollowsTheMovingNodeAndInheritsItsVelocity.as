@@ -1,24 +1,30 @@
-// The release node slides along +Y at 500 uu/s through the whole transfer, and from the carry the hand node rides on it (as a
-// station's glove carries its piece to the release node): the release carries the carried piece's pose of that frame, its
-// middle on the node, and its velocity is the spec's local drop (0, 0, -20) plus half the node's measured velocity,
-// (0, 250, 0), within 20 percent.
+// The release node slides along +Y at 500 uu/s through the whole transfer, and the feed carries its hand to it (the test
+// spec's hand geometry puts the held piece's middle on the node at the release): the release carries the carried piece's
+// pose of that frame, its middle on the node as the feed last read it (the hand follows the node it sampled the frame
+// before, so it trails by at most two frames of the node's travel), and its velocity is the spec's local drop
+// (0, 0, -20) plus half the node's measured velocity, (0, 250, 0), within 20 percent.
 class UMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInheritsItsVelocity : UMars_AutoTestRig_CookingFeed
 {
     private const float64 k_Speed = 500.0;
     private const float64 k_Tolerance = 0.2;
 
     private float32 _MoveStart = 0.0f;
+    // The longest frame seen while the node moved: the hand's trail is bounded by two of them.
+    private float32 _LongestFrameSeconds = 0.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        BuildFeed(InHandle, Make_TestSpec());
+        // A carry long enough that its easing has settled onto the node by its last frame.
+        auto Spec = Make_TestSpec();
+        Spec.Timing = FMars_CookingFeed_TimingSpec(0.1f, 0.05f, 0.5f, 0.1f);
+        BuildFeed(InHandle, Spec);
         Add_Steps_SourceTheFeed();
 
         Add_Step("start moving the release node", n"Step_StartMoving");
-        Add_Step_WaitUntil("the node has moved for 0.2 s", n"Check_MovedAWhile", 0, 1.0f);
+        Add_Step_WaitUntil("the node has moved for 0.2 s", n"Check_MovedAWhile", k_SlowPolls, 0);
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the release while the node moves", n"Check_ReleasedWhileMoving", 0, 2.0f);
+        Add_Step_WaitUntil("the release while the node moves", n"Check_ReleasedWhileMoving", 0, 0);
         Add_Step("the release follows the node and inherits its velocity", n"Step_AssertRelease");
         Run_Steps(InHandle);
     }
@@ -29,19 +35,13 @@ class UMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInherits
         _MoveStart = float32(System::GetGameTimeInSeconds());
     }
 
-    // The node's offset this frame: k_Speed along +Y since the start. From the carry the hand rides the node, keeping the
-    // rotation it took at the grasp.
+    // The node's offset this frame: k_Speed along +Y since the start.
     private void Move_ReleaseNode()
     {
         const auto Elapsed = float64(System::GetGameTimeInSeconds()) - float64(_MoveStart);
         const auto NodeLocal = k_ReleaseLocal + FVector(0.0, k_Speed * Elapsed, 0.0);
         utils_scene_node::Request_UpdateOffset(_ReleaseNode, FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(NodeLocal)));
-
-        if (_Feed.Get_Phase() != EMars_CookingFeed_Phase::Carry)
-        { return; }
-
-        const auto HandRotation = utils_scene_node::Get_Offset(_HandNode).GetRotation();
-        utils_scene_node::Request_UpdateOffset(_HandNode, FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(HandRotation, NodeLocal)));
+        _LongestFrameSeconds = Math::Max(_LongestFrameSeconds, float32(Gameplay::GetWorldDeltaSeconds()));
     }
 
     UFUNCTION()
@@ -71,7 +71,8 @@ class UMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInherits
         const auto NodeWorld = _ReleaseNodeAtRelease[0];
         const auto Centre = Release.WorldTransform.TransformPosition(utils_searing::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(Release.Piece.Get_Geometry())));
         const auto Gap = Centre.Distance(NodeWorld.GetLocation());
-        Assert_True(Gap <= 1.0, f"the released piece's middle is at the node's pose that frame (gap {Gap})");
+        const auto Trail = 2.0 * k_Speed * float64(_LongestFrameSeconds) + 1.0;
+        Assert_True(Gap <= Trail, f"the released piece's middle is on the node the hand followed (gap {Gap}, two frames' travel {Trail})");
 
         const auto RootWorld = FTransform(FRotator::ZeroRotator, k_Origin);
         const auto Travelled = RootWorld.InverseTransformPosition(Release.WorldTransform.GetLocation()).Y;

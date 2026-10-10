@@ -1,7 +1,7 @@
 // A pickup lands at the gloves' Grip. A carrier with gloves reaches for a meat slab (as the resolver would) and starts its
 // pickup: every frame before the gloves' Grip the slab's mount is World and it lies where it lay; it is stowed within a few
-// frames of the Grip (well before the task's no-reach fallback could act) and Carried on the carrier's back. A second carrier without gloves picks up a second slab: it is stowed at once
-// (no reach to wait for). Isolated origin (23600, -15000, -30000).
+// frames of the Grip into the empty hands' bag slot, which selects itself, so it is Held on the carrier's Hand. A second carrier without gloves picks up a second slab: it is stowed at once
+// (no reach to wait for) and Held on its Hand. Isolated origin (23600, -15000, -30000).
 class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrier
 {
     default _TimeoutSeconds = 30.0f;
@@ -9,9 +9,17 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
     private const FVector k_Origin = FVector(23600.0, -15000.0, -30000.0);
     private const FVector k_SlabOffset = FVector(200.0, 0.0, 0.0);
     private const FVector k_BareOffset = FVector(0.0, 400.0, 0.0);
-    // A stow with nothing to wait for lands within a few frames; a wrongly awaited grip would take the reach window.
-    private const float32 k_AtOnceSeconds = 0.3f;
-    // A stow at the Grip lands within a few frames of it; the task's fallback (half a second after it began waiting) later.
+    // From the bare pickup's start: the target's drain that starts the interaction, the interactable's step into its
+    // pickup state (whose task, with no gloves, asks the transfer at once), the holder's transfer drain and the poll
+    // after it. A wrongly awaited grip would take the reach window.
+    private const int32 k_MaxBareStowFrames = 5;
+    // The slabs' construction (their joints import), their fall onto their floors and the mounts' arrivals outrun the
+    // default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
+    // A body slower than this (cm/s) for k_RestPolls polls in a row lies still: one slow poll may be a bounce's top.
+    private const float64 k_RestSpeed = 2.0;
+    private const int32 k_RestPolls = 10;
+    // A stow at the Grip lands within a few frames of it.
     private const float64 k_AtGripSeconds = 0.25;
 
     private FCk_Handle _SlabEntity;
@@ -21,7 +29,7 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
 
     private FCk_Handle _BareCarrier;
     private FCk_Handle_Hotbar _BareHotbar;
-    private FCk_Handle_Transform _BareBackNode;
+    private FCk_Handle_Transform _BareHandNode;
 
     private FTransform _SlabWorldAtStart;
     private int32 _FramesBeforeGrip = 0;
@@ -30,6 +38,10 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
     // Game time the gloves were first seen in Grip, and the slab's holder first seen empty.
     private TOptional<float64> _GripSeconds;
     private TOptional<float64> _StowSeconds;
+    // The frame the bare pickup started, and the frame its slab was first seen stowed.
+    private int64 _BarePickUpFrame = -1;
+    private int64 _BareStowSeenFrame = -1;
+    private int32 _RestPolls = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -42,32 +54,32 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
         _SlabEntity = Spawn_Slab(InHandle, k_Origin + k_SlabOffset);
         _BareSlabEntity = Spawn_Slab(InHandle, k_Origin + k_BareOffset + k_SlabOffset);
 
-        Add_Step_WaitUntil("both slabs are constructed and their bodies added", n"Check_SlabsReady", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
-        Add_Step_WaitSeconds("the slabs settle on their floors", 1.0f);
+        Add_Step_WaitUntil("both slabs are constructed and their bodies added", n"Check_SlabsReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
+        Add_Step_WaitUntil("the slabs lie still on their floors", n"Check_SlabsAtRest", k_SlowPolls, 0);
         Add_Step("each carrier focuses its slab's pickup", n"Step_FocusBoth");
-        Add_Step_WaitFrames("the pickups' targets enter Focused", 3);
+        Add_Step_WaitUntil("the pickups' targets enter Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier reaches for its slab and picks it up", n"Step_ReachAndPickUp");
-        Add_Step_WaitUntil("the gloves close on the slab (every frame before: World, where it lay)", n"Check_GripWatchingTheSlab", 0, 3.0f);
-        Add_Step_WaitUntil("the slab is stowed and Carried on the back", n"Check_SlabOnTheBack", 0, 5.0f);
-        Add_Step("nothing moved before the Grip; after it the slab is Carried", n"Step_AssertWaitedForTheGrip");
+        Add_Step_WaitUntil("the gloves close on the slab (every frame before: World, where it lay)", n"Check_GripWatchingTheSlab", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the slab is stowed and Held on the hand", n"Check_SlabInTheHand", k_SlowPolls, 0);
+        Add_Step("nothing moved before the Grip; after it the slab is Held", n"Step_AssertWaitedForTheGrip");
         Add_Step("the bare carrier picks its slab up", n"Step_BarePickUp");
-        Add_Step_WaitUntil("the bare carrier's slab is stowed at once", n"Check_BareStowed", 0, k_AtOnceSeconds);
-        Add_Step_WaitUntil("and Carried on its back", n"Check_BareOnTheBack", 0, 5.0f);
+        Add_Step_WaitUntil("the bare carrier's slab is stowed at once", n"Check_BareStowed", 0, 0);
+        Add_Step_WaitUntil("and Held on its hand", n"Check_BareInTheHand", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 
-    // A carrier with a Back node and a hotbar, and no gloves.
+    // A carrier with a Hand node, a Back node and a hotbar, and no gloves.
     private void Build_BareCarrier(FCk_Handle InHandle)
     {
         _BareCarrier = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(_BareCarrier, FTransform(FRotator::ZeroRotator, k_Origin + k_BareOffset), ECk_Replication::DoesNotReplicate);
-        auto HandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
-        _BareBackNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0))).As_Transform();
+        _BareHandNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(40.0, 20.0, 60.0))).As_Transform();
+        auto BackNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(-30.0, 0.0, 20.0))).As_Transform();
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, HandNode));
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, _BareBackNode));
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _BareHandNode));
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, BackNode));
         utils_attach_points::Add(_BareCarrier, AttachPointsSpec);
 
         auto Spec = FMars_Hotbar_Spec();
@@ -114,6 +126,17 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
             && utils_jolt_body::Get_IsBodyAdded(_Slab.Get_Body()) && utils_jolt_body::Get_IsBodyAdded(_BareSlab.Get_Body()));
     }
 
+    UFUNCTION()
+    private void Check_SlabsAtRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto IsSlow = utils_jolt_body::Get_LinearVelocity(_Slab.Get_Body()).Size() < k_RestSpeed
+            && utils_jolt_body::Get_LinearVelocity(_BareSlab.Get_Body()).Size() < k_RestSpeed;
+        _RestPolls = IsSlow ? _RestPolls + 1 : 0;
+
+        auto Res = OutResult;
+        Res.Set(_RestPolls >= k_RestPolls);
+    }
+
     private bool Get_IsConstructed(FCk_Handle InEntity) const
     {
         return ck::IsValid(InEntity) && InEntity.Is_WorldItem() && ck::IsValid(InEntity.As_WorldItem().Get_HeldItem());
@@ -126,6 +149,8 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
         auto BarePickup = _BareSlab.Get_Pickup();
         BarePickup.Request_Focus(FMars_Request_Interactable_Focus(_BareCarrier));
+        Await_FocusOf(Pickup);
+        Await_FocusOf(BarePickup);
     }
 
     // What the player's resolver and interaction glue do on a press: the gloves reach for the pickup's target, and the
@@ -166,13 +191,13 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
     }
 
     UFUNCTION()
-    private void Check_SlabOnTheBack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_SlabInTheHand(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         if (ck::Is_NOT_Valid(_Slab.Get_HeldItem()) && _StowSeconds.IsSet() == false)
         { _StowSeconds = TOptional<float64>(System::GetGameTimeInSeconds()); }
 
         auto Res = OutResult;
-        Res.Set(_Slab.Get_Mount() == EMars_WorldItem_Mount::Carried && Get_MountParent(_Slab) == _BackNode);
+        Res.Set(_Slab.Get_Mount() == EMars_WorldItem_Mount::Held && Get_MountParent(_Slab) == _HandNode);
     }
 
     UFUNCTION()
@@ -193,20 +218,32 @@ class UMars_AutoTest_WorldItem_APickupWaitsForTheGrip : UMars_AutoTestRig_Carrie
         auto Pickup = _BareSlab.Get_Pickup();
         auto Target = Pickup.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_BareCarrier, _BareCarrier));
+        _BarePickUpFrame = utils_time::Get_FrameCounter();
     }
 
+    // Asserts the frame bound itself when it holds: the step after it is a wait.
     UFUNCTION()
     private void Check_BareStowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::Is_NOT_Valid(_BareSlab.Get_HeldItem()));
+        if (ck::IsValid(_BareSlab.Get_HeldItem()))
+        {
+            Res.Set(false);
+            return;
+        }
+
+        _BareStowSeenFrame = utils_time::Get_FrameCounter();
+        const auto Frames = _BareStowSeenFrame - _BarePickUpFrame;
+        Assert_True(Frames <= k_MaxBareStowFrames,
+            f"the bare carrier's slab was stowed within {k_MaxBareStowFrames} frames of its pickup (took {Frames})");
+        Res.Set(true);
     }
 
     UFUNCTION()
-    private void Check_BareOnTheBack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_BareInTheHand(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_BareSlab.Get_Mount() == EMars_WorldItem_Mount::Carried && Get_MountParent(_BareSlab) == _BareBackNode
+        Res.Set(_BareSlab.Get_Mount() == EMars_WorldItem_Mount::Held && Get_MountParent(_BareSlab) == _BareHandNode
             && _BareSlab.Get_Carrier() == _BareCarrier);
     }
 

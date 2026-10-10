@@ -19,15 +19,15 @@ class UMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInT
         Spawn_Station(InHandle, k_Origin);
         Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
+        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", k_SlowPolls, 0);
         Add_Step("dock the input platter", n"Step_DockInput");
-        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
-        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
+        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("add food; leave in the frame the feed releases", n"Step_AddFoodAndLeaveOnRelease");
-        Add_Step_WaitUntil("the station is Idle, the joint lies on the board and the glove is back", n"Check_IdleWithJoint", 0, 5.0f);
+        Add_Step_WaitUntil("the station is Idle, the joint lies on the board and the glove is back", n"Check_IdleWithJoint", k_SlowPolls, 0);
         Add_Step_WaitFrames("a second place would have drained by now", 5);
         Add_Step("the joint landed once; the platter is empty", n"Step_Assert");
         Run_Steps(InHandle);

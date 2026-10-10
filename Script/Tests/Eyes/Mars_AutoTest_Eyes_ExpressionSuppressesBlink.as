@@ -15,6 +15,9 @@ class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UMars_AutoTestRig_Eyes
     // Frame quantisation of the clear request and of the poll that sees the blink complete.
     private float _ResumeToleranceSeconds = 0.05;
 
+    // Frame quantisation between the window's game-time clock and the step's summed frame deltas.
+    private const float k_WindowSlackSeconds = 0.5;
+
     private int32 _CountAtSuppress = 0;
     private float _WindowStartSeconds = 0.0;
     private bool _BlinkSeenWhileSuppressed = false;
@@ -42,10 +45,11 @@ class UMars_AutoTest_Eyes_ExpressionSuppressesBlink : UMars_AutoTestRig_Eyes
         Add_Step_WaitUntil("the eyes completed a blink (a double blink is now pending)", n"Check_Blinked");
         Add_Step("play an expression that forbids blinking, until cleared", n"Step_PlayNoBlink");
         Add_Step_WaitUntil("the expression shows (15) and the eyes are open", n"Check_SuppressedAndOpen");
-        Add_Step_WaitUntil("a window that would hold two blinks passed, sampling every poll", n"Check_WindowPassed", 0, 3.0f);
+        Add_Step_WaitUntil("a window that would hold two blinks passed, sampling every poll", n"Check_WindowPassed",
+            0, _WindowSeconds + k_WindowSlackSeconds);
         Add_Step("the eyes stayed open and the blink count did not move", n"Step_AssertSuppressed");
         Add_Step("clear the expression", n"Step_ClearNoBlink");
-        Add_Step_WaitUntil("the eyes completed a blink again", n"Check_Resumed", 0, 3.0f);
+        Add_Step_WaitUntil("the eyes completed a blink again", n"Check_Resumed", k_SlowPolls, 0);
         Add_Step("the first blink after the expression came no sooner than a full interval", n"Step_AssertNoOrphanBlink");
         Run_Steps(InHandle);
     }

@@ -26,12 +26,12 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UMars_AutoTestR
         BuildLever(InHandle);
         Add_HandsSm();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a push", n"Check_RestListeningForPush", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a push", n"Check_RestListeningForPush", 0, 0);
         Add_Step("request a push", n"Step_RequestPush");
-        Add_Step_WaitUntil("the gloves are busy pushing", n"Check_IsPush", 0, 5.0f);
+        Add_Step_WaitUntil("the gloves are busy pushing", n"Check_IsPush", 0, 0);
         Add_Step("while pushing: add the lever to the resolver, open Use, start the interaction", n"Step_TargetWhileBusy");
-        Add_Step_WaitUntil("the interaction from the player is live", n"Check_HasInteraction", 0, 5.0f);
-        Add_Step_WaitUntil("the gloves hold", n"Check_IsHold", 0, 5.0f);
+        Add_Step_WaitUntil("the interaction from the player is live", n"Check_HasInteraction", 0, 0);
+        Add_Step_WaitUntil("the gloves hold", n"Check_IsHold", k_SlowPolls, 0);
         Add_Step("the gloves hold the lever, timed, and the target became best during the push", n"Step_AssertHoldsTarget");
         Run_Steps(InHandle);
     }

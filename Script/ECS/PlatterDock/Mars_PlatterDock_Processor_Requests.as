@@ -1,11 +1,9 @@
 // Drains Dock, then Undock (each kind in queue order). Both are plain inventory transfers; the dock never writes what it
-// holds here - UMars_Processor_PlatterDock_Sync reacts to what lands, like the cargo slot's sync pass.
-//   Dock:   Item.Get_ParentInventory() -> this dock's inventory, refused when the dock is taken or the policy says no;
-//           once the transfer succeeds, the platter's world item is asked to Carry onto the dock's node.
-//   Undock: this dock's inventory -> Target; the taker's hotbar arrival then holds it (Carried -> Held).
-// The Carry waits for the transfer so a refused transfer never leaves a platter mounted on an empty dock. It still drains
-// before the hotbar's sync empties the hand, so the HeldItem's re-carry on deselect finds the item already headed for the
-// dock and leaves it alone.
+// holds here - UMars_Processor_PlatterDock_Sync reacts to what lands, like the cargo slot's sync pass - and the platter's
+// world item mounts from where its item lands (UMars_Processor_WorldItem_Reconcile), so a refused transfer moves nothing.
+//   Dock:   Item.Get_ParentInventory() -> this dock's inventory, refused when the dock is taken or the policy says no.
+//   Undock: this dock's inventory -> Target. A refused undock (not the docked item, no target, or the inventory refused)
+//           broadcasts OnUndockRefused, so a taker waiting on OnUndocked ends.
 class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -52,7 +50,6 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Refusal = Get_DockRefusal(InDock, Item);
         if (Refusal.IsSet())
         {
-            ck::Trace(f"[PlatterDock] [{InDock.ToString()}] refused [{Item.ToString()}]: {Refusal.GetValue() :n}");
             Broadcast_DockRefused(InDock, Item, Refusal.GetValue());
             return;
         }
@@ -66,10 +63,14 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
                                      FMars_Fragment_PlatterDock& InState,
                                      const FMars_Request_PlatterDock_Undock& InRequest)
     {
-        const auto CanUndock = ck::IsValid(InRequest.Item) && InRequest.Item == InDock.Get_Item() && ck::IsValid(InRequest.Target);
+        const auto IsDocked = ck::IsValid(InRequest.Item) && InRequest.Item == InDock.Get_Item();
+        const auto CanUndock = IsDocked && ck::IsValid(InRequest.Target);
         if (ck::EnsureIfNot(CanUndock,
-            f"[PlatterDock] Undock from [{InDock.ToString()}]: item [{InRequest.Item.ToString()}] is not the docked one, or target [{InRequest.Target.ToString()}] is invalid - skipped"))
-        { return; }
+            f"[PlatterDock] Undock from [{InDock.ToString()}]: item [{InRequest.Item.ToString()}] is not the docked one, or target [{InRequest.Target.ToString()}] is invalid - refused"))
+        {
+            Broadcast_UndockRefused(InDock, InRequest.Item, IsDocked ? EMars_PlatterDock_Refusal::TransferFailed : EMars_PlatterDock_Refusal::NotDocked);
+            return;
+        }
 
         auto Inventory = InState.Inventory;
         Inventory.Request_TransferItem_ToDataOnly(
@@ -87,10 +88,10 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
         if (InDock.Get_IsOccupied())
         { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::Occupied); }
 
-        return utils_platter_dock::Get_Refusal(InDock.Get_Spec().Policy, Platter);
+        return utils_platter_dock::Get_Refusal(InDock.Get_Spec(), Platter);
     }
 
-    // The dock is the target's owner. The Carry names the dock's point and no offset: the platter root sits on the node.
+    // The dock is the target's owner.
     UFUNCTION()
     private void OnDockTransferComplete(FCk_Handle_Inventory InSource,
                                         FCk_Handle_Item InItem,
@@ -106,21 +107,10 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
         {
             if (ck::IsValid(Dock))
             { Broadcast_DockRefused(Dock, InItem, EMars_PlatterDock_Refusal::TransferFailed); }
-
-            return;
         }
-
-        const auto Item = ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem;
-        auto WorldItem = Item.Get_PersistentWorldItem();
-        if (ck::EnsureIfNot(ck::IsValid(Dock) && ck::IsValid(WorldItem),
-            f"[PlatterDock] Docked [{Item.ToString()}] into [{InTarget.ToString()}], but the dock or the item's world item is gone"))
-        { return; }
-
-        WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(Dock, GameplayTags::AttachPoint_Mars_Dock, FTransform::Identity));
-        ck::Trace(f"[PlatterDock] [{Dock.ToString()}] took [{Item.ToString()}]: its world item [{WorldItem.ToString()}] carries onto the dock");
     }
 
-    // A refused undock leaves the platter docked.
+    // A refused undock leaves the platter docked. The dock is the source's owner.
     UFUNCTION()
     private void OnUndockTransferComplete(FCk_Handle_Inventory InSource,
                                           FCk_Handle_Item InItem,
@@ -129,13 +119,25 @@ class UMars_Processor_PlatterDock_HandleRequests : UCk_Processor_Script_Base_UE
                                           FCk_Handle_Item InNewItemInTarget,
                                           ECk_Inventory_OperationResult_Transfer InResult)
     {
-        ck::EnsureIfNot(InResult == ECk_Inventory_OperationResult_Transfer::Success,
-            f"[PlatterDock] Undocking [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]");
+        const auto Succeeded = InResult == ECk_Inventory_OperationResult_Transfer::Success;
+        if (ck::EnsureIfNot(Succeeded,
+            f"[PlatterDock] Undocking [{InItem.ToString()}] from [{InSource.ToString()}] to [{InTarget.ToString()}] failed with [{InResult :n}]"))
+        {
+            auto Dock = utils_entity_lifetime::Get_LifetimeOwner(InSource).As_PlatterDock(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Dock))
+            { Broadcast_UndockRefused(Dock, InItem, EMars_PlatterDock_Refusal::TransferFailed); }
+        }
     }
 
     private void Broadcast_DockRefused(FCk_Handle_PlatterDock& InDock, const FCk_Handle_Item& InItem, EMars_PlatterDock_Refusal InRefusal)
     {
         if (InDock.Has_Fragment(FMars_Fragment_PlatterDock_Signals))
         { InDock.Get_Fragment(FMars_Fragment_PlatterDock_Signals).OnDockRefused.Broadcast(InDock, InItem, InRefusal); }
+    }
+
+    private void Broadcast_UndockRefused(FCk_Handle_PlatterDock& InDock, const FCk_Handle_Item& InItem, EMars_PlatterDock_Refusal InRefusal)
+    {
+        if (InDock.Has_Fragment(FMars_Fragment_PlatterDock_Signals))
+        { InDock.Get_Fragment(FMars_Fragment_PlatterDock_Signals).OnUndockRefused.Broadcast(InDock, InItem, InRefusal); }
     }
 }

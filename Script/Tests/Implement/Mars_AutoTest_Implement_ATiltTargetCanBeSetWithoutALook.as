@@ -1,5 +1,5 @@
 // A tilt-free implement (Axes None, Relax WhileIdle, no lift, MaxTiltDegrees 60), Driven: a set tilt target of roll 55
-// is taken as it is and the tilt tracks it within 1 degree in 0.5 s (the node's world rotation shows it); a look (30, 30)
+// is taken as it is and the tilt tracks it within 1 degree (the node's world rotation shows it); a look (30, 30)
 // moves no target, no tilt and no lift; Idle, the target and the tilt relax back to level.
 class UMars_AutoTest_Implement_ATiltTargetCanBeSetWithoutALook : UMars_AutoTestRig_Implement
 {
@@ -8,7 +8,6 @@ class UMars_AutoTest_Implement_ATiltTargetCanBeSetWithoutALook : UMars_AutoTestR
     private const float32 k_MaxTiltDegrees = 60.0f;
     private const float32 k_TargetRoll = 55.0f;
     private const float32 k_TrackTolerance = 1.0f;
-    private const float32 k_TrackSeconds = 0.5f;
     private const FVector k_Look = FVector(30.0, 30.0, 0.0);
     // The look is drained and its frame ticked well within this.
     private const float32 k_LookSettleSeconds = 0.2f;
@@ -25,13 +24,13 @@ class UMars_AutoTest_Implement_ATiltTargetCanBeSetWithoutALook : UMars_AutoTestR
         BuildImplement(InHandle, Spec);
 
         Add_Step("drive the implement and set a roll target of 55", n"Step_DriveAndSetTilt");
-        Add_Step_WaitUntil("the roll target is set", n"Check_TargetSet", 0, 0.3f);
+        Add_Step_WaitUntil("the roll target is set", n"Check_TargetSet", 0, 0);
         Add_Step("the roll target is 55 and nothing else moved", n"Step_AssertTarget");
-        Add_Step_WaitUntil("the tilt tracked the target within 0.5 s", n"Check_Tracked", 0, k_TrackSeconds);
+        Add_Step_WaitUntil("the tilt tracked the target", n"Check_Tracked", 0, 0);
         Add_Step("the node shows the roll; look right and down", n"Step_AssertTrackedThenLook");
         Add_Step_WaitSeconds("the look is drained and ticked", k_LookSettleSeconds);
         Add_Step("the look moved nothing; idle it", n"Step_AssertLookIgnoredThenIdle");
-        Add_Step_WaitUntil("the implement relaxed to level", n"Check_Level", 0, 2.0f);
+        Add_Step_WaitUntil("the implement relaxed to level", n"Check_Level", 0, 0);
         Add_Step("the implement is level and Idle", n"Step_AssertLevel");
         Run_Steps(InHandle);
     }

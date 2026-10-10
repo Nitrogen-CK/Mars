@@ -8,6 +8,11 @@ class UMars_AutoTest_Crawler_CrippledCowers : UMars_AutoTestRig_Crawler
     default _TimeoutSeconds = 30.0f;
     default _Origin = FVector(150000.0, 88000.0, 600.0);
 
+    // The cowering body must hold still this long.
+    private const float32 k_HoldSeconds = 2.0f;
+    // Frame quantization between the step's clock and the game-time stamp the hold counts from.
+    private const float32 k_HoldSlackSeconds = 0.5f;
+
     private FVector _CowerLocation;
     private float64 _CowerAt = 0.0;
     private float64 _WorstDrift = 0.0;
@@ -17,13 +22,13 @@ class UMars_AutoTest_Crawler_CrippledCowers : UMars_AutoTestRig_Crawler
     {
         SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 5.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 0);
         Add_Step("deplete legs 0 and 1 through their Health", n"Step_DepleteTwoLegs");
-        Add_Step_WaitUntil("both legs are severed", n"Check_BothSevered", 0, 3.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM reaches Cower", n"Check_InCower", 0, 3.0f);
+        Add_Step_WaitUntil("both legs are severed", n"Check_BothSevered", 0, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM reaches Cower", n"Check_InCower", 0, 0);
         Add_Step("CanWalk is false, the leaf is Cower and the navigator Idle", n"Step_AssertCowering");
-        Add_Step_WaitUntil("the body holds within 50 uu for 2 s", n"Check_HoldsStill", 0, 4.0f);
+        Add_Step_WaitUntil("the body holds within 50 uu for 2 s", n"Check_HoldsStill", 0, k_HoldSeconds + k_HoldSlackSeconds);
         Run_Steps(InHandle);
     }
 
@@ -98,6 +103,6 @@ class UMars_AutoTest_Crawler_CrippledCowers : UMars_AutoTestRig_Crawler
             return;
         }
 
-        Res.Set(System::GetGameTimeInSeconds() - _CowerAt >= 2.0);
+        Res.Set(System::GetGameTimeInSeconds() - _CowerAt >= k_HoldSeconds);
     }
 }

@@ -24,13 +24,13 @@ class UMars_AutoTest_Station_ReserveWhileOperatingElsewhereRejected : UMars_Auto
         _StationTwo.BindTo_OnReserveRejected(FMars_Delegate_Station_OnReserveRejected(this, n"OnTwoRejected"));
 
         Add_Step("S1 reserves for the operator", n"Step_ReserveOne");
-        Add_Step_WaitUntil("S1 is reserved", n"Check_OneReserved", 0, 2.0f);
+        Add_Step_WaitUntil("S1 is reserved", n"Check_OneReserved", 0, 0);
         Add_Step("S2 reserves for the same operator", n"Step_ReserveTwo");
-        Add_Step_WaitUntil("S2 rejects the operator", n"Check_TwoRejected", 0, 2.0f);
+        Add_Step_WaitUntil("S2 rejects the operator", n"Check_TwoRejected", 0, 0);
         Add_Step("S2 rejected AlreadyOperating and S1 kept the operator; S1 releases", n"Step_AssertRejectedThenReleaseOne");
-        Add_Step_WaitUntil("S1 is released", n"Check_OneReleased", 0, 2.0f);
+        Add_Step_WaitUntil("S1 is released", n"Check_OneReleased", 0, 0);
         Add_Step("S2 reserves for the operator again", n"Step_ReserveTwo");
-        Add_Step_WaitUntil("S2 is reserved", n"Check_TwoReserved", 0, 2.0f);
+        Add_Step_WaitUntil("S2 is reserved", n"Check_TwoReserved", 0, 0);
         Add_Step("S2 holds the operator and the back-ref moved", n"Step_AssertMoved");
         Run_Steps(InHandle);
     }

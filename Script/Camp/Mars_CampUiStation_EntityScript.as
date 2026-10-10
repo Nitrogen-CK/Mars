@@ -45,13 +45,14 @@ class UMars_CampUiStation_EntityScript : UCk_GenericEntityScript_UE
             ? NSLOCTEXT("MarsCamp", "OpenContracts", "Open contracts")
             : NSLOCTEXT("MarsCamp", "OpenDeparture", "Open departure");
 
+        // WhileLive: the open state reads who interacts from the live interaction, and ends it once the UI opened.
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
         Target.InteractPromptSpec = Prompt;
         Target.InteractionStateClass = UMars_SmState_CampUiStation_Open;
+        Target.Work = EMars_Interactable_Work::WhileLive;
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
@@ -75,10 +76,10 @@ class UMars_SmState_CampUiStation_Open : UCk_SmState_EntityScript
     {
         AddTask(InHandle, UMars_SmTask_CampUiStation_Open);
 
-        auto OnSuccess = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
+        auto OnSuccess = AddTransition(InHandle, UMars_SmState_InteractTarget_Succeeded);
         AddCondition(OnSuccess, UMars_SmCondition_AllTasksSucceeded);
 
-        auto OnFailure = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
+        auto OnFailure = AddTransition(InHandle, UMars_SmState_InteractTarget_Failed);
         AddCondition(OnFailure, UMars_SmCondition_AnyTaskFailed);
     }
 }

@@ -23,9 +23,9 @@ class UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth : UCk_AutoTe
         _Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnHit"));
 
         Add_Step("the spec rules hold; hit the zone with Sever 10", n"Step_ValidateAndHitSever");
-        Add_Step_WaitUntil("Health reads 80 (Sever x2)", n"Check_At80", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 80 (Sever x2)", n"Check_At80", 0, 0);
         Add_Step("one OnHit carrying the scaled event; hit the zone with Crush 10", n"Step_AssertSeverAndHitCrush");
-        Add_Step_WaitUntil("Health reads 70 (Crush has no row: x1)", n"Check_At70", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 70 (Crush has no row: x1)", n"Check_At70", 0, 0);
         Add_Step("the default row applied and the zone counted two hits", n"Step_AssertCrush");
         Run_Steps(InHandle);
     }

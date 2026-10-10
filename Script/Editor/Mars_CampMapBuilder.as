@@ -126,7 +126,7 @@ namespace utils_mars_camp
         {
             if (EditorAsset::DoesAssetExist(k_MapPath))
             {
-                ck::Warning(f"[{Command}] [{k_MapPath}] already exists. Open it (empty) or delete it first to rebuild.");
+                ck::Trace(f"[{Command}] [{k_MapPath}] already exists. Open it (empty) or delete it first to rebuild.", NAME_None, 2.0f, FLinearColor::Yellow);
                 return;
             }
         }
@@ -134,7 +134,7 @@ namespace utils_mars_camp
         {
             if (utils_mars_map_builder::Get_IsMap(World, k_MapPath) == false)
             {
-                ck::Warning(f"[{Command}] The open level [{WorldPath}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.");
+                ck::Trace(f"[{Command}] The open level [{WorldPath}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.", NAME_None, 2.0f, FLinearColor::Yellow);
                 return;
             }
 
@@ -254,7 +254,7 @@ namespace utils_mars_camp
 
         if (Get_CampSockets().Num() == 0)
         {
-            ck::Warning(f"[{Command}] No camp sockets (Mise_Socket TargetPoints) in this map: build the kit camp first.");
+            ck::Trace(f"[{Command}] No camp sockets (Mise_Socket TargetPoints) in this map: build the kit camp first.", NAME_None, 2.0f, FLinearColor::Yellow);
             return;
         }
 
@@ -362,7 +362,7 @@ namespace utils_mars_camp
                 ++Placed;
             }
             else if (ck::IsValid(Existing))
-            { ck::Warning(f"[Mars.Camp] no kit socket for station [{Station :n}]: its view point stays where it is"); }
+            { ck::Trace(f"[Mars.Camp] no kit socket for station [{Station :n}]: its view point stays where it is", NAME_None, 2.0f, FLinearColor::Yellow); }
         }
 
         Placed += Place_BoardAnchors(Anchors, Sockets);
@@ -372,7 +372,7 @@ namespace utils_mars_camp
             auto Socket = TryGet_CampSocket(Sockets, f"camp_start_{Index}");
             if (ck::Is_NOT_Valid(Socket))
             {
-                ck::Warning(f"[Mars.Camp] no camp_start_{Index} socket in the map");
+                ck::Trace(f"[Mars.Camp] no camp_start_{Index} socket in the map", NAME_None, 2.0f, FLinearColor::Yellow);
                 continue;
             }
 
@@ -441,7 +441,7 @@ namespace utils_mars_camp
             auto Socket = TryGet_CampSocket(InSockets, f"camp_anchor_{Anchor.Station :n}");
             if (ck::Is_NOT_Valid(Socket))
             {
-                ck::Warning(f"[Mars.Camp] no camp_anchor_{Anchor.Station :n} socket: that board anchor stays where it is");
+                ck::Trace(f"[Mars.Camp] no camp_anchor_{Anchor.Station :n} socket: that board anchor stays where it is", NAME_None, 2.0f, FLinearColor::Yellow);
                 continue;
             }
 

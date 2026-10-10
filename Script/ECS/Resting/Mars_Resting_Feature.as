@@ -89,32 +89,33 @@ mixin FMars_Validation Validate(const FMars_Resting_Spec& Self)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Params
-//--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_Fragment_Resting_Params
-{
-    UPROPERTY()
-    FMars_Resting_Spec Spec;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Resting processors (and Add). A Retarget rewrites the Params' spec too.
+// Written only by the Resting processors (and Add). The targets and both tuners are state, not params: a Retarget replaces
+// them with the tracker.
 struct FMars_Fragment_Resting
 {
+    // The spec's Targets: Add's, or the last Retarget's.
+    UPROPERTY()
+    TArray<FCk_Handle> Targets;
+
+    UPROPERTY()
+    float32 GraceSeconds = 0.1f;
+
+    UPROPERTY()
+    float32 HopMinSeconds = 0.12f;
+
     // Resting on any target.
     UPROPERTY()
     EMars_Resting_State State = EMars_Resting_State::Apart;
 
-    // Parallel to the spec's Targets: seconds since the last contact with that target (0 on each Added / Persisted event;
+    // Parallel to Targets: seconds since the last contact with that target (0 on each Added / Persisted event;
     // k_NoContactAge before the first).
     UPROPERTY()
     TArray<float32> ContactAges;
 
-    // Parallel to the spec's Targets: the last verdict for that target (a recent contact, or asleep while resting on it).
+    // Parallel to Targets: the last verdict for that target (a recent contact, or asleep while resting on it).
     UPROPERTY()
     TArray<bool> RestingOn;
 
@@ -157,8 +158,8 @@ struct FMars_Fragment_Resting_Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
 // New targets and tuners for a body that moves on to other supports (a piece handed from one station's kernel to another's):
-// the spec is replaced, the tracker starts Apart on every new target with its hops and apart time zeroed, as Add leaves it.
-// A spec Validate rejects ensures and changes nothing. The last one in a drain wins.
+// they replace the old ones and the tracker starts Apart on every new target with its hops and apart time zeroed, as Add
+// leaves it. A spec Validate rejects ensures and changes nothing. The last one in a drain wins.
 struct FMars_Request_Resting_Retarget
 {
     UPROPERTY()

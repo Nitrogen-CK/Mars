@@ -9,18 +9,24 @@ struct FMars_CookingFeed_Frame
 // The one clock of the transfer, and the hand that carries the real piece. First it guards the reservation: before the
 // release, a reserved piece that is gone or was taken by someone else (unloaded from the source by another hand, the platter
 // swapped under it, lifted off the glove) cancels the transfer as a Cancel would. Every positive-dt frame it measures the
-// release node's world velocity; while the hand is in a timed phase it advances the phase time and crosses every boundary
-// the frame reaches, each once and in order (a long frame crosses several, a zero-length phase passes through), carrying
-// the remainder into the next phase. Entering Grasp asks the source to unload the reserved piece; Carry's end lets the piece
-// go where the hand holds it (detached at its world pose) and samples the release (that pose, or the release node's when no
+// release node's world velocity; an admission no kernel has answered within Timing.AdmissionBudgetSeconds settles
+// Rejected, its piece goes back to the platter it came from (or, with none left, is let go where it lies: OnPieceLetGo)
+// and the hand turns home; while the hand is in a timed phase it advances the phase time and crosses every boundary the
+// frame reaches, each once and in order (a long frame crosses several, a zero-length phase passes through), carrying the
+// remainder into the next phase. Entering Grasp asks the source to unload the reserved piece; Carry's end lets the piece go
+// where the hand holds it (detached at its world pose) and samples the release (that pose, or the release node's when no
 // piece rode the hand; the spec's local velocity rotated to the node plus the inherited node velocity) and waits for the
-// admission answer; Return's end idles the hand. AwaitAdmission has no clock. Then the piece follows the hand: once its
-// unload has landed (off the source, its body Kinematic) it is attached under Nodes.Hand where it is, and through Grasp its
-// offset lerps to Motion.HeldOffset. Last, the stock is compared with what was last broadcast: the source changes under the
-// feed without a request, so its edges are found here. A feed torn down while a piece is off the source puts it back.
+// admission answer; Return's end idles the hand. With hand geometry in the spec the hand node then takes this frame's pose
+// (utils_cooking_feed::Get_HandLocal: rest, the reserved piece's middle as it last lay on its own, the release node), so
+// the carry never depends on who draws the glove. Then the piece follows the hand: once its unload has landed (off the
+// source, its body Kinematic) it is attached under Nodes.Hand where it is, and through Grasp its offset lerps to
+// Motion.HeldOffset. Last, the stock is compared with what was last broadcast: the source changes under the feed without a
+// request, so its edges are found here. A feed torn down while it holds a piece (from the grasp until the admission
+// answer) ends that piece with it.
 class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_CookingFeed_HandleRequests");
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -37,14 +43,16 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 
         Guard_Reservation(Frame, InState);
         Measure_Release(Frame, InState);
+        Expire_Admission(Frame, InState);
         Advance_Phase(Frame, InState);
+        Move_Hand(Frame, InState);
         Carry_Piece(Frame, InState);
         Broadcast_StockIfChanged(Frame, InState);
     }
 
     // From Reach through Carry the reserved piece must be where the feed left it: on the source while the hand reaches, on
     // the source or off every platter while it unloads, under the hand once attached. In AwaitAdmission it is released by
-    // design and only an answer or a Cancel ends the transfer.
+    // design and only an answer, a SetSource or the admission budget ends the transfer.
     private void Guard_Reservation(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
     {
         const auto IsBeforeRelease = InState.Phase == EMars_CookingFeed_Phase::Reach || InState.Phase == EMars_CookingFeed_Phase::Grasp
@@ -57,7 +65,6 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         utils_cooking_feed::Cancel_Active(InState);
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] {utils_cooking_feed::Get_PieceName(Reservation.Id)} [{Reservation.Piece.ToString()}] was taken before its release ({Reservation.Hold :n}): transfer cancelled");
 
         auto Feed = InFrame.Feed;
         if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
@@ -74,12 +81,12 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         if (InReservation.Hold == EMars_CookingFeed_PieceHold::OnSource)
         { return utils_cooking_feed::Get_IsOnSource(Piece, InState.Source); }
 
-        if (ck::Is_NOT_Valid(Piece) || utils_entity_lifetime::Get_IsPendingDestroy(Piece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+        if (utils_cooking_feed::Get_IsGone(Piece))
         { return false; }
 
         if (InReservation.Hold == EMars_CookingFeed_PieceHold::Unloading)
         {
-            const auto Holder = Piece.TryGet_Platter();
+            const auto Holder = Piece.TryGet_Holder();
             return ck::Is_NOT_Valid(Holder) || Holder == InState.Source;
         }
 
@@ -100,6 +107,43 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         }
 
         InState.ReleasePrevWorld = TOptional<FTransform>(Now);
+    }
+
+    // AwaitAdmission against Timing.AdmissionBudgetSeconds (0 = unbounded): past it the release settles Rejected as an
+    // answer would, its piece goes back (or is let go where it lies, broadcast after the settle), and the hand turns home
+    // (its Return clock starts this frame, as after an answer).
+    private void Expire_Admission(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
+    {
+        const auto Budget = InFrame.Spec.Timing.AdmissionBudgetSeconds;
+        if (InState.Phase != EMars_CookingFeed_Phase::AwaitAdmission || Budget <= 0.0f)
+        { return; }
+
+        if (ck::EnsureIfNot(InState.Active.IsSet(), f"[CookingFeed] [{InFrame.Feed.ToString()}] awaits an admission with no reserved piece"))
+        {
+            utils_cooking_feed::Cancel_Active(InState);
+            return;
+        }
+
+        InState.PhaseSeconds += InFrame.DeltaSeconds;
+        if (InState.PhaseSeconds < Budget)
+        { return; }
+
+        const auto PieceId = InState.Active.GetValue().Id;
+        const auto Piece = InState.Active.GetValue().Piece;
+        const auto Returned = utils_cooking_feed::Return_Piece(InState, InFrame.Spec.Nodes.Hand);
+        InState.Active.Reset();
+        InState.Phase = EMars_CookingFeed_Phase::Return;
+        InState.PhaseSeconds = 0.0f;
+
+        auto Feed = InFrame.Feed;
+        if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
+        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnTransferSettled.Broadcast(Feed, PieceId, EMars_CookingFeed_Settle::Rejected); }
+
+        if (Returned == EMars_CookingFeed_PieceReturn::LetGo && Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
+        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnPieceLetGo.Broadcast(Feed, Piece); }
+
+        if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
+        { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnPhaseChanged.Broadcast(Feed, EMars_CookingFeed_Phase::Return); }
     }
 
     private void Advance_Phase(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
@@ -135,7 +179,6 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Release = InState.PendingRelease;
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] hand -> {InState.Phase :n} ({Entered.Num()} boundary(ies) this frame)");
 
         auto Feed = InFrame.Feed;
         for (const auto Phase : Entered)
@@ -148,8 +191,55 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnReleaseRequested.Broadcast(Feed, Release); }
     }
 
+    // The hand node's pose this frame (with hand geometry only), written on change. The reserved piece's middle is sampled
+    // while it lies on its own and is Ready (on the source, or coming off it), so the hand reaches where it lies and never
+    // chases itself once the piece rides it; idle forgets it.
+    private void Move_Hand(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
+    {
+        if (InFrame.Spec.Hand.IsSet() == false)
+        { return; }
+
+        FCk_Handle HandEntity = InFrame.Spec.Nodes.Hand;
+        auto HandNode = HandEntity.As_SceneNode();
+        const auto ParentWorld = utils_transform::Get_EntityCurrentTransform(utils_scene_node::Get_Parent(HandNode));
+        Track_Grasp(InState, ParentWorld);
+
+        auto Query = FMars_CookingFeed_HandQuery();
+        Query.Geometry = InFrame.Spec.Hand.GetValue();
+        Query.Phase = InState.Phase;
+        Query.Progress = InFrame.Feed.Get_PhaseProgress();
+        Query.GraspPoint = InState.GraspPoint;
+        Query.ReleasePoint = ParentWorld.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(InFrame.Spec.Nodes.Release));
+
+        const auto HandLocal = utils_cooking_feed::Get_HandLocal(Query);
+        if (HandLocal.Equals(utils_scene_node::Get_Offset(HandNode), 0.01))
+        { return; }
+
+        utils_scene_node::Request_UpdateOffset(HandNode, FCk_Request_SceneNode_UpdateRelativeTransform(HandLocal));
+    }
+
+    private void Track_Grasp(FMars_Fragment_CookingFeed& InState, const FTransform& InParentWorld)
+    {
+        if (InState.Active.IsSet() == false)
+        {
+            InState.GraspPoint.Reset();
+            return;
+        }
+
+        const auto Reservation = InState.Active.GetValue();
+        const auto LiesOnItsOwn = Reservation.Hold == EMars_CookingFeed_PieceHold::OnSource || Reservation.Hold == EMars_CookingFeed_PieceHold::Unloading;
+        const auto& Piece = Reservation.Piece;
+        if (LiesOnItsOwn == false || utils_cooking_feed::Get_IsGone(Piece) || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
+        { return; }
+
+        FCk_Handle Entity = Piece;
+        const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+        const auto Centre = PieceWorld.TransformPosition(utils_foodpiece::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry())));
+        InState.GraspPoint = TOptional<FVector>(InParentWorld.InverseTransformPosition(Centre));
+    }
+
     // The grasp takes the reserved piece off the source; it rides the hand once the unload lands (Carry_Piece). The feed
-    // watches its own teardown from here on, so a piece it holds never strands.
+    // watches its own teardown from here on, so a piece it holds ends with it.
     private void Begin_Unload(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
     {
         if (ck::EnsureIfNot(InState.Active.IsSet(), f"[CookingFeed] [{InFrame.Feed.ToString()}] grasped with no reserved piece"))
@@ -163,8 +253,6 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Reservation.Hold = EMars_CookingFeed_PieceHold::Unloading;
         InState.Active = TOptional<FMars_CookingFeed_Reservation>(Reservation);
         Watch_Teardown(InFrame.Feed);
-
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] {utils_cooking_feed::Get_PieceName(Reservation.Id)} [{Reservation.Piece.ToString()}] comes off [{Source.ToString()}] into the hand");
     }
 
     // The release at Carry's end, kept in PendingRelease. A piece riding the hand is let go there (detached, keeping its
@@ -193,10 +281,9 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Reservation.Hold = EMars_CookingFeed_PieceHold::Released;
         InState.Active = TOptional<FMars_CookingFeed_Reservation>(Reservation);
 
-        InState.PendingRelease = FMars_CookingFeed_Release(Reservation.Id, PieceWorld, Velocity, Reservation.Id.StockIndex);
+        InState.PendingRelease = FMars_CookingFeed_Release(Reservation.Id, PieceWorld, Velocity);
         InState.PendingRelease.Piece = Reservation.Piece;
 
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] released {utils_cooking_feed::Get_PieceName(Reservation.Id)} [{Reservation.Piece.ToString()}] at {PieceWorld.GetLocation()} moving {Velocity}");
         return true;
     }
 
@@ -265,8 +352,6 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 
         InOutReservation.Hold = EMars_CookingFeed_PieceHold::InHand;
         InOutReservation.HeldFrom = FromOffset;
-
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] {utils_cooking_feed::Get_PieceName(InOutReservation.Id)} [{InOutReservation.Piece.ToString()}] rides the hand");
     }
 
     // The piece root's offset under the hand that puts its bounds centre at Motion.HeldOffset's location, in its rotation.
@@ -290,7 +375,6 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         InState.LastStockAvailable = Available;
         InState.LastStockAdmitted = Admitted;
         InState.LastStockSettling = IsSettling;
-        ck::Trace(f"[CookingFeed] [{InFrame.Feed.ToString()}] stock: {Available} available, {Admitted} admitted, settling: {IsSettling}");
 
         auto Feed = InFrame.Feed;
         if (Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
@@ -315,7 +399,8 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Feed.BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnFeedBeginDestroy"));
     }
 
-    // A piece the feed took off the source goes back onto it rather than dying with the hand node or hanging in the air.
+    // A piece the feed holds (coming off the source, riding the hand, or released and not yet admitted) ends with the station:
+    // the platter it came from goes in the same teardown, so nothing could take it back.
     UFUNCTION()
     private void OnFeedBeginDestroy(FCk_Handle InFeed)
     {
@@ -323,8 +408,14 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         if (FeedEntity.Has_Fragment(FMars_Fragment_CookingFeed) == false)
         { return; }
 
-        const auto State = FeedEntity.Get_Fragment(FMars_Fragment_CookingFeed);
-        const auto Hand = FeedEntity.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.Hand;
-        utils_cooking_feed::Return_Piece(State, Hand);
+        const auto Active = FeedEntity.Get_Fragment(FMars_Fragment_CookingFeed).Active;
+        if (Active.IsSet() == false || Active.GetValue().Hold == EMars_CookingFeed_PieceHold::OnSource)
+        { return; }
+
+        auto Piece = Active.GetValue().Piece;
+        if (utils_cooking_feed::Get_IsGone(Piece))
+        { return; }
+
+        utils_entity_lifetime::Request_DestroyEntity(Piece);
     }
 }

@@ -1,3 +1,13 @@
+// How a mesh part's PrimaryColor tints its material.
+enum EMars_MeshPart_Tint
+{
+    // PrimaryColor only: the material keeps its own secondary and line colours.
+    Primary,
+    // A ProtoGrid instance: PrimaryColor with the darker SecondaryColor and the brighter LineColor Paint_MeshPart derives,
+    // so iron does not read as the counter or wire as interactable green.
+    ProtoGrid
+}
+
 // One static mesh on its own scene node under a transform: the visual parts entity scripts build from engine shapes and
 // the mechanism meshes.
 struct FMars_MeshPart
@@ -19,9 +29,13 @@ struct FMars_MeshPart
     UPROPERTY()
     FName DebugName;
 
-    // Set: the part's material slot 0 gets a dynamic instance with this PrimaryColor.
+    // Set: the part's material slot 0 gets a dynamic instance with this PrimaryColor (and, per Tint, the colours derived
+    // from it).
     UPROPERTY()
     TOptional<FLinearColor> PrimaryColor;
+
+    UPROPERTY()
+    EMars_MeshPart_Tint Tint = EMars_MeshPart_Tint::Primary;
 
     UPROPERTY()
     bool CastShadow = true;
@@ -63,7 +77,12 @@ mixin FCk_Handle_UnrealComponent Add_MeshPart(FCk_Handle_Transform& Self, UObjec
     {
         auto TintedMaterial = Archetype.CreateDynamicMaterialInstance(0);
         if (ck::IsValid(TintedMaterial))
-        { TintedMaterial.SetVectorParameterValue(n"PrimaryColor", InPart.PrimaryColor.GetValue()); }
+        {
+            if (InPart.Tint == EMars_MeshPart_Tint::ProtoGrid)
+            { TintedMaterial.Set_ProtoGridColors(InPart.PrimaryColor.GetValue()); }
+            else
+            { TintedMaterial.SetVectorParameterValue(n"PrimaryColor", InPart.PrimaryColor.GetValue()); }
+        }
     }
 
     auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
@@ -87,7 +106,13 @@ mixin void Paint_MeshPart(const FCk_Handle_UnrealComponent& Self, FLinearColor I
     if (ck::Is_NOT_Valid(Material))
     { return; }
 
-    Material.SetVectorParameterValue(n"PrimaryColor", InColor);
-    Material.SetVectorParameterValue(n"SecondaryColor", FLinearColor(InColor.R * 0.6f, InColor.G * 0.6f, InColor.B * 0.6f, InColor.A));
-    Material.SetVectorParameterValue(n"LineColor", FLinearColor(InColor.R * 1.5f, InColor.G * 1.5f, InColor.B * 1.5f, InColor.A));
+    Material.Set_ProtoGridColors(InColor);
+}
+
+// PrimaryColor InColor, SecondaryColor 0.6 of it and LineColor 1.5 of it (alpha kept).
+mixin void Set_ProtoGridColors(UMaterialInstanceDynamic Self, FLinearColor InColor)
+{
+    Self.SetVectorParameterValue(n"PrimaryColor", InColor);
+    Self.SetVectorParameterValue(n"SecondaryColor", FLinearColor(InColor.R * 0.6f, InColor.G * 0.6f, InColor.B * 0.6f, InColor.A));
+    Self.SetVectorParameterValue(n"LineColor", FLinearColor(InColor.R * 1.5f, InColor.G * 1.5f, InColor.B * 1.5f, InColor.A));
 }

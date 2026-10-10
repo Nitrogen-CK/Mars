@@ -80,7 +80,7 @@ namespace utils_mars_map_builder
         if (ck::IsValid(World) && Get_IsMap(World, InMapPath))
         { return World; }
 
-        ck::Warning(f"[{InCommand}] Open [{InMapPath}] first.");
+        ck::Trace(f"[{InCommand}] Open [{InMapPath}] first.", NAME_None, 2.0f, FLinearColor::Yellow);
         return nullptr;
     }
 
@@ -121,7 +121,7 @@ namespace utils_mars_map_builder
         if (ck::Is_NOT_Valid(InBlocker))
         { return true; }
 
-        ck::Warning(f"[{InCommand}] [{InBlocker.GetActorLabel()}] already exists. {InHint}");
+        ck::Trace(f"[{InCommand}] [{InBlocker.GetActorLabel()}] already exists. {InHint}", NAME_None, 2.0f, FLinearColor::Yellow);
         return false;
     }
 

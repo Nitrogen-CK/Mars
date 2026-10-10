@@ -29,9 +29,9 @@ class UMars_AutoTest_Resting_TwoTargetsAreToldApart : UMars_AutoTestRig_Resting
         _TwoResting = utils_resting::Add(_TwoBox, FMars_Resting_Spec(Targets, 0.1f, 0.12f));
 
         Add_Step("the two-target Resting composed; a repeated target is rejected", n"Step_AssertComposed");
-        Add_Step_WaitUntil("the box rests on plate A", n"Check_OnAOnly", 0, 2.0f);
+        Add_Step_WaitUntil("the box rests on plate A", n"Check_OnAOnly", k_SlowPolls, 0);
         Add_Step("on A, not on B; teleport the box over B", n"Step_AssertOnAThenMoveToB");
-        Add_Step_WaitUntil("the box rests on plate B", n"Check_OnBOnly", 0, 3.0f);
+        Add_Step_WaitUntil("the box rests on plate B", n"Check_OnBOnly", k_SlowPolls, 0);
         Add_Step("on B, not on A", n"Step_AssertOnB");
         Run_Steps(InHandle);
     }

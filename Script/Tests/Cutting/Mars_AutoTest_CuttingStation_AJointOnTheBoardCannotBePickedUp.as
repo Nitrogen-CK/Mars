@@ -14,23 +14,23 @@ class UMars_AutoTest_CuttingStation_AJointOnTheBoardCannotBePickedUp : UMars_Aut
         Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
         Spawn_OutputPlatter(InHandle);
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", 0, 10.0f);
-        Add_Step_WaitUntil("the finished tray is constructed", n"Check_OutputPlatterReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 0);
+        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the finished tray is constructed", n"Check_OutputPlatterReady", k_SlowPolls, 0);
         Add_Step("the joint on the input platter can be picked up", n"Step_AssertPickupLive");
         Add_Step("dock the input platter", n"Step_DockInput");
-        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", 0, 5.0f);
-        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("add food", n"Step_AddFood");
-        Add_Step_WaitUntil("the feed laid the joint on the board", n"Check_JointOnBoard", 0, 5.0f);
-        Add_Step_WaitUntil("the joint's pickup reads disabled", n"Check_PickupDisabled", 0, 1.0f);
+        Add_Step_WaitUntil("the feed laid the joint on the board", n"Check_JointOnBoard", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the joint's pickup reads disabled", n"Check_PickupDisabled", 0, 0);
         Add_Step_WaitFrames("the board holds the joint a while", 10);
         Add_Step("the joint on the board cannot be picked up", n"Step_AssertPickupDisabled");
         Add_Step("dock the finished tray", n"Step_DockOutput");
-        Add_Step_WaitUntil("the finished tray is docked", n"Check_OutputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the finished tray is docked", n"Check_OutputDocked", k_SlowPolls, 0);
         Add_Step("sweep the joint to the tray", n"Step_Sweep");
-        Add_Step_WaitUntil("the board let the joint go", n"Check_Released", 0, 3.0f);
-        Add_Step_WaitUntil("the released joint's pickup reads enabled", n"Check_PickupEnabled", 0, 1.0f);
+        Add_Step_WaitUntil("the board let the joint go", n"Check_Released", 0, 0);
+        Add_Step_WaitUntil("the released joint's pickup reads enabled", n"Check_PickupEnabled", 0, 0);
         Run_Steps(InHandle);
     }
 

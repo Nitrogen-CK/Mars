@@ -42,6 +42,14 @@ enum EMars_Platter_FreezeCause
     TimedOut
 }
 
+// Whether the platter rides a carrier (Carried or Held): its pile then ignores pawns, as the tray's own body does
+// (constants_world_item::k_MountedBodyProfile); Free, every piece collides as its own body surface says.
+enum EMars_Platter_Mounting
+{
+    Free,
+    Mounted
+}
+
 namespace constants_platter
 {
     // The root counts as still between two passes while it moves less than this and turns less than k_StillDegrees: a tray
@@ -58,6 +66,10 @@ namespace constants_platter
     const float32 k_WallFriction = 0.3f;
     const float32 k_WallRestitution = 0.0f;
     const float32 k_WallMassKg = 1.0f;
+
+    // Passes a frozen piece's attach asks its body for Kinematic before the piece is refused: the mirror reads it within a
+    // pass or two of a body in the simulation.
+    const int32 k_MotionTypeAskBudget = 60;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -105,7 +117,8 @@ struct FMars_Platter_SettleTuners
     UPROPERTY()
     float32 DwellSeconds = 0.4f;
 
-    // A piece still moving this long after its drop is frozen where it is.
+    // A piece still moving this long after its drop is frozen where it is; one whose body is not in the simulation by then
+    // is refused; one that escaped the walls while the root moves is accepted where it lies.
     UPROPERTY()
     float32 MaxSeconds = 3.0f;
 }
@@ -213,6 +226,15 @@ struct FMars_Platter_Settling
     UPROPERTY()
     TOptional<EMars_Platter_FreezeCause> Freeze;
 
+    // Passes the attach has asked Kinematic again since the freeze (constants_platter::k_MotionTypeAskBudget bounds them).
+    UPROPERTY()
+    int32 MotionTypeAsks = 0;
+
+    // Re-settling only: the pile's next freeze index when this piece let go. A held piece frozen at or after it may lie on
+    // this one, so it re-settles if this one leaves.
+    UPROPERTY()
+    int32 FreezeFloor = 0;
+
     FMars_Platter_Settling() {}
 
     FMars_Platter_Settling(FCk_Handle_FoodPiece InPiece, EMars_Platter_SettleReason InReason, FVector InLastSample)
@@ -223,14 +245,36 @@ struct FMars_Platter_Settling
     }
 }
 
+// A frozen piece and its place in the freeze order: a piece can only lie on pieces frozen before it.
+struct FMars_Platter_Held
+{
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    UPROPERTY()
+    int32 FreezeIndex = 0;
+
+    FMars_Platter_Held() {}
+
+    FMars_Platter_Held(FCk_Handle_FoodPiece InPiece, int32 InFreezeIndex)
+    {
+        Piece = InPiece;
+        FreezeIndex = InFreezeIndex;
+    }
+}
+
 // Written only by the Platter processors (and Add). A ledger, not an owner: every piece belongs to the world's transient
-// entity; the platter ends the pieces it holds (Clear, its own destruction). A piece is in exactly one of Held, Settling
-// and Queue.
+// entity; the platter ends the pieces it holds when it is destroyed. A piece is in exactly one of Held, Settling and
+// Queue.
 struct FMars_Fragment_Platter
 {
     // Frozen, Kinematic, scene-node children of the root, in freeze order: the top of the pile last.
     UPROPERTY()
-    TArray<FCk_Handle_FoodPiece> Held;
+    TArray<FMars_Platter_Held> Held;
+
+    // The FreezeIndex the next piece to freeze gets.
+    UPROPERTY()
+    int32 NextFreezeIndex = 0;
 
     // Accepted loads waiting to drop, oldest first.
     UPROPERTY()
@@ -250,10 +294,14 @@ struct FMars_Fragment_Platter
     // Seconds the root has been still since the last drop.
     UPROPERTY()
     float32 SinceDrop = 0.0f;
+
+    // Held and settling pieces collide by it; a piece that lands later takes it on landing.
+    UPROPERTY()
+    EMars_Platter_Mounting Mounting = EMars_Platter_Mounting::Free;
 }
 
 // On every piece the platter holds (held, settling or queued); written only by the Platter processors. Removed on Unload,
-// Clear, refusal and when Reconcile finds the piece gone.
+// refusal and when Reconcile finds the piece gone.
 struct FMars_Fragment_Platter_Membership
 {
     UPROPERTY()
@@ -275,16 +323,11 @@ event void FMars_Delegate_Platter_OnLoadRefused_MC(FCk_Handle_Platter InPlatter,
 delegate void FMars_Delegate_Platter_OnUnloaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_Platter_OnUnloaded_MC(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece);
 
-// Once per drain holding a Clear, an empty platter included.
-delegate void FMars_Delegate_Platter_OnCleared(FCk_Handle_Platter InPlatter);
-event void FMars_Delegate_Platter_OnCleared_MC(FCk_Handle_Platter InPlatter);
-
 struct FMars_Fragment_Platter_Signals
 {
     FMars_Delegate_Platter_OnLoaded_MC OnLoaded;
     FMars_Delegate_Platter_OnLoadRefused_MC OnLoadRefused;
     FMars_Delegate_Platter_OnUnloaded_MC OnUnloaded;
-    FMars_Delegate_Platter_OnCleared_MC OnCleared;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -292,8 +335,10 @@ struct FMars_Fragment_Platter_Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Put Piece on the platter. Refused at the drain (never deferred) Full / AlreadyHeld / HeldElsewhere / Gone / Cutting /
-// Failed with OnLoadRefused; accepted, it queues. A queued piece drops once it is Ready (one whose import fails is refused
-// Failed then) and the root is still, settles with physics and freezes into the pile (OnLoaded).
+// Failed with OnLoadRefused; accepted, it queues. A queued piece drops once it is Ready (one whose import or body setup
+// fails is refused Failed then) and the root is still, settles with physics and freezes into the pile (OnLoaded); one whose
+// body never reaches the simulation is refused Failed too. A queued piece something else takes (attaches) is forgotten
+// without a signal.
 struct FMars_Request_Platter_Load
 {
     UPROPERTY()
@@ -324,22 +369,26 @@ struct FMars_Request_Platter_Unload
     }
 }
 
-// Destroy every piece: held, settling and queued; the platter is empty. Several in one drain are one.
-// Payload-less: one placeholder field (request doctrine).
-struct FMars_Request_Platter_Clear
+// The pile ignores pawns (Mounted) or collides as each piece's own surface says (Free); a piece leaving the pile takes its
+// own profile back. Issued by the platter's assembly from its world item's mount.
+struct FMars_Request_Platter_SetMounted
 {
     UPROPERTY()
-    bool Requested = true;
+    EMars_Platter_Mounting Mounting = EMars_Platter_Mounting::Free;
 
-    FMars_Request_Platter_Clear() {}
+    FMars_Request_Platter_SetMounted() {}
+
+    FMars_Request_Platter_SetMounted(EMars_Platter_Mounting InMounting)
+    {
+        Mounting = InMounting;
+    }
 }
 
-// Applied Clear -> Unload -> Load: a clear and the next load can share a drain, and an unload never races a load of the
-// same piece.
+// Applied SetMounted -> Unload -> Load: the latest SetMounted wins, and an unload never races a load of the same piece.
 struct FMars_Fragment_Platter_Requests
 {
     UPROPERTY()
-    TArray<FMars_Request_Platter_Clear> ClearRequests;
+    TArray<FMars_Request_Platter_SetMounted> SetMountedRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Platter_Unload> UnloadRequests;

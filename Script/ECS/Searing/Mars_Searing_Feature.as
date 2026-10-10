@@ -290,8 +290,9 @@ struct FMars_Fragment_Searing_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // One adopted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity is the food
-// piece's own (the kernel's guest: it keeps its lifetime) and carries the dynamic body and a Resting on the pan base body.
-// Its geometry is read once, at admission, from its mesh's metrics: a cut piece's origin need not be its middle.
+// piece's own (the kernel's guest: it keeps its lifetime) and carries the dynamic body and a Resting on the pan base body;
+// the kernel stamps it with the holder fact while it is on the books. Its geometry is read once, at admission, from its
+// mesh's metrics: a cut piece's origin need not be its middle.
 struct FMars_Searing_PieceState
 {
     UPROPERTY()
@@ -389,7 +390,8 @@ struct FMars_Searing_Summary
     int32 TakenOut = 0;
 }
 
-// Written only by the Searing processors (and Add). The station SM, the feed bridge and the operator only issue requests.
+// Written only by the Searing processors (and Add). The station SM, the feed bridge and the operator only issue requests
+// (the bridge through the station's admission inbox, the take-out through the station's take-out contract).
 struct FMars_Fragment_Searing
 {
     // In admission order. Lost pieces stay while they linger (one array, one identity space).
@@ -414,11 +416,6 @@ struct FMars_Fragment_Searing
 // A SetHeat that changed it; a Reset that found it Hot. Station-level: no piece.
 delegate void FMars_Delegate_Searing_OnHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 event void FMars_Delegate_Searing_OnHeatChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
-
-// The answer to every AddPiece: Accepted (the piece is on the pan's books; OnPieceAdded follows) or Rejected with a reason
-// (the piece is left as it was).
-delegate void FMars_Delegate_Searing_OnPieceAdmission(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
-event void FMars_Delegate_Searing_OnPieceAdmission_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
 
 // An adopted piece is on the pan's books (its body requested or switched back to Dynamic, not yet moving): the placing
 // script adds its visuals here.
@@ -448,15 +445,18 @@ event void FMars_Delegate_Searing_OnPieceLost_MC(FCk_Handle_Searing InSearing, F
 delegate void FMars_Delegate_Searing_OnSizzleChanged(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle);
 event void FMars_Delegate_Searing_OnSizzleChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Sizzle InSizzle);
 
-// A TakeOut handed InPiece back: off the pan's books, its cook state written, its body Kinematic. Control loads it where it
-// goes next.
+// A TakeOut handed InPiece back: off the pan's books, its cook state written, its body Kinematic, on its way to the
+// request's tray (the kernel readopts it if the tray refuses it), or the caller's when the request named no tray.
 delegate void FMars_Delegate_Searing_OnPieceTakenOut(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_Searing_OnPieceTakenOut_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+
+// A TakeOut that handed nothing back, and why.
+delegate void FMars_Delegate_Searing_OnTakeOutRefused(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal);
+event void FMars_Delegate_Searing_OnTakeOutRefused_MC(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal);
 
 struct FMars_Fragment_Searing_Signals
 {
     FMars_Delegate_Searing_OnHeatChanged_MC OnHeatChanged;
-    FMars_Delegate_Searing_OnPieceAdmission_MC OnPieceAdmission;
     FMars_Delegate_Searing_OnPieceAdded_MC OnPieceAdded;
     FMars_Delegate_Searing_OnPanContactChanged_MC OnPanContactChanged;
     FMars_Delegate_Searing_OnSearProgress_MC OnSearProgress;
@@ -465,6 +465,7 @@ struct FMars_Fragment_Searing_Signals
     FMars_Delegate_Searing_OnPieceLost_MC OnPieceLost;
     FMars_Delegate_Searing_OnSizzleChanged_MC OnSizzleChanged;
     FMars_Delegate_Searing_OnPieceTakenOut_MC OnPieceTakenOut;
+    FMars_Delegate_Searing_OnTakeOutRefused_MC OnTakeOutRefused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -511,7 +512,10 @@ struct FMars_Request_Searing_Reset
 
 // Hands pieces back, each with its cook state written and its body Kinematic, answered by OnPieceTakenOut per piece. Piece
 // set: that piece, if it is on the pan and not lost; unset: every Ready piece in admission order. MaxPieces set: at most
-// that many leave.
+// that many leave. Tray set: each one is loaded onto it (the pan keeps its pickup's Ledger claim until it lands, and
+// readopts it if the tray refuses it: the station's take-out contract, FMars_Request_StationTakeOut, arrives as this);
+// unset: each is the caller's, its claim released. A take-out that hands nothing back is refused with OnTakeOutRefused:
+// NoRoom when MaxPieces is set and at most 0, else NothingReady.
 struct FMars_Request_Searing_TakeOut
 {
     UPROPERTY()
@@ -520,6 +524,9 @@ struct FMars_Request_Searing_TakeOut
     UPROPERTY()
     TOptional<int32> MaxPieces;
 
+    UPROPERTY()
+    FCk_Handle_Platter Tray;
+
     FMars_Request_Searing_TakeOut() {}
 
     FMars_Request_Searing_TakeOut(TOptional<FCk_Handle_FoodPiece> InPiece, TOptional<int32> InMaxPieces)
@@ -527,27 +534,46 @@ struct FMars_Request_Searing_TakeOut
         Piece = InPiece;
         MaxPieces = InMaxPieces;
     }
-}
 
-// One released piece to adopt (Release.Piece), answered by OnPieceAdmission. Rejected (the piece left as it was) while the
-// pan body is not yet in the simulation, when the release names no live piece, a piece not Ready, one already on the pan,
-// one still on its platter or still attached, when a piece on the pan (lingering lost ones included) already carries the
-// Id, or when Supply.MaxPieces live pieces are on it. A cold pan accepts (it just does not sear).
-struct FMars_Request_Searing_AddPiece
-{
-    UPROPERTY()
-    FMars_CookingFeed_Release Release;
-
-    FMars_Request_Searing_AddPiece() {}
-
-    FMars_Request_Searing_AddPiece(FMars_CookingFeed_Release InRelease)
+    FMars_Request_Searing_TakeOut(TOptional<FCk_Handle_FoodPiece> InPiece, TOptional<int32> InMaxPieces, FCk_Handle_Platter InTray)
     {
-        Release = InRelease;
+        Piece = InPiece;
+        MaxPieces = InMaxPieces;
+        Tray = InTray;
     }
 }
 
-// Applied Reset -> SetHeat -> TakeOut -> AddPiece -> Look, so a reset and the first heat, pieces and looks of a new session
-// can share a drain, and a take-out frees its place before the next admission.
+// A piece this kernel handed back that nobody took (the tray refused it: the kernel asks this itself): it goes back on the
+// pan's books where it lies, under PieceId, its holder fact and its pickup's Ledger claim the pan's again. Its record is
+// rebuilt from the piece itself: its sear from its cook state (seared all round = Ready, with OnPieceReady), its extents
+// from its mesh, its resting face from its pose; its body goes back to Dynamic and its Resting to the pan, and the take-out
+// it undoes no longer counts. No admission answer: nobody awaits one. A no-op for a piece that is gone, attached, or that another ledger holds by now; a piece or PieceId the pan
+// already holds ensures.
+struct FMars_Request_Searing_Readopt
+{
+    UPROPERTY()
+    FMars_CookingFeed_PieceId PieceId;
+
+    UPROPERTY()
+    FCk_Handle_FoodPiece Piece;
+
+    FMars_Request_Searing_Readopt() {}
+
+    FMars_Request_Searing_Readopt(FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
+    {
+        PieceId = InPieceId;
+        Piece = InPiece;
+    }
+}
+
+// Applied Reset -> SetHeat -> TakeOut (then the station's take-outs) -> Readopt -> the station inbox's releases -> Look, so
+// a reset and the first heat, pieces and looks of a new session can share a drain, a take-out frees its place before the
+// next admission, and a piece handed back and refused is back on the books before any admission. A release from the inbox
+// is adopted (Release.Piece) and answered on the station's OnAdmission: rejected (the piece left as it was) in a drain that
+// also reset, while the pan body is not yet in the simulation, when the release names no live piece, a piece not Ready,
+// one already on the pan, one another ledger holds (its holder fact) or still attached, when a piece on the pan (lingering
+// lost ones included) already carries the Id, or when Supply.MaxPieces live pieces are on it. A cold pan accepts (it just
+// does not sear).
 struct FMars_Fragment_Searing_Requests
 {
     UPROPERTY()
@@ -560,7 +586,7 @@ struct FMars_Fragment_Searing_Requests
     TArray<FMars_Request_Searing_TakeOut> TakeOutRequests;
 
     UPROPERTY()
-    TArray<FMars_Request_Searing_AddPiece> AddPieceRequests;
+    TArray<FMars_Request_Searing_Readopt> ReadoptRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Searing_Look> LookRequests;

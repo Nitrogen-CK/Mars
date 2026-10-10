@@ -1,5 +1,5 @@
-// The station arbiter. Drains SetEngagement -> Release -> Reserve, each kind in arrival order, so a release and a reserve
-// in one drain re-seat the station and the second of two same-drain reserves is rejected Occupied.
+// The station arbiter. Drains Release -> Reserve, each kind in arrival order, so a release and a reserve in one drain
+// re-seat the station and the second of two same-drain reserves is rejected Occupied.
 //
 // It writes BOTH ends of the link: FMars_Fragment_Station.Operator here and FMars_Fragment_Operator.Station on the
 // operator, in the same call. This is the one documented exception to "only a feature's processors write its fragments"
@@ -26,15 +26,11 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Self = InHandle.As_Station();
 
-        TArray<FMars_Request_Station_SetEngagement> SetEngagementRequests = InRequests.SetEngagementRequests;
         TArray<FMars_Request_Station_Release> ReleaseRequests = InRequests.ReleaseRequests;
         TArray<FMars_Request_Station_Reserve> ReserveRequests = InRequests.ReserveRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Station_Requests);
-
-        for (const auto& Request : SetEngagementRequests)
-        { InState.Engagement = Request.Engagement; }
 
         for (const auto& Request : ReleaseRequests)
         { HandleRelease(Self, InState, Request); }
@@ -52,12 +48,6 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
         if (ck::EnsureIfNot(Operator.Is_Operator(),
             f"[Station] [{Operator.ToString()}] reserved [{InStation.ToString()}] without the Operator feature - compose utils_operator::Add first"))
         { return; }
-
-        if (InState.Engagement == ECk_EnableDisable::Disable)
-        {
-            BroadcastRejected(InStation, Operator, EMars_Station_RejectReason::Disabled);
-            return;
-        }
 
         if (ck::IsValid(InState.Operator))
         {
@@ -82,8 +72,6 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
         InStation.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
         InStation.H().BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
 
-        ck::Trace(f"[Station] [{InStation.ToString()}] reserved by [{Operator.ToString()}]");
-
         if (InStation.Has_Fragment(FMars_Fragment_Station_Signals))
         { InStation.Get_Fragment(FMars_Fragment_Station_Signals).OnReserved.Broadcast(InStation, Operator); }
     }
@@ -107,7 +95,6 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
         Operator.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnOperatorBeginDestroy"));
         InStation.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
 
-        ck::Trace(f"[Station] [{InStation.ToString()}] released by [{Operator.ToString()}] ({InRequest.Reason :n})");
         BroadcastReleased(InStation, Operator, InRequest.Reason);
     }
 
@@ -132,7 +119,6 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
 
         Station.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
 
-        ck::Trace(f"[Station] [{Station.ToString()}] released: its operator [{InOperator.ToString()}] was destroyed");
         BroadcastReleased(Station, InOperator, EMars_Station_ReleaseReason::OperatorLost);
     }
 
@@ -159,14 +145,11 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
         Operator.UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnOperatorBeginDestroy"));
 
         auto Station = StationEntity.As_Station();
-        ck::Trace(f"[Station] [{Station.ToString()}] destroyed while [{Operator.ToString()}] operated it");
         BroadcastReleased(Station, Operator, EMars_Station_ReleaseReason::StationDestroyed);
     }
 
     private void BroadcastRejected(FCk_Handle_Station& InStation, FCk_Handle InOperator, EMars_Station_RejectReason InReason)
     {
-        ck::Trace(f"[Station] [{InStation.ToString()}] rejected [{InOperator.ToString()}] ({InReason :n})");
-
         if (InStation.Has_Fragment(FMars_Fragment_Station_Signals))
         { InStation.Get_Fragment(FMars_Fragment_Station_Signals).OnReserveRejected.Broadcast(InStation, InOperator, InReason); }
     }

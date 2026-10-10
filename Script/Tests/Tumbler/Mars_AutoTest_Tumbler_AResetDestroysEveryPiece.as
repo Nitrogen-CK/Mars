@@ -1,5 +1,5 @@
-// Three admitted pieces are body entities parented to the station; a Reset destroys every one of them (the entities and
-// their bodies go invalid), empties the drum, zeroes the reseat count and shuts the hatch, and the drum loads again once the
+// Three admitted pieces (real boxes, each on its own body); a Reset destroys every one of them (the pieces and their bodies
+// go invalid), empties the drum, zeroes the reseat count and shuts the hatch, and the drum loads a fresh piece once the
 // hatch is reopened.
 class UMars_AutoTest_Tumbler_AResetDestroysEveryPiece : UMars_AutoTestRig_Tumbler
 {
@@ -11,18 +11,19 @@ class UMars_AutoTest_Tumbler_AResetDestroysEveryPiece : UMars_AutoTestRig_Tumble
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Boxes(4);
 
         Add_Steps_StationReady();
         Add_Steps_OpenHatch();
         Add_Step("load pieces 0, 1 and 2", n"Step_AddThree");
-        Add_Step_WaitUntil("three pieces are added", n"Check_Added3", 0, 1.0f);
+        Add_Step_WaitUntil("three pieces are added", n"Check_Added3", 0, 0);
         Add_Step("reset", n"Step_Reset");
-        Add_Step_WaitUntil("every piece entity and body is destroyed", n"Check_PiecesGone", 0, 1.0f);
-        Add_Step_WaitUntil("the hatch is closed", n"Check_HatchClosed", 0, 2.0f);
+        Add_Step_WaitUntil("every piece entity and body is destroyed", n"Check_PiecesGone", 0, 0);
+        Add_Step_WaitUntil("the hatch is closed", n"Check_HatchClosed", 0, 0);
         Add_Step("the drum is empty and the hand free", n"Step_AssertEmpty");
         Add_Steps_OpenHatch();
-        Add_Step("load piece 0 again", n"Step_AddFirst");
-        Add_Step_WaitUntil("it is added", n"Check_Added4", 0, 1.0f);
+        Add_Step("load a fresh piece", n"Step_AddFresh");
+        Add_Step_WaitUntil("it is added", n"Check_Added4", 0, 0);
         Add_Step("the drum loads again", n"Step_AssertReloaded");
         Run_Steps(InHandle);
     }
@@ -31,13 +32,13 @@ class UMars_AutoTest_Tumbler_AResetDestroysEveryPiece : UMars_AutoTestRig_Tumble
     private void Step_AddThree(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         for (int32 Slot = 0; Slot < 3; ++Slot)
-        { AddPiece(Slot); }
+        { Admit(Slot); }
     }
 
     UFUNCTION()
-    private void Step_AddFirst(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AddFresh(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        AddPiece(0);
+        Admit(3);
     }
 
     UFUNCTION()
@@ -102,7 +103,7 @@ class UMars_AutoTest_Tumbler_AResetDestroysEveryPiece : UMars_AutoTestRig_Tumble
     UFUNCTION()
     private void Step_AssertReloaded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Admissions.Last() == EMars_CookingFeed_Admission::Accepted, f"piece 0 is accepted again (reason: {_AdmissionReasons.Last()})");
+        Assert_True(_Admissions.Last() == EMars_CookingFeed_Admission::Accepted, f"the fresh piece is accepted (reason: {_AdmissionReasons.Last()})");
         Assert_Equals_Int(_Tumbler.Get_PieceCount(), 1, "one piece in the drum");
         Assert_Valid(_Added.Last(), "its entity is valid");
     }

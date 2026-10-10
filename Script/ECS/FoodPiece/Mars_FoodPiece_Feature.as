@@ -102,6 +102,36 @@ struct FMars_FoodPiece_MassSplit
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
+// How cooked the piece is, as the kernels that cooked it wrote it (each its own channels; nothing clamps one channel into
+// another). A display shows it through utils_cookstate::Make_DisplayParams.
+struct FMars_FoodPiece_CookState
+{
+    // A pan's sear per face, 0 raw .. 1 full crust. Six, indexed by int32(EMars_Searing_Face).
+    UPROPERTY()
+    TArray<float32> Sear;
+
+    // The fryer's batter heat per face, 0 pale .. 1 golden .. 2 overdone. Six, indexed by int32(EMars_Searing_Face).
+    UPROPERTY()
+    TArray<float32> Batter;
+
+    // The oil a fryer left on the piece when it took it out, 0..1: its sheen at the next station.
+    UPROPERTY()
+    float32 OilCoat = 0.0f;
+
+    // The crumb coating a tumbler left on the piece when it took it out, 0..1 (its coverage).
+    UPROPERTY()
+    float32 Crumb = 0.0f;
+
+    FMars_FoodPiece_CookState()
+    {
+        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
+        {
+            Sear.Add(0.0f);
+            Batter.Add(0.0f);
+        }
+    }
+}
+
 // What the piece is. A cut half carries its source's lineage, cook state, definition and kind, and its share of the mass.
 struct FMars_FoodPiece_Data
 {
@@ -117,7 +147,7 @@ struct FMars_FoodPiece_Data
     float MassKg = 0.0;
 
     UPROPERTY()
-    FMars_CookState CookState;
+    FMars_FoodPiece_CookState CookState;
 
     // The food this piece is a portion of; identity for whoever dresses or gates it, never read by the kernel. Unset for a
     // bare piece (tests).
@@ -155,7 +185,8 @@ struct FMars_FoodPiece_Tuners
     }
 }
 
-// The surface of a piece's own convex body (utils_foodpiece::Add_Body): whoever gives the piece its body picks these.
+// The surface of the piece's own convex body (utils_foodpiece::Add_Body). The piece carries it, so every body it is given
+// (a platter's drop, a board's loose release, a food item's construction) has the one surface, and a cut half inherits it.
 struct FMars_FoodPiece_BodyTuners
 {
     UPROPERTY()
@@ -189,19 +220,24 @@ struct FMars_FoodPiece_Spec
     UPROPERTY()
     FCk_RuntimeMesh_Cap Cap;
 
+    UPROPERTY()
+    FMars_FoodPiece_BodyTuners Body;
+
     FMars_FoodPiece_Spec() {}
 
-    FMars_FoodPiece_Spec(FMars_FoodPiece_Data InData, FMars_FoodPiece_Tuners InTuners, FCk_RuntimeMesh_Cap InCap)
+    FMars_FoodPiece_Spec(FMars_FoodPiece_Data InData, FMars_FoodPiece_Tuners InTuners, FCk_RuntimeMesh_Cap InCap, FMars_FoodPiece_BodyTuners InBody)
     {
         Data = InData;
         Tuners = InTuners;
         Cap = InCap;
+        Body = InBody;
     }
 }
 
 // A massless piece has no density to split, a non-positive portion minimum is no minimum RuntimeMesh accepts, a ParentId
-// without a Lineage breaks the lineage, and a cap outside the slice's ranges would fail every cut. The RuntimeMesh and
-// Transform the piece needs are checked by Add.
+// without a Lineage breaks the lineage, a cap outside the slice's ranges would fail every cut, and a body surface Jolt
+// would refuse (no collision profile, a negative friction, a restitution outside [0, 1]) would fail every body. The
+// RuntimeMesh and Transform the piece needs are checked by Add.
 mixin FMars_Validation Validate(const FMars_FoodPiece_Spec& Self)
 {
     if (Math::IsFinite(Self.Data.MassKg) == false || Self.Data.MassKg <= 0.0)
@@ -235,6 +271,15 @@ mixin FMars_Validation Validate(const FMars_FoodPiece_Spec& Self)
         || Math::Abs(UVOffset.X) > utils_foodpiece::k_MaxCapUVOffset || Math::Abs(UVOffset.Y) > utils_foodpiece::k_MaxCapUVOffset)
     { return FMars_Validation(f"FoodPiece has a Cap.UVOffset [{UVOffset.ToString()}] that is non-finite or beyond {utils_foodpiece::k_MaxCapUVOffset}"); }
 
+    if (Self.Body.CollisionProfileName.IsNone())
+    { return FMars_Validation("FoodPiece has no Body.CollisionProfileName"); }
+
+    if (Math::IsFinite(Self.Body.Friction) == false || Self.Body.Friction < 0.0f)
+    { return FMars_Validation(f"FoodPiece has a negative or non-finite Body.Friction [{Self.Body.Friction}]"); }
+
+    if (Math::IsFinite(Self.Body.Restitution) == false || Self.Body.Restitution < 0.0f || Self.Body.Restitution > 1.0f)
+    { return FMars_Validation(f"FoodPiece has Body.Restitution [{Self.Body.Restitution}] outside [0, 1]"); }
+
     return FMars_Validation();
 }
 
@@ -244,7 +289,7 @@ struct FMars_Tag_FoodPiece_NeedsSetup {}
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Read at every cut and handed on to both halves.
+// Read at every cut and handed on to both halves; Body by every utils_foodpiece::Add_Body.
 struct FMars_Fragment_FoodPiece_Params
 {
     UPROPERTY()
@@ -252,6 +297,9 @@ struct FMars_Fragment_FoodPiece_Params
 
     UPROPERTY()
     FCk_RuntimeMesh_Cap Cap;
+
+    UPROPERTY()
+    FMars_FoodPiece_BodyTuners Body;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -279,7 +327,7 @@ struct FMars_Fragment_FoodPiece
     float VolumeCm3 = 0.0;
 
     UPROPERTY()
-    FMars_CookState CookState;
+    FMars_FoodPiece_CookState CookState;
 
     // Identity, never read by the kernel; unset for a bare piece.
     UPROPERTY()
@@ -322,6 +370,16 @@ struct FMars_Fragment_FoodPiece_PendingCuts
 {
     UPROPERTY()
     TArray<FMars_FoodPiece_CutInFlight> Entries;
+}
+
+// The one ledger holding the piece (a platter, a board, a pan, a fryer): the fact every "another ledger holds it" check
+// reads. A ledger's processor stamps it when that ledger admits the piece and removes it when the ledger lets the piece go
+// (utils_foodpiece::Stamp_Holder, Clear_Holder); each ledger keeps its own record of the piece besides. Absent while no
+// ledger holds the piece (in a hand, in flight between two ledgers, lying loose).
+struct FMars_Fragment_FoodPiece_Holder
+{
+    UPROPERTY()
+    FCk_Handle Owner;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -372,11 +430,11 @@ struct FMars_Request_FoodPiece_Cut
 struct FMars_Request_FoodPiece_SetCookState
 {
     UPROPERTY()
-    FMars_CookState CookState;
+    FMars_FoodPiece_CookState CookState;
 
     FMars_Request_FoodPiece_SetCookState() {}
 
-    FMars_Request_FoodPiece_SetCookState(FMars_CookState InCookState)
+    FMars_Request_FoodPiece_SetCookState(FMars_FoodPiece_CookState InCookState)
     {
         CookState = InCookState;
     }

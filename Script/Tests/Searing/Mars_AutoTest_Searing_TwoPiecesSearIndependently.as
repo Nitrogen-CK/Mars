@@ -23,13 +23,13 @@ class UMars_AutoTest_Searing_TwoPiecesSearIndependently : UMars_AutoTestRig_Sear
         BuildStation(InHandle, Spec);
         Build_Pieces(2);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("add two pieces side by side on the cold pan", n"Step_AddTwo");
-        Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", k_SlowPolls, 0);
         Add_Step("two identities, two entities, two bodies; turn the first onto +X", n"Step_AssertDistinctAndTurnFirst");
         Add_Step_WaitFrames("the teleport is applied and written back", 4);
-        Add_Step_WaitUntil("both pieces are on the pan again", n"Check_BothOnPan", 0, 2.0f);
+        Add_Step_WaitUntil("both pieces are on the pan again", n"Check_BothOnPan", k_SlowPolls, 0);
         Add_Step("the first lies on +X, the second on -Z; heat the pan", n"Step_AssertFacesAndHeat");
         Add_Step_WaitSeconds("both pieces sear", k_SearSeconds);
         Add_Step("each piece seared only its own down face", n"Step_AssertIndependentSear");

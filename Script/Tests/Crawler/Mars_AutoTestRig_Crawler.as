@@ -4,6 +4,9 @@
 UCLASS(Abstract)
 class UMars_AutoTestRig_Crawler : UCk_AutoTest_Base
 {
+    // Composition, physics falls and the debris and corpse timers outrun the default poll budget at lane frame rate.
+    protected const int32 k_SlowPolls = 900;
+
     protected FVector _Origin;
     protected FCk_Handle_Crawler _Crawler;
 

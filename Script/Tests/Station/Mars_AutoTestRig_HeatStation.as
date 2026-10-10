@@ -7,11 +7,13 @@ enum EMars_AutoTest_HeatStation
 
 // The heat-station rig: the real searing or fry station, spawned at an isolated origin through its entity script with its
 // two platter docks, and a bare operator (no input, no display) that takes and leaves it, so the station's own state
-// machine runs Idle and Operated: the feed draws from the docked raw platter, its bridge hands each release to the kernel,
-// and the take-out bridge loads every piece the kernel hands back onto the docked finished tray. A press is the request the
-// operator's input task would issue. Platters are large World-mode platter world items under the test, each lying on a
-// static floor beside the station (a platter drops what it is given only while it lies still) until a test docks them.
-// The handlers record the docks' signals, the feed's settles and the kernel's take-outs.
+// machine runs Idle and Operated: the feed draws from the docked raw platter, its bridge hands each release to the
+// station's admission inbox, and the kernel loads every piece a take-out hands back onto the tray the take-out names (a
+// piece the tray refuses goes back to the kernel). A press is the request the operator's input task would issue. Platters are World-mode
+// platter world items under the test (large ones unless a test asks for another), each lying on a static floor beside the
+// station (a platter drops what it is given only while it lies still) until a test docks them. The station, the platters,
+// the boxes, docking and readiness are the shared heat-station fixture's (UMars_AutoTestHelper_HeatStation). The handlers
+// record the docks' signals, the feed's settles and the kernel's take-outs.
 UCLASS(Abstract)
 class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
 {
@@ -35,18 +37,15 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
     protected TArray<EMars_CookingFeed_Settle> _Settles;
     protected TArray<FCk_Handle_FoodPiece> _TakenOut;
 
-    private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
+    private UMars_AutoTestHelper_HeatStation _Fixture;
 
     // The real searing station at InOrigin with InTiming on its feed.
     protected void Spawn_Searing(FCk_Handle InHandle, FVector InOrigin, FMars_CookingFeed_TimingSpec InTiming)
     {
         _Kind = EMars_AutoTest_HeatStation::Searing;
         _Origin = InOrigin;
-
-        auto SpawnParams = UMars_SearingStation_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InOrigin);
-        SpawnParams.Feed.Timing = InTiming;
-        Spawn_Station(InHandle, utils_entity_script::Request_SpawnEntity(InHandle, UMars_SearingStation_EntityScript, SpawnParams));
+        Make_Fixture();
+        Spawn_Station(InHandle, _Fixture.Spawn_Searing(InHandle, InOrigin, InTiming));
     }
 
     // The real fry station at InOrigin with InTiming on its feed.
@@ -54,11 +53,8 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
     {
         _Kind = EMars_AutoTest_HeatStation::Fry;
         _Origin = InOrigin;
-
-        auto SpawnParams = UMars_FryStation_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, InOrigin);
-        SpawnParams.Feed.Timing = InTiming;
-        Spawn_Station(InHandle, utils_entity_script::Request_SpawnEntity(InHandle, UMars_FryStation_EntityScript, SpawnParams));
+        Make_Fixture();
+        Spawn_Station(InHandle, _Fixture.Spawn_Fry(InHandle, InOrigin, InTiming));
     }
 
     // A large platter (wide enough for the whole meat slab) lying on a floor beside the station at InOffset from its origin,
@@ -66,60 +62,33 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
     // construction until Get_IsPlatterReady says otherwise.
     protected FCk_Handle Spawn_Platter(FCk_Handle InHandle, FVector InOffset, UCk_InventoryItem_Definition InFoodItem)
     {
-        auto Owner = InHandle;
-        Spawn_PlatterFloor(Owner, _Origin + InOffset);
-        const auto World = FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
-        auto PlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(World, mars_items::Platter_Large()));
-        if (ck::Is_NOT_Valid(InFoodItem))
-        { return PlatterEntity; }
+        auto PlatterEntity = _Fixture.Spawn_EmptyPlatter(InHandle, _Origin + InOffset, mars_items::Platter_Large());
+        if (ck::IsValid(InFoodItem))
+        { Track_ForCleanup(_Fixture.Spawn_FoodOnto(PlatterEntity, InFoodItem, _Origin + InOffset + FVector(0.0, 0.0, 60.0))); }
 
-        if (ck::Is_NOT_Valid(_FoodOnPlatter))
-        { _FoodOnPlatter = Cast<UMars_AutoTestHelper_FoodOnPlatter>(NewObject(this, UMars_AutoTestHelper_FoodOnPlatter)); }
-
-        Track_ForCleanup(_FoodOnPlatter.Spawn_Onto(PlatterEntity, InFoodItem,
-            FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, 60.0))));
         return PlatterEntity;
     }
 
-    // A static slab whose top is at InTop, for a World-mode platter to lie still on (a platter drops what it is given only
-    // while it lies still); a platter spawned at InTop + the tray's base height rests on it.
-    protected void Spawn_PlatterFloor(FCk_Handle InHandle, FVector InTop)
+    // An empty InPlatterItem platter lying on a floor beside the station at InOffset from its origin; under construction until
+    // Get_IsPlatterReady says otherwise.
+    protected FCk_Handle Spawn_EmptyPlatterOf(FCk_Handle InHandle, FVector InOffset, UCk_InventoryItem_Definition InPlatterItem)
     {
-        auto Owner = InHandle;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
+        return _Fixture.Spawn_EmptyPlatter(InHandle, _Origin + InOffset, InPlatterItem);
     }
 
-
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with InKind and no definition: Transform, RuntimeMesh
-    // and FoodPiece on a new entity under the world's transient entity, tracked for cleanup.
+    // The FoodPiece rig's box fixture with InKind and no definition, under the world's transient entity, tracked for cleanup.
     protected FCk_Handle_FoodPiece Build_Box(FTransform InWorld, FGameplayTag InKind)
     {
-        auto Spec = FMars_FoodPiece_Spec();
-        Spec.Data.MassKg = 0.1;
-        Spec.Data.Kind.AddTag(InKind);
-        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
-
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        Track_ForCleanup(Entity);
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
-            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
-        return utils_foodpiece::Add(Entity, Spec);
+        const auto Box = _Fixture.Build_Box(InWorld, InKind);
+        FCk_Handle BoxEntity = Box;
+        Track_ForCleanup(BoxEntity);
+        return Box;
     }
 
     // Constructed (a World-mode platter whose holder holds its item) with InHeld pieces landed on it.
     protected bool Get_IsPlatterReady(FCk_Handle InEntity, int32 InHeld) const
     {
-        return ck::IsValid(InEntity) && InEntity.Is_WorldItem() && InEntity.Is_Platter()
-            && ck::IsValid(InEntity.As_WorldItem().Get_HeldItem()) && InEntity.As_Platter().Get_HeldCount() == InHeld;
+        return _Fixture.Get_IsPlatterReady(InEntity, InHeld);
     }
 
     // Pieces live under the world's transient entity: one that ends on a test-owned platter would outlive the test's leak
@@ -132,19 +101,13 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
 
     protected void Dock(FCk_Handle_PlatterDock InDock, FCk_Handle InPlatterEntity)
     {
-        auto Target = InDock;
-        Target.Request_Dock(FMars_Request_PlatterDock_Dock(InPlatterEntity.As_WorldItem().Get_HeldItem()));
+        _Fixture.Dock(InDock, InPlatterEntity);
     }
 
-    // Docked on InDock and no longer lerping onto it: a station torn down under a platter still arriving leaves the arrival
-    // writing an offset under a dead parent.
+    // Docked on InDock and no longer lerping onto it.
     protected bool Get_IsDocked(FCk_Handle_PlatterDock InDock, FCk_Handle InPlatterEntity) const
     {
-        if (ck::Is_NOT_Valid(InPlatterEntity) || InPlatterEntity.Is_Platter() == false || InDock.Get_Platter() != InPlatterEntity.As_Platter())
-        { return false; }
-
-        return InPlatterEntity.As_WorldItem().Get_Mount() == EMars_WorldItem_Mount::Carried
-            && InPlatterEntity.Has_Fragment(FMars_Fragment_WorldItem_Arrival) == false;
+        return _Fixture.Get_IsDocked(InDock, InPlatterEntity);
     }
 
     protected void Take()
@@ -174,16 +137,18 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
         return _Fry.Get_PieceHandle(InPieceId);
     }
 
+    // InPiece onto the docked finished tray (the kernel lands it, and readopts it if the tray refuses it).
     protected void Request_TakeOut(FCk_Handle_FoodPiece InPiece)
     {
         const auto Piece = TOptional<FCk_Handle_FoodPiece>(InPiece);
+        const auto Tray = _OutputDock.Get_Platter();
         if (_Kind == EMars_AutoTest_HeatStation::Searing)
         {
-            _Searing.Request_TakeOut(FMars_Request_Searing_TakeOut(Piece, TOptional<int32>()));
+            _Searing.Request_TakeOut(FMars_Request_Searing_TakeOut(Piece, TOptional<int32>(), Tray));
             return;
         }
 
-        _Fry.Request_TakeOut(FMars_Request_Fry_TakeOut(Piece, TOptional<int32>()));
+        _Fry.Request_TakeOut(FMars_Request_Fry_TakeOut(Piece, TOptional<int32>(), Tray));
     }
 
     protected int32 Get_TakenOutCount() const
@@ -223,12 +188,16 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
         return Entity.Is_JoltBody() && utils_jolt_body::Get_MotionType(Entity.As_JoltBody()) == ECk_MotionType::Kinematic;
     }
 
+    // Spawn_Searing / Spawn_Fry make the fixture, and every test calls one of them first.
+    private void Make_Fixture()
+    {
+        if (ck::Is_NOT_Valid(_Fixture))
+        { _Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation)); }
+    }
+
     private void Spawn_Station(FCk_Handle InHandle, FCk_Handle_PendingEntityScript InPending)
     {
         auto Pending = InPending;
-        // As the map's entity spawner does: the station is its own context, so its state machine's ck::Ctx is the station.
-        auto Station = Pending.Get_EntityUnderConstruction();
-        Station.Request_OverrideToSelf();
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnStationConstructed"));
 
         auto OperatorEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
@@ -265,14 +234,8 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
     UFUNCTION()
     protected void Check_StationReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        auto IsReady = ck::IsValid(_Feed) && ck::IsValid(_InputDock) && ck::IsValid(_OutputDock);
-        if (_Kind == EMars_AutoTest_HeatStation::Searing)
-        { IsReady = IsReady && ck::IsValid(_Searing) && utils_jolt_body::Get_IsBodyAdded(_Searing.Get_Spec().Nodes.PanBaseBody); }
-        else
-        { IsReady = IsReady && ck::IsValid(_Fry); }
-
         auto Res = OutResult;
-        Res.Set(IsReady);
+        Res.Set(_Fixture.Get_IsStationReady(_Station));
     }
 
     UFUNCTION()
@@ -291,20 +254,12 @@ class UMars_AutoTestRig_HeatStation : UCk_AutoTest_Base
 
     protected bool Get_IsOperated() const
     {
-        const auto StateClass = utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm());
-        if (_Kind == EMars_AutoTest_HeatStation::Searing)
-        { return StateClass == UMars_SmState_Searing_Operated; }
-
-        return StateClass == UMars_SmState_Fry_Operated;
+        return _Fixture.Get_IsOperated(_Station, _Kind);
     }
 
     protected bool Get_IsIdle() const
     {
-        const auto StateClass = utils_state_machine::Get_CurrentStateClass(_Station.Get_MinigameSm());
-        if (_Kind == EMars_AutoTest_HeatStation::Searing)
-        { return StateClass == UMars_SmState_Searing_Idle; }
-
-        return StateClass == UMars_SmState_Fry_Idle;
+        return _Fixture.Get_IsIdle(_Station, _Kind);
     }
 
     //----------------------------------------------------------------------------------------------------------------------

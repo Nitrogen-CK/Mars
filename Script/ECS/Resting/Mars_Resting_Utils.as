@@ -15,22 +15,21 @@ namespace utils_resting
         if (ck::EnsureIfNot(InHandle.Is_JoltBody(), f"[Resting] [{InHandle.ToString()}] has no Jolt body (add the body first)"))
         { return FCk_Handle_Resting(); }
 
-        auto Params = FMars_Fragment_Resting_Params();
-        Params.Spec = InSpec;
-
         InHandle.Add_Fragment(FMars_Feature_Resting());
-        InHandle.Add_Fragment(Params);
-        InHandle.Add_Fragment(Make_State(InHandle.As_JoltBody(), InSpec.Targets.Num()));
+        InHandle.Add_Fragment(Make_State(InHandle.As_JoltBody(), InSpec));
         InHandle.Add_Fragment(FMars_Tag_Resting_NeedsSetup());
         return InHandle.As_Resting();
     }
 
-    // Apart on every one of InTargetCount targets, no contact yet, no hop: the tracker as Add and a Retarget leave it.
-    FMars_Fragment_Resting Make_State(FCk_Handle_JoltBody InBody, int32 InTargetCount)
+    // InSpec's targets and tuners, Apart on every target, no contact yet, no hop: the tracker as Add and a Retarget leave it.
+    FMars_Fragment_Resting Make_State(FCk_Handle_JoltBody InBody, const FMars_Resting_Spec& InSpec)
     {
         auto State = FMars_Fragment_Resting();
+        State.Targets = InSpec.Targets;
+        State.GraceSeconds = InSpec.GraceSeconds;
+        State.HopMinSeconds = InSpec.HopMinSeconds;
         State.Body = InBody;
-        for (int32 Index = 0; Index < InTargetCount; ++Index)
+        for (int32 Index = 0; Index < InSpec.Targets.Num(); ++Index)
         {
             State.ContactAges.Add(k_NoContactAge);
             State.RestingOn.Add(false);
@@ -56,9 +55,11 @@ namespace utils_resting
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The targets and tuners the tracker runs on now: Add's, or the last Retarget's.
 mixin FMars_Resting_Spec Get_Spec(const FCk_Handle_Resting& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Resting_Params).Spec;
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Resting);
+    return FMars_Resting_Spec(State.Targets, State.GraceSeconds, State.HopMinSeconds);
 }
 
 mixin EMars_Resting_State Get_State(const FCk_Handle_Resting& Self)
@@ -97,12 +98,12 @@ mixin float32 Get_ApartSeconds(const FCk_Handle_Resting& Self)
 // The first target (the only one of a single-target Resting).
 mixin FCk_Handle Get_Target(const FCk_Handle_Resting& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Resting_Params).Spec.Targets[0];
+    return Self.Get_Fragment(FMars_Fragment_Resting).Targets[0];
 }
 
 mixin TArray<FCk_Handle> Get_Targets(const FCk_Handle_Resting& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Resting_Params).Spec.Targets;
+    return Self.Get_Fragment(FMars_Fragment_Resting).Targets;
 }
 
 mixin FCk_Handle_JoltBody Get_Body(const FCk_Handle_Resting& Self)

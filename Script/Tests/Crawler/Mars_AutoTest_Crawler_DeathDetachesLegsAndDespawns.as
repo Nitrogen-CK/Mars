@@ -20,14 +20,14 @@ class UMars_AutoTest_Crawler_DeathDetachesLegsAndDespawns : UMars_AutoTestRig_Cr
     {
         _Floor = SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed and its gait Ready", n"Check_GaitReady", 0, 10.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 5.0f);
+        Add_Step_WaitUntil("the crawler is composed and its gait Ready", n"Check_GaitReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 0);
         Add_Step("bind OnDied and every part's OnSevered; hit the body zone with 200 Blunt", n"Step_BindAndKill");
-        Add_Step_WaitUntil("the root state machine is in Dead", n"Check_InDead", 0, 3.0f);
-        Add_Step_WaitUntil("the Die task tore the crawler down", n"Check_TornDown", 0, 1.0f);
+        Add_Step_WaitUntil("the root state machine is in Dead", n"Check_InDead", 0, 0);
+        Add_Step_WaitUntil("the Die task tore the crawler down", n"Check_TornDown", 0, 0);
         Add_Step("one death, four severs, no leg enabled", n"Step_AssertTeardown");
-        Add_Step_WaitUntil("every severed leg is world-owned while the corpse stands", n"Check_LegsWorldOwned", 0, 1.0f);
-        Add_Step_WaitUntil("the corpse timer destroyed the crawler root", n"Check_RootDestroyed", 0, 2.5f);
+        Add_Step_WaitUntil("every severed leg is world-owned while the corpse stands", n"Check_LegsWorldOwned", 0, 0);
+        Add_Step_WaitUntil("the corpse timer destroyed the crawler root", n"Check_RootDestroyed", k_SlowPolls, 0);
         Add_Step("the severed limbs died on their own timer; the floor is untouched", n"Step_AssertDespawned");
         Run_Steps(InHandle);
     }

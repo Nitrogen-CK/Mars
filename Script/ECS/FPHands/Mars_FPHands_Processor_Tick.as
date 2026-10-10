@@ -1,9 +1,10 @@
-// Every frame: advances PhaseTime, follows moving reach/focus anchors, eases the focus lean (dropping a focus whose
-// interactable has died), rides a picked-up item in with the gloves, carries a held item out with a Place and turns the
-// pitch node for the view's pitch. The phase itself is the Hands sub-SM's.
+// Every frame: advances PhaseTime, lets go of a held target that died, follows moving reach/focus anchors, eases the focus
+// lean (dropping a focus whose interactable has died), rides a picked-up item in with the gloves, carries a held item out
+// with a Place and turns the pitch node for the view's pitch. The phase itself is the Hands sub-SM's.
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_FPHands_HandleRequests");
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -25,6 +26,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         if (InState.PhaseState.Phase != EMars_FPHands_Phase::None)
         { InState.PhaseState.PhaseTime += DeltaSeconds; }
 
+        Tick_HoldTarget(InHandle, InState);
         utils_fphands::Update_ReachTarget(InState.Reach.Target);
         utils_fphands::Update_ReachTarget(InState.Focus.Target);
 
@@ -34,9 +36,25 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         Tick_Pitch(Params.Spec.Pitch, InState, DeltaSeconds);
     }
 
+    // A held interact target that died under the gloves (its device destroyed) is announced once (OnReachTargetLost, which
+    // the Hold state lets go on) and forgotten, so it is not announced again while the state machine leaves Hold.
+    private void Tick_HoldTarget(FCk_Handle& InHandle, FMars_Fragment_FPHands& InState)
+    {
+        if (InState.PhaseState.Phase != EMars_FPHands_Phase::Hold || InState.Reach.InteractTarget.IsSet() == false)
+        { return; }
+
+        if (ck::IsValid(InState.Reach.InteractTarget.GetValue()))
+        { return; }
+
+        InState.Reach.InteractTarget.Reset();
+        if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
+        { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachTargetLost.Broadcast(InHandle.As_FPHands()); }
+    }
+
     // A Place carries the held item with the gloves: its offset from the hand goes from the hold to the point the reach sets
-    // it down at by the reach alpha, rotation kept, and back as the gloves return without letting go. Only while it still
-    // hangs off this carrier's hand and no mount arrival is moving it; one offset request per frame, as the carry.
+    // it down at by the reach alpha, rotation kept, and back as the gloves return without letting go. Only while it is
+    // Held by this carrier and settled there (its item still in the hand, no mount moving it); one offset request per
+    // frame, as the carry.
     private void Tick_Place(FCk_Handle& InHandle, const FMars_Fragment_FPHands_Params& InParams, const FMars_Fragment_FPHands& InState)
     {
         if (InState.Reach.Target.IsSet() == false || InState.Reach.Target.GetValue().PlaceAt.IsSet() == false)
@@ -52,7 +70,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 
         auto WorldItem = Presentation.As_WorldItem(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(WorldItem) || WorldItem.Get_Mount() != EMars_WorldItem_Mount::Held || WorldItem.Get_Carrier() != InHandle
-            || WorldItem.Has_Fragment(FMars_Fragment_WorldItem_Arrival))
+            || WorldItem.Get_IsSettled() == false)
         { return; }
 
         auto Node = WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);

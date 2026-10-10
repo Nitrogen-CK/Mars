@@ -1,6 +1,7 @@
-// Whether one glove or both hold the item.
+// Whether one glove or both hold the item. Every definition names it: Unset fails Validate.
 enum EMars_ItemPresentation_Handedness
 {
+    Unset,
     // Only the right glove grips it, at the Hand attach point.
     OneHanded,
     // Both gloves hold it by its sides; the hold centres on screen.
@@ -41,7 +42,7 @@ struct FMars_ItemPresentation_Grip
     EMars_HandGripLayout Layout = EMars_HandGripLayout::Sides;
 
     UPROPERTY()
-    EMars_ItemPresentation_Handedness Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
+    EMars_ItemPresentation_Handedness Handedness = EMars_ItemPresentation_Handedness::Unset;
 
     // Two-handed: half the distance between the palms. Unset measures the Mesh bounds (x MeshScale, through
     // Mounting.HeldOffset).
@@ -116,6 +117,15 @@ class UMars_ItemTrait_Presentation : UCk_ItemTrait
 
     UPROPERTY()
     FMars_ItemPresentation_WorldItem WorldItem;
+}
+
+// The gloves need to know how many hands hold the item.
+mixin FMars_Validation Validate(const UMars_ItemTrait_Presentation Self)
+{
+    if (Self.Grip.Handedness == EMars_ItemPresentation_Handedness::Unset)
+    { return FMars_Validation("Grip.Handedness is unset: name OneHanded or TwoHanded"); }
+
+    return FMars_Validation();
 }
 
 mixin bool Has_Presentation(const FCk_Handle_Item& Self)

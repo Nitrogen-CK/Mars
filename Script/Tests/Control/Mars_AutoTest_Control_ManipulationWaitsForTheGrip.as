@@ -1,6 +1,7 @@
 // The player's ManipulateControl task begins a lever's manipulation only once the gloves grip it: Use on a
-// ManuallyCompleted lever starts the interaction at once, but the Control is not manipulated while the gloves are still
-// reaching. The lever's interactable is transform-only, so the reach resolves as a point grip at the lever root.
+// ManuallyCompleted lever (the player's Use task, the lever offered to the resolver) starts the interaction at once, but the
+// Control is not manipulated while the gloves are still reaching. The lever's interactable is transform-only, so the reach
+// resolves as a point grip at the lever root.
 class UMars_AutoTest_Control_ManipulationWaitsForTheGrip : UMars_AutoTestRig_LeverThroughPlayer
 {
     private bool _SawManipulationBeforeGrip = false;
@@ -11,9 +12,10 @@ class UMars_AutoTest_Control_ManipulationWaitsForTheGrip : UMars_AutoTestRig_Lev
         BuildPlayerAndLever(InHandle, FMars_FPHands_Spec());
         utils_state_machine::Add(_Player, FCk_StateMachine_Spec(UMars_AutoTestState_ManipulateControlRig));
 
-        Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 5.0f);
-        Add_Step("add the lever to the resolver and open Use", n"Step_UseLever");
-        Add_Step_WaitUntil("the lever is manipulated", n"Check_IsManipulatingWatchingTheGrip", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests, listening for a reach", n"Check_HandsRest", 0, 0);
+        Add_Steps_UseRowLive();
+        Add_Step("offer the lever to the resolver and press Use", n"Step_UseLever");
+        Add_Step_WaitUntil("the lever is manipulated", n"Check_IsManipulatingWatchingTheGrip", k_SlowPolls, 0);
         Add_Step("the manipulation began only once the gloves gripped the lever", n"Step_AssertGripFirst");
         Run_Steps(InHandle);
     }

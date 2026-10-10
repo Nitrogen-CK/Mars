@@ -1,9 +1,9 @@
-// The player's state machine. Alive keeps only what outlives both of its modes - the hotbar -> held-item link and the
-// gloves' sub-SM (Script/ECS/FPHands/Mars_FPHands_Hfsm.as); every interaction task lives on the mode that uses it:
-// Locomotion is free roam, Operating is the station mode. A parent's transitions keep firing while any descendant is
-// active, and leaving a parent tears down its subtree - so Alive->Downed interrupts any locomotion or operating state,
-// and Locomotion->Operating tears down every free-roam task (focus cleared, intents closed, manipulation ended, hints
-// unregistered) before the station's enter.
+// The player's state machine. Alive keeps only what outlives both of its modes - the overflow eject, the held-item ->
+// gloves link and the gloves' sub-SM (Script/ECS/FPHands/Mars_FPHands_Hfsm.as); every interaction task lives on the
+// mode that uses it: Locomotion is free roam, Operating is the station mode. A parent's transitions keep firing while
+// any descendant is active, and leaving a parent tears down its subtree - so Alive->Downed interrupts any locomotion or
+// operating state, and Locomotion->Operating tears down every free-roam task (focus cleared, intents closed,
+// manipulation ended, hints unregistered) before the station's enter.
 //
 // The SM is owning-client authoritative (Mars_PlayerCharacter::TryStartPlayerSm): the owner's transitions replicate, so
 // every copy (the server's, the other clients') enters the owner's states and runs their tasks' enter and exit; only the
@@ -58,15 +58,10 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddCondition(ToDowned, UMars_SmCondition_IsDowned);
 
         AddTask(InHandle, UMars_SmTask_MovementSpeedSync);
-        AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
+        AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);
+        AddTask(InHandle, UMars_SmTask_HeldItemDrivesHands);
         AddTask(InHandle, UMars_SmTask_AliveSubSm);
         AddTask(InHandle, UMars_SmTask_HandsSubSm);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Alive", n"PlayerSM", 2.0f, FLinearColor(0.3f, 1.0f, 0.3f, 1.0f));
     }
 }
 
@@ -77,12 +72,6 @@ class UMars_SmState_Downed : UCk_SmState_EntityScript
     {
         auto ToAlive = AddTransition(InHandle, UMars_SmState_Alive);
         AddCondition(ToAlive, UMars_SmCondition_IsNotDowned);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Downed", n"PlayerSM", 2.0f, FLinearColor(1.0f, 0.3f, 0.3f, 1.0f));
     }
 }
 
@@ -97,7 +86,6 @@ class UMars_SmState_Locomotion : UCk_SmState_EntityScript
         AddCondition(ToOperating, UMars_SmCondition_IsOperating);
 
         AddTask(InHandle, UMars_SmTask_InteractionFocus);
-        AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
         AddTask(InHandle, UMars_SmTask_PrimaryIntentToResolver);
         AddTask(InHandle, UMars_SmTask_ManipulateControl);

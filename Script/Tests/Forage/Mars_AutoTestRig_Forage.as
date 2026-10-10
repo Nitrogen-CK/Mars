@@ -17,6 +17,8 @@ class UMars_AutoTestRig_Forage : UCk_AutoTest_Base
     protected int32 _ExhaustedCount = 0;
     protected int32 _ReplenishedCount = 0;
 
+    // A poll budget, not a ceiling: a refill or regrow timer runs out, a dropped or thrown item falls and strikes.
+    protected const int32 k_SlowPolls = 900;
     private const float64 k_ReleasePointHeight = 50.0;
 
     // A source at InOrigin: transform root and a release point node 50 uu up.

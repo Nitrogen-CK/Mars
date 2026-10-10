@@ -44,11 +44,11 @@ class UMars_EmoteWheelSegment_Widget : UCk_UserWidget_UE
         if (InEntry.Icon.IsNull() == false)
         { IconTexture = System::LoadAsset_Blocking(InEntry.Icon); }
 
+        // Without the icon material the red-encoded art shows as is - visible, but untinted.
         _IconDMI = Icon.GetDynamicMaterial();
-        if (ck::Is_NOT_Valid(_IconDMI))
+        if (ck::EnsureIfNot(ck::IsValid(_IconDMI),
+            "[Mars_EmoteWheelSegment] the Icon brush is not a material; set it to EmoteIcon_Mars_M in the widget blueprint"))
         {
-            // Without the icon material the red-encoded art shows as is - visible, but untinted.
-            ck::Warning("[Mars_EmoteWheelSegment] the Icon brush is not a material; set it to EmoteIcon_Mars_M in the widget blueprint");
             if (ck::IsValid(IconTexture))
             { Icon.SetBrushFromTexture(IconTexture); }
             return;

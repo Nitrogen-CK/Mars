@@ -10,8 +10,9 @@ class UMars_CargoSlot_AcceptPolicy : UObject
 namespace utils_cargo_slot
 {
     // A scene-node child of the pack root at MountOffset carrying the slot: a capacity-1 Inventory.Mars.Cargo.<Index>
-    // inventory (accept policy CDO) and a probe interactable with one Use target running UMars_SmState_CargoSlot_Interact.
-    // The slot entity is owned by the pack, so it dies with it.
+    // inventory (accept policy CDO) whose Persistent item rides the slot's node at its CargoOffset, and a probe
+    // interactable with one Use target running UMars_SmState_CargoSlot_Interact. The slot entity is owned by the pack, so
+    // it dies with it.
     FCk_Handle_CargoSlot Create(FCk_Handle_Transform& InPackRoot, FMars_CargoSlot_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -32,6 +33,8 @@ namespace utils_cargo_slot
 
         FCk_Handle SlotEntity = SlotNode;
         auto Inventory = utils_inventory_data_only::Add(SlotEntity, InventoryParams, ECk_Replication::DoesNotReplicate);
+        utils_world_item::Add_MountedInventory(Inventory, FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule::PointAtCargoOffset,
+            constants_cargo_slot::Get_MountPoint(), FTransform::Identity));
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(constants_cargo_slot::Get_MountPoint(), SlotNode));
@@ -86,7 +89,7 @@ namespace utils_cargo_slot
 
     // The probe carries Probe.Mars.Interact (the player's interaction trace only sees probes under that tag) and is
     // Kinematic: it follows the pack. The prompt text is a placeholder until UMars_Processor_CargoSlot_Prompt writes
-    // the focuser's action.
+    // the focuser's action. The target is WhileLive: a stow or a take lives until the slot reports it.
     FCk_Handle_Interactable DoCreate_Interactable(FCk_Handle_Transform& InSlotNode, float32 InProbeRadius)
     {
         auto Probe = FMars_Interactable_ProbeInfo();
@@ -96,7 +99,6 @@ namespace utils_cargo_slot
         Probe.ProbeOffset = FTransform::Identity;
 
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
         auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
@@ -106,6 +108,7 @@ namespace utils_cargo_slot
         Target.InteractTargetSpec = TargetSpec;
         Target.InteractPromptSpec = Prompt;
         Target.InteractionStateClass = UMars_SmState_CargoSlot_Interact;
+        Target.Work = EMars_Interactable_Work::WhileLive;
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;

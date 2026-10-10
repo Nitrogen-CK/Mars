@@ -1,6 +1,6 @@
-// A Persistent (backpack) world item survives being stowed, then moves between its carrier's Back (Carried, Kinematic),
-// its Hand (Held) and the world (Released: Dynamic, the item back in its holder, the launch drained). Isolated Z band:
-// -51000.
+// A Persistent (backpack) world item survives being stowed and follows where its item lives: in the backpack slot it is
+// Carried on its carrier's Back (Kinematic), with that slot selected it is Held on the Hand, and released it is back in the
+// world (Dynamic, the item back in its holder, the launch drained). No mount is ever requested. Isolated Z band: -51000.
 class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Carrier
 {
     private FCk_Handle_WorldItem _WorldItem;
@@ -28,9 +28,8 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
         Add_Step_WaitUntil("the carrier wears the backpack", n"Check_Wearing");
         Add_Step_WaitFrames("give a transient world item time to destroy itself", 3);
         Add_Step("the persistent world item survived the stow", n"Step_AssertSurvivedStow");
-        Add_Step("request Carry", n"Step_Carry");
         Add_Step_WaitUntil("Carried on the Back node with a Kinematic body", n"Check_Carried");
-        Add_Step("request Hold", n"Step_Hold");
+        Add_Step("select the backpack slot", n"Step_SelectBackpackSlot");
         Add_Step_WaitUntil("Held on the Hand node", n"Check_Held");
         Add_Step("request Release", n"Step_Release");
         Add_Step_WaitUntil("back in the world: holder holds the item, slot empty, body Dynamic, launch drained", n"Check_Released");
@@ -89,11 +88,6 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
         Assert_True(_Hotbar.Get_BackpackItem() == _Item, "the backpack slot holds the backpack item");
     }
 
-    UFUNCTION()
-    private void Step_Carry(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(_Carrier));
-    }
 
     UFUNCTION()
     private void Check_Carried(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
@@ -107,9 +101,9 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
     }
 
     UFUNCTION()
-    private void Step_Hold(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_SelectBackpackSlot(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _WorldItem.Request_Hold(FMars_Request_WorldItem_Hold(_Carrier));
+        _Hotbar.Request_Select(FMars_Request_Hotbar_Select(_Hotbar.Get_BackpackIndex().GetValue()));
     }
 
     UFUNCTION()
@@ -125,8 +119,7 @@ class UMars_AutoTest_WorldItem_PersistentCarryHoldRelease : UMars_AutoTestRig_Ca
     UFUNCTION()
     private void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _WorldItem.Request_Release(FMars_Request_WorldItem_Release(
-            _Item, _Hotbar.Get_BackpackSlot(), FVector(0.0, 0.0, 50.0), FVector::ZeroVector));
+        _WorldItem.Request_Release(FMars_Request_WorldItem_Release(FVector(0.0, 0.0, 50.0), FVector::ZeroVector));
     }
 
     UFUNCTION()

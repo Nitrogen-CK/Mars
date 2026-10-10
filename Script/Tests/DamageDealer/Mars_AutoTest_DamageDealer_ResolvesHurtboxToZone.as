@@ -38,9 +38,9 @@ class UMars_AutoTest_DamageDealer_ResolvesHurtboxToZone : UCk_AutoTest_Base
         _Dealer.BindTo_OnDamageRejected(FMars_Delegate_DamageDealer_OnDamageRejected(this, n"OnDamageRejected"));
 
         Add_Step("deal Sever 10 to the hurtbox node", n"Step_DealToHurtbox");
-        Add_Step_WaitUntil("Health reads 80", n"Check_At80", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 80", n"Check_At80", 0, 0);
         Add_Step("dealt once to the zone, instigated by the attacker; deal to a bare entity", n"Step_AssertDealtAndDealToBare");
-        Add_Step_WaitUntil("the bare entity is rejected", n"Check_Rejected", 0, 2.0f);
+        Add_Step_WaitUntil("the bare entity is rejected", n"Check_Rejected", 0, 0);
         Add_Step("rejected NoHitZone and counted", n"Step_AssertRejected");
         Run_Steps(InHandle);
     }

@@ -9,6 +9,8 @@ class UMars_AutoTestRig_Resting : UCk_AutoTest_Base
     protected const float32 k_PlateRestZ = 100.0f;
     protected const float32 k_PlateHalfHeight = 2.0f;
     protected const float32 k_BoxHalfSize = 10.0f;
+    // A poll budget, not a ceiling: a dropped, hopped or teleported box takes its time to land and rest.
+    protected const int32 k_SlowPolls = 900;
 
     protected FCk_Handle_SceneNode _PlateNode;
     protected FCk_Handle_JoltBody _PlateBody;

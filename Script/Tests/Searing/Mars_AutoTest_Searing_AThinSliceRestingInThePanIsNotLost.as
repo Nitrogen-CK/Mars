@@ -10,6 +10,9 @@ class UMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost : UMars_AutoTest
     private const float64 k_SliceThickness = 1.0;
     private const float64 k_SunkDepth = 0.8;
     private const float32 k_HoldSeconds = 3.0f;
+    // The hold is timed from its step's first poll, so past k_HoldSeconds the step needs only the poll that reads the end;
+    // the rest is headroom for a hitched frame.
+    private const float32 k_HoldSlackSeconds = 2.0f;
     // Slow enough that the hold's sear is measurable (the rig's 0.2 s would sear the face before the hold).
     private const float32 k_SecondsPerFace = 10.0f;
 
@@ -28,16 +31,16 @@ class UMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost : UMars_AutoTest
         BuildStation(InHandle, Spec);
         Build_Pieces(1);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("cut the box 1 cm under its top", n"Step_CutSlice");
-        Add_Step_WaitUntil("the cut resolved", n"Check_Cut", 0, 3.0f);
+        Add_Step_WaitUntil("the cut resolved", n"Check_Cut", k_SlowPolls, 0);
         Add_Step("heat the pan and release the slice flat over its centre", n"Step_ReleaseSlice");
-        Add_Step_WaitUntil("the slice landed on the pan", n"Check_SliceOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("the slice landed on the pan", n"Check_SliceOnPan", k_SlowPolls, 0);
         Add_Step("note the contact edges so far", n"Step_NoteLanding");
         Add_Step_WaitSeconds("the slice rests on the still pan", 1.5f);
         Add_Step("log where a resting slice sits and whether it flickered", n"Step_LogRest");
-        Add_Step_WaitUntil("hold the slice 0.8 cm under the surface for 3 s", n"Check_HoldSunk", 0, k_HoldSeconds + 2.0f);
+        Add_Step_WaitUntil("hold the slice 0.8 cm under the surface for 3 s", n"Check_HoldSunk", 0, k_HoldSeconds + k_HoldSlackSeconds);
         Add_Step_WaitFrames("the last hold frame is judged", 2);
         Add_Step("never lost, on the pan, and its down face kept searing", n"Step_AssertKept");
         Run_Steps(InHandle);

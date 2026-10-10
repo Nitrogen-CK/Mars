@@ -5,6 +5,9 @@ class UMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne : UMars_AutoTe
 {
     private const FVector k_Origin = FVector(14000.0, -17000.0, -30000.0);
 
+    // Two cadenced drops each settle with physics (up to Settle.MaxSeconds): well past the harness's default poll budget.
+    private const int32 k_SlowPolls = 900;
+
     private FCk_Handle_Platter _Platter;
     private FCk_Handle_FoodPiece _P;
     private FCk_Handle_FoodPiece _Q;
@@ -16,9 +19,9 @@ class UMars_AutoTest_Platter_TwoUnloadsOfOnePieceInOneDrainAreOne : UMars_AutoTe
         _P = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 0.0, 0.0)), 0.5);
         _Q = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 50.0, 0.0)), 0.5);
 
-        Add_Step_WaitUntil("P and Q are Ready", n"Check_Ready");
+        Add_Step_WaitUntil("P and Q are Ready", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("load P and Q", n"Step_Load");
-        Add_Step_WaitUntil("both landed", n"Check_Landed");
+        Add_Step_WaitUntil("both landed", n"Check_Landed", k_SlowPolls, 0);
         Add_Step("unload P twice in one step", n"Step_UnloadTwice");
         Add_Step_WaitUntil("P was unloaded", n"Check_Unloaded");
         Add_Step_WaitFrames("a second unload would have drained by now", 3);

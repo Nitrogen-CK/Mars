@@ -1,7 +1,7 @@
 // The same station class fed the mushroom slice on its input platter instead of the meat: its joint is the slice (53.6 cm3)
 // at the definition's 32 g with the definition's portion tuners and cap. A chop 5.6 cm off centre, 0.37 cm inside the
 // slice's tip, would leave a sliver under the 0.8 cm minimum: the cut is issued, RuntimeMesh rejects it and the slice stays
-// whole, held and untouched. A chop at the centre then cuts it through the same station into two shown, gram-scale halves
+// whole and held. A chop at the centre then cuts it through the same station into two shown, gram-scale halves
 // whose masses add back exactly and whose volumes add back within RuntimeMesh's tolerance.
 class UMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation : UMars_AutoTestRig_CuttingStation
 {
@@ -21,14 +21,14 @@ class UMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation : UM
         Add_Steps_FeedTheJoint();
         Add_Step("the slice has the mushroom's volume, mass, tuners and cap", n"Step_AssertSlice");
         Add_Step("move the hand near the slice's tip", n"Step_MoveToEdge");
-        Add_Step_WaitUntil("the hand is near the tip", n"Check_HandAtEdge", 0, 2.0f);
+        Add_Step_WaitUntil("the hand is near the tip", n"Check_HandAtEdge", 0, 0);
         Add_Step("chop near the tip", n"Step_Chop");
-        Add_Step_WaitUntil("the edge cut resolved and the cleaver is back up", n"Check_EdgeCutResolved", 0, 5.0f);
-        Add_Step("the edge cut was issued and rejected; the slice is whole and untouched", n"Step_AssertRejected");
+        Add_Step_WaitUntil("the edge cut resolved and the cleaver is back up", n"Check_EdgeCutResolved", k_SlowPolls, 0);
+        Add_Step("the edge cut was issued and rejected; the slice is whole and held", n"Step_AssertRejected");
         Add_Step("move the hand to the centre", n"Step_MoveToCentre");
-        Add_Step_WaitUntil("the hand is at the centre", n"Check_HandAtCentre", 0, 2.0f);
+        Add_Step_WaitUntil("the hand is at the centre", n"Check_HandAtCentre", 0, 0);
         Add_Step("chop at the centre", n"Step_Chop");
-        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
+        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", k_SlowPolls, 0);
         Add_Step("two gram-scale halves conserve the slice", n"Step_AssertHalves");
         Run_Steps(InHandle);
     }
@@ -87,7 +87,6 @@ class UMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation : UM
         Assert_Equals_Int(_Board.Get_HeldCount(), 1, "the slice is still the one piece held");
         Assert_True(_Board.Get_Held()[0] == _Slice, "the held piece is the whole slice");
         Assert_True(_Slice.Get_Status() == EMars_FoodPiece_Status::Ready, "the slice is Ready again");
-        Assert_True(_Board.Get_IsUntouched(), "a refused cut leaves the board untouched");
     }
 
     UFUNCTION()

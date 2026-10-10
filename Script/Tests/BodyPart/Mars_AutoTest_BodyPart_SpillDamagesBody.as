@@ -10,9 +10,9 @@ class UMars_AutoTest_BodyPart_SpillDamagesBody : UMars_AutoTestRig_Crawler
     {
         SpawnFloorAndCrawler(InHandle, Make_CrawlerSpec(FVector(400.0, 400.0, 200.0)));
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("hit leg 0's zone with 10 Sever", n"Step_HitLeg0");
-        Add_Step_WaitUntil("the body reads 115 (half the hit spilled)", n"Check_BodyAt115", 0, 2.0f);
+        Add_Step_WaitUntil("the body reads 115 (half the hit spilled)", n"Check_BodyAt115", 0, 0);
         Add_Step("leg 0 took the full hit; the other legs took nothing", n"Step_AssertLegs");
         Run_Steps(InHandle);
     }

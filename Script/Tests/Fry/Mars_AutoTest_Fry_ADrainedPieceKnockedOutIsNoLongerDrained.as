@@ -17,14 +17,14 @@ class UMars_AutoTest_Fry_ADrainedPieceKnockedOutIsNoLongerDrained : UMars_AutoTe
         BuildStation(InHandle, Spec);
         Build_Pieces(1);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("release a piece over the basket", n"Step_Release");
-        Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", 0, 4.0f);
+        Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", k_SlowPolls, 0);
         Add_Step("drained once; knock it out over the oil", n"Step_AssertDrainedThenKnockOut");
-        Add_Step_WaitUntil("the piece is in the oil", n"Check_InOil", 0, 3.0f);
+        Add_Step_WaitUntil("the piece is in the oil", n"Check_InOil", k_SlowPolls, 0);
         Add_Step("no longer drained; put it back in the basket", n"Step_AssertResetThenPutBack");
-        Add_Step_WaitUntil("the piece drained again", n"Check_FirstDrained", 0, 4.0f);
+        Add_Step_WaitUntil("the piece drained again", n"Check_FirstDrained", k_SlowPolls, 0);
         Add_Step("drained a second time from scratch", n"Step_AssertDrainedAgain");
         Run_Steps(InHandle);
     }

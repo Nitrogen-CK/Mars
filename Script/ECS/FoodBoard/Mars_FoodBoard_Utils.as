@@ -6,8 +6,10 @@ namespace utils_foodboard
     // A corner this close to the plane is on it: a piece the plane only touches is not a candidate.
     const float k_StraddleToleranceCm = 0.01;
 
-    // Composes the board on InHandle (the station entity), which must carry a Transform: the release velocity is in its frame.
-    // The board starts empty and untouched. A rejected spec or a missing Transform ensures and returns an invalid handle.
+    // Composes the board on InHandle (the station entity), which must carry a Transform, and the station's admission inbox:
+    // the board receives what the station's feed releases (each a Place, posed on Spec.PileNode) and its take-outs (each a
+    // Release onto the tray). The board starts empty; an empty first drain starts its watch of the station's queue. A
+    // rejected spec, a missing Transform or a missing pile node ensures and returns an invalid handle.
     FCk_Handle_FoodBoard Add(FCk_Handle& InHandle, FMars_FoodBoard_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -18,12 +20,18 @@ namespace utils_foodboard
         if (ck::EnsureIfNot(IsComposable, f"[FoodBoard] [{InHandle.ToString()}] needs a Transform, and no FoodBoard yet"))
         { return FCk_Handle_FoodBoard(); }
 
+        if (ck::EnsureIfNot(ck::IsValid(InSpec.PileNode), f"[FoodBoard] [{InHandle.ToString()}] needs a pile node"))
+        { return FCk_Handle_FoodBoard(); }
+
         auto Params = FMars_Fragment_FoodBoard_Params();
         Params.Tuners = InSpec.Tuners;
+        Params.PileNode = InSpec.PileNode;
 
         InHandle.Add_Fragment(FMars_Feature_FoodBoard());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_FoodBoard());
+        InHandle.Add_Fragment(FMars_Fragment_FoodBoard_Requests());
+        utils_cooking_feed::Add_Admission(InHandle);
         return InHandle.As_FoodBoard();
     }
 
@@ -95,6 +103,28 @@ mixin FMars_FoodBoard_Tuners Get_Tuners(const FCk_Handle_FoodBoard& Self)
     return Self.Get_Fragment(FMars_Fragment_FoodBoard_Params).Tuners;
 }
 
+// The pile node's world pose at unit scale: what the food on the board turns about.
+mixin FTransform Get_PileNodeWorld(const FCk_Handle_FoodBoard& Self)
+{
+    auto PileWorld = utils_transform::Get_EntityCurrentTransform(Self.Get_Fragment(FMars_Fragment_FoodBoard_Params).PileNode);
+    PileWorld.SetScale3D(FVector::OneVector);
+    return PileWorld;
+}
+
+// The pose InPiece takes on the board: the pile node with its food's layout applied (yaw about the node's Z, lift along
+// it), at unit scale. A piece with no definition lies unrotated.
+mixin FTransform Get_PoseOnPile(const FCk_Handle_FoodBoard& Self, const FCk_Handle_FoodPiece& InPiece)
+{
+    auto LayoutLocal = FTransform::Identity;
+    const UMars_Food_Def Def = InPiece.Get_Definition().Get();
+    if (ck::IsValid(Def))
+    { LayoutLocal = FTransform(FRotator(0.0, Def.Layout.YawDegrees, 0.0), FVector(0.0, 0.0, Def.Layout.LiftCm)); }
+
+    auto PoseWorld = LayoutLocal * Self.Get_PileNodeWorld();
+    PoseWorld.SetScale3D(FVector::OneVector);
+    return PoseWorld;
+}
+
 // Board order. A piece destroyed elsewhere leaves the ledger at the board's next drain.
 mixin TArray<FCk_Handle_FoodPiece> Get_Held(const FCk_Handle_FoodBoard& Self)
 {
@@ -104,17 +134,6 @@ mixin TArray<FCk_Handle_FoodPiece> Get_Held(const FCk_Handle_FoodBoard& Self)
 mixin int32 Get_HeldCount(const FCk_Handle_FoodBoard& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FoodBoard).Held.Num();
-}
-
-// Oldest first.
-mixin TArray<FCk_Handle_FoodPiece> Get_Released(const FCk_Handle_FoodBoard& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_FoodBoard).Released;
-}
-
-mixin bool Get_IsUntouched(const FCk_Handle_FoodBoard& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_FoodBoard).IsUntouched;
 }
 
 // What a Place or a chop counts against MaxHeldPieces: the held pieces plus the second half of every cut the board has in
@@ -154,12 +173,6 @@ mixin bool Get_HasBoardCutPending(const FCk_Handle_FoodPiece& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_Clear(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoard_Clear& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
-    Requests.ClearRequests.Add(InRequest);
-}
-
 mixin void Request_Place(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoard_Place& InRequest)
 {
     if (ck::EnsureIfNot(ck::IsValid(InRequest.Piece), f"[FoodBoard] [{Self.ToString()}] was asked to place an invalid piece"))
@@ -169,16 +182,21 @@ mixin void Request_Place(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoa
     Requests.PlaceRequests.Add(InRequest);
 }
 
+// Cuts, turns and releases are stamped in arrival order: the board queues them in that order whatever their kind.
 mixin void Request_Cut(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoard_Cut& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
-    Requests.CutRequests.Add(InRequest);
+    auto Request = InRequest;
+    Request.Sequence = Requests.NextSequence++;
+    Requests.CutRequests.Add(Request);
 }
 
 mixin void Request_Release(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoard_Release& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
-    Requests.ReleaseRequests.Add(InRequest);
+    auto Request = InRequest;
+    Request.Sequence = Requests.NextSequence++;
+    Requests.ReleaseRequests.Add(Request);
 }
 
 // A rejected Turn ensures and is dropped: nothing moves.
@@ -189,7 +207,9 @@ mixin void Request_Turn(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoar
     { return; }
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
-    Requests.TurnRequests.Add(InRequest);
+    auto Request = InRequest;
+    Request.Sequence = Requests.NextSequence++;
+    Requests.TurnRequests.Add(Request);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -266,18 +286,18 @@ mixin void UnbindFrom_OnReleased(FCk_Handle_FoodBoard& Self, FMars_Delegate_Food
     Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnReleased.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
-mixin void BindTo_OnCleared(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnCleared InDelegate)
+mixin void BindTo_OnReleaseRefused(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnReleaseRefused InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Signals);
-    Fragment.OnCleared.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    Fragment.OnReleaseRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
-mixin void UnbindFrom_OnCleared(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnCleared InDelegate)
+mixin void UnbindFrom_OnReleaseRefused(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnReleaseRefused InDelegate)
 {
     if (Self.Has_Fragment(FMars_Fragment_FoodBoard_Signals) == false)
     { return; }
 
-    Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnCleared.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    Self.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnReleaseRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnTurned(FCk_Handle_FoodBoard& Self, FMars_Delegate_FoodBoard_OnTurned InDelegate)

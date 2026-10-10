@@ -1,6 +1,6 @@
-// A Handoff release capped at two lets go of the first two of three held boxes, in board order: each is still alive, has no
-// body and no membership, and is not in Released (the board no longer names it). The third stays held and the board is
-// touched. A Loose release after it gives the last box its body and its Released entry, as a sweep always did.
+// A release capped at two hands off the first two of three held boxes, in board order: each is still alive, has no body and
+// no membership (the board no longer names it). The third stays held. An uncapped release after it hands the last box off
+// too, still without a body.
 class UMars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces : UMars_AutoTestRig_FoodBoard
 {
     private const FVector k_Origin = FVector(12800.0, -16000.0, -30000.0);
@@ -25,9 +25,9 @@ class UMars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces : U
         Add_Step_WaitUntil("two pieces were handed off", n"Check_HandedOff");
         Add_Step_WaitFrames("nothing else moves", 2);
         Add_Step("the first two left without bodies; the third stays held", n"Step_AssertHandoff");
-        Add_Step("release the rest loose", n"Step_Loose");
-        Add_Step_WaitUntil("the last box has a settled body", n"Check_LastBody");
-        Add_Step("the last box was released loose, as before", n"Step_AssertLoose");
+        Add_Step("hand off the rest, uncapped", n"Step_HandoffRest");
+        Add_Step_WaitUntil("the last box was handed off", n"Check_LastHandedOff");
+        Add_Step("the last box left without a body; nothing is held", n"Step_AssertRest");
         Run_Steps(InHandle);
     }
 
@@ -46,7 +46,7 @@ class UMars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces : U
     private void Step_Handoff(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Board = _Board;
-        Board.Request_Release(FMars_Request_FoodBoard_Release(EMars_FoodBoard_ReleaseMode::Handoff, TOptional<int32>(k_HandoffCap)));
+        Board.Request_Release(FMars_Request_FoodBoard_Release(TOptional<int32>(k_HandoffCap)));
     }
 
     UFUNCTION()
@@ -74,44 +74,36 @@ class UMars_AutoTest_FoodBoard_HandoffReleaseLeavesNoBodyAndStopsAtMaxPieces : U
             Assert_True(ck::Is_NOT_Valid(Box.TryGet_FoodBoard()), f"handed-off box {Index} names no board");
         }
 
-        Assert_Equals_Int(_Board.Get_Released().Num(), 0, "a hand-off keeps nothing in Released");
         Assert_Equals_Int(_Board.Get_HeldCount(), 1, "one box is still held");
         Assert_True(_Board.Get_HeldCount() == 1 && _Board.Get_Held()[0] == _Boxes[2], "the third box is the one held");
-        Assert_False(_Board.Get_IsUntouched(), "a hand-off touches the board");
     }
 
     UFUNCTION()
-    private void Step_Loose(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_HandoffRest(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Board = _Board;
-        Board.Request_Release(FMars_Request_FoodBoard_Release(EMars_FoodBoard_ReleaseMode::Loose, TOptional<int32>()));
+        Board.Request_Release(FMars_Request_FoodBoard_Release());
     }
 
-    // A body that failed settles at once so the assertions report it.
     UFUNCTION()
-    private void Check_LastBody(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_LastHandedOff(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        FCk_Handle Entity = _Boxes[2];
-        const auto IsSettled = Entity.Is_JoltBody() && utils_jolt_body::Get_SetupState(Entity.As_JoltBody()) != ECk_JoltBody_SetupState::Pending;
-
         auto Res = OutResult;
-        Res.Set(Get_ReleasedEvents(_Board).Num() >= 3 && IsSettled);
+        Res.Set(Get_ReleasedEvents(_Board).Num() >= 3);
     }
 
     UFUNCTION()
-    private void Step_AssertLoose(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertRest(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        FCk_Handle Entity = _Boxes[2];
-        const auto Body = Entity.As_JoltBody();
-        Assert_True(utils_jolt_body::Get_SetupState(Body) == ECk_JoltBody_SetupState::Ready, "the last box has a Ready body");
-        Assert_True(utils_jolt_body::Get_MotionType(Body) == ECk_MotionType::Dynamic, "the last box's body is dynamic");
         Assert_Equals_Int(_Board.Get_HeldCount(), 0, "nothing is held");
-        Assert_True(_Board.Get_Released().Num() == 1 && _Board.Get_Released()[0] == _Boxes[2], "only the loose box is in Released");
+        Assert_True(Get_ReleasedEvents(_Board).Num() == 3 && Get_ReleasedEvents(_Board)[2] == _Boxes[2], "OnReleased named the last box third");
 
-        for (int32 Index = 0; Index < k_HandoffCap; ++Index)
+        for (int32 Index = 0; Index < _Boxes.Num(); ++Index)
         {
             FCk_Handle HandedOff = _Boxes[Index];
-            Assert_False(HandedOff.Is_JoltBody(), f"handed-off box {Index} still has no body");
+            Assert_True(ck::IsValid(_Boxes[Index]), f"handed-off box {Index} is alive");
+            Assert_False(HandedOff.Is_JoltBody(), f"handed-off box {Index} has no body");
+            Assert_True(ck::Is_NOT_Valid(_Boxes[Index].TryGet_FoodBoard()), f"handed-off box {Index} names no board");
         }
     }
 }

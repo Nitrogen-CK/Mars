@@ -15,11 +15,11 @@ class UMars_AutoTest_Health_HealRaisesCurrentAndClampsAtMax : UCk_AutoTest_Base
         _Health.BindTo_OnHealed(FMars_Delegate_Health_OnHealed(this, n"OnHealed"));
 
         Add_Step("hit the Health for 60", n"Step_Hit");
-        Add_Step_WaitUntil("Health reads 40", n"Check_At40", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 40", n"Check_At40", 0, 0);
         Add_Step("heal 25", n"Step_HealSmall");
-        Add_Step_WaitUntil("Health reads 65", n"Check_At65", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 65", n"Check_At65", 0, 0);
         Add_Step("OnHealed reported 25 / 65; heal 1000", n"Step_AssertSmallAndHealHuge");
-        Add_Step_WaitUntil("Health reads 100", n"Check_At100", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 100", n"Check_At100", 0, 0);
         Add_Step("the huge heal stopped at Max and reported 35 / 100", n"Step_AssertClamped");
         Run_Steps(InHandle);
     }

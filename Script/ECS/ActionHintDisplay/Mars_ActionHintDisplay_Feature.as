@@ -19,18 +19,6 @@ asset Mars_ActionHintRowHandle of UCkDynamic_HandleDefinition
 struct FMars_Feature_ActionHintRow {}
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Enums
-//--------------------------------------------------------------------------------------------------------------------------
-
-enum EMars_ActionHintDisplay_Suppression
-{
-    // Takes one suppress reference.
-    Suppress,
-    // Returns one suppress reference.
-    Release
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -93,7 +81,6 @@ struct FMars_Fragment_ActionHintRow
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Suppression never touches Hints, only what the display broadcasts, so a hidden row's owner can still unregister it.
 struct FMars_Fragment_ActionHintDisplay
 {
     // Registered rows, in registration order.
@@ -102,13 +89,6 @@ struct FMars_Fragment_ActionHintDisplay
 
     UPROPERTY()
     int64 NextSequence = 0;
-
-    UPROPERTY()
-    int32 SuppressDepth = 0;
-
-    // Set while SuppressDepth > 0: rows whose Sequence is below it are hidden.
-    UPROPERTY()
-    TOptional<int64> SuppressWatermark;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -215,20 +195,6 @@ struct FMars_Request_ActionHintDisplay_Update
     }
 }
 
-// Ref-counted: the watermark is taken on the 0->1 edge and released on the 1->0 edge.
-struct FMars_Request_ActionHintDisplay_SetSuppressed
-{
-    UPROPERTY()
-    EMars_ActionHintDisplay_Suppression Suppression = EMars_ActionHintDisplay_Suppression::Suppress;
-
-    FMars_Request_ActionHintDisplay_SetSuppressed() {}
-
-    FMars_Request_ActionHintDisplay_SetSuppressed(EMars_ActionHintDisplay_Suppression InSuppression)
-    {
-        Suppression = InSuppression;
-    }
-}
-
 struct FMars_Fragment_ActionHintDisplay_Requests
 {
     UPROPERTY()
@@ -242,7 +208,4 @@ struct FMars_Fragment_ActionHintDisplay_Requests
 
     UPROPERTY()
     TArray<FMars_Request_ActionHintDisplay_UnregisterByOwner> UnregisterByOwnerRequests;
-
-    UPROPERTY()
-    TArray<FMars_Request_ActionHintDisplay_SetSuppressed> SuppressRequests;
 }

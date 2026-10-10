@@ -15,6 +15,8 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
     private FMars_CookingFeed_PieceId _SecondId;
     private FCk_Handle_FoodPiece _ReadyPiece;
     private FCk_Handle_JoltBody _ReadyBody;
+    // One entry per OnTakeOutRefused.
+    private TArray<EMars_CookingFeed_TakeOutRefusal> _TakeOutRefusals;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -22,6 +24,7 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         auto Spec = Make_TestSpec();
         Spec.Cook.SecondsPerFace = 0.15f;
         BuildStation(InHandle, Spec);
+        _Searing.BindTo_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         Build_Pieces(2);
 
         _Order.Add(EMars_Searing_Face::NegZ);
@@ -37,18 +40,18 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         {
             Add_Step(f"teleport face {utils_searing::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
             Add_Step_WaitFrames("the teleport is applied and written back", 4);
-            Add_Step_WaitUntil("the piece is on the pan", n"Check_FirstOnPan", 0, 2.0f);
-            Add_Step_WaitUntil("that face seared", n"Check_CurrentFaceSeared", 0, 2.0f);
+            Add_Step_WaitUntil("the piece is on the pan", n"Check_FirstOnPan", k_SlowPolls, 0);
+            Add_Step_WaitUntil("that face seared", n"Check_CurrentFaceSeared", 0, 0);
         }
 
-        Add_Step_WaitUntil("the piece is ready", n"Check_Ready1", 0, 0.5f);
+        Add_Step_WaitUntil("the piece is ready", n"Check_Ready1", 0, 0);
         Add_Step("add a second piece beside the ready one", n"Step_AddSecond");
-        Add_Step_WaitUntil("the second piece landed on the pan", n"Check_SecondOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("the second piece landed on the pan", n"Check_SecondOnPan", k_SlowPolls, 0);
         Add_Step("one Ready, one cooking; take out at most none", n"Step_TakeOutNone");
-        Add_Step_WaitFrames("the capped take-out drains", 3);
+        Add_Step_WaitUntil("the capped take-out was answered", n"Check_CappedTakeOutAnswered", 0, 0);
         Add_Step("nothing left the pan; take out every Ready piece", n"Step_AssertNoneThenTakeOut");
-        Add_Step_WaitUntil("the take-out was answered", n"Check_TakenOut1", 0, 1.0f);
-        Add_Step_WaitUntil("the taken piece's body reads Kinematic", n"Check_TakenKinematic", 0, 1.0f);
+        Add_Step_WaitUntil("the take-out was answered", n"Check_TakenOut1", 0, 0);
+        Add_Step_WaitUntil("the taken piece's body reads Kinematic", n"Check_TakenKinematic", 0, 0);
         Add_Step_WaitFrames("the cook state drains", 2);
         Add_Step("the Ready piece came back with its cook state", n"Step_AssertTakenOut");
         Run_Steps(InHandle);
@@ -95,6 +98,20 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         _Searing.Request_TakeOut(FMars_Request_Searing_TakeOut(TOptional<FCk_Handle_FoodPiece>(), TOptional<int32>(0)));
     }
 
+    // A take-out capped at zero is refused; one that wrongly hands a piece back answers through OnPieceTakenOut instead.
+    UFUNCTION()
+    private void Check_CappedTakeOutAnswered(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_TakeOutRefusals.Num() > 0 || _TakenOut.Num() > 0);
+    }
+
+    UFUNCTION()
+    private void OnTakeOutRefused(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        _TakeOutRefusals.Add(InRefusal);
+    }
+
     UFUNCTION()
     private void Step_AssertNoneThenTakeOut(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -136,15 +153,16 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         Assert_True(utils_jolt_body::Get_MotionType(_ReadyBody) == ECk_MotionType::Kinematic, "its body is Kinematic");
 
         const auto CookState = _ReadyPiece.Get_CookState();
-        Assert_Equals_Int(CookState.FaceSear.Num(), utils_searing::k_FaceCount, "six face sears");
-        for (int32 Index = 0; Index < CookState.FaceSear.Num(); ++Index)
+        Assert_Equals_Int(CookState.Sear.Num(), utils_searing::k_FaceCount, "six face sears");
+        for (int32 Index = 0; Index < CookState.Sear.Num(); ++Index)
         {
-            Assert_Equals_Float(CookState.FaceSear[Index], 1.0, 0.0001,
+            Assert_Equals_Float(CookState.Sear[Index], 1.0, 0.0001,
                 f"face {utils_searing::Get_FaceName(EMars_Searing_Face(Index))} is seared in its cook state");
         }
 
-        Assert_Equals_Float(CookState.Penetration, 1.0, 0.0001, "the crust's penetration is full");
-        Assert_Equals_Float(CookState.Shape, 1.0, 0.0001, "the silhouette is cooked");
+        const auto Look = utils_cookstate::Make_DisplayParams(CookState);
+        Assert_Equals_Float(Look.Penetration, 1.0, 0.0001, "its look's crust penetration is full");
+        Assert_Equals_Float(Look.Shape, 1.0, 0.0001, "its look's silhouette is cooked");
 
         const auto Summary = _Searing.Get_Summary();
         Assert_Equals_Int(Summary.TakenOut, 1, "the summary counts one taken out");

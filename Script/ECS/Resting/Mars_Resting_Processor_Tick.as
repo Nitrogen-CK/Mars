@@ -5,6 +5,7 @@
 class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Resting_HandleRequests");
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -15,7 +16,6 @@ class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_Fragment_Resting& InState)
     {
         auto Self = InHandle.As_Resting();
-        const auto Spec = Self.Get_Spec();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
 
         const auto IsAsleep = utils_jolt_body::Get_SleepState(InState.Body) == ECk_Jolt_SleepState::Asleep;
@@ -25,7 +25,7 @@ class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
             const auto Age = InState.ContactAges[Index] + DeltaSeconds;
             InState.ContactAges[Index] = Age;
 
-            const auto IsOn = Age <= Spec.GraceSeconds || (InState.RestingOn[Index] && IsAsleep);
+            const auto IsOn = Age <= InState.GraceSeconds || (InState.RestingOn[Index] && IsAsleep);
             InState.RestingOn[Index] = IsOn;
             if (IsOn)
             { IsResting = true; }
@@ -34,7 +34,7 @@ class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
         if (InState.State == EMars_Resting_State::Apart && IsResting)
         {
             const auto ApartSeconds = InState.ApartSeconds;
-            const auto Hopped = ApartSeconds >= Spec.HopMinSeconds;
+            const auto Hopped = ApartSeconds >= InState.HopMinSeconds;
             if (Hopped)
             { InState.Hops += 1; }
 

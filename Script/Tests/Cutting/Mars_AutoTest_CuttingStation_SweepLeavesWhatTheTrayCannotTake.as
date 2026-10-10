@@ -22,23 +22,22 @@ class UMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake : UMars_Aut
 
         for (int32 Index = 0; Index < k_BoardBoxCount; ++Index)
         {
-            const auto PileLocal = FTransform(FRotator::ZeroRotator, FVector(0.0, 15.0 * (Index - 1), 0.0)) * utils_cutting::Get_PileLocal();
-            _BoardBoxes.Add(Build_Box(PileLocal * FTransform(FRotator::ZeroRotator, k_Origin)));
+            _BoardBoxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + Get_PileOffset(Index))));
         }
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", 0, 10.0f);
-        Add_Step_WaitUntil("every box is Ready", n"Check_BoxesReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 0);
+        Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("every box is Ready", n"Check_BoxesReady", k_SlowPolls, 0);
         Add_Step("dock the empty tray", n"Step_DockOutput");
-        Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", k_SlowPolls, 0);
         Add_Step("load three boxes onto the tray", n"Step_FillTray");
-        Add_Step_WaitUntil("the three boxes landed", n"Check_TrayFilled", 0, 8.0f);
+        Add_Step_WaitUntil("the three boxes landed", n"Check_TrayFilled", k_SlowPolls, 0);
         Add_Step("place three boxes on the board", n"Step_PlaceOnBoard");
-        Add_Step_WaitUntil("the board holds the three boxes", n"Check_BoardFilled", 0, 5.0f);
+        Add_Step_WaitUntil("the board holds the three boxes", n"Check_BoardFilled", 0, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
         Add_Step("sweep", n"Step_Sweep");
-        Add_Step_WaitUntil("the tray is full", n"Check_TrayFull", 0, 8.0f);
+        Add_Step_WaitUntil("the tray is full", n"Check_TrayFull", k_SlowPolls, 0);
         Add_Step_WaitFrames("a second hand-off would have landed by now", 10);
         Add_Step("one box went to the tray; two stay on the board, bodiless", n"Step_Assert");
         Run_Steps(InHandle);
@@ -75,8 +74,17 @@ class UMars_AutoTest_CuttingStation_SweepLeavesWhatTheTrayCannotTake : UMars_Aut
     UFUNCTION()
     private void Step_PlaceOnBoard(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        for (const auto& Box : _BoardBoxes)
-        { _Board.Request_Place(FMars_Request_FoodBoard_Place(Box)); }
+        for (int32 Index = 0; Index < _BoardBoxes.Num(); ++Index)
+        {
+            Pose_OnPile(_BoardBoxes[Index], Get_PileOffset(Index));
+            _Board.Request_Place(FMars_Request_FoodBoard_Place(_BoardBoxes[Index]));
+        }
+    }
+
+    // In a row along the board (the pile node's Y), 15 cm apart.
+    private FVector Get_PileOffset(int32 InIndex) const
+    {
+        return FVector(0.0, 15.0 * (InIndex - 1), 0.0);
     }
 
     UFUNCTION()

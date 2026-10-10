@@ -1,6 +1,7 @@
 // The Forage arbiter. Replenish is applied before Release, so a regrow and a hit landing in one frame read as
 // "replenished, then released". A release spawns the yield as a World-mode world item at the release point, owned by the
-// transient entity (a Destroyed source dies the same frame); the last charge exhausts the source by its policy.
+// transient entity (a Destroyed source dies the same frame); the last charge exhausts the source by its policy. A release
+// asked of an exhausted source spawns nothing and is refused (OnReleaseRefused).
 // It knows nothing of what triggers a release: the owning entity script composes the strike/knock/pluck adapters and
 // decides what exhaustion means for its own parts.
 //
@@ -41,14 +42,11 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         const auto& Params = InForage.Get_Fragment(FMars_Fragment_Forage_Params);
         auto& State = InForage.Get_Fragment(FMars_Fragment_Forage);
         State.ChargesLeft = Params.Yield.Charges;
-        State.IsExhausted = false;
 
         if (ck::IsValid(State.RegrowTimer))
         { utils_entity_lifetime::Request_DestroyEntity(State.RegrowTimer); }
 
         State.RegrowTimer = FCk_Handle_Timer();
-
-        ck::Trace(f"[Forage] [{InForage.ToString()}] replenished to [{Params.Yield.Charges}] charges");
 
         if (InForage.Has_Fragment(FMars_Fragment_Forage_Signals))
         { InForage.Get_Fragment(FMars_Fragment_Forage_Signals).OnReplenished.Broadcast(InForage); }
@@ -56,9 +54,11 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
 
     private void HandleRelease(FCk_Handle_Forage& InForage, const FMars_Request_Forage_Release& InRequest)
     {
-        if (InForage.Get_Fragment(FMars_Fragment_Forage).IsExhausted)
+        if (InForage.Get_IsExhausted())
         {
-            ck::Trace(f"[Forage] [{InForage.ToString()}] ignored a {InRequest.Reason :n} release: exhausted");
+            if (InForage.Has_Fragment(FMars_Fragment_Forage_Signals))
+            { InForage.Get_Fragment(FMars_Fragment_Forage_Signals).OnReleaseRefused.Broadcast(InForage, InRequest.Reason); }
+
             return;
         }
 
@@ -80,8 +80,6 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         --State.ChargesLeft;
         const auto Exhausted = State.ChargesLeft <= 0;
 
-        ck::Trace(f"[Forage] [{InForage.ToString()}] released [{Spawned.ToString()}] on a {InRequest.Reason :n}, [{State.ChargesLeft}] charges left");
-
         if (InForage.Has_Fragment(FMars_Fragment_Forage_Signals))
         { InForage.Get_Fragment(FMars_Fragment_Forage_Signals).OnReleased.Broadcast(InForage, Spawned, InRequest.Reason); }
 
@@ -91,8 +89,6 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
 
     private void Exhaust(FCk_Handle_Forage& InForage)
     {
-        InForage.Get_Fragment(FMars_Fragment_Forage).IsExhausted = true;
-
         if (InForage.Has_Fragment(FMars_Fragment_Forage_Signals))
         { InForage.Get_Fragment(FMars_Fragment_Forage_Signals).OnExhausted.Broadcast(InForage); }
 
@@ -151,6 +147,6 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         if (Forage.Get_Fragment(FMars_Fragment_Forage).RegrowTimer != InTimer)
         { return; }
 
-        Forage.Request_Replenish();
+        Forage.Request_Replenish(FMars_Request_Forage_Replenish());
     }
 }

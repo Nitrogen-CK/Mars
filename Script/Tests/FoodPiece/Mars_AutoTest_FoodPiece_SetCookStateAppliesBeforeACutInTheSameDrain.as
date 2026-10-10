@@ -29,8 +29,8 @@ class UMars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain : UMa
     UFUNCTION()
     private void Step_SetCookStateThenCut(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto CookState = FMars_CookState();
-        CookState.Penetration = k_Penetration;
+        auto CookState = FMars_FoodPiece_CookState();
+        CookState.OilCoat = k_Penetration;
         _Source.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
         Cut(_Source, Get_BoundsCenter(_Source), FVector::ForwardVector);
     }
@@ -66,9 +66,9 @@ class UMars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain : UMa
         if (Result.Outcome != EMars_FoodPiece_CutOutcome::Cut)
         { return; }
 
-        Assert_True(Math::IsNearlyEqual(Result.Positive.Get_CookState().Penetration, k_Penetration),
-            f"the positive half carries the cook state (Penetration {Result.Positive.Get_CookState().Penetration})");
-        Assert_True(Math::IsNearlyEqual(Result.Negative.Get_CookState().Penetration, k_Penetration),
-            f"the negative half carries the cook state (Penetration {Result.Negative.Get_CookState().Penetration})");
+        Assert_True(Math::IsNearlyEqual(Result.Positive.Get_CookState().OilCoat, k_Penetration),
+            f"the positive half carries the cook state (OilCoat {Result.Positive.Get_CookState().OilCoat})");
+        Assert_True(Math::IsNearlyEqual(Result.Negative.Get_CookState().OilCoat, k_Penetration),
+            f"the negative half carries the cook state (OilCoat {Result.Negative.Get_CookState().OilCoat})");
     }
 }

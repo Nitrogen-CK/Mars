@@ -26,12 +26,13 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMa
         auto Spec = Make_TestSpec();
         Spec.Coating.CoveragePerCm = k_CoveragePerCm;
         BuildStation(InHandle, Spec);
+        Build_Boxes(3);
 
         Add_Steps_StationReady();
         Add_Steps_OpenHatch();
         Add_Step("load pieces 0 and 1", n"Step_AddTwo");
-        Add_Step_WaitUntil("both are answered", n"Check_Answered2", 0, 1.0f);
-        Add_Step_WaitUntil("both rest inside the shell", n"Check_AllAtRest", 0, 3.0f);
+        Add_Step_WaitUntil("both are answered", n"Check_Answered2", 0, 0);
+        Add_Step_WaitUntil("both rest inside the shell", n"Check_AllAtRest", k_SlowPolls, 0);
         Add_Steps_CloseHatch();
         Add_Step("both are in, uncoated", n"Step_AssertUncoated");
         Add_Steps_Grip();
@@ -39,19 +40,19 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMa
         Add_Step_Rock("rock up for 40 frames", -k_RockDegrees, 40);
         Add_Step("both gained coverage, never falling", n"Step_AssertRocked");
         Add_Step_Rock("rock down to the end of the arc", k_RockDegrees, 60);
-        Add_Step_WaitSeconds("the lever settles against the end stop", 0.5f);
-        Add_Step_WaitUntil("the pieces come to rest against the held drum", n"Check_AllAtRest", 0, 4.0f);
+        Add_Step_WaitUntil("the lever rests against the end stop", n"Check_LeverAtEndStop", 0, 0);
+        Add_Step_WaitUntil("the pieces come to rest against the held drum", n"Check_AllAtRest", k_SlowPolls, 0);
         Add_Step("remember the held coverage", n"Step_SampleHeld");
         Add_Step_WaitSeconds("hold the grip still", 1.0f);
         Add_Step("held still, the coverage did not move", n"Step_AssertHeld");
         Add_Step("let go", n"Step_ReleaseSampled");
-        Add_Step_WaitUntil("the drum returns home", n"Check_HomeSampling", 0, 2.0f);
+        Add_Step_WaitUntil("the drum returns home", n"Check_HomeSampling", 0, 0);
         Add_Step("the return added coverage", n"Step_AssertReturnCoated");
         Add_Steps_OpenHatch();
         Add_Step("load piece 2", n"Step_AddThird");
-        Add_Step_WaitUntil("it is answered", n"Check_Answered3", 0, 1.0f);
+        Add_Step_WaitUntil("it is answered", n"Check_Answered3", 0, 0);
         Add_Step("the new piece starts uncoated, the others keep theirs", n"Step_AssertThird");
-        Add_Step_WaitUntil("all three rest inside the shell", n"Check_AllAtRest", 0, 3.0f);
+        Add_Step_WaitUntil("all three rest inside the shell", n"Check_AllAtRest", k_SlowPolls, 0);
         Add_Steps_CloseHatch();
         Add_Steps_Grip();
         for (int32 Cycle = 0; Cycle < k_LongRockCycles; ++Cycle)
@@ -65,15 +66,15 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMa
         Add_Step_Rock("rock on up", -k_RockDegrees, k_RockHalfCycleFrames);
         Add_Step("they stay fully coated and no coverage ever fell", n"Step_AssertStaysFull");
         Add_Step("let go", n"Step_Release");
-        Add_Step_WaitUntil("the drum returns home", n"Check_DrumHome", 0, 2.0f);
+        Add_Step_WaitUntil("the drum returns home", n"Check_DrumHome", 0, 0);
         Run_Steps(InHandle);
     }
 
     UFUNCTION()
     private void Step_AddTwo(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        AddPiece(0);
-        AddPiece(1);
+        Admit(0);
+        Admit(1);
     }
 
     UFUNCTION()
@@ -81,7 +82,7 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMa
     {
         _Coverage0AtHome = _Tumbler.Get_PieceCoverage(Make_Id(0));
         _Coverage1AtHome = _Tumbler.Get_PieceCoverage(Make_Id(1));
-        AddPiece(2);
+        Admit(2);
     }
 
     UFUNCTION()
@@ -118,6 +119,14 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMa
         Assert_True(Get_IsMonotonic(Make_Id(0)), "every coverage step of piece 0 is non-decreasing");
         Assert_True(Get_IsMonotonic(Make_Id(1)), "every coverage step of piece 1 is non-decreasing");
         Assert_True(Check_PieceInside(Make_Id(0)) && Check_PieceInside(Make_Id(1)), "both stayed inside the shell");
+    }
+
+    // The hard stop pins the handle at alpha 1 with no velocity: the drum no longer moves under the pieces.
+    UFUNCTION()
+    private void Check_LeverAtEndStop(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Lever.Get_IsManipulating() && _Lever.Get_ManipulationAlpha() >= 1.0f);
     }
 
     UFUNCTION()

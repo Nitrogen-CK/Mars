@@ -3,8 +3,14 @@
 // still on the platter. The next press reserves the next piece.
 class UMars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTransfer : UMars_AutoTestRig_CookingFeed
 {
+    // The platter's drain of the unload (it runs after the feed's tick, in the frame of the request or the next), the
+    // feed's guard cancelling in the pass after it, and the poll that sees the settle.
+    private const int32 k_MaxCancelFrames = 2;
+
     private FMars_CookingFeed_PieceId _Reserved;
     private FCk_Handle_FoodPiece _TakenPiece;
+    private int64 _UnloadFrame = -1;
+    private int64 _SettledSeenFrame = -1;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -16,13 +22,13 @@ class UMars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTrans
         Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 1.0f);
+        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 0);
         Add_Step("unload the reserved piece from the platter", n"Step_TakeTheReservedPiece");
-        Add_Step_WaitUntil("the transfer settles within a frame of the unload", n"Check_Settled", 0, 0.1f);
+        Add_Step_WaitUntil("the transfer settles within a frame of the unload", n"Check_Settled", 0, 0);
         Add_Step("cancelled, at rest, five left", n"Step_AssertCancelled");
-        Add_Step_WaitUntil("the pile has re-settled", n"Check_PileSettled", 0, 2.0f);
+        Add_Step_WaitUntil("the pile has re-settled", n"Check_PileSettled", k_SlowPolls, 0);
         Add_Step("press add food again", n"Step_Begin");
-        Add_Step_WaitUntil("the hand reaches again", n"Check_Reaching", 0, 1.0f);
+        Add_Step_WaitUntil("the hand reaches again", n"Check_Reaching", 0, 0);
         Add_Step("the next piece is reserved", n"Step_AssertNextReserved");
         Run_Steps(InHandle);
     }
@@ -36,20 +42,28 @@ class UMars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTrans
         if (_Feed.TryGet_ActivePiece().IsSet())
         { _Reserved = _Feed.TryGet_ActivePiece().GetValue(); }
 
+        _UnloadFrame = utils_time::Get_FrameCounter();
         if (ck::IsValid(_TakenPiece))
         { _Platter.Request_Unload(FMars_Request_Platter_Unload(_TakenPiece)); }
     }
 
+    // Records the frame it first sees the settle.
     UFUNCTION()
     private void Check_Settled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        const auto Settled = _Settles.Num() > 0;
+        if (Settled && _SettledSeenFrame < 0)
+        { _SettledSeenFrame = utils_time::Get_FrameCounter(); }
+
         auto Res = OutResult;
-        Res.Set(_Settles.Num() > 0);
+        Res.Set(Settled);
     }
 
     UFUNCTION()
     private void Step_AssertCancelled(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        const auto Frames = _SettledSeenFrame - _UnloadFrame;
+        Assert_True(Frames <= k_MaxCancelFrames, f"the transfer settled within {k_MaxCancelFrames} frames of the unload (took {Frames})");
         Assert_Equals_Int(_Settles.Num(), 1, "one transfer settled");
         Assert_True(_Settles.Num() == 1 && _Settles[0] == EMars_CookingFeed_Settle::Cancelled, "it settled Cancelled");
         Assert_True(_SettledPieces.Num() == 1 && _SettledPieces[0].Get_IsSame(_Reserved), "under the reservation's id");
@@ -68,7 +82,7 @@ class UMars_AutoTest_CookingFeed_AReservedPieceTakenOffThePlatterCancelsTheTrans
         Assert_True(ck::IsValid(Next) && Next != _TakenPiece, "a different piece is reserved");
         Assert_True(Next.TryGet_Platter() == _Platter, "it is on the platter");
         const auto Active = _Feed.TryGet_ActivePiece();
-        Assert_True(Active.IsSet() && Active.GetValue().StockIndex != _Reserved.StockIndex, "from another slot");
+        Assert_True(Active.IsSet() && Active.GetValue().Get_IsSame(_Reserved) == false, "under a new id");
         Assert_Equals_Int(_Refusals.Num(), 0, "no press was refused");
     }
 }

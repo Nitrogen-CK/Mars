@@ -12,6 +12,8 @@ class UMars_AutoTest_Fry_AnAirborneCrossingOfTheBasketDoesNotDrain : UMars_AutoT
     private const float64 k_CrossBottomAboveWalls = 4.0;
     private const FVector k_CrossVelocity = FVector(700.0, 0.0, 60.0);
     private const float32 k_WatchSeconds = 1.5f;
+    // The watch ends on the first poll past k_WatchSeconds: a second of slack covers that poll on any lane.
+    private const float32 k_WatchSlackSeconds = 1.0f;
 
     private FMars_CookingFeed_PieceId _Piece;
     private int32 _EdgesBeforeCross = 0;
@@ -24,12 +26,12 @@ class UMars_AutoTest_Fry_AnAirborneCrossingOfTheBasketDoesNotDrain : UMars_AutoT
         BuildStation(InHandle, Make_TestSpec());
         Build_Pieces(1);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("release a piece over the oil", n"Step_Release");
-        Add_Step_WaitUntil("its body is in the simulation", n"Check_Added1", 0, 2.0f);
+        Add_Step_WaitUntil("its body is in the simulation", n"Check_Added1", 0, 0);
         Add_Step("fling it across the basket", n"Step_Fling");
-        Add_Step_WaitUntil("it crossed and fell away", n"Check_Watched", 0, k_WatchSeconds + 1.0f);
+        Add_Step_WaitUntil("it crossed and fell away", n"Check_Watched", 0, k_WatchSeconds + k_WatchSlackSeconds);
         Add_Step("it never drained", n"Step_AssertNeverDrained");
         Run_Steps(InHandle);
     }

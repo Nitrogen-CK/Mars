@@ -11,9 +11,11 @@ asset Mars_ItemDef_AutoTest_PlatterOfOne of UCk_InventoryItem_Definition
     _ItemTraits.Add(Platter);
 }
 
-// A full platter refuses a deposit before it is tried: a capacity-1 platter on a floor holds one box piece; the carrier
-// holds the mushroom slice's food item and focuses the platter: the prompt reads "Platter full" in the blocked colour and
-// the platter's Use target is disabled. Isolated origin (22000, -19000, -30000).
+// A full platter refuses a deposit, and a press on it does nothing. A capacity-1 platter on a floor holds one box piece;
+// the carrier holds the mushroom slice's food item and focuses the platter: once the prompt has followed the held food it
+// reads "Platter full" in the blocked colour and the platter's Use target is disabled. The carrier then starts an
+// interaction on that disabled target, as a press on a stale best target would: the framework refuses it (no interaction
+// begins), the food stays in the hands and the platter's books are unchanged. Isolated origin (22000, -19000, -30000).
 class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrier
 {
     default _TimeoutSeconds = 30.0f;
@@ -21,6 +23,8 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
     private const FVector k_Origin = FVector(22000.0, -19000.0, -30000.0);
     private const FVector k_PlatterOffset = FVector(200.0, 0.0, 0.0);
     private const FVector k_FoodOffset = FVector(200.0, 200.0, 0.0);
+    // Item constructions, physics settles and mount commits outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     // Under construction until each is a WorldItem whose holder holds its item.
     private FCk_Handle _PlatterEntity;
@@ -31,13 +35,19 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
     private FCk_Handle_WorldItem _Food;
     private FCk_Handle_FoodPiece _Box;
 
+    // What the carrier held, and the platter's books, when it pressed on the disabled platter.
+    private FCk_Handle_Item _HeldBeforePress;
+    private int32 _PlatterHeldBeforePress = 0;
+    private int32 _PlatterPendingBeforePress = 0;
+    // Every interaction the platter's Use target began since the press.
+    private int32 _InteractionsSincePress = 0;
+
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         auto Owner = InHandle;
         Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
@@ -57,16 +67,20 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
         _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
-        Add_Step_WaitUntil("the platter and the food item are constructed and the box is Ready", n"Check_Constructed", 0, 10.0f);
+        Add_Step_WaitUntil("the platter and the food item are constructed and the box is Ready", n"Check_Constructed", k_SlowPolls, 0);
         Add_Step("load the box onto the platter of one", n"Step_LoadBox");
-        Add_Step_WaitUntil("the box landed: the platter is full", n"Check_Full", 0, 5.0f);
+        Add_Step_WaitUntil("the box landed: the platter is full", n"Check_Full", k_SlowPolls, 0);
         Add_Step("the carrier focuses the food's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the food's target enters Focused", 3);
+        Add_Step_WaitUntil("the food's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier picks the food up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", 0, 5.0f);
+        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", k_SlowPolls, 0);
         Add_Step("the carrier unfocuses the food and focuses the platter", n"Step_FocusPlatter");
-        Add_Step_WaitFrames("the platter's target enters Focused and its prompt refreshes", 3);
+        Add_Step_WaitUntil("the platter's target enters Focused", n"Check_AwaitedFocus", 0, 0);
+        Add_Step_WaitUntil("the platter's prompt leaves its placeholder for the held food", n"Check_PlatterPromptWritten", 0, 0);
         Add_Step("the prompt reads Platter full and the target is disabled", n"Step_AssertBlocked");
+        Add_Step("the carrier starts an interaction on the platter's disabled target, as a stale best target would", n"Step_PressTheDisabledPlatter");
+        Add_Step_WaitSeconds("an interaction the press began would show here", 0.25f);
+        Add_Step("the framework refused the press: the food stays in the hands and the platter's books are unchanged", n"Step_AssertPressRefused");
         Run_Steps(InHandle);
     }
 
@@ -138,6 +152,7 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
     {
         auto Pickup = Get_Pickup(_Food);
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Pickup);
     }
 
     UFUNCTION()
@@ -162,6 +177,17 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
 
         auto PlatterPickup = Get_Pickup(_PlatterItem);
         PlatterPickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(PlatterPickup);
+    }
+
+    // The platter's prompt left the world item's placeholder ("Pick up <item>", which a focuser with no food also gets): the
+    // platter's assembly wrote what the food in the focuser's hands can do there.
+    UFUNCTION()
+    private void Check_PlatterPromptWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto PromptText = Get_UseTarget(_PlatterItem).As_InteractPrompt().Get_PromptText().ToString();
+        auto Res = OutResult;
+        Res.Set(PromptText.StartsWith("Pick up") == false);
     }
 
     UFUNCTION()
@@ -176,6 +202,44 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
             "the platter's pickup itself stays enabled (the prompt shows why nothing happens)");
         Assert_True(_Food.Get_Mount() == EMars_WorldItem_Mount::Held, "the food stays in the hands");
         Assert_Equals_Int(_Platter.Get_Occupancy(), 1, "the platter still holds only the box");
+    }
+
+    UFUNCTION()
+    private void Step_PressTheDisabledPlatter(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto Target = Get_UseTarget(_PlatterItem);
+        Assert_True(utils_interact_target::Get_Enabled(Target) == ECk_EnableDisable::Disable, "the platter's Use target is disabled before the press");
+
+        _HeldBeforePress = _HeldItem.Get_CurrentItem();
+        Assert_True(ck::IsValid(_HeldBeforePress) && _Hotbar.Get_ItemAt(0) == _HeldBeforePress, "the carrier holds the food from its bag slot before the press");
+        _PlatterHeldBeforePress = _Platter.Get_HeldCount();
+        _PlatterPendingBeforePress = _Platter.Get_PendingCount();
+
+        Target.BindTo_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnPlatterTargetNewInteraction"));
+        Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
+    }
+
+    UFUNCTION()
+    private void Step_AssertPressRefused(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto Target = Get_UseTarget(_PlatterItem);
+        Assert_Equals_Int(_InteractionsSincePress, 0, "the platter's disabled target began no interaction");
+        Assert_True(ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, _Carrier)), "the carrier has no interaction on the platter's target");
+
+        Assert_True(_HeldItem.Get_CurrentItem() == _HeldBeforePress, "the carrier still holds the food");
+        Assert_True(_Hotbar.Get_ItemAt(0) == _HeldBeforePress, "the bag slot still holds the food");
+        Assert_True(_Food.Get_Mount() == EMars_WorldItem_Mount::Held, "the food is still Held");
+
+        Assert_Equals_Int(_Platter.Get_HeldCount(), _PlatterHeldBeforePress, "the platter holds what it held before the press");
+        Assert_Equals_Int(_Platter.Get_PendingCount(), _PlatterPendingBeforePress, "nothing waits to drop on the platter");
+        Assert_True(_Platter.Get_Held().Contains(_Box), "the platter still holds only the box");
+        Assert_True(ck::Is_NOT_Valid(_FoodEntity.As_FoodPiece().TryGet_Platter()), "the food's joint is on no platter's books");
+    }
+
+    UFUNCTION()
+    private void OnPlatterTargetNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
+    {
+        ++_InteractionsSincePress;
     }
 
     private FCk_Handle_Interactable Get_Pickup(const FCk_Handle_WorldItem& InWorldItem) const

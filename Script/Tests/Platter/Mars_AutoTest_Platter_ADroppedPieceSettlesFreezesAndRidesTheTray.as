@@ -1,10 +1,12 @@
 // A cut-sized piece loaded onto a still platter drops between its walls, settles with physics and freezes into the pile:
-// within 3 s OnLoaded fires once, the piece is a scene-node child of the root, its body reads Kinematic and its bounds centre
-// lies inside the walls. The platter root then moves 50 cm and the piece moves with it.
+// within Settle.MaxSeconds of its drop OnLoaded fires once, the piece is a scene-node child of the root, its body reads
+// Kinematic and its bounds centre lies inside the walls. The platter root then moves 50 cm and the piece moves with it.
 class UMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -18000.0, -30000.0);
     private const FVector k_Move = FVector(50.0, 0.0, 0.0);
+    // The load's drain, the Kinematic read before the attach and the poll after it: a few frames past the freeze.
+    private const float32 k_FreezeSlackSeconds = 0.5f;
 
     private FCk_Handle_Platter _Platter;
     private FCk_Handle_FoodPiece _P;
@@ -13,12 +15,15 @@ class UMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray : UMars_
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, 30.0, 0.0), k_Origin), Make_PlatterSpec(4));
+        const auto Spec = Make_PlatterSpec(4);
+        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, 30.0, 0.0), k_Origin), Spec);
         _P = Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 0.0, 0.0)), 0.5);
 
         Add_Step_WaitUntil("P is Ready", n"Check_Ready");
         Add_Step("load P", n"Step_Load");
-        Add_Step_WaitUntil("P froze into the pile within 3 s", n"Check_Loaded", 0, 3.0f);
+        // The piece drops one DropCadenceSeconds after the load and is frozen by Settle.MaxSeconds after its drop.
+        Add_Step_WaitUntil("P froze into the pile within Settle.MaxSeconds of its drop", n"Check_Loaded", 0,
+            Spec.Settle.DropCadenceSeconds + Spec.Settle.MaxSeconds + k_FreezeSlackSeconds);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("P is held, Kinematic, on the root and inside the walls; move the platter 50 cm", n"Step_AssertFrozenAndMove");
         Add_Step_WaitFrames("the move lands and P follows", 2);

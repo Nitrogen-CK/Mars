@@ -1,18 +1,29 @@
-// A dock judges the food a focuser would place by the piece it would add. An empty large platter docks on a meat-only dock
-// ("Meat only"); the carrier picks a mushroom slice up into its bag slot and focuses the dock: the dock refuses the piece
-// (Blocked_Policy, KindRejected, as the pure Get_PieceRefusal says), the prompt reads "Meat only" and the dock's target
-// is disabled; the platter stays empty and the slice stays in the hands. Isolated origin (28000, -23000, -30000).
+// A dock judges the food a focuser would place by the piece it would add, and a press on the refusing dock does nothing. An
+// empty large platter docks on a meat-only dock ("Meat only"); the carrier picks a mushroom slice up into its bag slot and
+// focuses the dock: the dock refuses the piece (Blocked_Policy, KindRejected, as the pure Get_PieceRefusal says), the
+// prompt reads "Meat only" and the dock's target is disabled. The carrier then starts an interaction on that disabled
+// target, as a press on a stale best target would: the framework refuses it (no interaction begins), the slice stays in
+// the hands and the platter's books are unchanged. Isolated origin (28000, -23000, -30000).
 class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_PlatterDock
 {
     default _TimeoutSeconds = 30.0f;
 
     private const FVector k_Origin = FVector(28000.0, -23000.0, -30000.0);
     private const FVector k_FoodOffset = FVector(200.0, 200.0, 0.0);
+    // Item constructions, mount arrivals and the gloves' reaches outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_PlatterDock _Dock;
     private FCk_Handle _FoodEntity;
     private FCk_Handle_WorldItem _Food;
     private FCk_Handle_FoodPiece _Slice;
+
+    // What the carrier held, and the docked platter's books, when it pressed on the disabled dock.
+    private FCk_Handle_Item _HeldBeforePress;
+    private int32 _PlatterHeldBeforePress = 0;
+    private int32 _PlatterPendingBeforePress = 0;
+    // Every interaction the dock's target began since the press.
+    private int32 _InteractionsSincePress = 0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -21,7 +32,6 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
         Add_CarrierHands();
-        Bind_PushSelection();
 
         auto Root = Build_StationRoot(InHandle, k_Origin);
         auto Spec = Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(GameplayTags::Food_Meat), true),
@@ -42,18 +52,21 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
         _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
-        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", 0, 10.0f);
-        Add_Step_WaitUntil("the food item is constructed", n"Check_FoodConstructed", 0, 10.0f);
+        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the food item is constructed", n"Check_FoodConstructed", k_SlowPolls, 0);
         Add_Step("dock the empty platter", n"Step_Dock");
-        Add_Step_WaitUntil("the empty platter arrived on the dock", n"Check_Arrived", 0, 5.0f);
+        Add_Step_WaitUntil("the empty platter arrived on the dock", n"Check_Arrived", k_SlowPolls, 0);
         Add_Step("the carrier focuses the slice's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the slice's target enters Focused", 3);
+        Add_Step_WaitUntil("the slice's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier picks the slice up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the slice is Held", n"Check_FoodHeld", 0, 5.0f);
+        Add_Step_WaitUntil("the slice is Held", n"Check_FoodHeld", k_SlowPolls, 0);
         Add_Step("the carrier unfocuses the slice and focuses the dock", n"Step_FocusDock");
-        Add_Step_WaitFrames("the dock's prompt follows the focuser", 3);
+        Add_Step_WaitUntil("the dock's targets enter Focused", n"Check_AwaitedFocus", 0, 0);
+        Add_Step_WaitUntil("the dock's prompt follows the focuser", n"Check_DockPromptWritten", 0, 0);
         Add_Step("the dock refuses the slice by its kind", n"Step_AssertRefused");
-        Add_Step("the platter is empty and the slice stays in the hands", n"Step_AssertNothingMoved");
+        Add_Step("the carrier starts an interaction on the dock's disabled target, as a stale best target would", n"Step_PressTheDisabledDock");
+        Add_Step_WaitSeconds("an interaction the press began would show here", 0.25f);
+        Add_Step("the framework refused the press: the slice stays in the hands and the platter's books are unchanged", n"Step_AssertPressRefused");
         Run_Steps(InHandle);
     }
 
@@ -104,6 +117,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
     {
         auto Pickup = _Food.Get_Pickup();
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Pickup);
     }
 
     UFUNCTION()
@@ -129,6 +143,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
 
         auto DockInteractable = _Dock.Get_Interactable();
         DockInteractable.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(DockInteractable);
     }
 
     UFUNCTION()
@@ -140,20 +155,58 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
         const auto Refusal = _Dock.TryGet_Refusal(_Carrier);
         Assert_True(Refusal.IsSet() && Refusal.GetValue() == EMars_PlatterDock_Refusal::KindRejected, "the dock refuses the slice for its kind");
 
-        const auto PieceRefusal = utils_platter_dock::Get_PieceRefusal(_Dock.Get_Spec().Policy, _Platters[0], _Slice);
+        const auto PieceRefusal = utils_platter_dock::Get_PieceRefusal(_Dock.Get_Spec(), _Platters[0], _Slice);
         Assert_True(PieceRefusal.IsSet() && PieceRefusal.GetValue() == EMars_PlatterDock_Refusal::KindRejected, "the pure rule agrees");
 
         const auto Target = Get_DockTarget();
         Assert_Equals_String(Target.As_InteractPrompt().Get_PromptText().ToString(), "Meat only", "the prompt gives the dock's reason");
-        Assert_True(utils_interact_target::Get_Enabled(Target) == ECk_EnableDisable::Disable, "the dock's target is disabled");
     }
 
     UFUNCTION()
-    private void Step_AssertNothingMoved(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_PressTheDisabledDock(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_Platters[0].Get_Occupancy(), 0, "the docked platter is empty");
+        auto Target = Get_DockTarget();
+        Assert_True(utils_interact_target::Get_Enabled(Target) == ECk_EnableDisable::Disable, "the dock's target is disabled before the press");
+
+        _HeldBeforePress = _HeldItem.Get_CurrentItem();
+        Assert_True(ck::IsValid(_HeldBeforePress) && _Hotbar.Get_ItemAt(0) == _HeldBeforePress, "the carrier holds the slice from its bag slot before the press");
+        _PlatterHeldBeforePress = _Platters[0].Get_HeldCount();
+        _PlatterPendingBeforePress = _Platters[0].Get_PendingCount();
+
+        Target.BindTo_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnDockTargetNewInteraction"));
+        Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
+    }
+
+    UFUNCTION()
+    private void Step_AssertPressRefused(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto Target = Get_DockTarget();
+        Assert_Equals_Int(_InteractionsSincePress, 0, "the dock's disabled target began no interaction");
+        Assert_True(ck::Is_NOT_Valid(utils_interact_target::TryGet_Interaction(Target, _Carrier)), "the carrier has no interaction on the dock's target");
+
+        Assert_True(_HeldItem.Get_CurrentItem() == _HeldBeforePress, "the carrier still holds the slice");
+        Assert_True(_Hotbar.Get_ItemAt(0) == _HeldBeforePress, "the bag slot still holds the slice");
         Assert_True(_Food.Get_Mount() == EMars_WorldItem_Mount::Held, "the slice is still Held");
+
+        Assert_Equals_Int(_Platters[0].Get_HeldCount(), _PlatterHeldBeforePress, "the docked platter holds what it held before the press");
+        Assert_Equals_Int(_Platters[0].Get_PendingCount(), _PlatterPendingBeforePress, "nothing waits to drop on the docked platter");
+        Assert_Equals_Int(_Platters[0].Get_Occupancy(), 0, "the docked platter is empty");
         Assert_True(ck::Is_NOT_Valid(_Slice.TryGet_Platter()), "the slice is on no platter's books");
+    }
+
+    UFUNCTION()
+    private void OnDockTargetNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
+    {
+        ++_InteractionsSincePress;
+    }
+
+    // The dock's prompt left its placeholder ("Dock", utils_platter_dock::DoCreate_Interactable): the dock's prompt processor
+    // wrote what the focuser can do there.
+    UFUNCTION()
+    private void Check_DockPromptWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_DockTarget().As_InteractPrompt().Get_PromptText().ToString() != "Dock");
     }
 
     private FCk_Handle_InteractTarget Get_DockTarget() const

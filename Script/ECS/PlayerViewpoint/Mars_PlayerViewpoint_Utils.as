@@ -12,17 +12,30 @@ namespace utils_player_viewpoint
         State.Viewpoint = InSpec.Camera.Get_ViewAnchor();
         utils_handle::Set_DebugName(State.Viewpoint, n"PlayerViewpoint");
 
-        auto TraceSettings = FCk_Probe_RayCastPersistent_Settings(
-            State.Viewpoint,
-            FVector(InSpec.InteractionTraceDistance, 0.0, 0.0),
-            GameplayTag::MakeGameplayTagContainerFromTag(GameplayTags::Probe_Mars_Interact));
-        TraceSettings.Set_TracePolicy(ECk_ProbeTrace_Policy::Multi);
+        auto TraceSettings = Make_InteractionTraceSettings(State.Viewpoint, InSpec.InteractionTraceDistance, InHandle);
         State.InteractionTrace = utils_probe_trace::Create_LineTrace_Persistent(TraceSettings);
         utils_handle::Set_DebugName(State.InteractionTrace, n"PlayerViewpoint.InteractionTrace");
 
         InHandle.Add_Fragment(FMars_Feature_PlayerViewpoint());
         InHandle.Add_Fragment(State);
         return InHandle.As_PlayerViewpoint();
+    }
+
+    // The player's interaction trace from InStart, InDistance along its X: a persistent multi line trace over every
+    // Probe.Mars.Interact probe on the ray, nearest first; InPlayer's own entity is never a hit. The ignore list drops a hit
+    // only on the very entity it names, not on its lifetime dependents.
+    FCk_Probe_RayCastPersistent_Settings Make_InteractionTraceSettings(FCk_Handle_Transform InStart, float32 InDistance, FCk_Handle InPlayer)
+    {
+        auto Settings = FCk_Probe_RayCastPersistent_Settings(
+            InStart,
+            FVector(InDistance, 0.0, 0.0),
+            GameplayTag::MakeGameplayTagContainerFromTag(GameplayTags::Probe_Mars_Interact));
+        Settings.Set_TracePolicy(ECk_ProbeTrace_Policy::Multi);
+
+        auto Ignored = TArray<FCk_Handle>();
+        Ignored.Add(InPlayer);
+        Settings.Set_IgnoredEntities(Ignored);
+        return Settings;
     }
 
     // The director's resting profile for the first-person view: eye-anchored (pivot 0, boom 0), no collision, free yaw,
@@ -76,4 +89,26 @@ mixin FCk_Handle_Transform Get_Viewpoint(const FCk_Handle_PlayerViewpoint& Self)
 mixin FCk_Handle_ProbeTrace Get_InteractionTrace(const FCk_Handle_PlayerViewpoint& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint).InteractionTrace;
+}
+
+// Some holder keeps the view still.
+mixin bool Get_IsViewHeld(const FCk_Handle_PlayerViewpoint& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_PlayerViewpoint).ViewHolders.Num() > 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Requests
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void Request_HoldView(FCk_Handle_PlayerViewpoint& Self, const FMars_Request_PlayerViewpoint_HoldView& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_PlayerViewpoint_Requests);
+    Requests.ViewHoldRequests.Add(FMars_PlayerViewpoint_ViewHoldRequest(EMars_PlayerViewpoint_ViewHoldChange::Hold, InRequest.Holder));
+}
+
+mixin void Request_ReleaseView(FCk_Handle_PlayerViewpoint& Self, const FMars_Request_PlayerViewpoint_ReleaseView& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_PlayerViewpoint_Requests);
+    Requests.ViewHoldRequests.Add(FMars_PlayerViewpoint_ViewHoldRequest(EMars_PlayerViewpoint_ViewHoldChange::Release, InRequest.Holder));
 }

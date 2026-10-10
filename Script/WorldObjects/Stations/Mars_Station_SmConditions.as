@@ -1,5 +1,5 @@
-// Polled conditions on the context entity's Station, shared by every station's control SM
-// (Mars_SearingStation_Hfsm.as, Mars_CuttingStation_Hfsm.as).
+// Polled conditions on the context entity's Station, shared by every station's control SM (Mars_CuttingStation_Hfsm.as,
+// Mars_SearingStation_Hfsm.as, Mars_FryStation_Hfsm.as, Mars_TumblerStation_Hfsm.as).
 
 // Polled on the context entity's Station; false without one.
 class UMars_SmCondition_StationIsOperated : UCk_SmCondition_Polled

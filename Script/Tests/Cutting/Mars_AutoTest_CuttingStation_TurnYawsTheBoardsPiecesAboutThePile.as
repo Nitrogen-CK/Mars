@@ -1,4 +1,4 @@
-// The control's turn (what R issues) yaws the food on the board a quarter turn about the pile point: with the meat joint on
+// The control's turn (what R issues) yaws the food on the board a quarter turn about the board's pile node: with the meat joint on
 // the board, its world rotation is the old one yawed 90 degrees about the vertical, and its location is the pivot plus the
 // old offset yawed the same (within 0.5 cm and 0.5 degree). OnTurned fires once, with 90.
 class UMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile : UMars_AutoTestRig_CuttingStation
@@ -19,7 +19,7 @@ class UMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile : UMars_
 
         Add_Steps_FeedTheJoint();
         Add_Step("turn the food on the board", n"Step_Turn");
-        Add_Step_WaitUntil("the board turned", n"Check_Turned", 0, 2.0f);
+        Add_Step_WaitUntil("the board turned", n"Check_Turned", 0, 0);
         Add_Step_WaitFrames("the turned pose lands", 2);
         Add_Step("the joint yawed 90 degrees about the pile point", n"Step_AssertTurned");
         Run_Steps(InHandle);
@@ -30,7 +30,7 @@ class UMars_AutoTest_CuttingStation_TurnYawsTheBoardsPiecesAboutThePile : UMars_
     {
         _Joint = _Board.Get_Held()[0];
         _Before = Get_World(_Joint);
-        _Pivot = utils_cutting::Get_PileCentreWorld(Get_StationWorld()).GetLocation();
+        _Pivot = _Board.Get_PileNodeWorld().GetLocation();
         utils_cutting::Request_Turn(_Station);
     }
 

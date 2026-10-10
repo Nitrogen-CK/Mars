@@ -16,13 +16,13 @@ class UMars_AutoTest_Monster_BodyDepletionSetsDeadAndSignals : UMars_AutoTestRig
     {
         SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("bind OnDied; hit the body zone with 200 Blunt", n"Step_BindAndKill");
-        Add_Step_WaitUntil("the monster is dead and the Dead attribute reads 1", n"Check_Dead", 0, 2.0f);
+        Add_Step_WaitUntil("the monster is dead and the Dead attribute reads 1", n"Check_Dead", 0, 0);
         Add_Step("one OnDied with the lethal hit; hit again and request Die directly", n"Step_AssertDiedAndKillAgain");
         Add_Step_WaitFrames("let the second hit and the direct Die drain", 10);
         Add_Step("still one OnDied, the first cause kept", n"Step_AssertLatched");
-        Add_Step_WaitUntil("the Dead state shed every leg and the severed limbs died on their timer", n"Check_LegsShedAndGone", 0, 3.0f);
+        Add_Step_WaitUntil("the Dead state shed every leg and the severed limbs died on their timer", n"Check_LegsShedAndGone", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

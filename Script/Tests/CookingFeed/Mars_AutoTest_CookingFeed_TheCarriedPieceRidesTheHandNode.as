@@ -1,28 +1,34 @@
 // The feed carries the real piece: from the grasp the reserved piece is off the platter and its scene-node parent is the
-// feed's hand node, its middle at the hand's held offset (identity here: on the hand node) through the carry. At the release
-// it is let go where it rides (no scene node any more) and the release names that pose, not the release node's. A rejected
-// admission puts it back on the platter (the rig stands in for the bridge), and the stock is whole again.
+// feed's hand node, its middle at the hand's held offset (identity here: on the hand node) through the carry. The feed
+// carries the hand to 20 above the release node here, so at the release the piece is let go where it rides (no scene node
+// any more) and the release names that pose, not the release node's. A rejected admission puts it back on the platter (the
+// feed's own put-back), and the stock is whole again.
 class UMars_AutoTest_CookingFeed_TheCarriedPieceRidesTheHandNode : UMars_AutoTestRig_CookingFeed
 {
+    private const float64 k_AboveReleaseCm = 20.0;
+
     private FCk_Handle_FoodPiece _Piece;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        // A carry long enough to look at the piece riding the hand.
+        // A carry long enough to look at the piece riding the hand, which stops above the release node.
         auto Spec = Make_TestSpec();
         Spec.Timing = FMars_CookingFeed_TimingSpec(0.1f, 0.1f, 0.5f, 0.1f);
+        auto Hand = Spec.Hand.GetValue();
+        Hand.ReleaseLocal = FTransform(FVector(0.0, 0.0, k_AboveReleaseCm));
+        Spec.Hand = TOptional<FMars_CookingFeed_HandGeometry>(Hand);
         BuildFeed(InHandle, Spec);
         Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the hand carries and the piece rides the hand node", n"Check_RidingTheHand", 0, 2.0f);
+        Add_Step_WaitUntil("the hand carries and the piece rides the hand node", n"Check_RidingTheHand", 0, 0);
         Add_Step_WaitFrames("the held offset applies", 3);
         Add_Step("off the platter, under the hand node, its middle on the hand", n"Step_AssertRides");
-        Add_Step_WaitUntil("the release", n"Check_AwaitingAdmission", 0, 2.0f);
+        Add_Step_WaitUntil("the release", n"Check_AwaitingAdmission", 0, 0);
         Add_Step("let go where it rode: no parent, released at its own pose", n"Step_AssertReleased");
         Add_Step("reject the release", n"Step_RejectPending");
-        Add_Step_WaitUntil("the piece is back on the platter and the pile settled", n"Check_BackOnThePlatter", 0, 3.0f);
+        Add_Step_WaitUntil("the piece is back on the platter and the pile settled", n"Check_BackOnThePlatter", k_SlowPolls, 0);
         Add_Step("the stock is whole again", n"Step_AssertBack");
         Run_Steps(InHandle);
     }

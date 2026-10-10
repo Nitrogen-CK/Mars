@@ -14,12 +14,12 @@ class UMars_AutoTest_Hotbar_AStowWithNoSelectionSelectsTheSlot : UMars_AutoTestR
 
         Add_Step_WaitUntil("every holder holds its rock", n"Check_HoldersSeeded");
         Add_Step("nothing is selected; stow the first rock", n"Step_AssertNoSelectionAndStowFirst");
-        Add_Step_WaitUntil("slot 0 holds it and is selected", n"Check_FirstSelected", 0, 2.0f);
+        Add_Step_WaitUntil("slot 0 holds it and is selected", n"Check_FirstSelected", 0, 0);
         Add_Step("select empty slot 2 (nothing in the hands)", n"Step_SelectEmptySlotTwo");
-        Add_Step_WaitUntil("slot 2 is selected", n"Check_EmptySlotSelected", 0, 2.0f);
+        Add_Step_WaitUntil("slot 2 is selected", n"Check_EmptySlotSelected", 0, 0);
         Add_Step("stow the second rock", n"Step_StowSecond");
-        Add_Step_WaitUntil("slot 1 holds it", n"Check_SecondStowed", 0, 2.0f);
-        Add_Step_WaitFrames("the sync pass has seen the arrival", 3);
+        Add_Step_WaitUntil("slot 1 holds it", n"Check_SecondStowed", 0, 0);
+        Add_Step_WaitUntil("the sync pass has seen the arrival", n"Check_SyncSawSlotOne", 0, 0);
         Add_Step("slot 1 is selected", n"Step_AssertSecondSelected");
         Run_Steps(InHandle);
     }
@@ -49,6 +49,15 @@ class UMars_AutoTest_Hotbar_AStowWithNoSelectionSelectsTheSlot : UMars_AutoTestR
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(2) && ck::Is_NOT_Valid(_Hotbar.Get_SelectedItem()));
+    }
+
+    // The hotbar's sync pass records each slot's item (LastSeen) in the pass that applies the arrival rule to it.
+    UFUNCTION()
+    private void Check_SyncSawSlotOne(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Item = _Hotbar.Get_ItemAt(1);
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(Item) && _Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[1] == Item);
     }
 
     UFUNCTION()

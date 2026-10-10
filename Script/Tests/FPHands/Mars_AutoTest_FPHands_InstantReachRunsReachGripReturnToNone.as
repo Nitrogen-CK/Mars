@@ -17,9 +17,9 @@ class UMars_AutoTest_FPHands_InstantReachRunsReachGripReturnToNone : UMars_AutoT
         Add_HandsSm();
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChangedRecordingPhaseTime"));
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("request an instant reach", n"Step_RequestInstantReach");
-        Add_Step_WaitUntil("the phase went through Reach, Grip, Return back to None", n"Check_BackToNone", 0, 5.0f);
+        Add_Step_WaitUntil("the phase went through Reach, Grip, Return back to None", n"Check_BackToNone", k_SlowPolls, 0);
         Add_Step("the phases ran in order and each change reset PhaseTime", n"Step_AssertSequence");
         Run_Steps(InHandle);
     }

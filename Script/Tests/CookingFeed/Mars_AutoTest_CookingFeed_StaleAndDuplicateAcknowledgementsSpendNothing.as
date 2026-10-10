@@ -1,7 +1,7 @@
-// Only an answer for exactly the awaited piece counts: a slot the reservation does not name and a newer generation are
-// ignored while awaiting, the right answer spends once, the same answer again spends nothing. After a reset mid-admission
-// (the released piece goes back on the platter, as the bridge would put it), an Accepted answer for the old piece spends
-// nothing in the new attempt.
+// Only an answer for exactly the awaited piece counts: a transfer the reservation does not name and a newer generation are
+// ignored while awaiting, the right answer spends once, the same answer again spends nothing. After the source changes
+// mid-admission (unsourced and sourced again in one drain: the feed puts the released piece back on the platter it came
+// from), an Accepted answer for the old piece spends nothing in the new attempt.
 class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing : UMars_AutoTestRig_CookingFeed
 {
     private FMars_CookingFeed_PieceId _Awaited;
@@ -14,22 +14,22 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
         Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
-        Add_Step("answer for a wrong slot and for a newer generation", n"Step_AnswerWrongPieces");
+        Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 0, 0);
+        Add_Step("answer for a wrong transfer and for a newer generation", n"Step_AnswerWrongPieces");
         Add_Step_WaitFrames("the answers drain", 3);
         Add_Step("still awaiting; nothing spent", n"Step_AssertStillAwaiting");
         Add_Step("accept the awaited piece", n"Step_AcceptPending");
-        Add_Step_WaitUntil("the piece is admitted", n"Check_OneAdmitted", 0, 1.0f);
+        Add_Step_WaitUntil("the piece is admitted", n"Check_OneAdmitted", 0, 0);
         Add_Step("accept it again", n"Step_AcceptPending");
         Add_Step_WaitFrames("the duplicate drains", 3);
         Add_Step("admitted exactly once", n"Step_AssertAdmittedOnce");
-        Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 0, 2.0f);
-        Add_Step_WaitUntil("the pile has re-settled", n"Check_PileSettled", 0, 2.0f);
+        Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 0, 0);
+        Add_Step_WaitUntil("the pile has re-settled", n"Check_PileSettled", k_SlowPolls, 0);
         Add_Step("press add food again", n"Step_Begin");
-        Add_Step_WaitUntil("the second piece awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
-        Add_Step("reset mid-admission", n"Step_ResetMidAdmission");
-        Add_Step_WaitUntil("the reset applied", n"Check_ResetApplied", 0, 1.0f);
-        Add_Step_WaitUntil("the released piece is back on the platter", n"Check_StaleBack", 0, 1.0f);
+        Add_Step_WaitUntil("the second piece awaits admission", n"Check_AwaitingAdmission", 0, 0);
+        Add_Step("change the source mid-admission", n"Step_ResourceMidAdmission");
+        Add_Step_WaitUntil("the source change applied", n"Check_ResourceApplied", 0, 0);
+        Add_Step_WaitUntil("the released piece is back on the platter", n"Check_StaleBack", k_SlowPolls, 0);
         Add_Step("accept the old piece", n"Step_AcceptStale");
         Add_Step_WaitFrames("the stale answer drains", 3);
         Add_Step("the new attempt is untouched", n"Step_AssertFreshAttempt");
@@ -40,8 +40,8 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     private void Step_AnswerWrongPieces(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Awaited = _Releases.Last().PieceId;
-        Resolve(FMars_CookingFeed_PieceId(_Awaited.Generation, _Awaited.StockIndex + 1), EMars_CookingFeed_Admission::Accepted);
-        Resolve(FMars_CookingFeed_PieceId(_Awaited.Generation + 1, _Awaited.StockIndex), EMars_CookingFeed_Admission::Accepted);
+        Resolve(FMars_CookingFeed_PieceId(_Awaited.Generation, _Awaited.TransferIndex + 1), EMars_CookingFeed_Admission::Accepted);
+        Resolve(FMars_CookingFeed_PieceId(_Awaited.Generation + 1, _Awaited.TransferIndex), EMars_CookingFeed_Admission::Accepted);
     }
 
     UFUNCTION()
@@ -68,17 +68,19 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     }
 
     UFUNCTION()
-    private void Step_ResetMidAdmission(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_ResourceMidAdmission(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Stale = _Releases.Last().PieceId;
-        Reset();
+        SetSource(FCk_Handle_Platter());
+        SetSource(_Platter);
     }
 
     UFUNCTION()
-    private void Check_ResetApplied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_ResourceApplied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Feed.Get_Generation() == _Stale.Generation + 1 && _Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle);
+        Res.Set(_Feed.Get_Generation() == _Stale.Generation + 2 && _Feed.Get_Source() == _Platter
+            && _Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle);
     }
 
     UFUNCTION()
@@ -99,7 +101,7 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     {
         Assert_Ledger(k_Stock - 1, 0, "after the stale answer (the first piece stays spent)");
         Assert_True(_Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle, "the hand stays at rest");
-        Assert_Equals_Int(_Settles.Num(), 2, "the reset settled the reservation; the stale answer settled nothing");
+        Assert_Equals_Int(_Settles.Num(), 2, "the source change settled the reservation; the stale answer settled nothing");
         Assert_True(_Settles.Num() == 2 && _Settles[1] == EMars_CookingFeed_Settle::Cancelled, "the reservation settled Cancelled");
         Assert_True(_SettledPieces.Num() == 2 && _SettledPieces[1].Get_IsSame(_Stale), "under its old id");
         Assert_Equals_Int(_Platter.Get_HeldCount(), k_Stock - 1, "the platter holds every piece but the admitted one");

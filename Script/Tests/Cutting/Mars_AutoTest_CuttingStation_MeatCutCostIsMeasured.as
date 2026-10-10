@@ -44,15 +44,15 @@ class UMars_AutoTest_CuttingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Cu
         _Laterals.Add(-8.0f);
 
         Add_Steps_FeedTheJoint();
-        Add_Step_WaitUntil("the board holds one shown joint and the marker mesh is Ready", n"Check_Ready", 0, 10.0f);
+        Add_Step_WaitUntil("the board holds one shown joint and the marker mesh is Ready", n"Check_Ready", k_SlowPolls, 0);
         for (int32 Cut = 0; Cut < _Laterals.Num(); ++Cut)
         {
             Add_Step("move the hand to the cut", n"Step_MoveHand");
-            Add_Step_WaitUntil("the hand is there and the cleaver is up", n"Check_HandReady", 0, 2.0f);
+            Add_Step_WaitUntil("the hand is there and the cleaver is up", n"Check_HandReady", 0, 0);
             Add_Step("sample idle frames", n"Step_BeginIdle");
-            Add_Step_WaitUntil("the idle frames are sampled", n"Check_IdleSampled", 0, 3.0f);
+            Add_Step_WaitUntil("the idle frames are sampled", n"Check_IdleSampled", 0, 0);
             Add_Step("chop, arming the markers", n"Step_Chop");
-            Add_Step_WaitUntil("the cut committed and the frame after it was polled", n"Check_Committed", 0, 5.0f);
+            Add_Step_WaitUntil("the cut committed and the frame after it was polled", n"Check_Committed", k_SlowPolls, 0);
             Add_Step("record the cut", n"Step_Record");
         }
         Run_Steps(InHandle);

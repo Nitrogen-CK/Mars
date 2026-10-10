@@ -1,28 +1,51 @@
+// The kind of slot an index of the hotbar's layout is: [0, BagSlotCount) bag, BagSlotCount overflow, BagSlotCount + 1
+// backpack (only with a backpack slot).
+enum EMars_Hotbar_SlotKind
+{
+    Bag,
+    Overflow,
+    Backpack
+}
+
 // Stateless accept predicates for the hotbar's slot inventories, bound from the CDO (a params-borne delegate has no
-// post-creation install API and needs a target that outlives every hotbar).
+// post-creation install API and needs a target that outlives every hotbar). Each asks the fit rule for its own kind.
 UCLASS()
 class UMars_Hotbar_AcceptPolicy : UObject
 {
     UFUNCTION()
     void OnCanAccept_ItemSlot(FCk_Handle_Inventory InInventory, FCk_Handle_Item InItem, bool& OutCanAccept)
-    { OutCanAccept = InItem.Has_Backpack() == false && InItem.Has_HandsOnly() == false; }
+    { OutCanAccept = utils_hotbar::Get_FitsSlot(EMars_Hotbar_SlotKind::Bag, InItem); }
 
     UFUNCTION()
     void OnCanAccept_OverflowSlot(FCk_Handle_Inventory InInventory, FCk_Handle_Item InItem, bool& OutCanAccept)
-    { OutCanAccept = InItem.Has_Backpack() == false; }
+    { OutCanAccept = utils_hotbar::Get_FitsSlot(EMars_Hotbar_SlotKind::Overflow, InItem); }
 
     UFUNCTION()
     void OnCanAccept_BackpackSlot(FCk_Handle_Inventory InInventory, FCk_Handle_Item InItem, bool& OutCanAccept)
-    { OutCanAccept = InItem.Has_Backpack(); }
+    { OutCanAccept = utils_hotbar::Get_FitsSlot(EMars_Hotbar_SlotKind::Backpack, InItem); }
 }
 
 namespace utils_hotbar
 {
     const int32 k_MaxBagSlotCount = 8;
 
+    // The slot-fit rule, the one place it is written: a backpack fits only the backpack slot, a hands-only item only the
+    // overflow slot, any other item a bag slot or the overflow slot. CkInventory enforces it on every add and transfer
+    // through the accept predicates; the stow and take targets ask it before they name a slot.
+    bool Get_FitsSlot(EMars_Hotbar_SlotKind InKind, const FCk_Handle_Item& InItem)
+    {
+        switch (InKind)
+        {
+            case EMars_Hotbar_SlotKind::Bag: return InItem.Has_Backpack() == false && InItem.Has_HandsOnly() == false;
+            case EMars_Hotbar_SlotKind::Overflow: return InItem.Has_Backpack() == false;
+            default: return InItem.Has_Backpack();
+        }
+    }
+
     // Composes BagSlotCount capacity-1 bag slot inventories, one overflow slot and (BackpackSlot Enable) one backpack slot
     // on InPlayer. The Hotbar never moves items itself: a caller stows by transferring into TryGet_StowTarget(Item), and
-    // the sync pass reacts to what lands. Every slot's accept policy is enforced by CkInventory on every add/transfer.
+    // the sync pass reacts to what lands. Every slot's accept policy is enforced by CkInventory on every add/transfer. A
+    // Persistent item in a slot rides InPlayer: Held from the selected slot, else Carried on its own CarryPoint.
     FCk_Handle_Hotbar Add(FCk_Handle& InPlayer, FMars_Hotbar_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -60,7 +83,9 @@ namespace utils_hotbar
             SlotParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
             SlotParams.Set_PersistContents(ECk_EnableDisable::Disable);
 
-            State.Slots.Add(utils_inventory_data_only::Add(InPlayer, SlotParams, ECk_Replication::DoesNotReplicate));
+            auto Slot = utils_inventory_data_only::Add(InPlayer, SlotParams, ECk_Replication::DoesNotReplicate);
+            utils_world_item::Add_MountedInventory(Slot, FMars_Fragment_MountedInventory());
+            State.Slots.Add(Slot);
             State.LastSeen.Add(FCk_Handle_Item());
         }
 
@@ -71,18 +96,6 @@ namespace utils_hotbar
         InPlayer.Add_Fragment(Params);
         InPlayer.Add_Fragment(State);
         return InPlayer.As_Hotbar();
-    }
-
-    // Processor-only: the two Hotbar processors are the only writers of SelectedIndex.
-    void Apply_Selection(FCk_Handle_Hotbar& InHotbar, FMars_Fragment_Hotbar& InState, TOptional<int32> InNewIndex)
-    {
-        if (InState.SelectedIndex == InNewIndex)
-        { return; }
-
-        InState.SelectedIndex = InNewIndex;
-
-        if (InHotbar.Has_Fragment(FMars_Fragment_Hotbar_Signals))
-        { InHotbar.Get_Fragment(FMars_Fragment_Hotbar_Signals).OnSelectionChanged.Broadcast(InHotbar); }
     }
 }
 
@@ -118,6 +131,17 @@ mixin TOptional<int32> Get_BackpackIndex(const FCk_Handle_Hotbar& Self)
 mixin int32 Get_LastIndex(const FCk_Handle_Hotbar& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Hotbar).Slots.Num() - 1;
+}
+
+mixin EMars_Hotbar_SlotKind Get_SlotKind(const FCk_Handle_Hotbar& Self, int32 InIndex)
+{
+    if (InIndex < Self.Get_BagSlotCount())
+    { return EMars_Hotbar_SlotKind::Bag; }
+
+    if (InIndex == Self.Get_OverflowIndex())
+    { return EMars_Hotbar_SlotKind::Overflow; }
+
+    return EMars_Hotbar_SlotKind::Backpack;
 }
 
 mixin TArray<FCk_Handle_Inventory_DataOnly> Get_Slots(const FCk_Handle_Hotbar& Self)
@@ -211,34 +235,21 @@ mixin TOptional<int32> TryGet_FirstEmptyBagSlot(const FCk_Handle_Hotbar& Self)
     return TOptional<int32>();
 }
 
-// Backpack item: the backpack slot if present and empty, else invalid.
-// Hands-only item: the overflow slot if empty, else invalid (never a bag slot, even a free one).
-// Any other item: first empty bag slot, else overflow if empty, else invalid.
+// The first empty slot InItem fits (utils_hotbar::Get_FitsSlot), in layout order: a bag slot before the overflow slot, so
+// a backpack goes only to the empty backpack slot, a hands-only item only to the empty overflow slot, any other item to the
+// first empty bag slot, else the empty overflow slot. Invalid when none is free.
 mixin FCk_Handle_Inventory_DataOnly TryGet_StowTarget(const FCk_Handle_Hotbar& Self, const FCk_Handle_Item& InItem)
 {
     if (ck::Is_NOT_Valid(InItem))
     { return FCk_Handle_Inventory_DataOnly(); }
 
-    if (InItem.Has_Backpack())
+    for (int32 Index = 0; Index <= Self.Get_LastIndex(); ++Index)
     {
-        if (Self.Get_HasBackpackSlot() == false || Self.Get_IsWearingBackpack())
-        { return FCk_Handle_Inventory_DataOnly(); }
-
-        return Self.Get_BackpackSlot();
+        if (ck::Is_NOT_Valid(Self.Get_ItemAt(Index)) && utils_hotbar::Get_FitsSlot(Self.Get_SlotKind(Index), InItem))
+        { return Self.Get_Slot(Index); }
     }
 
-    // A hands-only item: the overflow slot (both hands) or nowhere.
-    if (InItem.Has_HandsOnly())
-    { return Self.Get_IsOverflowOccupied() ? FCk_Handle_Inventory_DataOnly() : Self.Get_Slot(Self.Get_OverflowIndex()); }
-
-    const auto BagIndex = Self.TryGet_FirstEmptyBagSlot();
-    if (BagIndex.IsSet())
-    { return Self.Get_Slot(BagIndex.GetValue()); }
-
-    if (Self.Get_IsOverflowOccupied())
-    { return FCk_Handle_Inventory_DataOnly(); }
-
-    return Self.Get_Slot(Self.Get_OverflowIndex());
+    return FCk_Handle_Inventory_DataOnly();
 }
 
 mixin bool Get_CanStow(const FCk_Handle_Hotbar& Self, const FCk_Handle_Item& InItem)
@@ -254,8 +265,8 @@ mixin FCk_Handle_Inventory_DataOnly TryGet_TakeTarget(const FCk_Handle_Hotbar& S
     { return FCk_Handle_Inventory_DataOnly(); }
 
     const auto SelectedIndex = Self.Get_SelectedIndex();
-    const auto SelectedIsBagSlot = SelectedIndex.IsSet() && SelectedIndex.GetValue() < Self.Get_BagSlotCount();
-    const auto FitsBagSlot = InItem.Has_Backpack() == false && InItem.Has_HandsOnly() == false;
+    const auto SelectedIsBagSlot = SelectedIndex.IsSet() && Self.Get_SlotKind(SelectedIndex.GetValue()) == EMars_Hotbar_SlotKind::Bag;
+    const auto FitsBagSlot = utils_hotbar::Get_FitsSlot(EMars_Hotbar_SlotKind::Bag, InItem);
     if (SelectedIsBagSlot && FitsBagSlot && ck::Is_NOT_Valid(Self.Get_ItemAt(SelectedIndex.GetValue())))
     { return Self.Get_Slot(SelectedIndex.GetValue()); }
 

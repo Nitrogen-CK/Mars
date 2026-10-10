@@ -1,12 +1,13 @@
-// The station Use target's interaction sub-SM: an acquire gate, and nothing else. The interaction is Instant and only
-// reserves; once the station answers (or never does) the sub-SM terminates. Operating the station is the player's
-// Operating state (Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Operating.as) and the station's own minigame SM.
+// The station Use target's interaction sub-SM: an acquire gate, and nothing else. The target is WhileLive: its interaction
+// lives while the reserve is asked, and the sub-SM ends it with the answer (or with none). Operating the station is the
+// player's Operating state (Script/PlayerCharacter/HFSM/Mars_PlayerCharacter_Hfsm_Operating.as) and the station's own
+// minigame SM.
 //
 //   Station_Use (overrides InteractTarget_Enter)   task: Station_RequestReserve (no presentation: nothing to undo)
-//     ->ExitAndTerminate [ReserveConfirmed]   the station names this initiator
-//     ->ExitAndTerminate [ReserveRejected]    the station rejected this initiator, or died while we waited
-//     ->ExitAndTerminate [ReserveTimeout]     no answer within TimeoutSeconds (the request was lost)
-//     ->ExitAndTerminate [AnyTaskFailed]      no station or no initiator to reserve for
+//     ->InteractTarget_Succeeded [ReserveConfirmed]   the station names this initiator
+//     ->InteractTarget_Failed    [ReserveRejected]    the station rejected this initiator, or died while we waited
+//     ->InteractTarget_Failed    [ReserveTimeout]     no answer within TimeoutSeconds (the request was lost)
+//     ->InteractTarget_Failed    [AnyTaskFailed]      no station or no initiator to reserve for
 
 class UMars_SmState_Station_Use : UCk_SmState_EntityScript
 {
@@ -22,16 +23,16 @@ class UMars_SmState_Station_Use : UCk_SmState_EntityScript
     {
         AddTask(InHandle, UMars_SmTask_Station_RequestReserve);
 
-        auto OnConfirmed = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
+        auto OnConfirmed = AddTransition(InHandle, UMars_SmState_InteractTarget_Succeeded);
         AddCondition(OnConfirmed, UMars_SmCondition_Station_ReserveConfirmed);
 
-        auto OnRejected = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
+        auto OnRejected = AddTransition(InHandle, UMars_SmState_InteractTarget_Failed);
         AddCondition(OnRejected, UMars_SmCondition_Station_ReserveRejected);
 
-        auto OnTimeout = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
+        auto OnTimeout = AddTransition(InHandle, UMars_SmState_InteractTarget_Failed);
         AddCondition(OnTimeout, UMars_SmCondition_Station_ReserveTimeout);
 
-        auto OnFailure = AddTransition(InHandle, UMars_SmState_ExitAndTerminate);
+        auto OnFailure = AddTransition(InHandle, UMars_SmState_InteractTarget_Failed);
         AddCondition(OnFailure, UMars_SmCondition_AnyTaskFailed);
     }
 }
@@ -53,7 +54,7 @@ class UMars_SmState_Station_Grip : UMars_SmState_ExitAndTerminate
 }
 
 // Reserves the station for the initiator. The state only runs as a station's Use interaction, so the owner is the
-// station and the interaction recorded its initiator; failing either ensures and fails the task.
+// station and the sub-SM root carries the initiator of its live interaction; failing either ensures and fails the task.
 class UMars_SmTask_Station_RequestReserve : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -172,8 +173,10 @@ class UMars_SmCondition_Station_ReserveRejected : UCk_SmCondition_EventDriven
     }
 }
 
-// Event-driven: satisfied TimeoutSeconds after enter (neither confirmed nor rejected: the reserve was lost, e.g. the
-// station died with it queued). The timer is a child of the condition and is destroyed on exit.
+// Event-driven: satisfied TimeoutSeconds after enter, neither confirmed nor rejected. The station answers every reserve it
+// drains and its destruction rejects one still queued, so a reserve lost this way is a defect (an initiator without the
+// Operator feature, ensured by the station's drain): ensured here too, and the Use interaction gives up. The timer is a
+// child of the condition and is destroyed on exit.
 class UMars_SmCondition_Station_ReserveTimeout : UCk_SmCondition_EventDriven
 {
     protected float32 TimeoutSeconds = 3.0f;
@@ -206,7 +209,7 @@ class UMars_SmCondition_Station_ReserveTimeout : UCk_SmCondition_EventDriven
     UFUNCTION()
     private void OnTimeout(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        ck::Trace("[Station] the reserve was not answered in time; the Use interaction gives up");
+        ck::EnsureIfNot(false, f"[Station] a reserve was not answered within {TimeoutSeconds} s: the Use interaction gives up");
         MarkSatisfied();
     }
 }

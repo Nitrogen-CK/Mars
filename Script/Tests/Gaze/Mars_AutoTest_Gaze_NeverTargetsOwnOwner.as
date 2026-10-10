@@ -5,6 +5,9 @@
 // and only the shared context keeps the owner out. Isolated Z band: -57000.
 class UMars_AutoTest_Gaze_NeverTargetsOwnOwner : UMars_AutoTestRig_Gaze
 {
+    // A poll budget, not a ceiling: the window step polls for its whole span.
+    private const int32 k_SlowPolls = 900;
+
     private FVector _Origin = FVector(0.0, 0.0, -57000.0);
     private FVector _OwnHeadOffset = FVector(100.0, 0.0, 0.0);
     private FCk_Handle _OwnOwner;
@@ -30,7 +33,7 @@ class UMars_AutoTest_Gaze_NeverTargetsOwnOwner : UMars_AutoTestRig_Gaze
         Add_Step("add a foreign stand-in at the owner's own Head", n"Step_AddStandIn");
         Add_Step_WaitUntil("the stand-in is sensed and takes the gaze, the own owner still unsensed", n"Check_LooksAtStandIn");
         Add_Step("the stand-in is its own context; start the window", n"Step_StartWindow");
-        Add_Step_WaitUntil("for 0.25 s the gaze keeps evaluating without sensing its own owner", n"Check_WindowWithoutOwnOwner", 0, 2.0f);
+        Add_Step_WaitUntil("for 0.25 s the gaze keeps evaluating without sensing its own owner", n"Check_WindowWithoutOwnOwner", k_SlowPolls, 0);
         Add_Step("the gaze still looks at the stand-in and never looked at its own owner's Head", n"Step_AssertNeverOwn");
         Run_Steps(InHandle);
     }

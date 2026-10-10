@@ -30,13 +30,13 @@ class UMars_AutoTest_Health_HitsOnConsecutiveFramesAccumulate : UCk_AutoTest_Bas
         Add_Step("A: hit 10", n"Step_Hit");
         Add_Step_WaitFrames("A: one frame", 1);
         Add_Step("A: hit 10", n"Step_Hit");
-        Add_Step_WaitUntil("A: Health reads 70", n"Check_At70", 0, 2.0f);
+        Add_Step_WaitUntil("A: Health reads 70", n"Check_At70", 0, 0);
         Add_Step("A: Remaining 90, 80, 70; B: two hits of 10 in one step", n"Step_AssertAAndHitTwice");
         Add_Step_WaitFrames("B: one frame", 1);
         Add_Step("B: hit 10", n"Step_Hit");
-        Add_Step_WaitUntil("B: Health reads 40", n"Check_At40", 0, 2.0f);
+        Add_Step_WaitUntil("B: Health reads 40", n"Check_At40", 0, 0);
         Add_Step("B: Remaining 60, 50, 40; C: a hit whose OnDamaged queues the next", n"Step_AssertBAndChain");
-        Add_Step_WaitUntil("C: Health reads 20", n"Check_At20", 0, 2.0f);
+        Add_Step_WaitUntil("C: Health reads 20", n"Check_At20", 0, 0);
         Add_Step("C: Remaining 30, 20", n"Step_AssertC");
         Run_Steps(InHandle);
     }

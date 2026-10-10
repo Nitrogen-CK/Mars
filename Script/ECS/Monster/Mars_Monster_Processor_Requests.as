@@ -59,8 +59,6 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
         State.DeathCause = InRequest.Cause;
         utils_byte_attribute::Request_Override(State.Dead, 1, ECk_MinMaxCurrent::Current);
 
-        ck::Trace(f"[Monster] [{InMonster.ToString()}] died of [{InRequest.Cause.Amount}] [{InRequest.Cause.DamageType.ToString()}]");
-
         if (InMonster.Has_Fragment(FMars_Fragment_Monster_Signals))
         { InMonster.Get_Fragment(FMars_Fragment_Monster_Signals).OnDied.Broadcast(InMonster, InRequest.Cause); }
     }

@@ -5,6 +5,9 @@
 // mostly a lift kick; FastUpwardLookKicksTheLiftAndItSettles pins that split.)
 class UMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut : UMars_AutoTestRig_Implement
 {
+    // Degrees of roll or pitch that still count as level.
+    private const float64 k_LevelTolerance = 0.5;
+
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
@@ -13,13 +16,13 @@ class UMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut : UMars_AutoTestR
         Add_Step("look right on an idle implement", n"Step_IdleLook");
         Add_Step_WaitFrames("the idle look drained", 4);
         Add_Step("the idle implement stayed level; drive it and look right", n"Step_AssertLevelThenDriveAndLookRight");
-        Add_Step_WaitUntil("the look tilted the implement", n"Check_RolledPast5", 0, 0.3f);
+        Add_Step_WaitUntil("the look tilted the implement", n"Check_RolledPast5", 0, 0);
         Add_Step("the implement rolled right; look down", n"Step_AssertRolledThenLookDown");
-        Add_Step_WaitUntil("the look tilted the implement", n"Check_PitchedPastMinus5", 0, 0.3f);
+        Add_Step_WaitUntil("the look tilted the implement", n"Check_PitchedPastMinus5", 0, 0);
         Add_Step("the implement pitched toward the operator", n"Step_AssertPitched");
-        Add_Step_WaitSeconds("the tilt relaxes", 1.0f);
+        Add_Step_WaitUntil("the tilt relaxed to level", n"Check_Level", 0, 0);
         Add_Step("the implement is level again; a large look right", n"Step_AssertLevelThenLargeLook");
-        Add_Step_WaitUntil("the large look tilted the implement near its clamp", n"Check_RolledPast25", 0, 0.3f);
+        Add_Step_WaitUntil("the large look tilted the implement near its clamp", n"Check_RolledPast25", 0, 0);
         Add_Step("the roll clamped and the node shows it", n"Step_AssertClampedOnTheNode");
         Run_Steps(InHandle);
     }
@@ -80,11 +83,19 @@ class UMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut : UMars_AutoTestR
     }
 
     UFUNCTION()
+    private void Check_Level(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Tilt = _Implement.Get_Tilt();
+        auto Res = OutResult;
+        Res.Set(Math::Abs(Tilt.Roll) < k_LevelTolerance && Math::Abs(Tilt.Pitch) < k_LevelTolerance);
+    }
+
+    UFUNCTION()
     private void Step_AssertLevelThenLargeLook(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Tilt = _Implement.Get_Tilt();
-        Assert_True(Math::Abs(Tilt.Roll) < 0.5, f"the roll relaxed to level within a second (got {Tilt.Roll})");
-        Assert_True(Math::Abs(Tilt.Pitch) < 0.5, f"the pitch relaxed to level within a second (got {Tilt.Pitch})");
+        Assert_True(Math::Abs(Tilt.Roll) < k_LevelTolerance, f"the roll relaxed to level (got {Tilt.Roll})");
+        Assert_True(Math::Abs(Tilt.Pitch) < k_LevelTolerance, f"the pitch relaxed to level (got {Tilt.Pitch})");
 
         Look(FVector(100.0, 0.0, 0.0));
     }

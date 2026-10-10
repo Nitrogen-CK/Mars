@@ -16,18 +16,18 @@ class UMars_AutoTest_CookingFeed_ChangingTheSourceCancelsAndUnsourcedIsEmpty : U
         Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 1.0f);
+        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 0);
         Add_Step("unsource the feed", n"Step_Unsource");
-        Add_Step_WaitUntil("the transfer settles", n"Check_OneSettle", 0, 0.5f);
-        Add_Step_WaitUntil("the hand is at rest", n"Check_Idle", 0, 1.0f);
+        Add_Step_WaitUntil("the transfer settles", n"Check_OneSettle", 0, 0);
+        Add_Step_WaitUntil("the hand is at rest", n"Check_Idle", 0, 0);
         Add_Step("cancelled once; nothing available", n"Step_AssertCancelledAndEmpty");
         Add_Step("press add food unsourced", n"Step_Begin");
         Add_Step_WaitFrames("the press drains", 2);
         Add_Step("the press is refused Empty", n"Step_AssertRefusedEmpty");
         Add_Step("source the platter again", n"Step_SetSource");
-        Add_Step_WaitUntil("the feed draws from the platter again", n"Check_Sourced", 0, 1.0f);
+        Add_Step_WaitUntil("the feed draws from the platter again", n"Check_Sourced", 0, 0);
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the new piece awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
+        Add_Step_WaitUntil("the new piece awaits admission", n"Check_AwaitingAdmission", 0, 0);
         Add_Step("a new generation; answer Accepted under the cancelled id", n"Step_AnswerCancelledId");
         Add_Step_WaitFrames("the late answer drains", 3);
         Add_Step("the late answer spent nothing", n"Step_AssertLateAnswerIgnored");

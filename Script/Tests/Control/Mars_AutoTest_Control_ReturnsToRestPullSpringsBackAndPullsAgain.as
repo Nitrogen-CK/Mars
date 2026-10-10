@@ -9,25 +9,25 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UMars_A
         BuildChain(InHandle);
 
         Add_Step("start the first interaction", n"Step_StartInteraction");
-        Add_Step_WaitUntil("the first interaction exists", n"Check_FirstInteraction", 0, 5.0f);
+        Add_Step_WaitUntil("the first interaction exists", n"Check_FirstInteraction", 0, 0);
         Add_Step("grip the chain", n"Step_BeginManipulation");
-        Add_Step_WaitUntil("the chain is gripped", n"Check_IsManipulating", 0, 5.0f);
-        Add_Step_WaitUntil("pull until the manipulation ends", n"Check_PullUntilEnded", 0, 5.0f);
-        Add_Step_WaitUntil("the first interaction finishes", n"Check_FirstFinished", 0, 5.0f);
-        Add_Step_WaitUntil("the handle springs back to rest", n"Check_SettledToRest", 0, 5.0f);
+        Add_Step_WaitUntil("the chain is gripped", n"Check_IsManipulating", 0, 0);
+        Add_Step_WaitUntil("pull until the manipulation ends", n"Check_PullUntilEnded", 0, 0);
+        Add_Step_WaitUntil("the first interaction finishes", n"Check_FirstFinished", 0, 0);
+        Add_Step_WaitUntil("the handle springs back to rest", n"Check_SettledToRest", k_SlowPolls, 0);
         Add_Step("the first pull engaged and left the target at rest", n"Step_AssertFirstPull");
         Add_Step("make the control active, as a momentary pull would", n"Step_SetActive");
-        Add_Step_WaitUntil("the control is active", n"Check_IsActive", 0, 5.0f);
+        Add_Step_WaitUntil("the control is active", n"Check_IsActive", 0, 0);
         Add_Step_WaitSeconds("give a mover request time to land, if one were made", 0.2f);
         Add_Step("being active does not move the handle, and the next pull still runs toward the end", n"Step_AssertActiveDoesNotMove");
         Add_Step("start the second interaction", n"Step_StartInteraction");
-        Add_Step_WaitUntil("the second interaction exists", n"Check_SecondInteraction", 0, 5.0f);
+        Add_Step_WaitUntil("the second interaction exists", n"Check_SecondInteraction", 0, 0);
         Add_Step("grip the chain again", n"Step_BeginManipulation");
-        Add_Step_WaitUntil("the chain is gripped again", n"Check_IsManipulating", 0, 5.0f);
+        Add_Step_WaitUntil("the chain is gripped again", n"Check_IsManipulating", 0, 0);
         Add_Step("the second grip starts from rest", n"Step_AssertGripFromRest");
-        Add_Step_WaitUntil("pull until the manipulation ends again", n"Check_PullUntilEnded", 0, 5.0f);
-        Add_Step_WaitUntil("the second interaction finishes", n"Check_SecondFinished", 0, 5.0f);
-        Add_Step_WaitUntil("the handle springs back to rest again", n"Check_SettledToRest", 0, 5.0f);
+        Add_Step_WaitUntil("pull until the manipulation ends again", n"Check_PullUntilEnded", 0, 0);
+        Add_Step_WaitUntil("the second interaction finishes", n"Check_SecondFinished", 0, 0);
+        Add_Step_WaitUntil("the handle springs back to rest again", n"Check_SettledToRest", k_SlowPolls, 0);
         Add_Step("the second pull engaged too", n"Step_AssertSecondPull");
         Run_Steps(InHandle);
     }

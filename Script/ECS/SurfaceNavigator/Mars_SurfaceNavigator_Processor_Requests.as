@@ -73,8 +73,6 @@ class UMars_Processor_SurfaceNavigator_HandleRequests : UCk_Processor_Script_Bas
             FailedState.FailReason = EMars_SurfaceNavigator_FailReason::NoPath;
             FailedState.Route = Route;
 
-            ck::Trace(f"[SurfaceNavigator] [{InSelf.ToString()}] no path to [{InRequest.Goal.ToString()}]: [{Status :n}]");
-
             if (InSelf.Has_Fragment(FMars_Fragment_SurfaceNavigator_Signals))
             { InSelf.Get_Fragment(FMars_Fragment_SurfaceNavigator_Signals).OnFailed.Broadcast(InSelf, InRequest.Goal, EMars_SurfaceNavigator_FailReason::NoPath); }
             return;

@@ -27,9 +27,9 @@ class UMars_AutoTest_Health_DepletionLatchesOnceForSameFrameLethalHits : UCk_Aut
         _Sentinel.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnSentinelDamaged"));
 
         Add_Step("queue two hits of 80 in one frame", n"Step_TwoLethalHits");
-        Add_Step_WaitUntil("Health is depleted and reads 0", n"Check_Depleted", 0, 2.0f);
+        Add_Step_WaitUntil("Health is depleted and reads 0", n"Check_Depleted", 0, 0);
         Add_Step("one depletion, two OnDamaged (80, 20), LastHit is the second; hit the depleted Health again", n"Step_AssertAndHitAgain");
-        Add_Step_WaitUntil("the sentinel's hit drained", n"Check_SentinelDrained", 0, 2.0f);
+        Add_Step_WaitUntil("the sentinel's hit drained", n"Check_SentinelDrained", 0, 0);
         Add_Step("the hit on the depleted Health was ignored", n"Step_AssertIgnored");
         Run_Steps(InHandle);
     }

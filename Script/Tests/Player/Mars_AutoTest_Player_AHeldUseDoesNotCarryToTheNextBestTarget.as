@@ -6,25 +6,24 @@ asset Mars_ItemDef_AutoTest_Pebble of UCk_InventoryItem_Definition
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
     Presentation.Visual.Mesh = engine::Sphere();
     Presentation.Visual.MeshScale = FVector(0.2, 0.2, 0.2);
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
     Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
     _ItemTraits.Add(Presentation);
 }
 
-// The player's tasks this test runs on the test entity: the resolver -> interaction bridge and the Use row -> resolver
-// intent forwarding.
+// The player's task this test runs on the test entity: the Use row -> resolver intent and its interaction.
 class UMars_AutoTestState_UseIntentRig : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
-        AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
     }
 }
 
-// One held press is one interaction. The carrier (Hotbar with two bag slots, HeldItem, the player's InteractionResolverBinds
-// and UseIntentToResolver tasks, a Use resolver and a real Use level row on F9) has two pebbles focused. Pebble A is
+// One held press is one interaction. The carrier (Hotbar with two bag slots, HeldItem, the player's UseIntentToResolver
+// task, a Use resolver and a real Use level row on F9) has two pebbles focused. Pebble A is
 // offered to the resolver and Use is pressed: A is picked up. With Use still held, A's target leaves the resolver and B's
 // joins it, as the view moving on would: B becomes the best target, yet nothing picks it up while the row stays held.
 // Releasing and pressing Use again picks B up. Isolated origin (28000, -27000, -30000).
@@ -33,6 +32,8 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
     default _TimeoutSeconds = 20.0f;
 
     private const FVector k_Origin = FVector(28000.0, -27000.0, -30000.0);
+    // World item constructions and mount commits outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_InputIntents _Intents;
     private FCk_Handle_InteractionResolver _Resolver;
@@ -56,7 +57,6 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 2);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
         _Intents = utils_input_intents::Add(_Carrier);
         _Resolver = utils_interaction_resolver::Add(_Carrier, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
         Build_UseInput(InHandle);
@@ -64,21 +64,21 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         _EntityA = Spawn_Pebble(InHandle, k_Origin + FVector(150.0, -60.0, 0.0));
         _EntityB = Spawn_Pebble(InHandle, k_Origin + FVector(150.0, 60.0, 0.0));
 
-        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 5.0f);
+        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 0);
         Add_Step("bake the Use level row and swap it in", n"Step_SwapUseSet");
-        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 5.0f);
-        Add_Step_WaitUntil("both pebbles are constructed", n"Check_PebblesConstructed", 0, 10.0f);
+        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 0);
+        Add_Step_WaitUntil("both pebbles are constructed", n"Check_PebblesConstructed", k_SlowPolls, 0);
         Add_Step("compose the player's matcher and its tasks; focus both pebbles; offer A", n"Step_ComposeRig");
-        Add_Step_WaitUntil("the player reads the matcher and both pickups are Focused", n"Check_RigReady", 0, 5.0f);
+        Add_Step_WaitUntil("the player reads the matcher and both pickups are Focused", n"Check_RigReady", 0, 0);
         Add_Step("press Use", n"Step_PressUse");
-        Add_Step_WaitUntil("A is picked up", n"Check_AStowed", 0, 5.0f);
+        Add_Step_WaitUntil("A is picked up", n"Check_AStowed", k_SlowPolls, 0);
         Add_Step("Use still held: A leaves the resolver and B joins it", n"Step_MoveOnToB");
         Add_Step_WaitFrames("a carried press would have taken B by now", 20);
         Add_Step("B is the best target, but still lies in the world", n"Step_AssertBNotTaken");
         Add_Step("release Use", n"Step_ReleaseUse");
-        Add_Step_WaitUntil("the Use row releases", n"Check_UseReleased", 0, 5.0f);
+        Add_Step_WaitUntil("the Use row releases", n"Check_UseReleased", 0, 0);
         Add_Step("press Use again", n"Step_PressUse");
-        Add_Step_WaitUntil("the fresh press picks B up", n"Check_BStowed", 0, 5.0f);
+        Add_Step_WaitUntil("the fresh press picks B up", n"Check_BStowed", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 
@@ -173,7 +173,7 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         utils_intent_matcher::Request_SwapSet(_Matcher, FCk_Request_IntentMatcher_SwapSet(Baked.Get_CompiledSet()));
     }
 
-    // Stands in for the player's InteractionFocus task: without focus a pickup's HFSM never reaches Interacting.
+    // Stands in for the player's InteractionFocus task: both pebbles focused, A offered to the resolver.
     UFUNCTION()
     private void Step_ComposeRig(FCk_Handle InHandle, FInstancedStruct InPayload)
     {

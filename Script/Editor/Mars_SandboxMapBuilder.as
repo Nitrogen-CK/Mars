@@ -209,14 +209,14 @@ namespace utils_mars_sandbox
 
         if (EditorAsset::DoesAssetExist(k_MapPath))
         {
-            ck::Warning(f"[Mars.Sandbox.Build] [{k_MapPath}] already exists. Delete it first to rebuild.");
+            ck::Trace(f"[Mars.Sandbox.Build] [{k_MapPath}] already exists. Delete it first to rebuild.", NAME_None, 2.0f, FLinearColor::Yellow);
             return;
         }
 
         const FString WorldPath = World.GetPathName();
         if (WorldPath.StartsWith("/Temp/") == false)
         {
-            ck::Warning(f"[Mars.Sandbox.Build] The open level [{WorldPath}] is a saved map. Open File > New Level > Empty Level first.");
+            ck::Trace(f"[Mars.Sandbox.Build] The open level [{WorldPath}] is a saved map. Open File > New Level > Empty Level first.", NAME_None, 2.0f, FLinearColor::Yellow);
             return;
         }
 

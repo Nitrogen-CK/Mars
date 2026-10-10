@@ -27,14 +27,17 @@ struct FMars_Fry_PieceEvents
 
 // Every frame, in order: the oil's buoyancy and drag on every piece in it (wherever it is, the basket's whereabouts never
 // matter), then each live piece in admission order: its whereabouts (edges, counted in the tally), the heat of its faces
-// below the oil line while it is in the oil or on the scoop (stage edges), and its drain while it rests on the basket floor
-// inside the basket; then the lingering lost bodies age (and are destroyed at Zones.LingerSeconds), the frying time, and the
+// below the oil line while it is in the oil or on the scoop (stage edges), and its drain while it lies still inside the
+// basket (bounded by Receiver.DrainBudgetSeconds); then the lingering lost bodies age (and are destroyed at Zones.LingerSeconds), the frying time, and the
 // pieces' edges last. The skimmer moves itself (an Implement); Jolt owns every piece's pose; the kernel reads it back through
 // the entity transform and only pushes on it, and only once an adopted piece has arrived at its release. Nothing is ever
-// spawned here: pieces arrive only through AddPiece.
+// spawned here: pieces arrive only through the station's inbox. The station's take-out readout (the Drained pieces, in
+// admission order) is written after the tally.
 class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Fry_HandleRequests");
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Resting_Tick");
 
     // CkJolt steps a fixed 60 Hz at most four times per frame and drops the rest, so a frame's buoyancy impulse covers at
     // most this much simulated time: a long frame (a hitch) must not hand a piece the whole frame's worth of lift.
@@ -55,6 +58,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         Frame.RootWorld = Frame.Fry.Get_RootWorld();
         Frame.BasketWorld = Frame.Fry.Get_BasketWorld();
         Frame.ScoopWorld = Frame.Fry.Get_ScoopWorld();
+        const auto IsTornDown = utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
 
         Advance_Buoyancy(Frame, InState);
 
@@ -62,9 +66,23 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         for (int32 Index = 0; Index < InState.Pieces.Num(); ++Index)
         {
             auto Piece = InState.Pieces[Index];
-            // A lost piece only lingers; a piece whose entity is gone is going with a station torn down around it.
-            if (Piece.Whereabouts == EMars_Fry_Whereabouts::Lost || ck::Is_NOT_Valid(Piece.Entity))
+            // A lost piece only lingers.
+            if (Piece.Whereabouts == EMars_Fry_Whereabouts::Lost)
             { continue; }
+
+            // A piece whose entity is gone is going with the station torn down around it; anything else that ended a piece
+            // the kernel holds is a defect, and the entry is dropped so it is no longer counted.
+            if (ck::Is_NOT_Valid(Piece.Entity))
+            {
+                if (ck::EnsureIfNot(IsTornDown, f"[Fry] [{Frame.Fry.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} "
+                    + f"was destroyed outside the kernel while in play; its entry is dropped"))
+                {
+                    InState.Pieces.RemoveAt(Index);
+                    --Index;
+                }
+
+                continue;
+            }
 
             // An adopted piece is judged only once it is where it was released, or once it has taken too long to get there.
             if (Piece.Arriving.IsSet())
@@ -101,7 +119,21 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
 
         Advance_Lingering(Frame, InState);
         Advance_Tally(Frame, InState);
+        utils_cooking_feed::Write_Takeable(InHandle, Get_Takeable(InState));
         Broadcast_PieceEvents(Frame, Events);
+    }
+
+    // What a take-out without a named piece would hand back now.
+    private TArray<FCk_Handle_FoodPiece> Get_Takeable(const FMars_Fragment_Fry& InState) const
+    {
+        TArray<FCk_Handle_FoodPiece> Takeable;
+        for (const auto& Piece : InState.Pieces)
+        {
+            if (Piece.Drain == EMars_Fry_Drain::Drained && ck::IsValid(Piece.Entity))
+            { Takeable.Add(Piece.Piece); }
+        }
+
+        return Takeable;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -192,12 +224,11 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         {
             InPiece.Drain = EMars_Fry_Drain::NotDraining;
             InPiece.DrainSeconds = 0.0f;
+            InPiece.BasketSeconds = 0.0f;
         }
 
         if (To == EMars_Fry_Whereabouts::Lost)
         { InPiece.LingerSeconds = 0.0f; }
-
-        ck::Trace(f"[Fry] [{InFrame.Fry.ToString()}] piece {utils_cooking_feed::Get_PieceName(InPiece.Id)}: {From :n} -> {To :n} at root {Root}");
     }
 
     // A lost piece keeps simulating as a lingering body; at Zones.LingerSeconds it leaves the array and its entity is
@@ -223,7 +254,6 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
             if (ck::Is_NOT_Valid(Piece.Entity))
             { continue; }
 
-            ck::Trace(f"[Fry] [{InFrame.Fry.ToString()}] destroyed lost piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}]");
             utils_entity_lifetime::Request_DestroyEntity(Piece.Entity);
         }
     }
@@ -250,11 +280,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         { InState.Tally.Retrievals += 1; }
 
         if (To == EMars_Fry_Whereabouts::Lost)
-        {
-            InState.Tally.Lost += 1;
-            ck::Trace(f"[Fry] [{InFrame.Fry.ToString()}] lost piece {utils_cooking_feed::Get_PieceName(InEvents.Id)} "
-                + f"[{InEvents.Entity.ToString()}] (lost {InState.Tally.Lost})");
-        }
+        { InState.Tally.Lost += 1; }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -295,22 +321,33 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         }
     }
 
-    // A piece in the drain basket that rests on its floor (its Resting's grace, Receiver.SupportGraceSeconds, rides out a
-    // sleeping or a hopping contact) drains: NotDraining becomes Draining and accrues; at Receiver.DrainSeconds it is
-    // Drained, once. One in the basket but not supported holds its progress; crossing the basket's volume in the air never
-    // starts it. Leaving the basket resets it (Advance_Whereabouts).
+    // A piece inside the basket's interior drains while it lies still there, whatever it rests on (the floor, a wall, another
+    // piece): NotDraining becomes Draining and accrues; at Receiver.DrainSeconds it is Drained, once. One that moves holds its
+    // progress; crossing the basket's volume in the air never starts it. A piece that has been inside the basket
+    // Receiver.DrainBudgetSeconds without stilling that long is Drained there (traced): the operator can always take it out.
+    // Leaving the basket resets both clocks (Advance_Whereabouts).
     private void Advance_Drain(FMars_Fry_Frame& InFrame, FMars_Fry_PieceState& InPiece, FMars_Fry_PieceEvents& OutEvents)
     {
         if (InPiece.Whereabouts != EMars_Fry_Whereabouts::DrainBasket || InPiece.Drain == EMars_Fry_Drain::Drained)
         { return; }
 
-        if (Get_IsRestingOn(InPiece, InFrame.Spec.Nodes.BasketBody) == false)
-        { return; }
+        const auto& Receiver = InFrame.Spec.Receiver;
+        InPiece.BasketSeconds += InFrame.DeltaSeconds;
+        if (utils_fry::Get_IsStill(InPiece.Body))
+        {
+            InPiece.Drain = EMars_Fry_Drain::Draining;
+            InPiece.DrainSeconds += InFrame.DeltaSeconds;
+        }
 
-        InPiece.Drain = EMars_Fry_Drain::Draining;
-        InPiece.DrainSeconds += InFrame.DeltaSeconds;
-        if (InPiece.DrainSeconds < InFrame.Spec.Receiver.DrainSeconds)
-        { return; }
+        if (InPiece.DrainSeconds < Receiver.DrainSeconds)
+        {
+            if (InPiece.BasketSeconds < Receiver.DrainBudgetSeconds)
+            { return; }
+
+            ck::Trace(f"[Fry] [{InFrame.Fry.ToString()}] piece {utils_cooking_feed::Get_PieceName(InPiece.Id)} did not lie still "
+                + f"{Receiver.DrainSeconds} s within Receiver.DrainBudgetSeconds [{Receiver.DrainBudgetSeconds}] in the basket: drained there");
+            InPiece.DrainSeconds = Receiver.DrainSeconds;
+        }
 
         InPiece.Drain = EMars_Fry_Drain::Drained;
         OutEvents.Drained = true;
@@ -336,16 +373,6 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
     // Per piece, in admission order: whereabouts, face stages, drained, lost.
     private void Broadcast_PieceEvents(FMars_Fry_Frame& InFrame, const TArray<FMars_Fry_PieceEvents>& InEvents)
     {
-        for (const auto& Event : InEvents)
-        {
-            const auto PieceName = utils_cooking_feed::Get_PieceName(Event.Id);
-            for (int32 Index = 0; Index < Event.Stages.Num(); ++Index)
-            { ck::Trace(f"[Fry] [{InFrame.Fry.ToString()}] piece {PieceName} face {utils_searing::Get_FaceName(Event.StageFaces[Index])} {Event.Stages[Index] :n}"); }
-
-            if (Event.Drained)
-            { ck::Trace(f"[Fry] [{InFrame.Fry.ToString()}] piece {PieceName} drained"); }
-        }
-
         if (InFrame.Fry.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
         { return; }
 
@@ -371,7 +398,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
     private FTransform Get_RootPose(const FMars_Fry_Frame& InFrame, const FMars_Fry_PieceState& InPiece) const
     {
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(InPiece.Entity.As_Transform());
-        return utils_searing::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.RootWorld), InPiece.CentreLocal);
+        return utils_foodpiece::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.RootWorld), InPiece.CentreLocal);
     }
 
     // A piece adopted from another station has its Resting retargeted onto the scoop and the basket by a request: until that

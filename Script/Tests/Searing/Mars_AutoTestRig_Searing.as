@@ -3,8 +3,8 @@
 // triangle-mesh body on its own child node (built by utils_searing::Add_PanBody, as the station builds it). There is no
 // table or floor: a lost piece falls into the void until the kernel destroys it. The pan starts empty; the rig is the test
 // feed: Build_Pieces makes box food pieces (the FoodPiece rig's box, under the world's transient entity), parked beside the
-// station with no body, and its AddPiece helpers release them in build order with Ids {1, 0}, {1, 1}, ..., each so that
-// the piece's middle lands at a pan-local point. A test waits on Check_PiecesReady before its first admission. The box's
+// station with no body, and its AddPiece helpers release them in build order with Ids {1, 0}, {1, 1}, ..., into the
+// station's admission inbox as the feed's bridge does, each so that the piece's middle lands at a pan-local point. A test waits on Check_PiecesReady before its first admission. The box's
 // size is read from its metrics, never assumed. The handlers record every signal by piece; the steps heat the pan, add
 // pieces, look, and wait on them.
 UCLASS(Abstract)
@@ -24,6 +24,8 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     // Where built pieces wait for their release, beside the station, k_ParkPitch apart.
     protected const FVector k_ParkLocal = FVector(0.0, -300.0, 0.0);
     protected const float64 k_ParkPitch = 20.0;
+    // A poll budget, not a ceiling: the pan's mesh bakes into the simulation and the pieces import and land over seconds.
+    protected const int32 k_SlowPolls = 900;
 
     protected FCk_Handle_Searing _Searing;
     // The specs the station was built from, nodes included.
@@ -34,13 +36,13 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     protected FCk_Handle_JoltBody _PanBaseBody;
     // The station entity (the Searing's), which a test may destroy.
     protected FCk_Handle _StationEntity;
-    // The next StockIndex AddPiece hands out.
+    // The next TransferIndex AddPiece hands out.
     protected int32 _NextIndex = 0;
     // Built in order; _NextPiece is the next one a release takes.
     protected TArray<FCk_Handle_FoodPiece> _Pieces;
     protected int32 _NextPiece = 0;
 
-    // In parallel: one entry per OnPieceAdmission.
+    // In parallel: one entry per answer on the station's OnAdmission.
     protected TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
     protected TArray<EMars_CookingFeed_Admission> _Admissions;
     protected TArray<FString> _AdmissionReasons;
@@ -89,6 +91,10 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
 
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _StationEntity = StationEntity;
+        // Tracked with the pieces so it is torn down in the frame they are, as a station's own teardown ends them: left
+        // to the runner's cascade it would tick on after they are gone, and a piece gone from under a live kernel is a
+        // defect the kernel ensures on.
+        Track_ForCleanup(StationEntity);
         auto Root = utils_transform::Add(StationEntity, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
         _PanNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 100.0)));
 
@@ -100,7 +106,7 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
         _Searing = utils_searing::Add(StationEntity, _Spec);
 
         _Searing.BindTo_OnHeatChanged(FMars_Delegate_Searing_OnHeatChanged(this, n"OnHeatChanged"));
-        _Searing.BindTo_OnPieceAdmission(FMars_Delegate_Searing_OnPieceAdmission(this, n"OnPieceAdmission"));
+        utils_cooking_feed::BindTo_OnAdmission(_StationEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
         _Searing.BindTo_OnPieceAdded(FMars_Delegate_Searing_OnPieceAdded(this, n"OnPieceAdded"));
         _Searing.BindTo_OnPanContactChanged(FMars_Delegate_Searing_OnPanContactChanged(this, n"OnPanContactChanged"));
         _Searing.BindTo_OnSearProgress(FMars_Delegate_Searing_OnSearProgress(this, n"OnSearProgress"));
@@ -193,9 +199,9 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
         const auto Centre = PanBaseWorld.TransformPosition(InPanLocal);
         const auto ReleaseWorld = FTransform(Rotation, Centre - Rotation.RotateVector(Get_BoundsCenter(InPiece)));
 
-        auto Release = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector, 0);
+        auto Release = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector);
         Release.Piece = InPiece;
-        _Searing.Request_AddPiece(FMars_Request_Searing_AddPiece(Release));
+        utils_cooking_feed::Request_Admit(_StationEntity, Release);
     }
 
     // Teleports the piece's body so its middle lands at InPanLocal (pan base frame), turned by InPanRotation on top of the
@@ -247,10 +253,10 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     // Wait for the pan body and the rig's pieces, add one piece over the centre and wait for it to land.
     protected void Add_Steps_AddPieceAndLand()
     {
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("add a piece over the pan's centre", n"Step_AddPiece");
-        Add_Step_WaitUntil("the piece landed on the pan", n"Check_FirstOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("the piece landed on the pan", n"Check_FirstOnPan", k_SlowPolls, 0);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -264,7 +270,7 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     }
 
     UFUNCTION()
-    protected void OnPieceAdmission(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId,
+    protected void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId,
         EMars_CookingFeed_Admission InAdmission, FString InReason)
     {
         _AdmissionIds.Add(InPieceId);

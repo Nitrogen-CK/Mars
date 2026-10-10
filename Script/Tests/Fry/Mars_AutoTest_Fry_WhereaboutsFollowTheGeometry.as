@@ -22,6 +22,8 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
     private const float32 k_FloatSettleSeconds = 2.0f;
     private const float32 k_FloatWindowSeconds = 0.5f;
     private const float32 k_FloatBand = 1.5f;
+    // Slack past the settle and the window: the window closes on the first poll after it, on any lane.
+    private const float32 k_FloatSlackSeconds = 3.5f;
     // Seconds after the beside piece found a home in which a late Skimmer edge would still show.
     private const float32 k_BesideSettleSeconds = 0.5f;
 
@@ -45,14 +47,15 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
         BuildStation(InHandle, Spec);
         Build_Pieces(5);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("release A over the scoop, B over the oil, C below the floor, D over the basket, E over the corridor", n"Step_Release");
-        Add_Step_WaitUntil("every piece found its whereabouts", n"Check_AllHomed", 0, 4.0f);
+        Add_Step_WaitUntil("every piece found its whereabouts", n"Check_AllHomed", k_SlowPolls, 0);
         Add_Step("A caught, C and E lost, D in the basket", n"Step_AssertHomes");
-        Add_Step_WaitUntil("the oil piece floated a while and its window was sampled", n"Check_FloatSampled", 0, 6.0f);
+        Add_Step_WaitUntil("the oil piece floated a while and its window was sampled", n"Check_FloatSampled", 0,
+            k_FloatSettleSeconds + k_FloatWindowSeconds + k_FloatSlackSeconds);
         Add_Step("B floats near the predicted line; teleport A beside the bowl", n"Step_AssertFloatThenBeside");
-        Add_Step_WaitUntil("A came down beside the scoop", n"Check_BesideLanded", 0, 3.0f);
+        Add_Step_WaitUntil("A came down beside the scoop", n"Check_BesideLanded", k_SlowPolls, 0);
         Add_Step_WaitSeconds("a late catch would show", k_BesideSettleSeconds);
         Add_Step("A never read Skimmer beside the bowl; C and E stayed Lost", n"Step_AssertBeside");
         Run_Steps(InHandle);

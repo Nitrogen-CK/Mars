@@ -27,19 +27,45 @@ enum EMars_WorldItem_Persistence
 {
     // Stowing destroys the world item; a held visual / cargo visual is spawned as needed.
     Transient,
-    // The world item IS the item's body: on stow it mounts to its carrier and moves between Carried / Held / World.
+    // The world item IS the item's body: it mounts where its item lives and moves between World / Carried / Held.
     Persistent
 }
 
 // Where a Persistent world item is right now.
 enum EMars_WorldItem_Mount
 {
-    // A free Jolt body, pickable.
+    // A free Jolt body, pickable: the item is in the world item's own holder.
     World,
-    // On the carrier's CarryPoint attach point (the back), or on the point the Carry named (a station dock).
+    // On an attach point of the carrier whose inventory holds the item (the back, a cargo slot, a station dock).
     Carried,
-    // On the carrier's Hand attach point.
+    // On the Hand attach point of the carrier whose selected hotbar slot holds the item.
     Held
+}
+
+// How an item in a mounting inventory sits on that inventory's lifetime owner (FMars_Fragment_MountedInventory).
+enum EMars_WorldItem_MountRule
+{
+    // On the attach point the item names: Presentation.Mounting.CarryPoint at its CarryOffset (a hotbar slot).
+    ItemCarryPoint,
+    // On Point at the item's Presentation.Mounting.CargoOffset (a pack's cargo slot).
+    PointAtCargoOffset,
+    // On Point at Offset (a station dock).
+    PointAtOffset
+}
+
+// What the inventory a Persistent world item's item lives in says about where it belongs
+// (utils_world_item::Resolve_Target).
+enum EMars_WorldItem_Placement
+{
+    // The target names the mount.
+    Resolved,
+    // The item is gone or ending: its world item ends with it.
+    ItemGone,
+    // The inventory holding the item, or that inventory's owner, is gone or ending: the world item ends with it.
+    CarrierGone,
+    // The item sits in no inventory, in one that names no mount (FMars_Fragment_MountedInventory), or on a carrier that
+    // publishes no attach point for it.
+    Unmountable
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -48,7 +74,7 @@ enum EMars_WorldItem_Mount
 
 namespace constants_world_item
 {
-    // A pending arrival older than this is dropped unread, so a stale pose never animates a later visual.
+    // A pending arrival older than this is dropped unread, so a stale pose never animates a later visual or mount.
     const float64 k_ArriveFromMaxAgeSeconds = 0.5;
 
     // A Carried or Held body rides its carrier: against the carrier's own capsule it would shove the character every step.
@@ -56,6 +82,10 @@ namespace constants_world_item
 
     // What a world item's own body collides as when its script names nothing else.
     const FName k_DefaultBodyProfile = n"PhysicsActor";
+
+    // Passes a mount or a launch waits on a body still setting up before it goes on without it (a mount commits bodiless,
+    // a launch is dropped): a body is in the simulation within a few passes of its Add.
+    const int32 k_BodySetupBudgetPasses = 120;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -208,6 +238,94 @@ struct FMars_WorldItem_BoundsFit
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// Mounts
+//--------------------------------------------------------------------------------------------------------------------------
+
+// A mount: World (no carrier), or Carried / Held on Carrier's Point at Offset. Both what a world item is committed to and
+// what its item's inventory says it should be (utils_world_item::Resolve_Target).
+struct FMars_WorldItem_MountTarget
+{
+    UPROPERTY()
+    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::World;
+
+    UPROPERTY()
+    FCk_Handle Carrier;
+
+    UPROPERTY()
+    FGameplayTag Point;
+
+    UPROPERTY()
+    FTransform Offset;
+
+    FMars_WorldItem_MountTarget() {}
+
+    FMars_WorldItem_MountTarget(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier, FGameplayTag InPoint, const FTransform& InOffset)
+    {
+        Mount = InMount;
+        Carrier = InCarrier;
+        Point = InPoint;
+        Offset = InOffset;
+    }
+}
+
+// What Resolve_Target read from the world item's item and the inventory it lives in.
+struct FMars_WorldItem_Resolution
+{
+    UPROPERTY()
+    EMars_WorldItem_Placement Placement = EMars_WorldItem_Placement::Resolved;
+
+    UPROPERTY()
+    FMars_WorldItem_MountTarget Target;
+
+    // The inventory the item is in; invalid when it is in none.
+    UPROPERTY()
+    FCk_Handle_Inventory Inventory;
+}
+
+// How a mount arrives at its attach point: it stays where it was for DelaySeconds, then travels over Seconds with Easing. A
+// mount taken at the gloves' grip passes the grip's remaining time and the gloves' return, so the item rides the gloves
+// home (Request_ArriveNextMount). Unset = the presentation's ArriveSeconds, at once, OutCubic.
+struct FMars_WorldItem_ArriveSpec
+{
+    UPROPERTY()
+    float32 DelaySeconds = 0.0f;
+
+    UPROPERTY()
+    float32 Seconds = 0.25f;
+
+    UPROPERTY()
+    ECk_TweenEasing Easing = ECk_TweenEasing::OutCubic;
+
+    FMars_WorldItem_ArriveSpec() {}
+
+    FMars_WorldItem_ArriveSpec(float32 InDelaySeconds, float32 InSeconds, ECk_TweenEasing InEasing)
+    {
+        DelaySeconds = InDelaySeconds;
+        Seconds = InSeconds;
+        Easing = InEasing;
+    }
+}
+
+// The next mount's arrival, kept until that mount is requested; aged by the time since StampedAtSeconds and dropped past
+// constants_world_item::k_ArriveFromMaxAgeSeconds.
+struct FMars_WorldItem_PendingArrive
+{
+    UPROPERTY()
+    FMars_WorldItem_ArriveSpec Arrive;
+
+    UPROPERTY()
+    float64 StampedAtSeconds = 0.0;
+
+    FMars_WorldItem_PendingArrive() {}
+
+    FMars_WorldItem_PendingArrive(const FMars_WorldItem_ArriveSpec& InArrive, float64 InStampedAtSeconds)
+    {
+        Arrive = InArrive;
+        StampedAtSeconds = InStampedAtSeconds;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // Transient fragments (drained by the WorldItem processors)
 //--------------------------------------------------------------------------------------------------------------------------
 
@@ -220,6 +338,10 @@ struct FMars_Fragment_WorldItem_PendingLaunch
     UPROPERTY()
     FVector AngularVelocityDeg = FVector::ZeroVector;
 
+    // Passes the launch has waited on a body still setting up (constants_world_item::k_BodySetupBudgetPasses bounds them).
+    UPROPERTY()
+    int32 WaitedPasses = 0;
+
     FMars_Fragment_WorldItem_PendingLaunch() {}
 
     FMars_Fragment_WorldItem_PendingLaunch(FVector InLinearVelocity, FVector InAngularVelocityDeg)
@@ -229,22 +351,17 @@ struct FMars_Fragment_WorldItem_PendingLaunch
     }
 }
 
-// Waiting for the body to read Kinematic before the scene-node attach (SetMotionType is deferred; attaching a Dynamic
-// body's transform would fight the Jolt writeback for a frame). Overwritten by a newer Carry/Hold; removed by Release.
-// Drained by UMars_Processor_WorldItem_Mount.
+// Written by UMars_Processor_WorldItem_Reconcile, waiting for the body to read Kinematic before the scene-node attach
+// (SetMotionType is deferred; attaching a Dynamic body's transform would fight the Jolt writeback for a frame). A body that
+// failed setup, or is still setting up after constants_world_item::k_BodySetupBudgetPasses passes, is not waited for.
+// Removed by a release's World commit. Drained by UMars_Processor_WorldItem_Mount.
 struct FMars_Fragment_WorldItem_PendingMount
 {
     UPROPERTY()
-    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::World;
-
-    UPROPERTY()
-    FCk_Handle Carrier;
+    FMars_WorldItem_MountTarget Target;
 
     UPROPERTY()
     FCk_Handle_Transform Node;
-
-    UPROPERTY()
-    FTransform Offset;
 
     // Unset = the presentation's arrival. Aged at the commit by the time since RequestedAtSeconds.
     UPROPERTY()
@@ -253,13 +370,9 @@ struct FMars_Fragment_WorldItem_PendingMount
     UPROPERTY()
     float64 RequestedAtSeconds = 0.0;
 
-    FMars_Fragment_WorldItem_PendingMount() {}
-
-    FMars_Fragment_WorldItem_PendingMount(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier)
-    {
-        Mount = InMount;
-        Carrier = InCarrier;
-    }
+    // Passes the mount has waited on a body still setting up.
+    UPROPERTY()
+    int32 WaitedPasses = 0;
 }
 
 // Holds the scene-node offset at FromOffset for DelaySeconds, then drives it FromOffset -> ToOffset with Easing over
@@ -285,27 +398,22 @@ struct FMars_Fragment_WorldItem_Arrival
     ECk_TweenEasing Easing = ECk_TweenEasing::OutCubic;
 }
 
-// How a Carry or Hold arrives at its mount: it stays where it was for DelaySeconds, then travels over Seconds with Easing.
-// A mount taken at the gloves' grip passes the grip's remaining time and the gloves' return, so the item rides the gloves
-// home. Unset on a request = the presentation's ArriveSeconds, at once, OutCubic.
-struct FMars_WorldItem_ArriveSpec
+// A release whose transfer back into the holder has not answered yet: the launch its World commit applies. Added by the
+// Release drain, removed by the transfer's answer (UMars_Processor_WorldItem_HandleRequests).
+struct FMars_Fragment_WorldItem_PendingRelease
 {
     UPROPERTY()
-    float32 DelaySeconds = 0.0f;
+    FVector LinearVelocity = FVector::ZeroVector;
 
     UPROPERTY()
-    float32 Seconds = 0.25f;
+    FVector AngularVelocityDeg = FVector::ZeroVector;
 
-    UPROPERTY()
-    ECk_TweenEasing Easing = ECk_TweenEasing::OutCubic;
+    FMars_Fragment_WorldItem_PendingRelease() {}
 
-    FMars_WorldItem_ArriveSpec() {}
-
-    FMars_WorldItem_ArriveSpec(float32 InDelaySeconds, float32 InSeconds, ECk_TweenEasing InEasing)
+    FMars_Fragment_WorldItem_PendingRelease(FVector InLinearVelocity, FVector InAngularVelocityDeg)
     {
-        DelaySeconds = InDelaySeconds;
-        Seconds = InSeconds;
-        Easing = InEasing;
+        LinearVelocity = InLinearVelocity;
+        AngularVelocityDeg = InAngularVelocityDeg;
     }
 }
 
@@ -424,7 +532,8 @@ struct FMars_Fragment_WorldItem_Params
 //--------------------------------------------------------------------------------------------------------------------------
 
 // World mode owns a capacity-1 holder and the item entity lives inside it, so pickup and drop are entity-preserving
-// transfers. Every handle is invalid in Visual mode.
+// transfers. Every handle is invalid in Visual mode. Written by utils_world_item::Add / Add_Item and the WorldItem
+// processors.
 struct FMars_Fragment_WorldItem
 {
     UPROPERTY()
@@ -436,8 +545,8 @@ struct FMars_Fragment_WorldItem
     UPROPERTY()
     FCk_Handle_JoltBody Body;
 
-    // The profile Body was built with; a Carry or Hold swaps it for constants_world_item::k_MountedBodyProfile and a
-    // Release restores it.
+    // The profile Body was built with; a mount swaps it for constants_world_item::k_MountedBodyProfile and a release
+    // restores it.
     UPROPERTY()
     FName BodyProfile = constants_world_item::k_DefaultBodyProfile;
 
@@ -450,24 +559,63 @@ struct FMars_Fragment_WorldItem
     UPROPERTY()
     FMars_WorldItem_BoundsFit BoundsFit;
 
-    // Persistent only; always World for a Transient item.
+    // Persistent only: the item this world item is the body of, linked once its holder seeded or adopted it
+    // (utils_world_item::Add_Item). Unset before then, and always for a Transient or Visual-mode world item.
     UPROPERTY()
-    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::World;
+    TOptional<FCk_Handle_Item> Item;
 
-    // Valid while Carried / Held.
+    // The committed mount. Always World for a Transient item.
     UPROPERTY()
-    FCk_Handle Carrier;
+    FMars_WorldItem_MountTarget Committed;
+
+    // How the next mount arrives (Request_ArriveNextMount); taken by the reconcile's next mount request.
+    UPROPERTY()
+    TOptional<FMars_WorldItem_PendingArrive> NextArrive;
+
+    // The inventory the reconcile last reported as naming no mount for the item: it ensures once per placement.
+    UPROPERTY()
+    TOptional<FCk_Handle_Inventory> ReportedUnmountedIn;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Item-side marker (on the ITEM entity, not the world item)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Stamped once by a Persistent world item on its item at seed/adopt; lives as long as the item.
+// Stamped once by utils_world_item::Add_Item on a Persistent world item's item; lives as long as the item.
 struct FMars_Fragment_Item_PersistentWorldItem
 {
     UPROPERTY()
     FCk_Handle_WorldItem WorldItem;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Inventory-side marker (on an INVENTORY entity: its items mount on its lifetime owner)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Stamped by whoever composes an inventory whose Persistent items ride its lifetime owner (the carrier), which publishes
+// the attach point (utils_world_item::Add_MountedInventory): the hotbar's slots, a pack's cargo slots, a station's docks.
+// An inventory without it holds no Persistent item but its world item's own holder.
+struct FMars_Fragment_MountedInventory
+{
+    UPROPERTY()
+    EMars_WorldItem_MountRule Rule = EMars_WorldItem_MountRule::ItemCarryPoint;
+
+    // PointAtCargoOffset and PointAtOffset only.
+    UPROPERTY()
+    FGameplayTag Point;
+
+    // PointAtOffset only.
+    UPROPERTY()
+    FTransform Offset;
+
+    FMars_Fragment_MountedInventory() {}
+
+    FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule InRule, FGameplayTag InPoint, const FTransform& InOffset)
+    {
+        Rule = InRule;
+        Point = InPoint;
+        Offset = InOffset;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -477,118 +625,58 @@ struct FMars_Fragment_Item_PersistentWorldItem
 delegate void FMars_Delegate_WorldItem_OnMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew);
 event void FMars_Delegate_WorldItem_OnMountChanged_MC(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew);
 
+// The world item came to rest on its committed mount (Get_IsSettled): the end of a mount's arrival, a mount committed
+// without travel, or a release's World commit. Once per commit.
+delegate void FMars_Delegate_WorldItem_OnMountSettled(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InMount, FCk_Handle InCarrier);
+event void FMars_Delegate_WorldItem_OnMountSettled_MC(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InMount, FCk_Handle InCarrier);
+
+// Why a Release left the world item where it was (OnReleaseRefused).
+enum EMars_WorldItem_ReleaseRefusal
+{
+    // Not a Persistent world item linked to its item and mounted (Carried or Held).
+    NotMounted,
+    // Its last release has not answered yet.
+    InFlight,
+    // Its item is in no inventory but its own holder.
+    NotAway,
+    // The transfer back into its holder failed: it stays mounted.
+    TransferFailed
+}
+
+// A Release that changed nothing: the world item stays on its mount. The answer to every release that does not end in the
+// World commit (OnMountSettled with World).
+delegate void FMars_Delegate_WorldItem_OnReleaseRefused(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_ReleaseRefusal InReason);
+event void FMars_Delegate_WorldItem_OnReleaseRefused_MC(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_ReleaseRefusal InReason);
+
 struct FMars_Fragment_WorldItem_Signals
 {
     FMars_Delegate_WorldItem_OnMountChanged_MC OnMountChanged;
+    FMars_Delegate_WorldItem_OnMountSettled_MC OnMountSettled;
+    FMars_Delegate_WorldItem_OnReleaseRefused_MC OnReleaseRefused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests (Persistent items only)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// World | Held -> Carried. Unset Point / Offset = the definition's CarryPoint / CarryOffset (the carrier's back, the hand);
-// set, the carrier publishes Point and the item mounts there at Offset (a station dock). Arrive (set after the ctor):
-// see FMars_WorldItem_ArriveSpec.
-struct FMars_Request_WorldItem_Carry
+// The next mount (wherever the item goes next) arrives this way: a pickup or a take at the gloves' grip rides them home.
+struct FMars_Request_WorldItem_ArriveNextMount
 {
     UPROPERTY()
-    FCk_Handle Carrier;
+    FMars_WorldItem_ArriveSpec Arrive;
 
-    UPROPERTY()
-    TOptional<FGameplayTag> Point;
+    FMars_Request_WorldItem_ArriveNextMount() {}
 
-    UPROPERTY()
-    TOptional<FTransform> Offset;
-
-    UPROPERTY()
-    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
-
-    FMars_Request_WorldItem_Carry() {}
-
-    FMars_Request_WorldItem_Carry(const FCk_Handle& InCarrier)
+    FMars_Request_WorldItem_ArriveNextMount(const FMars_WorldItem_ArriveSpec& InArrive)
     {
-        Carrier = InCarrier;
-    }
-
-    FMars_Request_WorldItem_Carry(const FCk_Handle& InCarrier, FGameplayTag InPoint, const FTransform& InOffset)
-    {
-        Carrier = InCarrier;
-        Point = TOptional<FGameplayTag>(InPoint);
-        Offset = TOptional<FTransform>(InOffset);
+        Arrive = InArrive;
     }
 }
 
-// What a Carry names instead of the definition's CarryPoint / CarryOffset; unset fields fall back to the definition. A
-// Hold never overrides.
-struct FMars_WorldItem_MountOverride
-{
-    UPROPERTY()
-    TOptional<FGameplayTag> Point;
-
-    UPROPERTY()
-    TOptional<FTransform> Offset;
-
-    FMars_WorldItem_MountOverride() {}
-
-    FMars_WorldItem_MountOverride(TOptional<FGameplayTag> InPoint, TOptional<FTransform> InOffset)
-    {
-        Point = InPoint;
-        Offset = InOffset;
-    }
-}
-
-// What a Carry or Hold asks for before its attach node and offset are resolved (the drain's input, never a fragment).
-struct FMars_WorldItem_MountRequest
-{
-    UPROPERTY()
-    EMars_WorldItem_Mount Mount = EMars_WorldItem_Mount::Carried;
-
-    UPROPERTY()
-    FCk_Handle Carrier;
-
-    UPROPERTY()
-    FMars_WorldItem_MountOverride Override;
-
-    UPROPERTY()
-    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
-
-    FMars_WorldItem_MountRequest() {}
-
-    FMars_WorldItem_MountRequest(EMars_WorldItem_Mount InMount, const FCk_Handle& InCarrier, const FMars_WorldItem_MountOverride& InOverride)
-    {
-        Mount = InMount;
-        Carrier = InCarrier;
-        Override = InOverride;
-    }
-}
-
-// Carried -> Held. Arrive (set after the ctor): see FMars_WorldItem_ArriveSpec.
-struct FMars_Request_WorldItem_Hold
-{
-    UPROPERTY()
-    FCk_Handle Carrier;
-
-    UPROPERTY()
-    TOptional<FMars_WorldItem_ArriveSpec> Arrive;
-
-    FMars_Request_WorldItem_Hold() {}
-
-    FMars_Request_WorldItem_Hold(const FCk_Handle& InCarrier)
-    {
-        Carrier = InCarrier;
-    }
-}
-
-// Carried | Held -> World: the item is transferred from SourceInventory back into the world item's holder and the body
-// is launched.
+// Carried | Held -> World: the item is transferred from whatever inventory holds it back into the world item's holder, and
+// once that transfer answers, the body is launched with these velocities.
 struct FMars_Request_WorldItem_Release
 {
-    UPROPERTY()
-    FCk_Handle_Item Item;
-
-    UPROPERTY()
-    FCk_Handle_Inventory SourceInventory;
-
     UPROPERTY()
     FVector LinearVelocity = FVector::ZeroVector;
 
@@ -597,26 +685,18 @@ struct FMars_Request_WorldItem_Release
 
     FMars_Request_WorldItem_Release() {}
 
-    FMars_Request_WorldItem_Release(const FCk_Handle_Item& InItem,
-                                    const FCk_Handle_Inventory& InSourceInventory,
-                                    FVector InLinearVelocity,
-                                    FVector InAngularVelocityDeg)
+    FMars_Request_WorldItem_Release(FVector InLinearVelocity, FVector InAngularVelocityDeg)
     {
-        Item = InItem;
-        SourceInventory = InSourceInventory;
         LinearVelocity = InLinearVelocity;
         AngularVelocityDeg = InAngularVelocityDeg;
     }
 }
 
-// Drain order Carry -> Hold -> Release (see UMars_Processor_WorldItem_HandleRequests).
+// Drain order ArriveNextMount -> Release (see UMars_Processor_WorldItem_HandleRequests).
 struct FMars_Fragment_WorldItem_Requests
 {
     UPROPERTY()
-    TArray<FMars_Request_WorldItem_Carry> CarryRequests;
-
-    UPROPERTY()
-    TArray<FMars_Request_WorldItem_Hold> HoldRequests;
+    TArray<FMars_Request_WorldItem_ArriveNextMount> ArriveNextMountRequests;
 
     UPROPERTY()
     TArray<FMars_Request_WorldItem_Release> ReleaseRequests;

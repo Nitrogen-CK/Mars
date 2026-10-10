@@ -29,7 +29,7 @@ class UMars_AutoTest_Forage_CenserSpillsPerHitThenRefills : UMars_AutoTestRig_Fo
         Add_Step("hit 3", n"Step_Hit");
         Add_Step_WaitUntil("three handfuls, exhausted, zone disabled", n"Check_ExhaustedAndDisabled");
         Add_Step("hit 4 while empty", n"Step_Hit");
-        Add_Step_WaitUntil("refilled", n"Check_Replenished", 0, 3.0f);
+        Add_Step_WaitUntil("refilled", n"Check_Replenished", k_SlowPolls, 0);
         Add_Step("the empty hit spilled nothing", n"Step_AssertNoFourthSpill");
         Add_Step_WaitUntil("zone enabled again", n"Check_ZoneEnabled");
         Add_Step("hit 5", n"Step_Hit");

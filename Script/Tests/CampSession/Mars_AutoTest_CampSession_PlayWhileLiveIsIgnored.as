@@ -16,7 +16,7 @@ class UMars_AutoTest_CampSession_PlayWhileLiveIsIgnored : UCk_AutoTest_Base
         _Session.BindTo_OnPhaseChanged(FMars_Delegate_CampSession_OnPhaseChanged(this, n"OnPhaseChanged"));
 
         Add_Step("request Play", n"Step_RequestPlay");
-        Add_Step_WaitUntil("OnPhaseChanged fired once", n"Check_BroadcastOnce", 0, 5.0f);
+        Add_Step_WaitUntil("OnPhaseChanged fired once", n"Check_BroadcastOnce", 0, 0);
         Add_Step("the broadcast carried Lobby -> Live", n"Step_AssertLobbyToLive");
         Add_Step("request Play again while Live", n"Step_RequestPlay");
         Add_Step_WaitSeconds("second play window", 0.5f);

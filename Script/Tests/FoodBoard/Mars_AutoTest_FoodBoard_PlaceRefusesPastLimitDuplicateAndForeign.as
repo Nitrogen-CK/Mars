@@ -1,7 +1,6 @@
 // Place refuses, without deferring, a piece past MaxHeldPieces (Full), one the board already holds (AlreadyHeld, within the
 // very drain that placed it), one another board holds (HeldElsewhere) and one destroyed before the drain (Gone). Accepted
-// pieces are held in request order and stamped with their board; a placement onto an empty board leaves it untouched, one
-// onto a board already holding a piece does not.
+// pieces are held in request order and stamped with their board.
 class UMars_AutoTest_FoodBoard_PlaceRefusesPastLimitDuplicateAndForeign : UMars_AutoTestRig_FoodBoard
 {
     private FCk_Handle_FoodBoard _BoardA;
@@ -100,9 +99,6 @@ class UMars_AutoTest_FoodBoard_PlaceRefusesPastLimitDuplicateAndForeign : UMars_
         Assert_True(_P1.TryGet_FoodBoard() == _BoardA && _P2.TryGet_FoodBoard() == _BoardA, "board A's pieces carry board A");
         Assert_True(_P4.TryGet_FoodBoard() == _BoardB, "board B's piece carries board B");
         Assert_True(ck::Is_NOT_Valid(_P3.TryGet_FoodBoard()), "the refused piece carries no board");
-
-        Assert_False(_BoardA.Get_IsUntouched(), "a placement onto a board already holding a piece touches it");
-        Assert_True(_BoardB.Get_IsUntouched(), "a placement onto an empty board leaves it untouched");
     }
 
     private TArray<FCk_Handle_FoodPiece> Pieces(FCk_Handle_FoodPiece InFirst, FCk_Handle_FoodPiece InSecond) const

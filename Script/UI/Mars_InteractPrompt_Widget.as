@@ -42,7 +42,6 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
 
         Set_Prompt(InPrompt.Get_DisplayText(), InputAction, InPrompt.Get_DisplayTextColor());
         Report_MissingIcon(PromptIcon, InputAction);
-        Show_Progress(InPrompt.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::Instant);
 
         auto Interaction = InPrompt.Get_CurrentInteraction();
         auto TimeAttribute = ck::IsValid(Interaction)
@@ -59,6 +58,10 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext)
             && Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted)
         { Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked); }
+
+        // A bar fills only for a timed hold or a pulled control: a WhileLive target is ManuallyCompleted too, and
+        // nothing would fill it.
+        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed || ck::IsValid(Control));
 
         if (ck::IsValid(Control))
         { ListenForManipulation(Control); }

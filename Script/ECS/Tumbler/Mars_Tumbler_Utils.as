@@ -22,12 +22,16 @@ namespace utils_tumbler
     const float64 k_BaffleThickness = 1.5;
     // A reseated piece's lowest face starts this far above the shell's floor.
     const float32 k_ReseatLift = 1.0f;
+    // A reseated piece goes back in line with where it escaped along the axle, at most this fraction of the baffles' half
+    // length from the middle.
+    const float32 k_ReseatAxialFraction = 0.8f;
 
-    // Composes the minigame on InStation (the station entity, which carries the root transform). The spec's Nodes are built
-    // by the caller (the shell with Add_DrumBodies, the hatch plate with Add_HatchBody): the hand starts Free at the
-    // workspace centre, the hatch and the drum in whatever state their Movers are in. Nothing is in the drum until the first
-    // AddPiece. A rejected spec, a missing node, a lever that is not a ManuallyCompleted Control with a Mover, or a hand node
-    // not on the station root ensures and returns an invalid handle.
+    // Composes the minigame on InStation (the station entity, which carries the root transform) and makes the station a
+    // receiver: its admission inbox and its take-out readout. The spec's Nodes are built by the caller (the shell with
+    // Add_DrumBodies, the hatch plate with Add_HatchBody): the hand starts Free at the workspace centre, the hatch and the
+    // drum in whatever state their Movers are in. Nothing is in the drum until the inbox brings a piece. A rejected spec, a
+    // missing node, a lever that is not a ManuallyCompleted Control with a Mover, or a hand node not on the station root
+    // ensures and returns an invalid handle.
     FCk_Handle_Tumbler Add(FCk_Handle& InStation, FMars_Tumbler_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -70,8 +74,11 @@ namespace utils_tumbler
         State.Drum = Get_DrumAtRest(Drum) ? EMars_Tumbler_Drum::Home : EMars_Tumbler_Drum::Returning;
         State.DrumDegrees = Drum.Get_Alpha() * InSpec.Drum.ArcDegrees;
         InStation.Add_Fragment(State);
+        // The first drain arms the station's queue watch.
+        InStation.Add_Fragment(FMars_Fragment_Tumbler_Requests());
+        utils_cooking_feed::Add_Admission(InStation);
+        utils_cooking_feed::Add_TakeOut(InStation);
 
-        ck::Trace(f"[Tumbler] [{InStation.ToString()}] composed: hatch {State.Hatch :n}, drum {State.Drum :n}, capacity {InSpec.Drum.Capacity}");
         return InStation.As_Tumbler();
     }
 
@@ -123,8 +130,6 @@ namespace utils_tumbler
         for (int32 Index = 0; Index < Shell.Baffles.Count; ++Index)
         { Add_ShellPart(Parent, Get_RingPose(Get_BaffleDegrees(InSpec, Index), BaffleRadius), Baffle); }
 
-        ck::Trace(f"[Tumbler] [{InAxle.ToString()}] shell built: {Shell.PanelCount} panels, {Shell.Baffles.Count} baffles, gap "
-            + f"{Shell.Gap.CentreDegrees :.1} +/- {Shell.Gap.HalfDegrees :.1} degrees");
         return FirstPanel;
     }
 
@@ -204,24 +209,19 @@ namespace utils_tumbler
         return float32(GapEnd + (float64(InIndex) + 0.5) * Get_ClosedArcDegrees(InSpec) / float64(Shell.Baffles.Count));
     }
 
-    // Where an escaped piece in InSlot is put back, from the axle in the station frame: in its lane along the axle, its
-    // lowest face just above the shell's floor at the drum's world bottom.
-    FVector Get_ReseatOffset(int32 InSlot, const FMars_Tumbler_Spec& InSpec)
+    // Where an escaped piece is put back, from the axle in the station frame: in line with InAxialCm (where it escaped along
+    // the axle, clamped inside the baffles), its lowest face just above the shell's floor at the drum's world bottom.
+    FVector Get_ReseatOffset(float64 InAxialCm, const FMars_Tumbler_Spec& InSpec)
     {
         const auto Depth = InSpec.Drum.InnerRadius - InSpec.Piece.HalfSize - k_ReseatLift;
-        return FVector(0.0, float64(Get_AxialCm(InSlot, InSpec.Drum.HalfLength)), -float64(Depth));
+        const auto MaxAxial = float64(InSpec.Drum.HalfLength * k_ReseatAxialFraction);
+        return FVector(0.0, Math::Clamp(InAxialCm, -MaxAxial, MaxAxial), -float64(Depth));
     }
 
     // The cursor's point on the reach plane, station frame.
     FVector Get_PlanePoint(const FMars_Tumbler_HandSpec& InHand, FVector2D InCursor)
     {
         return InHand.WorkspaceCentreLocal + FVector(0.0, InCursor.X, InCursor.Y);
-    }
-
-    // Three lanes along the axle, by slot.
-    float32 Get_AxialCm(int32 InSlot, float32 InHalfLength)
-    {
-        return float32(Get_Wrapped(InSlot, 3) - 1) * InHalfLength * 0.8f;
     }
 
     // The free right hand (station frame): fingers toward the station (+X), palm down over the reach plane.
@@ -248,6 +248,48 @@ namespace utils_tumbler
         return -1;
     }
 
+    // The index of the piece record holding InPiece; -1 = none.
+    int32 Find_PieceIndexByHandle(const TArray<FMars_Tumbler_PieceState>& InPieces, const FCk_Handle_FoodPiece& InPiece)
+    {
+        for (int32 Index = 0; Index < InPieces.Num(); ++Index)
+        {
+            if (InPieces[Index].Piece == InPiece)
+            { return Index; }
+        }
+
+        return -1;
+    }
+
+    // A piece arrives with the crumb an earlier tumble wrote into its cook state: its coverage starts there.
+    float32 Get_SeedCoverage(const FCk_Handle_FoodPiece& InPiece)
+    {
+        return Math::Clamp(InPiece.Get_CookState().Crumb, 0.0f, 1.0f);
+    }
+
+    // What a take-out would hand back now: every piece whose coverage has reached InCoating.TakeOutCoverage, in admission
+    // order.
+    TArray<FCk_Handle_FoodPiece> Get_Takeable(const TArray<FMars_Tumbler_PieceState>& InPieces, const FMars_Tumbler_CoatingSpec& InCoating)
+    {
+        TArray<FCk_Handle_FoodPiece> Takeable;
+        for (const auto& Piece : InPieces)
+        {
+            if (ck::IsValid(Piece.Piece) && Piece.Coverage >= InCoating.TakeOutCoverage)
+            { Takeable.Add(Piece.Piece); }
+        }
+
+        return Takeable;
+    }
+
+    // The station's feed's phase (Idle without a feed): anything but Idle is a transfer in flight.
+    EMars_CookingFeed_Phase Get_FeedPhase(const FCk_Handle& InStation)
+    {
+        const auto Feed = InStation.As_CookingFeed(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Feed))
+        { return EMars_CookingFeed_Phase::Idle; }
+
+        return Feed.Get_Phase();
+    }
+
     // The hatch state its Mover shows: resting at a pose, or moving toward one.
     EMars_Tumbler_Hatch Get_HatchFromMover(const FCk_Handle_Mover& InHatch)
     {
@@ -264,26 +306,26 @@ namespace utils_tumbler
         return InDrum.Get_IsResting() && InDrum.Get_Target() == EMars_Mover_Pose::Start;
     }
 
-    // The hatch toggles only at home, settled, with a free hand, and not shut on a piece in flight.
-    bool Get_CanToggleHatch(const FMars_Fragment_Tumbler& InState)
+    // The hatch toggles only at home, settled, with a free hand, and not shut on a piece in flight (InFeedPhase not Idle).
+    bool Get_CanToggleHatch(const FMars_Fragment_Tumbler& InState, EMars_CookingFeed_Phase InFeedPhase)
     {
         const auto Settled = InState.Hatch == EMars_Tumbler_Hatch::Closed || InState.Hatch == EMars_Tumbler_Hatch::Open;
-        const auto ClosingOnTransfer = InState.Hatch == EMars_Tumbler_Hatch::Open && InState.Loading == EMars_Tumbler_Loading::InFlight;
+        const auto ClosingOnTransfer = InState.Hatch == EMars_Tumbler_Hatch::Open && InFeedPhase != EMars_CookingFeed_Phase::Idle;
         return InState.Drum == EMars_Tumbler_Drum::Home && Settled && ClosingOnTransfer == false
             && InState.Hand.Mode == EMars_Tumbler_HandMode::Free;
     }
 
     // A regrip while Returning is allowed: BeginManipulation scrubs from the current alpha.
-    bool Get_CanGrip(const FMars_Fragment_Tumbler& InState)
+    bool Get_CanGrip(const FMars_Fragment_Tumbler& InState, EMars_CookingFeed_Phase InFeedPhase)
     {
-        return InState.Hatch == EMars_Tumbler_Hatch::Closed && InState.Loading == EMars_Tumbler_Loading::Idle
+        return InState.Hatch == EMars_Tumbler_Hatch::Closed && InFeedPhase == EMars_CookingFeed_Phase::Idle
             && InState.Hand.Mode == EMars_Tumbler_HandMode::Free;
     }
 
-    bool Get_CanLoad(const FMars_Fragment_Tumbler& InState, int32 InCapacity)
+    bool Get_CanLoad(const FMars_Fragment_Tumbler& InState, EMars_CookingFeed_Phase InFeedPhase, int32 InCapacity)
     {
         return InState.Hatch == EMars_Tumbler_Hatch::Open && InState.Drum == EMars_Tumbler_Drum::Home
-            && InState.Loading == EMars_Tumbler_Loading::Idle && InState.Pieces.Num() < InCapacity;
+            && InFeedPhase == EMars_CookingFeed_Phase::Idle && InState.Pieces.Num() < InCapacity;
     }
 
     // Why a hatch press is refused; only meaningful when Get_CanToggleHatch is false.
@@ -314,15 +356,6 @@ namespace utils_tumbler
         { return EMars_Tumbler_Refusal::HatchOpen; }
 
         return EMars_Tumbler_Refusal::LoadingInFlight;
-    }
-
-    // InValue wrapped into [0, InCount): a slot index past the capacity reuses the lanes.
-    int32 Get_Wrapped(int32 InValue, int32 InCount)
-    {
-        if (InCount <= 0)
-        { return 0; }
-
-        return ((InValue % InCount) + InCount) % InCount;
     }
 
     // A part's pose on the ring (drum frame): at InDegrees on the circle of InRadius, pitched by the same angle so its local
@@ -404,11 +437,6 @@ mixin EMars_Tumbler_Drum Get_Drum(const FCk_Handle_Tumbler& Self)
     return Self.Get_Fragment(FMars_Fragment_Tumbler).Drum;
 }
 
-mixin EMars_Tumbler_Loading Get_Loading(const FCk_Handle_Tumbler& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Tumbler).Loading;
-}
-
 mixin float32 Get_DrumDegrees(const FCk_Handle_Tumbler& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Tumbler).DrumDegrees;
@@ -427,17 +455,17 @@ mixin int32 Get_Reseats(const FCk_Handle_Tumbler& Self)
 
 mixin bool Get_CanToggleHatch(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::Get_CanToggleHatch(Self.Get_Fragment(FMars_Fragment_Tumbler));
+    return utils_tumbler::Get_CanToggleHatch(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self));
 }
 
 mixin bool Get_CanGrip(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::Get_CanGrip(Self.Get_Fragment(FMars_Fragment_Tumbler));
+    return utils_tumbler::Get_CanGrip(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self));
 }
 
 mixin bool Get_CanLoad(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::Get_CanLoad(Self.Get_Fragment(FMars_Fragment_Tumbler), Self.Get_Spec().Drum.Capacity);
+    return utils_tumbler::Get_CanLoad(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self), Self.Get_Spec().Drum.Capacity);
 }
 
 // The station root's world transform (the station frame).
@@ -488,9 +516,18 @@ mixin float32 Get_PieceCoverage(const FCk_Handle_Tumbler& Self, const FMars_Cook
     return Self.Get_PieceState(InPieceId).Coverage;
 }
 
-mixin int32 Get_PiecePresetIndex(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
+mixin FCk_Handle_FoodPiece Get_PieceHandle(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
-    return Self.Get_PieceState(InPieceId).PresetIndex;
+    return Self.Get_PieceState(InPieceId).Piece;
+}
+
+// The piece's cook state as a take-out would hand it back now: its coverage so far as its crumb.
+mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto Piece = Self.Get_PieceState(InPieceId);
+    auto CookState = Piece.Piece.Get_CookState();
+    CookState.Crumb = Piece.Coverage;
+    return CookState;
 }
 
 mixin FCk_Handle Get_PieceEntity(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
@@ -529,16 +566,10 @@ mixin void Request_Cancel(FCk_Handle_Tumbler& Self, const FMars_Request_Tumbler_
     Requests.CancelRequests.Add(InRequest);
 }
 
-mixin void Request_SetLoading(FCk_Handle_Tumbler& Self, const FMars_Request_Tumbler_SetLoading& InRequest)
+mixin void Request_Readopt(FCk_Handle_Tumbler& Self, const FMars_Request_Tumbler_Readopt& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Tumbler_Requests);
-    Requests.SetLoadingRequests.Add(InRequest);
-}
-
-mixin void Request_AddPiece(FCk_Handle_Tumbler& Self, const FMars_Request_Tumbler_AddPiece& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Tumbler_Requests);
-    Requests.AddPieceRequests.Add(InRequest);
+    Requests.ReadoptRequests.Add(InRequest);
 }
 
 mixin void Request_Press(FCk_Handle_Tumbler& Self, const FMars_Request_Tumbler_Press& InRequest)
@@ -633,18 +664,32 @@ mixin void UnbindFrom_OnPressRefused(FCk_Handle_Tumbler& Self, FMars_Delegate_Tu
     Self.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnPressRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
-mixin void BindTo_OnPieceAdmission(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnPieceAdmission InDelegate)
+mixin void BindTo_OnPieceTakenOut(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnPieceTakenOut InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Tumbler_Signals);
-    Fragment.OnPieceAdmission.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    Fragment.OnPieceTakenOut.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
-mixin void UnbindFrom_OnPieceAdmission(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnPieceAdmission InDelegate)
+mixin void UnbindFrom_OnPieceTakenOut(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnPieceTakenOut InDelegate)
 {
     if (Self.Has_Fragment(FMars_Fragment_Tumbler_Signals) == false)
     { return; }
 
-    Self.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnPieceAdmission.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+    Self.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnPieceTakenOut.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTakeOutRefused(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnTakeOutRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Tumbler_Signals);
+    Fragment.OnTakeOutRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTakeOutRefused(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnTakeOutRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Tumbler_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnTakeOutRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnPieceAdded(FCk_Handle_Tumbler& Self, FMars_Delegate_Tumbler_OnPieceAdded InDelegate)

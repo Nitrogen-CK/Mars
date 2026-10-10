@@ -38,17 +38,17 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
         {
             Add_Step(f"teleport face {utils_searing::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
             Add_Step_WaitFrames("the teleport is applied and written back", 4);
-            Add_Step_WaitUntil("the piece is on the pan", n"Check_FirstOnPan", 0, 2.0f);
+            Add_Step_WaitUntil("the piece is on the pan", n"Check_FirstOnPan", k_SlowPolls, 0);
             Add_Step("the teleported face is the one on the pan", n"Step_AssertDownFace");
-            Add_Step_WaitUntil("that face seared", n"Check_CurrentFaceSeared", 0, 2.0f);
+            Add_Step_WaitUntil("that face seared", n"Check_CurrentFaceSeared", 0, 0);
         }
 
-        Add_Step_WaitUntil("the piece is ready", n"Check_Ready1", 0, 0.5f);
+        Add_Step_WaitUntil("the piece is ready", n"Check_Ready1", 0, 0);
         Add_Step("six faces seared and the piece is ready once", n"Step_AssertReady");
         Add_Step_WaitSeconds("the ready piece sits on the hot pan", k_InertSeconds);
         Add_Step("the ready piece is inert; add a second piece", n"Step_AssertInertAndAddSecond");
-        Add_Step_WaitUntil("the second piece landed on the pan", n"Check_SecondOnPan", 0, 3.0f);
-        Add_Step_WaitUntil("the second piece's down face seared", n"Check_SecondDownFaceSeared", 0, 2.0f);
+        Add_Step_WaitUntil("the second piece landed on the pan", n"Check_SecondOnPan", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the second piece's down face seared", n"Check_SecondDownFaceSeared", 0, 0);
         Add_Step("the second piece cooked beside the ready one", n"Step_AssertSecondCooked");
         Run_Steps(InHandle);
     }

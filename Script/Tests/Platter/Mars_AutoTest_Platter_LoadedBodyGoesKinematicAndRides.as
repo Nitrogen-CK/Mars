@@ -4,6 +4,8 @@
 class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -13000.0, -30000.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_Platter _Platter;
     private FCk_Handle_FoodPiece _P;
@@ -20,7 +22,7 @@ class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig
         Add_Step("give P a dynamic body", n"Step_GiveBody");
         Add_Step_WaitUntil("P's body is added", n"Check_BodyAdded");
         Add_Step("load P", n"Step_Load");
-        Add_Step_WaitUntil("P landed", n"Check_Landed");
+        Add_Step_WaitUntil("P landed", n"Check_Landed", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("P landed kinematic; move the platter 150 cm along X", n"Step_AssertLandedAndMove");
         Add_Step_WaitFrames("the move lands and P follows", 2);

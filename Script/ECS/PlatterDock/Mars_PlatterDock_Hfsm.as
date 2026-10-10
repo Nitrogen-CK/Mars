@@ -15,12 +15,12 @@ class UMars_SmState_PlatterDock_Interact : UMars_SmState_InteractTarget_RunTask
 
 // Re-evaluates Get_ActionFor for the initiator and moves the platter at the Grip of the initiator's gloves
 // (UMars_SmTask_ActAtGrip): a Place is a Place reach that sets the held platter down over the dock's node
-// (utils_platter_dock::Request_PlaceHeldPlatter), and the Dock is requested at its Grip, so the dock's Carry takes the tray
-// from where the gloves hold it; a Take waits for the gloves to close on the dock, then requests the Undock. Without gloves
-// both act at once. The task then runs until the dock reports the platter docked or undocked, or that the dock was
-// refused. No arrival to hand over: a Persistent world item's mount lerps on its own. PlaceFood succeeds at once
-// (UMars_SmTask_PlaceHeldFood places the food). A Blocked_ action fails with a warning: the prompt processor disables the
-// target for it, but can lag the initiator's hands by a frame.
+// (utils_platter_dock::Request_PlaceHeldPlatter), and the Dock is requested at its Grip, so the platter mounts on the dock
+// from where the gloves hold it; a Take waits for the gloves to close on the dock, then requests the Undock, its next
+// mount riding the gloves home. Without gloves both act at once. The task then runs until the dock reports the platter
+// docked or undocked, or that the dock or the undock was refused (the task fails).
+// PlaceFood succeeds at once (UMars_SmTask_PlaceHeldFood places the food). A Blocked_ action fails (ActionBlocked): the
+// prompt processor disables the target for it, but can lag the initiator's hands by a frame.
 class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
 {
     private FCk_Handle_PlatterDock _Dock;
@@ -89,7 +89,7 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
             return;
         }
 
-        DoFail(f"the dock refuses the initiator: [{Action :n}]");
+        DoFail(EMars_Interaction_FailReason::ActionBlocked);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -108,27 +108,26 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
             return;
         }
 
-        const auto Target = _Initiator.As_Hotbar().TryGet_StowTarget(_Item);
-        if (ck::Is_NOT_Valid(Target) || _Dock.Get_Item() != _Item)
+        if (_Dock.Get_Item() != _Item)
         {
-            DoFail(f"at the grip [{_Item.ToString()}] is no longer docked, or the hotbar has nowhere to take it");
+            DoFail(EMars_Interaction_FailReason::NoLongerDocked);
             return;
         }
 
-        // The take reaches the hands through the hotbar and HeldItem's Hold: that Hold rides the gloves home.
+        const auto Target = _Initiator.As_Hotbar().TryGet_StowTarget(_Item);
+        if (ck::Is_NOT_Valid(Target))
+        {
+            DoFail(EMars_Interaction_FailReason::NowhereToStow);
+            return;
+        }
+
+        // The take reaches the hands through the hotbar: the platter's next mount rides the gloves home.
         const auto Ride = TryGet_RideHome();
-        auto HeldItem = _Initiator.As_HeldItem(ECk_SanityCheck::UnChecked);
-        const auto WorldItem = _Item.Get_PersistentWorldItem();
-        if (Ride.IsSet() && ck::IsValid(HeldItem) && ck::IsValid(WorldItem))
-        { HeldItem.Request_SetNextHoldArrive(FMars_Request_HeldItem_SetNextHoldArrive(WorldItem, Ride.GetValue())); }
+        auto WorldItem = _Item.Get_PersistentWorldItem();
+        if (Ride.IsSet() && ck::IsValid(WorldItem))
+        { WorldItem.Request_ArriveNextMount(FMars_Request_WorldItem_ArriveNextMount(Ride.GetValue())); }
 
         _Dock.Request_Undock(FMars_Request_PlatterDock_Undock(_Item, Target));
-    }
-
-    protected void DoFail(const FString& InReason) override
-    {
-        ck::Warning(f"[PlatterDock] Interaction failed: {InReason}");
-        _Outcome = ECk_SmTaskResult::Failed;
     }
 
     UFUNCTION()
@@ -158,10 +157,20 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
         { return; }
 
         DoUnbind();
-        DoFail(f"placing [{InItem.ToString()}] was refused: [{InRefusal :n}]");
+        DoFail(EMars_Interaction_FailReason::DockRefused);
     }
 
-    // Place waits on OnDocked of the item's platter (or its refusal), Take on OnUndocked of the docked one.
+    UFUNCTION()
+    private void OnUndockRefused(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal)
+    {
+        if (_Action != EMars_PlatterDock_Action::Take || InItem != _Item)
+        { return; }
+
+        DoUnbind();
+        DoFail(EMars_Interaction_FailReason::UndockRefused);
+    }
+
+    // Place waits on OnDocked of the item's platter (or its refusal), Take on OnUndocked of the docked one (or its refusal).
     private void DoStart(FCk_Handle_PlatterDock& InDock, const FCk_Handle_Item& InItem, EMars_PlatterDock_Action InAction)
     {
         _Dock = InDock;
@@ -171,6 +180,7 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
         _Dock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDocked"));
         _Dock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnUndocked"));
         _Dock.BindTo_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefused"));
+        _Dock.BindTo_OnUndockRefused(FMars_Delegate_PlatterDock_OnUndockRefused(this, n"OnUndockRefused"));
     }
 
     private void DoUnbind()
@@ -180,6 +190,7 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
             _Dock.UnbindFrom_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDocked"));
             _Dock.UnbindFrom_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnUndocked"));
             _Dock.UnbindFrom_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefused"));
+            _Dock.UnbindFrom_OnUndockRefused(FMars_Delegate_PlatterDock_OnUndockRefused(this, n"OnUndockRefused"));
         }
 
         _Dock = FCk_Handle_PlatterDock();

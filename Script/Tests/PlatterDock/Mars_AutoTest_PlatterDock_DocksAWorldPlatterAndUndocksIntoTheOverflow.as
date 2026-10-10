@@ -5,6 +5,8 @@
 class UMars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow : UMars_AutoTestRig_PlatterDock
 {
     private const FVector k_Origin = FVector(0.0, 0.0, -57000.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_Transform _Root;
     private FCk_Handle_PlatterDock _Dock;
@@ -15,7 +17,6 @@ class UMars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow : U
         Add_CarrierBody(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         _Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(_Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), false),
@@ -26,11 +27,11 @@ class UMars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow : U
         Add_Step("the dock is the station's; dock the lying platter", n"Step_Dock");
         Add_Step_WaitUntil("the dock reports the platter docked", n"Check_Docked");
         Add_Step_WaitUntil("the platter is Carried", n"Check_Carried");
-        Add_Step_WaitSeconds("the carry's arrival settles", 1.0f);
+        Add_Step_WaitUntil("the carry's arrival settled", n"Check_CarrySettled", k_SlowPolls, 0);
         Add_Step("the platter rests on the dock's node, carried by the dock", n"Step_AssertDocked");
         Add_Step("undock the platter into the carrier's overflow", n"Step_Undock");
         Add_Step_WaitUntil("the dock reports the platter undocked", n"Check_Undocked");
-        Add_Step_WaitUntil("the platter is Held", n"Check_Held");
+        Add_Step_WaitUntil("the platter is Held", n"Check_Held", k_SlowPolls, 0);
         Add_Step("the platter is in the overflow, selected, in the carrier's hand", n"Step_AssertHeld");
         Run_Steps(InHandle);
     }
@@ -62,6 +63,13 @@ class UMars_AutoTest_PlatterDock_DocksAWorldPlatterAndUndocksIntoTheOverflow : U
     {
         auto Res = OutResult;
         Res.Set(_WorldItems[0].Get_Mount() == EMars_WorldItem_Mount::Carried);
+    }
+
+    UFUNCTION()
+    private void Check_CarrySettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_WorldItems[0].Get_Mount() == EMars_WorldItem_Mount::Carried && _WorldItems[0].Get_IsSettled());
     }
 
     UFUNCTION()

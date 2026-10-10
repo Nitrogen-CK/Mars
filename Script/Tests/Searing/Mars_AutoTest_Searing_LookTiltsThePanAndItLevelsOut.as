@@ -13,9 +13,9 @@ class UMars_AutoTest_Searing_LookTiltsThePanAndItLevelsOut : UMars_AutoTestRig_S
         Add_Step("look right on a cold pan", n"Step_ColdLook");
         Add_Step_WaitFrames("the cold look drained", 4);
         Add_Step("the cold pan stayed level and idle; heat and look right", n"Step_AssertLevelThenHeatAndLookRight");
-        Add_Step_WaitUntil("the look tilted the pan", n"Check_RolledPast5", 0, 0.3f);
+        Add_Step_WaitUntil("the look tilted the pan", n"Check_RolledPast5", 0, 0);
         Add_Step("the hot pan is driven and rolled right; reset", n"Step_AssertRolledThenReset");
-        Add_Step_WaitUntil("the reset reached the pan", n"Check_PanResetAndIdle", 0, 0.5f);
+        Add_Step_WaitUntil("the reset reached the pan", n"Check_PanResetAndIdle", 0, 0);
         Add_Step("the pan is level, idle and cold", n"Step_AssertReset");
         Run_Steps(InHandle);
     }

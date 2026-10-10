@@ -32,10 +32,10 @@ class UMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow : UCk_AutoTest_Base
         Spec.HandNode = _HandNode;
         _Hands = utils_fphands::Add(Player, Spec);
 
-        Add_Step_WaitUntil("the hand node has settled at part of the upward look", n"Check_FollowsPartOfTheLookUp", 0, 5.0f);
+        Add_Step_WaitUntil("the hand node has settled at part of the upward look", n"Check_FollowsPartOfTheLookUp", 0, 0);
         Add_Step("the gloves sit low and still face where the view turns", n"Step_AssertLow");
         Add_Step("look down", n"Step_LookDown");
-        Add_Step_WaitUntil("the hand node has taken the whole downward look", n"Check_FollowsTheLookDown", 0, 5.0f);
+        Add_Step_WaitUntil("the hand node has taken the whole downward look", n"Check_FollowsTheLookDown", 0, 0);
         Add_Step("the gloves are where the view carries them", n"Step_AssertFollowsDown");
         Run_Steps(InHandle);
     }

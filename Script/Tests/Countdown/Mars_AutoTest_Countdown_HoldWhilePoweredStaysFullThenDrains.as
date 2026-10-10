@@ -4,6 +4,11 @@
 // straight to the sink would be overwritten by the driver's next recompute.
 class UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the countdown drains one step every SecondsPerStep.
+    private const int32 k_SlowPolls = 900;
+    // Steps of drain time the held window spans: more than the countdown's two, so unheld it would drain empty.
+    private const float32 k_HeldWindowSteps = 2.5f;
+
     private FCk_Handle_Countdown _Countdown;
     private FCk_Handle_MechanismSink _Sink;
     private FCk_Handle_MechanismSource _Source;
@@ -22,7 +27,8 @@ class UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains : UCk_AutoTes
         SinkSpec.Rule = EMars_MechanismSink_Rule::AnyChannel;
         _Sink = utils_mechanism_sink::Add(Entity, SinkSpec);
 
-        _Countdown = utils_countdown::Add(Entity, FMars_Countdown_Spec(2, 0.4f, false, true));
+        const auto CountdownSpec = FMars_Countdown_Spec(2, 0.4f, false, true);
+        _Countdown = utils_countdown::Add(Entity, CountdownSpec);
 
         auto SourceSpec = FMars_MechanismSource_Spec();
         SourceSpec.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.M");
@@ -34,14 +40,14 @@ class UMars_AutoTest_Countdown_HoldWhilePoweredStaysFullThenDrains : UCk_AutoTes
         _Input = utils_mechanism_source::Add(InputEntity, InputSpec);
 
         Add_Step("the input channel tag exists", n"Step_AssertChannel");
-        Add_Step_WaitUntil("the link is set up (the sink's power signal is bound)", n"Check_LinkBound", 0, 5.0f);
+        Add_Step_WaitUntil("the link is set up (the sink's power signal is bound)", n"Check_LinkBound", 0, 0);
         Add_Step("assert the input", n"Step_Power");
-        Add_Step_WaitUntil("the countdown is full, held, and its source asserted", n"Check_HeldFull", 0, 5.0f);
-        Add_Step_WaitSeconds("more than two steps' worth of time while powered", 1.0f);
+        Add_Step_WaitUntil("the countdown is full, held, and its source asserted", n"Check_HeldFull", 0, 0);
+        Add_Step_WaitSeconds("more than two steps' worth of time while powered", CountdownSpec.SecondsPerStep * k_HeldWindowSteps);
         Add_Step("still full and held", n"Step_AssertStillFull");
         Add_Step("drop the input", n"Step_Unpower");
-        Add_Step_WaitUntil("released, it drains to the last step", n"Check_DrainedOneStep", 0, 5.0f);
-        Add_Step_WaitUntil("it drains to empty and its source drops", n"Check_EmptyAndDropped", 0, 5.0f);
+        Add_Step_WaitUntil("released, it drains to the last step", n"Check_DrainedOneStep", k_SlowPolls, 0);
+        Add_Step_WaitUntil("it drains to empty and its source drops", n"Check_EmptyAndDropped", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

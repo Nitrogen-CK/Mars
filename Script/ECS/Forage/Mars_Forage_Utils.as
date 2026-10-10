@@ -59,7 +59,7 @@ mixin int32 Get_ChargesLeft(const FCk_Handle_Forage& Self)
 
 mixin bool Get_IsExhausted(const FCk_Handle_Forage& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Forage).IsExhausted;
+    return Self.Get_Fragment(FMars_Fragment_Forage).ChargesLeft <= 0;
 }
 
 mixin int32 Get_ReleasedCount(const FCk_Handle_Forage& Self)
@@ -87,10 +87,10 @@ mixin void Request_Release(FCk_Handle_Forage& Self, const FMars_Request_Forage_R
     Requests.ReleaseRequests.Add(InRequest);
 }
 
-mixin void Request_Replenish(FCk_Handle_Forage& Self)
+mixin void Request_Replenish(FCk_Handle_Forage& Self, const FMars_Request_Forage_Replenish& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Forage_Requests);
-    Requests.ReplenishRequests.Add(FMars_Request_Forage_Replenish());
+    Requests.ReplenishRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -109,6 +109,20 @@ mixin void UnbindFrom_OnReleased(FCk_Handle_Forage& Self, FMars_Delegate_Forage_
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Forage_Signals).OnReleased.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnReleaseRefused(FCk_Handle_Forage& Self, FMars_Delegate_Forage_OnReleaseRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Forage_Signals);
+    Fragment.OnReleaseRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnReleaseRefused(FCk_Handle_Forage& Self, FMars_Delegate_Forage_OnReleaseRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Forage_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Forage_Signals).OnReleaseRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnExhausted(FCk_Handle_Forage& Self, FMars_Delegate_Forage_OnExhausted InDelegate)

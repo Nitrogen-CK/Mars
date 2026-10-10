@@ -17,6 +17,9 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     // Below the write threshold: a change smaller than this would be a write off an edge.
     private const float32 k_EdgeFloor = 0.0199f;
     private const int32 k_WindowFrames = 30;
+    // A poll budget, not a ceiling: the station composes, the platter constructs, drops, docks and settles, and a transfer
+    // and a cook take seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Raw;
     private FCk_Handle_FoodPiece _Slice;
@@ -40,18 +43,18 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
         Spawn_Fry(InHandle, k_Origin, FMars_CookingFeed_TimingSpec());
         _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MushroomSlice());
 
-        Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the platter is constructed and the slice landed on it", n"Check_PlatterReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the platter is constructed and the slice landed on it", n"Check_PlatterReady", k_SlowPolls, 0);
         Add_Step("dock the mushroom platter as raw", n"Step_Dock");
-        Add_Step_WaitUntil("the platter is docked and arrived", n"Check_Docked", 0, 5.0f);
+        Add_Step_WaitUntil("the platter is docked and arrived", n"Check_Docked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", 0, 3.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", k_SlowPolls, 0);
         Add_Step("one add-food press", n"Step_BeginTransfer");
-        Add_Step_WaitUntil("the kernel admitted the slice", n"Check_Admitted", 0, 5.0f);
+        Add_Step_WaitUntil("the kernel admitted the slice", n"Check_Admitted", k_SlowPolls, 0);
         Add_Step("the fryer holds the slice, which wears its own display", n"Step_AssertAdmitted");
-        Add_Step_WaitUntil("a face heated past 0.05 and the display caught up", n"Check_DisplayCaughtUp", 0, 10.0f);
+        Add_Step_WaitUntil("a face heated past 0.05 and the display caught up", n"Check_DisplayCaughtUp", k_SlowPolls, 0);
         Add_Step("the slice's display carries its face heats and its fry", n"Step_AssertDisplayCarriesTheHeat");
-        Add_Step_WaitUntil("a run of frames in the oil", n"Check_EdgeWindow", 0, 5.0f);
+        Add_Step_WaitUntil("a run of frames in the oil", n"Check_EdgeWindow", k_SlowPolls, 0);
         Add_Step("the display changed only on edges", n"Step_AssertEdgesOnly");
         Run_Steps(InHandle);
     }

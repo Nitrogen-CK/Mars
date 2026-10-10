@@ -29,7 +29,7 @@ class UMars_AutoTest_Searing_HeldTiltParksTheSteakAgainstTheLip : UMars_AutoTest
         Add_Steps_AddPieceAndLand();
         Add_Step("tilt the pan right to its clamp", n"Step_TiltRight");
         // The tilt reaches the clamp at MaxTiltRateDegreesPerSecond (0.1 s); runner frames are not processor ticks.
-        Add_Step_WaitUntil("the look tilted the pan to its clamp", n"Check_RollAtClamp", 0, 0.5f);
+        Add_Step_WaitUntil("the look tilted the pan to its clamp", n"Check_RollAtClamp", 0, 0);
         Add_Step("the roll holds at the clamp", n"Step_AssertHeldAtClamp");
         for (auto Sample = 0; Sample < k_SlideSamples; ++Sample)
         {

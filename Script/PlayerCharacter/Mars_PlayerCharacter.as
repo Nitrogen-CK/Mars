@@ -497,7 +497,7 @@ class AMars_PlayerCharacter : AMars_Character
         { return false; }
 
         const auto IsOwner = IsLocallyControlled();
-        const auto PlayedHands = IsOwner && utils_fphands::Play_Emote(_Hands, InEmote);
+        const auto PlayedHands = IsOwner && utils_player_emotes::Play_Emote(_Hands, InEmote);
         const auto PlayedBody = PlayBodyEmote(InEmote);
         if (PlayedHands == false && PlayedBody == false)
         { return false; }
@@ -508,7 +508,7 @@ class AMars_PlayerCharacter : AMars_Character
         return true;
     }
 
-    // Ends the body's emote; the gloves' own is stopped by utils_fphands::Stop_Emote, which calls this. The owner
+    // Ends the body's emote; the gloves' own is stopped by utils_player_emotes::Stop_Emote, which calls this. The owner
     // forwards the stop.
     void Request_StopEmote()
     {
@@ -741,16 +741,14 @@ class AMars_PlayerCharacter : AMars_Character
     }
 
     // Empty hands and two-handed holds centre the Hand node between the gloves; one-handed items move it to the right.
-    // The gloves' own hold (and the carry of a picked-up item) is the FPHands feature's; the rest offset is measured
-    // here from the same item. Stays on the actor: the Hand node's sway handle is held only here.
+    // The gloves' own hold follows HeldItem through the player HFSM (UMars_SmTask_HeldItemDrivesHands); the rest offset is
+    // measured here from the same item. Stays on the actor: the Hand node's sway handle is held only here.
     UFUNCTION()
     private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
     {
-        _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(InNew));
-
         const auto NewHold = utils_fphands::Make_Hold(InNew);
         if (NewHold.Kind != EMars_FPHands_HoldKind::Empty)
-        { utils_fphands::Stop_Emote(_Hands); }
+        { utils_player_emotes::Stop_Emote(_Hands); }
 
         // Only the owner's held item is real (nothing about items replicates); everyone else learns it from _HeldView.
         if (IsLocallyControlled())

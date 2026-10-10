@@ -4,6 +4,9 @@
 // player's body probe) are built in the test, so no placeable or driver is involved. Isolated Z band: -76000.
 class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the threshold sees the occupant come and go through physics overlaps.
+    private const int32 k_SlowPolls = 900;
+
     private FVector _Origin = FVector(0.0, 0.0, -76000.0);
     private FCk_Handle_Gate _Gate;
     private FCk_Handle_Transform _Occupant;
@@ -28,17 +31,17 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
         _Occupant = MakeOccupant(InHandle, _Origin + FVector(0.0, 0.0, 110.0));
 
         Add_Step("the gate made its threshold", n"Step_AssertThreshold");
-        Add_Step_WaitUntil("the occupant stands in the threshold", n"Check_Occupied", 0, 5.0f);
+        Add_Step_WaitUntil("the occupant stands in the threshold", n"Check_Occupied", k_SlowPolls, 0);
         Add_Step("tell the gate to close", n"Step_Close");
-        Add_Step_WaitUntil("the close is deferred", n"Check_Deferred", 0, 5.0f);
+        Add_Step_WaitUntil("the close is deferred", n"Check_Deferred", 0, 0);
         Add_Step_WaitSeconds("give a wrongful close time to land", 0.2f);
         Add_Step("still open, still waiting", n"Step_AssertStillOpen");
         Add_Step("tell the gate to open", n"Step_Open");
-        Add_Step_WaitUntil("the open cancels the waiting close", n"Check_OpenNotDeferred", 0, 5.0f);
+        Add_Step_WaitUntil("the open cancels the waiting close", n"Check_OpenNotDeferred", 0, 0);
         Add_Step("tell the gate to close again", n"Step_Close");
-        Add_Step_WaitUntil("the close is deferred again", n"Check_Deferred", 0, 5.0f);
+        Add_Step_WaitUntil("the close is deferred again", n"Check_Deferred", 0, 0);
         Add_Step("the occupant leaves", n"Step_Leave");
-        Add_Step_WaitUntil("the gate closes once the threshold clears", n"Check_Closed", 0, 5.0f);
+        Add_Step_WaitUntil("the gate closes once the threshold clears", n"Check_Closed", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

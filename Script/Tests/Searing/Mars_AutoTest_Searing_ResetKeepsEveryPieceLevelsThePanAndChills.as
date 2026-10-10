@@ -25,16 +25,16 @@ class UMars_AutoTest_Searing_ResetKeepsEveryPieceLevelsThePanAndChills : UMars_A
         Build_Pieces(2);
 
         Add_Step("heat the pan", n"Step_Heat");
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("add two pieces", n"Step_AddTwo");
-        Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", k_SlowPolls, 0);
         Add_Step("tilt the pan", n"Step_Tilt");
-        Add_Step_WaitUntil("the first piece's face on the pan seared", n"Check_FirstDownFaceSeared", 0, 2.0f);
+        Add_Step_WaitUntil("the first piece's face on the pan seared", n"Check_FirstDownFaceSeared", 0, 0);
         Add_Step("reset", n"Step_Reset");
         Add_Step_WaitFrames("the reset drains (a flip needs utils_searing::k_FaceSettleSeconds)", 2);
         Add_Step("the reset zeroed the tally and chilled the pan", n"Step_AssertTallyZeroed");
-        Add_Step_WaitUntil("the reset reached the pan", n"Check_PanLevelAndIdle", 0, 1.0f);
+        Add_Step_WaitUntil("the reset reached the pan", n"Check_PanLevelAndIdle", 0, 0);
         Add_Step_WaitSeconds("watch the pan", k_WatchSeconds);
         Add_Step("both pieces kept with their sear; a level, cold pan with a zero tally", n"Step_AssertReset");
         Run_Steps(InHandle);

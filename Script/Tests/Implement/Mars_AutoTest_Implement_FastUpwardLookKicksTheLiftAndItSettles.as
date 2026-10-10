@@ -13,9 +13,9 @@ class UMars_AutoTest_Implement_FastUpwardLookKicksTheLiftAndItSettles : UMars_Au
         BuildImplement(InHandle, FMars_Implement_Spec());
 
         Add_Step("drive the implement", n"Step_Drive");
-        Add_Step_WaitUntil("the implement is Driven", n"Check_Driven", 0, 0.5f);
+        Add_Step_WaitUntil("the implement is Driven", n"Check_Driven", 0, 0);
         Add_Step("flick the look up", n"Step_Flick");
-        Add_Step_WaitUntil("the implement lifted", n"Check_Lifted", 0, 0.2f);
+        Add_Step_WaitUntil("the implement lifted", n"Check_Lifted", 0, 0);
         Add_Step("one kick, and the pitch target took only the slow part", n"Step_AssertKick");
         Add_Step_WaitSeconds("the lift spring settles", 0.8f);
         Add_Step("the implement is back at rest", n"Step_AssertSettled");

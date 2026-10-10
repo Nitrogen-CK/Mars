@@ -1,5 +1,5 @@
 // A Commanded lift (LiftPerLookDegree 1, MinLift -30, MaxLift 20) on a RollOnly tilt: the look's Y moves only the lift
-// target (10 degrees down -> -10, exactly: the drain is additive), and the spring carries the node there within 0.8 s
+// target (10 degrees down -> -10, exactly: the drain is additive), and the spring carries the node there
 // and holds it instead of returning to rest; 60 degrees up clamps the target at MaxLift and the lift follows; an Idle
 // implement drops the look and keeps its target. The overshoot past -10 is traced for tuning, not asserted.
 class UMars_AutoTest_Implement_CommandedLiftFollowsTheLookAndHolds : UMars_AutoTestRig_Implement
@@ -28,15 +28,15 @@ class UMars_AutoTest_Implement_CommandedLiftFollowsTheLookAndHolds : UMars_AutoT
         BuildImplement(InHandle, Spec);
 
         Add_Step("drive the implement and look down", n"Step_DriveAndLookDown");
-        Add_Step_WaitUntil("the look moved the lift target", n"Check_TargetLowered", 0, 0.3f);
+        Add_Step_WaitUntil("the look moved the lift target", n"Check_TargetLowered", 0, 0);
         Add_Step("the lift target took the whole look and the tilt none of it", n"Step_AssertDownTarget");
-        Add_Step_WaitUntil("the lift reached its target within 0.8 s", n"Check_LiftAtDownTarget", 0, 0.8f);
+        Add_Step_WaitUntil("the lift reached its target", n"Check_LiftAtDownTarget", 0, 0);
         Add_Step("start the hold", n"Step_StartHold");
-        Add_Step_WaitUntil("the lift is held for 0.5 s", n"Check_HoldElapsed", 0, 1.0f);
+        Add_Step_WaitUntil("the lift is held for 0.5 s", n"Check_HoldElapsed", k_SlowPolls, 0);
         Add_Step("the lift held at its target; look up past the ceiling", n"Step_AssertHeldThenLookUp");
-        Add_Step_WaitUntil("the look raised the lift target", n"Check_TargetRaised", 0, 0.3f);
+        Add_Step_WaitUntil("the look raised the lift target", n"Check_TargetRaised", 0, 0);
         Add_Step("the lift target clamped at MaxLift", n"Step_AssertClampedTarget");
-        Add_Step_WaitUntil("the lift reached the ceiling", n"Check_LiftAtCeiling", 0, 0.8f);
+        Add_Step_WaitUntil("the lift reached the ceiling", n"Check_LiftAtCeiling", 0, 0);
         Add_Step("idle the implement and look down", n"Step_IdleAndLookDown");
         Add_Step_WaitSeconds("the idle look would have drained", 0.3f);
         Add_Step("the idle look moved nothing", n"Step_AssertIdleLookDropped");

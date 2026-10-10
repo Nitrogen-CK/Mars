@@ -14,6 +14,7 @@ struct FMars_FoodPiece_Drain
 class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_FoodBoard_HandleRequests");
     default _MarkedDirtyBy = FMars_Fragment_FoodPiece_Requests;
 
     UFUNCTION(BlueprintOverride)
@@ -37,9 +38,6 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 
         for (const auto& Request : SetCookStateRequests)
         { InState.CookState = Request.CookState; }
-
-        if (SetCookStateRequests.Num() > 0)
-        { ck::Trace(f"[FoodPiece] [{Drain.Piece.ToString()}] cook state set"); }
 
         for (const auto& Request : CutRequests)
         { Apply_Cut(Drain, InState, Request); }
@@ -82,15 +80,14 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         InState.Status = EMars_FoodPiece_Status::Cutting;
         WorldEntity.AddOrGet_Fragment(FMars_Fragment_FoodPiece_PendingCuts).Entries.Add(FMars_FoodPiece_CutInFlight(OperationID, Piece));
 
-        ck::Trace(f"[FoodPiece] [{Piece.ToString()}] cut submitted as [{OperationID.ToString(EGuidFormats::Short)}]");
-
         auto Geometry = Piece.Get_Geometry();
         utils_runtime_mesh::Request_Slice(Geometry, Slice, FCk_Delegate_RuntimeMesh_OnSliceResolved(this, n"OnSliceResolved"));
     }
 
     // The single resolution of every submitted slice, from RuntimeMesh's drain (or its submission, for a slice it could not
-    // queue). A Succeeded slice commits; any other outcome hands the piece back Ready. A piece that is gone, being
-    // destroyed, or no longer waiting on this operation is stale: its halves are destroyed and nothing is broadcast.
+    // queue). A Succeeded slice commits; any other outcome hands the piece back Ready. A piece that is gone or being
+    // destroyed has its halves destroyed and nothing is broadcast; a live piece no longer waiting on this operation is a
+    // broken ledger: it ensures, with the same recovery.
     UFUNCTION()
     private void OnSliceResolved(FCk_RuntimeMesh_SliceResult InResult)
     {
@@ -101,9 +98,17 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 
         const auto OperationID = InResult.Get_OperationID();
         auto Piece = Take_CutInFlight(WorldEntity, OperationID);
-        if (Get_IsStale(Piece, OperationID))
+
+        // An expected absence, not a defect: a board or a test tore the piece down while its slice was queued.
+        if (Get_IsGone(Piece))
         {
-            ck::Trace(f"[FoodPiece] cut [{OperationID.ToString(EGuidFormats::Short)}] resolved {InResult.Get_Outcome() :n} for a piece that no longer waits on it: discarded");
+            Destroy_Halves(InResult);
+            return;
+        }
+
+        if (ck::EnsureIfNot(Get_IsAwaiting(Piece, OperationID),
+            f"[FoodPiece] a live piece [{Piece.ToString()}] no longer waits on cut [{OperationID.ToString(EGuidFormats::Short)}]: only that cut's resolution clears it"))
+        {
             Destroy_Halves(InResult);
             return;
         }
@@ -119,7 +124,6 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         State.Status = EMars_FoodPiece_Status::Ready;
 
         const auto Outcome = utils_foodpiece::Get_CutOutcome(InResult.Get_Outcome());
-        ck::Trace(f"[FoodPiece] [{Piece.ToString()}] cut {Outcome :n} ({InResult.Get_Outcome() :n}): the piece is whole");
 
         Broadcast_CutResolved(Piece, FMars_FoodPiece_CutResult(Outcome, InResult.Get_Outcome()));
     }
@@ -147,18 +151,21 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         return FCk_Handle_FoodPiece();
     }
 
-    private bool Get_IsStale(const FCk_Handle_FoodPiece& InPiece, const FGuid& InOperationID)
+    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece)
     {
-        if (ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
-        { return true; }
+        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+    }
 
+    // The live piece's pending cut is InOperationID: set at submission, cleared only by that cut's resolution.
+    private bool Get_IsAwaiting(const FCk_Handle_FoodPiece& InPiece, const FGuid& InOperationID)
+    {
         const auto PendingCut = InPiece.Get_Fragment(FMars_Fragment_FoodPiece).PendingCut;
-        return PendingCut.IsSet() == false || PendingCut.GetValue() != InOperationID;
+        return PendingCut.IsSet() && PendingCut.GetValue() == InOperationID;
     }
 
     // Exactly once per succeeded slice: each half gets the source's current world transform and a FoodPiece of its own
-    // (new Id, ParentId = the source, the source's lineage, cook state, definition, kind, tuners and cap, its share of the
-    // mass), then OnCutResolved reports both and the source is destroyed.
+    // (new Id, ParentId = the source, the source's lineage, cook state, definition, kind, tuners, cap and body surface, its
+    // share of the mass), then OnCutResolved reports both and the source is destroyed.
     private void Commit(FCk_Handle_FoodPiece& InSource, const FCk_RuntimeMesh_SliceResult& InResult)
     {
         const auto State = InSource.Get_Fragment(FMars_Fragment_FoodPiece);
@@ -166,7 +173,7 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         const auto SourceWorld = utils_transform::Get_EntityCurrentTransform(SourceEntity.As_Transform());
         const auto Split = utils_foodpiece::Get_MassSplit(State.MassKg, InResult);
 
-        auto HalfSpec = FMars_FoodPiece_Spec(FMars_FoodPiece_Data(), InSource.Get_Tuners(), InSource.Get_Cap());
+        auto HalfSpec = FMars_FoodPiece_Spec(FMars_FoodPiece_Data(), InSource.Get_Tuners(), InSource.Get_Cap(), InSource.Get_BodyTuners());
         HalfSpec.Data.Lineage = State.Lineage;
         HalfSpec.Data.ParentId = State.Id;
         HalfSpec.Data.CookState = State.CookState;
@@ -190,8 +197,6 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
             Broadcast_CutResolved(InSource, FMars_FoodPiece_CutResult(EMars_FoodPiece_CutOutcome::Failed, InResult.Get_Outcome()));
             return;
         }
-
-        ck::Trace(f"[FoodPiece] [{InSource.ToString()}] cut into [{Positive.ToString()}] {Split.PositiveKg :.4} kg and [{Negative.ToString()}] {Split.NegativeKg :.4} kg");
 
         auto Result = FMars_FoodPiece_CutResult(EMars_FoodPiece_CutOutcome::Cut, InResult.Get_Outcome());
         Result.Positive = Positive;

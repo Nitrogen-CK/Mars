@@ -12,12 +12,12 @@ class UMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder : U
     {
         SpawnFloorAndBody(InHandle);
 
-        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", 0, 5.0f);
+        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", k_SlowPolls, 0);
         Add_Step("bind OnArrived/OnFailed; request a move 1200 uu along +X, then a Stop, in one frame", n"Step_MoveToThenStop");
         Add_Step_WaitSeconds("a surviving move would show in a second", 1.0f);
         Add_Step("the navigator stayed Idle and the body did not move", n"Step_AssertStayedStopped");
         Add_Step("request a Stop, then a move 1200 uu along +X, in one frame", n"Step_StopThenMoveTo");
-        Add_Step_WaitUntil("the navigator is Moving and the body moved 50 uu", n"Check_Underway", 0, 3.0f);
+        Add_Step_WaitUntil("the navigator is Moving and the body moved 50 uu", n"Check_Underway", k_SlowPolls, 0);
         Add_Step("the move toward the goal is running and no move failed", n"Step_AssertMoving");
         Run_Steps(InHandle);
     }

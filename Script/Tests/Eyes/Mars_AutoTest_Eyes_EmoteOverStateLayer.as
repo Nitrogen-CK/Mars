@@ -32,7 +32,7 @@ class UMars_AutoTest_Eyes_EmoteOverStateLayer : UMars_AutoTestRig_Eyes
         Add_Step_WaitUntil("both eyes show Downed again, not the style", n"Check_DownedShown");
         Add_Step("play Happy as authored (timed) over Downed", n"Step_PlayTimedHappy");
         Add_Step_WaitUntil("the timed Happy is playing", n"Check_EmotePlaying");
-        Add_Step_WaitUntil("the timed Happy expired and Downed is back", n"Check_DownedShown", 0, 5.0f);
+        Add_Step_WaitUntil("the timed Happy expired and Downed is back", n"Check_DownedShown", k_SlowPolls, 0);
         Add_Step("clear the State layer", n"Step_ClearState");
         Add_Step_WaitUntil("both eyes show the style (3)", n"Check_StyleShown");
         Run_Steps(InHandle);

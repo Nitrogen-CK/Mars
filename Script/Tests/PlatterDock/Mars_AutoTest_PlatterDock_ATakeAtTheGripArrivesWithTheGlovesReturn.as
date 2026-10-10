@@ -1,7 +1,8 @@
-// Taking a platter off a dock rides the gloves home, as a pickup does. A gloved carrier (hotbar, HeldItem with its
-// selection pushed) uses the occupied dock's Take: at the gloves' Grip the platter is undocked into the overflow and held,
-// yet it does not move from the dock until the gloves start their Return, and it reaches its HeldOffset under the Hand
-// node within a frame of the gloves coming to Rest. Isolated origin (32800, -21000, -30000).
+// Taking a platter off a dock rides the gloves home, as a pickup does. A gloved carrier (hotbar, HeldItem) uses the
+// occupied dock's Take: at the gloves' Grip the platter is undocked into the overflow and held (its next mount riding
+// the gloves home: Request_ArriveNextMount), yet it does not move from the dock until the gloves start their Return,
+// and it reaches its HeldOffset under the Hand node within a frame of the gloves coming to Rest. Isolated origin
+// (32800, -21000, -30000).
 class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMars_AutoTestRig_PlatterDock
 {
     default _TimeoutSeconds = 30.0f;
@@ -11,6 +12,8 @@ class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMar
     private const float64 k_AtOffsetCm = 0.5;
     private const int32 k_MaxFramesAfterRest = 2;
     private const int32 k_GiveUpFramesAfterRest = 30;
+    // Item constructions, mount arrivals and the gloves' reaches outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_PlatterDock _Dock;
     private FVector _PlatterAtStart;
@@ -27,21 +30,20 @@ class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMar
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
         Add_CarrierHands();
-        Bind_PushSelection();
 
         auto Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), false),
             FTransform(FRotator::ZeroRotator, FVector(60.0, 20.0, 50.0)), "input platter"));
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0))));
 
-        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
+        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
         Add_Step("dock the platter", n"Step_Dock");
-        Add_Step_WaitUntil("the platter has landed on the dock", n"Check_Arrived", 0, 10.0f);
+        Add_Step_WaitUntil("the platter has landed on the dock", n"Check_Arrived", k_SlowPolls, 0);
         Add_Step("the carrier focuses the dock", n"Step_FocusDock");
-        Add_Step_WaitFrames("the dock's target enters Focused", 3);
+        Add_Step_WaitUntil("the dock's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier reaches for the dock and takes the platter", n"Step_ReachAndTake");
-        Add_Step_WaitUntil("the gloves grip, return and rest; the platter rides them home", n"Check_RideHome", 0, 5.0f);
+        Add_Step_WaitUntil("the gloves grip, return and rest; the platter rides them home", n"Check_RideHome", k_SlowPolls, 0);
         Add_Step("still until the Return; at its HeldOffset within a frame of Rest", n"Step_AssertRodeHome");
         Run_Steps(InHandle);
     }
@@ -64,10 +66,11 @@ class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMar
     {
         auto Interactable = _Dock.Get_Interactable();
         Interactable.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Interactable);
     }
 
-    // What the player's resolver and interaction glue do on a press: the gloves reach for the dock's Use target, and the
-    // interaction starts.
+    // What the player's resolver and interaction glue do on a press: the gloves reach for the dock's Use target with its
+    // gesture, and the interaction starts.
     UFUNCTION()
     private void Step_ReachAndTake(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -80,7 +83,8 @@ class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMar
         auto Target = Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
         const auto& Context = Target.Get_Fragment(FMars_Fragment_InteractionContext);
         _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(
-            FMars_FPHands_ReachSubject(Target, Context.Interactable, Context.InteractableOwner), Target.Get_InteractionCompletionPolicy()));
+            FMars_FPHands_ReachSubject(Target, Context.Interactable, Context.InteractableOwner), Target.Get_InteractionCompletionPolicy(),
+            Context.ReachKind));
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 

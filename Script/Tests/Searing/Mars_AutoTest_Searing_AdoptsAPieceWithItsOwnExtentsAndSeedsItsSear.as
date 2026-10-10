@@ -21,14 +21,14 @@ class UMars_AutoTest_Searing_AdoptsAPieceWithItsOwnExtentsAndSeedsItsSear : UMar
         BuildStation(InHandle, Make_TestSpec());
         Build_Pieces(1);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("cut the box through its middle", n"Step_Cut");
-        Add_Step_WaitUntil("the cut resolved", n"Check_Cut", 0, 3.0f);
+        Add_Step_WaitUntil("the cut resolved", n"Check_Cut", k_SlowPolls, 0);
         Add_Step("give the positive half's +X face 0.5 sear", n"Step_SeedSear");
         Add_Step_WaitFrames("the cook state drains", 2);
         Add_Step("release the half with its middle over the pan's centre", n"Step_ReleaseHalf");
-        Add_Step_WaitUntil("the half landed on the pan", n"Check_HalfOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("the half landed on the pan", n"Check_HalfOnPan", k_SlowPolls, 0);
         Add_Step_WaitSeconds("the half settles", 0.3f);
         Add_Step("its own extents, its middle over the centre, its sear as it came", n"Step_AssertAdopted");
         Run_Steps(InHandle);
@@ -56,14 +56,14 @@ class UMars_AutoTest_Searing_AdoptsAPieceWithItsOwnExtentsAndSeedsItsSear : UMar
         Assert_True(_Half.Get_Status() == EMars_FoodPiece_Status::Ready, "the half is Ready");
 
         auto CookState = _Half.Get_CookState();
-        CookState.FaceSear[int32(EMars_Searing_Face::PosX)] = k_SeededSear;
+        CookState.Sear[int32(EMars_Searing_Face::PosX)] = k_SeededSear;
         _Half.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 
     UFUNCTION()
     private void Step_ReleaseHalf(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Float(_Half.Get_CookState().FaceSear[int32(EMars_Searing_Face::PosX)], k_SeededSear, 0.0001,
+        Assert_Equals_Float(_Half.Get_CookState().Sear[int32(EMars_Searing_Face::PosX)], k_SeededSear, 0.0001,
             "the half carries its +X sear before it is released");
 
         _HalfId = FMars_CookingFeed_PieceId(k_Generation, _NextIndex);

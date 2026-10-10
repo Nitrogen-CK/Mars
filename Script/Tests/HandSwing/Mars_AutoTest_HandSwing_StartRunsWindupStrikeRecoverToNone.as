@@ -5,6 +5,9 @@
 // were announced in order. Isolated Z band: -84000.
 class UMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the recovery eases home on the swing's own clock.
+    private const int32 k_SlowPolls = 900;
+
     private FVector _Origin = FVector(0.0, 0.0, -84000.0);
     private FCk_Handle_HandSwing _Swing;
     private FCk_Handle_SceneNode _Node;
@@ -24,9 +27,9 @@ class UMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone : UCk_AutoTest
 
         Add_Step("the timeline places the impact and the keys sit on the boundaries", n"Step_AssertTimeline");
         Add_Step("start", n"Step_Start");
-        Add_Step_WaitUntil("the strike travel", n"Check_PastWindup", 0, 2.0f);
+        Add_Step_WaitUntil("the strike travel", n"Check_PastWindup", 0, 0);
         Add_Step("in flight the node has left rest", n"Step_AssertInFlight");
-        Add_Step_WaitUntil("back at rest", n"Check_AtRest", 0, 3.0f);
+        Add_Step_WaitUntil("back at rest", n"Check_AtRest", k_SlowPolls, 0);
         Add_Step("the phases ran in order and the node is at rest", n"Step_AssertDone");
         Run_Steps(InHandle);
     }

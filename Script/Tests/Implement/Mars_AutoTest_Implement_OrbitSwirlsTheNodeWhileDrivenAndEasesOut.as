@@ -19,12 +19,12 @@ class UMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut : UMars_
 
         Add_Step_WaitFrames("the idle implement ticks", 4);
         Add_Step("an idle implement shows no orbit; drive it", n"Step_AssertNoOrbitThenDrive");
-        Add_Step_WaitUntil("the orbit eased in to its radius", n"Check_OrbitAtRadius", 0, 0.5f);
+        Add_Step_WaitUntil("the orbit eased in to its radius", n"Check_OrbitAtRadius", 0, 0);
         Add_Step("sample the orbit", n"Step_FirstSample");
         Add_Step_WaitSeconds("a quarter of a turn", 0.25f);
         Add_Step("the orbit turned and the node shows it; idle it", n"Step_AssertTurnedThenIdle");
-        Add_Step_WaitUntil("the orbit eased out", n"Check_OrbitGone", 0, 0.5f);
-        Add_Step_WaitFrames("the last write lands", 3);
+        Add_Step_WaitUntil("the orbit eased out", n"Check_OrbitGone", 0, 0);
+        Add_Step_WaitUntil("the last write put the node back at its rest location", n"Check_NodeAtRest", 0, 0);
         Add_Step("the node is back at its rest location", n"Step_AssertAtRest");
         Run_Steps(InHandle);
     }
@@ -77,6 +77,14 @@ class UMars_AutoTest_Implement_OrbitSwirlsTheNodeWhileDrivenAndEasesOut : UMars_
     {
         auto Res = OutResult;
         Res.Set(_Implement.Get_OrbitOffset().Size() < 0.1);
+    }
+
+    UFUNCTION()
+    private void Check_NodeAtRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Implement.Get_OrbitOffset().Size() <= 0.0001
+            && (utils_scene_node::Get_Offset(_Node).GetLocation() - k_RestLocation).Size() <= 0.01);
     }
 
     UFUNCTION()

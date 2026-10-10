@@ -5,8 +5,9 @@
 // and which carries the hatch plate's bodies (utils_tumbler::Add_HatchBody) and the hatch tab node at
 // utils_tumbler::Get_HatchTabLocal. The hand node sits on the root at the workspace centre and a view node on the root looks
 // down at the drum. No meshes and no floor: an escaped piece falls into the void until the kernel reseats it. The rig is the
-// operator and the test feed: it looks, presses, releases and cancels, and AddPiece releases piece {1, Slot} at rest inside
-// the shell. The handlers record every signal.
+// operator and the test feed: it looks, presses, releases and cancels, and Admit releases box Slot (a real FoodPiece, the
+// heat-station fixture's box, built bodiless by Build_Boxes) as piece {1, Slot} at rest inside the shell, into the
+// station's admission inbox. The handlers record every signal, the station's admission answers included.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
 {
@@ -31,10 +32,18 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     // top of a tumble.
     protected const float64 k_RestSpeed = 2.0;
     protected const int32 k_RestFrames = 20;
+    // A poll budget, not a ceiling, for waits on pieces coming to rest and on the hand's reach.
+    protected const int32 k_SlowPolls = 900;
     // Coverage grows a hundredth per cm of a piece's path: a long rock coats fully within a test's time.
     protected const float32 k_TestCoveragePerCm = 1.0f / 100.0f;
+    // Where the bodiless boxes wait before they are released, from the origin: apart from each other and the drum.
+    protected const FVector k_BoxShelfLocal = FVector(0.0, 300.0, 0.0);
+    protected const float64 k_BoxSpacingCm = 20.0;
 
     protected FCk_Handle_Tumbler _Tumbler;
+    protected FCk_Handle _StationEntity;
+    // In build order; box Slot is released as piece {k_Generation, Slot}.
+    protected TArray<FCk_Handle_FoodPiece> _Boxes;
     // The spec the station was built from, nodes included.
     protected FMars_Tumbler_Spec _Spec;
     protected FCk_Handle_Control _Lever;
@@ -56,7 +65,11 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     protected TArray<FMars_CookingFeed_PieceId> _CoverageIds;
     protected TArray<float32> _Coverages;
     protected TArray<FMars_CookingFeed_PieceId> _ReseatIds;
+    protected TArray<FCk_Handle_FoodPiece> _TakenOut;
+    protected TArray<EMars_CookingFeed_TakeOutRefusal> _TakeOutRefusals;
     protected int32 _LeverEngagedCount = 0;
+
+    protected UMars_AutoTestHelper_HeatStation _Fixture;
 
     // The rocking plan Add_Step_Rock queues: each wait consumes the next entry, looking that many frames at that pitch.
     private TArray<float32> _RockPitches;
@@ -81,6 +94,7 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _Spec = InSpec;
 
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        _StationEntity = StationEntity;
         auto Root = utils_transform::Add(StationEntity, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
 
         auto AxleNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, k_AxleLocal));
@@ -136,8 +150,10 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _Tumbler.BindTo_OnHatchChanged(FMars_Delegate_Tumbler_OnHatchChanged(this, n"OnHatchChanged"));
         _Tumbler.BindTo_OnDrumChanged(FMars_Delegate_Tumbler_OnDrumChanged(this, n"OnDrumChanged"));
         _Tumbler.BindTo_OnPressRefused(FMars_Delegate_Tumbler_OnPressRefused(this, n"OnPressRefused"));
-        _Tumbler.BindTo_OnPieceAdmission(FMars_Delegate_Tumbler_OnPieceAdmission(this, n"OnPieceAdmission"));
+        utils_cooking_feed::BindTo_OnAdmission(StationEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
         _Tumbler.BindTo_OnPieceAdded(FMars_Delegate_Tumbler_OnPieceAdded(this, n"OnPieceAdded"));
+        _Tumbler.BindTo_OnPieceTakenOut(FMars_Delegate_Tumbler_OnPieceTakenOut(this, n"OnPieceTakenOut"));
+        _Tumbler.BindTo_OnTakeOutRefused(FMars_Delegate_Tumbler_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         _Tumbler.BindTo_OnCoverageChanged(FMars_Delegate_Tumbler_OnCoverageChanged(this, n"OnCoverageChanged"));
         _Tumbler.BindTo_OnPieceReseated(FMars_Delegate_Tumbler_OnPieceReseated(this, n"OnPieceReseated"));
     }
@@ -166,18 +182,38 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         _Tumbler.Request_Cancel(FMars_Request_Tumbler_Cancel());
     }
 
-    protected void SetLoading(EMars_Tumbler_Loading InLoading)
+    // InCount bodiless boxes (the heat-station fixture's: Food.Meat.Beef, 0.1 kg) on the shelf, under the world's transient
+    // entity and tracked for cleanup; Add_Steps_StationReady waits for them to be Ready.
+    protected void Build_Boxes(int32 InCount)
     {
-        _Tumbler.Request_SetLoading(FMars_Request_Tumbler_SetLoading(InLoading));
+        if (ck::Is_NOT_Valid(_Fixture))
+        { _Fixture = Cast<UMars_AutoTestHelper_HeatStation>(NewObject(this, UMars_AutoTestHelper_HeatStation)); }
+
+        for (int32 Index = 0; Index < InCount; ++Index)
+        {
+            const auto BoxWorld = FTransform(k_Origin + k_BoxShelfLocal + FVector(0.0, k_BoxSpacingCm * float64(Index), 0.0));
+            const auto Box = _Fixture.Build_Box(BoxWorld, GameplayTags::Food_Meat_Beef);
+            FCk_Handle BoxEntity = Box;
+            Track_ForCleanup(BoxEntity);
+            _Boxes.Add(Box);
+        }
     }
 
-    // Piece {k_Generation, InSlot} released at rest at the rig's release pose with preset InSlot.
-    protected FMars_CookingFeed_PieceId AddPiece(int32 InSlot)
+    // Box InSlot released at rest at the rig's release pose as piece {k_Generation, InSlot}.
+    protected FMars_CookingFeed_PieceId Admit(int32 InSlot)
+    {
+        return Admit_As(InSlot, InSlot);
+    }
+
+    // Box InBox released at rest at the rig's release pose as piece {k_Generation, InSlot}.
+    protected FMars_CookingFeed_PieceId Admit_As(int32 InBox, int32 InSlot)
     {
         const auto PieceId = FMars_CookingFeed_PieceId(k_Generation, InSlot);
         const auto RootWorld = _Tumbler.Get_RootWorld();
-        const auto ReleaseWorld = FTransform(RootWorld.GetRotation(), RootWorld.TransformPosition(k_ReleaseLocal));
-        _Tumbler.Request_AddPiece(FMars_Request_Tumbler_AddPiece(FMars_CookingFeed_Release(PieceId, ReleaseWorld, FVector::ZeroVector, InSlot)));
+        auto Release = FMars_CookingFeed_Release(PieceId, FTransform(RootWorld.GetRotation(), RootWorld.TransformPosition(k_ReleaseLocal)), FVector::ZeroVector);
+        Release.Piece = _Boxes[InBox];
+        auto Station = _StationEntity;
+        utils_cooking_feed::Request_Admit(Station, Release);
         return PieceId;
     }
 
@@ -194,15 +230,25 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(RootWorld.TransformPosition(InRootLocal), RootWorld.Rotator()));
     }
 
-    // The piece's centre is inside the shell: within the inner radius of the axis and between the end discs.
+    // The piece's middle is inside the shell: within the inner radius of the axis and between the end discs.
     protected bool Check_PieceInside(const FMars_CookingFeed_PieceId& InPieceId) const
     {
         if (_Tumbler.Get_HasPiece(InPieceId) == false)
         { return false; }
 
-        const auto Local = _Tumbler.Get_PieceAxleLocal(InPieceId);
+        const auto Local = Get_PieceMiddleAxleLocal(InPieceId);
         const auto Radial = FVector2D(Local.X, Local.Z).Size();
         return Radial < float64(_Spec.Drum.InnerRadius) && Math::Abs(Local.Y) < float64(_Spec.Drum.HalfLength + _Spec.Shell.DiscGap);
+    }
+
+    // The middle of the piece's mesh bounds in the drum frame (its origin need not be its middle).
+    protected FVector Get_PieceMiddleAxleLocal(const FMars_CookingFeed_PieceId& InPieceId) const
+    {
+        const auto Piece = _Tumbler.Get_PieceHandle(InPieceId);
+        FCk_Handle Entity = Piece;
+        const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+        const auto Middle = PieceWorld.TransformPosition(utils_foodpiece::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry())));
+        return _Tumbler.Get_AxleWorld().InverseTransformPosition(Middle);
     }
 
     // The piece's body is in the simulation and moving slower than k_RestSpeed.
@@ -267,36 +313,36 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     }
 
     // The scene nodes composed their world poses, then the shell's and the hatch plate's bodies joined the simulation (a
-    // piece admitted before them would be rejected).
+    // piece admitted before them would be rejected) and every box is Ready.
     protected void Add_Steps_StationReady()
     {
-        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 2.0f);
-        Add_Step_WaitUntil("the shell's bodies are in the simulation", n"Check_BodiesAdded", 0, 2.0f);
+        Add_Step_WaitUntil("the station's nodes are posed", n"Check_NodesPosed", 0, 0);
+        Add_Step_WaitUntil("the shell's bodies are in the simulation and every box is Ready", n"Check_BodiesAdded", 0, 0);
     }
 
     // The hatch opened: aim at the tab, wait for the hover, press, wait for Open.
     protected void Add_Steps_OpenHatch()
     {
         Add_Step("look at the hatch", n"Step_LookToHatch");
-        Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 2.0f);
+        Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 0);
         Add_Step("press on the hatch", n"Step_Press");
-        Add_Step_WaitUntil("the hatch is open", n"Check_HatchOpen", 0, 2.0f);
+        Add_Step_WaitUntil("the hatch is open", n"Check_HatchOpen", 0, 0);
     }
 
     protected void Add_Steps_CloseHatch()
     {
         Add_Step("look at the open hatch", n"Step_LookToHatch");
-        Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 2.0f);
+        Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 0);
         Add_Step("press on the hatch", n"Step_Press");
-        Add_Step_WaitUntil("the hatch is closed", n"Check_HatchClosed", 0, 2.0f);
+        Add_Step_WaitUntil("the hatch is closed", n"Check_HatchClosed", 0, 0);
     }
 
     protected void Add_Steps_Grip()
     {
         Add_Step("look at the lever", n"Step_LookToLever");
-        Add_Step_WaitUntil("the lever is hovered", n"Check_HoveredLever", 0, 2.0f);
+        Add_Step_WaitUntil("the lever is hovered", n"Check_HoveredLever", 0, 0);
         Add_Step("press on the lever", n"Step_Press");
-        Add_Step_WaitUntil("the lever is gripped", n"Check_Gripped", 0, 3.0f);
+        Add_Step_WaitUntil("the lever is gripped", n"Check_Gripped", k_SlowPolls, 0);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -389,7 +435,7 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    protected void OnPieceAdmission(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId,
+    protected void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId,
         EMars_CookingFeed_Admission InAdmission, FString InReason)
     {
         _AdmissionIds.Add(InPieceId);
@@ -402,6 +448,18 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     {
         _AddedIds.Add(InPieceId);
         _Added.Add(InPiece);
+    }
+
+    UFUNCTION()
+    protected void OnPieceTakenOut(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
+    {
+        _TakenOut.Add(InPiece);
+    }
+
+    UFUNCTION()
+    protected void OnTakeOutRefused(FCk_Handle_Tumbler InTumbler, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        _TakeOutRefusals.Add(InRefusal);
     }
 
     UFUNCTION()
@@ -445,8 +503,12 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
     UFUNCTION()
     protected void Check_BodiesAdded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        auto IsReady = utils_jolt_body::Get_IsBodyAdded(_Spec.Nodes.DrumBody) && utils_jolt_body::Get_IsBodyAdded(_HatchBody);
+        for (const auto& Box : _Boxes)
+        { IsReady = IsReady && Box.Get_Status() == EMars_FoodPiece_Status::Ready; }
+
         auto Res = OutResult;
-        Res.Set(utils_jolt_body::Get_IsBodyAdded(_Spec.Nodes.DrumBody) && utils_jolt_body::Get_IsBodyAdded(_HatchBody));
+        Res.Set(IsReady);
     }
 
     // Every piece inside the shell and slow for k_RestFrames frames in a row.

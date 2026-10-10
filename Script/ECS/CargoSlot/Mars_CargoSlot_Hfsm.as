@@ -7,8 +7,8 @@ class UMars_SmState_CargoSlot_Interact : UMars_SmState_InteractTarget_RunTask
 
 // Re-evaluates Get_ActionFor for the initiator, requests the Stow / Take with where the moving item visually is (so its
 // next visual lerps from there) and runs until the slot reports the expected content, or that the transfer was refused.
-// A Blocked_ action fails with a warning: the prompt processor disables the target for it, but can lag the initiator's
-// hands by a frame.
+// A Blocked_ action fails (ActionBlocked): the prompt processor disables the target for it, but can lag the initiator's
+// hands by a frame. A failure names its reason on the interaction's stamped context, which the sub-SM's Failed end reports.
 class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -71,7 +71,7 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
             return;
         }
 
-        DoFail(f"the slot refuses the initiator: [{Action :n}]");
+        DoFail(EMars_Interaction_FailReason::ActionBlocked);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -104,7 +104,7 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         { return; }
 
         DoUnbind();
-        DoFail(f"the [{_Action :n}] of [{InItem.ToString()}] was refused");
+        DoFail(EMars_Interaction_FailReason::TransferRefused);
     }
 
     private void DoStart(FCk_Handle_CargoSlot& InSlot, const FCk_Handle_Item& InItem, EMars_CargoSlot_Action InAction)
@@ -137,9 +137,9 @@ class UMars_SmTask_CargoSlot_StowOrTake : UCk_SmTask_EntityScript
         return utils_transform::Get_EntityCurrentTransform(InFallback.As_Transform());
     }
 
-    private void DoFail(const FString& InReason)
+    private void DoFail(EMars_Interaction_FailReason InReason)
     {
-        ck::Warning(f"[CargoSlot] Interaction failed: {InReason}");
+        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
         _Outcome = ECk_SmTaskResult::Failed;
     }
 }

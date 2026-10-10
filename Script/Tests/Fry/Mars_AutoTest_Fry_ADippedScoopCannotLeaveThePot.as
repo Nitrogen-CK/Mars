@@ -8,6 +8,10 @@ class UMars_AutoTest_Fry_ADippedScoopCannotLeaveThePot : UMars_AutoTestRig_Fry
 
     private const FVector k_HardRight = FVector(80.0, 0.0, 0.0);
     private const float32 k_WatchSeconds = 1.2f;
+    // A watch ends on the first poll past k_WatchSeconds: a second of slack covers that poll on any lane.
+    private const float32 k_WatchSlackSeconds = 1.0f;
+    // The carried watch also waits for the slide to settle over the basket, which can trail the span.
+    private const float32 k_CarriedWatchSlackSeconds = 1.8f;
 
     private float32 _WatchStart = 0.0f;
     private float64 _MaxDippedRadius = 0.0;
@@ -21,13 +25,13 @@ class UMars_AutoTest_Fry_ADippedScoopCannotLeaveThePot : UMars_AutoTestRig_Fry
 
         Add_Step("drive the skimmer", n"Step_Drive");
         Add_Step("dip it at its park", n"Step_Dip");
-        Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", k_SlowPolls, 0);
         Add_Step("look hard right while dipped", n"Step_LookHardRight");
-        Add_Step_WaitUntil("the dipped scoop had time to follow", n"Check_DippedWatched", 0, k_WatchSeconds + 1.0f);
+        Add_Step_WaitUntil("the dipped scoop had time to follow", n"Check_DippedWatched", 0, k_WatchSeconds + k_WatchSlackSeconds);
         Add_Step("it stayed in the pot; carry it up", n"Step_AssertInPotThenCarry");
-        Add_Step_WaitUntil("the scoop carries, clear of the rim", n"Check_CarryingClear", 0, 4.0f);
+        Add_Step_WaitUntil("the scoop carries, clear of the rim", n"Check_CarryingClear", k_SlowPolls, 0);
         Add_Step("look hard right again", n"Step_LookHardRight");
-        Add_Step_WaitUntil("the carried scoop had time to follow", n"Check_CarriedWatched", 0, 3.0f);
+        Add_Step_WaitUntil("the carried scoop had time to follow", n"Check_CarriedWatched", 0, k_WatchSeconds + k_CarriedWatchSlackSeconds);
         Add_Step("it left the pot", n"Step_AssertLeftThePot");
         Run_Steps(InHandle);
     }

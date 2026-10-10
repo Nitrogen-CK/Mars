@@ -34,12 +34,12 @@ class UMars_AutoTest_Climber_LocomotionExitDismounts : UMars_AutoTestRig_Climber
         auto LocalHandle = InHandle;
         _Machine = utils_state_machine::Add(LocalHandle, FCk_StateMachine_Spec(UMars_AutoTestState_BareLocomotion));
 
-        Add_Step_WaitUntil("the machine is in Locomotion", n"Check_InLocomotion", 0, 2.0f);
+        Add_Step_WaitUntil("the machine is in Locomotion", n"Check_InLocomotion", 0, 0);
         Add_Step("mount from the front", n"Step_MountFront");
-        Add_Step_WaitUntil("the climber is climbing", n"Check_Climbing", 0, 2.0f);
-        Add_Step_WaitUntil("climbing up reaches 0.3", n"Check_AboveFoot", 0, 3.0f);
+        Add_Step_WaitUntil("the climber is climbing", n"Check_Climbing", 0, 0);
+        Add_Step_WaitUntil("climbing up reaches 0.3", n"Check_AboveFoot", 0, 0);
         Add_Step("leave Locomotion while climbing", n"Step_LeaveLocomotion");
-        Add_Step_WaitUntil("the machine left Locomotion and the climber is off the ladder", n"Check_LeftAndDismounted", 0, 2.0f);
+        Add_Step_WaitUntil("the machine left Locomotion and the climber is off the ladder", n"Check_LeftAndDismounted", 0, 0);
         Add_Step("the climb ended Lost, mid-ladder", n"Step_AssertLost");
         Run_Steps(InHandle);
     }

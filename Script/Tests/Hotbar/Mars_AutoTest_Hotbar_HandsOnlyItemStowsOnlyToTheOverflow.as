@@ -24,7 +24,7 @@ class UMars_AutoTest_Hotbar_HandsOnlyItemStowsOnlyToTheOverflow : UMars_AutoTest
         Add_Step_WaitUntil("the overflow slot holds the platter and is selected", n"Check_PlatterInOverflowAndSelected");
         Add_Step("stow the rock", n"Step_StowSecond");
         Add_Step_WaitUntil("bag slot 0 holds the rock", n"Check_RockInBagSlot0");
-        Add_Step_WaitFrames("let the sync pass observe the rock arrival", 3);
+        Add_Step_WaitUntil("the sync pass has seen the rock arrival", n"Check_SyncSawRock", 0, 0);
         Add_Step("the rock arrival kept the overflow selected", n"Step_AssertOverflowStillSelected");
         Add_Step("a second platter has no stow or take target while the overflow is taken", n"Step_AssertSecondPlatterHasNoTarget");
         Run_Steps(InHandle);
@@ -90,6 +90,14 @@ class UMars_AutoTest_Hotbar_HandsOnlyItemStowsOnlyToTheOverflow : UMars_AutoTest
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_ItemAt(0) == _Items[1]);
+    }
+
+    // The hotbar's sync pass records each slot's item (LastSeen) in the pass that applies the arrival rule to it.
+    UFUNCTION()
+    private void Check_SyncSawRock(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[0] == _Items[1]);
     }
 
     UFUNCTION()

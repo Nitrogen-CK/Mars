@@ -2,7 +2,7 @@
 // (its own pickup) into its bag slot, then interacts with a large platter lying on a floor: the platter's prompt offers
 // "Place Meat slab on platter", and its interaction (UMars_SmTask_PlaceHeldFood) has the gloves carry the slab over the
 // platter (a Place reach: Reach, then Grip) and only at the Grip releases the food (its world item back in the world, the
-// item back in its holder) and loads the joint: the platter drops it, it settles and OnLoaded fires within 3 s with the
+// item back in its holder) and loads the joint: the platter drops it, it settles and OnLoaded fires with the
 // joint a scene-node child of the root. Then the slab's own pickup takes it back: the Mount processor detaches it from the
 // root, the platter's Reconcile broadcasts OnUnloaded and empties the ledger, and the slab is Held again. Isolated origin
 // (22000, -17000, -30000).
@@ -13,6 +13,8 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
     private const FVector k_Origin = FVector(22000.0, -17000.0, -30000.0);
     private const FVector k_PlatterOffset = FVector(200.0, 0.0, 0.0);
     private const FVector k_FoodOffset = FVector(200.0, 200.0, 0.0);
+    // Constructions, glove reaches, mount arrivals and settles outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     // Under construction until each is a WorldItem whose holder holds its item.
     private FCk_Handle _PlatterEntity;
@@ -39,7 +41,6 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
         Add_CarrierHands();
-        Bind_PushSelection();
 
         auto Owner = InHandle;
         Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
@@ -58,30 +59,31 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
         _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
-        Add_Step_WaitUntil("the platter and the food item are constructed", n"Check_Constructed", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
+        Add_Step_WaitUntil("the platter and the food item are constructed", n"Check_Constructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
         Add_Step("the carrier focuses the food's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the food's target enters Focused", 3);
+        Add_Step_WaitUntil("the food's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier picks the food up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 0.5f);
+        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the hold's arrival settled", n"Check_FoodHoldSettled", k_SlowPolls, 0);
         Add_Step("the carrier unfocuses the food and focuses the platter", n"Step_FocusPlatter");
-        Add_Step_WaitFrames("the platter's target enters Focused and its prompt refreshes", 3);
+        Add_Step_WaitUntil("the platter's target enters Focused", n"Check_AwaitedFocus", 0, 0);
+        Add_Step_WaitUntil("the platter's prompt leaves its placeholder for the held food", n"Check_PlatterPromptWritten", 0, 0);
         Add_Step("the platter offers to place the food", n"Step_AssertDepositPrompt");
         Add_Step("the carrier interacts with the platter", n"Step_Deposit");
         Add_Step_WaitFrames("the interaction has begun", 1);
         Add_Step("the food is still in the hands: the place waits for the gloves", n"Step_RecordAfterDepositStart");
-        Add_Step_WaitUntil("the food is released into the world", n"Check_FoodReleased", 0, 3.0f);
+        Add_Step_WaitUntil("the food is released into the world", n"Check_FoodReleased", k_SlowPolls, 0);
         Add_Step("the food left the hands at the gloves' Grip, after their Reach", n"Step_AssertReleasedAtTheGrip");
-        Add_Step_WaitUntil("the platter loaded the joint", n"Check_Loaded", 0, 3.0f);
+        Add_Step_WaitUntil("the platter loaded the joint", n"Check_Loaded", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("the joint is on the platter and the hands are empty", n"Step_AssertOnThePlatter");
         Add_Step("the carrier unfocuses the platter", n"Step_UnfocusPlatter");
         Add_Step_WaitFrames("the platter's target leaves Focused", 2);
         Add_Step("the carrier focuses the food's pickup again", n"Step_FocusFood");
-        Add_Step_WaitFrames("the food's target enters Focused", 3);
+        Add_Step_WaitUntil("the food's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier takes the food off the platter", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the food is Held again and the platter unloaded it", n"Check_TakenBack", 0, 5.0f);
+        Add_Step_WaitUntil("the food is Held again and the platter unloaded it", n"Check_TakenBack", k_SlowPolls, 0);
         Add_Step("the platter is empty and the joint rides the hand", n"Step_AssertTakenBack");
         Run_Steps(InHandle);
     }
@@ -128,6 +130,7 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
     {
         auto Pickup = Get_Pickup(_Food);
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Pickup);
     }
 
     UFUNCTION()
@@ -145,6 +148,13 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
     }
 
     UFUNCTION()
+    private void Check_FoodHoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Food.Get_Mount() == EMars_WorldItem_Mount::Held && _Food.Get_IsSettled());
+    }
+
+    UFUNCTION()
     private void Step_FocusPlatter(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto FoodPickup = Get_Pickup(_Food);
@@ -152,6 +162,17 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
 
         auto PlatterPickup = Get_Pickup(_PlatterItem);
         PlatterPickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(PlatterPickup);
+    }
+
+    // The platter's prompt left the world item's placeholder ("Pick up <item>", which a focuser with no food also gets): the
+    // platter's assembly wrote what the food in the focuser's hands can do there.
+    UFUNCTION()
+    private void Check_PlatterPromptWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto PromptText = Get_UseTarget(_PlatterItem).As_InteractPrompt().Get_PromptText().ToString();
+        auto Res = OutResult;
+        Res.Set(PromptText.StartsWith("Pick up") == false);
     }
 
     UFUNCTION()

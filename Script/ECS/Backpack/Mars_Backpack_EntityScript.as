@@ -5,8 +5,8 @@
 // transform, the socket location scaled by Presentation.Visual.MeshScale (the pack root is unit scale; the visual node
 // carries the display scale). A named socket the mesh does not have is a configuration error: ensure, destroy self.
 //
-// While the pack is Held (in its carrier's hands) its cargo interactables are disabled: nobody can reach them. Every
-// other mount re-enables them.
+// While the pack is Held (in its carrier's hands) its cargo interactables hold the HolderHeld claim: nobody can reach them.
+// Every other mount releases it.
 //
 // The weight probe (Probe.Mars.Backpack) is what backpack pressure plates feel. It is enabled only while the pack lies in
 // the world (Mount World): a carried or held pack weighs on nothing.
@@ -131,11 +131,16 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
     UFUNCTION()
     private void OnMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
     {
-        const auto EnableDisable = InNew == EMars_WorldItem_Mount::Held ? ECk_EnableDisable::Disable : ECk_EnableDisable::Enable;
+        const auto IsHeld = InNew == EMars_WorldItem_Mount::Held;
         for (auto& Interactable : _CargoInteractables)
         {
-            if (ck::IsValid(Interactable))
-            { Interactable.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(EnableDisable)); }
+            if (ck::Is_NOT_Valid(Interactable))
+            { continue; }
+
+            if (IsHeld)
+            { Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::HolderHeld)); }
+            else
+            { Interactable.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::HolderHeld)); }
         }
 
         if (ck::IsValid(_WeightProbe))

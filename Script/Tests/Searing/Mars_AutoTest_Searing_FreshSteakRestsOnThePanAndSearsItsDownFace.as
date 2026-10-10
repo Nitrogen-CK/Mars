@@ -13,7 +13,7 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();
         Add_Step("the piece rests flat on its -Z face and the pan sizzles", n"Step_AssertResting");
-        Add_Step_WaitUntil("the face on the pan seared", n"Check_FirstDownFaceSeared", 0, 2.0f);
+        Add_Step_WaitUntil("the face on the pan seared", n"Check_FirstDownFaceSeared", 0, 0);
         Add_Step("only -Z seared", n"Step_AssertOnlyDownFaceSeared");
         Add_Step_WaitFrames("the sizzle edge", 2);
         Add_Step("the sizzle went quiet", n"Step_AssertQuiet");

@@ -17,7 +17,7 @@ class UMars_AutoTest_Health_InvulnerableIgnoresDamage : UCk_AutoTest_Base
         // Deliberately a fixed window: an ignored hit has no signal to wait on.
         Add_Step_WaitSeconds("let the drain run", 0.2f);
         Add_Step("the hit was ignored; make it vulnerable and hit it for 50 again", n"Step_AssertIgnoredAndHitAgain");
-        Add_Step_WaitUntil("Health reads 50", n"Check_At50", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 50", n"Check_At50", 0, 0);
         Add_Step("the second hit landed", n"Step_AssertLanded");
         Run_Steps(InHandle);
     }

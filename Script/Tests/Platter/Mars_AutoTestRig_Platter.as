@@ -32,7 +32,6 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
     protected TArray<FMars_AutoTest_Platter_Loaded> _Loaded;
     protected TArray<FMars_AutoTest_Platter_Refusal> _Refused;
     protected TArray<FMars_AutoTest_Platter_Unloaded> _Unloaded;
-    protected TArray<FCk_Handle_Platter> _Cleared;
 
     // A 30 x 30 floor between 40 cm walls (the box fixture is a 10 cm cube), the item's settle tuners.
     protected FMars_Platter_Spec Make_PlatterSpec(int32 InCapacity) const
@@ -49,7 +48,6 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
         Platter.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnPlatterLoaded"));
         Platter.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnPlatterLoadRefused"));
         Platter.BindTo_OnUnloaded(FMars_Delegate_Platter_OnUnloaded(this, n"OnPlatterUnloaded"));
-        Platter.BindTo_OnCleared(FMars_Delegate_Platter_OnCleared(this, n"OnPlatterCleared"));
         return Platter;
     }
 
@@ -68,12 +66,6 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
     {
         auto Platter = InPlatter;
         Platter.Request_Unload(FMars_Request_Platter_Unload(InPiece));
-    }
-
-    protected void Clear(FCk_Handle_Platter InPlatter)
-    {
-        auto Platter = InPlatter;
-        Platter.Request_Clear(FMars_Request_Platter_Clear());
     }
 
     protected FTransform Get_PlatterWorld(FCk_Handle_Platter InPlatter) const
@@ -245,18 +237,6 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
         return Count;
     }
 
-    protected int32 Get_ClearedCount(FCk_Handle_Platter InPlatter) const
-    {
-        auto Count = 0;
-        for (const auto& Platter : _Cleared)
-        {
-            if (Platter == InPlatter)
-            { ++Count; }
-        }
-
-        return Count;
-    }
-
     //----------------------------------------------------------------------------------------------------------------------
     // Handlers
     //----------------------------------------------------------------------------------------------------------------------
@@ -292,11 +272,5 @@ class UMars_AutoTestRig_Platter : UMars_AutoTestRig_FoodPiece
         Event.Platter = InPlatter;
         Event.Piece = InPiece;
         _Unloaded.Add(Event);
-    }
-
-    UFUNCTION()
-    private void OnPlatterCleared(FCk_Handle_Platter InPlatter)
-    {
-        _Cleared.Add(InPlatter);
     }
 }

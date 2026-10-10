@@ -1,17 +1,20 @@
 // The tumbler station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Tumbler_Idle). It runs on the STATION entity (context = the station, which also carries the Tumbler feature
-// and the platter's CookingFeed) and reads the station's operator; it only issues Tumbler and CookingFeed requests and
-// registers the operator's legend rows. The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
+// and the raw platter's CookingFeed; its two platter docks are lifetime children of it) and reads the station's operator;
+// it only issues Tumbler and CookingFeed requests and registers the operator's legend rows. The feed tasks are the shared
+// ones (Mars_StationFeed_SmTasks.as).
 //
 //   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source, StationFeed_Bridge (a release in flight lands; no
 //                                                 reset: the batch, its coverage and the feed's attempt persist across a
 //                                                 leave and a re-enter)
-//   Operated  ->Idle     [StationIsNotOperated]   tasks: Tumbler_OperatorInput (Tick), Tumbler_FeedGate, Tumbler_CancelOnExit,
+//   Operated  ->Idle     [StationIsNotOperated]   tasks: Tumbler_OperatorInput (Tick), Tumbler_CancelOnExit,
 //                                                 StationFeed_Source, TumblerFeed_OperatorInput (Tick), StationFeed_Bridge,
-//                                                 StationFeed_OperatorHints, Tumbler_OperatorHints
+//                                                 StationFeed_OperatorHints, Tumbler_OperatorHints, StationFeed_TakeOutInput
+//                                                 (Tick)
 //
-// The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
-// the camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.
+// A piece the drum hands back lands on the finished tray through the kernel's own landing, whoever operates. The
+// conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose, the
+// camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.
 
 class UMars_SmState_Tumbler_Idle : UCk_SmState_EntityScript
 {
@@ -35,13 +38,13 @@ class UMars_SmState_Tumbler_Operated : UCk_SmState_EntityScript
         AddCondition(ToIdle, UMars_SmCondition_StationIsNotOperated);
 
         AddTask(InHandle, UMars_SmTask_Tumbler_OperatorInput);
-        AddTask(InHandle, UMars_SmTask_Tumbler_FeedGate);
         AddTask(InHandle, UMars_SmTask_Tumbler_CancelOnExit);
         AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_TumblerFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_Tumbler_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
     }
 }
 
@@ -116,64 +119,6 @@ class UMars_SmTask_Tumbler_OperatorInput : UCk_SmTask_EntityScript
     }
 }
 
-// Forwards the feed's busy edges to the kernel (InFlight from BeginTransfer until the glove is back, Idle otherwise): the
-// hatch never shuts on a piece in flight and the lever is never gripped mid-transfer. Seeded on enter; exit sends Idle (the
-// bridge cancels a transfer in flight on the same exit). A station without a feed has nothing to forward.
-class UMars_SmTask_Tumbler_FeedGate : UCk_SmTask_EntityScript
-{
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    private FCk_Handle_Tumbler _Tumbler;
-    private FCk_Handle_CookingFeed _Feed;
-    private EMars_Tumbler_Loading _SentLoading = EMars_Tumbler_Loading::Idle;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Tumbler = StationEntity.As_Tumbler();
-        _Feed = StationEntity.As_CookingFeed(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Feed))
-        { return; }
-
-        _Feed.BindTo_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnPhaseChanged"));
-        Send(_Feed.Get_IsBusy() ? EMars_Tumbler_Loading::InFlight : EMars_Tumbler_Loading::Idle);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::IsValid(_Feed))
-        { _Feed.UnbindFrom_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnPhaseChanged")); }
-
-        if (ck::IsValid(_Tumbler))
-        { _Tumbler.Request_SetLoading(FMars_Request_Tumbler_SetLoading(EMars_Tumbler_Loading::Idle)); }
-
-        _Tumbler = FCk_Handle_Tumbler();
-        _Feed = FCk_Handle_CookingFeed();
-        _SentLoading = EMars_Tumbler_Loading::Idle;
-    }
-
-    UFUNCTION()
-    private void OnPhaseChanged(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Phase InPhase)
-    {
-        const auto Loading = InPhase == EMars_CookingFeed_Phase::Idle ? EMars_Tumbler_Loading::Idle : EMars_Tumbler_Loading::InFlight;
-        if (Loading == _SentLoading)
-        { return; }
-
-        Send(Loading);
-    }
-
-    private void Send(EMars_Tumbler_Loading InLoading)
-    {
-        if (ck::Is_NOT_Valid(_Tumbler))
-        { return; }
-
-        _Tumbler.Request_SetLoading(FMars_Request_Tumbler_SetLoading(InLoading));
-        _SentLoading = InLoading;
-    }
-}
-
 // Leaving lets go: a grip ends (the drum returns home) or a reach stops, and the hand is Free. The pieces and their
 // coverage stay for the next operator.
 class UMars_SmTask_Tumbler_CancelOnExit : UCk_SmTask_EntityScript
@@ -191,8 +136,8 @@ class UMars_SmTask_Tumbler_CancelOnExit : UCk_SmTask_EntityScript
     }
 }
 
-// The shared add-food input, refused by the tumbler unless it can load (the hatch Open, the drum Home, nothing in flight and
-// room in the drum): a refused edge is consumed before BeginTransfer, so nothing is queued.
+// The shared add-food input, gated by the tumbler: it can load only with the hatch Open, the drum Home, nothing in flight
+// and room in the drum. A gated press is the feed's StationGate refusal (the label says why); nothing is queued.
 class UMars_SmTask_TumblerFeed_OperatorInput : UMars_SmTask_StationFeed_OperatorInput
 {
     private FCk_Handle_Tumbler _Tumbler;

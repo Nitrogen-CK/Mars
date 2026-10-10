@@ -17,21 +17,20 @@ class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoT
         for (int32 Index = 0; Index < k_BoxCount; ++Index)
         {
             // A slice dressed from its food, as the station dresses the halves it cuts.
-            const auto PileLocal = FTransform(FRotator::ZeroRotator, FVector(10.0 * (Index - 1), 0.0, 0.0)) * utils_cutting::Get_PileLocal();
-            const auto Slice = mars::Food_MushroomSlice_Mars.Build_Joint(ck::TransientEntity(), PileLocal * FTransform(FRotator::ZeroRotator, k_Origin));
+            const auto Slice = mars::Food_MushroomSlice_Mars.Build_Joint(ck::TransientEntity(), FTransform(FRotator::ZeroRotator, k_Origin + Get_PileOffset(Index)));
             Track_ForCleanup(Slice);
             _Boxes.Add(Slice);
         }
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("every slice is Ready", n"Check_BoxesReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 0);
+        Add_Step_WaitUntil("every slice is Ready", n"Check_BoxesReady", k_SlowPolls, 0);
         Add_Step("place the three slices on the board", n"Step_PlaceOnBoard");
-        Add_Step_WaitUntil("the board holds the three slices", n"Check_BoardFilled", 0, 5.0f);
+        Add_Step_WaitUntil("the board holds the three slices", n"Check_BoardFilled", 0, 0);
         Add_Step_WaitFrames("the placed poses have landed", 2);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
         Add_Step("move the hand over the slices' shared centre and chop", n"Step_AimAndChop");
-        Add_Step_WaitUntil("the chop landed and every slice was cut", n"Check_AllCut", 0, 5.0f);
+        Add_Step_WaitUntil("the chop landed and every slice was cut", n"Check_AllCut", k_SlowPolls, 0);
         Add_Step("three straddled, three cut", n"Step_Assert");
         Run_Steps(InHandle);
     }
@@ -50,11 +49,18 @@ class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoT
     UFUNCTION()
     private void Step_PlaceOnBoard(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        for (const auto& Box : _Boxes)
+        for (int32 Index = 0; Index < _Boxes.Num(); ++Index)
         {
-            Watch(Box);
-            _Board.Request_Place(FMars_Request_FoodBoard_Place(Box));
+            Watch(_Boxes[Index]);
+            Pose_OnPile(_Boxes[Index], Get_PileOffset(Index));
+            _Board.Request_Place(FMars_Request_FoodBoard_Place(_Boxes[Index]));
         }
+    }
+
+    // In a row along the board's depth (the pile node's X), 10 cm apart.
+    private FVector Get_PileOffset(int32 InIndex) const
+    {
+        return FVector(10.0 * (InIndex - 1), 0.0, 0.0);
     }
 
     UFUNCTION()

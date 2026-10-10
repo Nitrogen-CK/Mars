@@ -1,8 +1,9 @@
 // Drains Reset -> SetDrive -> SetLiftTarget -> SetTiltTarget -> SetSlideTarget -> Look. Reset levels the implement, zeroes
 // the lift, the slide (and their targets) and the orbit and idles it; SetDrive, SetLiftTarget, SetTiltTarget and
-// SetSlideTarget are last-wins (a lift target only for a Commanded lift, a slide target only for a Commanded slide; tilt
-// targets whatever the axes); looks only collect into the pending look while Driven. The drain collects and the Tick
-// measures: a dirty-marked processor is also pumped with a zero DeltaT, so nothing here integrates over time.
+// SetSlideTarget are last-wins (a lift target only for a Commanded lift, a slide target only for a Commanded slide: any
+// other is a caller's defect, ensured; tilt targets whatever the axes); looks only collect into the pending look while
+// Driven. The drain collects and the Tick measures: a dirty-marked processor is also pumped with a zero DeltaT, so nothing
+// here integrates over time.
 class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -86,22 +87,17 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.WrittenLift = 0.0f;
         InState.WrittenSlide = FVector2D::ZeroVector;
         InState.WrittenOrbit = FVector::ZeroVector;
-
-        ck::Trace(f"[Implement] [{InImplement.ToString()}] reset: level, no lift, no slide, no orbit, idle");
     }
 
-    // Only a Commanded lift has a target to set; the spring (the Tick) carries the node there.
+    // Only a Commanded lift has a target to set (any other is the caller's defect); the spring (the Tick) carries the node
+    // there.
     private void Apply_SetLiftTarget(FCk_Handle_Implement& InImplement, FMars_Fragment_Implement& InState, float32 InLift)
     {
         const auto& LiftSpec = InImplement.Get_Spec().Lift;
-        if (LiftSpec.Mode != EMars_Implement_LiftMode::Commanded)
-        {
-            ck::Trace(f"[Implement] [{InImplement.ToString()}] lift target {InLift} ignored: the lift is {LiftSpec.Mode :n}, not Commanded");
-            return;
-        }
+        if (ck::EnsureIfNot(LiftSpec.Mode == EMars_Implement_LiftMode::Commanded, f"[Implement] [{InImplement.ToString()}] got a lift target {InLift}: its lift is {LiftSpec.Mode :n}, not Commanded"))
+        { return; }
 
         InState.TargetLift = Math::Clamp(InLift, LiftSpec.MinLift, LiftSpec.MaxLift);
-        ck::Trace(f"[Implement] [{InImplement.ToString()}] lift target -> {InState.TargetLift :.2}");
     }
 
     // The tilt targets, each clamped to MaxTiltDegrees; the Tick tracks them at the bounded rate (and relaxes them per the
@@ -112,19 +108,15 @@ class UMars_Processor_Implement_HandleRequests : UCk_Processor_Script_Base_UE
         InState.TargetPitch = Math::Clamp(float32(InTilt.Pitch), -MaxTilt, MaxTilt);
         InState.TargetYaw = Math::Clamp(float32(InTilt.Yaw), -MaxTilt, MaxTilt);
         InState.TargetRoll = Math::Clamp(float32(InTilt.Roll), -MaxTilt, MaxTilt);
-        ck::Trace(f"[Implement] [{InImplement.ToString()}] tilt target -> P={InState.TargetPitch :.2} Y={InState.TargetYaw :.2} R={InState.TargetRoll :.2}");
     }
 
-    // Only a Commanded slide has a target to set; it clamps to the spec's box or disc and the spring (the Tick) carries the
-    // node there.
+    // Only a Commanded slide has a target to set (any other is the caller's defect); it clamps to the spec's box or disc and
+    // the spring (the Tick) carries the node there.
     private void Apply_SetSlideTarget(FCk_Handle_Implement& InImplement, FMars_Fragment_Implement& InState, FVector2D InSlide)
     {
         const auto& SlideSpec = InImplement.Get_Spec().Slide;
-        if (SlideSpec.Mode != EMars_Implement_SlideMode::Commanded)
-        {
-            ck::Trace(f"[Implement] [{InImplement.ToString()}] slide target {InSlide} ignored: the slide is {SlideSpec.Mode :n}, not Commanded");
-            return;
-        }
+        if (ck::EnsureIfNot(SlideSpec.Mode == EMars_Implement_SlideMode::Commanded, f"[Implement] [{InImplement.ToString()}] got a slide target {InSlide}: its slide is {SlideSpec.Mode :n}, not Commanded"))
+        { return; }
 
         InState.TargetSlide = utils_implement::Clamp_SlideTarget(SlideSpec, InSlide);
     }

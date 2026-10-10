@@ -4,6 +4,8 @@
 class UMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -21000.0, -30000.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_Platter _Platter;
     private FCk_Handle_FoodPiece _P;
@@ -18,7 +20,7 @@ class UMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand : UMars_AutoTestRig
 
         Add_Step_WaitUntil("P and Q are Ready", n"Check_Ready");
         Add_Step("load P and Q", n"Step_Load");
-        Add_Step_WaitUntil("both froze into the pile", n"Check_BothHeld");
+        Add_Step_WaitUntil("both froze into the pile", n"Check_BothHeld", k_SlowPolls, 0);
         Add_Step("take P off the root behind the platter's back", n"Step_DetachP");
         Add_Step_WaitFrames("the reconcile runs", 2);
         Add_Step("P left the ledger with OnUnloaded; Q is still the platter's", n"Step_Assert");

@@ -11,9 +11,10 @@ class UMars_PlatterDock_AcceptPolicy : UObject
 namespace utils_platter_dock
 {
     // A scene-node child of the station root at MountLocal carrying the dock: a capacity-1 Inventory.Mars.Dock.<Role>
-    // inventory (accept policy CDO), the node published as AttachPoint.Mars.Dock (the dock is the carrier a docked platter
-    // mounts on) and a probe interactable with one Use target running UMars_SmState_PlatterDock_Interact. The scene-node
-    // Create makes the dock a lifetime child of the station root, so it dies with the station.
+    // inventory (accept policy CDO) whose platter rides the node, published as AttachPoint.Mars.Dock (the dock is the
+    // carrier a docked platter mounts on; its root sits on the node), and a probe interactable with one Use target running
+    // UMars_SmState_PlatterDock_Interact. The scene-node Create makes the dock a lifetime child of the station root, so it
+    // dies with the station.
     FCk_Handle_PlatterDock Create(FCk_Handle_Transform& InStationRoot, FMars_PlatterDock_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -37,6 +38,8 @@ namespace utils_platter_dock
 
         FCk_Handle DockEntity = Node;
         auto Inventory = utils_inventory_data_only::Add(DockEntity, InventoryParams, ECk_Replication::DoesNotReplicate);
+        utils_world_item::Add_MountedInventory(Inventory, FMars_Fragment_MountedInventory(EMars_WorldItem_MountRule::PointAtOffset,
+            GameplayTags::AttachPoint_Mars_Dock, FTransform::Identity));
 
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Dock, Node));
@@ -81,28 +84,23 @@ namespace utils_platter_dock
         return WorldItemEntity.As_Platter(ECk_SanityCheck::UnChecked);
     }
 
-    // What InPolicy says to InPlatter as it is now; unset = it may dock. Pure: no transfer, no dock. Checked in order
-    // MustBeEmpty / MustHaveFood, NotWhole, KindRejected (Occupied is the dock's, not the policy's).
-    TOptional<EMars_PlatterDock_Refusal> Get_Refusal(const FMars_PlatterDock_Policy& InPolicy, const FCk_Handle_Platter& InPlatter)
+    // What a dock with InSpec says to InPlatter as it is now, every piece it holds counted (held, settling or queued: a
+    // pile re-settling after a take is still on the platter); unset = it may dock. Pure: no transfer, no dock. Checked in
+    // order MustBeEmpty (the Output role), NotWhole, KindRejected (Occupied is the dock's, not the policy's).
+    TOptional<EMars_PlatterDock_Refusal> Get_Refusal(const FMars_PlatterDock_Spec& InSpec, const FCk_Handle_Platter& InPlatter)
     {
-        if (InPolicy.RequireEmpty.IsSet())
-        {
-            const auto HeldCount = InPlatter.Get_HeldCount();
-            if (InPolicy.RequireEmpty.GetValue() && HeldCount > 0)
-            { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustBeEmpty); }
+        if (InSpec.Role == EMars_PlatterDock_Role::Output && InPlatter.Get_Occupancy() > 0)
+        { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustBeEmpty); }
 
-            if (InPolicy.RequireEmpty.GetValue() == false && HeldCount == 0)
-            { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustHaveFood); }
-        }
-
-        if (InPolicy.WholeOnly && InPlatter.Get_IsWhole() == false)
+        const auto& Policy = InSpec.Policy;
+        if (Policy.WholeOnly && InPlatter.Get_IsWhole() == false)
         { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::NotWhole); }
 
-        if (InPolicy.Kind.IsEmpty() == false)
+        if (Policy.Kind.IsEmpty() == false)
         {
-            for (const auto& Piece : InPlatter.Get_Held())
+            for (const auto& Piece : InPlatter.Get_Pieces())
             {
-                if (InPolicy.Kind.Matches(Piece.Get_Kind()) == false)
+                if (Policy.Kind.Matches(Piece.Get_Kind()) == false)
                 { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected); }
             }
         }
@@ -110,18 +108,19 @@ namespace utils_platter_dock
         return TOptional<EMars_PlatterDock_Refusal>();
     }
 
-    // What a food InPiece would meet placed onto InPlatter at a dock with InPolicy; unset = it may go on. Checked in order
-    // MustBeEmpty (a dock that wants an empty platter), NotWhole, KindRejected, then PlatterFull.
-    TOptional<EMars_PlatterDock_Refusal> Get_PieceRefusal(const FMars_PlatterDock_Policy& InPolicy, const FCk_Handle_Platter& InPlatter,
+    // What a food InPiece would meet placed onto InPlatter at a dock with InSpec; unset = it may go on. Checked in order
+    // MustBeEmpty (the Output role keeps its tray for the station), NotWhole, KindRejected, then PlatterFull.
+    TOptional<EMars_PlatterDock_Refusal> Get_PieceRefusal(const FMars_PlatterDock_Spec& InSpec, const FCk_Handle_Platter& InPlatter,
                                                           const FCk_Handle_FoodPiece& InPiece)
     {
-        if (InPolicy.RequireEmpty.IsSet() && InPolicy.RequireEmpty.GetValue())
+        if (InSpec.Role == EMars_PlatterDock_Role::Output)
         { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustBeEmpty); }
 
-        if (InPolicy.WholeOnly && InPiece.Get_IsWhole() == false)
+        const auto& Policy = InSpec.Policy;
+        if (Policy.WholeOnly && InPiece.Get_IsWhole() == false)
         { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::NotWhole); }
 
-        if (InPolicy.Kind.IsEmpty() == false && InPolicy.Kind.Matches(InPiece.Get_Kind()) == false)
+        if (Policy.Kind.IsEmpty() == false && Policy.Kind.Matches(InPiece.Get_Kind()) == false)
         { return TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected); }
 
         if (InPlatter.Get_FreeCount() <= 0)
@@ -185,9 +184,6 @@ namespace utils_platter_dock
         if (InRefusal == EMars_PlatterDock_Refusal::MustBeEmpty)
         { return FText::FromString("Must be empty"); }
 
-        if (InRefusal == EMars_PlatterDock_Refusal::MustHaveFood)
-        { return FText::FromString("Needs food"); }
-
         if (InRefusal == EMars_PlatterDock_Refusal::PlatterFull)
         { return FText::FromString("Platter full"); }
 
@@ -196,7 +192,7 @@ namespace utils_platter_dock
 
     // The probe carries Probe.Mars.Interact (the player's interaction trace only sees probes under that tag) and is
     // Kinematic: it follows the station. The prompt text is a placeholder until UMars_Processor_PlatterDock_Prompt writes
-    // the focuser's action.
+    // the focuser's action. The target is WhileLive: a Place or a Take moves the platter at the gloves' Grip.
     FCk_Handle_Interactable DoCreate_Interactable(FCk_Handle_Transform& InNode, float32 InProbeRadius)
     {
         auto Probe = FMars_Interactable_ProbeInfo();
@@ -206,7 +202,6 @@ namespace utils_platter_dock
         Probe.ProbeOffset = FTransform::Identity;
 
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
         auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
@@ -216,6 +211,7 @@ namespace utils_platter_dock
         Target.InteractTargetSpec = TargetSpec;
         Target.InteractPromptSpec = Prompt;
         Target.InteractionStateClass = UMars_SmState_PlatterDock_Interact;
+        Target.Work = EMars_Interactable_Work::WhileLive;
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
@@ -280,10 +276,16 @@ mixin FCk_Handle_Platter Get_Platter(const FCk_Handle_PlatterDock& Self)
     return Self.Get_Fragment(FMars_Fragment_PlatterDock).Platter;
 }
 
-// The docked platter has landed on the dock (OnArrived fired); false while the dock is empty or the platter is on its way.
+// The docked platter has landed on the dock: its world item settled, Carried by this dock (the moment OnArrived fires).
+// False while the dock is empty or the platter is on its way.
 mixin bool Get_HasArrived(const FCk_Handle_PlatterDock& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_PlatterDock).HasArrived;
+    const auto WorldItem = Self.Get_WorldItem();
+    if (ck::Is_NOT_Valid(WorldItem) || ck::Is_NOT_Valid(Self.Get_Platter()))
+    { return false; }
+
+    const FCk_Handle DockEntity = Self;
+    return WorldItem.Get_Mount() == EMars_WorldItem_Mount::Carried && WorldItem.Get_Carrier() == DockEntity && WorldItem.Get_IsSettled();
 }
 
 // What interacting would do for InFocuser, first matching row wins:
@@ -308,7 +310,7 @@ mixin EMars_PlatterDock_Action Get_ActionFor(const FCk_Handle_PlatterDock& Self,
     const auto Piece = utils_platter_dock::TryGet_SelectedFoodPiece(InFocuser);
     if (Self.Get_IsOccupied() && ck::IsValid(Docked) && ck::IsValid(Piece))
     {
-        const auto PieceRefusal = utils_platter_dock::Get_PieceRefusal(Self.Get_Spec().Policy, Docked, Piece);
+        const auto PieceRefusal = utils_platter_dock::Get_PieceRefusal(Self.Get_Spec(), Docked, Piece);
         return PieceRefusal.IsSet() ? EMars_PlatterDock_Action::Blocked_Policy : EMars_PlatterDock_Action::PlaceFood;
     }
 
@@ -323,7 +325,7 @@ mixin EMars_PlatterDock_Action Get_ActionFor(const FCk_Handle_PlatterDock& Self,
     if (ck::Is_NOT_Valid(Platter))
     { return EMars_PlatterDock_Action::Blocked_NotAPlatter; }
 
-    const auto Refusal = utils_platter_dock::Get_Refusal(Self.Get_Spec().Policy, Platter);
+    const auto Refusal = utils_platter_dock::Get_Refusal(Self.Get_Spec(), Platter);
     return Refusal.IsSet() ? EMars_PlatterDock_Action::Blocked_Policy : EMars_PlatterDock_Action::Place;
 }
 
@@ -334,7 +336,7 @@ mixin TOptional<EMars_PlatterDock_Refusal> TryGet_Refusal(const FCk_Handle_Platt
     const auto Docked = Self.Get_Platter();
     const auto Piece = utils_platter_dock::TryGet_SelectedFoodPiece(InFocuser);
     if (Self.Get_IsOccupied() && ck::IsValid(Docked) && ck::IsValid(Piece))
-    { return utils_platter_dock::Get_PieceRefusal(Self.Get_Spec().Policy, Docked, Piece); }
+    { return utils_platter_dock::Get_PieceRefusal(Self.Get_Spec(), Docked, Piece); }
 
     const auto HeldItem = InFocuser.As_HeldItem(ECk_SanityCheck::UnChecked);
     if (ck::Is_NOT_Valid(HeldItem))
@@ -344,7 +346,7 @@ mixin TOptional<EMars_PlatterDock_Refusal> TryGet_Refusal(const FCk_Handle_Platt
     if (ck::Is_NOT_Valid(Platter))
     { return TOptional<EMars_PlatterDock_Refusal>(); }
 
-    return utils_platter_dock::Get_Refusal(Self.Get_Spec().Policy, Platter);
+    return utils_platter_dock::Get_Refusal(Self.Get_Spec(), Platter);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -421,4 +423,18 @@ mixin void UnbindFrom_OnDockRefused(FCk_Handle_PlatterDock& Self, FMars_Delegate
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_PlatterDock_Signals).OnDockRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnUndockRefused(FCk_Handle_PlatterDock& Self, FMars_Delegate_PlatterDock_OnUndockRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_PlatterDock_Signals);
+    Fragment.OnUndockRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnUndockRefused(FCk_Handle_PlatterDock& Self, FMars_Delegate_PlatterDock_OnUndockRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_PlatterDock_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_PlatterDock_Signals).OnUndockRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

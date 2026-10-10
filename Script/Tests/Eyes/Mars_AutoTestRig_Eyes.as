@@ -3,6 +3,9 @@
 UCLASS(Abstract)
 class UMars_AutoTestRig_Eyes : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: a timed expression or a blink interval runs out on its own clock.
+    protected const int32 k_SlowPolls = 900;
+
     protected FCk_Handle_Eyes _Eyes;
 
     // A transform root of its own at InLocation.

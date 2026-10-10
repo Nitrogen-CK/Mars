@@ -1,11 +1,11 @@
-// A board's held pieces end with it; its released pieces do not. Board A releases one box and holds two; destroying the board
-// destroys the two held and leaves the released one, body and all. Board B is destroyed from inside its piece's
-// OnCutResolved(Cut), after the cut's ResolveCut is queued but before the board drains it: the halves that cut made are
-// destroyed with the board too, and no piece of that lineage survives.
+// A board's held pieces end with it; a piece it handed off does not. Board A hands one box off and holds two; destroying the
+// board destroys the two held and leaves the handed-off one. Board B is destroyed from inside its piece's OnCutResolved(Cut),
+// after the cut's ResolveCut is queued but before the board drains it: the halves that cut made are destroyed with the board
+// too, and no piece of that lineage survives.
 class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestRig_FoodBoard
 {
     private FCk_Handle_FoodBoard _BoardA;
-    private FCk_Handle_FoodPiece _Loose;
+    private FCk_Handle_FoodPiece _HandedOff;
     private FCk_Handle_FoodPiece _HeldFirst;
     private FCk_Handle_FoodPiece _HeldSecond;
 
@@ -18,18 +18,18 @@ class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestR
     void DoBeginPlay(FCk_Handle InHandle)
     {
         _BoardA = Build_Board(InHandle, FTransform(FRotator(0.0, 90.0, 0.0), FVector(6800.0, 3000.0, -42000.0)), Make_Tuners());
-        _Loose = Build_BoxOn(_BoardA, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 0.0)), 0.5);
+        _HandedOff = Build_BoxOn(_BoardA, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 0.0)), 0.5);
         _HeldFirst = Build_BoxOn(_BoardA, FTransform(FRotator::ZeroRotator, FVector(15.0, 0.0, 0.0)), 0.5);
         _HeldSecond = Build_BoxOn(_BoardA, FTransform(FRotator::ZeroRotator, FVector(30.0, 0.0, 0.0)), 0.5);
-        Place(_BoardA, _Loose);
+        Place(_BoardA, _HandedOff);
 
         _BoardB = Build_Board(InHandle, FTransform(FRotator(0.0, 160.0, 0.0), FVector(6800.0, 3400.0, -42000.0)), Make_Tuners());
         _PieceB = Build_BoxOn(_BoardB, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 0.0)), 1.0);
         Place(_BoardB, _PieceB);
 
         Add_Step_WaitUntil("the first boxes are Ready and placed", n"Check_FirstPlaced");
-        Add_Step("release board A's box", n"Step_Release");
-        Add_Step_WaitUntil("the box is released with its body", n"Check_Released");
+        Add_Step("hand board A's box off", n"Step_Release");
+        Add_Step_WaitUntil("the box is handed off", n"Check_Released");
         Add_Step("place two more on board A", n"Step_PlaceTwo");
         Add_Step_WaitUntil("board A holds two", n"Check_TwoHeld");
         Add_Step("destroy board A", n"Step_DestroyA");
@@ -37,7 +37,7 @@ class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestR
         Add_Step("chop board B, destroying it from inside its piece's cut", n"Step_ChopB");
         Add_Step_WaitUntil("board B's piece was cut as the board went away", n"Check_DestroyedFromCut");
         Add_Step_WaitSeconds("a surviving half or a late destroy would show in this window", 0.3f);
-        Add_Step("held pieces and uncommitted halves ended with their boards; the released piece lives", n"Step_Assert");
+        Add_Step("held pieces and uncommitted halves ended with their boards; the handed-off piece lives", n"Step_Assert");
         Run_Steps(InHandle);
     }
 
@@ -45,7 +45,7 @@ class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestR
     private void Check_FirstPlaced(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_PlacedCount(_BoardA) == 1 && Get_PlacedCount(_BoardB) == 1 && Get_HasReadied(_Loose) && Get_HasReadied(_PieceB));
+        Res.Set(Get_PlacedCount(_BoardA) == 1 && Get_PlacedCount(_BoardB) == 1 && Get_HasReadied(_HandedOff) && Get_HasReadied(_PieceB));
     }
 
     UFUNCTION()
@@ -59,9 +59,7 @@ class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestR
     private void Check_Released(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        FCk_Handle LooseEntity = _Loose;
-        Res.Set(Get_ReleasedEvents(_BoardA).Num() >= 1 && LooseEntity.Is_JoltBody()
-            && utils_jolt_body::Get_SetupState(LooseEntity.As_JoltBody()) != ECk_JoltBody_SetupState::Pending);
+        Res.Set(Get_ReleasedEvents(_BoardA).Num() >= 1);
     }
 
     UFUNCTION()
@@ -82,7 +80,7 @@ class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestR
     private void Step_DestroyA(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_BoardA.Get_HeldCount(), 2, "board A holds two pieces");
-        Assert_Equals_Int(_BoardA.Get_Released().Num(), 1, "board A released one piece");
+        Assert_True(Get_ReleasedEvents(_BoardA).Num() == 1 && Get_ReleasedEvents(_BoardA)[0] == _HandedOff, "board A handed one piece off");
         utils_entity_lifetime::Request_DestroyEntity(_BoardA);
     }
 
@@ -118,8 +116,8 @@ class UMars_AutoTest_FoodBoard_DestroyingBoardDestroysHeldOnly : UMars_AutoTestR
     {
         Assert_True(ck::Is_NOT_Valid(_BoardA), "board A is destroyed");
         Assert_True(ck::Is_NOT_Valid(_HeldFirst) && ck::Is_NOT_Valid(_HeldSecond), "board A's held pieces were destroyed with it");
-        FCk_Handle LooseEntity = _Loose;
-        Assert_True(ck::IsValid(_Loose) && LooseEntity.Is_JoltBody(), "board A's released piece lives on with its body");
+        Assert_True(ck::IsValid(_HandedOff) && utils_entity_lifetime::Get_IsPendingDestroy(_HandedOff, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false,
+            "board A's handed-off piece lives on");
 
         Assert_True(_DestroyedFromCut, "board B's piece was cut and the board destroyed from inside the cut");
         Assert_True(ck::Is_NOT_Valid(_BoardB), "board B is destroyed");

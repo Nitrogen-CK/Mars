@@ -1,6 +1,9 @@
 // A charge while the countdown is draining refills every step and restarts the current one, then it drains from full.
 class UMars_AutoTest_Countdown_RechargeWhileDrainingRefills : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the countdown drains one step every SecondsPerStep.
+    private const int32 k_SlowPolls = 900;
+
     private FCk_Handle_Countdown _Countdown;
     private TArray<int32> _Changes;
 
@@ -12,10 +15,10 @@ class UMars_AutoTest_Countdown_RechargeWhileDrainingRefills : UCk_AutoTest_Base
         _Countdown.BindTo_OnRemainingChanged(FMars_Delegate_Countdown_OnRemainingChanged(this, n"OnRemainingChanged"));
 
         Add_Step("charge it", n"Step_Charge");
-        Add_Step_WaitUntil("it has drained to half", n"Check_Half", 0, 5.0f);
+        Add_Step_WaitUntil("it has drained to half", n"Check_Half", k_SlowPolls, 0);
         Add_Step("charge it again", n"Step_Charge");
-        Add_Step_WaitUntil("it is full again", n"Check_Full", 0, 5.0f);
-        Add_Step_WaitUntil("it drains to empty", n"Check_Empty", 0, 5.0f);
+        Add_Step_WaitUntil("it is full again", n"Check_Full", 0, 0);
+        Add_Step_WaitUntil("it drains to empty", n"Check_Empty", k_SlowPolls, 0);
         Add_Step("it refilled from half and drained from full", n"Step_AssertSequence");
         Run_Steps(InHandle);
     }

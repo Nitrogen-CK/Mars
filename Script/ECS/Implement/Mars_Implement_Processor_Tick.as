@@ -18,6 +18,7 @@ struct FMars_Implement_Frame
 class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Implement_HandleRequests");
 
     // Degrees of tilt or uu of lift.
     private const float32 k_PoseTolerance = 0.001f;
@@ -197,7 +198,6 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         if (WasRising)
         { return; }
 
-        ck::Trace(f"[Implement] [{InFrame.Implement.ToString()}] lift {InExcess :.2} deg excess -> {InState.LiftVelocity :.1} uu/s");
         if (InFrame.Implement.Has_Fragment(FMars_Fragment_Implement_Signals))
         { InFrame.Implement.Get_Fragment(FMars_Fragment_Implement_Signals).OnLiftKicked.Broadcast(InFrame.Implement, InExcess); }
     }

@@ -4,6 +4,8 @@ class UMars_AutoTest_Platter_AMovingTrayDropsNothing : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -22000.0, -30000.0);
     private const float64 k_Speed = 60.0;
+    // Physics settles, and a wait that measures a second, outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_Platter _Platter;
     private FCk_Handle_FoodPiece _P;
@@ -23,9 +25,9 @@ class UMars_AutoTest_Platter_AMovingTrayDropsNothing : UMars_AutoTestRig_Platter
 
         Add_Step_WaitUntil("P is Ready", n"Check_Ready");
         Add_Step("start the platter sliding along Y, then load P", n"Step_MoveAndLoad");
-        Add_Step_WaitUntil("one second of sliding", n"Check_SecondPassed", 0, 3.0f);
+        Add_Step_WaitUntil("one second of sliding", n"Check_SecondPassed", k_SlowPolls, 0);
         Add_Step("P is still queued: no drop, no body, not moved", n"Step_AssertQueuedAndStop");
-        Add_Step_WaitUntil("P landed once the platter stopped", n"Check_Landed", 0, 5.0f);
+        Add_Step_WaitUntil("P landed once the platter stopped", n"Check_Landed", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("P is frozen on the stopped platter", n"Step_AssertLanded");
         Run_Steps(InHandle);

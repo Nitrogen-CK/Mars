@@ -1,11 +1,13 @@
 // A whole food the pan holds cannot be taken by hand: the pan's ledger would never notice. The meat slab (a food item, its
-// pickup live on the raw platter) is fed into the searing pan; once the kernel admits it the feed bridge has disabled its
-// pickup. Taken out onto the tray, its pickup is enabled again, so the slab can be picked off the tray.
+// pickup live on the raw platter) is fed into the searing pan; the kernel that admits it claims its pickup (Ledger). Taken
+// out onto the tray, its pickup is enabled again once it lands there, so the slab can be picked off the tray.
 class UMars_AutoTest_SearingStation_AnAdmittedJointCannotBePickedUp : UMars_AutoTestRig_HeatStation
 {
     private const FVector k_Origin = FVector(26000.0, -21000.0, -30000.0);
     private const FVector k_RawOffset = FVector(0.0, -300.0, 0.0);
     private const FVector k_TrayOffset = FVector(0.0, 300.0, 0.0);
+    // A poll budget, not a ceiling: the station composes and platters construct, drop and settle over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Raw;
     private FCk_Handle _Tray;
@@ -18,21 +20,21 @@ class UMars_AutoTest_SearingStation_AnAdmittedJointCannotBePickedUp : UMars_Auto
         _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MeatSlab());
         _Tray = Spawn_Platter(InHandle, k_TrayOffset, nullptr);
 
-        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("both platters are constructed and the slab landed on the raw one", n"Check_PlattersReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both platters are constructed and the slab landed on the raw one", n"Check_PlattersReady", k_SlowPolls, 0);
         Add_Step("dock the meat platter as raw and the empty one as the tray", n"Step_Dock");
-        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", 0, 5.0f);
+        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", k_SlowPolls, 0);
         Add_Step("the slab on the raw platter can be picked up", n"Step_AssertPickupLive");
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", 0, 3.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", k_SlowPolls, 0);
         Add_Step("one add-food press", n"Step_Press");
-        Add_Step_WaitUntil("the kernel admitted the slab", n"Check_Admitted", 0, 5.0f);
-        Add_Step_WaitUntil("the admitted slab's pickup reads disabled", n"Check_PickupDisabled", 0, 1.0f);
+        Add_Step_WaitUntil("the kernel admitted the slab", n"Check_Admitted", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the admitted slab's pickup reads disabled", n"Check_PickupDisabled", 0, 0);
         Add_Step_WaitSeconds("the pan holds the slab a while", 0.5f);
         Add_Step("the slab's pickup is still disabled", n"Step_AssertPickupDisabled");
         Add_Step("take the slab out by name", n"Step_TakeOut");
-        Add_Step_WaitUntil("the slab was handed back", n"Check_TakenOut", 0, 5.0f);
-        Add_Step_WaitUntil("the taken-out slab's pickup reads enabled", n"Check_PickupEnabled", 0, 1.0f);
+        Add_Step_WaitUntil("the slab was handed back", n"Check_TakenOut", 0, 0);
+        Add_Step_WaitUntil("the taken-out slab landed on the tray and its pickup reads enabled", n"Check_PickupEnabled", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

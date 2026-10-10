@@ -61,8 +61,6 @@ class UMars_Processor_SurfaceNavigator_Tick : UCk_Processor_Script_Base_UE
         InState.FailReason = EMars_SurfaceNavigator_FailReason::Stuck;
         const auto FailedGoal = Route.Goal;
 
-        ck::Trace(f"[SurfaceNavigator] [{Self.ToString()}] stuck at [{Location.ToString()}] on the way to [{FailedGoal.ToString()}]");
-
         if (Self.Has_Fragment(FMars_Fragment_SurfaceNavigator_Signals))
         { Self.Get_Fragment(FMars_Fragment_SurfaceNavigator_Signals).OnFailed.Broadcast(Self, FailedGoal, EMars_SurfaceNavigator_FailReason::Stuck); }
     }

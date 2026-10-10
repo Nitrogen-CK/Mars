@@ -1,8 +1,8 @@
 // The real searing station (spawned through its entity script, the only station in this world) starts with an empty pan
 // and no source for its feed (nothing is docked), and shows no raw proxies: the docked platter is the stock's only visual.
 // Nobody operates it here, so no release reaches its feed bridge: the test admits one piece itself (a box food piece wearing
-// its own display, as whoever makes a piece dresses it; Request_AddPiece with its middle at the feed's release node, as
-// the bridge would) and reads the dressing the station builds from the kernel every frame. The station adds no part to the
+// its own display, as whoever makes a piece dresses it; into the station's admission inbox with its middle at the feed's
+// release node, as the bridge would) and reads the dressing the station builds from the kernel every frame. The station adds no part to the
 // admitted piece: it keeps its own display and nothing hangs off it. After a second of heat with the piece on the pan: the
 // kernel sears its down face (NegZ as released), the pan's material shows the piece's footprint at its pan-local XY in the
 // mesh's cm with the footprint radius and pool radius of the piece's own size, the oil trail has caught up with it, and the
@@ -31,6 +31,8 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
     // The write threshold (0.02) plus the frame or two a deferred write trails the kernel.
     private const float32 k_DisplayTolerance = 0.03f;
     private const float32 k_SearedPast = 0.05f;
+    // A poll budget, not a ceiling: the pan's mesh bakes, the box imports and its display sets up over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_EntityScript _Station;
     private FCk_Handle_Searing _Searing;
@@ -70,30 +72,30 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnStationConstructed"));
         _Piece = Build_Piece(Get_BoxMesh(), FTransform(FRotator::ZeroRotator, k_Origin + k_ParkLocal), Make_Spec(k_PieceMassKg));
 
-        Add_Step_WaitUntil("the station composed its Searing and its feed, the pan body exists and the box is ready", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Searing and its feed, the pan body exists and the box is ready", n"Check_StationReady", k_SlowPolls, 0);
         Add_Step("dress the box with its own display", n"Step_DressPiece");
-        Add_Step_WaitUntil("the box's display is set up", n"Check_PieceShown", 0, 3.0f);
-        Add_Step_WaitFrames("the station's state machine settles in Idle (its reset empties the pan)", 3);
+        Add_Step_WaitUntil("the box's display is set up", n"Check_PieceShown", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the station's state machine is Idle and the kernel has no request pending", n"Check_IdleAndDrained", 0, 0);
         Add_Step("the pan is empty and the feed unsourced; heat the pan and admit a piece at the release node", n"Step_AssertEmptyHeatAndAdd");
-        Add_Step_WaitUntil("the piece was admitted", n"Check_PieceAdded", 0, 2.0f);
+        Add_Step_WaitUntil("the piece was admitted", n"Check_PieceAdded", 0, 0);
         Add_Step_WaitFrames("the arrival write drains", 1);
         Add_Step("the piece's display reads its unseared arrival look", n"Step_AssertArrivalWrite");
         Add_Step("find the tagged pan part and footprint node; no raw proxy exists", n"Step_FindParts");
-        Add_Step_WaitUntil("the pan's component exists", n"Check_ComponentsExist", 0, 3.0f);
+        Add_Step_WaitUntil("the pan's component exists", n"Check_ComponentsExist", 0, 0);
         Add_Step("the admitted piece wears only its own display", n"Step_AssertPieceUndressed");
-        Add_Step_WaitUntil("the piece lies on the hot pan", n"Check_OnHotPan", 0, 5.0f);
-        Add_Step_WaitUntil("the pan's dynamic instance shows the piece's footprint", n"Check_FootprintShown", 0, 2.0f);
+        Add_Step_WaitUntil("the piece lies on the hot pan", n"Check_OnHotPan", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the pan's dynamic instance shows the piece's footprint", n"Check_FootprintShown", 0, 0);
         Add_Step_WaitSeconds("a second of searing", 1.0f);
         Add_Step("the pan material and the footprint node follow the piece", n"Step_AssertDressing");
         Add_Step("teleport the piece across the pan", n"Step_Teleport");
-        Add_Step_WaitUntil("the dressing saw the piece move", n"Check_FootprintMoved", 0, 1.0f);
+        Add_Step_WaitUntil("the dressing saw the piece move", n"Check_FootprintMoved", 0, 0);
         Add_Step("the trail lags the footprint", n"Step_AssertTrailLags");
         Add_Step_WaitSeconds("the trail catches up", 1.0f);
         Add_Step("the trail is back on the footprint", n"Step_AssertTrailCaughtUp");
-        Add_Step_WaitUntil("the down face seared past 0.05 and the display caught up", n"Check_DisplayCaughtUp", 0, 3.0f);
+        Add_Step_WaitUntil("the down face seared past 0.05 and the display caught up", n"Check_DisplayCaughtUp", k_SlowPolls, 0);
         Add_Step("the piece's display carries its face sears and shape", n"Step_AssertDisplayCarriesTheSear");
         Add_Step("destroy the station", n"Step_DestroyStation");
-        Add_Step_WaitUntil("the station is gone", n"Check_StationGone", 0, 2.0f);
+        Add_Step_WaitUntil("the station is gone", n"Check_StationGone", 0, 0);
         Add_Step_WaitFrames("its components tear down", 2);
         Run_Steps(InHandle);
     }
@@ -131,6 +133,16 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
             && utils_runtime_mesh_display::Get_SetupState(Entity.As_RuntimeMeshDisplay()) == ECk_RuntimeMesh_SetupState::Ready);
     }
 
+    // Idle's enter task resets the kernel: an admission sharing that drain is rejected, and a reset landing after the
+    // test's heat chills the pan.
+    UFUNCTION()
+    private void Check_IdleAndDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto StateClass = utils_state_machine::Get_CurrentStateClass(_Station.As_Station().Get_MinigameSm());
+        auto Res = OutResult;
+        Res.Set(StateClass == UMars_SmState_Searing_Idle && _Searing.Has_Fragment(FMars_Fragment_Searing_Requests) == false);
+    }
+
     // The bridge's job done by hand: one release of the box, its middle at the feed's release node (over the pan's centre,
     // above the rim), with the feed's generation and slot 0; the feed itself is not asked.
     UFUNCTION()
@@ -146,9 +158,10 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         const auto Rotation = NodeWorld.GetRotation();
         const auto ReleaseWorld = FTransform(Rotation, NodeWorld.GetLocation() - Rotation.RotateVector(Get_BoundsCenter(_Piece)));
         _PieceId = FMars_CookingFeed_PieceId(_Feed.Get_Generation(), 0);
-        auto Release = FMars_CookingFeed_Release(_PieceId, ReleaseWorld, FVector::ZeroVector, 0);
+        auto Release = FMars_CookingFeed_Release(_PieceId, ReleaseWorld, FVector::ZeroVector);
         Release.Piece = _Piece;
-        _Searing.Request_AddPiece(FMars_Request_Searing_AddPiece(Release));
+        FCk_Handle Station = _Searing;
+        utils_cooking_feed::Request_Admit(Station, Release);
     }
 
     UFUNCTION()

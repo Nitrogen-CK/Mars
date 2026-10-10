@@ -19,13 +19,13 @@ class UMars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId : UMars_AutoTest
         // Every release takes its own piece, so the repeats are refused for their Id alone.
         Build_Pieces(4);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("release one Id twice in one drain", n"Step_ReleaseTwice");
-        Add_Step_WaitUntil("both releases were answered", n"Check_Answered2", 0, 1.0f);
+        Add_Step_WaitUntil("both releases were answered", n"Check_Answered2", 0, 0);
         Add_Step("the first is accepted, the duplicate rejected with a reason", n"Step_AssertFirstDrain");
         Add_Step("release the same Id again, and a new one", n"Step_ReleaseAgainAndNew");
-        Add_Step_WaitUntil("both releases were answered", n"Check_Answered4", 0, 1.0f);
+        Add_Step_WaitUntil("both releases were answered", n"Check_Answered4", 0, 0);
         Add_Step_WaitFrames("the bodies settle into the books", 2);
         Add_Step("the repeat is rejected, the new one accepted: two bodies", n"Step_AssertSecondDrain");
         Run_Steps(InHandle);

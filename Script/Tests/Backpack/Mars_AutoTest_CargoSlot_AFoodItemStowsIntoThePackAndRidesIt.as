@@ -1,8 +1,8 @@
 // A food item stows into a worn pack's cargo slot and rides it. The carrier (Hand and Back nodes, Hotbar with a backpack
 // slot, HeldItem) wears a backpack (its item in the backpack slot, its world item Carried on the back) and picks the meat
-// slab up into its bag slot. Cargo slot 0 offers Stow; the stow moves the item into the slot and carries the slab's own
-// world item onto the slot's node: no cargo visual, the slab is Carried by the slot, its parent chain reaches the pack's
-// root and the bag slot is empty. Taking it back out lands it in the selected bag slot and the hands hold it again: Held,
+// slab up into its bag slot. Cargo slot 0 offers Stow; the stow moves the item into the slot and the slab's own world item
+// mounts on the slot's node: no cargo visual, the slab is Carried by the slot, its parent chain reaches the pack's root and
+// the bag slot is empty. Taking it back out lands it in the selected bag slot and the hands hold it again: Held,
 // on the hand. Isolated origin (28000, -29000, -30000).
 class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoTestRig_Carrier
 {
@@ -13,6 +13,9 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
     private const FVector k_FoodOffset = FVector(200.0, 150.0, 0.0);
     // A scene-node chain longer than this from the slab is not the pack's.
     private const int32 k_MaxChainLength = 8;
+    // The slab's construction (its joint imports) and the mounts' arrivals outrun the default poll budget at lane frame
+    // rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _PackEntity;
     private FCk_Handle_Backpack _Backpack;
@@ -29,7 +32,6 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         Spawn_Floor(InHandle, k_Origin + k_PackOffset);
         auto PackParams = UMars_Backpack_EntityScript::Params();
@@ -50,19 +52,19 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, FoodParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
-        Add_Step_WaitUntil("the pack and the slab are constructed", n"Check_Constructed", 0, 10.0f);
+        Add_Step_WaitUntil("the pack and the slab are constructed", n"Check_Constructed", k_SlowPolls, 0);
         Add_Step("the carrier puts the pack on", n"Step_WearPack");
-        Add_Step_WaitUntil("the pack is worn: Carried on the back", n"Check_PackWorn", 0, 5.0f);
+        Add_Step_WaitUntil("the pack is worn: Carried on the back", n"Check_PackWorn", k_SlowPolls, 0);
         Add_Step("the carrier focuses the slab's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the slab's target enters Focused", 3);
+        Add_Step_WaitUntil("the slab's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier picks the slab up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the slab is Held", n"Check_SlabHeld", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 0.5f);
+        Add_Step_WaitUntil("the slab is Held", n"Check_SlabHeld", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the slab's hold has settled", n"Check_SlabHoldSettled", k_SlowPolls, 0);
         Add_Step("cargo slot 0 offers Stow; stow the slab", n"Step_StowIntoSlot0");
-        Add_Step_WaitUntil("slot 0 holds the slab and the slab rides the slot", n"Check_RidesTheSlot", 0, 5.0f);
+        Add_Step_WaitUntil("slot 0 holds the slab and the slab rides the slot", n"Check_RidesTheSlot", k_SlowPolls, 0);
         Add_Step("no visual; the slab hangs off the pack; the bag slot is empty", n"Step_AssertRidesThePack");
         Add_Step("take the slab back out", n"Step_TakeFromSlot0");
-        Add_Step_WaitUntil("the slab is Held on the hand again", n"Check_SlabHeld", 0, 5.0f);
+        Add_Step_WaitUntil("the slab is Held on the hand again", n"Check_SlabHeld", k_SlowPolls, 0);
         Add_Step("the bag slot holds it and slot 0 is empty", n"Step_AssertTakenBack");
         Run_Steps(InHandle);
     }
@@ -131,8 +133,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
         Res.Set(PackReady && FoodReady);
     }
 
-    // What the pickup task does for a Persistent item: transfer into the hotbar's stow target (the backpack slot), then
-    // Carry once it reports.
+    // What the pickup task does for a Persistent item: transfer into the hotbar's stow target (the backpack slot).
     UFUNCTION()
     private void Step_WearPack(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -154,12 +155,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
                               FCk_Handle_Item InNewItemInTarget, ECk_Inventory_OperationResult_Transfer InResult)
     {
         if (InResult != ECk_Inventory_OperationResult_Transfer::Success)
-        {
-            FinishFailure(f"the pack's stow transfer failed with [{InResult :n}]");
-            return;
-        }
-
-        _PackWorldItem.Request_Carry(FMars_Request_WorldItem_Carry(_Carrier));
+        { FinishFailure(f"the pack's stow transfer failed with [{InResult :n}]"); }
     }
 
     UFUNCTION()
@@ -175,6 +171,7 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
     {
         auto Pickup = _Slab.Get_Pickup();
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Pickup);
     }
 
     UFUNCTION()
@@ -190,6 +187,14 @@ class UMars_AutoTest_CargoSlot_AFoodItemStowsIntoThePackAndRidesIt : UMars_AutoT
     {
         auto Res = OutResult;
         Res.Set(_Slab.Get_Mount() == EMars_WorldItem_Mount::Held && Get_MountParent(_Slab) == _HandNode);
+    }
+
+    // The Held mount's arrival is over: nothing pending, and the committed mount is where the item lives.
+    UFUNCTION()
+    private void Check_SlabHoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Slab.Get_Mount() == EMars_WorldItem_Mount::Held && _Slab.Get_IsSettled());
     }
 
     UFUNCTION()

@@ -2,8 +2,8 @@
 // a rock lying in the world is the subject. A Grab reach for it is refused (both gloves are busy): no reach is requested
 // and the phase stays None. A Place reach for the same subject is accepted: OnReachRequested reports Place, both gloves
 // take part, the reach sets the held rock's centre down at the subject's bounds-fit top plus the held rock's own half
-// height (in the subject's frame), and the gloves run Reach -> Grip -> Return -> None, as a grab does. Isolated origin
-// (28000, -25000, -30000).
+// height (in the subject's frame), and the gloves run Reach -> Grip -> Return -> None, as a grab does. The reach target is
+// read as the gloves start back (Return): back at None they forget it. Isolated origin (28000, -25000, -30000).
 class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars_AutoTestRig_Hands
 {
     default _TimeoutSeconds = 15.0f;
@@ -15,6 +15,7 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
     private FCk_Handle _SubjectEntity;
     private FCk_Handle_WorldItem _Subject;
     private TArray<EMars_FPHands_ReachKind> _Requested;
+    private TOptional<FMars_FPHands_ReachTarget> _TargetAtReturn;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -27,6 +28,7 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
         Add_HandsSm();
         Log_Phases();
         _Hands.BindTo_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnReachRequested"));
+        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseRecordTarget"));
 
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto HolderParams = utils_inventory_data_only::Make_Params_Bounded(GameplayTags::Inventory_Mars_WorldItemHolder, 1,
@@ -40,15 +42,15 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
         _SubjectEntity = utils_world_item::Request_SpawnWorld(Owner, FMars_WorldItem_WorldSpec(
             utils_held_item::Make_DefinitionSoft(mars_items::Rock()), FTransform(FRotator::ZeroRotator, k_Origin)));
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
-        Add_Step_WaitUntil("the rock item is seeded and the subject rock is a world item", n"Check_Ready", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
+        Add_Step_WaitUntil("the rock item is seeded and the subject rock is a world item", n"Check_Ready", 0, 0);
         Add_Step("the gloves hold the rock", n"Step_Hold");
-        Add_Step_WaitUntil("the hold is two-handed", n"Check_TwoHanded", 0, 2.0f);
+        Add_Step_WaitUntil("the hold is two-handed", n"Check_TwoHanded", 0, 0);
         Add_Step("request a Grab reach for the subject", n"Step_RequestGrab");
         Add_Step_WaitFrames("a grab would have started", 5);
         Add_Step("the grab was refused: no reach, no phase", n"Step_AssertGrabRefused");
         Add_Step("request a Place reach for the subject", n"Step_RequestPlace");
-        Add_Step_WaitUntil("the gloves went Reach, Grip, Return and back to None", n"Check_BackToNone", 0, 5.0f);
+        Add_Step_WaitUntil("the gloves went Reach, Grip, Return and back to None", n"Check_BackToNone", k_SlowPolls, 0);
         Add_Step("the place was accepted, both gloves took it and it sets the rock down above the subject", n"Step_AssertPlace");
         Run_Steps(InHandle);
     }
@@ -57,6 +59,13 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
     private void OnReachRequested(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind)
     {
         _Requested.Add(InKind);
+    }
+
+    UFUNCTION()
+    private void OnPhaseRecordTarget(FCk_Handle_FPHands InHands, EMars_FPHands_Phase InPrevious, EMars_FPHands_Phase InNew)
+    {
+        if (InNew == EMars_FPHands_Phase::Return)
+        { _TargetAtReturn = InHands.Get_Target(); }
     }
 
     UFUNCTION()
@@ -129,14 +138,14 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
             Assert_True(_Phases[3] == EMars_FPHands_Phase::None, f"then None (got {_Phases[3] :n})");
         }
 
-        const auto MaybeTarget = _Hands.Get_Target();
-        if (MaybeTarget.IsSet() == false)
+        Assert_False(_Hands.Get_Target().IsSet(), "back at rest, the gloves forget the reach target");
+        if (_TargetAtReturn.IsSet() == false)
         {
-            FinishFailure("the place left no reach target");
+            FinishFailure("the place had no reach target as the gloves started back");
             return;
         }
 
-        const auto Target = MaybeTarget.GetValue();
+        const auto Target = _TargetAtReturn.GetValue();
         Assert_True(Target.Right.IsSet() && Target.Left.IsSet(), "both gloves take part in the place");
         Assert_True(Target.Layout == EMars_FPHands_GripLayout::Sides, "the gloves hold the rock by its sides");
         Assert_True(Target.PlaceAt.IsSet(), "the reach names where the rock is set down");

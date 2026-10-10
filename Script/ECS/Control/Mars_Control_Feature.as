@@ -198,9 +198,6 @@ struct FMars_Control_Manipulation
     UPROPERTY()
     FCk_Handle_Interaction Interaction;
 
-    UPROPERTY()
-    FCk_Handle Manipulator;
-
     // Handle position 0..1, seeded from the Mover's alpha on Begin, else from where the pull starts.
     UPROPERTY()
     float32 Alpha = 0.0f;

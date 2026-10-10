@@ -1,4 +1,4 @@
-// One AddPiece's answer, broadcast after the whole drain applied.
+// One release's answer, broadcast after the whole drain applied.
 struct FMars_Fry_AdmissionResult
 {
     FMars_CookingFeed_PieceId Id;
@@ -15,18 +15,27 @@ struct FMars_Fry_TakeOutResult
     FCk_Handle_FoodPiece Piece;
 }
 
-// Drains Reset -> SetDrive -> TakeOut -> AddPiece -> Skim -> Look. Reset resets the skimmer (carry, level, back at its park,
-// idle) and zeroes the tally, and keeps every piece with its heat; SetDrive is last-wins and drives the skimmer (an idle one
-// carries); TakeOut hands pieces back with their cook state written and their bodies Kinematic; AddPiece adopts or rejects
-// each released piece (every one in a drain that also reset is rejected: the release belongs to the attempt the reset
-// ended); Skim dips inside the pot, pours over the basket, carries anywhere, and is ignored elsewhere or while idle; a look
-// moves the skimmer's target within the reach (the pot only while the scoop is dipped or still below the rim) while driven.
-// The new target goes to the skimmer's commanded slide once. The drive and skim edges, then every take-out, then every
-// admission answer (and OnPieceAdded for an accepted one) are broadcast last. The drain collects and the Tick measures:
-// nothing here integrates over time.
+// Drains Reset -> SetDrive -> TakeOut (the station's take-outs after the fryer's own) -> Readopt -> the station inbox's
+// releases -> Skim -> Look. Reset resets the skimmer (carry, level, back at its park, idle) and zeroes the tally, and keeps
+// every piece with its heat; SetDrive is last-wins and drives the skimmer (an idle one carries); TakeOut hands pieces back
+// with their cook state written and their bodies Kinematic, each onto the request's tray (the station's take-out contract)
+// or to the caller, and one that hands none back is refused (NoRoom under a cap of zero or with no tray named by the
+// station, else NothingReady); Readopt puts a handed-back piece nobody took back in play where it lies; each release in the
+// inbox is adopted or rejected (every one in a drain that also reset is rejected: the release belongs to the attempt the
+// reset ended); Skim dips inside the pot, pours over the basket, carries anywhere, is refused elsewhere (the corridor) and
+// ignored while idle; a look moves the skimmer's target within the reach (the pot only while the scoop is dipped or still
+// below the rim) while driven. The new target goes to the skimmer's commanded slide once. The drive and skim edges and every
+// refused skim, then every take-out and every refused take-out, then every admission answer on the station's OnAdmission
+// (and OnPieceAdded for an accepted one) are broadcast last. The drain collects and the Tick measures: nothing here
+// integrates over time.
 //
 // A piece is the kernel's guest: the kernel creates no entity, and a piece it holds ends only lost (the Tick) or with the
-// station (OnFryBeginDestroy).
+// station (OnFryBeginDestroy). The fryer is the one owner of its pieces' lease facts: it stamps every piece it takes on
+// with the holder fact and its pickup's Ledger claim, removes the holder when it hands the piece back, and releases the
+// claim when the piece lands on its tray (or at once when the take-out named none); a tray's refusal readopts the piece.
+//
+// It also listens: the station's queue (OnQueued wakes this drain) and the answers of every tray it loads (OnLoaded,
+// OnLoadRefused).
 class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -50,12 +59,18 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         const auto HasReset = InRequests.ResetRequests.Num() > 0;
         TArray<FMars_Request_Fry_SetDrive> SetDriveRequests = InRequests.SetDriveRequests;
         TArray<FMars_Request_Fry_TakeOut> TakeOutRequests = InRequests.TakeOutRequests;
-        TArray<FMars_Request_Fry_AddPiece> AddPieceRequests = InRequests.AddPieceRequests;
+        TArray<FMars_Request_Fry_Readopt> ReadoptRequests = InRequests.ReadoptRequests;
         TArray<FMars_Request_Fry_Skim> SkimRequests = InRequests.SkimRequests;
         TArray<FMars_Request_Fry_Look> LookRequests = InRequests.LookRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Fry_Requests);
+
+        Watch_Station(Self);
+        TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
+        TArray<FMars_Request_StationTakeOut> StationTakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
+        for (const auto& TakeOut : StationTakeOuts)
+        { TakeOutRequests.Add(Make_TakeOut(TakeOut)); }
 
         const auto StartDrive = InState.Drive;
         const auto StartSkim = InState.Skim;
@@ -67,22 +82,38 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         { Apply_SetDrive(Self, InState, SetDriveRequests.Last().Drive); }
 
         TArray<FMars_Fry_TakeOutResult> TakenOut;
+        TArray<EMars_CookingFeed_TakeOutRefusal> TakeOutRefusals;
         for (const auto& Request : TakeOutRequests)
-        { TakenOut.Append(Apply_TakeOut(Self, InState, Request)); }
+        {
+            const auto Taken = Apply_TakeOut(Self, InState, Request);
+            if (Taken.Num() == 0)
+            { TakeOutRefusals.Add(Get_TakeOutRefusal(Request)); }
+
+            Land(Self, Request, Taken);
+            TakenOut.Append(Taken);
+        }
+
+        for (const auto& Request : ReadoptRequests)
+        { Apply_Readopt(Self, InState, Request); }
 
         TArray<FMars_Fry_AdmissionResult> Admissions;
-        for (const auto& Request : AddPieceRequests)
+        for (const auto& Release : Inbox)
         {
             if (HasReset)
-            { Admissions.Add(Reject_InResetDrain(Self, Request.Release)); }
+            { Admissions.Add(Reject_InResetDrain(Self, Release)); }
             else
-            { Admissions.Add(Apply_AddPiece(Self, InState, Request.Release)); }
+            { Admissions.Add(Apply_AddPiece(Self, InState, Release)); }
         }
 
         const auto TargetBeforeSteering = InState.SkimmerTarget;
 
+        TArray<EMars_Fry_Skim> RefusedSkims;
         for (const auto& Request : SkimRequests)
-        { Apply_Skim(Self, InState, Request.Skim); }
+        {
+            const auto Refused = Apply_Skim(Self, InState, Request.Skim);
+            if (Refused.IsSet())
+            { RefusedSkims.Add(Refused.GetValue()); }
+        }
 
         if (LookRequests.Num() > 0 && InState.Drive == EMars_Implement_Drive::Driven)
         {
@@ -102,14 +133,19 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         if ((InState.SkimmerTarget - TargetBeforeSteering).Size() > 0.0001)
         { Send_SlideTarget(Self, InState); }
 
-        if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
-        { return; }
+        const auto EndDrive = InState.Drive;
+        const auto EndSkim = InState.Skim;
+        if (EndDrive != StartDrive && Self.Has_Fragment(FMars_Fragment_Fry_Signals))
+        { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnDriveChanged.Broadcast(Self, EndDrive); }
 
-        if (InState.Drive != StartDrive)
-        { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnDriveChanged.Broadcast(Self, InState.Drive); }
+        if (EndSkim != StartSkim && Self.Has_Fragment(FMars_Fragment_Fry_Signals))
+        { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnSkimChanged.Broadcast(Self, EndSkim); }
 
-        if (InState.Skim != StartSkim && Self.Has_Fragment(FMars_Fragment_Fry_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnSkimChanged.Broadcast(Self, InState.Skim); }
+        for (const auto Skim : RefusedSkims)
+        {
+            if (Self.Has_Fragment(FMars_Fragment_Fry_Signals))
+            { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnSkimRefused.Broadcast(Self, Skim); }
+        }
 
         for (const auto& Result : TakenOut)
         {
@@ -117,12 +153,16 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
             { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceTakenOut.Broadcast(Self, Result.Id, Result.Piece); }
         }
 
+        for (const auto Refusal : TakeOutRefusals)
+        {
+            if (Self.Has_Fragment(FMars_Fragment_Fry_Signals))
+            { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnTakeOutRefused.Broadcast(Self, Refusal); }
+        }
+
+        FCk_Handle Station = Self;
         for (const auto& Result : Admissions)
         {
-            if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
-            { return; }
-
-            Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceAdmission.Broadcast(Self, Result.Id, Result.Admission, Result.Reason);
+            utils_cooking_feed::Broadcast_Admission(Station, FMars_CookingFeed_AdmissionAnswer(Result.Id, Result.Admission, Result.Reason));
             if (Result.Admission == EMars_CookingFeed_Admission::Accepted && Self.Has_Fragment(FMars_Fragment_Fry_Signals))
             { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceAdded.Broadcast(Self, Result.Id, Result.Entity); }
         }
@@ -143,8 +183,6 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         // After the implement's reset in its own drain: the carry height is the skimmer's, not necessarily its rest.
         Skimmer.Request_SetLiftTarget(FMars_Request_Implement_SetLiftTarget(InFry.Get_Spec().Scoop.CarryLift));
         Skimmer.Request_SetSlideTarget(FMars_Request_Implement_SetSlideTarget(FVector2D::ZeroVector));
-
-        ck::Trace(f"[Fry] [{InFry.ToString()}] reset: {InState.Pieces.Num()} piece(s) kept, skimmer parked, carrying and idle");
     }
 
     // An idle skimmer carries: nobody holds it in the oil.
@@ -159,8 +197,6 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InDrive == EMars_Implement_Drive::Idle)
         { Set_Skim(InFry, InState, EMars_Fry_Skim::Carry); }
-
-        ck::Trace(f"[Fry] [{InFry.ToString()}] skimmer {InDrive :n}");
     }
 
     private FMars_Fry_AdmissionResult Reject_InResetDrain(FCk_Handle_Fry& InFry, const FMars_CookingFeed_Release& InRelease)
@@ -168,13 +204,19 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         auto Result = FMars_Fry_AdmissionResult();
         Result.Id = InRelease.PieceId;
         Result.Reason = "reset in the same drain";
-        ck::Trace(f"[Fry] [{InFry.ToString()}] rejected piece {utils_cooking_feed::Get_PieceName(InRelease.PieceId)}: {Result.Reason}");
         return Result;
     }
 
+    // A station take-out is the fryer's own TakeOut onto its tray, capped at the room the press read: no tray caps it at none.
+    private FMars_Request_Fry_TakeOut Make_TakeOut(const FMars_Request_StationTakeOut& InTakeOut) const
+    {
+        const auto MaxPieces = ck::IsValid(InTakeOut.Tray) ? InTakeOut.MaxPieces : 0;
+        return FMars_Request_Fry_TakeOut(TOptional<FCk_Handle_FoodPiece>(), TOptional<int32>(MaxPieces), InTakeOut.Tray);
+    }
+
     // Unset Piece: every Drained piece, in admission order; set: that piece while it is in play and not lost. MaxPieces caps
-    // either. Each one leaves play with its cook state written onto the piece and its body Kinematic (a platter takes it
-    // next); its Resting stays for whoever adopts it next to retarget.
+    // either. Each one leaves play with its cook state written onto the piece, its body Kinematic (a platter takes it next)
+    // and its holder fact gone; its Resting stays for whoever adopts it next to retarget.
     private TArray<FMars_Fry_TakeOutResult> Apply_TakeOut(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState,
         const FMars_Request_Fry_TakeOut& InRequest)
     {
@@ -189,7 +231,7 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
                 continue;
             }
 
-            Hand_Back(Piece);
+            Hand_Back(InFry, Piece);
 
             auto Result = FMars_Fry_TakeOutResult();
             Result.Id = Piece.Id;
@@ -200,7 +242,6 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         InState.Pieces = Kept;
         InState.Tally.TakenOut += Taken.Num();
 
-        ck::Trace(f"[Fry] [{InFry.ToString()}] took out {Taken.Num()} piece(s) ({utils_fry::Get_LivePieceCount(InState.Pieces)} left in play)");
         return Taken;
     }
 
@@ -215,19 +256,118 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         return InPiece.Drain == EMars_Fry_Drain::Drained;
     }
 
-    private void Hand_Back(const FMars_Fry_PieceState& InPiece)
+    // Why a take-out took nothing: a cap of zero left no room (no tray docked, or a full one), else nothing was takeable.
+    private EMars_CookingFeed_TakeOutRefusal Get_TakeOutRefusal(const FMars_Request_Fry_TakeOut& InRequest) const
+    {
+        if (InRequest.MaxPieces.IsSet() && InRequest.MaxPieces.GetValue() <= 0)
+        { return EMars_CookingFeed_TakeOutRefusal::NoRoom; }
+
+        return EMars_CookingFeed_TakeOutRefusal::NothingReady;
+    }
+
+    // The piece leaves with its batter and the oil the basket left on it (Receiver.DrainedOilCoat): its sheen at the next
+    // station.
+    private void Hand_Back(const FCk_Handle_Fry& InFry, const FMars_Fry_PieceState& InPiece)
     {
         auto Piece = InPiece.Piece;
-        Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(utils_fry::Get_CookState(InPiece, Piece.Get_CookState())));
+        auto CookState = utils_fry::Get_CookState(InPiece, Piece.Get_CookState());
+        CookState.OilCoat = InFry.Get_Spec().Receiver.DrainedOilCoat;
+        Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
 
         auto Body = InPiece.Body;
         utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Kinematic));
+        utils_foodpiece::Clear_Holder(Piece, InFry);
     }
 
-    // Adopted: the released piece (Release.Piece, Ready, on no platter and no scene node) moves to the release pose with a
-    // dynamic body moving at the release's velocities and a Resting on the scoop disc and the basket floor (which tell
-    // whether it lies on the scoop and whether it is supported in the basket); its faces' heat is seeded from its sear (a
-    // seared face arrives golden). It starts Airborne, its last home the Oil. Rejected: the piece is left as it was.
+    // Every piece a take-out handed back goes onto the request's tray (detached first, its landing watched: its Ledger claim
+    // stays the fryer's until it lands), else to the caller, its claim released.
+    private void Land(const FCk_Handle_Fry& InFry, const FMars_Request_Fry_TakeOut& InRequest, const TArray<FMars_Fry_TakeOutResult>& InTaken)
+    {
+        for (const auto& Result : InTaken)
+        {
+            auto Piece = Result.Piece;
+            if (ck::IsValid(InRequest.Tray))
+            { utils_cooking_feed::Send_ToTray(Piece, FMars_Fragment_StationLanding(InFry, Result.Id, InRequest.Tray)); }
+            else
+            { utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable); }
+        }
+
+        if (InTaken.Num() > 0 && ck::IsValid(InRequest.Tray))
+        { Watch_Tray(InRequest.Tray); }
+    }
+
+    // A handed-back piece nobody took, back in play where it lies (it is not moved): the record rebuilt from the piece (the
+    // take-out wrote its faces' heat into its cook state as its batter), its body Dynamic again, its Resting on the scoop
+    // and the basket, its holder fact and its pickup's Ledger claim the fryer's. It starts as an admitted piece does,
+    // Airborne and NotDraining: the Tick judges where it is from its pose, and a piece lying in the basket drains again. The take-out it undoes leaves the tally. A piece gone, attached, or that another ledger
+    // holds by now is not readopted.
+    private void Apply_Readopt(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, const FMars_Request_Fry_Readopt& InRequest)
+    {
+        auto Piece = InRequest.Piece;
+        const auto PieceName = utils_cooking_feed::Get_PieceName(InRequest.PieceId);
+        if (Get_IsGone(Piece))
+        { return; }
+
+        FCk_Handle Entity = Piece;
+        const auto Holder = Piece.TryGet_Holder();
+        if ((ck::IsValid(Holder) && Holder != InFry) || Entity.Is_SceneNode())
+        { return; }
+
+        const auto IsInPlay = utils_fry::Find_PieceIndexByHandle(InState.Pieces, Piece) >= 0
+            || utils_fry::Find_PieceIndex(InState.Pieces, InRequest.PieceId) >= 0;
+        if (ck::EnsureIfNot(IsInPlay == false, f"[Fry] [{InFry.ToString()}] was asked to readopt piece {PieceName} [{Piece.ToString()}], which is already in play"))
+        { return; }
+
+        if (ck::EnsureIfNot(Entity.Is_JoltBody(), f"[Fry] [{InFry.ToString()}] was asked to readopt piece {PieceName} [{Piece.ToString()}], which has no body: it handed back only bodied pieces"))
+        { return; }
+
+        const auto Spec = InFry.Get_Spec();
+        auto Body = Entity.As_JoltBody();
+        utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
+
+        TArray<FCk_Handle> Supports;
+        Supports.Add(Spec.Nodes.ScoopBody);
+        Supports.Add(Spec.Nodes.BasketBody);
+        if (Entity.Is_Resting())
+        {
+            auto Resting = Entity.As_Resting();
+            Resting.Request_Retarget(FMars_Request_Resting_Retarget(Supports, Spec.Receiver.SupportGraceSeconds, k_HopMinSeconds));
+        }
+        else
+        { utils_resting::Add(Entity, FMars_Resting_Spec(Supports, Spec.Receiver.SupportGraceSeconds, k_HopMinSeconds)); }
+
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry());
+        auto State = FMars_Fry_PieceState();
+        State.Id = InRequest.PieceId;
+        State.Piece = Piece;
+        State.Entity = Entity;
+        State.Body = Body;
+        State.CentreLocal = utils_searing::Get_BoundsCentre(Metrics);
+        State.HalfExtents = utils_searing::Get_BoundsHalfExtents(Metrics);
+        State.Whereabouts = EMars_Fry_Whereabouts::Airborne;
+        State.LastHome = EMars_Fry_Whereabouts::Oil;
+
+        const auto CookState = Piece.Get_CookState();
+        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
+        {
+            const auto Heat = CookState.Batter.IsValidIndex(Index) ? Math::Clamp(CookState.Batter[Index], 0.0f, 2.0f) : 0.0f;
+            State.FaceHeat.Add(Heat);
+            State.ReportedStage.Add(utils_fry::Get_HeatStage(Heat));
+        }
+
+        InState.Pieces.Add(State);
+        InState.Tally.TakenOut = Math::Max(0, InState.Tally.TakenOut - 1);
+        utils_foodpiece::Stamp_Holder(Piece, InFry);
+        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
+        Watch_Teardown(InFry);
+    }
+
+    // Adopted: the released piece (Release.Piece, Ready, held by no other ledger and on no scene node) moves to the release
+    // pose with a dynamic body moving at the release's velocities and a Resting on the scoop disc and the basket floor
+    // (which tell whether it lies on the scoop); its faces' heat is seeded from its batter (a pan's sear is not batter: a
+    // seared face arrives pale and keeps its sear in the ledger); the fryer stamps it with the holder fact and its pickup's
+    // Ledger claim. It starts
+    // Airborne, its last home the Oil. Rejected: the piece is left as it was.
     private FMars_Fry_AdmissionResult Apply_AddPiece(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState,
         const FMars_CookingFeed_Release& InRelease)
     {
@@ -250,18 +390,15 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         { Result.Reason = "already admitted"; }
         else if (utils_fry::Find_PieceIndex(InState.Pieces, InRelease.PieceId) >= 0)
         { Result.Reason = f"piece {PieceName} is already in play"; }
-        else if (ck::IsValid(Piece.TryGet_Platter()))
-        { Result.Reason = "still on its platter"; }
+        else if (ck::IsValid(Piece.TryGet_Holder()))
+        { Result.Reason = "another ledger holds it"; }
         else if (Entity.Is_SceneNode())
         { Result.Reason = "still attached"; }
         else if (utils_fry::Get_LivePieceCount(InState.Pieces) >= Spec.Supply.MaxPieces)
         { Result.Reason = f"Supply.MaxPieces [{Spec.Supply.MaxPieces}] pieces are already in play"; }
 
         if (Result.Reason.Len() > 0)
-        {
-            ck::Trace(f"[Fry] [{InFry.ToString()}] rejected piece {PieceName} [{Piece.ToString()}]: {Result.Reason}");
-            return Result;
-        }
+        { return Result; }
 
         const auto Body = Adopt_Body(Piece, InRelease, Spec.Piece);
 
@@ -281,7 +418,6 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Metrics = utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry());
         auto State = FMars_Fry_PieceState();
         State.Id = InRelease.PieceId;
-        State.PresetIndex = InRelease.PresetIndex;
         State.Piece = Piece;
         State.Entity = Entity;
         State.Body = Body;
@@ -291,20 +427,19 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         State.Whereabouts = EMars_Fry_Whereabouts::Airborne;
         State.LastHome = EMars_Fry_Whereabouts::Oil;
 
-        // A face seared on a pan arrives golden; its stage counts as reported.
+        // A face fried before arrives at its heat; its stage counts as reported.
         const auto Seed = Piece.Get_CookState();
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            const auto Heat = Seed.FaceSear.IsValidIndex(Index) ? Math::Clamp(Seed.FaceSear[Index], 0.0f, 2.0f) : 0.0f;
+            const auto Heat = Seed.Batter.IsValidIndex(Index) ? Math::Clamp(Seed.Batter[Index], 0.0f, 2.0f) : 0.0f;
             State.FaceHeat.Add(Heat);
             State.ReportedStage.Add(utils_fry::Get_HeatStage(Heat));
         }
 
         InState.Pieces.Add(State);
+        utils_foodpiece::Stamp_Holder(Piece, InFry);
+        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
         Watch_Teardown(InFry);
-
-        ck::Trace(f"[Fry] [{InFry.ToString()}] adopted piece {PieceName} [{Entity.ToString()}] "
-            + f"({utils_fry::Get_PaleFaceCount(State.FaceHeat)} pale face(s), {utils_fry::Get_LivePieceCount(InState.Pieces)} in play)");
 
         Result.Admission = EMars_CookingFeed_Admission::Accepted;
         Result.Entity = Entity;
@@ -377,6 +512,69 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         Fry.BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnFryBeginDestroy"));
     }
 
+    // Unbinding first keeps the watch single across drains: the station's queue wakes this drain.
+    private void Watch_Station(const FCk_Handle_Fry& InFry)
+    {
+        FCk_Handle Station = InFry;
+        utils_cooking_feed::UnbindFrom_OnQueued(Station, FMars_Delegate_StationAdmission_OnQueued(this, n"OnStationQueued"));
+        utils_cooking_feed::BindTo_OnQueued(Station, FMars_Delegate_StationAdmission_OnQueued(this, n"OnStationQueued"));
+    }
+
+    // Unbinding first keeps one binding per tray across take-outs.
+    private void Watch_Tray(const FCk_Handle_Platter& InTray)
+    {
+        auto Tray = InTray;
+        Tray.UnbindFrom_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));
+        Tray.UnbindFrom_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnTrayLoadRefused"));
+        Tray.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));
+        Tray.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnTrayLoadRefused"));
+    }
+
+    // A live fryer's station: a landing whose fryer is gone has nothing to go back to.
+    private bool Get_IsFry(const FCk_Handle& InStation) const
+    {
+        return ck::IsValid(InStation)
+            && utils_entity_lifetime::Get_IsPendingDestroy(InStation, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false
+            && InStation.Is_Fry();
+    }
+
+    // The station queued a release or a take-out: the fryer drains it this frame.
+    UFUNCTION()
+    private void OnStationQueued(FCk_Handle InStation)
+    {
+        auto Station = InStation;
+        if (Station.Is_Fry())
+        { Station.AddOrGet_Fragment(FMars_Fragment_Fry_Requests); }
+    }
+
+    // A piece the fryer handed to a tray landed there: the tray holds it now, and its pickup's Ledger claim goes.
+    UFUNCTION()
+    private void OnTrayLoaded(FCk_Handle_Platter InTray, FCk_Handle_FoodPiece InPiece)
+    {
+        const auto Landing = utils_cooking_feed::TryGet_Landing(InPiece, InTray);
+        if (Landing.IsSet() == false || Get_IsFry(Landing.GetValue().Station) == false)
+        { return; }
+
+        auto Piece = InPiece;
+        utils_cooking_feed::Clear_Landing(Piece);
+        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable);
+    }
+
+    // A piece the fryer handed to a tray was refused: back in play where it lies.
+    UFUNCTION()
+    private void OnTrayLoadRefused(FCk_Handle_Platter InTray, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal)
+    {
+        const auto Landing = utils_cooking_feed::TryGet_Landing(InPiece, InTray);
+        if (Landing.IsSet() == false || Get_IsFry(Landing.GetValue().Station) == false)
+        { return; }
+
+        auto Piece = InPiece;
+        utils_cooking_feed::Clear_Landing(Piece);
+        auto Station = Landing.GetValue().Station;
+        auto Fry = Station.As_Fry();
+        Fry.Request_Readopt(FMars_Request_Fry_Readopt(Landing.GetValue().PieceId, Piece));
+    }
+
     // The pieces in play end with the station: under the world's transient entity they would outlive it.
     UFUNCTION()
     private void OnFryBeginDestroy(FCk_Handle InFry)
@@ -386,55 +584,44 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto State = FryEntity.Get_Fragment(FMars_Fragment_Fry);
-        auto Destroyed = 0;
         for (const auto& Piece : State.Pieces)
         {
             if (Get_IsGone(Piece.Piece))
             { continue; }
 
             utils_entity_lifetime::Request_DestroyEntity(Piece.Entity);
-            ++Destroyed;
         }
-
-        ck::Trace(f"[Fry] [{FryEntity.ToString()}] destroyed: {Destroyed} piece(s) destroyed with it");
     }
 
     // Carry is honoured anywhere. A Dip (or a Pour asked for) dips with the whole scoop inside the pot (and holds the target
     // there, so it cannot carry on out while dipped), pours with the whole bowl over the basket interior (lowering the disc
-    // there would press the basket's pieces through its floor), and is ignored elsewhere (in the corridor the disc would
-    // drop into the counter).
-    private void Apply_Skim(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, EMars_Fry_Skim InSkim)
+    // there would press the basket's pieces through its floor), and is refused elsewhere (in the corridor the disc would
+    // drop into the counter): the refused skim is returned for OnSkimRefused. Unset when honoured, and while idle.
+    private TOptional<EMars_Fry_Skim> Apply_Skim(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, EMars_Fry_Skim InSkim)
     {
         if (InState.Drive != EMars_Implement_Drive::Driven)
-        {
-            ck::Trace(f"[Fry] [{InFry.ToString()}] skim {InSkim :n} ignored (the skimmer is idle)");
-            return;
-        }
+        { return TOptional<EMars_Fry_Skim>(); }
 
-        const auto ScoopRoot = InFry.Get_ScoopRoot();
         if (InSkim == EMars_Fry_Skim::Carry)
         {
             Set_Skim(InFry, InState, EMars_Fry_Skim::Carry);
-            ck::Trace(f"[Fry] [{InFry.ToString()}] skim Carry with the scoop at root XY ({ScoopRoot.X :.2}, {ScoopRoot.Y :.2})");
-            return;
+            return TOptional<EMars_Fry_Skim>();
         }
 
         if (InFry.Get_IsScoopInPot())
         {
             Set_Skim(InFry, InState, EMars_Fry_Skim::Dip);
             InState.SkimmerTarget = utils_fry::Clamp_Reach(InState.SkimmerTarget, InFry.Get_Spec(), EMars_Fry_Skim::Dip);
-            ck::Trace(f"[Fry] [{InFry.ToString()}] skim Dip with the scoop at root XY ({ScoopRoot.X :.2}, {ScoopRoot.Y :.2})");
-            return;
+            return TOptional<EMars_Fry_Skim>();
         }
 
         if (InFry.Get_IsScoopOverBasket())
         {
             Set_Skim(InFry, InState, EMars_Fry_Skim::Pour);
-            ck::Trace(f"[Fry] [{InFry.ToString()}] skim Pour with the scoop at root XY ({ScoopRoot.X :.2}, {ScoopRoot.Y :.2})");
-            return;
+            return TOptional<EMars_Fry_Skim>();
         }
 
-        ck::Trace(f"[Fry] [{InFry.ToString()}] skim {InSkim :n} ignored: the scoop at root XY ({ScoopRoot.X :.2}, {ScoopRoot.Y :.2}) is neither in the pot nor over the basket");
+        return TOptional<EMars_Fry_Skim>(InSkim);
     }
 
     // The skimmer implement's commanded lift and tilt follow the skim: its spring lowers or raises the scoop, its tilt tips

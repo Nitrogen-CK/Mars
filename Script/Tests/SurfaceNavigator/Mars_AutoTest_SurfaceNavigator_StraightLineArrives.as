@@ -15,11 +15,11 @@ class UMars_AutoTest_SurfaceNavigator_StraightLineArrives : UMars_AutoTestRig_Su
         _Goal = _Origin + FVector(400.0, 0.0, 65.0);
 
         Add_Step("the spec rules hold", n"Step_AssertValidation");
-        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", 0, 5.0f);
+        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", k_SlowPolls, 0);
         Add_Step("bind OnArrived/OnFailed; request a move 400 uu along +X", n"Step_MoveTo");
-        Add_Step_WaitUntil("the navigator is Moving", n"Check_Moving", 0, 2.0f);
+        Add_Step_WaitUntil("the navigator is Moving", n"Check_Moving", 0, 0);
         Add_Step("the move runs straight to the goal", n"Step_AssertStraightLine");
-        Add_Step_WaitUntil("the navigator arrives", n"Check_Arrived", 0, 8.0f);
+        Add_Step_WaitUntil("the navigator arrives", n"Check_Arrived", k_SlowPolls, 0);
         Add_Step("the body is at the goal and OnArrived fired once", n"Step_AssertArrived");
         Run_Steps(InHandle);
     }

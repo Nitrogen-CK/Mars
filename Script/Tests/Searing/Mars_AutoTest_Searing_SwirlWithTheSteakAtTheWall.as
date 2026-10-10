@@ -27,7 +27,7 @@ class UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall : UMars_AutoTestRig_Sear
 
         Add_Steps_AddPieceAndLand();
         Add_Step("heat the pan: the swirl runs", n"Step_Heat");
-        Add_Step_WaitSeconds("let the swirl ease in", 0.5f);
+        Add_Step_WaitUntil("the swirl eased in to its full radius", n"Check_SwirlEasedIn", 0, 0);
         Add_Step("teleport the piece to the foot of the wall", n"Step_TeleportToWall");
         for (auto Second = 0; Second < k_SwirlSeconds; ++Second)
         {
@@ -37,6 +37,14 @@ class UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall : UMars_AutoTestRig_Sear
 
         Add_Step("the piece stayed on the pan, on its face", n"Step_AssertOnPan");
         Run_Steps(InHandle);
+    }
+
+    // The orbit's share eases to 1 over the pan's Orbit.EaseSeconds once the heat drives the pan.
+    UFUNCTION()
+    private void Check_SwirlEasedIn(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Pan.Get_OrbitOffset().Size() >= float64(k_SwirlRadius) - 0.001);
     }
 
     UFUNCTION()

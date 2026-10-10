@@ -10,6 +10,9 @@ namespace utils_foodpiece
     // Exact: a released piece's Jolt body admits only exactly unit scale.
     const float k_UnitScaleTolerance = 0.0;
 
+    // A piece is cooked face by face: the six faces of its bounds box.
+    const int32 k_FaceCount = 6;
+
     // Composes the piece on InHandle, which must already carry a Transform and a RuntimeMesh. A new root (invalid
     // Data.Lineage) starts a lineage; every piece gets a new Id. A piece whose geometry is already Ready (every cut half)
     // is Ready at once; one still importing is Pending until the Setup processor sees the import resolve. A rejected spec
@@ -27,6 +30,7 @@ namespace utils_foodpiece
         auto Params = FMars_Fragment_FoodPiece_Params();
         Params.Tuners = InSpec.Tuners;
         Params.Cap = InSpec.Cap;
+        Params.Body = InSpec.Body;
 
         auto State = FMars_Fragment_FoodPiece();
         State.Id = FGuid::NewGuid();
@@ -55,16 +59,17 @@ namespace utils_foodpiece
         return InHandle.As_FoodPiece();
     }
 
-    // A Dynamic convex body of the piece's own mesh and mass with InTuners' surface, on the piece's entity: the one builder
-    // for a loose piece and a piece dropped onto a platter. The piece must be Ready (its geometry gives the hull) and
-    // bodiless; the body reads the piece's transform as it is when the body is set up.
-    FCk_Handle_JoltBody Add_Body(FCk_Handle_FoodPiece& InPiece, const FMars_FoodPiece_BodyTuners& InTuners)
+    // A Dynamic convex body of the piece's own mesh and mass with the piece's own surface (its Body tuners), on the piece's
+    // entity: the one builder for a piece dropped onto a platter and a whole food item. The piece must be Ready (its
+    // geometry gives the hull) and bodiless; the body reads the piece's transform as it is when the body is set up.
+    FCk_Handle_JoltBody Add_Body(FCk_Handle_FoodPiece& InPiece)
     {
         FCk_Handle Entity = InPiece;
         const auto CanAdd = InPiece.Get_Status() == EMars_FoodPiece_Status::Ready && Entity.Is_JoltBody() == false;
         if (ck::EnsureIfNot(CanAdd, f"[FoodPiece] [{InPiece.ToString()}] gets a body only once Ready and bodiless (status [{InPiece.Get_Status() :n}], body [{Entity.Is_JoltBody()}])"))
         { return FCk_Handle_JoltBody(); }
 
+        const auto Tuners = InPiece.Get_BodyTuners();
         auto Convex = FCk_JoltBody_RuntimeConvexSpec();
         Convex.Set_PointsCm(utils_runtime_mesh::Copy_LocalVerticesCm(InPiece.Get_Geometry()));
 
@@ -74,9 +79,11 @@ namespace utils_foodpiece
         BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
         BodySpec.Set_MassKg(float32(InPiece.Get_MassKg()));
         BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
-        BodySpec.Set_Friction(InTuners.Friction);
-        BodySpec.Set_Restitution(InTuners.Restitution);
-        BodySpec.Set_CollisionProfileName(InTuners.CollisionProfileName);
+        BodySpec.Set_Friction(Tuners.Friction);
+        BodySpec.Set_Restitution(Tuners.Restitution);
+        BodySpec.Set_CollisionProfileName(Tuners.CollisionProfileName);
+        // A Resting on this body needs a Persisted contact every step from a resting awake piece.
+        BodySpec.Set_PersistContacts(ECk_EnableDisable::Enable);
         return utils_jolt_body::Add(Entity, BodySpec);
     }
 
@@ -160,6 +167,51 @@ namespace utils_foodpiece
     {
         return Math::IsFinite(InValue) && InValue >= 0.0f && InValue <= 1.0f;
     }
+
+    // The middle of a piece's mesh bounds, in its own frame (a cut half's origin is the uncut piece's, not its own middle).
+    FVector Get_BoundsCentre(const FCk_RuntimeMesh_Metrics& InMetrics)
+    {
+        return (InMetrics.Get_BoundsMinCm() + InMetrics.Get_BoundsMaxCm()) * 0.5;
+    }
+
+    FVector Get_BoundsHalfExtents(const FCk_RuntimeMesh_Metrics& InMetrics)
+    {
+        return (InMetrics.Get_BoundsMaxCm() - InMetrics.Get_BoundsMinCm()) * 0.5;
+    }
+
+    // InPieceTransform (in any frame) moved to the piece's middle: the frame its faces are measured from.
+    FTransform Get_CentreFrame(const FTransform& InPieceTransform, const FVector& InCentreLocal)
+    {
+        return FTransform(InPieceTransform.GetRotation(), InPieceTransform.TransformPosition(InCentreLocal));
+    }
+
+    // InOwner's ledger admitted InPiece. Called only by a ledger's processor, after its own refusals read the holder: a
+    // live holder other than InOwner here would put the piece in two ledgers (a defect); the newest admission wins.
+    void Stamp_Holder(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
+    {
+        const auto Holder = InPiece.TryGet_Holder();
+        if (ck::EnsureIfNot(ck::Is_NOT_Valid(Holder) || Holder == InOwner,
+            f"[FoodPiece] [{InPiece.ToString()}] is admitted by [{InOwner.ToString()}] while [{Holder.ToString()}] still holds it"))
+        {
+            InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Holder).Owner = InOwner;
+            return;
+        }
+
+        InPiece.AddOrGet_Fragment(FMars_Fragment_FoodPiece_Holder).Owner = InOwner;
+    }
+
+    // InOwner's ledger let InPiece go. A piece some other ledger holds by now keeps that holder. Called only by a ledger's
+    // processor.
+    void Clear_Holder(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
+    {
+        if (ck::Is_NOT_Valid(InPiece) || InPiece.Has_Fragment(FMars_Fragment_FoodPiece_Holder) == false)
+        { return; }
+
+        if (InPiece.Get_Fragment(FMars_Fragment_FoodPiece_Holder).Owner != InOwner)
+        { return; }
+
+        InPiece.Request_TryRemove(FMars_Fragment_FoodPiece_Holder);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -193,7 +245,7 @@ mixin float Get_VolumeCm3(const FCk_Handle_FoodPiece& Self)
     return Self.Get_Fragment(FMars_Fragment_FoodPiece).VolumeCm3;
 }
 
-mixin FMars_CookState Get_CookState(const FCk_Handle_FoodPiece& Self)
+mixin FMars_FoodPiece_CookState Get_CookState(const FCk_Handle_FoodPiece& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_FoodPiece).CookState;
 }
@@ -235,6 +287,12 @@ mixin FCk_RuntimeMesh_Cap Get_Cap(const FCk_Handle_FoodPiece& Self)
     return Self.Get_Fragment(FMars_Fragment_FoodPiece_Params).Cap;
 }
 
+// The surface of every body the piece is given.
+mixin FMars_FoodPiece_BodyTuners Get_BodyTuners(const FCk_Handle_FoodPiece& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FoodPiece_Params).Body;
+}
+
 // The piece's own entity, as its geometry.
 mixin FCk_Handle_RuntimeMesh Get_Geometry(const FCk_Handle_FoodPiece& Self)
 {
@@ -248,6 +306,19 @@ mixin float Get_MinimumPortionVolumeCm3(const FCk_Handle_FoodPiece& Self)
     const auto& State = Self.Get_Fragment(FMars_Fragment_FoodPiece);
     const auto MinimumCm3 = Self.Get_Tuners().MinPortionMassKg * State.VolumeCm3 / State.MassKg;
     return Math::Min(MinimumCm3, utils_foodpiece::k_MaxPortionVolumeCm3);
+}
+
+// The ledger holding the piece (FMars_Fragment_FoodPiece_Holder); invalid while none does, or once it is gone.
+mixin FCk_Handle TryGet_Holder(const FCk_Handle_FoodPiece& Self)
+{
+    if (ck::Is_NOT_Valid(Self) || Self.Has_Fragment(FMars_Fragment_FoodPiece_Holder) == false)
+    { return FCk_Handle(); }
+
+    const auto Owner = Self.Get_Fragment(FMars_Fragment_FoodPiece_Holder).Owner;
+    if (ck::Is_NOT_Valid(Owner))
+    { return FCk_Handle(); }
+
+    return Owner;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

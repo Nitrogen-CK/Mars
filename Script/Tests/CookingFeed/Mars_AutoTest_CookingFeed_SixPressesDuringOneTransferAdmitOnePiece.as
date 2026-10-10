@@ -11,9 +11,9 @@ class UMars_AutoTest_CookingFeed_SixPressesDuringOneTransferAdmitOnePiece : UMar
 
         Add_Step("press add food three times in one drain", n"Step_PressThrice");
         Add_Step("press three more times while the hand reaches", n"Step_PressThrice");
-        Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 0, 2.0f);
+        Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 0, 0);
         Add_Step("five refusals, one release; accept it", n"Step_AssertOneTransferAndAccept");
-        Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 0, 2.0f);
+        Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 0, 0);
         Add_Step("one piece admitted, five left", n"Step_AssertOnePieceAdmitted");
         Run_Steps(InHandle);
     }

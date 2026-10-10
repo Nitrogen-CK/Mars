@@ -1,11 +1,13 @@
 // Holds a scene-node-attached world item's offset at FromOffset for DelaySeconds, then lerps it to ToOffset with Easing
-// over Duration, then removes the Arrival fragment.
+// over Duration, then removes the Arrival fragment; a World-mode world item has then settled on its mount
+// (OnMountSettled).
 //
 // Exactly ONE Request_UpdateOffset per frame: the scene-node request handler assigns the whole offset, so separate
 // location / rotation / scale requests (utils_tween::Create_TweenSceneNodeOffsetTransform) clobber each other.
 class UMars_Processor_WorldItem_Arrive : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_WorldItem_HandleRequests");
     default _MarkedDirtyBy = FMars_Fragment_WorldItem_Arrival;
 
     UFUNCTION(BlueprintOverride)
@@ -43,7 +45,16 @@ class UMars_Processor_WorldItem_Arrive : UCk_Processor_Script_Base_UE
         const auto Offset = Alpha >= 1.0f ? To : utils_world_item::Blend(From, To, Eased);
         utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
 
-        if (Alpha >= 1.0f)
-        { InHandle.Request_TryRemove(FMars_Fragment_WorldItem_Arrival); }
+        if (Alpha < 1.0f)
+        { return; }
+
+        InHandle.Request_TryRemove(FMars_Fragment_WorldItem_Arrival);
+
+        auto Self = InHandle.As_WorldItem();
+        if (Self.Get_Mode() != EMars_WorldItem_Mode::World || Self.Has_Fragment(FMars_Fragment_WorldItem_Signals) == false)
+        { return; }
+
+        const auto Committed = Self.Get_Fragment(FMars_Fragment_WorldItem).Committed;
+        Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountSettled.Broadcast(Self, Committed.Mount, Committed.Carrier);
     }
 }

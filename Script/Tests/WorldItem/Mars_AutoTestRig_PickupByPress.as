@@ -1,36 +1,42 @@
-// The player's tasks the pickup-by-press rig runs on its carrier: the resolver -> interaction bridge, the Use row ->
-// resolver intent forwarding, and the gloves' Hands sub-SM (whose Rest also follows a launch through with a push).
+// The player's tasks the pickup-by-press rig runs on its carrier: the Use row -> resolver intent and its interaction, the
+// held-item -> gloves link and the gloves' Hands sub-SM (whose Rest also follows a launch through with a push).
 class UMars_AutoTestState_PickupByPressRig : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
-        AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
         AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
+        AddTask(InHandle, UMars_SmTask_HeldItemDrivesHands);
         AddTask(InHandle, UMars_SmTask_HandsSubSm);
     }
 }
 
-// A carrier composed as the player is for a pickup: Hotbar (two bag slots), HeldItem with the selection push, HeldItemUse
+// A carrier composed as the player is for a pickup: Hotbar (two bag slots), HeldItem, HeldItemUse
 // (the drop / throw launch), its gloves (FPHands on the Hand node, the Hands sub-SM), a Use resolver, InputIntents and a
-// private input stack with a real Use level row on F9, and the player's resolver -> interaction and Use -> resolver tasks.
+// private input stack with a real Use level row on F9, and the player's Use -> resolver task.
 // It holds a rock (seeded, stowed to bag slot 0, held), launches it with the real HeldItemUse path onto a floor in front
 // of it, focuses the rock's new world item from the frame it exists (the player looks where it throws), and once it lies
 // still offers it to the resolver as the view trace would and taps Use (pressed, released two frames later). A test sets
-// _LaunchKind and asserts the pickup lands within k_StowSeconds. Add_Steps_TapWhileHolding instead keeps the held rock and
-// taps on a second rock lying in front of the carrier: the gloves, full with a two-handed rock, refuse the reach, and the
-// pickup must land at once (within k_RefusedStowSeconds, under the grip-wait's time bound).
+// _LaunchKind and asserts the pickup lands. Add_Steps_TapWhileHolding instead keeps the held rock and taps on a second
+// rock lying in front of the carrier (at _LooseRockLocal): the gloves, full with a two-handed rock, refuse the reach,
+// and the pickup must land at once (within k_MaxRefusedStowFrames of the press).
+// Add_Steps_UpToALooseRockOfferedWhileHolding is that sequence up to the offer, for a test that acts on the loose rock
+// itself.
 UCLASS(Abstract)
 class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
 {
     default _TimeoutSeconds = 30.0f;
 
-    // The tap must land the pickup this soon: the gloves' reach and grip, or at once when they cannot reach.
-    protected const float32 k_StowSeconds = 1.0f;
-    // A pickup the gloves refused lands within a few frames; the grip-wait's time bound (0.5 s) would be later.
-    protected const float32 k_RefusedStowSeconds = 0.3f;
+    // A launched rock's roll and the gloves' return from a grab outrun the default poll budget at lane frame rate.
+    protected const int32 k_SlowPolls = 900;
+    // From the press (the tap's first poll comes four frames on): the matcher's pass, the resolver's, the target's
+    // start of the interaction, the pickup state's entry, the gloves' drain that refuses the reach, the holder's
+    // transfer drain and the poll after it. A reach and grip would add the gloves' Reach.Grab.OutSeconds.
+    protected const int32 k_MaxRefusedStowFrames = 8;
 
     protected EMars_LaunchKind _LaunchKind = EMars_LaunchKind::Drop;
+    // Where Add_Steps_TapWhileHolding's second rock is dropped from, from the origin.
+    protected FVector _LooseRockLocal = FVector(100.0, 0.0, 20.0);
 
     protected FCk_Handle_HeldItemUse _Use;
     protected FCk_Handle_InputIntents _Intents;
@@ -42,13 +48,16 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
     private FKey _UseKey;
 
     private FVector _Origin;
-    // Every reach the gloves refused, by interact target (invalid for a reach that served no interaction).
-    protected TArray<FCk_Handle_InteractTarget> _RefusedTargets;
+    // The interact target of every reach the gloves refused (invalid for a reach that served no interaction).
+    protected TArray<FCk_Handle_InteractTarget> _RefusedReaches;
     // The rock's Use target as it was offered (a picked-up transient rock's world item is destroyed with it).
     protected FCk_Handle_InteractTarget _OfferedTarget;
     protected FCk_Handle_WorldItem _Landed;
     private TOptional<FVector> _LastLandedLocation;
     private int32 _StillFrames = 0;
+    // The frame Use was last pressed, and the frame a refused pickup was first seen stowed.
+    private int64 _PressFrame = -1;
+    private int64 _StowSeenFrame = -1;
 
     protected void Build_Rig(FCk_Handle InHandle, FVector InOrigin)
     {
@@ -56,7 +65,6 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
         Add_CarrierBodyWithBack(InHandle, InOrigin);
         Add_Hotbar(_Carrier, 2);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
         _Use = utils_held_item_use::Add(_Carrier);
         _Intents = utils_input_intents::Add(_Carrier);
         _Resolver = utils_interaction_resolver::Add(_Carrier, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
@@ -75,40 +83,47 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
     // Up to the tap; the test adds its assertion steps after.
     protected void Add_Steps_LaunchAndTap()
     {
-        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 5.0f);
+        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 0);
         Add_Step("bake the Use level row and swap it in", n"Step_SwapUseSet");
-        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 5.0f);
-        Add_Step_WaitUntil("the rock holder is seeded", n"Check_HoldersSeeded", 0, 5.0f);
+        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 0);
+        Add_Step_WaitUntil("the rock holder is seeded", n"Check_HoldersSeeded", 0, 0);
         Add_Step("compose the player's tasks and stow the rock into bag slot 0", n"Step_ComposeAndStow");
-        Add_Step_WaitUntil("the rock is held and the gloves rest, listening", n"Check_RockHeldAndRest", 0, 5.0f);
+        Add_Step_WaitUntil("the rock is held and the gloves rest, listening", n"Check_RockHeldAndRest", 0, 0);
         Add_Step("launch the rock with the held item's drop / throw", n"Step_Launch");
-        Add_Step_WaitUntil("the rock lies (nearly) still on the floor", n"Check_Landed", 0, 15.0f);
+        Add_Step_WaitUntil("the rock lies (nearly) still on the floor", n"Check_Landed", k_SlowPolls, 0);
         Add_Step("offer its (focused) pickup to the resolver", n"Step_FocusAndOffer");
-        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 2.0f);
+        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 0);
         Add_Step("press Use", n"Step_PressUse");
         Add_Step_WaitFrames("a tap", 2);
         Add_Step("release Use", n"Step_ReleaseUse");
-        Add_Step_WaitUntil("the rock is picked up", n"Check_Stowed", 0, k_StowSeconds);
+        Add_Step_WaitUntil("the rock is picked up", n"Check_Stowed", 0, 0);
         Add_Step("it is in a bag slot and its world item is gone", n"Step_AssertStowed");
+    }
+
+    // Up to a loose rock lying in front of the carrier, focused and offered to its resolver, while the carrier still holds its
+    // own rock and its gloves rest.
+    protected void Add_Steps_UpToALooseRockOfferedWhileHolding()
+    {
+        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 0);
+        Add_Step("bake the Use level row and swap it in", n"Step_SwapUseSet");
+        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 0);
+        Add_Step_WaitUntil("the rock holder is seeded", n"Check_HoldersSeeded", 0, 0);
+        Add_Step("compose the player's tasks and stow the rock into bag slot 0", n"Step_ComposeAndStow");
+        Add_Step_WaitUntil("the rock is held and the gloves rest, listening", n"Check_RockHeldAndRest", 0, 0);
+        Add_Step("a second rock is dropped in front of the carrier", n"Step_SpawnLooseRock");
+        Add_Step_WaitUntil("the second rock lies (nearly) still on the floor", n"Check_Landed", k_SlowPolls, 0);
+        Add_Step("offer its (focused) pickup to the resolver", n"Step_FocusAndOffer");
+        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 0);
     }
 
     // Up to the tap on a loose rock while the carrier still holds its own; the test adds its assertion steps after.
     protected void Add_Steps_TapWhileHolding()
     {
-        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 5.0f);
-        Add_Step("bake the Use level row and swap it in", n"Step_SwapUseSet");
-        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 5.0f);
-        Add_Step_WaitUntil("the rock holder is seeded", n"Check_HoldersSeeded", 0, 5.0f);
-        Add_Step("compose the player's tasks and stow the rock into bag slot 0", n"Step_ComposeAndStow");
-        Add_Step_WaitUntil("the rock is held and the gloves rest, listening", n"Check_RockHeldAndRest", 0, 5.0f);
-        Add_Step("a second rock is dropped in front of the carrier", n"Step_SpawnLooseRock");
-        Add_Step_WaitUntil("the second rock lies (nearly) still on the floor", n"Check_Landed", 0, 15.0f);
-        Add_Step("offer its (focused) pickup to the resolver", n"Step_FocusAndOffer");
-        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 2.0f);
+        Add_Steps_UpToALooseRockOfferedWhileHolding();
         Add_Step("press Use", n"Step_PressUse");
         Add_Step_WaitFrames("a tap", 2);
         Add_Step("release Use", n"Step_ReleaseUse");
-        Add_Step_WaitUntil("the second rock is picked up at once", n"Check_Stowed", 0, k_RefusedStowSeconds);
+        Add_Step_WaitUntil("the second rock is picked up at once", n"Check_StowedAtOnce", 0, 0);
         Add_Step("the gloves refused its reach, and it is in the other bag slot", n"Step_AssertRefusedAndStowed");
     }
 
@@ -116,28 +131,28 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
     // throws it, and taps on it again once it lies still; the test adds its assertion steps after.
     protected void Add_Steps_TapTwice()
     {
-        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 5.0f);
+        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_Recording", 0, 0);
         Add_Step("bake the Use level row and swap it in", n"Step_SwapUseSet");
-        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 5.0f);
+        Add_Step_WaitUntil("the Use row is live on the matcher", n"Check_UseSetActive", 0, 0);
         Add_Step("compose the player's tasks", n"Step_Compose");
-        Add_Step_WaitUntil("the empty gloves rest, listening", n"Check_EmptyAndRest", 0, 5.0f);
+        Add_Step_WaitUntil("the empty gloves rest, listening", n"Check_EmptyAndRest", 0, 0);
         Add_Step("a rock is dropped in front of the carrier", n"Step_SpawnLooseRock");
-        Add_Step_WaitUntil("the rock lies (nearly) still on the floor", n"Check_Landed", 0, 15.0f);
+        Add_Step_WaitUntil("the rock lies (nearly) still on the floor", n"Check_Landed", k_SlowPolls, 0);
         Add_Step("offer its (focused) pickup to the resolver", n"Step_FocusAndOffer");
-        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 2.0f);
+        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 0);
         Add_Step("press Use (the first hold)", n"Step_PressUse");
         Add_Step_WaitFrames("a tap", 2);
         Add_Step("release Use", n"Step_ReleaseUse");
-        Add_Step_WaitUntil("the first tap picks the rock up", n"Check_Stowed", 0, k_StowSeconds);
-        Add_Step_WaitUntil("the rock is held and the gloves rest, listening", n"Check_RockHeldAndRest", 0, 5.0f);
+        Add_Step_WaitUntil("the first tap picks the rock up", n"Check_Stowed", 0, 0);
+        Add_Step_WaitUntil("the rock is held and the gloves rest, listening", n"Check_RockHeldAndRest", k_SlowPolls, 0);
         Add_Step("forget the picked-up world item and throw the rock", n"Step_ForgetAndLaunch");
-        Add_Step_WaitUntil("the thrown rock lies (nearly) still on the floor", n"Check_Landed", 0, 15.0f);
+        Add_Step_WaitUntil("the thrown rock lies (nearly) still on the floor", n"Check_Landed", k_SlowPolls, 0);
         Add_Step("offer its (focused) pickup to the resolver", n"Step_FocusAndOffer");
-        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 2.0f);
+        Add_Step_WaitUntil("the pickup is Focused", n"Check_Focused", 0, 0);
         Add_Step("press Use again (a fresh hold)", n"Step_PressUse");
         Add_Step_WaitFrames("a tap", 2);
         Add_Step("release Use", n"Step_ReleaseUse");
-        Add_Step_WaitUntil("the second tap picks the rock up again", n"Check_Stowed", 0, k_StowSeconds);
+        Add_Step_WaitUntil("the second tap picks the rock up again", n"Check_Stowed", 0, 0);
         Add_Step("it is in a bag slot and its world item is gone", n"Step_AssertStowed");
     }
 
@@ -304,7 +319,7 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
     {
         auto Owner = InHandle;
         auto Spec = FMars_WorldItem_WorldSpec(utils_held_item::Make_DefinitionSoft(mars_items::Rock()),
-            FTransform(FRotator::ZeroRotator, _Origin + FVector(100.0, 0.0, 20.0)));
+            FTransform(FRotator::ZeroRotator, _Origin + _LooseRockLocal));
         utils_world_item::Request_SpawnWorld(Owner, Spec);
     }
 
@@ -388,14 +403,15 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
     }
 
     UFUNCTION()
-    private void Step_PressUse(FCk_Handle InHandle, FInstancedStruct InPayload)
+    protected void Step_PressUse(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        _PressFrame = utils_time::Get_FrameCounter();
         Inject_UseKey(ECk_InputSource_EventType::Pressed);
     }
 
     // Logs the held row's activation frame first: the frame each hold is known by.
     UFUNCTION()
-    private void Step_ReleaseUse(FCk_Handle InHandle, FInstancedStruct InPayload)
+    protected void Step_ReleaseUse(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Frame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Use);
         auto FrameText = FString("unset");
@@ -414,12 +430,32 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
         Res.Set(ck::Is_NOT_Valid(_Landed) || ck::Is_NOT_Valid(_Landed.Get_HeldItem()));
     }
 
+    // Check_Stowed, marking the frame it first holds: the refused pickup's frame bound counts to it from the press.
+    UFUNCTION()
+    private void Check_StowedAtOnce(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        const auto IsStowed = ck::Is_NOT_Valid(_Landed) || ck::Is_NOT_Valid(_Landed.Get_HeldItem());
+        if (IsStowed == false)
+        {
+            Res.Set(false);
+            return;
+        }
+
+        _StowSeenFrame = utils_time::Get_FrameCounter();
+        Res.Set(true);
+    }
+
     UFUNCTION()
     private void Step_AssertRefusedAndStowed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_RefusedTargets.Contains(_OfferedTarget), "the gloves, full with a two-handed rock, refused the reach for it");
+        Assert_True(_RefusedReaches.Contains(_OfferedTarget), "the gloves, full with a two-handed rock, refused the reach for it");
         Assert_True(ck::IsValid(_Hotbar.Get_ItemAt(0)) && ck::IsValid(_Hotbar.Get_ItemAt(1)), "both bag slots hold a rock");
         Assert_True(_HeldItem.Get_CurrentItem() == _Hotbar.Get_ItemAt(0), "the first rock stays in the hands");
+
+        const auto Frames = _StowSeenFrame - _PressFrame;
+        Assert_True(Frames <= k_MaxRefusedStowFrames,
+            f"the refused pickup landed within {k_MaxRefusedStowFrames} frames of the press (took {Frames})");
     }
 
     // The frames a press is known by, read in the matcher's own phase broadcast (where the player's intent task reads them).
@@ -439,9 +475,10 @@ class UMars_AutoTestRig_PickupByPress : UMars_AutoTestRig_Carrier
     }
 
     UFUNCTION()
-    private void OnRigReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind)
+    private void OnRigReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind,
+                                   EMars_FPHands_ReachRefusal InReason)
     {
-        _RefusedTargets.Add(InTarget);
+        _RefusedReaches.Add(InTarget);
     }
 
     UFUNCTION()

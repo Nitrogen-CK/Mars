@@ -24,20 +24,20 @@ class UMars_AutoTest_CuttingStation_SweepingTheBoardEmptyTakesTheNextJoint : UMa
         for (int32 Index = 0; Index < 2; ++Index)
         { _Boxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + k_InputPlatterOffset + FVector(100.0, 20.0 * Index, 0.0)))); }
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("both platters are constructed and both boxes are Ready", n"Check_PlattersAndBoxesReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 0);
+        Add_Step_WaitUntil("both platters are constructed and both boxes are Ready", n"Check_PlattersAndBoxesReady", k_SlowPolls, 0);
         Add_Step("load both boxes onto the input platter", n"Step_LoadBoxes");
-        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLanded", 0, 8.0f);
+        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLanded", k_SlowPolls, 0);
         Add_Step("dock the input platter and the tray", n"Step_DockBoth");
-        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_BothDocked", 0, 5.0f);
-        Add_Step_WaitUntil("the feed draws from the input platter, its pile frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_BothDocked", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the feed draws from the input platter, its pile frozen", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("add food", n"Step_AddFood");
-        Add_Step_WaitUntil("the feed laid the first box on the board and the glove is back", n"Check_FirstOnBoard", 0, 5.0f);
+        Add_Step_WaitUntil("the feed laid the first box on the board and the glove is back", n"Check_FirstOnBoard", k_SlowPolls, 0);
         Add_Step("one box on the board, one on the input platter; sweep", n"Step_AssertFirstThenSweep");
-        Add_Step_WaitUntil("the first box is on the tray and the board is empty", n"Check_FirstOnTray", 0, 8.0f);
-        Add_Step_WaitUntil("the other box is frozen on the input platter", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the first box is on the tray and the board is empty", n"Check_FirstOnTray", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the other box is frozen on the input platter", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("add food again", n"Step_AddFood");
-        Add_Step_WaitUntil("the second box is on the board and the glove is back", n"Check_SecondOnBoard", 0, 8.0f);
+        Add_Step_WaitUntil("the second box is on the board and the glove is back", n"Check_SecondOnBoard", k_SlowPolls, 0);
         Add_Step_WaitFrames("the second box's pile pose lands", 2);
         Add_Step("the tray holds the first box, the board the second; the input platter is empty", n"Step_Assert");
         Run_Steps(InHandle);
@@ -135,7 +135,7 @@ class UMars_AutoTest_CuttingStation_SweepingTheBoardEmptyTakesTheNextJoint : UMa
         Assert_Equals_Int(_Feed.Get_Admitted(), 2, "the feed counted two admissions");
         Assert_True(ck::Is_NOT_Valid(_Second.TryGet_Platter()), "the second box names no platter");
 
-        const auto Pile = (utils_cutting::Get_PileLocal() * Get_StationWorld()).GetLocation();
+        const auto Pile = _Board.Get_PileNodeWorld().GetLocation();
         const auto Offset = Get_World(_Second).GetLocation() - Pile;
         Assert_True(Math::Abs(Offset.X) <= 0.5 && Math::Abs(Offset.Y) <= 0.5, f"the second box lies at the pile ({Offset} off)");
     }

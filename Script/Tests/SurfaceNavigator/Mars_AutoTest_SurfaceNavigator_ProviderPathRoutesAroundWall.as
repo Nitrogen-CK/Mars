@@ -11,6 +11,9 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UMars_AutoT
     default _TimeoutSeconds = 30.0f;
     default _Origin = FVector(140000.0, 92000.0, 600.0);
 
+    // The route round the wall (about 900 uu at the navigator's 120 uu/s) outruns k_SlowPolls at lane frame rate.
+    private const int32 k_RoutePolls = 1800;
+
     private FVector _Goal;
     private FCk_Handle_JoltBody _FloorBody;
     private FCk_Handle_JoltBody _WallBody;
@@ -27,13 +30,13 @@ class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UMars_AutoT
         SpawnBody(InHandle);
         _Goal = _Origin + FVector(500.0, 0.0, 65.0);
 
-        Add_Step_WaitUntil("the floor and wall are in the Jolt world and the body's surface motion is Ready", n"Check_WorldReady", 0, 5.0f);
+        Add_Step_WaitUntil("the floor and wall are in the Jolt world and the body's surface motion is Ready", n"Check_WorldReady", k_SlowPolls, 0);
         Add_Step("bake the field", n"Step_Build");
-        Add_Step_WaitUntil("the field is built", n"Check_Built", 0, 5.0f);
+        Add_Step_WaitUntil("the field is built", n"Check_Built", k_SlowPolls, 0);
         Add_Step("bind OnArrived/OnFailed; request a move to the far side of the wall", n"Step_MoveTo");
-        Add_Step_WaitUntil("the navigator is Moving", n"Check_Moving", 0, 2.0f);
+        Add_Step_WaitUntil("the navigator is Moving", n"Check_Moving", 0, 0);
         Add_Step("the move follows the provider's route", n"Step_AssertProviderRoute");
-        Add_Step_WaitUntil("the navigator arrives", n"Check_Arrived", 0, 15.0f);
+        Add_Step_WaitUntil("the navigator arrives", n"Check_Arrived", k_RoutePolls, 0);
         Add_Step("the body went round the wall and is at the goal", n"Step_AssertArrived");
         Run_Steps(InHandle);
     }

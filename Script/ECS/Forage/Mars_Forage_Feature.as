@@ -25,7 +25,7 @@ enum EMars_Forage_Exhaustion
     Destroyed
 }
 
-// What asked for the release; carried on the request and the OnReleased signal for logs and tests.
+// What asked for the release; carried on the request and the OnReleased and OnReleaseRefused signals for logs and tests.
 enum EMars_Forage_ReleaseReason
 {
     Hit,
@@ -172,11 +172,9 @@ struct FMars_Fragment_Forage
     UPROPERTY()
     FCk_Handle_Transform ReleasePoint;
 
+    // 0 = exhausted.
     UPROPERTY()
     int32 ChargesLeft = 0;
-
-    UPROPERTY()
-    bool IsExhausted = false;
 
     UPROPERTY()
     int32 ReleasedCount = 0;
@@ -194,6 +192,10 @@ struct FMars_Fragment_Forage
 delegate void FMars_Delegate_Forage_OnReleased(FCk_Handle_Forage InForage, FCk_Handle InWorldItem, EMars_Forage_ReleaseReason InReason);
 event void FMars_Delegate_Forage_OnReleased_MC(FCk_Handle_Forage InForage, FCk_Handle InWorldItem, EMars_Forage_ReleaseReason InReason);
 
+// A release asked of an exhausted forage; nothing spawned.
+delegate void FMars_Delegate_Forage_OnReleaseRefused(FCk_Handle_Forage InForage, EMars_Forage_ReleaseReason InReason);
+event void FMars_Delegate_Forage_OnReleaseRefused_MC(FCk_Handle_Forage InForage, EMars_Forage_ReleaseReason InReason);
+
 delegate void FMars_Delegate_Forage_OnExhausted(FCk_Handle_Forage InForage);
 event void FMars_Delegate_Forage_OnExhausted_MC(FCk_Handle_Forage InForage);
 
@@ -203,6 +205,7 @@ event void FMars_Delegate_Forage_OnReplenished_MC(FCk_Handle_Forage InForage);
 struct FMars_Fragment_Forage_Signals
 {
     FMars_Delegate_Forage_OnReleased_MC OnReleased;
+    FMars_Delegate_Forage_OnReleaseRefused_MC OnReleaseRefused;
     FMars_Delegate_Forage_OnExhausted_MC OnExhausted;
     FMars_Delegate_Forage_OnReplenished_MC OnReplenished;
 }
@@ -211,7 +214,7 @@ struct FMars_Fragment_Forage_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Dropped (with a trace) while the source is exhausted, so a trigger adapter never needs to guard.
+// Refused while the source is exhausted (OnReleaseRefused; nothing spawns), so a trigger adapter never needs to guard.
 struct FMars_Request_Forage_Release
 {
     UPROPERTY()

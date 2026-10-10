@@ -1,11 +1,13 @@
-// Add food brings the joint from the input platter to the board by glove. An empty large platter docks on the input dock
-// and is filled by hand through it: a cook (a carrier with gloves: Hotbar, HeldItem, Hand and Back nodes, FPHands and the
-// Hands state machine) picks the meat slab up and uses the dock, which offers PlaceFood; the gloves carry the slab over the
-// docked platter and it lands there. An operator whose intents read a real add-food key takes the station; the feed already
-// draws from the docked platter. Nothing moves until the key is pressed. One press: the feed's glove runs Reach, Grasp,
-// Carry, AwaitAdmission, Return and is Idle again, the board admitted it (one admission); the platter is empty and the same
-// piece lies on the board at the pile (world XY within 0.5 cm), yawed by its food's layout (within 0.5 deg), no longer riding
-// the platter, still shown and still whole, placed once. Isolated origin (16000, -9000, -30000).
+// Add food brings the joint from the input platter to the board by glove. An empty large platter docks on the input
+// dock and is filled by hand through it: a cook (a carrier with gloves: Hotbar, HeldItem, Hand and Back nodes, FPHands, a
+// Use resolver and InputIntents, and the carrier's tasks: the player's Use intent task, held-item -> gloves link and Hands
+// sub-SM) picks the meat slab up and uses the dock, which offers
+// PlaceFood; the gloves carry the slab over the docked platter and it lands there. An operator whose intents read a
+// real add-food key takes the station; the feed already draws from the docked platter. Nothing moves until the key is
+// pressed. One press: the feed's glove runs Reach, Grasp, Carry, AwaitAdmission, Return and is Idle again, the board
+// admitted it (one admission); the platter is empty and the same piece lies on the board at the pile (world XY within
+// 0.5 cm), yawed by its food's layout (within 0.5 deg), no longer riding the platter, still shown and still whole,
+// placed once. Isolated origin (16000, -9000, -30000).
 class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(16000.0, -9000.0, -30000.0);
@@ -22,6 +24,8 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
     private FCk_Handle _FoodEntity;
     private FCk_Handle_WorldItem _Slab;
     private FCk_Handle_FoodPiece _Joint;
+    // The interactable the last focus step focused (Check_AwaitedFocus).
+    private FCk_Handle_Interactable _AwaitedFocus;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -32,29 +36,29 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
         Build_Cook(InHandle);
         Spawn_Food(InHandle);
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
         Add_Steps_ArmTheAddFoodKey();
-        Add_Step_WaitUntil("the empty input platter is constructed", n"Check_EmptyInputPlatterReady", 0, 10.0f);
-        Add_Step_WaitUntil("the food item is constructed and the cook's gloves rest", n"Check_FoodAndCookReady", 0, 10.0f);
+        Add_Step_WaitUntil("the empty input platter is constructed", n"Check_EmptyInputPlatterReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the food item is constructed and the cook's gloves rest", n"Check_FoodAndCookReady", k_SlowPolls, 0);
         Add_Step("dock the empty platter", n"Step_DockInput");
-        Add_Step_WaitUntil("the empty platter is docked", n"Check_InputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the empty platter is docked", n"Check_InputDocked", k_SlowPolls, 0);
         Add_Step("the cook focuses the slab's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the slab's target enters Focused", 3);
+        Add_Step_WaitUntil("the slab's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the cook picks the slab up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the slab is Held", n"Check_FoodHeld", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 0.5f);
+        Add_Step_WaitUntil("the slab is Held", n"Check_FoodHeld", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the slab's hold has settled", n"Check_HoldSettled", k_SlowPolls, 0);
         Add_Step("the cook unfocuses the slab and focuses the input dock", n"Step_FocusDock");
-        Add_Step_WaitFrames("the dock's prompt follows the cook", 3);
+        Add_Step_WaitUntil("the dock's targets enter Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the dock offers to place the slab; the cook uses it", n"Step_PlaceThroughTheDock");
-        Add_Step_WaitUntil("the slab landed and froze on the docked platter", n"Check_OnTheDockedPlatter", 0, 8.0f);
+        Add_Step_WaitUntil("the slab landed and froze on the docked platter", n"Check_OnTheDockedPlatter", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
-        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
+        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step_WaitFrames("a joint taken without a press would have moved by now", 10);
         Add_Step("the joint still waits on the platter, the glove at rest", n"Step_AssertNothingMoved");
         Add_Step("press add food", n"Step_PressAddFood");
-        Add_Step_WaitUntil("the press is seen", n"Check_AddFoodHeld", 0, 2.0f);
-        Add_Step_WaitUntil("the feed laid one shown joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", 0, 5.0f);
+        Add_Step_WaitUntil("the press is seen", n"Check_AddFoodHeld", 0, 0);
+        Add_Step_WaitUntil("the feed laid one shown joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", k_SlowPolls, 0);
         Add_Step("release add food", n"Step_ReleaseAddFood");
         Add_Step_WaitFrames("a second transfer would have drained by now", 5);
         Add_Step("the platter is empty; the joint lies at the pile in its layout, shown and whole", n"Step_Assert");
@@ -85,10 +89,24 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
         auto HandsSpec = FMars_FPHands_Spec();
         HandsSpec.HandNode = _CookHand;
         _CookHands = utils_fphands::Add(_Cook, HandsSpec);
-        utils_state_machine::Add(_Cook, FCk_StateMachine_Spec(UMars_SmState_Hands_Rest));
+        utils_interaction_resolver::Add(_Cook, Make_CookResolverSpec(), ECk_Replication::DoesNotReplicate);
+        utils_input_intents::Add(_Cook);
+        utils_state_machine::Add(_Cook, FCk_StateMachine_Spec(UMars_AutoTestState_CarrierHands));
+    }
 
-        _CookHotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnCookSelectionChanged"));
-        _CookHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnCookSlotItemChanged"));
+    // The Use intent over the Use channel (UMars_AutoTestState_CarrierHands runs the player's Use intent task over it); the
+    // cook's targets are started by the test, so no distance sort.
+    private FCk_InteractionResolver_Spec Make_CookResolverSpec() const
+    {
+        auto Channels = TArray<FGameplayTag>();
+        Channels.Add(GameplayTags::InteractionChannel_Mars_Use);
+
+        auto Mapping = FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, Channels);
+        Mapping.Set_DistanceSorting(ECk_InteractionResolver_DistanceSorting::Disabled);
+
+        auto Mappings = TArray<FCk_InteractionResolver_IntentChannelMapping>();
+        Mappings.Add(Mapping);
+        return FCk_InteractionResolver_Spec(Mappings);
     }
 
     // The meat slab's food item on a floor of its own beside the cook.
@@ -107,25 +125,6 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
         Track_ForCleanup(_FoodEntity);
     }
 
-    // What the player HFSM's HotbarDrivesHeldItem task and the player's hold sync do on every hotbar change.
-    private void Push_CookSelection()
-    {
-        _CookHeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_CookHotbar.Get_SelectedSlot(), _CookHotbar.Get_SelectedItem()));
-        _CookHands.Request_SetHold(FMars_Request_FPHands_SetHold(_CookHotbar.Get_SelectedItem()));
-    }
-
-    UFUNCTION()
-    private void OnCookSelectionChanged(FCk_Handle_Hotbar InHotbar)
-    {
-        Push_CookSelection();
-    }
-
-    UFUNCTION()
-    private void OnCookSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        Push_CookSelection();
-    }
-
     private FCk_Handle_InteractTarget Get_DockTarget() const
     {
         auto DockInteractable = _InputDock.Get_Interactable();
@@ -141,6 +140,7 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
     {
         auto Pickup = _Slab.Get_Pickup();
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Cook));
+        _AwaitedFocus = Pickup;
     }
 
     UFUNCTION()
@@ -159,6 +159,22 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
 
         auto DockInteractable = _InputDock.Get_Interactable();
         DockInteractable.Request_Focus(FMars_Request_Interactable_Focus(_Cook));
+        _AwaitedFocus = DockInteractable;
+    }
+
+    // Every target of the interactable the last focus step focused is Focused.
+    UFUNCTION()
+    private void Check_AwaitedFocus(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto AllFocused = ck::IsValid(_AwaitedFocus);
+        if (AllFocused)
+        {
+            for (auto Target : _AwaitedFocus.Get_AllInteractTargets())
+            { AllFocused = AllFocused && utils_state_machine::Get_CurrentStateClass(Target.As_StateMachine()) == UMars_SmState_Interactable_Focused; }
+        }
+
+        auto Res = OutResult;
+        Res.Set(AllFocused);
     }
 
     UFUNCTION()
@@ -202,12 +218,11 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
         Assert_Equals_Int(_Placed.Num(), 1, "the joint was placed once");
         Assert_True(ck::Is_NOT_Valid(_Joint.TryGet_Platter()), "the joint no longer names a platter");
         Assert_False(ck::IsValid(Get_Parent(_Joint)), "the joint no longer rides the platter");
-        Assert_True(_Board.Get_IsUntouched(), "a whole joint on an empty board leaves it untouched");
         Assert_True(_Joint.Get_IsWhole(), "the joint is still whole");
         Assert_True(Get_IsShown(_Joint), "the joint is still shown");
 
         const auto StationWorld = Get_StationWorld();
-        const auto Pile = (utils_cutting::Get_PileLocal() * StationWorld).GetLocation();
+        const auto Pile = _Board.Get_PileNodeWorld().GetLocation();
         const auto JointWorld = Get_World(_Joint);
         const auto Offset = JointWorld.GetLocation() - Pile;
         Assert_True(Math::Abs(Offset.X) <= 0.5 && Math::Abs(Offset.Y) <= 0.5, f"the joint lies at the pile ({JointWorld.GetLocation()} vs {Pile})");
@@ -261,6 +276,14 @@ class UMars_AutoTest_CuttingStation_AddFoodBringsTheJointToTheBoard : UMars_Auto
         auto Node = _Slab.As_SceneNode(ECk_SanityCheck::UnChecked);
         auto Res = OutResult;
         Res.Set(_Slab.Get_Mount() == EMars_WorldItem_Mount::Held && ck::IsValid(Node) && utils_scene_node::Get_Parent(Node) == _CookHand);
+    }
+
+    // Held with nothing pending: no mount waiting on the body, no arrival in flight.
+    UFUNCTION()
+    private void Check_HoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Slab.Get_Mount() == EMars_WorldItem_Mount::Held && _Slab.Get_IsSettled());
     }
 
     UFUNCTION()

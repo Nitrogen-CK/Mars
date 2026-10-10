@@ -17,14 +17,14 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
         BuildLever(InHandle, EMars_Control_Activation::Inactive);
 
         Add_Step("grip the lever until release, with no interaction", n"Step_BeginHeldGrip");
-        Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 5.0f);
+        Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 0);
         Add_Step("the grip is held until release", n"Step_AssertHeldGrip");
-        Add_Step_WaitUntil("push past the threshold to the stop", n"Check_PushedToTheStop", 0, 5.0f);
+        Add_Step_WaitUntil("push past the threshold to the stop", n"Check_PushedToTheStop", 0, 0);
         Add_Step("still gripped at the stop, nothing engaged or finished", n"Step_AssertHeldAtTheStop");
-        Add_Step_WaitUntil("pull back while held", n"Check_RockedBack", 0, 5.0f);
+        Add_Step_WaitUntil("pull back while held", n"Check_RockedBack", 0, 0);
         Add_Step("the handle rocked back and is still gripped", n"Step_AssertRockedBack");
         Add_Step("let go", n"Step_EndManipulation");
-        Add_Step_WaitUntil("the handle settles back to rest", n"Check_SettledToRest", 0, 5.0f);
+        Add_Step_WaitUntil("the handle settles back to rest", n"Check_SettledToRest", k_SlowPolls, 0);
         Add_Step("released without engaging", n"Step_AssertReleased");
         Run_Steps(InHandle);
     }

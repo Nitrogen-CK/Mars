@@ -16,16 +16,16 @@ class UMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter : UMars_AutoTest
         Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
         Spawn_OutputPlatter(InHandle);
 
-        Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", 0, 10.0f);
+        Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", k_SlowPolls, 0);
         Add_Steps_FeedTheJoint();
         Add_Step("dock the tray", n"Step_DockOutput");
-        Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", k_SlowPolls, 0);
         Add_Step("chop at the board's centre", n"Step_Chop");
-        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
+        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", k_SlowPolls, 0);
         Add_Step("sweep the halves onto the tray", n"Step_Sweep");
-        Add_Step_WaitUntil("both halves landed on the tray", n"Check_TwoOnTray", 0, 5.0f);
+        Add_Step_WaitUntil("both halves landed on the tray", n"Check_TwoOnTray", k_SlowPolls, 0);
         Add_Step("the input policy refuses the two halves NotWhole; unload one", n"Step_AssertTwoHalvesAndUnload");
-        Add_Step_WaitUntil("one half came off the tray", n"Check_OneOnTray", 0, 5.0f);
+        Add_Step_WaitUntil("one half came off the tray", n"Check_OneOnTray", k_SlowPolls, 0);
         Add_Step("the input policy refuses the one half NotWhole", n"Step_AssertNotWhole");
         Run_Steps(InHandle);
     }
@@ -54,11 +54,11 @@ class UMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter : UMars_AutoTest
     UFUNCTION()
     private void Step_AssertTwoHalvesAndUnload(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Policy = _InputDock.Get_Spec().Policy;
-        Assert_True(Policy.WholeOnly, "the input dock takes whole pieces only");
-        Assert_False(Policy.RequireEmpty.IsSet(), "the input dock takes an empty platter as well as a laden one");
+        const auto Spec = _InputDock.Get_Spec();
+        Assert_True(Spec.Policy.WholeOnly, "the input dock takes whole pieces only");
+        Assert_True(Spec.Role == EMars_PlatterDock_Role::Input, "the input dock takes an empty platter as well as a laden one (no Output rule)");
 
-        const auto Refusal = utils_platter_dock::Get_Refusal(Policy, _OutputPlatter);
+        const auto Refusal = utils_platter_dock::Get_Refusal(Spec, _OutputPlatter);
         Assert_True(Refusal.IsSet() && Refusal.GetValue() == EMars_PlatterDock_Refusal::NotWhole,
             f"the two halves are refused NotWhole (got [{Describe(Refusal)}])");
 
@@ -81,7 +81,7 @@ class UMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter : UMars_AutoTest
         const auto Half = _OutputPlatter.Get_Held()[0];
         Assert_False(Half.Get_IsWhole(), "the half on the tray is not whole");
 
-        const auto Refusal = utils_platter_dock::Get_Refusal(_InputDock.Get_Spec().Policy, _OutputPlatter);
+        const auto Refusal = utils_platter_dock::Get_Refusal(_InputDock.Get_Spec(), _OutputPlatter);
         Assert_True(Refusal.IsSet() && Refusal.GetValue() == EMars_PlatterDock_Refusal::NotWhole,
             f"the one half is refused NotWhole (got [{Describe(Refusal)}])");
     }

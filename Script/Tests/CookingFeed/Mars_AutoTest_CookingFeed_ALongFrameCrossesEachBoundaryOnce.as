@@ -12,10 +12,10 @@ class UMars_AutoTest_CookingFeed_ALongFrameCrossesEachBoundaryOnce : UMars_AutoT
         Add_Steps_SourceTheFeed();
 
         Add_Step("press add food", n"Step_Begin");
-        Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 4, 1.0f);
+        Add_Step_WaitUntil("the hand awaits admission", n"Check_AwaitingAdmission", 4, 0);
         Add_Step_WaitFrames("nothing more happens while awaiting", 2);
         Add_Step("each boundary once, in one tick, one release; accept", n"Step_AssertBoundariesAndAccept");
-        Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 4, 1.0f);
+        Add_Step_WaitUntil("the hand is back at rest", n"Check_Idle", 4, 0);
         Add_Step_WaitFrames("nothing more happens at rest", 2);
         Add_Step("Return and Idle once each", n"Step_AssertReturn");
         Run_Steps(InHandle);

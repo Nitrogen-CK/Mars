@@ -57,17 +57,16 @@ class UMars_SmTask_HotbarIntents : UMars_SmTask_IntentEdges
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// HotbarDrivesHeldItem
+// HotbarEjectDrops
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Pushes (selected slot, its item) into HeldItem on every selection or slot-content change, and answers an overflow eject
-// with a drop (the hotbar applies the parked selection once the overflow slot reads empty).
-class UMars_SmTask_HotbarDrivesHeldItem : UCk_SmTask_EntityScript
+// Answers an overflow eject with a drop: the hotbar applies the parked selection once the overflow slot reads empty. What
+// is held follows the hotbar on its own (UMars_Processor_HeldItem_Sync).
+class UMars_SmTask_HotbarEjectDrops : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private FCk_Handle_Hotbar _Hotbar;
-    private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_HeldItemUse _Use;
 
     UFUNCTION(BlueprintOverride)
@@ -75,41 +74,19 @@ class UMars_SmTask_HotbarDrivesHeldItem : UCk_SmTask_EntityScript
     {
         auto Player = ck::Ctx(InHandle);
         _Hotbar = Player.As_Hotbar();
-        _HeldItem = Player.As_HeldItem();
-        _Use = Player.As_HeldItemUse();
+        _Use = Player.As_HeldItemUse(ECk_SanityCheck::UnChecked);
 
-        _Hotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
-        _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
         _Hotbar.BindTo_OnOverflowEjectRequested(FMars_Delegate_Hotbar_OnOverflowEjectRequested(this, n"OnOverflowEjectRequested"));
-
-        PushSelection();
     }
 
     UFUNCTION(BlueprintOverride)
     void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
         if (ck::IsValid(_Hotbar))
-        {
-            _Hotbar.UnbindFrom_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnSelectionChanged"));
-            _Hotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
-            _Hotbar.UnbindFrom_OnOverflowEjectRequested(FMars_Delegate_Hotbar_OnOverflowEjectRequested(this, n"OnOverflowEjectRequested"));
-        }
+        { _Hotbar.UnbindFrom_OnOverflowEjectRequested(FMars_Delegate_Hotbar_OnOverflowEjectRequested(this, n"OnOverflowEjectRequested")); }
 
         _Hotbar = FCk_Handle_Hotbar();
-        _HeldItem = FCk_Handle_HeldItem();
         _Use = FCk_Handle_HeldItemUse();
-    }
-
-    UFUNCTION()
-    private void OnSelectionChanged(FCk_Handle_Hotbar InHotbar)
-    {
-        PushSelection();
-    }
-
-    UFUNCTION()
-    private void OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        PushSelection();
     }
 
     UFUNCTION()
@@ -118,13 +95,56 @@ class UMars_SmTask_HotbarDrivesHeldItem : UCk_SmTask_EntityScript
         if (ck::IsValid(_Use))
         { _Use.Request_Drop(); }
     }
+}
 
-    private void PushSelection()
+//--------------------------------------------------------------------------------------------------------------------------
+// HeldItemDrivesHands
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The gloves hold what HeldItem holds (FPHands builds the hold from the item, utils_fphands::Make_Hold): told on enter and
+// on every held-item change. A carrier without gloves or HeldItem (a test rig) binds nothing.
+class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
+
+    private FCk_Handle_HeldItem _HeldItem;
+    private FCk_Handle_FPHands _Hands;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
-        if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_HeldItem))
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
         { return; }
 
-        _HeldItem.Request_SetSlot(FMars_Request_HeldItem_SetSlot(_Hotbar.Get_SelectedSlot(), _Hotbar.Get_SelectedItem()));
+        auto Player = ck::Ctx(InHandle);
+        _HeldItem = Player.As_HeldItem(ECk_SanityCheck::UnChecked);
+        _Hands = Player.As_FPHands(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(_HeldItem) || ck::Is_NOT_Valid(_Hands))
+        {
+            _HeldItem = FCk_Handle_HeldItem();
+            _Hands = FCk_Handle_FPHands();
+            return;
+        }
+
+        _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
+        _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(_HeldItem.Get_CurrentItem()));
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_HeldItem))
+        { _HeldItem.UnbindFrom_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged")); }
+
+        _HeldItem = FCk_Handle_HeldItem();
+        _Hands = FCk_Handle_FPHands();
+    }
+
+    UFUNCTION()
+    private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
+    {
+        if (ck::IsValid(_Hands))
+        { _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(InNew)); }
     }
 }
 

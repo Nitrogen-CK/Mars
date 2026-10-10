@@ -5,6 +5,8 @@
 class UMars_AutoTest_Platter_UnloadKeepsTheWorldPoseAndReloadsAfterAMove : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -11000.0, -30000.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_Platter _Platter;
     private FCk_Handle_FoodPiece _P;
@@ -19,14 +21,14 @@ class UMars_AutoTest_Platter_UnloadKeepsTheWorldPoseAndReloadsAfterAMove : UMars
 
         Add_Step_WaitUntil("P is Ready", n"Check_Ready");
         Add_Step("load P", n"Step_Load");
-        Add_Step_WaitUntil("P landed", n"Check_FirstLanded");
+        Add_Step_WaitUntil("P landed", n"Check_FirstLanded", k_SlowPolls, 0);
         Add_Step("record P, then move the platter 200 cm along Y", n"Step_Move");
         Add_Step_WaitFrames("the move lands and P follows", 2);
         Add_Step("record P's world, then unload it", n"Step_Unload");
         Add_Step_WaitUntil("P was unloaded", n"Check_Unloaded");
         Add_Step_WaitFrames("an unload that moved P would show here", 2);
         Add_Step("P kept its world pose and left the ledger; move the platter again and reload P", n"Step_AssertUnloadedAndReload");
-        Add_Step_WaitUntil("P landed again", n"Check_SecondLanded");
+        Add_Step_WaitUntil("P landed again", n"Check_SecondLanded", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("P froze on the moved platter", n"Step_AssertReloaded");
         Run_Steps(InHandle);

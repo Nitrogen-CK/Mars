@@ -26,7 +26,7 @@ class UMars_AutoTest_Station_ViewLocalMakesAViewNode : UMars_AutoTestRig_Station
         _Unviewed = AddStation(InHandle, FMars_Station_Spec());
 
         Add_Step("ViewLocal makes a View node; no ViewLocal leaves it invalid", n"Step_AssertViewNodes");
-        Add_Step_WaitUntil("the View node settles at ViewLocal in the station frame", n"Check_ViewSettled", 0, 2.0f);
+        Add_Step_WaitUntil("the View node settles at ViewLocal in the station frame", n"Check_ViewSettled", 0, 0);
         Run_Steps(InHandle);
     }
 

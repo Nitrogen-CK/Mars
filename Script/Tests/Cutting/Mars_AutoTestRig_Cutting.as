@@ -1,5 +1,5 @@
-// The cutting rig: a Cutting station on a transform-only root, its lateral node carrying a cleaver node 25 uu up that a
-// Mover drops to the board in 0.05 s. The handlers record the cleaver's landings; the steps wait on chops.
+// The cutting rig: a Cutting station on a transform-only root and its lateral node; nothing draws a cleaver (the chop is the
+// kernel's own clock). The handlers record the chops' starts and landings; the steps wait on chops.
 UCLASS(Abstract)
 class UMars_AutoTestRig_Cutting : UCk_AutoTest_Base
 {
@@ -8,6 +8,7 @@ class UMars_AutoTestRig_Cutting : UCk_AutoTest_Base
     protected FMars_Cutting_Spec _Spec;
 
     protected int32 _ChopsIssued = 0;
+    protected int32 _ChopsStarted = 0;
     protected int32 _ChopsLanded = 0;
 
     protected void BuildStation(FCk_Handle InHandle, FMars_Cutting_Spec InSpec)
@@ -17,22 +18,20 @@ class UMars_AutoTestRig_Cutting : UCk_AutoTest_Base
         auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Root = utils_transform::Add(StationEntity, FTransform::Identity, ECk_Replication::DoesNotReplicate);
         auto LateralNode = utils_scene_node::Create(Root, FTransform::Identity);
-        auto LateralTransform = LateralNode.As_Transform();
-        auto CleaverNode = utils_scene_node::Create(LateralTransform, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 25.0)));
 
-        auto MoverSpec = FMars_Mover_Spec();
-        MoverSpec.StartLocation = FVector(0.0, 0.0, 25.0);
-        MoverSpec.EndLocation = FVector::ZeroVector;
-        MoverSpec.Duration = 0.05f;
-        auto Mover = utils_mover::Add(CleaverNode, MoverSpec);
-
-        _Spec.Nodes = FMars_Cutting_Nodes(LateralNode, Mover);
+        _Spec.Nodes = FMars_Cutting_Nodes(LateralNode);
         _Cutting = utils_cutting::Add(StationEntity, _Spec);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // Handlers
     //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION()
+    protected void OnChopStarted(FCk_Handle_Cutting InCutting)
+    {
+        ++_ChopsStarted;
+    }
 
     UFUNCTION()
     protected void OnChopLanded(FCk_Handle_Cutting InCutting)

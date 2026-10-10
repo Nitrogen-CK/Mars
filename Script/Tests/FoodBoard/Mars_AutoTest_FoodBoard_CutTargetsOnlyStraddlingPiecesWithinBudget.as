@@ -163,7 +163,6 @@ class UMars_AutoTest_FoodBoard_CutTargetsOnlyStraddlingPiecesWithinBudget : UMar
 
         Expected.Add(Missed);
         Assert_True(Get_IsSameOrder(Board.Get_Held(), Expected), f"{Label} the halves hold their sources' places, positive first ({Board.Get_HeldCount()} held)");
-        Assert_False(Board.Get_IsUntouched(), f"{Label} a committed cut touches the board");
     }
 
     private void Add_Halves(TArray<FCk_Handle_FoodPiece>& InOutPieces, const FMars_AutoTest_FoodBoard_PieceCut& InPieceCut)

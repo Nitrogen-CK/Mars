@@ -1,8 +1,6 @@
 // Validate() accepts the default spec and the boundary values (one held piece, one and k_MaxCutsPerChop cuts a chop, no
-// parting, a ring of one, restitution 1), and rejects, each naming its rule: no held piece, zero or one past
-// k_MaxCutsPerChop cuts a chop, a negative or
-// non-finite parting, a ring of zero, no collision profile, a negative or non-finite friction, a restitution outside [0, 1]
-// and a non-finite release velocity.
+// parting), and rejects, each naming its rule: no held piece, zero or one past k_MaxCutsPerChop cuts a chop, and a negative
+// or non-finite parting.
 class UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid : UCk_AutoTest_Base
 {
     UFUNCTION(BlueprintOverride)
@@ -22,8 +20,6 @@ class UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid : UCk_AutoTest_Base
         Edges.Tuners.MaxHeldPieces = 1;
         Edges.Tuners.MaxCutsPerChop = 1;
         Edges.Tuners.SeparationCm = 0.0f;
-        Edges.Tuners.MaxReleasedPieces = 1;
-        Edges.Tuners.Release.Restitution = 1.0f;
         const auto EdgesResult = Edges.Validate();
         Assert_True(EdgesResult.IsValid(), f"the lower boundary values are accepted (error: {EdgesResult.Get_Error()})");
 
@@ -51,34 +47,6 @@ class UMars_AutoTest_FoodBoard_SpecValidateRejectsInvalid : UCk_AutoTest_Base
         auto NaNParting = FMars_FoodBoard_Spec();
         NaNParting.Tuners.SeparationCm = float32(Math::Sqrt(-1.0));
         AssertRejected(NaNParting, "a non-finite parting");
-
-        auto NoRing = FMars_FoodBoard_Spec();
-        NoRing.Tuners.MaxReleasedPieces = 0;
-        AssertRejected(NoRing, "a release ring of zero");
-
-        auto NoProfile = FMars_FoodBoard_Spec();
-        NoProfile.Tuners.Release.CollisionProfileName = NAME_None;
-        AssertRejected(NoProfile, "no collision profile");
-
-        auto NegativeFriction = FMars_FoodBoard_Spec();
-        NegativeFriction.Tuners.Release.Friction = -0.2f;
-        AssertRejected(NegativeFriction, "a negative friction");
-
-        auto NaNFriction = FMars_FoodBoard_Spec();
-        NaNFriction.Tuners.Release.Friction = float32(Math::Sqrt(-1.0));
-        AssertRejected(NaNFriction, "a non-finite friction");
-
-        auto NegativeRestitution = FMars_FoodBoard_Spec();
-        NegativeRestitution.Tuners.Release.Restitution = -0.1f;
-        AssertRejected(NegativeRestitution, "a negative restitution");
-
-        auto BouncyRestitution = FMars_FoodBoard_Spec();
-        BouncyRestitution.Tuners.Release.Restitution = 1.5f;
-        AssertRejected(BouncyRestitution, "a restitution above 1");
-
-        auto NaNVelocity = FMars_FoodBoard_Spec();
-        NaNVelocity.Tuners.Release.VelocityLocal = FVector(0.0, Math::Sqrt(-1.0), 0.0);
-        AssertRejected(NaNVelocity, "a non-finite release velocity");
     }
 
     private void AssertRejected(const FMars_FoodBoard_Spec& InSpec, const FString& InWhat)

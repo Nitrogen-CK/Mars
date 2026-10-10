@@ -28,15 +28,15 @@ class UMars_AutoTest_Implement_SlideFollowsTheLookAndALiftTargetCanBeSet : UMars
         _Disc = Build_DiscImplement(InHandle);
 
         Add_Step("drive both implements and look right and up", n"Step_DriveAndLook");
-        Add_Step_WaitUntil("the look moved the slide target", n"Check_TargetMoved", 0, 0.3f);
+        Add_Step_WaitUntil("the look moved the slide target", n"Check_TargetMoved", 0, 0);
         Add_Step("the slide target is (15, 15)", n"Step_AssertTarget");
-        Add_Step_WaitUntil("the slide settled at its target", n"Check_SlideAtTarget", 0, 1.5f);
+        Add_Step_WaitUntil("the slide settled at its target", n"Check_SlideAtTarget", 0, 0);
         Add_Step("start the hold", n"Step_StartHold");
-        Add_Step_WaitUntil("the slide is held for 0.3 s", n"Check_HoldElapsed", 0, 1.0f);
+        Add_Step_WaitUntil("the slide is held for 0.3 s", n"Check_HoldElapsed", k_SlowPolls, 0);
         Add_Step("the slide held; look far right", n"Step_AssertHeldThenLookFar");
-        Add_Step_WaitUntil("the far look clamped the targets", n"Check_TargetsClamped", 0, 0.3f);
+        Add_Step_WaitUntil("the far look clamped the targets", n"Check_TargetsClamped", 0, 0);
         Add_Step("the box clamps Y at 30 and the disc onto its circle; set the lift target", n"Step_AssertClampedThenSetLift");
-        Add_Step_WaitUntil("the lift settled near its target", n"Check_LiftAtTarget", 0, 1.5f);
+        Add_Step_WaitUntil("the lift settled near its target", n"Check_LiftAtTarget", 0, 0);
         Add_Step("the lift target is -20 and no tilt target moved", n"Step_AssertLiftAndNoTilt");
         Run_Steps(InHandle);
     }

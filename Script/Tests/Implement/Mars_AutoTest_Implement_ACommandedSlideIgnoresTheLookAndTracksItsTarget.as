@@ -1,7 +1,8 @@
 // A Commanded slide (Axes None, no lift, Slide.Mode Commanded with a non-zero CmPerLookDegree that must not matter, box half
 // extents 30 / 30): a driven look (10, -10) leaves the slide target at zero and the node at rest; SetSlideTarget (12, -8)
 // is taken as it is and the spring settles the node there (the node's offset carries it); another look moves nothing;
-// SetSlideTarget (100, 0) clamps X at 30. A second implement with a Look slide ignores a SetSlideTarget (traced no-op).
+// SetSlideTarget (100, 0) clamps X at 30. A second implement with a Look slide refuses a SetSlideTarget with an ensure, and
+// its target does not move.
 class UMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget : UMars_AutoTestRig_Implement
 {
     default _TimeoutSeconds = 8.0f;
@@ -21,7 +22,7 @@ class UMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget :
         Add_Step("drive both implements and look right and up", n"Step_DriveAndLook");
         Add_Step_WaitSeconds("the look would have moved a Look slide", 0.25f);
         Add_Step("the look moved nothing; set the slide target on both", n"Step_AssertStillThenSetTarget");
-        Add_Step_WaitUntil("the commanded slide settled at its target", n"Check_SlideAtTarget", 0, 1.5f);
+        Add_Step_WaitUntil("the commanded slide settled at its target", n"Check_SlideAtTarget", 0, 0);
         Add_Step("the target is taken as it is and the node carries it; look again", n"Step_AssertTrackedThenLook");
         Add_Step_WaitSeconds("the look would have moved a Look slide", 0.25f);
         Add_Step("the look moved nothing; set a target past the box", n"Step_AssertUnmovedThenSetFar");
@@ -122,5 +123,20 @@ class UMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget :
         const auto LookTarget = _LookSlide.Get_TargetSlide();
         Assert_Equals_Float(LookTarget.X, 15.0, 0.001, "the Look slide's target is the look's (X), not the request's");
         Assert_Equals_Float(LookTarget.Y, 15.0, 0.001, "the Look slide's target is the look's (Y), not the request's");
+    }
+}
+
+// Hand-authored so the Look slide's ensure on its SetSlideTarget is an expected error rather than a failure.
+class AMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget_Actor : ACk_AutoTestRunner
+{
+    default _TestEntityScriptClass = UMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget;
+    default _TimeoutSeconds = 8.0f;
+
+    UFUNCTION(BlueprintOverride)
+    TArray<FString> Get_ExpectedLogErrors() const
+    {
+        TArray<FString> Out;
+        Out.Add(": its slide is Look, not Commanded");
+        return Out;
     }
 }

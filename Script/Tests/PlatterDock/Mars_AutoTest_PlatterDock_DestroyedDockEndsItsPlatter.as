@@ -6,10 +6,17 @@
 class UMars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter : UMars_AutoTestRig_PlatterDock
 {
     private const FVector k_Origin = FVector(0.0, 0.0, -60500.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
+    // The root's destroy request, the lifetime cascade to the dock, the dock's teardown ending its platter, and the poll
+    // that sees all three going.
+    private const int32 k_MaxFramesToEnd = 3;
 
     private FCk_Handle_Transform _Root;
     private FCk_Handle_PlatterDock _Dock;
     private FCk_Handle_FoodPiece _Box;
+    private int64 _DestroyFrame = -1;
+    private int64 _EndedSeenFrame = -1;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -22,11 +29,11 @@ class UMars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter : UMars_AutoTestRig
 
         Add_Step_WaitUntil("the platter is constructed and the box is Ready", n"Check_Ready");
         Add_Step("load the box onto the platter", n"Step_Load");
-        Add_Step_WaitUntil("the box landed", n"Check_BoxLanded");
+        Add_Step_WaitUntil("the box landed", n"Check_BoxLanded", k_SlowPolls, 0);
         Add_Step("dock the platter", n"Step_Dock");
         Add_Step_WaitUntil("the platter is docked and has arrived on the dock", n"Check_DockedAndArrived");
         Add_Step("destroy the station root", n"Step_DestroyRoot");
-        Add_Step_WaitFrames("the dock's teardown ends its platter", 3);
+        Add_Step_WaitUntil("the station root's teardown ended the dock, its platter and the box", n"Check_Ended", 0, 0);
         Add_Step("the dock, the platter and its box are all going", n"Step_AssertEnded");
         Run_Steps(InHandle);
     }
@@ -78,7 +85,20 @@ class UMars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter : UMars_AutoTestRig
         Assert_True(_Box.TryGet_Platter() == _Platters[0], "the box rides the docked platter");
 
         FCk_Handle Root = _Root;
+        _DestroyFrame = utils_time::Get_FrameCounter();
         utils_entity_lifetime::Request_DestroyEntity(Root);
+    }
+
+    // Records the frame it first sees all three going.
+    UFUNCTION()
+    private void Check_Ended(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Ended = Get_IsGoing(_Dock) && Get_IsGoing(_WorldItems[0]) && Get_IsGoing(_Box);
+        if (Ended && _EndedSeenFrame < 0)
+        { _EndedSeenFrame = utils_time::Get_FrameCounter(); }
+
+        auto Res = OutResult;
+        Res.Set(Ended);
     }
 
     UFUNCTION()
@@ -87,6 +107,8 @@ class UMars_AutoTest_PlatterDock_DestroyedDockEndsItsPlatter : UMars_AutoTestRig
         Assert_True(Get_IsGoing(_Dock), "the dock is torn down");
         Assert_True(Get_IsGoing(_WorldItems[0]), "the docked platter ended with its dock");
         Assert_True(Get_IsGoing(_Box), "the box on the platter ended with it");
+        const auto Frames = _EndedSeenFrame - _DestroyFrame;
+        Assert_True(Frames <= k_MaxFramesToEnd, f"all three were going within {k_MaxFramesToEnd} frames of the destroy (took {Frames})");
     }
 
     private bool Get_IsGoing(FCk_Handle InEntity) const

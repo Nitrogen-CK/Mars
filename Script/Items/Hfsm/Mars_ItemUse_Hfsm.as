@@ -158,15 +158,16 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         auto Dealer = Player.As_DamageDealer(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Dealer) || Player.Is_PlayerViewpoint() == false)
         {
-            DoFail("the player has no DamageDealer or no PlayerViewpoint");
+            _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 
+        // The hands changed between the press and this state (the item dropped, another selected): nothing to strike with.
         auto HeldItem = utils_held_item::Get_UserHeldItem(Context);
         auto Item = ck::IsValid(HeldItem) ? HeldItem.Get_CurrentItem() : FCk_Handle_Item();
         if (ck::Is_NOT_Valid(Item) || Item.Has_Strike() == false)
         {
-            DoFail("the held item has no Strike trait");
+            _Outcome = ECk_SmTaskResult::Failed;
             return;
         }
 
@@ -240,11 +241,5 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
 
         // The dealer is the player's entity, so the sweep skips the player's own bodies.
         utils_damage_dealer::Try_StrikeSweep(_Dealer, FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
-    }
-
-    private void DoFail(const FString& InReason)
-    {
-        ck::Warning(f"[ItemUse] Strike failed: {InReason}");
-        _Outcome = ECk_SmTaskResult::Failed;
     }
 }

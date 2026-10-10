@@ -43,8 +43,6 @@ class UMars_Processor_FoodPiece_Setup : UCk_Processor_Script_Base_UE
 
         Piece.Request_TryRemove(FMars_Tag_FoodPiece_NeedsSetup);
 
-        ck::Trace(f"[FoodPiece] [{Piece.ToString()}] ready: {InState.MassKg :.4} kg, {InState.VolumeCm3 :.3} cm3");
-
         if (Piece.Has_Fragment(FMars_Fragment_FoodPiece_Signals))
         { Piece.Get_Fragment(FMars_Fragment_FoodPiece_Signals).OnReady.Broadcast(Piece); }
     }

@@ -3,6 +3,9 @@
 UCLASS(Abstract)
 class UMars_AutoTestRig_Hands : UCk_AutoTest_Base
 {
+    // The gloves' motion (a grab, a release, a push, a lean) outruns the default poll budget at lane frame rate.
+    protected const int32 k_SlowPolls = 900;
+
     protected FCk_Handle_FPHands _Hands;
     protected FCk_Handle_StateMachine _Sm;
     protected FCk_Handle _Player;

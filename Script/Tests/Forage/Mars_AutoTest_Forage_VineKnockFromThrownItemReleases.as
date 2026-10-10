@@ -33,9 +33,9 @@ class UMars_AutoTest_Forage_VineKnockFromThrownItemReleases : UMars_AutoTestRig_
 
         Add_Step_WaitUntil("the vine composed its forage and zone", n"Check_Composed");
         Add_Step("bind the forage; drop a Rock 20 uu onto the fruit", n"Step_DropSlowRock");
-        Add_Step_WaitUntil("the slow Rock rolled off and fell past the fruit", n"Check_SlowRockFell", 0, 4.0f);
+        Add_Step_WaitUntil("the slow Rock rolled off and fell past the fruit", n"Check_SlowRockFell", k_SlowPolls, 0);
         Add_Step("nothing released; launch a Rock down at the fruit from 200 uu", n"Step_LaunchFastRock");
-        Add_Step_WaitUntil("the fruit is knocked down", n"Check_Knocked", 0, 4.0f);
+        Add_Step_WaitUntil("the fruit is knocked down", n"Check_Knocked", k_SlowPolls, 0);
         Add_Step("the one-charge vine is exhausted", n"Step_AssertExhausted");
         Run_Steps(InHandle);
     }

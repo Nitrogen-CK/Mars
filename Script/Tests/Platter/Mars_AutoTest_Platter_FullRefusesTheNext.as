@@ -3,6 +3,8 @@
 class UMars_AutoTest_Platter_FullRefusesTheNext : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -19000.0, -30000.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_Platter _Platter;
     private TArray<FCk_Handle_FoodPiece> _Pieces;
@@ -18,7 +20,7 @@ class UMars_AutoTest_Platter_FullRefusesTheNext : UMars_AutoTestRig_Platter
         Add_Step("load all three in one step", n"Step_LoadThree");
         Add_Step_WaitFrames("the loads drain", 2);
         Add_Step("the third is refused Full before anything dropped", n"Step_AssertRefused");
-        Add_Step_WaitUntil("the two accepted pieces landed", n"Check_TwoLanded");
+        Add_Step_WaitUntil("the two accepted pieces landed", n"Check_TwoLanded", k_SlowPolls, 0);
         Add_Step("two held, the third never loaded", n"Step_AssertLanded");
         Run_Steps(InHandle);
     }

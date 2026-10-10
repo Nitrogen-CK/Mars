@@ -2,12 +2,14 @@
 // The gloves take a Place reach whose spot is over the dock's node (the reach target names a place point) and the platter
 // is still Held, the dock empty, the frame after the interaction began; at the gloves' Grip the dock is still empty (its
 // Dock request goes out there), the dock reports the platter docked only after that Grip, and the platter ends Carried on
-// the dock's node. Isolated origin (30400, -21000, -30000).
+// the dock's node: the transfer into the dock's inventory alone mounts it. Isolated origin (30400, -21000, -30000).
 class UMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip : UMars_AutoTestRig_PlatterDock
 {
     default _TimeoutSeconds = 30.0f;
 
     private const FVector k_Origin = FVector(30400.0, -21000.0, -30000.0);
+    // Constructions, mount commits and arrivals, and glove reaches outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_PlatterDock _Dock;
     private TArray<EMars_FPHands_ReachKind> _ReachKinds;
@@ -23,7 +25,6 @@ class UMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip : UMars_A
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
         Add_CarrierHands();
-        Bind_PushSelection();
         _Hands.BindTo_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnReachRequested"));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseChanged"));
 
@@ -33,18 +34,18 @@ class UMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip : UMars_A
         _Dock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDocked"));
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0))));
 
-        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
-        Add_Step("stow the platter into the overflow and carry it", n"Step_Stow");
-        Add_Step_WaitUntil("the platter is Held", n"Check_Held", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 0.5f);
+        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
+        Add_Step("stow the platter into the overflow", n"Step_Stow");
+        Add_Step_WaitUntil("the platter is Held", n"Check_Held", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the hold's arrival settled", n"Check_HoldSettled", k_SlowPolls, 0);
         Add_Step("the carrier focuses the dock", n"Step_FocusDock");
-        Add_Step_WaitFrames("the dock's prompt follows the focuser", 3);
+        Add_Step_WaitUntil("the dock's targets enter Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the dock offers Place; the carrier uses it", n"Step_Place");
         Add_Step_WaitFrames("the interaction has begun", 1);
         Add_Step("a Place reach over the dock; the platter is still Held and the dock empty", n"Step_AssertNotOnEnter");
-        Add_Step_WaitUntil("the dock reports the platter docked", n"Check_Docked", 0, 5.0f);
-        Add_Step_WaitUntil("the platter is Carried on the dock", n"Check_OnTheDock", 0, 5.0f);
+        Add_Step_WaitUntil("the dock reports the platter docked", n"Check_Docked", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the platter is Carried on the dock", n"Check_OnTheDock", k_SlowPolls, 0);
         Add_Step("the dock was asked at the gloves' Grip, and the platter rides the dock's node", n"Step_AssertDockedAtTheGrip");
         Run_Steps(InHandle);
     }
@@ -63,10 +64,18 @@ class UMars_AutoTest_PlatterDock_PlaceRunsAPlaceReachAndDocksAtTheGrip : UMars_A
     }
 
     UFUNCTION()
+    private void Check_HoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_WorldItems[0].Get_Mount() == EMars_WorldItem_Mount::Held && _WorldItems[0].Get_IsSettled());
+    }
+
+    UFUNCTION()
     private void Step_FocusDock(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Interactable = _Dock.Get_Interactable();
         Interactable.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Interactable);
     }
 
     UFUNCTION()

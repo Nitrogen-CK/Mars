@@ -1,23 +1,23 @@
 // The cutting station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Cutting_Idle). It runs on the STATION entity (context = the station, which also carries the Cutting feature,
 // the FoodBoard and the input platter's CookingFeed; its two platter docks are lifetime children of it) and reads the
-// station's operator; it only issues Cutting, FoodBoard, CookingFeed and Platter requests, switches the pickup of a whole
-// food the board holds and registers the operator's legend rows. The feed tasks are the shared ones
-// (Mars_StationFeed_SmTasks.as): add food (Q) sends the free glove to the whole food on the input platter and the bridge
-// places it on the board; the board takes one joint at a time, so a press while it holds anything is refused here.
+// station's operator; it only issues Cutting, FoodBoard and CookingFeed requests and registers the operator's legend rows.
+// The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as): add food (Q) sends the free glove to the whole food on
+// the input platter and the bridge hands it to the board through the station's inbox (the board poses it on its pile
+// node); the board takes one joint at a time, so a press while it holds anything is refused here.
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a new generation for an idle hand),
-//                                                         StationFeed_Source, StationFeed_Bridge (a release in flight
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source, StationFeed_Bridge (a release in flight
 //                                                         lands), Cutting_ResetOnEnter (the hand back at the centre for
-//                                                         the next operator), Cutting_SweepBridge
+//                                                         the next operator)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Cutting_OperatorInput (Tick), Cutting_CutBridge,
 //                                                         StationFeed_Source, CuttingFeed_OperatorInput (Tick),
-//                                                         StationFeed_Bridge, Cutting_SweepBridge, CuttingFeed_OperatorHints,
+//                                                         StationFeed_Bridge, CuttingFeed_OperatorHints (Tick),
 //                                                         Cutting_OperatorHints
 //
-// The feed bridge and the sweep bridge run in both states: neither needs an operator, and a joint released over the board
-// or a piece the board handed off lands whoever is standing there. The sweep (RMB) is this station's take-out, so the
-// feed's take-out tasks are not added.
+// The feed bridge runs in both states: it needs no operator, and a joint released over the board lands whoever is standing
+// there. The sweep (RMB) is this station's take-out (the station's take-out contract on the board), so the feed's take-out
+// input is not added: the board lands what it lets go on the finished tray, places back what the tray refuses, and keeps
+// its pieces' pickups off while it holds them.
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.
@@ -27,21 +27,8 @@ namespace utils_cutting
     // The quarter turn R gives the food on the board.
     const float32 k_TurnDegrees = 90.0f;
 
-    // Where the food lies on the board, in the station frame: over the board's middle, on its top (the counter and the 4 cm
-    // board). Here, beside the control that lays pieces there. A function: a global's initializer cannot read another
-    // module's constant.
-    FTransform Get_PileLocal()
-    {
-        return FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, constants_station::k_CounterHeight + 4.0));
-    }
-
-    // The pile point in the world, at unit scale and with no food's layout: what the food on the board turns about.
-    FTransform Get_PileCentreWorld(const FTransform& InStationWorld)
-    {
-        auto PileWorld = Get_PileLocal() * InStationWorld;
-        PileWorld.SetScale3D(FVector::OneVector);
-        return PileWorld;
-    }
+    // Centimetres of hand travel along the board per degree of look yaw: the operator's look steers the cleaver.
+    const float32 k_LateralCmPerLookDegree = 1.5f;
 
     // The blade as a cutting plane at contact: through the hand's lateral position, its normal along the hand's travel (the
     // station's local Y), its face along the board's depth. Read from the station root and Cutting's HandLateral rather than
@@ -53,20 +40,6 @@ namespace utils_cutting
             InStationWorld.TransformPosition(FVector(0.0, float64(InHandLateral), 0.0)),
             InStationWorld.TransformVectorNoScale(FVector::RightVector),
             InStationWorld.TransformVectorNoScale(FVector::ForwardVector));
-    }
-
-    // The pose InPiece takes on the board: the pile, with its food's layout applied (yaw about the station's Z, lift along
-    // it), at unit scale. A piece with no definition lies unrotated.
-    FTransform Get_PileWorld(const FTransform& InStationWorld, const FCk_Handle_FoodPiece& InPiece)
-    {
-        auto LayoutLocal = FTransform::Identity;
-        const UMars_Food_Def Def = InPiece.Get_Definition().Get();
-        if (ck::IsValid(Def))
-        { LayoutLocal = FTransform(FRotator(0.0, Def.Layout.YawDegrees, 0.0), FVector(0.0, 0.0, Def.Layout.LiftCm)); }
-
-        auto PileWorld = LayoutLocal * Get_PileLocal() * InStationWorld;
-        PileWorld.SetScale3D(FVector::OneVector);
-        return PileWorld;
     }
 
     // The board takes one joint at a time: an add-food press is refused while it holds anything, cut or whole.
@@ -85,28 +58,23 @@ namespace utils_cutting
         return Dock.Get_Platter();
     }
 
-    // The sweep: hands the board's free pieces to the docked finished tray, no more than it has room for (the sweep bridge
-    // loads each one the board lets go). No tray docked = refused; the station's label already says so.
+    // The sweep, the station's take-out: the board hands its free pieces to the docked finished tray, no more than it has
+    // room for, loading each one it lets go. No tray docked caps it at none, which the board refuses (OnReleaseRefused
+    // NoRoom), and the station's label says so.
     void Request_Sweep(FCk_Handle InStation)
     {
         const auto Tray = TryGet_Tray(InStation);
-        if (ck::Is_NOT_Valid(Tray))
-        {
-            ck::Trace("[Cutting] sweep refused: no tray");
-            return;
-        }
-
-        auto Board = InStation.As_FoodBoard();
-        Board.Request_Release(FMars_Request_FoodBoard_Release(EMars_FoodBoard_ReleaseMode::Handoff, TOptional<int32>(Tray.Get_FreeCount())));
+        const auto Room = ck::IsValid(Tray) ? Tray.Get_FreeCount() : 0;
+        auto Station = InStation;
+        utils_cooking_feed::Request_StationTakeOut(Station, FMars_Request_StationTakeOut(Room, Tray));
     }
 
-    // The turn: the food on the board yaws a quarter turn about the pile point, so the next chops cross the last ones. The
-    // board waits out any cut in flight before it turns.
+    // The turn: the food on the board yaws a quarter turn about the board's pile node, so the next chops cross the last ones.
+    // The board waits out any cut in flight before it turns.
     void Request_Turn(FCk_Handle InStation)
     {
         auto Board = InStation.As_FoodBoard();
-        const auto StationWorld = utils_transform::Get_EntityCurrentTransform(InStation.As_Transform());
-        Board.Request_Turn(FMars_Request_FoodBoard_Turn(Get_PileCentreWorld(StationWorld), k_TurnDegrees));
+        Board.Request_Turn(FMars_Request_FoodBoard_Turn(k_TurnDegrees));
     }
 }
 
@@ -118,11 +86,9 @@ class UMars_SmState_Cutting_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Cutting_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
-        AddTask(InHandle, UMars_SmTask_StationFeed_ResetOnEnter);
         AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_Cutting_ResetOnEnter);
-        AddTask(InHandle, UMars_SmTask_Cutting_SweepBridge);
     }
 }
 
@@ -139,15 +105,14 @@ class UMars_SmState_Cutting_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_CuttingFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
-        AddTask(InHandle, UMars_SmTask_Cutting_SweepBridge);
         AddTask(InHandle, UMars_SmTask_CuttingFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_Cutting_OperatorHints);
     }
 }
 
 // The hand back at the board centre for the next operator. The board keeps whatever the last one left: the player's food is
-// never cleared by an operator change. No Cutting on the context yet (the SM can enter before the entity script composes
-// it) = nothing to reset.
+// never cleared by an operator change. No Cutting on the context (a composition that failed and already ensured) = nothing
+// to reset.
 class UMars_SmTask_Cutting_ResetOnEnter : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -163,11 +128,12 @@ class UMars_SmTask_Cutting_ResetOnEnter : UCk_SmTask_EntityScript
     }
 }
 
-// The operator's input, read off its InputIntents: one nudge per drained look delta (its horizontal component, degrees;
-// positive = mouse right = the board's +Y, the operator's right), one chop per rising edge of Interact_Primary, one sweep
-// (utils_cutting::Request_Sweep) per rising edge of Interact_Secondary and one turn (utils_cutting::Request_Turn) per rising
-// edge of Drop (R: the hands are empty at a station, so nothing else reads it here). All are seeded on enter, so a delta or
-// a press from before the station was taken does not count. No operator intents (headless) = nothing to read.
+// The operator's input, read off its InputIntents: one nudge per drained look delta (its horizontal component in degrees,
+// k_LateralCmPerLookDegree cm along the board each; positive = mouse right = the board's +Y, the operator's right), one
+// chop per rising edge of Interact_Primary, one sweep (utils_cutting::Request_Sweep) per rising edge of Interact_Secondary
+// and one turn (utils_cutting::Request_Turn) per rising edge of Drop (R: the hands are empty at a station, so nothing else
+// reads it here). All are seeded on enter, so a delta or a press from before the station was taken does not count. No
+// operator intents (headless) = nothing to read.
 class UMars_SmTask_Cutting_OperatorInput : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -214,7 +180,7 @@ class UMars_SmTask_Cutting_OperatorInput : UCk_SmTask_EntityScript
         if (Sequence != _SeenLookSequence)
         {
             _SeenLookSequence = Sequence;
-            _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(float32(_Intents.Get_LookDelta().X)));
+            _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(float32(_Intents.Get_LookDelta().X) * utils_cutting::k_LateralCmPerLookDegree));
         }
 
         const auto ChopFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
@@ -323,16 +289,12 @@ class UMars_SmTask_CuttingFeed_OperatorInput : UMars_SmTask_StationFeed_Operator
 
     protected bool Get_CanBeginTransfer() const override
     {
-        if (utils_cutting::Get_IsBoardBusy(_Board) == false)
-        { return true; }
-
-        ck::Trace(f"[Cutting] add food refused: board busy ({_Board.Get_HeldCount()} on [{_Board.ToString()}])");
-        return false;
+        return utils_cutting::Get_IsBoardBusy(_Board) == false;
     }
 }
 
 // The shared add-food row, reading "board busy" while the cutting station would refuse a press, re-texted on every board edge
-// that changes it (a place, a release, a clear; a cut keeps the count above zero).
+// that changes it (a place, a release; a cut keeps the count above zero).
 class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_OperatorHints
 {
     private FCk_Handle_FoodBoard _Board;
@@ -344,7 +306,6 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
         _Board = ck::Ctx(InHandle).As_FoodBoard();
         _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
         _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
-        _Board.BindTo_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
         Super::DoEnterTask(InHandle, InNetContext);
     }
 
@@ -355,7 +316,6 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
         {
             _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
             _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
-            _Board.UnbindFrom_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
         }
 
         Super::DoExitTask(InHandle, InNetContext);
@@ -381,74 +341,6 @@ class UMars_SmTask_CuttingFeed_OperatorHints : UMars_SmTask_StationFeed_Operator
     private void OnBoardReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
     {
         Refresh_AddFoodRow();
-    }
-
-    UFUNCTION()
-    private void OnBoardCleared(FCk_Handle_FoodBoard InBoard)
-    {
-        Refresh_AddFoodRow();
-    }
-}
-
-// The board's pieces' pickups, and the sweep's landing. A whole food is a world item whose pickup would let a hand take it
-// off the board behind the board's back (the board never reconciles): every piece the board places loses its pickup, and
-// every piece it lets go gets it back, whoever asked (a piece with no world item needs nothing). Every piece the board lets
-// go is then loaded onto the docked finished tray, where it drops onto the pile. The sweep releases only with a tray docked
-// and only as many as it has room for (utils_cutting::Request_Sweep); a piece released with no tray docked is left where it
-// is. It runs in both states, so a sweep in the frame the operator leaves still lands on the tray; the bindings live as long
-// as the state. No board on the context (a composition that failed and already ensured) = nothing to bridge.
-class UMars_SmTask_Cutting_SweepBridge : UCk_SmTask_EntityScript
-{
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    private FCk_Handle _Station;
-    private FCk_Handle_FoodBoard _Board;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        auto StationEntity = ck::Ctx(InHandle);
-        _Board = StationEntity.As_FoodBoard(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(_Board))
-        { return; }
-
-        _Station = StationEntity;
-        _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnPlaced"));
-        _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnReleased"));
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::IsValid(_Board))
-        {
-            _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnPlaced"));
-            _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnReleased"));
-        }
-
-        _Station = FCk_Handle();
-        _Board = FCk_Handle_FoodBoard();
-    }
-
-    UFUNCTION()
-    private void OnPlaced(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
-    {
-        utils_world_item::Request_SetPickupEnableDisable(InPiece, ECk_EnableDisable::Disable);
-    }
-
-    UFUNCTION()
-    private void OnReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
-    {
-        utils_world_item::Request_SetPickupEnableDisable(InPiece, ECk_EnableDisable::Enable);
-
-        auto Tray = utils_cutting::TryGet_Tray(_Station);
-        if (ck::Is_NOT_Valid(Tray))
-        {
-            ck::Trace(f"[Cutting] [{InPiece.ToString()}] was released with no tray docked: it stays where it is");
-            return;
-        }
-
-        Tray.Request_Load(FMars_Request_Platter_Load(InPiece));
     }
 }
 
@@ -495,7 +387,6 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
         {
             _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
             _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
-            _Board.BindTo_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
             Refresh_TurnRow();
         }
 
@@ -522,7 +413,6 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
         {
             _Board.UnbindFrom_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
             _Board.UnbindFrom_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
-            _Board.UnbindFrom_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
         }
 
         if (ck::IsValid(_Display))
@@ -543,7 +433,7 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
         _SweepRow = _Display.Request_RegisterHint(FMars_ActionHint_Spec(mars::Mars_IA_Interact_Secondary, FText::FromString("to tray"), k_SweepSortOrder, k_OwnerKey));
     }
 
-    // A cut keeps the count above zero, so placements, releases and clears are the only edges.
+    // A cut keeps the count above zero, so placements and releases are the only edges.
     private void Refresh_TurnRow()
     {
         const auto HoldsAnything = _Board.Get_HeldCount() > 0;
@@ -584,12 +474,6 @@ class UMars_SmTask_Cutting_OperatorHints : UCk_SmTask_EntityScript
 
     UFUNCTION()
     private void OnBoardReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
-    {
-        Refresh_TurnRow();
-    }
-
-    UFUNCTION()
-    private void OnBoardCleared(FCk_Handle_FoodBoard InBoard)
     {
         Refresh_TurnRow();
     }

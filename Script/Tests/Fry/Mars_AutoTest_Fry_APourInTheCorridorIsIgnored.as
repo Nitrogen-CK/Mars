@@ -16,7 +16,7 @@ class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
 
         Add_Step("drive the skimmer", n"Step_Drive");
         Add_Step("slide the carried scoop into the corridor", n"Step_SlideToCorridor");
-        Add_Step_WaitUntil("the scoop is in the corridor", n"Check_SlideSettled", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop is in the corridor", n"Check_SlideSettled", k_SlowPolls, 0);
         Add_Step("neither in the pot nor over the basket; ask for a dip", n"Step_AskDip");
         Add_Step_WaitFrames("the dip drains", 3);
         Add_Step("the dip was ignored", n"Step_AssertIgnored");

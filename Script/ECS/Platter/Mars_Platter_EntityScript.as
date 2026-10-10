@@ -12,8 +12,9 @@ enum EMars_Platter_PickupAction
 // A World-mode, Persistent world item whose definition carries UMars_ItemTrait_Platter: the base WorldItem composition,
 // then the Platter kernel on the same entity (its root is what the pile rides). Its pickup does two things
 // (UMars_SmState_Platter_Interact): a focuser holding a food item places it on the platter, anyone else picks the platter
-// up. The prompt follows the focuser: refreshed when the pickup is focused and whenever the focuser's hotbar changes a
-// slot or its selection, never per frame. The small and the large platter items share this script.
+// up. The prompt follows the focuser: refreshed when the pickup is focused and whenever the focuser's held item changes,
+// never per frame. While the platter rides a carrier (Carried or Held) its pile ignores pawns, as the tray's own body
+// does. The small and the large platter items share this script.
 class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
 {
     // A placed platter resolves its item from here; a spawn sets it anyway.
@@ -21,8 +22,12 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
 
     private FCk_Handle_Platter _Platter;
 
-    // The focuser's hotbar the prompt follows; valid while the pickup is focused by an entity with a hotbar.
+    // The focuser's hotbar the prompt reads (its owner's held food); valid while the pickup is focused by an entity with a
+    // hotbar.
     private FCk_Handle_Hotbar _PromptHotbar;
+
+    // The focuser's held item the prompt follows; valid while the pickup is focused by an entity with HeldItem.
+    private FCk_Handle_HeldItem _PromptHeldItem;
 
     // Unset until the first refresh of a focus: the target's enable state changes only with the action.
     private TOptional<EMars_Platter_PickupAction> _LastAction;
@@ -63,6 +68,8 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
         Pickup.BindTo_OnFocused(FMars_Delegate_Interactable_OnFocused(this, n"OnPlatterFocused"));
         Pickup.BindTo_OnUnfocused(FMars_Delegate_Interactable_OnUnfocused(this, n"OnPlatterUnfocused"));
 
+        WorldItem.BindTo_OnMountChanged(FMars_Delegate_WorldItem_OnMountChanged(this, n"OnPlatterMountChanged"));
+
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
@@ -86,17 +93,23 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
         return Super::DoGet_CanStowSelf(InHotbar) || ck::IsValid(InHotbar.TryGet_SelectedFood());
     }
 
+    // Carried or Held: the pile rides a carrier and ignores pawns; World: it collides as its pieces say.
+    UFUNCTION()
+    private void OnPlatterMountChanged(FCk_Handle_WorldItem InWorldItem, EMars_WorldItem_Mount InPrev, EMars_WorldItem_Mount InNew)
+    {
+        const auto Mounting = InNew == EMars_WorldItem_Mount::World ? EMars_Platter_Mounting::Free : EMars_Platter_Mounting::Mounted;
+        _Platter.Request_SetMounted(FMars_Request_Platter_SetMounted(Mounting));
+    }
+
     UFUNCTION()
     private void OnPlatterFocused(FCk_Handle_Interactable InInteractable, FCk_Handle InFocusedBy)
     {
         Stop_FollowingFocuser();
 
         _PromptHotbar = InFocusedBy.As_Hotbar(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(_PromptHotbar))
-        {
-            _PromptHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnFocuserSlotItemChanged"));
-            _PromptHotbar.BindTo_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnFocuserSelectionChanged"));
-        }
+        _PromptHeldItem = InFocusedBy.As_HeldItem(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(_PromptHeldItem))
+        { _PromptHeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnFocuserHeldItemChanged")); }
 
         Refresh_Prompt();
     }
@@ -108,26 +121,18 @@ class UMars_Platter_EntityScript : UMars_WorldItem_EntityScript
     }
 
     UFUNCTION()
-    private void OnFocuserSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
-    {
-        Refresh_Prompt();
-    }
-
-    UFUNCTION()
-    private void OnFocuserSelectionChanged(FCk_Handle_Hotbar InHotbar)
+    private void OnFocuserHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
     {
         Refresh_Prompt();
     }
 
     private void Stop_FollowingFocuser()
     {
-        if (ck::IsValid(_PromptHotbar))
-        {
-            _PromptHotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnFocuserSlotItemChanged"));
-            _PromptHotbar.UnbindFrom_OnSelectionChanged(FMars_Delegate_Hotbar_OnSelectionChanged(this, n"OnFocuserSelectionChanged"));
-        }
+        if (ck::IsValid(_PromptHeldItem))
+        { _PromptHeldItem.UnbindFrom_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnFocuserHeldItemChanged")); }
 
         _PromptHotbar = FCk_Handle_Hotbar();
+        _PromptHeldItem = FCk_Handle_HeldItem();
         _LastAction.Reset();
     }
 

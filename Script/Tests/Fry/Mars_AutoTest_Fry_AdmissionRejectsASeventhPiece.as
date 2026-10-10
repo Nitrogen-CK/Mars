@@ -10,10 +10,10 @@ class UMars_AutoTest_Fry_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_Fry
         BuildStation(InHandle, Make_TestSpec());
         Build_Pieces(7);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("release seven different pieces over the oil", n"Step_ReleaseSeven");
-        Add_Step_WaitUntil("all seven releases were answered", n"Check_Answered7", 0, 1.0f);
+        Add_Step_WaitUntil("all seven releases were answered", n"Check_Answered7", 0, 0);
         Add_Step_WaitFrames("anything made would show", 2);
         Add_Step("six accepted, the seventh rejected", n"Step_AssertLimit");
         Run_Steps(InHandle);

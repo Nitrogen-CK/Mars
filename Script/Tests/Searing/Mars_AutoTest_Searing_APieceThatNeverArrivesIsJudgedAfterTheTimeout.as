@@ -21,18 +21,18 @@ class UMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout : UMa
     {
         BuildStation(InHandle, Make_TestSpec());
         Build_Pieces(1);
-        _Searing.BindTo_OnPieceAdmission(FMars_Delegate_Searing_OnPieceAdmission(this, n"OnAdmittedHold"));
+        utils_cooking_feed::BindTo_OnAdmission(_StationEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnAdmittedHold"));
 
         auto HoldEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         _HoldNode = utils_transform::Add(HoldEntity, FTransform(FRotator::ZeroRotator, k_Origin + k_HoldLocal), ECk_Replication::DoesNotReplicate);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's piece is ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's piece is ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("release the piece over the pan's centre", n"Step_Release");
-        Add_Step_WaitUntil("the kernel admitted it and the test holds it away", n"Check_AdmittedAndHeld", 0, 3.0f);
-        Add_Step_WaitSeconds("half the arrival timeout", 0.5f);
+        Add_Step_WaitUntil("the kernel admitted it and the test holds it away", n"Check_AdmittedAndHeld", 0, 0);
+        Add_Step_WaitSeconds("half the arrival timeout", utils_searing::k_ArrivalMaxSeconds * 0.5f);
         Add_Step("the piece is still arriving: nothing judges it", n"Step_AssertStillArriving");
-        Add_Step_WaitUntil("the kernel stopped waiting for it", n"Check_NoLongerArriving", 0, 2.0f);
+        Add_Step_WaitUntil("the kernel stopped waiting for it", n"Check_NoLongerArriving", 0, 0);
         Add_Step("it timed out and is judged where it is", n"Step_AssertJudged");
         Run_Steps(InHandle);
     }
@@ -46,7 +46,7 @@ class UMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout : UMa
 
     // The admission has already asked for the release pose; the attach overrides it from here on.
     UFUNCTION()
-    private void OnAdmittedHold(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId,
+    private void OnAdmittedHold(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId,
         EMars_CookingFeed_Admission InAdmission, FString InReason)
     {
         if (InAdmission != EMars_CookingFeed_Admission::Accepted || InPieceId.Get_IsSame(_PieceId) == false)

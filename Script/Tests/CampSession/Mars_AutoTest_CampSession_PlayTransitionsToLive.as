@@ -12,7 +12,7 @@ class UMars_AutoTest_CampSession_PlayTransitionsToLive : UCk_AutoTest_Base
 
         Add_Step("the session starts in Lobby", n"Step_AssertLobby");
         Add_Step("request Play", n"Step_RequestPlay");
-        Add_Step_WaitUntil("the session is Live", n"Check_IsLive", 0, 5.0f);
+        Add_Step_WaitUntil("the session is Live", n"Check_IsLive", 0, 0);
         Run_Steps(InHandle);
     }
 

@@ -19,9 +19,7 @@ enum EMars_Station_RejectReason
     // Another operator holds the station.
     Occupied,
     // The operator already holds a different station.
-    AlreadyOperating,
-    // The station's engagement is disabled (FMars_Request_Station_SetEngagement, or the spec's AllowEngagement).
-    Disabled
+    AlreadyOperating
 }
 
 enum EMars_Station_ReleaseReason
@@ -181,10 +179,6 @@ struct FMars_Station_Spec
     UPROPERTY()
     float32 EngageMaxSeconds = 0.35f;
 
-    // The starting value of the station's engagement switch (FMars_Request_Station_SetEngagement changes it).
-    UPROPERTY()
-    bool AllowEngagement = true;
-
     UPROPERTY()
     FMars_Station_CameraSpec Camera;
 
@@ -201,7 +195,6 @@ struct FMars_Station_Spec
         FTransform InStandLocal,
         TArray<FMars_Station_Grip> InGrips,
         float32 InEngageMaxSeconds,
-        bool InAllowEngagement,
         FMars_Station_CameraSpec InCamera,
         FMars_Station_PromptSpec InPrompt,
         TSoftClassPtr<UCk_SmState_EntityScript> InMinigameStateClass)
@@ -209,7 +202,6 @@ struct FMars_Station_Spec
         StandLocal = InStandLocal;
         Grips = InGrips;
         EngageMaxSeconds = InEngageMaxSeconds;
-        AllowEngagement = InAllowEngagement;
         Camera = InCamera;
         Prompt = InPrompt;
         MinigameStateClass = InMinigameStateClass;
@@ -264,17 +256,13 @@ struct FMars_Fragment_Station_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Operator and Engagement are written only by UMars_Processor_Station_HandleRequests (its drain and its destroy watches),
-// Operator always in the same call as the operator's FMars_Fragment_Operator.Station. The handles are set once by Add.
+// Operator is written only by UMars_Processor_Station_HandleRequests (its drain and its destroy watches), always in the
+// same call as the operator's FMars_Fragment_Operator.Station. The handles are set once by Add.
 struct FMars_Fragment_Station
 {
     // The operating entity (the player); invalid = free.
     UPROPERTY()
     FCk_Handle Operator;
-
-    // Disabled rejects every reserve (Disabled); it does not evict the current operator.
-    UPROPERTY()
-    ECk_EnableDisable Engagement = ECk_EnableDisable::Enable;
 
     // Child scene node at StandLocal: the world pose the operator glides to.
     UPROPERTY()
@@ -356,27 +344,10 @@ struct FMars_Request_Station_Release
     }
 }
 
-// Disabling rejects later reserves (Disabled); it does not evict the current operator.
-struct FMars_Request_Station_SetEngagement
-{
-    UPROPERTY()
-    ECk_EnableDisable Engagement = ECk_EnableDisable::Enable;
-
-    FMars_Request_Station_SetEngagement() {}
-
-    FMars_Request_Station_SetEngagement(ECk_EnableDisable InEngagement)
-    {
-        Engagement = InEngagement;
-    }
-}
-
-// Applied SetEngagement -> Release -> Reserve, each kind in arrival order: a release and a reserve in one drain re-seat
-// the station, and of two reserves in one drain the first wins and the second is rejected Occupied.
+// Applied Release -> Reserve, each kind in arrival order: a release and a reserve in one drain re-seat the station, and of
+// two reserves in one drain the first wins and the second is rejected Occupied.
 struct FMars_Fragment_Station_Requests
 {
-    UPROPERTY()
-    TArray<FMars_Request_Station_SetEngagement> SetEngagementRequests;
-
     UPROPERTY()
     TArray<FMars_Request_Station_Release> ReleaseRequests;
 

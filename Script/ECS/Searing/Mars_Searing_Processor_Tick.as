@@ -26,13 +26,15 @@ struct FMars_Searing_PieceEvents
 
 // Every frame: the lingering lost bodies age (and are destroyed at LingerSeconds), then each live piece in admission order:
 // whether it is on the pan (on/off edges), the face it rests on (flips), its loss, and the sear of its face on the pan
-// (its sixth seared face makes it Ready); then the tally, the pieces' edges, and the aggregate sizzle edge last. The pan
-// moves itself (an Implement); Jolt owns every piece's pose; the kernel reads it back through the entity transform and
-// never writes it, and judges an adopted piece only once it has arrived at its release. Nothing is ever spawned here:
-// pieces arrive only through AddPiece.
+// (its sixth seared face makes it Ready); then the tally, the station's take-out readout (the Ready pieces, in admission
+// order), the pieces' edges, and the aggregate sizzle edge last. The pan moves itself (an Implement); Jolt owns every
+// piece's pose; the kernel reads it back through the entity transform and never writes it, and judges an adopted piece
+// only once it has arrived at its release. Nothing is ever spawned here: pieces arrive only through the station's inbox.
 class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Searing_HandleRequests");
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Resting_Tick");
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -49,6 +51,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         Frame.PanUp = Frame.PanBaseWorld.GetRotation().GetUpVector();
         Frame.IsHot = InState.Heat == EMars_Searing_Heat::Hot;
         Frame.DeltaSeconds = float32(InDeltaT.Get_Seconds());
+        const auto IsTornDown = utils_entity_lifetime::Get_IsPendingDestroy(InHandle, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
 
         Advance_Lingering(Frame, InState);
 
@@ -56,9 +59,23 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         for (int32 Index = 0; Index < InState.Pieces.Num(); ++Index)
         {
             auto Piece = InState.Pieces[Index];
-            // A lost piece only lingers; a piece whose entity is gone is going with a station torn down around it.
-            if (Piece.Status == EMars_Searing_PieceStatus::Lost || ck::Is_NOT_Valid(Piece.Entity))
+            // A lost piece only lingers.
+            if (Piece.Status == EMars_Searing_PieceStatus::Lost)
             { continue; }
+
+            // A piece whose entity is gone is going with the station torn down around it; anything else that ended a piece
+            // the kernel holds is a defect, and the entry is dropped so it is no longer counted.
+            if (ck::Is_NOT_Valid(Piece.Entity))
+            {
+                if (ck::EnsureIfNot(IsTornDown, f"[Searing] [{Frame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} "
+                    + f"was destroyed outside the kernel while on the pan; its entry is dropped"))
+                {
+                    InState.Pieces.RemoveAt(Index);
+                    --Index;
+                }
+
+                continue;
+            }
 
             // An adopted piece is judged only once it is where it was released, or once it has taken too long to get there.
             if (Piece.Arriving.IsSet())
@@ -91,25 +108,31 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
             InState.Pieces[Index] = Piece;
 
             if (PieceEvents.Flipped)
-            {
-                InState.Tally.Flips += 1;
-                ck::Trace(f"[Searing] [{Frame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} now rests on "
-                    + f"{utils_searing::Get_FaceName(Piece.RestingFace)} (flips {InState.Tally.Flips})");
-            }
+            { InState.Tally.Flips += 1; }
 
             if (PieceEvents.Lost)
-            {
-                InState.Tally.Losses += 1;
-                ck::Trace(f"[Searing] [{Frame.Searing.ToString()}] lost piece {utils_cooking_feed::Get_PieceName(Piece.Id)} "
-                    + f"[{Piece.Entity.ToString()}] (losses {InState.Tally.Losses})");
-            }
+            { InState.Tally.Losses += 1; }
 
             Events.Add(PieceEvents);
         }
 
         Advance_Tally(Frame, InState);
+        utils_cooking_feed::Write_Takeable(InHandle, Get_Takeable(InState));
         Broadcast_PieceEvents(Frame, InState, Events);
         Broadcast_SizzleEdge(Frame, InState);
+    }
+
+    // What a take-out without a named piece would hand back now.
+    private TArray<FCk_Handle_FoodPiece> Get_Takeable(const FMars_Fragment_Searing& InState) const
+    {
+        TArray<FCk_Handle_FoodPiece> Takeable;
+        for (const auto& Piece : InState.Pieces)
+        {
+            if (Piece.Status == EMars_Searing_PieceStatus::Ready && ck::IsValid(Piece.Entity))
+            { Takeable.Add(Piece.Piece); }
+        }
+
+        return Takeable;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -139,7 +162,6 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
             if (ck::Is_NOT_Valid(Piece.Entity))
             { continue; }
 
-            ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] destroyed lost piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}]");
             utils_entity_lifetime::Request_DestroyEntity(Piece.Entity);
         }
     }
@@ -195,9 +217,6 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         const auto FellThrough = AboveTop < -InFrame.Spec.Loss.FallThroughCm;
         if (OffTheDisc == false && FellThrough == false)
         { return; }
-
-        ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(InPiece.Id)} leaves the pan: "
-            + f"radius {Local.Size2D() :.2} (off the disc {OffTheDisc}), {AboveTop :.3} cm above the surface (fell through {FellThrough})");
 
         InPiece.Status = EMars_Searing_PieceStatus::Lost;
         InPiece.LingerSeconds = 0.0f;
@@ -267,19 +286,6 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     private void Broadcast_PieceEvents(FMars_Searing_Frame& InFrame, const FMars_Fragment_Searing& InState,
         const TArray<FMars_Searing_PieceEvents>& InEvents)
     {
-        for (const auto& Event : InEvents)
-        {
-            const auto PieceName = utils_cooking_feed::Get_PieceName(Event.Id);
-            if (Event.Seared.IsSet())
-            { ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] piece {PieceName} face {utils_searing::Get_FaceName(Event.Seared.GetValue())} seared"); }
-
-            if (Event.Ready)
-            {
-                ck::Trace(f"[Searing] [{InFrame.Searing.ToString()}] piece {PieceName} ready ({InState.Tally.Seconds :.2} s hot, "
-                    + f"{InState.Tally.Losses} lost, {InState.Tally.Flips} flips)");
-            }
-        }
-
         if (InFrame.Searing.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
         { return; }
 
@@ -344,7 +350,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     private FTransform Get_PanPose(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
     {
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(InPiece.Entity.As_Transform());
-        return utils_searing::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.PanBaseWorld), InPiece.CentreLocal);
+        return utils_foodpiece::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.PanBaseWorld), InPiece.CentreLocal);
     }
 
     private EMars_Searing_Face Get_DownFace(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const

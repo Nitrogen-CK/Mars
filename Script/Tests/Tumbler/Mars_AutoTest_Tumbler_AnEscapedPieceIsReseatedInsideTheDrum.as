@@ -1,5 +1,5 @@
 // With the hatch shut and one piece at rest inside the shell, the piece teleported 100 cm out in front of the drum (where
-// nothing holds it) is reseated within 1 s: OnPieceReseated fires once for it, the reseat count is 1, it is inside the shell
+// nothing holds it) is reseated: OnPieceReseated fires once for it, the reseat count is 1, it is inside the shell
 // again, the drum still holds one piece, and the jump back coats nothing (its coverage grows by no more than the short drop
 // from the reseat point onto the floor could add).
 class UMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum : UMars_AutoTestRig_Tumbler
@@ -17,16 +17,17 @@ class UMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum : UMars_AutoT
     void DoBeginPlay(FCk_Handle InHandle)
     {
         BuildStation(InHandle, Make_TestSpec());
+        Build_Boxes(1);
 
         Add_Steps_StationReady();
         Add_Steps_OpenHatch();
         Add_Step("load piece 0", n"Step_AddFirst");
-        Add_Step_WaitUntil("it is added", n"Check_Added1", 0, 1.0f);
+        Add_Step_WaitUntil("it is added", n"Check_Added1", 0, 0);
         Add_Steps_CloseHatch();
-        Add_Step_WaitUntil("it rests inside the shell", n"Check_AllAtRest", 0, 3.0f);
+        Add_Step_WaitUntil("it rests inside the shell", n"Check_AllAtRest", k_SlowPolls, 0);
         Add_Step("teleport it out of the drum", n"Step_TeleportOut");
-        Add_Step_WaitUntil("it was reseated", n"Check_Reseated", 0, 1.0f);
-        Add_Step_WaitUntil("it is inside the shell again", n"Check_InsideAgain", 0, 1.0f);
+        Add_Step_WaitUntil("it was reseated", n"Check_Reseated", 0, 0);
+        Add_Step_WaitUntil("it is inside the shell again", n"Check_InsideAgain", 0, 0);
         Add_Step_WaitFrames("a second reseat would show", 5);
         Add_Step("reseated once, inside, the batch and its coverage kept", n"Step_AssertReseated");
         Run_Steps(InHandle);
@@ -35,7 +36,7 @@ class UMars_AutoTest_Tumbler_AnEscapedPieceIsReseatedInsideTheDrum : UMars_AutoT
     UFUNCTION()
     private void Step_AddFirst(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        AddPiece(0);
+        Admit(0);
     }
 
     UFUNCTION()

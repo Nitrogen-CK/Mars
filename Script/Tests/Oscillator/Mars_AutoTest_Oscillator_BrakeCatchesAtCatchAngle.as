@@ -5,6 +5,9 @@
 // outside its amplitude fails Validate(). Isolated Z band: -77000.
 class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: a catch or a release waits on the swing's period.
+    private const int32 k_SlowPolls = 900;
+
     private FVector _Origin = FVector(0.0, 0.0, -77000.0);
     private FCk_Handle_Oscillator _Oscillator;
     private FCk_Handle_SceneNode _Pivot;
@@ -31,12 +34,12 @@ class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
         Add_Step("a catch angle beyond the amplitude is rejected", n"Step_AssertValidate");
         Add_Step_WaitSeconds("let them swing", 0.3f);
         Add_Step("brake them", n"Step_Stop");
-        Add_Step_WaitUntil("the brake catches both", n"Check_Caught", 0, 3.0f);
+        Add_Step_WaitUntil("the brake catches both", n"Check_Caught", k_SlowPolls, 0);
         Add_Step("each is caught at its catch angle", n"Step_AssertAtCatchAngle");
         Add_Step_WaitSeconds("a caught swing holds", 0.3f);
         Add_Step("still caught, still at the catch angle, written to the node", n"Step_AssertHeld");
         Add_Step("release them", n"Step_Start");
-        Add_Step_WaitUntil("released, each swings away from its catch angle", n"Check_SwingingAgain", 0, 3.0f);
+        Add_Step_WaitUntil("released, each swings away from its catch angle", n"Check_SwingingAgain", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

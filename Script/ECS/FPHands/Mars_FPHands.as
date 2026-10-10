@@ -487,7 +487,8 @@ namespace utils_fphands
     }
 
     // How the gloves grip InItem: authored sockets win (and decide one- vs two-handed), then the presentation's
-    // Grip.HalfWidth, then the mesh bounds. An invalid item, or one without a presentation, is empty hands.
+    // Grip.HalfWidth, then the mesh bounds. An invalid item, or one without a presentation, is empty hands; a presentation
+    // that fails Validate (no handedness) ensures and is empty hands.
     FMars_FPHands_Hold Make_Hold(const FCk_Handle_Item& InItem)
     {
         auto Hold = FMars_FPHands_Hold();
@@ -495,6 +496,10 @@ namespace utils_fphands
         { return Hold; }
 
         const auto Presentation = InItem.Get_Presentation();
+        const auto Validation = Presentation.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[FPHands] the gloves cannot hold [{InItem.ToString()}]: {Validation.Get_Error()}"))
+        { return Hold; }
+
         const auto IsTwoHanded = Presentation.Grip.Handedness == EMars_ItemPresentation_Handedness::TwoHanded;
         Hold.Kind = IsTwoHanded ? EMars_FPHands_HoldKind::TwoHanded : EMars_FPHands_HoldKind::OneHanded;
         Hold.Pose = Presentation.Grip.Pose;

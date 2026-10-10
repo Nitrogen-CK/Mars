@@ -6,16 +6,6 @@ namespace utils_action_hint_display
         InHandle.Add_Fragment(FMars_Fragment_ActionHintDisplay());
         return InHandle.As_ActionHintDisplay();
     }
-
-    // Suppression hides the rows registered before it was taken. A row whose register has not drained is never hidden.
-    bool Get_IsRowHidden(const FMars_Fragment_ActionHintDisplay& InState, const FCk_Handle_ActionHintRow& InRow)
-    {
-        if (InState.SuppressWatermark.IsSet() == false)
-        { return false; }
-
-        const auto Sequence = InRow.Get_Sequence();
-        return Sequence.IsSet() && Sequence.GetValue() < InState.SuppressWatermark.GetValue();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -43,25 +33,10 @@ mixin FName Get_OwnerKey(const FCk_Handle_ActionHintRow& Self)
 // Display Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin bool Get_IsHidden(const FCk_Handle_ActionHintDisplay& Self, const FCk_Handle_ActionHintRow& InRow)
-{
-    return utils_action_hint_display::Get_IsRowHidden(Self.Get_Fragment(FMars_Fragment_ActionHintDisplay), InRow);
-}
-
-// What a legend should show right now: suppressed rows filtered out, registration order preserved.
+// What a legend shows: every registered row, in registration order.
 mixin TArray<FCk_Handle_ActionHintRow> Get_VisibleHints(const FCk_Handle_ActionHintDisplay& Self)
 {
-    const auto& State = Self.Get_Fragment(FMars_Fragment_ActionHintDisplay);
-
-    TArray<FCk_Handle_ActionHintRow> Visible;
-    for (const auto& Row : State.Hints)
-    {
-        if (utils_action_hint_display::Get_IsRowHidden(State, Row))
-        { continue; }
-
-        Visible.Add(Row);
-    }
-    return Visible;
+    return Self.Get_Fragment(FMars_Fragment_ActionHintDisplay).Hints;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -113,19 +88,6 @@ mixin void Request_UpdateHint(
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
     Requests.UpdateRequests.Add(InRequest);
-}
-
-// Hides every row registered before the matching drain until the paired Request_ReleaseSuppress.
-mixin void Request_Suppress(FCk_Handle_ActionHintDisplay& Self)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
-    Requests.SuppressRequests.Add(FMars_Request_ActionHintDisplay_SetSuppressed(EMars_ActionHintDisplay_Suppression::Suppress));
-}
-
-mixin void Request_ReleaseSuppress(FCk_Handle_ActionHintDisplay& Self)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_ActionHintDisplay_Requests);
-    Requests.SuppressRequests.Add(FMars_Request_ActionHintDisplay_SetSuppressed(EMars_ActionHintDisplay_Suppression::Release));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

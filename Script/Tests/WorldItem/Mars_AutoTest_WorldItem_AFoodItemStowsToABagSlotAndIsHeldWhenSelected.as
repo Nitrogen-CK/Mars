@@ -10,6 +10,9 @@ class UMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected : U
     default _TimeoutSeconds = 20.0f;
 
     private const FVector k_Origin = FVector(22000.0, -15000.0, -30000.0);
+    // The food item's construction (its joint imports), its body's setup and the mounts' arrivals outrun the default
+    // poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     // Under construction until it is a WorldItem whose holder holds its item.
     private FCk_Handle _Entity;
@@ -23,7 +26,6 @@ class UMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected : U
         Add_CarrierBodyWithBack(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 2);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         _Holders.Add(MakeSeededHolder(InHandle, mars_items::Rock()));
 
@@ -40,20 +42,20 @@ class UMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected : U
         _Entity = Pending.Get_EntityUnderConstruction();
         Track_ForCleanup(_Entity);
 
-        Add_Step_WaitUntil("the rock holder is seeded", n"Check_HoldersSeeded", 0, 5.0f);
-        Add_Step_WaitUntil("the food item is constructed and its holder holds its item", n"Check_Constructed", 0, 10.0f);
-        Add_Step_WaitUntil("its body is added", n"Check_BodyAdded", 0, 5.0f);
+        Add_Step_WaitUntil("the rock holder is seeded", n"Check_HoldersSeeded", 0, 0);
+        Add_Step_WaitUntil("the food item is constructed and its holder holds its item", n"Check_Constructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("its body is added", n"Check_BodyAdded", k_SlowPolls, 0);
         Add_Step("the food item is the joint: FoodPiece, display, Dynamic body, Persistent world item, bounds fit", n"Step_AssertComposed");
         Add_Step("stow the rock into bag slot 0", n"Step_StowFirst");
-        Add_Step_WaitUntil("the rock is held from slot 0", n"Check_RockHeld", 0, 5.0f);
+        Add_Step_WaitUntil("the rock is held from slot 0", n"Check_RockHeld", 0, 0);
         Add_Step("the carrier focuses the food's pickup", n"Step_Focus");
-        Add_Step_WaitFrames("the pickup's target enters Focused", 3);
+        Add_Step_WaitUntil("the pickup's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier picks the food up", n"Step_PickUp");
-        Add_Step_WaitUntil("the food is stowed to slot 1 and rides the back", n"Check_OnTheBack", 0, 5.0f);
+        Add_Step_WaitUntil("the food is stowed to slot 1 and rides the back", n"Check_OnTheBack", k_SlowPolls, 0);
         Add_Step("slot 1 holds it, not the overflow; the rock stays in the hands", n"Step_AssertStowed");
         Add_Step("select slot 1", n"Step_SelectFood");
-        Add_Step_WaitUntil("the food is Held in the hand", n"Check_Held", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 1.0f);
+        Add_Step_WaitUntil("the food is Held in the hand", n"Check_Held", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the food's hold has settled", n"Check_HoldSettled", k_SlowPolls, 0);
         Add_Step("the selected slot holds it and the joint rides the hand", n"Step_AssertRidesTheHand");
         Run_Steps(InHandle);
     }
@@ -144,6 +146,7 @@ class UMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected : U
     {
         auto Pickup = _WorldItem.Get_Pickup();
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Pickup);
     }
 
     UFUNCTION()
@@ -180,6 +183,14 @@ class UMars_AutoTest_WorldItem_AFoodItemStowsToABagSlotAndIsHeldWhenSelected : U
     {
         auto Res = OutResult;
         Res.Set(_WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held && Get_MountParent() == _HandNode);
+    }
+
+    // The Held mount's arrival is over: nothing pending, and the committed mount is where the item lives.
+    UFUNCTION()
+    private void Check_HoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held && _WorldItem.Get_IsSettled());
     }
 
     UFUNCTION()

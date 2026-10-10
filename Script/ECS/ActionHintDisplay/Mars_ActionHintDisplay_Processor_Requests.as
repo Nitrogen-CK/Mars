@@ -1,10 +1,9 @@
-// Drains in one fixed order - Register, Update, Unregister, UnregisterByOwner, Suppress - so a suppress queued in
-// the same frame as a register always sees that register's row and takes it under the watermark, and an update or
-// unregister queued right after Request_RegisterHint finds its row already registered. Updates apply in queue order,
-// each one compared with the row as the previous one left it.
+// Drains in one fixed order - Register, Update, Unregister, UnregisterByOwner - so an update or unregister queued right
+// after Request_RegisterHint finds its row already registered. Updates apply in queue order, each one compared with the
+// row as the previous one left it.
 //
-// Rows are child entities of the display. Register gives a row the next Sequence; every removal broadcasts (while
-// visible) and then destroys the row.
+// Rows are child entities of the display. Register gives a row the next Sequence; every removal broadcasts and then
+// destroys the row.
 class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,7 +25,6 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
         TArray<FMars_Request_ActionHintDisplay_Update> UpdateRequests = InRequests.UpdateRequests;
         TArray<FMars_Request_ActionHintDisplay_Unregister> UnregisterRequests = InRequests.UnregisterRequests;
         TArray<FMars_Request_ActionHintDisplay_UnregisterByOwner> UnregisterByOwnerRequests = InRequests.UnregisterByOwnerRequests;
-        TArray<FMars_Request_ActionHintDisplay_SetSuppressed> SuppressRequests = InRequests.SuppressRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_ActionHintDisplay_Requests);
@@ -42,9 +40,6 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
 
         for (const auto& Request : UnregisterByOwnerRequests)
         { HandleUnregisterByOwnerRequest(Self, InState, Request); }
-
-        for (const auto& Request : SuppressRequests)
-        { HandleSetSuppressedRequest(Self, InState, Request); }
     }
 
     // The row is the display's own child, minted with the request; only the drain destroys it.
@@ -63,10 +58,6 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
         InState.NextSequence += 1;
 
         InState.Hints.Add(Row);
-
-        if (utils_action_hint_display::Get_IsRowHidden(InState, Row))
-        { return; }
-
         Broadcast_Registered(InDisplay, Row);
     }
 
@@ -94,7 +85,7 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
             Changed = true;
         }
 
-        if (Changed && utils_action_hint_display::Get_IsRowHidden(InState, Row) == false)
+        if (Changed)
         { Broadcast_Updated(InDisplay, Row); }
     }
 
@@ -124,56 +115,12 @@ class UMars_Processor_ActionHintDisplay_HandleRequests : UCk_Processor_Script_Ba
         }
     }
 
-    private void HandleSetSuppressedRequest(
-        FCk_Handle_ActionHintDisplay& InDisplay,
-        FMars_Fragment_ActionHintDisplay& InState,
-        const FMars_Request_ActionHintDisplay_SetSuppressed& InRequest)
-    {
-        if (InRequest.Suppression == EMars_ActionHintDisplay_Suppression::Suppress)
-        {
-            InState.SuppressDepth += 1;
-            if (InState.SuppressDepth != 1)
-            { return; }
-
-            InState.SuppressWatermark = TOptional<int64>(InState.NextSequence);
-            for (const auto& Row : InState.Hints)
-            {
-                if (utils_action_hint_display::Get_IsRowHidden(InState, Row))
-                { Broadcast_Unregistered(InDisplay, Row); }
-            }
-            return;
-        }
-
-        if (ck::EnsureIfNot(InState.SuppressDepth > 0,
-            f"[ActionHintDisplay] [{InDisplay.ToString()}] got a ReleaseSuppress without a matching Suppress"))
-        { return; }
-
-        InState.SuppressDepth -= 1;
-        if (InState.SuppressDepth != 0)
-        { return; }
-
-        // The rows the released watermark hid, read before it is cleared.
-        TArray<FCk_Handle_ActionHintRow> Revealed;
-        for (const auto& Row : InState.Hints)
-        {
-            if (utils_action_hint_display::Get_IsRowHidden(InState, Row))
-            { Revealed.Add(Row); }
-        }
-
-        InState.SuppressWatermark.Reset();
-        for (const auto& Row : Revealed)
-        { Broadcast_Registered(InDisplay, Row); }
-    }
-
     private void RemoveHintAt(FCk_Handle_ActionHintDisplay& InDisplay, FMars_Fragment_ActionHintDisplay& InState, int32 InIndex)
     {
         auto RemovedRow = InState.Hints[InIndex];
-        const auto WasHidden = utils_action_hint_display::Get_IsRowHidden(InState, RemovedRow);
         InState.Hints.RemoveAt(InIndex);
 
-        if (WasHidden == false)
-        { Broadcast_Unregistered(InDisplay, RemovedRow); }
-
+        Broadcast_Unregistered(InDisplay, RemovedRow);
         utils_entity_lifetime::Request_DestroyEntity(RemovedRow.H());
     }
 

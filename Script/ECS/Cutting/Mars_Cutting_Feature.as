@@ -14,72 +14,67 @@ struct FMars_Feature_Cutting {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Board frame: the hand (and the cleaver under it) slides along the station's local Y about the board centre. The cleaver's
-// Mover has one Duration for both directions (the entity script sets it to ChopDownSeconds), so the recover takes as long
-// as the strike.
+// Board frame: the hand (and the cleaver under it) slides along the station's local Y about the board centre. A chop is
+// the kernel's own clock: a strike of ChopSeconds, the landing, then a recover of ChopSeconds; whatever draws the cleaver
+// follows OnChopStarted and OnChopLanded.
 struct FMars_Cutting_Spec
 {
-    // The hand's lateral travel each side of the board centre (uu).
+    // The hand's lateral travel each side of the board centre (cm).
     UPROPERTY()
     float32 BoardHalfWidth = 40.0f;
 
-    // uu of hand travel per degree of look yaw.
+    // The cleaver's strike in seconds; its recover takes as long.
     UPROPERTY()
-    float32 LateralPerDegree = 1.5f;
-
-    // The cleaver's strike (and, through the Mover's single Duration, its recover) in seconds.
-    UPROPERTY()
-    float32 ChopDownSeconds = 0.10f;
+    float32 ChopSeconds = 0.10f;
 
     // Built by the placing script before Add. Not a UPROPERTY: the spawn params never carry handles.
     FMars_Cutting_Nodes Nodes;
 
     FMars_Cutting_Spec() {}
 
-    FMars_Cutting_Spec(float32 InBoardHalfWidth, float32 InLateralPerDegree, float32 InChopDownSeconds)
+    FMars_Cutting_Spec(float32 InBoardHalfWidth, float32 InChopSeconds)
     {
         BoardHalfWidth = InBoardHalfWidth;
-        LateralPerDegree = InLateralPerDegree;
-        ChopDownSeconds = InChopDownSeconds;
+        ChopSeconds = InChopSeconds;
     }
 }
 
-// A board with no width has nowhere for the hand to go, a look that moves nothing cannot steer it, and a zero-length strike
-// is no motion at all.
+// A board with no width has nowhere for the hand to go, and a zero-length strike is no chop at all.
 mixin FMars_Validation Validate(const FMars_Cutting_Spec& Self)
 {
     if (Self.BoardHalfWidth <= 0.0f)
     { return FMars_Validation(f"Cutting has a non-positive BoardHalfWidth [{Self.BoardHalfWidth}]"); }
 
-    if (Self.LateralPerDegree <= 0.0f)
-    { return FMars_Validation(f"Cutting has a non-positive LateralPerDegree [{Self.LateralPerDegree}]"); }
-
-    if (Self.ChopDownSeconds <= 0.0f)
-    { return FMars_Validation(f"Cutting has a non-positive ChopDownSeconds [{Self.ChopDownSeconds}]"); }
+    if (Self.ChopSeconds <= 0.0f)
+    { return FMars_Validation(f"Cutting has a non-positive ChopSeconds [{Self.ChopSeconds}]"); }
 
     return FMars_Validation();
 }
 
-// The nodes the placing script builds for the feature: the lateral node the hand slides (its offset Y is the hand), and
-// the Mover on the cleaver node under it (start = raised, end = contact with the board).
+// The node the placing script builds for the feature: the lateral node the hand slides (its offset Y is the hand).
 struct FMars_Cutting_Nodes
 {
     UPROPERTY()
     FCk_Handle_SceneNode LateralNode;
 
-    UPROPERTY()
-    FCk_Handle_Mover ChopMover;
-
     FMars_Cutting_Nodes() {}
 
-    FMars_Cutting_Nodes(FCk_Handle_SceneNode InLateralNode, FCk_Handle_Mover InChopMover)
+    FMars_Cutting_Nodes(FCk_Handle_SceneNode InLateralNode)
     {
         LateralNode = InLateralNode;
-        ChopMover = InChopMover;
     }
 }
 
-struct FMars_Tag_Cutting_NeedsSetup {}
+// Where a chop is: the cleaver up and ready, on its way down, or on its way back up.
+enum EMars_Cutting_ChopPhase
+{
+    Idle,
+    Striking,
+    Recovering
+}
+
+// On the Cutting entity while a chop runs: the chop clock's Tick runs only then.
+struct FMars_Tag_Cutting_Chopping {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
@@ -98,61 +93,53 @@ struct FMars_Fragment_Cutting_Params
 // Written only by the Cutting processors (and Add). The station SM and the operator only issue requests.
 struct FMars_Fragment_Cutting
 {
-    // uu, clamped to +-BoardHalfWidth.
+    // cm, clamped to +-BoardHalfWidth.
     UPROPERTY()
     float32 HandLateral = 0.0f;
 
-    // One press = one chop: true from the chop request until the cleaver is back up; chops meanwhile are ignored.
+    // One press = one chop: a chop request starts a chop only while Idle.
     UPROPERTY()
-    bool IsChopping = false;
-}
+    EMars_Cutting_ChopPhase ChopPhase = EMars_Cutting_ChopPhase::Idle;
 
-// On the cleaver's Mover entity: the Cutting feature it strikes for (its OnArrived handler lands the chop through it).
-// Written only by Add.
-struct FMars_Fragment_Cutting_ChopLink
-{
+    // Seconds left in the current phase of the chop (Spec.ChopSeconds at each phase's start); 0 while Idle.
     UPROPERTY()
-    FCk_Handle_Cutting Cutting;
+    float32 ChopSecondsLeft = 0.0f;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Broadcast as a chop starts: the cleaver leaves its raised pose for the board, reaching it ChopSeconds later.
+delegate void FMars_Delegate_Cutting_OnChopStarted(FCk_Handle_Cutting InCutting);
+event void FMars_Delegate_Cutting_OnChopStarted_MC(FCk_Handle_Cutting InCutting);
+
 // Broadcast at the cleaver's contact with the board, as it starts back up. Whether the blade met food is the board's answer
 // to the cut the control issues on it (FoodBoard OnCutIssued, Straddling > 0).
 delegate void FMars_Delegate_Cutting_OnChopLanded(FCk_Handle_Cutting InCutting);
 event void FMars_Delegate_Cutting_OnChopLanded_MC(FCk_Handle_Cutting InCutting);
 
-delegate void FMars_Delegate_Cutting_OnHandMoved(FCk_Handle_Cutting InCutting, float32 InLateral);
-event void FMars_Delegate_Cutting_OnHandMoved_MC(FCk_Handle_Cutting InCutting, float32 InLateral);
-
-// A Reset put the hand back at the board centre for the next operator.
-delegate void FMars_Delegate_Cutting_OnReset(FCk_Handle_Cutting InCutting);
-event void FMars_Delegate_Cutting_OnReset_MC(FCk_Handle_Cutting InCutting);
-
 struct FMars_Fragment_Cutting_Signals
 {
+    FMars_Delegate_Cutting_OnChopStarted_MC OnChopStarted;
     FMars_Delegate_Cutting_OnChopLanded_MC OnChopLanded;
-    FMars_Delegate_Cutting_OnHandMoved_MC OnHandMoved;
-    FMars_Delegate_Cutting_OnReset_MC OnReset;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Degrees of look yaw; positive slides the hand toward the board's +Y. Summed per drain.
+// Centimetres along the board; positive slides the hand toward the board's +Y. Summed per drain.
 struct FMars_Request_Cutting_Nudge
 {
     UPROPERTY()
-    float32 LateralDegrees = 0.0f;
+    float32 LateralCm = 0.0f;
 
     FMars_Request_Cutting_Nudge() {}
 
-    FMars_Request_Cutting_Nudge(float32 InLateralDegrees)
+    FMars_Request_Cutting_Nudge(float32 InLateralCm)
     {
-        LateralDegrees = InLateralDegrees;
+        LateralCm = InLateralCm;
     }
 }
 

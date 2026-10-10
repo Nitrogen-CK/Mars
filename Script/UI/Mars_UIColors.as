@@ -11,4 +11,7 @@ namespace constants_ui_colors
     // Parchment-kit moss greens: the hovered/active control tint and its pressed shade.
     const FLinearColor k_Moss = FLinearColor(0.55f, 0.72f, 0.30f, 1.0f);
     const FLinearColor k_MossDeep = FLinearColor(0.20f, 0.34f, 0.10f, 1.0f);
+
+    // A station's world label: what it holds, and why a press or an interaction there did nothing.
+    const FColor k_StationLabel = FColor(255, 238, 0, 255);
 }

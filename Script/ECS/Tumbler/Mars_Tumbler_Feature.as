@@ -6,7 +6,7 @@ asset Mars_TumblerHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Tumbler";
     RequiredFragments.Add(FMars_Feature_Tumbler);
-    Description = "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever, drum and its kinematic shell together), and admitted pieces that tumble as dynamic bodies in the shell and gain coating with the distance they move while it is shut";
+    Description = "A tumbling minigame on a station: a hand the operator steers over a reach plane, a hatch it clicks open and shut, a crank lever it grips and rocks (one Mover turns lever, drum and its kinematic shell together), and the food pieces the station admits, which tumble as dynamic bodies in the shell, gain coating with the distance they move while it is shut and are taken out onto a tray once coated";
 }
 struct FMars_Feature_Tumbler {}
 
@@ -47,14 +47,7 @@ enum EMars_Tumbler_Drum
     Returning
 }
 
-// InFlight while the feed carries a piece toward the drum (the control layer forwards the feed's busy edges).
-enum EMars_Tumbler_Loading
-{
-    Idle,
-    InFlight
-}
-
-// Why a press did nothing.
+// Why a press did nothing. LoadingInFlight: the station's feed is mid-transfer.
 enum EMars_Tumbler_Refusal
 {
     NotHome,
@@ -249,7 +242,8 @@ struct FMars_Tumbler_ShellSpec
     FMars_Tumbler_SurfaceSpec Surface;
 }
 
-// Each admitted piece is a dynamic box body of this size and feel.
+// The nominal piece: HalfSize places a reseated piece's middle above the shell's floor. A piece admitted without a body of
+// its own gets a dynamic convex body of its own mesh with this mass and feel; one that brings its body keeps it.
 struct FMars_Tumbler_PieceSpec
 {
     UPROPERTY()
@@ -290,7 +284,8 @@ struct FMars_Tumbler_PieceSpec
 }
 
 // Useful travel: the distance each piece's own centre moves while the hatch is Closed. A step under MinStepCm is solver
-// jitter, not tumbling, and coats nothing.
+// jitter, not tumbling, and coats nothing. A piece whose coverage has reached TakeOutCoverage is tumbled: a take-out hands
+// it back.
 struct FMars_Tumbler_CoatingSpec
 {
     UPROPERTY()
@@ -299,12 +294,16 @@ struct FMars_Tumbler_CoatingSpec
     UPROPERTY()
     float32 MinStepCm = 0.05f;
 
+    UPROPERTY()
+    float32 TakeOutCoverage = 0.8f;
+
     FMars_Tumbler_CoatingSpec() {}
 
-    FMars_Tumbler_CoatingSpec(float32 InCoveragePerCm, float32 InMinStepCm)
+    FMars_Tumbler_CoatingSpec(float32 InCoveragePerCm, float32 InMinStepCm, float32 InTakeOutCoverage)
     {
         CoveragePerCm = InCoveragePerCm;
         MinStepCm = InMinStepCm;
+        TakeOutCoverage = InTakeOutCoverage;
     }
 }
 
@@ -388,8 +387,8 @@ struct FMars_Tumbler_Spec
 
 // A reach with no extent or no look, a hand that never arrives, a target nobody can hover, a drum that never turns, has no
 // room or never notices an escape, a shell with no wall, too few panels to close, a gap that swallows the drum or a hatch
-// with no plate, a baffle with no height, a piece with no size or mass or one that cannot fit, or a coating that never grows
-// each make the minigame unplayable.
+// with no plate, a baffle with no height, a piece with no size or mass or one that cannot fit, a coating that never grows,
+// or a take-out threshold outside (0, 1] each make the minigame unplayable.
 mixin FMars_Validation Validate(const FMars_Tumbler_Spec& Self)
 {
     const auto& Hand = Self.Hand;
@@ -486,6 +485,9 @@ mixin FMars_Validation Validate(const FMars_Tumbler_Spec& Self)
     if (Self.Coating.MinStepCm <= 0.0f)
     { return FMars_Validation(f"Tumbler has a non-positive Coating.MinStepCm [{Self.Coating.MinStepCm}]"); }
 
+    if (Self.Coating.TakeOutCoverage <= 0.0f || Self.Coating.TakeOutCoverage > 1.0f)
+    { return FMars_Validation(f"Tumbler has Coating.TakeOutCoverage [{Self.Coating.TakeOutCoverage}] outside (0, 1]"); }
+
     return FMars_Validation();
 }
 
@@ -531,18 +533,18 @@ struct FMars_Tumbler_HandState
     FQuat ReachFromRotation = FQuat::Identity;
 }
 
-// One admitted piece, keyed by the feed identity it arrived with (an array index is never identity). Its entity is a
-// lifetime child of the station carrying a dynamic box body: the simulation moves it, the kernel only reads it (and
-// reseats it when it escapes).
+// One admitted food piece, keyed by the feed identity it arrived with (an array index is never identity). The piece is the
+// station's guest: its own entity (under the world's transient entity) on its own dynamic body; the simulation moves it,
+// the kernel only reads it (and reseats it when it escapes).
 struct FMars_Tumbler_PieceState
 {
     UPROPERTY()
     FMars_CookingFeed_PieceId Id;
 
-    // The release's preset (which mesh the placing script dresses it as); the kernel never reads it.
     UPROPERTY()
-    int32 PresetIndex = 0;
+    FCk_Handle_FoodPiece Piece;
 
+    // The piece's own entity.
     UPROPERTY()
     FCk_Handle Entity;
 
@@ -553,12 +555,13 @@ struct FMars_Tumbler_PieceState
     UPROPERTY()
     FVector LastWorld = FVector::ZeroVector;
 
-    // 0..1, never decreases.
+    // 0..1, never decreases; seeded from the crumb the piece's cook state arrived with.
     UPROPERTY()
     float32 Coverage = 0.0f;
 }
 
-// Written only by the two Tumbler processors (and Add). The station SM, the feed bridge and the operator only issue requests.
+// Written only by the two Tumbler processors (and Add). The station SM, the feed bridge and the operator only issue requests;
+// a transfer in flight is read from the station's CookingFeed, never mirrored here.
 struct FMars_Fragment_Tumbler
 {
     UPROPERTY()
@@ -572,9 +575,6 @@ struct FMars_Fragment_Tumbler
 
     UPROPERTY()
     EMars_Tumbler_Drum Drum = EMars_Tumbler_Drum::Home;
-
-    UPROPERTY()
-    EMars_Tumbler_Loading Loading = EMars_Tumbler_Loading::Idle;
 
     // The drum's turn from home as of the last tick (the axle Mover's alpha times ArcDegrees).
     UPROPERTY()
@@ -609,14 +609,18 @@ event void FMars_Delegate_Tumbler_OnDrumChanged_MC(FCk_Handle_Tumbler InTumbler,
 delegate void FMars_Delegate_Tumbler_OnPressRefused(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal);
 event void FMars_Delegate_Tumbler_OnPressRefused_MC(FCk_Handle_Tumbler InTumbler, EMars_Tumbler_Refusal InRefusal);
 
-// The answer to every AddPiece: Accepted (the piece entity exists; OnPieceAdded follows) or Rejected with a reason (nothing
-// made).
-delegate void FMars_Delegate_Tumbler_OnPieceAdmission(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
-event void FMars_Delegate_Tumbler_OnPieceAdmission_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason);
-
-// An admitted piece's entity (its body's) exists: the placing script adds its visuals here.
+// A piece the station's inbox brought is in the drum (right after the station's OnAdmission answered Accepted): the placing
+// script keeps its record here.
 delegate void FMars_Delegate_Tumbler_OnPieceAdded(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Tumbler_OnPieceAdded_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
+
+// A take-out handed the piece back (its crumb written, its body Kinematic), on its way onto the take-out's tray.
+delegate void FMars_Delegate_Tumbler_OnPieceTakenOut(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+event void FMars_Delegate_Tumbler_OnPieceTakenOut_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece);
+
+// A take-out that handed nothing back: no room (no tray, or a full one) or nothing tumbled yet.
+delegate void FMars_Delegate_Tumbler_OnTakeOutRefused(FCk_Handle_Tumbler InTumbler, EMars_CookingFeed_TakeOutRefusal InRefusal);
+event void FMars_Delegate_Tumbler_OnTakeOutRefused_MC(FCk_Handle_Tumbler InTumbler, EMars_CookingFeed_TakeOutRefusal InRefusal);
 
 delegate void FMars_Delegate_Tumbler_OnCoverageChanged(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, float32 InCoverage);
 event void FMars_Delegate_Tumbler_OnCoverageChanged_MC(FCk_Handle_Tumbler InTumbler, FMars_CookingFeed_PieceId InPieceId, float32 InCoverage);
@@ -632,8 +636,9 @@ struct FMars_Fragment_Tumbler_Signals
     FMars_Delegate_Tumbler_OnHatchChanged_MC OnHatchChanged;
     FMars_Delegate_Tumbler_OnDrumChanged_MC OnDrumChanged;
     FMars_Delegate_Tumbler_OnPressRefused_MC OnPressRefused;
-    FMars_Delegate_Tumbler_OnPieceAdmission_MC OnPieceAdmission;
     FMars_Delegate_Tumbler_OnPieceAdded_MC OnPieceAdded;
+    FMars_Delegate_Tumbler_OnPieceTakenOut_MC OnPieceTakenOut;
+    FMars_Delegate_Tumbler_OnTakeOutRefused_MC OnTakeOutRefused;
     FMars_Delegate_Tumbler_OnCoverageChanged_MC OnCoverageChanged;
     FMars_Delegate_Tumbler_OnPieceReseated_MC OnPieceReseated;
 }
@@ -642,8 +647,8 @@ struct FMars_Fragment_Tumbler_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Debug and tests only: destroys every piece entity (its body with it), zeroes the reseat count, frees the hand, closes the
-// hatch and lets go of the lever. Payload-less: one placeholder field (request doctrine).
+// Debug and tests only: destroys every piece in the drum (its body with it), zeroes the reseat count, frees the hand, closes
+// the hatch and lets go of the lever. Payload-less: one placeholder field (request doctrine).
 struct FMars_Request_Tumbler_Reset
 {
     UPROPERTY()
@@ -662,33 +667,22 @@ struct FMars_Request_Tumbler_Cancel
     FMars_Request_Tumbler_Cancel() {}
 }
 
-// The feed's busy edges. Last wins within a drain.
-struct FMars_Request_Tumbler_SetLoading
+// A piece a take-out handed back that its tray refused: back in the drum where it lies (the kernel's own landing watch
+// sends it).
+struct FMars_Request_Tumbler_Readopt
 {
     UPROPERTY()
-    EMars_Tumbler_Loading Loading = EMars_Tumbler_Loading::Idle;
+    FMars_CookingFeed_PieceId PieceId;
 
-    FMars_Request_Tumbler_SetLoading() {}
-
-    FMars_Request_Tumbler_SetLoading(EMars_Tumbler_Loading InLoading)
-    {
-        Loading = InLoading;
-    }
-}
-
-// One released piece to admit, answered by OnPieceAdmission. Accepted only with the drum body in the simulation, the hatch
-// Open, the drum Home, no piece with that Id and fewer than Drum.Capacity pieces in. The piece's body starts at the
-// release's pose and velocities.
-struct FMars_Request_Tumbler_AddPiece
-{
     UPROPERTY()
-    FMars_CookingFeed_Release Release;
+    FCk_Handle_FoodPiece Piece;
 
-    FMars_Request_Tumbler_AddPiece() {}
+    FMars_Request_Tumbler_Readopt() {}
 
-    FMars_Request_Tumbler_AddPiece(FMars_CookingFeed_Release InRelease)
+    FMars_Request_Tumbler_Readopt(FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
     {
-        Release = InRelease;
+        PieceId = InPieceId;
+        Piece = InPiece;
     }
 }
 
@@ -725,9 +719,9 @@ struct FMars_Request_Tumbler_Look
     }
 }
 
-// Applied Reset -> Cancel -> SetLoading -> AddPiece -> Release -> Press -> Look: a leave (Cancel) lands before anything the
-// same drain asks of the hand, the feed's busy edge is current before admission and before a press reads it, and a release
-// and a press sharing a drain end the old grip before the new press is judged.
+// Applied Reset -> Cancel -> the station's take-outs -> Readopt -> the station inbox's releases -> Release -> Press -> Look:
+// a leave (Cancel) lands before anything the same drain asks of the hand, a take-out frees its room before a release is
+// admitted, and a release and a press sharing a drain end the old grip before the new press is judged.
 struct FMars_Fragment_Tumbler_Requests
 {
     UPROPERTY()
@@ -737,10 +731,7 @@ struct FMars_Fragment_Tumbler_Requests
     TArray<FMars_Request_Tumbler_Cancel> CancelRequests;
 
     UPROPERTY()
-    TArray<FMars_Request_Tumbler_SetLoading> SetLoadingRequests;
-
-    UPROPERTY()
-    TArray<FMars_Request_Tumbler_AddPiece> AddPieceRequests;
+    TArray<FMars_Request_Tumbler_Readopt> ReadoptRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Tumbler_Release> ReleaseRequests;

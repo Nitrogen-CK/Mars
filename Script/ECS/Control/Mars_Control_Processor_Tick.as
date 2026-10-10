@@ -6,6 +6,7 @@
 class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Control_HandleRequests");
 
     // A hitch must not blow the spring up.
     private const float32 k_MaxStepSeconds = 0.1f;

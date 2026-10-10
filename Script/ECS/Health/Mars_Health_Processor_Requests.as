@@ -76,8 +76,6 @@ class UMars_Processor_Health_HandleRequests : UCk_Processor_Script_Base_UE
             if (Depleted == false)
             { continue; }
 
-            ck::Trace(f"[Health] [{Self.ToString()}] depleted by [{Request.Event.Amount}] [{Request.Event.DamageType.ToString()}]");
-
             if (Self.Has_Fragment(FMars_Fragment_Health_Signals))
             { Self.Get_Fragment(FMars_Fragment_Health_Signals).OnDepleted.Broadcast(Self, Request.Event); }
         }

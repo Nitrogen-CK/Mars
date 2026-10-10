@@ -31,13 +31,13 @@ class UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd : UMars_AutoTestRig_Crawler
     {
         SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 5.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 0);
         Add_Step("an attacker on team One with a DamageDealer stands 150 uu outside leg 0's foot", n"Step_AddAttacker");
-        Add_Step_WaitUntil("strike leg 0 through the shared sweep until it is severed", n"Check_StrikeUntilSevered", 0, 5.0f);
-        Add_Step_WaitUntil("the crawler flinched and roams again", n"Check_FlinchedThenRoams", 0, 4.0f);
+        Add_Step_WaitUntil("strike leg 0 through the shared sweep until it is severed", n"Check_StrikeUntilSevered", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the crawler flinched and roams again", n"Check_FlinchedThenRoams", k_SlowPolls, 0);
         Add_Step("two swept hits on leg 0's zone; body 100; three legs walk", n"Step_AssertEndToEnd");
-        Add_Step_WaitUntil("the severed limb died on its debris timer", n"Check_SeveredLegGone", 0, 3.0f);
+        Add_Step_WaitUntil("the severed limb died on its debris timer", n"Check_SeveredLegGone", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }
 

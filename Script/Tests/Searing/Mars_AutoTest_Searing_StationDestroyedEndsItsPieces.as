@@ -15,10 +15,10 @@ class UMars_AutoTest_Searing_StationDestroyedEndsItsPieces : UMars_AutoTestRig_S
         BuildStation(InHandle, Make_TestSpec());
         Build_Pieces(2);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("add two pieces", n"Step_AddTwo");
-        Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", 0, 3.0f);
+        Add_Step_WaitUntil("both pieces landed on the pan", n"Check_BothOnPan", k_SlowPolls, 0);
         Add_Step("the pieces are the world's; destroy the station", n"Step_DestroyStation");
         Add_Step_WaitFrames("the station's teardown runs", 2);
         Add_Step("both pieces ended with the station", n"Step_AssertPiecesEnded");

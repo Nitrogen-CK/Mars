@@ -22,9 +22,9 @@ class UMars_AutoTest_FPHands_FocusedInteractableDestroyedClearsLean : UMars_Auto
         _Interactable = utils_interactable::Create(AnchorTransform, FMars_Interactable_Spec());
 
         Add_Step("focus the interactable", n"Step_Focus");
-        Add_Step_WaitUntil("a glove leans toward it", n"Check_IsLeaning", 0, 5.0f);
+        Add_Step_WaitUntil("a glove leans toward it", n"Check_IsLeaning", k_SlowPolls, 0);
         Add_Step("destroy the focused interactable without an unfocus", n"Step_DestroyInteractable");
-        Add_Step_WaitUntil("the focus is dropped and the lean eases out", n"Check_LeanCleared", 0, 5.0f);
+        Add_Step_WaitUntil("the focus is dropped and the lean eases out", n"Check_LeanCleared", k_SlowPolls, 0);
         Add_Step("no focus target, no lean", n"Step_AssertCleared");
         Run_Steps(InHandle);
     }

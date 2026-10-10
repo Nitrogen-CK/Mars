@@ -87,7 +87,7 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
 // A RequiresFreeHands target while focused: its prompt reads utils_interactable::Get_HandsFullText while the focuser's
 // hands are full. Starting an interaction is refused by UMars_Interactable_FreeHandsPolicy, but the resolver only re-checks
 // it when dirtied, so when the hands fill this task re-offers the target to the focuser's resolver (remove + add, drained
-// in order): the re-resolve drops it from the best targets, and the resolver's consumers let go - the player's bridge
+// in order): the re-resolve drops it from the best targets, and the resolver's consumers let go - the player's Use task
 // cancels a live pull and the gloves release. A focuser without HeldItem binds nothing.
 class UMars_SmTask_Interactable_HandsGate : UCk_SmTask_EntityScript
 {
@@ -244,22 +244,46 @@ class UMars_SmTask_Interactable_Outline : UCk_SmTask_EntityScript
 }
 
 // Runs the target's InteractionStateClass as a sub-SM. The sub-SM's context is the InteractTarget; the sub-SM root is
-// stamped with a copy of the target's InteractionContext whose Initiator is the source of the interaction that started
-// this run (recorded by UMars_Processor_Interactable_Setup when it started).
+// stamped with a copy of the target's InteractionContext whose Initiator is who the work is for: the source of a WhileLive
+// target's live interaction, or the initiator of an AfterCompletion target's fresh completion (consumed here, so the work
+// runs once per finish). The stamp lands before the sub-SM's first state enters. Leaving Interacting while a WhileLive
+// interaction the sub-SM ran for is still live (a claim took the interactable out of focus, a teardown) ends it Failed:
+// its work did not finish.
 class UMars_SmTask_PerformInteractionSubSm : UCk_SmTask_SubStateMachine
 {
     default _InitialStateClass = UMars_SmState_InteractTarget_Enter;
     default _CompletionBehavior = ECk_SmTask_SubSm_CompletionBehavior::SucceedOnStop;
 
+    // Valid once the sub-SM was stamped for a WhileLive interaction.
+    private FCk_Handle_InteractTarget _WhileLiveTarget;
+    private FCk_Handle _Initiator;
+
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        _WhileLiveTarget = FCk_Handle_InteractTarget();
+        _Initiator = FCk_Handle();
+
         // The C++ EnterTask already spawned the sub-SM; catch the in-flight broadcast.
         auto TaskHandle = InHandle;
         TaskHandle.BindTo_OnSubSmConstructed(
             FCk_Delegate_SmTask_OnSubSmConstructed(this, n"OnSubSmConstructed"),
             ECk_Signal_BindingPolicy::FireIfPayloadInFlight,
             ECk_Signal_PostFireBehavior::Unbind);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_WhileLiveTarget) && ck::IsValid(_Initiator))
+        {
+            auto Interaction = utils_interact_target::TryGet_Interaction(_WhileLiveTarget, _Initiator);
+            if (ck::IsValid(Interaction))
+            { utils_interaction::Request_EndInteraction(Interaction, FCk_Request_Interaction_EndInteraction(ECk_SucceededFailed::Failed)); }
+        }
+
+        _WhileLiveTarget = FCk_Handle_InteractTarget();
+        _Initiator = FCk_Handle();
     }
 
     UFUNCTION()
@@ -274,18 +298,89 @@ class UMars_SmTask_PerformInteractionSubSm : UCk_SmTask_SubStateMachine
         if (ck::EnsureIfNot(ck::IsValid(TargetContext.Interactable), "InteractionContext is missing the Interactable handle"))
         { return; }
 
+        auto Target = TargetEntity.As_InteractTarget();
+        const auto Initiator = DoGet_Initiator(Target, TargetContext);
+
         // Stamped even when missing: the interaction's own state then fails on the invalid initiator.
-        const auto Initiator = TargetContext.Interactable.Get_InitiatorOn(TargetEntity);
         ck::EnsureIfNot(ck::IsValid(Initiator),
-            f"[Interactable] [{TargetEntity.ToString()}] runs an interaction with no recorded initiator");
+            f"[Interactable] [{TargetEntity.ToString()}] runs a [{TargetContext.Work :n}] interaction with no initiator to run it for");
+
+        if (TargetContext.Work == EMars_Interactable_Work::WhileLive)
+        {
+            _WhileLiveTarget = Target;
+            _Initiator = Initiator;
+        }
 
         auto& StampedContext = SubSm.AddOrGet_Fragment(FMars_Fragment_InteractionContext);
-        StampedContext.Interactable = TargetContext.Interactable;
-        StampedContext.InteractableOwner = TargetContext.InteractableOwner;
+        StampedContext = TargetContext;
         StampedContext.Initiator = Initiator;
-
-        const auto StateClass = utils_state_machine::Get_CurrentStateClass(SubSm);
-        const auto StateName = ck::IsValid(StateClass) ? StateClass.Get().GetName().ToString() : FString("- (not entered yet)");
-        ck::Trace(f"[Interactable SM] Interacting started sub-SM [{SubSm.ToString()}] running [{StateName}] for target [{TargetEntity.ToString()}] of [{TargetContext.InteractableOwner.ToString()}], initiator [{Initiator.ToString()}]");
     }
+
+    // A WhileLive target's live interaction's source; an AfterCompletion target's fresh completion's initiator, whose
+    // consume is queued here. Invalid when neither exists.
+    private FCk_Handle DoGet_Initiator(const FCk_Handle_InteractTarget& InTarget, const FMars_Fragment_InteractionContext& InContext)
+    {
+        if (InContext.Work == EMars_Interactable_Work::WhileLive)
+        {
+            const auto Interaction = utils_interactable::Get_LiveInteraction(InTarget, FCk_Handle_Interaction());
+            if (ck::Is_NOT_Valid(Interaction))
+            { return FCk_Handle(); }
+
+            return utils_interaction::Get_InteractionSource(Interaction);
+        }
+
+        auto Interactable = InContext.Interactable;
+        const auto Completion = Interactable.TryGet_FreshCompletion(InTarget);
+        if (Completion.IsSet() == false)
+        { return FCk_Handle(); }
+
+        Interactable.Request_ConsumeCompletion(FMars_Request_Interactable_ConsumeCompletion(Completion.GetValue().Serial));
+        return Completion.GetValue().Initiator;
+    }
+}
+
+// The per-interaction sub-SM's end: ends the WhileLive interaction its root was stamped for with Result, and a Failed end
+// whose work named why (utils_interactable::Record_FailReason) reports it (OnInteractionFailed). An AfterCompletion
+// target's interaction ended before the sub-SM ran: nothing to end. Subclasses only set Result.
+UCLASS(Abstract)
+class UMars_SmTask_EndInteraction : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
+
+    protected ECk_SucceededFailed Result = ECk_SucceededFailed::Succeeded;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        FCk_Handle OwningSm = Get_OwningStateMachine();
+        auto Interaction = utils_interactable::TryGet_StampedInteraction(Get_StateMachineContext(), OwningSm);
+        if (ck::Is_NOT_Valid(Interaction))
+        { return; }
+
+        utils_interaction::Request_EndInteraction(Interaction, FCk_Request_Interaction_EndInteraction(Result));
+
+        if (Result == ECk_SucceededFailed::Failed)
+        { Report_FailReason(OwningSm); }
+    }
+
+    private void Report_FailReason(const FCk_Handle& InOwningSm)
+    {
+        const auto Context = InOwningSm.Get_Fragment(FMars_Fragment_InteractionContext);
+        if (Context.FailReason.IsSet() == false)
+        { return; }
+
+        auto Interactable = Context.Interactable;
+        Interactable.Request_ReportFailure(FMars_Request_Interactable_ReportFailure(
+            Get_StateMachineContext().As_InteractTarget(), Context.Initiator, Context.FailReason.GetValue()));
+    }
+}
+
+class UMars_SmTask_EndInteraction_Succeeded : UMars_SmTask_EndInteraction
+{
+    default Result = ECk_SucceededFailed::Succeeded;
+}
+
+class UMars_SmTask_EndInteraction_Failed : UMars_SmTask_EndInteraction
+{
+    default Result = ECk_SucceededFailed::Failed;
 }

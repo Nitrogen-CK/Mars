@@ -1,7 +1,7 @@
-// Drains Retarget, the last one in a drain winning: the spec takes its targets and tuners and the tracker starts over as Add
-// leaves it (Apart on every new target, no contact yet, hops and apart time zeroed). The body's contact bindings stay as the
-// Setup processor made them: the body is this entity's own, and the contact handler looks the other entity up in the spec
-// current at the contact. A tracker that was Resting reports its Apart edge.
+// Drains Retarget, the last one in a drain winning: the state takes its targets and tuners and the tracker starts over as
+// Add leaves it (Apart on every new target, no contact yet, hops and apart time zeroed). The body's contact bindings stay as
+// the Setup processor made them: the body is this entity's own, and the contact handler looks the other entity up in the
+// targets current at the contact. A tracker that was Resting reports its Apart edge.
 class UMars_Processor_Resting_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -33,10 +33,7 @@ class UMars_Processor_Resting_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto WasResting = InState.State == EMars_Resting_State::Resting;
-        Self.Get_Fragment(FMars_Fragment_Resting_Params).Spec = Spec;
-        InState = utils_resting::Make_State(InHandle.As_JoltBody(), Spec.Targets.Num());
-
-        ck::Trace(f"[Resting] [{Self.ToString()}] retargeted onto {Spec.Targets.Num()} target(s), apart");
+        InState = utils_resting::Make_State(InHandle.As_JoltBody(), Spec);
 
         if (WasResting && Self.Has_Fragment(FMars_Fragment_Resting_Signals))
         { Self.Get_Fragment(FMars_Fragment_Resting_Signals).OnRestingChanged.Broadcast(Self, EMars_Resting_State::Apart); }

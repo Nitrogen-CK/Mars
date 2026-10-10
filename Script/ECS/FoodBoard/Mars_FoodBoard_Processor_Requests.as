@@ -24,36 +24,60 @@ struct FMars_FoodBoard_CutCandidate
 struct FMars_FoodBoard_Drain
 {
     FCk_Handle_FoodBoard Board;
-    bool Cleared = false;
     TArray<FMars_Request_FoodBoard_ResolveCut> PieceCuts;
-    // The board was parted this drain: its pieces' moves land after it (FGroup_Transform).
-    bool Parted = false;
-    // Waiting chops (or a waiting sweep) were re-queued this drain: anything newer goes behind them.
-    bool Flushed = false;
+    // The board's pieces were moved this drain (a parting or a turn): their moves land after it (FGroup_Transform), so a
+    // cut or a turn behind them waits for the next pass.
+    bool Moved = false;
     TArray<FCk_Handle_FoodPiece> Placed;
     TArray<FMars_FoodBoard_PlaceRefused> Refused;
     TArray<FMars_FoodBoard_CutIssue> CutIssues;
     // The yaw of each applied Turn.
     TArray<float32> Turned;
     TArray<FCk_Handle_FoodPiece> Released;
+    // One per applied Release that let nothing go.
+    TArray<EMars_FoodBoard_ReleaseRefusal> ReleaseRefusals;
+    // One per release the station's inbox held, answered on the station's OnAdmission.
+    TArray<FMars_CookingFeed_AdmissionAnswer> Answers;
 }
 
-// Drains Clear -> ResolveCut -> (parting) -> Place -> Cut -> Turn -> Release, then broadcasts in that order. Pieces
-// destroyed elsewhere leave the ledger after the resolutions, so a cut source (destroyed by its own commit) is still found
-// by its ResolveCut. The board parts only when quiet (Apply_Parting). Chops never cut poses a parting is about to move:
-// while a parting is owed (a committed cut waits for others in flight) they wait on the board state; a drain that parted, or
-// re-queued waiting chops, hands this drain's chops to the next pass, behind the waiting ones. A sweep or a turn queued
-// with a chop that waits or moves on waits or moves on with it. A turn also waits while any cut is in flight (it would turn
-// a source under its blade), with every release behind it, until the board is quiet.
+// Why the queue's head did not apply this drain.
+enum EMars_FoodBoard_HeadWait
+{
+    // It applied: the queue moves on.
+    None,
+    // A cut in flight resolves it (its ResolveCut wakes the board).
+    CutInFlight,
+    // The pieces moved this drain: the next pass applies it.
+    PiecesMoved
+}
+
+// Drains ResolveCut -> (parting) -> Place (then the station inbox's releases, each a Place posed on the pile node and
+// answered on the station's OnAdmission) -> the queue, then broadcasts in that order. Pieces destroyed elsewhere leave the
+// ledger after the resolutions, so a cut source (destroyed by its own commit) is still found by its ResolveCut. The board
+// parts only when quiet (Apply_Parting). This drain's cuts, turns and releases join the queue in arrival order (the
+// station's take-outs, each a Release onto its tray, after them), and the queue applies from its head until an entry must
+// wait (EMars_FoodBoard_HeadWait): a cut while a parting is owed or once the pieces moved this drain, a turn while any cut
+// is in flight or once the pieces moved; everything behind a waiting entry waits with it. Turns that reach the head
+// together apply as one yaw of their sum, so two turns in one drain compose.
 //
-// It is also the board's only listener: every held piece's OnCutResolved (each becomes a ResolveCut on the board, drained
-// the same frame because RuntimeMesh resolves slices in FGroup_Gameplay; a Cut replaces the piece with its halves, any other
-// outcome leaves it whole and free for the next chop) and the board's own destruction (held pieces end with it; released
-// pieces live on). It never writes a FoodPiece fragment.
+// The board is the one owner of its pieces' lease facts: it stamps every piece it holds with the holder fact and its
+// pickup's Ledger claim (a whole food is a world item a hand could otherwise take off the board behind its back), and
+// removes the holder when it lets a piece go: the claim goes then for a piece let go where it lies, and only once it lands
+// for one it loads onto a tray (a refusal places it back on the board, claim and all).
+//
+// It is also the board's only listener: the station's inbox and take-outs (OnQueued wakes this drain), every held piece's
+// OnCutResolved (each becomes a ResolveCut on the board, drained the same frame because RuntimeMesh resolves slices in
+// FGroup_Gameplay; a Cut replaces the piece with its halves, any other outcome leaves it whole and free for the next chop),
+// the answers of every tray it loads (OnLoaded, OnLoadRefused) and the board's own destruction (held pieces end with it; a
+// piece it handed off lives on). The only FoodPiece fragment it writes is the holder fact.
 class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Cutting_Tick");
     default _MarkedDirtyBy = FMars_Fragment_FoodBoard_Requests;
+
+    // Above every Sequence: a request list whose entries are all merged.
+    private const int32 k_Exhausted = 2147483647;
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -68,18 +92,25 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         auto Drain = FMars_FoodBoard_Drain();
         Drain.Board = InHandle.As_FoodBoard();
 
-        const auto HasClear = InRequests.ClearRequests.Num() > 0;
         TArray<FMars_Request_FoodBoard_ResolveCut> ResolveCutRequests = InRequests.ResolveCutRequests;
         TArray<FMars_Request_FoodBoard_Place> PlaceRequests = InRequests.PlaceRequests;
-        TArray<FMars_Request_FoodBoard_Cut> CutRequests = InRequests.CutRequests;
-        TArray<FMars_Request_FoodBoard_Turn> TurnRequests = InRequests.TurnRequests;
-        TArray<FMars_Request_FoodBoard_Release> ReleaseRequests = InRequests.ReleaseRequests;
+        const TArray<FMars_FoodBoard_Op> Arrived = Make_Ops(InRequests);
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Drain.Board.Request_TryRemove(FMars_Fragment_FoodBoard_Requests);
 
-        if (HasClear)
-        { Apply_Clear(Drain, InState); }
+        Watch_Station(Drain.Board);
+        TArray<FMars_CookingFeed_Release> Inbox = utils_cooking_feed::Take_Inbox(InHandle);
+        TArray<FMars_Request_StationTakeOut> TakeOuts = utils_cooking_feed::Take_TakeOutRequests(InHandle);
+
+        InState.Queue.Append(Arrived);
+        for (const auto& TakeOut : TakeOuts)
+        {
+            auto Op = FMars_FoodBoard_Op();
+            Op.Kind = EMars_FoodBoard_OpKind::Release;
+            Op.Release = Make_TakeOutRelease(TakeOut);
+            InState.Queue.Add(Op);
+        }
 
         for (const auto& Request : ResolveCutRequests)
         { Apply_ResolveCut(Drain, InState, Request); }
@@ -87,38 +118,61 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         Drop_Gone(Drain, InState);
         Apply_Parting(Drain, InState);
 
-        // A cut that left nothing to part (it failed, or its source was cleared) still ends the wait of the turns.
-        if (InState.WaitingTurns.Num() > 0 && Get_IsQuiet(InState))
-        { Flush_Waiting(Drain, InState); }
-
         for (const auto& Request : PlaceRequests)
         { Apply_Place(Drain, InState, Request); }
 
-        const auto HasChops = CutRequests.Num() > 0 || InState.WaitingCuts.Num() > 0;
-        if (InState.Unparted.Num() > 0 && HasChops)
-        {
-            InState.WaitingCuts.Append(CutRequests);
-            InState.WaitingTurns.Append(TurnRequests);
-            InState.WaitingReleases.Append(ReleaseRequests);
-            if (CutRequests.Num() > 0)
-            { ck::Trace(f"[FoodBoard] [{Drain.Board.ToString()}] {CutRequests.Num()} chop(s) wait for the cuts in flight ({InState.WaitingCuts.Num()} waiting)"); }
-        }
-        else if ((Drain.Parted && CutRequests.Num() > 0) || Drain.Flushed)
-        {
-            auto& Next = Drain.Board.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
-            Next.CutRequests.Append(CutRequests);
-            Next.TurnRequests.Append(TurnRequests);
-            Next.ReleaseRequests.Append(ReleaseRequests);
-        }
-        else
-        {
-            for (const auto& Request : CutRequests)
-            { Apply_Cut(Drain, InState, Request); }
+        for (const auto& Release : Inbox)
+        { Apply_Admission(Drain, InState, Release); }
 
-            Apply_TurnsThenReleases(Drain, InState, TurnRequests, ReleaseRequests);
-        }
+        const auto Wait = Apply_Queue(Drain, InState);
+        if (Wait == EMars_FoodBoard_HeadWait::PiecesMoved)
+        { Drain.Board.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests); }
 
         Broadcast(Drain);
+    }
+
+    // This drain's cuts, turns and releases as queue entries in arrival order: each list is already in its own order, so
+    // the merge takes the lowest Sequence at the head of the three.
+    private TArray<FMars_FoodBoard_Op> Make_Ops(const FMars_Fragment_FoodBoard_Requests& InRequests) const
+    {
+        TArray<FMars_FoodBoard_Op> Ops;
+        auto Cut = 0;
+        auto Turn = 0;
+        auto Release = 0;
+        const auto Total = InRequests.CutRequests.Num() + InRequests.TurnRequests.Num() + InRequests.ReleaseRequests.Num();
+        while (Ops.Num() < Total)
+        {
+            const auto CutSequence = Cut < InRequests.CutRequests.Num() ? InRequests.CutRequests[Cut].Sequence : k_Exhausted;
+            const auto TurnSequence = Turn < InRequests.TurnRequests.Num() ? InRequests.TurnRequests[Turn].Sequence : k_Exhausted;
+            const auto ReleaseSequence = Release < InRequests.ReleaseRequests.Num() ? InRequests.ReleaseRequests[Release].Sequence : k_Exhausted;
+
+            auto Op = FMars_FoodBoard_Op();
+            if (CutSequence <= TurnSequence && CutSequence <= ReleaseSequence)
+            {
+                Op.Kind = EMars_FoodBoard_OpKind::Cut;
+                Op.Cut = InRequests.CutRequests[Cut];
+                Op.Sequence = CutSequence;
+                ++Cut;
+            }
+            else if (TurnSequence <= ReleaseSequence)
+            {
+                Op.Kind = EMars_FoodBoard_OpKind::Turn;
+                Op.Turn = InRequests.TurnRequests[Turn];
+                Op.Sequence = TurnSequence;
+                ++Turn;
+            }
+            else
+            {
+                Op.Kind = EMars_FoodBoard_OpKind::Release;
+                Op.Release = InRequests.ReleaseRequests[Release];
+                Op.Sequence = ReleaseSequence;
+                ++Release;
+            }
+
+            Ops.Add(Op);
+        }
+
+        return Ops;
     }
 
     // Quiet: no cut the board submitted is in flight and no parting is owed.
@@ -136,34 +190,72 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         return true;
     }
 
-    // Turns apply only on a quiet board (this drain's chops included), and nothing overtakes a waiting turn: while one waits,
-    // the new turns and the releases queue behind it.
-    private void Apply_TurnsThenReleases(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState,
-                                         const TArray<FMars_Request_FoodBoard_Turn>& InTurns,
-                                         const TArray<FMars_Request_FoodBoard_Release>& InReleases)
+    // Applies the queue from its head until an entry must wait; returns why it stopped (None: the queue is empty).
+    private EMars_FoodBoard_HeadWait Apply_Queue(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
     {
-        const auto MustWait = InState.WaitingTurns.Num() > 0 || (InTurns.Num() > 0 && Get_IsQuiet(InState) == false);
-        if (MustWait)
+        while (InState.Queue.Num() > 0)
         {
-            InState.WaitingTurns.Append(InTurns);
-            InState.WaitingReleases.Append(InReleases);
-            ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] {InState.WaitingTurns.Num()} turn(s) wait for the cuts in flight");
-            return;
+            const auto Head = InState.Queue[0];
+            if (Head.Kind == EMars_FoodBoard_OpKind::Release)
+            {
+                InState.Queue.RemoveAt(0);
+                Apply_Release(InDrain, InState, Head.Release);
+                continue;
+            }
+
+            const auto Wait = Get_HeadWait(InDrain, InState, Head.Kind);
+            if (Wait != EMars_FoodBoard_HeadWait::None)
+            { return Wait; }
+
+            if (Head.Kind == EMars_FoodBoard_OpKind::Cut)
+            {
+                InState.Queue.RemoveAt(0);
+                Apply_Cut(InDrain, InState, Head.Cut);
+                continue;
+            }
+
+            Apply_Turns(InDrain, InState);
         }
 
-        for (const auto& Request : InTurns)
-        { Apply_Turn(InDrain, InState, Request); }
-
-        for (const auto& Request : InReleases)
-        { Apply_Release(InDrain, InState, Request); }
+        return EMars_FoodBoard_HeadWait::None;
     }
 
-    // Every held piece turns about the pivot on the world's vertical axis, location and rotation together. The location moves
-    // by an offset (as the parting does), so a parting move still landing composes with it.
-    private void Apply_Turn(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, const FMars_Request_FoodBoard_Turn& InRequest)
+    // A cut cuts the parted poses as they will be seen (no parting owed, nothing moved this drain); a turn turns only a
+    // quiet board's pieces as they stand.
+    private EMars_FoodBoard_HeadWait Get_HeadWait(const FMars_FoodBoard_Drain& InDrain, const FMars_Fragment_FoodBoard& InState,
+        EMars_FoodBoard_OpKind InKind) const
     {
-        const auto Pivot = InRequest.PivotWorld.GetLocation();
-        const auto Yaw = FQuat(FVector::UpVector, Math::DegreesToRadians(float64(InRequest.YawDegrees)));
+        const auto IsBlocked = InKind == EMars_FoodBoard_OpKind::Turn ? Get_IsQuiet(InState) == false : InState.Unparted.Num() > 0;
+        if (IsBlocked)
+        { return EMars_FoodBoard_HeadWait::CutInFlight; }
+
+        if (InDrain.Moved)
+        { return EMars_FoodBoard_HeadWait::PiecesMoved; }
+
+        return EMars_FoodBoard_HeadWait::None;
+    }
+
+    // Every turn at the queue's head goes, as one yaw of their sum (each still answers with its own OnTurned).
+    private void Apply_Turns(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
+    {
+        auto DeltaDegrees = 0.0f;
+        while (InState.Queue.Num() > 0 && InState.Queue[0].Kind == EMars_FoodBoard_OpKind::Turn)
+        {
+            const auto Turn = InState.Queue[0].Turn;
+            InState.Queue.RemoveAt(0);
+            DeltaDegrees += Turn.DeltaDegrees;
+            InDrain.Turned.Add(Turn.DeltaDegrees);
+        }
+
+        Apply_Turn(InDrain, InState, DeltaDegrees);
+    }
+
+    // Every held piece turns about the pile node on the world's vertical axis, location and rotation together. The location
+    // moves by an offset (as the parting does).
+    private void Apply_Turn(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, float32 InDeltaDegrees)
+    {
+        const auto Pivot = InDrain.Board.Get_PileNodeWorld().GetLocation();
+        const auto Yaw = FQuat(FVector::UpVector, Math::DegreesToRadians(float64(InDeltaDegrees)));
 
         for (const auto& Piece : InState.Held)
         {
@@ -175,49 +267,22 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
             utils_transform::Request_SetRotation(PieceTransform, FCk_Request_Transform_SetRotation((Yaw * PieceWorld.GetRotation()).Rotator()));
         }
 
-        InDrain.Turned.Add(InRequest.YawDegrees);
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] turned {InState.Held.Num()} held piece(s) {InRequest.YawDegrees} degrees about {Pivot}");
-    }
-
-    // Held pieces are the board's to end; released ones are not. A chop still waiting has nothing left to cut: it knocks.
-    private void Apply_Clear(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
-    {
-        const TArray<FCk_Handle_FoodPiece> Held = InState.Held;
-        InState.Held.Empty();
-        InState.IsUntouched = true;
-        InState.Unparted.Empty();
-        InDrain.Cleared = true;
-
-        for (const auto& Piece : Held)
-        { utils_entity_lifetime::Request_DestroyEntity(Piece); }
-
-        for (int32 Index = 0; Index < InState.WaitingCuts.Num(); ++Index)
-        { InDrain.CutIssues.Add(FMars_FoodBoard_CutIssue()); }
-
-        const auto Knocked = InState.WaitingCuts.Num();
-        InState.WaitingCuts.Empty();
-        InState.WaitingTurns.Empty();
-        InState.WaitingReleases.Empty();
-
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] cleared: {Held.Num()} held piece(s) destroyed, {InState.Released.Num()} released kept, {Knocked} waiting chop(s) knocked");
+        InDrain.Moved = true;
     }
 
     // A cut that did not commit leaves its piece held and whole. A committed cut's halves take the source's index (positive
-    // first) and are stamped and watched like any held piece; its plane waits in Unparted for the board to go quiet. A source
-    // no longer held was cleared after its cut was submitted: nothing of that cut may reach the board.
+    // first) and are stamped and watched like any held piece; its plane waits in Unparted for the board to go quiet. Nothing
+    // removes a piece mid-cut (a release skips it, and a source destroyed by its own commit leaves the ledger only after its
+    // resolution), so a source the board no longer holds is a defect: it ensures and its halves are destroyed.
     private void Apply_ResolveCut(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState,
                                   const FMars_Request_FoodBoard_ResolveCut& InRequest)
     {
         if (InRequest.Outcome != EMars_FoodPiece_CutOutcome::Cut)
-        {
-            ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] [{InRequest.Source.ToString()}] cut {InRequest.Outcome :n}: it stays held, whole");
-            return;
-        }
+        { return; }
 
         const auto Index = utils_foodboard::Find_Piece(InState.Held, InRequest.Source);
-        if (Index < 0)
+        if (ck::EnsureIfNot(Index >= 0, f"[FoodBoard] [{InDrain.Board.ToString()}] the cut of [{InRequest.Source.ToString()}] committed after it left the board: nothing removes a piece mid-cut"))
         {
-            ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] the cut of [{InRequest.Source.ToString()}] committed after it left the board: its halves are destroyed");
             Destroy_Halves(InRequest);
             return;
         }
@@ -234,7 +299,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         auto Negative = InRequest.Negative;
         InState.Held[Index] = Positive;
         InState.Held.Insert(Negative, Index + 1);
-        InState.IsUntouched = false;
 
         Admit(InDrain.Board, Positive);
         Admit(InDrain.Board, Negative);
@@ -243,8 +307,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InRequest.Plane.IsSet())
         { Add_Unparted(InState, InRequest.Plane.GetValue()); }
-
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] [{InRequest.Source.ToString()}] cut into [{Positive.ToString()}] and [{Negative.ToString()}] ({InState.Held.Num()} held)");
     }
 
     // One entry per distinct plane: a chop that cut several pieces, or two chops along one plane, part the board once.
@@ -263,7 +325,7 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
     // away from each unparted plane on its centroid's side, the newest halves included, so each cut opens a gap and every
     // earlier gap keeps its width. Waiting for quiet is what makes a chop whose cuts commit over several frames (RuntimeMesh
     // slices two per frame) part once, and keeps every piece still at its blade until its own cut lands. Classifying by the
-    // pre-move poses is sound: no piece moves farther than a fraction of a gap. The chops that waited go next.
+    // pre-move poses is sound: no piece moves farther than a fraction of a gap. The queue's cuts and turns wait for the next pass.
     private void Apply_Parting(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
     {
         if (InState.Unparted.Num() == 0)
@@ -277,7 +339,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
 
         const TArray<FMars_FoodPiece_WorldPlane> Planes = InState.Unparted;
         InState.Unparted.Empty();
-        Flush_Waiting(InDrain, InState);
 
         const auto HalfSeparationCm = 0.5 * float(InDrain.Board.Get_Tuners().SeparationCm);
         if (HalfSeparationCm <= 0.0)
@@ -298,56 +359,65 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
             }
         }
 
-        InDrain.Parted = true;
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] parted along {Planes.Num()} cut plane(s) ({InState.Held.Num()} held)");
+        InDrain.Moved = true;
     }
 
-    // The waiting chops (and the turns and sweeps behind them) go back on the queue, oldest first, ahead of anything this
-    // drain adds; the next pass applies them, after the parting moves have landed.
-    private void Flush_Waiting(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
-    {
-        if (InState.WaitingCuts.Num() == 0 && InState.WaitingTurns.Num() == 0 && InState.WaitingReleases.Num() == 0)
-        { return; }
-
-        auto& Next = InDrain.Board.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
-        Next.CutRequests.Append(InState.WaitingCuts);
-        Next.TurnRequests.Append(InState.WaitingTurns);
-        Next.ReleaseRequests.Append(InState.WaitingReleases);
-
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] the board is quiet: {InState.WaitingCuts.Num()} waiting chop(s) and {InState.WaitingTurns.Num()} turn(s) go next");
-
-        InState.WaitingCuts.Empty();
-        InState.WaitingTurns.Empty();
-        InState.WaitingReleases.Empty();
-        InDrain.Flushed = true;
-    }
-
-    // A piece destroyed elsewhere is no longer the board's to cut, release or clear.
+    // A piece destroyed elsewhere is no longer the board's to cut or release.
     private void Drop_Gone(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
     {
-        const auto Dropped = Remove_Gone(InState.Held) + Remove_Gone(InState.Released);
-        if (Dropped > 0)
-        { ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] dropped {Dropped} piece(s) destroyed elsewhere"); }
+        Remove_Gone(InState.Held);
     }
 
     private void Apply_Place(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, const FMars_Request_FoodBoard_Place& InRequest)
     {
         auto Piece = InRequest.Piece;
-        const auto Refusal = Get_PlaceRefusal(InDrain.Board, Piece);
+        const auto Refusal = Try_Place(InDrain, InState, Piece);
         if (Refusal.IsSet())
+        { InDrain.Refused.Add(FMars_FoodBoard_PlaceRefused(Piece, Refusal.GetValue())); }
+    }
+
+    // A release from the station's inbox is a Place, its piece posed on the pile node in its food's layout once the board
+    // holds it (the feed's release only marks where the glove let go); answered either way. A release with no piece places
+    // nothing.
+    private void Apply_Admission(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, const FMars_CookingFeed_Release& InRelease)
+    {
+        auto Piece = InRelease.Piece;
+        if (ck::Is_NOT_Valid(Piece))
         {
-            ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] refused [{Piece.ToString()}]: {Refusal.GetValue() :n}");
-            InDrain.Refused.Add(FMars_FoodBoard_PlaceRefused(Piece, Refusal.GetValue()));
+            InDrain.Answers.Add(FMars_CookingFeed_AdmissionAnswer(InRelease.PieceId, EMars_CookingFeed_Admission::Rejected, "no piece to place on the board"));
             return;
         }
 
-        InState.IsUntouched = InState.Held.Num() == 0;
-        InState.Held.Add(Piece);
-        Admit(InDrain.Board, Piece);
-        Watch_Teardown(InDrain.Board);
-        InDrain.Placed.Add(Piece);
+        const auto Refusal = Try_Place(InDrain, InState, Piece);
+        if (Refusal.IsSet())
+        {
+            InDrain.Refused.Add(FMars_FoodBoard_PlaceRefused(Piece, Refusal.GetValue()));
+            InDrain.Answers.Add(FMars_CookingFeed_AdmissionAnswer(InRelease.PieceId, EMars_CookingFeed_Admission::Rejected,
+                f"the board refused it: {Refusal.GetValue() :n}"));
+            return;
+        }
 
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] placed [{Piece.ToString()}] ({InState.Held.Num()} held)");
+        const auto PoseWorld = InDrain.Board.Get_PoseOnPile(Piece);
+        FCk_Handle Entity = Piece;
+        auto PieceTransform = Entity.As_Transform();
+        utils_transform::Request_SetLocation(PieceTransform, FCk_Request_Transform_SetLocation(PoseWorld.GetLocation()));
+        utils_transform::Request_SetRotation(PieceTransform, FCk_Request_Transform_SetRotation(PoseWorld.Rotator()));
+        InDrain.Answers.Add(FMars_CookingFeed_AdmissionAnswer(InRelease.PieceId, EMars_CookingFeed_Admission::Accepted, ""));
+    }
+
+    // Holds InPiece, or answers why not.
+    private TOptional<EMars_FoodBoard_PlaceRefusal> Try_Place(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, FCk_Handle_FoodPiece& InPiece)
+    {
+        const auto Refusal = Get_PlaceRefusal(InDrain.Board, InPiece);
+        if (Refusal.IsSet())
+        { return Refusal; }
+
+        InState.Held.Add(InPiece);
+        Admit(InDrain.Board, InPiece);
+        utils_world_item::Request_ClaimPickup(InPiece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
+        Watch_Teardown(InDrain.Board);
+        InDrain.Placed.Add(InPiece);
+        return TOptional<EMars_FoodBoard_PlaceRefusal>();
     }
 
     private TOptional<EMars_FoodBoard_PlaceRefusal> Get_PlaceRefusal(const FCk_Handle_FoodBoard& InBoard, const FCk_Handle_FoodPiece& InPiece)
@@ -355,7 +425,8 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         if (Get_IsGone(InPiece))
         { return TOptional<EMars_FoodBoard_PlaceRefusal>(EMars_FoodBoard_PlaceRefusal::Gone); }
 
-        const auto Holder = InPiece.TryGet_FoodBoard();
+        // The holder fact, whichever ledger it names: a platter's or a pan's piece is refused as another board's is.
+        const auto Holder = InPiece.TryGet_Holder();
         if (Holder == InBoard)
         { return TOptional<EMars_FoodBoard_PlaceRefusal>(EMars_FoodBoard_PlaceRefusal::AlreadyHeld); }
 
@@ -398,8 +469,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         InDrain.CutIssues.Add(Issue);
-
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] chop: {Issue.Straddling} straddling, budget {Issue.Budget}, {Issue.Issued} cut(s) issued");
     }
 
     private TArray<FMars_FoodBoard_CutCandidate> Find_Candidates(const TArray<FCk_Handle_FoodPiece>& InHeld, const FMars_FoodPiece_WorldPlane& InPlane)
@@ -455,18 +524,12 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         return true;
     }
 
-    // Every held piece free to move leaves, in held order, until MaxPieces have left. A piece still cutting (or not Ready),
-    // or past the cap, stays held, so the halves of a cut in flight land on the board. Loose: the piece turns Dynamic (its own
-    // body, or a new convex body of its mesh and mass) with the board's release velocity, and moves to the end of Released; past
-    // MaxReleasedPieces the oldest released pieces are destroyed. Handoff: the piece is only let go, where it lies.
+    // Every held piece free to move leaves, in held order, until MaxPieces have left: let go where it lies (its Ledger claim
+    // released), or loaded onto the request's tray (the claim kept until it lands). A piece still cutting (or not Ready), or
+    // past the cap, stays held, so the halves of a cut in flight land on the board. A release that let nothing go is
+    // refused: NoRoom under a cap of zero, else NothingFree.
     private void Apply_Release(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, const FMars_Request_FoodBoard_Release& InRequest)
     {
-        const auto Tuners = InDrain.Board.Get_Tuners();
-        FCk_Handle BoardEntity = InDrain.Board;
-        const auto BoardWorld = utils_transform::Get_EntityCurrentTransform(BoardEntity.As_Transform());
-        const auto Velocity = BoardWorld.GetRotation().RotateVector(Tuners.Release.VelocityLocal);
-        const auto IsLoose = InRequest.Mode == EMars_FoodBoard_ReleaseMode::Loose;
-
         TArray<FCk_Handle_FoodPiece> StillHeld;
         auto ReleasedCount = 0;
         for (const auto& Held : InState.Held)
@@ -479,96 +542,70 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
                 continue;
             }
 
-            if (IsLoose)
-            {
-                const auto Pending = Loosen(Piece, Tuners.Release, Velocity);
-                if (Pending.IsSet())
-                { InState.PendingLoosens.Add(Pending.GetValue()); }
-
-                InState.Released.Add(Piece);
-            }
+            Let_Go(InDrain.Board, Piece);
+            if (ck::IsValid(InRequest.Tray))
+            { utils_cooking_feed::Send_ToTray(Piece, FMars_Fragment_StationLanding(InDrain.Board, FMars_CookingFeed_PieceId(), InRequest.Tray)); }
             else
-            { Let_Go(Piece); }
+            { utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable); }
 
             InDrain.Released.Add(Piece);
             ++ReleasedCount;
         }
 
         InState.Held = StillHeld;
+
+        if (ReleasedCount > 0 && ck::IsValid(InRequest.Tray))
+        { Watch_Tray(InRequest.Tray); }
+
         if (ReleasedCount > 0)
-        { InState.IsUntouched = false; }
+        { return; }
 
-        if (IsLoose == false)
-        {
-            ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] handed off {ReleasedCount} piece(s) ({StillHeld.Num()} still held)");
-            return;
-        }
-
-        const auto Destroyed = Trim_Released(InState, Tuners.MaxReleasedPieces);
-
-        ck::Trace(f"[FoodBoard] [{InDrain.Board.ToString()}] released {ReleasedCount} piece(s) at {Velocity} cm/s ({StillHeld.Num()} still held, {Destroyed} oldest released destroyed)");
+        const auto IsCappedAtZero = InRequest.MaxPieces.IsSet() && InRequest.MaxPieces.GetValue() <= 0;
+        InDrain.ReleaseRefusals.Add(IsCappedAtZero ? EMars_FoodBoard_ReleaseRefusal::NoRoom : EMars_FoodBoard_ReleaseRefusal::NothingFree);
     }
 
-    // A piece with its own body (a Kinematic one: the board refuses a Dynamic one) keeps it: it is asked to go Dynamic and,
-    // when there is a velocity to give, returns the pending entry UMars_Processor_FoodBoard_Loosen finishes once the switch
-    // has landed. A bodiless piece gets a new body, which takes the velocity once it is set up.
-    private TOptional<FMars_FoodBoard_PendingLoosen> Loosen(FCk_Handle_FoodPiece& InPiece, const FMars_FoodBoard_ReleaseTuners& InTuners, FVector InWorldVelocity)
-    {
-        FCk_Handle Entity = InPiece;
-        if (Entity.Is_JoltBody())
-        {
-            utils_jolt_body::Request_SetMotionType(Entity.As_JoltBody(), FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
-            Let_Go(InPiece);
-
-            if (InWorldVelocity.IsNearlyZero())
-            { return TOptional<FMars_FoodBoard_PendingLoosen>(); }
-
-            return TOptional<FMars_FoodBoard_PendingLoosen>(FMars_FoodBoard_PendingLoosen(InPiece, InWorldVelocity));
-        }
-
-        auto Body = utils_foodpiece::Add_Body(InPiece,
-            FMars_FoodPiece_BodyTuners(InTuners.CollisionProfileName, InTuners.Friction, InTuners.Restitution));
-
-        // Applied once the body is set up.
-        if (InWorldVelocity.IsNearlyZero() == false)
-        { utils_jolt_body::Request_SetLinearVelocity(Body, FCk_Request_JoltBody_SetLinearVelocity(InWorldVelocity)); }
-
-        const auto IsObserved = utils_jolt_body::TryPromise_OnSetupResolved(Body, FCk_Delegate_JoltBody_OnSetupResolved(this, n"OnReleasedBodySetupResolved"));
-        ck::EnsureIfNot(IsObserved, f"[FoodBoard] released piece [{InPiece.ToString()}] has a body whose setup cannot be observed");
-
-        Let_Go(InPiece);
-        return TOptional<FMars_FoodBoard_PendingLoosen>();
-    }
-
-    // The board stops watching the piece's cuts and no longer names it.
-    private void Let_Go(FCk_Handle_FoodPiece& InPiece)
+    // The board stops watching the piece's cuts and no longer names it, nor holds it.
+    private void Let_Go(const FCk_Handle_FoodBoard& InBoard, FCk_Handle_FoodPiece& InPiece)
     {
         InPiece.UnbindFrom_OnCutResolved(FMars_Delegate_FoodPiece_OnCutResolved(this, n"OnHeldPieceCutResolved"));
         InPiece.Request_TryRemove(FMars_Fragment_FoodBoard_Membership);
+        utils_foodpiece::Clear_Holder(InPiece, InBoard);
     }
 
-    private int32 Trim_Released(FMars_Fragment_FoodBoard& InState, int32 InMaxReleased)
-    {
-        auto Destroyed = 0;
-        while (InState.Released.Num() > InMaxReleased)
-        {
-            const auto Oldest = InState.Released[0];
-            InState.Released.RemoveAt(0);
-            utils_entity_lifetime::Request_DestroyEntity(Oldest);
-            ++Destroyed;
-        }
-
-        return Destroyed;
-    }
-
-    // Stamps InPiece as held by InBoard and watches its cuts.
+    // Stamps InPiece as held by InBoard (its membership and the holder fact) and watches its cuts.
     private void Admit(const FCk_Handle_FoodBoard& InBoard, FCk_Handle_FoodPiece& InPiece)
     {
         auto& Membership = InPiece.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Membership);
         Membership.Board = InBoard;
         Membership.PendingCutPlane.Reset();
+        utils_foodpiece::Stamp_Holder(InPiece, InBoard);
 
         InPiece.BindTo_OnCutResolved(FMars_Delegate_FoodPiece_OnCutResolved(this, n"OnHeldPieceCutResolved"));
+    }
+
+    // A take-out is the board's own Release onto its tray, capped at the room the press read: no tray caps it at none.
+    private FMars_Request_FoodBoard_Release Make_TakeOutRelease(const FMars_Request_StationTakeOut& InTakeOut) const
+    {
+        const auto MaxPieces = ck::IsValid(InTakeOut.Tray) ? InTakeOut.MaxPieces : 0;
+        return FMars_Request_FoodBoard_Release(TOptional<int32>(MaxPieces), InTakeOut.Tray);
+    }
+
+    // Unbinding first keeps the watch single across drains: the station's queue wakes this drain.
+    private void Watch_Station(const FCk_Handle_FoodBoard& InBoard)
+    {
+        FCk_Handle Station = InBoard;
+        utils_cooking_feed::UnbindFrom_OnQueued(Station, FMars_Delegate_StationAdmission_OnQueued(this, n"OnStationQueued"));
+        utils_cooking_feed::BindTo_OnQueued(Station, FMars_Delegate_StationAdmission_OnQueued(this, n"OnStationQueued"));
+    }
+
+    // Unbinding first keeps one binding per tray across take-outs.
+    private void Watch_Tray(const FCk_Handle_Platter& InTray)
+    {
+        auto Tray = InTray;
+        Tray.UnbindFrom_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));
+        Tray.UnbindFrom_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnTrayLoadRefused"));
+        Tray.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));
+        Tray.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnTrayLoadRefused"));
     }
 
     // Unbinding first keeps the watch single across placements.
@@ -626,9 +663,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto Board = InDrain.Board;
 
-        if (InDrain.Cleared && Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
-        { Board.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnCleared.Broadcast(Board); }
-
         for (const auto& Cut : InDrain.PieceCuts)
         {
             if (Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
@@ -647,6 +681,10 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
             { Board.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnPlaceRefused.Broadcast(Board, Refused.Piece, Refused.Refusal); }
         }
 
+        FCk_Handle Station = Board;
+        for (const auto& Answer : InDrain.Answers)
+        { utils_cooking_feed::Broadcast_Admission(Station, Answer); }
+
         for (const auto& Issue : InDrain.CutIssues)
         {
             if (Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
@@ -664,11 +702,17 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
             if (Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
             { Board.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnReleased.Broadcast(Board, Piece); }
         }
+
+        for (const auto Refusal : InDrain.ReleaseRefusals)
+        {
+            if (Board.Has_Fragment(FMars_Fragment_FoodBoard_Signals))
+            { Board.Get_Fragment(FMars_Fragment_FoodBoard_Signals).OnReleaseRefused.Broadcast(Board, Refusal); }
+        }
     }
 
-    // A held piece's cut resolved: every outcome reaches the board as a ResolveCut, drained after any Clear of the same drain
-    // (a Cut replaces the piece with its halves; any other outcome leaves it whole and free for the next chop, and may leave
-    // the board quiet enough to part). A board already being destroyed takes no halves.
+    // A held piece's cut resolved: every outcome reaches the board as a ResolveCut (a Cut replaces the piece with its halves;
+    // any other outcome leaves it whole and free for the next chop, and may leave the board quiet enough to part). A board
+    // already being destroyed takes no halves.
     UFUNCTION()
     private void OnHeldPieceCutResolved(FCk_Handle_FoodPiece InSource, FMars_FoodPiece_CutResult InResult)
     {
@@ -687,7 +731,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         {
             if (IsCut)
             {
-                ck::Trace(f"[FoodBoard] [{Source.ToString()}] was cut as its board went away: its halves are destroyed");
                 utils_entity_lifetime::Request_DestroyEntity(InResult.Positive);
                 utils_entity_lifetime::Request_DestroyEntity(InResult.Negative);
             }
@@ -703,8 +746,54 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         Requests.ResolveCutRequests.Add(FMars_Request_FoodBoard_ResolveCut(Source, InResult, PendingCutPlane));
     }
 
-    // Held pieces end with the board (under the world's transient entity they would outlive it); released pieces live on. The
-    // halves of a cut that committed after the board's last drain were never admitted, so they go too.
+    // The station queued a release or a take-out: the board drains it this frame.
+    UFUNCTION()
+    private void OnStationQueued(FCk_Handle InStation)
+    {
+        auto Station = InStation;
+        if (Station.Is_FoodBoard())
+        { Station.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests); }
+    }
+
+    // A piece the board loaded onto a tray landed there: the tray holds it now, and its pickup's Ledger claim goes.
+    UFUNCTION()
+    private void OnTrayLoaded(FCk_Handle_Platter InTray, FCk_Handle_FoodPiece InPiece)
+    {
+        const auto Landing = utils_cooking_feed::TryGet_Landing(InPiece, InTray);
+        if (Landing.IsSet() == false || Get_IsBoard(Landing.GetValue().Station) == false)
+        { return; }
+
+        auto Piece = InPiece;
+        utils_cooking_feed::Clear_Landing(Piece);
+        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable);
+    }
+
+    // A piece the board loaded onto a tray was refused: where it lies is where the board let it go, so placing it again puts
+    // it back on the board's books.
+    UFUNCTION()
+    private void OnTrayLoadRefused(FCk_Handle_Platter InTray, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal)
+    {
+        const auto Landing = utils_cooking_feed::TryGet_Landing(InPiece, InTray);
+        if (Landing.IsSet() == false || Get_IsBoard(Landing.GetValue().Station) == false)
+        { return; }
+
+        auto Piece = InPiece;
+        utils_cooking_feed::Clear_Landing(Piece);
+        auto Station = Landing.GetValue().Station;
+        auto Board = Station.As_FoodBoard();
+        Board.Request_Place(FMars_Request_FoodBoard_Place(Piece));
+    }
+
+    // A live board's station: a landing whose board is gone has nothing to go back to.
+    private bool Get_IsBoard(const FCk_Handle& InStation) const
+    {
+        return ck::IsValid(InStation)
+            && utils_entity_lifetime::Get_IsPendingDestroy(InStation, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false
+            && InStation.Is_FoodBoard();
+    }
+
+    // Held pieces end with the board (under the world's transient entity they would outlive it); a piece it handed off lives
+    // on. The halves of a cut that committed after the board's last drain were never admitted, so they go too.
     UFUNCTION()
     private void OnBoardBeginDestroy(FCk_Handle InBoard)
     {
@@ -716,7 +805,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Piece : Held)
         { utils_entity_lifetime::Request_DestroyEntity(Piece); }
 
-        auto Orphaned = 0;
         if (BoardEntity.Has_Fragment(FMars_Fragment_FoodBoard_Requests))
         {
             const TArray<FMars_Request_FoodBoard_ResolveCut> Pending = BoardEntity.Get_Fragment(FMars_Fragment_FoodBoard_Requests).ResolveCutRequests;
@@ -726,21 +814,7 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
                 { continue; }
 
                 Destroy_Halves(Request);
-                ++Orphaned;
             }
         }
-
-        ck::Trace(f"[FoodBoard] [{BoardEntity.ToString()}] destroyed: {Held.Num()} held piece(s) and {Orphaned} uncommitted cut(s) destroyed with it");
-    }
-
-    // A mesh Jolt cannot hull is a content defect, and there is no fallback shape; a body cancelled with its entity or world
-    // is not a defect.
-    UFUNCTION()
-    private void OnReleasedBodySetupResolved(FCk_Handle_JoltBody InBody, ECk_JoltBody_SetupState InState, ECk_JoltBody_SetupFailure InFailure)
-    {
-        if (InState != ECk_JoltBody_SetupState::Failed || InFailure == ECk_JoltBody_SetupFailure::Cancelled)
-        { return; }
-
-        ck::EnsureIfNot(false, f"[FoodBoard] released piece [{InBody.ToString()}] got no body: {InFailure :n} ({utils_jolt_body::Get_SetupDiagnostic(InBody)})");
     }
 }

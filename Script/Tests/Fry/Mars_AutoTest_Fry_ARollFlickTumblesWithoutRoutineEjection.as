@@ -8,9 +8,9 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
 
     private const float32 k_TapSeconds = 0.12f;
     private const float32 k_WatchSeconds = 1.5f;
+    // The watch ends on the first poll past k_WatchSeconds: a second of slack covers that poll on any lane.
+    private const float32 k_WatchSlackSeconds = 1.0f;
     private const float32 k_MinKick = 5.0f;
-    // How long the piece may take to float calmly over the dipped scoop after its release.
-    private const float32 k_CalmTimeoutSeconds = 8.0f;
     private const float32 k_CalmSpeed = 4.0f;
     private const float32 k_LipClearanceCm = 1.0f;
 
@@ -27,17 +27,17 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
         BuildStation(InHandle, Make_TestSpec());
         Build_Pieces(1);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("drive the skimmer", n"Step_Drive");
         Add_Step("dip it at its park", n"Step_Dip");
-        Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop reached the dip", n"Check_Dipped", k_SlowPolls, 0);
         Add_Step("release a piece over the dipped bowl", n"Step_ReleaseOverScoop");
-        Add_Step_WaitUntil("the piece floats calmly over the dipped lip", n"Check_FloatCalm", 0, k_CalmTimeoutSeconds);
+        Add_Step_WaitUntil("the piece floats calmly over the dipped lip", n"Check_FloatCalm", k_SlowPolls, 0);
         Add_Step("record its down face; carry (the flick's rise)", n"Step_FlickUp");
-        Add_Step_WaitUntil("the tap's length passed", n"Check_TapElapsed", 0, 1.0f);
+        Add_Step_WaitUntil("the tap's length passed", n"Check_TapElapsed", k_SlowPolls, 0);
         Add_Step("dip again (the flick's fall)", n"Step_FlickDown");
-        Add_Step_WaitUntil("1.5 s after the flick", n"Check_Watched", 0, k_WatchSeconds + 1.0f);
+        Add_Step_WaitUntil("1.5 s after the flick", n"Check_Watched", 0, k_WatchSeconds + k_WatchSlackSeconds);
         Add_Step("the scoop reached the piece; nothing was lost; the tumble traced", n"Step_AssertNoLoss");
         Run_Steps(InHandle);
     }

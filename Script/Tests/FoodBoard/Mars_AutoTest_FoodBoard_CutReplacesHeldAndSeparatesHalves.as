@@ -109,7 +109,6 @@ class UMars_AutoTest_FoodBoard_CutReplacesHeldAndSeparatesHalves : UMars_AutoTes
             && NegativeWorld.GetRotation().Equals(_SourceWorld.GetRotation(), 0.0001), "the halves keep the source's rotation");
 
         Assert_True(Math::Abs(Positive.Get_MassKg() + Negative.Get_MassKg() - _MassKg) <= 0.000000001, "the halves' masses sum to the source's");
-        Assert_False(_Board.Get_IsUntouched(), "a committed cut touches the board");
     }
 
     UFUNCTION()

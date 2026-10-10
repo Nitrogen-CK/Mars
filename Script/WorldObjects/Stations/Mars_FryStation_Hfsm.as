@@ -4,15 +4,17 @@
 // CookingFeed and Platter requests and registers the operator's legend rows.
 // The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a new generation for an idle
-//                                                 hand), StationFeed_Source,
-//                                                 StationFeed_Bridge (a release in flight lands),
-//                                                 StationFeed_TakeOutBridge (a take-out in flight lands), Fry_ResetOnEnter
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source,
+//                                                 StationFeed_Bridge (a release in flight lands: a transfer past its
+//                                                 grasp is committed, the feed's own rule), Fry_ResetOnEnter
 //                                                 (the skimmer parked and idle; the pieces stay in play)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Fry_DriveOnEnter (the skimmer is in hand), Fry_OperatorInput (Tick),
 //                                                 Fry_OperatorHints, StationFeed_Source, StationFeed_OperatorInput (Tick),
 //                                                 StationFeed_Bridge, StationFeed_OperatorHints,
-//                                                 StationFeed_TakeOutInput (Tick), StationFeed_TakeOutBridge
+//                                                 StationFeed_TakeOutInput (Tick)
+//
+// A piece the fryer hands back lands on the finished tray through the station's assembly (UMars_FeedStation_EntityScript),
+// whoever operates.
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grips and the Leave intent.
@@ -25,10 +27,8 @@ class UMars_SmState_Fry_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Fry_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
-        AddTask(InHandle, UMars_SmTask_StationFeed_ResetOnEnter);
         AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
-        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
         AddTask(InHandle, UMars_SmTask_Fry_ResetOnEnter);
     }
 }
@@ -49,13 +49,12 @@ class UMars_SmState_Fry_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
     }
 }
 
 // Parks, levels and idles the skimmer and zeroes the tally; the pieces stay where they are with their heat (the player's
-// food is theirs). Added after the feed's reset, so the generation bump comes first. No Fry on the context yet (the SM can
-// enter before the entity script composes it) = nothing to reset.
+// food is theirs). The feed is not reset with it: a transfer the last operator committed lands, and only a new source
+// starts a new attempt. No Fry on the context (a composition that failed and already ensured) = nothing to reset.
 class UMars_SmTask_Fry_ResetOnEnter : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -128,9 +127,7 @@ class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
         if (Sequence != _SeenLookSequence)
         {
             _SeenLookSequence = Sequence;
-            const auto Delta = _Intents.Get_LookDelta();
-            ck::Trace(f"[Fry] operator look {Delta}");
-            _Fry.Request_Look(FMars_Request_Fry_Look(Delta));
+            _Fry.Request_Look(FMars_Request_Fry_Look(_Intents.Get_LookDelta()));
         }
 
         const auto PrimaryFrame = _Intents.TryGet_IntentActivationFrame(GameplayTags::Mars_Intent_Interact_Primary);
@@ -155,8 +152,8 @@ class UMars_SmTask_Fry_OperatorInput : UCk_SmTask_EntityScript
 }
 
 // The operator's legend rows while operating, under owner key k_OwnerKey: "move the skimmer" (IA_Look) and the dip row
-// (IA_Interact_Primary), re-texted on every skim edge: "hold to dip · press over the basket to pour" while carrying,
-// "release to lift" while dipped, "pouring · release to level" while pouring. Registered once on enter (the display drains
+// (IA_Interact_Primary), re-texted on every skim edge: "hold to dip - press over the basket to pour" while carrying,
+// "release to lift" while dipped, "pouring - release to level" while pouring. Registered once on enter (the display drains
 // registers before unregisters, so the rows are re-texted, never re-registered). The batch's state is the station's world
 // label, not a row. An operator without a display (headless) gets no rows.
 class UMars_SmTask_Fry_OperatorHints : UCk_SmTask_EntityScript
@@ -219,8 +216,8 @@ class UMars_SmTask_Fry_OperatorHints : UCk_SmTask_EntityScript
         { return FText::FromString("release to lift"); }
 
         if (InSkim == EMars_Fry_Skim::Pour)
-        { return FText::FromString("pouring · release to level"); }
+        { return FText::FromString("pouring - release to level"); }
 
-        return FText::FromString("hold to dip · press over the basket to pour");
+        return FText::FromString("hold to dip - press over the basket to pour");
     }
 }

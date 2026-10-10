@@ -1,6 +1,7 @@
 namespace utils_world_item
 {
-    // The entity script composes the holder, body, pickup and visual first and hands their handles in through the Spec.
+    // The entity script composes the holder, body, pickup and visual first and hands their handles in through the Spec. The
+    // item is linked once the holder holds it (Add_Item).
     FCk_Handle_WorldItem Add(FCk_Handle& InHandle, FMars_WorldItem_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -33,6 +34,198 @@ namespace utils_world_item
         return InHandle.As_WorldItem();
     }
 
+    // The second half of Add, once the holder has seeded or adopted InItem: a Persistent world item links InItem to itself
+    // and stamps the item's back-link, so the item's moves reach this entity and its mount follows the inventory the item
+    // lives in (UMars_Processor_WorldItem_Reconcile). A Transient world item links nothing.
+    void Add_Item(FCk_Handle_WorldItem& InWorldItem, FCk_Handle_Item InItem)
+    {
+        if (ck::EnsureIfNot(ck::IsValid(InItem), f"[WorldItem] [{InWorldItem.ToString()}] has no item to link"))
+        { return; }
+
+        if (InWorldItem.Get_Persistence() != EMars_WorldItem_Persistence::Persistent)
+        { return; }
+
+        // The message is formatted whether or not the ensure fires: Get_Item reads an unset link as an invalid handle.
+        const auto IsLinked = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem).Item.IsSet();
+        if (ck::EnsureIfNot(IsLinked == false,
+            f"[WorldItem] [{InWorldItem.ToString()}] already links item [{InWorldItem.Get_Item().ToString()}], not [{InItem.ToString()}]"))
+        { return; }
+
+        auto Item = InItem;
+        if (Item.Has_PersistentWorldItem())
+        {
+            const auto Existing = Item.Get_PersistentWorldItem();
+            if (ck::EnsureIfNot(Existing == InWorldItem,
+                f"[WorldItem] Item [{Item.ToString()}] is already linked to world item [{Existing.ToString()}], not [{InWorldItem.ToString()}]"))
+            { return; }
+        }
+        else
+        {
+            auto Marker = FMars_Fragment_Item_PersistentWorldItem();
+            Marker.WorldItem = InWorldItem;
+            Item.Add_Fragment(Marker);
+        }
+
+        auto& State = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem);
+        State.Item = TOptional<FCk_Handle_Item>(Item);
+    }
+
+    // Marks InInventory as one whose Persistent items ride its lifetime owner as InMarker says. Called once, by whoever
+    // composes the inventory.
+    void Add_MountedInventory(FCk_Handle_Inventory_DataOnly& InInventory, FMars_Fragment_MountedInventory InMarker)
+    {
+        FCk_Handle InventoryEntity = InInventory;
+        InventoryEntity.Add_Fragment(InMarker);
+    }
+
+    // Where InWorldItem belongs, from the inventory its item lives in: its own holder -> World; the selected slot of the
+    // carrier's hotbar -> Held on the carrier's Hand at Presentation.Mounting.HeldOffset; any other inventory marked
+    // FMars_Fragment_MountedInventory -> Carried on its lifetime owner as the marker says. Unlinked (Transient, Visual, not
+    // yet seeded) -> World. The carrier is the inventory's lifetime owner and must publish the attach point.
+    FMars_WorldItem_Resolution Resolve_Target(const FCk_Handle_WorldItem& InWorldItem)
+    {
+        auto Resolution = FMars_WorldItem_Resolution();
+        const auto& State = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem);
+        if (State.Item.IsSet() == false)
+        { return Resolution; }
+
+        const auto Item = State.Item.GetValue();
+        if (Get_IsEnding(Item))
+        {
+            Resolution.Placement = EMars_WorldItem_Placement::ItemGone;
+            return Resolution;
+        }
+
+        auto Inventory = Item.Get_ParentInventory();
+        Resolution.Inventory = Inventory;
+        FCk_Handle InventoryEntity = Inventory;
+        const FCk_Handle HolderEntity = State.Holder;
+        if (ck::IsValid(Inventory) && InventoryEntity == HolderEntity)
+        { return Resolution; }
+
+        if (ck::Is_NOT_Valid(Inventory))
+        {
+            Resolution.Placement = EMars_WorldItem_Placement::Unmountable;
+            return Resolution;
+        }
+
+        const auto Carrier = utils_entity_lifetime::Get_LifetimeOwner(InventoryEntity, ECk_PendingKill_Policy::IncludePendingKill);
+        if (Get_IsEnding(InventoryEntity) || Get_IsEnding(Carrier))
+        {
+            Resolution.Placement = EMars_WorldItem_Placement::CarrierGone;
+            return Resolution;
+        }
+
+        const UMars_ItemTrait_Presentation Presentation = TryGet_Presentation(InWorldItem);
+        if (ck::Is_NOT_Valid(Presentation))
+        {
+            Resolution.Placement = EMars_WorldItem_Placement::Unmountable;
+            return Resolution;
+        }
+
+        const auto& Mounting = Presentation.Mounting;
+        const auto Hotbar = Carrier.As_Hotbar(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Hotbar) && Hotbar.Get_SelectedItem() == Item)
+        {
+            Resolution.Target = FMars_WorldItem_MountTarget(EMars_WorldItem_Mount::Held, Carrier, GameplayTags::AttachPoint_Mars_Hand,
+                Mounting.HeldOffset);
+        }
+        else if (InventoryEntity.Has_Fragment(FMars_Fragment_MountedInventory))
+        {
+            const auto Marker = InventoryEntity.Get_Fragment(FMars_Fragment_MountedInventory);
+            auto Point = Marker.Point;
+            auto Offset = Marker.Offset;
+            if (Marker.Rule == EMars_WorldItem_MountRule::ItemCarryPoint)
+            {
+                Point = Mounting.CarryPoint;
+                Offset = Mounting.CarryOffset;
+            }
+            else if (Marker.Rule == EMars_WorldItem_MountRule::PointAtCargoOffset)
+            { Offset = Mounting.CargoOffset; }
+
+            Resolution.Target = FMars_WorldItem_MountTarget(EMars_WorldItem_Mount::Carried, Carrier, Point, Offset);
+        }
+        else
+        {
+            Resolution.Placement = EMars_WorldItem_Placement::Unmountable;
+            return Resolution;
+        }
+
+        const auto AttachPoints = Carrier.As_AttachPoints(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(AttachPoints) || AttachPoints.Has_AttachPoint(Resolution.Target.Point) == false)
+        { Resolution.Placement = EMars_WorldItem_Placement::Unmountable; }
+
+        return Resolution;
+    }
+
+    // The same mount: the same kind, carrier and point at the same offset (World has neither).
+    bool Get_IsSameMount(const FMars_WorldItem_MountTarget& InA, const FMars_WorldItem_MountTarget& InB)
+    {
+        if (InA.Mount != InB.Mount)
+        { return false; }
+
+        if (InA.Mount == EMars_WorldItem_Mount::World)
+        { return true; }
+
+        return InA.Carrier == InB.Carrier && InA.Point == InB.Point && InA.Offset.Equals(InB.Offset, 0.01);
+    }
+
+    // Invalid, or on its way out.
+    bool Get_IsEnding(const FCk_Handle& InEntity)
+    {
+        return ck::Is_NOT_Valid(InEntity) || utils_entity_lifetime::Get_IsPendingDestroy(InEntity, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+    }
+
+    // The World commit, called only by the WorldItem processors (a release's answer, and the reconcile's recovery): any
+    // pending mount and arrival dropped, detached keeping its world pose, the body Dynamic with its own profile
+    // (InOnProfileRestored records it) and InLaunch pending, the pickup's Mounted claim released, then OnMountChanged and
+    // OnMountSettled.
+    void Commit_World(FCk_Handle_WorldItem& InWorldItem, TOptional<FMars_Fragment_WorldItem_PendingLaunch> InLaunch,
+                      FCk_Delegate_Request_OnCompleted InOnProfileRestored)
+    {
+        InWorldItem.Request_TryRemove(FMars_Fragment_WorldItem_PendingMount);
+        InWorldItem.Request_TryRemove(FMars_Fragment_WorldItem_Arrival);
+
+        auto SceneNode = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(SceneNode))
+        { utils_scene_node::Request_Detach(SceneNode); }
+
+        auto& State = InWorldItem.Get_Fragment(FMars_Fragment_WorldItem);
+
+        // The launch processor waits for the body to read Dynamic before applying the velocity.
+        auto Body = State.Body;
+        if (ck::IsValid(Body))
+        {
+            utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
+            utils_jolt_body::Request_SetCollisionProfile(Body, FCk_Request_JoltBody_SetCollisionProfile(State.BodyProfile), InOnProfileRestored);
+
+            if (InLaunch.IsSet())
+            {
+                auto& Launch = InWorldItem.AddOrGet_Fragment(FMars_Fragment_WorldItem_PendingLaunch);
+                Launch.LinearVelocity = InLaunch.GetValue().LinearVelocity;
+                Launch.AngularVelocityDeg = InLaunch.GetValue().AngularVelocityDeg;
+                Launch.WaitedPasses = 0;
+            }
+        }
+
+        auto Pickup = State.Pickup;
+        if (ck::IsValid(Pickup))
+        { Pickup.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::Mounted)); }
+
+        const auto PrevMount = State.Committed.Mount;
+        State.Committed = FMars_WorldItem_MountTarget();
+
+        // State is not read past this line: a listener may add a fragment to the world item.
+        if (InWorldItem.Has_Fragment(FMars_Fragment_WorldItem_Signals) == false)
+        { return; }
+
+        if (PrevMount != EMars_WorldItem_Mount::World)
+        { InWorldItem.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountChanged.Broadcast(InWorldItem, PrevMount, EMars_WorldItem_Mount::World); }
+
+        if (InWorldItem.Has_Fragment(FMars_Fragment_WorldItem_Signals))
+        { InWorldItem.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountSettled.Broadcast(InWorldItem, EMars_WorldItem_Mount::World, FCk_Handle()); }
+    }
+
     // InSpec InElapsedSeconds after it was asked for: the delay shrinks first, then the travel (a travel already over
     // snaps in the next frame).
     FMars_WorldItem_ArriveSpec Get_ArriveSpecAfter(const FMars_WorldItem_ArriveSpec& InSpec, float32 InElapsedSeconds)
@@ -44,7 +237,8 @@ namespace utils_world_item
     }
 
     // A World-mode item tells a reach what its body spans and how many hands its Presentation takes it with. No
-    // Presentation: no hint (the gloves fall back to sockets or a point).
+    // Presentation: no hint (the gloves fall back to sockets or a point). A Presentation that fails Validate (no
+    // handedness) ensures and hints nothing.
     void Add_ReachHint(FCk_Handle& InHandle, const FMars_WorldItem_Spec& InSpec)
     {
         if (InSpec.Mode != EMars_WorldItem_Mode::World)
@@ -56,6 +250,10 @@ namespace utils_world_item
 
         const UMars_ItemTrait_Presentation Presentation = Definition.Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
         if (ck::Is_NOT_Valid(Presentation))
+        { return; }
+
+        const auto Validation = Presentation.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[WorldItem] [{InHandle.ToString()}] has a Presentation the gloves cannot hold: {Validation.Get_Error()}"))
         { return; }
 
         utils_reach_hint::Add(InHandle,
@@ -197,9 +395,10 @@ namespace utils_world_item
         return FTransform(Rot, Loc, Scale);
     }
 
-    // Switches the pickup of InEntity's world item: a ledger that holds an item's entity (a whole food on a board or in a
-    // pan) keeps a hand from taking it. An entity that is no World-mode world item has no pickup and needs nothing.
-    void Request_SetPickupEnableDisable(FCk_Handle InEntity, ECk_EnableDisable InEnableDisable)
+    // Claims (Disable) or releases (Enable) InReason on the pickup of InEntity's world item: a ledger that holds an item's
+    // entity (a whole food on a board or in a pan) keeps a hand from taking it until it lets go, whatever other claimant
+    // releases in between. An entity that is no World-mode world item has no pickup and needs nothing.
+    void Request_ClaimPickup(FCk_Handle InEntity, EMars_Interactable_DisableReason InReason, ECk_EnableDisable InEnableDisable)
     {
         if (InEntity.Is_WorldItem() == false)
         { return; }
@@ -208,7 +407,10 @@ namespace utils_world_item
         if (ck::Is_NOT_Valid(Pickup))
         { return; }
 
-        Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(InEnableDisable));
+        if (InEnableDisable == ECk_EnableDisable::Disable)
+        { Pickup.Request_Disable(FMars_Request_Interactable_Disable(InReason)); }
+        else
+        { Pickup.Request_Enable(FMars_Request_Interactable_Enable(InReason)); }
     }
 }
 
@@ -238,6 +440,17 @@ mixin FCk_Handle_Item Get_HeldItem(const FCk_Handle_WorldItem& Self)
 {
     const auto Holder = Self.Get_Holder();
     return Holder.Get_SoleItem();
+}
+
+// The item a Persistent world item is the body of, wherever it lives; invalid before its holder seeded or adopted it, and
+// for a Transient or Visual-mode world item.
+mixin FCk_Handle_Item Get_Item(const FCk_Handle_WorldItem& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_WorldItem);
+    if (State.Item.IsSet() == false)
+    { return FCk_Handle_Item(); }
+
+    return State.Item.GetValue();
 }
 
 // Invalid in Visual mode.
@@ -283,15 +496,14 @@ mixin EMars_WorldItem_Persistence Get_Persistence(const FCk_Handle_WorldItem& Se
 // The committed mount. Always World for a Transient item.
 mixin EMars_WorldItem_Mount Get_Mount(const FCk_Handle_WorldItem& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_WorldItem).Mount;
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).Committed.Mount;
 }
 
-// The mount the item is committed to, or already moving toward (a PendingMount waiting for the body to read
-// Kinematic). Requests are validated against this, so a Carry and a Hold queued back to back are both legal.
+// The mount the item is committed to, or already moving toward (a PendingMount waiting for the body to read Kinematic).
 mixin EMars_WorldItem_Mount Get_TargetMount(const FCk_Handle_WorldItem& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_WorldItem_PendingMount))
-    { return Self.Get_Fragment(FMars_Fragment_WorldItem_PendingMount).Mount; }
+    { return Self.Get_Fragment(FMars_Fragment_WorldItem_PendingMount).Target.Mount; }
 
     return Self.Get_Mount();
 }
@@ -299,7 +511,23 @@ mixin EMars_WorldItem_Mount Get_TargetMount(const FCk_Handle_WorldItem& Self)
 // Valid while Carried / Held.
 mixin FCk_Handle Get_Carrier(const FCk_Handle_WorldItem& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_WorldItem).Carrier;
+    return Self.Get_Fragment(FMars_Fragment_WorldItem).Committed.Carrier;
+}
+
+// Landed: the committed mount is where the item's inventory says it belongs, with nothing pending (no mount waiting on the
+// body, no arrival in flight, no release waiting on its transfer). The one "landed" predicate; OnMountSettled reports the
+// moment it becomes true.
+mixin bool Get_IsSettled(const FCk_Handle_WorldItem& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_PendingMount) || Self.Has_Fragment(FMars_Fragment_WorldItem_Arrival)
+        || Self.Has_Fragment(FMars_Fragment_WorldItem_PendingRelease))
+    { return false; }
+
+    const auto Resolution = utils_world_item::Resolve_Target(Self);
+    if (Resolution.Placement != EMars_WorldItem_Placement::Resolved)
+    { return false; }
+
+    return utils_world_item::Get_IsSameMount(Resolution.Target, Self.Get_Fragment(FMars_Fragment_WorldItem).Committed);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -336,19 +564,13 @@ mixin FCk_Handle_Item Get_SoleItem(const FCk_Handle_Inventory_DataOnly& Self)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Requests (Persistent items only; UMars_Processor_WorldItem_HandleRequests validates the transition)
+// Requests (Persistent items only; UMars_Processor_WorldItem_HandleRequests validates them)
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_Carry(FCk_Handle_WorldItem& Self, const FMars_Request_WorldItem_Carry& InRequest)
+mixin void Request_ArriveNextMount(FCk_Handle_WorldItem& Self, const FMars_Request_WorldItem_ArriveNextMount& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Requests);
-    Requests.CarryRequests.Add(InRequest);
-}
-
-mixin void Request_Hold(FCk_Handle_WorldItem& Self, const FMars_Request_WorldItem_Hold& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Requests);
-    Requests.HoldRequests.Add(InRequest);
+    Requests.ArriveNextMountRequests.Add(InRequest);
 }
 
 mixin void Request_Release(FCk_Handle_WorldItem& Self, const FMars_Request_WorldItem_Release& InRequest)
@@ -373,4 +595,32 @@ mixin void UnbindFrom_OnMountChanged(FCk_Handle_WorldItem& Self, FMars_Delegate_
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnMountSettled(FCk_Handle_WorldItem& Self, FMars_Delegate_WorldItem_OnMountSettled InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Signals);
+    Fragment.OnMountSettled.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnMountSettled(FCk_Handle_WorldItem& Self, FMars_Delegate_WorldItem_OnMountSettled InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountSettled.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnReleaseRefused(FCk_Handle_WorldItem& Self, FMars_Delegate_WorldItem_OnReleaseRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Signals);
+    Fragment.OnReleaseRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnReleaseRefused(FCk_Handle_WorldItem& Self, FMars_Delegate_WorldItem_OnReleaseRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_WorldItem_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnReleaseRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

@@ -49,8 +49,6 @@ class UMars_Processor_HitZone_HandleRequests : UCk_Processor_Script_Base_UE
             if (ck::IsValid(Hurtbox))
             { utils_entity_lifetime::Request_DestroyEntity(Hurtbox); }
         }
-
-        ck::Trace(f"[HitZone] [{InZone.ToString()}] released [{Hurtboxes.Num()}] hurtboxes");
     }
 
     private void HandleHit(FCk_Handle_HitZone& InZone, const FMars_Request_HitZone_Hit& InRequest)

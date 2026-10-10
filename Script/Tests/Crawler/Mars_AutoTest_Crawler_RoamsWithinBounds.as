@@ -6,6 +6,11 @@ class UMars_AutoTest_Crawler_RoamsWithinBounds : UMars_AutoTestRig_Crawler
     default _TimeoutSeconds = 30.0f;
     default _Origin = FVector(150000.0, 80000.0, 600.0);
 
+    // The roam is recorded this long.
+    private const float32 k_RecordSeconds = 8.0f;
+    // The arrival the record also needs can come after it: one leg across RoamBounds at 120 uu/s, then a dwell.
+    private const float32 k_ArrivalSlackSeconds = 12.0f;
+
     private FBox _Bounds;
 
     private int32 _ArrivedCount = 0;
@@ -21,10 +26,10 @@ class UMars_AutoTest_Crawler_RoamsWithinBounds : UMars_AutoTestRig_Crawler
         _Bounds = FBox(_Origin - Half, _Origin + Half);
         SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed and its gait Ready", n"Check_GaitReady", 0, 10.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 5.0f);
+        Add_Step_WaitUntil("the crawler is composed and its gait Ready", n"Check_GaitReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", 0, 0);
         Add_Step("bind the navigator's OnArrived; start recording", n"Step_StartRecording");
-        Add_Step_WaitUntil("8 s of roaming recorded and an arrival seen", n"Check_Recorded", 0, 20.0f);
+        Add_Step_WaitUntil("8 s of roaming recorded and an arrival seen", n"Check_Recorded", 0, k_RecordSeconds + k_ArrivalSlackSeconds);
         Add_Step("the crawler roamed inside its bounds", n"Step_AssertRoamed");
         Run_Steps(InHandle);
     }
@@ -74,7 +79,7 @@ class UMars_AutoTest_Crawler_RoamsWithinBounds : UMars_AutoTestRig_Crawler
         const auto OutsideY = Math::Max(_Bounds.Min.Y - Location.Y, Location.Y - _Bounds.Max.Y);
         _WorstOutside = Math::Max(_WorstOutside, Math::Max(OutsideX, OutsideY));
 
-        Res.Set(System::GetGameTimeInSeconds() - _RecordStart >= 8.0 && _ArrivedCount > 0);
+        Res.Set(System::GetGameTimeInSeconds() - _RecordStart >= k_RecordSeconds && _ArrivedCount > 0);
     }
 
     UFUNCTION()

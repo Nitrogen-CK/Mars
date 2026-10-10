@@ -17,13 +17,13 @@ class UMars_AutoTest_Control_ThresholdInteractionFailingSettlesBack : UMars_Auto
         _Control.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnManipulationChanged"));
 
         Add_Step("start the interaction", n"Step_StartInteraction");
-        Add_Step_WaitUntil("the interaction exists", n"Check_HasInteraction", 0, 5.0f);
+        Add_Step_WaitUntil("the interaction exists", n"Check_HasInteraction", 0, 0);
         Add_Step("grip the lever", n"Step_BeginManipulation");
-        Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 5.0f);
-        Add_Step_WaitUntil("pull until the threshold ends the manipulation (the interaction is ended Failed in that frame)", n"Check_NudgeWhileGripped", 0, 5.0f);
-        Add_Step_WaitUntil("the interaction finishes", n"Check_AnyInteractionFinished", 0, 5.0f);
+        Add_Step_WaitUntil("the lever is gripped", n"Check_IsManipulating", 0, 0);
+        Add_Step_WaitUntil("pull until the threshold ends the manipulation (the interaction is ended Failed in that frame)", n"Check_NudgeWhileGripped", 0, 0);
+        Add_Step_WaitUntil("the interaction finishes", n"Check_AnyInteractionFinished", 0, 0);
         Add_Step("the interaction finished Failed, once, and nothing engaged", n"Step_AssertFailed");
-        Add_Step_WaitUntil("the Failed finish settles the handle back to rest", n"Check_SettledToRest", 0, 5.0f);
+        Add_Step_WaitUntil("the Failed finish settles the handle back to rest", n"Check_SettledToRest", k_SlowPolls, 0);
         Add_Step("the handle rests at the start pose", n"Step_AssertSettled");
         Run_Steps(InHandle);
     }

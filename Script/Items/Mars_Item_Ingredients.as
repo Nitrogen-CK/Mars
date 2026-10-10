@@ -10,6 +10,7 @@ asset Mars_ItemDef_Truffle of UCk_InventoryItem_Definition
     Presentation.Visual.MeshScale = FVector(0.28, 0.28, 0.22);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -25,6 +26,7 @@ asset Mars_ItemDef_Root of UCk_InventoryItem_Definition
     Presentation.Visual.MeshScale = FVector(0.12, 0.12, 0.45);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.Grip.Shape = EMars_FPHands_GripShape::Capsule;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -39,6 +41,7 @@ asset Mars_ItemDef_Salt of UCk_InventoryItem_Definition
     Presentation.Visual.Mesh = engine::Cube();
     Presentation.Visual.MeshScale = FVector(0.25, 0.2, 0.2);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -53,6 +56,7 @@ asset Mars_ItemDef_Fungus of UCk_InventoryItem_Definition
     Presentation.Visual.Mesh = engine::Cone();
     Presentation.Visual.MeshScale = FVector(0.3, 0.3, 0.25);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -70,6 +74,7 @@ asset Mars_ItemDef_Peppercorns of UCk_InventoryItem_Definition
     Presentation.Visual.MeshScale = FVector(0.18, 0.18, 0.18);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -85,6 +90,7 @@ asset Mars_ItemDef_Fig of UCk_InventoryItem_Definition
     Presentation.Visual.MeshScale = FVector(0.22, 0.22, 0.28);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -101,6 +107,7 @@ asset Mars_ItemDef_BellnutKernel of UCk_InventoryItem_Definition
     Presentation.Visual.MeshScale = FVector(0.15, 0.15, 0.15);
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -118,6 +125,7 @@ asset Mars_ItemDef_Bellnut of UCk_InventoryItem_Definition
     Presentation.Visual.MaterialOverride = TSoftObjectPtr<UMaterialInterface>(assets::ProtoGrid_Item_Mars_MI().ToSoftObjectPath());
     Presentation.Grip.Shape = EMars_FPHands_GripShape::Sphere;
     Presentation.WorldItem.ScriptClass = UMars_WorldItem_Husk_EntityScript;
+    Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));

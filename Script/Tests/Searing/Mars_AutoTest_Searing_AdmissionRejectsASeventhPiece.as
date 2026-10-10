@@ -15,10 +15,10 @@ class UMars_AutoTest_Searing_AdmissionRejectsASeventhPiece : UMars_AutoTestRig_S
         BuildStation(InHandle, Spec);
         Build_Pieces(2);
 
-        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("release two different pieces", n"Step_ReleaseTwo");
-        Add_Step_WaitUntil("both releases were answered", n"Check_Answered2", 0, 1.0f);
+        Add_Step_WaitUntil("both releases were answered", n"Check_Answered2", 0, 0);
         Add_Step_WaitFrames("anything made would show", 2);
         Add_Step("the first is accepted, the one past MaxPieces rejected", n"Step_AssertLimit");
         Run_Steps(InHandle);

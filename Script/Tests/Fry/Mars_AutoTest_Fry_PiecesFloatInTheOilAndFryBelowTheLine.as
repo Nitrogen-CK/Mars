@@ -7,6 +7,8 @@ class UMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine : UMars_AutoTestR
     default _TimeoutSeconds = 15.0f;
 
     private const float32 k_GoldenSeconds = 1.0f;
+    // The clock ends on the first poll past twice GoldenSeconds: the slack covers that poll on any lane.
+    private const float32 k_ClockSlackSeconds = 2.0f;
     // Clear of each other and of the parked scoop's footprint, inside the pot.
     private const FVector2D k_SpotA = FVector2D(-20.0, 0.0);
     private const FVector2D k_SpotB = FVector2D(0.0, -22.0);
@@ -25,12 +27,12 @@ class UMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine : UMars_AutoTestR
         BuildStation(InHandle, Spec);
         Build_Pieces(3);
 
-        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 3.0f);
-        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 3.0f);
+        Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
+        Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("release three pieces just above the oil", n"Step_Release");
-        Add_Step_WaitUntil("all three float in the oil", n"Check_AllInOil", 0, 3.0f);
+        Add_Step_WaitUntil("all three float in the oil", n"Check_AllInOil", k_SlowPolls, 0);
         Add_Step("start the clock", n"Step_StartClock");
-        Add_Step_WaitUntil("twice GoldenSeconds in the oil", n"Check_TwiceGolden", 0, 4.0f);
+        Add_Step_WaitUntil("twice GoldenSeconds in the oil", n"Check_TwiceGolden", 0, 2.0f * k_GoldenSeconds + k_ClockSlackSeconds);
         Add_Step("down faces golden, up faces pale, each reported once", n"Step_AssertFloatFried");
         Run_Steps(InHandle);
     }

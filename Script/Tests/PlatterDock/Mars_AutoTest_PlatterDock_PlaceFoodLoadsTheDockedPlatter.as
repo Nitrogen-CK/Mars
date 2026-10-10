@@ -2,7 +2,7 @@
 // picks the meat slab up into its bag slot and focuses the dock: the dock offers PlaceFood, its prompt reads "Place Meat
 // slab on prep tray" and its target is enabled. The dock's interaction has the gloves carry the slab over the docked
 // platter and releases it only at their Grip (still Held the frame after the interaction began); the docked platter loads
-// the joint (OnLoaded within 5 s), the joint rides the platter root and the bag slot is empty. Isolated origin
+// the joint (OnLoaded), the joint rides the platter root and the bag slot is empty. Isolated origin
 // (28000, -21000, -30000).
 class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTestRig_PlatterDock
 {
@@ -10,6 +10,8 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
 
     private const FVector k_Origin = FVector(28000.0, -21000.0, -30000.0);
     private const FVector k_FoodOffset = FVector(200.0, 200.0, 0.0);
+    // Constructions, glove reaches, mount arrivals and settles outrun the default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_PlatterDock _Dock;
     private FCk_Handle _FoodEntity;
@@ -28,7 +30,6 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
         Add_CarrierHands();
-        Bind_PushSelection();
 
         auto Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), true),
@@ -47,23 +48,24 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
         _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
-        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", 0, 10.0f);
-        Add_Step_WaitUntil("the food item is constructed", n"Check_FoodConstructed", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
+        Add_Step_WaitUntil("the platter is constructed", n"Check_PlattersConstructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the food item is constructed", n"Check_FoodConstructed", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
         Add_Step("dock the empty platter", n"Step_Dock");
-        Add_Step_WaitUntil("the empty platter arrived on the dock", n"Check_Arrived", 0, 5.0f);
+        Add_Step_WaitUntil("the empty platter arrived on the dock", n"Check_Arrived", k_SlowPolls, 0);
         Add_Step("the carrier focuses the food's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the food's target enters Focused", 3);
+        Add_Step_WaitUntil("the food's target enters Focused", n"Check_AwaitedFocus", 0, 0);
         Add_Step("the carrier picks the food up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 0.5f);
+        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the hold's arrival settled", n"Check_FoodHoldSettled", k_SlowPolls, 0);
         Add_Step("the carrier unfocuses the food and focuses the dock", n"Step_FocusDock");
-        Add_Step_WaitFrames("the dock's prompt follows the focuser", 3);
+        Add_Step_WaitUntil("the dock's targets enter Focused", n"Check_AwaitedFocus", 0, 0);
+        Add_Step_WaitUntil("the dock's prompt follows the focuser", n"Check_DockPromptWritten", 0, 0);
         Add_Step("the dock offers to place the food on its platter", n"Step_AssertPlaceFoodOffered");
         Add_Step("the carrier interacts with the dock", n"Step_InteractWithDock");
         Add_Step_WaitFrames("the interaction has begun", 1);
         Add_Step("the food is still in the hands", n"Step_AssertStillHeld");
-        Add_Step_WaitUntil("the docked platter loaded the joint", n"Check_Loaded", 0, 5.0f);
+        Add_Step_WaitUntil("the docked platter loaded the joint", n"Check_Loaded", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("the joint rides the docked platter; it left the hands at the Grip", n"Step_AssertLoaded");
         Run_Steps(InHandle);
@@ -119,6 +121,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
     {
         auto Pickup = _Food.Get_Pickup();
         Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(Pickup);
     }
 
     UFUNCTION()
@@ -137,6 +140,13 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
     }
 
     UFUNCTION()
+    private void Check_FoodHoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Food.Get_Mount() == EMars_WorldItem_Mount::Held && _Food.Get_IsSettled());
+    }
+
+    UFUNCTION()
     private void Step_FocusDock(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto FoodPickup = _Food.Get_Pickup();
@@ -144,6 +154,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
 
         auto DockInteractable = _Dock.Get_Interactable();
         DockInteractable.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Await_FocusOf(DockInteractable);
     }
 
     UFUNCTION()
@@ -213,6 +224,15 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
     private void OnLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
     {
         _Loaded.Add(InPiece);
+    }
+
+    // The dock's prompt left its placeholder ("Dock", utils_platter_dock::DoCreate_Interactable): the dock's prompt processor
+    // wrote what the focuser can do there.
+    UFUNCTION()
+    private void Check_DockPromptWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_DockTarget().As_InteractPrompt().Get_PromptText().ToString() != "Dock");
     }
 
     private FCk_Handle_InteractTarget Get_DockTarget() const

@@ -21,12 +21,12 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UMars_AutoTest
         BuildOwner(InHandle);
         Add_HandsSm();
 
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("request a timed reach for the owner's interactable", n"Step_RequestTimedReachForOwner");
-        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 5.0f);
+        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
         Add_Step("each glove has its own anchor, both are used, the left takes its own pose", n"Step_AssertPerHandAnchors");
         Add_Step("move node R to the Mover's end", n"Step_MoveR");
-        Add_Step_WaitUntil("the Mover reached its end", n"Check_MoverAtEnd", 0, 5.0f);
+        Add_Step_WaitUntil("the Mover reached its end", n"Check_MoverAtEnd", k_SlowPolls, 0);
         Add_Step_WaitSeconds("let the offset and the anchors refresh", 0.1f);
         Add_Step("the right anchor moved down 20, the left did not move", n"Step_AssertOnlyRightFollows");
         Run_Steps(InHandle);

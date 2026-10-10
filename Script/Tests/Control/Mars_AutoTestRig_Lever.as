@@ -5,6 +5,9 @@
 UCLASS(Abstract)
 class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling, for waits on a glove reach or on the handle's tween back to rest.
+    protected const int32 k_SlowPolls = 900;
+
     protected FCk_Handle_Control _Control;
     protected FCk_Handle_Mover _Mover;
     protected FCk_Handle_Interactable _Interactable;

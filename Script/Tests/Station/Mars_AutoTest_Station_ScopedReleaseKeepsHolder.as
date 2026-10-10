@@ -18,11 +18,11 @@ class UMars_AutoTest_Station_ScopedReleaseKeepsHolder : UMars_AutoTestRig_Statio
         _Station.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnReleased"));
 
         Add_Step("reserve for operator A", n"Step_ReserveA");
-        Add_Step_WaitUntil("the station is reserved", n"Check_Reserved", 0, 2.0f);
+        Add_Step_WaitUntil("the station is reserved", n"Check_Reserved", 0, 0);
         Add_Step("release scoped to operator B", n"Step_ReleaseB");
         Add_Step_WaitSeconds("let the scoped release drain", 0.3f);
         Add_Step("operator A still holds the station; release scoped to operator A", n"Step_AssertKeptThenReleaseA");
-        Add_Step_WaitUntil("the station is released", n"Check_Released", 0, 2.0f);
+        Add_Step_WaitUntil("the station is released", n"Check_Released", 0, 0);
         Add_Step("A's release freed the station and cleared both ends", n"Step_AssertReleased");
         Run_Steps(InHandle);
     }

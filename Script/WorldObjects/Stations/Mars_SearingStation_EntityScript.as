@@ -5,12 +5,14 @@
 // of the pan. The Searing feature lives on the station entity and its own state machine (UMars_SmState_Searing_Idle)
 // reads the operator. Two platter docks sit on the table: the raw platter (left, -Y) the feed draws from and the finished
 // tray (right, +Y) the take-out fills. The pan starts empty: a CookingFeed on the same entity draws the pieces of the docked
-// raw platter, and its station-feed tasks turn the operator's add-food press into a left-hand transfer that this script
-// presents (the glove node the feed carries the real piece under; the hand reaches for the reserved piece where it lies) and whose
-// release the Searing kernel admits (the piece itself, wearing its own display, on a dynamic body). This script builds the
-// nodes and the docks and, every frame, dresses the pan, the oil and every piece's record from the Searing state. While
-// operating, the right glove holds the pan handle (riding the tilt and the toss) and the left follows the feed node,
-// resting in front of the raw platter between transfers.
+// raw platter, and its station-feed tasks turn the operator's add-food press into a left-hand transfer (the feed moves the
+// glove node it carries the real piece under; the hand reaches for the reserved piece where it lies) whose release lands
+// in the station's admission inbox and the Searing kernel admits (the piece itself, wearing its own display, on a dynamic
+// body); the kernel lands every piece it hands back on the docked finished tray and readopts one the tray refuses. The
+// base builds the feed's nodes and the docks and keeps the label; this script builds the pan and, every frame, dresses the
+// pan, the oil and every piece's record from the Searing state. While operating, the right glove holds the pan handle
+// (riding the tilt and the toss) and the left follows the feed node, resting in front of the raw platter between
+// transfers.
 //
 // Per piece: its own cook state (from that piece's face sears only, never another's), its own seared burst and its own oil
 // pool, sized from its own extents. The pan material has k_PoolSlots meat footprints and oil trails; the pieces
@@ -28,25 +30,11 @@ enum EMars_SearingStation_Pool
     Pooled
 }
 
-// The station's record of one admitted piece. The piece wears its own display; the station adds no part to it.
+// The station's record of one admitted piece: its display record and its pool.
 struct FMars_SearingStation_PieceVisual
 {
     UPROPERTY()
-    FMars_CookingFeed_PieceId Id;
-
-    UPROPERTY()
-    FCk_Handle Entity;
-
-    UPROPERTY()
-    FCk_Handle_FoodPiece Piece;
-
-    // This piece's look; a lost piece keeps its last one.
-    UPROPERTY()
-    FMars_CookState CookState;
-
-    // The look last sent to the piece's display.
-    UPROPERTY()
-    FMars_CookState Written;
+    FMars_Station_PieceDisplay Display;
 
     // Art cm in the pan mesh's frame (the pan material's units): where the piece last lay on the pan, and its oil trail
     // lagging that. A piece off the pan keeps both.
@@ -61,7 +49,7 @@ struct FMars_SearingStation_PieceVisual
     EMars_SearingStation_Pool Pool = EMars_SearingStation_Pool::None;
 }
 
-class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
+class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
 {
     default _ShowInPlaceActors = true;
 
@@ -72,29 +60,18 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_Implement_Spec Implement;
 
-    // The transfer's timing and release motion; its release node is set here. The stock is the feed's source platter.
-    UPROPERTY(ExposeOnSpawn)
-    FMars_CookingFeed_Spec Feed;
-
     // The raw platter brings meat (the pan admits up to its Supply.MaxPieces of it); the finished tray docks empty.
-    UPROPERTY(EditDefaultsOnly, Category = "Docks")
-    FMars_Station_DockPolicies Docks;
     default Docks.Input.Kind = FGameplayTagQuery::MakeQuery_MatchTag(GameplayTags::Food_Meat);
-    default Docks.Output.RequireEmpty = TOptional<bool>(true);
 
     private const float64 TableWidth = 140.0;
     private const float64 TableDepth = 80.0;
     private const float64 TableHeight = constants_station::k_CounterHeight;
-    // Close in: the capsule (radius 39) stands almost touching the table edge.
-    private const float64 StandGap = 43.0;
     // The operating view: the eye sits ViewDistance uu from the pan's rest pivot along the CameraPitch line, so the pan
     // centre is the centre of the screen by construction (the reference: the pan fills the middle of the frame, seen
     // steeply from above, the handle and the glove at the bottom). It lives in the station frame (Camera.ViewLocal), so
     // the framing holds whatever the operator's eye height.
     private const float32 CameraPitch = -58.0f;
     private const float64 ViewDistance = 99.0;
-    // The Use probe's margin around the table.
-    private const float64 ProbePadding = 5.0;
 
     // The hearth (Hearth_Mars_SM + EmberBed_Mars_SM, pivot at the centre of the underside, on the table top at StoveX): a
     // 56 cm chiselled slab HearthSlabHeight tall, an iron fire bowl, and a trivet whose ring (radius HearthTrivetRingRadius,
@@ -117,9 +94,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 PanRimRadius = 14.5f;
     private const float32 PanRimHeight = 4.6f;
     private const float32 PanUndersideDepth = 0.3f;
-    // A carried piece's nominal half extent: the glove holds a piece's middle this far under its palm, and the release node
-    // clears the rim by it.
-    private const float32 CarriedHalfExtent = 6.0f;
     // The pool as ratios of a piece's half extent h in pan cm (mars_cooking_ue.py LOOKDEV_POOL_NOTE): the footprint radius
     // is h * sqrt(2) * 0.9; Pool Radius, Pool Margin, Pool Blend, Simmer Width and Contact Softness are 1.1 / 0.6 / 0.5 /
     // 0.4 / 0.4 h. A piece's h is the mean of its two horizontal half extents as it was admitted (a cube's own half).
@@ -158,7 +132,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 FondRate = 0.02f;
     private const float32 TrailLagSeconds = 0.25f;
     // The pan material's Meat Footprint / Oil Trail pairs (slot 0 unsuffixed, then 1..5): one pool per piece the Searing
-    // spec's Supply.MaxPieces lets onto the pan (6 by default); DoConstruct ensures it allows no more.
+    // spec's Supply.MaxPieces lets onto the pan (6 by default); DoConstruct clamps it to them.
     private const int32 k_PoolSlots = 6;
     private const float32 OilCoatOnPan = 0.7f;
     private const float32 OilCoatOffPan = 0.3f;
@@ -209,9 +183,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private const float32 LookSimmerDensity = 0.85f;
     private const float32 LookSimmerRimDarken = 0.95f;
 
-    // A palm's thickness: the glove's grip bone above what its palm rests on.
-    private const float64 PalmLift = 2.5;
-
     // The docks on the table top (Z is the table's): the raw platter on the left (-Y), the free glove's rest in front of it;
     // the finished tray on the right (+Y), nearer the operator than the bellows (which runs from Y 34 to the table's edge
     // along X 0) and clear of the pan's rim.
@@ -224,20 +195,13 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     // The state label above the table's far edge.
     private const float64 LabelInset = 5.0;
     private const float64 LabelHeight = 44.0;
-    private const float32 LabelWorldSize = 10.0f;
-    private const FColor LabelColor = FColor(255, 238, 0, 255);
 
     // The ember bed's emissive Strength (Ember_Mars_MI on Emissive_Mars_M): glowing coals when hot, a dull bed when cold.
     private const float32 EmberStrengthHot = 8.0f;
     private const float32 EmberStrengthCold = 0.4f;
 
-    private const int32 k_SearedBurstBehavior = 13; // SparksBurst
-    private const float32 SearedBurstSize = 0.35f;
-    private const float32 SearedBurstColorIntensity = 0.8f;
-    private const float32 SearedBurstPlaybackSpeed = 1.6f;
-
-    private FCk_Handle_Transform _Root;
-    // Searing as exposed, with the steak and pan sizes and the nodes set (DoConstruct); what the feature and the visuals read.
+    // Searing as exposed, with the steak and pan sizes and the nodes set (Prepare_Kernel, Compose_Kernel); what the feature
+    // and the visuals read.
     private FMars_Searing_Spec _SearingSpec;
     private FCk_Handle_Searing _SearingHandle;
     private FCk_Handle_SceneNode _PanNode;
@@ -257,22 +221,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private FCk_Handle_UnrealComponent _SplatterPart;
     // The right glove's grip: the pan handle, under the pan node so it rides the tilt and the toss.
     private FCk_Handle_Transform _HandleGripNode;
-    // The left glove's grip (Station.Node.Feed): the presentation moves it through each transfer, and the feed carries its
-    // piece under it.
-    private FCk_Handle_SceneNode _FeedHandNode;
-    // Under the pan mesh node, over the rim: where a carried piece is released.
-    private FCk_Handle_Transform _ReleaseNode;
-    private FCk_Handle_CookingFeed _FeedHandle;
-    private FMars_StationFeed_Presentation _FeedPresentation;
-    private FCk_Handle_PlatterDock _InputDock;
-    // The label reads it: without a tray, a take-out has nowhere to go.
-    private FCk_Handle_PlatterDock _OutputDock;
     // One per piece entity still alive, in admission order.
     private TArray<FMars_SearingStation_PieceVisual> _PieceVisuals;
-    private FCk_Handle_UnrealComponent _Label;
-    // The text last written to the label: it is rewritten only when it changes.
-    private FString _LabelText;
-    private FCk_Handle_Timer _DressingTick;
 
     // The entity script is a UObject, not a fragment, so it may hold the components. Each is null until its hosted
     // component exists.
@@ -281,9 +231,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private UNiagaraComponent _Splatter;
     private bool _BubblesActive = false;
     private bool _SplatterActive = false;
-    private UNiagaraComponent _SearedBurst;
 
-    // The pan material's pool slot names, slot 0 first (DoConstruct builds them once).
+    // The pan material's pool slot names, slot 0 first (Prepare_Kernel builds them once).
     private TArray<FName> _FootprintParameterNames;
     private TArray<FName> _TrailParameterNames;
 
@@ -312,10 +261,10 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private TOptional<float32> _WrittenSizzleVolume;
 
     // The base composes the transform, the visuals and nodes (AddVisuals: the pan node and its body) and the Station
-    // (Configure_Spec, grips on the registered nodes); the pan Implement and the minigame need them, so they come after.
-    // The Searing signals are bound here, not at begin play, so no piece's visuals can miss its OnPieceAdded.
-    UFUNCTION(BlueprintOverride)
-    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    // (Configure_Spec, grips on the registered nodes); the pan Implement and the minigame need them, so they come after
+    // (Compose_Kernel), then the base's feed and docks. The Searing signals are bound there, not at begin play, so no
+    // piece's visuals can miss its OnPieceAdded.
+    protected void Prepare_Kernel() override
     {
         // Before the base: its AddVisuals reads the pan radius from it. The pan is the pan mesh, so the exposed spec cannot
         // size it.
@@ -323,17 +272,16 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _SearingSpec.Piece.ContactGraceSeconds = SteakContactGraceSeconds;
         _SearingSpec.Loss.PanRadius = PanRimRadius * PanScale;
         // A piece past the material's last pool slot would sear without any oil around it.
-        ck::EnsureIfNot(_SearingSpec.Supply.MaxPieces <= k_PoolSlots,
-            f"[SearingStation] lets {_SearingSpec.Supply.MaxPieces} pieces onto the pan but its material has only {k_PoolSlots} pools");
+        const auto FitsThePools = _SearingSpec.Supply.MaxPieces <= k_PoolSlots;
+        if (ck::EnsureIfNot(FitsThePools,
+            f"[SearingStation] lets {_SearingSpec.Supply.MaxPieces} pieces onto the pan but its material has only {k_PoolSlots} pools: it takes {k_PoolSlots}"))
+        { _SearingSpec.Supply.MaxPieces = k_PoolSlots; }
+
         Build_PoolParameterNames();
+    }
 
-        const auto Flow = Super::DoConstruct(InHandle);
-
-        // A rejected station already ensured in utils_station::Add; there is nothing to sear on.
-        auto StationHandle = InHandle.As_Station(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(StationHandle))
-        { return Flow; }
-
+    protected bool Compose_Kernel(FCk_Handle& InHandle) override
+    {
         // A rejected pan spec already ensured in utils_implement::Add. The swirl is tuned to this pan's geometry, so it is
         // set here rather than in the struct's defaults.
         auto PanSpec = Implement;
@@ -344,39 +292,29 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         PanSpec.Nodes = FMars_Implement_Nodes(_PanNode);
         _PanImplement = utils_implement::Add(_PanNode.H(), PanSpec);
         if (ck::Is_NOT_Valid(_PanImplement))
-        { return Flow; }
+        { return false; }
 
         // A rejected Searing spec already ensured in utils_searing::Add.
         _SearingSpec.Nodes = FMars_Searing_Nodes(_PanImplement, _PanBaseBody);
         _SearingHandle = utils_searing::Add(InHandle, _SearingSpec);
         if (ck::Is_NOT_Valid(_SearingHandle))
-        { return Flow; }
+        { return false; }
 
         // The label is recomputed every dressing tick (it reads the feed too), so no signal refreshes it.
         _SearingHandle.BindTo_OnHeatChanged(FMars_Delegate_Searing_OnHeatChanged(this, n"OnHeatChanged"));
         _SearingHandle.BindTo_OnPieceAdded(FMars_Delegate_Searing_OnPieceAdded(this, n"OnPieceAdded"));
         _SearingHandle.BindTo_OnFaceSeared(FMars_Delegate_Searing_OnFaceSeared(this, n"OnFaceSeared"));
-
-        // A rejected feed spec already ensured in utils_cooking_feed::Add; the station still sears without a platter.
-        auto FeedSpec = Feed;
-        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
-        FeedSpec.Motion.HeldOffset = _FeedPresentation.Geometry.HeldLocal;
-        _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
-        Add_Docks();
-
-        // The timer dies with the entity; nothing to unbind.
-        _DressingTick = utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDressingTick"));
-        return Flow;
+        _SearingHandle.BindTo_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnTakeOutRefused"));
+        return true;
     }
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
+        Super::DoBeginPlay(InHandle);
+
         if (ck::IsValid(_EmberPart))
         { utils_unreal_component::BindTo_OnAdded(_EmberPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
-
-        if (ck::IsValid(_Label))
-        { utils_unreal_component::BindTo_OnAdded(_Label, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPartAdded")); }
 
         if (ck::IsValid(_PanPart))
         { utils_unreal_component::BindTo_OnAdded(_PanPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnPanPartAdded")); }
@@ -387,11 +325,11 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         if (ck::IsValid(_SplatterPart))
         { utils_unreal_component::BindTo_OnAdded(_SplatterPart, FCk_Delegate_UnrealComponent_OnAdded(this, n"OnFxPartAdded")); }
 
-        Refresh_All();
+        Refresh_Burner();
     }
 
-    // The oil FX and the pan are hosted components: they die with their entities. Only the seared burst and the sizzle loop
-    // are spawned loose.
+    // The oil FX and the pan are hosted components: they die with their entities. The sizzle loop is spawned loose (the
+    // base destroys the burst).
     UFUNCTION(BlueprintOverride)
     void DoEndPlay(FCk_Handle InHandle)
     {
@@ -400,9 +338,9 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
             _SearingHandle.UnbindFrom_OnHeatChanged(FMars_Delegate_Searing_OnHeatChanged(this, n"OnHeatChanged"));
             _SearingHandle.UnbindFrom_OnPieceAdded(FMars_Delegate_Searing_OnPieceAdded(this, n"OnPieceAdded"));
             _SearingHandle.UnbindFrom_OnFaceSeared(FMars_Delegate_Searing_OnFaceSeared(this, n"OnFaceSeared"));
+            _SearingHandle.UnbindFrom_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         }
 
-        _FeedPresentation.Clear(FCk_Handle());
         // The pieces wear their own displays; only the records go.
         _PieceVisuals.Empty();
 
@@ -412,11 +350,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _BubblesActive = false;
         _SplatterActive = false;
 
-        if (ck::IsValid(_SearedBurst))
-        { _SearedBurst.DestroyComponent(); }
-
-        _SearedBurst = nullptr;
-
         if (ck::IsValid(_SizzleAudio))
         {
             _SizzleAudio.Stop();
@@ -425,45 +358,36 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         _SizzleAudio = nullptr;
         _WrittenSizzleVolume.Reset();
+
+        Super::DoEndPlay(InHandle);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // Station hooks
     //----------------------------------------------------------------------------------------------------------------------
 
-    protected void Configure_Spec(FMars_Station_Spec& InOutSpec) override
+    protected void Configure_Operation(FMars_Station_Spec& InOutSpec) override
     {
-        InOutSpec.StandLocal = FTransform(FRotator::ZeroRotator, FVector(-(TableDepth * 0.5 + StandGap), 0.0, 0.0));
-
+        // The handle node wraps the right glove around the handle (the base adds the feed's left grip).
         auto Grips = TArray<FMars_Station_Grip>();
-        // Both grips take their node's frame: the handle node wraps the right glove around the handle, the feed node lays
-        // the left glove palm down (at rest in front of the platter, and through each transfer).
         Grips.Add(FMars_Station_Grip(EMars_Hand::Right, GameplayTags::Station_Node_Tool, NAME_None,
             EMars_HandGripPose::Power, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
-        Grips.Add(FMars_Station_Grip(EMars_Hand::Left, GameplayTags::Station_Node_Feed, NAME_None,
-            EMars_HandGripPose::Open, TOptional<float32>(), EMars_FPHands_GripFrame::Node, EMars_FPHands_GripRoll::Fixed));
         InOutSpec.Grips = Grips;
 
         InOutSpec.Camera.LookControl = EMars_Station_LookControl::Captured;
         InOutSpec.Camera.PitchOffset = CameraPitch;
         // Back along the pitched view line from the pan's rest pivot, so the pan is dead centre on screen.
-        const auto PitchRadians = Math::DegreesToRadians(float64(-CameraPitch));
-        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(FTransform(FRotator(CameraPitch, 0.0, 0.0),
-            FVector(StoveX - ViewDistance * Math::Cos(PitchRadians), 0.0, Get_PanRestZ() + ViewDistance * Math::Sin(PitchRadians))));
+        InOutSpec.Camera.ViewLocal = TOptional<FTransform>(
+            utils_station::Make_ViewLocal(FVector(StoveX, 0.0, Get_PanRestZ()), CameraPitch, ViewDistance));
         InOutSpec.Prompt = FMars_Station_PromptSpec(
             NSLOCTEXT("MarsInteraction", "SearSteakPrompt", "Sear steak"),
             NSLOCTEXT("MarsInteraction", "SearingStationInUsePrompt", "In use"));
         InOutSpec.MinigameStateClass = UMars_SmState_Searing_Idle;
     }
 
-    protected TOptional<FMars_Interactable_ProbeInfo> Make_Probe() const override
+    protected FVector2D Get_CounterFootprint() const override
     {
-        auto Probe = FMars_Interactable_ProbeInfo();
-        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
-        Probe.ProbeShape = utils_shapes::Make_Box(FCk_ShapeBox_Dimensions(
-            FVector(TableDepth * 0.5 + ProbePadding, TableWidth * 0.5 + ProbePadding, TableHeight * 0.5 + ProbePadding)));
-        Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, TableHeight * 0.5));
-        return TOptional<FMars_Interactable_ProbeInfo>(Probe);
+        return FVector2D(TableDepth, TableWidth);
     }
 
     // Engine cube and cylinder are 100 uu with the pivot at the centre.
@@ -495,20 +419,30 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         AddPan(InRoot);
         AddOilFx();
         _SizzleSound = assets::load::FryingPanSizzle_Looping_Cue();
-        AddFeedHand(InRoot);
+        // The left glove rests in front of the raw platter's dock; the docked raw platter is the stock's only visual.
+        Add_FeedHand(FVector(FeedRestLocal.X, FeedRestLocal.Y, TableHeight));
 
-        _Label = AddLabel(InRoot,
-            FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - LabelInset, 0.0, StoveTop + LabelHeight)));
+        AddLabel(FTransform(FRotator(0.0, 180.0, 0.0), FVector(TableDepth * 0.5 - LabelInset, 0.0, StoveTop + LabelHeight)),
+            EVerticalTextAligment::EVRTA_TextBottom, n"SearingStation_Label");
     }
 
     protected void Register_GripNodes(TArray<FMars_Station_GripNode>& OutNodes) override
     {
         OutNodes.Add(FMars_Station_GripNode(GameplayTags::Station_Node_Tool, _HandleGripNode));
-        OutNodes.Add(FMars_Station_GripNode(GameplayTags::Station_Node_Feed, _FeedHandNode.As_Transform()));
+        Super::Register_GripNodes(OutNodes);
+    }
+
+    protected FMars_FeedStation_DockLayout Get_DockLayout() const override
+    {
+        auto Layout = FMars_FeedStation_DockLayout();
+        Layout.Input = FMars_FeedStation_DockSpot(InputDockLocal, FText::FromString("raw platter"), n"SearingStation_InputDockMarker");
+        Layout.Input.KindRejectedText = FText::FromString("Meat only");
+        Layout.Output = FMars_FeedStation_DockSpot(OutputDockLocal, FText::FromString("finished tray"), n"SearingStation_OutputDockMarker");
+        return Layout;
     }
 
     // The pan node is the centre of the cooking surface (the mesh's pivot), its underside resting on the burner; the
-    // Implement (composed in DoConstruct) writes its offset, so its own frame stays the operator's (the tilt's axes).
+    // Implement (composed in Compose_Kernel) writes its offset, so its own frame stays the operator's (the tilt's axes).
     // Everything of the pan hangs off one child yawed 180 degrees, so the mesh's handle (+X) points at the operator and
     // every pan-local quantity (Get_PiecePanLocal, the footprint node's offset, the material's Meat Footprint) is in one
     // frame, the mesh's own: the pan mesh (its own two material instances), the kinematic triangle-mesh body of the same
@@ -551,24 +485,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
 
         // Over the pan's centre, clear of the rim by a carried piece's half extent and ReleaseClearance: it tilts and tosses
         // with the pan, so a release lands where the pan is.
-        const auto ReleaseZ = float64(PanRimHeight) * Scale + float64(CarriedHalfExtent) + ReleaseClearance;
+        const auto ReleaseZ = float64(PanRimHeight) * Scale + constants_station::k_CarriedHalfExtent + ReleaseClearance;
         _ReleaseNode = utils_scene_node::Create(PanMeshTransform, FTransform(FVector(0.0, 0.0, ReleaseZ))).As_Transform();
-    }
-
-    // The feed node the left glove follows (at rest in front of the raw platter's dock, palm down, fingers forward); the feed
-    // carries the reserved piece itself under it, in the palm. The docked raw platter is the stock's only visual. The
-    // presentation's geometry is authored here, in the station frame.
-    private void AddFeedHand(FCk_Handle_Transform& InRoot)
-    {
-        const auto HandRotation = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector::ForwardVector, -FVector::UpVector);
-        auto& Geometry = _FeedPresentation.Geometry;
-        Geometry.RestLocal = FTransform(HandRotation, FVector(FeedRestLocal.X, FeedRestLocal.Y, TableHeight + PalmLift));
-        // The piece sits under the palm, world-aligned: a palm's thickness and its half extent out of the palm.
-        Geometry.HeldLocal = FTransform(HandRotation.Inverse(), FVector(0.0, 0.0, PalmLift + float64(CarriedHalfExtent)));
-
-        _FeedHandNode = utils_scene_node::Create(InRoot, Geometry.RestLocal);
-        _FeedPresentation.HandNode = _FeedHandNode;
-        _FeedPresentation.WrittenHand = Geometry.RestLocal;
     }
 
     // The beads on their own node (over every piece) and the splatter on the footprint node (the newest piece), both unit
@@ -591,98 +509,34 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         return utils_unreal_component::Add(InNode, ComponentParams);
     }
 
-    // The two docks on the table top, children of the root (they die with the station), lifted so a docked platter's
-    // underside rests on the top, each with its marker. A rejected spec already ensured in utils_platter_dock::Create.
-    private void Add_Docks()
-    {
-        const auto DockLift = FVector(0.0, 0.0, TableHeight + constants_platter::k_FloorAboveBase);
-        auto InputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, Docks.Input,
-            FTransform(FRotator::ZeroRotator, InputDockLocal + DockLift));
-        InputSpec.Name = FText::FromString("raw platter");
-        InputSpec.KindRejectedText = FText::FromString("Meat only");
-        _InputDock = utils_platter_dock::Create(_Root, InputSpec);
-        if (ck::IsValid(_InputDock))
-        { _InputDock.Add_Marker(this, n"SearingStation_InputDockMarker"); }
-
-        auto OutputSpec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Output, Docks.Output,
-            FTransform(FRotator::ZeroRotator, OutputDockLocal + DockLift));
-        OutputSpec.Name = FText::FromString("finished tray");
-        _OutputDock = utils_platter_dock::Create(_Root, OutputSpec);
-        if (ck::IsValid(_OutputDock))
-        { _OutputDock.Add_Marker(this, n"SearingStation_OutputDockMarker"); }
-    }
-
-    // A piece's record: the piece wears its own display (whoever made the piece dressed it); Jolt owns its pose. The cook
-    // state starts as the piece arrived with it, and the display gets it at once.
+    // A piece's record: the piece wears its own display, and its cook state starts as the piece arrived with it.
     private void AddPieceVisuals(const FMars_CookingFeed_PieceId& InPieceId, FCk_Handle InPiece)
     {
         auto Visual = FMars_SearingStation_PieceVisual();
-        Visual.Id = InPieceId;
-        Visual.Entity = InPiece;
-        Visual.Piece = InPiece.As_FoodPiece();
-        Visual.CookState = Visual.Piece.Get_CookState();
-        if (Visual.Entity.Is_RuntimeMeshDisplay())
-        {
-            utils_cookstate::Request_Write(Visual.Entity.As_RuntimeMeshDisplay(), Visual.CookState);
-            Visual.Written = Visual.CookState;
-        }
-
+        Visual.Display = utils_station::Make_PieceDisplay(InPieceId, InPiece);
         _PieceVisuals.Add(Visual);
-    }
-
-    // The state label above the table's far edge, yawed to face the operator. Its text is set once the component exists.
-    private FCk_Handle_UnrealComponent AddLabel(FCk_Handle_Transform& InAttachTo, FTransform InLocalTransform)
-    {
-        auto Node = utils_scene_node::Create(InAttachTo, InLocalTransform);
-
-        auto Archetype = NewObject(this, UTextRenderComponent);
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        Archetype.SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
-        Archetype.SetWorldSize(LabelWorldSize);
-        Archetype.SetTextRenderColor(LabelColor);
-        Archetype.SetText(FText::FromString("cold"));
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"SearingStation_Label");
-        return utils_unreal_component::Add(Node, ComponentParams);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
     // The dressing (every frame; the Searing feature is the source of truth)
     //----------------------------------------------------------------------------------------------------------------------
 
-    // The Advance_ steps update the lag state and the footprint node (under nullrhi too); the Apply_ steps write the
-    // components and skip any that does not exist yet.
-    UFUNCTION()
-    private void OnDressingTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    // After the base advanced the feed and before it refreshes the label. The Advance_ steps update the lag state and the
+    // footprint node (under nullrhi too); the Apply_ steps write the components and skip any that does not exist yet.
+    protected void Dress(float32 InDeltaSeconds) override
     {
         if (ck::Is_NOT_Valid(_SearingHandle))
         { return; }
 
-        const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
-        Advance_Feed(DeltaSeconds);
-        Advance_Pools(DeltaSeconds);
+        Advance_Pools(InDeltaSeconds);
         Advance_PoolHalf();
         Advance_FootprintNode();
         Advance_BubblesNode();
-        Advance_Sizzle(DeltaSeconds);
-        Advance_PieceVisuals(DeltaSeconds);
+        Advance_Sizzle(InDeltaSeconds);
+        Advance_PieceVisuals(InDeltaSeconds);
         Apply_PanMaterial();
         Apply_OilFx();
         Apply_SizzleSound();
-        Refresh_Label();
-    }
-
-    // The feed's glove node and pose override follow the feed (the piece rides the node).
-    private void Advance_Feed(float32 InDeltaSeconds)
-    {
-        if (ck::Is_NOT_Valid(_FeedHandle))
-        { return; }
-
-        const auto RootWorld = utils_transform::Get_EntityCurrentTransform(_Root);
-        const auto Operator = _Root.H().As_Station().Get_Operator();
-        _FeedPresentation.Advance(FMars_StationFeed_Frame(_FeedHandle, Operator, RootWorld, InDeltaSeconds));
     }
 
     // Every piece's pool (see the file header): a piece that lies on the pan and is not lost has its footprint at its
@@ -696,11 +550,11 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         for (int32 Index = 0; Index < _PieceVisuals.Num(); ++Index)
         {
             auto Visual = _PieceVisuals[Index];
-            const auto Pooled = _SearingHandle.Get_HasPiece(Visual.Id) && Get_IsLiveOnPan(Visual.Id);
+            const auto Pooled = _SearingHandle.Get_HasPiece(Visual.Display.Id) && Get_IsLiveOnPan(Visual.Display.Id);
             Visual.Pool = Pooled ? EMars_SearingStation_Pool::Pooled : EMars_SearingStation_Pool::None;
             if (Pooled)
             {
-                const auto Local = _SearingHandle.Get_PiecePanLocal(Visual.Id);
+                const auto Local = _SearingHandle.Get_PiecePanLocal(Visual.Display.Id);
                 Visual.Footprint = FVector2D(Local.X / Scale, Local.Y / Scale);
             }
 
@@ -717,7 +571,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         for (const auto& Visual : _PieceVisuals)
         {
             if (Visual.Pool == EMars_SearingStation_Pool::Pooled)
-            { Largest = Math::Max(Largest, Get_PoolHalf(Visual.Id)); }
+            { Largest = Math::Max(Largest, Get_PoolHalf(Visual.Display.Id)); }
         }
 
         if (Largest > 0.0f)
@@ -821,7 +675,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         { Target = SizzleSearedFace; }
 
         const auto Rate = Target > _SizzleRamp ? SizzleRiseRate : SizzleFallRate;
-        _SizzleRamp = MoveToward(_SizzleRamp, Target, Rate * InDeltaSeconds);
+        _SizzleRamp = Math::FInterpConstantTo(_SizzleRamp, Target, InDeltaSeconds, Rate);
 
         if (IsSizzling)
         { _Fond = Math::Min(1.0f, _Fond + FondRate * InDeltaSeconds); }
@@ -895,7 +749,8 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         return false;
     }
 
-    // Each piece's cook state from its own sears. A record whose piece the kernel no longer holds (taken out, or destroyed at
+    // Each piece's look from the kernel's mapping of its cook state (utils_cookstate::Make_DisplayParams over its sears so
+    // far), its oil coat layered by the pan's heat. A record whose piece the kernel no longer holds (taken out, or destroyed at
     // the end of its linger) or whose entity is gone is dropped; a lost piece keeps its last cook state.
     private void Advance_PieceVisuals(float32 InDeltaSeconds)
     {
@@ -903,46 +758,25 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         for (int32 Index = _PieceVisuals.Num() - 1; Index >= 0; --Index)
         {
             auto Visual = _PieceVisuals[Index];
-            if (ck::Is_NOT_Valid(Visual.Entity) || _SearingHandle.Get_HasPiece(Visual.Id) == false)
+            auto& Display = Visual.Display;
+            if (ck::Is_NOT_Valid(Display.Entity) || _SearingHandle.Get_HasPiece(Display.Id) == false)
             {
                 _PieceVisuals.RemoveAt(Index);
                 continue;
             }
 
-            if (_SearingHandle.Get_PieceStatus(Visual.Id) == EMars_Searing_PieceStatus::Lost)
+            if (_SearingHandle.Get_PieceStatus(Display.Id) == EMars_Searing_PieceStatus::Lost)
             { continue; }
 
-            auto SearSum = 0.0f;
-            for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
-            {
-                const auto Sear = _SearingHandle.Get_FaceSear(Visual.Id, EMars_Searing_Face(Face));
-                Visual.CookState.FaceSear[Face] = Sear;
-                SearSum += Sear;
-            }
+            const auto OilCoat = Display.CookState.OilCoat;
+            Display.CookState = utils_cookstate::Make_DisplayParams(_SearingHandle.Get_PieceCookState(Display.Id));
 
-            Visual.CookState.Penetration = Math::Min(1.0f, SearSum);
-            Visual.CookState.Shape = SearSum / float32(utils_searing::k_FaceCount);
-
-            const auto OnHotPan = IsHot && _SearingHandle.Get_PieceContact(Visual.Id) == EMars_Searing_Contact::OnPan;
-            Visual.CookState.OilCoat = MoveToward(Visual.CookState.OilCoat, OnHotPan ? OilCoatOnPan : OilCoatOffPan,
-                OilCoatRate * InDeltaSeconds);
-            Write_PieceCpd(Visual);
+            const auto OnHotPan = IsHot && _SearingHandle.Get_PieceContact(Display.Id) == EMars_Searing_Contact::OnPan;
+            Display.CookState.OilCoat = Math::FInterpConstantTo(OilCoat, OnHotPan ? OilCoatOnPan : OilCoatOffPan,
+                InDeltaSeconds, OilCoatRate);
+            utils_station::Write_PieceDisplay(Display);
             _PieceVisuals[Index] = Visual;
         }
-    }
-
-    // The display follows the look on its edges, never per frame: a write once any float has moved by the threshold since
-    // the last one. A piece without a display (a bare test piece) is legal and gets none.
-    private void Write_PieceCpd(FMars_SearingStation_PieceVisual& InVisual)
-    {
-        if (InVisual.Entity.Is_RuntimeMeshDisplay() == false)
-        { return; }
-
-        if (utils_cookstate::Get_HasMovedBeyond(InVisual.Written, InVisual.CookState, constants_cookstate::k_WriteThreshold) == false)
-        { return; }
-
-        utils_cookstate::Request_Write(InVisual.Entity.As_RuntimeMeshDisplay(), InVisual.CookState);
-        InVisual.Written = InVisual.CookState;
     }
 
     // The driven group on the pan's dynamic instance, in the pan mesh's own cm: the pieces on the pan fill the pool slots
@@ -964,7 +798,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
             if (Visual.Pool == EMars_SearingStation_Pool::None || Slot >= k_PoolSlots)
             { continue; }
 
-            const auto Radius = Get_PoolHalf(Visual.Id) * FootprintPerHalf;
+            const auto Radius = Get_PoolHalf(Visual.Display.Id) * FootprintPerHalf;
             _PanMaterial.SetVectorParameterValue(_FootprintParameterNames[Slot],
                 FLinearColor(float32(Visual.Footprint.X), float32(Visual.Footprint.Y), Radius, 0.0f));
             _PanMaterial.SetVectorParameterValue(_TrailParameterNames[Slot],
@@ -1042,15 +876,6 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         { InFx.Deactivate(); }
 
         return InActive;
-    }
-
-    // InValue moved toward InTarget by at most InMaxStep.
-    private float32 MoveToward(float32 InValue, float32 InTarget, float32 InMaxStep) const
-    {
-        if (InValue < InTarget)
-        { return Math::Min(InTarget, InValue + InMaxStep); }
-
-        return Math::Max(InTarget, InValue - InMaxStep);
     }
 
     // The pan part's slot-0 dynamic instance, created (and given the cooking look) the first time the component exists.
@@ -1219,32 +1044,12 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         _EmberMaterial.SetScalarParameterValue(n"Strength", _SearingHandle.Get_IsHot() ? EmberStrengthHot : EmberStrengthCold);
     }
 
-    // Rewritten only when the text changes.
-    private void Refresh_Label()
-    {
-        if (ck::Is_NOT_Valid(_SearingHandle) || ck::Is_NOT_Valid(_Label))
-        { return; }
-
-        // Null until the component is created (asynchronously); OnPartAdded refreshes then.
-        auto Text = Cast<UTextRenderComponent>(utils_unreal_component::Get_Component(_Label));
-        if (ck::Is_NOT_Valid(Text))
-        { return; }
-
-        const auto Label = Get_StateLabel();
-        const auto LabelText = Label.ToString();
-        if (LabelText == _LabelText)
-        { return; }
-
-        _LabelText = LabelText;
-        Text.SetText(Label);
-    }
-
     // What the label reads: "cold" off the burner; once something was admitted, the raw platter is spent, no transfer is
     // under way and nothing still cooks, the batch is all accounted for (taken out counts); otherwise the batch so far and
     // what is left raw ("no platter" without one docked). A second line says when no tray is docked to take out onto.
-    private FText Get_StateLabel() const
+    protected FText Get_StateLabel() const override
     {
-        if (_SearingHandle.Get_IsHot() == false)
+        if (ck::Is_NOT_Valid(_SearingHandle) || _SearingHandle.Get_IsHot() == false)
         { return FText::FromString("cold"); }
 
         const auto Summary = _SearingHandle.Get_Summary();
@@ -1255,19 +1060,13 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         const FString TrayLine = Get_HasTray() ? "" : "\nno tray: dock one to take out";
 
         if (Summary.Admitted > 0 && Raw == 0 && IsFeeding == false && Summary.Cooking == 0)
-        { return FText::FromString(f"all accounted for: {Summary.Ready} ready · {Summary.TakenOut} taken out · {Summary.Lost} lost{TrayLine}"); }
+        { return FText::FromString(f"all accounted for: {Summary.Ready} ready - {Summary.TakenOut} taken out - {Summary.Lost} lost{TrayLine}"); }
 
         const FString RawText = IsSourced ? f"{Raw} raw" : "no platter";
-        return FText::FromString(f"{Summary.Ready}/{Summary.Admitted} ready · {Summary.Lost} lost · {Summary.TakenOut} taken out · {RawText}{TrayLine}");
+        return FText::FromString(f"{Summary.Ready}/{Summary.Admitted} ready - {Summary.Lost} lost - {Summary.TakenOut} taken out - {RawText}{TrayLine}");
     }
 
-    private bool Get_HasTray() const
-    {
-        return ck::IsValid(_OutputDock) && ck::IsValid(_OutputDock.Get_Platter());
-    }
-
-    // One reused burst component: spawned at the first seared face whose template is ready, then moved to the middle of the
-    // piece whose face seared (a cut piece's origin is not its middle) and re-activated. Null under nullrhi.
+    // The burst at the middle of the piece whose face seared (a cut piece's origin is not its middle).
     private void Play_SearedBurst(const FMars_CookingFeed_PieceId& InPieceId)
     {
         if (ck::Is_NOT_Valid(_SearingHandle) || _SearingHandle.Get_HasPiece(InPieceId) == false)
@@ -1277,21 +1076,7 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
         if (ck::Is_NOT_Valid(Piece))
         { return; }
 
-        const auto Location = _SearingHandle.Get_PieceCentre(InPieceId);
-
-        if (ck::IsValid(_SearedBurst))
-        {
-            _SearedBurst.SetWorldLocation(Location);
-            _SearedBurst.Activate(true);
-            return;
-        }
-
-        if (utils_particles::Get_IsBehaviorTemplateReady(k_SearedBurstBehavior) == false)
-        { return; }
-
-        _SearedBurst = utils_particles::Spawn_BehaviorAtLocation(k_SearedBurstBehavior, Location, FRotator::ZeroRotator);
-        if (ck::IsValid(_SearedBurst))
-        { utils_particles::Request_ApplyTuningValues(_SearedBurst, SearedBurstSize, SearedBurstColorIntensity, 1.0f, SearedBurstPlaybackSpeed); }
+        Play_Burst(_SearingHandle.Get_PieceCentre(InPieceId), FRotator::ZeroRotator);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -1336,5 +1121,11 @@ class UMars_SearingStation_EntityScript : UMars_Station_EntityScript
     private void OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace)
     {
         Play_SearedBurst(InPieceId);
+    }
+
+    UFUNCTION()
+    private void OnTakeOutRefused(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal)
+    {
+        Flash_TakeOutRefusal(InRefusal);
     }
 }

@@ -25,13 +25,14 @@ struct FMars_Tumbler_TickEdges
 
 // Every frame, in order: the drum (its turn from the axle Mover and its state from the lever's grip and the Mover's rest),
 // the pieces (each read back from its body: an escaped one is reseated at the drum's bottom, any other coats by the distance
-// it moved while the hatch is shut), the hatch (settled when its Mover rests), the hover (a free hand only) and the hand
-// (following the cursor, reaching for the lever and gripping it, or riding the grip). Edges are broadcast last. The pieces
-// are dynamic bodies tumbled by the kinematic shell that follows the axle: the simulation moves them, the kernel only reads
-// them (and teleports an escaped one).
+// it moved while the hatch is shut), the station's take-out readout (every tumbled piece, written on change), the hatch
+// (settled when its Mover rests), the hover (a free hand only) and the hand (following the cursor, reaching for the lever
+// and gripping it, or riding the grip). Edges are broadcast last. The pieces are dynamic bodies tumbled by the kinematic
+// shell that follows the axle: the simulation moves them, the kernel only reads them (and teleports an escaped one).
 class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Tumbler_HandleRequests");
 
     // A hitch must not throw the hand across the reach in one step.
     private const float32 k_MaxStepSeconds = 0.1f;
@@ -61,6 +62,7 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
 
         Advance_Drum(Frame, InState);
         Advance_Pieces(Frame, InState, Edges);
+        utils_cooking_feed::Write_Takeable(InHandle, utils_tumbler::Get_Takeable(InState.Pieces, Frame.Spec.Coating));
         Advance_Hatch(Frame, InState);
         Advance_Hover(Frame, InState);
         Advance_Hand(Frame, InState);
@@ -110,6 +112,11 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
             if (ck::Is_NOT_Valid(Piece.Entity))
             { continue; }
 
+            // An adopted piece is read only once its body is in the simulation: until then its entity may still stand where
+            // it waited before the release pose reached it.
+            if (utils_jolt_body::Get_IsBodyAdded(Piece.Body) == false)
+            { continue; }
+
             const auto PieceWorld = utils_transform::Get_EntityCurrentLocation(Piece.Entity.As_Transform());
             const auto Local = InFrame.AxleWorld.InverseTransformPosition(PieceWorld);
             const auto Radial = FVector2D(Local.X, Local.Z).Size();
@@ -129,28 +136,25 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
                 Piece.Coverage = Math::Min(1.0f, Piece.Coverage + float32(Step) * Spec.Coating.CoveragePerCm);
                 OutEdges.CoverageIds.Add(Piece.Id);
                 OutEdges.Coverages.Add(Piece.Coverage);
-                if (Piece.Coverage >= 1.0f)
-                { ck::Trace(f"[Tumbler] [{InFrame.Tumbler.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} is fully coated"); }
             }
 
             InState.Pieces[Index] = Piece;
         }
     }
 
-    // Teleports InPiece (at InLocal in the drum frame) to its slot's reseat point at the drum's world bottom, level with the
-    // root and at rest. Returns the reseat point (the next step is measured from it, so the jump coats nothing).
+    // Teleports InPiece (at InLocal in the drum frame) to the reseat point at the drum's world bottom in line with where it
+    // escaped along the axle, level with the root and at rest. Returns the reseat point (the next step is measured from it,
+    // so the jump coats nothing).
     private FVector Reseat(const FMars_Tumbler_Frame& InFrame, const FMars_Tumbler_PieceState& InPiece, FVector InLocal)
     {
         const auto AxleLocation = InFrame.RootWorld.InverseTransformPosition(InFrame.AxleWorld.GetLocation());
-        const auto Offset = utils_tumbler::Get_ReseatOffset(InPiece.Id.StockIndex, InFrame.Spec);
+        const auto Offset = utils_tumbler::Get_ReseatOffset(InLocal.Y, InFrame.Spec);
         const auto ReseatWorld = InFrame.RootWorld.TransformPosition(AxleLocation + Offset);
 
         // The default velocity policy zeroes both velocities.
         auto Body = InPiece.Body;
         utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(ReseatWorld, InFrame.RootWorld.Rotator()));
 
-        ck::Trace(f"[Tumbler] [{InFrame.Tumbler.ToString()}] piece {utils_cooking_feed::Get_PieceName(InPiece.Id)} escaped the shell "
-            + f"(drum frame {InLocal}): reseated at the bottom");
         return ReseatWorld;
     }
 
@@ -173,7 +177,6 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.Hatch = Settled;
-        ck::Trace(f"[Tumbler] [{InFrame.Tumbler.ToString()}] hatch {Settled :n}");
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -246,7 +249,6 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
                 Hand.Mode = EMars_Tumbler_HandMode::Gripped;
                 Hand.HandLocal = GripLocal;
                 Hand.HandRotationLocal = GripRotationLocal;
-                ck::Trace(f"[Tumbler] [{InFrame.Tumbler.ToString()}] grip begins at {InState.DrumDegrees :.1} degrees");
             }
         }
         else

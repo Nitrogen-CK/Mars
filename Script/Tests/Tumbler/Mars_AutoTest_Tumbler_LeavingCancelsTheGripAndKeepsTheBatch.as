@@ -17,23 +17,24 @@ class UMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch : UMars_AutoT
         auto Spec = Make_TestSpec();
         Spec.Hand.ReachSeconds = k_SlowReachSeconds;
         BuildStation(InHandle, Spec);
+        Build_Boxes(2);
 
         Add_Steps_StationReady();
         Add_Steps_OpenHatch();
         Add_Step("load pieces 0 and 1", n"Step_AddTwo");
-        Add_Step_WaitUntil("both are answered", n"Check_Answered2", 0, 1.0f);
+        Add_Step_WaitUntil("both are answered", n"Check_Answered2", 0, 0);
         Add_Steps_CloseHatch();
         Add_Steps_Grip();
         Add_Step_Rock("rock part way down", k_RockDegrees, 15);
         Add_Step("the operator leaves mid-arc", n"Step_SampleAndCancel");
         Add_Step("the hand is free and the drum returning one pass later", n"Step_AssertCancelled");
-        Add_Step_WaitUntil("the lever is let go", n"Check_LeverLetGo", 0, 1.0f);
-        Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 2.0f);
+        Add_Step_WaitUntil("the lever is let go", n"Check_LeverLetGo", 0, 0);
+        Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 0);
         Add_Step("the batch is kept", n"Step_AssertBatchKept");
         Add_Step("look at the lever", n"Step_LookToLever");
-        Add_Step_WaitUntil("the lever is hovered", n"Check_HoveredLever", 0, 2.0f);
+        Add_Step_WaitUntil("the lever is hovered", n"Check_HoveredLever", 0, 0);
         Add_Step("press on the lever", n"Step_PressCounted");
-        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 1.0f);
+        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 0);
         Add_Step("let go before the reach arrives", n"Step_Release");
         Add_Step("the hand is free one pass later", n"Step_AssertReachDropped");
         Add_Step_WaitSeconds("the reach would have arrived by now", k_SlowReachSeconds + 0.2f);
@@ -44,8 +45,8 @@ class UMars_AutoTest_Tumbler_LeavingCancelsTheGripAndKeepsTheBatch : UMars_AutoT
     UFUNCTION()
     private void Step_AddTwo(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        AddPiece(0);
-        AddPiece(1);
+        Admit(0);
+        Admit(1);
     }
 
     UFUNCTION()

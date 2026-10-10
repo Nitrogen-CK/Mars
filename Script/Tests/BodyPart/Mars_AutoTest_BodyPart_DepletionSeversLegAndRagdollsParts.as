@@ -29,16 +29,16 @@ class UMars_AutoTest_BodyPart_DepletionSeversLegAndRagdollsParts : UMars_AutoTes
     {
         SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("bind leg 1's OnSevered and the gait's OnLegSetChanged", n"Step_Bind");
-        Add_Step_WaitUntil("the crawler walks +X for 1 s", n"Check_Walked", 0, 3.0f);
+        Add_Step_WaitUntil("the crawler walks +X for 1 s", n"Check_Walked", k_SlowPolls, 0);
         Add_Step("record leg 1's hurtboxes and segments; deplete its Health with 30 Sever", n"Step_Deplete");
-        Add_Step_WaitUntil("leg 1 is severed, detached and its hurtboxes are gone", n"Check_Severed", 0, 3.0f);
+        Add_Step_WaitUntil("leg 1 is severed, detached and its hurtboxes are gone", n"Check_Severed", 0, 0);
         Add_Step("the sever contract holds", n"Step_AssertSevered");
-        Add_Step_WaitUntil("every released part's debris body is in the Jolt world", n"Check_BodiesAdded", 0, 1.0f);
-        Add_Step_WaitUntil("both segments fell to the floor", n"Check_SegmentsFell", 0, 3.0f);
-        Add_Step_WaitUntil("the debris timer destroyed the leg and its parts", n"Check_LegTreeGone", 0, 5.0f);
-        Add_Step_WaitUntil("the body's record drops the destroyed leg", n"Check_RecordDropped", 0, 1.0f);
+        Add_Step_WaitUntil("every released part's debris body is in the Jolt world", n"Check_BodiesAdded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both segments fell to the floor", n"Check_SegmentsFell", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the debris timer destroyed the leg and its parts", n"Check_LegTreeGone", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the body's record drops the destroyed leg", n"Check_RecordDropped", 0, 0);
         Add_Step("the crawler lives on with 3 legs", n"Step_AssertAfterDebris");
         Run_Steps(InHandle);
     }

@@ -19,15 +19,15 @@ class UMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition : UMars_AutoT
     {
         SpawnFloorAndCrawler(InHandle, Make_CrawlerSpec(FVector(400.0, 400.0, 200.0)));
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("bind OnConditionChanged on legs 0 and 1; Sever 10 on leg 0", n"Step_BindAndSeverLeg0");
-        Add_Step_WaitUntil("the body reads 115", n"Check_BodyAt115", 0, 2.0f);
+        Add_Step_WaitUntil("the body reads 115", n"Check_BodyAt115", 0, 0);
         Add_Step("leg 0 is Damaged; Sever 10 on leg 0 again", n"Step_AssertDamagedAndSeverAgain");
-        Add_Step_WaitUntil("the body reads 110", n"Check_BodyAt110", 0, 2.0f);
+        Add_Step_WaitUntil("the body reads 110", n"Check_BodyAt110", 0, 0);
         Add_Step("leg 0 stays Damaged with no new signal; Crush 6 on leg 1", n"Step_AssertStillDamagedAndCrushLeg1");
-        Add_Step_WaitUntil("the body reads 105.5", n"Check_BodyAt105", 0, 2.0f);
+        Add_Step_WaitUntil("the body reads 105.5", n"Check_BodyAt105", 0, 0);
         Add_Step("leg 1 is Damaged with 9 ruin damage; Crush 6 on leg 1 again", n"Step_AssertCrushDamagedAndCrushAgain");
-        Add_Step_WaitUntil("the body reads 101", n"Check_BodyAt101", 0, 2.0f);
+        Add_Step_WaitUntil("the body reads 101", n"Check_BodyAt101", 0, 0);
         Add_Step("leg 1 is Ruined; leg 0 is still Damaged", n"Step_AssertRuined");
         Run_Steps(InHandle);
     }

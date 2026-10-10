@@ -1,12 +1,16 @@
-// The platter world item carries its pile through the item path: stowed (into the overflow, as the pickup task does it:
-// transfer, then Carry) and held still in the hand (the selection), it takes a piece dropped between its walls onto its
-// own tray body; the piece freezes on the root, rides the held platter under the held offset and stays a scene-node child
-// of the root when the platter is released into the world. Isolated Z band: -56000.
+// The platter world item carries its pile through the item path: stowed (into the overflow, as the pickup task does it: a
+// transfer, its mount following) and held still in the hand (the selection), it takes a piece dropped between its walls
+// onto its own tray body; the piece freezes on the root, rides the held platter under the held offset and stays a
+// scene-node child of the root when the platter is released into the world. Isolated Z band: -56000.
 class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease : UMars_AutoTestRig_Carrier
 {
     default _TimeoutSeconds = 20.0f;
 
     private const FVector k_Origin = FVector(0.0, 0.0, -56000.0);
+
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+
+    private const int32 k_SlowPolls = 900;
 
     // The spawned platter entity, under construction until it is a WorldItem and a Platter.
     private FCk_Handle _Entity;
@@ -21,7 +25,6 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
         Add_CarrierBody(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         auto Owner = InHandle;
         _Entity = utils_platter::Request_SpawnWorld(Owner,
@@ -30,11 +33,11 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
 
         Add_Step_WaitUntil("the platter world item is constructed and its holder holds its item", n"Check_Constructed");
         Add_Step_WaitUntil("the piece is Ready", n"Check_PieceReady");
-        Add_Step("stow the platter into the overflow slot and carry it", n"Step_Stow");
-        Add_Step_WaitUntil("the platter is Held", n"Check_Held");
-        Add_Step_WaitSeconds("the hold's arrival settles", 1.0f);
+        Add_Step("stow the platter into the overflow slot", n"Step_Stow");
+        Add_Step_WaitUntil("the platter is Held", n"Check_Held", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the hold's arrival settled", n"Check_HoldSettled", k_SlowPolls, 0);
         Add_Step("load the piece onto the held platter", n"Step_Load");
-        Add_Step_WaitUntil("the piece landed on the platter", n"Check_Landed");
+        Add_Step_WaitUntil("the piece landed on the platter", n"Check_Landed", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("the piece rides the held platter inside its walls", n"Step_AssertRidesInHand");
         Add_Step("release the platter", n"Step_Release");
@@ -97,7 +100,7 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
         Res.Set(_Platter.Get_HeldCount() == 1);
     }
 
-    // What the pickup task does: transfer into the stow target, then Carry once the stow reports.
+    // What the pickup task does: transfer into the stow target.
     UFUNCTION()
     private void Step_Stow(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -123,12 +126,7 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
                                 ECk_Inventory_OperationResult_Transfer InResult)
     {
         if (InResult != ECk_Inventory_OperationResult_Transfer::Success)
-        {
-            FinishFailure(f"the platter's stow transfer failed with [{InResult :n}]");
-            return;
-        }
-
-        _WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(_Carrier));
+        { FinishFailure(f"the platter's stow transfer failed with [{InResult :n}]"); }
     }
 
     UFUNCTION()
@@ -136,6 +134,13 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
     {
         auto Res = OutResult;
         Res.Set(_WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held);
+    }
+
+    UFUNCTION()
+    private void Check_HoldSettled(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_WorldItem.Get_Mount() == EMars_WorldItem_Mount::Held && _WorldItem.Get_IsSettled());
     }
 
     UFUNCTION()
@@ -158,8 +163,7 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
     UFUNCTION()
     private void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _WorldItem.Request_Release(FMars_Request_WorldItem_Release(
-            _Item, _Hotbar.Get_Slot(_Hotbar.Get_OverflowIndex()), FVector(0.0, 0.0, 50.0), FVector::ZeroVector));
+        _WorldItem.Request_Release(FMars_Request_WorldItem_Release(FVector(0.0, 0.0, 50.0), FVector::ZeroVector));
     }
 
     UFUNCTION()

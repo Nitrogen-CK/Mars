@@ -11,6 +11,8 @@ class UMars_AutoTest_SearingStation_FeedTakesFromTheTrayAndTakeOutLoadsTheOther 
     private const FVector k_TrayOffset = FVector(0.0, 300.0, 0.0);
     // A frame of searing between the snapshot and the take-out's drain moves a face far less than this.
     private const float32 k_SearTolerance = 0.05f;
+    // A poll budget, not a ceiling: the station composes and platters construct, drop and settle over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Raw;
     private FCk_Handle _Tray;
@@ -25,19 +27,19 @@ class UMars_AutoTest_SearingStation_FeedTakesFromTheTrayAndTakeOutLoadsTheOther 
         _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MeatSlab());
         _Tray = Spawn_Platter(InHandle, k_TrayOffset, nullptr);
 
-        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("both platters are constructed and the slab landed on the raw one", n"Check_PlattersReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both platters are constructed and the slab landed on the raw one", n"Check_PlattersReady", k_SlowPolls, 0);
         Add_Step("dock the meat platter as raw and the empty one as the tray", n"Step_Dock");
-        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", 0, 5.0f);
+        Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", 0, 3.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", k_SlowPolls, 0);
         Add_Step("one add-food press", n"Step_Press");
-        Add_Step_WaitUntil("the kernel admitted the slab and the raw platter is empty", n"Check_Admitted", 0, 5.0f);
+        Add_Step_WaitUntil("the kernel admitted the slab and the raw platter is empty", n"Check_Admitted", k_SlowPolls, 0);
         Add_Step("the pan holds the slab", n"Step_AssertAdmitted");
         Add_Step_WaitSeconds("a second on the hot pan", 1.0f);
         Add_Step("take the slab out by name", n"Step_TakeOut");
-        Add_Step_WaitUntil("the slab landed on the tray", n"Check_OnTray", 0, 5.0f);
-        Add_Step_WaitSeconds("its arrival on the tray finishes", 0.5f);
+        Add_Step_WaitUntil("the slab landed on the tray", n"Check_OnTray", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the slab rides the tray, a Kinematic scene-node child of its root", n"Check_SlabRidesTheTray", k_SlowPolls, 0);
         Add_Step("the slab rides the tray with its sear; the pan holds nothing", n"Step_AssertOnTray");
         Run_Steps(InHandle);
     }
@@ -112,6 +114,14 @@ class UMars_AutoTest_SearingStation_FeedTakesFromTheTrayAndTakeOutLoadsTheOther 
         Res.Set(_Tray.As_Platter().Get_HeldCount() == 1);
     }
 
+    // The tray's freeze parents the slab under its root and asks its body for Kinematic.
+    UFUNCTION()
+    private void Check_SlabRidesTheTray(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Slab.TryGet_Platter() == _Tray.As_Platter() && Get_Parent(_Slab) == _Tray.As_Transform() && Get_IsKinematic(_Slab));
+    }
+
     UFUNCTION()
     private void Step_AssertOnTray(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -124,14 +134,14 @@ class UMars_AutoTest_SearingStation_FeedTakesFromTheTrayAndTakeOutLoadsTheOther 
         Assert_Equals_Int(Get_TakenOutCount(), 1, "the kernel counts one piece taken out");
 
         const auto CookState = _Slab.Get_CookState();
-        Assert_Equals_Int(CookState.FaceSear.Num(), utils_searing::k_FaceCount, "the cook state has every face");
-        if (CookState.FaceSear.Num() != utils_searing::k_FaceCount || _SearAtTakeOut.Num() != utils_searing::k_FaceCount)
+        Assert_Equals_Int(CookState.Sear.Num(), utils_searing::k_FaceCount, "the cook state has every face's sear");
+        if (CookState.Sear.Num() != utils_searing::k_FaceCount || _SearAtTakeOut.Num() != utils_searing::k_FaceCount)
         { return; }
 
         auto MaxSear = 0.0f;
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
         {
-            const auto Written = CookState.FaceSear[Face];
+            const auto Written = CookState.Sear[Face];
             const auto Asked = _SearAtTakeOut[Face];
             Assert_True(Written >= Asked - 0.0001f && Written <= Asked + k_SearTolerance,
                 f"face {Face}'s sear [{Written}] is the kernel's at the take-out [{Asked}]");

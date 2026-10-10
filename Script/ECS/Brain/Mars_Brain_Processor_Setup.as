@@ -49,8 +49,6 @@ class UMars_Processor_Brain_Setup : UCk_Processor_Script_Base_UE
 
         State.LeafClass = New;
 
-        ck::Trace(f"[Brain] [{InBrain.ToString()}] leaf [{utils_brain::Get_ClassName(Old)}] -> [{utils_brain::Get_ClassName(New)}]");
-
         if (InBrain.Has_Fragment(FMars_Fragment_Brain_Signals))
         { InBrain.Get_Fragment(FMars_Fragment_Brain_Signals).OnLeafChanged.Broadcast(InBrain, Old, New); }
     }

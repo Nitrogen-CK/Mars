@@ -2,6 +2,9 @@
 // countdown stays empty (and stops running) once the last step is gone.
 class UMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the countdown drains one step every SecondsPerStep.
+    private const int32 k_SlowPolls = 900;
+
     private FCk_Handle_Countdown _Countdown;
     private TArray<int32> _Changes;
 
@@ -14,8 +17,8 @@ class UMars_AutoTest_Countdown_ChargeDrainsOneStepAtATime : UCk_AutoTest_Base
 
         Add_Step("it starts empty and idle", n"Step_AssertEmpty");
         Add_Step("charge it", n"Step_Charge");
-        Add_Step_WaitUntil("every step is charged", n"Check_Full", 0, 5.0f);
-        Add_Step_WaitUntil("it drains to empty", n"Check_Empty", 0, 5.0f);
+        Add_Step_WaitUntil("every step is charged", n"Check_Full", 0, 0);
+        Add_Step_WaitUntil("it drains to empty", n"Check_Empty", k_SlowPolls, 0);
         Add_Step_WaitSeconds("let it sit empty", 0.3f);
         Add_Step("it drained one step at a time and stopped", n"Step_AssertDrained");
         Run_Steps(InHandle);

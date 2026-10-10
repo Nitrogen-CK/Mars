@@ -1,8 +1,10 @@
-// A food item taken off a platter while it still settles stays in the hand. The carrier picks the meat slab up, deposits it on
-// a large platter (the platter drops the joint, Dynamic, into Settling), and picks it up again one frame after the drop,
-// long before it could freeze. Three seconds later (past Settle.MaxSeconds) the slab is still Held with the hand as its
-// parent: the freeze's attach did not pull it back onto the root. The platter forgot it silently (a first landing never
-// landed): it is empty, no OnLoaded, no OnUnloaded. Isolated origin (24000, -21000, -30000).
+// A food taken off a platter in the frame after its drop stays where it was taken. A meat slab lying on its floor is loaded
+// onto a large platter (the kernel's way, no hand); the platter drops the joint, Dynamic, into Settling. A per-frame hook
+// takes it in the first frame it sees the joint settling (the step timers run before the platter's processors: the frame
+// after the drop, before the platter's next pass): the joint's body is asked for Kinematic and the joint is attached to the
+// carrier's hand node where it is, which is all "taken" means to the platter's books. The platter forgets it silently (a
+// first landing never landed), and past the longest settle the joint's parent is still the hand node: no freeze pulled it
+// back onto the root. No OnLoaded, no OnUnloaded, no refusal. Isolated origin (24000, -21000, -30000).
 class UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack : UMars_AutoTestRig_Carrier
 {
     default _TimeoutSeconds = 30.0f;
@@ -10,28 +12,30 @@ class UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack : UMars_Auto
     private const FVector k_Origin = FVector(24000.0, -21000.0, -30000.0);
     private const FVector k_PlatterOffset = FVector(200.0, 0.0, 0.0);
     private const FVector k_FoodOffset = FVector(200.0, 200.0, 0.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     // Under construction until each is a WorldItem whose holder holds its item.
     private FCk_Handle _PlatterEntity;
     private FCk_Handle _FoodEntity;
 
     private FCk_Handle_Platter _Platter;
-    private FCk_Handle_WorldItem _PlatterItem;
-    private FCk_Handle_WorldItem _Food;
-    private FCk_Handle_Item _FoodItem;
     private FCk_Handle_FoodPiece _Joint;
 
     private TArray<FCk_Handle_FoodPiece> _Loaded;
     private TArray<FCk_Handle_FoodPiece> _Unloaded;
+    private TArray<EMars_Platter_LoadRefusal> _Refusals;
+
+    // Armed by the load; the take hook acts once, the first frame it sees the joint settling.
+    private bool _IsTakeArmed = false;
+    private bool _HasTaken = false;
+    // The settling entry's age when the hand took the joint: zero while the platter has not watched it since the drop.
+    private float32 _SettlingSecondsAtTake = -1.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Add_CarrierBodyWithBack(InHandle, k_Origin);
-        Add_Hotbar(_Carrier, 1);
-        _HeldItem = utils_held_item::Add(_Carrier);
-        Add_CarrierHands();
-        Bind_PushSelection();
 
         auto Owner = InHandle;
         Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
@@ -50,25 +54,18 @@ class UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack : UMars_Auto
         _FoodEntity = utils_entity_script::Request_SpawnEntity(PieceOwner, UMars_FoodItem_EntityScript, SpawnParams).Get_EntityUnderConstruction();
         Track_ForCleanup(_FoodEntity);
 
-        Add_Step_WaitUntil("the platter and the food item are constructed", n"Check_Constructed", 0, 10.0f);
-        Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 5.0f);
-        Add_Step("the carrier focuses the food's pickup", n"Step_FocusFood");
-        Add_Step_WaitFrames("the food's target enters Focused", 3);
-        Add_Step("the carrier picks the food up", n"Step_PickUpFood");
-        Add_Step_WaitUntil("the food is Held", n"Check_FoodHeld", 0, 5.0f);
-        Add_Step_WaitSeconds("the hold's arrival settles", 0.5f);
-        Add_Step("the carrier unfocuses the food and focuses the platter", n"Step_FocusPlatter");
-        Add_Step_WaitFrames("the platter's target enters Focused", 3);
-        Add_Step("the carrier deposits the food on the platter", n"Step_Deposit");
-        Add_Step_WaitUntil("the food is released into the world", n"Check_FoodReleased", 0, 3.0f);
-        Add_Step("the carrier unfocuses the platter and focuses the food", n"Step_RefocusFood");
-        Add_Step_WaitFrames("the food's target enters Focused", 3);
-        Add_Step_WaitUntil("the platter dropped the joint", n"Check_Dropped", 0, 3.0f);
-        Add_Step_WaitFrames("one frame after the drop", 1);
-        Add_Step("the carrier takes the food while it settles", n"Step_TakeWhileSettling");
-        Add_Step_WaitUntil("the food is Held again", n"Check_FoodHeld", 0, 5.0f);
-        Add_Step_WaitSeconds("past the longest settle", 3.0f);
-        Add_Step("the food stayed in the hand and the platter is empty", n"Step_AssertStayedInTheHand");
+        utils_timer::Create_Tick(Owner, FCk_Delegate_Timer(this, n"OnTakeTick"));
+
+        // Past the platter's longest settle (Settle.MaxSeconds) a freeze would have pulled the joint back.
+        const auto PastTheLongestSettle = FMars_Platter_SettleTuners().MaxSeconds + 0.5f;
+
+        Add_Step_WaitUntil("the platter and the food item are constructed", n"Check_Constructed", k_SlowPolls, 0);
+        Add_Step("load the slab's joint onto the platter", n"Step_Load");
+        Add_Step_WaitUntil("the hand takes the joint before the platter's next pass after its drop", n"Check_Taken", k_SlowPolls, 0);
+        Add_Step("the platter had not watched the joint when it was taken", n"Step_AssertTakenAtTheDrop");
+        Add_Step_WaitUntil("the platter forgot the joint", n"Check_Forgotten", 0, 0);
+        Add_Step_WaitSeconds("past the longest settle", PastTheLongestSettle);
+        Add_Step("the joint stayed on the hand node and the platter is empty", n"Step_AssertStayedInTheHand");
         Run_Steps(InHandle);
     }
 
@@ -96,12 +93,10 @@ class UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack : UMars_Auto
         if (PlatterReady && FoodReady && ck::Is_NOT_Valid(_Platter))
         {
             _Platter = _PlatterEntity.As_Platter();
-            _PlatterItem = _PlatterEntity.As_WorldItem();
-            _Food = _FoodEntity.As_WorldItem();
-            _FoodItem = _Food.Get_HeldItem();
             _Joint = _FoodEntity.As_FoodPiece();
             _Platter.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnLoaded"));
             _Platter.BindTo_OnUnloaded(FMars_Delegate_Platter_OnUnloaded(this, n"OnUnloaded"));
+            _Platter.BindTo_OnLoadRefused(FMars_Delegate_Platter_OnLoadRefused(this, n"OnLoadRefused"));
         }
 
         auto Res = OutResult;
@@ -109,86 +104,70 @@ class UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack : UMars_Auto
     }
 
     UFUNCTION()
-    private void Step_FocusFood(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_Load(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Pickup = Get_Pickup(_Food);
-        Pickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        _IsTakeArmed = true;
+        _Platter.Request_Load(FMars_Request_Platter_Load(_Joint));
+    }
+
+    // Takes the joint the first frame it is settling: its body Kinematic (as a mount asks before it attaches: a Dynamic body
+    // would fight the attach) and the joint a scene-node child of the hand node, keeping its world pose.
+    UFUNCTION()
+    private void OnTakeTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        if (_IsTakeArmed == false || _HasTaken || ck::Is_NOT_Valid(_Platter))
+        { return; }
+
+        const auto Settling = TryGet_Settling();
+        if (Settling.IsSet() == false)
+        { return; }
+
+        _HasTaken = true;
+        _SettlingSecondsAtTake = Settling.GetValue().Seconds;
+
+        FCk_Handle JointEntity = _Joint;
+        auto Body = JointEntity.As_JoltBody(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Body))
+        { utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Kinematic)); }
+
+        auto JointTransform = JointEntity.As_Transform();
+        const auto JointWorld = utils_transform::Get_EntityCurrentTransform(JointTransform);
+        const auto HandWorld = utils_transform::Get_EntityCurrentTransform(_HandNode);
+        utils_scene_node::Add(JointTransform, _HandNode, JointWorld.GetRelativeTransform(HandWorld));
     }
 
     UFUNCTION()
-    private void Step_PickUpFood(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        auto Target = Get_UseTarget(_Food);
-        Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
-    }
-
-    UFUNCTION()
-    private void Check_FoodHeld(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_Taken(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Food.Get_Mount() == EMars_WorldItem_Mount::Held && Get_Parent(_Food) == _HandNode);
+        Res.Set(_HasTaken || _Loaded.Num() > 0 || _Refusals.Num() > 0);
     }
 
     UFUNCTION()
-    private void Step_FocusPlatter(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertTakenAtTheDrop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto FoodPickup = Get_Pickup(_Food);
-        FoodPickup.Request_Unfocus(FMars_Request_Interactable_Unfocus(_Carrier));
-
-        auto PlatterPickup = Get_Pickup(_PlatterItem);
-        PlatterPickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
+        Assert_True(_HasTaken, "the hand took the joint while it settled");
+        Assert_True(_SettlingSecondsAtTake == 0.0f,
+            f"the platter had not watched the joint since its drop when the hand took it (settling for {_SettlingSecondsAtTake} s)");
+        Assert_Equals_Int(_Loaded.Num(), 0, "the joint had not landed when it was taken");
     }
 
     UFUNCTION()
-    private void Step_Deposit(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        auto Target = Get_UseTarget(_PlatterItem);
-        Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
-    }
-
-    UFUNCTION()
-    private void Check_FoodReleased(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_Forgotten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Food.Get_Mount() == EMars_WorldItem_Mount::World && _Food.Get_HeldItem() == _FoodItem);
-    }
-
-    UFUNCTION()
-    private void Step_RefocusFood(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        auto PlatterPickup = Get_Pickup(_PlatterItem);
-        PlatterPickup.Request_Unfocus(FMars_Request_Interactable_Unfocus(_Carrier));
-
-        auto FoodPickup = Get_Pickup(_Food);
-        FoodPickup.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
-    }
-
-    UFUNCTION()
-    private void Check_Dropped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(Get_IsSettling());
-    }
-
-    UFUNCTION()
-    private void Step_TakeWhileSettling(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Assert_True(Get_IsSettling(), "the joint is still settling when the hand takes it");
-        Assert_Equals_Int(_Loaded.Num(), 0, "the joint has not landed yet");
-
-        auto Target = Get_UseTarget(_Food);
-        Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
+        Res.Set(ck::Is_NOT_Valid(_Joint.TryGet_Platter()));
     }
 
     UFUNCTION()
     private void Step_AssertStayedInTheHand(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Food.Get_Mount() == EMars_WorldItem_Mount::Held, "the food is still Held");
-        Assert_True(Get_Parent(_Food) == _HandNode, "the food's parent is the hand, not the platter root");
+        Assert_True(Get_JointParent() == _HandNode, "the joint's parent is the hand node, not the platter root");
         Assert_Equals_Int(_Platter.Get_Occupancy(), 0, "the platter is empty");
         Assert_True(ck::Is_NOT_Valid(_Joint.TryGet_Platter()), "the joint is off the platter's books");
         Assert_Equals_Int(_Loaded.Num(), 0, "no OnLoaded: the joint never landed");
         Assert_Equals_Int(_Unloaded.Num(), 0, "no OnUnloaded: a first landing leaves silently");
+        Assert_Equals_Int(_Refusals.Num(), 0, "no refusal: a taken piece is not refused");
     }
 
     UFUNCTION()
@@ -203,31 +182,29 @@ class UMars_AutoTest_Platter_AFoodTakenWhileSettlingIsNotPulledBack : UMars_Auto
         _Unloaded.Add(InPiece);
     }
 
-    private bool Get_IsSettling() const
+    UFUNCTION()
+    private void OnLoadRefused(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal)
+    {
+        _Refusals.Add(InRefusal);
+    }
+
+    // The joint's entry in the platter's Settling list; unset while it is queued, held or gone.
+    private TOptional<FMars_Platter_Settling> TryGet_Settling() const
     {
         for (const auto& Settling : _Platter.Get_Fragment(FMars_Fragment_Platter).Settling)
         {
             if (Settling.Piece == _Joint)
-            { return true; }
+            { return TOptional<FMars_Platter_Settling>(Settling); }
         }
 
-        return false;
+        return TOptional<FMars_Platter_Settling>();
     }
 
-    private FCk_Handle_Interactable Get_Pickup(const FCk_Handle_WorldItem& InWorldItem) const
+    // Invalid while the joint is not scene-node attached.
+    private FCk_Handle_Transform Get_JointParent() const
     {
-        return InWorldItem.Get_Fragment(FMars_Fragment_WorldItem).Pickup;
-    }
-
-    private FCk_Handle_InteractTarget Get_UseTarget(const FCk_Handle_WorldItem& InWorldItem) const
-    {
-        return Get_Pickup(InWorldItem).Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
-    }
-
-    // Invalid while the world item is not scene-node attached.
-    private FCk_Handle_Transform Get_Parent(const FCk_Handle_WorldItem& InWorldItem) const
-    {
-        auto Node = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
+        FCk_Handle Entity = _Joint;
+        auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Node))
         { return FCk_Handle_Transform(); }
 

@@ -1,7 +1,6 @@
 // With an empty finished tray docked, a centre chop and a sweep hand both halves to the tray: the board lets them go without
 // bodies (a hand-off) and the sweep bridge loads each onto the tray, where it drops between the walls. Both freeze on the
-// tray as scene-node children of its root, still shown, on their own Kinematic bodies; the board is empty and touched and
-// keeps nothing released.
+// tray as scene-node children of its root, still shown, on their own Kinematic bodies; the board is empty.
 class UMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(12800.0, -9000.0, -30000.0);
@@ -15,14 +14,14 @@ class UMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRi
         Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
         Spawn_OutputPlatter(InHandle);
 
-        Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", 0, 10.0f);
+        Add_Step_WaitUntil("the empty tray is constructed", n"Check_OutputPlatterReady", k_SlowPolls, 0);
         Add_Steps_FeedTheJoint();
         Add_Step("dock the tray", n"Step_DockOutput");
-        Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the tray is docked", n"Check_OutputDocked", k_SlowPolls, 0);
         Add_Step("chop at the board's centre", n"Step_Chop");
-        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
+        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", k_SlowPolls, 0);
         Add_Step("sweep", n"Step_SweepHalves");
-        Add_Step_WaitUntil("both halves landed on the tray", n"Check_OnTray", 0, 8.0f);
+        Add_Step_WaitUntil("both halves landed on the tray", n"Check_OnTray", k_SlowPolls, 0);
         Add_Step_WaitFrames("the landing poses compose", 2);
         Add_Step("both ride the tray, shown and Kinematic; the board is empty", n"Step_Assert");
         Run_Steps(InHandle);
@@ -62,8 +61,6 @@ class UMars_AutoTest_CuttingStation_SweepHandsPiecesToTheTray : UMars_AutoTestRi
     {
         Assert_Equals_Int(_Released.Num(), 2, "the board let both halves go");
         Assert_Equals_Int(_Board.Get_HeldCount(), 0, "the board holds nothing");
-        Assert_Equals_Int(_Board.Get_Released().Num(), 0, "a hand-off keeps nothing released");
-        Assert_False(_Board.Get_IsUntouched(), "a sweep touches the board");
         Assert_Equals_Int(_OutputPlatter.Get_HeldCount(), 2, "the tray holds both halves");
 
         FCk_Handle TrayEntity = _OutputPlatter;

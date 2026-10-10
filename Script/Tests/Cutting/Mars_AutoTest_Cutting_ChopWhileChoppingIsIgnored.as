@@ -10,7 +10,7 @@ class UMars_AutoTest_Cutting_ChopWhileChoppingIsIgnored : UMars_AutoTestRig_Cutt
         _Cutting.BindTo_OnChopLanded(FMars_Delegate_Cutting_OnChopLanded(this, n"OnChopLanded"));
 
         Add_Step("chop twice in one step", n"Step_ChopTwice");
-        Add_Step_WaitUntil("the chop landed and the cleaver is back up", n"Check_FirstChopDone", 0, 2.0f);
+        Add_Step_WaitUntil("the chop landed and the cleaver is back up", n"Check_FirstChopDone", 0, 0);
         Add_Step_WaitSeconds("a second chop would land in this window", 0.3f);
         Add_Step("exactly one chop landed", n"Step_AssertOneChop");
         Run_Steps(InHandle);

@@ -13,7 +13,6 @@ class UMars_AutoTest_Backpack_CargoRejectsBackpack : UMars_AutoTestRig_Carrier
         Add_CarrierBodyWithBack(InHandle, FVector(0.0, 0.0, -54000.0));
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         auto SpawnParams = UMars_Backpack_EntityScript::Params();
         SpawnParams.Definition = mars_items::Backpack();

@@ -73,12 +73,12 @@ class UMars_AutoTest_Brain_LeafConditionDrivesStateMachine : UMars_AutoTestRig_B
         utils_state_machine::BindTo_OnStateChanged(_Machine, FCk_Delegate_Sm_OnStateChanged(this, n"OnStateChanged"));
 
         Add_Step("the brain and the machine composed on one entity", n"Step_AssertComposed");
-        Add_Step_WaitUntil("the machine settles in BrainRoam", n"Check_InRoam", 0, 3.0f);
+        Add_Step_WaitUntil("the machine settles in BrainRoam", n"Check_InRoam", 0, 0);
         Add_Step("IsHurt true", n"Step_Hurt");
-        Add_Step_WaitUntil("the machine reaches BrainFlinch", n"Check_InFlinch", 0, 3.0f);
+        Add_Step_WaitUntil("the machine reaches BrainFlinch", n"Check_InFlinch", 0, 0);
         Add_Step("Roam -> Flinch passed through the Idle hub", n"Step_AssertThroughIdle");
         Add_Step("IsHurt false", n"Step_Heal");
-        Add_Step_WaitUntil("the machine returns to BrainRoam", n"Check_InRoam", 0, 3.0f);
+        Add_Step_WaitUntil("the machine returns to BrainRoam", n"Check_InRoam", 0, 0);
         Run_Steps(InHandle);
     }
 

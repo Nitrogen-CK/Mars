@@ -4,6 +4,8 @@ UCLASS(Abstract)
 class UMars_AutoTestRig_Implement : UCk_AutoTest_Base
 {
     protected const FVector k_Origin = FVector(-60000.0, 18000.0, -60000.0);
+    // A poll budget, not a ceiling: a hold step polls for its whole span.
+    protected const int32 k_SlowPolls = 900;
 
     protected FCk_Handle_Implement _Implement;
     // The spec the implement was built from, nodes included.

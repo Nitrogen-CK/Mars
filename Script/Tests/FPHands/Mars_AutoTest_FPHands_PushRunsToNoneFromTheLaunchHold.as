@@ -18,9 +18,9 @@ class UMars_AutoTest_FPHands_PushRunsToNoneFromTheLaunchHold : UMars_AutoTestRig
         Log_Phases();
 
         Add_Step("the push curve starts at the hold, peaks at OutSeconds and returns", n"Step_AssertCurve");
-        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a push", n"Check_RestListeningForPush", 0, 5.0f);
+        Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a push", n"Check_RestListeningForPush", 0, 0);
         Add_Step("request a throw push from a two-handed hold, then empty the hold", n"Step_RequestPush");
-        Add_Step_WaitUntil("the phase went through Push back to None", n"Check_BackToNone", 0, 5.0f);
+        Add_Step_WaitUntil("the phase went through Push back to None", n"Check_BackToNone", k_SlowPolls, 0);
         Add_Step("Push ran once and kept the launch hold while the feature's hold was empty", n"Step_AssertSequence");
         Run_Steps(InHandle);
     }

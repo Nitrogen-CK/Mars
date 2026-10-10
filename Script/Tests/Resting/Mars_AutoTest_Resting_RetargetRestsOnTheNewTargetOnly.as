@@ -28,11 +28,11 @@ class UMars_AutoTest_Resting_RetargetRestsOnTheNewTargetOnly : UMars_AutoTestRig
         _RetargetResting = utils_resting::Add(_RetargetBox, FMars_Resting_Spec(_PlateA));
         _RetargetResting.BindTo_OnRestingChanged(FMars_Delegate_Resting_OnRestingChanged(this, n"OnRestingChanged"));
 
-        Add_Step_WaitUntil("the box rests on plate A", n"Check_OnA", 0, 2.0f);
+        Add_Step_WaitUntil("the box rests on plate A", n"Check_OnA", k_SlowPolls, 0);
         Add_Step("retarget the box onto plate B while it lies on A", n"Step_Retarget");
         Add_Step_WaitFrames("the retarget drains", k_RetargetFrames);
         Add_Step("apart, B its only target, A no target at all; teleport the box over B", n"Step_AssertRetargetedThenMoveToB");
-        Add_Step_WaitUntil("the box rests on plate B", n"Check_OnB", 0, 3.0f);
+        Add_Step_WaitUntil("the box rests on plate B", n"Check_OnB", k_SlowPolls, 0);
         Add_Step("resting on B", n"Step_AssertOnB");
         Run_Steps(InHandle);
     }

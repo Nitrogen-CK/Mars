@@ -16,7 +16,7 @@ class UMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive : UCk_AutoTest_Ba
         _Session.BindTo_OnPhaseChanged(FMars_Delegate_CampSession_OnPhaseChanged(this, n"OnPhaseChanged"));
 
         Add_Step("request Play", n"Step_RequestPlay");
-        Add_Step_WaitUntil("OnPhaseChanged fired", n"Check_Broadcast", 0, 5.0f);
+        Add_Step_WaitUntil("OnPhaseChanged fired", n"Check_Broadcast", 0, 0);
         Add_Step_WaitSeconds("a second broadcast would land in this window", 0.5f);
         Add_Step("one broadcast, carrying Lobby -> Live", n"Step_AssertOnceLobbyToLive");
         Run_Steps(InHandle);

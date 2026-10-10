@@ -39,7 +39,6 @@ class UMars_Processor_Crawler_Setup : UCk_Processor_Script_Base_UE
         auto Crawler = InGait.As_Crawler();
 
         const auto CanWalk = InEnabledCount >= Crawler.Get_Spec().MinLegsToWalk;
-        ck::Trace(f"[Crawler] [{Crawler.ToString()}] legs enabled [{InEnabledCount}] of [{InTotalCount}]: CanWalk [{CanWalk}]");
 
         auto Brain = Crawler.Get_Brain();
         Brain.Request_SetFact(FMars_Request_Brain_SetFact(utils_crawler::Get_CanWalkFact(), CanWalk));

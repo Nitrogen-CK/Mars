@@ -1,15 +1,15 @@
-// The carrier's SM root state: the player HFSM's real Hotbar -> HeldItem glue.
+// The carrier's SM root state: the player HFSM's real hotbar glue (HeldItem follows the hotbar on its own).
 class UMars_AutoTestState_FreeHandsCarrierRig : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
-        AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
+        AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);
     }
 }
 
 // A carrier (AttachPoints + Hotbar + HeldItem + HeldItemUse, the test entity, whose SM runs the player HFSM's
-// HotbarDrivesHeldItem task) holding a rock can't start a RequiresFreeHands lever: Get_CanInteractWith reads
+// HotbarEjectDrops task) holding a rock can't start a RequiresFreeHands lever: Get_CanInteractWith reads
 // CustomValidationFailed and a StartInteraction creates nothing, while the same lever without the flag reads
 // CanInteractWith. Selecting the empty bag slot frees the hands; the gated lever then reads CanInteractWith and the same
 // StartInteraction creates the interaction. Isolated Z band: -81000.
@@ -44,7 +44,7 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UMars_AutoTe
         Add_Step("select the empty bag slot 1", n"Step_SelectEmptySlot");
         Add_Step_WaitUntil("the carrier's hands are empty", n"Check_HandsEmpty");
         Add_Step("empty hands: the gated lever accepts the carrier; start it", n"Step_AssertAcceptedAndStart");
-        Add_Step_WaitUntil("the gated lever has the carrier's interaction", n"Check_HasInteraction", 0, 5.0f);
+        Add_Step_WaitUntil("the gated lever has the carrier's interaction", n"Check_HasInteraction", 0, 0);
         Run_Steps(InHandle);
     }
 

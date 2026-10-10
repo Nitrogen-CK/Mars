@@ -13,11 +13,11 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UMars_AutoTestRig_Climber
 
         Add_Step("the climber spec rejects a zero climb speed", n"Step_ValidateSpec");
         Add_Step("mount from the front", n"Step_Mount");
-        Add_Step_WaitUntil("the climber is climbing", n"Check_Climbing", 0, 2.0f);
+        Add_Step_WaitUntil("the climber is climbing", n"Check_Climbing", 0, 0);
         Add_Step("a front mount without a character starts at the foot", n"Step_AssertAtFoot");
-        Add_Step_WaitUntil("climbing up reaches half way", n"Check_HalfWay", 0, 3.0f);
+        Add_Step_WaitUntil("climbing up reaches half way", n"Check_HalfWay", 0, 0);
         Add_Step("still climbing at half way", n"Step_AssertStillClimbing");
-        Add_Step_WaitUntil("climbing up past the top ends the climb", n"Check_ToppedOut", 0, 5.0f);
+        Add_Step_WaitUntil("climbing up past the top ends the climb", n"Check_ToppedOut", 0, 0);
         Add_Step("the climb ended at the top and was signalled", n"Step_AssertToppedOut");
         Run_Steps(InHandle);
     }

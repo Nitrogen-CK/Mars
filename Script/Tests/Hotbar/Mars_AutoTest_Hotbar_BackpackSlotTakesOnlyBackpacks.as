@@ -26,7 +26,7 @@ class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UMars_AutoTestRig_C
         Add_Step_WaitUntil("slot 0 holds the rock and is auto-held", n"Check_RockStowedAndSelected");
         Add_Step("stow the backpack", n"Step_StowBackpack");
         Add_Step_WaitUntil("the backpack slot holds it", n"Check_WearingBackpack");
-        Add_Step_WaitFrames("let the sync pass observe the backpack arrival", 3);
+        Add_Step_WaitUntil("the sync pass has seen the backpack arrival", n"Check_SyncSawBackpack", 0, 0);
         Add_Step("the backpack arrival kept the selection", n"Step_AssertSelectionKept");
         Add_Step("a second backpack has nowhere to go", n"Step_AssertSecondBackpackHasNoTarget");
         Add_Step("force the second backpack into the occupied backpack slot", n"Step_ForceBackpack2IntoBackpackSlot");
@@ -106,6 +106,16 @@ class UMars_AutoTest_Hotbar_BackpackSlotTakesOnlyBackpacks : UMars_AutoTestRig_C
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_IsWearingBackpack());
+    }
+
+    // The hotbar's sync pass records each slot's item (LastSeen) in the pass that applies the arrival rule to it.
+    UFUNCTION()
+    private void Check_SyncSawBackpack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto Index = _Hotbar.Get_BackpackIndex().GetValue();
+        const auto Item = _Hotbar.Get_ItemAt(Index);
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(Item) && _Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[Index] == Item);
     }
 
     UFUNCTION()

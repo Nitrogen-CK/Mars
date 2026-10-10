@@ -1,9 +1,11 @@
-// Docking a platter held in the hands is ONE mount change (Held -> Carried, the dock's Carry): the HeldItem's re-carry on
-// deselect finds the item already headed for the dock and leaves it alone, so no illegal move fires. The overflow empties
-// and the hands with it. Taking it back is ONE more (Carried -> Held, the hotbar arrival's Hold). Isolated Z band: -59000.
+// Docking a platter held in the hands is ONE mount change (Held -> Carried on the dock): its item moves from the overflow
+// to the dock's inventory and its mount follows, never stopping on the back. The overflow empties and the hands with it.
+// Taking it back is ONE more (Carried -> Held, the overflow selected). Isolated Z band: -59000.
 class UMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold : UMars_AutoTestRig_PlatterDock
 {
     private const FVector k_Origin = FVector(0.0, 0.0, -59000.0);
+    // Physics settles and mount arrivals outrun the harness's default poll budget at lane frame rate.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle_PlatterDock _Dock;
 
@@ -17,7 +19,6 @@ class UMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold : UMa
         Add_CarrierBody(InHandle, k_Origin);
         Add_Hotbar(_Carrier, 1);
         _HeldItem = utils_held_item::Add(_Carrier);
-        Bind_PushSelection();
 
         auto Root = Build_StationRoot(InHandle, k_Origin);
         _Dock = Build_Dock(Root, Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(), false),
@@ -25,15 +26,15 @@ class UMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold : UMa
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0))));
 
         Add_Step_WaitUntil("the platter world item is constructed and its holder holds its item", n"Check_PlattersConstructed");
-        Add_Step("stow the platter into the overflow and carry it", n"Step_Stow");
-        Add_Step_WaitUntil("the platter is Held", n"Check_Held");
+        Add_Step("stow the platter into the overflow", n"Step_Stow");
+        Add_Step_WaitUntil("the platter is Held", n"Check_Held", k_SlowPolls, 0);
         Add_Step("holding a platter, an empty dock offers Place; dock it from the hand", n"Step_DockFromTheHand");
         Add_Step_WaitUntil("the dock reports the platter docked", n"Check_Docked");
         Add_Step_WaitUntil("the platter is Carried", n"Check_Carried");
-        Add_Step_WaitSeconds("any stray re-carry would have drained", 0.5f);
+        Add_Step_WaitSeconds("any stray mount change would have drained", 0.5f);
         Add_Step("one Held -> Carried; the dock carries it; the overflow and the hands are empty", n"Step_AssertDocked");
         Add_Step("take the platter back into the overflow", n"Step_Take");
-        Add_Step_WaitUntil("the platter is Held", n"Check_Held");
+        Add_Step_WaitUntil("the platter is Held", n"Check_Held", k_SlowPolls, 0);
         Add_Step_WaitSeconds("any stray mount change would have drained", 0.5f);
         Add_Step("one more Carried -> Held; the carrier holds it", n"Step_AssertTaken");
         Run_Steps(InHandle);
@@ -84,7 +85,7 @@ class UMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold : UMa
     UFUNCTION()
     private void Step_AssertDocked(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_HeldToCarried, 1, "exactly one Held -> Carried (the dock's Carry)");
+        Assert_Equals_Int(_HeldToCarried, 1, "exactly one Held -> Carried (onto the dock)");
         Assert_True(_WorldItems[0].Get_Mount() == EMars_WorldItem_Mount::Carried, "the platter is Carried");
         Assert_True(_WorldItems[0].Get_TargetMount() == EMars_WorldItem_Mount::Carried, "the platter is not headed anywhere else");
 
@@ -110,7 +111,7 @@ class UMars_AutoTest_PlatterDock_DockFromTheHandIsOneCarryAndTakeIsOneHold : UMa
     UFUNCTION()
     private void Step_AssertTaken(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Int(_CarriedToHeld - _CarriedToHeldBeforeTake, 1, "exactly one more Carried -> Held (the take's Hold)");
+        Assert_Equals_Int(_CarriedToHeld - _CarriedToHeldBeforeTake, 1, "exactly one more Carried -> Held (the take)");
         Assert_Equals_Int(_HeldToCarried, 1, "still exactly one Held -> Carried");
         Assert_Equals_Int(Get_UndockedCount(_Dock), 1, "the dock reported one undock");
         Assert_True(_WorldItems[0].Get_Carrier() == _Carrier, "the carrier is the platter's carrier");

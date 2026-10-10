@@ -18,9 +18,9 @@ class UMars_AutoTest_FPHands_UnfocusEasesTheLeanOut : UMars_AutoTestRig_Hands
         _Interactable = utils_interactable::Create(OwnerRoot, FMars_Interactable_Spec());
 
         Add_Step("focus the interactable", n"Step_Focus");
-        Add_Step_WaitUntil("the glove has leaned in", n"Check_LeanedIn", 0, 5.0f);
+        Add_Step_WaitUntil("the glove has leaned in", n"Check_LeanedIn", k_SlowPolls, 0);
         Add_Step("look away", n"Step_Unfocus");
-        Add_Step_WaitUntil("the lean has eased out and the focus target is cleared", n"Check_EasedOut", 0, 5.0f);
+        Add_Step_WaitUntil("the lean has eased out and the focus target is cleared", n"Check_EasedOut", k_SlowPolls, 0);
         Add_Step("the lean eased down over several frames before the target cleared", n"Step_AssertEased");
         Run_Steps(InHandle);
     }

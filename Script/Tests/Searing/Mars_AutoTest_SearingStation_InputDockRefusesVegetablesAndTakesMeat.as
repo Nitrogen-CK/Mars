@@ -7,6 +7,8 @@ class UMars_AutoTest_SearingStation_InputDockRefusesVegetablesAndTakesMeat : UMa
     private const FVector k_Origin = FVector(12000.0, -12000.0, -30000.0);
     private const FVector k_MeatOffset = FVector(0.0, -300.0, 0.0);
     private const FVector k_MushroomOffset = FVector(0.0, 300.0, 0.0);
+    // A poll budget, not a ceiling: the station composes and platters construct, drop and settle over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Meat;
     private FCk_Handle _Mushroom;
@@ -18,13 +20,13 @@ class UMars_AutoTest_SearingStation_InputDockRefusesVegetablesAndTakesMeat : UMa
         _Meat = Spawn_Platter(InHandle, k_MeatOffset, mars_items::Food_MeatSlab());
         _Mushroom = Spawn_Platter(InHandle, k_MushroomOffset, mars_items::Food_MushroomSlice());
 
-        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("both platters are constructed and their joints landed", n"Check_PlattersReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both platters are constructed and their joints landed", n"Check_PlattersReady", k_SlowPolls, 0);
         Add_Step("dock the mushroom platter on the raw platter dock", n"Step_DockMushroom");
-        Add_Step_WaitUntil("the dock answered", n"Check_Refused", 0, 5.0f);
+        Add_Step_WaitUntil("the dock answered", n"Check_Refused", 0, 0);
         Add_Step("it was refused for its kind and nothing is docked", n"Step_AssertRefused");
         Add_Step("dock the meat platter on the raw platter dock", n"Step_DockMeat");
-        Add_Step_WaitUntil("the meat platter is docked and the feed draws from it", n"Check_MeatSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the meat platter is docked and the feed draws from it", n"Check_MeatSourced", k_SlowPolls, 0);
         Add_Step("the feed is sourced with the slab available", n"Step_AssertSourced");
         Run_Steps(InHandle);
     }

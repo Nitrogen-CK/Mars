@@ -22,7 +22,7 @@ class UMars_AutoTest_Forage_VineStrikeDepletesThenRegrows : UMars_AutoTestRig_Fo
         Add_Step_WaitUntil("the vine composed its forage and zone", n"Check_Composed");
         Add_Step("bind the forage; hit the zone Blunt 25", n"Step_Hit");
         Add_Step_WaitUntil("released on the depletion, exhausted, zone disabled", n"Check_ReleasedAndDisabled");
-        Add_Step_WaitUntil("regrown", n"Check_Replenished", 0, 3.0f);
+        Add_Step_WaitUntil("regrown", n"Check_Replenished", k_SlowPolls, 0);
         Add_Step_WaitUntil("zone enabled and Health back at Max", n"Check_Rearmed");
         Add_Step("hit the zone again", n"Step_Hit");
         Add_Step_WaitUntil("released a second time", n"Check_SecondRelease");

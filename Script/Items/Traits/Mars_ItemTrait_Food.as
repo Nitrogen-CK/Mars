@@ -17,11 +17,16 @@ mixin const UMars_ItemTrait_Food Get_Food(const FCk_Handle_Item& Self)
     return Self.Get_ItemTrait(UMars_ItemTrait_Food);
 }
 
-// The food item in the hands: the selected slot's item when it carries the Food trait and is a Persistent world item's.
-// Invalid otherwise. Read from the hotbar, not HeldItem: HeldItem follows the selection a drain later.
+// The food item in the hands: the hotbar owner's held item (HeldItem, synced from the selected slot) when it carries the
+// Food trait and is a Persistent world item's. Invalid otherwise, and for an owner without HeldItem.
 mixin FCk_Handle_Item TryGet_SelectedFood(const FCk_Handle_Hotbar& Self)
 {
-    const auto Item = Self.Get_SelectedItem();
+    const FCk_Handle Owner = Self;
+    const auto HeldItem = Owner.As_HeldItem(ECk_SanityCheck::UnChecked);
+    if (ck::Is_NOT_Valid(HeldItem))
+    { return FCk_Handle_Item(); }
+
+    const auto Item = HeldItem.Get_CurrentItem();
     if (ck::Is_NOT_Valid(Item) || Item.Has_Food() == false || Item.Has_PersistentWorldItem() == false)
     { return FCk_Handle_Item(); }
 

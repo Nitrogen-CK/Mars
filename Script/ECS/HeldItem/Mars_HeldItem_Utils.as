@@ -1,7 +1,7 @@
 namespace utils_held_item
 {
-    // What is held is pushed in by the player HFSM (UMars_SmTask_HotbarDrivesHeldItem); the feature never reads the
-    // hotbar itself. The hand is the player's AttachPoint.Mars.Hand, so AttachPoints must be composed first.
+    // What is held is the player's own hotbar's selected slot (UMars_Processor_HeldItem_Sync reads it every pass). The hand
+    // is the player's AttachPoint.Mars.Hand, so AttachPoints and the Hotbar must be composed first.
     FCk_Handle_HeldItem Add(FCk_Handle& InPlayer)
     {
         const auto AttachPoints = InPlayer.As_AttachPoints(ECk_SanityCheck::UnChecked);
@@ -9,8 +9,15 @@ namespace utils_held_item
         if (ck::EnsureIfNot(HasHand, f"[HeldItem] [{InPlayer.ToString()}] needs AttachPoints with AttachPoint.Mars.Hand before HeldItem"))
         { return FCk_Handle_HeldItem(); }
 
+        const auto Hotbar = InPlayer.As_Hotbar(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(ck::IsValid(Hotbar), f"[HeldItem] [{InPlayer.ToString()}] needs a Hotbar before HeldItem"))
+        { return FCk_Handle_HeldItem(); }
+
+        auto State = FMars_Fragment_HeldItem();
+        State.Hotbar = Hotbar;
+
         InPlayer.Add_Fragment(FMars_Feature_HeldItem());
-        InPlayer.Add_Fragment(FMars_Fragment_HeldItem());
+        InPlayer.Add_Fragment(State);
         return InPlayer.As_HeldItem();
     }
 
@@ -67,12 +74,6 @@ mixin FCk_Handle_Transform Get_HandAttachPoint(const FCk_Handle_HeldItem& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_SetSlot(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetSlot& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
-    Requests.SetSlotRequests.Add(InRequest);
-}
-
 // The next held visual spawns at InRequest.WorldTransform and keeps that offset from the hand; consumed by that spawn.
 // Clear it if no spawn follows.
 mixin void Request_SetNextSpawnFrom(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetNextSpawnFrom& InRequest)
@@ -95,12 +96,6 @@ mixin void Request_SetNextArrival(FCk_Handle_HeldItem& Self, const FMars_Request
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
     Requests.SetNextArrivalRequests.Add(InRequest);
-}
-
-mixin void Request_SetNextHoldArrive(FCk_Handle_HeldItem& Self, const FMars_Request_HeldItem_SetNextHoldArrive& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItem_Requests);
-    Requests.SetNextHoldArriveRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

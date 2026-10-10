@@ -12,7 +12,7 @@ struct FMars_AutoTest_PlatterDock_Refusal
 }
 
 // The PlatterDock rig, on the carrier rig (the test entity is a carrier with a Hand node; tests add the hotbar and HeldItem
-// they need). A station root is a plain Transform entity under the test; docks are created on it with their three signals
+// they need). A station root is a plain Transform entity under the test; docks are created on it with their signals
 // recorded. Platters are spawned as World-mode platter world items under the test, each lying on a static floor of its own
 // (a platter drops what it is given only while it lies still), and resolved once constructed; box pieces live under the
 // world's transient entity, tracked for cleanup.
@@ -32,6 +32,7 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
     protected TArray<FMars_AutoTest_PlatterDock_Docked> _Arrived;
     protected TArray<FMars_AutoTest_PlatterDock_Docked> _Undocked;
     protected TArray<FMars_AutoTest_PlatterDock_Refusal> _DockRefused;
+    protected TArray<FMars_AutoTest_PlatterDock_Refusal> _UndockRefused;
 
     private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
 
@@ -50,6 +51,7 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         Dock.BindTo_OnArrived(FMars_Delegate_PlatterDock_OnArrived(this, n"OnDockArrived"));
         Dock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnDockUndocked"));
         Dock.BindTo_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefusedItem"));
+        Dock.BindTo_OnUndockRefused(FMars_Delegate_PlatterDock_OnUndockRefused(this, n"OnUndockRefusedItem"));
         return Dock;
     }
 
@@ -130,7 +132,7 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         PlatterDock.Request_Undock(FMars_Request_PlatterDock_Undock(InItem, InTarget));
     }
 
-    // What the pickup task does for a Persistent item: transfer into the hotbar's stow target, then Carry once it reports.
+    // What the pickup task does for a Persistent item: transfer into the hotbar's stow target; its mount follows.
     protected void Stow_Platter(int32 InIndex)
     {
         auto Item = _PlatterItems[InIndex];
@@ -252,13 +254,7 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
                                        ECk_Inventory_OperationResult_Transfer InResult)
     {
         if (InResult != ECk_Inventory_OperationResult_Transfer::Success)
-        {
-            FinishFailure(f"the platter's stow transfer failed with [{InResult :n}]");
-            return;
-        }
-
-        auto WorldItem = InItem.Get_PersistentWorldItem();
-        WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(_Carrier));
+        { FinishFailure(f"the platter's stow transfer failed with [{InResult :n}]"); }
     }
 
     UFUNCTION()
@@ -302,5 +298,15 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         Event.Item = InItem;
         Event.Refusal = InRefusal;
         _DockRefused.Add(Event);
+    }
+
+    UFUNCTION()
+    private void OnUndockRefusedItem(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem, EMars_PlatterDock_Refusal InRefusal)
+    {
+        auto Event = FMars_AutoTest_PlatterDock_Refusal();
+        Event.Dock = InDock;
+        Event.Item = InItem;
+        Event.Refusal = InRefusal;
+        _UndockRefused.Add(Event);
     }
 }

@@ -8,6 +8,8 @@ class UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndNothingReplacesIt : UM
 
     // Watched after the loss for a replacement (a respawn used to follow in 0.2 s).
     private const float32 k_NoReplacementSeconds = 1.5f;
+    // The window runs from the loss, before its wait step starts, so that step needs only the poll that reads its end.
+    private const float32 k_WindowSlackSeconds = 0.5f;
 
     private FCk_Handle _FirstPiece;
     private float32 _LostTime = -1.0f;
@@ -22,11 +24,11 @@ class UMars_AutoTest_Searing_TeleportedOffTheDiscIsLostAndNothingReplacesIt : UM
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();
         Add_Step("teleport the piece off the disc", n"Step_TeleportOff");
-        Add_Step_WaitUntil("the piece was lost", n"Check_Lost1", 0, 1.0f);
+        Add_Step_WaitUntil("the piece was lost", n"Check_Lost1", 0, 0);
         Add_Step("the piece is lost and its body lingers", n"Step_AssertLost");
-        Add_Step_WaitUntil("the lost body was destroyed", n"Check_LostDestroyed", 0, 1.5f);
+        Add_Step_WaitUntil("the lost body was destroyed", n"Check_LostDestroyed", 0, 0);
         Add_Step("the Id is gone with the body", n"Step_AssertDestroyed");
-        Add_Step_WaitUntil("the no-replacement window passed", n"Check_WindowPassed", 0, 2.0f);
+        Add_Step_WaitUntil("the no-replacement window passed", n"Check_WindowPassed", 0, k_NoReplacementSeconds + k_WindowSlackSeconds);
         Add_Step("nothing replaced the piece", n"Step_AssertNothingReplaced");
         Run_Steps(InHandle);
     }

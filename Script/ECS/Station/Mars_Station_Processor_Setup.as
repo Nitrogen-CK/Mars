@@ -1,7 +1,8 @@
-// One-shot per station: keeps the Use target in step with the reservation. While an operator holds the station its Use
-// target is disabled for everyone (the resolver skips it, so nobody can start a second reserve) and its prompt reads
-// Prompt.OccupiedText; on release it is enabled again and reads Prompt.Text. A reservation that landed before this setup ran
-// (same-frame reserve) is applied here at once.
+// One-shot per station: keeps the Use interactable in step with the reservation. While an operator holds the station its
+// Use interactable holds the Operated claim (its framework target is disabled with it, so the resolver skips it and nobody
+// can start a second reserve) and its prompt is re-texted to Prompt.OccupiedText; on release the claim goes and the prompt
+// reads Prompt.Text. Operated keeps the interactable focusable, so a focuser sees the occupied text while the claim holds.
+// A reservation that landed before this setup ran (same-frame reserve) is applied here at once.
 class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -42,7 +43,7 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
         Sync_UseTarget(InStation);
     }
 
-    // The Use target follows the reservation. Its target is missing only when its interactable was rejected (ensured
+    // The Use interactable follows the reservation. Its target is missing only when its interactable was rejected (ensured
     // there).
     private void Sync_UseTarget(FCk_Handle_Station InStation)
     {
@@ -51,7 +52,11 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Occupied = InStation.Get_IsOperated();
-        utils_interact_target::Set_Enabled(Target, Occupied ? ECk_EnableDisable::Disable : ECk_EnableDisable::Enable);
+        auto Interactable = InStation.Get_Interactable();
+        if (Occupied)
+        { Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::Operated)); }
+        else
+        { Interactable.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::Operated)); }
 
         const auto PromptSpec = InStation.Get_Spec().Prompt;
         auto Prompt = Target.As_InteractPrompt();

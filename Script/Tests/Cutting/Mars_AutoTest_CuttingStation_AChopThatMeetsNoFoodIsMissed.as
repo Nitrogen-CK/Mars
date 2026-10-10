@@ -10,11 +10,11 @@ class UMars_AutoTest_CuttingStation_AChopThatMeetsNoFoodIsMissed : UMars_AutoTes
     {
         Spawn_Station(InHandle, k_Origin);
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
         Add_Step("chop on the empty board", n"Step_Chop");
-        Add_Step_WaitUntil("the chop landed, the cleaver is back up and the board answered", n"Check_Answered", 0, 3.0f);
+        Add_Step_WaitUntil("the chop landed, the cleaver is back up and the board answered", n"Check_Answered", 0, 0);
         Add_Step_WaitFrames("a late cut or a second answer would show by now", 5);
         Add_Step("one landing, one knock, nothing cut", n"Step_AssertMissed");
         Run_Steps(InHandle);

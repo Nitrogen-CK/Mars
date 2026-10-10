@@ -77,12 +77,6 @@ class UMars_SmState_Crawler_Alive : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Crawler_BehaviorSubSm);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace(f"Crawler SM [{ck::Ctx(InHandle).ToString()}]: Alive", n"CrawlerSM", 2.0f, FLinearColor(0.3f, 1.0f, 0.3f, 1.0f));
-    }
 }
 
 // A sink: nothing leaves it. The Die task does the teardown (stop, brain off, shed legs, corpse timer, despawn).
@@ -92,12 +86,6 @@ class UMars_SmState_Crawler_Dead : UCk_SmState_EntityScript
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
         AddTask(InHandle, UMars_SmTask_Crawler_Die);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace(f"Crawler SM [{ck::Ctx(InHandle).ToString()}]: Dead", n"CrawlerSM", 2.0f, FLinearColor(1.0f, 0.3f, 0.3f, 1.0f));
     }
 }
 
@@ -129,7 +117,6 @@ class UMars_SmTask_Crawler_Die : UCk_SmTask_EntityScript
         ck::EnsureIfNot(MaybeCause.IsSet(), f"[Crawler] [{Crawler.ToString()}] entered Dead with no death cause");
         const auto Cause = MaybeCause.IsSet() ? MaybeCause.GetValue() : FMars_DamageEvent();
 
-        auto Shed = 0;
         // An index loop: a range-for over the returned array yields read-only elements.
         auto Parts = Monster.Get_Parts();
         for (int32 Index = 0; Index < Parts.Num(); ++Index)
@@ -139,15 +126,12 @@ class UMars_SmTask_Crawler_Die : UCk_SmTask_EntityScript
             { continue; }
 
             Part.Request_Sever(FMars_Request_BodyPart_Sever(Cause));
-            ++Shed;
         }
 
         auto BodyZone = Monster.Get_BodyZone();
         BodyZone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
 
         utils_monster::Add_DespawnTimer(Crawler, Monster.Get_CorpseSeconds(), FCk_Delegate_Timer(this, n"OnCorpseExpired"));
-
-        ck::Trace(f"[Crawler] [{Crawler.ToString()}] died: shedding [{Shed}] parts, corpse for [{Monster.Get_CorpseSeconds()}]s");
     }
 
     UFUNCTION()
@@ -176,12 +160,6 @@ class UMars_SmState_Crawler_Idle : UCk_SmState_EntityScript
         auto ToCower = AddTransition(InHandle, UMars_SmState_Crawler_Cower);
         AddCondition(ToCower, UMars_SmCondition_Crawler_LeafCower);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace(f"Crawler SM [{ck::Ctx(InHandle).ToString()}]: Idle", n"CrawlerSM");
-    }
 }
 
 class UMars_SmState_Crawler_Roam : UCk_SmState_EntityScript
@@ -193,12 +171,6 @@ class UMars_SmState_Crawler_Roam : UCk_SmState_EntityScript
         AddCondition(ToIdle, UMars_SmCondition_Crawler_LeafNotRoam);
 
         AddTask(InHandle, UMars_SmTask_Crawler_Roam);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace(f"Crawler SM [{ck::Ctx(InHandle).ToString()}]: Roam", n"CrawlerSM");
     }
 }
 
@@ -212,12 +184,6 @@ class UMars_SmState_Crawler_Flinch : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Crawler_Flinch);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace(f"Crawler SM [{ck::Ctx(InHandle).ToString()}]: Flinch", n"CrawlerSM");
-    }
 }
 
 class UMars_SmState_Crawler_Cower : UCk_SmState_EntityScript
@@ -229,12 +195,6 @@ class UMars_SmState_Crawler_Cower : UCk_SmState_EntityScript
         AddCondition(ToIdle, UMars_SmCondition_Crawler_LeafNotCower);
 
         AddTask(InHandle, UMars_SmTask_Crawler_Cower);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace(f"Crawler SM [{ck::Ctx(InHandle).ToString()}]: Cower", n"CrawlerSM");
     }
 }
 

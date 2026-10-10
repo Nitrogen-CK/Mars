@@ -14,12 +14,12 @@ class UMars_AutoTest_Crawler_DamageFlinchesThenResumesRoam : UMars_AutoTestRig_C
     {
         SpawnFloorAndCrawler(InHandle, Make_Spec());
 
-        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", 0, 10.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM is in Roam and the navigator Moving", n"Check_RoamingAndMoving", 0, 8.0f);
+        Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is in Roam and the navigator Moving", n"Check_RoamingAndMoving", 0, 0);
         Add_Step("hit leg part 0 for 5 Sever through its zone", n"Step_HitLeg");
-        Add_Step_WaitUntil("the behaviour sub-SM reaches Flinch", n"Check_InFlinch", 0, 2.0f);
-        Add_Step_WaitUntil("the flinch stopped the navigator within 0.5 s", n"Check_NavigatorIdle", 0, 2.0f);
-        Add_Step_WaitUntil("the behaviour sub-SM is back in Roam", n"Check_InRoam", 0, 3.0f);
+        Add_Step_WaitUntil("the behaviour sub-SM reaches Flinch", n"Check_InFlinch", 0, 0);
+        Add_Step_WaitUntil("the flinch stopped the navigator", n"Check_NavigatorIdle", 0, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is back in Roam", n"Check_InRoam", k_SlowPolls, 0);
         Add_Step("IsHurt was cleared and the leaf is Roam", n"Step_AssertRecovered");
         Run_Steps(InHandle);
     }

@@ -49,7 +49,6 @@ namespace utils_station
         Params.Spec = InSpec;
 
         auto State = FMars_Fragment_Station();
-        State.Engagement = InSpec.AllowEngagement ? ECk_EnableDisable::Enable : ECk_EnableDisable::Disable;
         State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
         if (InSpec.Camera.ViewLocal.IsSet())
         { State.View = utils_scene_node::Create(InRoot, InSpec.Camera.ViewLocal.GetValue()).As_Transform(); }
@@ -107,27 +106,18 @@ namespace utils_station
         return Math::Clamp(Math::Max(GlideSeconds, TurnSeconds), Math::Min(k_EngageMinSeconds, InMaxSeconds), InMaxSeconds);
     }
 
-    // The interaction context of a station interaction sub-SM: the stamped sub-SM root's copy when it carries the
-    // initiator, else the InteractTarget's copy with the initiator the interactable recorded for the interaction that
-    // started on it (the value the stamp copies; the stamp can land after the sub-SM's first state entered).
+    // The interaction context of a station interaction sub-SM: the stamped sub-SM root's copy (the stamp lands before the
+    // sub-SM's first state enters), else the InteractTarget's copy, which names no initiator.
     FMars_Fragment_InteractionContext Get_InteractionContext(FCk_Handle InContext, FCk_Handle InOwningSm)
     {
         if (ck::IsValid(InOwningSm) && InOwningSm.Has_Fragment(FMars_Fragment_InteractionContext))
-        {
-            const auto& Stamped = InOwningSm.Get_Fragment(FMars_Fragment_InteractionContext);
-            if (ck::IsValid(Stamped.Initiator))
-            { return Stamped; }
-        }
+        { return InOwningSm.Get_Fragment(FMars_Fragment_InteractionContext); }
 
         if (ck::EnsureIfNot(ck::IsValid(InContext) && InContext.Has_Fragment(FMars_Fragment_InteractionContext),
             f"[Station] [{InContext.ToString()}] is not an interact target: a station interaction state ran outside one"))
         { return FMars_Fragment_InteractionContext(); }
 
-        auto Context = InContext.Get_Fragment(FMars_Fragment_InteractionContext);
-        if (ck::Is_NOT_Valid(Context.Initiator) && ck::IsValid(Context.Interactable))
-        { Context.Initiator = Context.Interactable.Get_InitiatorOn(InContext); }
-
-        return Context;
+        return InContext.Get_Fragment(FMars_Fragment_InteractionContext);
     }
 }
 
@@ -135,14 +125,13 @@ namespace utils_station
 // Interact Targets
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The Use target: Instant, routed to UMars_SmState_Station_Use, which only reserves the station for the initiator.
-// Operating takes both hands (RequiresFreeHands).
+// The Use target: WhileLive, routed to UMars_SmState_Station_Use, which only reserves the station for the initiator and
+// ends the interaction with the answer. Operating takes both hands (RequiresFreeHands).
 mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Self)
 {
     const auto& Spec = Self.Get_Fragment(FMars_Fragment_Station_Params).Spec;
 
     auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-    TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
     auto Prompt = FMars_InteractPrompt_Spec();
     Prompt.InputAction = mars::Mars_IA_Interact_Use;
@@ -153,6 +142,7 @@ mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Se
     Target.InteractPromptSpec = Prompt;
     Target.InteractionStateClass = UMars_SmState_Station_Use;
     Target.RequiresFreeHands = true;
+    Target.Work = EMars_Interactable_Work::WhileLive;
     return Target;
 }
 
@@ -167,6 +157,7 @@ mixin FMars_Interactable_TargetEntry Make_GripTarget(const FCk_Handle_Station& S
     auto Target = FMars_Interactable_TargetEntry();
     Target.InteractTargetSpec = TargetSpec;
     Target.InteractionStateClass = UMars_SmState_Station_Grip;
+    Target.ReachKind = EMars_FPHands_ReachKind::Hold;
     return Target;
 }
 
@@ -193,11 +184,6 @@ mixin bool Get_IsOperatedBy(const FCk_Handle_Station& Self, FCk_Handle InOperato
 {
     const auto Operator = Self.Get_Fragment(FMars_Fragment_Station).Operator;
     return ck::IsValid(Operator) && Operator == InOperator;
-}
-
-mixin ECk_EnableDisable Get_Engagement(const FCk_Handle_Station& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Station).Engagement;
 }
 
 mixin FCk_Handle_Transform Get_Stand(const FCk_Handle_Station& Self)
@@ -263,12 +249,6 @@ mixin void Request_Release(FCk_Handle_Station& Self, const FMars_Request_Station
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Station_Requests);
     Requests.ReleaseRequests.Add(InRequest);
-}
-
-mixin void Request_SetEngagement(FCk_Handle_Station& Self, const FMars_Request_Station_SetEngagement& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Station_Requests);
-    Requests.SetEngagementRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

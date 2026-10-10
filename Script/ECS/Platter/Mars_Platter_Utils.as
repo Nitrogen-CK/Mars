@@ -95,6 +95,22 @@ namespace utils_platter
         return utils_jolt_body::Add(Node.H(), BodySpec);
     }
 
+    // The profile the pile's bodies collide as: pawn-ignoring while InMounting is Mounted, else the piece's own
+    // (FMars_FoodPiece_BodyTuners.CollisionProfileName). A piece without a body has nothing to switch. Called by the
+    // Platter processors.
+    void Apply_PileProfile(const FCk_Handle_FoodPiece& InPiece, EMars_Platter_Mounting InMounting)
+    {
+        FCk_Handle PieceEntity = InPiece;
+        auto Body = PieceEntity.As_JoltBody(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Body))
+        { return; }
+
+        const auto Profile = InMounting == EMars_Platter_Mounting::Mounted
+            ? constants_world_item::k_MountedBodyProfile
+            : InPiece.Get_BodyTuners().CollisionProfileName;
+        utils_jolt_body::Request_SetCollisionProfile(Body, FCk_Request_JoltBody_SetCollisionProfile(Profile));
+    }
+
     // Moved less than k_StillCm and turned less than k_StillDegrees between two passes.
     bool Get_IsStill(const FTransform& InLast, const FTransform& InNow)
     {
@@ -169,8 +185,19 @@ namespace utils_platter
             && CentreRoot.Z >= 0.0;
     }
 
-    // A settling piece is detached (the drop and the re-settle detach it), so a scene-node parent means something else took
-    // it: a pickup's Carry attached it to a hand.
+    // InPiece leaves InPlatter's ledger: its membership goes, and so does its holder fact while InPlatter is the holder.
+    // Called by the Platter processors wherever a piece leaves the books; a destroyed piece has nothing left to remove.
+    void Leave_Ledger(FCk_Handle_FoodPiece& InPiece, const FCk_Handle_Platter& InPlatter)
+    {
+        if (ck::Is_NOT_Valid(InPiece))
+        { return; }
+
+        InPiece.Request_TryRemove(FMars_Fragment_Platter_Membership);
+        utils_foodpiece::Clear_Holder(InPiece, InPlatter);
+    }
+
+    // A settling piece is detached (the drop and the re-settle detach it), and a queued one lies where whoever loaded it let
+    // it go, so a scene-node parent means something else took it: a pickup's Carry attached it to a hand.
     bool Get_IsTaken(const FCk_Handle_FoodPiece& InPiece)
     {
         FCk_Handle PieceEntity = InPiece;
@@ -178,13 +205,22 @@ namespace utils_platter
         return ck::IsValid(Node) && ck::IsValid(utils_scene_node::Get_Parent(Node));
     }
 
-    // Every frozen piece lets go and settles again, so nothing floats over a hole: detached where it is, Dynamic, back in
-    // Settling. Called by the Platter processors after a landed piece left; InRootWorld is the platter root's world pose.
-    void Resettle(FMars_Fragment_Platter& InState, const FTransform& InRootWorld)
+    // The held pieces frozen at or after InFrozenFrom (the ones that may lie on a piece that left) let go and settle again,
+    // so nothing floats over a hole: detached where they are, Dynamic, back in Settling; the pieces frozen before stay put.
+    // Called by the Platter processors after a landed piece left (Get_ResettleFrom); InRootWorld is the platter root's world
+    // pose.
+    void Resettle(FMars_Fragment_Platter& InState, const FTransform& InRootWorld, int32 InFrozenFrom)
     {
+        TArray<FMars_Platter_Held> StillHeld;
         for (const auto& Held : InState.Held)
         {
-            auto Piece = Held;
+            if (Held.FreezeIndex < InFrozenFrom)
+            {
+                StillHeld.Add(Held);
+                continue;
+            }
+
+            auto Piece = Held.Piece;
             if (ck::Is_NOT_Valid(Piece) || utils_entity_lifetime::Get_IsPendingDestroy(Piece, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
             { continue; }
 
@@ -198,10 +234,32 @@ namespace utils_platter
             { utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic)); }
 
             const auto Location = utils_transform::Get_EntityCurrentTransform(PieceEntity.As_Transform()).GetLocation();
-            InState.Settling.Add(FMars_Platter_Settling(Piece, EMars_Platter_SettleReason::Resettle, InRootWorld.InverseTransformPosition(Location)));
+            auto Settling = FMars_Platter_Settling(Piece, EMars_Platter_SettleReason::Resettle, InRootWorld.InverseTransformPosition(Location));
+            Settling.FreezeFloor = InState.NextFreezeIndex;
+            InState.Settling.Add(Settling);
         }
 
-        InState.Held.Empty();
+        InState.Held = StillHeld;
+    }
+
+    // Lowers InOutFrom to the first freeze index a departed landed piece may have supported: a held piece's successors in
+    // the freeze order (InHeldFreezeIndex + 1), or whatever froze since a re-settling piece let go (its FreezeFloor).
+    void Lower_ResettleFrom(TOptional<int32>& InOutFrom, int32 InFrozenFrom)
+    {
+        if (InOutFrom.IsSet() == false || InFrozenFrom < InOutFrom.GetValue())
+        { InOutFrom = TOptional<int32>(InFrozenFrom); }
+    }
+
+    // InPiece's index in InHeld; -1 when absent.
+    int32 Find_Held(const TArray<FMars_Platter_Held>& InHeld, const FCk_Handle_FoodPiece& InPiece)
+    {
+        for (int32 Index = 0; Index < InHeld.Num(); ++Index)
+        {
+            if (InHeld[Index].Piece == InPiece)
+            { return Index; }
+        }
+
+        return -1;
     }
 
     // A platter world item (World mode) owned by InOwner (ck::TransientEntity() for one that must outlive its spawner).
@@ -239,7 +297,23 @@ mixin int32 Get_Capacity(const FCk_Handle_Platter& Self)
 // The frozen pile in freeze order: a station taking "the next piece" takes the last (the top).
 mixin TArray<FCk_Handle_FoodPiece> Get_Held(const FCk_Handle_Platter& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Platter).Held;
+    TArray<FCk_Handle_FoodPiece> Pieces;
+    for (const auto& Held : Self.Get_Fragment(FMars_Fragment_Platter).Held)
+    { Pieces.Add(Held.Piece); }
+
+    return Pieces;
+}
+
+// Every piece the platter holds: frozen (freeze order), settling, then queued. What a dock's policy judges.
+mixin TArray<FCk_Handle_FoodPiece> Get_Pieces(const FCk_Handle_Platter& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Platter);
+    auto Pieces = Self.Get_Held();
+    for (const auto& Settling : State.Settling)
+    { Pieces.Add(Settling.Piece); }
+
+    Pieces.Append(State.Queue);
+    return Pieces;
 }
 
 mixin int32 Get_HeldCount(const FCk_Handle_Platter& Self)
@@ -276,10 +350,16 @@ mixin TArray<FCk_Handle_JoltBody> Get_Walls(const FCk_Handle_Platter& Self)
     return Self.Get_Fragment(FMars_Fragment_Platter).Walls;
 }
 
-// Whether every held piece is a root (never cut); true for an empty platter.
+// Whether the platter rides a carrier, so its pile ignores pawns.
+mixin EMars_Platter_Mounting Get_Mounting(const FCk_Handle_Platter& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Platter).Mounting;
+}
+
+// Whether every piece it holds (Get_Pieces) is a root (never cut); true for an empty platter.
 mixin bool Get_IsWhole(const FCk_Handle_Platter& Self)
 {
-    for (const auto& Piece : Self.Get_Held())
+    for (const auto& Piece : Self.Get_Pieces())
     {
         if (Piece.Get_IsWhole() == false)
         { return false; }
@@ -288,11 +368,11 @@ mixin bool Get_IsWhole(const FCk_Handle_Platter& Self)
     return true;
 }
 
-// The union of the held pieces' kinds.
+// The union of the kinds of every piece it holds (Get_Pieces).
 mixin FGameplayTagContainer Get_Kinds(const FCk_Handle_Platter& Self)
 {
     auto Kinds = FGameplayTagContainer();
-    for (const auto& Piece : Self.Get_Held())
+    for (const auto& Piece : Self.Get_Pieces())
     { Kinds.AppendTags(Piece.Get_Kind()); }
 
     return Kinds;
@@ -311,6 +391,12 @@ mixin FCk_Handle_Platter TryGet_Platter(const FCk_Handle_FoodPiece& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
+mixin void Request_SetMounted(FCk_Handle_Platter& Self, const FMars_Request_Platter_SetMounted& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Platter_Requests);
+    Requests.SetMountedRequests.Add(InRequest);
+}
+
 mixin void Request_Load(FCk_Handle_Platter& Self, const FMars_Request_Platter_Load& InRequest)
 {
     if (ck::EnsureIfNot(ck::IsValid(InRequest.Piece), f"[Platter] [{Self.ToString()}] was asked to load an invalid piece"))
@@ -327,12 +413,6 @@ mixin void Request_Unload(FCk_Handle_Platter& Self, const FMars_Request_Platter_
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Platter_Requests);
     Requests.UnloadRequests.Add(InRequest);
-}
-
-mixin void Request_Clear(FCk_Handle_Platter& Self, const FMars_Request_Platter_Clear& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Platter_Requests);
-    Requests.ClearRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -379,18 +459,4 @@ mixin void UnbindFrom_OnUnloaded(FCk_Handle_Platter& Self, FMars_Delegate_Platte
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Platter_Signals).OnUnloaded.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnCleared(FCk_Handle_Platter& Self, FMars_Delegate_Platter_OnCleared InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Platter_Signals);
-    Fragment.OnCleared.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnCleared(FCk_Handle_Platter& Self, FMars_Delegate_Platter_OnCleared InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Platter_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Platter_Signals).OnCleared.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

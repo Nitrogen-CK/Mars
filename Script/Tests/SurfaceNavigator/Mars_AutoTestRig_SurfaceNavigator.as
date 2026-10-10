@@ -4,6 +4,9 @@
 UCLASS(Abstract)
 class UMars_AutoTestRig_SurfaceNavigator : UCk_AutoTest_Base
 {
+    // Jolt adds, the first ground contact and body travel outrun the default poll budget at lane frame rate.
+    protected const int32 k_SlowPolls = 900;
+
     protected FVector _Origin;
     protected FCk_Handle_SurfaceMotion _Motion;
     protected FCk_Handle_SurfaceNavigator _Nav;

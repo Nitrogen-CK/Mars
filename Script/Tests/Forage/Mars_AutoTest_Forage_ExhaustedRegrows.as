@@ -14,7 +14,7 @@ class UMars_AutoTest_Forage_ExhaustedRegrows : UMars_AutoTestRig_Forage
 
         Add_Step("request a release", n"Step_Release");
         Add_Step_WaitUntil("released, exhausted, regrow pending", n"Check_ExhaustedPending");
-        Add_Step_WaitUntil("replenished", n"Check_Replenished", 0, 3.0f);
+        Add_Step_WaitUntil("replenished", n"Check_Replenished", k_SlowPolls, 0);
         Add_Step("the charge is back and nothing is pending", n"Step_AssertReplenished");
         Add_Step("request a release again", n"Step_Release");
         Add_Step_WaitUntil("released again", n"Check_SecondRelease");

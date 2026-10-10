@@ -4,15 +4,16 @@
 // operator; it only issues Searing, CookingFeed and Platter requests and registers the operator's legend rows. The feed
 // tasks are the shared ones (Mars_StationFeed_SmTasks.as).
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_ResetOnEnter (a new generation for an idle
-//                                                 hand), StationFeed_Source,
-//                                                 StationFeed_Bridge (a release in flight lands),
-//                                                 StationFeed_TakeOutBridge (a take-out in flight lands),
+//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source,
+//                                                 StationFeed_Bridge (a release in flight lands: a transfer past its
+//                                                 grasp is committed, the feed's own rule),
 //                                                 Searing_ResetOnEnter (a level, cold pan; the pieces stay on it)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Searing_HeatOnEnter, Searing_OperatorInput (Tick), Searing_OperatorHints,
 //                                                 StationFeed_Source, StationFeed_OperatorInput (Tick), StationFeed_Bridge,
-//                                                 StationFeed_OperatorHints, StationFeed_TakeOutInput (Tick),
-//                                                 StationFeed_TakeOutBridge
+//                                                 StationFeed_OperatorHints, StationFeed_TakeOutInput (Tick)
+//
+// A piece the pan hands back lands on the finished tray through the station's assembly (UMars_FeedStation_EntityScript),
+// whoever operates.
 //
 // The conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose,
 // the camera (Captured: the view stays still, the look delta is ours), the glove grip and the Leave intent.
@@ -25,10 +26,8 @@ class UMars_SmState_Searing_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Searing_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
-        AddTask(InHandle, UMars_SmTask_StationFeed_ResetOnEnter);
         AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
-        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
         AddTask(InHandle, UMars_SmTask_Searing_ResetOnEnter);
     }
 }
@@ -49,13 +48,12 @@ class UMars_SmState_Searing_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutBridge);
     }
 }
 
-// Levels and idles the pan and chills it; the pieces stay on it with their sear (the player's food is theirs). Added after
-// the feed's reset, so the generation bump comes first. No Searing on the context yet (the SM can enter before the entity
-// script composes it) = nothing to reset.
+// Levels and idles the pan and chills it; the pieces stay on it with their sear (the player's food is theirs). The feed is
+// not reset with it: a transfer the last operator committed lands, and only a new source starts a new attempt. No Searing
+// on the context (a composition that failed and already ensured) = nothing to reset.
 class UMars_SmTask_Searing_ResetOnEnter : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
@@ -122,9 +120,7 @@ class UMars_SmTask_Searing_OperatorInput : UCk_SmTask_EntityScript
         if (Sequence != _SeenLookSequence)
         {
             _SeenLookSequence = Sequence;
-            const auto Delta = _Intents.Get_LookDelta();
-            ck::Trace(f"[Searing] operator look {Delta}");
-            _Searing.Request_Look(FMars_Request_Searing_Look(Delta));
+            _Searing.Request_Look(FMars_Request_Searing_Look(_Intents.Get_LookDelta()));
         }
 
         return ECk_SmTaskResult::Running;

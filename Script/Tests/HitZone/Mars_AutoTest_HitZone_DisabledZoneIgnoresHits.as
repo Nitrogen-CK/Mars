@@ -23,7 +23,7 @@ class UMars_AutoTest_HitZone_DisabledZoneIgnoresHits : UCk_AutoTest_Base
         // Deliberately a fixed window: an ignored hit has no signal to wait on.
         Add_Step_WaitSeconds("let the drains run", 0.2f);
         Add_Step("the hit was ignored; re-enable the zone and hit it for 10 again", n"Step_AssertIgnoredAndHitAgain");
-        Add_Step_WaitUntil("Health reads 90", n"Check_At90", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 90", n"Check_At90", 0, 0);
         Add_Step("the second hit landed", n"Step_AssertLanded");
         Run_Steps(InHandle);
     }

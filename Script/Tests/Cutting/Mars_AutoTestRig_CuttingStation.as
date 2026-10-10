@@ -18,6 +18,9 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     // Where the platters lie before they dock, from the station's origin.
     protected const FVector k_InputPlatterOffset = FVector(0.0, -300.0, 0.0);
     protected const FVector k_OutputPlatterOffset = FVector(0.0, 300.0, 0.0);
+    // A poll budget, not a ceiling: platters construct, drop and settle, docks arrive and the feed's glove travels over
+    // seconds. Protected: the station tests inherit it.
+    protected const int32 k_SlowPolls = 900;
 
     protected FVector _Origin;
     // The input platter's food.
@@ -53,7 +56,6 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     protected TArray<float32> _Turns;
     protected TArray<FCk_Handle_FoodPiece> _Placed;
     protected int32 _PieceCuts = 0;
-    protected int32 _Cleared = 0;
     protected TArray<FMars_FoodBoard_CutIssue> _Issues;
     protected TArray<FCk_Handle_FoodPiece> _Released;
     // In parallel: one entry per OnCutResolved of a watched piece.
@@ -110,11 +112,11 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
 
     protected void Add_Steps_ArmTheAddFoodKey()
     {
-        Add_Step_WaitUntil("the add-food key is minted and the sampler records", n"Check_AddFoodKeyRecording", 0, 5.0f);
+        Add_Step_WaitUntil("the add-food key is minted and the sampler records", n"Check_AddFoodKeyRecording", 0, 0);
         Add_Step("bake the add-food level row and swap it in", n"Step_SwapAddFoodSet");
-        Add_Step_WaitUntil("the add-food row is live on the matcher", n"Check_AddFoodSetActive", 0, 5.0f);
+        Add_Step_WaitUntil("the add-food row is live on the matcher", n"Check_AddFoodSetActive", 0, 0);
         Add_Step("the operator's intents read the matcher", n"Step_UseAddFoodMatcher");
-        Add_Step_WaitUntil("the operator reads the matcher", n"Check_OperatorReadsMatcher", 0, 2.0f);
+        Add_Step_WaitUntil("the operator reads the matcher", n"Check_OperatorReadsMatcher", 0, 0);
     }
 
     protected void Inject_AddFoodKey(ECk_InputSource_EventType InEventType)
@@ -215,15 +217,15 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     // it, an operator takes the station and adds food: the joint is on the board, its pose landed, the glove back at rest.
     protected void Add_Steps_FeedTheJoint()
     {
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
+        Add_Step_WaitUntil("the input platter is constructed and its joint landed", n"Check_InputPlatterReady", k_SlowPolls, 0);
         Add_Step("dock the input platter", n"Step_DockInput");
-        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
-        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
+        Add_Step_WaitUntil("the feed draws from the docked platter, its joint frozen", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("add food", n"Step_AddFood");
-        Add_Step_WaitUntil("the feed laid one shown joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", 0, 5.0f);
+        Add_Step_WaitUntil("the feed laid one shown joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", k_SlowPolls, 0);
         Add_Step_WaitFrames("the pile pose has landed", 2);
     }
 
@@ -251,7 +253,17 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
 
     protected void MoveHandTo(float32 InLateral)
     {
-        _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge((InLateral - _Cutting.Get_HandLateral()) / _Cutting.Get_Spec().LateralPerDegree));
+        _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(InLateral - _Cutting.Get_HandLateral()));
+    }
+
+    // Poses InPiece on the board's pile node, InOffsetCm in the node's frame, unscaled (the station must be composed).
+    protected void Pose_OnPile(FCk_Handle_FoodPiece InPiece, FVector InOffsetCm)
+    {
+        const auto PoseWorld = FTransform(FRotator::ZeroRotator, InOffsetCm) * _Board.Get_PileNodeWorld();
+        FCk_Handle Entity = InPiece;
+        auto PieceTransform = Entity.As_Transform();
+        utils_transform::Request_SetLocation(PieceTransform, FCk_Request_Transform_SetLocation(PoseWorld.GetLocation()));
+        utils_transform::Request_SetRotation(PieceTransform, FCk_Request_Transform_SetRotation(PoseWorld.Rotator()));
     }
 
     protected void Watch(FCk_Handle_FoodPiece InPiece)
@@ -658,7 +670,6 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         _Cutting.BindTo_OnChopLanded(FMars_Delegate_Cutting_OnChopLanded(this, n"OnChopLanded"));
         _Board.BindTo_OnPlaced(FMars_Delegate_FoodBoard_OnPlaced(this, n"OnBoardPlaced"));
         _Board.BindTo_OnPieceCut(FMars_Delegate_FoodBoard_OnPieceCut(this, n"OnBoardPieceCut"));
-        _Board.BindTo_OnCleared(FMars_Delegate_FoodBoard_OnCleared(this, n"OnBoardCleared"));
         _Board.BindTo_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnBoardCutIssued"));
         _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
         _Board.BindTo_OnTurned(FMars_Delegate_FoodBoard_OnTurned(this, n"OnBoardTurned"));
@@ -704,12 +715,6 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         ++_PieceCuts;
         Track_ForCleanup(InPositive);
         Track_ForCleanup(InNegative);
-    }
-
-    UFUNCTION()
-    private void OnBoardCleared(FCk_Handle_FoodBoard InBoard)
-    {
-        ++_Cleared;
     }
 
     UFUNCTION()

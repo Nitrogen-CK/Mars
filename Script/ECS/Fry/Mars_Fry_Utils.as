@@ -29,15 +29,28 @@ namespace utils_fry
     const int32 k_LipSegments = 8;
     // A lip segment is the rim's arc length plus this much, so neighbouring segments overlap at their corners.
     const float32 k_LipOverlap = 1.05f;
+
+    // A piece moving slower than this (cm/s) lies still: a resting body's contact jitter stays well under it, a hop or a
+    // slide does not.
+    const float64 k_StillSpeed = 5.0;
+
+    // Whether InBody lies still (its linear speed under k_StillSpeed), whatever it rests on.
+    bool Get_IsStill(const FCk_Handle_JoltBody& InBody)
+    {
+        auto Body = InBody;
+        return utils_jolt_body::Get_LinearVelocity(Body).Size() < k_StillSpeed;
+    }
     // cm the scoop's centre may sit past the pot disc and still count as in the pot: the slide spring overshoots a target
     // on the disc's edge by a little.
     const float32 k_ReachTolerance = 1.0f;
 
-    // Composes the minigame on InHandle (the station entity, which carries the root transform). The spec's Nodes are built
-    // by the caller and left as composed (the skimmer Idle at its park, carrying): the kernel drives it while Driven,
-    // steers its commanded slide within the reach, and sets its lift and tilt by the skim. Nothing is in play until the
-    // first AddPiece. A rejected spec, a missing node or a skimmer that cannot do what the kernel asks ensures and returns
-    // an invalid handle.
+    // Composes the minigame on InHandle (the station entity, which carries the root transform), and the station's admission
+    // inbox and take-out readout. The spec's Nodes are built by the caller and left as composed (the skimmer Idle at its
+    // park, carrying): the kernel drives it while Driven, steers its commanded slide within the reach, and sets its lift and
+    // tilt by the skim. Nothing is in play until the first release from the station's inbox; an empty first drain starts
+    // the watch of the station's queue. A rejected spec, a missing node or a skimmer that cannot do what the kernel asks
+    // (tilt to the pour, a Commanded slide, a node axis-aligned with the root) ensures and returns an invalid handle with
+    // nothing composed.
     FCk_Handle_Fry Add(FCk_Handle& InHandle, FMars_Fry_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -59,6 +72,16 @@ namespace utils_fry
             f"[Fry] [{InHandle.ToString()}] needs a skimmer whose slide is Commanded (the reach is the kernel's), not {SkimmerSpec.Slide.Mode :n}"))
         { return FCk_Handle_Fry(); }
 
+        // The slide target is in the skimmer node's rest frame: the kernel's root-frame target maps onto it only when the two
+        // frames are axis-aligned.
+        const auto RootRotation = utils_transform::Get_EntityCurrentTransform(InHandle.As_Transform()).GetRotation();
+        const auto NodeRotation = Nodes.Skimmer.Get_NodeWorld().GetRotation();
+        const auto IsAxisAligned = (RootRotation.GetForwardVector() - NodeRotation.GetForwardVector()).Size() < 0.001
+            && (RootRotation.GetUpVector() - NodeRotation.GetUpVector()).Size() < 0.001;
+        if (ck::EnsureIfNot(IsAxisAligned,
+            f"[Fry] [{InHandle.ToString()}] needs the skimmer node axis-aligned with the station root (its slide is steered in the root frame)"))
+        { return FCk_Handle_Fry(); }
+
         auto Params = FMars_Fragment_Fry_Params();
         Params.Spec = InSpec;
 
@@ -66,22 +89,15 @@ namespace utils_fry
         InHandle.Add_Fragment(Params);
 
         auto Fry = InHandle.As_Fry();
-
-        // The slide target is in the skimmer node's rest frame: the kernel's root-frame target maps onto it only when the two
-        // frames are axis-aligned.
-        const auto RootRotation = Fry.Get_RootWorld().GetRotation();
-        const auto NodeRotation = Nodes.Skimmer.Get_NodeWorld().GetRotation();
-        ck::EnsureIfNot((RootRotation.GetForwardVector() - NodeRotation.GetForwardVector()).Size() < 0.001
-            && (RootRotation.GetUpVector() - NodeRotation.GetUpVector()).Size() < 0.001,
-            f"[Fry] [{InHandle.ToString()}] needs the skimmer node axis-aligned with the station root (its slide is steered in the root frame)");
-
         const auto ScoopRoot = Fry.Get_ScoopRoot();
         auto State = FMars_Fragment_Fry();
         State.SkimmerPark = FVector2D(ScoopRoot.X, ScoopRoot.Y) - Nodes.Skimmer.Get_Slide();
         State.SkimmerTarget = State.SkimmerPark;
         InHandle.Add_Fragment(State);
+        InHandle.Add_Fragment(FMars_Fragment_Fry_Requests());
+        utils_cooking_feed::Add_Admission(InHandle);
+        utils_cooking_feed::Add_TakeOut(InHandle);
 
-        ck::Trace(f"[Fry] [{InHandle.ToString()}] composed: skimmer park at root XY {State.SkimmerPark}, pot reach radius {Get_PotReachRadius(InSpec) :.2}");
         return Fry;
     }
 
@@ -267,20 +283,12 @@ namespace utils_fry
         return float32(utils_searing::Get_FaceCentre(InCentreFrame, InFace, InHalfExtents).Z);
     }
 
-    // The cook state InPiece's heat makes of InSeed (the state the piece arrived with): the face sears are the faces' heat
-    // (0 pale, 1 golden, 2 burnt) and the batter's fry their mean. Everything else is the seed's.
-    FMars_CookState Get_CookState(const FMars_Fry_PieceState& InPiece, const FMars_CookState& InSeed)
+    // The cook state InPiece's heat makes of InSeed (the state the piece arrived with): the batter heats are its faces'
+    // heat (0 pale, 1 golden, 2 burnt); every other channel is the seed's.
+    FMars_FoodPiece_CookState Get_CookState(const FMars_Fry_PieceState& InPiece, const FMars_FoodPiece_CookState& InSeed)
     {
         auto CookState = InSeed;
-        CookState.FaceSear.Empty();
-        auto HeatSum = 0.0f;
-        for (const auto Heat : InPiece.FaceHeat)
-        {
-            CookState.FaceSear.Add(Heat);
-            HeatSum += Heat;
-        }
-
-        CookState.Fry = HeatSum / float32(utils_searing::k_FaceCount);
+        CookState.Batter = InPiece.FaceHeat;
         return CookState;
     }
 
@@ -587,9 +595,11 @@ mixin FVector Get_PieceCentre(const FCk_Handle_Fry& Self, const FMars_CookingFee
 }
 
 // The release's preset index the piece arrived with.
-mixin int32 Get_PiecePresetIndex(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
+// The piece's cook state as the fryer would hand it back now: its batter the faces' heat so far.
+mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
-    return Self.Get_PieceState(InPieceId).PresetIndex;
+    const auto Piece = Self.Get_PieceState(InPieceId);
+    return utils_fry::Get_CookState(Piece, Piece.Piece.Get_CookState());
 }
 
 mixin EMars_Fry_Whereabouts Get_PieceWhereabouts(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
@@ -656,12 +666,6 @@ mixin void Request_Skim(FCk_Handle_Fry& Self, const FMars_Request_Fry_Skim& InRe
     Requests.SkimRequests.Add(InRequest);
 }
 
-mixin void Request_AddPiece(FCk_Handle_Fry& Self, const FMars_Request_Fry_AddPiece& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Requests);
-    Requests.AddPieceRequests.Add(InRequest);
-}
-
 mixin void Request_Reset(FCk_Handle_Fry& Self, const FMars_Request_Fry_Reset& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Requests);
@@ -672,6 +676,12 @@ mixin void Request_TakeOut(FCk_Handle_Fry& Self, const FMars_Request_Fry_TakeOut
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Requests);
     Requests.TakeOutRequests.Add(InRequest);
+}
+
+mixin void Request_Readopt(FCk_Handle_Fry& Self, const FMars_Request_Fry_Readopt& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Requests);
+    Requests.ReadoptRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -690,20 +700,6 @@ mixin void UnbindFrom_OnDriveChanged(FCk_Handle_Fry& Self, FMars_Delegate_Fry_On
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnDriveChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnPieceAdmission(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnPieceAdmission InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Signals);
-    Fragment.OnPieceAdmission.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnPieceAdmission(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnPieceAdmission InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceAdmission.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnPieceAdded(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnPieceAdded InDelegate)
@@ -790,6 +786,20 @@ mixin void UnbindFrom_OnSkimChanged(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnS
     Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnSkimChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
+mixin void BindTo_OnSkimRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnSkimRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Signals);
+    Fragment.OnSkimRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnSkimRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnSkimRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnSkimRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
 mixin void BindTo_OnPieceTakenOut(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnPieceTakenOut InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Signals);
@@ -802,4 +812,18 @@ mixin void UnbindFrom_OnPieceTakenOut(FCk_Handle_Fry& Self, FMars_Delegate_Fry_O
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceTakenOut.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTakeOutRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnTakeOutRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Signals);
+    Fragment.OnTakeOutRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTakeOutRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnTakeOutRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnTakeOutRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

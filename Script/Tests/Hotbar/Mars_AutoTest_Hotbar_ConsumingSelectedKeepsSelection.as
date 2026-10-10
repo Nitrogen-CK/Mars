@@ -12,7 +12,7 @@ class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UMars_AutoTestRig_
         Add_Step_WaitUntil("slot 0 holds it and is auto-held", n"Check_StowedAndSelected");
         Add_Step("remove the selected item", n"Step_RemoveSelected");
         Add_Step_WaitUntil("slot 0 is empty", n"Check_SlotEmpty");
-        Add_Step_WaitFrames("let the sync pass observe the removal", 3);
+        Add_Step_WaitUntil("the sync pass has seen the removal", n"Check_SyncSawRemoval", 0, 0);
         Add_Step("slot 0 stays selected with empty hands", n"Step_AssertSelectionKept");
         Run_Steps(InHandle);
     }
@@ -51,6 +51,15 @@ class UMars_AutoTest_Hotbar_ConsumingSelectedKeepsSelection : UMars_AutoTestRig_
     {
         auto Res = OutResult;
         Res.Set(_Hotbar.Get_Slot(0).Get_NumItems() == 0);
+    }
+
+    // The hotbar's sync pass records each slot's item (LastSeen): it saw the rock in slot 0 and clears it in the pass
+    // that sees the slot empty.
+    UFUNCTION()
+    private void Check_SyncSawRemoval(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(ck::Is_NOT_Valid(_Hotbar.Get_Fragment(FMars_Fragment_Hotbar).LastSeen[0]));
     }
 
     UFUNCTION()

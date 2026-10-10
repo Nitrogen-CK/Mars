@@ -1,5 +1,5 @@
 // Drains Refresh, then Drop, then Throw, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each kind is
-// applied at most once per drain (a second Drop/Throw is already a no-op through LaunchedItem).
+// applied at most once per drain; a Drop and a Throw of one held item are one launch (LaunchedItem), the second traced.
 //
 // Refresh owns the use interactable: a no-probe child of the player whose single Primary.UsableItem target runs the held
 // item's UseAction state. Nothing traces it, so it is focused and offered to the player's resolver here, and torn down
@@ -7,8 +7,8 @@
 // action-hint row, not a centre-screen prompt.
 //
 // Drop and Throw launch the held item as a World-mode world item that adopts it out of the selected slot. A Persistent
-// item already has its world item: it is asked to Release (detach, go Dynamic, launch, take the item back). Either way
-// the hotbar's sync pass sees the slot empty and the held item follows.
+// item already has its world item: it is asked to Release (it takes the item back into its holder, then goes Dynamic and
+// launches). Either way the hotbar's sync pass sees the slot empty and the held item follows.
 class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -156,7 +156,10 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
     {
         auto HeldItem = InPlayer.As_HeldItem();
         auto Item = HeldItem.Get_CurrentItem();
-        if (ck::Is_NOT_Valid(Item) || Item == InState.LaunchedItem)
+        if (ck::Is_NOT_Valid(Item))
+        { return; }
+
+        if (Item == InState.LaunchedItem)
         { return; }
 
         const auto IsThrow = InKind == EMars_LaunchKind::Throw;
@@ -184,8 +187,7 @@ class UMars_Processor_HeldItemUse_HandleRequests : UCk_Processor_Script_Base_UE
             if (ck::EnsureIfNot(ck::IsValid(WorldItem), f"[HeldItemUse] Persistent item [{Item.ToString()}] has lost its world item"))
             { return; }
 
-            WorldItem.Request_Release(FMars_Request_WorldItem_Release(
-                Item, HeldItem.Get_CurrentInventory(), Forward * Speed + PawnVelocity, AngularVelocityDeg));
+            WorldItem.Request_Release(FMars_Request_WorldItem_Release(Forward * Speed + PawnVelocity, AngularVelocityDeg));
 
             InState.LaunchedItem = Item;
             Broadcast_ItemLaunched(InPlayer, Item, InKind);

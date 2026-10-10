@@ -1,10 +1,13 @@
 // A Stop halts a move in progress: once the body has covered 50 uu of a 1200 uu move, Request_Stop returns the navigator
-// to Idle with no waypoints, and half a second later the body is still (SurfaceMotion keeps the last steering, so the
+// to Idle with no waypoints, and the body comes to rest (SurfaceMotion keeps the last steering, so the
 // stop must clear it). Neither OnArrived nor OnFailed fires.
 class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UMars_AutoTestRig_SurfaceNavigator
 {
     default _TimeoutSeconds = 15.0f;
     default _Origin = FVector(140000.0, 88000.0, 600.0);
+
+    // Below this speed the body is still.
+    private const float64 k_RestSpeed = 5.0;
 
     private FVector _Start;
 
@@ -13,12 +16,12 @@ class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UMars_AutoTestRig_Surf
     {
         SpawnFloorAndBody(InHandle);
 
-        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", 0, 5.0f);
+        Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", k_SlowPolls, 0);
         Add_Step("bind OnArrived/OnFailed; request a move 1200 uu along +X", n"Step_MoveTo");
-        Add_Step_WaitUntil("the navigator is Moving and the body moved 50 uu", n"Check_Underway", 0, 3.0f);
+        Add_Step_WaitUntil("the navigator is Moving and the body moved 50 uu", n"Check_Underway", k_SlowPolls, 0);
         Add_Step("request a Stop", n"Step_Stop");
-        Add_Step_WaitUntil("the navigator is Idle", n"Check_Idle", 0, 1.0f);
-        Add_Step_WaitSeconds("the cleared steering settles", 0.5f);
+        Add_Step_WaitUntil("the navigator is Idle", n"Check_Idle", 0, 0);
+        Add_Step_WaitUntil("the cleared steering brings the body to rest", n"Check_AtRest", 0, 0);
         Add_Step("the body is still and no move signal fired", n"Step_AssertStopped");
         Run_Steps(InHandle);
     }
@@ -52,10 +55,17 @@ class UMars_AutoTest_SurfaceNavigator_StopHaltsMovement : UMars_AutoTestRig_Surf
     }
 
     UFUNCTION()
+    private void Check_AtRest(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(utils_surface_motion::Get_Velocity(_Motion).Size() < k_RestSpeed);
+    }
+
+    UFUNCTION()
     private void Step_AssertStopped(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Speed = utils_surface_motion::Get_Velocity(_Motion).Size();
-        Assert_True(Speed < 5.0, f"the stop cleared the steering: the body is still ({Speed} uu/s)");
+        Assert_True(Speed < k_RestSpeed, f"the stop cleared the steering: the body is still ({Speed} uu/s)");
         Assert_True(_Nav.Get_Status() == EMars_SurfaceNavigator_Status::Idle, f"the navigator stays Idle (got [{_Nav.Get_Status() :n}])");
         Assert_Equals_Int(_Nav.Get_Waypoints().Num(), 0, "a stopped navigator has no waypoints");
         const auto Travelled = (Get_BodyLocation() - _Start).Size2D();

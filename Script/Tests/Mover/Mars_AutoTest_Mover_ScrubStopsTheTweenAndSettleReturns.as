@@ -3,6 +3,9 @@
 // (Get_IsResting) is at the target with no tween: not after the scrub, not while the settle runs, again once it lands.
 class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Base
 {
+    // A poll budget, not a ceiling: the tweens run on the mover's Duration.
+    private const int32 k_SlowPolls = 900;
+
     private FCk_Handle_Mover _Mover;
     private float32 _LowestAlphaWhileSettling = 1.0f;
     private int32 _SettlingSamples = 0;
@@ -22,16 +25,16 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
 
         Add_Step("the handle rests at the start pose before anything moves", n"Step_AssertRestingAtStart");
         Add_Step("move to the end", n"Step_MoveToEnd");
-        Add_Step_WaitUntil("the tween is mid-way", n"Check_MidTween", 0, 5.0f);
+        Add_Step_WaitUntil("the tween is mid-way", n"Check_MidTween", k_SlowPolls, 0);
         Add_Step("scrub to 0.3", n"Step_Scrub");
         Add_Step_WaitSeconds("let the stopped tween stay stopped", 0.3f);
         Add_Step("the handle holds the scrubbed alpha and the target is unchanged", n"Step_AssertHeld");
         Add_Step("settle", n"Step_Settle");
-        Add_Step_WaitUntil("the handle returns to the end pose", n"Check_AtEndPose", 0, 5.0f);
-        Add_Step_WaitUntil("the settle tween lands and the handle rests", n"Check_Resting", 0, 1.0f);
+        Add_Step_WaitUntil("the handle returns to the end pose", n"Check_AtEndPose", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the settle tween lands and the handle rests", n"Check_Resting", 0, 0);
         Add_Step("the target is still the end, and the handle rests there", n"Step_AssertAtEnd");
         Add_Step("scrub and settle in the same frame", n"Step_ScrubAndSettle");
-        Add_Step_WaitUntil("the handle returns to the end pose again", n"Check_SettledFromScrub", 0, 5.0f);
+        Add_Step_WaitUntil("the handle returns to the end pose again", n"Check_SettledFromScrub", k_SlowPolls, 0);
         Add_Step("the scrub landed before the settle tweened home", n"Step_AssertScrubLandedFirst");
         Run_Steps(InHandle);
     }

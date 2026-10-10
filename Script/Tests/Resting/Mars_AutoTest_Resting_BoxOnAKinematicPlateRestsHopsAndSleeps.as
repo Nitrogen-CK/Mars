@@ -6,6 +6,11 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
     default _TimeoutSeconds = 12.0f;
 
     private const float32 k_HopRaise = 15.0f;
+    // The watch's spans (Check_Watched).
+    private const float32 k_StayRestingSeconds = 1.5f;
+    private const float32 k_SleepWatchSeconds = 3.0f;
+    // The watch ends on the first poll past its span: the slack covers that poll on any lane.
+    private const float32 k_WatchSlackSeconds = 0.5f;
 
     private int32 _StatesBeforeHop = 0;
     private float32 _MaxPlateRaise = 0.0f;
@@ -19,16 +24,16 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
         BuildRig(InHandle);
 
         Add_Step("the rig composed", n"Step_AssertComposed");
-        Add_Step_WaitUntil("the box rests on the plate", n"Check_Resting", 0, 1.0f);
+        Add_Step_WaitUntil("the box rests on the plate", n"Check_Resting", k_SlowPolls, 0);
         Add_Step("the drop was no hop; raise the plate half way", n"Step_AssertRestedThenRaiseHalf");
         Add_Step_WaitFrames("the plate rises", 1);
         Add_Step("raise the plate the rest of the way", n"Step_RaiseFull");
         Add_Step_WaitFrames("the plate rises", 1);
         Add_Step("drop the plate back to rest", n"Step_Lower");
-        Add_Step_WaitUntil("the box left the plate", n"Check_ApartAfterHop", 0, 1.0f);
-        Add_Step_WaitUntil("the box landed again", n"Check_LandedAgain", 0, 3.0f);
+        Add_Step_WaitUntil("the box left the plate", n"Check_ApartAfterHop", 0, 0);
+        Add_Step_WaitUntil("the box landed again", n"Check_LandedAgain", k_SlowPolls, 0);
         Add_Step("one hop, one landing", n"Step_AssertHop");
-        Add_Step_WaitUntil("the box stayed on the plate (asleep or not)", n"Check_Watched", 0, 3.5f);
+        Add_Step_WaitUntil("the box stayed on the plate (asleep or not)", n"Check_Watched", 0, k_SleepWatchSeconds + k_WatchSlackSeconds);
         Add_Step("the box is still resting", n"Step_AssertStillResting");
         Run_Steps(InHandle);
     }
@@ -104,7 +109,8 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
         _WatchStart = Get_Now();
     }
 
-    // Samples the verdict every check: the box must stay Resting for 1.5 s, and the watch runs on to 3 s for the sleep.
+    // Samples the verdict every check: the box must stay Resting for k_StayRestingSeconds, and the watch runs on to
+    // k_SleepWatchSeconds for the sleep.
     UFUNCTION()
     private void Check_Watched(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
@@ -116,7 +122,7 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
         { _AsleepAfter = Elapsed; }
 
         auto Res = OutResult;
-        Res.Set(Elapsed >= 1.5f && (_AsleepAfter >= 0.0f || Elapsed >= 3.0f));
+        Res.Set(Elapsed >= k_StayRestingSeconds && (_AsleepAfter >= 0.0f || Elapsed >= k_SleepWatchSeconds));
     }
 
     UFUNCTION()
@@ -129,7 +135,7 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
         if (_AsleepAfter >= 0.0f)
         { ck::Trace(f"[Resting] sleep: asleep {_AsleepAfter :.3} s after the landing was asserted; still Resting"); }
         else
-        { ck::Trace("[Resting] sleep: not reached within 3 s (the kinematic plate may keep the pair awake); still Resting"); }
+        { ck::Trace(f"[Resting] sleep: not reached within {k_SleepWatchSeconds} s (the kinematic plate may keep the pair awake); still Resting"); }
     }
 
     private void Record_PlateRaise()

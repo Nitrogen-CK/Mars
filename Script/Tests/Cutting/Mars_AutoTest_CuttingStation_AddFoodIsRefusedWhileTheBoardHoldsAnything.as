@@ -1,9 +1,9 @@
-// The board takes one joint at a time: an add-food press while it holds anything is refused by the station before the feed
-// sees it. An input platter carrying two bare boxes docks; an operator whose intents read a real add-food key takes the
+// The board takes one joint at a time: an add-food press while it holds anything is refused by the station's own gate, which
+// the feed reports (OnTransferRefused StationGate) without starting anything. An input platter carrying two bare boxes docks; an operator whose intents read a real add-food key takes the
 // station and presses it: one box comes to the board. The key is released and, once the other box has frozen on the
 // platter, pressed again: nothing moves. The board still holds the one box, the other still lies on the input platter, the
-// feed's glove never left its rest (no phase since the first transfer ended, no reservation) and the feed itself refused
-// nothing (the press never reached it). Isolated origin (22400, -9000, -30000).
+// feed's glove never left its rest (no phase since the first transfer ended, no reservation) and the feed refused the press
+// once, for the station's gate. Isolated origin (22400, -9000, -30000).
 class UMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(22400.0, -9000.0, -30000.0);
@@ -25,24 +25,25 @@ class UMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything :
         for (int32 Index = 0; Index < 2; ++Index)
         { _Boxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + k_InputPlatterOffset + FVector(100.0, 20.0 * Index, 0.0)))); }
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
         Add_Steps_ArmTheAddFoodKey();
-        Add_Step_WaitUntil("the input platter is constructed and both boxes are Ready", n"Check_PlatterAndBoxesReady", 0, 10.0f);
+        Add_Step_WaitUntil("the input platter is constructed and both boxes are Ready", n"Check_PlatterAndBoxesReady", k_SlowPolls, 0);
         Add_Step("load both boxes onto the input platter", n"Step_LoadBoxes");
-        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLanded", 0, 8.0f);
+        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLanded", k_SlowPolls, 0);
         Add_Step("dock the input platter", n"Step_DockInput");
-        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", 0, 5.0f);
+        Add_Step_WaitUntil("the input platter is docked", n"Check_InputDocked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 2.0f);
-        Add_Step_WaitUntil("the feed draws from the docked platter, its pile frozen", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
+        Add_Step_WaitUntil("the feed draws from the docked platter, its pile frozen", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("press add food", n"Step_PressAddFood");
-        Add_Step_WaitUntil("the press is seen", n"Check_AddFoodHeld", 0, 2.0f);
-        Add_Step_WaitUntil("one box is on the board and the glove is back", n"Check_OneOnBoard", 0, 5.0f);
+        Add_Step_WaitUntil("the press is seen", n"Check_AddFoodHeld", 0, 0);
+        Add_Step_WaitUntil("one box is on the board and the glove is back", n"Check_OneOnBoard", k_SlowPolls, 0);
         Add_Step("release add food", n"Step_ReleaseAddFood");
-        Add_Step_WaitUntil("the release is seen", n"Check_AddFoodReleased", 0, 2.0f);
-        Add_Step_WaitUntil("the other box is frozen on the input platter", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the release is seen", n"Check_AddFoodReleased", 0, 0);
+        Add_Step_WaitUntil("the other box is frozen on the input platter", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("note the feed; press add food again", n"Step_PressAgain");
-        Add_Step_WaitUntil("the second press is seen", n"Check_AddFoodHeld", 0, 2.0f);
+        Add_Step_WaitUntil("the second press is seen", n"Check_AddFoodHeld", 0, 0);
+        Add_Step_WaitUntil("the feed refused the press for the station's gate", n"Check_RefusedByTheGate", 0, 0);
         Add_Step_WaitFrames("a transfer would have reached by now", 30);
         Add_Step("the press was refused: nothing moved", n"Step_Assert");
         Run_Steps(InHandle);
@@ -96,6 +97,13 @@ class UMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything :
     }
 
     UFUNCTION()
+    private void Check_RefusedByTheGate(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_FeedRefusals.Contains(EMars_CookingFeed_Refusal::StationGate));
+    }
+
+    UFUNCTION()
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_OperatorIntents.Get_IsIntentActive(GameplayTags::Mars_Intent_StationAddFood), "the second press is still held");
@@ -105,7 +113,8 @@ class UMars_AutoTest_CuttingStation_AddFoodIsRefusedWhileTheBoardHoldsAnything :
         Assert_True(_Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle, "the feed's glove is at rest");
         Assert_False(_Feed.TryGet_ActivePiece().IsSet(), "nothing is reserved");
         Assert_Equals_Int(_FeedPhases.Num(), _PhasesBeforeSecondPress, "the glove never left its rest after the second press");
-        Assert_Equals_Int(_FeedRefusals.Num(), 0, "the press never reached the feed");
+        Assert_True(_FeedRefusals.Num() == 1 && _FeedRefusals[0] == EMars_CookingFeed_Refusal::StationGate,
+            f"the feed refused the press once, for the station's gate ({_FeedRefusals.Num()} refusals)");
         Assert_Equals_Int(_Feed.Get_Admitted(), 1, "one admission");
     }
 }

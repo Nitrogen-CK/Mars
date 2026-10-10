@@ -113,12 +113,6 @@ class UMars_SmState_Loco_Idle : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_LocomotionSpeed_Walk);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Idle", n"PlayerSM", 2.0f, FLinearColor(0.3f, 0.6f, 1.0f, 1.0f));
-    }
 }
 
 class UMars_SmState_Loco_Walk : UCk_SmState_EntityScript
@@ -146,12 +140,6 @@ class UMars_SmState_Loco_Walk : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_LocomotionSpeed_Walk);
         AddTask(InHandle, UMars_SmTask_Movement);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Walk", n"PlayerSM", 2.0f, FLinearColor(0.2f, 1.0f, 0.2f, 1.0f));
     }
 }
 
@@ -181,12 +169,6 @@ class UMars_SmState_Loco_Sprint : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_LocomotionSpeed_Sprint);
         AddTask(InHandle, UMars_SmTask_Movement);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Sprint", n"PlayerSM", 2.0f, FLinearColor(1.0f, 0.5f, 0.0f, 1.0f));
-    }
 }
 
 // Crouched speed is MaxWalkSpeedCrouched, which CharacterMovement applies itself.
@@ -214,12 +196,6 @@ class UMars_SmState_Loco_Crouch : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Crouch);
         AddTask(InHandle, UMars_SmTask_Movement);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Crouch", n"PlayerSM", 2.0f, FLinearColor(0.7f, 0.4f, 1.0f, 1.0f));
-    }
 }
 
 // Left for Airborne the frame CharacterMovement starts falling (the frame after Jump()).
@@ -240,12 +216,6 @@ class UMars_SmState_Loco_Jump : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Jump);
         AddTask(InHandle, UMars_SmTask_Movement);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Jump", n"PlayerSM", 2.0f, FLinearColor(1.0f, 0.8f, 0.0f, 1.0f));
     }
 }
 
@@ -272,12 +242,6 @@ class UMars_SmState_Loco_Airborne : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Movement);
     }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Airborne", n"PlayerSM", 2.0f, FLinearColor(0.9f, 0.9f, 0.9f, 1.0f));
-    }
 }
 
 // On a ladder: the Climber holds the character on the climb line in MOVE_Flying, so no movement or speed task runs here.
@@ -294,12 +258,6 @@ class UMars_SmState_Loco_Climb : UCk_SmState_EntityScript
         AddCondition(ToIdle, UMars_SmCondition_IsNotClimbing);
 
         AddTask(InHandle, UMars_SmTask_ClimbInput);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        ck::Trace("Player SM: Locomotion > Climb", n"PlayerSM", 2.0f, FLinearColor(0.4f, 0.9f, 0.9f, 1.0f));
     }
 }
 

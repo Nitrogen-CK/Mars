@@ -27,10 +27,7 @@ class UMars_Processor_CampSession_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Current = utils_state_machine::Get_CurrentStateClass(InState.StateMachine);
         if (Current == UMars_SmState_Camp_Live)
-        {
-            ck::Trace("[CampSession] Play ignored: already Live");
-            return;
-        }
+        { return; }
 
         InState.StateMachine.Request_Transition(UMars_SmState_Camp_Live);
     }

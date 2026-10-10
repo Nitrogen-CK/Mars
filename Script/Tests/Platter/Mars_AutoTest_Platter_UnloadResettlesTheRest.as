@@ -1,9 +1,14 @@
 // Three pieces frozen into a pile; unloading the first one frozen (the bottom) leaves a hole, so the other two let go and
-// settle again: they are Dynamic and off Held in the frame after the unload, and within 3 s both re-freeze, still inside the
-// walls, Held has two and nothing loads again (a re-settle is silent).
+// settle again: they are Dynamic and off Held in the frame after the unload, and within Settle.MaxSeconds both
+// re-freeze, still inside the walls, Held has two and nothing loads again (a re-settle is silent).
 class UMars_AutoTest_Platter_UnloadResettlesTheRest : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -20000.0, -30000.0);
+
+    // Three cadenced drops each settle with physics (up to Settle.MaxSeconds): well past the harness's default poll budget.
+    private const int32 k_SlowPolls = 900;
+    // The Kinematic read before the re-attach and the poll after it: a few frames past the freeze.
+    private const float32 k_FreezeSlackSeconds = 0.5f;
 
     private FCk_Handle_Platter _Platter;
     private TArray<FCk_Handle_FoodPiece> _Pieces;
@@ -12,17 +17,19 @@ class UMars_AutoTest_Platter_UnloadResettlesTheRest : UMars_AutoTestRig_Platter
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, -15.0, 0.0), k_Origin), Make_PlatterSpec(3));
+        const auto Spec = Make_PlatterSpec(3);
+        _Platter = Build_Platter(InHandle, FTransform(FRotator(0.0, -15.0, 0.0), k_Origin), Spec);
         for (int32 Index = 0; Index < 3; ++Index)
         { _Pieces.Add(Build_BoxAt(FTransform(FRotator::ZeroRotator, k_Origin + FVector(100.0, 30.0 * Index, 0.0)), 0.5)); }
 
-        Add_Step_WaitUntil("the three boxes are Ready", n"Check_Ready");
+        Add_Step_WaitUntil("the three boxes are Ready", n"Check_Ready", k_SlowPolls, 0);
         Add_Step("load all three", n"Step_Load");
-        Add_Step_WaitUntil("all three froze into the pile", n"Check_AllHeld");
+        Add_Step_WaitUntil("all three froze into the pile", n"Check_AllHeld", k_SlowPolls, 0);
         Add_Step("unload the first one frozen", n"Step_UnloadFirst");
         Add_Step_WaitUntil("the unload drained", n"Check_Unloaded");
         Add_Step("the other two let go and settle again", n"Step_AssertResettling");
-        Add_Step_WaitUntil("the two re-froze within 3 s", n"Check_TwoHeld", 0, 3.0f);
+        Add_Step_WaitUntil("the two re-froze within Settle.MaxSeconds", n"Check_TwoHeld", 0,
+            Spec.Settle.MaxSeconds + k_FreezeSlackSeconds);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("two held, inside the walls, no second landing", n"Step_AssertRefrozen");
         Run_Steps(InHandle);

@@ -13,7 +13,7 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         _RockHolder = MakeSeededHolder(InHandle, mars_items::Rock());
         _CleaverHolder = MakeSeededHolder(InHandle, mars_items::Cleaver());
 
-        Add_Step_WaitUntil("both holders are seeded with their item", n"Check_Seeded", 0, 5.0f);
+        Add_Step_WaitUntil("both holders are seeded with their item", n"Check_Seeded", 0, 0);
         Add_Step("the view of each item matches its Presentation and its first-person hold", n"Step_AssertViews");
         Add_Step("an invalid item makes an empty view", n"Step_AssertEmpty");
         Run_Steps(InHandle);

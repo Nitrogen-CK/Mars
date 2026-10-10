@@ -1,17 +1,23 @@
-// Commits a Carry / Hold once the body can be scene-node-attached, then broadcasts OnMountChanged.
+// Commits a PendingMount (written by UMars_Processor_WorldItem_Reconcile) once the body can be scene-node-attached, then
+// broadcasts OnMountChanged.
 //
 // Gate: no body, OR the body is added and reads Kinematic (utils_jolt_body::Get_MotionType is the mirror the
 // SetMotionType handler stamps). Attaching while the body still reads Dynamic would fight the Jolt writeback; a Kinematic
 // body follows the ECS transform (FTag_JoltBody_KinematicFromECS -> FProcessor_JoltBody_KinematicPush), so once attached
-// nothing else moves it.
+// nothing else moves it. A body whose setup failed, or that is still setting up after
+// constants_world_item::k_BodySetupBudgetPasses passes, has nothing to make Kinematic: the mount commits without it (an
+// ensure names the body's setup), as a bodiless item's does.
 //
 // The attach keeps the current world pose (the relative transform to the attach point), and an Arrival lerps the offset
-// to the mount offset, so the item visibly travels to the back / hand instead of snapping. Before the attach the body stops
-// colliding with pawns (constants_world_item::k_MountedBodyProfile): a kinematic item travelling through, then resting
-// against, its carrier's capsule would shove the character every step. A Release restores the body's own profile.
+// to the mount offset, so the item visibly travels to the back / hand / dock instead of snapping; a mount whose arrival
+// has no travel attaches at the offset and broadcasts OnMountSettled at once (the Arrive processor broadcasts it at the end
+// of a travel). Before the attach the body stops colliding with pawns (constants_world_item::k_MountedBodyProfile): a
+// kinematic item travelling through, then resting against, its carrier's capsule would shove the character every step. A
+// release restores the body's own profile.
 class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_WorldItem_HandleRequests");
     default _MarkedDirtyBy = FMars_Fragment_WorldItem_PendingMount;
 
     UFUNCTION(BlueprintOverride)
@@ -25,13 +31,26 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
                        FMars_Fragment_WorldItem& InState)
     {
         auto Body = InState.Body;
-        if (ck::IsValid(Body))
+        auto MountsWithBody = ck::IsValid(Body);
+        if (MountsWithBody)
         {
-            // Still waiting on the batched AddBodies pass - try again next frame.
-            if (utils_jolt_body::Get_IsBodyAdded(Body) == false)
-            { return; }
+            const auto SetupState = utils_jolt_body::Get_SetupState(Body);
+            if (SetupState == ECk_JoltBody_SetupState::Failed)
+            {
+                ck::EnsureIfNot(false, f"[WorldItem] Mount of [{InHandle.ToString()}]: its body failed setup ({utils_jolt_body::Get_SetupFailure(Body) :n}: {utils_jolt_body::Get_SetupDiagnostic(Body)}) - it mounts without the body");
+                MountsWithBody = false;
+            }
+            else if (SetupState == ECk_JoltBody_SetupState::Pending)
+            {
+                // Still waiting on the batched AddBodies pass - try again next frame, within the budget.
+                InPending.WaitedPasses += 1;
+                if (InPending.WaitedPasses <= constants_world_item::k_BodySetupBudgetPasses)
+                { return; }
 
-            if (utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Kinematic)
+                ck::EnsureIfNot(false, f"[WorldItem] Mount of [{InHandle.ToString()}]: its body is still setting up after {InPending.WaitedPasses} passes ({utils_jolt_body::Get_SetupDiagnostic(Body)}) - it mounts without the body");
+                MountsWithBody = false;
+            }
+            else if (utils_jolt_body::Get_MotionType(Body) != ECk_MotionType::Kinematic)
             {
                 // The SetMotionType handler drops a request that reaches it before the body is added, so re-ask until
                 // the mirror reads Kinematic. A duplicate that lands after the switch is a no-op in the handler.
@@ -44,10 +63,8 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_WorldItem();
 
         // Snapshot before the remove: InPending is invalid once Request_TryRemove returns.
-        const auto NewMount = InPending.Mount;
-        const auto Carrier = InPending.Carrier;
+        const auto Target = InPending.Target;
         auto Node = InPending.Node;
-        const auto Offset = InPending.Offset;
         const auto Arrive = InPending.Arrive;
         const auto RequestedAtSeconds = InPending.RequestedAtSeconds;
 
@@ -57,29 +74,20 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
             f"[WorldItem] Mount of [{Self.ToString()}]: the attach point went away before the body read Kinematic - skipped"))
         { return; }
 
-        const auto PrevMount = InState.Mount;
-        InState.Mount = NewMount;
-        InState.Carrier = Carrier;
+        const auto PrevMount = InState.Committed.Mount;
+        InState.Committed = Target;
 
         auto Root = InHandle.As_Transform();
         const auto WorldNow = utils_transform::Get_EntityCurrentTransform(Root);
         const auto NodeWorld = utils_transform::Get_EntityCurrentTransform(Node);
         const auto FromOffset = WorldNow.GetRelativeTransform(NodeWorld);
 
-        if (ck::IsValid(Body))
+        if (MountsWithBody)
         {
             utils_jolt_body::Request_SetCollisionProfile(Body,
                 FCk_Request_JoltBody_SetCollisionProfile(constants_world_item::k_MountedBodyProfile),
                 FCk_Delegate_Request_OnCompleted(this, n"OnMountedProfileApplied"));
         }
-
-        // utils_scene_node::Add never re-parents an attached node: detach first (immediate, removes the SceneNode
-        // fragments, keeps the world pose).
-        auto SceneNode = InHandle.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(SceneNode))
-        { utils_scene_node::Request_Detach(SceneNode); }
-
-        utils_scene_node::Add(Root, Node, FromOffset);
 
         const UMars_ItemTrait_Presentation Presentation = utils_world_item::TryGet_Presentation(Self);
 
@@ -88,16 +96,36 @@ class UMars_Processor_WorldItem_Mount : UCk_Processor_Script_Base_UE
         if (Arrive.IsSet())
         { Spec = utils_world_item::Get_ArriveSpecAfter(Arrive.GetValue(), float32(System::GetGameTimeInSeconds() - RequestedAtSeconds)); }
 
-        auto& Arrival = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Arrival);
-        Arrival.FromOffset = FromOffset;
-        Arrival.ToOffset = Offset;
-        Arrival.Duration = Spec.Seconds;
-        Arrival.DelaySeconds = Spec.DelaySeconds;
-        Arrival.Easing = Spec.Easing;
-        Arrival.Elapsed = 0.0f;
+        const auto HasTravel = Spec.Seconds > 0.0f || Spec.DelaySeconds > 0.0f;
 
-        if (PrevMount != NewMount && Self.Has_Fragment(FMars_Fragment_WorldItem_Signals))
-        { Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountChanged.Broadcast(Self, PrevMount, NewMount); }
+        // utils_scene_node::Add never re-parents an attached node: detach first (immediate, removes the SceneNode
+        // fragments, keeps the world pose).
+        auto SceneNode = InHandle.As_SceneNode(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(SceneNode))
+        { utils_scene_node::Request_Detach(SceneNode); }
+
+        utils_scene_node::Add(Root, Node, HasTravel ? FromOffset : Target.Offset);
+
+        if (HasTravel)
+        {
+            auto& Arrival = Self.AddOrGet_Fragment(FMars_Fragment_WorldItem_Arrival);
+            Arrival.FromOffset = FromOffset;
+            Arrival.ToOffset = Target.Offset;
+            Arrival.Duration = Spec.Seconds;
+            Arrival.DelaySeconds = Spec.DelaySeconds;
+            Arrival.Easing = Spec.Easing;
+            Arrival.Elapsed = 0.0f;
+        }
+
+        // InState is not read past this line: a listener may add a fragment to the world item.
+        if (Self.Has_Fragment(FMars_Fragment_WorldItem_Signals) == false)
+        { return; }
+
+        if (PrevMount != Target.Mount)
+        { Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountChanged.Broadcast(Self, PrevMount, Target.Mount); }
+
+        if (HasTravel == false && Self.Has_Fragment(FMars_Fragment_WorldItem_Signals))
+        { Self.Get_Fragment(FMars_Fragment_WorldItem_Signals).OnMountSettled.Broadcast(Self, Target.Mount, Target.Carrier); }
     }
 
     // The body has no profile read-back: the completed request is the record (the body is the world item's own entity).

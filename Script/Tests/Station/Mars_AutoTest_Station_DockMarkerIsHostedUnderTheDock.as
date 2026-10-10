@@ -17,8 +17,8 @@ class UMars_AutoTest_Station_DockMarkerIsHostedUnderTheDock : UMars_AutoTestRig_
     {
         Spawn_Station(InHandle, k_Origin);
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("each dock's marker component exists", n"Check_MarkersFound", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("each dock's marker component exists", n"Check_MarkersFound", k_SlowPolls, 0);
         Add_Step("the input marker is hosted under the input dock, at its floor", n"Step_Assert");
         Run_Steps(InHandle);
     }

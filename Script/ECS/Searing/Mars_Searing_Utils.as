@@ -1,5 +1,6 @@
 namespace utils_searing
 {
+    // utils_foodpiece::k_FaceCount, repeated: a namespace constant cannot be initialized from another file's.
     const int32 k_FaceCount = 6;
     const int32 k_SearSignalSteps = 10;
     // The cooking surface's height in the pan body's frame: the pan node sits at the centre of that surface (the pan mesh's
@@ -16,11 +17,12 @@ namespace utils_searing
     // where it is, so a piece is never left unjudged.
     const float32 k_ArrivalMaxSeconds = 1.0f;
 
-    // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature). The spec's
-    // Nodes are built by the caller: Nodes.Pan is the Implement on the pan node (the kernel makes it Driven while hot and
-    // forwards the looks to it), and a piece counts as on the pan only while it rests on Nodes.PanBaseBody. The pan starts
-    // empty: pieces arrive only through Request_AddPiece. A rejected spec or a missing node ensures and returns an invalid
-    // handle.
+    // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature), and the
+    // station's admission inbox and take-out readout. The spec's Nodes are built by the caller: Nodes.Pan is the Implement on
+    // the pan node (the kernel makes it Driven while hot and forwards the looks to it), and a piece counts as on the pan only
+    // while it rests on Nodes.PanBaseBody. The pan starts empty: pieces arrive only through the station's inbox
+    // (utils_cooking_feed::Request_Admit); an empty first drain starts its watch of the station's queue. A rejected spec or
+    // a missing node ensures and returns an invalid handle.
     FCk_Handle_Searing Add(FCk_Handle& InHandle, FMars_Searing_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -37,6 +39,9 @@ namespace utils_searing
         InHandle.Add_Fragment(FMars_Feature_Searing());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_Searing());
+        InHandle.Add_Fragment(FMars_Fragment_Searing_Requests());
+        utils_cooking_feed::Add_Admission(InHandle);
+        utils_cooking_feed::Add_TakeOut(InHandle);
         return InHandle.As_Searing();
     }
 
@@ -186,23 +191,23 @@ namespace utils_searing
 
     //----------------------------------------------------------------------------------------------------------------------
     // Piece geometry: a piece is its mesh's bounds box in its own frame, its middle CentreLocal and its half sizes HalfExtents
-    // (a cut half's origin is the uncut piece's, not its own middle). Shared with Fry.
+    // (a cut half's origin is the uncut piece's, not its own middle). Shared with Fry. The bounds and the centre frame are
+    // utils_foodpiece's; these forward to it.
     //----------------------------------------------------------------------------------------------------------------------
 
     FVector Get_BoundsCentre(const FCk_RuntimeMesh_Metrics& InMetrics)
     {
-        return (InMetrics.Get_BoundsMinCm() + InMetrics.Get_BoundsMaxCm()) * 0.5;
+        return utils_foodpiece::Get_BoundsCentre(InMetrics);
     }
 
     FVector Get_BoundsHalfExtents(const FCk_RuntimeMesh_Metrics& InMetrics)
     {
-        return (InMetrics.Get_BoundsMaxCm() - InMetrics.Get_BoundsMinCm()) * 0.5;
+        return utils_foodpiece::Get_BoundsHalfExtents(InMetrics);
     }
 
-    // InPieceTransform (in any frame) moved to the piece's middle: the frame its faces are measured from.
     FTransform Get_CentreFrame(const FTransform& InPieceTransform, const FVector& InCentreLocal)
     {
-        return FTransform(InPieceTransform.GetRotation(), InPieceTransform.TransformPosition(InCentreLocal));
+        return utils_foodpiece::Get_CentreFrame(InPieceTransform, InCentreLocal);
     }
 
     // The middle of InFace in InCentreFrame's parent frame: the face's normal picks the half extent it lies out.
@@ -243,21 +248,12 @@ namespace utils_searing
         return InHalfExtents.GetMax();
     }
 
-    // The cook state InPiece's sear makes of InSeed (the state the piece arrived with): the face sears are the pan's, the
-    // crust's penetration their sum (up to 1) and the silhouette their mean. Everything else is the seed's.
-    FMars_CookState Get_CookState(const FMars_Searing_PieceState& InPiece, const FMars_CookState& InSeed)
+    // The cook state InPiece's sear makes of InSeed (the state the piece arrived with): the sears are the pan's; every
+    // other channel is the seed's.
+    FMars_FoodPiece_CookState Get_CookState(const FMars_Searing_PieceState& InPiece, const FMars_FoodPiece_CookState& InSeed)
     {
         auto CookState = InSeed;
-        CookState.FaceSear.Empty();
-        auto SearSum = 0.0f;
-        for (const auto Sear : InPiece.FaceSear)
-        {
-            CookState.FaceSear.Add(Sear);
-            SearSum += Sear;
-        }
-
-        CookState.Penetration = Math::Min(1.0f, SearSum);
-        CookState.Shape = SearSum / float32(k_FaceCount);
+        CookState.Sear = InPiece.FaceSear;
         return CookState;
     }
 }
@@ -428,6 +424,13 @@ mixin EMars_Searing_Contact Get_PieceContact(const FCk_Handle_Searing& Self, con
 }
 
 // 0 raw .. 1 seared.
+// The piece's cook state as the pan would hand it back now: its sears so far.
+mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    const auto Piece = Self.Get_PieceState(InPieceId);
+    return utils_searing::Get_CookState(Piece, Piece.Piece.Get_CookState());
+}
+
 mixin float32 Get_FaceSear(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_Searing_Face InFace)
 {
     const auto Piece = Self.Get_PieceState(InPieceId);
@@ -492,16 +495,16 @@ mixin void Request_Reset(FCk_Handle_Searing& Self, const FMars_Request_Searing_R
     Requests.ResetRequests.Add(InRequest);
 }
 
-mixin void Request_AddPiece(FCk_Handle_Searing& Self, const FMars_Request_Searing_AddPiece& InRequest)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Requests);
-    Requests.AddPieceRequests.Add(InRequest);
-}
-
 mixin void Request_TakeOut(FCk_Handle_Searing& Self, const FMars_Request_Searing_TakeOut& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Requests);
     Requests.TakeOutRequests.Add(InRequest);
+}
+
+mixin void Request_Readopt(FCk_Handle_Searing& Self, const FMars_Request_Searing_Readopt& InRequest)
+{
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Requests);
+    Requests.ReadoptRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -520,20 +523,6 @@ mixin void UnbindFrom_OnHeatChanged(FCk_Handle_Searing& Self, FMars_Delegate_Sea
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnHeatChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnPieceAdmission(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdmission InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
-    Fragment.OnPieceAdmission.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnPieceAdmission(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdmission InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceAdmission.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnPieceAdded(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnPieceAdded InDelegate)
@@ -646,4 +635,18 @@ mixin void UnbindFrom_OnPieceTakenOut(FCk_Handle_Searing& Self, FMars_Delegate_S
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceTakenOut.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTakeOutRefused(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnTakeOutRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
+    Fragment.OnTakeOutRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTakeOutRefused(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnTakeOutRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnTakeOutRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

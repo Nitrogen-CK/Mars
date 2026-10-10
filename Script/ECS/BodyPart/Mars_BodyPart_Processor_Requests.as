@@ -72,8 +72,6 @@ class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (New != Old)
         {
-            ck::Trace(f"[BodyPart] [{InPart.ToString()}] condition {Old :n} -> {New :n}");
-
             if (InPart.Has_Fragment(FMars_Fragment_BodyPart_Signals))
             { InPart.Get_Fragment(FMars_Fragment_BodyPart_Signals).OnConditionChanged.Broadcast(InPart, Old, New); }
         }
@@ -108,7 +106,6 @@ class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
         if (Policy == EMars_BodyPart_DepletionPolicy::Break)
         {
             InPart.Get_Fragment(FMars_Fragment_BodyPart).State = EMars_BodyPart_State::Broken;
-            ck::Trace(f"[BodyPart] [{InPart.ToString()}] broken");
 
             if (InPart.Has_Fragment(FMars_Fragment_BodyPart_Signals))
             { InPart.Get_Fragment(FMars_Fragment_BodyPart_Signals).OnBroken.Broadcast(InPart, InRequest.Cause); }
@@ -119,13 +116,14 @@ class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
 
         InPart.Get_Fragment(FMars_Fragment_BodyPart).State = EMars_BodyPart_State::Severed;
 
+        // Only the sever detaches a leg, and a part severs once (it left Attached above), so a leg already detached is a
+        // defect. No detach would fire: the sever completes here with nothing released.
         auto Leg = InPart.Get_Leg();
-        if (utils_procedural_leg::Get_IsAttached(Leg) == false)
+        if (ck::EnsureIfNot(utils_procedural_leg::Get_IsAttached(Leg), f"[BodyPart] [{InPart.ToString()}] severed a leg that was no longer attached: only the sever detaches a leg"))
         {
-            // Detached by someone else already: no detach will fire, so the sever completes here with nothing released.
-            ck::Trace(f"[BodyPart] [{InPart.ToString()}] severed a leg that was no longer attached");
             if (InPart.Has_Fragment(FMars_Fragment_BodyPart_Signals))
             { InPart.Get_Fragment(FMars_Fragment_BodyPart_Signals).OnSevered.Broadcast(InPart, InRequest.Cause, TArray<FCk_Handle_Transform>()); }
+
             return;
         }
 
@@ -138,8 +136,6 @@ class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
         auto Detach = FCk_Request_ProceduralLeg_Detach(ECk_ProceduralLeg_ReleasedPartsOwnership::TransferToLeg);
         Detach.Set_LegOwnership(ECk_ProceduralLeg_DetachedLegOwnership::TransferToWorld);
         utils_procedural_leg::Request_Detach(Leg, Detach);
-
-        ck::Trace(f"[BodyPart] [{InPart.ToString()}] severing: detach requested");
     }
 
     // Bound only by HandleSever, on a part's own leg, after it stashed the cause in PendingSever.
@@ -199,8 +195,6 @@ class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
             Cause = Part.Get_Fragment(FMars_Fragment_BodyPart_PendingSever).Cause;
             Part.Request_TryRemove(FMars_Fragment_BodyPart_PendingSever);
         }
-
-        ck::Trace(f"[BodyPart] [{Part.ToString()}] severed: [{Released.Num()}] parts released as debris for [{Debris.LifetimeSeconds}]s");
 
         if (Part.Has_Fragment(FMars_Fragment_BodyPart_Signals))
         { Part.Get_Fragment(FMars_Fragment_BodyPart_Signals).OnSevered.Broadcast(Part, Cause, Released); }

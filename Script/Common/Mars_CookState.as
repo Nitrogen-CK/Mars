@@ -47,6 +47,34 @@ namespace constants_cookstate
 
 namespace utils_cookstate
 {
+    // How a piece's ledger looks (InCookState, as its kernels wrote it): each face shows the more cooked of its sear (0..1)
+    // and its batter heat (0..2), so a fried face stays golden on a pan and a seared one shows its crust in the oil; the
+    // crust's penetration is the sears' sum (up to 1) and the silhouette their mean; the batter's fry is the batter heats'
+    // mean; the oil coat and the crumb are the ledger's. A station layers only its own dressing (its oil coat) on top.
+    FMars_CookState Make_DisplayParams(const FMars_FoodPiece_CookState& InCookState)
+    {
+        auto Display = FMars_CookState();
+        if (ck::EnsureIfNot(InCookState.Sear.Num() == utils_searing::k_FaceCount && InCookState.Batter.Num() == utils_searing::k_FaceCount,
+            f"[CookState] a ledger needs {utils_searing::k_FaceCount} sears and batter heats (got {InCookState.Sear.Num()} and {InCookState.Batter.Num()})"))
+        { return Display; }
+
+        auto SearSum = 0.0f;
+        auto BatterSum = 0.0f;
+        for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
+        {
+            Display.FaceSear[Face] = Math::Max(InCookState.Sear[Face], InCookState.Batter[Face]);
+            SearSum += InCookState.Sear[Face];
+            BatterSum += InCookState.Batter[Face];
+        }
+
+        Display.Penetration = Math::Min(1.0f, SearSum);
+        Display.Shape = SearSum / float32(utils_searing::k_FaceCount);
+        Display.Fry = BatterSum / float32(utils_searing::k_FaceCount);
+        Display.OilCoat = InCookState.OilCoat;
+        Display.Crumb = InCookState.Crumb;
+        return Display;
+    }
+
     // Indices 0..12 as cooking_spec.py / FOOD_LIBRARY.md lay them out, as four Vector4 groups at 0, 4, 8 and 12. Expects six
     // face sears; the writers check.
     TArray<FCk_CustomPrimitiveData> Make_CustomPrimitiveData(const FMars_CookState& InState)

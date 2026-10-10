@@ -11,8 +11,8 @@ asset Mars_FPHandsHandle of UCkDynamic_HandleDefinition
 
 struct FMars_Feature_FPHands {}
 
-// Phase of the gloves. Set ONLY by the Hands sub-SM's state enter tasks through Request_SetPhase. Reach/Grip/Return is
-// the instant grab; Hold/Release is the timed interaction; Push follows through a drop or throw.
+// Phase of the gloves. Set ONLY by the Hands sub-SM (its state enter tasks, and its task's exit back to None) through
+// Request_SetPhase. Reach/Grip/Return is a Grab; Hold/Release is a Hold; Push follows through a drop or throw.
 enum EMars_FPHands_Phase
 {
     None,
@@ -24,14 +24,35 @@ enum EMars_FPHands_Phase
     Push
 }
 
-// The gesture a reach plays: Grab (an instant interaction) runs Reach -> Grip -> Return on its own; Hold (a timed or
-// manually completed one) keeps the gloves on the target until it is lost. Place runs Grab's phases with whatever the
-// gloves hold carried over the target (the one reach a two-handed hold may make): the Grip phase is where it is let go.
+// The gesture a reach plays (an interact target names its own: FMars_Interactable_TargetEntry.ReachKind): Grab runs
+// Reach -> Grip -> Return on its own; Hold keeps the gloves on the target until it is lost. Place runs Grab's phases with
+// whatever the gloves hold carried over the target (the one reach a two-handed hold may make): the Grip phase is where it is
+// let go.
 enum EMars_FPHands_ReachKind
 {
     Grab,
     Hold,
     Place
+}
+
+// Why the gloves did not take a StartReach (OnReachRefused).
+enum EMars_FPHands_ReachRefusal
+{
+    // A later StartReach for another target in the same drain was taken instead.
+    Superseded,
+    // A push the same drain accepted leaves Rest first.
+    PushStarted,
+    // The gloves are gripping, holding or pushing: a reach is taken only at rest or while letting go.
+    Busy,
+    // The gloves are returning with a picked-up item still riding in.
+    Carrying,
+    // The subject (its interact target or its owner) was destroyed before the drain.
+    SubjectGone,
+    // Nothing on the subject is within the gloves' reach.
+    OutOfReach,
+    // The request contradicts itself (a place spot on a reach that sets nothing down, a Place with no subject): a defect,
+    // ensured where it is refused.
+    Malformed
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -53,7 +74,7 @@ struct FMars_Fragment_FPHands_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The reach the gloves are on (or last were on).
+// The reach the gloves are on. Target and InteractTarget are unset at rest (phase None).
 struct FMars_FPHands_ReachState
 {
     UPROPERTY()
@@ -69,11 +90,6 @@ struct FMars_FPHands_ReachState
     // Single-handed targets near the centre line stay with this glove; every resolve (focus included) updates it.
     UPROPERTY()
     EMars_Hand PreferredHand = EMars_Hand::Right;
-
-    // The interact target of the last reach the gloves refused; cleared by the next reach they take and by a hold change.
-    // Lets a task that starts after the refusal (an interaction's grip-wait) know the gloves will not come.
-    UPROPERTY()
-    TOptional<FCk_Handle_InteractTarget> RefusedTarget;
 }
 
 // The lean toward what is looked at.
@@ -150,10 +166,10 @@ struct FMars_Fragment_FPHands
 delegate void FMars_Delegate_FPHands_OnReachRequested(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind);
 event void FMars_Delegate_FPHands_OnReachRequested_MC(FCk_Handle_FPHands InHands, EMars_FPHands_ReachKind InKind);
 
-// A StartReach the gloves did not take (busy, superseded in its drain, the subject gone, nothing to reach). InTarget is the
-// request's interact target (invalid for a reach that served no interaction).
-delegate void FMars_Delegate_FPHands_OnReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind);
-event void FMars_Delegate_FPHands_OnReachRefused_MC(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind);
+// A StartReach the gloves did not take, and why, in the drain after it was asked. InTarget is the request's interact target
+// (invalid for a reach that served no interaction).
+delegate void FMars_Delegate_FPHands_OnReachRefused(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind, EMars_FPHands_ReachRefusal InReason);
+event void FMars_Delegate_FPHands_OnReachRefused_MC(FCk_Handle_FPHands InHands, FCk_Handle_InteractTarget InTarget, EMars_FPHands_ReachKind InKind, EMars_FPHands_ReachRefusal InReason);
 
 delegate void FMars_Delegate_FPHands_OnReachTargetLost(FCk_Handle_FPHands InHands);
 event void FMars_Delegate_FPHands_OnReachTargetLost_MC(FCk_Handle_FPHands InHands);
@@ -177,7 +193,7 @@ struct FMars_Fragment_FPHands_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Issued only by the Hands sub-SM's state enter tasks. The last one in a drain wins.
+// Issued only by the Hands sub-SM's state enter tasks and its task's exit. The last one in a drain wins.
 struct FMars_Request_FPHands_SetPhase
 {
     UPROPERTY()
@@ -192,8 +208,9 @@ struct FMars_Request_FPHands_SetPhase
 }
 
 // Reach for a subject. The last one in a drain wins; ignored unless the gloves are at rest (Phase None) or letting go
-// (Release, Return), when the subject died before the drain, and when it is unresolvable. Every ignored one (the
-// superseded ones included) is refused out loud: OnReachRefused.
+// (Release, Return), when the subject died before the drain, and when it is unresolvable. One for the interact target the
+// gloves are already reaching, gripping or holding is taken as asked, without restarting the reach (OnReachRequested).
+// Every ignored one (the superseded ones included) is refused out loud: OnReachRefused, with its EMars_FPHands_ReachRefusal.
 struct FMars_Request_FPHands_StartReach
 {
     // Unset: a bare reach - the right glove toward the hand node itself, which drives the phase machine without an

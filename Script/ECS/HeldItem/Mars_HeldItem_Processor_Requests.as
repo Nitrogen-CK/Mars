@@ -1,12 +1,5 @@
-// Records the requested start poses, then commits the new held item, replaces its presentation and broadcasts
-// OnHeldItemChanged. An unchanged item only records the (possibly different, empty) selected slot.
-//
-// A Persistent item (one whose item carries FMars_Fragment_Item_PersistentWorldItem) is never respawned: its own World-mode
-// world item is asked to Hold (onto the hand) when it becomes held and to Carry (back onto its carry point) when it stops
-// being held while still in the hand. That world item is a Borrowed presentation, never destroyed here.
-//
-// Only the LAST queued SetSlot is applied: each one is a full snapshot of the selection, and applying the earlier ones
-// would spawn and destroy an intermediate visual and broadcast a held item that was never current at a drain.
+// Records the requested start poses of the next held visual: UMars_Processor_HeldItem_Sync spawns it, and consumes them,
+// when the held item changes.
 class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -27,10 +20,8 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
         const auto ClearNextSpawnFrom = InRequests.ClearNextSpawnFromRequests.Num() > 0;
         TArray<FMars_Request_HeldItem_SetNextSpawnFrom> SetNextSpawnFromRequests = InRequests.SetNextSpawnFromRequests;
         TArray<FMars_Request_HeldItem_SetNextArrival> SetNextArrivalRequests = InRequests.SetNextArrivalRequests;
-        TArray<FMars_Request_HeldItem_SetNextHoldArrive> SetNextHoldArriveRequests = InRequests.SetNextHoldArriveRequests;
-        TArray<FMars_Request_HeldItem_SetSlot> SetSlotRequests = InRequests.SetSlotRequests;
 
-        // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
+        // InRequests is invalid past this line.
         Self.Request_TryRemove(FMars_Fragment_HeldItem_Requests);
 
         if (ClearNextSpawnFrom)
@@ -45,123 +36,5 @@ class UMars_Processor_HeldItem_HandleRequests : UCk_Processor_Script_Base_UE
             InState.NextArrival = TOptional<FMars_WorldItem_PendingArrival>(
                 FMars_WorldItem_PendingArrival(Request.Item, Request.World, System::GetGameTimeInSeconds()));
         }
-
-        if (SetNextHoldArriveRequests.Num() > 0)
-        {
-            const auto& Request = SetNextHoldArriveRequests.Last();
-            InState.NextHoldArrive = TOptional<FMars_HeldItem_PendingHoldArrive>(
-                FMars_HeldItem_PendingHoldArrive(Request.WorldItem, Request.Arrive, System::GetGameTimeInSeconds()));
-        }
-
-        if (SetSlotRequests.Num() > 0)
-        { HandleSetSlotRequest(Self, InState, SetSlotRequests.Last()); }
-    }
-
-    private void HandleSetSlotRequest(FCk_Handle_HeldItem& InHeldItem, FMars_Fragment_HeldItem& InState, const FMars_Request_HeldItem_SetSlot& InRequest)
-    {
-        InState.CurrentInventory = InRequest.Inventory;
-
-        const auto PrevItem = InState.CurrentItem;
-        if (InRequest.Item == PrevItem)
-        { return; }
-
-        FCk_Handle Player = InHeldItem;
-
-        ReleasePresentation(Player, InState);
-        InState.CurrentItem = InRequest.Item;
-
-        auto NewItem = InRequest.Item;
-        if (ck::IsValid(NewItem) && NewItem.Has_PersistentWorldItem())
-        {
-            auto NewWorldItem = NewItem.Get_PersistentWorldItem();
-            const auto HasWorldItem = ck::IsValid(NewWorldItem);
-            ck::EnsureIfNot(HasWorldItem, f"[HeldItem] Persistent item [{NewItem.ToString()}] has lost its world item");
-
-            if (HasWorldItem)
-            {
-                auto Hold = FMars_Request_WorldItem_Hold(Player);
-                Hold.Arrive = Take_NextHoldArrive(InState, NewWorldItem);
-                NewWorldItem.Request_Hold(Hold);
-                InState.PresentationEntity = NewWorldItem;
-                InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Borrowed;
-            }
-        }
-        else if (ck::IsValid(NewItem) && NewItem.Has_Presentation())
-        {
-            InState.PresentationEntity = SpawnVisual(InHeldItem, InState, NewItem);
-            InState.PresentationOwnership = EMars_HeldItem_PresentationOwnership::Owned;
-        }
-
-        if (InHeldItem.Has_Fragment(FMars_Fragment_HeldItem_Signals))
-        { InHeldItem.Get_Fragment(FMars_Fragment_HeldItem_Signals).OnHeldItemChanged.Broadcast(InHeldItem, PrevItem, NewItem); }
-    }
-
-    // The pending Hold arrival for InWorldItem, aged to now; unset for another item or a stale one. Consumed either way.
-    private TOptional<FMars_WorldItem_ArriveSpec> Take_NextHoldArrive(FMars_Fragment_HeldItem& InState, const FCk_Handle_WorldItem& InWorldItem)
-    {
-        if (InState.NextHoldArrive.IsSet() == false)
-        { return TOptional<FMars_WorldItem_ArriveSpec>(); }
-
-        const auto Pending = InState.NextHoldArrive.GetValue();
-        InState.NextHoldArrive.Reset();
-
-        const auto AgeSeconds = System::GetGameTimeInSeconds() - Pending.StampedAtSeconds;
-        if (Pending.WorldItem != InWorldItem || AgeSeconds > constants_world_item::k_ArriveFromMaxAgeSeconds)
-        { return TOptional<FMars_WorldItem_ArriveSpec>(); }
-
-        return TOptional<FMars_WorldItem_ArriveSpec>(utils_world_item::Get_ArriveSpecAfter(Pending.Arrive, float32(AgeSeconds)));
-    }
-
-    // Owned: destroyed. Borrowed: a world item still in the hand goes back onto its carry point; a released one (dropped
-    // or thrown) already reads World and stays where it is.
-    private void ReleasePresentation(FCk_Handle& InPlayer, FMars_Fragment_HeldItem& InState)
-    {
-        auto Presentation = InState.PresentationEntity;
-        InState.PresentationEntity = FCk_Handle();
-
-        if (ck::Is_NOT_Valid(Presentation))
-        { return; }
-
-        if (InState.PresentationOwnership == EMars_HeldItem_PresentationOwnership::Owned)
-        {
-            utils_entity_lifetime::Request_DestroyEntity(Presentation);
-            return;
-        }
-
-        auto WorldItem = Presentation.As_WorldItem();
-        if (WorldItem.Get_TargetMount() == EMars_WorldItem_Mount::Held)
-        { WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(InPlayer)); }
-    }
-
-    // Two one-shot start poses, exclusive: the gloves' NextSpawnFrom (a pickup riding in; the hold offset then carries
-    // that pose) wins over this item's NextArrival (taken from a cargo slot; lerps to HeldOffset). Both are consumed
-    // here either way, so neither animates a later spawn.
-    private FCk_Handle SpawnVisual(FCk_Handle_HeldItem& InHeldItem, FMars_Fragment_HeldItem& InState, FCk_Handle_Item& InItem)
-    {
-        auto Hand = InHeldItem.Get_HandAttachPoint();
-        if (ck::EnsureIfNot(ck::IsValid(Hand), f"[HeldItem] [{InHeldItem.ToString()}] has no hand attach point"))
-        { return FCk_Handle(); }
-
-        const UMars_ItemTrait_Presentation Presentation = InItem.Get_Presentation();
-
-        auto Arrival = FMars_WorldItem_Arrival();
-        if (InState.NextArrival.IsSet() && InState.NextArrival.GetValue().Item == InItem)
-        {
-            Arrival = utils_world_item::Get_FreshArrival(InState.NextArrival.GetValue());
-            InState.NextArrival.Reset();
-        }
-
-        auto Visual = FMars_WorldItem_VisualSpec(InItem, Hand, Presentation.Mounting.HeldOffset);
-        if (InState.NextSpawnFrom.IsSet())
-        {
-            const auto HandWorld = utils_transform::Get_EntityCurrentTransform(Hand);
-            Visual.AttachOffset = InState.NextSpawnFrom.GetValue().GetRelativeTransform(HandWorld);
-            InState.NextSpawnFrom.Reset();
-        }
-        else
-        { Visual.ArriveFrom = Arrival; }
-
-        FCk_Handle Owner = InHeldItem;
-        return utils_world_item::Request_SpawnVisual(Owner, Visual);
     }
 }

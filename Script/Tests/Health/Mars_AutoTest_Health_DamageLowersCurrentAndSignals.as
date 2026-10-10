@@ -19,7 +19,7 @@ class UMars_AutoTest_Health_DamageLowersCurrentAndSignals : UCk_AutoTest_Base
         _Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnDepleted"));
 
         Add_Step("the spec rules hold and a fresh Health reads full; hit it for 30", n"Step_ValidateAndHit");
-        Add_Step_WaitUntil("Health reads 70", n"Check_At70", 0, 2.0f);
+        Add_Step_WaitUntil("Health reads 70", n"Check_At70", 0, 0);
         Add_Step("one OnDamaged (30 applied, 70 left), LastHit recorded, not depleted", n"Step_AssertDamaged");
         Run_Steps(InHandle);
     }

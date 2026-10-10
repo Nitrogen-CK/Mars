@@ -1,9 +1,10 @@
-// A meat platter whose joint has landed is taken in hand by a carrier node 150 cm from the input dock that then slides
-// toward it at 60 cm/s for the whole test (the player walking up with it), and is docked while the node still moves. The
+// A meat platter whose joint has landed is taken in hand by a carrier (a hotbar whose Hand is a node 150 cm from the input
+// dock) that then slides toward it at 60 cm/s for the whole test (the player walking up with it), and is docked while the
+// node still moves. The
 // cutting station's feed draws from a docked platter only once it has landed on its dock: in every frame the dock holds
 // the platter but it has not arrived, the feed is unsourced (and there is at least one such frame); once it has arrived the
 // feed draws from it. Add food then lays the joint on the board at the pile: the board holds the joint, the joint hangs off
-// no scene node and its world location is within 2 cm of utils_cutting::Get_PileWorld. Nobody operates the station: the
+// no scene node and its world location is within 2 cm of the board's pose for it on its pile node. Nobody operates the station: the
 // feed's source and bridge tasks run in Idle too. Isolated origin (20800, -9000, -30000).
 class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival : UMars_AutoTestRig_CuttingStation
 {
@@ -27,17 +28,17 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
     {
         Spawn_Station(InHandle, k_Origin);
 
-        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 5.0f);
+        Add_Step_WaitUntil("the station composed its Cutting, FoodBoard, feed and docks", n"Check_StationReady", 0, 0);
         Add_Step("a meat platter spawns on a floor 150 cm from the input dock", n"Step_SpawnPlatter");
-        Add_Step_WaitUntil("the platter is constructed and its joint landed", n"Check_PlatterWithJoint", 0, 10.0f);
+        Add_Step_WaitUntil("the platter is constructed and its joint landed", n"Check_PlatterWithJoint", k_SlowPolls, 0);
         Add_Step("a carrier node takes the platter in hand and starts toward the dock", n"Step_HoldOnCarrier");
-        Add_Step_WaitUntil("the platter is held on the moving carrier", n"Check_Held", 0, 5.0f);
+        Add_Step_WaitUntil("the platter is held on the moving carrier", n"Check_Held", k_SlowPolls, 0);
         Add_Step("dock the platter while the carrier still moves", n"Step_DockInFlight");
-        Add_Step_WaitUntil("the platter arrived on the dock and the feed draws from it", n"Check_SourcedOnArrival", 0, 5.0f);
+        Add_Step_WaitUntil("the platter arrived on the dock and the feed draws from it", n"Check_SourcedOnArrival", k_SlowPolls, 0);
         Add_Step("the feed was unsourced while the platter travelled onto the dock", n"Step_AssertNotSourcedInFlight");
-        Add_Step_WaitUntil("the joint is frozen on the docked platter", n"Check_FeedSourced", 0, 5.0f);
+        Add_Step_WaitUntil("the joint is frozen on the docked platter", n"Check_FeedSourced", k_SlowPolls, 0);
         Add_Step("add food", n"Step_AddFood");
-        Add_Step_WaitUntil("the feed laid the joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", 0, 5.0f);
+        Add_Step_WaitUntil("the feed laid the joint on the board and the glove is back", n"Check_JointOnBoardAndFeedIdle", k_SlowPolls, 0);
         Add_Step_WaitFrames("the pile pose has landed", 2);
         Add_Step("the joint lies on the board at the pile, riding nothing", n"Step_Assert");
         Run_Steps(InHandle);
@@ -88,8 +89,8 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
         { ++_SourcedInFlight; }
     }
 
-    // A carrier node where the platter lies; a Carry onto its hand point, then a Hold: the platter is in hand, as a player
-    // carries it to the dock. The node starts moving now and never stops.
+    // A carrier where the platter lies, its Hand a node: the platter's item goes into the carrier's hotbar (the overflow,
+    // selected), so the platter is in hand, as a player carries it to the dock. The node starts moving now and never stops.
     UFUNCTION()
     private void Step_HoldOnCarrier(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -99,14 +100,18 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
         auto Node = utils_scene_node::Create(_Carrier.As_Transform(), FTransform::Identity);
         _CarrierNode = Node;
 
-        FCk_Handle NodeEntity = Node;
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, Node.As_Transform()));
-        utils_attach_points::Add(NodeEntity, AttachPointsSpec);
+        utils_attach_points::Add(_Carrier, AttachPointsSpec);
+
+        auto HotbarSpec = FMars_Hotbar_Spec();
+        HotbarSpec.BagSlotCount = 1;
+        auto Hotbar = utils_hotbar::Add(_Carrier, HotbarSpec);
 
         auto WorldItem = _InputPlatterEntity.As_WorldItem();
-        WorldItem.Request_Carry(FMars_Request_WorldItem_Carry(NodeEntity));
-        WorldItem.Request_Hold(FMars_Request_WorldItem_Hold(NodeEntity));
+        auto Holder = WorldItem.Get_Holder();
+        Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(_InputPlatterItem, Hotbar.TryGet_StowTarget(_InputPlatterItem)),
+            FCk_Delegate_Inventory_OnOperationResult_Transfer());
 
         _MoveStart = float64(System::GetGameTimeInSeconds());
         utils_timer::Create_Tick(Owner, FCk_Delegate_Timer(this, n"OnCarrierTick"));
@@ -157,7 +162,7 @@ class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArriv
         Assert_True(_Board.Get_HeldCount() == 1 && _Board.Get_Held()[0] == _Joint, f"the board holds the joint (board holds {_Board.Get_HeldCount()})");
         Assert_False(ck::IsValid(Get_Parent(_Joint)), "the joint hangs off no scene node");
 
-        const auto Pile = utils_cutting::Get_PileWorld(Get_StationWorld(), _Joint).GetLocation();
+        const auto Pile = _Board.Get_PoseOnPile(_Joint).GetLocation();
         const auto JointWorld = Get_World(_Joint).GetLocation();
         const auto Gap = JointWorld.Distance(Pile);
         Log(f"[Mars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival] joint at {JointWorld}, pile at {Pile}, gap {Gap} cm");

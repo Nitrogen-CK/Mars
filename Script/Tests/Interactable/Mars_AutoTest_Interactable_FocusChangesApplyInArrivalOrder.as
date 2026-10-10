@@ -21,14 +21,14 @@ class UMars_AutoTest_Interactable_FocusChangesApplyInArrivalOrder : UCk_AutoTest
         _Interactable.BindTo_OnUnfocused(FMars_Delegate_Interactable_OnUnfocused(this, n"OnUnfocused"));
 
         Add_Step("focus the interactable", n"Step_Focus");
-        Add_Step_WaitUntil("the interactable is focused", n"Check_OneEvent", 0, 5.0f);
+        Add_Step_WaitUntil("the interactable is focused", n"Check_OneEvent", 0, 0);
         Add_Step("queue Unfocus then Focus in one frame", n"Step_UnfocusThenFocus");
-        Add_Step_WaitUntil("both changes drained", n"Check_ThreeEvents", 0, 5.0f);
+        Add_Step_WaitUntil("both changes drained", n"Check_ThreeEvents", 0, 0);
         Add_Step("the later Focus wins: focused by the focuser, unfocused then focused", n"Step_AssertFocused");
         Add_Step("unfocus the interactable", n"Step_Unfocus");
-        Add_Step_WaitUntil("the interactable is unfocused", n"Check_FourEvents", 0, 5.0f);
+        Add_Step_WaitUntil("the interactable is unfocused", n"Check_FourEvents", 0, 0);
         Add_Step("queue Focus then Unfocus in one frame", n"Step_FocusThenUnfocus");
-        Add_Step_WaitUntil("both changes drained", n"Check_SixEvents", 0, 5.0f);
+        Add_Step_WaitUntil("both changes drained", n"Check_SixEvents", 0, 0);
         Add_Step("the later Unfocus wins: unfocused, focused then unfocused", n"Step_AssertUnfocused");
         Run_Steps(InHandle);
     }

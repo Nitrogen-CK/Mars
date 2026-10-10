@@ -2,18 +2,13 @@ namespace constants_food_item
 {
     // Above a platter's pickup (0) and a dock (10): a whole food lying on a platter, docked or not, is what the hand takes.
     const int32 k_FocusPriority = 20;
-
-    // A whole food's body has the surface a cut piece gets when the board lets it go loose.
-    const FName k_BodyCollisionProfile = n"PhysicsActor";
-    const float32 k_BodyFriction = 0.6f;
-    const float32 k_BodyRestitution = 0.1f;
 }
 
 // A whole food as a World-mode, Persistent world item whose entity IS the food's FoodPiece: the definition's Food trait names
 // the food, its joint is composed on this entity, and construction continues until the joint is Ready. Then the joint is
-// dressed, given its convex body (only in a game world: Jolt runs nowhere else, and a food placed in a level also
-// composes in the editor's preview world) and the shared world-item tail: a holder, a pickup fitted to the joint's bounds
-// and the WorldItem feature. A joint that fails to import takes the entity with it.
+// dressed, given its convex body with the food's own surface (only in a game world: Jolt runs nowhere else, and a food
+// placed in a level also composes in the editor's preview world) and the shared world-item tail: a holder, a pickup fitted
+// to the joint's bounds and the WorldItem feature. A joint that fails to import takes the entity with it.
 class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
 {
     private UMars_Food_Def _Food;
@@ -92,9 +87,8 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
         if (ck::IsValid(EntityWorld) && EntityWorld.IsGameWorld())
         {
             auto Piece = InPiece;
-            Composition.Body = utils_foodpiece::Add_Body(Piece, FMars_FoodPiece_BodyTuners(
-                constants_food_item::k_BodyCollisionProfile, constants_food_item::k_BodyFriction, constants_food_item::k_BodyRestitution));
-            Composition.BodyProfile = constants_food_item::k_BodyCollisionProfile;
+            Composition.Body = utils_foodpiece::Add_Body(Piece);
+            Composition.BodyProfile = Piece.Get_BodyTuners().CollisionProfileName;
         }
 
         // A rejected spec destroyed the entity (utils_world_item::Add ensured): nothing to finish.
@@ -109,7 +103,6 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
     UFUNCTION()
     private void OnJointFailed(FCk_Handle_FoodPiece InPiece, ECk_RuntimeMesh_SetupFailure InReason)
     {
-        ck::Warning(f"[FoodItem] [{InPiece.ToString()}] of [{_Food.GetName()}] failed to import ({InReason :n}): the food item is destroyed");
         FCk_Handle Entity = InPiece;
         utils_entity_lifetime::Request_DestroyEntity(Entity);
     }

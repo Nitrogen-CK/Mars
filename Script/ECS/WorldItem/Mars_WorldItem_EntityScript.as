@@ -3,7 +3,7 @@
 // World: the entity hosts a capacity-1 holder and the real item entity lives inside it, so dropping and picking up are
 // entity-preserving transfers. A Jolt body carries it, and a pickup interactable on the Use channel stows it into the
 // focuser's hotbar. A Transient item's entity destroys itself once its holder empties; a Persistent item's entity is the
-// item's body and mounts to its carrier instead (Carry / Hold / Release requests, see UMars_Processor_WorldItem_*).
+// item's body and mounts where its item lives instead (UMars_Processor_WorldItem_Reconcile; a Release brings it home).
 //
 // Visual: a mesh scene-node-parented under AttachTo (the player's hand, a cargo slot). It never composes the item
 // (utils_item::Add), so item traits do not run a second time on the visual. With ArriveFrom set it starts at that world
@@ -63,7 +63,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private TSoftObjectPtr<UMaterialInterface> _MaterialOverride;
     private FCk_Handle_Interactable _Pickup;
 
-    // Valid while the pickup is disabled because this focuser's hotbar had nowhere to stow the item.
+    // Valid while the pickup holds its HotbarFull claim because this focuser's hotbar had nowhere to stow the item.
     private FCk_Handle_Hotbar _GatingHotbar;
 
     UFUNCTION(BlueprintOverride)
@@ -178,13 +178,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     void DoEndPlay(FCk_Handle InHandle)
     {
-        if (ck::IsValid(_GatingHotbar))
-        {
-            _GatingHotbar.UnbindFrom_OnSlotItemChanged(
-                FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
-        }
-
-        _GatingHotbar = FCk_Handle_Hotbar();
+        Unbind_GatingHotbar();
     }
 
     //--------------------------------------------------------------------------------------------------------------------------
@@ -254,11 +248,17 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             FCk_Delegate_UnrealComponent_OnAdded(this, n"OnMeshComponentAdded"));
     }
 
+    // Who may put an item into the holder; unbound accepts anything.
+    protected FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic Get_HolderAcceptPolicy() const
+    {
+        return FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic();
+    }
+
     private FCk_Handle_Inventory_DataOnly AddHolder(FCk_Handle& InHandle)
     {
         auto HolderParams = utils_inventory_data_only::Make_Params_Bounded(
             GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
+            Get_HolderAcceptPolicy(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         HolderParams.Set_StackingPolicy(ECk_Inventory_StackingPolicy::NoStacking);
 
@@ -300,16 +300,17 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         Probe.ProbeOffset = InFit.Offset;
 
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-        TargetSpec.Set_CompletionPolicy(ECk_Interaction_CompletionPolicy::Instant);
 
         auto Prompt = FMars_InteractPrompt_Spec();
         Prompt.InputAction = mars::Mars_IA_Interact_Use;
         Prompt.PromptText = FText::FromString(f"Pick up {Get_ItemName()}");
 
+        // WhileLive: the item moves at the gloves' Grip, and the interaction lives until it has.
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
         Target.InteractPromptSpec = Prompt;
         Target.InteractionStateClass = Get_PickupStateClass();
+        Target.Work = EMars_Interactable_Work::WhileLive;
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
@@ -368,7 +369,8 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (ck::EnsureIfNot(InItemsCreated.Num() > 0, f"[WorldItem] Seeding [{_SelfEntity.ToString()}] reported success but created no item"))
         { return; }
 
-        StampPersistentWorldItem(InItemsCreated[0]);
+        auto WorldItem = _SelfEntity.As_WorldItem();
+        utils_world_item::Add_Item(WorldItem, InItemsCreated[0]);
     }
 
     UFUNCTION()
@@ -387,11 +389,12 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
             return;
         }
 
-        StampPersistentWorldItem(ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem);
+        auto WorldItem = _SelfEntity.As_WorldItem();
+        utils_world_item::Add_Item(WorldItem, ck::IsValid(InNewItemInTarget) ? InNewItemInTarget : InItem);
     }
 
     // Transient: the item was stowed and nothing is left to present. Persistent: the world item IS the item's body and
-    // follows it (the pickup task requests Carry), so it never destroys itself here.
+    // follows it wherever it goes (UMars_Processor_WorldItem_Reconcile), so it never destroys itself here.
     UFUNCTION()
     private void OnHolderItemsChanged(FCk_Handle_Inventory InInventory,
                                       const TArray<FCk_Handle_Item>&in InItemsAdded,
@@ -407,46 +410,24 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         utils_entity_lifetime::Request_DestroyEntity(_SelfEntity);
     }
 
-    // A Persistent world item links its item back to itself once, so HeldItem / HeldItemUse / the pickup task can route
-    // the item's moves through this entity. A Transient one stamps nothing.
-    private void StampPersistentWorldItem(FCk_Handle_Item InItem)
-    {
-        if (ck::EnsureIfNot(ck::IsValid(InItem), f"[WorldItem] [{_SelfEntity.ToString()}] has no item to link"))
-        { return; }
-
-        auto WorldItem = _SelfEntity.As_WorldItem();
-        if (WorldItem.Get_Persistence() != EMars_WorldItem_Persistence::Persistent)
-        { return; }
-
-        auto Item = InItem;
-        if (Item.Has_PersistentWorldItem())
-        {
-            const auto Existing = Item.Get_PersistentWorldItem();
-            ck::EnsureIfNot(Existing == WorldItem,
-                f"[WorldItem] Item [{Item.ToString()}] is already linked to world item [{Existing.ToString()}], not [{WorldItem.ToString()}]");
-            return;
-        }
-
-        auto Marker = FMars_Fragment_Item_PersistentWorldItem();
-        Marker.WorldItem = WorldItem;
-        Item.Add_Fragment(Marker);
-    }
-
-    // A full hotbar disables the pickup (no prompt) until one of its slots frees up.
+    // A focuser whose hotbar has nowhere to stow the held item makes the pickup hold its HotbarFull claim: the pickup stays
+    // focused, a press starts nothing, and its prompt reads Get_HotbarFullText. The claim goes when one of that hotbar's
+    // slots frees room, or when the hotbar's owner is torn down. A holder that holds no item yet (an item just spawned,
+    // not adopted) claims nothing: a press then fails the pickup. Releasing re-enables the pickup only if no other claimant
+    // (a mount, a ledger) holds it too.
     UFUNCTION()
     private void OnPickupFocused(FCk_Handle_Interactable InInteractable, FCk_Handle InFocusedBy)
     {
         auto Hotbar = InFocusedBy.As_Hotbar(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hotbar) || DoGet_CanStowSelf(Hotbar) || ck::IsValid(_GatingHotbar))
+        const auto Item = _SelfEntity.As_WorldItem().Get_HeldItem();
+        if (ck::Is_NOT_Valid(Hotbar) || ck::Is_NOT_Valid(Item) || DoGet_CanStowSelf(Hotbar) || ck::IsValid(_GatingHotbar))
         { return; }
 
-        const auto Item = _SelfEntity.As_WorldItem().Get_HeldItem();
-        const auto Reason = ck::IsValid(Item) ? "the hotbar has nowhere to stow it" : "its holder holds no item yet";
-        ck::Trace(f"[WorldItem] [{_SelfEntity.ToString()}] pickup disabled for [{InFocusedBy.ToString()}]: {Reason} (item [{Item.ToString()}]); re-enabled on a hotbar slot change that frees room");
-
         _GatingHotbar = Hotbar;
-        _Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Disable));
+        _Pickup.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::HotbarFull));
         _GatingHotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
+        _GatingHotbar.H().BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnGatingHotbarBeginDestroy"));
+        Set_PromptBlocked(FMars_Request_InteractPrompt_SetBlocked(Get_HotbarFullText()));
     }
 
     UFUNCTION()
@@ -455,11 +436,52 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         if (DoGet_CanStowSelf(InHotbar) == false)
         { return; }
 
-        _GatingHotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
-        _GatingHotbar = FCk_Handle_Hotbar();
+        Release_HotbarGate();
+    }
+
+    UFUNCTION()
+    private void OnGatingHotbarBeginDestroy(FCk_Handle InEntity)
+    {
+        Release_HotbarGate();
+    }
+
+    private void Release_HotbarGate()
+    {
+        Unbind_GatingHotbar();
 
         if (ck::IsValid(_Pickup))
-        { _Pickup.Request_SetEnableDisable(FMars_Request_Interactable_SetEnableDisable(ECk_EnableDisable::Enable)); }
+        { _Pickup.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::HotbarFull)); }
+
+        Set_PromptBlocked(FMars_Request_InteractPrompt_SetBlocked());
+    }
+
+    private void Unbind_GatingHotbar()
+    {
+        if (ck::IsValid(_GatingHotbar))
+        {
+            _GatingHotbar.UnbindFrom_OnSlotItemChanged(
+                FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnGatingHotbarSlotItemChanged"));
+            _GatingHotbar.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnGatingHotbarBeginDestroy"));
+        }
+
+        _GatingHotbar = FCk_Handle_Hotbar();
+    }
+
+    // The pickup's one prompt (on its Use target); a pickup already gone has nothing to show.
+    private void Set_PromptBlocked(const FMars_Request_InteractPrompt_SetBlocked& InRequest)
+    {
+        if (ck::Is_NOT_Valid(_Pickup))
+        { return; }
+
+        auto Prompt = _Pickup.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use).As_InteractPrompt(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Prompt))
+        { Prompt.Request_SetBlocked(InRequest); }
+    }
+
+    // What the pickup's prompt reads while a focuser's full hotbar holds the HotbarFull claim.
+    protected FText Get_HotbarFullText() const
+    {
+        return FText::FromString("Hotbar full");
     }
 
     // Whether the pickup stays enabled for InHotbar's owner: an item-aware stow check (a second backpack has nowhere to go

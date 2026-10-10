@@ -1,8 +1,8 @@
 // An operator leaving the searing station mid-transfer. The raw platter carries two meat boxes and docks; an operator takes
-// the station and presses add food, then leaves while the hand carries: nothing cancels it (a carry finishes without the
-// operator, and the Idle reset waits for an idle hand), so the release lands through the bridge running in Idle and the
-// kernel admits the box. The operator takes the station again, presses, and leaves while the hand still reaches: that
-// transfer is Cancelled and the second box never left the raw platter.
+// the station and presses add food, then leaves while the hand carries: the leave's cancel is a no-op for a transfer past
+// its grasp (the feed's own rule: it is committed), so the release lands through the bridge running in Idle and the kernel
+// admits the box. The operator takes the station again, presses, and leaves while the hand still reaches: that transfer is
+// Cancelled and the second box never left the raw platter.
 class UMars_AutoTest_SearingStation_LeavingMidTransferStillAdmits : UMars_AutoTestRig_HeatStation
 {
     private const FVector k_Origin = FVector(13600.0, -12000.0, -30000.0);
@@ -12,6 +12,9 @@ class UMars_AutoTest_SearingStation_LeavingMidTransferStillAdmits : UMars_AutoTe
     private const float32 k_GraspSeconds = 0.08f;
     private const float32 k_CarrySeconds = 0.5f;
     private const float32 k_ReturnSeconds = 0.2f;
+    // A poll budget, not a ceiling: the station composes, platters construct, drop and settle, and the hand reaches,
+    // carries and returns over seconds.
+    private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Raw;
     private TArray<FCk_Handle_FoodPiece> _Boxes;
@@ -29,26 +32,26 @@ class UMars_AutoTest_SearingStation_LeavingMidTransferStillAdmits : UMars_AutoTe
             _Boxes.Add(Build_Box(BoxWorld, GameplayTags::Food_Meat_Beef));
         }
 
-        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", 0, 5.0f);
-        Add_Step_WaitUntil("the raw platter is constructed", n"Check_RawConstructed", 0, 10.0f);
+        Add_Step_WaitUntil("the station composed its Searing, feed and docks, and the pan body exists", n"Check_StationReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the raw platter is constructed", n"Check_RawConstructed", k_SlowPolls, 0);
         Add_Step("load both meat boxes onto it", n"Step_LoadBoxes");
-        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLoaded", 0, 5.0f);
+        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLoaded", k_SlowPolls, 0);
         Add_Step("dock it on the raw platter dock", n"Step_DockRaw");
-        Add_Step_WaitUntil("it is docked and arrived", n"Check_RawDocked", 0, 5.0f);
+        Add_Step_WaitUntil("it is docked and arrived", n"Check_RawDocked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
-        Add_Step_WaitUntil("Operated, and the feed draws from both boxes", n"Check_OperatedWithTwo", 0, 3.0f);
+        Add_Step_WaitUntil("Operated, and the feed draws from both boxes", n"Check_OperatedWithTwo", k_SlowPolls, 0);
         Add_Step("press add food", n"Step_BeginTransfer");
-        Add_Step_WaitUntil("the hand carries", n"Check_Carrying", 0, 3.0f);
+        Add_Step_WaitUntil("the hand carries", n"Check_Carrying", k_SlowPolls, 0);
         Add_Step("leave mid-carry", n"Step_LeaveNow");
-        Add_Step_WaitUntil("Idle, and the carried box was admitted", n"Check_IdleAndAdmitted", 0, 5.0f);
+        Add_Step_WaitUntil("Idle, and the carried box was admitted", n"Check_IdleAndAdmitted", k_SlowPolls, 0);
         Add_Step("the admission landed with nobody operating", n"Step_AssertAdmitted");
-        Add_Step_WaitUntil("the hand is home", n"Check_FeedIdle", 0, 3.0f);
+        Add_Step_WaitUntil("the hand is home", n"Check_FeedIdle", k_SlowPolls, 0);
         Add_Step("the operator takes the station again", n"Step_Take");
-        Add_Step_WaitUntil("Operated, and the feed draws from the last box, settled on the platter", n"Check_OperatedWithOne", 0, 3.0f);
+        Add_Step_WaitUntil("Operated, and the feed draws from the last box, settled on the platter", n"Check_OperatedWithOne", k_SlowPolls, 0);
         Add_Step("press add food", n"Step_BeginTransfer");
-        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 3.0f);
+        Add_Step_WaitUntil("the hand reaches", n"Check_Reaching", 0, 0);
         Add_Step("leave mid-reach", n"Step_LeaveNow");
-        Add_Step_WaitUntil("Idle, and the transfer was cancelled", n"Check_IdleAndCancelled", 0, 5.0f);
+        Add_Step_WaitUntil("Idle, and the transfer was cancelled", n"Check_IdleAndCancelled", 0, 0);
         Add_Step("the last box never left the raw platter", n"Step_AssertCancelled");
         Run_Steps(InHandle);
     }

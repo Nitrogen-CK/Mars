@@ -499,7 +499,8 @@ struct FMars_Request_Implement_SetDrive
 }
 
 // A Commanded lift's target set outright (uu above rest, clamped to [MinLift, MaxLift]), so a kernel can lower or raise
-// the node without a look. Last wins within a drain; a traced no-op unless the lift is Commanded.
+// the node without a look. Last wins within a drain; sent to a lift that is not Commanded it is the caller's defect
+// (ensured, ignored).
 struct FMars_Request_Implement_SetLiftTarget
 {
     UPROPERTY()
@@ -530,7 +531,8 @@ struct FMars_Request_Implement_SetTiltTarget
 }
 
 // A Commanded slide's target set outright (uu from the rest location in its XY plane, clamped to the spec's box or disc as
-// a look target is), so a kernel owns the reach. Last wins within a drain; a traced no-op unless the slide is Commanded.
+// a look target is), so a kernel owns the reach. Last wins within a drain; sent to a slide that is not Commanded it is the
+// caller's defect (ensured, ignored).
 struct FMars_Request_Implement_SetSlideTarget
 {
     UPROPERTY()

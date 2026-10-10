@@ -24,13 +24,13 @@ class UMars_AutoTest_CuttingStation_ACrossCutAfterATurnPartsAcrossTheFirstCut : 
 
         Add_Steps_FeedTheJoint();
         Add_Step("chop at the board's centre", n"Step_Chop");
-        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", 0, 5.0f);
-        Add_Step_WaitUntil("the cleaver is back up", n"Check_ChopDone", 0, 2.0f);
+        Add_Step_WaitUntil("the cut committed and both halves are shown", n"Check_TwoShown", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the cleaver is back up", n"Check_ChopDone", 0, 0);
         Add_Step("carry the first cut's plane into the positive half's frame, then turn", n"Step_Turn");
-        Add_Step_WaitUntil("the board turned", n"Check_Turned", 0, 2.0f);
+        Add_Step_WaitUntil("the board turned", n"Check_Turned", 0, 0);
         Add_Step_WaitFrames("the turned poses land", 2);
         Add_Step("read the turned first cut, then chop at the board's centre again", n"Step_ChopAcross");
-        Add_Step_WaitUntil("both halves were cut and every piece is shown", n"Check_FourShown", 0, 5.0f);
+        Add_Step_WaitUntil("both halves were cut and every piece is shown", n"Check_FourShown", k_SlowPolls, 0);
         Add_Step("the second cut crosses the first", n"Step_AssertCrossed");
         Run_Steps(InHandle);
     }

@@ -116,13 +116,6 @@ mixin TOptional<FCk_Handle_InteractTarget> Get_ReachInteractTarget(const FCk_Han
     return Self.Get_Fragment(FMars_Fragment_FPHands).Reach.InteractTarget;
 }
 
-// The gloves refused the last reach asked for InTarget, and have taken no reach and changed no hold since.
-mixin bool Get_IsReachRefused(const FCk_Handle_FPHands& Self, const FCk_Handle_InteractTarget& InTarget)
-{
-    const auto& Reach = Self.Get_Fragment(FMars_Fragment_FPHands).Reach;
-    return ck::IsValid(InTarget) && Reach.RefusedTarget.IsSet() && Reach.RefusedTarget.GetValue() == InTarget;
-}
-
 // InTarget is the interact target of the gloves' current (or last) reach.
 mixin bool Get_IsReachTarget(const FCk_Handle_FPHands& Self, const FCk_Handle_InteractTarget& InTarget)
 {

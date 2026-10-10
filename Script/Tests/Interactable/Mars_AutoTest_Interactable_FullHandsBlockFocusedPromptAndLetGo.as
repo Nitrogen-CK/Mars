@@ -1,23 +1,27 @@
-// The carrier's SM root state: the player HFSM's real Hotbar -> HeldItem and resolver -> interaction glue.
+// The carrier's SM root state: the player HFSM's real hotbar glue and its Use row -> resolver intent and interaction task
+// (HeldItem follows the hotbar on its own).
 class UMars_AutoTestState_FullHandsCarrierRig : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
-        AddTask(InHandle, UMars_SmTask_HotbarDrivesHeldItem);
-        AddTask(InHandle, UMars_SmTask_InteractionResolverBinds);
+        AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);
+        AddTask(InHandle, UMars_SmTask_UseIntentToResolver);
     }
 }
 
-// A RequiresFreeHands lever focused by a carrier (AttachPoints + Hotbar + HeldItem + HeldItemUse + a Use resolver, the
-// test entity) whose SM runs the player HFSM's HotbarDrivesHeldItem and InteractionResolverBinds tasks. With empty hands
-// the prompt shows "Pull", the lever becomes the best Use target and the resolver glue starts the carrier's interaction.
-// Selecting the rock's slot blocks the prompt (the hands-full reason in the blocked colour, "Pull" kept underneath) and
-// the re-resolve drops the lever from the best Use targets, so the glue cancels the live interaction. Selecting the
-// empty slot again clears the block. Isolated Z band: -82000.
+// A RequiresFreeHands lever focused by a carrier (AttachPoints + Hotbar + HeldItem + HeldItemUse + a Use resolver,
+// InputIntents on a private Use key, the test entity) whose SM runs the player HFSM's HotbarEjectDrops and
+// UseIntentToResolver tasks. With empty hands the prompt shows "Pull"; offered to the resolver with Use pressed, the lever
+// becomes the best Use target and the Use task starts the carrier's interaction. Selecting the rock's slot blocks the
+// prompt (the hands-full reason in the blocked colour, "Pull" kept underneath) and the re-resolve drops the lever from the
+// best Use targets, so the Use task cancels the live pull. Selecting the empty slot again clears the block. Isolated Z
+// band: -82000.
 class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UMars_AutoTestRig_Carrier
 {
     private FCk_Handle_InteractionResolver _Resolver;
+    private FCk_Handle_InputIntents _Intents;
+    private UMars_AutoTestHelper_UseKey _UseKey;
     private FCk_Handle_StateMachine _Sm;
     private FCk_Handle_Inventory_DataOnly _RockHolder;
     private FCk_Handle_Item _Rock;
@@ -34,26 +38,32 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UMars_Au
         _HeldItem = utils_held_item::Add(_Carrier);
         utils_held_item_use::Add(_Carrier);
         _Resolver = utils_interaction_resolver::Add(_Carrier, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
+        _Intents = utils_input_intents::Add(_Carrier);
+        _UseKey = Cast<UMars_AutoTestHelper_UseKey>(NewObject(this, UMars_AutoTestHelper_UseKey));
+        _UseKey.Build(InHandle, EKeys::F9);
 
         _RockHolder = MakeSeededHolder(InHandle, mars_items::Rock());
         BuildLever(InHandle);
 
         _Sm = utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_FullHandsCarrierRig));
 
+        Add_Step_WaitUntil("the Use key is minted and the sampler records", n"Check_UseKeyRecording", 0, 0);
+        Add_Step("bake the Use level row and swap it in, and hand its matcher to the carrier", n"Step_SwapUseSetAndSetMatcher");
+        Add_Step_WaitUntil("the carrier reads the live Use row", n"Check_UseRowRead", 0, 0);
         Add_Step_WaitUntil("the carrier's SM runs the glue and the rock holder is seeded", n"Check_Ready");
         Add_Step("stow the rock into bag slot 0", n"Step_StowRockIntoHotbar");
         Add_Step_WaitUntil("the rock is held", n"Check_RockHeld");
         Add_Step("select the empty bag slot 1", n"Step_SelectEmptySlot");
         Add_Step_WaitUntil("the carrier's hands are empty", n"Check_HandsEmpty");
-        Add_Step("the carrier focuses the lever, offers it to the resolver and opens Use", n"Step_FocusAndUse");
-        Add_Step_WaitUntil("the lever is focused and the best Use target", n"Check_FocusedAndBest", 0, 5.0f);
-        Add_Step_WaitUntil("the resolver glue started the carrier's interaction on the lever", n"Check_HasInteraction", 0, 5.0f);
+        Add_Step("the carrier focuses the lever, offers it to the resolver and presses Use", n"Step_FocusAndUse");
+        Add_Step_WaitUntil("the lever is focused and the best Use target", n"Check_FocusedAndBest", 0, 0);
+        Add_Step_WaitUntil("the Use task started the carrier's interaction on the lever", n"Check_HasInteraction", 0, 0);
         Add_Step("empty hands: the prompt shows Pull, unblocked", n"Step_AssertUnblocked");
         Add_Step("select the rock's slot 0", n"Step_SelectRockSlot");
-        Add_Step_WaitUntil("the prompt is blocked, the lever left the best Use targets and the interaction is gone", n"Check_BlockedAndLetGo", 0, 5.0f);
+        Add_Step_WaitUntil("the prompt is blocked, the lever left the best Use targets and the interaction is gone", n"Check_BlockedAndLetGo", 0, 0);
         Add_Step("full hands: the prompt shows the hands-full reason over Pull, and the interaction did not succeed", n"Step_AssertBlocked");
         Add_Step("select the empty bag slot 1 again", n"Step_SelectEmptySlot");
-        Add_Step_WaitUntil("the prompt is unblocked", n"Check_Unblocked", 0, 5.0f);
+        Add_Step_WaitUntil("the prompt is unblocked", n"Check_Unblocked", 0, 0);
         Add_Step("empty hands again: the prompt shows Pull", n"Step_AssertUnblocked");
         Run_Steps(InHandle);
     }
@@ -113,13 +123,40 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UMars_Au
         Res.Set(_Hotbar.Get_SelectedIndex() == TOptional<int32>(0) && _HeldItem.Get_CurrentItem() == _Rock);
     }
 
-    // What the player HFSM's InteractionFocus and UseIntentToResolver tasks do for a focused lever with Use held.
+    // What the player HFSM's InteractionFocus task does for a lever under the view, then a Use press.
     UFUNCTION()
     private void Step_FocusAndUse(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Interactable.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
         _Resolver.Request_AddInteractTarget(FCk_Request_InteractionResolver_AddInteractTarget(_Target));
-        _Resolver.Request_StartIntent(FCk_Request_InteractionResolver_StartIntent(GameplayTags::InteractionIntent_Mars_Use));
+        _UseKey.Press();
+    }
+
+    UFUNCTION()
+    private void Check_UseKeyRecording(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_UseKey.Get_IsRecording());
+    }
+
+    UFUNCTION()
+    private void Step_SwapUseSetAndSetMatcher(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto Swapped = _UseKey.Request_SwapUseSet();
+        if (Swapped.IsValid() == false)
+        {
+            FinishFailure(Swapped.Get_Error());
+            return;
+        }
+
+        _Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(_UseKey.Get_Matcher()));
+    }
+
+    UFUNCTION()
+    private void Check_UseRowRead(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_UseKey.Get_IsUseSetActive() && _Intents.Get_Matcher() == _UseKey.Get_Matcher());
     }
 
     UFUNCTION()

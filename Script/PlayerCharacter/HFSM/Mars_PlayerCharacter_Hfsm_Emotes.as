@@ -51,15 +51,14 @@ class UMars_SmTask_EmoteIntents : UMars_SmTask_IntentEdges
     }
 }
 
-// EmoteWheel held -> the wheel is open. The view holds still and the look input steers the wheel's pointer instead
-// (one MovePointer per drained look delta, hence Tick); the release chooses the hovered emote, the centre cancels.
-// Leaving Alive, or a matcher swap that reads the row Idle, cancels. A chosen entry's Mars.Emote.* tag plays that
-// emote on the character (utils_fphands::TryGet_Emote, AMars_PlayerCharacter::Request_Emote); an entity without a
-// character (tests) plays nothing.
+// EmoteWheel held -> the wheel is open. The view holds still (the player viewpoint's EmoteWheel hold) and the look input
+// steers the wheel's pointer instead (one MovePointer per drained look delta, hence Tick); the release chooses the hovered
+// emote, the centre cancels. Leaving Alive, or a matcher swap that reads the row Idle, cancels. A chosen entry's
+// Mars.Emote.* tag plays that emote on the character (utils_fphands::TryGet_Emote, AMars_PlayerCharacter::Request_Emote);
+// an entity without a character (tests) plays nothing.
 //
-// The wheel does not open while a gripped control holds the view (UMars_SmTask_ManipulateControl freezes it from the
-// interaction's start): both toggle the camera's orientation control and both read the look delta, so closing the
-// wheel would hand the view back mid-pull. A control gripped while the wheel is open keeps the view on close.
+// The wheel does not open while a control is being pulled (both read the look delta). Each holds the view for itself, so
+// a control gripped while the wheel is open keeps the view held when the wheel closes.
 class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -69,8 +68,8 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
     private FCk_Handle_EmoteWheel _Wheel;
     private FCk_Handle_InputIntents _InputIntents;
     private FCk_Handle_InteractionResolver _Resolver;
-    // Invalid without a PlayerViewpoint (headless tests): the view is not frozen.
-    private FCk_Handle_Camera _Camera;
+    // Invalid without a PlayerViewpoint (headless tests): the view is not held.
+    private FCk_Handle_PlayerViewpoint _Viewpoint;
     private bool _IsOpen = false;
     private int32 _SeenLookSequence = 0;
 
@@ -84,9 +83,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         _Resolver = _Player.As_InteractionResolver();
         _Wheel.BindTo_OnEmoteChosen(FMars_Delegate_EmoteWheel_OnEmoteChosen(this, n"OnEmoteChosen"));
 
-        auto Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Viewpoint))
-        { _Camera = Viewpoint.Get_Camera(); }
+        _Viewpoint = _Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
 
         Super::DoEnterTask(InHandle, InNetContext);
     }
@@ -106,7 +103,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         _Wheel = FCk_Handle_EmoteWheel();
         _InputIntents = FCk_Handle_InputIntents();
         _Resolver = FCk_Handle_InteractionResolver();
-        _Camera = FCk_Handle_Camera();
+        _Viewpoint = FCk_Handle_PlayerViewpoint();
     }
 
     // Must return Running every frame: a Succeeded/Failed result would end the task while Alive is still active.
@@ -166,8 +163,8 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         _SeenLookSequence = _InputIntents.Get_LookDeltaSequence();
         _Wheel.Request_Open();
 
-        if (ck::IsValid(_Camera))
-        { _Camera.Request_Set_HasOrientationControl(false); }
+        if (ck::IsValid(_Viewpoint))
+        { _Viewpoint.Request_HoldView(FMars_Request_PlayerViewpoint_HoldView(EMars_PlayerViewpoint_ViewHolder::EmoteWheel)); }
     }
 
     private void Close(EMars_EmoteWheel_CloseAction InAction)
@@ -181,12 +178,11 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         if (ck::IsValid(_Wheel))
         { _Wheel.Request_Close(FMars_Request_EmoteWheel_Close(InAction)); }
 
-        if (ck::IsValid(_Camera) && Get_IsControlEngaged() == false)
-        { _Camera.Request_Set_HasOrientationControl(true); }
+        if (ck::IsValid(_Viewpoint))
+        { _Viewpoint.Request_ReleaseView(FMars_Request_PlayerViewpoint_ReleaseView(EMars_PlayerViewpoint_ViewHolder::EmoteWheel)); }
     }
 
-    // A ManuallyCompleted interaction from this player is live on a best Use target: a control is gripped, or about to
-    // be, and UMars_SmTask_ManipulateControl holds the view for it.
+    // The control behind a best Use target is being pulled (its manipulation began).
     private bool Get_IsControlEngaged()
     {
         if (ck::Is_NOT_Valid(_Resolver))
@@ -195,13 +191,11 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         auto BestTargets = _Resolver.Get_BestInteractTargets(GameplayTags::InteractionIntent_Mars_Use);
         for (auto Target : BestTargets)
         {
-            if (ck::Is_NOT_Valid(Target))
+            if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
             { continue; }
 
-            if (Target.Get_InteractionCompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
-            { continue; }
-
-            if (ck::IsValid(utils_interact_target::TryGet_Interaction(Target, _Player)))
+            auto Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Control) && Control.Get_IsManipulating())
             { return true; }
         }
 
