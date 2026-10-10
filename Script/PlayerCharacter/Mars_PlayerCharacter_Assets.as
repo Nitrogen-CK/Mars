@@ -41,8 +41,9 @@ struct FMars_PlayerCharacter_Movement
     float32 ClientAuthMaxError = 750.0f;
 }
 
-// The capsule is the chef's size: 1.5 m tall (Config.TPBody.Scale stands the 1 m SK_Chef at 1.5 m), ~78 cm across (the
-// scaled chef's torso is about +-37 cm wide). 1.5x the 1 m chef's capsule (half height 50, radius 26, crouched 35).
+// The capsule is the chef's size: 1.5 m tall (Config.TPBody.Scale stands SK_Chef at 1.5 m), ~78 cm across (sized for
+// the LowPoly chef's +-37 cm torso; the MiniChef body's skirt is about +-46 cm at its scale, so its hem overhangs the
+// capsule a little). 1.5x the 1 m chef's capsule (half height 50, radius 26, crouched 35).
 struct FMars_PlayerCharacter_Body
 {
     UPROPERTY()
@@ -164,8 +165,9 @@ namespace mars
         HandSway.Set_TeleportAngleDeg(90.0f);
 
         // The movement component is supplied by the pawn at composition; only tunables live here. The 1.5 m chef's legs
-        // are 1.5x the 1 m chef's, so at the walk speed it takes 1 / 1.5 the steps: 1.6 / 1.5 = 1.07 strides per second,
-        // matching the body's locomotion play rate (FMars_TPBody_Spec::AuthoredScale).
+        // are 1.5x the 1 m chef's, so at the walk speed it takes 1 / 1.5 the steps: 1.6 / 1.5 = 1.07 strides per second.
+        // (That matched the LowPoly body's locomotion play rate; the MiniChef body steps at its clips' own rate,
+        // FMars_TPBody_Spec::AuthoredScale, and the first-person cadence was left as it was.)
         View.Gait = FCk_Gait_Spec();
         auto GaitStride = View.Gait.Get_Stride();
         GaitStride.Set_ReferenceSpeed(420.0f);
@@ -215,9 +217,9 @@ namespace mars
         HandBobAir.Set_MaxLiftCm(0.0f);
         FPHands.Bob.Set_Air(HandBobAir);
 
-        // The view at the chef's face: 71.1 cm (unscaled) * TPBody.Scale 1.6453 = 117.0 cm above the feet, less
-        // Body.CapsuleHalfHeight 75 (FMars_TPBody_Spec::Scale). The 1 m chef's was 28.
-        View.EyeHeight.Height = 42.0f;
+        // The view at the chef's face: 58.37 cm (unscaled) * TPBody.Scale 1.8828 = 109.9 cm above the feet, less
+        // Body.CapsuleHalfHeight 75 (FMars_TPBody_Spec::Scale). The LowPoly chef's was 42 (the 1 m chef's 28).
+        View.EyeHeight.Height = 35.0f;
 
         TPBody.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SK_Chef.SK_Chef"));
         TPBody.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C"));

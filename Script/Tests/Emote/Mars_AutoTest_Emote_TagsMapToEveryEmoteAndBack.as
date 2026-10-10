@@ -87,19 +87,19 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         auto Config = mars::Mars_PlayerCharacter_Config;
         const auto& Body = Config.TPBody;
 
-        // 150 / 91.167 (the unscaled chef's top, hat excluded); the clips are authored on the 1 m chef (1.0969).
-        Assert_True(Math::Abs(Body.Scale - 1.6453f) < 0.001f, f"the chef is scaled to 1.5 m (Scale [{Body.Scale}] ~ 1.645)");
+        // 150 / 79.67 (the unscaled MiniChef body's top, hat excluded).
+        Assert_True(Math::Abs(Body.Scale - 1.8828f) < 0.001f, f"the chef is scaled to 1.5 m (Scale [{Body.Scale}] ~ 1.883)");
         Assert_True(Math::Abs(Config.Body.CapsuleHalfHeight - 75.0f) < 0.001f, f"the capsule stands 1.5 m (half height [{Config.Body.CapsuleHalfHeight}])");
         Assert_True(Config.Body.CrouchedHalfHeight < Config.Body.CapsuleHalfHeight, "the crouched capsule is shorter than the standing one");
 
-        // The view at the chef's face centre: 71.1 cm unscaled above the feet, measured from the capsule centre.
-        const auto FaceHeight = 71.1f * Body.Scale - Config.Body.CapsuleHalfHeight;
+        // The view at the chef's face centre: 58.37 cm unscaled above the feet, measured from the capsule centre.
+        const auto FaceHeight = 58.37f * Body.Scale - Config.Body.CapsuleHalfHeight;
         Assert_True(Math::Abs(Config.View.EyeHeight.Height - FaceHeight) < 0.5f,
             f"the eye height [{Config.View.EyeHeight.Height}] is the chef's face [{FaceHeight}] above the capsule centre");
 
-        // The walk clips' footfalls were laid down on the 1 m chef; the 1.5 m body plays them 1.5x slower so they do not slide.
-        Assert_True(Math::Abs(Body.AuthoredScale - 1.0969f) < 0.001f, f"the locomotion clips are authored at the 1 m scale (AuthoredScale [{Body.AuthoredScale}])");
-        Assert_True(Math::Abs(Body.Get_LocomotionPlayRate() - 1.0969f / 1.6453f) < 0.001f, f"the locomotion play rate [{Body.Get_LocomotionPlayRate()}] is AuthoredScale / Scale");
+        // The MiniChef's walk clips are built to step at their own rate at the body's final height.
+        Assert_True(Math::Abs(Body.AuthoredScale - Body.Scale) < 0.001f, f"the locomotion clips are authored at the body's scale (AuthoredScale [{Body.AuthoredScale}])");
+        Assert_True(Math::Abs(Body.Get_LocomotionPlayRate() - 1.0f) < 0.001f, f"the locomotion play rate [{Body.Get_LocomotionPlayRate()}] is AuthoredScale / Scale");
 
         Assert_False(Body.Head.Hat.Mesh.IsNull(), "the chef has a hat mesh");
         Assert_True(Body.Head.Hat.Socket == n"Hat", f"the hat rides the Hat socket (got [{Body.Head.Hat.Socket}])");

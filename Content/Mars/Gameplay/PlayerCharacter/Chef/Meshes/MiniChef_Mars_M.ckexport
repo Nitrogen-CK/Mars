@@ -1,0 +1,87 @@
+{
+	"material": "MiniChef_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/MiniChef_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "31f1c60966182fe0a7fb03d613f17449",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Constant": 2,
+		"TextureSample": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSample",
+				"name": "MaterialExpressionTextureSample_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"Texture": "/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/MiniChef_BaseColor_Mars_T.MiniChef_BaseColor_Mars_T"
+				}
+			},
+			{
+				"id": 1,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_0",
+				"props":
+				{
+					"R": 0.80000001192092896
+				}
+			},
+			{
+				"id": 2,
+				"class": "Constant",
+				"name": "MaterialExpressionConstant_1",
+				"props":
+				{
+					"R": 0.20000000298023224
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0,
+				"mask": "rgb"
+			},
+			{
+				"property": "MP_Specular",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 1,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [],
+	"vectorParams": [],
+	"textureParams": [],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/MiniChef_BaseColor_Mars_T.MiniChef_BaseColor_Mars_T"
+	]
+}

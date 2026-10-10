@@ -41,14 +41,14 @@ struct FMars_TPBody_Face
     FName Bone = n"head";
 
     // The face node relative to Bone, in unscaled body units: +X out of the face, +Y the chef's right, +Z up, midway
-    // between the two eye quads. Derived from SK_Chef's reference pose (2026-10-03): head bone at component (0, -7, 62),
-    // its X along the neck (up, tilted 2.862 deg back), Y to the chef's left, Z out of the face. The eye quads (Eyes_LP,
-    // two 8.5 x 6 cm quads flush on the face plate, centred at x +-4.75, z 71.0, wrapping its curve back to y 7.66; they
-    // were 5.4 cm squares at x +-6 until the eyes were widened on 2026-10-03) have their midpoint at component
-    // (0, 7.66, 71.0), facing +Y: Offset = FaceInComponent * Inverse(HeadInComponent), i.e. the delta (0, 14.66, 9.0) in
-    // head axes. Gaze aims from here. Scale must stay one (the body's Scale sizes it).
+    // between the two eye quads. Derived from SK_Chef's reference pose (the MiniChef body, 2026-10-09): head bone at
+    // component (0, 1.5, 45), its X straight up, Y to the chef's left, Z out of the face. The eye quads (MiniChef_Eyes,
+    // two 8.5 x 8.5 cm quads flush on the face plate over its painted eyes, centred at x +-6.4, z 58.4) have their
+    // midpoint at component (0, 14.07, 58.37), facing +Y: Offset = FaceInComponent * Inverse(HeadInComponent), i.e. the
+    // delta (0, 12.57, 13.37) in head axes. Gaze aims from here. Scale must stay one (the body's Scale sizes it).
+    // (The LowPoly chef this body replaced: FRotator(87.138, 180, 0), FVector(8.26, 0, 15.09).)
     UPROPERTY()
-    FTransform Offset = FTransform(FRotator(87.138, 180.0, 0.0), FVector(8.26, 0.0, 15.09), FVector::OneVector);
+    FTransform Offset = FTransform(FRotator(90.0, 180.0, 0.0), FVector(13.37, 0.0, 12.57), FVector::OneVector);
 
     // The body mesh's material slot the eyes are drawn on (SK_Chef's Eyes_LP quads). The character replaces its
     // material with the MarsEyePlate look; the slot reads the eyes' custom primitive data.
@@ -82,21 +82,23 @@ struct FMars_TPBody_Spec
     FTransform MeshOffset = FTransform(FRotator(0.0, -90.0, 0.0), FVector::ZeroVector, FVector::OneVector);
 
     // Uniform body scale. The chef stands 1.5 m without its hat (settled 2026-10-03 after a trial in the crypt levels;
-    // SK_Chef is authored at 1 m, so this stays above one until the mesh is re-authored at 1.5 m):
-    //   Scale = 150 / ChefTopCm = 150 / 91.167 = 1.6453   (1 m: 100 / 91.167 = 1.0969)
-    // (ChefTopCm: the unscaled mesh's top above its feet, hat excluded). The capsule (Config.Body.CapsuleHalfHeight 75) is
-    // the chef's height, and the view sits at the chef's face centre (unscaled 71.1 cm above the feet):
-    //   EyeHeight.Height = 71.1 * Scale - CapsuleHalfHeight = 117.0 - 75 = 42   (1 m: 78.0 - 50 = 28)
+    // SK_Chef is authored smaller, so this stays above one until the mesh is re-authored at 1.5 m):
+    //   Scale = 150 / ChefTopCm = 150 / 79.67 = 1.8828
+    // (ChefTopCm: the unscaled mesh's top above its feet, hat excluded. The MiniChef body, on trial since 2026-10-09,
+    // tops out at 79.67; the LowPoly chef it replaced at 91.167, Scale 1.6453.) The capsule
+    // (Config.Body.CapsuleHalfHeight 75) is the chef's height, and the view sits at the chef's face centre (unscaled
+    // 58.37 cm above the feet):
+    //   EyeHeight.Height = 58.37 * Scale - CapsuleHalfHeight = 109.9 - 75 = 35   (the LowPoly chef: 117.0 - 75 = 42)
     // (EyeHeight is measured from the capsule centre). Re-derive all three when the chef mesh or the capsule changes.
     UPROPERTY()
-    float32 Scale = 1.6453f;
+    float32 Scale = 1.8828f;
 
-    // The Scale the locomotion clips were authored against: at it, A_Chef_Walk_F's footfalls cover the ground at
-    // Config.WalkSpeed with no slide. ABP_Chef plays BS_Chef_Locomotion at AuthoredScale / Scale (Get_LocomotionPlayRate)
-    // so longer legs take proportionally slower steps instead of sliding. Set it to the new Scale when the clips are
-    // re-authored at the body's final height.
+    // The Scale the locomotion clips were authored against. ABP_Chef plays BS_Chef_Locomotion at AuthoredScale / Scale
+    // (Get_LocomotionPlayRate), so a body scaled up past its clips takes proportionally slower steps. The MiniChef's
+    // clips are built for its short legs to step at their own rate at the body's final height, so this equals Scale
+    // (play rate 1; the LowPoly chef's clips were authored at 1.0969).
     UPROPERTY()
-    float32 AuthoredScale = 1.0969f;
+    float32 AuthoredScale = 1.8828f;
 
     UPROPERTY()
     FMars_TPBody_Montages Montages;

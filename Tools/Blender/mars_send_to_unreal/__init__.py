@@ -11,6 +11,10 @@ One sidebar panel (View3D > N > Mars) with two buttons:
 * **Send Environment to Unreal** - the crypt kit's own sender (`vns.crypt_send_to_unreal` from the vns_trim_sheet
   extension): export the changed library pieces, re-import them, re-cook the maps. Needs the kit library .blend open.
 
+The **Body** choice picks which third-person chef the body, clips and emotes come from (chef_profile.py next to the
+.blend): the LowPoly chef (`Chef_Rig`), or the MiniChef (`MiniChef_Rig`, FBX files in the `MiniChef` sub-folder).
+Both write the same file names and land on the same Unreal assets, so sending one replaces the other in the project.
+
 Install: junction or copy this folder into Blender's scripts/addons as `mars_send_to_unreal` and enable it. The
 Preferences hold the Mars project dir, the character scripts dir and the Monolith URL.
 """
@@ -18,7 +22,7 @@ Preferences hold the Mars project dir, the character scripts dir and the Monolit
 bl_info = {
     "name": "Mars - Send to Unreal",
     "author": "Mars",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (4, 2, 0),
     "location": "View3D > Sidebar > Mars",
     "description": "Export the chef / gloves or the crypt kit and re-import them in the running Unreal editor",
@@ -32,7 +36,7 @@ import sys
 import urllib.request
 
 import bpy
-from bpy.props import BoolProperty, StringProperty
+from bpy.props import BoolProperty, EnumProperty, StringProperty
 from bpy.types import AddonPreferences, Operator, Panel, PropertyGroup
 
 DEFAULT_PROJECT = r"D:\Repo\Mars"
@@ -138,6 +142,12 @@ class MARS_AP_send_to_unreal(AddonPreferences):
 
 
 class MARS_PG_send(PropertyGroup):
+    chef_body: EnumProperty(
+        name="Body", default="chef",
+        items=(("chef", "Chef (LowPoly)", "Chef_Rig and its A_Chef_* actions; FBX files next to the .blend"),
+               ("minichef", "MiniChef", "MiniChef_Rig and its A_MiniChef_* actions; FBX files in the MiniChef sub-folder")),
+        description="Which third-person chef the body, clips and emotes are exported from. Both land on the same "
+                    "Unreal assets (SK_Chef, A_Chef_*), so the one sent last is the one in the project")
     body: BoolProperty(name="Body + hat", default=True, description="SK_Chef.fbx and SM_Chef_Hat.fbx")
     chef_clips: BoolProperty(name="Chef clips", default=True, description="The A_Chef_* locomotion, jump and strike clips")
     chef_emotes: BoolProperty(name="Chef emotes", default=True, description="The A_Chef_Emote_* clips")
@@ -152,10 +162,16 @@ class MARS_PG_send(PropertyGroup):
 # character
 
 
-def _load_character_scripts(character_dir):
-    """verify_anims (and its siblings) from the character folder, reloaded so script edits are picked up."""
+def _load_character_scripts(character_dir, body="chef"):
+    """verify_anims (and its siblings) from the character folder, reloaded so script edits are picked up. `body` is
+    the chef_profile the scripts work on: they read it when they are (re)loaded, so it is set first."""
     if character_dir not in sys.path:
         sys.path.insert(0, character_dir)
+    try:
+        importlib.import_module("chef_profile").use(body)
+    except ModuleNotFoundError:
+        if body != "chef":
+            raise RuntimeError("%s has no chef_profile.py - only the LowPoly chef can be sent" % character_dir)
     mods = []
     for name in ("emote_spec", "anim_common", "build_fphands", "verify_anims"):
         m = importlib.import_module(name)
@@ -176,7 +192,7 @@ def _export_character(opts, va, ac, dry_run=False):
     fp_arm = bpy.data.objects.get(va.FP_ARM)
     if opts.body or opts.chef_clips or opts.chef_emotes:
         if chef_arm is None:
-            raise RuntimeError("no %s armature in this file - open FPHands_02.blend" % va.CHEF_ARM)
+            raise RuntimeError("no %s armature in this file - open the .blend that has it, or change Body" % va.CHEF_ARM)
     if opts.fp_emotes or opts.fp_mesh:
         if fp_arm is None:
             raise RuntimeError("no %s armature in this file - open FPHands_02.blend" % va.FP_ARM)
@@ -260,7 +276,7 @@ class MARS_OT_send_character(Operator):
             self.report({"ERROR"}, "Switch to Object mode first")
             return {"CANCELLED"}
         try:
-            va, ac = _load_character_scripts(cdir)
+            va, ac = _load_character_scripts(cdir, opts.chef_body)
             jobs = _export_character(opts, va, ac, dry_run=self.dry_run)
         except Exception as exc:
             self.report({"ERROR"}, "Export failed: %s" % exc)
@@ -288,7 +304,7 @@ class MARS_OT_import_last_export(Operator):
         pr = prefs(context)
         cdir = bpy.path.abspath(pr.character_dir)
         try:
-            va, ac = _load_character_scripts(cdir)
+            va, ac = _load_character_scripts(cdir, opts.chef_body)
             jobs = [j for j in _export_character(opts, va, ac, dry_run=True) if os.path.isfile(j["fbx"])]
         except Exception as exc:
             self.report({"ERROR"}, "Could not list the exports: %s" % exc)
@@ -355,6 +371,7 @@ class MARS_PT_send_to_unreal(Panel):
 
         box = lay.box()
         box.label(text="Character (FPHands_02.blend)", icon="ARMATURE_DATA")
+        box.prop(opts, "chef_body")
         col = box.column(align=True)
         col.prop(opts, "body")
         col.prop(opts, "chef_clips")

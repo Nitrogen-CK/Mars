@@ -2,7 +2,8 @@
 run_python); `import_character(jobs)` re-imports exported FBX files onto their existing assets.
 
 A job: {"fbx": "D:/.../SK_Chef.fbx", "folder": "/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes", "name": "SK_Chef",
-        "kind": "skeletal" | "static" | "anim", "skeleton": "/Game/.../SKEL_Chef" or None}
+        "kind": "skeletal" | "static" | "anim", "skeleton": "/Game/.../SKEL_Chef" or None,
+        "update_ref_pose": optional bool, skeletal only: also write the mesh's bind pose to the skeleton}
 
 Imports go through the legacy FBX importer (FbxImportUI, synchronous AssetImportTask) with Interchange's FBX
 feature flag switched off for the batch and restored after, as the crypt kit's mise_mars_ue does: Interchange
@@ -83,7 +84,8 @@ def _options(job, existing):
         d = opts.skeletal_mesh_import_data
         d.normal_import_method = unreal.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS
         _set(d, "import_morph_targets", False)
-        _set(d, "update_skeleton_reference_pose", False)
+        # a job for a re-proportioned body on the same bones (the MiniChef) moves the skeleton's reference pose too
+        _set(d, "update_skeleton_reference_pose", bool(job.get("update_ref_pose", False)))
         _set(d, "use_t0_as_ref_pose", False)
     elif kind == "static":
         opts.import_mesh = True

@@ -105,29 +105,41 @@ struct FMars_HeldView_GripTargets
 //   19.8 from its shoulder (98% of the reach); a 50 cm item's hands sit 20.9 out, just past the reach. Further forward
 //   the stubby arms cannot follow (the brief's y 24 needs 27.7). An item deeper than ~12 world cm still sinks into the
 //   belly: the chef's arms are shorter than its torso is deep.
+//
+// The MiniChef body (on trial since 2026-10-09; the defaults below are derived for it and have NOT been seen in PIE):
+//   upperarm_r (-15, 1.2, 42); lowerarm 12.84 from the upperarm, hand 4.31 from the lowerarm, so a shoulder reaches
+//   17.15. grip_r sits on hand_r at local (12.76, 0, 2.62): the hand is three quarters of the arm's length, and the hand
+//   bone lands 12.8 behind and 2.6 below its grip. The belly's front is at y +20 from z 22 to 34 (the cowl +18.5 above),
+//   3 further out than the wrists can reach around it.
+//   HandFrame (0, 27.3, 36.6): a 30 cm item (half width 8 body units at Scale 1.8828) puts hand_r at (-10.8, 14.5, 34),
+//   16.1 from its shoulder (94% of the reach) with the item's back edge on the belly's front; the bracers sink about
+//   3 into the belly's sides, which no frame avoids. One-handed, 36 cm moves hand_r to (-20.1, 14.5, 34), 16.3 from the
+//   shoulder and clear of the flank.
+//   (The LowPoly chef's values: HandFrame (0, 16, 50), OneHandedOffset 14, elbows (+-24, -12, 46), palm 2.5.)
 struct FMars_TPBody_Hold
 {
     // Plays the first-person Hand node's role for two-handed holds: the gloves' rest targets are laid out in it.
     UPROPERTY()
-    FTransform HandFrame = FTransform(FRotator(0.0, 90.0, 0.0), FVector(0.0, 16.0, 50.0), FVector::OneVector);
+    FTransform HandFrame = FTransform(FRotator(0.0, 90.0, 0.0), FVector(0.0, 27.3, 36.6), FVector::OneVector);
 
     // One-handed holds move the frame this far, in its own space (world cm), like the first-person Hand node moves to
-    // the right (Config.HandOffset vs FPHands.CenteredHandOffset). 14 cm puts hand_r 20.4 from its shoulder; at the
-    // centre it would need 26.7.
+    // the right (Config.HandOffset vs FPHands.CenteredHandOffset). 36 cm puts hand_r 16.3 from its shoulder, beside the
+    // belly; at the centre the wrist would be inside it.
     UPROPERTY()
-    FVector OneHandedOffset = FVector(0.0, 14.0, 0.0);
+    FVector OneHandedOffset = FVector(0.0, 36.0, 0.0);
 
     // Elbow pole targets (TwoBoneIK joint targets): behind (-Y is the chef's back) and outside the shoulders, at the
     // hands' height.
     UPROPERTY()
-    FVector ElbowOffset_L = FVector(24.0, -12.0, 46.0);
+    FVector ElbowOffset_L = FVector(26.0, -10.0, 34.0);
 
     UPROPERTY()
-    FVector ElbowOffset_R = FVector(-24.0, -12.0, 46.0);
+    FVector ElbowOffset_R = FVector(-26.0, -10.0, 34.0);
 
     // Grip bone to palm surface, world cm; replaces FPHands.PalmSurfaceOffset for the body's fitted two-handed grips.
+    // (grip_r floats 1.5 body units off the MiniChef glove's palm.)
     UPROPERTY()
-    float32 PalmSurfaceOffset = 2.5f;
+    float32 PalmSurfaceOffset = 2.8f;
 
     // How quickly the arms take or leave a hold, 1/s (FPHands.ReachInterpSpeed's feel). 0 = snap.
     UPROPERTY()
