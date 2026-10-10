@@ -52,6 +52,10 @@ STATION_LOOK = {
     "Wire": (ACCENT_MASTER, {"Roughness": 0.55, "Specular": 0.5}, {}),
     "Rope": (ACCENT_MASTER, {"Roughness": 0.9, "Specular": 0.3}, {}),
     "Ember": (EMISSIVE_MASTER, {"Strength": 8.0}, {"Color": (1.0, 0.40, 0.08, 1.0)}),
+    # kitchen dressing (build_station_kitchen.py): hammered copper pans (no metal in the accent master: a tight bright
+    # highlight on the painted copper reads as it), papery garlic skins
+    "Copper": (ACCENT_MASTER, {"Roughness": 0.3, "Specular": 0.75}, {}),
+    "Garlic": (ACCENT_MASTER, {"Roughness": 0.7, "Specular": 0.3}, {}),
     # The cutting station's sliceable MeatSlab lives as a procedural mesh copy (no vertex colours survive the copy), so its
     # flesh, fat cap and the cut faces the slicing caps with are flat Accent tints rather than the food master.
     "MeatSlabFlesh": (ACCENT_MASTER, {"Roughness": 0.5, "Specular": 0.4}, {"Tint": (0.55, 0.06, 0.05, 1.0)}),
@@ -196,9 +200,10 @@ def build_materials():
 
 
 def slot_material(slot):
+    """The station instance of a slot, else the food library's (Stone, Wood, Leaf ...)."""
     if slot in FOOD_SLOTS:
         return mc._asset(F_FOOD_INST, "%s_Mars_MI" % slot)
-    return mc._asset(F_MAT, "%s_Mars_MI" % slot)
+    return mc._asset(F_MAT, "%s_Mars_MI" % slot) or mc._asset(F_FOOD_INST, "%s_Mars_MI" % slot)
 
 
 def assign_slots(path=None):

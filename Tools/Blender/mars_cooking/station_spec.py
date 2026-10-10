@@ -27,6 +27,9 @@ SOURCE_DIR = base.SOURCE_DIR                                   # D:\Repo\Content
 BLEND_DIR = os.path.join(SOURCE_DIR, "stations")               # one .blend per station, written only by its builder
 EXPORT_DIR = os.path.join(base.EXPORT_DIR, "stations")         # FBX + JSON sidecar per mesh, flat
 REVIEW_DIR = os.path.join(EXPORT_DIR, "review")                # contact sheets (workbench renders)
+# the kitchen dressing set (build_station_kitchen.py) exports into its own folder, never into export/stations
+KITCHEN_EXPORT_DIR = os.path.join(base.EXPORT_DIR, "kitchen")
+KITCHEN_REVIEW_DIR = os.path.join(KITCHEN_EXPORT_DIR, "review")
 UE_FOLDER = base.UE_FOLDER + "/Stations"                       # /Game/Mars/Gameplay/Cooking/Stations/Meshes
 
 # station -> (blend file, builder script). A builder owns its .blend and never opens another station's file.
@@ -36,6 +39,7 @@ STATIONS = {
     "hearth": ("Station_Hearth.blend", "build_station_hearth.py"),
     "tools": ("Station_Tools.blend", "build_station_tools.py"),
 }
+STATIONS["kitchen"] = ("Station_Kitchen.blend", "build_station_kitchen.py")     # hanging dressing, rack iron, FurnaceMaw
 
 # ---------------------------------------------------------------- naming
 # mesh      <Name>_Mars_SM                 (one FBX per prop, pivot per PROPS below)
@@ -50,6 +54,7 @@ STATIONS = {
 # Unreal step instances from Accent_Mars_M (ACCENT_LOOK rows: Iron rough dark metal, Wire slightly brighter, Rope
 # matte fibre, Ember emissive). Keep a prop to the fewest slots that read.
 SLOTS = ("Stone", "Wood", "Iron", "Wire", "Rope", "Ember")
+SLOTS = SLOTS + ("Copper", "Garlic", "Leaf")      # kitchen dressing accents (hammered copper, garlic paper, dried herbs)
 
 # Base linear colours per slot (8-bit sRGB picked off the boards, converted by food_common.srgb at paint time).
 PALETTE_SRGB = {
@@ -62,6 +67,15 @@ PALETTE_SRGB = {
     "Rope": (156, 128, 84),
     "Ember": (255, 120, 30),      # emissive bed under the hearth and round the vat base
 }
+PALETTE_SRGB.update({
+    "Copper": (184, 98, 52),        # hammered copper pans
+    "CopperBright": (232, 156, 96), # worn rims, hammer highlights
+    "CopperSoot": (44, 32, 28),     # sooted undersides
+    "Garlic": (226, 214, 190),      # papery cream bulbs
+    "GarlicStreak": (132, 92, 96),  # the faint purple-brown streaks in the clove grooves
+    "Leaf": (88, 104, 52),          # dried herb green
+    "LeafDry": (124, 100, 52),      # the browner, fully dried leaves
+})
 
 # ---------------------------------------------------------------- the props (cm; pivot rules; sockets)
 # Pivot rules: free-standing props pivot at the floor contact (XY centre, z = 0); table-top props pivot at their
@@ -173,6 +187,64 @@ PROPS = {
                               "bands at both grips, iron pommel and bolster, a 34 cm blade with a thick dark spine, "
                               "a ground bevel band, a hexagonal hole near the toe, nicks and a wobbly hand-ground edge"),
 }
+
+# ---- kitchen dressing (build_station_kitchen.py -> KITCHEN_EXPORT_DIR). Frames are BLENDER cm (Unreal local = x, -y, z).
+# Hanging rule: the ORIGIN is the hang point (the inside top of the ring / loop that goes over a hook), the mesh hangs
+# below it toward -Z centred on x = 0, y = 0, broad sides facing -Y / +Y. No collision, no sockets. A RackHook over a
+# RackBar puts its cradle 9 cm under the bar axis (sidecar hook_drop_cm), which is where a hanging prop's origin goes.
+PROPS.update({
+    "HangPan": dict(builder="kitchen", tris_max=1200, slots=("Copper", "Iron"),
+                    bowl_diameter_cm=30.0, bowl_depth_cm=5.0, handle_length_cm=22.0, drop_cm=55.0,
+                    pivot="the hang point: inside top of the iron ring at the handle end", sockets={}, ucx="none",
+                    notes="copper skillet hanging by its handle, cooking surface facing -Y: hammered facets, a brighter "
+                          "worn rim, a sooted underside, an iron strap handle riveted to the wall, an iron ring"),
+    "HangSaucepan": dict(builder="kitchen", tris_max=1200, slots=("Copper", "Iron"),
+                         diameter_cm=20.0, depth_cm=11.0, drop_cm=48.0,
+                         pivot="the hang point: inside top of the iron ring at the handle end", sockets={}, ucx="none",
+                         notes="copper saucepan hanging handle-vertical, opening facing -Y, long straight iron handle"),
+    "HangLadle": dict(builder="kitchen", tris_max=700, slots=("Iron", "Copper"),
+                      length_cm=48.0, bowl_diameter_cm=10.0,
+                      pivot="the hang point: inside top of the hooked handle end", sockets={}, ucx="none",
+                      notes="iron ladle with a crook at the top and a copper bowl, opening facing -Y"),
+    "GarlicBraid": dict(builder="kitchen", tris_max=2200, slots=("Garlic", "Rope"),
+                        length_cm=62.0, bulbs=10, bulb_cm=6.5,
+                        pivot="the hang point: inside top of the rope loop", sockets={}, ucx="none",
+                        notes="plaited stalks with faceted bulbs alternating left / right / front: clove ridges, a "
+                              "papery tip, a root tuft"),
+    "HerbBundle": dict(builder="kitchen", tris_max=1500, slots=("Leaf", "Rope"),
+                       length_cm=42.0, width_cm=16.0,
+                       pivot="the hang point: inside top of the rope loop", sockets={}, ucx="none",
+                       notes="drying herbs hung upside down: rope loop + binding, stems, faceted leaf sprays fanning "
+                             "downward, green mixed with the browner dried colour"),
+    "RackBar": dict(builder="kitchen", tris_max=200, slots=("Iron",),
+                    length_cm=100.0, section_cm=2.4,
+                    pivot="on the bar axis at its middle; the bar runs along X from -50 to 50 (scaled along X in game)",
+                    sockets={}, ucx="none", notes="hand-forged square bar, hammered facets, plain ends"),
+    "RackHook": dict(builder="kitchen", tris_max=300, slots=("Iron",),
+                     hook_drop_cm=9.0, bar_clearance_radius_cm=1.6,
+                     pivot="the axis of the bar it hangs on (bar along X through the origin); the lower cradle, where "
+                           "a ring rests, is at (0, 0, -9)",
+                     sockets={}, ucx="none", notes="forged S-hook lying in the YZ plane"),
+    "RackBracket": dict(builder="kitchen", tris_max=500, slots=("Iron",),
+                        wall_plane_y_cm=16.0, plate_cm=(8.0, 22.0), bar_clearance_radius_cm=1.6,
+                        pivot="the bar axis point it holds (bar along X); the wall plane is y = +16, the room toward -Y",
+                        sockets={}, ucx="none",
+                        notes="riveted back plate on the wall, a forged arm with a scroll brace underneath and an open "
+                              "cradle at the origin"),
+    "FurnaceMaw": dict(builder="kitchen", tris_max=24000, slots=("Stone", "Iron", "Ember", "Wood"),
+                       face_cm=(800.0, 750.0), wall_thickness_cm=40.0, max_protrusion_cm=60.0,
+                       mouth_width_cm=420.0, mouth_apex_cm=430.0, sill_top_cm=45.0,
+                       firebox_cm=dict(width=400.0, back_y=320.0, floor_z=45.0, vault_z=400.0),
+                       pivot="floor, centre of the mouth, on the wall's room-side face plane (y = 0); room toward -Y",
+                       sockets={"Fire": (0.0, 150.0, 110.0), "EyeL": (-175.0, -5.0, 545.0),
+                                "EyeR": (175.0, -5.0, 545.0), "Mouth": (0.0, -45.0, 240.0)},
+                       ucx="left pier + right pier + lintel + sill + mouth blocker (5 boxes)",
+                       notes="monster-mouth oven replacing a section of a 40 cm wall: coursed chiselled basalt, a pointed "
+                             "arch mouth with voussoir lips, 8 upper + 7 lower stone fangs, slanted Ember eye sockets "
+                             "under heavy brows, Ember nostril slits, horn blocks on the crown, a sealed firebox with an "
+                             "ember bed, charred logs and two iron fire dogs. The strips |x| 350..400 and the top 30 cm "
+                             "are plain flush masonry (nothing beyond y = -6)"),
+})
 
 # review sheet views per prop (food_common.VIEWS keys)
 REVIEW_VIEWS = ("iso", "front", "top")

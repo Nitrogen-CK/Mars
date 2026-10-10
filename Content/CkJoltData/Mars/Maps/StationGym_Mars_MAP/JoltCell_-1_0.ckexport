@@ -1,0 +1,1361 @@
+{
+	"assetName": "JoltCell_-1_0",
+	"assetPath": "/Game/CkJoltData/Mars/Maps/StationGym_Mars_MAP/JoltCell_-1_0.JoltCell_-1_0",
+	"assetClass": "Ck_Jolt_CookedCell_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "4deb81162d539f8dfa3ccd657611e54d",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CookVersion",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 7
+		},
+		{
+			"name": "_JoltVersionId",
+			"type": "uint32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 537199105
+		},
+		{
+			"name": "_CellId",
+			"type": "FIntPoint",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value":
+			{
+				"X": -1,
+				"Y": 0
+			}
+		},
+		{
+			"name": "_ShapeCount",
+			"type": "int32",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": 19
+		},
+		{
+			"name": "_ActorGroups",
+			"type": "TArray",
+			"category": "Ck_Jolt_CookedCell_UE",
+			"value": [
+				{
+					"_SourceActorName": "StaticMeshActor_0",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_0"
+					},
+					"_SourceHash": 3.8276053228172349e+18,
+					"_RuntimeCheckHash": -4.7851729642811453e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -400,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_1",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_1"
+					},
+					"_SourceHash": 8.3192388197860096e+18,
+					"_RuntimeCheckHash": -4.8414739467289446e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 0,
+							"_Position":
+							{
+								"X": -400,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_12",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_12"
+					},
+					"_SourceHash": 5.6673230082264033e+18,
+					"_RuntimeCheckHash": -2.4423520958158904e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 1,
+							"_Position":
+							{
+								"X": -600,
+								"Y": 1596,
+								"Z": 80
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_19",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_19"
+					},
+					"_SourceHash": -3.828427933632085e+18,
+					"_RuntimeCheckHash": 7.698390550629633e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 2,
+							"_Position":
+							{
+								"X": -208.81999999999999,
+								"Y": 163.15000000000009,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.48633081950434071,
+								"W": 0.87377476159490675
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_29",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_29"
+					},
+					"_SourceHash": 8.8050746579246838e+18,
+					"_RuntimeCheckHash": 6.1633047212678656e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 3,
+							"_Position":
+							{
+								"X": -501.99999999999994,
+								"Y": 800,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.072997988861749089,
+								"W": 0.99733208793367312
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_31",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_31"
+					},
+					"_SourceHash": -8.4490811686227466e+18,
+					"_RuntimeCheckHash": 2.4490449537248041e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -530,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_49",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_49"
+					},
+					"_SourceHash": 1.9849741201895588e+18,
+					"_RuntimeCheckHash": 1.7374323543988411e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 5,
+							"_Position":
+							{
+								"X": -1000,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_65",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_65"
+					},
+					"_SourceHash": 1.9181129435168878e+18,
+					"_RuntimeCheckHash": 7.829191557962793e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 6,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 400,
+								"Z": 155
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_76",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_76"
+					},
+					"_SourceHash": 9.0825382151181711e+18,
+					"_RuntimeCheckHash": -3.25495816846321e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 7,
+							"_Position":
+							{
+								"X": -1126,
+								"Y": 660,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.71226009569311444,
+								"W": 0.70191563316629124
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_77",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_77"
+					},
+					"_SourceHash": -3.1363094015640125e+18,
+					"_RuntimeCheckHash": -3.2389789243281541e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -1140,
+								"Y": 145,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.68219237693600587,
+								"W": 0.73117272983228987
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_83",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_83"
+					},
+					"_SourceHash": -5.2668742540159529e+18,
+					"_RuntimeCheckHash": 9.1917869479496806e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 8,
+							"_Position":
+							{
+								"X": -1155,
+								"Y": 1490,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_84",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_84"
+					},
+					"_SourceHash": 3.0157188419378831e+18,
+					"_RuntimeCheckHash": -1.4142766479734346e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 1340,
+								"Z": 185
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_85",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_85"
+					},
+					"_SourceHash": -2.733369619829118e+18,
+					"_RuntimeCheckHash": -9.1748562364758088e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 9,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 1175,
+								"Z": 185
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_86",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_86"
+					},
+					"_SourceHash": 4.7519466379771628e+18,
+					"_RuntimeCheckHash": 7.2687336790215864e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 10,
+							"_Position":
+							{
+								"X": -1155,
+								"Y": 970,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": -0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_93",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_93"
+					},
+					"_SourceHash": -5.0095880579877294e+18,
+					"_RuntimeCheckHash": -4.8775233653887416e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -840,
+								"Y": 1540,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_94",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_94"
+					},
+					"_SourceHash": 4.9293560714320005e+18,
+					"_RuntimeCheckHash": 5.3759294868147927e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": -935,
+								"Y": 1534,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_6",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_6"
+					},
+					"_SourceHash": -4.8627293311945769e+18,
+					"_RuntimeCheckHash": -8.5183472237537393e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 11,
+							"_Position":
+							{
+								"X": -400,
+								"Y": 800,
+								"Z": 1008
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_7",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_7"
+					},
+					"_SourceHash": -7.7551985599188531e+18,
+					"_RuntimeCheckHash": -4.4243972128826349e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 11,
+							"_Position":
+							{
+								"X": -400,
+								"Y": 0,
+								"Z": 1008
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_21",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_21"
+					},
+					"_SourceHash": 3.8364644042276485e+18,
+					"_RuntimeCheckHash": 6.1114157731007109e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 12,
+							"_Position":
+							{
+								"X": -150,
+								"Y": 600,
+								"Z": 1150
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_25",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_25"
+					},
+					"_SourceHash": -4.9592067315849093e+18,
+					"_RuntimeCheckHash": 8.8600459582564403e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 12,
+							"_Position":
+							{
+								"X": -800,
+								"Y": 1200,
+								"Z": 1150
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_26",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_26"
+					},
+					"_SourceHash": 7.6965204252487055e+18,
+					"_RuntimeCheckHash": -8.5184377423314217e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 12,
+							"_Position":
+							{
+								"X": -800,
+								"Y": 400,
+								"Z": 1150
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_50",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_50"
+					},
+					"_SourceHash": -9.0360022486809743e+18,
+					"_RuntimeCheckHash": -7.3320962221423032e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 690,
+								"Z": 320
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_51",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_51"
+					},
+					"_SourceHash": 8.5525731432648315e+18,
+					"_RuntimeCheckHash": 8.7919938221641134e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 110,
+								"Z": 320
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_52",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_52"
+					},
+					"_SourceHash": -2.7427887372158362e+18,
+					"_RuntimeCheckHash": -4.2678609237821517e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 619.99999999999989,
+								"Z": 540
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_53",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_53"
+					},
+					"_SourceHash": -9.7360328824149325e+17,
+					"_RuntimeCheckHash": -4.226886818927532e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 180,
+								"Z": 540
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_87",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_87"
+					},
+					"_SourceHash": 4.5978904110622751e+18,
+					"_RuntimeCheckHash": -6.2226572922058107e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 13,
+							"_Position":
+							{
+								"X": -1196,
+								"Y": 1258,
+								"Z": 320
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": -0.70710678118654757,
+								"W": 0.70710678118654768
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "StaticMeshActor_122",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.StaticMeshActor_122"
+					},
+					"_SourceHash": -8.5452993111086735e+18,
+					"_RuntimeCheckHash": 8.6130744630872973e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 14,
+							"_Position":
+							{
+								"X": -20,
+								"Y": 653.99999999999989,
+								"Z": 76
+							},
+							"_Rotation":
+							{
+								"X": -0.69840112333371029,
+								"Y": -0.1106158710412372,
+								"Z": 0.11061587104123721,
+								"W": 0.69840112333371041
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_2",
+					"_SourceLevelPackage": "/Game/Mars/Maps/StationGym_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/StationGym_Mars_MAP",
+							"AssetName": "StationGym_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_2"
+					},
+					"_SourceHash": 7.2907748422348237e+18,
+					"_RuntimeCheckHash": 7.0199243420973069e+17,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": -1105,
+								"Y": 338,
+								"Z": 71.5
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 16,
+							"_Position":
+							{
+								"X": -1105,
+								"Y": 462,
+								"Z": 73
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 17,
+							"_Position":
+							{
+								"X": -1105,
+								"Y": 400,
+								"Z": 70
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 18,
+							"_Position":
+							{
+								"X": -1110,
+								"Y": 400,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0.99999999999999989,
+								"W": 6.123233995736766e-17
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,516 @@
+{
+	"material": "CandleFlame_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Candles/Materials/CandleFlame_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "80d839ceec7d37b69d8ee6821d77da87",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [],
+	"expressions":
+	{
+		"ComponentMask": 2,
+		"Custom": 4,
+		"MakeMaterialAttributes": 1,
+		"ObjectPositionWS": 1,
+		"PerInstanceRandom": 1,
+		"ScalarParameter": 8,
+		"TextureCoordinate": 1,
+		"Time": 1,
+		"VectorParameter": 3
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_24",
+				"desc": "Emissive strength of the core (tuned at the station gym's exposure).",
+				"props":
+				{
+					"DefaultValue": 4.5,
+					"SliderMax": 100,
+					"ParameterName": "Intensity",
+					"Group": "Flame",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"desc": "The body of the flame.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.780000,B=0.360000,A=1.000000)",
+					"ParameterName": "Core Color",
+					"Group": "Flame",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"desc": "The top of the flame.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.360000,B=0.060000,A=1.000000)",
+					"ParameterName": "Tip Color",
+					"Group": "Flame",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 3,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_11",
+				"desc": "The blue foot at the wick.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.100000,G=0.160000,B=0.550000,A=1.000000)",
+					"ParameterName": "Base Color",
+					"Group": "Flame",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_25",
+				"desc": "How far the tip leans (cm).",
+				"props":
+				{
+					"DefaultValue": 0.55000001192092896,
+					"SliderMax": 3,
+					"ParameterName": "Sway",
+					"Group": "Flame",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 5,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_26",
+				"desc": "How much taller a bright flame stands (cm per unit of brightness).",
+				"props":
+				{
+					"DefaultValue": 1.2000000476837158,
+					"SliderMax": 4,
+					"ParameterName": "Stretch",
+					"Group": "Flame",
+					"SortPriority": 5
+				}
+			},
+			{
+				"id": 6,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_27",
+				"desc": "How fast the flame dances.",
+				"props":
+				{
+					"DefaultValue": 1,
+					"SliderMax": 4,
+					"ParameterName": "Flicker Speed",
+					"Group": "Flicker",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 7,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_28",
+				"desc": "How far the brightness swings round its mean.",
+				"props":
+				{
+					"DefaultValue": 0.2199999988079071,
+					"SliderMax": 1,
+					"ParameterName": "Flicker Amount",
+					"Group": "Flicker",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_29",
+				"desc": "How far the flame dips when it gutters, now and then.",
+				"props":
+				{
+					"DefaultValue": 0.44999998807907104,
+					"SliderMax": 1,
+					"ParameterName": "Gutter",
+					"Group": "Flicker",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_30",
+				"desc": "Custom primitive data 0: shifts this component's flames in time.",
+				"props":
+				{
+					"SliderMax": 1,
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Phase Offset",
+					"Group": "Per Component (Custom Primitive Data)",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_31",
+				"desc": "Custom primitive data 1: -1 puts this component's flames out, +1 doubles them.",
+				"props":
+				{
+					"SliderMin": -1,
+					"SliderMax": 2,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "Intensity Offset",
+					"Group": "Per Component (Custom Primitive Data)",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 11,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_3",
+				"props":
+				{
+					"CoordinateIndex": 1
+				}
+			},
+			{
+				"id": 12,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_6",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"R": true
+				}
+			},
+			{
+				"id": 13,
+				"class": "ComponentMask",
+				"name": "MaterialExpressionComponentMask_7",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 11,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"G": true
+				}
+			},
+			{
+				"id": 14,
+				"class": "PerInstanceRandom",
+				"name": "MaterialExpressionPerInstanceRandom_3"
+			},
+			{
+				"id": 15,
+				"class": "ObjectPositionWS",
+				"name": "MaterialExpressionObjectPositionWS_3"
+			},
+			{
+				"id": 16,
+				"class": "Time",
+				"name": "MaterialExpressionTime_3"
+			},
+			{
+				"id": 17,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_12",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Id",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Rand",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "ObjPos",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Offset",
+						"node": 9,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float p = Id * 7.31 + Rand * 3.17 + dot(ObjPos, float3(0.0123, 0.0217, 0.0079)) + Offset;\nreturn frac(p);",
+					"OutputType": "CMOT_Float1",
+					"Description": "Flame Phase"
+				}
+			},
+			{
+				"id": 18,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_13",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Time",
+						"node": 16,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Speed",
+						"node": 6,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Phase",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Amount",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Gutter",
+						"node": 8,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float t = Time * Speed + Phase * 61.0;\nfloat n = sin(t * 6.1) * 0.5 + sin(t * 13.7 + 1.3) * 0.3 + sin(t * 23.3 + 2.1) * 0.2;\nfloat gutter = saturate(sin(t * 0.37 + Phase * 17.0) * 4.0 - 3.2);\nfloat i = 1.0 + n * Amount - gutter * Gutter;\nfloat sx = sin(t * 2.3) * 0.6 + sin(t * 5.9 + 0.7) * 0.4;\nfloat sy = sin(t * 1.9 + 1.1) * 0.6 + sin(t * 4.7 + 2.3) * 0.4;\nreturn float3(max(i, 0.05), sx, sy);",
+					"Description": "Flicker"
+				}
+			},
+			{
+				"id": 19,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_14",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Height",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Core",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Tip",
+						"node": 2,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 3,
+						"name": "Base",
+						"node": 3,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 4,
+						"name": "Intensity",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 5,
+						"name": "Flicker",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 6,
+						"name": "Boost",
+						"node": 10,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float h = saturate(Height);\nfloat3 c = lerp(Core, Tip, smoothstep(0.35, 1.0, h));\nc = lerp(Base, c, smoothstep(0.0, 0.22, h));\nreturn c * Intensity * Flicker.x * max(1.0 + Boost, 0.0);",
+					"Description": "Flame Colour"
+				}
+			},
+			{
+				"id": 20,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_15",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Height",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "Flicker",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "Sway",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "Stretch",
+						"node": 5,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"Code": "float h = saturate(Height);\nfloat bend = h * h * Sway;\nreturn float3(Flicker.y * bend, Flicker.z * bend, h * (Flicker.x - 1.0) * Stretch);",
+					"Description": "Flame Offset"
+				}
+			},
+			{
+				"id": 21,
+				"class": "MakeMaterialAttributes",
+				"name": "MaterialExpressionMakeMaterialAttributes_3",
+				"inputs": [
+					{
+						"index": 5,
+						"name": "EmissiveColor",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "WorldPositionOffset",
+						"node": 20,
+						"output": 0
+					}
+				]
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_MaterialAttributes",
+				"node": 21,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Intensity",
+			"value": 4.5
+		},
+		{
+			"name": "Sway",
+			"value": 0.55000001192092896
+		},
+		{
+			"name": "Stretch",
+			"value": 1.2000000476837158
+		},
+		{
+			"name": "Flicker Speed",
+			"value": 1
+		},
+		{
+			"name": "Flicker Amount",
+			"value": 0.2199999988079071
+		},
+		{
+			"name": "Gutter",
+			"value": 0.44999998807907104
+		},
+		{
+			"name": "Phase Offset",
+			"value": 0
+		},
+		{
+			"name": "Intensity Offset",
+			"value": 0
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Core Color",
+			"value": "RGBA(1, 0.78, 0.36, 1)"
+		},
+		{
+			"name": "Tip Color",
+			"value": "RGBA(1, 0.36, 0.06, 1)"
+		},
+		{
+			"name": "Base Color",
+			"value": "RGBA(0.1, 0.16, 0.55, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
