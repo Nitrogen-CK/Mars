@@ -11,10 +11,12 @@
 // Game mode: the map picks up AMars_Camp_GameMode through the "Camp_Mars_" entry in Config/DefaultEngine.ini
 // [GameMapsSettings] GameModeMapPrefixes.
 //
-// Kit camp (v2.2): the crypt kit's camp planner (vns_trim_sheet crypt_camp.plan_camp -> mise_mars_ue.build_camp_map
-// over Monolith) replaces the blockout geometry with the Sunken Chapel and drops TargetPoints tagged Mise_Socket
-// named camp_cam_<Station> / camp_start_<i>. On such a map Mars.Camp.Build places only the gameplay actors, and
-// Mars.Camp.PlaceStations re-places the station cameras and the four starts from those sockets.
+// Kit camp (v2.3): the crypt kit's planners (vns_trim_sheet crypt_camp.plan_camp + plan_vestibule ->
+// mise_mars_ue.build_camp_map over Monolith) replace the blockout geometry with the Sunken Chapel and the check-in
+// vestibule south of it, and drop TargetPoints tagged Mise_Socket: camp_cam_<Station>, camp_board_<Station> (the front
+// end's menu boards), camp_anchor_<Station> (world board anchors) and camp_start_<i>. On such a map Mars.Camp.Build
+// places only the gameplay actors, and Mars.Camp.PlaceStations moves the station view points, menu board stations and
+// board anchors already in the map onto those sockets (spawning any that are missing) and re-places the four starts.
 
 #if EDITOR
 UFUNCTION()
@@ -261,7 +263,7 @@ namespace utils_mars_camp
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // The kit builder's TargetPoints: tagged Mise_Socket plus their socket name (camp_cam_<Station>, camp_start_<i>).
+    // The kit builder's TargetPoints: tagged Mise_Socket plus their socket name (camp_<kind>_<Station>, camp_start_<i>).
     TArray<ATargetPoint> Get_CampSockets()
     {
         TArray<ATargetPoint> Sockets;
@@ -295,20 +297,29 @@ namespace utils_mars_camp
         return nullptr;
     }
 
-    // Drops the existing Camp_Cam_* and Camp_PlayerStart_* actors and spawns them again on their sockets. The sockets
-    // carry the yaw; the pitch is the camp design's per-station framing. Returns how many actors were placed.
+    // Kit camp: moves every enabled station view point (plain cameras and the front end's menu board stations) and
+    // every board anchor onto its kit socket, keeping the actor and whatever was authored on it, spawns the ones the
+    // map lacks and re-places the four starts. Sockets: camp_cam_<Station> (a camera; the pitch is the per-station
+    // framing), camp_board_<Station> (a menu board: the board centre, +X out of its face), camp_anchor_<Station> (a
+    // world board anchor), camp_start_<i>. Returns how many actors were placed or moved.
     int32 Place_FromSockets()
     {
         auto Actors = UEditorActorSubsystem::Get();
+        auto Sockets = Get_CampSockets();
+
+        TArray<AMars_CampStationCamera> Cameras;
+        TArray<AMars_CampBoardAnchor> Anchors;
         for (auto Actor : Actors.GetAllLevelActors())
         {
-            const FString Label = Actor.GetActorLabel();
-            if (Label.StartsWith(k_CameraLabelPrefix) || Label.StartsWith(k_PlayerStartLabelPrefix))
+            auto Camera = Cast<AMars_CampStationCamera>(Actor);
+            auto Anchor = Cast<AMars_CampBoardAnchor>(Actor);
+            if (ck::IsValid(Camera))
+            { Cameras.Add(Camera); }
+            else if (ck::IsValid(Anchor))
+            { Anchors.Add(Anchor); }
+            else if (ck::IsValid(Cast<APlayerStart>(Actor)))
             { Actors.DestroyActor(Actor); }
         }
-
-        auto Sockets = Get_CampSockets();
-        int32 Placed = 0;
 
         TArray<EMars_CampStation> Stations;
         Stations.Add(EMars_CampStation::Title);
@@ -319,20 +330,42 @@ namespace utils_mars_camp
         Stations.Add(EMars_CampStation::Guests);
         Stations.Add(EMars_CampStation::Contracts);
         Stations.Add(EMars_CampStation::Workbench);
+        Stations.Add(EMars_CampStation::FrontendHost);
+        Stations.Add(EMars_CampStation::FrontendJoin);
+        Stations.Add(EMars_CampStation::FrontendSettings);
+        Stations.Add(EMars_CampStation::FrontendQuit);
 
+        int32 Placed = 0;
         for (auto Station : Stations)
         {
-            auto Socket = TryGet_CampSocket(Sockets, f"camp_cam_{Station :n}");
-            if (ck::Is_NOT_Valid(Socket))
+            auto Existing = TryGet_EnabledCamera(Cameras, Station);
+            auto BoardSocket = TryGet_CampSocket(Sockets, f"camp_board_{Station :n}");
+            auto CameraSocket = TryGet_CampSocket(Sockets, f"camp_cam_{Station :n}");
+            if (ck::IsValid(BoardSocket))
             {
-                ck::Warning(f"[Mars.Camp] no camp_cam_{Station :n} socket in the map");
-                continue;
+                Place_MenuBoard(Station, Existing, BoardSocket);
+                ++Placed;
             }
-
-            const float64 Pitch = Station == EMars_CampStation::Title ? -8.0 : (Station == EMars_CampStation::Cauldron ? -15.0 : -12.0);
-            Spawn_StationCamera(Station, Socket.GetActorLocation(), FRotator(Pitch, Socket.GetActorRotation().Yaw, 0.0));
-            ++Placed;
+            else if (ck::IsValid(CameraSocket))
+            {
+                // A placed camera keeps the pitch authored on it; a new one gets the blockout's framing.
+                const float64 DefaultPitch = Station == EMars_CampStation::Cauldron ? -15.0 : -12.0;
+                const float64 Pitch = ck::IsValid(Existing) ? Existing.GetActorRotation().Pitch : DefaultPitch;
+                const auto Rotation = FRotator(Pitch, CameraSocket.GetActorRotation().Yaw, 0.0);
+                if (ck::IsValid(Existing))
+                {
+                    Existing.SetActorLocation(CameraSocket.GetActorLocation());
+                    Existing.SetActorRotation(Rotation);
+                }
+                else
+                { Spawn_StationCamera(Station, CameraSocket.GetActorLocation(), Rotation); }
+                ++Placed;
+            }
+            else if (ck::IsValid(Existing))
+            { ck::Warning(f"[Mars.Camp] no kit socket for station [{Station :n}]: its view point stays where it is"); }
         }
+
+        Placed += Place_BoardAnchors(Anchors, Sockets);
 
         for (int32 Index = 0; Index < 4; ++Index)
         {
@@ -349,6 +382,87 @@ namespace utils_mars_camp
             { continue; }
 
             Start.SetActorLabel(f"{k_PlayerStartLabelPrefix}{Index}");
+            ++Placed;
+        }
+
+        return Placed;
+    }
+
+    // The enabled view point for a station; disabled ones are authoring backups and stay untouched.
+    AMars_CampStationCamera TryGet_EnabledCamera(const TArray<AMars_CampStationCamera>& InCameras, EMars_CampStation InStation)
+    {
+        for (auto Camera : InCameras)
+        {
+            if (Camera.Station == InStation && Camera.bStationEnabled)
+            { return Camera; }
+        }
+
+        return nullptr;
+    }
+
+    // A menu board station on its kit socket, the kit's frame and stand standing in for the blockout blocks. A plain
+    // camera that held the station before is kept as a disabled backup beside the new board.
+    void Place_MenuBoard(EMars_CampStation InStation, AMars_CampStationCamera InExisting, ATargetPoint InSocket)
+    {
+        const auto Rotation = FRotator(0.0, InSocket.GetActorRotation().Yaw, 0.0);
+        auto Board = Cast<AMars_MenuBoardStation>(InExisting);
+        if (ck::Is_NOT_Valid(Board))
+        {
+            if (ck::IsValid(InExisting))
+            { InExisting.bStationEnabled = false; }
+
+            Board = Cast<AMars_MenuBoardStation>(UEditorActorSubsystem::Get().SpawnActorFromClass(
+                AMars_MenuBoardStation, InSocket.GetActorLocation(), Rotation));
+            if (ck::EnsureIfNot(ck::IsValid(Board), f"[Mars.Camp] Failed to place the [{InStation :n}] menu board"))
+            { return; }
+
+            Board.Station = InStation;
+            Board.SetActorLabel(f"Camp_Board_{InStation :n}");
+        }
+
+        Board.SetActorLocation(InSocket.GetActorLocation());
+        Board.SetActorRotation(Rotation);
+        Board.bShowBlockout = false;
+        Board.RefreshAssembly();
+    }
+
+    // Every board anchor with a camp_anchor_<Station> socket moves onto it (its scale and draw size are the board's
+    // authored size and stay); the Contracts and Departure anchors the camp controller requires are spawned at the
+    // blockout's sizes when the map has none. Returns how many were placed or moved.
+    int32 Place_BoardAnchors(const TArray<AMars_CampBoardAnchor>& InAnchors, const TArray<ATargetPoint>& InSockets)
+    {
+        int32 Placed = 0;
+        bool HasContracts = false;
+        bool HasDeparture = false;
+        for (auto Anchor : InAnchors)
+        {
+            HasContracts = HasContracts || Anchor.Station == EMars_CampStation::Contracts;
+            HasDeparture = HasDeparture || Anchor.Station == EMars_CampStation::Departure;
+            auto Socket = TryGet_CampSocket(InSockets, f"camp_anchor_{Anchor.Station :n}");
+            if (ck::Is_NOT_Valid(Socket))
+            {
+                ck::Warning(f"[Mars.Camp] no camp_anchor_{Anchor.Station :n} socket: that board anchor stays where it is");
+                continue;
+            }
+
+            Anchor.SetActorLocation(Socket.GetActorLocation());
+            Anchor.SetActorRotation(FRotator(0.0, Socket.GetActorRotation().Yaw, 0.0));
+            ++Placed;
+        }
+
+        auto Contracts = TryGet_CampSocket(InSockets, "camp_anchor_Contracts");
+        if (HasContracts == false && ck::IsValid(Contracts))
+        {
+            Spawn_BoardAnchor(EMars_CampStation::Contracts, Contracts.GetActorLocation(),
+                FRotator(0.0, Contracts.GetActorRotation().Yaw, 0.0), 0.27f, FIntPoint(1000, 1000));
+            ++Placed;
+        }
+
+        auto Departure = TryGet_CampSocket(InSockets, "camp_anchor_Departure");
+        if (HasDeparture == false && ck::IsValid(Departure))
+        {
+            Spawn_BoardAnchor(EMars_CampStation::Departure, Departure.GetActorLocation(),
+                FRotator(0.0, Departure.GetActorRotation().Yaw, 0.0), 0.28f, FIntPoint(700, 650));
             ++Placed;
         }
 

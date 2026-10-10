@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "52827fae85da596c46ca14a9229593b6",
+		"sourceHash": "bac5c018201cbf1e76183cdc926bc2c3",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -52,7 +52,7 @@
 					{
 						"Min":
 						{
-							"X": -2190,
+							"X": -1200,
 							"Y": -1200,
 							"Z": 0
 						},
@@ -65,6 +65,30 @@
 						"IsValid": true
 					},
 					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_0_0.JoltCell_0_0"
+				},
+				{
+					"_CellId":
+					{
+						"X": -1,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -2800,
+							"Y": -700,
+							"Z": 0
+						},
+						"Max":
+						{
+							"X": -1240,
+							"Y": 1100,
+							"Z": 750
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Camp_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1"
 				}
 			]
 		}

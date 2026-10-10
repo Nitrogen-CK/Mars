@@ -24,6 +24,11 @@ class AMars_MenuBoardStation : AMars_CampStationCamera
     UPROPERTY(EditAnywhere, Category = "Menu Board", meta = (ClampMin = "1.0", ClampMax = "10.0"))
     float PixelsPerCm = 5.0;
 
+    // Off where level art carries the board (the kit vestibule's frames and stands): the backing and plinth blocks
+    // hide and the plinth stops colliding; the surface and the camera are unchanged.
+    UPROPERTY(EditAnywhere, Category = "Menu Board")
+    bool bShowBlockout = true;
+
     UPROPERTY(EditAnywhere, Category = "Menu Camera")
     FVector CameraOffset = FVector(360.0, 0.0, 0.0);
 
@@ -60,8 +65,11 @@ class AMars_MenuBoardStation : AMars_CampStationCamera
         Support.SetStaticMesh(engine::load::Cube());
         Support.SetRelativeLocation(FVector(-18.0, 0.0, -(Height + PlinthHeight) * 0.5));
         Support.SetRelativeScale3D(FVector(0.78, (Width + 30.0) / 100.0, Math::Max(0.01, PlinthHeight) / 100.0));
-        Support.SetVisibility(PlinthHeight > 0.0);
-        Support.SetCollisionEnabled(PlinthHeight > 0.0 ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+        const bool ShowSupport = bShowBlockout && PlinthHeight > 0.0;
+        Backing.SetVisibility(bShowBlockout);
+        Backing.SetCollisionEnabled(bShowBlockout ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+        Support.SetVisibility(ShowSupport);
+        Support.SetCollisionEnabled(ShowSupport ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
     }
 }
 

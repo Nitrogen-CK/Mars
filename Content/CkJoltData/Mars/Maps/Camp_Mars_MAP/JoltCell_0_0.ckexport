@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "0a9a8f0978274d8c47ec1f351ef62d6e",
+		"sourceHash": "d7886cd0c985266f8e73d7666b1be742",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -38,7 +38,7 @@
 			"name": "_ShapeCount",
 			"type": "int32",
 			"category": "Ck_Jolt_CookedCell_UE",
-			"value": 54
+			"value": 52
 		},
 		{
 			"name": "_ActorGroups",
@@ -46,7 +46,7 @@
 			"category": "Ck_Jolt_CookedCell_UE",
 			"value": [
 				{
-					"_SourceActorName": "Actor_1",
+					"_SourceActorName": "Actor_0",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Camp_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -55,10 +55,10 @@
 							"PackageName": "/Game/Mars/Maps/Camp_Mars_MAP",
 							"AssetName": "Camp_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_1"
+						"SubPathString": "PersistentLevel.Actor_0"
 					},
-					"_SourceHash": 2.8710303727864556e+18,
-					"_RuntimeCheckHash": -3.4428933411273221e+18,
+					"_SourceHash": -1.2947237239785024e+18,
+					"_RuntimeCheckHash": -6.5686862461090529e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
@@ -117,7 +117,7 @@
 							"_ShapeIndex": 1,
 							"_Position":
 							{
-								"X": 210,
+								"X": 270,
 								"Y": -1120,
 								"Z": 0
 							},
@@ -247,7 +247,7 @@
 							"_ShapeIndex": 4,
 							"_Position":
 							{
-								"X": -190,
+								"X": -240,
 								"Y": -1140,
 								"Z": 0
 							},
@@ -309,32 +309,6 @@
 								"Y": 0,
 								"Z": 0.92387953251128674,
 								"W": 0.38268343236508984
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 7,
-							"_Position":
-							{
-								"X": 1188,
-								"Y": 319.99999999999989,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654735
 							},
 							"_Signature":
 							{
@@ -585,7 +559,7 @@
 							"_ShapeIndex": 9,
 							"_Position":
 							{
-								"X": -190,
+								"X": -240,
 								"Y": -1140,
 								"Z": 56.000000000000007
 							},
@@ -819,32 +793,6 @@
 							"_ShapeIndex": 11,
 							"_Position":
 							{
-								"X": 0,
-								"Y": -1165,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 11,
-							"_Position":
-							{
 								"X": -789.89999999999998,
 								"Y": 860.61000000000001,
 								"Z": 0
@@ -897,7 +845,7 @@
 							"_ShapeIndex": 13,
 							"_Position":
 							{
-								"X": 210,
+								"X": 270,
 								"Y": -1120,
 								"Z": 102
 							},
@@ -923,6 +871,58 @@
 							"_ShapeIndex": 14,
 							"_Position":
 							{
+								"X": 0,
+								"Y": -1187,
+								"Z": 175
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 15,
+							"_Position":
+							{
+								"X": 1187,
+								"Y": 310,
+								"Z": 155
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 16,
+							"_Position":
+							{
 								"X": 140,
 								"Y": 1170,
 								"Z": 0
@@ -946,7 +946,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 15,
+							"_ShapeIndex": 17,
 							"_Position":
 							{
 								"X": -170,
@@ -972,7 +972,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 16,
+							"_ShapeIndex": 18,
 							"_Position":
 							{
 								"X": 841.5100000000001,
@@ -998,7 +998,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 17,
+							"_ShapeIndex": 19,
 							"_Position":
 							{
 								"X": 0,
@@ -1024,7 +1024,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 18,
+							"_ShapeIndex": 20,
 							"_Position":
 							{
 								"X": -120,
@@ -1050,7 +1050,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 19,
+							"_ShapeIndex": 21,
 							"_Position":
 							{
 								"X": 786.36000000000001,
@@ -1076,7 +1076,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 20,
+							"_ShapeIndex": 22,
 							"_Position":
 							{
 								"X": 1200,
@@ -1102,33 +1102,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 20,
-							"_Position":
-							{
-								"X": -2140,
-								"Y": 200,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": -500,
@@ -1154,7 +1128,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": 500,
@@ -1180,7 +1154,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": 1200,
@@ -1206,7 +1180,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": 1200,
@@ -1232,7 +1206,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": 500,
@@ -1258,7 +1232,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": -500,
@@ -1284,7 +1258,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": -1200,
@@ -1310,7 +1284,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 21,
+							"_ShapeIndex": 23,
 							"_Position":
 							{
 								"X": -1200,
@@ -1336,7 +1310,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": -360,
@@ -1362,7 +1336,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 360,
@@ -1388,7 +1362,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 360,
@@ -1414,7 +1388,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": -360,
@@ -1440,33 +1414,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
-							"_Position":
-							{
-								"X": 1188,
-								"Y": 400,
-								"Z": 320
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654735
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 1188,
@@ -1492,7 +1440,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": -1188,
@@ -1518,7 +1466,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": -1188,
@@ -1544,7 +1492,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 841.5100000000001,
@@ -1570,7 +1518,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": -841.5100000000001,
@@ -1596,7 +1544,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": 841.5100000000001,
@@ -1622,7 +1570,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 22,
+							"_ShapeIndex": 24,
 							"_Position":
 							{
 								"X": -841.5100000000001,
@@ -1648,7 +1596,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 23,
+							"_ShapeIndex": 25,
 							"_Position":
 							{
 								"X": 1660.0000000000002,
@@ -1674,7 +1622,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 23,
+							"_ShapeIndex": 25,
 							"_Position":
 							{
 								"X": 1660.0000000000002,
@@ -1700,111 +1648,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 23,
-							"_Position":
-							{
-								"X": -2160,
-								"Y": 319.99999999999989,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 23,
-							"_Position":
-							{
-								"X": -2160,
-								"Y": -320,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 23,
-							"_Position":
-							{
-								"X": -2160,
-								"Y": 319.99999999999989,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 23,
-							"_Position":
-							{
-								"X": -2160,
-								"Y": -320,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 24,
+							"_ShapeIndex": 26,
 							"_Position":
 							{
 								"X": 1200,
@@ -1830,7 +1674,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 25,
+							"_ShapeIndex": 27,
 							"_Position":
 							{
 								"X": -1200,
@@ -1856,7 +1700,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 25,
+							"_ShapeIndex": 27,
 							"_Position":
 							{
 								"X": 200,
@@ -1882,7 +1726,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 26,
+							"_ShapeIndex": 28,
 							"_Position":
 							{
 								"X": 1240,
@@ -1908,7 +1752,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 27,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
 								"X": -200,
@@ -1934,7 +1778,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 27,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
 								"X": -200,
@@ -1960,7 +1804,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 27,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
 								"X": -200,
@@ -1986,7 +1830,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 27,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
 								"X": -200,
@@ -2012,7 +1856,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 27,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
 								"X": -200,
@@ -2038,7 +1882,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 27,
+							"_ShapeIndex": 29,
 							"_Position":
 							{
 								"X": -200,
@@ -2064,7 +1908,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 28,
+							"_ShapeIndex": 30,
 							"_Position":
 							{
 								"X": -1200,
@@ -2090,7 +1934,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 29,
+							"_ShapeIndex": 31,
 							"_Position":
 							{
 								"X": 1200,
@@ -2116,7 +1960,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 29,
+							"_ShapeIndex": 31,
 							"_Position":
 							{
 								"X": -1200,
@@ -2142,7 +1986,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 30,
+							"_ShapeIndex": 32,
 							"_Position":
 							{
 								"X": 1240,
@@ -2168,7 +2012,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 31,
+							"_ShapeIndex": 33,
 							"_Position":
 							{
 								"X": -100,
@@ -2194,7 +2038,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 31,
+							"_ShapeIndex": 33,
 							"_Position":
 							{
 								"X": -1200,
@@ -2220,7 +2064,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 32,
+							"_ShapeIndex": 34,
 							"_Position":
 							{
 								"X": -500,
@@ -2246,163 +2090,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 33,
-							"_Position":
-							{
-								"X": -1270,
-								"Y": 300,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 33,
-							"_Position":
-							{
-								"X": -1270,
-								"Y": 0,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 34,
-							"_Position":
-							{
-								"X": -1989.9999999999998,
-								"Y": 300,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 34,
-							"_Position":
-							{
-								"X": -1989.9999999999998,
-								"Y": 0,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
 							"_ShapeIndex": 35,
-							"_Position":
-							{
-								"X": -1270,
-								"Y": 300,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 35,
-							"_Position":
-							{
-								"X": -1989.9999999999998,
-								"Y": -300,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654735
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 36,
 							"_Position":
 							{
 								"X": -500,
@@ -2428,7 +2116,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": 500,
@@ -2454,7 +2142,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": 1200,
@@ -2480,7 +2168,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": 1200,
@@ -2506,7 +2194,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": 500,
@@ -2532,7 +2220,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": -500,
@@ -2558,7 +2246,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": -1200,
@@ -2584,7 +2272,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 36,
+							"_ShapeIndex": 35,
 							"_Position":
 							{
 								"X": -1200,
@@ -2610,7 +2298,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 36,
 							"_Position":
 							{
 								"X": 1200,
@@ -2636,7 +2324,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 36,
 							"_Position":
 							{
 								"X": 1200,
@@ -2662,7 +2350,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 36,
 							"_Position":
 							{
 								"X": -1200,
@@ -2688,7 +2376,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 37,
+							"_ShapeIndex": 36,
 							"_Position":
 							{
 								"X": -1200,
@@ -2715,58 +2403,6 @@
 						},
 						{
 							"_ShapeIndex": 37,
-							"_Position":
-							{
-								"X": -2140,
-								"Y": 300,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 37,
-							"_Position":
-							{
-								"X": -2140,
-								"Y": -200,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": -300,
@@ -2792,7 +2428,33 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 38,
+							"_ShapeIndex": 37,
+							"_Position":
+							{
+								"X": 1200,
+								"Y": 300,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0.70710678118654768,
+								"W": 0.70710678118654735
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default"
+						},
+						{
+							"_ShapeIndex": 37,
 							"_Position":
 							{
 								"X": 300,
@@ -2818,7 +2480,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 38,
+							"_ShapeIndex": 37,
 							"_Position":
 							{
 								"X": 300,
@@ -2844,7 +2506,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 38,
+							"_ShapeIndex": 37,
 							"_Position":
 							{
 								"X": -1200,
@@ -2870,7 +2532,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 38,
+							"_ShapeIndex": 37,
 							"_Position":
 							{
 								"X": 300,
@@ -2896,7 +2558,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 38,
+							"_ShapeIndex": 37,
 							"_Position":
 							{
 								"X": -1200,
@@ -2923,136 +2585,6 @@
 						},
 						{
 							"_ShapeIndex": 38,
-							"_Position":
-							{
-								"X": -1989.9999999999998,
-								"Y": 300,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 1,
-								"W": -6.1232339957367673e-17
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 38,
-							"_Position":
-							{
-								"X": -2190,
-								"Y": -300,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 38,
-							"_Position":
-							{
-								"X": -2140,
-								"Y": -100,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 38,
-							"_Position":
-							{
-								"X": -1989.9999999999998,
-								"Y": 300,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 1,
-								"W": -6.1232339957367673e-17
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 38,
-							"_Position":
-							{
-								"X": -2190,
-								"Y": -300,
-								"Z": 400
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0,
-								"W": 1
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 100,
@@ -3078,7 +2610,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 500,
@@ -3104,7 +2636,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": -100,
@@ -3130,7 +2662,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 1200,
@@ -3156,7 +2688,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 1200,
@@ -3182,7 +2714,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": -1200,
@@ -3208,7 +2740,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": -1200,
@@ -3234,7 +2766,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 100,
@@ -3260,7 +2792,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 1200,
@@ -3286,7 +2818,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": -500,
@@ -3312,7 +2844,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": -1200,
@@ -3338,7 +2870,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 1240,
@@ -3364,7 +2896,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 1639.9999999999998,
@@ -3390,7 +2922,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 39,
+							"_ShapeIndex": 38,
 							"_Position":
 							{
 								"X": 1639.9999999999998,
@@ -3419,32 +2951,6 @@
 							"_ShapeIndex": 39,
 							"_Position":
 							{
-								"X": -2140,
-								"Y": 300,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": -0.70710678118654757,
-								"W": 0.70710678118654746
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 40,
-							"_Position":
-							{
 								"X": 1200,
 								"Y": 500,
 								"Z": 350
@@ -3468,7 +2974,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 500,
@@ -3494,7 +3000,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -1200,
@@ -3520,7 +3026,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -500,
@@ -3546,7 +3052,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 1200,
@@ -3572,7 +3078,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 500,
@@ -3598,7 +3104,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -1200,
@@ -3624,7 +3130,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -500,
@@ -3650,7 +3156,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 1200,
@@ -3676,7 +3182,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 500,
@@ -3702,7 +3208,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -1200,
@@ -3728,7 +3234,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -500,
@@ -3754,7 +3260,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 1200,
@@ -3780,7 +3286,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": 500,
@@ -3806,7 +3312,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -1200,
@@ -3832,7 +3338,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 40,
+							"_ShapeIndex": 39,
 							"_Position":
 							{
 								"X": -500,
@@ -3858,7 +3364,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 1100,
@@ -3884,7 +3390,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 600,
@@ -3910,7 +3416,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -1100,
@@ -3936,7 +3442,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -600,
@@ -3962,7 +3468,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 1100,
@@ -3988,7 +3494,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 600,
@@ -4014,7 +3520,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -1100,
@@ -4040,7 +3546,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -600,
@@ -4066,7 +3572,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 1100,
@@ -4092,7 +3598,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 600,
@@ -4118,7 +3624,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -1100,
@@ -4144,7 +3650,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -600,
@@ -4170,7 +3676,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 1100,
@@ -4196,7 +3702,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": 600,
@@ -4222,7 +3728,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -1100,
@@ -4248,7 +3754,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 41,
+							"_ShapeIndex": 40,
 							"_Position":
 							{
 								"X": -600,
@@ -4274,7 +3780,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": 900,
@@ -4300,7 +3806,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": 800,
@@ -4326,7 +3832,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": -900,
@@ -4352,7 +3858,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": -800,
@@ -4378,7 +3884,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": 900,
@@ -4404,7 +3910,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": 800,
@@ -4430,7 +3936,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": -900,
@@ -4456,7 +3962,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": -800,
@@ -4482,7 +3988,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": 900,
@@ -4508,7 +4014,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": 800,
@@ -4534,7 +4040,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": -900,
@@ -4560,7 +4066,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 42,
+							"_ShapeIndex": 41,
 							"_Position":
 							{
 								"X": -800,
@@ -4586,7 +4092,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": 1200,
@@ -4612,7 +4118,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": 500,
@@ -4638,7 +4144,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": -1200,
@@ -4664,7 +4170,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": -500,
@@ -4690,7 +4196,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": 1200,
@@ -4716,7 +4222,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": 500,
@@ -4742,7 +4248,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": -1200,
@@ -4768,7 +4274,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": -500,
@@ -4794,7 +4300,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": 1200,
@@ -4820,7 +4326,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": 500,
@@ -4846,7 +4352,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": -1200,
@@ -4872,7 +4378,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 43,
+							"_ShapeIndex": 42,
 							"_Position":
 							{
 								"X": -500,
@@ -4898,7 +4404,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": 1100,
@@ -4924,7 +4430,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": 600,
@@ -4950,7 +4456,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": -1100,
@@ -4976,7 +4482,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": -600,
@@ -5002,7 +4508,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": 1100,
@@ -5028,7 +4534,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": -1100,
@@ -5054,7 +4560,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 44,
+							"_ShapeIndex": 43,
 							"_Position":
 							{
 								"X": -600,
@@ -5080,7 +4586,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": 900,
@@ -5106,7 +4612,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": 800,
@@ -5132,7 +4638,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": -900,
@@ -5158,7 +4664,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": -800,
@@ -5184,7 +4690,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": 800,
@@ -5210,7 +4716,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": -900,
@@ -5236,7 +4742,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": 800,
@@ -5262,7 +4768,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 45,
+							"_ShapeIndex": 44,
 							"_Position":
 							{
 								"X": -800,
@@ -5288,7 +4794,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": -300,
@@ -5314,7 +4820,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": 1200,
@@ -5340,7 +4846,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": -300,
@@ -5366,7 +4872,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": 1200,
@@ -5392,7 +4898,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": -300,
@@ -5418,7 +4924,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 46,
+							"_ShapeIndex": 45,
 							"_Position":
 							{
 								"X": 300,
@@ -5444,7 +4950,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": -500,
@@ -5470,7 +4976,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 100,
@@ -5496,7 +5002,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 500,
@@ -5522,7 +5028,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": -100,
@@ -5548,7 +5054,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": -500,
@@ -5574,7 +5080,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 500,
@@ -5600,7 +5106,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 1200,
@@ -5626,7 +5132,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": -100,
@@ -5652,7 +5158,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": -1200,
@@ -5678,7 +5184,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 500,
@@ -5704,7 +5210,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": 1200,
@@ -5730,7 +5236,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 47,
+							"_ShapeIndex": 46,
 							"_Position":
 							{
 								"X": -1200,
@@ -5756,7 +5262,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 48,
+							"_ShapeIndex": 47,
 							"_Position":
 							{
 								"X": 1100,
@@ -5782,7 +5288,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 48,
+							"_ShapeIndex": 47,
 							"_Position":
 							{
 								"X": 600,
@@ -5808,7 +5314,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 48,
+							"_ShapeIndex": 47,
 							"_Position":
 							{
 								"X": -1100,
@@ -5834,7 +5340,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 48,
+							"_ShapeIndex": 47,
 							"_Position":
 							{
 								"X": -600,
@@ -5860,7 +5366,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 48,
+							"_ShapeIndex": 47,
 							"_Position":
 							{
 								"X": 600,
@@ -5886,7 +5392,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": 900,
@@ -5912,7 +5418,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": -800,
@@ -5938,7 +5444,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": 900,
@@ -5964,7 +5470,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": -900,
@@ -5990,7 +5496,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": 900,
@@ -6016,7 +5522,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": 800,
@@ -6042,7 +5548,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": -900,
@@ -6068,7 +5574,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 49,
+							"_ShapeIndex": 48,
 							"_Position":
 							{
 								"X": -800,
@@ -6094,7 +5600,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": 500,
@@ -6120,7 +5626,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": 1200,
@@ -6146,7 +5652,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": -500,
@@ -6172,7 +5678,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": -1200,
@@ -6198,7 +5704,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": 500,
@@ -6224,7 +5730,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": 1200,
@@ -6250,7 +5756,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": -500,
@@ -6276,7 +5782,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": -1200,
@@ -6302,7 +5808,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": 500,
@@ -6328,7 +5834,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": 1200,
@@ -6354,7 +5860,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": -500,
@@ -6380,7 +5886,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 50,
+							"_ShapeIndex": 49,
 							"_Position":
 							{
 								"X": -1200,
@@ -6406,7 +5912,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -100,
@@ -6432,7 +5938,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 300,
@@ -6458,7 +5964,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -6484,7 +5990,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -6510,7 +6016,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 100,
@@ -6536,7 +6042,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -300,
@@ -6562,7 +6068,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -6588,7 +6094,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -6614,7 +6120,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -100,
@@ -6640,7 +6146,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 300,
@@ -6666,7 +6172,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -6692,7 +6198,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -6718,7 +6224,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 100,
@@ -6744,7 +6250,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -300,
@@ -6770,7 +6276,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -6796,7 +6302,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -6822,7 +6328,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -100,
@@ -6848,7 +6354,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 300,
@@ -6874,7 +6380,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -6900,7 +6406,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -6926,7 +6432,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 100,
@@ -6952,7 +6458,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -300,
@@ -6978,7 +6484,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -7004,7 +6510,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -7030,7 +6536,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 100,
@@ -7056,7 +6562,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -7082,7 +6588,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": 1200,
@@ -7108,7 +6614,7 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 51,
+							"_ShapeIndex": 50,
 							"_Position":
 							{
 								"X": -1200,
@@ -7134,37 +6640,11 @@
 							"_SurfaceType": "SurfaceType_Default"
 						},
 						{
-							"_ShapeIndex": 52,
+							"_ShapeIndex": 51,
 							"_Position":
 							{
 								"X": 1200,
 								"Y": -400,
-								"Z": 0
-							},
-							"_Rotation":
-							{
-								"X": 0,
-								"Y": 0,
-								"Z": 0.70710678118654768,
-								"W": 0.70710678118654735
-							},
-							"_Signature":
-							{
-								"_ObjectChannel": "ECC_WorldStatic",
-								"_ResponseMask": -6.1489148630353398e+18,
-								"_CollisionEnabled": "QueryAndPhysics",
-								"_Domain": "Static"
-							},
-							"_Friction": 0.69999998807907104,
-							"_Restitution": 0.30000001192092896,
-							"_SurfaceType": "SurfaceType_Default"
-						},
-						{
-							"_ShapeIndex": 53,
-							"_Position":
-							{
-								"X": 1200,
-								"Y": 300,
 								"Z": 0
 							},
 							"_Rotation":
