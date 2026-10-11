@@ -25,18 +25,6 @@ namespace utils_player_sm
     }
 }
 
-class UMars_SmCondition_IsDowned : UMars_SmCondition_ByteAttribute
-{
-    default AttributeTag = GameplayTags::ByteAttribute_Mars_Player_Downed;
-    default Comparison._Operator = ECk_ComparisonOperators::EqualTo;
-    default Comparison._RHS = 1;
-}
-
-class UMars_SmCondition_IsNotDowned : UMars_SmCondition_IsDowned
-{
-    default _NegateResult = true;
-}
-
 class UMars_SmTask_AliveSubSm : UCk_SmTask_SubStateMachine
 {
     default _InitialStateClass = UMars_SmState_Locomotion;
@@ -55,7 +43,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
         auto ToDowned = AddTransition(InHandle, UMars_SmState_Downed);
-        AddCondition(ToDowned, UMars_SmCondition_IsDowned);
+        AddCondition(ToDowned, UMars_SmCondition_IsDownedOrDepleted);
 
         AddTask(InHandle, UMars_SmTask_MovementSpeedSync);
         AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);
@@ -71,7 +59,9 @@ class UMars_SmState_Downed : UCk_SmState_EntityScript
     void DoDefineState(FCk_Handle_SmState_UnderConstruction& InHandle)
     {
         auto ToAlive = AddTransition(InHandle, UMars_SmState_Alive);
-        AddCondition(ToAlive, UMars_SmCondition_IsNotDowned);
+        AddCondition(ToAlive, UMars_SmCondition_IsAliveAndNotDepleted);
+
+        AddTask(InHandle, UMars_SmTask_Downed_Lockdown);
     }
 }
 
@@ -100,7 +90,8 @@ class UMars_SmState_Locomotion : UCk_SmState_EntityScript
     }
 
     // Leaving Locomotion while climbing (Downed, or a station's Operating) leaves the ladder: the Climber's drain runs next
-    // frame and restores walking, so a Downed player falls out of Flying and an operator's glide follows.
+    // frame and restores walking, so an operator's glide follows; Downed's lockdown waits for that drain before it takes
+    // the movement.
     UFUNCTION(BlueprintOverride)
     void DoExitState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
     {

@@ -25,8 +25,23 @@ class UMars_DebugPage_Player : UMars_DebugPage_Base
             ? Get_StateClassName(utils_state_machine::Get_CurrentStateClass(StateMachine))
             : "-";
         DrawKvRow("Root state", RootState, FLinearColor(0.6f, 0.9f, 1.0f));
+        mm::Spacer(0, 6);
+
+        // The debug byte and the root state differ while a cleared byte meets zero Health: the player stays Downed.
+        DrawSectionHeading("Combat");
+        auto Health = PlayerEntity.As_Health(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Health))
+        {
+            DrawKvRow("HP", f"{Health.Get_Current() :.0} / {Health.Get_Max() :.0}");
+            DrawKvRow("Depleted", BoolText(Health.Get_IsDepleted()));
+        }
+        else
+        { DrawKvRow("HP", "- (no local Health: not a local combat world, not locally controlled, or combat disabled)"); }
+
         const auto IsDowned = utils_byte_attribute::Get_FinalValue(PlayerEntity, GameplayTags::ByteAttribute_Mars_Player_Downed) > 0;
-        DrawKvRow("Downed", BoolText(IsDowned));
+        DrawKvRow("Downed (debug byte)", BoolText(IsDowned));
+        const auto InDownedState = ck::IsValid(StateMachine) && utils_state_machine::IsInState(StateMachine, UMars_SmState_Downed);
+        DrawKvRow("Downed (root state)", BoolText(InDownedState));
         mm::Spacer(0, 6);
 
         DrawSectionHeading("Movement");
@@ -54,9 +69,11 @@ class UMars_DebugPage_Player : UMars_DebugPage_Base
 
         DrawSectionHeading("Cheats");
         mm::BeginHorizontalBox();
-        const FString DownedLabel = IsDowned ? "Revive" : "Down";
+        const FString DownedLabel = IsDowned ? "Clear downed byte" : "Set downed byte";
         if (DrawButton_WasClicked("Downed", DownedLabel))
         { utils_byte_attribute::Override(PlayerEntity, GameplayTags::ByteAttribute_Mars_Player_Downed, uint8(IsDowned ? 0 : 1)); }
+        if (ck::IsValid(Health) && DrawButton_WasClicked("Heal", "Heal to max"))
+        { Health.Request_Heal(FMars_Request_Health_Heal(Health.Get_Max())); }
         if (DrawButton_WasClicked("LaunchUp", "Launch up"))
         {
             const bool OverrideXY = false;

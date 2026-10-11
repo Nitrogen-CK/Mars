@@ -56,6 +56,17 @@ struct FMars_PlayerCharacter_Body
     float32 CrouchedHalfHeight = 52.5f;
 }
 
+// The player as a local damage receiver: Health, a body HitZone and a hurtbox capsule that follows the movement capsule.
+// Composed only on the local host's own pawn (utils_local_session); this is not a networked combat model.
+struct FMars_PlayerCharacter_Combat
+{
+    UPROPERTY()
+    ECk_EnableDisable Enabled = ECk_EnableDisable::Enable;
+
+    UPROPERTY()
+    float32 MaxHealth = 100.0f;
+}
+
 struct FMars_PlayerCharacter_View
 {
     // Eye height above the capsule centre, and how fast the view eases there after a crouch or uncrouch. The config
@@ -97,6 +108,9 @@ class UMars_PlayerCharacter_Config : UDataAsset
 
     UPROPERTY(Category = "Body")
     FMars_PlayerCharacter_Body Body;
+
+    UPROPERTY(Category = "Body")
+    FMars_PlayerCharacter_Combat Combat;
 
     UPROPERTY(Category = "View")
     FMars_PlayerCharacter_View View;

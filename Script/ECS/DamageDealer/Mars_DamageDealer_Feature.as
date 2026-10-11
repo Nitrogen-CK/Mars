@@ -66,6 +66,11 @@ struct FMars_DamageDealer_Sweep
     UPROPERTY()
     float32 Radius = 25.0f;
 
+    // Entities the sweep passes through (their probe or world bodies are skipped), on top of the dealer's own entity and
+    // its own zone's hurtboxes, which Try_StrikeSweep always skips.
+    UPROPERTY()
+    TArray<FCk_Handle> IgnoredEntities;
+
     FMars_DamageDealer_Sweep() {}
 
     FMars_DamageDealer_Sweep(FVector InStart, FVector InEnd, float32 InRadius)

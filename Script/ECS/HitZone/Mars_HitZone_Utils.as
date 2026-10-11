@@ -34,25 +34,107 @@ namespace utils_hit_zone
     }
 
     // A box hurtbox node under InAttachTo (a scene node, so it rides the transform it hangs off): a Silent, Kinematic
-    // Probe.Mars.HitZone probe with no filter, so it detects nothing and only sweeps filtering on that name find it.
-    // Returns the node entity, which links back to InZone.
+    // Probe.Mars.HitZone probe with no filter, so it detects nothing and only sweeps filtering on that name find it,
+    // registered through AttachHurtbox. Returns the node entity, which links back to InZone; invalid (after an ensure, with
+    // nothing created) when InZone is not live or InAttachTo is outside the zone's tree (see AttachHurtbox).
     FCk_Handle AddHurtbox_Box(FCk_Handle_HitZone& InZone, FCk_Handle_Transform& InAttachTo, FMars_HitZone_Hurtbox InHurtbox)
     {
+        if (ck::EnsureIfNot(ck::IsValid(InZone), "[HitZone] AddHurtbox_Box was given a zone that is not live"))
+        { return FCk_Handle(); }
+
+        const auto InZoneTree = Get_IsWithinZoneTree(InZone, InAttachTo);
+        if (ck::EnsureIfNot(InZoneTree,
+            f"[HitZone] [{InZone.ToString()}] AddHurtbox_Box rejected attach target [{InAttachTo.ToString()}]: the attach target is owned outside the zone's tree"))
+        { return FCk_Handle(); }
+
         auto Node = utils_scene_node::Create(InAttachTo, InHurtbox.LocalOffset);
-        FCk_Handle NodeEntity = Node;
 
         auto ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_HitZone);
         ProbeSpec.Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent)
                  .Set_MotionType(ECk_MotionType::Kinematic);
-        utils_probe::Add_Box(Node.As_Transform(), InHurtbox.HalfExtents, ProbeSpec);
+        auto Probe = utils_probe::Add_Box(Node.As_Transform(), InHurtbox.HalfExtents, ProbeSpec);
+
+        const auto Hurtbox = AttachHurtbox(InZone, Probe);
+        if (ck::Is_NOT_Valid(Hurtbox))
+        { utils_entity_lifetime::Request_DestroyEntity(Node); }
+
+        return Hurtbox;
+    }
+
+    // Registers InProbe, a live Probe.Mars.HitZone probe the caller created, as one of InZone's hurtboxes: a Link back to
+    // InZone on the probe's entity and a unique Hurtboxes entry, both written at composition time. The probe's
+    // lifetime-owner chain must reach InZone's entity or the zone entity's own lifetime owner (so a probe under a sibling
+    // of the zone, as a crawler leg's segments are, qualifies, and one from an unrelated tree does not); a zone owned
+    // directly by the transient entity accepts only probes below the zone itself. Registering the same probe on the same
+    // zone again returns it and changes nothing. A dead zone or probe, a probe of another name, a probe already linked to
+    // another zone, or one owned outside the zone's tree ensures and returns an invalid handle with nothing written.
+    FCk_Handle AttachHurtbox(FCk_Handle_HitZone& InZone, FCk_Handle_Probe InProbe)
+    {
+        if (ck::EnsureIfNot(ck::IsValid(InZone), "[HitZone] AttachHurtbox was given a zone that is not live"))
+        { return FCk_Handle(); }
+
+        FCk_Handle ProbeEntity = InProbe;
+        const auto ProbeIsLive = ck::IsValid(ProbeEntity) && ck::IsValid(ProbeEntity.As_Probe(ECk_SanityCheck::UnChecked));
+        if (ck::EnsureIfNot(ProbeIsLive, f"[HitZone] [{InZone.ToString()}] AttachHurtbox was given a probe that is not live"))
+        { return FCk_Handle(); }
+
+        const auto ProbeName = utils_probe::Get_Name(InProbe);
+        if (ck::EnsureIfNot(ProbeName == GameplayTags::Probe_Mars_HitZone,
+            f"[HitZone] [{InZone.ToString()}] AttachHurtbox rejected [{ProbeEntity.ToString()}]: its probe is named [{ProbeName.ToString()}], not [Probe.Mars.HitZone]"))
+        { return FCk_Handle(); }
+
+        if (ProbeEntity.Has_Fragment(FMars_Fragment_HitZone_Link))
+        {
+            const auto LinkedZone = ProbeEntity.Get_Fragment(FMars_Fragment_HitZone_Link).Zone;
+            if (ck::EnsureIfNot(LinkedZone == InZone,
+                f"[HitZone] [{InZone.ToString()}] AttachHurtbox rejected [{ProbeEntity.ToString()}]: it is already linked to zone [{LinkedZone.ToString()}]"))
+            { return FCk_Handle(); }
+
+            return ProbeEntity;
+        }
+
+        const auto InZoneTree = Get_IsWithinZoneTree(InZone, ProbeEntity);
+        if (ck::EnsureIfNot(InZoneTree,
+            f"[HitZone] [{InZone.ToString()}] AttachHurtbox rejected [{ProbeEntity.ToString()}]: its lifetime owners reach neither the zone's entity nor the zone's owner"))
+        { return FCk_Handle(); }
 
         auto Link = FMars_Fragment_HitZone_Link();
         Link.Zone = InZone;
-        NodeEntity.Add_Fragment(Link);
+        ProbeEntity.Add_Fragment(Link);
 
         // A composition-time write, like Add's.
-        InZone.Get_Fragment(FMars_Fragment_HitZone).Hurtboxes.Add(NodeEntity);
-        return NodeEntity;
+        InZone.Get_Fragment(FMars_Fragment_HitZone).Hurtboxes.AddUnique(ProbeEntity);
+        return ProbeEntity;
+    }
+
+    // Whether InEntity's lifetime-owner chain reaches InZone's entity, or the zone entity's own lifetime owner unless that
+    // owner is the transient entity (every top-level entity shares it). Stops at the transient entity.
+    bool Get_IsWithinZoneTree(const FCk_Handle_HitZone& InZone, FCk_Handle InEntity)
+    {
+        FCk_Handle ZoneEntity = InZone;
+        auto ZoneOwner = utils_entity_lifetime::Get_LifetimeOwner(ZoneEntity);
+        if (ck::IsValid(ZoneOwner) && utils_entity_lifetime::Get_IsTransientEntity(ZoneOwner))
+        { ZoneOwner = FCk_Handle(); }
+
+        // Bounds the walk should an ownership chain ever loop without passing the transient entity.
+        const int32 MaxChainDepth = 64;
+        FCk_Handle Current = InEntity;
+        for (int32 Depth = 0; Depth < MaxChainDepth && ck::IsValid(Current); ++Depth)
+        {
+            if (Current == ZoneEntity || (ck::IsValid(ZoneOwner) && Current == ZoneOwner))
+            { return true; }
+
+            if (utils_entity_lifetime::Get_IsTransientEntity(Current))
+            { return false; }
+
+            const auto Owner = utils_entity_lifetime::Get_LifetimeOwner(Current);
+            if (Owner == Current)
+            { return false; }
+
+            Current = Owner;
+        }
+
+        return false;
     }
 
     // The zone a swept or overlapped entity belongs to: the entity itself when it is a zone, else the zone its hurtbox

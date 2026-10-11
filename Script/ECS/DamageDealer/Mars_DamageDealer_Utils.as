@@ -28,11 +28,21 @@ namespace utils_damage_dealer
 
     // One melee swing, traced now: a sphere sweep along InSweep filtered on Probe.Mars.HitZone, Blocking world policy (a
     // wall in front of a hurtbox stops the swing) and Silent overlap notify (an aim query must not ping the hurtboxes),
-    // traced as InDealer's entity (its own bodies are skipped). A hurtbox hit is requested as damage through InDealer as
-    // InTemplate with the hit location and surface normal stamped; the dealer resolves the hurtbox to its zone. Returns
-    // the trace result: a miss is a default result whose HitKind reads Probe, so callers test the hit entity's validity.
+    // traced as InDealer's entity (its own bodies are skipped). The sweep also skips InSweep.IgnoredEntities and, when the
+    // dealer is itself a zone, that zone's own hurtboxes: they are child entities, which the trace's own-entity skip does
+    // not cover. A hurtbox hit is requested as damage through InDealer as InTemplate with the hit location and surface
+    // normal stamped; the dealer resolves the hurtbox to its zone. Returns the trace result: a miss is a default result
+    // whose HitKind reads Probe, so callers test the hit entity's validity.
     FCk_ShapeCast_Result Try_StrikeSweep(FCk_Handle_DamageDealer& InDealer, FMars_DamageDealer_Sweep InSweep, FMars_DamageEvent InTemplate)
     {
+        TArray<FCk_Handle> Ignored = InSweep.IgnoredEntities;
+        auto OwnZone = InDealer.As_HitZone(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(OwnZone))
+        {
+            for (auto Hurtbox : OwnZone.Get_Hurtboxes())
+            { Ignored.AddUnique(Hurtbox); }
+        }
+
         auto Settings = FCk_ShapeCast_Settings(
             InSweep.Start,
             InSweep.End,
@@ -40,6 +50,7 @@ namespace utils_damage_dealer
             GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_HitZone));
         Settings.Set_WorldHitPolicy(ECk_ProbeTrace_WorldHitPolicy::Blocking);
         Settings.Set_OverlapNotifyPolicy(ECk_ProbeResponse_Policy::Silent);
+        Settings.Set_IgnoredEntities(Ignored);
 
         const auto Result = utils_probe_trace::Request_SingleShapeTrace(InDealer, Settings);
         if (Result.Get_HitKind() != ECk_ProbeTrace_HitKind::Probe || ck::Is_NOT_Valid(Result.Get_HitEntity()))

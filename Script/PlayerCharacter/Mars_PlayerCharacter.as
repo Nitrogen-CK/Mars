@@ -90,6 +90,9 @@ class AMars_PlayerCharacter : AMars_Character
     // The player SM (UMars_SmState_Alive) and whether this copy started it (TryStartPlayerSm).
     private FCk_Handle_StateMachine _Sm;
     private bool _SmStarted = false;
+    // The player's entity and whether this copy composed its local damage receiver (TryConstructCombatReceiver).
+    private FCk_Handle _PlayerEntity;
+    private bool _ReceiverConstructed = false;
     // The body emote montage last played on this machine (Request_StopEmote ends it); null when none.
     private UAnimMontage _BodyEmoteMontage;
 
@@ -261,6 +264,8 @@ class AMars_PlayerCharacter : AMars_Character
                      .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
         auto BodyProbe = utils_body_probe::Create(PlayerTransform, FMars_BodyProbe_Spec(BodyProbeSpec, this));
         utils_handle::Set_DebugName(BodyProbe.H(), n"Player.Probe.Body");
+        _PlayerEntity = Player;
+        TryConstructCombatReceiver();
 
         auto DownedSpec = FCk_ByteAttribute_Spec(GameplayTags::ByteAttribute_Mars_Player_Downed, 0);
         DownedSpec.Set_MinMax(ECk_MinMax::MinMax).Set_MinValue(0).Set_MaxValue(1);
@@ -337,6 +342,53 @@ class AMars_PlayerCharacter : AMars_Character
         TryStartPlayerSm();
     }
 
+    // The local damage receiver, on the local host's own pawn only (utils_local_session; never a client's or a remote
+    // player's pawn): Health, the body zone, and a second capsule probe named Probe.Mars.HitZone registered as the zone's
+    // hurtbox. That capsule follows the movement capsule like the Probe.Mars.Player one (crouch and a blocked uncrouch
+    // included); the Probe.Mars.Player one stays for the volumes that filter on it. The combat-target tag goes on last,
+    // so nothing discovers a half-built receiver. Downing at zero Health is the state machine's decision
+    // (Mars_PlayerCharacter_Hfsm_Combat.as), not this actor's. Like TryStartPlayerSm it waits for local control, which
+    // only resolves after possession: called when the entity is ready, when the controller changes and every tick until
+    // it composes. One-shot: a rejected composition ensures once and is not retried.
+    private void TryConstructCombatReceiver()
+    {
+        if (_ReceiverConstructed || ck::Is_NOT_Valid(_PlayerEntity))
+        { return; }
+
+        if (utils_local_session::Get_IsLocalCombatWorld(GetWorld()) == false || Config.Combat.Enabled == ECk_EnableDisable::Disable)
+        { return; }
+
+        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(_PlayerEntity) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+        { return; }
+
+        _ReceiverConstructed = true;
+        auto Player = _PlayerEntity;
+        auto PlayerTransform = _PlayerEntity.As_Transform();
+
+        // Each Add ensures on its own rejection.
+        auto Health = utils_health::Add(Player, FMars_Health_Spec(Config.Combat.MaxHealth));
+        if (ck::Is_NOT_Valid(Health))
+        { return; }
+
+        auto Zone = utils_hit_zone::Add(Player, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
+        if (ck::Is_NOT_Valid(Zone))
+        { return; }
+
+        auto HurtboxProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_HitZone);
+        HurtboxProbeSpec.Set_MotionType(ECk_MotionType::Kinematic)
+                        .Set_ResponsePolicy(ECk_ProbeResponse_Policy::Silent);
+        auto HurtboxProbe = utils_body_probe::Create(PlayerTransform, FMars_BodyProbe_Spec(HurtboxProbeSpec, this));
+        if (ck::Is_NOT_Valid(HurtboxProbe))
+        { return; }
+
+        utils_handle::Set_DebugName(HurtboxProbe.H(), n"Player.Probe.Hurtbox");
+        auto Hurtbox = utils_hit_zone::AttachHurtbox(Zone, HurtboxProbe.H().As_Probe());
+        if (ck::Is_NOT_Valid(Hurtbox))
+        { return; }
+
+        utils_entity_tag::Add(Player, n"TAG_MarsCombatTarget");
+    }
+
     // The owning client (or the listen host, for its own pawn) is the SM's only start authority. Called when the entity is
     // ready, when the controller changes, and every tick until it starts: local control only resolves a few frames after
     // possession. One-shot.
@@ -356,12 +408,14 @@ class AMars_PlayerCharacter : AMars_Character
     void ControllerChanged(AController OldController, AController NewController)
     {
         TryStartPlayerSm();
+        TryConstructCombatReceiver();
     }
 
     UFUNCTION(BlueprintOverride)
     void Tick(float DeltaSeconds)
     {
         TryStartPlayerSm();
+        TryConstructCombatReceiver();
         EmitSurfaceFx();
     }
 

@@ -127,7 +127,7 @@ struct FMars_Fragment_HitZone_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by UMars_Processor_HitZone_HandleRequests, Add and AddHurtbox_Box (composition).
+// Written only by UMars_Processor_HitZone_HandleRequests, Add and AttachHurtbox (composition).
 struct FMars_Fragment_HitZone
 {
     // The zone entity's own Health.

@@ -239,7 +239,8 @@ class UMars_SmTask_ItemUse_Strike : UCk_SmTask_EntityScript
         Template.Source.Causer = _Item;
         Template.Hit.Impulse = Forward * k_ImpulseSpeed;
 
-        // The dealer is the player's entity, so the sweep skips the player's own bodies.
+        // The dealer is the player's entity: the sweep skips that entity's own bodies and its own zone's hurtboxes, not the
+        // rest of the player's ownership tree.
         utils_damage_dealer::Try_StrikeSweep(_Dealer, FMars_DamageDealer_Sweep(Start, Start + Forward * _Reach, _Radius), Template);
     }
 }

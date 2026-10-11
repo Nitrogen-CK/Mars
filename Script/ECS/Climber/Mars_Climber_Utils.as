@@ -73,6 +73,13 @@ mixin bool Get_HasCandidate(const FCk_Handle_Climber& Self)
     return Self.Get_Fragment(FMars_Fragment_Climber).Candidates.Num() > 0;
 }
 
+// True until the request drain has run: climbing and the last dismount still describe the climber before the queued
+// requests.
+mixin bool Get_HasPendingRequests(const FCk_Handle_Climber& Self)
+{
+    return Self.Has_Fragment(FMars_Fragment_Climber_Requests);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
