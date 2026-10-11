@@ -1,3 +1,16 @@
+namespace mars
+{
+    // A food for the kernels' tests: the rig's box, batterable (its battered variant is the box itself). Only its
+    // definition is read; nothing dresses it.
+    asset Food_TestBatterableBox_Mars of UMars_Food_Def
+    {
+        Data.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"));
+        Data.MassKg = 0.08;
+        Data.Kind.AddTag(GameplayTags::Food_Vegetable_Mushroom);
+        Visuals.Battered.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"));
+    }
+}
+
 // The FoodPiece rig. Pieces are built under the world's transient entity, where the kernel puts their halves, tracked for
 // cleanup and recorded: every OnReady, OnFailed and OnCutResolved, and a Cut's halves are tracked and recorded as they
 // arrive. The box fixture is a CPU-readable 1000 cm3 cube; tests place their planes from its metrics.
@@ -25,6 +38,15 @@ class UMars_AutoTestRig_FoodPiece : UCk_AutoTest_Base
         auto Spec = FMars_FoodPiece_Spec();
         Spec.Data.MassKg = InMassKg;
         Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
+        return Spec;
+    }
+
+    // Make_Spec as a piece of InFood (its definition and its kind).
+    protected FMars_FoodPiece_Spec Make_FoodSpec(float InMassKg, UMars_Food_Def InFood) const
+    {
+        auto Spec = Make_Spec(InMassKg);
+        Spec.Data.Definition = TWeakObjectPtr<UMars_Food_Def>(InFood);
+        Spec.Data.Kind = InFood.Data.Kind;
         return Spec;
     }
 

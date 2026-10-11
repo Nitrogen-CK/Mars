@@ -23,9 +23,13 @@ namespace constants_station
     const float32 k_BurstSize = 0.35f;
     const float32 k_BurstColorIntensity = 0.8f;
     const float32 k_BurstPlaybackSpeed = 1.6f;
+
+    // The scene node under a piece that carries its battered shell (utils_station::Write_PieceLook).
+    const FName k_BatteredShellTag = n"TAG_MarsBatteredShell";
 }
 
-// The station's record of one piece its kernel admitted. The piece wears its own display; the station adds no part to it.
+// The station's record of one piece its kernel admitted. The piece wears its own display (or, battered, its food's battered
+// shell); the station adds no part of its own to it.
 struct FMars_Station_PieceDisplay
 {
     UPROPERTY()
@@ -57,11 +61,8 @@ namespace utils_station
         Display.Entity = InPiece;
         Display.Piece = InPiece.As_FoodPiece();
         Display.CookState = utils_cookstate::Make_DisplayParams(Display.Piece.Get_CookState());
-        if (Display.Entity.Is_RuntimeMeshDisplay())
-        {
-            utils_cookstate::Request_Write(Display.Entity.As_RuntimeMeshDisplay(), Display.CookState);
-            Display.Written = Display.CookState;
-        }
+        if (Write_PieceLook(Display.Piece, Display.CookState))
+        { Display.Written = Display.CookState; }
 
         return Display;
     }
@@ -70,14 +71,88 @@ namespace utils_station
     // the last one. A piece without a display (a bare test piece) is legal and gets none.
     void Write_PieceDisplay(FMars_Station_PieceDisplay& InOutDisplay)
     {
-        if (InOutDisplay.Entity.Is_RuntimeMeshDisplay() == false)
-        { return; }
-
         if (utils_cookstate::Get_HasMovedBeyond(InOutDisplay.Written, InOutDisplay.CookState, constants_cookstate::k_WriteThreshold) == false)
         { return; }
 
-        utils_cookstate::Request_Write(InOutDisplay.Entity.As_RuntimeMeshDisplay(), InOutDisplay.CookState);
-        InOutDisplay.Written = InOutDisplay.CookState;
+        if (Write_PieceLook(InOutDisplay.Piece, InOutDisplay.CookState))
+        { InOutDisplay.Written = InOutDisplay.CookState; }
+    }
+
+    // The one place a piece's look (InLook, its 14 cook-state floats) reaches what the piece wears: its RuntimeMesh display,
+    // and, while it is a battered whole piece of a batterable food (utils_batter::Get_IsBatterable), the battered shell its
+    // food shows in the display's place: made, and the display hidden, the first time the look says battered. Every write
+    // reaches both, so the shell and the hidden display always carry the same block. False for a piece without a display
+    // (a bare test piece, or one not dressed yet), which wears nothing.
+    bool Write_PieceLook(FCk_Handle_FoodPiece InPiece, const FMars_CookState& InLook)
+    {
+        FCk_Handle Entity = InPiece;
+        if (Entity.Is_RuntimeMeshDisplay() == false)
+        { return false; }
+
+        auto Display = Entity.As_RuntimeMeshDisplay();
+        utils_cookstate::Request_Write(Display, InLook);
+
+        if (InLook.Battered < 0.5f || utils_batter::Get_IsBatterable(InPiece) == false)
+        { return true; }
+
+        auto Shell = TryGet_BatteredShell(InPiece);
+        if (ck::Is_NOT_Valid(Shell))
+        { Shell = Add_BatteredShell(InPiece, Display); }
+
+        if (ck::IsValid(Shell))
+        { utils_cookstate::Request_WriteComponent(Shell, InLook); }
+
+        return true;
+    }
+
+    // The battered shell Write_PieceLook made under InPiece; invalid while it wears none.
+    FCk_Handle_UnrealComponent TryGet_BatteredShell(FCk_Handle_FoodPiece InPiece)
+    {
+        FCk_Handle Entity = InPiece;
+        for (auto Dependent : utils_entity_lifetime::Get_LifetimeDependents(Entity))
+        {
+            if (ck::Is_NOT_Valid(Dependent) || utils_entity_tag::Has(Dependent, constants_station::k_BatteredShellTag) == false)
+            { continue; }
+
+            const auto Components = utils_unreal_component::Get_AllHandles(Dependent);
+            if (Components.Num() > 0)
+            { return Components[0]; }
+        }
+
+        return FCk_Handle_UnrealComponent();
+    }
+
+    // InPiece's food's battered mesh on a tagged scene node under the piece at its pivot offset (no collision: the piece's
+    // RuntimeMesh stays its body), and InDisplay hidden. A battered mesh that does not load ensures, and the piece keeps
+    // showing its display.
+    FCk_Handle_UnrealComponent Add_BatteredShell(FCk_Handle_FoodPiece InPiece, FCk_Handle_RuntimeMeshDisplay InDisplay)
+    {
+        const UMars_Food_Def Food = InPiece.Get_Definition().Get();
+        const auto Battered = Food.Visuals.Battered;
+        auto Mesh = System::LoadAsset_Blocking(Battered.Mesh);
+        if (ck::EnsureIfNot(ck::IsValid(Mesh),
+            f"[Station] [{Food.GetName()}] battered mesh [{Battered.Mesh.ToSoftObjectPath().ToString()}] did not load: piece [{InPiece.ToString()}] keeps its display"))
+        { return FCk_Handle_UnrealComponent(); }
+
+        FCk_Handle Entity = InPiece;
+        auto Node = utils_scene_node::Create(Entity.As_Transform(), FTransform(FRotator::ZeroRotator, Battered.PivotOffset));
+        utils_entity_tag::Add(Node.H(), constants_station::k_BatteredShellTag);
+
+        // A template the hosted component is instanced from; nothing keeps it once it has been.
+        auto Archetype = NewObject(GetTransientPackage(), UStaticMeshComponent);
+        // Movable: the component is registered first and then follows the piece.
+        Archetype.SetMobility(EComponentMobility::Movable);
+        Archetype.SetStaticMesh(Mesh);
+        for (int32 Slot = 0; Slot < Battered.Materials.Num(); ++Slot)
+        { Archetype.SetMaterial(Slot, System::LoadAsset_Blocking(Battered.Materials[Slot])); }
+        Archetype.SetCollisionProfileName(collision::profile::NoCollision);
+
+        const auto Params = utils_unreal_component::Make_Params_FromArchetype(Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"Food_BatteredShell");
+        const auto Shell = utils_unreal_component::Add(Node.H(), Params);
+
+        auto Display = InDisplay;
+        Display.Request_SetVisibility(FCk_Request_RuntimeMeshDisplay_SetVisibility(ECk_EnableDisable::Disable), FCk_Delegate_Request_OnCompleted());
+        return Shell;
     }
 
     // One reused burst component: spawned at the first call whose template is ready (a cold template never stalls the game
@@ -141,8 +216,8 @@ struct FMars_FeedStation_DockLayout
     FMars_FeedStation_DockSpot Output;
 }
 
-// The base of a station whose entity carries a CookingFeed beside its own kernel (the searing, fry, cutting and tumbler
-// stations):
+// The base of a station whose entity carries a CookingFeed beside its own kernel (the searing, fry, cutting, tumbler and
+// batter stations):
 // the assembly every one of them shares. It composes, after the base station and the kernel (Compose_Kernel), the feed
 // (its release node, its glove's hand node and the hand geometry the feed moves that node by, Add_FeedHand) and the two
 // docks (Get_DockLayout) with their markers; it runs the dressing tick (the left glove's pose override, then the

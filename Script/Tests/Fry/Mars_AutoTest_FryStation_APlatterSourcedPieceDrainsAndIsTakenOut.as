@@ -25,6 +25,7 @@ class UMars_AutoTest_FryStation_APlatterSourcedPieceDrainsAndIsTakenOut : UMars_
         _Raw = Spawn_Platter(InHandle, k_RawOffset, nullptr);
         _Tray = Spawn_Platter(InHandle, k_TrayOffset, nullptr);
         _Box = Build_Box(FTransform(FRotator::ZeroRotator, _Origin + k_RawOffset + FVector(0.0, 0.0, 60.0)), GameplayTags::Food_Meat_Beef);
+        Batter_Ledger(_Box);
 
         Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", 0, 0);
         Add_Step_WaitUntil("both platters are constructed and the box is Ready", n"Check_PlattersAndBoxReady", k_SlowPolls, 0);
@@ -160,5 +161,14 @@ class UMars_AutoTest_FryStation_APlatterSourcedPieceDrainsAndIsTakenOut : UMars_
     private void OnBoxDrained(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId)
     {
         _Drained.Add(InPieceId);
+    }
+
+    // The fryer admits only battered pieces: the box arrives as the batter station's take-out hands one back.
+    private void Batter_Ledger(FCk_Handle_FoodPiece InBox)
+    {
+        auto Box = InBox;
+        auto CookState = Box.Get_CookState();
+        CookState.Battered = 1.0f;
+        Box.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 }

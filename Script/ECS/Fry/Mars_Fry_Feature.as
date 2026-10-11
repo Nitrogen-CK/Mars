@@ -6,7 +6,7 @@ asset Mars_FryHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Fry";
     RequiredFragments.Add(FMars_Feature_Fry);
-    Description = "A frying minigame on a station: admitted battered pieces (dynamic bodies keyed by their feed identity) that float, tumble and fry face by face below the oil line, a skimmer (a kinematic body) the operator dips, carries and pours, and a fixed drain basket outside the oil where a supported piece drains";
+    Description = "A frying minigame on a station: admitted battered pieces (only pieces the batter station coated; dynamic bodies keyed by their feed identity) that float, tumble and fry face by face below the oil line, a skimmer (a kinematic body) the operator dips, carries and pours, and a fixed drain basket outside the oil where a supported piece drains";
 }
 struct FMars_Feature_Fry {}
 
@@ -41,6 +41,17 @@ enum EMars_Fry_Drain
     NotDraining,
     Draining,
     Drained
+}
+
+// Why a release from the station's inbox was not admitted. Unavailable: the scoop or basket body is not in the simulation
+// yet, no piece, not Ready, already in play, held by another ledger, still attached, or released in a drain that also
+// reset. NotBattered: its ledger is not battered (the fryer fries only what the batter station coated). Full:
+// Supply.MaxPieces pieces are in play.
+enum EMars_Fry_AdmissionRefusal
+{
+    Unavailable,
+    NotBattered,
+    Full
 }
 
 // The skimmer's commanded pose: Carry level at carry height; Dip level below the oil line (under a floating piece), only
@@ -653,6 +664,10 @@ event void FMars_Delegate_Fry_OnPieceTakenOut_MC(FCk_Handle_Fry InFry, FMars_Coo
 delegate void FMars_Delegate_Fry_OnTakeOutRefused(FCk_Handle_Fry InFry, EMars_CookingFeed_TakeOutRefusal InRefusal);
 event void FMars_Delegate_Fry_OnTakeOutRefused_MC(FCk_Handle_Fry InFry, EMars_CookingFeed_TakeOutRefusal InRefusal);
 
+// A release the fryer would not take (right after the station's OnAdmission answered Rejected), and why.
+delegate void FMars_Delegate_Fry_OnAdmissionRefused(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_AdmissionRefusal InRefusal);
+event void FMars_Delegate_Fry_OnAdmissionRefused_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_AdmissionRefusal InRefusal);
+
 struct FMars_Fragment_Fry_Signals
 {
     FMars_Delegate_Fry_OnDriveChanged_MC OnDriveChanged;
@@ -665,6 +680,7 @@ struct FMars_Fragment_Fry_Signals
     FMars_Delegate_Fry_OnSkimRefused_MC OnSkimRefused;
     FMars_Delegate_Fry_OnPieceTakenOut_MC OnPieceTakenOut;
     FMars_Delegate_Fry_OnTakeOutRefused_MC OnTakeOutRefused;
+    FMars_Delegate_Fry_OnAdmissionRefused_MC OnAdmissionRefused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

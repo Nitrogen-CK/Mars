@@ -284,7 +284,8 @@ namespace utils_fry
     }
 
     // The cook state InPiece's heat makes of InSeed (the state the piece arrived with): the batter heats are its faces'
-    // heat (0 pale, 1 golden, 2 burnt); every other channel is the seed's.
+    // heat (0 pale, 1 golden, 2 burnt); every other channel is the seed's (its dip, Battered, included: the batter station
+    // wrote it, the fryer only admits it).
     FMars_FoodPiece_CookState Get_CookState(const FMars_Fry_PieceState& InPiece, const FMars_FoodPiece_CookState& InSeed)
     {
         auto CookState = InSeed;
@@ -812,6 +813,20 @@ mixin void UnbindFrom_OnPieceTakenOut(FCk_Handle_Fry& Self, FMars_Delegate_Fry_O
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceTakenOut.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnAdmissionRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnAdmissionRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Fry_Signals);
+    Fragment.OnAdmissionRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnAdmissionRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnAdmissionRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnAdmissionRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnTakeOutRefused(FCk_Handle_Fry& Self, FMars_Delegate_Fry_OnTakeOutRefused InDelegate)

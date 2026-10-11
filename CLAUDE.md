@@ -290,3 +290,16 @@ These are maintainer rulings; they override defaults from the framework skills w
   with `utils_fphands::Make_GripRotation(hand, fingers, palm)`, never a raw `MakeFromXZ`, so the call site states where the
   fingers point and what the palm faces. A changed glove pose is done only once it has been seen in PIE; no lane sees it.
 - **Surfaces** use the CkUsf ProtoGrid material instances under `/Game/Mars/Materials/ProtoGrid`.
+
+### Prep standard for cuttable meat
+
+A meat (`Food.Meat`) goes to the cutting bench and then the pan, and every cut piece must sear and look like the old cube:
+- **Mesh:** one closed solid, CPU access on, under RuntimeMesh's ceiling (<= 2048 LOD0 render vertices, <= 4096 tris); box-like,
+  its six faces near its local axes (the pan's six-face sear model reads the local axes), pivot at its base centre.
+- **Paint:** vertex colours RGB = albedo, A = cavity; UV0 = the mask; UV1/UV2 optional raw-to-cooked morph.
+- **Materials:** every cooking slot and the cap wear an instance on the food master (`Food_Mars_M` or `Meat_Mars_M`), never
+  `Accent_Mars_M` (only a named Bone/Horn accent slot may); the cap slot is the one after the last section, and the cap
+  colour is the cut flesh, alpha > 0.
+- **Order:** cuts happen only before cooking (the bench takes whole joints). Script enforces what it can headless:
+  `UMars_Food_Def::Validate_CookLook` and `FoodDef_EveryMeatFoodReadsTheCookState`. The full authoring contract and
+  pipeline for a new searable mesh is [Script/ECS/Searing/GUIDELINE.md](Script/ECS/Searing/GUIDELINE.md).

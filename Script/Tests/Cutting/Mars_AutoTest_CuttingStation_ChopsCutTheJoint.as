@@ -8,7 +8,7 @@ class UMars_AutoTest_CuttingStation_ChopsCutTheJoint : UMars_AutoTestRig_Cutting
 {
     private const FVector k_Origin = FVector(12000.0, -9000.0, -30000.0);
     private const float32 k_SecondChopLateral = 8.0f;
-    private const float64 k_SlabVolumeCm3 = 6927.34;
+    private const float64 k_SlabVolumeCm3 = 7561.07;
     private const float64 k_SeparationCm = 1.5;
 
     private FCk_Handle_FoodPiece _Joint;

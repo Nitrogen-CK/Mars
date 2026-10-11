@@ -329,7 +329,7 @@ class UMars_AutoTest_Player_FocusTakesTheNearestHitAndNestedPriorityOnly : UMars
         { _SlabHitCm = Distance; }
     }
 
-    // Spawn_Slab with the slab turned a quarter about Z: its 36.8 cm long side along the large tray's 44.5 cm one fits between
+    // Spawn_Slab with the slab turned a quarter about Z: its 36.6 cm long side along the large tray's 44.5 cm one fits between
     // the platter's walls, where along the 37.3 cm side it would not.
     private FCk_Handle Spawn_SlabAlongY(FVector InLocal)
     {

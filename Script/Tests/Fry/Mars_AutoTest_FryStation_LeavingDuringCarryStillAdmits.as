@@ -29,6 +29,7 @@ class UMars_AutoTest_FryStation_LeavingDuringCarryStillAdmits : UMars_AutoTestRi
         {
             const auto BoxWorld = FTransform(FRotator::ZeroRotator, k_Origin + k_RawOffset + FVector(0.0, 20.0 * float64(Index), 50.0));
             _Boxes.Add(Build_Box(BoxWorld, GameplayTags::Food_Meat_Beef));
+            Batter_Ledger(_Boxes.Last());
         }
 
         Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", 0, 0);
@@ -174,5 +175,14 @@ class UMars_AutoTest_FryStation_LeavingDuringCarryStillAdmits : UMars_AutoTestRi
 
             Assert_True(Box.TryGet_Platter() == Raw, f"[{Box.ToString()}] is still on the raw platter");
         }
+    }
+
+    // The fryer admits only battered pieces: the box arrives as the batter station's take-out hands one back.
+    private void Batter_Ledger(FCk_Handle_FoodPiece InBox)
+    {
+        auto Box = InBox;
+        auto CookState = Box.Get_CookState();
+        CookState.Battered = 1.0f;
+        Box.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 }

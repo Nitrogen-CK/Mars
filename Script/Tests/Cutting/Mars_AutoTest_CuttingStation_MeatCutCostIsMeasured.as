@@ -1,4 +1,4 @@
-// What a cut of the 636-triangle meat slab costs, measured through the real station: three chops (the board's centre, then 8
+// What a cut of the 644-triangle meat slab costs, measured through the real station: three chops (the board's centre, then 8
 // cm either side, each cutting one piece). RuntimeMesh's drain has no profiler scope and AngelScript no high-resolution clock,
 // so both readings are FDateTime::UtcNow wall-clock (millisecond resolution) in a headless editor:
 // - the bracket: three marker slices of the 12-triangle box are queued as the board issues the cut, so the last one drains

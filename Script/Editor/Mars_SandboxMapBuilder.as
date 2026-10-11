@@ -155,6 +155,14 @@ void Mars_PlaceSandboxTumblerStationFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxTumblerStationCommand("Mars.Sandbox.PlaceTumblerStation", n"Mars_PlaceSandboxTumblerStationFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxBatterStationFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceBatterStation();
+}
+
+const FConsoleCommand Mars_PlaceSandboxBatterStationCommand("Mars.Sandbox.PlaceBatterStation", n"Mars_PlaceSandboxBatterStationFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxPlattersFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlacePlatters();
@@ -195,6 +203,7 @@ namespace utils_mars_sandbox
     const FString k_SearingStationLabel = "Sandbox_SearingStation";
     const FString k_FryStationLabel = "Sandbox_FryStation";
     const FString k_TumblerStationLabel = "Sandbox_TumblerStation";
+    const FString k_BatterStationLabel = "Sandbox_BatterStation";
     const FString k_PlatterLargeLabel = "Sandbox_Platter_Large";
     const FString k_PlatterSmallLabel = "Sandbox_Platter_Small";
     const FString k_FoodMeatSlabLabel = "Sandbox_Food_MeatSlab";
@@ -259,6 +268,7 @@ namespace utils_mars_sandbox
         Spawn_SearingStation();
         Spawn_FryStation();
         Spawn_TumblerStation();
+        Spawn_BatterStation();
         Spawn_Gauntlets();
 
         Apply_ProtoGridMaterials();
@@ -519,6 +529,22 @@ namespace utils_mars_sandbox
     void Spawn_TumblerStation()
     {
         Spawn_Mechanism(UMars_TumblerStation_EntityScript, FMars_MapBuilder_Placement(k_TumblerStationLabel, FVector(0.0, -1600.0, 0.0)));
+    }
+
+    void PlaceBatterStation()
+    {
+        const FString Command = "Mars.Sandbox.PlaceBatterStation";
+        if (Get_CanAdd(Command, k_BatterStationLabel, "Delete it first to re-place.") == false)
+        { return; }
+
+        Spawn_BatterStation();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // On the fry station's other side, 400 uu toward -X, so the batter bowl, the fryer and the tumbler line up along X.
+    void Spawn_BatterStation()
+    {
+        Spawn_Mechanism(UMars_BatterStation_EntityScript, FMars_MapBuilder_Placement(k_BatterStationLabel, FVector(-800.0, -1600.0, 0.0)));
     }
 
     void PlacePlatters()

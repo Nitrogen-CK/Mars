@@ -197,12 +197,14 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         _OutputDock.Request_Dock(FMars_Request_PlatterDock_Dock(_OutputPlatterItem));
     }
 
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with no kind and no definition: Transform, RuntimeMesh
-    // and FoodPiece on a new entity under the world's transient entity, tracked for cleanup.
+    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) as beef (the bench's input dock takes meat only) with
+    // no definition: Transform, RuntimeMesh and FoodPiece on a new entity under the world's transient entity, tracked for
+    // cleanup.
     protected FCk_Handle_FoodPiece Build_Box(FTransform InWorld)
     {
         auto Spec = FMars_FoodPiece_Spec();
         Spec.Data.MassKg = 0.8;
+        Spec.Data.Kind.AddTag(GameplayTags::Food_Meat_Beef);
         Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
 
         auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
@@ -256,10 +258,11 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         _Cutting.Request_Nudge(FMars_Request_Cutting_Nudge(InLateral - _Cutting.Get_HandLateral()));
     }
 
-    // Poses InPiece on the board's pile node, InOffsetCm in the node's frame, unscaled (the station must be composed).
-    protected void Pose_OnPile(FCk_Handle_FoodPiece InPiece, FVector InOffsetCm)
+    // Poses InPiece on the board's pile node, InOffsetCm in the node's frame and yawed InYawDegrees about it (a food's
+    // Layout.YawDegrees lays it as the feed would), unscaled (the station must be composed).
+    protected void Pose_OnPile(FCk_Handle_FoodPiece InPiece, FVector InOffsetCm, float64 InYawDegrees = 0.0)
     {
-        const auto PoseWorld = FTransform(FRotator::ZeroRotator, InOffsetCm) * _Board.Get_PileNodeWorld();
+        const auto PoseWorld = FTransform(FRotator(0.0, InYawDegrees, 0.0), InOffsetCm) * _Board.Get_PileNodeWorld();
         FCk_Handle Entity = InPiece;
         auto PieceTransform = Entity.As_Transform();
         utils_transform::Request_SetLocation(PieceTransform, FCk_Request_Transform_SetLocation(PoseWorld.GetLocation()));

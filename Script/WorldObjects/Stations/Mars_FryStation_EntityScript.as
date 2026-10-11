@@ -8,7 +8,8 @@
 // entity draws the pieces of the docked raw platter, and its station-feed tasks turn the operator's add-food press into a
 // left-hand transfer (the feed moves the glove node it carries the real piece under; the hand reaches for the reserved
 // piece where it lies) whose release over the oil lands in the station's admission inbox and the Fry kernel admits (the
-// piece itself, wearing its own display, on a dynamic body); the kernel lands every piece it hands back on the docked
+// piece itself, wearing its own display, on a dynamic body) only when the batter station has battered it (an unbattered
+// piece is refused and goes back, the label saying why); the kernel lands every piece it hands back on the docked
 // finished tray and readopts one the tray refuses. The base builds the feed's nodes and the docks and keeps the label; this
 // script builds the fryer and, every frame, keeps every piece's record from the Fry state. While operating, the right glove
 // holds the skimmer's grip bar (riding its slide, dip and pour roll) and the left follows the feed node, resting in front of
@@ -182,6 +183,7 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
         _FryHandle.BindTo_OnPieceAdded(FMars_Delegate_Fry_OnPieceAdded(this, n"OnPieceAdded"));
         _FryHandle.BindTo_OnTakeOutRefused(FMars_Delegate_Fry_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         _FryHandle.BindTo_OnSkimRefused(FMars_Delegate_Fry_OnSkimRefused(this, n"OnSkimRefused"));
+        _FryHandle.BindTo_OnAdmissionRefused(FMars_Delegate_Fry_OnAdmissionRefused(this, n"OnAdmissionRefused"));
         return true;
     }
 
@@ -194,6 +196,7 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
             _FryHandle.UnbindFrom_OnPieceAdded(FMars_Delegate_Fry_OnPieceAdded(this, n"OnPieceAdded"));
             _FryHandle.UnbindFrom_OnTakeOutRefused(FMars_Delegate_Fry_OnTakeOutRefused(this, n"OnTakeOutRefused"));
             _FryHandle.UnbindFrom_OnSkimRefused(FMars_Delegate_Fry_OnSkimRefused(this, n"OnSkimRefused"));
+            _FryHandle.UnbindFrom_OnAdmissionRefused(FMars_Delegate_Fry_OnAdmissionRefused(this, n"OnAdmissionRefused"));
         }
 
         // The pieces wear their own displays; only the records go.
@@ -271,6 +274,12 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
         Layout.Input = FMars_FeedStation_DockSpot(InputDockLocal, FText::FromString("raw platter"), n"FryStation_InputDockMarker");
         Layout.Output = FMars_FeedStation_DockSpot(OutputDockLocal, FText::FromString("finished tray"), n"FryStation_OutputDockMarker");
         return Layout;
+    }
+
+    // The fryer's one gate on an add-food press: nothing battered on the raw platter (UMars_SmTask_FryFeed_OperatorInput).
+    protected FString Get_StationGateText() const override
+    {
+        return "not battered: batter it first";
     }
 
     // The pot's floor disc and its wall, all BlockAll: the static world the physics mirrors, so a piece flung against the
@@ -530,5 +539,24 @@ class UMars_FryStation_EntityScript : UMars_FeedStation_EntityScript
         }
 
         Flash_Refusal("dip in the oil");
+    }
+
+    // The piece went back to the raw platter: the label says why.
+    UFUNCTION()
+    private void OnAdmissionRefused(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_AdmissionRefusal InRefusal)
+    {
+        if (InRefusal == EMars_Fry_AdmissionRefusal::NotBattered)
+        {
+            Flash_Refusal("not battered: batter it first");
+            return;
+        }
+
+        if (InRefusal == EMars_Fry_AdmissionRefusal::Full)
+        {
+            Flash_Refusal("fryer full");
+            return;
+        }
+
+        Flash_Refusal("not now");
     }
 }

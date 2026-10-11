@@ -1,9 +1,11 @@
-// The fry station's heat reaches the piece's own display. A platter with a mushroom slice (dressed by the platter with its
-// food's display) docks on the raw platter dock; an operator takes the station and one add-food press carries the slice
-// into the oil. Once a face has heated past 0.05, at a frame a write lands (or the heat has stopped), the slice's display
-// carries the kernel's six face heats in slots 0..5 and their mean, the batter's fry, in slot 10, within 0.03. The display
-// follows on edges, never per frame: over a run of frames every change it shows is a jump of at least the write threshold
-// in some slot, and frames whose heat moved by less show the same values as the frame before.
+// The fry station's heat reaches the piece's own display. A platter with a whole mushroom (a prep food with a battered
+// variant, dressed by the platter with its food's display) docks on the raw platter dock, its ledger battered as the batter
+// station's take-out leaves it; an operator takes the station and one add-food press carries it into the oil. Admitted
+// battered, it comes to wear its food's battered shell, its display hidden. Once a face has heated past 0.05, at a frame a
+// write lands (or the heat has stopped), the mushroom's display carries the kernel's six face heats in slots 0..5 and their
+// mean, the batter's fry, in slot 10, within 0.03. The display follows on edges, never per frame: over a run of frames every
+// change it shows is a jump of at least the write threshold in some slot, and frames whose heat moved by less show the
+// same values as the frame before.
 class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTestRig_HeatStation
 {
     private const FVector k_Origin = FVector(16000.0, -12000.0, -30000.0);
@@ -22,7 +24,7 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     private const int32 k_SlowPolls = 900;
 
     private FCk_Handle _Raw;
-    private FCk_Handle_FoodPiece _Slice;
+    private FCk_Handle_FoodPiece _Mushroom;
     private FMars_CookingFeed_PieceId _PieceId;
     // The last poll's display slots and kernel face heats (empty before the first poll).
     private TArray<float32> _PolledSlots;
@@ -41,19 +43,20 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Fry(InHandle, k_Origin, FMars_CookingFeed_TimingSpec());
-        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MushroomSlice());
+        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_Mushroom());
 
         Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", k_SlowPolls, 0);
-        Add_Step_WaitUntil("the platter is constructed and the slice landed on it", n"Check_PlatterReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the platter is constructed and the mushroom landed on it", n"Check_PlatterReady", k_SlowPolls, 0);
         Add_Step("dock the mushroom platter as raw", n"Step_Dock");
         Add_Step_WaitUntil("the platter is docked and arrived", n"Check_Docked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
         Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", k_SlowPolls, 0);
         Add_Step("one add-food press", n"Step_BeginTransfer");
-        Add_Step_WaitUntil("the kernel admitted the slice", n"Check_Admitted", k_SlowPolls, 0);
-        Add_Step("the fryer holds the slice, which wears its own display", n"Step_AssertAdmitted");
+        Add_Step_WaitUntil("the kernel admitted the mushroom", n"Check_Admitted", k_SlowPolls, 0);
+        Add_Step("the fryer holds the mushroom, which wears its own display", n"Step_AssertAdmitted");
+        Add_Step_WaitUntil("the battered mushroom wears its shell in its display's place", n"Check_WearsShell", k_SlowPolls, 0);
         Add_Step_WaitUntil("a face heated past 0.05 and the display caught up", n"Check_DisplayCaughtUp", k_SlowPolls, 0);
-        Add_Step("the slice's display carries its face heats and its fry", n"Step_AssertDisplayCarriesTheHeat");
+        Add_Step("the mushroom's display carries its face heats and its fry", n"Step_AssertDisplayCarriesTheHeat");
         Add_Step_WaitUntil("a run of frames in the oil", n"Check_EdgeWindow", k_SlowPolls, 0);
         Add_Step("the display changed only on edges", n"Step_AssertEdgesOnly");
         Run_Steps(InHandle);
@@ -70,7 +73,8 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     private void Step_Dock(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Track_Held(_Raw);
-        _Slice = _Raw.As_Platter().Get_Held()[0];
+        _Mushroom = _Raw.As_Platter().Get_Held()[0];
+        Batter_Ledger(_Mushroom);
         Dock(_InputDock, _Raw);
     }
 
@@ -99,10 +103,20 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     private void Step_AssertAdmitted(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _PieceId = Get_PieceIds()[0];
-        Assert_True(Get_PieceHandle(_PieceId) == _Slice, "the fryer holds the slice from the raw platter");
+        Assert_True(Get_PieceHandle(_PieceId) == _Mushroom, "the fryer holds the mushroom from the raw platter");
 
-        FCk_Handle Entity = _Slice;
-        Assert_True(Entity.Is_RuntimeMeshDisplay(), "the slice wears its own display");
+        FCk_Handle Entity = _Mushroom;
+        Assert_True(Entity.Is_RuntimeMeshDisplay(), "the mushroom wears its own display");
+    }
+
+    UFUNCTION()
+    private void Check_WearsShell(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        FCk_Handle Entity = _Mushroom;
+        const auto Shell = utils_station::TryGet_BatteredShell(_Mushroom);
+        auto Res = OutResult;
+        Res.Set(Entity.Is_RuntimeMeshDisplay() && Entity.As_RuntimeMeshDisplay().Get_Visibility() == ECk_EnableDisable::Disable
+            && ck::IsValid(Shell) && ck::IsValid(utils_unreal_component::Get_Component(Shell)));
     }
 
     // Polled every frame. Passes once a face has heated past k_HeatedPast at a frame where a write has just landed (a slot
@@ -199,10 +213,10 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
         Assert_True(_HeldWhileHeating > 0, "a frame whose heat moved by less than the threshold shows the same values as the frame before");
     }
 
-    // The 13 cook-state slots of the slice's display (0 until it is Ready).
+    // The 13 cook-state slots of the mushroom's display (0 until it is Ready).
     private TArray<float32> Read_Slots() const
     {
-        FCk_Handle Entity = _Slice;
+        FCk_Handle Entity = _Mushroom;
         const auto Display = Entity.As_RuntimeMeshDisplay();
         auto Slots = TArray<float32>();
         for (int32 Index = 0; Index < k_SlotCount; ++Index)
@@ -228,5 +242,15 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
         { Largest = Math::Max(Largest, Math::Abs(InTo[Index] - InFrom[Index])); }
 
         return Largest;
+    }
+
+    // The fryer admits only battered pieces: the mushroom arrives as the batter station's take-out hands one back (its
+    // ledger battered, before the station dresses it again at the admission).
+    private void Batter_Ledger(FCk_Handle_FoodPiece InPiece)
+    {
+        auto Piece = InPiece;
+        auto CookState = Piece.Get_CookState();
+        CookState.Battered = 1.0f;
+        Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 }

@@ -1,6 +1,7 @@
-// The cooking materials' per-component float block (Custom Primitive Data 0..12): sear per face in the mesh's local axes
-// (0 raw, 1 full crust, 2 burnt), then the finish, then the crumb coating at 12. One struct and one writer for every cooking
-// mesh the project drives.
+// The cooking materials' per-component float block (Custom Primitive Data 0..13): sear per face in the mesh's local axes
+// (0 raw, 1 full crust, 2 burnt), then the finish, then the crumb coating at 12 and the batter dip at 13. One struct and one
+// writer for every cooking mesh the project drives. The contract a new searable mesh must meet (shape, paint, materials,
+// definition, pipeline) is Script/ECS/Searing/GUIDELINE.md.
 struct FMars_CookState
 {
     // Six, indexed by int32(EMars_Searing_Face): +X -X +Y -Y +Z -Z.
@@ -32,6 +33,10 @@ struct FMars_CookState
     UPROPERTY()
     float32 Crumb = 0.0f;
 
+    // 1 once the piece was dipped in batter, else 0.
+    UPROPERTY()
+    float32 Battered = 0.0f;
+
     FMars_CookState()
     {
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
@@ -50,7 +55,8 @@ namespace utils_cookstate
     // How a piece's ledger looks (InCookState, as its kernels wrote it): each face shows the more cooked of its sear (0..1)
     // and its batter heat (0..2), so a fried face stays golden on a pan and a seared one shows its crust in the oil; the
     // crust's penetration is the sears' sum (up to 1) and the silhouette their mean; the batter's fry is the batter heats'
-    // mean; the oil coat and the crumb are the ledger's. A station layers only its own dressing (its oil coat) on top.
+    // mean; the oil coat, the crumb and the batter dip are the ledger's. A station layers only its own dressing (its oil
+    // coat) on top.
     FMars_CookState Make_DisplayParams(const FMars_FoodPiece_CookState& InCookState)
     {
         auto Display = FMars_CookState();
@@ -72,11 +78,12 @@ namespace utils_cookstate
         Display.Fry = BatterSum / float32(utils_searing::k_FaceCount);
         Display.OilCoat = InCookState.OilCoat;
         Display.Crumb = InCookState.Crumb;
+        Display.Battered = InCookState.Battered;
         return Display;
     }
 
-    // Indices 0..12 as cooking_spec.py / FOOD_LIBRARY.md lay them out, as four Vector4 groups at 0, 4, 8 and 12. Expects six
-    // face sears; the writers check.
+    // Indices 0..13 as cooking_spec.py / FOOD_LIBRARY.md lay them out (the batter dip at 13), as four Vector4 groups at 0, 4,
+    // 8 and 12. Expects six face sears; the writers check.
     TArray<FCk_CustomPrimitiveData> Make_CustomPrimitiveData(const FMars_CookState& InState)
     {
         const auto& Sear = InState.FaceSear;
@@ -84,7 +91,7 @@ namespace utils_cookstate
         Data.Add(FCk_CustomPrimitiveData(0, FCk_CustomPrimitiveData_Value(FVector4(Sear[0], Sear[1], Sear[2], Sear[3]))));
         Data.Add(FCk_CustomPrimitiveData(4, FCk_CustomPrimitiveData_Value(FVector4(Sear[4], Sear[5], InState.Penetration, InState.OilCoat))));
         Data.Add(FCk_CustomPrimitiveData(8, FCk_CustomPrimitiveData_Value(FVector4(InState.Glaze, InState.Shape, InState.Fry, InState.Wet))));
-        Data.Add(FCk_CustomPrimitiveData(12, FCk_CustomPrimitiveData_Value(FVector4(InState.Crumb, 0.0, 0.0, 0.0))));
+        Data.Add(FCk_CustomPrimitiveData(12, FCk_CustomPrimitiveData_Value(FVector4(InState.Crumb, InState.Battered, 0.0, 0.0))));
         return Data;
     }
 
@@ -113,7 +120,19 @@ namespace utils_cookstate
         { utils_runtime_mesh_display::Request_SetCustomPrimitiveData(InDisplay, FCk_Request_RuntimeMeshDisplay_SetCustomPrimitiveData(Data)); }
     }
 
-    // True once any of the 13 floats differs by at least InThreshold.
+    // A hosted primitive component (a battered piece's shell) may not exist yet, so the write is deferred the same way: one
+    // request per group, applied once the component is set up.
+    void Request_WriteComponent(FCk_Handle_UnrealComponent InComponent, const FMars_CookState& InState)
+    {
+        if (ck::EnsureIfNot(InState.FaceSear.Num() == utils_searing::k_FaceCount,
+            f"[CookState] a component write needs {utils_searing::k_FaceCount} face sears (got {InState.FaceSear.Num()})"))
+        { return; }
+
+        for (const auto& Data : Make_CustomPrimitiveData(InState))
+        { utils_unreal_component::Request_SetCustomPrimitiveData(InComponent, FCk_Request_UnrealComponent_SetCustomPrimitiveData(Data)); }
+    }
+
+    // True once any of the 14 floats differs by at least InThreshold.
     bool Get_HasMovedBeyond(const FMars_CookState& InFrom, const FMars_CookState& InTo, float32 InThreshold)
     {
         if (ck::EnsureIfNot(InFrom.FaceSear.Num() == utils_searing::k_FaceCount && InTo.FaceSear.Num() == utils_searing::k_FaceCount,
@@ -132,6 +151,7 @@ namespace utils_cookstate
             || Math::Abs(InTo.Shape - InFrom.Shape) >= InThreshold
             || Math::Abs(InTo.Fry - InFrom.Fry) >= InThreshold
             || Math::Abs(InTo.Wet - InFrom.Wet) >= InThreshold
-            || Math::Abs(InTo.Crumb - InFrom.Crumb) >= InThreshold;
+            || Math::Abs(InTo.Crumb - InFrom.Crumb) >= InThreshold
+            || Math::Abs(InTo.Battered - InFrom.Battered) >= InThreshold;
     }
 }

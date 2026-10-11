@@ -9,9 +9,13 @@
 //                                                 grasp is committed, the feed's own rule), Fry_ResetOnEnter
 //                                                 (the skimmer parked and idle; the pieces stay in play)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Fry_DriveOnEnter (the skimmer is in hand), Fry_OperatorInput (Tick),
-//                                                 Fry_OperatorHints, StationFeed_Source, StationFeed_OperatorInput (Tick),
-//                                                 StationFeed_Bridge, StationFeed_OperatorHints,
+//                                                 Fry_OperatorHints, StationFeed_Source, FryFeed_OperatorInput (Tick),
+//                                                 StationFeed_Bridge, FryFeed_OperatorHints,
 //                                                 StationFeed_TakeOutInput (Tick)
+//
+// The fryer fries only battered pieces (the batter station's take-out writes the dip): the add-food press is gated shut and
+// its row reads "batter it first" while the docked raw platter has nothing battered on it, and the kernel refuses an
+// unbattered piece that still reaches it (the label says so).
 //
 // A piece the fryer hands back lands on the finished tray through the station's assembly (UMars_FeedStation_EntityScript),
 // whoever operates.
@@ -45,9 +49,9 @@ class UMars_SmState_Fry_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Fry_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Fry_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_Source);
-        AddTask(InHandle, UMars_SmTask_StationFeed_OperatorInput);
+        AddTask(InHandle, UMars_SmTask_FryFeed_OperatorInput);
         AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
-        AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
+        AddTask(InHandle, UMars_SmTask_FryFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
     }
 }
@@ -219,5 +223,69 @@ class UMars_SmTask_Fry_OperatorHints : UCk_SmTask_EntityScript
         { return FText::FromString("pouring - release to level"); }
 
         return FText::FromString("hold to dip - press over the basket to pour");
+    }
+}
+
+// The shared add-food input, gated by the fryer: a sourced platter with nothing battered on it has nothing the fryer would
+// admit, so the press is the feed's StationGate refusal (the label says why); nothing is queued. An unsourced feed refuses
+// on its own.
+class UMars_SmTask_FryFeed_OperatorInput : UMars_SmTask_StationFeed_OperatorInput
+{
+    private FCk_Handle_CookingFeed _FryFeed;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Super::DoEnterTask(InHandle, InNetContext);
+        _FryFeed = ck::Ctx(InHandle).As_CookingFeed();
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Super::DoExitTask(InHandle, InNetContext);
+        _FryFeed = FCk_Handle_CookingFeed();
+    }
+
+    protected bool Get_CanBeginTransfer() const override
+    {
+        if (ck::Is_NOT_Valid(_FryFeed) || _FryFeed.Get_IsSourced() == false)
+        { return true; }
+
+        return utils_batter::Get_HasBatteredPiece(_FryFeed.Get_Source());
+    }
+}
+
+// The shared add-food row, reading "batter it first" while the docked raw platter holds pieces but nothing battered (the
+// fryer's gate), re-texted on the feed's stock and phase edges (the shared row's own).
+class UMars_SmTask_FryFeed_OperatorHints : UMars_SmTask_StationFeed_OperatorHints
+{
+    private FCk_Handle_CookingFeed _FryFeed;
+
+    // The feed first: the row's first text reads it.
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        _FryFeed = ck::Ctx(InHandle).As_CookingFeed();
+        Super::DoEnterTask(InHandle, InNetContext);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        Super::DoExitTask(InHandle, InNetContext);
+        _FryFeed = FCk_Handle_CookingFeed();
+    }
+
+    protected TOptional<FString> TryGet_StationRefusal() const override
+    {
+        if (ck::Is_NOT_Valid(_FryFeed) || _FryFeed.Get_IsSourced() == false || _FryFeed.Get_Available() <= 0)
+        { return TOptional<FString>(); }
+
+        if (utils_batter::Get_HasBatteredPiece(_FryFeed.Get_Source()))
+        { return TOptional<FString>(); }
+
+        const FString Refusal = "not battered: batter it first";
+        return TOptional<FString>(Refusal);
     }
 }

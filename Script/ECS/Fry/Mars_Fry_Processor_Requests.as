@@ -3,6 +3,8 @@ struct FMars_Fry_AdmissionResult
 {
     FMars_CookingFeed_PieceId Id;
     EMars_CookingFeed_Admission Admission = EMars_CookingFeed_Admission::Rejected;
+    // Rejected only: why, and the kernel's own words for it (the station's OnAdmission carries the words).
+    EMars_Fry_AdmissionRefusal Refusal = EMars_Fry_AdmissionRefusal::Unavailable;
     FString Reason;
     // Accepted only: the adopted piece's entity.
     FCk_Handle Entity;
@@ -22,12 +24,13 @@ struct FMars_Fry_TakeOutResult
 // or to the caller, and one that hands none back is refused (NoRoom under a cap of zero or with no tray named by the
 // station, else NothingReady); Readopt puts a handed-back piece nobody took back in play where it lies; each release in the
 // inbox is adopted or rejected (every one in a drain that also reset is rejected: the release belongs to the attempt the
-// reset ended); Skim dips inside the pot, pours over the basket, carries anywhere, is refused elsewhere (the corridor) and
-// ignored while idle; a look moves the skimmer's target within the reach (the pot only while the scoop is dipped or still
-// below the rim) while driven. The new target goes to the skimmer's commanded slide once. The drive and skim edges and every
-// refused skim, then every take-out and every refused take-out, then every admission answer on the station's OnAdmission
-// (and OnPieceAdded for an accepted one) are broadcast last. The drain collects and the Tick measures: nothing here
-// integrates over time.
+// reset ended; an unbattered piece is refused NotBattered: the fryer fries only what the batter station coated); Skim dips
+// inside the pot, pours over the basket, carries anywhere, is refused elsewhere (the corridor) and ignored while idle; a
+// look moves the skimmer's target within the reach (the pot only while the scoop is dipped or still below the rim) while
+// driven. The new target goes to the skimmer's commanded slide once. The drive and skim edges and every refused skim, then
+// every take-out and every refused take-out, then every admission answer on the station's OnAdmission (and OnPieceAdded
+// for an accepted one, OnAdmissionRefused for a rejected one) are broadcast last. The drain collects and the Tick
+// measures: nothing here integrates over time.
 //
 // A piece is the kernel's guest: the kernel creates no entity, and a piece it holds ends only lost (the Tick) or with the
 // station (OnFryBeginDestroy). The fryer is the one owner of its pieces' lease facts: it stamps every piece it takes on
@@ -163,8 +166,13 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Result : Admissions)
         {
             utils_cooking_feed::Broadcast_Admission(Station, FMars_CookingFeed_AdmissionAnswer(Result.Id, Result.Admission, Result.Reason));
-            if (Result.Admission == EMars_CookingFeed_Admission::Accepted && Self.Has_Fragment(FMars_Fragment_Fry_Signals))
+            if (Self.Has_Fragment(FMars_Fragment_Fry_Signals) == false)
+            { continue; }
+
+            if (Result.Admission == EMars_CookingFeed_Admission::Accepted)
             { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceAdded.Broadcast(Self, Result.Id, Result.Entity); }
+            else
+            { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnAdmissionRefused.Broadcast(Self, Result.Id, Result.Refusal); }
         }
     }
 
@@ -366,8 +374,9 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
     // pose with a dynamic body moving at the release's velocities and a Resting on the scoop disc and the basket floor
     // (which tell whether it lies on the scoop); its faces' heat is seeded from its batter (a pan's sear is not batter: a
     // seared face arrives pale and keeps its sear in the ledger); the fryer stamps it with the holder fact and its pickup's
-    // Ledger claim. It starts
-    // Airborne, its last home the Oil. Rejected: the piece is left as it was.
+    // Ledger claim. It starts Airborne, its last home the Oil. Rejected: the piece is left as it was; a piece whose ledger is
+    // not battered (utils_batter::Get_IsBattered: the batter station's take-out wrote it) is refused NotBattered, the
+    // fryer never batters anything itself.
     private FMars_Fry_AdmissionResult Apply_AddPiece(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState,
         const FMars_CookingFeed_Release& InRelease)
     {
@@ -394,8 +403,16 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         { Result.Reason = "another ledger holds it"; }
         else if (Entity.Is_SceneNode())
         { Result.Reason = "still attached"; }
+        else if (utils_batter::Get_IsBattered(Piece.Get_CookState()) == false)
+        {
+            Result.Refusal = EMars_Fry_AdmissionRefusal::NotBattered;
+            Result.Reason = "not battered: batter it at the batter station first";
+        }
         else if (utils_fry::Get_LivePieceCount(InState.Pieces) >= Spec.Supply.MaxPieces)
-        { Result.Reason = f"Supply.MaxPieces [{Spec.Supply.MaxPieces}] pieces are already in play"; }
+        {
+            Result.Refusal = EMars_Fry_AdmissionRefusal::Full;
+            Result.Reason = f"Supply.MaxPieces [{Spec.Supply.MaxPieces}] pieces are already in play";
+        }
 
         if (Result.Reason.Len() > 0)
         { return Result; }

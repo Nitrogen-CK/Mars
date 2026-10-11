@@ -39,6 +39,7 @@ class UMars_AutoTest_FryStation_ATakeOutThroughTheIntentIsCappedByTheTray : UMar
         {
             const auto BoxWorld = FTransform(FRotator::ZeroRotator, k_Origin + k_RawOffset + FVector(0.0, 0.0, 60.0 + 15.0 * float64(Index)));
             _Boxes.Add(Build_Box(BoxWorld, GameplayTags::Food_Meat_Beef));
+            Batter_Ledger(_Boxes.Last());
         }
 
         for (int32 Index = 0; Index < k_FillerCount; ++Index)
@@ -294,5 +295,14 @@ class UMars_AutoTest_FryStation_ATakeOutThroughTheIntentIsCappedByTheTray : UMar
     private void OnTakeOutRefused(FCk_Handle_Fry InFry, EMars_CookingFeed_TakeOutRefusal InRefusal)
     {
         _TakeOutRefusals.Add(InRefusal);
+    }
+
+    // The fryer admits only battered pieces: the box arrives as the batter station's take-out hands one back.
+    private void Batter_Ledger(FCk_Handle_FoodPiece InBox)
+    {
+        auto Box = InBox;
+        auto CookState = Box.Get_CookState();
+        CookState.Battered = 1.0f;
+        Box.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 }

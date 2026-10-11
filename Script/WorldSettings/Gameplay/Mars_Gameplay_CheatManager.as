@@ -35,6 +35,14 @@ class UMars_Gameplay_CheatManager : UCheatManager
         else if (InItemName == "Cleaver") { Definition = mars_items::Cleaver(); }
         else if (InItemName == "Tenderizer") { Definition = mars_items::Tenderizer(); }
         else if (InItemName == "Pan") { Definition = mars_items::Pan(); }
+        // Foods: the bench takes whole meat (MeatSlab); the batter station takes the whole fryables.
+        else if (InItemName == "MeatSlab") { Definition = mars_items::Food_MeatSlab(); }
+        else if (InItemName == "MushroomSlice") { Definition = mars_items::Food_MushroomSlice(); }
+        else if (InItemName == "Drumstick") { Definition = mars_items::Food_Drumstick(); }
+        else if (InItemName == "Tentacle") { Definition = mars_items::Food_Tentacle(); }
+        else if (InItemName == "Puffer") { Definition = mars_items::Food_Puffer(); }
+        else if (InItemName == "SpikedBerry") { Definition = mars_items::Food_SpikedBerry(); }
+        else if (InItemName == "Mushroom") { Definition = mars_items::Food_Mushroom(); }
 
         if (ck::Is_NOT_Valid(Definition))
         {

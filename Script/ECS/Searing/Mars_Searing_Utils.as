@@ -248,6 +248,21 @@ namespace utils_searing
         return InHalfExtents.GetMax();
     }
 
+    // The mean of the piece's two half extents across the pan with InDownFace on it (the axis through that face stands
+    // up): what its footprint spans. A cube's is its own half whatever face is down; a cut half standing on its end covers
+    // less of the pan than lying flat.
+    float64 Get_FootprintHalf(const FVector& InHalfExtents, EMars_Searing_Face InDownFace)
+    {
+        const auto Normal = Get_FaceNormal(InDownFace);
+        if (Math::Abs(Normal.X) > 0.5)
+        { return (InHalfExtents.Y + InHalfExtents.Z) * 0.5; }
+
+        if (Math::Abs(Normal.Y) > 0.5)
+        { return (InHalfExtents.X + InHalfExtents.Z) * 0.5; }
+
+        return (InHalfExtents.X + InHalfExtents.Y) * 0.5;
+    }
+
     // The cook state InPiece's sear makes of InSeed (the state the piece arrived with): the sears are the pan's; every
     // other channel is the seed's.
     FMars_FoodPiece_CookState Get_CookState(const FMars_Searing_PieceState& InPiece, const FMars_FoodPiece_CookState& InSeed)
@@ -466,6 +481,12 @@ mixin EMars_Searing_Face Get_DownFace(const FCk_Handle_Searing& Self, const FMar
 
     const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
     return utils_searing::Get_DownFace(PieceWorld.GetRotation(), Self.Get_PanUp());
+}
+
+// The piece's footprint half on the pan now (utils_searing::Get_FootprintHalf over its own half extents and its down face).
+mixin float64 Get_PieceFootprintHalf(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+{
+    return utils_searing::Get_FootprintHalf(Self.Get_PieceHalfExtents(InPieceId), Self.Get_DownFace(InPieceId));
 }
 
 mixin bool Get_IsDownFaceSeared(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)

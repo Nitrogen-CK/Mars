@@ -122,6 +122,11 @@ struct FMars_FoodPiece_CookState
     UPROPERTY()
     float32 Crumb = 0.0f;
 
+    // 1 once the batter station handed the piece back fully coated (it admitted it whole, and its food has a battered variant), else 0.
+    // A cut half inherits it with the rest of the ledger.
+    UPROPERTY()
+    float32 Battered = 0.0f;
+
     FMars_FoodPiece_CookState()
     {
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)

@@ -23,10 +23,12 @@ class UMars_CuttingStation_EntityScript : UMars_FeedStation_EntityScript
     UPROPERTY(ExposeOnSpawn)
     FMars_Cutting_Spec Cutting;
 
-    // The input platter brings whole food, as many joints as it carries, and may dock empty to be filled by hand; the
-    // finished tray docks empty. The board's one joint at a time is the feed's only limit (the control refuses a press while
-    // the board holds anything).
+    // The input platter brings whole meat joints, as many as it carries, and may dock empty to be filled by hand; the
+    // finished tray docks empty. The bench cuts meat for the pan: a vegetable (a slice is already cut, a whole one goes to
+    // the fryer) is refused at the dock. The board's one joint at a time is the feed's only limit (the control refuses a
+    // press while the board holds anything).
     default Docks.Input.WholeOnly = true;
+    default Docks.Input.Kind = FGameplayTagQuery::MakeQuery_MatchTag(GameplayTags::Food_Meat);
 
     // The cut halves part 0.75 cm each way. A full board only knocks (the label says so).
     UPROPERTY(EditDefaultsOnly, Category = "Board")
@@ -220,6 +222,7 @@ class UMars_CuttingStation_EntityScript : UMars_FeedStation_EntityScript
         auto Layout = FMars_FeedStation_DockLayout();
         Layout.Input = FMars_FeedStation_DockSpot(FVector(BoardX, -BowlY, 0.0), FText::FromString("input platter"),
             n"CuttingStation_InputDockMarker");
+        Layout.Input.KindRejectedText = FText::FromString("Meat only");
         Layout.Output = FMars_FeedStation_DockSpot(FVector(BoardX, BowlY, 0.0), FText::FromString("finished tray"),
             n"CuttingStation_OutputDockMarker");
         return Layout;

@@ -1,7 +1,9 @@
-// A chop cuts every piece it straddles, not the few a small budget allowed. Three whole mushroom slices lie on the station's
-// board in a row along the board's depth (station X), the blade's face, all at one lateral position; the hand moves over
-// their shared centre and chops once. The board's answer names three straddling pieces and issues three cuts within a
-// budget of the station's MaxCutsPerChop (8), and each slice is cut in two. Isolated origin (30000, -21000, -30000).
+// A chop cuts every piece it straddles, not the few a small budget allowed. Three whole tentacles (meat joints, the bench's
+// own input: 29 cm long, 7.4 cm wide) lie on the station's board in a row along the board's depth (station X), the blade's
+// face, 10 cm apart and laid as the feed lays them (their food's Layout yaw: the long axis along the cleaver's travel), all
+// at one lateral position; the hand moves over their shared centroid and chops once. The board's answer names three
+// straddling pieces and issues three cuts within a budget of the station's MaxCutsPerChop (8), and each tentacle is cut in
+// two. Isolated origin (30000, -21000, -30000).
 class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(30000.0, -21000.0, -30000.0);
@@ -16,21 +18,21 @@ class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoT
 
         for (int32 Index = 0; Index < k_BoxCount; ++Index)
         {
-            // A slice dressed from its food, as the station dresses the halves it cuts.
-            const auto Slice = mars::Food_MushroomSlice_Mars.Build_Joint(ck::TransientEntity(), FTransform(FRotator::ZeroRotator, k_Origin + Get_PileOffset(Index)));
-            Track_ForCleanup(Slice);
-            _Boxes.Add(Slice);
+            // A whole joint of the bench's meat, as the feed builds it.
+            const auto Joint = mars::Food_Tentacle_Mars.Build_Joint(ck::TransientEntity(), FTransform(FRotator::ZeroRotator, k_Origin + Get_PileOffset(Index)));
+            Track_ForCleanup(Joint);
+            _Boxes.Add(Joint);
         }
 
         Add_Step_WaitUntil("the station composed its Cutting, FoodBoard and docks", n"Check_StationReady", 0, 0);
-        Add_Step_WaitUntil("every slice is Ready", n"Check_BoxesReady", k_SlowPolls, 0);
-        Add_Step("place the three slices on the board", n"Step_PlaceOnBoard");
-        Add_Step_WaitUntil("the board holds the three slices", n"Check_BoardFilled", 0, 0);
+        Add_Step_WaitUntil("every tentacle is Ready", n"Check_BoxesReady", k_SlowPolls, 0);
+        Add_Step("place the three tentacles on the board", n"Step_PlaceOnBoard");
+        Add_Step_WaitUntil("the board holds the three tentacles", n"Check_BoardFilled", 0, 0);
         Add_Step_WaitFrames("the placed poses have landed", 2);
         Add_Step("an operator takes the station", n"Step_Take");
         Add_Step_WaitUntil("the station's state machine is Operated", n"Check_Operated", 0, 0);
-        Add_Step("move the hand over the slices' shared centre and chop", n"Step_AimAndChop");
-        Add_Step_WaitUntil("the chop landed and every slice was cut", n"Check_AllCut", k_SlowPolls, 0);
+        Add_Step("move the hand over the tentacles' shared centroid and chop", n"Step_AimAndChop");
+        Add_Step_WaitUntil("the chop landed and every tentacle was cut", n"Check_AllCut", k_SlowPolls, 0);
         Add_Step("three straddled, three cut", n"Step_Assert");
         Run_Steps(InHandle);
     }
@@ -52,7 +54,7 @@ class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoT
         for (int32 Index = 0; Index < _Boxes.Num(); ++Index)
         {
             Watch(_Boxes[Index]);
-            Pose_OnPile(_Boxes[Index], Get_PileOffset(Index));
+            Pose_OnPile(_Boxes[Index], Get_PileOffset(Index), mars::Food_Tentacle_Mars.Layout.YawDegrees);
             _Board.Request_Place(FMars_Request_FoodBoard_Place(_Boxes[Index]));
         }
     }
@@ -96,14 +98,14 @@ class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoT
         Assert_Equals_Int(_Issues.Num(), 1, "the board answered the chop once");
         if (_Issues.Num() == 1)
         {
-            Assert_Equals_Int(_Issues[0].Straddling, k_BoxCount, "the blade straddled every slice");
+            Assert_Equals_Int(_Issues[0].Straddling, k_BoxCount, "the blade straddled every tentacle");
             Assert_Equals_Int(_Issues[0].Budget, utils_foodboard::k_MaxCutsPerChop, "the budget is the station's MaxCutsPerChop");
-            Assert_Equals_Int(_Issues[0].Issued, k_BoxCount, "a cut was issued for every slice");
+            Assert_Equals_Int(_Issues[0].Issued, k_BoxCount, "a cut was issued for every tentacle");
         }
 
-        Assert_Equals_Int(_PieceCuts, k_BoxCount, "every slice was cut");
+        Assert_Equals_Int(_PieceCuts, k_BoxCount, "every tentacle was cut");
         for (const auto& Box : _Boxes)
-        { Assert_Equals_Int(Get_OutcomeCount(Box, EMars_FoodPiece_CutOutcome::Cut), 1, f"slice [{Box.ToString()}] was cut once"); }
+        { Assert_Equals_Int(Get_OutcomeCount(Box, EMars_FoodPiece_CutOutcome::Cut), 1, f"tentacle [{Box.ToString()}] was cut once"); }
 
         Assert_Equals_Int(_Board.Get_HeldCount(), k_BoxCount * 2, "the board holds the six halves");
     }

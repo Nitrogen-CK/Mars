@@ -17,7 +17,9 @@
 // Per piece: its own cook state (from that piece's face sears only, never another's), its own seared burst and its own oil
 // pool, sized from its own extents. The pan material has k_PoolSlots meat footprints and oil trails; the pieces
 // that lie on the pan (Cooking or Ready) fill them in admission order and an unused slot has radius 0 (no pool). Each
-// piece's trail lags its own footprint, and a piece that leaves the pan keeps its last footprint while its slot goes dark.
+// piece's trail lags its own footprint. A piece that lifts off the pan keeps its last footprint while its pool shrinks
+// with the height of its underside (gone at PoolLiftFadeCm), so a toss leaves a puddle that closes rather than one that
+// pops; a piece past the rim or lost has no pool.
 // The beads' box covers every piece on the pan; the footprint node, and the splatter on it, follows the most recently
 // admitted piece that lies on the pan and stays where it was with none there. The sizzle ramp follows the kernel's
 // aggregate sizzle (full while any cooking piece sizzles; a hiss while only seared faces lie on the hot pan). Face values
@@ -44,9 +46,13 @@ struct FMars_SearingStation_PieceVisual
     UPROPERTY()
     FVector2D Trail;
 
-    // Pooled while it lies on the pan and is not lost: only then does it fill a pool slot and widen the beads' box.
+    // Pooled while it is over the pan and not lost: only then does it fill a pool slot and widen the beads' box.
     UPROPERTY()
     EMars_SearingStation_Pool Pool = EMars_SearingStation_Pool::None;
+
+    // 0 with its underside on the cooking surface, 1 once it is PoolLiftFadeCm above it: scales the pool's radius down.
+    UPROPERTY()
+    float32 Lift = 0.0f;
 }
 
 class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
@@ -96,7 +102,8 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     private const float32 PanUndersideDepth = 0.3f;
     // The pool as ratios of a piece's half extent h in pan cm (mars_cooking_ue.py LOOKDEV_POOL_NOTE): the footprint radius
     // is h * sqrt(2) * 0.9; Pool Radius, Pool Margin, Pool Blend, Simmer Width and Contact Softness are 1.1 / 0.6 / 0.5 /
-    // 0.4 / 0.4 h. A piece's h is the mean of its two horizontal half extents as it was admitted (a cube's own half).
+    // 0.4 / 0.4 h. A piece's h is the mean of its own two half extents across the pan on the face it lies on
+    // (Get_PieceFootprintHalf: a cube's own half, a cut half's per face).
     private const float32 FootprintPerHalf = 1.41421356f * 0.9f;
     private const float32 PoolRadiusPerHalf = 1.1f;
     private const float32 PoolMarginPerHalf = 0.6f;
@@ -120,7 +127,7 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     // on the pan (and the sizzle steady) through those gaps.
     private const float32 SteakContactGraceSeconds = 0.15f;
 
-    // The dressing: the pan material's driven group, the oil trail behind the cube, the sizzle ramp and the fond.
+    // The dressing: the pan material's driven group, the oil trail behind each piece, the sizzle ramp and the fond.
     private const float32 OilAmountHot = 0.7f;
     private const float32 OilAmountCold = 0.6f;
     private const float32 SizzleFull = 1.0f;
@@ -131,6 +138,8 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     private const float32 FondStart = 0.1f;
     private const float32 FondRate = 0.02f;
     private const float32 TrailLagSeconds = 0.25f;
+    // Art cm the piece's underside rises above the cooking surface before its pool has closed completely.
+    private const float32 PoolLiftFadeCm = 4.0f;
     // The pan material's Meat Footprint / Oil Trail pairs (slot 0 unsuffixed, then 1..5): one pool per piece the Searing
     // spec's Supply.MaxPieces lets onto the pan (6 by default); DoConstruct clamps it to them.
     private const int32 k_PoolSlots = 6;
@@ -550,13 +559,23 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
         for (int32 Index = 0; Index < _PieceVisuals.Num(); ++Index)
         {
             auto Visual = _PieceVisuals[Index];
-            const auto Pooled = _SearingHandle.Get_HasPiece(Visual.Display.Id) && Get_IsLiveOnPan(Visual.Display.Id);
-            Visual.Pool = Pooled ? EMars_SearingStation_Pool::Pooled : EMars_SearingStation_Pool::None;
-            if (Pooled)
+            const auto Id = Visual.Display.Id;
+            const auto OnPan = _SearingHandle.Get_HasPiece(Id) && Get_IsLiveOnPan(Id);
+            const auto Hovering = OnPan == false && Get_IsLiveOverPan(Id);
+            Visual.Pool = (OnPan || Hovering) ? EMars_SearingStation_Pool::Pooled : EMars_SearingStation_Pool::None;
+            if (OnPan)
             {
-                const auto Local = _SearingHandle.Get_PiecePanLocal(Visual.Display.Id);
+                const auto Local = _SearingHandle.Get_PiecePanLocal(Id);
                 Visual.Footprint = FVector2D(Local.X / Scale, Local.Y / Scale);
+                Visual.Lift = 0.0f;
             }
+            else if (Hovering)
+            {
+                // The footprint stays where it lifted off; the pool closes as the underside rises.
+                Visual.Lift = Get_PieceLift(Id);
+            }
+            else
+            { Visual.Lift = 1.0f; }
 
             Visual.Trail = FVector2D(Visual.Trail.X + (Visual.Footprint.X - Visual.Trail.X) * Alpha,
                 Visual.Trail.Y + (Visual.Footprint.Y - Visual.Trail.Y) * Alpha);
@@ -578,12 +597,11 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
         { _PoolHalf = Largest; }
     }
 
-    // The piece's h in the pan mesh's cm (the pan material's units): the mean of its two horizontal half extents as it was
-    // admitted. The kernel read them from its mesh, so a cut piece pools as its own size.
+    // The piece's h in the pan mesh's cm (the pan material's units): the mean of its two half extents across the pan on the
+    // face it lies on. The kernel read them from its mesh, so a cut piece pools as its own size, and as the face it shows.
     private float32 Get_PoolHalf(const FMars_CookingFeed_PieceId& InPieceId) const
     {
-        const auto HalfExtents = _SearingHandle.Get_PieceHalfExtents(InPieceId);
-        return float32((HalfExtents.X + HalfExtents.Y) * 0.5) / PanScale;
+        return float32(_SearingHandle.Get_PieceFootprintHalf(InPieceId)) / PanScale;
     }
 
     // The splatter's node follows the newest piece on the pan; with none there it stays where it was.
@@ -661,6 +679,38 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     {
         return _SearingHandle.Get_PieceStatus(InPieceId) != EMars_Searing_PieceStatus::Lost
             && _SearingHandle.Get_PieceContact(InPieceId) == EMars_Searing_Contact::OnPan;
+    }
+
+    // Not lost and with its middle inside the rim: a tossed or flipping piece over the pan keeps a closing pool, one that
+    // has left the disc does not.
+    private bool Get_IsLiveOverPan(const FMars_CookingFeed_PieceId& InPieceId) const
+    {
+        if (_SearingHandle.Get_HasPiece(InPieceId) == false)
+        { return false; }
+
+        if (_SearingHandle.Get_PieceStatus(InPieceId) == EMars_Searing_PieceStatus::Lost)
+        { return false; }
+
+        if (ck::Is_NOT_Valid(_SearingHandle.Get_PieceEntity(InPieceId)))
+        { return false; }
+
+        const auto Local = _SearingHandle.Get_PiecePanLocal(InPieceId);
+        return Local.Size2D() <= float64(PanRimRadius) * float64(PanScale);
+    }
+
+    // 0 with the piece's underside on the cooking surface, 1 once it is PoolLiftFadeCm (art cm) above it. The underside is the
+    // piece's middle in the pan base's frame less its half extent along that frame's up, as the kernel measures contact.
+    private float32 Get_PieceLift(const FMars_CookingFeed_PieceId& InPieceId) const
+    {
+        const auto Entity = _SearingHandle.Get_PieceEntity(InPieceId);
+        if (ck::Is_NOT_Valid(Entity))
+        { return 1.0f; }
+
+        const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
+        const auto PanLocalRotation = _SearingHandle.Get_PanBaseWorld().GetRotation().Inverse() * PieceWorld.GetRotation();
+        const auto HalfZ = utils_searing::Get_WorldHalfExtentZ(PanLocalRotation, _SearingHandle.Get_PieceHalfExtents(InPieceId));
+        const auto Underside = _SearingHandle.Get_PiecePanLocal(InPieceId).Z - float64(utils_searing::k_PanSurfaceZ) - HalfZ;
+        return float32(Math::Clamp(Underside / (float64(PoolLiftFadeCm) * float64(PanScale)), 0.0, 1.0));
     }
 
     // Full while the kernel's aggregate sizzle is on, a hiss while only seared faces lie on the hot pan, silent otherwise;
@@ -750,8 +800,10 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
     }
 
     // Each piece's look from the kernel's mapping of its cook state (utils_cookstate::Make_DisplayParams over its sears so
-    // far), its oil coat layered by the pan's heat. A record whose piece the kernel no longer holds (taken out, or destroyed at
-    // the end of its linger) or whose entity is gone is dropped; a lost piece keeps its last cook state.
+    // far), its oil coat layered by the pan's heat. A face that has just seared through is written at once, past the write
+    // threshold, so a finished face shows its full crust (1.0), not the last value within the threshold of it. A record whose
+    // piece the kernel no longer holds (taken out, or destroyed at the end of its linger) or whose entity is gone is
+    // dropped; a lost piece keeps its last cook state.
     private void Advance_PieceVisuals(float32 InDeltaSeconds)
     {
         const auto IsHot = _SearingHandle.Get_IsHot();
@@ -774,9 +826,31 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
             const auto OnHotPan = IsHot && _SearingHandle.Get_PieceContact(Display.Id) == EMars_Searing_Contact::OnPan;
             Display.CookState.OilCoat = Math::FInterpConstantTo(OilCoat, OnHotPan ? OilCoatOnPan : OilCoatOffPan,
                 InDeltaSeconds, OilCoatRate);
-            utils_station::Write_PieceDisplay(Display);
+            if (Get_HasUnshownSearedFace(Display))
+            {
+                if (utils_station::Write_PieceLook(Display.Piece, Display.CookState))
+                { Display.Written = Display.CookState; }
+            }
+            else
+            { utils_station::Write_PieceDisplay(Display); }
+
             _PieceVisuals[Index] = Visual;
         }
+    }
+
+    // A face of the look is seared through (1.0) but the display was last written short of it.
+    private bool Get_HasUnshownSearedFace(const FMars_Station_PieceDisplay& InDisplay) const
+    {
+        if (InDisplay.CookState.FaceSear.Num() != InDisplay.Written.FaceSear.Num())
+        { return false; }
+
+        for (int32 Face = 0; Face < InDisplay.CookState.FaceSear.Num(); ++Face)
+        {
+            if (InDisplay.CookState.FaceSear[Face] >= 1.0f && InDisplay.Written.FaceSear[Face] < 1.0f)
+            { return true; }
+        }
+
+        return false;
     }
 
     // The driven group on the pan's dynamic instance, in the pan mesh's own cm: the pieces on the pan fill the pool slots
@@ -798,7 +872,7 @@ class UMars_SearingStation_EntityScript : UMars_FeedStation_EntityScript
             if (Visual.Pool == EMars_SearingStation_Pool::None || Slot >= k_PoolSlots)
             { continue; }
 
-            const auto Radius = Get_PoolHalf(Visual.Display.Id) * FootprintPerHalf;
+            const auto Radius = Get_PoolHalf(Visual.Display.Id) * FootprintPerHalf * (1.0f - Visual.Lift);
             _PanMaterial.SetVectorParameterValue(_FootprintParameterNames[Slot],
                 FLinearColor(float32(Visual.Footprint.X), float32(Visual.Footprint.Y), Radius, 0.0f));
             _PanMaterial.SetVectorParameterValue(_TrailParameterNames[Slot],

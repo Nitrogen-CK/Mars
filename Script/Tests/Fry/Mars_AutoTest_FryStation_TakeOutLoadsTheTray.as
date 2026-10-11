@@ -1,6 +1,7 @@
-// The fry station's whole round on real pieces. A platter with a mushroom slice docks on the raw platter dock (the fryer
-// takes any food) and an empty platter on the finished tray's; an operator takes the station and one add-food press
-// carries the slice: the bridge unloads it from the raw platter and the kernel admits it into the oil. After a second of
+// The fry station's whole round on real pieces. A platter with a whole mushroom docks on the raw platter dock (its ledger
+// battered as the batter station's take-out leaves it: the fryer takes any battered food) and an empty platter on the
+// finished tray's; an operator takes the station and one add-food press
+// carries the mushroom: the bridge unloads it from the raw platter and the kernel admits it into the oil. After a second of
 // frying the test takes that piece out by name, as a take-out press would: the station's take-out task loads it onto the
 // docked tray, where it rides as a scene-node child of the tray's root with its body Kinematic, carrying the heat the
 // kernel gave its faces; the fryer holds nothing and the kernel counts one piece taken out.
@@ -17,7 +18,7 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
 
     private FCk_Handle _Raw;
     private FCk_Handle _Tray;
-    private FCk_Handle_FoodPiece _Slice;
+    private FCk_Handle_FoodPiece _Mushroom;
     // The kernel's face heats as the take-out was asked for.
     private TArray<float32> _HeatAtTakeOut;
 
@@ -25,23 +26,23 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_Fry(InHandle, k_Origin, FMars_CookingFeed_TimingSpec());
-        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_MushroomSlice());
+        _Raw = Spawn_Platter(InHandle, k_RawOffset, mars_items::Food_Mushroom());
         _Tray = Spawn_Platter(InHandle, k_TrayOffset, nullptr);
 
         Add_Step_WaitUntil("the station composed its Fry, feed and docks", n"Check_StationReady", k_SlowPolls, 0);
-        Add_Step_WaitUntil("both platters are constructed and the slice landed on the raw one", n"Check_PlattersReady", k_SlowPolls, 0);
+        Add_Step_WaitUntil("both platters are constructed and the mushroom landed on the raw one", n"Check_PlattersReady", k_SlowPolls, 0);
         Add_Step("dock the mushroom platter as raw and the empty one as the tray", n"Step_Dock");
         Add_Step_WaitUntil("both platters are docked and arrived", n"Check_Docked", k_SlowPolls, 0);
         Add_Step("an operator takes the station", n"Step_Take");
         Add_Step_WaitUntil("the station's state machine is Operated and the feed draws from the raw platter", n"Check_OperatedAndSourced", k_SlowPolls, 0);
         Add_Step("one add-food press", n"Step_BeginTransfer");
-        Add_Step_WaitUntil("the kernel admitted the slice and the raw platter is empty", n"Check_Admitted", k_SlowPolls, 0);
-        Add_Step("the fryer holds the slice", n"Step_AssertAdmitted");
+        Add_Step_WaitUntil("the kernel admitted the mushroom and the raw platter is empty", n"Check_Admitted", k_SlowPolls, 0);
+        Add_Step("the fryer holds the mushroom", n"Step_AssertAdmitted");
         Add_Step_WaitSeconds("a second in the oil", 1.0f);
-        Add_Step("take the slice out by name", n"Step_TakeOut");
-        Add_Step_WaitUntil("the slice landed on the tray", n"Check_OnTray", k_SlowPolls, 0);
-        Add_Step_WaitUntil("the slice rides the tray's root, Kinematic", n"Check_RidesTheTray", k_SlowPolls, 0);
-        Add_Step("the slice rides the tray with its heat; the fryer holds nothing", n"Step_AssertOnTray");
+        Add_Step("take the mushroom out by name", n"Step_TakeOut");
+        Add_Step_WaitUntil("the mushroom landed on the tray", n"Check_OnTray", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the mushroom rides the tray's root, Kinematic", n"Check_RidesTheTray", k_SlowPolls, 0);
+        Add_Step("the mushroom rides the tray with its heat; the fryer holds nothing", n"Step_AssertOnTray");
         Run_Steps(InHandle);
     }
 
@@ -56,7 +57,8 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
     private void Step_Dock(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Track_Held(_Raw);
-        _Slice = _Raw.As_Platter().Get_Held()[0];
+        _Mushroom = _Raw.As_Platter().Get_Held()[0];
+        Batter_Ledger(_Mushroom);
         Dock(_InputDock, _Raw);
         Dock(_OutputDock, _Tray);
     }
@@ -85,8 +87,8 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
     UFUNCTION()
     private void Step_AssertAdmitted(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Get_PieceHandle(Get_PieceIds()[0]) == _Slice, "the fryer holds the slice from the raw platter");
-        Assert_True(ck::Is_NOT_Valid(_Slice.TryGet_Platter()), "the slice is on no platter");
+        Assert_True(Get_PieceHandle(Get_PieceIds()[0]) == _Mushroom, "the fryer holds the mushroom from the raw platter");
+        Assert_True(ck::Is_NOT_Valid(_Mushroom.TryGet_Platter()), "the mushroom is on no platter");
         Assert_Equals_Int(Get_SettleCount(EMars_CookingFeed_Settle::Admitted), 1, "the transfer settled Admitted");
     }
 
@@ -98,7 +100,7 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
         { _HeatAtTakeOut.Add(_Fry.Get_FaceHeat(PieceId, EMars_Searing_Face(Face))); }
 
-        Request_TakeOut(_Slice);
+        Request_TakeOut(_Mushroom);
     }
 
     UFUNCTION()
@@ -113,7 +115,7 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
     private void Check_RidesTheTray(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Slice.TryGet_Platter() == _Tray.As_Platter() && Get_Parent(_Slice) == _Tray.As_Transform() && Get_IsKinematic(_Slice));
+        Res.Set(_Mushroom.TryGet_Platter() == _Tray.As_Platter() && Get_Parent(_Mushroom) == _Tray.As_Transform() && Get_IsKinematic(_Mushroom));
     }
 
     UFUNCTION()
@@ -121,13 +123,13 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
     {
         const auto Tray = _Tray.As_Platter();
         Assert_Equals_Int(_TakenOut.Num(), 1, "the kernel handed one piece back");
-        Assert_True(_Slice.TryGet_Platter() == Tray, "the slice is on the tray");
-        Assert_True(Get_Parent(_Slice) == _Tray.As_Transform(), "the slice is a scene-node child of the tray's root");
-        Assert_True(Get_IsKinematic(_Slice), "the slice's body is Kinematic");
+        Assert_True(_Mushroom.TryGet_Platter() == Tray, "the mushroom is on the tray");
+        Assert_True(Get_Parent(_Mushroom) == _Tray.As_Transform(), "the mushroom is a scene-node child of the tray's root");
+        Assert_True(Get_IsKinematic(_Mushroom), "the mushroom's body is Kinematic");
         Assert_Equals_Int(Get_PieceIds().Num(), 0, "the fryer holds nothing");
         Assert_Equals_Int(Get_TakenOutCount(), 1, "the kernel counts one piece taken out");
 
-        const auto CookState = _Slice.Get_CookState();
+        const auto CookState = _Mushroom.Get_CookState();
         Assert_Equals_Int(CookState.Batter.Num(), utils_searing::k_FaceCount, "the cook state has every face's batter");
         if (CookState.Batter.Num() != utils_searing::k_FaceCount || _HeatAtTakeOut.Num() != utils_searing::k_FaceCount)
         { return; }
@@ -142,6 +144,16 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
             MaxHeat = Math::Max(MaxHeat, Written);
         }
 
-        Assert_True(MaxHeat > 0.0f, f"the slice carries the oil's heat (its hottest face {MaxHeat})");
+        Assert_True(MaxHeat > 0.0f, f"the mushroom carries the oil's heat (its hottest face {MaxHeat})");
+    }
+
+    // The fryer admits only battered pieces: the mushroom arrives as the batter station's take-out hands one back (its
+    // ledger battered, before the station dresses it again at the admission).
+    private void Batter_Ledger(FCk_Handle_FoodPiece InPiece)
+    {
+        auto Piece = InPiece;
+        auto CookState = Piece.Get_CookState();
+        CookState.Battered = 1.0f;
+        Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 }

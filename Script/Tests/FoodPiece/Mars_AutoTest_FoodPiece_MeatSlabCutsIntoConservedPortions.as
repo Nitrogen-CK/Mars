@@ -1,4 +1,4 @@
-// The real meat slab imports Ready (about 6927 cm3, 636 triangles) and a cut across its long X axis at its centroid
+// The real meat slab imports Ready (about 7561 cm3, 644 triangles) and a cut across its long X axis at its centroid
 // succeeds: the halves' volumes add back to the slab's within RuntimeMesh's own tolerance, and their masses add back to
 // the slab's exactly and follow their volumes.
 class UMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions : UMars_AutoTestRig_FoodPiece
@@ -35,8 +35,8 @@ class UMars_AutoTest_FoodPiece_MeatSlabCutsIntoConservedPortions : UMars_AutoTes
 
         const auto Metrics = Get_Metrics(_Slab);
         _SlabVolumeCm3 = _Slab.Get_VolumeCm3();
-        Assert_Equals_Float(_SlabVolumeCm3, 6927.34, 0.5, "the slab's volume");
-        Assert_Equals_Int(Metrics.Get_TriangleCount(), 636, "the slab's triangle count");
+        Assert_Equals_Float(_SlabVolumeCm3, 7561.07, 0.5, "the slab's volume");
+        Assert_Equals_Int(Metrics.Get_TriangleCount(), 644, "the slab's triangle count");
 
         Cut(_Slab, Metrics.Get_CentroidCm(), FVector::ForwardVector);
     }
