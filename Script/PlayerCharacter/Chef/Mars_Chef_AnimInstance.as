@@ -1,8 +1,8 @@
 // Parent class of ABP_Chef, the third-person chef body other players see. Reads the owning character's movement
 // (velocity and falling state replicate, so this is valid on simulated proxies) and exposes what the anim graph
-// needs: ground speed and travel direction for the locomotion blend space, and whether the character is airborne for
-// the jump states. Emotes play as montages on the ABP's DefaultSlot; a held item's strike rides the hold IK below (see
-// AMars_PlayerCharacter).
+// needs: ground speed and travel direction for the locomotion and crouch blend spaces, whether the character is airborne
+// for the jump states, and whether it is crouched for the Crouch state. Emotes play as montages on the ABP's
+// DefaultSlot; a held item's strike rides the hold IK below (see AMars_PlayerCharacter).
 class UMars_Chef_AnimInstance : UAnimInstance
 {
     // Horizontal speed, uu/s (blend space Y).
@@ -17,6 +17,11 @@ class UMars_Chef_AnimInstance : UAnimInstance
     // Character movement reports falling (jump or drop).
     UPROPERTY(BlueprintReadOnly, NotEditable, Category = "Chef")
     bool IsInAir = false;
+
+    // The character is crouched (ACharacter::bIsCrouched, which replicates): 1 crouched, 0 standing. A number, so the
+    // Locomotion state machine's Ground <-> Crouch transition rules can compare it both ways.
+    UPROPERTY(BlueprintReadOnly, NotEditable, Category = "Chef")
+    float32 Crouched = 0.0f;
 
     // Play rate of BS_Chef_Locomotion (bound to its PlayRate pin): Config.TPBody.AuthoredScale / Scale, so the clips'
     // footfalls keep covering the ground at the config speeds when the body is scaled past the height they were made at.
@@ -64,6 +69,7 @@ class UMars_Chef_AnimInstance : UAnimInstance
         {
             Speed = 0.0f;
             IsInAir = false;
+            Crouched = 0.0f;
             HoldAlpha_L = 0.0f;
             HoldAlpha_R = 0.0f;
             return;
@@ -78,6 +84,7 @@ class UMars_Chef_AnimInstance : UAnimInstance
         const auto Planar = FVector(Velocity.X, Velocity.Y, 0.0);
         Speed = float32(Planar.Size());
         IsInAir = Character.CharacterMovement.IsFalling();
+        Crouched = Character.bIsCrouched ? 1.0f : 0.0f;
 
         if (Speed > MovingSpeedThreshold)
         {

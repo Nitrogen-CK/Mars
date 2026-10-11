@@ -111,6 +111,14 @@ struct FMars_TPBody_Spec
     FMars_TPBody_Hold Hold;
 }
 
+// The body mesh's location relative to the capsule's centre, with its feet on the capsule's base. InCrouchDrop is how
+// far the capsule's centre has dropped below its standing height (its half height shrinks by as much when the character
+// crouches; 0 standing): the body rises by it relative to the centre, so its feet stay on the floor.
+mixin FVector Get_BodyLocation(const FMars_TPBody_Spec& Self, float32 InCapsuleHalfHeight, float32 InCrouchDrop)
+{
+    return Self.MeshOffset.GetLocation() - FVector(0.0, 0.0, InCapsuleHalfHeight - InCrouchDrop);
+}
+
 // The blend space play rate that keeps the locomotion clips' footfalls on the ground at the config speeds (see AuthoredScale).
 mixin float32 Get_LocomotionPlayRate(const FMars_TPBody_Spec& Self)
 {

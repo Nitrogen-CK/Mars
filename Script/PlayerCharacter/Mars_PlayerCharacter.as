@@ -12,6 +12,16 @@ class AMars_PlayerCharacter : AMars_Character
     default CharacterMovement.NavAgentProps.bCanCrouch = true;
     default CharacterMovement.bCanWalkOffLedgesWhenCrouching = true;
 
+    // The engine's crouch code measures from the CLASS DEFAULT, not from this instance: standing up sets the capsule to
+    // the class default's size, and both crouching and standing up re-place the mesh from the class default's offset.
+    // With ACharacter's stock defaults (half height 88, radius 34, mesh at the capsule's centre) the first crouch left
+    // the capsule 26 cm too tall for good and the body floating above the floor for everyone who sees it. So the class
+    // defaults carry the standing capsule and the body's placement; ConstructionScript still applies Config and ensures
+    // it agrees with them.
+    default CapsuleComponent.CapsuleHalfHeight = FMars_PlayerCharacter_Body().CapsuleHalfHeight;
+    default CapsuleComponent.CapsuleRadius = FMars_PlayerCharacter_Body().CapsuleRadius;
+    default Mesh.RelativeLocation = FMars_TPBody_Spec().Get_BodyLocation(FMars_PlayerCharacter_Body().CapsuleHalfHeight, 0.0f);
+
     // Co-op correction tuning: smooth (rather than snap) corrections up to 20 m, correct the owner at most every 1.5 s
     // (0.5 s past 5 m off), and acknowledge good moves at most every 0.5 s. The client-authority radius
     // (Config.Movement.ClientAuthMaxError) keeps most moves from needing a correction at all.
@@ -119,6 +129,10 @@ class AMars_PlayerCharacter : AMars_Character
     void ConstructionScript()
     {
         const auto& Body = Config.Body;
+        const auto ClassBody = FMars_PlayerCharacter_Body();
+        ck::EnsureIfNot(Body.CapsuleHalfHeight == ClassBody.CapsuleHalfHeight && Body.CapsuleRadius == ClassBody.CapsuleRadius &&
+                Config.TPBody.MeshOffset.GetLocation().Equals(FMars_TPBody_Spec().MeshOffset.GetLocation()),
+            f"[PlayerCharacter] Config's capsule [{Body.CapsuleRadius} x {Body.CapsuleHalfHeight}] or body offset differs from the class defaults (FMars_PlayerCharacter_Body / FMars_TPBody_Spec defaults): crouching resets the capsule and the body to the class defaults, change them there");
         CapsuleComponent.SetCapsuleSize(Body.CapsuleRadius, Body.CapsuleHalfHeight);
         CameraComponent.SetRelativeLocation(FVector(0.0, 0.0, Config.View.EyeHeight.Height));
 
@@ -160,7 +174,8 @@ class AMars_PlayerCharacter : AMars_Character
         MarsMovement.ClientAuthMaxError = Movement.ClientAuthMaxError;
     }
 
-    // Before PostInitializeComponents, so ACharacter caches this placement as the mesh's base (crouch offsets it).
+    // Before PostInitializeComponents, so ACharacter caches this placement as the mesh's base (the target its network
+    // smoothing returns the mesh to). Crouching re-places the body from the class defaults (see the top of the class).
     private void ConstructBody()
     {
         const auto& Body = Config.TPBody;
@@ -172,7 +187,7 @@ class AMars_PlayerCharacter : AMars_Character
         Mesh.SetAnimInstanceClass(System::LoadClassAsset_Blocking(Body.AnimClass));
 
         // MeshOffset is relative to the capsule's base; the capsule's origin is its centre.
-        const auto FeetLocation = Body.MeshOffset.GetLocation() - FVector(0.0, 0.0, Config.Body.CapsuleHalfHeight);
+        const auto FeetLocation = Body.Get_BodyLocation(Config.Body.CapsuleHalfHeight, 0.0f);
         Mesh.SetRelativeLocationAndRotation(FeetLocation, Body.MeshOffset.Rotator());
         Mesh.SetRelativeScale3D(FVector(Body.Scale, Body.Scale, Body.Scale));
 

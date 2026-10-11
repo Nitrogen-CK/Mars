@@ -92,6 +92,14 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         Assert_True(Math::Abs(Config.Body.CapsuleHalfHeight - 75.0f) < 0.001f, f"the capsule stands 1.5 m (half height [{Config.Body.CapsuleHalfHeight}])");
         Assert_True(Config.Body.CrouchedHalfHeight < Config.Body.CapsuleHalfHeight, "the crouched capsule is shorter than the standing one");
 
+        // The body stands on the capsule's base, standing and crouched (the capsule's centre drops by the half heights'
+        // difference when it shrinks, and the body rises by as much relative to it).
+        const auto StandingZ = Body.Get_BodyLocation(Config.Body.CapsuleHalfHeight, 0.0f).Z;
+        Assert_True(Math::Abs(StandingZ + Config.Body.CapsuleHalfHeight) < 0.001, f"the standing body's feet are on the capsule's base (mesh z [{StandingZ}])");
+        const auto CrouchDrop = Config.Body.CapsuleHalfHeight - Config.Body.CrouchedHalfHeight;
+        const auto CrouchedZ = Body.Get_BodyLocation(Config.Body.CapsuleHalfHeight, CrouchDrop).Z;
+        Assert_True(Math::Abs(CrouchedZ + Config.Body.CrouchedHalfHeight) < 0.001, f"the crouched body's feet are on the crouched capsule's base (mesh z [{CrouchedZ}])");
+
         // The view at the chef's face centre: 58.37 cm unscaled above the feet, measured from the capsule centre.
         const auto FaceHeight = 58.37f * Body.Scale - Config.Body.CapsuleHalfHeight;
         Assert_True(Math::Abs(Config.View.EyeHeight.Height - FaceHeight) < 0.5f,

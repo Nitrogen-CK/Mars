@@ -4,7 +4,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "e7696683dc15b00c24be0f7778a9fef6",
+		"sourceHash": "a9c0b2d775a09f1dc72ebd5442f7a4cf",
 		"exporterVersion": 3
 	},
 	"blueprintType": "AnimBlueprint",
@@ -35,6 +35,13 @@
 			"tooltip": "Character movement reports falling (jump or drop)."
 		},
 		{
+			"name": "Crouched",
+			"type": "float",
+			"category": "Chef",
+			"value": 0,
+			"tooltip": "Locomotion state machine's Ground <-> Crouch transition rules can compare it both ways."
+		},
+		{
 			"name": "LocomotionPlayRate",
 			"type": "float",
 			"category": "Chef",
@@ -46,7 +53,7 @@
 			"type": "float",
 			"category": "Chef|Hold",
 			"value": 0,
-			"tooltip": "IK joint targets. Alpha 0 = the arm keeps the locomotion/montage pose; one-handed items only raise the right alpha."
+			"tooltip": "A held item's strike moves these targets along its HandSwing arc."
 		},
 		{
 			"name": "HoldAlpha_R",
