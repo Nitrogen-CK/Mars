@@ -34,13 +34,29 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     bool WithVisuals = true;
 
+    // Debugging only: each frame of an attack, draws the accepted hit sphere at the kernel's accepted hit centre, the
+    // segment the last accepted sample swept, and a line from the accepted body to the hit centre, coloured by phase
+    // (Windup yellow, Strike red, Recover and CancelRecover blue, Cooldown grey). Everything comes from the attack's
+    // recorded observations, never from the requested pose. Nothing is drawn while Idle or on an unarmed crawler.
+    UPROPERTY(ExposeOnSpawn)
+    bool DebugDrawAttack = false;
+
     private const float64 DefaultRoamHalfExtent = 400.0;
     private const float64 DefaultRoamHalfHeight = 200.0;
     private const float64 SegmentHalfThickness = 6.0;
     private const float64 FootHalfExtent = 8.0;
+    // The jab's default start distance beyond the body's half length (horizontal root-to-target).
+    private const float64 StartDistanceMargin = 70.0;
+
+    private const float32 DebugDrawThickness = 1.5f;
 
     // Created on first use of each tint.
     private TArray<FMars_Crawler_TintedRenderer> _Renderers;
+
+    // DebugDrawAttack only: the armed crawler and the last two accepted hit centres seen.
+    private FCk_Handle_Crawler _DebugCrawler;
+    private FVector _DebugCenter = FVector::ZeroVector;
+    private FVector _DebugPreviousCenter = FVector::ZeroVector;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -64,10 +80,74 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         }
 
         CrawlerSpec.Rig = BuildRig(InHandle, RigData);
-        utils_crawler::Add(Root, CrawlerSpec);
+        if (CrawlerSpec.Combat.Enabled)
+        { DefaultCombatGeometry(CrawlerSpec); }
+
+        const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");
 
+        // The timer dies with the entity; nothing to unbind.
+        if (DebugDrawAttack && ck::IsValid(Crawler) && Crawler.Get_IsCombatArmed())
+        {
+            _DebugCrawler = Crawler;
+            utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnDebugDrawAttackTick"));
+        }
+
         return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+
+    // The jab hits from the body's front face and starts within its half length plus StartDistanceMargin, unless the
+    // spec authored either.
+    private void DefaultCombatGeometry(FMars_Crawler_Spec& InOutSpec)
+    {
+        const auto HalfLength = InOutSpec.Rig.BodyHalfExtents.X;
+        if (InOutSpec.Combat.Hit.LocalCenter == FVector::ZeroVector)
+        { InOutSpec.Combat.Hit.LocalCenter = FVector(HalfLength, 0.0, 0.0); }
+
+        if (InOutSpec.Combat.Prepare.StartDistance == 0.0f)
+        { InOutSpec.Combat.Prepare.StartDistance = float32(HalfLength + StartDistanceMargin); }
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Attack debug drawing
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // A new accepted centre moves the previous one into _DebugPreviousCenter, so the line is the segment the kernel swept
+    // for that sample (from the neutral centre on the first sample of an attack).
+    UFUNCTION()
+    private void OnDebugDrawAttackTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
+    {
+        if (ck::Is_NOT_Valid(_DebugCrawler))
+        { return; }
+
+        const auto Center = _DebugCrawler.Get_AttackAcceptedHitCenter();
+        if (Center.Equals(_DebugCenter) == false)
+        {
+            _DebugPreviousCenter = _DebugCenter;
+            _DebugCenter = Center;
+        }
+
+        const auto Phase = _DebugCrawler.Get_AttackPhase();
+        if (Phase == EMars_Crawler_AttackPhase::Idle)
+        { return; }
+
+        const auto PhaseColor = Get_DebugPhaseColor(Phase);
+        const auto Radius = _DebugCrawler.Get_Spec().Combat.Hit.Radius;
+        utils_debug_draw::DrawDebugSphere(Center, Radius, 12, PhaseColor, 0.0f, DebugDrawThickness);
+        utils_debug_draw::DrawDebugLine(_DebugPreviousCenter, Center, PhaseColor, 0.0f, DebugDrawThickness * 2.0f);
+        utils_debug_draw::DrawDebugLine(_DebugCrawler.Get_AttackAcceptedWorld().GetLocation(), Center, FLinearColor::White, 0.0f, DebugDrawThickness);
+    }
+
+    private FLinearColor Get_DebugPhaseColor(EMars_Crawler_AttackPhase InPhase) const
+    {
+        switch (InPhase)
+        {
+            case EMars_Crawler_AttackPhase::Windup: return FLinearColor::Yellow;
+            case EMars_Crawler_AttackPhase::Strike: return FLinearColor::Red;
+            case EMars_Crawler_AttackPhase::Recover: return FLinearColor(0.2f, 0.4f, 1.0f);
+            case EMars_Crawler_AttackPhase::CancelRecover: return FLinearColor(0.2f, 0.4f, 1.0f);
+            default: return FLinearColor::Gray;
+        }
     }
 
     //----------------------------------------------------------------------------------------------------------------------

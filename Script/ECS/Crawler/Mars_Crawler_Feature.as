@@ -112,6 +112,251 @@ mixin FMars_Validation Validate(const FMars_Crawler_Rig& Self, int32 InLegCount)
     return FMars_Validation();
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+// Combat spec: the body jab (Mars_Crawler_Attack.as evaluates it)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// One jab's phase lengths. CancelSeconds eases an interrupted attack back to neutral; PoseTimeoutSeconds bounds the wait
+// for the body pose to publish a requested sample.
+struct FMars_Crawler_AttackTiming
+{
+    UPROPERTY()
+    float32 WindupSeconds = 0.40f;
+
+    UPROPERTY()
+    float32 StrikeSeconds = 0.12f;
+
+    UPROPERTY()
+    float32 RecoverSeconds = 0.50f;
+
+    UPROPERTY()
+    float32 CooldownSeconds = 0.70f;
+
+    UPROPERTY()
+    float32 CancelSeconds = 0.15f;
+
+    UPROPERTY()
+    float32 PoseTimeoutSeconds = 1.0f;
+}
+
+mixin FMars_Validation Validate(const FMars_Crawler_AttackTiming& Self)
+{
+    if (utils_crawler::Get_IsPositiveFinite(Self.WindupSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.StrikeSeconds) == false ||
+        utils_crawler::Get_IsPositiveFinite(Self.RecoverSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.CooldownSeconds) == false ||
+        utils_crawler::Get_IsPositiveFinite(Self.CancelSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.PoseTimeoutSeconds) == false)
+    {
+        return FMars_Validation(f"Crawler combat has a non-positive or non-finite duration (windup [{Self.WindupSeconds}], strike [{Self.StrikeSeconds}], recover [{Self.RecoverSeconds}], cooldown [{Self.CooldownSeconds}], cancel [{Self.CancelSeconds}], pose timeout [{Self.PoseTimeoutSeconds}])");
+    }
+
+    return FMars_Validation();
+}
+
+// Body-local action keys in centimetres, in the simulation body's axes, unit scale, and the easing into each. Translation
+// only: a rotated key would sweep a curved path that the straight sample-to-sample hit query does not cover.
+struct FMars_Crawler_AttackPose
+{
+    UPROPERTY()
+    FTransform Windup = FTransform(FRotator::ZeroRotator, FVector(-10.0, 0.0, -5.0), FVector::OneVector);
+
+    UPROPERTY()
+    FTransform Strike = FTransform(FRotator::ZeroRotator, FVector(24.0, 0.0, 0.0), FVector::OneVector);
+
+    UPROPERTY()
+    ECk_TweenEasing WindupEasing = ECk_TweenEasing::OutCubic;
+
+    UPROPERTY()
+    ECk_TweenEasing StrikeEasing = ECk_TweenEasing::InQuad;
+
+    // Also eases a cancelled attack back to neutral.
+    UPROPERTY()
+    ECk_TweenEasing RecoverEasing = ECk_TweenEasing::InOutCubic;
+}
+
+mixin FMars_Validation Validate(const FMars_Crawler_AttackPose& Self)
+{
+    if (utils_crawler::Get_IsTranslationOnly(Self.Windup) == false || utils_crawler::Get_IsTranslationOnly(Self.Strike) == false)
+    {
+        return FMars_Validation(f"Crawler combat needs finite, unit-scale, translation-only keys (windup [{Self.Windup.GetLocation().ToString()} {Self.Windup.Rotator().ToString()} {Self.Windup.GetScale3D().ToString()}], strike [{Self.Strike.GetLocation().ToString()} {Self.Strike.Rotator().ToString()} {Self.Strike.GetScale3D().ToString()}])");
+    }
+
+    return FMars_Validation();
+}
+
+struct FMars_Crawler_AttackHit
+{
+    // The hit sphere's centre in the presentation's frame. The entity script defaults an unset one to the body's front face.
+    UPROPERTY()
+    FVector LocalCenter = FVector::ZeroVector;
+
+    UPROPERTY()
+    float32 Radius = 20.0f;
+
+    UPROPERTY()
+    float32 Damage = 15.0f;
+
+    UPROPERTY(meta = (Categories = "DamageType"))
+    FGameplayTag DamageType = GameplayTags::DamageType_Mars_Blunt;
+
+    // An accepted hit centre that moves further than this between two samples cancels the attack (Displaced), unswept.
+    UPROPERTY()
+    float32 MaxSampleTravel = 80.0f;
+
+    // The root moving further than this from where the attack started cancels it (Displaced).
+    UPROPERTY()
+    float32 MaxRootDrift = 10.0f;
+}
+
+mixin FMars_Validation Validate(const FMars_Crawler_AttackHit& Self)
+{
+    if (utils_crawler::Get_IsFinite(Self.LocalCenter) == false)
+    { return FMars_Validation(f"Crawler combat has a non-finite hit LocalCenter [{Self.LocalCenter.ToString()}]"); }
+
+    if (utils_crawler::Get_IsPositiveFinite(Self.Radius) == false || Math::IsFinite(Self.Damage) == false || Self.Damage < 0.0f)
+    { return FMars_Validation(f"Crawler combat has a non-positive hit Radius [{Self.Radius}] or a negative or non-finite Damage [{Self.Damage}]"); }
+
+    if (Self.DamageType.IsValid() == false)
+    { return FMars_Validation("Crawler combat has no DamageType"); }
+
+    if (utils_crawler::Get_IsPositiveFinite(Self.MaxSampleTravel) == false || utils_crawler::Get_IsPositiveFinite(Self.MaxRootDrift) == false)
+    { return FMars_Validation(f"Crawler combat has a non-positive MaxSampleTravel [{Self.MaxSampleTravel}] or MaxRootDrift [{Self.MaxRootDrift}]"); }
+
+    return FMars_Validation();
+}
+
+// Target acquisition (UMars_Processor_Crawler_Targeting) and the behaviour's approach cadence.
+struct FMars_Crawler_Targeting
+{
+    UPROPERTY()
+    float32 AcquireRadius = 700.0f;
+
+    // A held target is kept until it leaves this radius (hysteresis over AcquireRadius).
+    UPROPERTY()
+    float32 LoseRadius = 900.0f;
+
+    // Targets are only chosen and kept within this distance of the crawler's home (its root at Add).
+    UPROPERTY()
+    float32 HomeRadius = 600.0f;
+
+    UPROPERTY()
+    float32 SenseInterval = 0.20f;
+
+    UPROPERTY()
+    float32 RepathSeconds = 0.25f;
+
+    UPROPERTY()
+    float32 RepathDistance = 35.0f;
+
+    UPROPERTY()
+    float32 BlockedRetrySeconds = 1.0f;
+}
+
+mixin FMars_Validation Validate(const FMars_Crawler_Targeting& Self)
+{
+    if (utils_crawler::Get_IsPositiveFinite(Self.AcquireRadius) == false || utils_crawler::Get_IsPositiveFinite(Self.LoseRadius) == false ||
+        utils_crawler::Get_IsPositiveFinite(Self.HomeRadius) == false || utils_crawler::Get_IsPositiveFinite(Self.SenseInterval) == false ||
+        utils_crawler::Get_IsPositiveFinite(Self.RepathSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.RepathDistance) == false ||
+        utils_crawler::Get_IsPositiveFinite(Self.BlockedRetrySeconds) == false)
+    {
+        return FMars_Validation(f"Crawler combat has a non-positive targeting value (acquire [{Self.AcquireRadius}], lose [{Self.LoseRadius}], home [{Self.HomeRadius}], sense [{Self.SenseInterval}], repath [{Self.RepathSeconds}] s / [{Self.RepathDistance}] cm, blocked retry [{Self.BlockedRetrySeconds}])");
+    }
+
+    if (Self.AcquireRadius > Self.LoseRadius)
+    { return FMars_Validation(f"Crawler combat has an AcquireRadius [{Self.AcquireRadius}] beyond its LoseRadius [{Self.LoseRadius}]"); }
+
+    return FMars_Validation();
+}
+
+// What must hold before a jab may start; the start request's admission checks it again.
+struct FMars_Crawler_Prepare
+{
+    // Horizontal root-to-target distance. The entity script defaults an unset one to the body's half length + 70.
+    UPROPERTY()
+    float32 StartDistance = 0.0f;
+
+    UPROPERTY()
+    float32 FacingToleranceDegrees = 10.0f;
+
+    UPROPERTY()
+    float32 MaxHeightDifference = 60.0f;
+
+    UPROPERTY()
+    float32 MaxGroundSlopeDegrees = 35.0f;
+
+    UPROPERTY()
+    float32 MaxSpeedToStart = 3.0f;
+
+    UPROPERTY()
+    float32 TimeoutSeconds = 2.0f;
+}
+
+mixin FMars_Validation Validate(const FMars_Crawler_Prepare& Self)
+{
+    if (utils_crawler::Get_IsPositiveFinite(Self.StartDistance) == false || utils_crawler::Get_IsPositiveFinite(Self.TimeoutSeconds) == false)
+    { return FMars_Validation(f"Crawler combat has a non-positive StartDistance [{Self.StartDistance}] or prepare TimeoutSeconds [{Self.TimeoutSeconds}]"); }
+
+    if (utils_crawler::Get_IsPositiveFinite(Self.FacingToleranceDegrees) == false || Self.FacingToleranceDegrees > 180.0f ||
+        utils_crawler::Get_IsPositiveFinite(Self.MaxGroundSlopeDegrees) == false || Self.MaxGroundSlopeDegrees > 90.0f)
+    { return FMars_Validation(f"Crawler combat has a FacingToleranceDegrees [{Self.FacingToleranceDegrees}] outside (0, 180] or a MaxGroundSlopeDegrees [{Self.MaxGroundSlopeDegrees}] outside (0, 90]"); }
+
+    if (Math::IsFinite(Self.MaxHeightDifference) == false || Self.MaxHeightDifference < 0.0f ||
+        Math::IsFinite(Self.MaxSpeedToStart) == false || Self.MaxSpeedToStart < 0.0f)
+    { return FMars_Validation(f"Crawler combat has a negative or non-finite MaxHeightDifference [{Self.MaxHeightDifference}] or MaxSpeedToStart [{Self.MaxSpeedToStart}]"); }
+
+    return FMars_Validation();
+}
+
+// Off by default: a crawler without Enabled composes exactly as it did before combat existed. Enabled arms it only in a
+// local combat world (utils_local_session::Get_IsLocalCombatWorld).
+struct FMars_Crawler_Combat
+{
+    UPROPERTY()
+    bool Enabled = false;
+
+    // Whether an armed crawler chooses combat targets from the start; Request_SetAggression switches it at run time.
+    UPROPERTY()
+    ECk_EnableDisable StartAggressive = ECk_EnableDisable::Enable;
+
+    UPROPERTY()
+    FMars_Crawler_AttackTiming Timing;
+
+    UPROPERTY()
+    FMars_Crawler_AttackPose Pose;
+
+    UPROPERTY()
+    FMars_Crawler_AttackHit Hit;
+
+    UPROPERTY()
+    FMars_Crawler_Targeting Targeting;
+
+    UPROPERTY()
+    FMars_Crawler_Prepare Prepare;
+}
+
+// A disabled profile is never checked: it composes nothing.
+mixin FMars_Validation Validate(const FMars_Crawler_Combat& Self)
+{
+    if (Self.Enabled == false)
+    { return FMars_Validation(); }
+
+    const auto TimingValidation = Self.Timing.Validate();
+    if (TimingValidation.IsValid() == false)
+    { return TimingValidation; }
+
+    const auto PoseValidation = Self.Pose.Validate();
+    if (PoseValidation.IsValid() == false)
+    { return PoseValidation; }
+
+    const auto HitValidation = Self.Hit.Validate();
+    if (HitValidation.IsValid() == false)
+    { return HitValidation; }
+
+    const auto TargetingValidation = Self.Targeting.Validate();
+    if (TargetingValidation.IsValid() == false)
+    { return TargetingValidation; }
+
+    return Self.Prepare.Validate();
+}
+
 struct FMars_Crawler_Spec
 {
     // 4 or 6 (utils_crawler::Get_RigData).
@@ -138,6 +383,10 @@ struct FMars_Crawler_Spec
     // The transform entities the walker poses, built by the entity script with its visuals (features own no visuals).
     UPROPERTY()
     FMars_Crawler_Rig Rig;
+
+    // Disabled by default.
+    UPROPERTY()
+    FMars_Crawler_Combat Combat;
 
     FMars_Crawler_Spec() {}
 
@@ -176,6 +425,10 @@ mixin FMars_Validation Validate(const FMars_Crawler_Spec& Self)
     const auto RigValidation = Self.Rig.Validate(Self.LegCount);
     if (RigValidation.IsValid() == false)
     { return RigValidation; }
+
+    const auto CombatValidation = Self.Combat.Validate();
+    if (CombatValidation.IsValid() == false)
+    { return CombatValidation; }
 
     return Vitals.LegDebris.Validate();
 }
@@ -222,6 +475,396 @@ struct FMars_Fragment_Crawler
     // lands while the flinch is being cleared cannot leave the crawler waiting on a fact that never clears.
     UPROPERTY()
     int32 HurtCount = 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Combat state (an armed crawler only; utils_crawler::Add composes none of it otherwise)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Idle -> Windup -> Strike -> Recover -> Cooldown -> Idle. A cancel during Windup, Strike or Recover eases back to neutral
+// in CancelRecover, then cools down; damage is possible only from accepted Strike samples.
+enum EMars_Crawler_AttackPhase
+{
+    Idle,
+    Windup,
+    Strike,
+    Recover,
+    CancelRecover,
+    Cooldown
+}
+
+enum EMars_Crawler_AttackCancel
+{
+    // The behaviour that asked for the attack left its state.
+    StateExit,
+    // The crawler took damage after the attack started.
+    Hurt,
+    // Fewer than MinLegsToWalk legs remain enabled.
+    Crippled,
+    // Dead or body Health depleted: no recovery, straight to neutral.
+    Dead,
+    // The attack's target is gone, depleted, disabled, out of LoseRadius, or the combat target changed.
+    TargetLost,
+    // Ungrounded, untrusted contact, too steep, or the gait or body pose is not Ready.
+    Unsupported,
+    // The body pose latched a failure: no recovery, straight to neutral.
+    PoseFailed,
+    // A requested pose sample was not published within PoseTimeoutSeconds.
+    PoseTimeout,
+    // The root drifted or turned, or an accepted sample jumped further than MaxSampleTravel.
+    Displaced,
+    // Combat was switched off for this crawler: no recovery, straight to neutral.
+    Disabled,
+    // A world body or another creature's hurtbox stood in the accepted sample path.
+    Obstructed
+}
+
+enum EMars_Crawler_AttackReject
+{
+    Disarmed,
+    // An attack, its recovery or its cooldown is still running.
+    Busy,
+    NoTarget,
+    // Not the current combat target, or the target is no longer valid.
+    TargetInvalid,
+    OutOfRange,
+    Facing,
+    Moving,
+    NotReady,
+    Ungrounded,
+    Slope,
+    Height,
+    Legs,
+    Hurt,
+    Dead,
+    // A world body stands between the neutral and the windup hit centre.
+    WindupBlocked,
+    // A cancel arrived in the same request drain.
+    CancelPending
+}
+
+// Composed by Add on an armed crawler; never written afterwards.
+struct FMars_Fragment_Crawler_Combat
+{
+    // Spec.Combat.Enabled in a local combat world.
+    UPROPERTY()
+    bool Armed = false;
+
+    UPROPERTY()
+    FCk_Handle_DamageDealer Dealer;
+
+    // The root's location at Add: the leash centre of target acquisition.
+    UPROPERTY()
+    FVector Home = FVector::ZeroVector;
+}
+
+// Owner: UMars_Processor_Crawler_Targeting.
+struct FMars_Fragment_Crawler_Targeting
+{
+    UPROPERTY()
+    float32 SenseClock = 0.0f;
+
+    // The last scan's choice (diagnostics).
+    UPROPERTY()
+    FCk_Handle Candidate;
+}
+
+// Owner: UMars_Processor_Crawler_HandleRequests.
+struct FMars_Fragment_Crawler_CombatTarget
+{
+    // Targeting chooses targets only while this holds; switching it off also clears Target.
+    UPROPERTY()
+    bool Aggressive = true;
+
+    UPROPERTY()
+    FCk_Handle Target;
+
+    // Bumped on every change of Target.
+    UPROPERTY()
+    int32 TargetGeneration = 0;
+}
+
+// Mailbox: written by UMars_Processor_Crawler_HandleRequests, consumed and reset by UMars_Processor_Crawler_AttackTick in
+// the same frame.
+struct FMars_Fragment_Crawler_AttackIntents
+{
+    UPROPERTY()
+    TOptional<FMars_Request_Crawler_StartAttack> PendingStart;
+
+    UPROPERTY()
+    TOptional<EMars_Crawler_AttackCancel> PendingCancel;
+}
+
+// Owner: UMars_Processor_Crawler_AttackTick, the one attack clock. Its inputs are the intents mailbox and the resolver's
+// observations.
+struct FMars_Fragment_Crawler_Attack
+{
+    UPROPERTY()
+    EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
+
+    UPROPERTY()
+    float32 PhaseElapsed = 0.0f;
+
+    // Bumped on every admission and every cancel: a candidate of an older generation never commits.
+    UPROPERTY()
+    int32 Generation = 0;
+
+    UPROPERTY()
+    int32 HurtCountAtStart = 0;
+
+    // The root's forward on the support plane at admission; the attack never re-aims.
+    UPROPERTY()
+    FVector CommittedDirection = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector RootAtStart = FVector::ZeroVector;
+
+    // The combat target at admission; a later change of the combat target cancels the attack instead.
+    UPROPERTY()
+    FCk_Handle Target;
+
+    // The body pose sample awaiting acknowledgment; 0 when none.
+    UPROPERTY()
+    int64 PendingSampleId = 0;
+
+    UPROPERTY()
+    int64 NextSampleId = 0;
+
+    // The pending sample is its phase's endpoint: its acknowledgment ends the phase.
+    UPROPERTY()
+    bool EndpointSubmitted = false;
+
+    UPROPERTY()
+    float32 PoseTimeoutElapsed = 0.0f;
+
+    UPROPERTY()
+    float32 CooldownRemaining = 0.0f;
+
+    // The last action offset submitted; a cancelled attack eases back from it.
+    UPROPERTY()
+    FTransform RequestedActionOffset = FTransform::Identity;
+
+    UPROPERTY()
+    FTransform CancelRecoverStart = FTransform::Identity;
+
+    // Latched by this attack's one damage request, whatever the dealer made of it; cleared by the next admission.
+    UPROPERTY()
+    bool DamageCommitted = false;
+
+    // The sample whose candidate was committed; 0 when none.
+    UPROPERTY()
+    int64 CommittedSampleId = 0;
+
+    // No later sample of this attack may produce a hit.
+    UPROPERTY()
+    bool WindowClosed = false;
+
+    // Cooldown's identity sample went out.
+    UPROPERTY()
+    bool NeutralSubmitted = false;
+
+    UPROPERTY()
+    TOptional<EMars_Crawler_AttackCancel> LastCancel;
+
+    UPROPERTY()
+    TOptional<EMars_Crawler_AttackReject> LastReject;
+}
+
+// One stored hit on the attack's target, committed or discarded by the next attack tick.
+struct FMars_Crawler_HitCandidate
+{
+    UPROPERTY()
+    FCk_Handle HitEntity;
+
+    UPROPERTY()
+    FCk_Handle_HitZone Zone;
+
+    UPROPERTY()
+    FCk_Handle Target;
+
+    UPROPERTY()
+    FVector Location = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector Normal = FVector::UpVector;
+
+    UPROPERTY()
+    int32 Generation = 0;
+
+    UPROPERTY()
+    int64 SampleId = 0;
+
+    UPROPERTY()
+    int32 HurtCount = 0;
+}
+
+// Mailbox: written by UMars_Processor_Crawler_AttackResolve (FGroup_Overlap); UMars_Processor_Crawler_AttackTick consumes
+// the candidate, the obstruction and the displacement on the next frame and resets the attack's fields at admission.
+struct FMars_Fragment_Crawler_AttackObservations
+{
+    UPROPERTY()
+    int64 AckSampleId = 0;
+
+    UPROPERTY()
+    int64 AckRevision = 0;
+
+    // The presentation's world transform of the last acknowledged sample.
+    UPROPERTY()
+    FTransform AcceptedWorld = FTransform::Identity;
+
+    UPROPERTY()
+    FVector AcceptedHitCenter = FVector::ZeroVector;
+
+    UPROPERTY()
+    FVector PreviousHitCenter = FVector::ZeroVector;
+
+    UPROPERTY()
+    TOptional<FMars_Crawler_HitCandidate> Candidate;
+
+    UPROPERTY()
+    bool Obstructed = false;
+
+    UPROPERTY()
+    TOptional<EMars_Crawler_AttackCancel> Displaced;
+
+    // The longest sample-to-sample sweep of the current attack (diagnostics).
+    UPROPERTY()
+    float32 LongestSweep = 0.0f;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Engage (the behaviour layer's stage record; an armed crawler only)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// The Engage behaviour's sub-SM stage (Mars_Crawler_Hfsm.as); None outside Engage.
+enum EMars_Crawler_EngageStage
+{
+    None,
+    Approach,
+    Prepare,
+    Attack,
+    Wait
+}
+
+// Owner: the Engage stage tasks (Mars_Crawler_Hfsm.as), not a processor: each stage's task writes the stage it hands over
+// to and the sub-SM's polled conditions read it; leaving Engage resets it. Times are on the current stage's clock,
+// StageElapsed.
+struct FMars_Fragment_Crawler_Engage
+{
+    UPROPERTY()
+    EMars_Crawler_EngageStage Stage = EMars_Crawler_EngageStage::None;
+
+    UPROPERTY()
+    float32 StageElapsed = 0.0f;
+
+    // Wait hands back to Approach no earlier than this.
+    UPROPERTY()
+    float32 RetryUntil = 0.0f;
+
+    // Approach's last MoveTo; unset until the stage sends one.
+    UPROPERTY()
+    TOptional<float32> LastRepathAt;
+
+    // Where the target stood at that MoveTo.
+    UPROPERTY()
+    FVector LastRepathTarget = FVector::ZeroVector;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Signals
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Every phase change of the attack, once the attack state is fully written.
+delegate void FMars_Delegate_Crawler_OnAttackPhaseChanged(FCk_Handle_Crawler InCrawler, EMars_Crawler_AttackPhase InOld, EMars_Crawler_AttackPhase InNew);
+event void FMars_Delegate_Crawler_OnAttackPhaseChanged_MC(FCk_Handle_Crawler InCrawler, EMars_Crawler_AttackPhase InOld, EMars_Crawler_AttackPhase InNew);
+
+// Every change of the combat target; an invalid handle is no target.
+delegate void FMars_Delegate_Crawler_OnTargetChanged(FCk_Handle_Crawler InCrawler, FCk_Handle InOld, FCk_Handle InNew);
+event void FMars_Delegate_Crawler_OnTargetChanged_MC(FCk_Handle_Crawler InCrawler, FCk_Handle InOld, FCk_Handle InNew);
+
+struct FMars_Fragment_Crawler_Signals
+{
+    FMars_Delegate_Crawler_OnAttackPhaseChanged_MC OnAttackPhaseChanged;
+    FMars_Delegate_Crawler_OnTargetChanged_MC OnTargetChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Requests
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Switches target acquisition on or off. Off clears the combat target and cancels an attack in flight (Disabled); on
+// lets the targeting processor choose again on its next scan.
+struct FMars_Request_Crawler_SetAggression
+{
+    UPROPERTY()
+    ECk_EnableDisable Aggression = ECk_EnableDisable::Enable;
+
+    FMars_Request_Crawler_SetAggression() {}
+
+    FMars_Request_Crawler_SetAggression(ECk_EnableDisable InAggression)
+    {
+        Aggression = InAggression;
+    }
+}
+
+// Selects the combat target; an invalid handle clears it. A change cancels an attack in flight (TargetLost).
+struct FMars_Request_Crawler_SetCombatTarget
+{
+    UPROPERTY()
+    FCk_Handle Target;
+
+    FMars_Request_Crawler_SetCombatTarget() {}
+
+    FMars_Request_Crawler_SetCombatTarget(FCk_Handle InTarget)
+    {
+        Target = InTarget;
+    }
+}
+
+// One jab at Target, which must be the current combat target. The next attack tick admits it or records why not
+// (Get_AttackLastReject); it is never queued behind an attack in flight.
+struct FMars_Request_Crawler_StartAttack
+{
+    UPROPERTY()
+    FCk_Handle Target;
+
+    FMars_Request_Crawler_StartAttack() {}
+
+    FMars_Request_Crawler_StartAttack(FCk_Handle InTarget)
+    {
+        Target = InTarget;
+    }
+}
+
+// Cancels the attack in flight. Idempotent: a recovery is never restarted. A start in the same drain is rejected.
+struct FMars_Request_Crawler_CancelAttack
+{
+    UPROPERTY()
+    EMars_Crawler_AttackCancel Reason = EMars_Crawler_AttackCancel::StateExit;
+
+    FMars_Request_Crawler_CancelAttack() {}
+
+    FMars_Request_Crawler_CancelAttack(EMars_Crawler_AttackCancel InReason)
+    {
+        Reason = InReason;
+    }
+}
+
+// Per kind: the last SetAggression and the last SetCombatTarget win, the first cancel reason wins, the last start is the
+// one considered.
+struct FMars_Fragment_Crawler_Requests
+{
+    UPROPERTY()
+    TArray<FMars_Request_Crawler_SetAggression> SetAggressionRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Crawler_SetCombatTarget> SetCombatTargetRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Crawler_StartAttack> StartAttackRequests;
+
+    UPROPERTY()
+    TArray<FMars_Request_Crawler_CancelAttack> CancelAttackRequests;
 }
 
 struct FMars_Tag_Crawler_NeedsSetup {}

@@ -60,11 +60,13 @@ namespace utils_crawler
     }
 
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
-    // their visuals): surface motion -> walker (legs, gait, rigs) -> body pose (before any detach) -> monster -> one
-    // part per leg on the leg entity, with a hurtbox on every segment and the foot -> the body hurtbox -> the navigator
-    // (on the root, steering the surface motion) -> the brain (Mars_Crawler_Goap.as) -> the crawler fragments -> LAST
-    // the state machine (Mars_Crawler_Hfsm.as), whose conditions bind the brain and the Dead attribute as it enters
-    // Alive. A rejected spec (rig included) or sub-feature ensures and returns an invalid handle.
+    // their visuals): surface motion -> walker (legs, gait, rigs) -> body pose (before any detach) -> monster -> the
+    // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
+    // the body hurtbox -> the navigator (on the root, steering the surface motion) -> the brain (Mars_Crawler_Goap.as)
+    // -> the crawler fragments and, armed only, the combat fragments -> LAST the state machine (Mars_Crawler_Hfsm.as),
+    // whose conditions bind the brain and the Dead attribute as it enters Alive. Armed = Spec.Combat.Enabled in a local
+    // combat world; an unarmed crawler composes exactly what it did before combat existed. A rejected spec (rig and
+    // combat profile included) or sub-feature ensures and returns an invalid handle.
     FCk_Handle_Crawler Add(FCk_Handle_Transform& InRoot, FMars_Crawler_Spec InSpec)
     {
         FCk_Handle RootEntity = InRoot;
@@ -101,6 +103,17 @@ namespace utils_crawler
         auto Monster = utils_monster::Add(RootEntity, Make_MonsterSpec(InSpec.Vitals));
         if (ck::Is_NOT_Valid(Monster))
         { return FCk_Handle_Crawler(); }
+
+        const auto Armed = InSpec.Combat.Enabled &&
+            utils_local_session::Get_IsLocalCombatWorld(utils_entity_lifetime::Get_WorldForEntity(RootEntity));
+
+        auto Dealer = FCk_Handle_DamageDealer();
+        if (Armed)
+        {
+            Dealer = utils_damage_dealer::Add(RootEntity, FMars_DamageDealer_Spec());
+            if (ck::Is_NOT_Valid(Dealer))
+            { return FCk_Handle_Crawler(); }
+        }
 
         auto BodyZone = Monster.Get_BodyZone();
         auto Presentation = Rig.Presentation;
@@ -149,6 +162,24 @@ namespace utils_crawler
         RootEntity.Add_Fragment(State);
         RootEntity.Add_Fragment(FMars_Tag_Crawler_NeedsSetup());
 
+        if (Armed)
+        {
+            auto Combat = FMars_Fragment_Crawler_Combat();
+            Combat.Armed = true;
+            Combat.Dealer = Dealer;
+            Combat.Home = utils_transform::Get_EntityCurrentLocation(InRoot);
+
+            RootEntity.Add_Fragment(Combat);
+            RootEntity.Add_Fragment(FMars_Fragment_Crawler_Targeting());
+            auto CombatTarget = FMars_Fragment_Crawler_CombatTarget();
+            CombatTarget.Aggressive = InSpec.Combat.StartAggressive == ECk_EnableDisable::Enable;
+            RootEntity.Add_Fragment(CombatTarget);
+            RootEntity.Add_Fragment(FMars_Fragment_Crawler_Attack());
+            RootEntity.Add_Fragment(FMars_Fragment_Crawler_AttackObservations());
+            RootEntity.Add_Fragment(FMars_Fragment_Crawler_AttackIntents());
+            RootEntity.Add_Fragment(FMars_Fragment_Crawler_Engage());
+        }
+
         // Last: Alive's conditions read the Dead attribute and the brain as the machine enters its initial state.
         utils_state_machine::Add(RootEntity, FCk_StateMachine_Spec(UMars_SmState_Crawler_Alive));
         return RootEntity.As_Crawler();
@@ -162,16 +193,24 @@ namespace utils_crawler
         Facts.Add(FMars_Brain_Fact(Get_IsHurtFact(), false));
         Facts.Add(FMars_Brain_Fact(Get_CanWalkFact(), true));
         Facts.Add(FMars_Brain_Fact(Get_SettledFact(), false));
+        Facts.Add(FMars_Brain_Fact(Get_HasCombatTargetFact(), false));
 
         auto Goal = TArray<FCk_GoapWS_Condition_Authored>();
         Goal.Add(FCk_GoapWS_Condition_Authored(Get_SettledFact(), true));
 
         auto Spec = FMars_Brain_Spec(GameplayTags::Mars_Goap_Crawler, GameplayTags::Mars_WS_Crawler, Facts, Goal, 0.25f);
         Spec.AddAction(UMars_GoapAction_Crawler_Roam);
+        Spec.AddAction(UMars_GoapAction_Crawler_Engage);
         Spec.AddAction(UMars_GoapAction_Crawler_Flinch);
         Spec.AddAction(UMars_GoapAction_Crawler_Cower);
         Spec.AddAction(UMars_GoapAction_Crawler_Idle);
         return Spec;
+    }
+
+    // Written only by the combat request drain: Aggressive and holding a valid combat target.
+    FGameplayTag Get_HasCombatTargetFact()
+    {
+        return GameplayTags::Mars_WS_Crawler_HasCombatTarget;
     }
 
     // A hurtbox on every segment (its own box) and on the foot (the last box), each a scene node under that part.
@@ -316,4 +355,415 @@ mixin FMars_Crawler_LegRig Get_LegRig(const FCk_Handle_Crawler& Self, int32 InIn
     { return FMars_Crawler_LegRig(); }
 
     return Legs[InIndex];
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Combat getters (read-only; an unarmed crawler reads Idle, no target and nothing pending)
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Spec.Combat.Enabled in a local combat world: only then does the crawler carry any combat state.
+mixin bool Get_IsCombatArmed(const FCk_Handle_Crawler& Self)
+{
+    return Self.Has_Fragment(FMars_Fragment_Crawler_Combat) && Self.Get_Fragment(FMars_Fragment_Crawler_Combat).Armed;
+}
+
+mixin FCk_Handle_DamageDealer Get_CombatDealer(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Combat) == false)
+    { return FCk_Handle_DamageDealer(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Combat).Dealer;
+}
+
+mixin FVector Get_CombatHome(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Combat) == false)
+    { return FVector::ZeroVector; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Combat).Home;
+}
+
+// Targeting chooses combat targets (Spec.Combat.StartAggressive, then Request_SetAggression); false when unarmed.
+mixin bool Get_IsAggressive(const FCk_Handle_Crawler& Self)
+{
+    return Self.Has_Fragment(FMars_Fragment_Crawler_CombatTarget) && Self.Get_Fragment(FMars_Fragment_Crawler_CombatTarget).Aggressive;
+}
+
+mixin FCk_Handle Get_CombatTarget(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_CombatTarget) == false)
+    { return FCk_Handle(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_CombatTarget).Target;
+}
+
+mixin int32 Get_CombatTargetGeneration(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_CombatTarget) == false)
+    { return 0; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_CombatTarget).TargetGeneration;
+}
+
+// True until the combat request drain has run.
+mixin bool Get_HasPendingCombatRequests(const FCk_Handle_Crawler& Self)
+{
+    return Self.Has_Fragment(FMars_Fragment_Crawler_Requests);
+}
+
+mixin EMars_Crawler_AttackPhase Get_AttackPhase(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return EMars_Crawler_AttackPhase::Idle; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Phase;
+}
+
+mixin float32 Get_AttackCooldownRemaining(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return 0.0f; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CooldownRemaining;
+}
+
+mixin float32 Get_AttackPhaseElapsed(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return 0.0f; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PhaseElapsed;
+}
+
+// The current phase's authored length (0 for Idle and Cooldown).
+mixin float32 Get_AttackPhaseDuration(const FCk_Handle_Crawler& Self)
+{
+    return utils_crawler::Make_PhaseDuration(Self.Get_Spec().Combat.Timing, Self.Get_AttackPhase());
+}
+
+mixin int32 Get_AttackGeneration(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return 0; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Generation;
+}
+
+// The attack's target, copied at admission.
+mixin FCk_Handle Get_AttackTarget(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return FCk_Handle(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Target;
+}
+
+mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return FVector::ZeroVector; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedDirection;
+}
+
+// The body pose sample the attack is waiting for; 0 when none.
+mixin int64 Get_AttackPendingSampleId(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return 0; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PendingSampleId;
+}
+
+// The pending sample ends its phase.
+mixin bool Get_AttackEndpointSubmitted(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return false; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).EndpointSubmitted;
+}
+
+// The last sample the body pose published that the attack was waiting for.
+mixin int64 Get_AttackAcknowledgedSampleId(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return 0; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AckSampleId;
+}
+
+// The presentation's world transform of the last acknowledged sample.
+mixin FTransform Get_AttackAcceptedWorld(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return FTransform::Identity; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedWorld;
+}
+
+mixin FVector Get_AttackAcceptedHitCenter(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return FVector::ZeroVector; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedHitCenter;
+}
+
+// The longest sample-to-sample sweep of the current (or last) attack.
+mixin float32 Get_AttackLongestSweep(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return 0.0f; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).LongestSweep;
+}
+
+// A hit was observed and waits for the next attack tick to commit or discard it.
+mixin bool Get_AttackCandidatePending(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return false; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Candidate.IsSet();
+}
+
+// This attack sent its one damage request (whatever the dealer made of it).
+mixin bool Get_AttackDamageCommitted(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return false; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).DamageCommitted;
+}
+
+// The sample whose hit was committed; 0 when none.
+mixin int64 Get_AttackCommittedSampleId(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return 0; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedSampleId;
+}
+
+mixin TOptional<EMars_Crawler_AttackCancel> Get_AttackLastCancel(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return TOptional<EMars_Crawler_AttackCancel>(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).LastCancel;
+}
+
+mixin TOptional<EMars_Crawler_AttackReject> Get_AttackLastReject(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return TOptional<EMars_Crawler_AttackReject>(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).LastReject;
+}
+
+// InTarget can be attacked and kept: live, not being destroyed, with a Health that is not depleted and an enabled HitZone,
+// within LoseRadius of the crawler (horizontally).
+mixin bool Get_IsCombatTargetValid(const FCk_Handle_Crawler& Self, FCk_Handle InTarget)
+{
+    if (ck::Is_NOT_Valid(InTarget) || utils_entity_lifetime::Get_IsPendingDestroy(InTarget, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
+    { return false; }
+
+    const auto Transform = InTarget.As_Transform(ECk_SanityCheck::UnChecked);
+    const auto Health = InTarget.As_Health(ECk_SanityCheck::UnChecked);
+    const auto Zone = InTarget.As_HitZone(ECk_SanityCheck::UnChecked);
+    if (ck::Is_NOT_Valid(Transform) || ck::Is_NOT_Valid(Health) || ck::Is_NOT_Valid(Zone))
+    { return false; }
+
+    if (Health.Get_IsDepleted() || Zone.Get_IsEnabled() == false)
+    { return false; }
+
+    const auto TargetLocation = utils_transform::Get_EntityCurrentLocation(Transform);
+    const auto Root = utils_transform::Get_EntityCurrentLocation(Self.As_Transform());
+    return (TargetLocation - Root).Size2D() <= Self.Get_Spec().Combat.Targeting.LoseRadius;
+}
+
+// The crawler is dead or its body Health depleted (the Dead attribute lags the depletion by a drain).
+mixin bool Get_IsCombatDead(const FCk_Handle_Crawler& Self)
+{
+    const auto Monster = Self.Get_Monster();
+    return Monster.Get_IsDead() || Monster.Get_BodyHealth().Get_IsDepleted();
+}
+
+// Unset when nothing about the crawler alone forbids an attack: Ready gait, body pose and surface motion, grounded on
+// trusted contact no steeper than MaxGroundSlopeDegrees. Otherwise the reason (NotReady, Ungrounded or Slope).
+mixin TOptional<EMars_Crawler_AttackReject> Get_SupportRejection(const FCk_Handle_Crawler& Self)
+{
+    const auto Motion = Self.Get_Motion();
+    if (utils_procedural_gait::Get_Status(Self.Get_Gait()) != ECk_ProceduralAnimation_Status::Ready ||
+        utils_procedural_body_pose::Get_Status(Self.Get_BodyPose()) != ECk_ProceduralAnimation_Status::Ready ||
+        utils_surface_motion::Get_Status(Motion) != ECk_ProceduralAnimation_Status::Ready)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::NotReady); }
+
+    if (utils_surface_motion::Get_Support(Motion) != ECk_SurfaceMotion_Support::Grounded ||
+        utils_surface_motion::Get_ContactQuery(Motion) != ECk_SurfaceMotion_ContactQuery::Trusted)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Ungrounded); }
+
+    const auto Normal = utils_surface_motion::Get_SupportNormal(Motion).GetSafeNormal();
+    const auto SlopeDegrees = Math::RadiansToDegrees(Math::Acos(Math::Clamp(Normal.DotProduct(FVector::UpVector), -1.0, 1.0)));
+    if (Normal.IsNearlyZero() || SlopeDegrees > Self.Get_Spec().Combat.Prepare.MaxGroundSlopeDegrees)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Slope); }
+
+    return TOptional<EMars_Crawler_AttackReject>();
+}
+
+// Why a start at InTarget would be rejected now, in admission order (Disarmed, Busy, NoTarget, TargetInvalid, Dead, Legs,
+// NotReady, Ungrounded, Slope, Height, OutOfRange, Moving, Facing, WindupBlocked); unset when it would be admitted. A
+// cancel queued in the same drain (CancelPending) is the attack tick's to add.
+mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_Crawler& Self, FCk_Handle InTarget)
+{
+    if (Self.Get_IsCombatArmed() == false)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Disarmed); }
+
+    if (Self.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle || Self.Get_AttackCooldownRemaining() > 0.0f)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Busy); }
+
+    const auto CombatTarget = Self.Get_CombatTarget();
+    if (ck::Is_NOT_Valid(CombatTarget))
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::NoTarget); }
+
+    if (InTarget != CombatTarget || Self.Get_IsCombatTargetValid(InTarget) == false)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::TargetInvalid); }
+
+    if (Self.Get_IsCombatDead())
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Dead); }
+
+    const auto Spec = Self.Get_Spec();
+    if (utils_procedural_gait::Get_EnabledLegCount(Self.Get_Gait()) < Spec.MinLegsToWalk)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Legs); }
+
+    const auto SupportRejection = Self.Get_SupportRejection();
+    if (SupportRejection.IsSet())
+    { return SupportRejection; }
+
+    const auto Prepare = Spec.Combat.Prepare;
+    const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
+    const auto ToTarget = utils_transform::Get_EntityCurrentLocation(InTarget.As_Transform()) - RootTransform.GetLocation();
+    if (Math::Abs(ToTarget.Z) > Prepare.MaxHeightDifference)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Height); }
+
+    if (ToTarget.Size2D() > Prepare.StartDistance)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::OutOfRange); }
+
+    const auto Motion = Self.Get_Motion();
+    if (utils_surface_motion::Get_Velocity(Motion).Size() > Prepare.MaxSpeedToStart)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Moving); }
+
+    const auto Up = utils_surface_motion::Get_SupportNormal(Motion).GetSafeNormal();
+    if (utils_crawler::Get_PlanarAngleDegrees(RootTransform.GetRotation().GetForwardVector(), ToTarget, Up) > Prepare.FacingToleranceDegrees)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Facing); }
+
+    if (Self.Get_IsWindupBlocked())
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::WindupBlocked); }
+
+    return TOptional<EMars_Crawler_AttackReject>();
+}
+
+// A world body stands between the hit centre now and where the windup key would put it.
+mixin bool Get_IsWindupBlocked(const FCk_Handle_Crawler& Self)
+{
+    const auto Combat = Self.Get_Spec().Combat;
+    const auto Presentation = utils_transform::Get_EntityCurrentTransform(Self.Get_Presentation());
+    const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
+    const auto Neutral = utils_crawler::Get_HitCenter(Presentation, Combat.Hit.LocalCenter);
+    const auto Windup = Neutral + RootTransform.GetRotation().RotateVector(Combat.Pose.Windup.GetLocation());
+
+    auto Settings = utils_crawler::Make_AttackQuery(Neutral, Windup, Combat.Hit.Radius);
+    Settings.Set_IgnoredEntities(Self.Get_AttackIgnoredEntities());
+    FCk_Handle Tracer = Self;
+    const auto Result = utils_probe_trace::Request_SingleShapeTrace(Tracer, Settings);
+    return ck::IsValid(Result.Get_HitEntity()) && Result.Get_HitKind() == ECk_ProbeTrace_HitKind::World;
+}
+
+// The combat target is set and a start at it would be admitted now.
+mixin bool Get_CanStartAttack(const FCk_Handle_Crawler& Self)
+{
+    return Self.Get_StartRejection(Self.Get_CombatTarget()).IsSet() == false;
+}
+
+// The Engage behaviour's current stage; None outside Engage and on an unarmed crawler.
+mixin EMars_Crawler_EngageStage Get_EngageStage(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Engage) == false)
+    { return EMars_Crawler_EngageStage::None; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Engage).Stage;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Combat requests (an armed crawler only)
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void Request_SetAggression(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_SetAggression& InRequest)
+{
+    if (ck::EnsureIfNot(Self.Get_IsCombatArmed(), f"[Crawler] [{Self.ToString()}] is not armed for combat; SetAggression dropped"))
+    { return; }
+
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests);
+    Requests.SetAggressionRequests.Add(InRequest);
+}
+
+mixin void Request_SetCombatTarget(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_SetCombatTarget& InRequest)
+{
+    if (ck::EnsureIfNot(Self.Get_IsCombatArmed(), f"[Crawler] [{Self.ToString()}] is not armed for combat; SetCombatTarget dropped"))
+    { return; }
+
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests);
+    Requests.SetCombatTargetRequests.Add(InRequest);
+}
+
+mixin void Request_StartAttack(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_StartAttack& InRequest)
+{
+    if (ck::EnsureIfNot(Self.Get_IsCombatArmed(), f"[Crawler] [{Self.ToString()}] is not armed for combat; StartAttack dropped"))
+    { return; }
+
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests);
+    Requests.StartAttackRequests.Add(InRequest);
+}
+
+// An unarmed crawler has no attack to cancel, so the intent already holds and nothing is queued.
+mixin void Request_CancelAttack(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_CancelAttack& InRequest)
+{
+    if (Self.Get_IsCombatArmed() == false)
+    { return; }
+
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests);
+    Requests.CancelAttackRequests.Add(InRequest);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Signal Binding
+//--------------------------------------------------------------------------------------------------------------------------
+
+mixin void BindTo_OnAttackPhaseChanged(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackPhaseChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Signals);
+    Fragment.OnAttackPhaseChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnAttackPhaseChanged(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackPhaseChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackPhaseChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnTargetChanged(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnTargetChanged InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Signals);
+    Fragment.OnTargetChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnTargetChanged(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnTargetChanged InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnTargetChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

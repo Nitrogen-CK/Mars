@@ -1,6 +1,6 @@
 // Every entity tagged TAG_MarsMonster in the selected player's world: its body health, dead flag and parts, and for a
-// crawler its gait, legs, navigator, state machine (root and behaviour states) and brain (leaf and facts). Read-only: it
-// never requests or writes anything.
+// crawler its gait, legs, navigator, attack (target, phase, samples, hit ledger), state machine (root and behaviour
+// states) and brain (leaf and facts). Read-only: it never requests or writes anything.
 class UMars_DebugPage_Monsters : UMars_DebugPage_Base
 {
     FString GetPageName() override
@@ -56,7 +56,10 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
 
         const auto Crawler = InMonster.As_Crawler(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Crawler))
-        { DrawCrawler(Crawler); }
+        {
+            DrawCrawler(Crawler);
+            DrawCrawlerAttack(Crawler);
+        }
 
         auto StateMachine = InMonster.As_StateMachine(ECk_SanityCheck::UnChecked);
         const FString RootState = ck::IsValid(StateMachine)
@@ -105,6 +108,37 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
         DrawKvRow("Path mode", f"{Navigator.Get_PathMode() :n}");
         DrawKvRow("Goal", Navigator.Get_Goal().ToString());
         DrawKvRow("Waypoint", f"{Navigator.Get_WaypointIndex()} / {Navigator.Get_Waypoints().Num()}");
+    }
+
+    private void DrawCrawlerAttack(FCk_Handle_Crawler InCrawler)
+    {
+        if (InCrawler.Get_IsCombatArmed() == false)
+        {
+            DrawKvRow("Attack", "unarmed");
+            return;
+        }
+
+        DrawKvRow("Attack aggressive", BoolText(InCrawler.Get_IsAggressive()));
+        DrawKvRow("Engage stage", f"{InCrawler.Get_EngageStage() :n}");
+
+        const auto Target = InCrawler.Get_CombatTarget();
+        const FString TargetText = ck::IsValid(Target) ? f"{utils_handle::Get_DebugName(Target)}  {Target.ToString()}" : "-";
+        DrawKvRow("Attack target", f"{TargetText} (generation {InCrawler.Get_CombatTargetGeneration()})");
+
+        const auto Phase = InCrawler.Get_AttackPhase();
+        DrawKvRow("Attack phase", f"{Phase :n}  {InCrawler.Get_AttackPhaseElapsed() :.2} / {InCrawler.Get_AttackPhaseDuration() :.2} s",
+            Phase == EMars_Crawler_AttackPhase::Idle ? FLinearColor::White : FLinearColor(1.0f, 0.6f, 0.3f));
+        DrawKvRow("Attack cooldown", f"{InCrawler.Get_AttackCooldownRemaining() :.2} s");
+        DrawKvRow("Attack generation", f"{InCrawler.Get_AttackGeneration()}");
+        DrawKvRow("Attack samples", f"pending {InCrawler.Get_AttackPendingSampleId()} | acknowledged {InCrawler.Get_AttackAcknowledgedSampleId()}");
+        DrawKvRow("Attack accepted pose", InCrawler.Get_AttackAcceptedWorld().GetLocation().ToString());
+        DrawKvRow("Attack hit", f"candidate {BoolText(InCrawler.Get_AttackCandidatePending())} | committed {BoolText(InCrawler.Get_AttackDamageCommitted())}");
+
+        const auto LastCancel = InCrawler.Get_AttackLastCancel();
+        const auto LastReject = InCrawler.Get_AttackLastReject();
+        const FString CancelText = LastCancel.IsSet() ? f"{LastCancel.GetValue() :n}" : "-";
+        const FString RejectText = LastReject.IsSet() ? f"{LastReject.GetValue() :n}" : "-";
+        DrawKvRow("Attack last cancel / reject", f"{CancelText} / {RejectText}");
     }
 
     private FString Get_HealthText(FCk_Handle_Health InHealth) const
