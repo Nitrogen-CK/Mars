@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "39ee0783e024db1c71add2a236ebb938",
+		"sourceHash": "89dfd5a282c9a389aae688ce358e2654",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -1000,7 +1000,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_2",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_3",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1009,7 +1009,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_2"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_3"
 					},
 					"_SourceHash": -8.7129961917994865e+18,
 					"_RuntimeCheckHash": 6.4667607668865352e+18,
@@ -1053,7 +1053,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_49",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_50",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1062,7 +1062,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_49"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_50"
 					},
 					"_SourceHash": 5.305782986771372e+18,
 					"_RuntimeCheckHash": 5.627361645378814e+18,
@@ -1211,7 +1211,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_69",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_70",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1220,7 +1220,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_69"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_70"
 					},
 					"_SourceHash": 2.4449370567174758e+18,
 					"_RuntimeCheckHash": -7.9524634002502093e+18,
@@ -1264,7 +1264,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_70",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_71",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1273,7 +1273,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_70"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_71"
 					},
 					"_SourceHash": -2.8721417042572925e+17,
 					"_RuntimeCheckHash": 7.3213701045096069e+18,
@@ -1422,7 +1422,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_71",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_72",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1431,7 +1431,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_71"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_72"
 					},
 					"_SourceHash": 2.43598222836382e+18,
 					"_RuntimeCheckHash": -4.5042862452345242e+18,
@@ -1475,7 +1475,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_72",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_73",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1484,7 +1484,7 @@
 							"PackageName": "/Game/Mars/Maps/Sandbox_Mars_MAP",
 							"AssetName": "Sandbox_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_72"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_73"
 					},
 					"_SourceHash": -2.7417362211037455e+18,
 					"_RuntimeCheckHash": 6.862588771655424e+18,
