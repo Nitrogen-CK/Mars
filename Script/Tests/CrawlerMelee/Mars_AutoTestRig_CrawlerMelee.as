@@ -22,7 +22,7 @@ struct FMars_AutoTest_CrawlerMelee_PhaseRecord
     bool DamageCommitted = false;
     int64 CommittedSampleId = 0;
     int64 AcknowledgedSampleId = 0;
-    // The body pose's processed action input (the last sample submitted).
+    // The game offset whose correlated accepted receipt caused this phase transition.
     FVector ActionOffset = FVector::ZeroVector;
     int32 DamageRequests = 0;
     TOptional<EMars_Crawler_AttackCancel> LastCancel;
@@ -261,7 +261,7 @@ enum EMars_TESTONLY_CrawlerMelee_When
     CancelRecoverEntered,
     // A hit candidate is waiting for the next attack tick (FGroup_Overlap, after the resolver).
     CandidatePending,
-    // Every frame the attack is in StealPhase (StealPose only).
+    // Every frame the attack is in StealPhase (DropAcknowledgement only).
     WhilePhase
 }
 
@@ -277,8 +277,8 @@ enum EMars_TESTONLY_CrawlerMelee_Action
     DamageHealth,
     DestroyEntity,
     CancelAttack,
-    // Submits a body pose action with an id of its own after the attack's sample, so the attack's sample is never published.
-    StealPose
+    // Test-only post-resolver fault: the game ignores a real published receipt so its own acknowledgement watchdog runs.
+    DropAcknowledgement
 }
 
 // Armed by the test, read and written only by the two trigger processors once armed.
@@ -302,8 +302,7 @@ struct FMars_TESTONLY_CrawlerMelee_Trigger
     bool Fired = false;
     int64 FiredFrame = -1;
     int32 FiredGeneration = 0;
-    int32 StolenSamples = 0;
-    int64 NextStolenId = 1000000000000;
+    int32 DroppedAcknowledgements = 0;
 
     // Written by the Overlap trigger processor whatever the trigger: a candidate was pending after the resolver ran.
     bool SawCandidate = false;
@@ -336,11 +335,7 @@ class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_
             { continue; }
 
             if (Trigger.When == EMars_TESTONLY_CrawlerMelee_When::WhilePhase)
-            {
-                if (Trigger.Crawler.Get_AttackPhase() == Trigger.StealPhase)
-                { StealPose(Trigger); }
-                continue;
-            }
+            { continue; }
 
             if (Trigger.Fired || Get_IsDue(Trigger) == false)
             { continue; }
@@ -367,14 +362,6 @@ class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_
         }
     }
 
-    private void StealPose(FMars_TESTONLY_CrawlerMelee_Trigger& InOutTrigger)
-    {
-        auto BodyPose = InOutTrigger.Crawler.Get_BodyPose();
-        ++InOutTrigger.NextStolenId;
-        ++InOutTrigger.StolenSamples;
-        utils_procedural_body_pose::Request_SetActionOffset(BodyPose,
-            FCk_Request_ProceduralBodyPose_SetActionOffset(FTransform::Identity, InOutTrigger.NextStolenId));
-    }
 }
 
 // In FGroup_Overlap after the resolver: records that a candidate was pending, and fires CandidatePending triggers.
@@ -396,6 +383,19 @@ class UMars_TESTONLY_Processor_CrawlerMelee_CandidateTrigger : UCk_Processor_Scr
         {
             auto Entity = Batch.GetHandle(Index);
             auto& Trigger = Entity.Get_Fragment(FMars_TESTONLY_CrawlerMelee_Trigger);
+            if (Trigger.Armed && Trigger.When == EMars_TESTONLY_CrawlerMelee_When::WhilePhase &&
+                Trigger.Action == EMars_TESTONLY_CrawlerMelee_Action::DropAcknowledgement &&
+                ck::IsValid(Trigger.Crawler) && Trigger.Crawler.Get_AttackPhase() == Trigger.StealPhase)
+            {
+                const auto PendingId = Trigger.Crawler.Get_AttackPendingSampleId();
+                auto& Observations = Trigger.Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
+                if (PendingId != 0 && Observations.AckSampleId == PendingId)
+                {
+                    Observations.AckSampleId = 0;
+                    ++Trigger.DroppedAcknowledgements;
+                }
+                continue;
+            }
             if (Trigger.Armed == false || ck::Is_NOT_Valid(Trigger.Crawler) || Trigger.Crawler.Get_AttackCandidatePending() == false)
             { continue; }
 
@@ -1154,7 +1154,7 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         Record.DamageCommitted = InCrawler.Get_AttackDamageCommitted();
         Record.CommittedSampleId = InCrawler.Get_AttackCommittedSampleId();
         Record.AcknowledgedSampleId = InCrawler.Get_AttackAcknowledgedSampleId();
-        Record.ActionOffset = utils_procedural_body_pose::Get_ActionOffset(InCrawler.Get_BodyPose()).GetLocation();
+        Record.ActionOffset = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).RequestedActionOffset.GetLocation();
         Record.DamageRequests = InCrawler.Get_CombatDealer().Get_HitsDealt() + InCrawler.Get_CombatDealer().Get_HitsRejected();
         Record.LastCancel = InCrawler.Get_AttackLastCancel();
         const auto RootTransform = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());

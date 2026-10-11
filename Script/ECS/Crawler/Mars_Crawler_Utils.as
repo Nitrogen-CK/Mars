@@ -59,6 +59,22 @@ namespace utils_crawler
         return FCk_ProceduralWalker_LegChain(InLeg.LegId, RigSpec);
     }
 
+    // The body jab keeps its game-owned travel guard; the manual controller admits the same full body samples.
+    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Combat& InCombat)
+    {
+        auto Spec = FCk_ProceduralActionPlayer_Spec();
+        auto Tuning = Spec.Get_Tuning();
+        auto Sampling = Tuning.Get_Sampling();
+        Sampling.Set_MaxEndpointTravelCm(InCombat.Hit.MaxSampleTravel);
+        Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
+        Tuning.Set_Sampling(Sampling);
+        auto Watchdogs = Tuning.Get_Watchdogs();
+        Watchdogs.Set_PublicationTimeout(FCk_Time(InCombat.Timing.PoseTimeoutSeconds + 1.0f));
+        Tuning.Set_Watchdogs(Watchdogs);
+        Spec.Set_Tuning(Tuning);
+        return Spec;
+    }
+
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
     // their visuals): surface motion -> walker (legs, gait, rigs) -> body pose (before any detach) -> monster -> the
     // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
@@ -107,6 +123,15 @@ namespace utils_crawler
         const auto Armed = InSpec.Combat.Enabled &&
             utils_local_session::Get_IsLocalCombatWorld(utils_entity_lifetime::Get_WorldForEntity(RootEntity));
 
+        auto ActionPlayer = FCk_Handle_ProceduralActionPlayer();
+        if (Armed)
+        {
+            auto Subject = utils_procedural_articulation::DoCastChecked(InRoot);
+            ActionPlayer = utils_procedural_action_player::Add(Subject, Make_AttackPlayerSpec(InSpec.Combat));
+            if (ck::Is_NOT_Valid(ActionPlayer))
+            { return FCk_Handle_Crawler(); }
+        }
+
         auto Dealer = FCk_Handle_DamageDealer();
         if (Armed)
         {
@@ -153,6 +178,7 @@ namespace utils_crawler
         State.Motion = Motion;
         State.Gait = Gait;
         State.BodyPose = BodyPose;
+        State.ActionPlayer = ActionPlayer;
         State.Presentation = Rig.Presentation;
         State.LegParts = LegParts;
         State.Navigator = Navigator;
@@ -250,6 +276,11 @@ mixin FCk_Handle_ProceduralGait Get_Gait(const FCk_Handle_Crawler& Self)
 mixin FCk_Handle_ProceduralBodyPose Get_BodyPose(const FCk_Handle_Crawler& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Crawler).BodyPose;
+}
+
+mixin FCk_Handle_ProceduralActionPlayer Get_ActionPlayer(const FCk_Handle_Crawler& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Crawler).ActionPlayer;
 }
 
 mixin FCk_Handle_Transform Get_Presentation(const FCk_Handle_Crawler& Self)
@@ -619,6 +650,9 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
 {
     if (Self.Get_IsCombatArmed() == false)
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Disarmed); }
+
+    if (ck::Is_NOT_Valid(Self.Get_ActionPlayer()))
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::NotReady); }
 
     if (Self.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle || Self.Get_AttackCooldownRemaining() > 0.0f)
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Busy); }

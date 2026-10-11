@@ -3,15 +3,17 @@
 //   1-3. Request_CancelAttack(StateExit) in Windup, in Strike (on its first sample) and in Recover: CancelRecover,
 //        Cooldown, Idle;
 //   4.   Request_CancelAttack(Disabled) in Windup: straight to Cooldown, no CancelRecover;
-//   5.   the Windup samples are never published (another writer's sample always lands after the attack's): after
-//        PoseTimeoutSeconds the attack cancels as PoseTimeout into CancelRecover, which completes;
-//   6.   a StateExit cancel in Windup, then CancelRecover's samples are never published: its own timeout ends the wait in
+//   5.   the test observer drops each Windup acknowledgement after an actual receipt: after
+//        PoseTimeoutSeconds the game cancels as PoseTimeout into CancelRecover, which completes;
+//   6.   a StateExit cancel in Windup, then CancelRecover's acknowledgements are dropped: its own timeout ends the wait in
 //        Cooldown instead of starting another recovery;
+//   6b.  the action is cancelled while CancelRecover has no pending game acknowledgement: PoseFailed enters Cooldown
+//        and the terminal is consumed instead of waiting forever;
 //   7.   a leg hit as Strike begins cancels as Hurt; as CancelRecover begins the target is destroyed and a second cancel
 //        arrives: CancelRecover still completes on acknowledged samples, exactly once, in the same generation, with the
 //        second cancel recorded and nothing restarted;
 //   8.   the crawler, settled again after its flinch, is destroyed mid-Strike: no ensure, no script error.
-// After 1-7 the body pose's action input is identity.
+// After 1-7 actual presentation has returned to neutral and the scoped action has released ownership.
 class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 120.0f;
@@ -65,6 +67,13 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
         Add_Finish("(6)");
         Add_Step("(6) CancelRecover's own timeout ends it in Cooldown", n"Step_AssertRecoveryTimeout");
 
+        Add_Start("(6b)");
+        Add_Step("(6b) cancel (StateExit) during Windup", n"Step_CancelStateExit");
+        Add_Step_WaitUntil("(6b) the attack is in CancelRecover", n"Check_InCancelRecover", k_SlowPolls, 0);
+        Add_Step("(6b) cancel the action with no pending game acknowledgement", n"Step_CancelActionDuringRecover");
+        Add_Finish("(6b)");
+        Add_Step("(6b) PoseFailed enters Cooldown and drains the terminal", n"Step_AssertActionFailedDuringRecover");
+
         Add_Step("(7) arm a leg hit as Strike begins, and the target's destruction plus a second cancel as CancelRecover begins", n"Step_ArmHurtAndLoseTarget");
         Add_Start("(7)");
         Add_Finish("(7)");
@@ -104,8 +113,13 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
 
         const auto LastCancel = _Crawler.Get_AttackLastCancel();
         Assert_True(LastCancel.IsSet() && LastCancel.GetValue() == InCancel, f"{InLabel} the last cancel is {InCancel :n} (got {Get_LastCancelText()})");
-        Assert_True(utils_procedural_body_pose::Get_ActionOffset(_Crawler.Get_BodyPose()).Equals(FTransform::Identity, 0.001),
-            f"{InLabel} the action input is identity again");
+        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action),
+            f"{InLabel} the scoped action returned ownership and was released");
+        const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
+        const auto ExpectedNeutral = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).NeutralRootLocal * Root;
+        const auto Presented = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
+        Assert_True((Presented.GetLocation() - ExpectedNeutral.GetLocation()).Size() < 1.0f,
+            f"{InLabel} the actual presentation returned to its neutral root-relative position");
         Assert_Equals_Int(Get_DamageRequestCount(), 0, f"{InLabel} no damage request exists");
     }
 
@@ -183,7 +197,7 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
     UFUNCTION()
     private void Step_ArmStealWindup(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::WhilePhase, EMars_TESTONLY_CrawlerMelee_Action::StealPose);
+        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::WhilePhase, EMars_TESTONLY_CrawlerMelee_Action::DropAcknowledgement);
         Trigger.StealPhase = EMars_Crawler_AttackPhase::Windup;
         _TriggerEntity = Add_Trigger(InHandle, Trigger);
     }
@@ -192,7 +206,11 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
     private void Step_AssertWindupTimeout(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Trigger = _TriggerEntity.Get_Fragment(FMars_TESTONLY_CrawlerMelee_Trigger);
-        Assert_True(Trigger.StolenSamples > 0, "(5) the other writer overwrote the Windup samples");
+        Assert_True(Trigger.DroppedAcknowledgements > 0, "(5) the game ignored a settled Windup acknowledgement");
+        const auto RecoverIndex = Find_RecordSinceMark(EMars_Crawler_AttackPhase::CancelRecover);
+        Assert_True(RecoverIndex >= 0 && _Records[RecoverIndex].LastCancel.IsSet() &&
+            _Records[RecoverIndex].LastCancel.GetValue() == EMars_Crawler_AttackCancel::PoseTimeout,
+            "(5) the game acknowledgement watchdog initiated CancelRecover as PoseTimeout");
         Assert_Exit("(5)", Make_Phases(EMars_Crawler_AttackPhase::CancelRecover, EMars_Crawler_AttackPhase::Cooldown, EMars_Crawler_AttackPhase::Idle),
             EMars_Crawler_AttackCancel::PoseTimeout);
         utils_entity_lifetime::Request_DestroyEntity(_TriggerEntity);
@@ -201,7 +219,7 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
     UFUNCTION()
     private void Step_ArmStealCancelRecover(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::WhilePhase, EMars_TESTONLY_CrawlerMelee_Action::StealPose);
+        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::WhilePhase, EMars_TESTONLY_CrawlerMelee_Action::DropAcknowledgement);
         Trigger.StealPhase = EMars_Crawler_AttackPhase::CancelRecover;
         _TriggerEntity = Add_Trigger(InHandle, Trigger);
     }
@@ -210,10 +228,33 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
     private void Step_AssertRecoveryTimeout(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Trigger = _TriggerEntity.Get_Fragment(FMars_TESTONLY_CrawlerMelee_Trigger);
-        Assert_True(Trigger.StolenSamples > 0, "(6) the other writer overwrote the CancelRecover samples");
+        Assert_True(Trigger.DroppedAcknowledgements > 0, "(6) the game ignored a settled CancelRecover acknowledgement");
         Assert_Exit("(6)", Make_Phases(EMars_Crawler_AttackPhase::CancelRecover, EMars_Crawler_AttackPhase::Cooldown, EMars_Crawler_AttackPhase::Idle),
             EMars_Crawler_AttackCancel::PoseTimeout);
         utils_entity_lifetime::Request_DestroyEntity(_TriggerEntity);
+    }
+
+    UFUNCTION()
+    private void Step_CancelActionDuringRecover(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        Assert_True(ck::IsValid(Attack.Action) && Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover,
+            "(6b) the action is live in CancelRecover before the injected failure");
+        if (ck::Is_NOT_Valid(Attack.Action))
+        { return; }
+
+        // A game acknowledgement can be absent when library control fails between accepted samples.
+        // Fault only the game-owned pending ID; cancellation still runs through the public action request.
+        Attack.PendingSampleId = 0;
+        Attack.Action.Request_Cancel(FCk_Request_ProceduralAction_Cancel());
+    }
+
+    UFUNCTION()
+    private void Step_AssertActionFailedDuringRecover(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto Expected = Make_Phases(EMars_Crawler_AttackPhase::CancelRecover, EMars_Crawler_AttackPhase::Cooldown,
+            EMars_Crawler_AttackPhase::Idle);
+        Assert_Exit("(6b)", Expected, EMars_Crawler_AttackCancel::PoseFailed);
     }
 
     UFUNCTION()

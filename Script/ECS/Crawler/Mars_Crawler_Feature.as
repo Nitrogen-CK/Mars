@@ -460,6 +460,10 @@ struct FMars_Fragment_Crawler
     UPROPERTY()
     FCk_Handle_ProceduralBodyPose BodyPose;
 
+    // Armed crawlers own one body-channel player on the walker's articulation.
+    UPROPERTY()
+    FCk_Handle_ProceduralActionPlayer ActionPlayer;
+
     UPROPERTY()
     FCk_Handle_Transform Presentation;
 
@@ -619,6 +623,9 @@ struct FMars_Fragment_Crawler_Attack
     UPROPERTY()
     FVector RootAtStart = FVector::ZeroVector;
 
+    UPROPERTY()
+    FTransform NeutralRootLocal = FTransform::Identity;
+
     // The combat target at admission; a later change of the combat target cancels the attack instead.
     UPROPERTY()
     FCk_Handle Target;
@@ -646,6 +653,31 @@ struct FMars_Fragment_Crawler_Attack
 
     UPROPERTY()
     FTransform CancelRecoverStart = FTransform::Identity;
+
+    // One scoped manual action per jab. The copied identity survives the action handle until its terminal stream drains.
+    UPROPERTY()
+    FCk_Handle ActionScope;
+
+    UPROPERTY()
+    FCk_Handle_ProceduralAction Action;
+
+    UPROPERTY()
+    FCk_ProceduralAction_Identity ActionIdentity;
+
+    UPROPERTY()
+    int64 ReceiptCursor = 0;
+
+    UPROPERTY()
+    bool EndRequested = false;
+
+    UPROPERTY()
+    bool TerminalSeen = false;
+
+    UPROPERTY()
+    bool TerminalConsumeIssued = false;
+
+    UPROPERTY()
+    bool TerminalConsumeSucceeded = false;
 
     // Latched by this attack's one damage request, whatever the dealer made of it; cleared by the next admission.
     UPROPERTY()
@@ -726,6 +758,9 @@ struct FMars_Fragment_Crawler_AttackObservations
 
     UPROPERTY()
     TOptional<EMars_Crawler_AttackCancel> Displaced;
+
+    UPROPERTY()
+    bool ActionStreamFailed = false;
 
     // The longest sample-to-sample sweep of the current attack (diagnostics).
     UPROPERTY()

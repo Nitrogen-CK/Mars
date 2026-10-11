@@ -79,8 +79,17 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
 
         Assert_Equals_Int(Get_DamageRequestCount(), 1, "the dealer drained exactly one damage request");
         Assert_Equals_Float(_Target.Health.Get_Current(), 85.0f, 0.01f, "the target lost the jab's 15 HP once");
-        Assert_True(utils_procedural_body_pose::Get_ActionOffset(_Crawler.Get_BodyPose()).Equals(FTransform::Identity, 0.001),
-            "the body pose's action input is identity after the attack");
+        const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
+        const auto BodyPose = _Crawler.Get_BodyPose();
+        const auto ExpectedNeutral = utils_procedural_body_pose::Get_Offset(BodyPose) * Root;
+        const auto Presented = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
+        const auto NeutralErrorCm = (Presented.GetLocation() - ExpectedNeutral.GetLocation()).Size();
+        Assert_True(NeutralErrorCm < k_KeyTolerance,
+            f"the presentation follows the current support/conform neutral (error {NeutralErrorCm :.5} cm)");
+        Assert_True(utils_procedural_body_pose::Get_ActionOffset(BodyPose).Equals(FTransform::Identity),
+            "the legacy body-pose action offset is neutral after the scoped action releases");
+        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action),
+            "the scoped action released ownership after its terminal receipt");
         Assert_True(_Crawler.Get_AttackLastCancel().IsSet() == false, f"nothing cancelled the attack (last cancel {Get_LastCancelText()})");
     }
 }
