@@ -37,6 +37,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Batter",
+			"ShortName": "Batter",
+			"Description": "A batter bowl on a station: the whole, batterable, unbattered food pieces the station admits sit in slots in the bowl; while the operator holds the bowl dipped each piece sinks under the batter and its coat clock runs, and a take-out hands every fully coated piece back battered onto a tray",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_BatterHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Batter"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_BodyPart",
 			"ShortName": "BodyPart",
 			"Description": "A monster part with its own Health and HitZone, a condition ledger, spill to the body, and a depletion policy (detach a leg, break, none)",
@@ -219,7 +228,7 @@
 		{
 			"TypeName": "FCk_Handle_Fry",
 			"ShortName": "Fry",
-			"Description": "A frying minigame on a station: admitted battered pieces (dynamic bodies keyed by their feed identity) that float, tumble and fry face by face below the oil line, a skimmer (a kinematic body) the operator dips, carries and pours, and a fixed drain basket outside the oil where a supported piece drains",
+			"Description": "A frying minigame on a station: admitted battered pieces (only pieces the batter station coated; dynamic bodies keyed by their feed identity) that float, tumble and fry face by face below the oil line, a skimmer (a kinematic body) the operator dips, carries and pours, and a fixed drain basket outside the oil where a supported piece drains",
 			"SourceAsset": "/Script/AngelscriptAssets.Mars_FryHandle",
 			"RequiredFragments": [
 				"Mars_Feature_Fry"

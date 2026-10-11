@@ -190,6 +190,149 @@ namespace UMars_AutoTest_Backpack_CargoStowThenTake
 }
 
 USTRUCT()
+struct FMars_AutoTest_Batter_AdmissionAcceptsAWholeBatterablePiece_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_AdmissionAcceptsAWholeBatterablePiece
+{
+    FMars_AutoTest_Batter_AdmissionAcceptsAWholeBatterablePiece_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_AdmissionAcceptsAWholeBatterablePiece_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_AdmissionRefusesACutPiece_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_AdmissionRefusesACutPiece
+{
+    FMars_AutoTest_Batter_AdmissionRefusesACutPiece_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_AdmissionRefusesACutPiece_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_AdmissionRefusesAFullBowl_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_AdmissionRefusesAFullBowl
+{
+    FMars_AutoTest_Batter_AdmissionRefusesAFullBowl_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_AdmissionRefusesAFullBowl_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_AdmissionRefusesAnAlreadyBatteredPiece_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_AdmissionRefusesAnAlreadyBatteredPiece
+{
+    FMars_AutoTest_Batter_AdmissionRefusesAnAlreadyBatteredPiece_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_AdmissionRefusesAnAlreadyBatteredPiece_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_AdmissionRefusesANonBatterableFood_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_AdmissionRefusesANonBatterableFood
+{
+    FMars_AutoTest_Batter_AdmissionRefusesANonBatterableFood_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_AdmissionRefusesANonBatterableFood_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_ATakeOutWritesBatteredAndTheTrayReceivesIt_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_ATakeOutWritesBatteredAndTheTrayReceivesIt
+{
+    FMars_AutoTest_Batter_ATakeOutWritesBatteredAndTheTrayReceivesIt_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_ATakeOutWritesBatteredAndTheTrayReceivesIt_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_CoatGrowsOnlyWhileDippedAndNeverFalls_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_CoatGrowsOnlyWhileDippedAndNeverFalls
+{
+    FMars_AutoTest_Batter_CoatGrowsOnlyWhileDippedAndNeverFalls_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_CoatGrowsOnlyWhileDippedAndNeverFalls_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_SpecValidateRejectsBadSpecs_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_SpecValidateRejectsBadSpecs
+{
+    FMars_AutoTest_Batter_SpecValidateRejectsBadSpecs_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_SpecValidateRejectsBadSpecs_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Batter_TakeOutBeforeTheCoatIsCompleteIsRefused_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Batter_TakeOutBeforeTheCoatIsCompleteIsRefused
+{
+    FMars_AutoTest_Batter_TakeOutBeforeTheCoatIsCompleteIsRefused_SpawnParams Params()
+    {
+        return FMars_AutoTest_Batter_TakeOutBeforeTheCoatIsCompleteIsRefused_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_BatterStation_APlatterSourcedPrepFoodIsBatteredAndWearsItsShell_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_BatterStation_APlatterSourcedPrepFoodIsBatteredAndWearsItsShell
+{
+    FMars_AutoTest_BatterStation_APlatterSourcedPrepFoodIsBatteredAndWearsItsShell_SpawnParams Params()
+    {
+        return FMars_AutoTest_BatterStation_APlatterSourcedPrepFoodIsBatteredAndWearsItsShell_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch
+{
+    FMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch_SpawnParams Params()
+    {
+        return FMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_BodyPart_CrushRuinsAndSeverPreservesCondition_SpawnParams
 {
 }
@@ -1139,6 +1282,19 @@ namespace UMars_AutoTest_CuttingStation_InputDockRefusesACutPlatter
 }
 
 USTRUCT()
+struct FMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly
+{
+    FMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly_SpawnParams Params()
+    {
+        return FMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CuttingStation_LeaveMidCutKeepsTheHalvesForTheNextOperator_SpawnParams
 {
 }
@@ -1161,19 +1317,6 @@ namespace UMars_AutoTest_CuttingStation_MeatCutCostIsMeasured
     FMars_AutoTest_CuttingStation_MeatCutCostIsMeasured_SpawnParams Params()
     {
         return FMars_AutoTest_CuttingStation_MeatCutCostIsMeasured_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams
-{
-}
-
-namespace UMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation
-{
-    FMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams Params()
-    {
-        return FMars_AutoTest_CuttingStation_MushroomConfigCutsThroughTheSameStation_SpawnParams();
     }
 }
 
@@ -1737,6 +1880,45 @@ namespace UMars_AutoTest_FoodBoard_TwoTurnsInOneDrainCompose
 }
 
 USTRUCT()
+struct FMars_AutoTest_FoodDef_EveryMeatFoodReadsTheCookState_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodDef_EveryMeatFoodReadsTheCookState
+{
+    FMars_AutoTest_FoodDef_EveryMeatFoodReadsTheCookState_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodDef_EveryMeatFoodReadsTheCookState_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook
+{
+    FMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_ABatteredVariantIsOptionalAndValidated_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_ABatteredVariantIsOptionalAndValidated
+{
+    FMars_AutoTest_FoodPiece_ABatteredVariantIsOptionalAndValidated_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_ABatteredVariantIsOptionalAndValidated_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState_SpawnParams
 {
 }
@@ -1746,6 +1928,32 @@ namespace UMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState
     FMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState_SpawnParams Params()
     {
         return FMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_APrepFoodImportsReadyAndCuts_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_APrepFoodImportsReadyAndCuts
+{
+    FMars_AutoTest_FoodPiece_APrepFoodImportsReadyAndCuts_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_APrepFoodImportsReadyAndCuts_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_FoodPiece_BatteredSurvivesACut_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_BatteredSurvivesACut
+{
+    FMars_AutoTest_FoodPiece_BatteredSurvivesACut_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_BatteredSurvivesACut_SpawnParams();
     }
 }
 
@@ -2335,6 +2543,19 @@ namespace UMars_AutoTest_FPHands_ViewerFacingGripTakesTheBarFromThePlayersSide
 }
 
 USTRUCT()
+struct FMars_AutoTest_Fry_ABatteredWholePieceFriesGolden_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fry_ABatteredWholePieceFriesGolden
+{
+    FMars_AutoTest_Fry_ABatteredWholePieceFriesGolden_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fry_ABatteredWholePieceFriesGolden_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Fry_ADippedScoopCannotLeaveThePot_SpawnParams
 {
 }
@@ -2344,6 +2565,19 @@ namespace UMars_AutoTest_Fry_ADippedScoopCannotLeaveThePot
     FMars_AutoTest_Fry_ADippedScoopCannotLeaveThePot_SpawnParams Params()
     {
         return FMars_AutoTest_Fry_ADippedScoopCannotLeaveThePot_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Fry_AdmissionRefusesAnUnbatteredPiece_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Fry_AdmissionRefusesAnUnbatteredPiece
+{
+    FMars_AutoTest_Fry_AdmissionRefusesAnUnbatteredPiece_SpawnParams Params()
+    {
+        return FMars_AutoTest_Fry_AdmissionRefusesAnUnbatteredPiece_SpawnParams();
     }
 }
 
@@ -4129,6 +4363,19 @@ namespace UMars_AutoTest_Resting_TwoTargetsAreToldApart
 }
 
 USTRUCT()
+struct FMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady
+{
+    FMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady_SpawnParams Params()
+    {
+        return FMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId_SpawnParams
 {
 }
@@ -4476,6 +4723,19 @@ namespace UMars_AutoTest_SearingStation_APlatterSourcedPieceSearsAFaceThrough
     FMars_AutoTest_SearingStation_APlatterSourcedPieceSearsAFaceThrough_SpawnParams Params()
     {
         return FMars_AutoTest_SearingStation_APlatterSourcedPieceSearsAFaceThrough_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan
+{
+    FMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan_SpawnParams Params()
+    {
+        return FMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan_SpawnParams();
     }
 }
 
@@ -5803,6 +6063,43 @@ namespace UMars_Backpack_EntityScript
     FMars_Backpack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, TSoftObjectPtr<UCk_InventoryItem_Definition> InDefinition, EMars_WorldItem_Mode InMode, FCk_Handle InAttachTo, FTransform InAttachOffset, FCk_Handle_Item InSourceItem, FCk_Handle_Inventory InSourceInventory, FVector InLaunchVelocity, FVector InAngularVelocityDeg, FMars_WorldItem_Arrival InArriveFrom)
     {
         return FMars_Backpack_EntityScript_SpawnParams(InSpawnTransform, InDefinition, InMode, InAttachTo, InAttachOffset, InSourceItem, InSourceInventory, InLaunchVelocity, InAngularVelocityDeg, InArriveFrom);
+    }
+}
+
+USTRUCT()
+struct FMars_BatterStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    UPROPERTY()
+    FMars_CookingFeed_Spec Feed;
+
+    UPROPERTY()
+    FMars_Batter_Spec Batter = FMars_Batter_Spec();
+
+    FMars_BatterStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_CookingFeed_Spec InFeed, FMars_Batter_Spec InBatter)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+        Feed = InFeed;
+        Batter = InBatter;
+    }
+}
+
+namespace UMars_BatterStation_EntityScript
+{
+    FMars_BatterStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_BatterStation_EntityScript_SpawnParams();
+    }
+
+    FMars_BatterStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation, FMars_CookingFeed_Spec InFeed, FMars_Batter_Spec InBatter)
+    {
+        return FMars_BatterStation_EntityScript_SpawnParams(InSpawnTransform, InStation, InFeed, InBatter);
     }
 }
 
@@ -10148,6 +10445,32 @@ namespace UMars_SmState_Alive
 }
 
 USTRUCT()
+struct FMars_SmState_Batter_Idle_SpawnParams
+{
+}
+
+namespace UMars_SmState_Batter_Idle
+{
+    FMars_SmState_Batter_Idle_SpawnParams Params()
+    {
+        return FMars_SmState_Batter_Idle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Batter_Operated_SpawnParams
+{
+}
+
+namespace UMars_SmState_Batter_Operated
+{
+    FMars_SmState_Batter_Operated_SpawnParams Params()
+    {
+        return FMars_SmState_Batter_Operated_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmState_Camp_Live_SpawnParams
 {
 }
@@ -10850,6 +11173,58 @@ namespace UMars_SmTask_AliveSubSm
 }
 
 USTRUCT()
+struct FMars_SmTask_Batter_LiftOnExit_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Batter_LiftOnExit
+{
+    FMars_SmTask_Batter_LiftOnExit_SpawnParams Params()
+    {
+        return FMars_SmTask_Batter_LiftOnExit_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Batter_OperatorHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Batter_OperatorHints
+{
+    FMars_SmTask_Batter_OperatorHints_SpawnParams Params()
+    {
+        return FMars_SmTask_Batter_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Batter_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Batter_OperatorInput
+{
+    FMars_SmTask_Batter_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_Batter_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_BatterFeed_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_BatterFeed_OperatorInput
+{
+    FMars_SmTask_BatterFeed_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_BatterFeed_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_CampUiStation_Open_SpawnParams
 {
 }
@@ -11184,6 +11559,32 @@ namespace UMars_SmTask_Fry_ResetOnEnter
     FMars_SmTask_Fry_ResetOnEnter_SpawnParams Params()
     {
         return FMars_SmTask_Fry_ResetOnEnter_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_FryFeed_OperatorHints_SpawnParams
+{
+}
+
+namespace UMars_SmTask_FryFeed_OperatorHints
+{
+    FMars_SmTask_FryFeed_OperatorHints_SpawnParams Params()
+    {
+        return FMars_SmTask_FryFeed_OperatorHints_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_FryFeed_OperatorInput_SpawnParams
+{
+}
+
+namespace UMars_SmTask_FryFeed_OperatorInput
+{
+    FMars_SmTask_FryFeed_OperatorInput_SpawnParams Params()
+    {
+        return FMars_SmTask_FryFeed_OperatorInput_SpawnParams();
     }
 }
 
