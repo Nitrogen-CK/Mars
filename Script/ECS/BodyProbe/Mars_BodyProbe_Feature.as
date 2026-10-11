@@ -17,7 +17,7 @@ struct FMars_Feature_BodyProbe {}
 
 struct FMars_BodyProbe_Spec
 {
-    // The probe's shape comes from the character's capsule.
+    // The probe's shape is the character's movement capsule, exactly: same centre, radius and overall height.
     UPROPERTY()
     FCk_Probe_Spec Probe;
 
@@ -56,7 +56,8 @@ struct FMars_Fragment_BodyProbe_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// The capsule size the probe was last sized to.
+// The capsule size the probe was last sized to, as the probe takes it: HalfHeight is the cylinder's, without the
+// hemispheres (GetScaledCapsuleHalfHeight_WithoutHemisphere).
 struct FMars_Fragment_BodyProbe
 {
     UPROPERTY()

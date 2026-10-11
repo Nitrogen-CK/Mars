@@ -18,7 +18,7 @@ class UMars_Processor_BodyProbe_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Capsule = Character.CapsuleComponent;
-        const auto HalfHeight = Capsule.GetScaledCapsuleHalfHeight();
+        const auto HalfHeight = Capsule.GetScaledCapsuleHalfHeight_WithoutHemisphere();
         const auto Radius = Capsule.GetScaledCapsuleRadius();
         if (HalfHeight == InState.HalfHeight && Radius == InState.Radius)
         { return; }
