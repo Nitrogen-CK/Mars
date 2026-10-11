@@ -55,6 +55,8 @@ ROOM = "station_gym_kitchen"
 GYM_MAP = "/Game/Mars/Maps/StationGym_Mars_MAP"
 GAME_MODE = "/Script/Angelscript.Mars_Gameplay_GameMode"
 STATION_CLASS = "/Script/Angelscript.Mars_%sStation_EntityScript"
+# plan station name -> script name where they differ (the dicing station became the generic cutting station)
+STATION_SCRIPT = {"Dicing": "Cutting"}
 RACK_CLASS = "/Script/Angelscript.Mars_HangingRack"
 MESH_FOLDERS = ("/Game/Mars/Gameplay/Cooking/Stations/Meshes", "/Game/Mars/Gameplay/Cooking/Food/Meshes",
                 "/Game/Mars/Gameplay/Cooking/Meshes", "/Game/Mars/Gameplay/Cooking/Candles/Meshes")
@@ -422,7 +424,7 @@ def spawn_stations(data, origin, reg):
     (UEditorActorSubsystem::SpawnActorFromObject on the entity script class)."""
     placed = []
     for s in data.get("stations", []):
-        cls = unreal.load_class(None, STATION_CLASS % s["name"])
+        cls = unreal.load_class(None, STATION_CLASS % STATION_SCRIPT.get(s["name"], s["name"]))
         if cls is None:
             _warn("no script class for the %s station (AngelScript not compiled?)" % s["name"])
             continue
