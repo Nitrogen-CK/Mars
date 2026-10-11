@@ -1061,6 +1061,292 @@ namespace UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd
 }
 
 USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_AcquireAndLeash_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_AcquireAndLeash
+{
+    FMars_AutoTest_CrawlerMelee_AcquireAndLeash_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_AcquireAndLeash_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_AggressionToggle_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_AggressionToggle
+{
+    FMars_AutoTest_CrawlerMelee_AggressionToggle_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_AggressionToggle_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_ApproachAndPrepare_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_ApproachAndPrepare
+{
+    FMars_AutoTest_CrawlerMelee_ApproachAndPrepare_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_ApproachAndPrepare_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_BlockedRoute_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_BlockedRoute
+{
+    FMars_AutoTest_CrawlerMelee_BlockedRoute_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_BlockedRoute_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_CancelBeforeCommit_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_CancelBeforeCommit
+{
+    FMars_AutoTest_CrawlerMelee_CancelBeforeCommit_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_CancelBeforeCommit_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_Displacement_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_Displacement
+{
+    FMars_AutoTest_CrawlerMelee_Displacement_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_Displacement_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_DodgeCommitment_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_DodgeCommitment
+{
+    FMars_AutoTest_CrawlerMelee_DodgeCommitment_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_DodgeCommitment_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_EngagesAndRetries_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_EngagesAndRetries
+{
+    FMars_AutoTest_CrawlerMelee_EngagesAndRetries_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_EngagesAndRetries_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_EveryExit_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_EveryExit
+{
+    FMars_AutoTest_CrawlerMelee_EveryExit_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_EveryExit_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_HitchAndZeroTime_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_HitchAndZeroTime
+{
+    FMars_AutoTest_CrawlerMelee_HitchAndZeroTime_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_HitchAndZeroTime_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_HitExactlyOnce_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_HitExactlyOnce
+{
+    FMars_AutoTest_CrawlerMelee_HitExactlyOnce_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_HitExactlyOnce_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_InterruptPriority_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_InterruptPriority
+{
+    FMars_AutoTest_CrawlerMelee_InterruptPriority_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_InterruptPriority_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_InvalidSpec_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_InvalidSpec
+{
+    FMars_AutoTest_CrawlerMelee_InvalidSpec_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_InvalidSpec_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_MissAndCooldown_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_MissAndCooldown
+{
+    FMars_AutoTest_CrawlerMelee_MissAndCooldown_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_MissAndCooldown_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_Obstruction_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_Obstruction
+{
+    FMars_AutoTest_CrawlerMelee_Obstruction_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_Obstruction_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PassiveAndNetworkGate_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PassiveAndNetworkGate
+{
+    FMars_AutoTest_CrawlerMelee_PassiveAndNetworkGate_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PassiveAndNetworkGate_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PhaseSequence_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PhaseSequence
+{
+    FMars_AutoTest_CrawlerMelee_PhaseSequence_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PhaseSequence_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PrepareTimeout_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PrepareTimeout
+{
+    FMars_AutoTest_CrawlerMelee_PrepareTimeout_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PrepareTimeout_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_QueryPrimitives_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_QueryPrimitives
+{
+    FMars_AutoTest_CrawlerMelee_QueryPrimitives_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_QueryPrimitives_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_StaleGeneration_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_StaleGeneration
+{
+    FMars_AutoTest_CrawlerMelee_StaleGeneration_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_StaleGeneration_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_StationaryFacing_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_StationaryFacing
+{
+    FMars_AutoTest_CrawlerMelee_StationaryFacing_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_StationaryFacing_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_TerminalStrikeHit_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_TerminalStrikeHit
+{
+    FMars_AutoTest_CrawlerMelee_TerminalStrikeHit_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_TerminalStrikeHit_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Cutting_ChopWhileChoppingIsIgnored_SpawnParams
 {
 }
@@ -1434,6 +1720,19 @@ namespace UMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox
     FMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox_SpawnParams Params()
     {
         return FMars_AutoTest_DamageDealer_ShapeTraceFindsSilentHurtbox_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes
+{
+    FMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes_SpawnParams Params()
+    {
+        return FMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes_SpawnParams();
     }
 }
 
@@ -3180,6 +3479,19 @@ namespace UMars_AutoTest_HitZone_HitScalesByReactionAndForwardsToHealth
 }
 
 USTRUCT()
+struct FMars_AutoTest_HitZone_HurtboxRegistration_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_HitZone_HurtboxRegistration
+{
+    FMars_AutoTest_HitZone_HurtboxRegistration_SpawnParams Params()
+    {
+        return FMars_AutoTest_HitZone_HurtboxRegistration_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Hotbar_AStowWhileHoldingKeepsTheSelection_SpawnParams
 {
 }
@@ -4307,6 +4619,110 @@ namespace UMars_AutoTest_Player_FocusTakesTheNearestHitAndNestedPriorityOnly
     FMars_AutoTest_Player_FocusTakesTheNearestHitAndNestedPriorityOnly_SpawnParams Params()
     {
         return FMars_AutoTest_Player_FocusTakesTheNearestHitAndNestedPriorityOnly_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_ClimbRace_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_ClimbRace
+{
+    FMars_AutoTest_PlayerCombat_ClimbRace_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_ClimbRace_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_CrouchAndBlockedUncrouch_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_CrouchAndBlockedUncrouch
+{
+    FMars_AutoTest_PlayerCombat_CrouchAndBlockedUncrouch_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_CrouchAndBlockedUncrouch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_DebugAndHeal_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_DebugAndHeal
+{
+    FMars_AutoTest_PlayerCombat_DebugAndHeal_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_DebugAndHeal_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_LethalDowned_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_LethalDowned
+{
+    FMars_AutoTest_PlayerCombat_LethalDowned_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_LethalDowned_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_Lifetime_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_Lifetime
+{
+    FMars_AutoTest_PlayerCombat_Lifetime_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_Lifetime_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_PlayerStrikeSelfExclusion_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_PlayerStrikeSelfExclusion
+{
+    FMars_AutoTest_PlayerCombat_PlayerStrikeSelfExclusion_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_PlayerStrikeSelfExclusion_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_ProductionReceiver_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_ProductionReceiver
+{
+    FMars_AutoTest_PlayerCombat_ProductionReceiver_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_ProductionReceiver_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_PlayerCombat_ReceiverWaitsForLocalControl_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_PlayerCombat_ReceiverWaitsForLocalControl
+{
+    FMars_AutoTest_PlayerCombat_ReceiverWaitsForLocalControl_SpawnParams Params()
+    {
+        return FMars_AutoTest_PlayerCombat_ReceiverWaitsForLocalControl_SpawnParams();
     }
 }
 
@@ -6164,12 +6580,16 @@ struct FMars_Crawler_EntityScript_SpawnParams
     UPROPERTY()
     bool WithVisuals = true;
 
-    FMars_Crawler_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals)
+    UPROPERTY()
+    bool DebugDrawAttack = false;
+
+    FMars_Crawler_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
         SpawnTransform = InSpawnTransform;
         Spec = InSpec;
         Color = InColor;
         WithVisuals = InWithVisuals;
+        DebugDrawAttack = InDebugDrawAttack;
     }
 }
 
@@ -6180,9 +6600,9 @@ namespace UMars_Crawler_EntityScript
         return FMars_Crawler_EntityScript_SpawnParams();
     }
 
-    FMars_Crawler_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals)
+    FMars_Crawler_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
-        return FMars_Crawler_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals);
+        return FMars_Crawler_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals, InDebugDrawAttack);
     }
 }
 
@@ -8469,6 +8889,51 @@ namespace UMars_PullChain_EntityScript
 }
 
 USTRUCT()
+struct FMars_Sandbox_AggressionLever_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Toggle, 1.0f, false, FMars_Control_Manipulation_Spec(FVector(-1.0, 0.0, 0.0), 0.019999999552965164f, 0.8500000238418579f, 60.0f, 12.0f, false));
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    float32 PulledAngle = 70.0f;
+
+    UPROPERTY()
+    float32 MoveDuration = 0.3499999940395355f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Rouse the crawlers");
+
+    FMars_Sandbox_AggressionLever_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPulledAngle, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        PulledAngle = InPulledAngle;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Sandbox_AggressionLever_EntityScript
+{
+    FMars_Sandbox_AggressionLever_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_AggressionLever_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_AggressionLever_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, float32 InPulledAngle, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Sandbox_AggressionLever_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPulledAngle, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
 struct FMars_Sandbox_BackpackPlateF_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -8638,12 +9103,16 @@ struct FMars_Sandbox_Crawler4_EntityScript_SpawnParams
     UPROPERTY()
     bool WithVisuals = true;
 
-    FMars_Sandbox_Crawler4_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals)
+    UPROPERTY()
+    bool DebugDrawAttack = false;
+
+    FMars_Sandbox_Crawler4_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
         SpawnTransform = InSpawnTransform;
         Spec = InSpec;
         Color = InColor;
         WithVisuals = InWithVisuals;
+        DebugDrawAttack = InDebugDrawAttack;
     }
 }
 
@@ -8654,9 +9123,9 @@ namespace UMars_Sandbox_Crawler4_EntityScript
         return FMars_Sandbox_Crawler4_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_Crawler4_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals)
+    FMars_Sandbox_Crawler4_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
-        return FMars_Sandbox_Crawler4_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals);
+        return FMars_Sandbox_Crawler4_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals, InDebugDrawAttack);
     }
 }
 
@@ -8675,12 +9144,16 @@ struct FMars_Sandbox_Crawler6_EntityScript_SpawnParams
     UPROPERTY()
     bool WithVisuals = true;
 
-    FMars_Sandbox_Crawler6_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals)
+    UPROPERTY()
+    bool DebugDrawAttack = false;
+
+    FMars_Sandbox_Crawler6_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
         SpawnTransform = InSpawnTransform;
         Spec = InSpec;
         Color = InColor;
         WithVisuals = InWithVisuals;
+        DebugDrawAttack = InDebugDrawAttack;
     }
 }
 
@@ -8691,9 +9164,9 @@ namespace UMars_Sandbox_Crawler6_EntityScript
         return FMars_Sandbox_Crawler6_EntityScript_SpawnParams();
     }
 
-    FMars_Sandbox_Crawler6_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals)
+    FMars_Sandbox_Crawler6_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
-        return FMars_Sandbox_Crawler6_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals);
+        return FMars_Sandbox_Crawler6_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals, InDebugDrawAttack);
     }
 }
 
@@ -9782,6 +10255,71 @@ namespace UMars_SmCondition_ByteAttribute
 }
 
 USTRUCT()
+struct FMars_SmCondition_Crawler_EngageStage_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_EngageStage
+{
+    FMars_SmCondition_Crawler_EngageStage_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_EngageStage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Crawler_EngageStage_Approach_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_EngageStage_Approach
+{
+    FMars_SmCondition_Crawler_EngageStage_Approach_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_EngageStage_Approach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Crawler_EngageStage_Attack_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_EngageStage_Attack
+{
+    FMars_SmCondition_Crawler_EngageStage_Attack_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_EngageStage_Attack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Crawler_EngageStage_Prepare_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_EngageStage_Prepare
+{
+    FMars_SmCondition_Crawler_EngageStage_Prepare_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_EngageStage_Prepare_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Crawler_EngageStage_Wait_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_EngageStage_Wait
+{
+    FMars_SmCondition_Crawler_EngageStage_Wait_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_EngageStage_Wait_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_Crawler_IsDead_SpawnParams
 {
 }
@@ -9808,6 +10346,19 @@ namespace UMars_SmCondition_Crawler_LeafCower
 }
 
 USTRUCT()
+struct FMars_SmCondition_Crawler_LeafEngage_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_LeafEngage
+{
+    FMars_SmCondition_Crawler_LeafEngage_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_LeafEngage_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_Crawler_LeafFlinch_SpawnParams
 {
 }
@@ -9830,6 +10381,19 @@ namespace UMars_SmCondition_Crawler_LeafNotCower
     FMars_SmCondition_Crawler_LeafNotCower_SpawnParams Params()
     {
         return FMars_SmCondition_Crawler_LeafNotCower_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_Crawler_LeafNotEngage_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_Crawler_LeafNotEngage
+{
+    FMars_SmCondition_Crawler_LeafNotEngage_SpawnParams Params()
+    {
+        return FMars_SmCondition_Crawler_LeafNotEngage_SpawnParams();
     }
 }
 
@@ -10172,6 +10736,19 @@ namespace UMars_SmCondition_InteractionLive
 }
 
 USTRUCT()
+struct FMars_SmCondition_IsAliveAndNotDepleted_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsAliveAndNotDepleted
+{
+    FMars_SmCondition_IsAliveAndNotDepleted_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsAliveAndNotDepleted_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_IsClimbing_SpawnParams
 {
 }
@@ -10185,15 +10762,15 @@ namespace UMars_SmCondition_IsClimbing
 }
 
 USTRUCT()
-struct FMars_SmCondition_IsDowned_SpawnParams
+struct FMars_SmCondition_IsDownedOrDepleted_SpawnParams
 {
 }
 
-namespace UMars_SmCondition_IsDowned
+namespace UMars_SmCondition_IsDownedOrDepleted
 {
-    FMars_SmCondition_IsDowned_SpawnParams Params()
+    FMars_SmCondition_IsDownedOrDepleted_SpawnParams Params()
     {
-        return FMars_SmCondition_IsDowned_SpawnParams();
+        return FMars_SmCondition_IsDownedOrDepleted_SpawnParams();
     }
 }
 
@@ -10233,19 +10810,6 @@ namespace UMars_SmCondition_IsNotClimbing
     FMars_SmCondition_IsNotClimbing_SpawnParams Params()
     {
         return FMars_SmCondition_IsNotClimbing_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_SmCondition_IsNotDowned_SpawnParams
-{
-}
-
-namespace UMars_SmCondition_IsNotDowned
-{
-    FMars_SmCondition_IsNotDowned_SpawnParams Params()
-    {
-        return FMars_SmCondition_IsNotDowned_SpawnParams();
     }
 }
 
@@ -10571,6 +11135,71 @@ namespace UMars_SmState_Crawler_Dead
     FMars_SmState_Crawler_Dead_SpawnParams Params()
     {
         return FMars_SmState_Crawler_Dead_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Crawler_Engage_SpawnParams
+{
+}
+
+namespace UMars_SmState_Crawler_Engage
+{
+    FMars_SmState_Crawler_Engage_SpawnParams Params()
+    {
+        return FMars_SmState_Crawler_Engage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Crawler_Engage_Approach_SpawnParams
+{
+}
+
+namespace UMars_SmState_Crawler_Engage_Approach
+{
+    FMars_SmState_Crawler_Engage_Approach_SpawnParams Params()
+    {
+        return FMars_SmState_Crawler_Engage_Approach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Crawler_Engage_Attack_SpawnParams
+{
+}
+
+namespace UMars_SmState_Crawler_Engage_Attack
+{
+    FMars_SmState_Crawler_Engage_Attack_SpawnParams Params()
+    {
+        return FMars_SmState_Crawler_Engage_Attack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Crawler_Engage_Prepare_SpawnParams
+{
+}
+
+namespace UMars_SmState_Crawler_Engage_Prepare
+{
+    FMars_SmState_Crawler_Engage_Prepare_SpawnParams Params()
+    {
+        return FMars_SmState_Crawler_Engage_Prepare_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Crawler_Engage_Wait_SpawnParams
+{
+}
+
+namespace UMars_SmState_Crawler_Engage_Wait
+{
+    FMars_SmState_Crawler_Engage_Wait_SpawnParams Params()
+    {
+        return FMars_SmState_Crawler_Engage_Wait_SpawnParams();
     }
 }
 
@@ -11329,6 +11958,84 @@ namespace UMars_SmTask_Crawler_Die
 }
 
 USTRUCT()
+struct FMars_SmTask_Crawler_Engage_Approach_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crawler_Engage_Approach
+{
+    FMars_SmTask_Crawler_Engage_Approach_SpawnParams Params()
+    {
+        return FMars_SmTask_Crawler_Engage_Approach_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Crawler_Engage_Attack_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crawler_Engage_Attack
+{
+    FMars_SmTask_Crawler_Engage_Attack_SpawnParams Params()
+    {
+        return FMars_SmTask_Crawler_Engage_Attack_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Crawler_Engage_Prepare_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crawler_Engage_Prepare
+{
+    FMars_SmTask_Crawler_Engage_Prepare_SpawnParams Params()
+    {
+        return FMars_SmTask_Crawler_Engage_Prepare_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Crawler_Engage_Wait_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crawler_Engage_Wait
+{
+    FMars_SmTask_Crawler_Engage_Wait_SpawnParams Params()
+    {
+        return FMars_SmTask_Crawler_Engage_Wait_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Crawler_EngageStage_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crawler_EngageStage
+{
+    FMars_SmTask_Crawler_EngageStage_SpawnParams Params()
+    {
+        return FMars_SmTask_Crawler_EngageStage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Crawler_EngageSubSm_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Crawler_EngageSubSm
+{
+    FMars_SmTask_Crawler_EngageSubSm_SpawnParams Params()
+    {
+        return FMars_SmTask_Crawler_EngageSubSm_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmTask_Crawler_Flinch_SpawnParams
 {
 }
@@ -11442,6 +12149,19 @@ namespace UMars_SmTask_CuttingFeed_OperatorInput
     FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams Params()
     {
         return FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Downed_Lockdown_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Downed_Lockdown
+{
+    FMars_SmTask_Downed_Lockdown_SpawnParams Params()
+    {
+        return FMars_SmTask_Downed_Lockdown_SpawnParams();
     }
 }
 
