@@ -674,3 +674,358 @@ def reimport_check(fbx_path):
                        "slots": [m.name if m else None for m in o.data.materials]})
         bpy.data.objects.remove(o)
     return report
+
+
+# ---------------------------------------------------------------- runtime-mesh contract (CkRuntimeMesh import)
+# What the game's runtime slicer (CkFoundation CkRuntimeMesh, FCk_RuntimeMesh_ImportLimits / PreflightLOD /
+# ValidateMesh) accepts from a static mesh's LOD0, mirrored here so a builder FAILS instead of shipping a mesh the game
+# rejects at import:
+#   * RAW render vertices (PositionVertexBuffer: after Unreal splits corners on normal / UV / colour) <= 2048; a
+#     flat-shaded, per-facet-painted mesh has 3 per triangle, so ~680 tris is its practical ceiling;
+#   * triangles <= 4096;
+#   * after re-welding the split seams (SeamToleranceCm 1e-4): every edge shared by exactly two triangles walking it in
+#     opposite directions (closed, no ambiguous seam), no bowtie vertex, ONE connected component, no self-intersection,
+#     positive volume (outward winding), no degenerate triangle (area / edge floors stricter than the importer's
+#     1e-8 cm2, so Unreal's own degenerate-triangle removal at build time can never open the shell);
+#   * vertex colours present; the asset needs CPU access (food_spec "cpu_access" / the sidecar, set by mars_food_ue).
+RUNTIME_MAX_RENDER_VERTS = 2048
+RUNTIME_MAX_TRIS = 4096
+RUNTIME_WELD_CM = 1e-4
+RUNTIME_MIN_AREA_CM2 = 1e-5            # 1000x the importer's floor
+RUNTIME_MIN_EDGE_CM = 1e-3             # 50x Unreal's THRESH_POINTS_ARE_SAME (2e-5 cm)
+
+
+class RuntimeMeshError(RuntimeError):
+    pass
+
+
+def _uf_find(parent, a):
+    root = a
+    while parent[root] != root:
+        root = parent[root]
+    while parent[a] != root:
+        parent[a], a = root, parent[a]
+    return root
+
+
+def render_vertex_count(mesh, positions_cm, tri_loops):
+    """Unique (position, normal, every UV layer, colour bytes) triangle corners: what Unreal's static mesh build keeps
+    as render vertices (it merges corners only when all of them match). Exact keys, so never an under-count."""
+    loops = np.asarray(tri_loops, np.int64).ravel()
+    lv = np.empty(len(mesh.loops), np.int64)
+    mesh.loops.foreach_get("vertex_index", lv)
+    cols = [np.round(positions_cm[lv[loops]] / RUNTIME_WELD_CM).astype(np.int64)]
+    try:
+        cn = np.array([c.vector[:] for c in mesh.corner_normals])
+    except AttributeError:
+        cn = np.zeros((len(mesh.loops), 3))
+        mesh.loops.foreach_get("normal", cn.reshape(-1))
+    cols.append(np.round(cn[loops] * 1e4).astype(np.int64))
+    for uv in mesh.uv_layers:
+        u = np.empty(len(mesh.loops) * 2)
+        uv.data.foreach_get("uv", u)
+        cols.append(np.round(u.reshape(-1, 2)[loops] * 1e6).astype(np.int64))
+    attr = mesh.color_attributes.get(spec.COLOR_ATTR) or (mesh.color_attributes[0] if len(mesh.color_attributes) else None)
+    if attr is not None:
+        c = np.empty(len(attr.data) * 4, np.float32)
+        attr.data.foreach_get("color", c)
+        c = c.reshape(-1, 4)
+        c = c[loops] if attr.domain == "CORNER" else c[lv[loops]]
+        cols.append(np.round(np.clip(c, 0.0, 1.0) * 255.0).astype(np.int64))      # FColor bytes
+    keys = np.concatenate(cols, axis=1)
+    return int(len(np.unique(keys, axis=0)))
+
+
+def topology_report(positions_cm, tris):
+    """Closed / single-solid / bowtie / self-intersection / volume / degenerate checks over triangles (n, 3) of
+    vertex ids, after welding positions within RUNTIME_WELD_CM (the importer's seam reconstruction)."""
+    from mathutils.bvhtree import BVHTree
+    positions_cm = np.asarray(positions_cm, float)
+    keys = np.round(positions_cm / RUNTIME_WELD_CM).astype(np.int64)
+    _, weld = np.unique(keys, axis=0, return_inverse=True)
+    weld = np.asarray(weld).ravel()
+    n = int(weld.max()) + 1 if len(weld) else 0
+    wpos = np.zeros((n, 3))
+    wpos[weld] = positions_cm
+    t = weld[np.asarray(tris, np.int64)]
+    rep = {"welded_verts": n}
+    degenerate = (t[:, 0] == t[:, 1]) | (t[:, 1] == t[:, 2]) | (t[:, 0] == t[:, 2])
+    a, b, c = wpos[t[:, 0]], wpos[t[:, 1]], wpos[t[:, 2]]
+    area = 0.5 * np.linalg.norm(np.cross(b - a, c - a), axis=1)
+    edge = np.minimum(np.minimum(np.linalg.norm(b - a, axis=1), np.linalg.norm(c - b, axis=1)),
+                      np.linalg.norm(a - c, axis=1))
+    rep["degenerate_tris"] = int((degenerate | (area < RUNTIME_MIN_AREA_CM2) | (edge < RUNTIME_MIN_EDGE_CM)).sum())
+    rep["min_area_cm2"] = round(float(area.min()), 6) if len(area) else 0.0
+    rep["min_edge_cm"] = round(float(edge.min()), 5) if len(edge) else 0.0
+    # edges: undirected use count, and directed duplicates (two triangles walking an edge the same way = flipped)
+    d = np.concatenate([t[:, [0, 1]], t[:, [1, 2]], t[:, [2, 0]]])
+    _, ucount = np.unique(np.sort(d, axis=1), axis=0, return_counts=True)
+    _, dcount = np.unique(d, axis=0, return_counts=True)
+    rep["boundary_edges"] = int((ucount == 1).sum())
+    rep["nonmanifold_edges"] = int((ucount > 2).sum())
+    rep["flipped_edges"] = int((dcount > 1).sum())
+    # bowtie: the link of every vertex (the opposite edges of its triangles) must be one connected cycle
+    links = {}
+    for tri in t.tolist():
+        for k in range(3):
+            links.setdefault(tri[k], []).append((tri[(k + 1) % 3], tri[(k + 2) % 3]))
+    bowtie = 0
+    for pairs in links.values():
+        parent = {}
+        for p, q in pairs:
+            parent.setdefault(p, p)
+            parent.setdefault(q, q)
+            rp, rq = _uf_find(parent, p), _uf_find(parent, q)
+            if rp != rq:
+                parent[rp] = rq
+        if len({_uf_find(parent, x) for x in list(parent)}) > 1:
+            bowtie += 1
+    rep["bowtie_verts"] = bowtie
+    # connected components over the triangles
+    parent = list(range(n))
+    for tri in t.tolist():
+        r0 = _uf_find(parent, tri[0])
+        for v in tri[1:]:
+            r = _uf_find(parent, v)
+            if r != r0:
+                parent[r] = r0
+    rep["components"] = len({_uf_find(parent, int(v)) for v in np.unique(t)})
+    rep["volume_cm3"] = round(float(np.einsum("ij,ij->i", a, np.cross(b, c)).sum() / 6.0), 4)
+    # self-intersections: overlapping triangle pairs that share no vertex
+    bvh = BVHTree.FromPolygons(wpos.tolist(), t.tolist(), all_triangles=True)
+    tset = [set(x) for x in t.tolist()]
+    rep["self_intersections"] = sum(1 for i, j in bvh.overlap(bvh) if i < j and not (tset[i] & tset[j]))
+    rep["closed"] = (rep["boundary_edges"] == 0 and rep["nonmanifold_edges"] == 0 and rep["flipped_edges"] == 0
+                     and rep["bowtie_verts"] == 0)
+    rep["single_solid"] = (rep["closed"] and rep["components"] == 1 and rep["self_intersections"] == 0
+                           and rep["volume_cm3"] > 0.0)
+    return rep
+
+
+# ---------------------------------------------------------------- cook-look standard (cuttable meat, 2026-10-10)
+# Stephen's ruling: a piece cut at the bench must sear in the pan like MeatCube_Mars_SM (one cube, Meat_Mars_M, six
+# sear slots in CPD 0-5, one per local axis face). The six-face sear model only reads right on a piece whose surface
+# IS six faces, so an ingredient flagged food_spec "cook_standard" (cuttable meat) must also pass, on its exported FBX:
+#   1. box-likeness: >= COOK_BOX_MIN of the surface area has a face normal within COOK_AXIS_DEG of one of the six
+#      local axes (the sear slots), so the sear lands on whole faces, not on a rounded blend between two slots;
+#   2. six real faces: each of +X -X +Y -Y +Z -Z owns >= COOK_FACE_MIN of the area (within COOK_AXIS_DEG of it), so
+#      every ledger slot is a face the piece can rest on;
+#   3. vertex colours: A = cavity in 0..1, RGB albedo present (not all white); UV0 inside 0..1 and the
+#      <Name>_Mask_Mars_T.png exported beside the FBX; morph UV1 / UV2 either absent or finite and <= the sidecar's
+#      morph_max_cm (the morph rides with the piece; a broken one tears it);
+#   4. the runtime-mesh contract above (closed single solid, <= 2048 render verts / <= 4096 tris, no degenerates).
+# Axes are Unreal local (x, -y, z of Blender), the frame the CPD sear slots use.
+COOK_AXIS_DEG = 25.0
+COOK_BOX_MIN = 0.85
+COOK_FACE_MIN = 0.05
+COOK_AXES = ("+X", "-X", "+Y", "-Y", "+Z", "-Z")
+COOK_WHITE = 0.98                      # every RGB channel at or above this on every corner = "all white"
+
+
+def cook_look_report(positions_cm, tris):
+    """Box-likeness of a closed triangle mesh (Blender-frame cm, outward winding) for the six-face sear model.
+    Returns box_fraction (area within COOK_AXIS_DEG of any axis), face_split (that area per axis, Unreal local
+    names), dominant_split (all area by nearest axis) and total_area_cm2."""
+    p = np.asarray(positions_cm, float)
+    t = np.asarray(tris, np.int64)
+    a, b, c = p[t[:, 0]], p[t[:, 1]], p[t[:, 2]]
+    cr = np.cross(b - a, c - a)
+    area = 0.5 * np.linalg.norm(cr, axis=1)
+    nrm = cr / np.maximum(2.0 * area, 1e-12)[:, None]
+    nrm = nrm * UE_MIRROR            # Unreal local axes (the mirror of a normal is the normal of the mirrored face)
+    total = float(area.sum()) or 1.0
+    ax = np.argmax(np.abs(nrm), axis=1)
+    neg = np.take_along_axis(nrm, ax[:, None], axis=1)[:, 0] < 0.0
+    slot = ax * 2 + neg.astype(np.int64)                    # 0 +X, 1 -X, 2 +Y, 3 -Y, 4 +Z, 5 -Z
+    within = np.abs(nrm).max(axis=1) >= math.cos(math.radians(COOK_AXIS_DEG))
+    face = {k: round(float(area[within & (slot == i)].sum() / total), 4) for i, k in enumerate(COOK_AXES)}
+    dom = {k: round(float(area[slot == i].sum() / total), 4) for i, k in enumerate(COOK_AXES)}
+    return {"box_fraction": round(float(area[within].sum() / total), 4), "face_split": face, "dominant_split": dom,
+            "total_area_cm2": round(total, 2), "axis_deg": COOK_AXIS_DEG}
+
+
+def _cook_attr_report(mesh, tri_loops, fbx_path):
+    """Vertex colour / UV0 / mask / morph facts for the cook-look standard, read from the re-imported FBX mesh."""
+    loops = np.asarray(tri_loops, np.int64).ravel()
+    rep = {}
+    attr = mesh.color_attributes.get(spec.COLOR_ATTR) or (mesh.color_attributes[0] if len(mesh.color_attributes) else None)
+    if attr is not None:
+        c = np.empty(len(attr.data) * 4, np.float32)
+        attr.data.foreach_get("color", c)
+        c = c.reshape(-1, 4)
+        if attr.domain != "CORNER":
+            lv = np.empty(len(mesh.loops), np.int64)
+            mesh.loops.foreach_get("vertex_index", lv)
+            c = c[lv]
+        c = c[loops]
+        rep["alpha_min"], rep["alpha_max"] = round(float(c[:, 3].min()), 4), round(float(c[:, 3].max()), 4)
+        rep["rgb_mean"] = [round(float(x), 4) for x in c[:, :3].mean(axis=0)]
+        rep["rgb_all_white"] = bool(np.all(c[:, :3] >= COOK_WHITE))
+        rep["rgb_finite"] = bool(np.all(np.isfinite(c)))
+    uvs = {u.name: u for u in mesh.uv_layers}
+    if len(mesh.uv_layers):
+        u = np.empty(len(mesh.loops) * 2)
+        mesh.uv_layers[0].data.foreach_get("uv", u)
+        u = u.reshape(-1, 2)[loops]
+        rep["uv0_min"] = [round(float(x), 5) for x in u.min(axis=0)]
+        rep["uv0_max"] = [round(float(x), 5) for x in u.max(axis=0)]
+    morph = [n for n in spec.MORPH_UV if n in uvs]
+    rep["morph_layers"] = morph
+    if morph:
+        off = np.zeros((len(loops), 3))
+        if spec.MORPH_UV[0] in uvs:
+            u = np.empty(len(mesh.loops) * 2)
+            uvs[spec.MORPH_UV[0]].data.foreach_get("uv", u)
+            u = u.reshape(-1, 2)[loops]
+            off[:, 0], off[:, 1] = u[:, 0], 1.0 - u[:, 1]
+        if spec.MORPH_UV[1] in uvs:
+            u = np.empty(len(mesh.loops) * 2)
+            uvs[spec.MORPH_UV[1]].data.foreach_get("uv", u)
+            off[:, 2] = u.reshape(-1, 2)[loops][:, 0]
+        rep["morph_finite"] = bool(np.all(np.isfinite(off)))
+        rep["morph_seen_cm"] = round(float(np.abs(off).max()), 4) if rep["morph_finite"] else None
+    stem = os.path.splitext(os.path.basename(fbx_path))[0].replace("_Mars_SM", "")
+    mask = os.path.join(os.path.dirname(fbx_path), "%s_Mask_Mars_T.png" % stem)
+    rep["mask"] = mask if os.path.exists(mask) else None
+    try:
+        with open(os.path.splitext(fbx_path)[0] + ".json") as fh:
+            rep["morph_max_cm"] = float(json.load(fh).get("morph_max_cm", 0.0))
+    except (OSError, ValueError):
+        rep["morph_max_cm"] = 0.0
+    return rep
+
+
+def cook_standard_of(name):
+    """True for a hero mesh whose ingredient carries food_spec INGREDIENTS[...]['cook_standard'], or is cuttable meat
+    (category meats with cpu_access: the standard applies whether or not the flag was remembered)."""
+    ing = spec.INGREDIENTS.get(name.replace("_Mars_SM", ""))
+    return bool(ing and (ing.get("cook_standard") or (ing.get("category") == "meats" and ing.get("cpu_access"))))
+
+
+def cook_standard_problems(rep):
+    """The cook-look rules 1-3 a runtime_mesh_report misses, as strings (rule 4 is the runtime contract itself)."""
+    look, attr = rep["cook_look"], rep["cook_attrs"]
+    out = []
+    if look["box_fraction"] < COOK_BOX_MIN:
+        out.append("box_fraction %.3f < %.2f" % (look["box_fraction"], COOK_BOX_MIN))
+    thin = [k for k in COOK_AXES if look["face_split"][k] < COOK_FACE_MIN]
+    if thin:
+        out.append("faces under %d%%: %s" % (round(COOK_FACE_MIN * 100), ", ".join(
+            "%s %.3f" % (k, look["face_split"][k]) for k in thin)))
+    if "alpha_min" not in attr:
+        out.append("no vertex colours")
+    else:
+        if not attr["rgb_finite"] or attr["alpha_min"] < 0.0 or attr["alpha_max"] > 1.0:
+            out.append("vertex colour alpha outside 0..1 (%.3f..%.3f)" % (attr["alpha_min"], attr["alpha_max"]))
+        if attr["rgb_all_white"]:
+            out.append("vertex colour RGB all white (no albedo painted)")
+    if "uv0_min" not in attr:
+        out.append("no UV0")
+    elif min(attr["uv0_min"]) < -1e-4 or max(attr["uv0_max"]) > 1.0 + 1e-4:
+        out.append("UV0 outside 0..1 (%s..%s)" % (attr["uv0_min"], attr["uv0_max"]))
+    if not attr["mask"]:
+        out.append("mask PNG missing")
+    if attr["morph_layers"]:
+        if not attr.get("morph_finite"):
+            out.append("morph UV1/UV2 not finite")
+        elif attr["morph_seen_cm"] > attr["morph_max_cm"] + 1e-3:
+            out.append("morph %.3f cm > morph_max_cm %.3f" % (attr["morph_seen_cm"], attr["morph_max_cm"]))
+    return out
+
+
+def runtime_mesh_report(fbx_path, cook_standard=None):
+    """Re-import an exported FBX (what Unreal reads) and measure it against the runtime-mesh contract. Returns a dict:
+    tris, render_verts, the topology_report fields, the cook-look numbers ('cook_look', 'cook_attrs',
+    'cook_standard'), 'ok' and 'problems'. Prints one RUNTIME_MESH and one COOK_STANDARD line. cook_standard None =
+    the ingredient's food_spec flag (cook_standard_of): when on, a missed cook-look rule makes the mesh not ok; when
+    off the numbers are information only."""
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.fbx(filepath=fbx_path, colors_type="LINEAR")
+    new = [o for o in bpy.data.objects if o not in before]
+    meshes = [o for o in new if o.type == "MESH"]
+    try:
+        if len(meshes) != 1:
+            raise RuntimeMeshError("%s: %d mesh objects in the FBX (want 1)" % (fbx_path, len(meshes)))
+        o = meshes[0]
+        mesh = o.data
+        mesh.update()
+        m = np.array(o.matrix_world)
+        n = len(mesh.vertices)
+        co = np.empty(n * 3)
+        mesh.vertices.foreach_get("co", co)
+        pos_cm = (np.c_[co.reshape(n, 3), np.ones(n)] @ m.T)[:, :3] * 100.0
+        mesh.calc_loop_triangles()
+        lt = mesh.loop_triangles
+        tris = np.empty(len(lt) * 3, np.int64)
+        lt.foreach_get("vertices", tris)
+        tl = np.empty(len(lt) * 3, np.int64)
+        lt.foreach_get("loops", tl)
+        tris, tl = tris.reshape(-1, 3), tl.reshape(-1, 3)
+        if np.linalg.det(m[:3, :3]) < 0:            # a mirroring import transform flips the winding
+            tris = tris[:, ::-1]
+        rep = {"name": os.path.splitext(os.path.basename(fbx_path))[0], "tris": int(len(tris)),
+               "render_verts": render_vertex_count(mesh, pos_cm, tl),
+               "uv_layers": [u.name for u in mesh.uv_layers],
+               "color_attr": len(mesh.color_attributes) > 0}
+        rep.update(topology_report(pos_cm, tris))
+        rep["cook_look"] = cook_look_report(pos_cm, tris)
+        rep["cook_attrs"] = _cook_attr_report(mesh, tl, fbx_path)
+    finally:
+        for o in new:
+            me = o.data if o.type == "MESH" else None
+            bpy.data.objects.remove(o, do_unlink=True)
+            if me is not None and me.users == 0:
+                bpy.data.meshes.remove(me)
+    problems = []
+    if rep["render_verts"] > RUNTIME_MAX_RENDER_VERTS:
+        problems.append("render verts %d > %d" % (rep["render_verts"], RUNTIME_MAX_RENDER_VERTS))
+    if rep["tris"] > RUNTIME_MAX_TRIS:
+        problems.append("tris %d > %d" % (rep["tris"], RUNTIME_MAX_TRIS))
+    for k in ("boundary_edges", "nonmanifold_edges", "flipped_edges", "bowtie_verts", "self_intersections",
+              "degenerate_tris"):
+        if rep[k]:
+            problems.append("%s %d" % (k, rep[k]))
+    if rep["components"] != 1:
+        problems.append("components %d" % rep["components"])
+    if rep["volume_cm3"] <= 0.0:
+        problems.append("volume %.3f cm3" % rep["volume_cm3"])
+    if not rep["color_attr"]:
+        problems.append("no vertex colours")
+    runtime_ok = not problems
+    if cook_standard is None:
+        cook_standard = cook_standard_of(rep["name"])
+    cook_problems = cook_standard_problems(rep)
+    rep["cook_standard"] = {"enforced": bool(cook_standard), "ok": runtime_ok and not cook_problems,
+                            "problems": cook_problems, "box_min": COOK_BOX_MIN, "face_min": COOK_FACE_MIN,
+                            "axis_deg": COOK_AXIS_DEG}
+    if cook_standard:
+        problems += ["cook standard: " + p for p in cook_problems]
+    rep["ok"] = not problems
+    rep["problems"] = problems
+    look, attr = rep["cook_look"], rep["cook_attrs"]
+    print("COOK_STANDARD %s  %s  box %.3f (>= %.2f within %d deg)  faces %s (each >= %.2f)  dominant %s  "
+          "alpha %s..%s  rgb_mean %s  uv0 %s..%s  mask %s  morph %s  runtime %s  -> %s" % (
+              rep["name"], "enforced" if cook_standard else "info", look["box_fraction"], COOK_BOX_MIN,
+              round(COOK_AXIS_DEG), " ".join("%s %.3f" % (k, look["face_split"][k]) for k in COOK_AXES),
+              COOK_FACE_MIN, " ".join("%s %.3f" % (k, look["dominant_split"][k]) for k in COOK_AXES),
+              attr.get("alpha_min"), attr.get("alpha_max"), attr.get("rgb_mean"), attr.get("uv0_min"),
+              attr.get("uv0_max"), "yes" if attr["mask"] else "MISSING",
+              ("%s %.3f / %.3f cm" % (attr["morph_layers"], attr.get("morph_seen_cm") or 0.0, attr["morph_max_cm"]))
+              if attr["morph_layers"] else "none", "ok" if runtime_ok else "FAIL",
+              "PASS" if rep["cook_standard"]["ok"] else "FAIL (%s)" % "; ".join(
+                  cook_problems + ([] if runtime_ok else ["runtime-mesh contract"]))))
+    print("RUNTIME_MESH %s  tris %d  render_verts %d / %d  closed %s  single_solid %s  components %d  self_isect %d  "
+          "volume %.1f cm3  min_edge %.4f cm  -> %s" % (
+              rep["name"], rep["tris"], rep["render_verts"], RUNTIME_MAX_RENDER_VERTS, rep["closed"],
+              rep["single_solid"], rep["components"], rep["self_intersections"], rep["volume_cm3"], rep["min_edge_cm"],
+              "OK" if rep["ok"] else "FAIL (%s)" % "; ".join(problems)))
+    return rep
+
+
+def check_runtime_mesh(fbx_path, cook_standard=None):
+    """runtime_mesh_report that raises RuntimeMeshError when the export breaks the contract or, for a cook_standard
+    ingredient (food_spec flag, or cook_standard=True), the cook-look standard (a build FAILS on it)."""
+    rep = runtime_mesh_report(fbx_path, cook_standard)
+    if not rep["ok"]:
+        raise RuntimeMeshError("%s breaks the runtime-mesh contract: %s" % (rep["name"], "; ".join(rep["problems"])))
+    return rep

@@ -10,6 +10,8 @@
                 (or --review_dir <dir> for iteration renders).
   --only        comma list of asset names to build.
   --nobake      skip the mask bake on --export (fast iteration only).
+  --parity_half <dir>  also export MeatSlab_HalfA_Mars_SM (the slab cut at x = 0, flat "Cut" cap) into <dir> for the
+                cube-vs-cut-piece look capture (unreal/mars_cook_parity.py); never into the food export folder.
 
 Style (food_spec ruling): faceted low-poly, every face flat, 600..2500 tris, hand-cut irregular facets, horns and bone
 as real geometry. Geometry is procedural numpy / bmesh with fixed seeds, so a re-run reproduces every mesh exactly:
@@ -1083,16 +1085,25 @@ def build_tentacle():
 # self-intersect, and the planes stay exactly planar. The fat cap is the region above one wavy ring of fixed
 # directions (locked edges, so the Flesh | Skin border is a clean edge loop, not a staircase); two sinew strips are
 # pairs of close fixed lines. Both slots are faces of the same shell.
-SLAB_A, SLAB_B = 22.0, (10.4, 9.8)        # planform half axes (the end cuts set the length); B for +Y / -Y
-SLAB_C = (6.9, 6.2)                       # half height above / below the centre (the floor plane clamps below)
+SLAB_A, SLAB_B = 22.0, (11.4, 10.8)       # planform half axes (the end cuts set the length); B for +Y / -Y
+SLAB_C = (8.3, 6.2)                       # half height above / below the centre (the floor plane clamps below)
 SLAB_P, SLAB_M = 3.0, 4.0
 SLAB_FLOOR = 4.9                          # floor plane z = -SLAB_FLOOR (centred frame)
+# Prep standard (2026-10-10, food_common cook-look standard): the bench slab is a butcher-TRIMMED block, so its cut
+# pieces sear like MeatCube_Mars_SM (six faces, one per CPD sear slot). Besides the floor and the two end cuts, the
+# long sides and the fat cap are trimmed by near-axis planes (a few degrees off true for the hand-cut read); the
+# super-ellipsoid only shows at the rounded corners. SLAB_B / SLAB_C sit past the trims so the lumps never dip below
+# a trimmed face except at the dents.
 SLAB_PLANES = (((0.0, 0.0, -1.0), SLAB_FLOOR, "floor"),
                ((1.0, 0.10, 0.16), 17.1, "cut_px"),          # +X cut, top leaning back
-               ((-1.0, -0.07, 0.10), 17.4, "cut_nx"))        # -X cut
+               ((-1.0, -0.07, 0.10), 17.4, "cut_nx"),        # -X cut
+               ((0.015, 1.0, -0.04), 9.75, "trim_py"),       # +Y side trim
+               ((-0.01, -1.0, -0.03), 9.7, "trim_ny"),       # -Y side trim
+               ((-0.02, 0.02, 1.0), 6.95, "trim_top"))       # fat-cap trim (a touch higher toward -X, like the ring)
+SLAB_SP_EDGE, SLAB_SP_FACE = 1.35, 2.6    # blue-noise spacing at a crease / inside a trimmed face (cm)
+SLAB_FREE_DIRS = 158                      # blue-noise directions besides the fixed ring / sinew ones
 SLAB_DENTS = (((4.0, -3.0, 7.0), 3.4, 0.55), ((-9.5, 3.5, 7.2), 3.0, 0.45), ((-5.0, -10.0, 1.0), 3.2, 0.5),
               ((9.0, 9.5, 0.5), 3.0, 0.45), ((12.0, 2.5, 6.4), 2.6, 0.4))          # (centre, radius, depth) cm
-SLAB_SPACING = 1.75
 SLAB_RING_SP = 1.3                        # fat boundary ring spacing
 SLAB_FIXED_SP = 1.55                      # keeps blue-noise points this far (mean with theirs) off fixed points
 SLAB_LEDGE = 0.35                         # lean under the cap is inset this much (the fat overhangs a touch)
@@ -1298,12 +1309,17 @@ def build_meatslab():
         strip_sets.append((ia, ib))
         k += len(a) + len(b)
 
-    def spacing(p):
-        return np.full(len(p), SLAB_SPACING)
+    planes = [(unit(np.array(n, float)), h) for n, h, _ in SLAB_PLANES]
 
-    # 158 free + 162 fixed dirs -> 636 tris: runtime slicing (CkRuntimeMesh) caps LOD0 at 2048 render verts and a
+    def spacing(p):
+        # dense along the creases (a vertex near the crease keeps the straddling facets thin, so most of the area
+        # stays on a trimmed face for the six-face sear), sparse inside a trimmed face (flat needs few vertices)
+        d = np.sort(np.stack([np.abs(p @ n - h) for n, h in planes], axis=1), axis=1)
+        return SLAB_SP_EDGE + (SLAB_SP_FACE - SLAB_SP_EDGE) * fc.smoothstep(0.3, 3.0, d[:, 1])
+
+    # free + 162 fixed dirs -> ~640 tris: runtime slicing (CkRuntimeMesh) caps LOD0 at 2048 render verts and a
     # flat-shaded, per-facet-painted mesh has 3 per triangle
-    dirs = blue_noise_dirs(slab_surface, spacing, 158, seed=71, fixed=fixed, fixed_spacing=SLAB_FIXED_SP)
+    dirs = blue_noise_dirs(slab_surface, spacing, SLAB_FREE_DIRS, seed=71, fixed=fixed, fixed_spacing=SLAB_FIXED_SP)
     t, which = slab_radius(dirs)
     body = t[:, None] * unit(dirs)
 
@@ -1433,6 +1449,70 @@ def build_meatslab():
         return assemble_masks(fields, r + 0.2 * edges, edges, grain_freq=0.8, seed=330)
 
     return dict(obj=obj, raw=raw, cooked=raw.copy(), masks=masks, static=np.ones(len(raw), bool))
+
+
+def slab_parity_half(obj, out_dir, keep="nx", x_cut_cm=0.0):
+    """One-off look-parity stand-in, NOT a game food: MeatSlab_HalfA_Mars_SM = the exported slab cut by the plane
+    x = x_cut_cm (Blender / Unreal x), keeping the -X half ("nx") or the +X half, the cut filled with a flat cap on a
+    third slot "Cut" painted the slab's cut-lean colour (alpha = 1, an open face) - what the bench's runtime cut makes,
+    as a static mesh for the cube-vs-cut-piece capture (unreal/mars_cook_parity.py). The cap's UV0 is a planar (y, z)
+    projection at the slab's own UV scale, as the runtime slicer does. Written to out_dir (never food_spec.EXPORT_DIR, so
+    mars_food_ue's sidecar-driven import never picks it up)."""
+    import bmesh as _bm
+    half = obj.copy()
+    half.data = obj.data.copy()
+    half.name = half.data.name = "MeatSlab_HalfA_Mars_SM"
+    bpy.context.scene.collection.objects.link(half)
+    mesh = half.data
+    cut = bpy.data.materials.get("Cut") or bpy.data.materials.new("Cut")
+    mesh.materials.append(cut)
+    cut_slot = len(mesh.materials) - 1
+    bm = _bm.new()
+    bm.from_mesh(mesh)
+    x0 = x_cut_cm * 0.01
+    geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
+    res = _bm.ops.bisect_plane(bm, geom=geom, plane_co=(x0, 0.0, 0.0), plane_no=(1.0, 0.0, 0.0),
+                               clear_outer=(keep == "nx"), clear_inner=(keep != "nx"))
+    ring_edges = [e for e in res["geom_cut"] if isinstance(e, _bm.types.BMEdge)]
+    _bm.ops.triangle_fill(bm, use_beauty=True, use_dissolve=False, edges=ring_edges)
+    _bm.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    _bm.ops.triangulate(bm, faces=bm.faces[:])
+    for f in bm.faces:                                                # the cap: flat on the cut plane
+        c = f.calc_center_median()
+        if abs(c.x - x0) < 1e-5 and abs(abs(f.normal.x) - 1.0) < 1e-4:
+            f.material_index = cut_slot
+    col_l = bm.loops.layers.float_color.get(spec.COLOR_ATTR)
+    uv_l = bm.loops.layers.uv.get("UVMap")
+    lean_cut = col(212, 36, 56)
+    span = 0.37                                                       # the slab's UVs span about 37 cm
+    for f in bm.faces:
+        if f.material_index != cut_slot:
+            continue
+        f.smooth = False
+        for lp in f.loops:
+            if col_l is not None:
+                lp[col_l] = (float(lean_cut[0]), float(lean_cut[1]), float(lean_cut[2]), 1.0)
+            if uv_l is not None:
+                lp[uv_l].uv = (0.5 + lp.vert.co.y / span, lp.vert.co.z / span)
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+    n_cap = sum(1 for p in mesh.polygons if p.material_index == cut_slot)
+    old = spec.EXPORT_DIR
+    os.makedirs(out_dir, exist_ok=True)
+    try:
+        spec.EXPORT_DIR = out_dir
+        others = isolate(half)
+        try:
+            path = fc.export_fbx(half, extra={"parity_only": True, "source": obj.name, "cut_x_cm": x_cut_cm,
+                                              "keep": keep, "cap_faces": n_cap,
+                                              "note": "look-parity stand-in for the cube vs cut-piece capture; not a game food"})
+        finally:
+            unisolate(others)
+    finally:
+        spec.EXPORT_DIR = old
+    print("PARITY_HALF %s  tris %d  cap faces %d" % (path, fc.tri_count(half), n_cap))
+    return half, path
 
 
 # ================================================================ masks
@@ -1734,7 +1814,7 @@ def run_reimport(fbx_paths, expected):
 
 def main():
     args = fc.cli_args({"export": False, "save": False, "sheets": False, "only": "", "review_dir": "",
-                        "nobake": False, "reimport": "", "views": "iso,front,top"})
+                        "nobake": False, "reimport": "", "views": "iso,front,top", "parity_half": ""})
     if args["reimport"]:
         reimport_child(str(args["reimport"]))
         return
@@ -1752,6 +1832,7 @@ def main():
     fc.clear_scene()
 
     results, all_ok, summary = {}, True, {}
+    cook_failures = []
     for name in names:
         t0 = time.time()
         res = BUILDERS[name]()
@@ -1785,6 +1866,22 @@ def main():
                 fbx = fc.export_fbx(obj, extra=extra)
                 fbx_paths.append(fbx)
                 info["fbx"] = fbx
+                if spec.INGREDIENTS[name].get("cpu_access"):
+                    # runtime-mesh contract + (cook_standard meats) the cook-look standard, measured on the exported FBX
+                    rep = fc.runtime_mesh_report(fbx)
+                    side = os.path.splitext(fbx)[0] + ".json"
+                    with open(side) as fh:
+                        meta = json.load(fh)
+                    meta["runtime_mesh"] = {k: v for k, v in rep.items() if k != "name"}
+                    with open(side, "w") as fh:
+                        json.dump(meta, fh, indent=2)
+                    info["runtime_mesh"] = {k: rep[k] for k in ("tris", "render_verts", "single_solid", "ok")}
+                    info["cook_standard"] = dict(rep["cook_standard"], box_fraction=rep["cook_look"]["box_fraction"],
+                                                 face_split=rep["cook_look"]["face_split"])
+                    checks_ok = rep["ok"]
+                    all_ok &= checks_ok
+                    if not checks_ok:
+                        cook_failures.append("%s: %s" % (name, "; ".join(rep["problems"])))
             finally:
                 unisolate(others)
         if args["sheets"] and not spec.INGREDIENTS[name]["morph"]:
@@ -1809,6 +1906,15 @@ def main():
                 bpy.data.meshes.remove(gm)
         summary[name] = info
 
+    if args["parity_half"] and "MeatSlab" in results:                  # look-parity stand-in (not a game food)
+        half, half_fbx = slab_parity_half(results["MeatSlab"]["obj"], str(args["parity_half"]))
+        summary["MeatSlab"]["parity_half"] = half_fbx
+        half_rep = fc.runtime_mesh_report(half_fbx, cook_standard=True)          # information: a cut piece's numbers
+        summary["MeatSlab"]["parity_half_cook"] = dict(box_fraction=half_rep["cook_look"]["box_fraction"],
+                                                       ok=half_rep["ok"], problems=half_rep["problems"])
+        hm = half.data
+        bpy.data.objects.remove(half)
+        bpy.data.meshes.remove(hm)
     if fbx_paths:
         ok, _ = run_reimport(fbx_paths, {n: summary[n] for n in summary})
         all_ok &= ok
@@ -1818,6 +1924,8 @@ def main():
     print("SUMMARY " + json.dumps(summary))
     print("total %.1fs" % (time.time() - t_start))
     print("FOOD_MEATS_OK" if all_ok else "FOOD_MEATS_FAIL")
+    if cook_failures:                       # a cuttable meat the game or the six-face sear would reject fails the build
+        raise fc.RuntimeMeshError("runtime-mesh / cook standard: " + " | ".join(cook_failures))
 
 
 if __name__ == "__main__":

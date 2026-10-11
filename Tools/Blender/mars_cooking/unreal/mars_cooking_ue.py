@@ -551,6 +551,8 @@ def build_pan_master():
                       "half extent so the puddle stays close to the meat's pool.")
     margin = g.scalar("Pool Margin", 1.2, 0.0, 6.0, "Oil showing around the meat footprint at Oil Amount 1, cm (0.6 x the "
                       "cube's half extent: the pool is just wider than the cube).")
+    wall_reach = g.scalar("Pool Wall Reach", 0.75, 0.0, 1.0, "How far up the wall the oil may climb, 0 = the base only, 1 = the "
+                          "rim; the blob follows a piece pushed against the flare but never reaches the lip.")
     blend = g.scalar("Pool Blend", 1.0, 0.0, 6.0, "How softly the puddle and the meat's blob merge, cm.")
     edge_soft = g.scalar("Pool Edge Softness", 0.25, 0.02, 2.0)
     wobble = g.scalar("Pool Wobble", 0.3, 0.0, 3.0, "Irregularity of the pool outline, cm.")
@@ -590,7 +592,7 @@ def build_pan_master():
     time = g.expr(unreal.MaterialExpressionTime, x - 440, -560)
     pool = g.custom("PanPool: oil pool, meniscus, simmer", hlsl.PAN_POOL, (
         ("P", lp, ""), ("T", time, ""), ("Meat", meat, "RGBA"), ("Trail", trail, "RGBA"), ("OilAmount", oil, ""),
-        ("Sizzle", sizzle, ""), ("BaseR", base_r, ""), ("PoolR", pool_r, ""), ("Margin", margin, ""), ("Blend", blend, ""),
+        ("Sizzle", sizzle, ""), ("BaseR", base_r, ""), ("RimR", rim_r, ""), ("WallReach", wall_reach, ""), ("PoolR", pool_r, ""), ("Margin", margin, ""), ("Blend", blend, ""),
         ("EdgeSoft", edge_soft, ""), ("Wobble", wobble, ""), ("Meniscus", meniscus, ""), ("SimW", sim_w, ""),
         ("SimCell", sim_cell, ""), ("SimRate", sim_rate, ""), ("SimStrength", sim_strength, ""),
         ("SimDensity", sim_density, ""), ("SimNear", sim_near, ""))

@@ -30,15 +30,22 @@ CATEGORIES = {
     "meats": ("Food_Meats.blend", "build_food_meats.py"),
     "produce": ("Food_Produce.blend", "build_food_produce.py"),
     "mortar": ("Food_Mortar.blend", "build_food_mortar.py"),
-    "fryer": ("Food_Fryer.blend", "build_food_fryer.py"),      # batter shell generator + oil VAT
+    "prep": ("Food_Prep.blend", "build_food_prep.py"),         # runtime-mesh prep variants (after meats / produce)
+    "fryer": ("Food_Fryer.blend", "build_food_fryer.py"),      # batter shell generator + oil VAT (runs last)
 }
 
 # ---------------------------------------------------------------- naming
 # mesh         <Name>_Mars_SM            textures  <Name>_Mask_Mars_T (RGBA masks), <Name>_Normal_Mars_T (optional)
-# battered     <Name>_Battered_Mars_SM   (ingredient + batter shell, slots Flesh/Skin.. + Batter)
+# battered     <Name>_Battered_Mars_SM   (ingredient + batter shell, slots Flesh/Skin.. + Batter), also
+#              <Name>_<Cut>_Battered_Mars_SM and <Name>_Prep_Battered_Mars_SM: one battered twin per raw mesh, always in
+#              that raw mesh's local frame (see BATTER_FRAME below)
+# prep         <Name>_Prep_Mars_SM       (the runtime-mesh variant of a hero, see PREP below; CPU access)
 # stage meshes <Name>_<Stage>_Mars_SM    (salt / pepper piles)
 # VAT          OilSurface_Mars_SM + OilSurface_VATPos_Mars_T / OilSurface_VATNrm_Mars_T + OilVAT_Mars.json
 # sidecar      <Name>_Mars_SM.json next to every FBX (food_common.write_meta): tris, bounds, slots, uv layers, morph
+
+
+PREP_STAGE = "Prep"
 
 
 def mesh_name(name, stage=None):
@@ -58,17 +65,24 @@ INGREDIENTS = {
     "RoastHorned": dict(category="meats", size_cm=30.0, slots=("Flesh", "Horn"), morph=True, fryable=False,
                         ref="the horned, spiked roast joint (reference 1 / 5): a plump oval body, four to six curved horns, pulled-skin facets"),
     "Drumstick": dict(category="meats", size_cm=22.0, slots=("Flesh", "Bone"), morph=True, fryable=True,
+                      prep=dict(shells="union", cpu_access=True),
                       ref="a cartoon drumstick (reference 5): fat teardrop of meat, exposed pale bone with a knuckle"),
     "Tentacle": dict(category="meats", size_cm=28.0, slots=("Flesh",), morph=True, fryable=True,
+                     prep=dict(shells="drop", cpu_access=True),
                      ref="a curled purple tentacle (reference 1): tapering spiral with a row of round suckers, tip curling up"),
+    # cook_standard: cuttable meat held to food_common's cook-look standard (box-like for the six-face sear, six real
+    # faces, colours / UV0 / mask, the runtime-mesh contract); see "prep standard for cuttable meat" below
     "MeatSlab": dict(category="meats", size_cm=36.0, slots=("Flesh", "Skin"), morph=False, fryable=False, cpu_access=True,
+                     cook_standard=True,
                      ref="a large raw joint for the cutting board: a thick loin / brisket slab with a fat cap, chopped into pieces at runtime"),
     # produce: same cook model (the sear ramp browns anything); morph where the reference shows a shape change
     "Puffer": dict(category="produce", size_cm=14.0, slots=("Skin", "Horn"), morph=True, fryable=True,
+                   prep=dict(shells="union", cpu_access=True),
                    ref="the spiked orange puffer (reference 2): ball with short conical spikes and two bead eyes; morph = puffs up ~15% when fried"),
     "Turnip": dict(category="produce", size_cm=16.0, slots=("Skin", "Leaf"), morph=True, fryable=False,
                    ref="the screaming turnip (reference 3): white-to-magenta root, open mouth with teeth modelled in, leaf crown; morph = wilts / sags when cooked"),
     "SpikedBerry": dict(category="produce", size_cm=10.0, slots=("Skin", "Horn"), morph=False, fryable=True,
+                        prep=dict(shells="union", cpu_access=True),
                         ref="the purple spiked berry (reference 4): squat sphere with blunt spikes and an open mouth"),
     "TomatoBulb": dict(category="produce", size_cm=12.0, slots=("Skin", "Leaf"), morph=True, fryable=False,
                        ref="the red bulb with fangs (reference 4): lobed tomato body, small leaf cap; morph = slumps when stewed"),
@@ -82,7 +96,7 @@ INGREDIENTS = {
     # (a 1 cm lengthwise slice). Exterior on slot Skin, every cut face / gill surface on slot Flesh so the runtime cut
     # cap can take the same material.
     "Mushroom": dict(category="produce", size_cm=12.0, slots=("Skin", "Flesh"), morph=True, fryable=True, cpu_access=True,
-                     cuts=("Half", "Slice"),
+                     cuts=("Half", "Slice"), prep=dict(shells="union", cpu_access=True),
                      ref="a chunky faceted button / cremini mushroom standing on its stem: domed cap 12 cm across with a slightly rolled rim, short thick stem, cream-tan cap with darker centre, pale stem; morph = shrinks ~12 % and the cap sags when cooked"),
     # mortar & pestle minigame: separate meshes per stage, all piles share one pivot (the bowl floor centre)
     "SaltCrystal": dict(category="mortar", size_cm=2.5, slots=("Salt",), morph=False, fryable=False, variants=3,
@@ -171,3 +185,37 @@ OIL_POP_WINDOW = 0.15
 # kept with their slots, shell faces on slot "Batter", shell vertex colour = pale raw batter). Raw vs fried is the
 # Fry value in CPD slot Finish.z on the batter material; the oil-coat function is shared with the meats.
 BATTER_THICKNESS_CM = (0.6, 1.4)
+
+# ---------------------------------------------------------------- batter frame rule (2026-10-10)
+# The game swaps a battered mesh in DISPLAY-ONLY at the raw piece's transform, so <X>_Battered_Mars_SM is exported in
+# the exact local frame of its raw input <X>_Mars_SM: the raw core vertices keep their coordinates, nothing is
+# re-centred, and the shell (BATTER_DEFAULTS Thickness, 1 cm) simply reaches below z = 0 and past the raw bounds. The
+# sidecar records raw_source, pivot_shift_cm (measured raw -> battered translation in Unreal local cm, always
+# [0, 0, 0]; the build fails otherwise), shell_offset_cm and shell_below_floor_cm. A placer that wants a battered
+# mesh resting on a counter lifts it by shell_below_floor_cm.
+
+# ---------------------------------------------------------------- prep variants (runtime-mesh contract)
+# INGREDIENTS[...]["prep"] = dict(shells=..., cpu_access=True) makes build_food_prep.py export <Name>_Prep_Mars_SM:
+# the hero rebuilt to what the game's runtime slicer (CkFoundation CkRuntimeMesh) imports, checked on the exported
+# FBX by food_common.check_runtime_mesh (the build FAILS otherwise):
+#   * ONE closed, connected, non-self-intersecting solid with positive volume (no bowtie / non-manifold / degenerate),
+#   * <= 2048 RENDER vertices (unique position / normal / UV / colour corners; flat shaded + per-facet colour = 3 per
+#     triangle, so a prep mesh stays at or under PREP_TRI_BUDGET triangles) and <= 4096 triangles,
+#   * vertex colours "Col" + UV0 (a fresh atlas with its own <Name>_Prep_Mask_Mars_T transferred from the hero's mask);
+#     no morph UV1 / UV2 (the slicer projects every UV layer planar on its cut caps, a morph would tear the pieces),
+#   * the hero's local frame and pivot unchanged (no re-centring), so the game can use either mesh at one transform,
+#   * CPU access on the Unreal asset (prep.cpu_access; mars_food_plan.wants_cpu_access).
+# shells: what happens to the hero's separate closed shells (horns, spikes, bone, suckers) - "union" boolean-merges
+# them into the body, "drop" removes them and paints their colour onto the body where they sat. The sidecar lists
+# what was merged / dropped ("prep" block) and the checker's numbers ("runtime_mesh" block).
+# A hero that already meets the contract (MeatSlab, 636 tris) gets no prep twin: it IS the prep mesh.
+PREP_TRI_BUDGET = 660
+
+# ---------------------------------------------------------------- prep standard for cuttable meat (2026-10-10)
+# Stephen's ruling: the steak minigame's MeatCube_Mars_SM (one cube, Meat_Mars_M) sears per face; a player who cuts meat
+# at the bench must get the same behaviour and look with the cut piece in the pan, so meat that goes to the bench is
+# prepped to a standard that makes that true. An INGREDIENTS entry with cook_standard=True (cuttable meat: kind meats,
+# cpu_access) FAILS its builder unless the exported FBX passes food_common.check_runtime_mesh with the cook-look rules
+# (food_common.COOK_*): >= 85 % of the area within 25 deg of the six local axes, each axis >= 5 % of the area, vertex
+# colours (A = cavity 0..1, RGB painted), UV0 in 0..1 + its mask PNG, morph UVs absent or within morph_max_cm, and the
+# runtime-mesh contract above. Every new cuttable meat gets the flag.

@@ -6,7 +6,12 @@
 --oil     OilSurface_Mars_SM + OilBubbles_Mars_SM (rest meshes, FBX) and their four VAT EXRs + OilVAT_Mars.json, with
           a numeric verification (decode error, loop seam, NaN, row order straight from the EXR file).
 --batter  <Name>_Battered_Mars_SM for every fryable ingredient whose <Name>_Mars_SM.fbx exists in spec.EXPORT_DIR
-          (missing ones are skipped with a message), plus --batter-input <fbx> for any other mesh.
+          (missing ones are skipped with a message), and the same for its authored cuts (<Name>_<Cut>_Battered, e.g.
+          Mushroom_Slice_Battered) and its runtime-mesh prep variant (<Name>_Prep_Battered, build_food_prep.py), plus
+          --batter-input <fbx> for any other mesh. --only A,B limits the run to those stems (Mushroom_Slice, ...).
+          Frame rule: a battered mesh keeps its raw input's local frame exactly (no re-centring; the shell reaches
+          ~Thickness below z = 0), so the game swaps it in display-only at the raw piece's transform. The sidecar
+          carries raw_source, pivot_shift_cm (measured, always [0, 0, 0]), shell_offset_cm and shell_below_floor_cm.
 --save    writes spec.BLEND_DIR/Food_Fryer.blend: the MarsBatterShell node group, the rest oil meshes, the shell-only
           and battered meshes of this run, and a live BatterDemo object (GN + Decimate modifiers) to tweak.
 --sheets  workbench contact sheets in spec.REVIEW_DIR (OilVAT_sheet.png, <Name>_Battered_sheet.png).
@@ -512,7 +517,8 @@ def drop_inner_components(verts_cm, faces):
 def batter_one(name, path, ng, sheets):
     """Build <name>_Battered_Mars_SM from the ingredient FBX at path. Returns a stats dict."""
     params = dict(BATTER_DEFAULTS)
-    per = BATTER_PER_INGREDIENT.get(name, {})
+    # variants (Mushroom_Slice, Puffer_Prep) wrap like their ingredient: same seed, excluded slots, exposed eyes
+    per = BATTER_PER_INGREDIENT.get(name) or BATTER_PER_INGREDIENT.get(name.split("_")[0], {})
     params.update({k: v for k, v in per.items() if k in BATTER_DEFAULTS})
     exclude = tuple(per.get("exclude_slots", ()))
     ing = ingredient_object("%s_Ingredient" % name, path)
@@ -558,9 +564,20 @@ def batter_one(name, path, ng, sheets):
     if old is not None:
         remove_object(old)
     bat = make_object(bat_name, merged_v, merged_f, slots, merged_s, loop_colors=merged_c)
-    shift = fc.rest_on_floor(bat)[0] - merged_v[0]
-    for o in (ing, shell):
-        fc.set_verts_cm(o, fc.verts_cm(o) + shift)       # keep the review / .blend copies registered with it
+    # Frame rule (2026-10-10): the battered mesh stays in its RAW input's local frame (no rest_on_floor re-centring),
+    # so the game can swap it in display-only at the raw piece's transform. The shell hangs ~Thickness below z = 0.
+    # pivot_shift_cm is measured (raw core vertices in the export vs the raw input) and must stay [0, 0, 0].
+    raw_lo, raw_hi = ing_v.min(axis=0), ing_v.max(axis=0)
+    shift = (fc.verts_cm(bat)[:len(iv)] - iv).mean(axis=0) * fc.UE_MIRROR + 0.0      # Unreal local cm
+    bat_lo, bat_hi = fc.bounds_cm(bat)
+    frame = dict(raw_source=os.path.splitext(os.path.basename(path))[0], frame="raw",
+                 pivot_shift_cm=[round(float(c), 4) for c in shift],
+                 shell_offset_cm=float(params["Thickness"]),
+                 shell_below_floor_cm=round(float(max(0.0, raw_lo[2] - bat_lo[2])), 3),
+                 raw_bounds_min_cm=(np.minimum(raw_lo * fc.UE_MIRROR, raw_hi * fc.UE_MIRROR)).round(3).tolist(),
+                 raw_bounds_max_cm=(np.maximum(raw_lo * fc.UE_MIRROR, raw_hi * fc.UE_MIRROR)).round(3).tolist())
+    if np.abs(shift).max() > 1e-4:
+        raise RuntimeError("%s: battered core moved %s cm off the raw frame" % (bat_name, frame["pivot_shift_cm"]))
     fc.smart_uv(bat)
     bat["batter_generator"] = "GN MarsBatterShell + Decimate collapse"
     bat["batter_params"] = json.dumps(params)
@@ -587,13 +604,16 @@ def batter_one(name, path, ng, sheets):
     except Exception as exc:          # a failed bake must not lose the mesh
         log("%s mask bake failed: %r" % (name, exc))
         stats["mask"] = None
-    fc.export_fbx(bat, extra={"batter": {k: v for k, v in stats.items() if k not in ("name",)}})
+    stats.update(frame)
+    extra = dict(frame)
+    extra["batter"] = {k: v for k, v in stats.items() if k not in ("name",) and k not in frame}
+    fc.export_fbx(bat, extra=extra)
     stats["fbx"] = os.path.join(spec.EXPORT_DIR, bat_name + ".fbx")
     if sheets:
         stats["sheet"] = batter_sheet(name, ing, bat, b_idx)
     log("%s battered: %s" % (name, json.dumps({k: stats[k] for k in (
-        "ingredient_tris", "shell_tris", "tri_ratio", "shell_boundary_edges", "wrapped_outside", "all_outside", "eyes_exposed",
-        "clearance_min_cm", "thickness_cm")})))
+        "ingredient_tris", "shell_tris", "battered_tris", "tri_ratio", "shell_boundary_edges", "wrapped_outside",
+        "all_outside", "eyes_exposed", "clearance_min_cm", "thickness_cm", "pivot_shift_cm", "shell_below_floor_cm")})))
     return stats, ing, shell, bat, src_mesh
 
 
@@ -1598,11 +1618,14 @@ def save_blend(keep):
     bpy.data.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
     # lay the inspection copies out (object transforms only; exported mesh data stays at the spec pivot)
     rows = {"_Battered_Mars_SM": -0.8, "_BatterShell": -1.1}
-    names = sorted({o.name.split("_")[0] for o in keep if any(o.name.endswith(k) for k in rows)})
+
+    def stem_of(n):
+        return next((n[:-len(k)] for k in rows if n.endswith(k)), None)
+    names = sorted({stem_of(o.name) for o in keep if stem_of(o.name)})
     for o in keep:
         for suffix, y in rows.items():
             if o.name.endswith(suffix):
-                o.location = (0.4 * (names.index(o.name.split("_")[0]) - (len(names) - 1) * 0.5), y, 0.0)
+                o.location = (0.3 * (names.index(stem_of(o.name)) - (len(names) - 1) * 0.5), y, 0.0)
         if o.name.startswith("BatterDemo_"):
             o.location = (0.4 * (len(names) + 1) * 0.5 + 0.2, -0.95, 0.0)
     path = os.path.join(spec.BLEND_DIR, spec.CATEGORIES["fryer"][0])
@@ -1614,7 +1637,7 @@ def save_blend(keep):
 # ================================================================ main
 def main():
     args = fc.cli_args({"oil": False, "batter": False, "save": False, "sheets": False, "batter-input": None,
-                        "out": None, "bubble-mesh": False})
+                        "out": None, "bubble-mesh": False, "only": None})
     if args["out"]:                       # test runs: keep exports and sheets out of the shared export folder
         spec.EXPORT_DIR = os.path.abspath(args["out"])
         spec.REVIEW_DIR = os.path.join(spec.EXPORT_DIR, "review")
@@ -1646,15 +1669,23 @@ def main():
         for name, info in spec.INGREDIENTS.items():
             if not info.get("fryable"):
                 continue
-            path = os.path.join(spec.EXPORT_DIR, spec.mesh_name(name) + ".fbx")
-            if os.path.exists(path):
-                jobs.append((name, path))
-            else:
-                log("SKIP %s: %s not found (its builder has not exported it yet)" % (name, path))
+            # the hero, its authored cuts (Mushroom_Half / _Slice) and its runtime-mesh prep variant (<Name>_Prep):
+            # every raw mesh the game can drop in the fryer gets a battered twin in the same local frame
+            stems = [name] + ["%s_%s" % (name, c) for c in info.get("cuts") or ()]
+            stems += ["%s_%s" % (name, spec.PREP_STAGE)] if info.get("prep") else []
+            for stem in stems:
+                path = os.path.join(spec.EXPORT_DIR, spec.mesh_name(stem) + ".fbx")
+                if os.path.exists(path):
+                    jobs.append((stem, path))
+                else:
+                    log("SKIP %s: %s not found (its builder has not exported it yet)" % (stem, path))
         if args["batter-input"]:
             path = os.path.abspath(args["batter-input"])
             stem = os.path.splitext(os.path.basename(path))[0].replace("_Mars_SM", "")
-            jobs.append((stem, path))
+            jobs = [j for j in jobs if j[0] != stem] + [(stem, path)]
+        if args["only"]:
+            only = set(s.strip() for s in str(args["only"]).split(",") if s.strip())
+            jobs = [j for j in jobs if j[0] in only]
         for name, path in jobs:
             stats, ing, shell, bat, src_mesh = batter_one(name, path, ng, args["sheets"])
             summary.setdefault("batter", []).append(stats)

@@ -228,9 +228,10 @@ def import_textures(export_dir=None):
 
 
 # ------------------------------------------------------------------ meshes
-def _mesh_task(path, name):
+def _mesh_task(path, name, keep_degenerates=False):
     """mc.import_meshes' legacy FBX settings (import normals, no lightmap UVs so UV1 / UV2 survive, combined, no
-    auto collision) plus the FBX vertex colours."""
+    auto collision) plus the FBX vertex colours. keep_degenerates: a runtime-mesh solid (its sidecar's runtime_mesh
+    block) keeps every triangle; the importer's default drops near-degenerate slivers and opens the closed solid."""
     task = mc._task(path, F_MESH, name)
     opts = unreal.FbxImportUI()
     opts.import_mesh = True
@@ -244,6 +245,8 @@ def _mesh_task(path, name):
     sm.set_editor_property("normal_import_method", unreal.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS)
     _set(sm, "vertex_color_import_option", unreal.VertexColorImportOption.REPLACE)
     _set(sm, "build_nanite", False)                     # small faceted props with WPO: keep them off Nanite
+    if keep_degenerates:
+        _set(sm, "remove_degenerates", False)
     task.options = opts
     return task
 
@@ -295,6 +298,22 @@ def _cpu_access(sme, mesh):
             _warn("%s: could not allow CPU access (%s)" % (mesh.get_name(), exc))
 
 
+def _keep_degenerates(sme, mesh):
+    """A runtime-mesh solid must reach the editor triangle for triangle: Unreal drops near-degenerate triangles (a
+    0.0035 cm sliver on Drumstick_Prep) at FBX import (_mesh_task's keep_degenerates) and at build (this), which opens the
+    closed solid and CkRuntimeMesh refuses it (InvalidTopology). The prep meshes are already checked clean in Blender
+    (food_common.check_runtime_mesh)."""
+    try:
+        bs = sme.get_lod_build_settings(mesh, 0)
+        if bs.get_editor_property("remove_degenerates"):
+            bs.set_editor_property("remove_degenerates", False)
+            sme.set_lod_build_settings(mesh, 0, bs)
+            _log("%s: keeps its degenerate-looking triangles (runtime-mesh solid)" % mesh.get_name())
+    except Exception as exc:
+        _warn("%s: could not switch off Remove Degenerates (%s); switch it off by hand in the mesh's LOD0 build settings "
+              "or RuntimeMesh may refuse the solid" % (mesh.get_name(), exc))
+
+
 def _check_mesh(sme, mesh, meta):
     b = mesh.get_bounds()
     try:
@@ -310,6 +329,18 @@ def _check_mesh(sme, mesh, meta):
         _warn("%s: %d uv channels, sidecar lists %d (%s)" % (mesh.get_name(), uvs, want, meta.get("uv_layers")))
     for w in plan.uv_layer_warnings(meta):
         _warn(w)
+    rt = meta.get("runtime_mesh")
+    if rt:                                      # prep meshes: Blender's render-vertex count vs what Unreal built
+        try:
+            got = sme.get_number_verts(mesh, 0)
+        except Exception:
+            got = -1
+        if got > plan.RUNTIME_MAX_RENDER_VERTS:
+            _warn("%s: %d render vertices > the runtime-mesh ceiling %d (Blender counted %s)" % (
+                mesh.get_name(), got, plan.RUNTIME_MAX_RENDER_VERTS, rt.get("render_verts")))
+        elif got >= 0:
+            _log("%s: %d render vertices (Blender counted %s, ceiling %d)" % (
+                mesh.get_name(), got, rt.get("render_verts"), plan.RUNTIME_MAX_RENDER_VERTS))
     if meta.get("color_attr"):
         try:
             if not sme.has_vertex_colors(mesh):
@@ -330,7 +361,13 @@ def import_meshes(export_dir=None):
         return []
     metas = {m["name"]: m for m in plan.read_metas(src)}
     names = [os.path.splitext(os.path.basename(p))[0] for p in files]
-    tasks = [_mesh_task(path, name) for path, name in zip(files, names)]
+    keep = {name: bool((metas.get(name) or {}).get("runtime_mesh")) for name in names}
+    for name in [n for n in names if keep[n]]:
+        existing = mc._asset(F_MESH, name)              # a reimport reads the asset's stored FBX options, not the task's
+        data = existing.get_editor_property("asset_import_data") if existing is not None else None
+        if data is not None:
+            _set(data, "remove_degenerates", False)
+    tasks = [_mesh_task(path, name, keep[name]) for path, name in zip(files, names)]
     cvar = "Interchange.FeatureFlags.Import.FBX"            # the legacy importer honours FbxImportUI
     was = unreal.SystemLibrary.get_console_variable_bool_value(cvar)
     unreal.SystemLibrary.execute_console_command(None, "%s 0" % cvar)
@@ -353,9 +390,10 @@ def import_meshes(export_dir=None):
         kind = plan.classify(meta) if meta and "_error" not in meta else None
         oil = kind == "oil" or name.startswith("Oil")
         _collision(sme, mesh, not oil)
-        ing = plan.parse_name(name)[1]
-        if fs.INGREDIENTS.get(ing, {}).get("cpu_access"):
-            _cpu_access(sme, mesh)                              # runtime slicing (HerbPile, Mushroom) reads the buffers
+        if plan.wants_cpu_access(meta if meta and "_error" not in meta else name):
+            _cpu_access(sme, mesh)                  # runtime slicing (MeatSlab, <Ing>_Prep, Mushroom) reads the buffers
+        if meta and meta.get("runtime_mesh"):
+            _keep_degenerates(sme, mesh)            # the prep solids must stay closed triangle for triangle
         if oil and kind != "particle":
             _full_precision_uvs(sme, mesh)
             reach = float(((meta or {}).get("vat") or {}).get("max_offset_cm") or 8.0)

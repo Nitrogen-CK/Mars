@@ -76,7 +76,7 @@ PAN_POOL = """struct FPanPool
 {
     float4 M0; float4 M1; float4 M2; float4 M3; float4 M4; float4 M5;     // each meat: pan-local xy, footprint radius
     float2 T0; float2 T1; float2 T2; float2 T3; float2 T4; float2 T5;     // each meat's lagging trail
-    float Amount; float PoolR; float Margin; float Blend; float Wobble; float BaseR;
+    float Amount; float PoolR; float Margin; float Blend; float Wobble; float BaseR; float RimR; float WallReach;
 
     float Hash(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
     float Noise(float2 p)
@@ -101,6 +101,15 @@ PAN_POOL = """struct FPanPool
             d = lerp(dm, d, t) - k * t * (1.0 - t);
         }
     }
+    // How far out the oil may lie: the base, plus Wall Reach of the wall between the base and the rim.
+    float Reach() { return BaseR + max(RimR - BaseR, 0.0) * saturate(WallReach); }
+    // 0 on the base, 1 at the reach limit: the film thins as it climbs so the blob reads as oil creeping up, not a disc.
+    float Climb(float2 p)
+    {
+        float wallStart = BaseR;
+        float wallSpan = max(Reach() - wallStart, 0.01);
+        return saturate((length(p) - wallStart) / wallSpan);
+    }
     // signed distance to the pool edge (cm, negative inside)
     float Sdf(float2 p)
     {
@@ -112,7 +121,9 @@ PAN_POOL = """struct FPanPool
         BlendMeat(d, p, M4, T4);
         BlendMeat(d, p, M5, T5);
         d += (Noise(p * 0.9) - 0.5) * Wobble;
-        return max(d, length(p) - BaseR - 0.6);          // the pool cannot climb the wall
+        // The oil may climb the wall up to Wall Reach of the way from the base to the rim, never past it: pieces pushed
+        // against the flare drag their blob up the slope, but nothing reaches the lip or the outside of the pan.
+        return max(d, length(p) - Reach());
     }
     // the simmer near one meat: the band around it bubbles harder (the strongest band wins), nothing bubbles under it
     void Near(float2 p, float4 M, float SimW, inout float nearMeat, inout float under)
@@ -129,12 +140,14 @@ FPanPool pool;
 pool.M0 = Meat; pool.M1 = Meat1; pool.M2 = Meat2; pool.M3 = Meat3; pool.M4 = Meat4; pool.M5 = Meat5;
 pool.T0 = Trail.xy; pool.T1 = Trail1.xy; pool.T2 = Trail2.xy; pool.T3 = Trail3.xy; pool.T4 = Trail4.xy; pool.T5 = Trail5.xy;
 pool.Amount = OilAmount; pool.PoolR = PoolR; pool.Margin = Margin; pool.Blend = Blend; pool.Wobble = Wobble; pool.BaseR = BaseR;
+pool.RimR = RimR; pool.WallReach = WallReach;
 
 float2 p = P.xy;
 float d = pool.Sdf(p);
 float on = saturate(OilAmount * 20.0);
 float soft = max(EdgeSoft, 1e-3);
 float film = (1.0 - smoothstep(-soft, 0.0, d)) * on;
+film *= 1.0 - 0.7 * smoothstep(0.35, 1.0, pool.Climb(p));       // thinner the higher it has crept up the wall
 
 // meniscus: the film's edge leans outward, which is where the highlight catches
 float2 e = float2(0.06, 0.0);

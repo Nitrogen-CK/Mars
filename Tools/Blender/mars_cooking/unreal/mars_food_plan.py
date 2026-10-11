@@ -96,6 +96,8 @@ GENERATED = (
     (VAT_REST, (128, 128, 255, 255), "vat_rest"),
 )
 
+PREP = getattr(fs, "PREP_STAGE", "Prep")          # <Ing>_Prep_Mars_SM: the runtime-mesh (CPU access) variant
+RUNTIME_MAX_RENDER_VERTS = 2048                    # CkRuntimeMesh import ceiling (food_common.check_runtime_mesh)
 COOKING = frozenset(fs.SLOTS_COOKING)
 STATIC = frozenset(fs.SLOTS_STATIC)
 ACCENT_SLOTS = ("Horn", "Bone", "Leaf", "Stem", "Stone", "Wood")    # always instanced
@@ -194,8 +196,33 @@ def cuts_of(ing):
     return tuple(fs.INGREDIENTS.get(ing, {}).get("cuts") or ())
 
 
+def variants_of(ing):
+    """Raw variants that get their own child material instance (own UV0 + mask): the authored cuts and the prep."""
+    return cuts_of(ing) + ((PREP,) if fs.INGREDIENTS.get(ing, {}).get("prep") else ())
+
+
+def batter_variant(name):
+    """The raw mesh a battered mesh was made from, as a stem: 'Mushroom_Slice_Battered_Mars_SM' -> 'Mushroom_Slice',
+    'Drumstick_Battered_Mars_SM' -> 'Drumstick' (== the ingredient for the hero's own battered twin)."""
+    stem = parse_name(name)[0]
+    return stem[:-len("_Battered")] if stem.endswith("_Battered") else stem
+
+
+def wants_cpu_access(meta_or_name):
+    """CPU-readable buffers on the Unreal asset: every mesh of an ingredient with cpu_access (HerbPile, Mushroom), a
+    prep variant whose roster entry asks for it, or any mesh whose sidecar says cpu_access (MeatSlab, prep meshes)."""
+    meta = meta_or_name if isinstance(meta_or_name, dict) else {"name": meta_or_name}
+    stem, ing, rest = parse_name(meta.get("name", ""))
+    info = fs.INGREDIENTS.get(ing, {})
+    if info.get("cpu_access") or meta.get("cpu_access") is True:
+        return True
+    if rest == [PREP]:
+        return bool((info.get("prep") or {}).get("cpu_access"))
+    return False
+
+
 def classify(meta):
-    """swatch | oil | battered | stage | vessel | cut | hero | loose | tool | prop."""
+    """swatch | oil | battered | stage | vessel | prep | cut | hero | loose | tool | prop."""
     stem, ing, rest = parse_name(meta["name"])
     slots = set(slots_of(meta))
     info = fs.INGREDIENTS.get(ing, {})
@@ -212,6 +239,8 @@ def classify(meta):
         return "stage"
     if "bowl_floor_cm" in meta:
         return "vessel"
+    if rest and rest[0] == PREP and slots & COOKING:
+        return "prep"                                 # the runtime-mesh variant of the hero (Puffer_Prep)
     if rest and rest[0] in cuts_of(ing) and slots & COOKING:
         return "cut"                                  # an authored cross section of the hero (Mushroom_Half)
     if slots & COOKING:
@@ -287,6 +316,8 @@ def ingredient_mi(ing):
 
 
 def batter_mi(ing):
+    """<Ing>_Batter_Mars_MI; for a battered variant pass its raw stem (Mushroom_Slice -> Mushroom_Slice_Batter_Mars_MI,
+    a child of the ingredient's carrying the variant's own mask: every battered mesh has its own UV0)."""
     return "%s_Batter_Mars_MI" % ing
 
 
@@ -304,8 +335,9 @@ def cut_mi(ing, cut):
 
 def resolve_material(mesh_name, slot, meta=None):
     """Material instance for one mesh slot, or None for a slot outside food_spec.SLOTS_*.
-    Flesh / Skin -> <Ing>_Mars_MI (on a battered mesh <Ing>_BatteredCore_Mars_MI, on a cut <Ing>_<Cut>_Mars_MI, a
-    child of <Ing>_Mars_MI that only swaps in the cut's own mask), Batter -> <Ing>_Batter_Mars_MI,
+    Flesh / Skin -> <Ing>_Mars_MI (on a battered mesh <Variant>_BatteredCore_Mars_MI, on a cut or the prep variant
+    <Ing>_<Cut|Prep>_Mars_MI, a child of <Ing>_Mars_MI that only swaps in its own mask), Batter ->
+    <Variant>_Batter_Mars_MI (Variant = the raw stem the batter wrapped: Drumstick, Mushroom_Slice, Puffer_Prep),
     Oil -> <MeshStem>_Mars_MI (OilVAT), any other static slot -> <Slot>_Mars_MI, ColorSwatch* -> ColorSwatch_Mars_MI."""
     stem, ing, rest = parse_name(mesh_name)
     slot = clean_slot(slot)
@@ -314,11 +346,11 @@ def resolve_material(mesh_name, slot, meta=None):
     if meta and meta.get("particle_mesh") and slot in STATIC:
         return PARTICLE_MI
     if slot == "Batter":
-        return batter_mi(ing)
+        return batter_mi(batter_variant(mesh_name) if "Battered" in rest else ing)
     if slot in COOKING:
         if "Battered" in rest:
-            return core_mi(ing)
-        if rest and rest[0] in cuts_of(ing):
+            return core_mi(batter_variant(mesh_name))
+        if rest and rest[0] in variants_of(ing):
             return cut_mi(ing, rest[0])
         return ingredient_mi(ing)
     if slot == "Oil":
@@ -488,8 +520,8 @@ def instance_plan(metas, vat=None, vat_tex=None, has_texture=lambda name: False)
         cooking = [m for m in by_ing[ing] if set(slots_of(m)) & COOKING]
         if not cooking:
             continue
-        plain = [m for m in cooking if classify(m) not in ("battered", "cut")]
-        plain = plain or [m for m in cooking if classify(m) == "cut"]
+        plain = [m for m in cooking if classify(m) not in ("battered", "cut", "prep")]
+        plain = plain or [m for m in cooking if classify(m) in ("cut", "prep")]
         main = next((m for m in plain if parse_name(m["name"])[0] == ing), plain[0] if plain else None)
         textures = {"Mask": _first(has_texture, ["%s_Mask_Mars_T" % ing]) or NEUTRAL_MASK}
         nrm = _first(has_texture, ["%s_Normal_Mars_T" % ing])
@@ -500,9 +532,10 @@ def instance_plan(metas, vat=None, vat_tex=None, has_texture=lambda name: False)
         add(_spec(ingredient_mi(ing), MASTER_FOOD, scalars={"Shape Scale": 1.0 if main and has_morph(main) else 0.0},
                   textures=textures, create_scalars=look_s, create_vectors=look_v))
 
-    # cut variants (Mushroom_Half): a child of the ingredient instance with the cut's own mask (its UV0 differs)
+    # cut / prep variants (Mushroom_Half, Puffer_Prep): a child of the ingredient instance with the variant's own mask
+    # (its UV0 differs); a prep mesh carries no morph, so its Shape Scale is 0
     for meta in metas:
-        if classify(meta) != "cut":
+        if classify(meta) not in ("cut", "prep"):
             continue
         stem, ing, rest = parse_name(meta["name"])
         textures = {}
@@ -515,24 +548,36 @@ def instance_plan(metas, vat=None, vat_tex=None, has_texture=lambda name: False)
         add(_spec(cut_mi(ing, rest[0]), ingredient_mi(ing), scalars={"Shape Scale": 1.0 if has_morph(meta) else 0.0},
                   textures=textures))
 
-    # battered meshes: the shell on Batter_Mars_M, the ingredient faces on a child of the ingredient instance
-    for meta in metas:
-        if classify(meta) != "battered":
-            continue
+    # battered meshes: the shell on Batter_Mars_M, the ingredient faces on a child of the ingredient instance. Each
+    # battered mesh has its own UV0 and mask, so a variant (Mushroom_Slice_Battered, Puffer_Prep_Battered) gets its own
+    # <Variant>_Batter_Mars_MI (a child of <Ing>_Batter_Mars_MI) and <Variant>_BatteredCore_Mars_MI; the hero's twin
+    # (Variant == Ing) keeps the original names. Heroes' twins first, so the parents exist before their children.
+    battered = sorted((m for m in metas if classify(m) == "battered"),
+                      key=lambda m: (batter_variant(m["name"]) != parse_name(m["name"])[1], m["name"]))
+    for meta in battered:
         stem, ing, rest = parse_name(meta["name"])
-        mask = _first(has_texture, ["%s_Mask_Mars_T" % stem, "%s_Batter_Mask_Mars_T" % ing])
-        nrm = _first(has_texture, ["%s_Normal_Mars_T" % stem, "%s_Batter_Normal_Mars_T" % ing])
-        textures = {"Mask": mask or NEUTRAL_MASK}
-        if nrm:
-            textures["Normal"] = nrm
-        add(_spec(batter_mi(ing), MASTER_BATTER, textures=textures))
+        var = batter_variant(meta["name"])
+        mask = _first(has_texture, ["%s_Mask_Mars_T" % stem, "%s_Batter_Mask_Mars_T" % var])
+        nrm = _first(has_texture, ["%s_Normal_Mars_T" % stem, "%s_Batter_Normal_Mars_T" % var])
+        if var == ing:
+            textures = {"Mask": mask or NEUTRAL_MASK}
+            if nrm:
+                textures["Normal"] = nrm
+            add(_spec(batter_mi(ing), MASTER_BATTER, textures=textures))
+        else:
+            if batter_mi(ing) not in seen:        # a variant without the hero's twin: a neutral parent
+                add(_spec(batter_mi(ing), MASTER_BATTER, textures={"Mask": NEUTRAL_MASK}))
+            textures = {"Mask": mask} if mask else {}
+            if nrm:
+                textures["Normal"] = nrm
+            add(_spec(batter_mi(var), batter_mi(ing), textures=textures))
         if set(slots_of(meta)) & COOKING:
             core_tex = {}
             if mask:
                 core_tex["Mask"] = mask          # baked over the battered mesh's own UV0
             if nrm:
                 core_tex["Normal"] = nrm
-            add(_spec(core_mi(ing), ingredient_mi(ing), scalars={"Shape Scale": 1.0 if has_morph(meta) else 0.0},
+            add(_spec(core_mi(var), ingredient_mi(ing), scalars={"Shape Scale": 1.0 if has_morph(meta) else 0.0},
                       textures=core_tex))
 
     # accents and the salt / pepper crystals
@@ -607,6 +652,17 @@ NIAGARA = "@niagara"        # an OilBubbles_Mars_NS actor (placement carries use
 CYLINDER = "@cylinder"      # the engine's 1 m cylinder (placed with its bottom at loc z)
 
 
+def rest_lift(meta):
+    """How far to raise a mesh so it rests on z = 0: a battered mesh keeps its raw input's frame (food_spec batter
+    frame rule), so its shell reaches shell_below_floor_cm under its pivot."""
+    try:
+        if meta.get("shell_below_floor_cm") is not None:
+            return round(float(meta["shell_below_floor_cm"]), 3)
+        return round(max(0.0, -float((meta.get("bounds_min_cm") or (0, 0, 0))[2])), 3)
+    except (TypeError, ValueError, IndexError):
+        return 0.0
+
+
 def _size(meta):
     try:
         return max(float(meta.get("size_cm") or 0.0), 1.0)
@@ -673,7 +729,7 @@ def plan_lookdev(metas, vat=None):
     out, shots = [], {}
     cuts = {}
     heroes = set(parse_name(m["name"])[1] for m in kinds.get("hero", []))
-    for m in kinds.get("cut", []):
+    for m in kinds.get("cut", []) + kinds.get("prep", []):
         ing = parse_name(m["name"])[1]
         if ing in heroes:
             cuts.setdefault(ing, []).append(m)
@@ -691,9 +747,10 @@ def plan_lookdev(metas, vat=None):
         pitch = s * 1.15 + GAP
         n = len(states)
         stem = parse_name(meta["name"])[0]
+        z = rest_lift(meta)
         for i, (label, sa, sb, fin) in enumerate(states):
             x = (i - (n - 1) * 0.5) * pitch
-            _place(out, "%s_%s" % (stem, label), meta["name"], (x, y, 0.0), 20.0, cpd=(sa, sb, fin),
+            _place(out, "%s_%s" % (stem, label), meta["name"], (x, y, z), 20.0, cpd=(sa, sb, fin),
                    folder="Food/%s" % ("Battered" if kind == "battered" else "Cooking"), size=s,
                    bounds_scale=1.3 if has_morph(meta) else None)
         extra = sorted(cuts.get(stem, []), key=lambda m: m["name"]) if kind == "hero" else []
