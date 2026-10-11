@@ -1,6 +1,6 @@
 // Editor-only: generates the gameplay sandbox map into /Game/Mars/Maps/Sandbox_Mars_MAP. Open File > New Level > Empty
-// Level, then run Mars.Sandbox.Build. The Mars.Sandbox.BuildRoomN / Place* / BuildGauntlets commands add one part to an
-// already-built sandbox map, so a map built before that part existed can catch up without a rebuild.
+// Level, then run Mars.Sandbox.Build. The Mars.Sandbox.BuildRoomN / Place* / Add* / BuildGauntlets commands add one part
+// to an already-built sandbox map, so a map built before that part existed can catch up without a rebuild.
 //
 // It must NOT create/load a level itself: swapping the editor world from inside a script call GCs the world the
 // calling script context holds, and the next nested script call (Ck processor Configure during the new world's
@@ -65,6 +65,14 @@ void Mars_PlaceSandboxCrawlersFunc(const TArray<FString>& Args)
 }
 
 const FConsoleCommand Mars_PlaceSandboxCrawlersCommand("Mars.Sandbox.PlaceCrawlers", n"Mars_PlaceSandboxCrawlersFunc");
+
+UFUNCTION()
+void Mars_AddSandboxRoom5AggressionLeverFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::AddRoom5AggressionLever();
+}
+
+const FConsoleCommand Mars_AddSandboxRoom5AggressionLeverCommand("Mars.Sandbox.AddRoom5AggressionLever", n"Mars_AddSandboxRoom5AggressionLeverFunc");
 
 UFUNCTION()
 void Mars_PlaceSandboxNavFieldFunc(const TArray<FString>& Args)
@@ -195,6 +203,7 @@ namespace utils_mars_sandbox
     const FString k_Room5FloorLabel = "Room5_Floor";
     const FString k_Room5CrawlerLabelPrefix = "Mech5_Crawler";
     const FString k_Room5NavFieldLabel = "Mech5_NavField";
+    const FString k_Room5AggressionLeverLabel = "Mech5_AggressionLever";
     const FString k_Room3BackpackPlateLabel = "Mech3_BackpackPlate";
     const FString k_ItemLabelPrefix = "Item_";
     const FString k_LadderPlatformLabel = "Sandbox_LadderPlatform";
@@ -446,6 +455,25 @@ namespace utils_mars_sandbox
 
         Spawn_Room5NavField();
         utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    void AddRoom5AggressionLever()
+    {
+        const FString Command = "Mars.Sandbox.AddRoom5AggressionLever";
+        if (Get_CanAdd(Command, k_Room5AggressionLeverLabel, "Delete it first to re-place.") == false)
+        { return; }
+
+        Spawn_Room5AggressionLever();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // On the west wall's room face (X = -3990) at hand height, the base's 12 uu radius touching it. The lever's handle is
+    // its local +Z and a pull leans it toward local -X; Pitch 90 then Yaw 180 turns local +Z to world +X (out of the wall,
+    // into the room) and local +X to world +Z, so the handle rests level and a throw swings it down.
+    void Spawn_Room5AggressionLever()
+    {
+        Spawn_Mechanism(UMars_Sandbox_AggressionLever_EntityScript,
+            FMars_MapBuilder_Placement(k_Room5AggressionLeverLabel, FVector(-3978.0, 0.0, 110.0), FRotator(90.0, 180.0, 0.0)));
     }
 
     // The preset's bounds are local to this placement, so placing it at the room's centre covers the room.
@@ -754,6 +782,7 @@ namespace utils_mars_sandbox
 
         Spawn_Room5Crawlers();
         Spawn_Room5NavField();
+        Spawn_Room5AggressionLever();
     }
 
     void Spawn_Cube(const FString& InLabel, FVector InLocation, FVector InScale)

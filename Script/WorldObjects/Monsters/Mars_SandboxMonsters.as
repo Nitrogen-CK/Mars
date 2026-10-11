@@ -12,12 +12,16 @@ class UMars_Sandbox_Tenderizer_EntityScript : UMars_WorldItem_EntityScript
     default Definition = mars_items::Tenderizer();
 }
 
-// The Room 5 crawlers. The spec is set in DoConstruct, not as subclass defaults: the spawn-params generator emits a
-// non-default struct default as a positional constructor call. RoamBounds is Room 5 inset by 150 uu.
+// The Room 5 crawlers: armed but passive until the Room 5 aggression lever powers their sink (channel
+// Mechanism.Channel.Room5Aggression), then they hunt the player; pulling the lever back calms them. The spec and the sink
+// are set in DoConstruct, not as subclass defaults: the spawn-params generator emits a non-default struct default as a
+// positional constructor call. RoamBounds is Room 5 inset by 150 uu.
 UCLASS(Abstract)
 class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
 {
     default _ShowInPlaceActors = false;
+
+    private FMars_MechanismSink_Spec _Sink;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -26,7 +30,39 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Spec.MinLegsToWalk = 3;
         Color = Get_PresetColor();
         Spec.RoamBounds = FBox(FVector(-3850.0, -550.0, 0.0), FVector(-2150.0, 550.0, 200.0));
-        return Super::DoConstruct(InHandle);
+        Spec.Combat.Enabled = true;
+        Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
+        _Sink.InputChannels.Empty();
+        _Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression"));
+
+        const auto Flow = Super::DoConstruct(InHandle);
+        ComposeAggressionSink(InHandle);
+        return Flow;
+    }
+
+    // Only on a crawler that composed armed: a rejected spec has no crawler, and outside a local combat world the crawler
+    // is unarmed and would refuse the aggression request.
+    private void ComposeAggressionSink(FCk_Handle& InHandle)
+    {
+        const auto Crawler = InHandle.As_Crawler(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Crawler) || Crawler.Get_IsCombatArmed() == false)
+        { return; }
+
+        auto SinkHandle = utils_mechanism_sink::Add(InHandle, _Sink);
+        if (ck::IsValid(SinkHandle))
+        { SinkHandle.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnAggressionSinkPoweredChanged")); }
+    }
+
+    UFUNCTION()
+    private void OnAggressionSinkPoweredChanged(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower)
+    {
+        FCk_Handle Entity = InSink;
+        auto Crawler = Entity.As_Crawler(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Crawler))
+        { return; }
+
+        const auto Aggression = InPower == EMars_MechanismSink_Power::Powered ? ECk_EnableDisable::Enable : ECk_EnableDisable::Disable;
+        Crawler.Request_SetAggression(FMars_Request_Crawler_SetAggression(Aggression));
     }
 
     protected int32 Get_PresetLegCount() const
@@ -47,6 +83,23 @@ class UMars_Sandbox_Crawler6_EntityScript : UMars_Sandbox_Crawler_EntityScript
 
     protected FLinearColor Get_PresetColor() const override
     { return FLinearColor(0.35f, 0.55f, 0.2f, 1.0f); }
+}
+
+// The Room 5 aggression lever on the west wall: an instant toggle asserting Mechanism.Channel.Room5Aggression while
+// thrown, which the Room 5 crawlers' sinks turn into Request_SetAggression. The behaviour is set in DoConstruct for the
+// same spawn-params reason as the crawlers' spec.
+class UMars_Sandbox_AggressionLever_EntityScript : UMars_Lever_EntityScript
+{
+    default _ShowInPlaceActors = false;
+    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression");
+    default PromptText = NSLOCTEXT("MarsInteraction", "RouseCrawlersPrompt", "Rouse the crawlers");
+
+    UFUNCTION(BlueprintOverride)
+    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    {
+        Control.Behavior = EMars_Control_Behavior::Toggle;
+        return Super::DoConstruct(InHandle);
+    }
 }
 
 // The Room 5 ground-nav field: the framework's placeable volume script with Room 5's bake settings. The bounds are
