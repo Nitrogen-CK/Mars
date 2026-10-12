@@ -18,8 +18,8 @@ struct FMars_Crawler_AttackPhaseChange
 //      the rest of this tick's time is discarded (a hitch never skips a phase). A sample still unacknowledged keeps its
 //      phase clock still and runs the pose timeout instead;
 //   4. admission of a queued start (from Idle only; anything else records the reason in LastReject);
-//   5. pose: once the scoped action is Ready, advance the phase clock, evaluate the authored offset and submit one
-//      complete body batch. Cooldown submits neutral once, waits for the accepted endpoint, then ends and drains control.
+//   5. pose: once the scoped action is Ready, advance the phase clock, evaluate the authored offset (and the pincer's
+//      claw points) and submit one complete batch. Cooldown submits neutral once, waits for the accepted endpoint, then ends and drains control.
 // A tick with no positive time runs step 1 only. The acknowledgment is the published sample, never the request's
 // completion.
 class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
@@ -151,6 +151,12 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         { return; }
 
         Attack.LastCancel = TOptional<EMars_Crawler_AttackCancel>(InReason);
+        if (InReason == EMars_Crawler_AttackCancel::PoseFailed && ck::IsValid(Attack.Action))
+        {
+            const auto Result = Attack.Action.Get_Result();
+            Attack.LastActionOutcome = Result.Get_Outcome();
+            Attack.LastActionReason = Result.Get_Reason();
+        }
 
         if (utils_crawler::Get_IsOffensivePhase(Phase))
         {
@@ -170,6 +176,8 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
             }
 
             Attack.CancelRecoverStart = Attack.RequestedActionOffset;
+            for (auto& Claw : Attack.Claws)
+            { Claw.CancelRecoverStart = Claw.Requested; }
             if (InReason == EMars_Crawler_AttackCancel::PoseTimeout)
             {
                 // The watchdog abandoned this sample. Keeping its ID would make recovery wait for
@@ -207,7 +215,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
     // Try identity once; if the action no longer admits input its finite return still owns neutralization.
     private void EnterNeutralCooldown(FCk_Handle_Crawler& InSelf, float32 InCooldownSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
-        const auto SampleId = utils_crawler::Submit_AttackOffset(InSelf, FTransform::Identity);
+        const auto SampleId = utils_crawler::Submit_AttackPose(InSelf, FMars_Crawler_PoseQuery());
 
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
         Attack.PendingSampleId = SampleId;
@@ -389,10 +397,9 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         const auto Duration = utils_crawler::Make_PhaseDuration(Combat.Timing, Phase);
         Attack.PhaseElapsed = Math::Min(Attack.PhaseElapsed + InDeltaSeconds, Duration);
         const auto Alpha = Attack.PhaseElapsed / Duration;
-        const auto Offset = utils_crawler::Evaluate_ActionOffset(Combat.Pose, FMars_Crawler_PoseQuery(Phase, Alpha, Attack.CancelRecoverStart));
         const auto Endpoint = Attack.PhaseElapsed >= Duration;
 
-        const auto SampleId = utils_crawler::Submit_AttackOffset(InSelf, Offset);
+        const auto SampleId = utils_crawler::Submit_AttackPose(InSelf, FMars_Crawler_PoseQuery(Phase, Alpha, Attack.CancelRecoverStart));
         if (SampleId != 0)
         {
             auto& Submitted = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
@@ -417,7 +424,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         if (Attack.NeutralSubmitted == false)
         {
             Attack.NeutralSubmitted = true;
-            const auto SampleId = utils_crawler::Submit_AttackOffset(InSelf, FTransform::Identity);
+            const auto SampleId = utils_crawler::Submit_AttackPose(InSelf, FMars_Crawler_PoseQuery());
             InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).PendingSampleId = SampleId;
             if (SampleId == 0)
             { utils_crawler::End_AttackAction(InSelf); }

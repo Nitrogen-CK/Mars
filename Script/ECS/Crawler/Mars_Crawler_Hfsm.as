@@ -430,7 +430,8 @@ class UMars_SmTask_Crawler_EngageStage : UCk_SmTask_EntityScript
     }
 }
 
-// Closes on the combat target through the navigator. A MoveTo goes out on the stage's first tick (unless the target is
+// Closes on the combat target through the navigator, once no attack holds the crawler where it stands
+// (Get_IsHeldByAttack). A MoveTo goes out on the stage's first tick (unless the target is
 // already inside StartDistance), then again only once RepathSeconds have passed AND the target has moved more than
 // RepathDistance since the last one: a target that stands still gets one route, so the navigator's stuck watchdog can
 // fail it. Inside StartDistance, or Arrived, hands over to Prepare; a Failed move (NoPath or Stuck) hands over to Wait
@@ -459,6 +460,9 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
             InOutEngage.Stage = EMars_Crawler_EngageStage::Prepare;
             return;
         }
+
+        if (_Crawler.Get_IsHeldByAttack())
+        { return; }
 
         auto Navigator = _Crawler.Get_Navigator();
         if (InOutEngage.LastRepathAt.IsSet() == false)
@@ -670,7 +674,8 @@ enum EMars_Crawler_RoamPhase
     Dwell
 }
 
-// Pick a goal in RoamBounds -> MoveTo -> on Arrived dwell RoamDwellSeconds -> repeat. A failed move picks again at once,
+// Pick a goal in RoamBounds (once no attack holds the crawler where it stands, Get_IsHeldByAttack) -> MoveTo -> on Arrived
+// dwell RoamDwellSeconds -> repeat. A failed move picks again at once,
 // except after 3 consecutive failures, when it dwells first (no tight NoPath loop); a move stopped from outside dwells
 // too. Always Running; the exit stops the navigator (a leaf change or death tears the state down mid-move).
 class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
@@ -705,6 +710,9 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
 
         if (_Phase == EMars_Crawler_RoamPhase::Pick)
         {
+            if (_Crawler.Get_IsHeldByAttack())
+            { return ECk_SmTaskResult::Running; }
+
             Navigator.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(_Crawler.Pick_RoamPoint()));
             _Phase = EMars_Crawler_RoamPhase::Travel;
             return ECk_SmTaskResult::Running;
