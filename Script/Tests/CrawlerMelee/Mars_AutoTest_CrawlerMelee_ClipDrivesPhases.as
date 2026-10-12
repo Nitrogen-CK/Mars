@@ -1,5 +1,5 @@
 // The jab is a compiled clip and its phases come only from what the resolver accepted from it.
-//   - utils_crawler::Make_AttackClip builds the spec's jab: the body channel from the identity offset; Windup, Strike and
+//   - utils_crawler::Build_AttackClip builds the spec's jab: the body channel from the identity offset; Windup, Strike and
 //     Recover with the spec's durations and easings; body keys identity -> windup key -> strike key -> identity, each
 //     phase starting on the key the one before it ended on; one Offense window over [Windup 0, Recover 1).
 //   - One jab (the target out of reach) runs Windup > Strike > Recover > Cooldown > Idle. Watched every frame after the
@@ -38,10 +38,15 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
     UFUNCTION()
     private void Step_AssertClip(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        // The kernel rebuilds the clip at every admission with the claws that attack claims; a body-only jab claims none.
         auto Combat = Make_ArmedCrawlerSpec(4).Combat;
-        _Clip = utils_crawler::Make_AttackClip(Combat, this);
-        Assert_True(ck::IsValid(_Clip), "Make_AttackClip built a clip");
-        if (ck::Is_NOT_Valid(_Clip))
+        _Clip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
+        auto Build = FMars_Crawler_ClipBuild();
+        Build.Combat = Combat;
+        const auto Built = utils_crawler::Build_AttackClip(Build, _Clip);
+        Assert_True(Built.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+            f"Build_AttackClip built the body-only jab (got [{utils_crawler::Get_FirstDiagnosticText(Built)}])");
+        if (Built.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
         { return; }
 
         const auto Report = utils_procedural_action::Validate_Data(_Clip);

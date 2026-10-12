@@ -5,23 +5,24 @@ struct FMars_Crawler_AttackPhaseChange
     EMars_Crawler_AttackPhase New = EMars_Crawler_AttackPhase::Idle;
 }
 
-// The attack's one clock (armed crawlers only). Every tick runs a fixed pass:
+// The attack's game state (armed crawlers only). The clip action owns the motion's timing; this tick starts it, cancels
+// it and follows what the resolver accepted from it. Every tick runs a fixed pass:
 //   1. cancellation: the queued cancel, then the resolver's displacement and obstruction, then the direct guards (Dead,
-//      Hurt, Crippled, TargetLost, PoseFailed, Unsupported), then the pose timeout; the first reason wins. An offensive
-//      phase (Windup, Strike, Recover) drops its candidate, bumps the generation and eases back from the last requested
-//      offset in CancelRecover; Dead, PoseFailed and Disabled close control and go straight to Cooldown. A cancel during
-//      CancelRecover or Cooldown changes nothing but LastCancel, except a pose timeout or a failed action in
-//      CancelRecover, which ends the wait;
+//      Hurt, Crippled, TargetLost, PoseFailed, Unsupported); the first reason wins. An offensive phase (Windup, Strike,
+//      Recover) drops its candidate, bumps the generation, closes the damage window and cancels the action, whose
+//      dedicated return eases the body back (and whose limb return hands a pincer's claws back to the gait) while the
+//      attack waits in CancelRecover; Dead, PoseFailed and Disabled go straight to Cooldown. A cancel during
+//      CancelRecover or Cooldown changes nothing but LastCancel, except a failed or lost action in CancelRecover, which
+//      ends the wait;
 //   2. commit: a surviving candidate of this generation on the live, enabled, undepleted target, with the crawler alive
 //      and unhurt since admission, becomes the attack's one damage request;
-//   3. endpoint: the resolver's acknowledgment of the pending sample; an acknowledged endpoint enters the next phase and
-//      the rest of this tick's time is discarded (a hitch never skips a phase). A sample still unacknowledged keeps its
-//      phase clock still and runs the pose timeout instead;
-//   4. admission of a queued start (from Idle only; anything else records the reason in LastReject);
-//   5. pose: once the scoped action is Ready, advance the phase clock, evaluate the authored offset (and the pincer's
-//      claw points) and submit one complete batch. Cooldown submits neutral once, waits for the accepted endpoint, then ends and drains control.
-// A tick with no positive time runs step 1 only. The acknowledgment is the published sample, never the request's
-// completion.
+//   3. accepted phase: each posed phase an accepted interval reached since the last tick is entered in order (a hitch
+//      never skips one), and Recover ends in Cooldown once the accepted motion closed the Offense window;
+//   4. admission of a queued start (from Idle only; anything else records the reason in LastReject): the clip is built
+//      for this attack's claws and played;
+//   5. settling: CancelRecover ends in Cooldown on the action's terminal record; Cooldown counts down and returns to Idle
+//      once the terminal stream is acknowledged and the action released.
+// A tick with no positive time runs step 1 only.
 class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -72,7 +73,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
         CommitCandidate(InSelf);
 
-        const auto PoseHeld = ConsumeAcknowledgment(InSelf, InDeltaSeconds, OutChanges);
+        FollowAcceptedPhase(InSelf, OutChanges);
 
         if (StartIntent.IsSet())
         {
@@ -83,10 +84,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
             { Admit(InSelf, StartIntent.GetValue(), OutChanges); }
         }
 
-        if (PoseHeld)
-        { return; }
-
-        Pose(InSelf, InDeltaSeconds, OutChanges);
+        Settle(InSelf, InDeltaSeconds, OutChanges);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -124,23 +122,34 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
             if (utils_procedural_body_pose::Get_Status(InSelf.Get_BodyPose()) == ECk_ProceduralAnimation_Status::Failed ||
                 Observations.ActionStreamFailed || utils_crawler::Get_IsAttackActionLost(InSelf) ||
-                (ck::IsValid(Attack.Action) && Attack.Action.Get_State() == ECk_ProceduralAction_State::Finished))
+                Get_HasActionStoppedOnItsOwn(Attack))
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::PoseFailed); }
 
             if (InSelf.Get_SupportRejection().IsSet())
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::Unsupported); }
         }
 
-        // Recovery cannot wait for an acknowledgement after its action has stopped accepting poses.
+        // The return cannot be waited for once the action's stream has failed or the action is gone.
         if (Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover &&
-            (Observations.ActionStreamFailed || utils_crawler::Get_IsAttackActionLost(InSelf) ||
-                Attack.Action.Get_State() != ECk_ProceduralAction_State::Ready))
+            (Observations.ActionStreamFailed || utils_crawler::Get_IsAttackActionLost(InSelf)))
         { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::PoseFailed); }
 
-        if (Attack.PendingSampleId != 0 && Attack.PoseTimeoutElapsed > Spec.Combat.Timing.PoseTimeoutSeconds)
-        { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::PoseTimeout); }
-
         return TOptional<EMars_Crawler_AttackCancel>();
+    }
+
+    // The library interrupted the clip (support loss, a rejected pose, a watchdog) or finished it short of completion. A
+    // completed clip returns to neutral on its own; the accepted Offense exit ends its offense instead.
+    private bool Get_HasActionStoppedOnItsOwn(const FMars_Fragment_Crawler_Attack& InAttack) const
+    {
+        if (ck::Is_NOT_Valid(InAttack.Action) || InAttack.CancelRequested)
+        { return false; }
+
+        const auto State = InAttack.Action.Get_State();
+        if (State == ECk_ProceduralAction_State::Cancelling)
+        { return true; }
+
+        return State == ECk_ProceduralAction_State::Finished &&
+            InAttack.Action.Get_Result().Get_Outcome() != ECk_ProceduralAction_Outcome::Completed;
     }
 
     private void ApplyCancel(FCk_Handle_Crawler& InSelf, EMars_Crawler_AttackCancel InReason, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
@@ -162,67 +171,31 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         {
             InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Candidate.Reset();
             ++Attack.Generation;
-            Attack.PoseTimeoutElapsed = 0.0f;
             Attack.WindowClosed = true;
+            utils_crawler::Cancel_AttackAction(InSelf);
 
             const auto SkipsRecovery = InReason == EMars_Crawler_AttackCancel::Dead || InReason == EMars_Crawler_AttackCancel::PoseFailed ||
                 InReason == EMars_Crawler_AttackCancel::Disabled;
             if (SkipsRecovery)
             {
-                Attack.PendingSampleId = 0;
-                utils_crawler::Cancel_AttackAction(InSelf);
-                EnterNeutralCooldown(InSelf, 0.0f, OutChanges);
+                EnterCooldown(InSelf, 0.0f, OutChanges);
                 return;
             }
 
-            Attack.CancelRecoverStart = Attack.RequestedActionOffset;
-            for (auto& Claw : Attack.Claws)
-            { Claw.CancelRecoverStart = Claw.Requested; }
-            if (InReason == EMars_Crawler_AttackCancel::PoseTimeout)
-            {
-                // The watchdog abandoned this sample. Keeping its ID would make recovery wait for
-                // the acknowledgement that just timed out, until the action's own input watchdog wins.
-                Attack.PendingSampleId = 0;
-            }
-            Enter(Attack, EMars_Crawler_AttackPhase::CancelRecover, OutChanges);
-            Attack.EndpointSubmitted = false;
+            Enter(InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack), EMars_Crawler_AttackPhase::CancelRecover, OutChanges);
             return;
         }
 
         if (Phase == EMars_Crawler_AttackPhase::CancelRecover && InReason == EMars_Crawler_AttackCancel::PoseFailed)
         {
-            Attack.PendingSampleId = 0;
             utils_crawler::Cancel_AttackAction(InSelf);
-            EnterNeutralCooldown(InSelf, InSelf.Get_Spec().Combat.Timing.CooldownSeconds, OutChanges);
-            return;
+            EnterCooldown(InSelf, InSelf.Get_Spec().Combat.Timing.CooldownSeconds, OutChanges);
         }
-
-        if (InReason != EMars_Crawler_AttackCancel::PoseTimeout)
-        { return; }
-
-        if (Phase == EMars_Crawler_AttackPhase::CancelRecover)
-        {
-            EnterNeutralCooldown(InSelf, InSelf.Get_Spec().Combat.Timing.CooldownSeconds, OutChanges);
-            return;
-        }
-
-        // The game's acknowledgement watchdog wins over the library's longer input/publication watchdogs.
-        Attack.PendingSampleId = 0;
-        Attack.PoseTimeoutElapsed = 0.0f;
-        utils_crawler::Cancel_AttackAction(InSelf);
     }
 
-    // Try identity once; if the action no longer admits input its finite return still owns neutralization.
-    private void EnterNeutralCooldown(FCk_Handle_Crawler& InSelf, float32 InCooldownSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
+    private void EnterCooldown(FCk_Handle_Crawler& InSelf, float32 InCooldownSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
-        const auto SampleId = utils_crawler::Submit_AttackPose(InSelf, FMars_Crawler_PoseQuery());
-
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Attack.PendingSampleId = SampleId;
-        Attack.PoseTimeoutElapsed = 0.0f;
-        Attack.NeutralSubmitted = true;
-        if (SampleId == 0)
-        { utils_crawler::End_AttackAction(InSelf); }
         Enter(Attack, EMars_Crawler_AttackPhase::Cooldown, OutChanges);
         Attack.CooldownRemaining = InCooldownSeconds;
     }
@@ -276,44 +249,19 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // 3. Endpoint
+    // 3. Accepted phase
     //----------------------------------------------------------------------------------------------------------------------
 
-    // True when this tick poses nothing more: a phase just ended on its acknowledged endpoint, or the pending sample is
-    // still unacknowledged.
-    private bool ConsumeAcknowledgment(FCk_Handle_Crawler& InSelf, float32 InDeltaSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
+    private void FollowAcceptedPhase(FCk_Handle_Crawler& InSelf, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
+        const auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.PendingSampleId == 0)
-        { return false; }
 
-        if (InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AckSampleId != Attack.PendingSampleId)
-        {
-            Attack.PoseTimeoutElapsed += InDeltaSeconds;
-            return true;
-        }
+        while (utils_crawler::Get_IsOffensivePhase(Attack.Phase) && int32(Attack.Phase) < int32(Observations.AcceptedPhase))
+        { Enter(Attack, EMars_Crawler_AttackPhase(int32(Attack.Phase) + 1), OutChanges); }
 
-        Attack.PendingSampleId = 0;
-        Attack.PoseTimeoutElapsed = 0.0f;
-        if (Attack.EndpointSubmitted == false)
-        { return false; }
-
-        switch (Attack.Phase)
-        {
-            case EMars_Crawler_AttackPhase::Windup:
-                Enter(Attack, EMars_Crawler_AttackPhase::Strike, OutChanges);
-                break;
-            case EMars_Crawler_AttackPhase::Strike:
-                Enter(Attack, EMars_Crawler_AttackPhase::Recover, OutChanges);
-                break;
-            default:
-                Enter(Attack, EMars_Crawler_AttackPhase::Cooldown, OutChanges);
-                Attack.CooldownRemaining = InSelf.Get_Spec().Combat.Timing.CooldownSeconds;
-                Attack.NeutralSubmitted = false;
-                break;
-        }
-
-        return true;
+        if (Attack.Phase == EMars_Crawler_AttackPhase::Recover && Observations.OffenseEnded)
+        { EnterCooldown(InSelf, InSelf.Get_Spec().Combat.Timing.CooldownSeconds, OutChanges); }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -352,9 +300,6 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Attack.DamageCommitted = false;
         Attack.CommittedSampleId = 0;
         Attack.WindowClosed = false;
-        Attack.PendingSampleId = 0;
-        Attack.PoseTimeoutElapsed = 0.0f;
-        Attack.RequestedActionOffset = FTransform::Identity;
 
         auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
         Observations.Candidate.Reset();
@@ -364,79 +309,33 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Observations.LongestSweep = 0.0f;
         Observations.PreviousHitCenter = Neutral;
         Observations.AcceptedHitCenter = Neutral;
+        Observations.AckSampleId = 0;
+        Observations.AcceptedInterval = FCk_ProceduralAction_Interval();
+        Observations.AcceptedPhase = EMars_Crawler_AttackPhase::Idle;
+        Observations.OffenseEnded = false;
 
         Enter(Attack, EMars_Crawler_AttackPhase::Windup, OutChanges);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // 5. Pose
+    // 5. Settling
     //----------------------------------------------------------------------------------------------------------------------
 
-    private void Pose(FCk_Handle_Crawler& InSelf, float32 InDeltaSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
-    {
-        const auto Combat = InSelf.Get_Spec().Combat;
-        const auto Phase = InSelf.Get_AttackPhase();
-
-        if (Phase == EMars_Crawler_AttackPhase::Idle)
-        { return; }
-
-        if (Phase == EMars_Crawler_AttackPhase::Cooldown)
-        {
-            CoolDown(InSelf, InDeltaSeconds, OutChanges);
-            return;
-        }
-
-        auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (ck::Is_NOT_Valid(Attack.Action))
-        { ApplyCancel(InSelf, EMars_Crawler_AttackCancel::PoseFailed, OutChanges); return; }
-        if (Attack.Action.Get_State() == ECk_ProceduralAction_State::PendingAdmission ||
-            Attack.Action.Get_State() == ECk_ProceduralAction_State::Acquiring)
-        { return; }
-        if (Attack.Action.Get_State() != ECk_ProceduralAction_State::Ready)
-        { ApplyCancel(InSelf, EMars_Crawler_AttackCancel::PoseFailed, OutChanges); return; }
-        const auto Duration = utils_crawler::Make_PhaseDuration(Combat.Timing, Phase);
-        Attack.PhaseElapsed = Math::Min(Attack.PhaseElapsed + InDeltaSeconds, Duration);
-        const auto Alpha = Attack.PhaseElapsed / Duration;
-        const auto Endpoint = Attack.PhaseElapsed >= Duration;
-
-        const auto SampleId = utils_crawler::Submit_AttackPose(InSelf, FMars_Crawler_PoseQuery(Phase, Alpha, Attack.CancelRecoverStart));
-        if (SampleId != 0)
-        {
-            auto& Submitted = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-            Submitted.PendingSampleId = SampleId;
-            Submitted.EndpointSubmitted = Endpoint;
-            return;
-        }
-
-        // The action no longer admits input: offense ends, while recovery delegates neutralization to its return.
-        if (Phase == EMars_Crawler_AttackPhase::CancelRecover)
-        {
-            EnterNeutralCooldown(InSelf, Combat.Timing.CooldownSeconds, OutChanges);
-            return;
-        }
-
-        ApplyCancel(InSelf, EMars_Crawler_AttackCancel::PoseFailed, OutChanges);
-    }
-
-    private void CoolDown(FCk_Handle_Crawler& InSelf, float32 InDeltaSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
+    private void Settle(FCk_Handle_Crawler& InSelf, float32 InDeltaSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.NeutralSubmitted == false)
+        if (Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover && Attack.TerminalSeen)
         {
-            Attack.NeutralSubmitted = true;
-            const auto SampleId = utils_crawler::Submit_AttackPose(InSelf, FMars_Crawler_PoseQuery());
-            InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).PendingSampleId = SampleId;
-            if (SampleId == 0)
-            { utils_crawler::End_AttackAction(InSelf); }
+            EnterCooldown(InSelf, InSelf.Get_Spec().Combat.Timing.CooldownSeconds, OutChanges);
+            return;
         }
 
-        auto& Cooling = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Cooling.PendingSampleId == 0 && Cooling.NeutralSubmitted)
-        { utils_crawler::End_AttackAction(InSelf); }
-        Cooling.CooldownRemaining = Math::Max(Cooling.CooldownRemaining - InDeltaSeconds, 0.0f);
-        if (Cooling.CooldownRemaining <= 0.0f && Cooling.PendingSampleId == 0 &&
-            utils_crawler::Release_TerminalAttackAction(InSelf))
-        { Enter(Cooling, EMars_Crawler_AttackPhase::Idle, OutChanges); }
+        if (Attack.Phase != EMars_Crawler_AttackPhase::Cooldown)
+        { return; }
+
+        Attack.CooldownRemaining = Math::Max(Attack.CooldownRemaining - InDeltaSeconds, 0.0f);
+        if (Attack.CooldownRemaining <= 0.0f && utils_crawler::Release_TerminalAttackAction(InSelf))
+        { Enter(InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack), EMars_Crawler_AttackPhase::Idle, OutChanges); }
     }
 
     private void Enter(FMars_Fragment_Crawler_Attack& InOutAttack, EMars_Crawler_AttackPhase InPhase, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
@@ -447,7 +346,5 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         OutChanges.Add(Change);
 
         InOutAttack.Phase = InPhase;
-        InOutAttack.PhaseElapsed = 0.0f;
-        InOutAttack.EndpointSubmitted = false;
     }
 }

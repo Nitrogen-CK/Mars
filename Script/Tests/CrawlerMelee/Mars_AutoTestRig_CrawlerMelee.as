@@ -479,6 +479,8 @@ struct FMars_AutoTest_CrawlerMelee_AcceptRecord
     ECk_ProceduralAction_Outcome ActionOutcome = ECk_ProceduralAction_Outcome::None;
     ECk_ProceduralAction_Recovery ActionRecovery = ECk_ProceduralAction_Recovery::NotRequired;
     float64 PresentationErrorCm = 0.0;
+    // The two front feet (the rig's first leg, then its last) in the root's frame: where a pincer's claws stand.
+    TArray<FVector> FrontFeet;
 }
 
 // Added to a crawler root by the test; written only by the accept watch processor.
@@ -496,6 +498,20 @@ namespace utils_crawler_melee_watch
         const auto Neutral = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).NeutralRootLocal * Root;
         const auto Presented = utils_transform::Get_EntityCurrentTransform(InCrawler.Get_Presentation());
         return (Presented.GetLocation() - Neutral.GetLocation()).Size();
+    }
+
+    // The foot parts of the rig's first and last leg, in the root's frame; empty for a rig of fewer than two legs.
+    TArray<FVector> Get_FrontFeet(const FCk_Handle_Crawler& InCrawler)
+    {
+        auto Feet = TArray<FVector>();
+        const auto Legs = InCrawler.Get_Spec().Rig.Legs;
+        if (Legs.Num() < 2)
+        { return Feet; }
+
+        const auto Root = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
+        Feet.Add(Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Legs[0].Foot)));
+        Feet.Add(Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Legs[Legs.Num() - 1].Foot)));
+        return Feet;
     }
 }
 
@@ -539,6 +555,7 @@ class UMars_TESTONLY_Processor_CrawlerMelee_AcceptWatch : UCk_Processor_Script_B
             Record.ActionRecovery = Action.Get_Result().Get_Recovery();
         }
         Record.PresentationErrorCm = utils_crawler_melee_watch::Get_PresentationErrorCm(Crawler);
+        Record.FrontFeet = utils_crawler_melee_watch::Get_FrontFeet(Crawler);
         InWatch.Frames.Add(Record);
     }
 }

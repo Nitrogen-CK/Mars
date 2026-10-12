@@ -221,6 +221,11 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // Created on first use of each tint.
     private TArray<FMars_Crawler_TintedRenderer> _Renderers;
 
+    // The object the kernel builds each attack's clip into at admission (the claws, and where their feet stand, change
+    // from one attack to the next). This property keeps it alive; the kernel holds it weakly in Spec.Combat.AttackClip.
+    UPROPERTY()
+    private UCk_ProceduralAction_Data _AttackClip;
+
     // Look only: its pieces (empty without one) and a renderer per piece, created on first use.
     private FMars_Crawler_LookMeshes _LookMeshes;
     private TArray<FMars_Crawler_MeshRenderer> _MeshRenderers;
@@ -264,7 +269,11 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         _LookMeshes = Load_Look(InHandle, RigData.Get_Legs().Num());
         CrawlerSpec.Rig = BuildRig(InHandle, RigData);
         if (CrawlerSpec.Combat.Enabled)
-        { DefaultCombatGeometry(CrawlerSpec); }
+        {
+            DefaultCombatGeometry(CrawlerSpec);
+            _AttackClip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
+            CrawlerSpec.Combat.AttackClip = _AttackClip;
+        }
 
         const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");

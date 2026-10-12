@@ -84,58 +84,69 @@ namespace utils_crawler
         return Combat;
     }
 
-    // The body jab keeps its game-owned travel guard; the manual controller admits the same full body samples. A pincer
-    // also borrows the two front legs from the gait: the player then admits a claw sample anywhere in the chain's reach
-    // (a hitch can pose a whole phase in one sample), counts the legs left standing, and lets them wait out a whole
-    // attack before a step the count forbids interrupts it.
-    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Spec& InSpec)
+    // The one tuning of the attack's clip action, used by both the player and each play spec. Sampling: the body jab keeps
+    // its game-owned travel guard (no accepted sample moves it further than MaxSampleTravel); a pincer's claws travel the
+    // chain's reach, so with a pincer the guard is raised to twice the front leg's reach (a hitch can pose a whole phase
+    // in one sample). Transition: no entry blend (the windup starts at admission, from the identity offset and the claws'
+    // own feet), CancelSeconds as the dedicated return a cancel eases back through, and a return timeout no shorter than
+    // that return, nor than the time the gait gets to step a released claw back down.
+    FCk_ProceduralAction_Tuning Make_AttackTuning(const FMars_Crawler_Spec& InSpec)
     {
         const auto& Combat = InSpec.Combat;
+        auto Tuning = FCk_ProceduralAction_Tuning();
 
-        auto Spec = FCk_ProceduralActionPlayer_Spec();
-        auto Tuning = Spec.Get_Tuning();
         auto Sampling = Tuning.Get_Sampling();
         Sampling.Set_MaxEndpointTravelCm(Combat.Hit.MaxSampleTravel);
         Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
-        auto Watchdogs = Tuning.Get_Watchdogs();
-        Watchdogs.Set_PublicationTimeout(FCk_Time(Combat.Timing.PoseTimeoutSeconds + 1.0f));
-        Tuning.Set_Watchdogs(Watchdogs);
-
         if (Combat.Pincer.Enabled)
         {
             const TArray<FCk_ProceduralLeg_Spec> Legs = InSpec.Get_RigData().Get_Legs();
             Sampling.Set_MaxEndpointTravelCm(Math::Max(Combat.Hit.MaxSampleTravel, 2.0f * Get_ChainReach(Legs[0])));
-
-            const auto& Timing = Combat.Timing;
-            auto Support = FCk_ProceduralLimbControl_Support();
-            Support.Set_Mode(ECk_ProceduralLimbControl_SupportMode::CountOnly);
-            Support.Set_MinimumTrustedContacts(PincerMinStandingLegs);
-            Support.Set_SupportHoldTimeout(FCk_Time(Timing.WindupSeconds + Timing.StrikeSeconds + Timing.RecoverSeconds + Timing.CancelSeconds));
-
-            // Handing a claw back to the gait is a real step from wherever the action left it (the windup key, when a cancel
-            // skips the eased recovery) to where the gait wants the foot. The return's own budget is the smaller of this
-            // one and the sampling's, and its default (2 cm and 5 degrees a sample, 1 s in all) times out on such a
-            // step, which leaves the leg out of the gait for good.
-            auto Motion = FCk_ProceduralLimbControl_MotionBudget();
-            Motion.Set_MaxEndpointTravelCm(Sampling.Get_MaxEndpointTravelCm());
-            Motion.Set_MaxSegmentAngularStepDegrees(Sampling.Get_MaxSegmentAngularStepDegrees());
-            auto Return = FCk_ProceduralLimbControl_Return();
-            Return.Set_Timeout(FCk_Time(PincerReturnTimeoutSeconds));
-            Return.Set_Motion(Motion);
-
-            auto Locomotion = FCk_ProceduralLimbControl_Locomotion();
-            Locomotion.Set_Support(Support);
-            Locomotion.Set_Return(Return);
-
-            auto Transition = Tuning.Get_Transition();
-            Transition.Set_ReturnTimeout(FCk_Time(PincerReturnTimeoutSeconds));
-            Tuning.Set_Transition(Transition);
-            Spec.Set_Locomotion(Locomotion);
         }
-
         Tuning.Set_Sampling(Sampling);
-        Spec.Set_Tuning(Tuning);
-        return Spec;
+
+        auto Transition = Tuning.Get_Transition();
+        const auto CancelReturn = float64(Combat.Timing.CancelSeconds);
+        Transition.Set_EntryBlend(FCk_Time(0.0));
+        Transition.Set_DedicatedReturn(FCk_Time(CancelReturn));
+        auto ReturnTimeout = Math::Max(Transition.Get_ReturnTimeout().Get_Seconds(), CancelReturn);
+        if (Combat.Pincer.Enabled)
+        { ReturnTimeout = Math::Max(ReturnTimeout, float64(PincerReturnTimeoutSeconds)); }
+        Transition.Set_ReturnTimeout(FCk_Time(ReturnTimeout));
+        Tuning.Set_Transition(Transition);
+        return Tuning;
+    }
+
+    // A crawler without a pincer plays its jab on the body alone: a dedicated player. A pincer also borrows the two front
+    // legs from the gait: the player counts the legs left standing, lets them wait out a whole attack before a step the
+    // count forbids interrupts it, and hands a claw back to the gait as a real step from wherever the action left it (the
+    // windup key, when a cancel lands in the air) to where the gait wants the foot. That return gets the sampling's travel
+    // budget, since the default (2 cm and 5 degrees a sample, 1 s in all) times out on such a step and leaves the leg out
+    // of the gait.
+    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Spec& InSpec)
+    {
+        const auto Tuning = Make_AttackTuning(InSpec);
+        const auto& Combat = InSpec.Combat;
+        if (Combat.Pincer.Enabled == false)
+        { return utils_procedural_action_player::Make_DedicatedPlayerSpec(Tuning); }
+
+        const auto& Timing = Combat.Timing;
+        auto Support = utils_procedural_action_player::Make_CountOnlySupport(PincerMinStandingLegs);
+        Support.Set_SupportHoldTimeout(FCk_Time(float64(Timing.WindupSeconds + Timing.StrikeSeconds + Timing.RecoverSeconds + Timing.CancelSeconds)));
+
+        const auto Sampling = Tuning.Get_Sampling();
+        auto Motion = FCk_ProceduralLimbControl_MotionBudget();
+        Motion.Set_MaxEndpointTravelCm(Sampling.Get_MaxEndpointTravelCm());
+        Motion.Set_MaxSegmentAngularStepDegrees(Sampling.Get_MaxSegmentAngularStepDegrees());
+
+        auto Return = FCk_ProceduralLimbControl_Return();
+        Return.Set_Duration(FCk_Time(float64(Timing.CancelSeconds)));
+        Return.Set_Timeout(FCk_Time(float64(PincerReturnTimeoutSeconds)));
+        Return.Set_Motion(Motion);
+
+        auto Borrowing = FCk_ProceduralActionPlayer_BorrowingSpec(Support, Return);
+        Borrowing.Set_Tuning(Tuning);
+        return utils_procedural_action_player::Make_BorrowingPlayerSpec(Borrowing);
     }
 
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
@@ -529,20 +540,6 @@ mixin float32 Get_AttackCooldownRemaining(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CooldownRemaining;
 }
 
-mixin float32 Get_AttackPhaseElapsed(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return 0.0f; }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PhaseElapsed;
-}
-
-// The current phase's authored length (0 for Idle and Cooldown).
-mixin float32 Get_AttackPhaseDuration(const FCk_Handle_Crawler& Self)
-{
-    return utils_crawler::Make_PhaseDuration(Self.Get_Spec().Combat.Timing, Self.Get_AttackPhase());
-}
-
 mixin int32 Get_AttackGeneration(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
@@ -568,31 +565,31 @@ mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedDirection;
 }
 
-// The body pose sample the attack is waiting for; 0 when none.
-mixin int64 Get_AttackPendingSampleId(const FCk_Handle_Crawler& Self)
+// The jab's clip action while one is held (an invalid handle otherwise).
+mixin FCk_Handle_ProceduralAction Get_AttackAction(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return 0; }
+    { return FCk_Handle_ProceduralAction(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PendingSampleId;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
 }
 
-// The pending sample ends its phase.
-mixin bool Get_AttackEndpointSubmitted(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return false; }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).EndpointSubmitted;
-}
-
-// The last sample the body pose published that the attack was waiting for.
+// The sample sequence of the current action's last accepted receipt; 0 when none.
 mixin int64 Get_AttackAcknowledgedSampleId(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
     { return 0; }
 
     return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AckSampleId;
+}
+
+// The clip interval of the current action's last accepted receipt (its PhaseId is None before the first).
+mixin FCk_ProceduralAction_Interval Get_AttackAcceptedInterval(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return FCk_ProceduralAction_Interval(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedInterval;
 }
 
 // The presentation's world transform of the last acknowledged sample.

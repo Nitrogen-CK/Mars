@@ -1,7 +1,7 @@
 // A crawler with the rearing pincer profile (utils_crawler::Make_RearingPincerCombat, what the sandbox crawlers wear)
 // strikes with both front legs: its attack's action claims the rig's first and last leg, each foot starts from where it
-// stood, is at its windup key (thrown up and apart) when Strike is entered and at its strike key (slammed together in
-// front of the body) when Recover is entered, the left claw mirroring the right. The body rears with them: it is pitched
+// stood, is at its windup key (thrown up and apart) on the windup's accepted endpoint and at its strike key (slammed
+// together in front of the body) on the strike's, the left claw mirroring the right. The body rears with them: it is pitched
 // up by the windup key's pitch when Strike is entered and level again when Recover is. The jab underneath is unchanged:
 // the phases run in order, the target loses the jab's 15 HP once and nothing cancels the attack. The start is requested
 // once the crawler would admit it, since a pincer waits for its other feet to stand (the Stance rejection). Each claw is back where it stood when Cooldown is entered; afterwards the gait has both legs back: each reads
@@ -21,6 +21,7 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
     private const float64 k_KeyTolerance = 1.0;
     private const float64 k_PitchTolerance = 2.0;
     private const float64 k_GroundTolerance = 2.0;
+    private const float64 k_EndpointTimeTolerance = 1.0e-4;
 
     // Right claw then left: the foot parts, their leg ids and where each foot stood before the attack (body frame).
     private TArray<FCk_Handle_Transform> _Feet;
@@ -90,6 +91,7 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
 
         _RecordMark = _Records.Num();
         _AdmissionPolls = 0;
+        Watch_Accepts();
         _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Target.Entity));
     }
 
@@ -161,6 +163,24 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
         return true;
     }
 
+    // The two feet on the frame that accepted the InPhaseId interval ending at InEndSeconds of the clip (that phase's
+    // endpoint); false when no frame did.
+    private bool Find_EndpointFeet(FName InPhaseId, float64 InEndSeconds, FVector& OutRight, FVector& OutLeft) const
+    {
+        for (const auto& Frame : Get_AcceptRecords())
+        {
+            if (Frame.AcceptedPhaseId != InPhaseId || Math::Abs(Frame.AcceptedTo - InEndSeconds) > k_EndpointTimeTolerance ||
+                Frame.FrontFeet.Num() != 2)
+            { continue; }
+
+            OutRight = Frame.FrontFeet[0];
+            OutLeft = Frame.FrontFeet[1];
+            return true;
+        }
+
+        return false;
+    }
+
     UFUNCTION()
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -174,17 +194,24 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
             f"the attack ran Windup > Strike > Recover > Cooldown > Idle uncancelled (got{Phases}, last cancel {Get_LastCancelText()}, action {Attack.LastActionOutcome :n} [{Attack.LastActionReason}], planted feet {utils_procedural_gait::Get_PlantedCount(_Crawler.Get_Gait())}, trusted {utils_procedural_gait::Get_TrustedContactCount(_Crawler.Get_Gait())})");
         Assert_Equals_Int(_ClawsAtStrike, 2, "the attack's action claimed both front legs");
 
+        // The claws' keys are checked on each phase's endpoint, the frame that accepted the interval ending there: the
+        // clip action enters Strike and Recover on their own first accepted interval, which already carries that phase's
+        // first motion (InQuad strike: up to about 2.5 cm from the windup key at 60 Hz).
+        const auto Timing = _Crawler.Get_Spec().Combat.Timing;
+        const auto WindupEnd = float64(Timing.WindupSeconds);
+        const auto StrikeEnd = WindupEnd + float64(Timing.StrikeSeconds);
+
         FVector Right;
         FVector Left;
-        if (Find_ClawPoints(EMars_Crawler_AttackPhase::Strike, Right, Left))
+        if (Find_EndpointFeet(n"Windup", WindupEnd, Right, Left))
         {
             Assert_True((Right - Pincer.Windup).Size() <= k_KeyTolerance && (Left - LeftWindup).Size() <= k_KeyTolerance,
-                f"Strike is entered with both claws at the windup key (right {Right.ToString()}, left {Left.ToString()}; key {Pincer.Windup.ToString()}, mirrored for the left)");
+                f"the windup ends with both claws at the windup key (right {Right.ToString()}, left {Left.ToString()}; key {Pincer.Windup.ToString()}, mirrored for the left)");
             Assert_True(Right.Z > _FeetAtRest[0].Z + 100.0 && Left.Z > _FeetAtRest[1].Z + 100.0,
                 f"the windup throws both feet up over the body (right from {_FeetAtRest[0].Z :.1} to {Right.Z :.1}, left from {_FeetAtRest[1].Z :.1} to {Left.Z :.1})");
         }
         else
-        { Assert_True(false, f"Strike was never entered (got{Phases})"); }
+        { Assert_True(false, f"no frame accepted the windup's endpoint at [{WindupEnd :.4}] s (got{Phases})"); }
 
         const auto WindupPitch = _Crawler.Get_Spec().Combat.Pose.Windup.Rotator().Pitch;
         const auto StrikeIndex = _ClawPhases.FindIndex(EMars_Crawler_AttackPhase::Strike);
@@ -197,15 +224,15 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
                 f"Recover is entered with the body level again ({_BodyPitches[RecoverIndex] - _PitchAtRest :.2} deg off its rest pitch)");
         }
 
-        if (Find_ClawPoints(EMars_Crawler_AttackPhase::Recover, Right, Left))
+        if (Find_EndpointFeet(n"Strike", StrikeEnd, Right, Left))
         {
             Assert_True((Right - Pincer.Strike).Size() <= k_KeyTolerance && (Left - LeftStrike).Size() <= k_KeyTolerance,
-                f"Recover is entered with both claws at the strike key (right {Right.ToString()}, left {Left.ToString()}; key {Pincer.Strike.ToString()}, mirrored for the left)");
+                f"the strike ends with both claws at the strike key (right {Right.ToString()}, left {Left.ToString()}; key {Pincer.Strike.ToString()}, mirrored for the left)");
             Assert_True(Math::Abs(Right.Y - Left.Y) < Math::Abs(_FeetAtRest[0].Y - _FeetAtRest[1].Y) * 0.5,
                 f"the strike closes the claws (apart {Math::Abs(Right.Y - Left.Y) :.1} cm, {Math::Abs(_FeetAtRest[0].Y - _FeetAtRest[1].Y) :.1} cm at rest)");
         }
         else
-        { Assert_True(false, f"Recover was never entered (got{Phases})"); }
+        { Assert_True(false, f"no frame accepted the strike's endpoint at [{StrikeEnd :.4}] s (got{Phases})"); }
 
         if (Find_ClawPoints(EMars_Crawler_AttackPhase::Cooldown, Right, Left) && _ClawHomes.Num() == 2)
         {

@@ -113,11 +113,11 @@ mixin FMars_Validation Validate(const FMars_Crawler_Rig& Self, int32 InLegCount)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Combat spec: the body jab (Mars_Crawler_Attack.as evaluates it)
+// Combat spec: the body jab (Mars_Crawler_Attack.as builds its clip)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One jab's phase lengths. CancelSeconds eases an interrupted attack back to neutral; PoseTimeoutSeconds bounds the wait
-// for the body pose to publish a requested sample.
+// One jab's phase lengths: the clip's Windup, Strike and Recover phases, then the game-owned cooldown. CancelSeconds is
+// the action's dedicated return to neutral after a cancel.
 struct FMars_Crawler_AttackTiming
 {
     UPROPERTY()
@@ -134,29 +134,26 @@ struct FMars_Crawler_AttackTiming
 
     UPROPERTY()
     float32 CancelSeconds = 0.15f;
-
-    UPROPERTY()
-    float32 PoseTimeoutSeconds = 1.0f;
 }
 
 mixin FMars_Validation Validate(const FMars_Crawler_AttackTiming& Self)
 {
     if (utils_crawler::Get_IsPositiveFinite(Self.WindupSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.StrikeSeconds) == false ||
         utils_crawler::Get_IsPositiveFinite(Self.RecoverSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.CooldownSeconds) == false ||
-        utils_crawler::Get_IsPositiveFinite(Self.CancelSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.PoseTimeoutSeconds) == false)
+        utils_crawler::Get_IsPositiveFinite(Self.CancelSeconds) == false)
     {
-        return FMars_Validation(f"Crawler combat has a non-positive or non-finite duration (windup [{Self.WindupSeconds}], strike [{Self.StrikeSeconds}], recover [{Self.RecoverSeconds}], cooldown [{Self.CooldownSeconds}], cancel [{Self.CancelSeconds}], pose timeout [{Self.PoseTimeoutSeconds}])");
+        return FMars_Validation(f"Crawler combat has a non-positive or non-finite duration (windup [{Self.WindupSeconds}], strike [{Self.StrikeSeconds}], recover [{Self.RecoverSeconds}], cooldown [{Self.CooldownSeconds}], cancel [{Self.CancelSeconds}])");
     }
 
     return FMars_Validation();
 }
 
-// Body-local action keys in centimetres, in the simulation body's axes, unit scale, and the easing into each. The strike
-// key is translation only. The windup key may also pitch (rear the body up or dip it, about its own Y axis) by at most
-// utils_crawler::MaxWindupPitchDegrees: the hit centre then travels an arc while the straight sample-to-sample hit query
-// covers its chords, and at that limit a whole phase posed in one sample leaves the chord about 4 cm inside the arc for a
-// hit centre 55 cm from the body's origin, well inside the hit sphere. Yaw and roll would swing the hit centre off the
-// committed direction and stay rejected.
+// Body-local action keys in centimetres, in the simulation body's axes, unit scale, and the easing of the clip phase
+// that moves into each. The strike key is translation only. The windup key may also pitch (rear the body up or dip it,
+// about its own Y axis) by at most utils_crawler::MaxWindupPitchDegrees: the hit centre then travels an arc while the
+// straight sample-to-sample hit query covers its chords, and at that limit a whole phase posed in one sample leaves the
+// chord about 4 cm inside the arc for a hit centre 55 cm from the body's origin, well inside the hit sphere. Yaw and roll
+// would swing the hit centre off the committed direction and stay rejected.
 struct FMars_Crawler_AttackPose
 {
     UPROPERTY()
@@ -166,14 +163,13 @@ struct FMars_Crawler_AttackPose
     FTransform Strike = FTransform(FRotator::ZeroRotator, FVector(24.0, 0.0, 0.0), FVector::OneVector);
 
     UPROPERTY()
-    ECk_TweenEasing WindupEasing = ECk_TweenEasing::OutCubic;
+    ECk_ProceduralAction_Easing WindupEasing = ECk_ProceduralAction_Easing::OutCubic;
 
     UPROPERTY()
-    ECk_TweenEasing StrikeEasing = ECk_TweenEasing::InQuad;
+    ECk_ProceduralAction_Easing StrikeEasing = ECk_ProceduralAction_Easing::InQuad;
 
-    // Also eases a cancelled attack back to neutral.
     UPROPERTY()
-    ECk_TweenEasing RecoverEasing = ECk_TweenEasing::InOutCubic;
+    ECk_ProceduralAction_Easing RecoverEasing = ECk_ProceduralAction_Easing::InOutCubic;
 }
 
 mixin FMars_Validation Validate(const FMars_Crawler_AttackPose& Self)
@@ -182,6 +178,15 @@ mixin FMars_Validation Validate(const FMars_Crawler_AttackPose& Self)
     {
         return FMars_Validation(f"Crawler combat needs finite, unit-scale, translation-only keys, but for a windup pitch of at most {utils_crawler::MaxWindupPitchDegrees} degrees (windup [{Self.Windup.GetLocation().ToString()} {Self.Windup.Rotator().ToString()} {Self.Windup.GetScale3D().ToString()}], strike [{Self.Strike.GetLocation().ToString()} {Self.Strike.Rotator().ToString()} {Self.Strike.GetScale3D().ToString()}])");
     }
+
+    if (utils_crawler::Get_IsClipEasing(Self.WindupEasing) == false)
+    { return FMars_Validation(f"Crawler combat WindupEasing [{int32(Self.WindupEasing)}] is not a Linear, Quad or Cubic clip easing"); }
+
+    if (utils_crawler::Get_IsClipEasing(Self.StrikeEasing) == false)
+    { return FMars_Validation(f"Crawler combat StrikeEasing [{int32(Self.StrikeEasing)}] is not a Linear, Quad or Cubic clip easing"); }
+
+    if (utils_crawler::Get_IsClipEasing(Self.RecoverEasing) == false)
+    { return FMars_Validation(f"Crawler combat RecoverEasing [{int32(Self.RecoverEasing)}] is not a Linear, Quad or Cubic clip easing"); }
 
     return FMars_Validation();
 }
@@ -420,6 +425,12 @@ struct FMars_Crawler_Combat
 
     UPROPERTY()
     FMars_Crawler_Prepare Prepare;
+
+    // The object each attack's clip is built into at admission (utils_crawler::Build_AttackClip of Timing, Pose and the
+    // claws the attack claims). Weak: the spec is retained in a fragment, and the entity script that created the object
+    // owns it.
+    UPROPERTY()
+    TWeakObjectPtr<UCk_ProceduralAction_Data> AttackClip;
 }
 
 // A disabled profile is never checked: it composes nothing.
@@ -444,7 +455,14 @@ mixin FMars_Validation Validate(const FMars_Crawler_Combat& Self)
     if (TargetingValidation.IsValid() == false)
     { return TargetingValidation; }
 
-    return Self.Prepare.Validate();
+    const auto PrepareValidation = Self.Prepare.Validate();
+    if (PrepareValidation.IsValid() == false)
+    { return PrepareValidation; }
+
+    if (ck::Is_NOT_Valid(Self.AttackClip.Get()))
+    { return FMars_Validation("Crawler combat has no AttackClip (the entity script creates the object each attack's clip is built into)"); }
+
+    return FMars_Validation();
 }
 
 struct FMars_Crawler_Spec
@@ -592,8 +610,10 @@ struct FMars_Fragment_Crawler
 // Combat state (an armed crawler only; utils_crawler::Add composes none of it otherwise)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Idle -> Windup -> Strike -> Recover -> Cooldown -> Idle. A cancel during Windup, Strike or Recover eases back to neutral
-// in CancelRecover, then cools down; damage is possible only from accepted Strike samples.
+// Idle -> Windup -> Strike -> Recover -> Cooldown -> Idle. Windup is entered at admission; Strike and Recover when an
+// accepted clip interval of that phase arrives; Cooldown when the accepted motion closes the Offense window. A cancel
+// during Windup, Strike or Recover cancels the clip action and waits in CancelRecover for the action's return to finish,
+// then cools down; damage is possible only from accepted Strike intervals.
 enum EMars_Crawler_AttackPhase
 {
     Idle,
@@ -618,10 +638,9 @@ enum EMars_Crawler_AttackCancel
     TargetLost,
     // Ungrounded, untrusted contact, too steep, or the gait or body pose is not Ready.
     Unsupported,
-    // The body pose latched a failure: no recovery, straight to neutral.
+    // The body pose latched a failure, or the clip action failed, was lost or stopped on its own: no recovery, straight
+    // to neutral.
     PoseFailed,
-    // A requested pose sample was not published within PoseTimeoutSeconds.
-    PoseTimeout,
     // The root drifted or turned, or an accepted sample jumped further than MaxSampleTravel.
     Displaced,
     // Combat was switched off for this crawler: no recovery, straight to neutral.
@@ -709,7 +728,7 @@ struct FMars_Fragment_Crawler_AttackIntents
     TOptional<EMars_Crawler_AttackCancel> PendingCancel;
 }
 
-// One front leg the attack's action has claimed. Points are the foot's, in the simulation body's frame.
+// One front leg the attack's clip poses through a claw slot. Points are the foot's, in the simulation body's frame.
 struct FMars_Crawler_AttackClaw
 {
     UPROPERTY()
@@ -722,27 +741,17 @@ struct FMars_Crawler_AttackClaw
     UPROPERTY()
     float32 Side = 1.0f;
 
-    // Where the foot stood when the action first admitted a pose; unset until then.
+    // Where the foot stood when the attack was admitted: the claw's first and last key. Always set for a claimed claw.
     UPROPERTY()
     TOptional<FVector> Home;
-
-    // The last point submitted; a cancelled attack eases back from it.
-    UPROPERTY()
-    FVector Requested = FVector::ZeroVector;
-
-    UPROPERTY()
-    FVector CancelRecoverStart = FVector::ZeroVector;
 }
 
-// Owner: UMars_Processor_Crawler_AttackTick, the one attack clock. Its inputs are the intents mailbox and the resolver's
-// observations.
+// Owner: UMars_Processor_Crawler_AttackTick. Its inputs are the intents mailbox and the resolver's observations; the
+// clip action owns the motion's timing.
 struct FMars_Fragment_Crawler_Attack
 {
     UPROPERTY()
     EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
-
-    UPROPERTY()
-    float32 PhaseElapsed = 0.0f;
 
     // Bumped on every admission and every cancel: a candidate of an older generation never commits.
     UPROPERTY()
@@ -765,35 +774,14 @@ struct FMars_Fragment_Crawler_Attack
     UPROPERTY()
     FCk_Handle Target;
 
-    // The body pose sample awaiting acknowledgment; 0 when none.
-    UPROPERTY()
-    int64 PendingSampleId = 0;
-
-    UPROPERTY()
-    int64 NextSampleId = 0;
-
-    // The pending sample is its phase's endpoint: its acknowledgment ends the phase.
-    UPROPERTY()
-    bool EndpointSubmitted = false;
-
-    UPROPERTY()
-    float32 PoseTimeoutElapsed = 0.0f;
-
     UPROPERTY()
     float32 CooldownRemaining = 0.0f;
 
-    // The last action offset submitted; a cancelled attack eases back from it.
-    UPROPERTY()
-    FTransform RequestedActionOffset = FTransform::Identity;
-
-    UPROPERTY()
-    FTransform CancelRecoverStart = FTransform::Identity;
-
-    // The front legs this attack's action claimed, right then left; empty for a body-only jab.
+    // The front legs this attack's clip claimed, right then left; empty for a body-only jab.
     UPROPERTY()
     TArray<FMars_Crawler_AttackClaw> Claws;
 
-    // One scoped manual action per jab. The copied identity survives the action handle until its terminal stream drains.
+    // One scoped clip action per jab. The copied identity survives the action handle until its terminal stream drains.
     UPROPERTY()
     FCk_Handle ActionScope;
 
@@ -807,7 +795,7 @@ struct FMars_Fragment_Crawler_Attack
     int64 ReceiptCursor = 0;
 
     UPROPERTY()
-    bool EndRequested = false;
+    bool CancelRequested = false;
 
     UPROPERTY()
     bool TerminalSeen = false;
@@ -822,17 +810,13 @@ struct FMars_Fragment_Crawler_Attack
     UPROPERTY()
     bool DamageCommitted = false;
 
-    // The sample whose candidate was committed; 0 when none.
+    // The accepted sample whose candidate was committed; 0 when none.
     UPROPERTY()
     int64 CommittedSampleId = 0;
 
-    // No later sample of this attack may produce a hit.
+    // Set by a cancel: no later accepted interval of this attack may sweep or produce a hit, whatever windows it carries.
     UPROPERTY()
     bool WindowClosed = false;
-
-    // Cooldown's identity sample went out.
-    UPROPERTY()
-    bool NeutralSubmitted = false;
 
     UPROPERTY()
     TOptional<EMars_Crawler_AttackCancel> LastCancel;
@@ -877,14 +861,28 @@ struct FMars_Crawler_HitCandidate
 }
 
 // Mailbox: written by UMars_Processor_Crawler_AttackResolve (FGroup_Overlap); UMars_Processor_Crawler_AttackTick consumes
-// the candidate, the obstruction and the displacement on the next frame and resets the attack's fields at admission.
+// the candidate, the obstruction, the displacement and the accepted phase on the next frame and resets the attack's fields
+// at admission.
 struct FMars_Fragment_Crawler_AttackObservations
 {
+    // The sample sequence of the last accepted receipt of the current action; 0 when none.
     UPROPERTY()
     int64 AckSampleId = 0;
 
     UPROPERTY()
     int64 AckRevision = 0;
+
+    // The clip interval of the last accepted receipt.
+    UPROPERTY()
+    FCk_ProceduralAction_Interval AcceptedInterval;
+
+    // The latest posed phase (Windup, Strike or Recover) an accepted interval reached; Idle before the first.
+    UPROPERTY()
+    EMars_Crawler_AttackPhase AcceptedPhase = EMars_Crawler_AttackPhase::Idle;
+
+    // An accepted interval carried the Offense window's exit: the clip's posed motion is over.
+    UPROPERTY()
+    bool OffenseEnded = false;
 
     // The presentation's world transform of the last acknowledged sample.
     UPROPERTY()
