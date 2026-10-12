@@ -229,4 +229,7 @@ namespace utils_eyes
 
     // The chef's resting style (AMars_PlayerCharacter's config); assets resolve across files through a namespace.
     UMars_EyeStyle Style_Wide() { return Mars_EyeStyle_Wide; }
+
+    // The steward's resting style (Mars_Steward_Config.as): a tall oval, as painted on its face plate.
+    UMars_EyeStyle Style_ClassicOval() { return Mars_EyeStyle_ClassicOval; }
 }
