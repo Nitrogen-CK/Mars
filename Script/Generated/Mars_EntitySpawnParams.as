@@ -1243,6 +1243,19 @@ namespace UMars_AutoTest_CrawlerMelee_InvalidSpec
 }
 
 USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_JabThenWalks_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_JabThenWalks
+{
+    FMars_AutoTest_CrawlerMelee_JabThenWalks_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_JabThenWalks_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CrawlerMelee_LongLimbBounds_SpawnParams
 {
 }
@@ -1447,6 +1460,123 @@ namespace UMars_AutoTest_CrawlerMelee_PhaseSequence
     FMars_AutoTest_CrawlerMelee_PhaseSequence_SpawnParams Params()
     {
         return FMars_AutoTest_CrawlerMelee_PhaseSequence_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerCancelledInTheAirThenWalks_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerCancelledInTheAirThenWalks
+{
+    FMars_AutoTest_CrawlerMelee_PincerCancelledInTheAirThenWalks_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerCancelledInTheAirThenWalks_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerKeyValidation_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerKeyValidation
+{
+    FMars_AutoTest_CrawlerMelee_PincerKeyValidation_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerKeyValidation_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws
+{
+    FMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerStrike_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerStrike
+{
+    FMars_AutoTest_CrawlerMelee_PincerStrike_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerStrike_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerStrikeSixLegs_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerStrikeSixLegs
+{
+    FMars_AutoTest_CrawlerMelee_PincerStrikeSixLegs_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerStrikeSixLegs_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerStrikeSpider_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerStrikeSpider
+{
+    FMars_AutoTest_CrawlerMelee_PincerStrikeSpider_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerStrikeSpider_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerThenWalks_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerThenWalks
+{
+    FMars_AutoTest_CrawlerMelee_PincerThenWalks_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerThenWalks_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerThenWalksSixLegs_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerThenWalksSixLegs
+{
+    FMars_AutoTest_CrawlerMelee_PincerThenWalksSixLegs_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerThenWalksSixLegs_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerThenWalksSpider_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerThenWalksSpider
+{
+    FMars_AutoTest_CrawlerMelee_PincerThenWalksSpider_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerThenWalksSpider_SpawnParams();
     }
 }
 
