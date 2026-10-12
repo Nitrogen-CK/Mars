@@ -1,0 +1,152 @@
+{
+	"material": "Crawler_Mars_MI",
+	"packagePath": "/Game/Mars/Gameplay/Monsters/Crawler/Materials/Crawler_Mars_MI",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "215011c34188c8f570a7bd520040c672",
+		"exporterVersion": 3
+	},
+	"parentChain": [
+		"/Game/Mars/Gameplay/Monsters/Crawler/Materials/Crawler_Mars_M.Crawler_Mars_M"
+	],
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Multiply": 1,
+		"ScalarParameter": 2,
+		"TextureSampleParameter2D": 1,
+		"VectorParameter": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "TextureSampleParameter2D",
+				"name": "MaterialExpressionTextureSampleParameter2D_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"ParameterName": "BaseColor",
+					"Texture": "/Game/Mars/Gameplay/Monsters/Crawler/Materials/Crawler_BaseColor_Mars_T.Crawler_BaseColor_Mars_T"
+				}
+			},
+			{
+				"id": 1,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=1.000000,B=1.000000,A=1.000000)",
+					"ParameterName": "Tint"
+				}
+			},
+			{
+				"id": 2,
+				"class": "Multiply",
+				"name": "MaterialExpressionMultiply_2",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "A",
+						"node": 0,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "B",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					}
+				]
+			},
+			{
+				"id": 3,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"DefaultValue": 0.69999998807907104,
+					"ParameterName": "Roughness"
+				}
+			},
+			{
+				"id": 4,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 0.40000000596046448,
+					"ParameterName": "Specular"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 2,
+				"output": 0
+			},
+			{
+				"property": "MP_Specular",
+				"node": 4,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 3,
+				"output": 0
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Roughness",
+			"value": 0.69999998807907104
+		},
+		{
+			"name": "Specular",
+			"value": 0.40000000596046448
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Tint",
+			"value": "RGBA(1, 1, 1, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "BaseColor",
+			"value": "/Game/Mars/Gameplay/Monsters/Crawler/Materials/Crawler_BaseColor_Mars_T.Crawler_BaseColor_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/Monsters/Crawler/Materials/Crawler_BaseColor_Mars_T.Crawler_BaseColor_Mars_T"
+	]
+}

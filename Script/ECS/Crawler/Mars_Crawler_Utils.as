@@ -1,24 +1,35 @@
 namespace utils_crawler
 {
-    // The crawler's motion profile: it rides the plane through its planted feet, slides along faces it cannot step onto
-    // and steps up to about 1.3 clearances.
-    FCk_SurfaceMotion_Spec Make_MotionSpec()
+    // The crawler's motion profile: it rides the plane through its planted feet at its layout's clearance, slides along
+    // faces it cannot step onto and steps up to about 1.3 clearances; its probe reach and top speed grow with its size.
+    FCk_SurfaceMotion_Spec Make_MotionSpec(EMars_Crawler_Layout InLayout)
     {
+        const auto Clearance = Get_LayoutClearance(InLayout);
+        const auto Size = Get_LayoutSizeScale(InLayout);
         auto Contact = FCk_SurfaceMotion_Contact();
-        Contact.Set_Clearance(65.0f);
-        Contact.Set_ProbeReach(180.0f);
+        Contact.Set_Clearance(Clearance);
+        Contact.Set_ProbeReach(180.0f * Size);
         Contact.Set_HeightSource(ECk_SurfaceMotion_HeightSource::PlantedFeet);
         Contact.Set_WallPolicy(ECk_SurfaceMotion_WallPolicy::Slide);
-        Contact.Set_MaxStepHeight(85.0f);
+        Contact.Set_MaxStepHeight(InLayout == EMars_Crawler_Layout::Radial ? 85.0f : Clearance * 1.3f);
 
         auto Movement = FCk_SurfaceMotion_Movement();
-        Movement.Set_MaxSpeed(180.0f);
+        Movement.Set_MaxSpeed(180.0f * Size);
         Movement.Set_SurfaceTurnRate(180.0f);
 
         auto Spec = FCk_SurfaceMotion_Spec();
         Spec.Set_Contact(Contact);
         Spec.Set_Movement(Movement);
         return Spec;
+    }
+
+    // The navigator's defaults, its speed and distances grown with the layout's size (the same body lengths a second).
+    FMars_SurfaceNavigator_Spec Make_NavigatorSpec(EMars_Crawler_Layout InLayout)
+    {
+        const auto Size = Get_LayoutSizeScale(InLayout);
+        const auto Defaults = FMars_SurfaceNavigator_Spec();
+        return FMars_SurfaceNavigator_Spec(Defaults.Speed * Size, Defaults.AcceptanceRadius * Size, Defaults.StuckSeconds,
+            Defaults.StuckDistance * Size, Defaults.AgentRadius * Size);
     }
 
     // A leg part: crushing ruins a leg faster than the body; depletion detaches the leg.
@@ -39,12 +50,12 @@ namespace utils_crawler
             Zone, InVitals.CorpseSeconds, ECk_Team_ID::Two);
     }
 
-    // The rig chain for one leg: its segments and foot, the Auto solver, the knee swivelled clear of solids, and one
-    // sibling-capsule radius per segment from its box cross section.
-    FCk_ProceduralWalker_LegChain Make_LegChain(FMars_Crawler_LegRig InLeg)
+    // The rig chain for one leg: its segments and foot, the Auto solver, the knee swivelled clear of solids, and, on a
+    // layout that keeps them (Get_LayoutSiblingCapsules), one sibling-capsule radius per segment from its box cross section.
+    FCk_ProceduralWalker_LegChain Make_LegChain(FMars_Crawler_LegRig InLeg, EMars_Crawler_Layout InLayout)
     {
         auto Radii = TArray<float32>();
-        for (int32 Index = 0; Index < InLeg.Segments.Num(); ++Index)
+        for (int32 Index = 0; Index < InLeg.Segments.Num() && Get_LayoutSiblingCapsules(InLayout); ++Index)
         {
             const auto HalfExtents = InLeg.SegmentHalfExtents[Index];
             Radii.Add(float32(Math::Sqrt(HalfExtents.Y * HalfExtents.Y + HalfExtents.Z * HalfExtents.Z)));
@@ -59,14 +70,69 @@ namespace utils_crawler
         return FCk_ProceduralWalker_LegChain(InLeg.LegId, RigSpec);
     }
 
-    // The body jab keeps its game-owned travel guard: no accepted clip sample moves the body further than MaxSampleTravel.
-    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Combat& InCombat)
+    // The rearing pincer: the body rears back and up with its front thrown high while both claws go up and apart, then
+    // lunges forward and down as they slam together in front of it. A longer windup than the plain jab's, so the display
+    // reads before the strike. Everything else is the default combat profile; the caller sets StartAggressive.
+    FMars_Crawler_Combat Make_RearingPincerCombat()
     {
+        auto Combat = FMars_Crawler_Combat();
+        Combat.Enabled = true;
+        Combat.Pincer.Enabled = true;
+        Combat.Pose.Windup = FTransform(FRotator(28.0, 0.0, 0.0), FVector(-12.0, 0.0, 14.0), FVector::OneVector);
+        Combat.Pose.Strike = FTransform(FRotator::ZeroRotator, FVector(30.0, 0.0, -6.0), FVector::OneVector);
+        Combat.Timing.WindupSeconds = 0.60f;
+        return Combat;
+    }
+
+    // The body jab keeps its game-owned travel guard; the manual controller admits the same full body samples. A pincer
+    // also borrows the two front legs from the gait: the player then admits a claw sample anywhere in the chain's reach
+    // (a hitch can pose a whole phase in one sample), counts the legs left standing, and lets them wait out a whole
+    // attack before a step the count forbids interrupts it.
+    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Spec& InSpec)
+    {
+        const auto& Combat = InSpec.Combat;
+
         auto Spec = FCk_ProceduralActionPlayer_Spec();
         auto Tuning = Spec.Get_Tuning();
         auto Sampling = Tuning.Get_Sampling();
-        Sampling.Set_MaxEndpointTravelCm(InCombat.Hit.MaxSampleTravel);
+        Sampling.Set_MaxEndpointTravelCm(Combat.Hit.MaxSampleTravel);
         Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
+        auto Watchdogs = Tuning.Get_Watchdogs();
+        Watchdogs.Set_PublicationTimeout(FCk_Time(Combat.Timing.PoseTimeoutSeconds + 1.0f));
+        Tuning.Set_Watchdogs(Watchdogs);
+
+        if (Combat.Pincer.Enabled)
+        {
+            const TArray<FCk_ProceduralLeg_Spec> Legs = InSpec.Get_RigData().Get_Legs();
+            Sampling.Set_MaxEndpointTravelCm(Math::Max(Combat.Hit.MaxSampleTravel, 2.0f * Get_ChainReach(Legs[0])));
+
+            const auto& Timing = Combat.Timing;
+            auto Support = FCk_ProceduralLimbControl_Support();
+            Support.Set_Mode(ECk_ProceduralLimbControl_SupportMode::CountOnly);
+            Support.Set_MinimumTrustedContacts(PincerMinStandingLegs);
+            Support.Set_SupportHoldTimeout(FCk_Time(Timing.WindupSeconds + Timing.StrikeSeconds + Timing.RecoverSeconds + Timing.CancelSeconds));
+
+            // Handing a claw back to the gait is a real step from wherever the action left it (the windup key, when a cancel
+            // skips the eased recovery) to where the gait wants the foot. The return's own budget is the smaller of this
+            // one and the sampling's, and its default (2 cm and 5 degrees a sample, 1 s in all) times out on such a
+            // step, which leaves the leg out of the gait for good.
+            auto Motion = FCk_ProceduralLimbControl_MotionBudget();
+            Motion.Set_MaxEndpointTravelCm(Sampling.Get_MaxEndpointTravelCm());
+            Motion.Set_MaxSegmentAngularStepDegrees(Sampling.Get_MaxSegmentAngularStepDegrees());
+            auto Return = FCk_ProceduralLimbControl_Return();
+            Return.Set_Timeout(FCk_Time(PincerReturnTimeoutSeconds));
+            Return.Set_Motion(Motion);
+
+            auto Locomotion = FCk_ProceduralLimbControl_Locomotion();
+            Locomotion.Set_Support(Support);
+            Locomotion.Set_Return(Return);
+
+            auto Transition = Tuning.Get_Transition();
+            Transition.Set_ReturnTimeout(FCk_Time(PincerReturnTimeoutSeconds));
+            Tuning.Set_Transition(Transition);
+            Spec.Set_Locomotion(Locomotion);
+        }
+
         Tuning.Set_Sampling(Sampling);
         Spec.Set_Tuning(Tuning);
         return Spec;
@@ -90,13 +156,13 @@ namespace utils_crawler
 
         const auto& Rig = InSpec.Rig;
 
-        auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec());
+        auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec.Layout));
 
         auto Chains = TArray<FCk_ProceduralWalker_LegChain>();
         for (const auto& Leg : Rig.Legs)
-        { Chains.Add(Make_LegChain(Leg)); }
+        { Chains.Add(Make_LegChain(Leg, InSpec.Layout)); }
 
-        auto Walker = utils_procedural_animation::Add_Walker(InRoot, utils_crawler::Get_RigData(InSpec.LegCount), utils_crawler::Mars_CrawlerGait, Chains);
+        auto Walker = utils_procedural_animation::Add_Walker(InRoot, InSpec.Get_RigData(), Get_LayoutGaitData(InSpec.Layout), Chains);
         auto Gait = Walker.Get_Gait();
         if (ck::EnsureIfNot(ck::IsValid(Gait) && ck::IsValid(Motion),
             f"[Crawler] [{RootEntity.ToString()}] surface motion or walker composition was rejected"))
@@ -124,7 +190,7 @@ namespace utils_crawler
         if (Armed)
         {
             auto Subject = utils_procedural_articulation::DoCastChecked(InRoot);
-            ActionPlayer = utils_procedural_action_player::Add(Subject, Make_AttackPlayerSpec(InSpec.Combat));
+            ActionPlayer = utils_procedural_action_player::Add(Subject, Make_AttackPlayerSpec(InSpec));
             if (ck::Is_NOT_Valid(ActionPlayer))
             { return FCk_Handle_Crawler(); }
         }
@@ -163,7 +229,7 @@ namespace utils_crawler
             LegParts.Add(Part);
         }
 
-        auto Navigator = utils_surface_navigator::Add(Motion, FMars_SurfaceNavigator_Spec());
+        auto Navigator = utils_surface_navigator::Add(Motion, Make_NavigatorSpec(InSpec.Layout));
         auto Brain = utils_brain::Add(RootEntity, Make_BrainSpec());
         if (ck::Is_NOT_Valid(Navigator) || ck::Is_NOT_Valid(Brain))
         { return FCk_Handle_Crawler(); }
@@ -447,12 +513,34 @@ mixin EMars_Crawler_AttackPhase Get_AttackPhase(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Phase;
 }
 
+// The crawler must stand where it is: its attack is posing, recovering, cooling down or still handing its legs back to
+// the gait. The phase is Idle again only once the attack's action has finished its return, and a leg stepping back onto
+// the ground under a body that walks away from it never lands. The behaviours ask this before they send a MoveTo.
+mixin bool Get_IsHeldByAttack(const FCk_Handle_Crawler& Self)
+{
+    return Self.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle;
+}
+
 mixin float32 Get_AttackCooldownRemaining(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return 0.0f; }
 
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CooldownRemaining;
+}
+
+mixin float32 Get_AttackPhaseElapsed(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return 0.0f; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PhaseElapsed;
+}
+
+// The current phase's authored length (0 for Idle and Cooldown).
+mixin float32 Get_AttackPhaseDuration(const FCk_Handle_Crawler& Self)
+{
+    return utils_crawler::Make_PhaseDuration(Self.Get_Spec().Combat.Timing, Self.Get_AttackPhase());
 }
 
 mixin int32 Get_AttackGeneration(const FCk_Handle_Crawler& Self)
@@ -480,31 +568,31 @@ mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedDirection;
 }
 
-// The jab's clip action while one is held (an invalid handle otherwise).
-mixin FCk_Handle_ProceduralAction Get_AttackAction(const FCk_Handle_Crawler& Self)
+// The body pose sample the attack is waiting for; 0 when none.
+mixin int64 Get_AttackPendingSampleId(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return FCk_Handle_ProceduralAction(); }
+    { return 0; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PendingSampleId;
 }
 
-// The sample sequence of the current action's last accepted receipt; 0 when none.
+// The pending sample ends its phase.
+mixin bool Get_AttackEndpointSubmitted(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return false; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).EndpointSubmitted;
+}
+
+// The last sample the body pose published that the attack was waiting for.
 mixin int64 Get_AttackAcknowledgedSampleId(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
     { return 0; }
 
     return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AckSampleId;
-}
-
-// The clip interval of the current action's last accepted receipt (its PhaseId is None before the first).
-mixin FCk_ProceduralAction_Interval Get_AttackAcceptedInterval(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
-    { return FCk_ProceduralAction_Interval(); }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedInterval;
 }
 
 // The presentation's world transform of the last acknowledged sample.
@@ -627,8 +715,10 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_SupportRejection(const FCk_Handl
 }
 
 // Why a start at InTarget would be rejected now, in admission order (Disarmed, Busy, NoTarget, TargetInvalid, Dead, Legs,
-// NotReady, Ungrounded, Slope, Height, OutOfRange, Moving, Facing, WindupBlocked); unset when it would be admitted. A
-// cancel queued in the same drain (CancelPending) is the attack tick's to add.
+// NotReady, Ungrounded, Slope, Stance, Height, OutOfRange, Moving, Facing, WindupBlocked); unset when it would be
+// admitted. A cancel queued in the same drain (CancelPending) is the attack tick's to add. Stance only ever delays a
+// pincer: a crawler that just stopped waits for its feet to land instead of asking the gait for two legs it would refuse
+// to lend.
 mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_Crawler& Self, FCk_Handle InTarget)
 {
     if (Self.Get_IsCombatArmed() == false)
@@ -657,6 +747,10 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
     const auto SupportRejection = Self.Get_SupportRejection();
     if (SupportRejection.IsSet())
     { return SupportRejection; }
+
+    const auto Claws = utils_crawler::Find_AttackClaws(Self);
+    if (Claws.Num() > 0 && utils_crawler::Get_IsPincerStanceReady(Self, Claws) == false)
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Stance); }
 
     const auto Prepare = Spec.Combat.Prepare;
     const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
@@ -688,7 +782,7 @@ mixin bool Get_IsWindupBlocked(const FCk_Handle_Crawler& Self)
     const auto Presentation = utils_transform::Get_EntityCurrentTransform(Self.Get_Presentation());
     const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
     const auto Neutral = utils_crawler::Get_HitCenter(Presentation, Combat.Hit.LocalCenter);
-    const auto Windup = Neutral + RootTransform.GetRotation().RotateVector(Combat.Pose.Windup.GetLocation());
+    const auto Windup = Neutral + RootTransform.GetRotation().RotateVector(utils_crawler::Make_HitCenterOffset(Combat.Pose.Windup, Combat.Hit.LocalCenter));
 
     auto Settings = utils_crawler::Make_AttackQuery(Neutral, Windup, Combat.Hit.Radius);
     Settings.Set_IgnoredEntities(Self.Get_AttackIgnoredEntities());

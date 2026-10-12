@@ -13,9 +13,10 @@ class UMars_Sandbox_Tenderizer_EntityScript : UMars_WorldItem_EntityScript
 }
 
 // The Room 5 crawlers: armed but passive until the Room 5 aggression lever powers their sink (channel
-// Mechanism.Channel.Room5Aggression), then they hunt the player; pulling the lever back calms them. The spec and the sink
-// are set in DoConstruct, not as subclass defaults: the spawn-params generator emits a non-default struct default as a
-// positional constructor call. RoamBounds is Room 5 inset by 150 uu.
+// Mechanism.Channel.Room5Aggression), then they hunt the player and strike with the rearing pincer (the body rears up
+// with both front legs thrown high, then lunges as they slam down; the mouth's fangs flare and snap with it); pulling the
+// lever back calms them. The spec and the sink are set in DoConstruct, not as subclass defaults: the spawn-params
+// generator emits a non-default struct default as a positional constructor call. RoamBounds is Room 5 inset by 150 uu.
 UCLASS(Abstract)
 class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
 {
@@ -27,10 +28,13 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         Spec.LegCount = Get_PresetLegCount();
+        Spec.Layout = Get_PresetLayout();
         Spec.MinLegsToWalk = 3;
         Color = Get_PresetColor();
+        Look = Get_PresetLook();
         Spec.RoamBounds = FBox(FVector(-3850.0, -550.0, 0.0), FVector(-2150.0, 550.0, 200.0));
-        Spec.Combat.Enabled = true;
+        // Authored for the radial box crawler; another layout's rig and size get it refitted.
+        Spec.Combat = utils_crawler::Fit_CombatToLayout(utils_crawler::Make_RearingPincerCombat(), Spec.Layout, Spec.LegCount);
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
         _Sink.InputChannels.Empty();
         _Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression"));
@@ -70,6 +74,13 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
 
     protected FLinearColor Get_PresetColor() const
     { return FLinearColor(0.75f, 0.35f, 0.2f, 1.0f); }
+
+    protected EMars_Crawler_Layout Get_PresetLayout() const
+    { return EMars_Crawler_Layout::Radial; }
+
+    // Empty: the boxes.
+    protected FMars_Crawler_Look Get_PresetLook() const
+    { return FMars_Crawler_Look(); }
 }
 
 class UMars_Sandbox_Crawler4_EntityScript : UMars_Sandbox_Crawler_EntityScript
@@ -83,6 +94,39 @@ class UMars_Sandbox_Crawler6_EntityScript : UMars_Sandbox_Crawler_EntityScript
 
     protected FLinearColor Get_PresetColor() const override
     { return FLinearColor(0.35f, 0.55f, 0.2f, 1.0f); }
+
+    // The spider: its measured rig and the pieces cut from the same model (Tools/Blender/mars_monsters/
+    // build_crawler_pieces.py); their slot carries Crawler_Mars_MI.
+    protected EMars_Crawler_Layout Get_PresetLayout() const override
+    { return EMars_Crawler_Layout::Spider; }
+
+    protected FMars_Crawler_Look Get_PresetLook() const override
+    {
+        auto Pieces = FMars_Crawler_Look();
+        Pieces.Body = Get_SpiderMesh("Body");
+        // Rig order: front, mid and back on the right, then back, mid and front on the left; a left leg wears its right
+        // twin's pieces.
+        auto Pairs = TArray<FString>();
+        Pairs.Add("Front");
+        Pairs.Add("Mid");
+        Pairs.Add("Back");
+        Pairs.Add("Back");
+        Pairs.Add("Mid");
+        Pairs.Add("Front");
+        for (const auto& Pair : Pairs)
+        { Pieces.Legs.Add(FMars_Crawler_LegLook(Get_SpiderMesh(f"LegUpper{Pair}"), Get_SpiderMesh(f"LegLower{Pair}"))); }
+
+        Pieces.Foot = Get_SpiderMesh("Foot");
+        Pieces.Fang = Get_SpiderMesh("Fang");
+        Pieces.FangRoot = FVector(87.4, 16.39, -28.95);
+        return Pieces;
+    }
+
+    private TSoftObjectPtr<UStaticMesh> Get_SpiderMesh(FString InPart) const
+    {
+        const FString Name = f"Crawler_{InPart}_Mars_SM";
+        return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(f"/Game/Mars/Gameplay/Monsters/Crawler/Meshes/{Name}.{Name}"));
+    }
 }
 
 // The Room 5 aggression lever on the west wall: an instant toggle asserting Mechanism.Channel.Room5Aggression while
