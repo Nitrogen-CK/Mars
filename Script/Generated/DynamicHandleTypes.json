@@ -406,6 +406,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Mortar",
+			"ShortName": "Mortar",
+			"Description": "A mortar and pestle: a batch of seasoning crushed by timed strikes, then ground while the pestle is held down",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_MortarHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Mortar"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Mover",
 			"ShortName": "Mover",
 			"Description": "A scene-node entity that tweens its own offset between a start and an end pose",
