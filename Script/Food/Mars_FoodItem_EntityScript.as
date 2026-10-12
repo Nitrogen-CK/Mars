@@ -118,7 +118,8 @@ class UMars_FoodItem_EntityScript : UMars_WorldItem_EntityScript
     }
 }
 
-// The sandbox's placed foods: a placed entity resolves its definition from a class default.
+// The placed foods (the sandbox's two, and every one on the station gym's ingredient table): a placed entity resolves its
+// definition from a class default.
 class UMars_FoodItem_MeatSlab_EntityScript : UMars_FoodItem_EntityScript
 {
     default Definition = mars_items::Food_MeatSlab();
@@ -127,4 +128,34 @@ class UMars_FoodItem_MeatSlab_EntityScript : UMars_FoodItem_EntityScript
 class UMars_FoodItem_MushroomSlice_EntityScript : UMars_FoodItem_EntityScript
 {
     default Definition = mars_items::Food_MushroomSlice();
+}
+
+class UMars_FoodItem_Drumstick_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_Drumstick();
+}
+
+class UMars_FoodItem_Tentacle_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_Tentacle();
+}
+
+class UMars_FoodItem_Puffer_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_Puffer();
+}
+
+class UMars_FoodItem_SpikedBerry_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_SpikedBerry();
+}
+
+class UMars_FoodItem_Mushroom_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_Mushroom();
+}
+
+class UMars_FoodItem_Pickle_EntityScript : UMars_FoodItem_EntityScript
+{
+    default Definition = mars_items::Food_Pickle();
 }
