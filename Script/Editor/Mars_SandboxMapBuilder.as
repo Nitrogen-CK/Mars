@@ -171,6 +171,14 @@ void Mars_PlaceSandboxBatterStationFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxBatterStationCommand("Mars.Sandbox.PlaceBatterStation", n"Mars_PlaceSandboxBatterStationFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxMortarStationFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceMortarStation();
+}
+
+const FConsoleCommand Mars_PlaceSandboxMortarStationCommand("Mars.Sandbox.PlaceMortarStation", n"Mars_PlaceSandboxMortarStationFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxPlattersFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlacePlatters();
@@ -213,6 +221,7 @@ namespace utils_mars_sandbox
     const FString k_FryStationLabel = "Sandbox_FryStation";
     const FString k_TumblerStationLabel = "Sandbox_TumblerStation";
     const FString k_BatterStationLabel = "Sandbox_BatterStation";
+    const FString k_MortarStationLabel = "Sandbox_MortarStation";
     const FString k_PlatterLargeLabel = "Sandbox_Platter_Large";
     const FString k_PlatterSmallLabel = "Sandbox_Platter_Small";
     const FString k_FoodMeatSlabLabel = "Sandbox_Food_MeatSlab";
@@ -278,6 +287,7 @@ namespace utils_mars_sandbox
         Spawn_FryStation();
         Spawn_TumblerStation();
         Spawn_BatterStation();
+        Spawn_MortarStation();
         Spawn_Gauntlets();
 
         Apply_ProtoGridMaterials();
@@ -573,6 +583,22 @@ namespace utils_mars_sandbox
     void Spawn_BatterStation()
     {
         Spawn_Mechanism(UMars_BatterStation_EntityScript, FMars_MapBuilder_Placement(k_BatterStationLabel, FVector(-800.0, -1600.0, 0.0)));
+    }
+
+    void PlaceMortarStation()
+    {
+        const FString Command = "Mars.Sandbox.PlaceMortarStation";
+        if (Get_CanAdd(Command, k_MortarStationLabel, "Delete it first to re-place.") == false)
+        { return; }
+
+        Spawn_MortarStation();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // Beside the tumbler station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
+    void Spawn_MortarStation()
+    {
+        Spawn_Mechanism(UMars_MortarStation_EntityScript, FMars_MapBuilder_Placement(k_MortarStationLabel, FVector(400.0, -1600.0, 0.0)));
     }
 
     void PlacePlatters()

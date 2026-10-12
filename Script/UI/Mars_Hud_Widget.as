@@ -16,4 +16,7 @@ class UMars_Hud_Widget : UCk_ActivatableWidget_UE
 
     UPROPERTY(meta = (BindWidgetOptional))
     UMars_EmoteWheel_Widget EmoteWheel;
+
+    UPROPERTY(meta = (BindWidgetOptional))
+    UMars_MortarMeter_Widget MortarMeter;
 }
