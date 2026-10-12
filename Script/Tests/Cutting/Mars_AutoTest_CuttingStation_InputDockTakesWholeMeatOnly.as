@@ -1,7 +1,7 @@
 // The cutting bench cuts meat joints for the pan: its input dock takes whole meat only. Two platters lie beside the real
 // station, the input platter with a mushroom slice (already a slice: not a bench input) and a second with the meat slab.
 // The dock's kind gate takes every meat food's kind and refuses every vegetable's (the slice, the whole mushroom, the
-// spiked berry), and its pure answer refuses the slice's platter KindRejected ("Meat only") and takes the slab's. Docking
+// spiked berry), and its pure answer refuses the slice's platter KindRejected ("Meat or pickle only") and takes the slab's. Docking
 // the slice's platter is refused KindRejected: the dock stays empty and the feed has no source. Docking the slab's docks it
 // and the feed draws from it (the Idle state's Source task): one joint available. Isolated origin (13600, -9000, -30000).
 class UMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly : UMars_AutoTestRig_CuttingStation
@@ -66,7 +66,7 @@ class UMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly : UMars_AutoTest
         const auto SliceRefusal = utils_platter_dock::Get_Refusal(Spec, _InputPlatter);
         Assert_True(SliceRefusal.IsSet() && SliceRefusal.GetValue() == EMars_PlatterDock_Refusal::KindRejected,
             "the slice's platter is refused for its kind");
-        Assert_Equals_String(utils_platter_dock::Get_RefusalText(Spec, SliceRefusal).ToString(), "Meat only", "the dock's prompt says why");
+        Assert_Equals_String(utils_platter_dock::Get_RefusalText(Spec, SliceRefusal).ToString(), "Meat or pickle only", "the dock's prompt says why");
         Assert_False(utils_platter_dock::Get_Refusal(Spec, _MeatPlatterEntity.As_Platter()).IsSet(), "the slab's platter may dock");
 
         _InputDock.BindTo_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefused"));

@@ -1,0 +1,39 @@
+// /Project/Looks/CutLine.ush
+//
+// A dotted guide line stamped onto whatever surface a UDecalComponent's box intersects: round-capped dashes along the
+// decal's U (its local Z), centred on V (its local Y), the box's width being the line's. Emissive-only, like ImageDecal: the
+// line reads the same in any light, and BaseColor is zeroed so the surface under a dash goes dark and the dash is the tint
+// alone. Aspect is the box's length over its width, so the caps stay round whatever the box.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+// The dash's soft edge, as a fraction of the line's half width.
+#ifndef MARS_CUTLINE_EDGE_SOFTNESS
+#define MARS_CUTLINE_EDGE_SOFTNESS 0.3f
+#endif
+
+FCkUsf_SurfaceOutput Mars_Look_CutLine(
+    FCkUsf_SurfaceInput In,
+    float3              Tint,
+    float               Brightness,
+    float               DashCount,
+    float               DashFill,
+    float               Aspect,
+    float               Coverage)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    // In half line widths: Across is -1..1 over the box, Along is the offset from the middle of the nearest dash.
+    const float Period = 2.0f * Aspect / max(DashCount, 1.0f);
+    const float Along  = (frac(In.UV.x * DashCount) - 0.5f) * Period;
+    const float Across = In.UV.y * 2.0f - 1.0f;
+
+    // A capsule one half width in radius; a dash shorter than it is wide is a dot.
+    const float HalfStraight = max(0.5f * Period * DashFill - 1.0f, 0.0f);
+    const float FromCore     = length(float2(max(abs(Along) - HalfStraight, 0.0f), Across));
+
+    O.BaseColor     = float3(0.0f, 0.0f, 0.0f);
+    O.EmissiveColor = Tint * Brightness;
+    O.Opacity       = saturate((1.0f - FromCore) / MARS_CUTLINE_EDGE_SOFTNESS) * Coverage;
+    return O;
+}
