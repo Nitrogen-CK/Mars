@@ -39,7 +39,7 @@ Other plugins under `Plugins/` may adopt the same pattern over time; check their
 
 ## Build System and Development Commands
 
-The project uses the **runreal** build system. The engine source comes from `https://github.com/Chainkemists/UnrealEngine-Internal` (configured in `runreal.config.json`).
+The project uses the **runreal** build system. The engine source comes from `https://github.com/CommitAndChill/UnrealEngine-Angelscript`, branch `main-ck` (configured in `runreal.config.json`).
 
 **Build + run automation/Gauntlet tests via the Unreal Toolbox** — use the
 `/build-test` skill (canonical doc: [CkAuto/.claude/skills/build-test/SKILL.md](CkAuto/.claude/skills/build-test/SKILL.md);
