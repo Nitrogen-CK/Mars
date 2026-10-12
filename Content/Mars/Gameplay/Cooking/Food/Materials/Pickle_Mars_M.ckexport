@@ -1,0 +1,451 @@
+{
+	"material": "Pickle_Mars_M",
+	"packagePath": "/Game/Mars/Gameplay/Cooking/Food/Materials/Pickle_Mars_M",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "de9d67914bec522285c6be121a3fb056",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Opaque",
+	"twoSided": false,
+	"unlit": false,
+	"shadingModel": "MSM_DefaultLit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"BaseColor"
+	],
+	"expressions":
+	{
+		"Custom": 1,
+		"ScalarParameter": 2,
+		"Transform": 1,
+		"TransformPosition": 1,
+		"VectorParameter": 8,
+		"VertexColor": 1,
+		"VertexNormalWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"desc": "0 = the skin (the painted vertex colours), 1 = a cut face (the solid texture read from the piece's local position).",
+				"props":
+				{
+					"SliderMax": 1,
+					"ParameterName": "Section",
+					"Group": "Pickle",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 1,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"desc": "The brined skin's roughness.",
+				"props":
+				{
+					"DefaultValue": 0.41999998688697815,
+					"SliderMax": 1,
+					"ParameterName": "Skin Roughness",
+					"Group": "Pickle",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 2,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_8",
+				"desc": "The pickle's long axis in its mesh's local cm (the sidecar's section_* numbers).",
+				"outputs": [
+					"RGB",
+					"Centre X",
+					"Axis Z",
+					"Radius",
+					"Half Length",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.003100,G=3.661700,B=3.450700,A=10.149100)",
+					"ParameterName": "Axis",
+					"Group": "Section shape",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 3,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_9",
+				"desc": "The skin's radius along the pickle: R (1 - |u|^A)^(1/B) (1 + Fatten u), as the mesh builder's.",
+				"outputs": [
+					"RGB",
+					"A",
+					"B",
+					"Fatten",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=2.600000,G=2.200000,B=0.070000,A=0.000000)",
+					"ParameterName": "Taper",
+					"Group": "Section shape",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 4,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_10",
+				"desc": "Seed pockets round the axis, and the seeds' spacing along it (cm).",
+				"outputs": [
+					"RGB",
+					"Pockets",
+					"Seed Spacing",
+					"-",
+					"-",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=6.000000,G=1.150000,B=0.000000,A=0.000000)",
+					"ParameterName": "Lobes",
+					"Group": "Section shape",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 5,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_11",
+				"desc": "The firm flesh under the rind.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.686685,G=0.745404,B=0.341914,A=1.000000)",
+					"ParameterName": "Flesh",
+					"Group": "Section colours",
+					"SortPriority": 0
+				}
+			},
+			{
+				"id": 6,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_12",
+				"desc": "The softer flesh round the seed pockets.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.564712,G=0.617207,B=0.181164,A=1.000000)",
+					"ParameterName": "Inner",
+					"Group": "Section colours",
+					"SortPriority": 1
+				}
+			},
+			{
+				"id": 7,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_13",
+				"desc": "The seed pockets' jelly and the core.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.296138,G=0.351533,B=0.061246,A=1.000000)",
+					"ParameterName": "Jelly",
+					"Group": "Section colours",
+					"SortPriority": 2
+				}
+			},
+			{
+				"id": 8,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_14",
+				"desc": "The seeds.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.854993,G=0.791298,B=0.479320,A=1.000000)",
+					"ParameterName": "Seed",
+					"Group": "Section colours",
+					"SortPriority": 3
+				}
+			},
+			{
+				"id": 9,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_15",
+				"desc": "The thin skin at the edge of a cut.",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.048172,G=0.088656,B=0.012983,A=1.000000)",
+					"ParameterName": "Rind",
+					"Group": "Section colours",
+					"SortPriority": 4
+				}
+			},
+			{
+				"id": 10,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_1",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				],
+				"props":
+				{
+					"WorldPositionShaderOffset": "WPT_ExcludeAllShaderOffsets"
+				}
+			},
+			{
+				"id": 11,
+				"class": "TransformPosition",
+				"name": "MaterialExpressionTransformPosition_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 10,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMPOSSOURCE_World"
+				}
+			},
+			{
+				"id": 12,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_1"
+			},
+			{
+				"id": 13,
+				"class": "Transform",
+				"name": "MaterialExpressionTransform_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "Input",
+						"node": 12,
+						"output": 0
+					}
+				],
+				"props":
+				{
+					"TransformSourceType": "TRANSFORMSOURCE_World",
+					"TransformType": "TRANSFORM_Local"
+				}
+			},
+			{
+				"id": 14,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_1",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 15,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_1",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "P",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 1,
+						"name": "VC",
+						"node": 14,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 2,
+						"name": "Section",
+						"node": 0,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "SkinRoughness",
+						"node": 1,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "Axis",
+						"node": 2,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 5,
+						"name": "Taper",
+						"node": 3,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 6,
+						"name": "Lobes",
+						"node": 4,
+						"output": 5,
+						"mask": "rgba"
+					},
+					{
+						"index": 7,
+						"name": "Flesh",
+						"node": 5,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 8,
+						"name": "Inner",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 9,
+						"name": "Jelly",
+						"node": 7,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 10,
+						"name": "Seed",
+						"node": 8,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 11,
+						"name": "Rind",
+						"node": 9,
+						"output": 0,
+						"mask": "rgb"
+					}
+				],
+				"outputs": [
+					"return",
+					"Roughness"
+				],
+				"props":
+				{
+					"Code": "float u = clamp((P.x - Axis.x) / max(Axis.w, 0.01), -0.999, 0.999);\nfloat skin = Axis.z * pow(1.0 - pow(abs(u), Taper.x), 1.0 / Taper.y) * (1.0 + Taper.z * u);\nfloat2 q = float2(P.y, P.z - Axis.y);\nfloat t = saturate(length(q) / max(skin, 0.05));\nfloat a = (atan2(q.y, q.x) / 6.2831853 + 0.25) * Lobes.x;\nfloat cell = floor(a + 0.5);\nfloat f = a - cell;\n\nfloat pocket = 1.0 - smoothstep(0.72, 1.0, length(float2((t - 0.37) / 0.23, f / 0.36)));\nfloat row = frac(P.x / max(Lobes.y, 0.05) + frac(sin(cell * 12.9898) * 43758.5453)) - 0.5;\nfloat seed = 1.0 - smoothstep(0.65, 1.0, length(float3((t - 0.37) / 0.11, f / 0.17, row / 0.34)));\nfloat core = 1.0 - smoothstep(0.05, 0.16, t);\n\nfloat3 c = lerp(Inner.rgb, Flesh.rgb, smoothstep(0.52, 0.72, t));\nc = lerp(c, Jelly.rgb, saturate(max(pocket, core) * 0.9));\nc = lerp(c, Seed.rgb, seed);\nc = lerp(c, Rind.rgb, smoothstep(0.86, 0.95, t));\n\nRoughness = lerp(SkinRoughness, lerp(0.34, 0.5, seed), Section);\nreturn lerp(saturate(VC), c, Section);",
+					"Description": "Pickle skin / cut face"
+				}
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_BaseColor",
+				"node": 15,
+				"output": 0
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 15,
+				"output": 1
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Section",
+			"value": 0
+		},
+		{
+			"name": "Skin Roughness",
+			"value": 0.41999998688697815
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Axis",
+			"value": "RGBA(0.0031, 3.6617, 3.4507, 10.1491)"
+		},
+		{
+			"name": "Taper",
+			"value": "RGBA(2.6, 2.2, 0.07, 0)"
+		},
+		{
+			"name": "Lobes",
+			"value": "RGBA(6, 1.15, 0, 0)"
+		},
+		{
+			"name": "Flesh",
+			"value": "RGBA(0.686685, 0.745404, 0.341914, 1)"
+		},
+		{
+			"name": "Inner",
+			"value": "RGBA(0.564712, 0.617207, 0.181164, 1)"
+		},
+		{
+			"name": "Jelly",
+			"value": "RGBA(0.296138, 0.351533, 0.0612461, 1)"
+		},
+		{
+			"name": "Seed",
+			"value": "RGBA(0.854993, 0.791298, 0.47932, 1)"
+		},
+		{
+			"name": "Rind",
+			"value": "RGBA(0.0481718, 0.0886556, 0.012983, 1)"
+		}
+	],
+	"textureParams": [],
+	"usedTextures": []
+}
