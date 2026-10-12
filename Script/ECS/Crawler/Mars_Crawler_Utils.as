@@ -59,6 +59,19 @@ namespace utils_crawler
         return FCk_ProceduralWalker_LegChain(InLeg.LegId, RigSpec);
     }
 
+    // The body jab keeps its game-owned travel guard: no accepted clip sample moves the body further than MaxSampleTravel.
+    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Combat& InCombat)
+    {
+        auto Spec = FCk_ProceduralActionPlayer_Spec();
+        auto Tuning = Spec.Get_Tuning();
+        auto Sampling = Tuning.Get_Sampling();
+        Sampling.Set_MaxEndpointTravelCm(InCombat.Hit.MaxSampleTravel);
+        Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
+        Tuning.Set_Sampling(Sampling);
+        Spec.Set_Tuning(Tuning);
+        return Spec;
+    }
+
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
     // their visuals): surface motion -> walker (legs, gait, rigs) -> body pose (before any detach) -> monster -> the
     // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
@@ -107,6 +120,15 @@ namespace utils_crawler
         const auto Armed = InSpec.Combat.Enabled &&
             utils_local_session::Get_IsLocalCombatWorld(utils_entity_lifetime::Get_WorldForEntity(RootEntity));
 
+        auto ActionPlayer = FCk_Handle_ProceduralActionPlayer();
+        if (Armed)
+        {
+            auto Subject = utils_procedural_articulation::DoCastChecked(InRoot);
+            ActionPlayer = utils_procedural_action_player::Add(Subject, Make_AttackPlayerSpec(InSpec.Combat));
+            if (ck::Is_NOT_Valid(ActionPlayer))
+            { return FCk_Handle_Crawler(); }
+        }
+
         auto Dealer = FCk_Handle_DamageDealer();
         if (Armed)
         {
@@ -153,6 +175,7 @@ namespace utils_crawler
         State.Motion = Motion;
         State.Gait = Gait;
         State.BodyPose = BodyPose;
+        State.ActionPlayer = ActionPlayer;
         State.Presentation = Rig.Presentation;
         State.LegParts = LegParts;
         State.Navigator = Navigator;
@@ -250,6 +273,11 @@ mixin FCk_Handle_ProceduralGait Get_Gait(const FCk_Handle_Crawler& Self)
 mixin FCk_Handle_ProceduralBodyPose Get_BodyPose(const FCk_Handle_Crawler& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Crawler).BodyPose;
+}
+
+mixin FCk_Handle_ProceduralActionPlayer Get_ActionPlayer(const FCk_Handle_Crawler& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Crawler).ActionPlayer;
 }
 
 mixin FCk_Handle_Transform Get_Presentation(const FCk_Handle_Crawler& Self)
@@ -427,20 +455,6 @@ mixin float32 Get_AttackCooldownRemaining(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CooldownRemaining;
 }
 
-mixin float32 Get_AttackPhaseElapsed(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return 0.0f; }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PhaseElapsed;
-}
-
-// The current phase's authored length (0 for Idle and Cooldown).
-mixin float32 Get_AttackPhaseDuration(const FCk_Handle_Crawler& Self)
-{
-    return utils_crawler::Make_PhaseDuration(Self.Get_Spec().Combat.Timing, Self.Get_AttackPhase());
-}
-
 mixin int32 Get_AttackGeneration(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
@@ -466,31 +480,31 @@ mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedDirection;
 }
 
-// The body pose sample the attack is waiting for; 0 when none.
-mixin int64 Get_AttackPendingSampleId(const FCk_Handle_Crawler& Self)
+// The jab's clip action while one is held (an invalid handle otherwise).
+mixin FCk_Handle_ProceduralAction Get_AttackAction(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return 0; }
+    { return FCk_Handle_ProceduralAction(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).PendingSampleId;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
 }
 
-// The pending sample ends its phase.
-mixin bool Get_AttackEndpointSubmitted(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-    { return false; }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).EndpointSubmitted;
-}
-
-// The last sample the body pose published that the attack was waiting for.
+// The sample sequence of the current action's last accepted receipt; 0 when none.
 mixin int64 Get_AttackAcknowledgedSampleId(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
     { return 0; }
 
     return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AckSampleId;
+}
+
+// The clip interval of the current action's last accepted receipt (its PhaseId is None before the first).
+mixin FCk_ProceduralAction_Interval Get_AttackAcceptedInterval(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return FCk_ProceduralAction_Interval(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedInterval;
 }
 
 // The presentation's world transform of the last acknowledged sample.
@@ -619,6 +633,9 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
 {
     if (Self.Get_IsCombatArmed() == false)
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Disarmed); }
+
+    if (ck::Is_NOT_Valid(Self.Get_ActionPlayer()))
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::NotReady); }
 
     if (Self.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle || Self.Get_AttackCooldownRemaining() > 0.0f)
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Busy); }

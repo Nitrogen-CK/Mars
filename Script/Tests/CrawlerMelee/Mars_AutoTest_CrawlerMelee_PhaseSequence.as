@@ -1,14 +1,18 @@
-// One directly requested jab runs Windup -> Strike -> Recover -> Cooldown -> Idle, each phase entered on the acknowledged
-// endpoint of the one before it: entering Strike the body pose holds the windup key, entering Recover the strike key,
-// entering Cooldown and Idle identity. The target stands where the strike reaches it mid-phase, and its one damage
-// request comes from a Strike sample: no request exists when Strike is entered, the committed sample lies after the
-// windup's endpoint and no later than the strike's, and the target loses exactly the jab's 15 HP.
+// One directly requested jab runs Windup -> Strike -> Recover -> Cooldown -> Idle, each posed phase entered on the first
+// accepted clip interval of that phase, which starts exactly where the phase before it ended (where the clip holds the
+// windup key, then the strike key); Cooldown is entered on the interval that ends the clip, and Cooldown and Idle find
+// the presentation at neutral. The target stands where the strike reaches it mid-phase, and its one damage request
+// comes from a Strike sample: no request exists when Strike is entered, the committed sample is a Strike interval's
+// (no earlier than the one that entered Strike, before the one that entered Recover), and the target loses exactly the
+// jab's 15 HP.
 class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 40.0f;
     default _Origin = FVector(-170000.0, -150000.0, 600.0);
 
     private const float64 k_KeyTolerance = 0.01;
+    private const float64 k_TimeTolerance = 1.0e-4;
+    private const float64 k_NeutralToleranceCm = 1.0;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -44,7 +48,6 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Phases = Get_PhaseText(_RecordMark);
-        const auto Pose = _Crawler.Get_Spec().Combat.Pose;
 
         Assert_True(_Records.Num() - _RecordMark == 5, f"exactly five phase changes (got{Phases})");
         if (_Records.Num() - _RecordMark != 5)
@@ -61,26 +64,44 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
             ToCooldown.New == EMars_Crawler_AttackPhase::Cooldown && ToIdle.New == EMars_Crawler_AttackPhase::Idle,
             f"the phases are Windup > Strike > Recover > Cooldown > Idle (got{Phases})");
 
-        Assert_True((ToStrike.ActionOffset - Pose.Windup.GetLocation()).Size() <= k_KeyTolerance,
-            f"Strike is entered with the windup key posed (action {ToStrike.ActionOffset.ToString()})");
-        Assert_True((ToRecover.ActionOffset - Pose.Strike.GetLocation()).Size() <= k_KeyTolerance,
-            f"Recover is entered with the strike key posed (action {ToRecover.ActionOffset.ToString()})");
-        Assert_True(ToCooldown.ActionOffset.Size() <= k_KeyTolerance && ToIdle.ActionOffset.Size() <= k_KeyTolerance,
-            f"Cooldown and Idle are entered at identity (actions {ToCooldown.ActionOffset.ToString()}, {ToIdle.ActionOffset.ToString()})");
+        // Approved change: phases follow the accepted clip PhaseId, so a phase is entered on its own first accepted
+        // interval (which starts on the previous phase's key) rather than on the previous phase's acknowledged endpoint.
+        const auto Timing = _Crawler.Get_Spec().Combat.Timing;
+        const auto WindupEnd = float64(Timing.WindupSeconds);
+        const auto StrikeEnd = WindupEnd + float64(Timing.StrikeSeconds);
+        const auto ClipEnd = StrikeEnd + float64(Timing.RecoverSeconds);
+        Assert_True(ToStrike.AcceptedPhaseId == n"Strike" && Math::Abs(ToStrike.AcceptedFrom - WindupEnd) <= k_TimeTolerance,
+            f"Strike is entered on the first accepted Strike interval, from the windup key at [{WindupEnd :.4}] s (got {ToStrike.AcceptedPhaseId} from [{ToStrike.AcceptedFrom :.4}])");
+        Assert_True(ToRecover.AcceptedPhaseId == n"Recover" && Math::Abs(ToRecover.AcceptedFrom - StrikeEnd) <= k_TimeTolerance,
+            f"Recover is entered on the first accepted Recover interval, from the strike key at [{StrikeEnd :.4}] s (got {ToRecover.AcceptedPhaseId} from [{ToRecover.AcceptedFrom :.4}])");
+        Assert_True(ToCooldown.AcceptedPhaseId == n"Recover" && Math::Abs(ToCooldown.AcceptedTo - ClipEnd) <= k_TimeTolerance,
+            f"Cooldown is entered on the accepted interval that ends the clip at [{ClipEnd :.4}] s (got {ToCooldown.AcceptedPhaseId} to [{ToCooldown.AcceptedTo :.4}])");
+        Assert_True(ToCooldown.PresentationErrorCm <= k_NeutralToleranceCm && ToIdle.PresentationErrorCm <= k_NeutralToleranceCm,
+            f"Cooldown and Idle are entered with the presentation at neutral ({ToCooldown.PresentationErrorCm :.3}, {ToIdle.PresentationErrorCm :.3} cm)");
 
         Assert_True(ToWindup.DamageRequests == 0 && ToStrike.DamageRequests == 0 && ToStrike.DamageCommitted == false,
             f"no damage request exists before Strike (at Windup {ToWindup.DamageRequests}, at Strike {ToStrike.DamageRequests}, committed {ToStrike.DamageCommitted})");
         Assert_True(ToRecover.DamageCommitted && ToCooldown.DamageCommitted,
             "the hit was committed during Strike and the latch survives into Recover and Cooldown");
 
+        // Approved change: ToStrike now carries the first Strike sample and ToRecover the first Recover sample.
         const auto Committed = _Crawler.Get_AttackCommittedSampleId();
-        Assert_True(Committed > ToStrike.AcknowledgedSampleId && Committed <= ToRecover.AcknowledgedSampleId,
-            f"the committed sample [{Committed}] is a Strike sample: after the windup endpoint [{ToStrike.AcknowledgedSampleId}], no later than the strike endpoint [{ToRecover.AcknowledgedSampleId}]");
+        Assert_True(Committed >= ToStrike.AcknowledgedSampleId && Committed < ToRecover.AcknowledgedSampleId,
+            f"the committed sample [{Committed}] is a Strike sample: no earlier than the first Strike interval [{ToStrike.AcknowledgedSampleId}], before the first Recover interval [{ToRecover.AcknowledgedSampleId}]");
 
         Assert_Equals_Int(Get_DamageRequestCount(), 1, "the dealer drained exactly one damage request");
         Assert_Equals_Float(_Target.Health.Get_Current(), 85.0f, 0.01f, "the target lost the jab's 15 HP once");
-        Assert_True(utils_procedural_body_pose::Get_ActionOffset(_Crawler.Get_BodyPose()).Equals(FTransform::Identity, 0.001),
-            "the body pose's action input is identity after the attack");
+        const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
+        const auto BodyPose = _Crawler.Get_BodyPose();
+        const auto ExpectedNeutral = utils_procedural_body_pose::Get_Offset(BodyPose) * Root;
+        const auto Presented = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
+        const auto NeutralErrorCm = (Presented.GetLocation() - ExpectedNeutral.GetLocation()).Size();
+        Assert_True(NeutralErrorCm < k_KeyTolerance,
+            f"the presentation follows the current support/conform neutral (error {NeutralErrorCm :.5} cm)");
+        Assert_True(utils_procedural_body_pose::Get_ActionOffset(BodyPose).Equals(FTransform::Identity),
+            "the legacy body-pose action offset is neutral after the scoped action releases");
+        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action),
+            "the scoped action released ownership after its terminal receipt");
         Assert_True(_Crawler.Get_AttackLastCancel().IsSet() == false, f"nothing cancelled the attack (last cancel {Get_LastCancelText()})");
     }
 }

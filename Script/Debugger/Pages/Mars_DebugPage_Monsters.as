@@ -126,11 +126,14 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
         DrawKvRow("Attack target", f"{TargetText} (generation {InCrawler.Get_CombatTargetGeneration()})");
 
         const auto Phase = InCrawler.Get_AttackPhase();
-        DrawKvRow("Attack phase", f"{Phase :n}  {InCrawler.Get_AttackPhaseElapsed() :.2} / {InCrawler.Get_AttackPhaseDuration() :.2} s",
+        const auto Action = InCrawler.Get_AttackAction();
+        const FString ActionText = ck::IsValid(Action) ? f"{Action.Get_State() :n}" : "-";
+        DrawKvRow("Attack phase", f"{Phase :n}  (action {ActionText})",
             Phase == EMars_Crawler_AttackPhase::Idle ? FLinearColor::White : FLinearColor(1.0f, 0.6f, 0.3f));
         DrawKvRow("Attack cooldown", f"{InCrawler.Get_AttackCooldownRemaining() :.2} s");
         DrawKvRow("Attack generation", f"{InCrawler.Get_AttackGeneration()}");
-        DrawKvRow("Attack samples", f"pending {InCrawler.Get_AttackPendingSampleId()} | acknowledged {InCrawler.Get_AttackAcknowledgedSampleId()}");
+        const auto Interval = InCrawler.Get_AttackAcceptedInterval();
+        DrawKvRow("Attack accepted", f"phase {Interval.Get_PhaseId()} | sample {InCrawler.Get_AttackAcknowledgedSampleId()} | {Interval.Get_FromTime().Get_Seconds() :.3} - {Interval.Get_ToTime().Get_Seconds() :.3} s");
         DrawKvRow("Attack accepted pose", InCrawler.Get_AttackAcceptedWorld().GetLocation().ToString());
         DrawKvRow("Attack hit", f"candidate {BoolText(InCrawler.Get_AttackCandidatePending())} | committed {BoolText(InCrawler.Get_AttackDamageCommitted())}");
 

@@ -1,5 +1,5 @@
-// A root that turns away from the committed direction mid-attack cancels the attack instead of sweeping on. On the first
-// Strike sample the crawler is steered, at zero speed, 90 degrees to its right through SurfaceMotion (the root's only
+// A root that turns away from the committed direction mid-attack cancels the attack instead of sweeping on. As Strike
+// begins the crawler is steered, at zero speed, 90 degrees to its right through SurfaceMotion (the root's only
 // mover): once the root's heading is beyond FacingToleranceDegrees from the direction committed at admission, the next
 // accepted sample is Displaced and never swept, the attack eases back through CancelRecover, and no sweep of the attack is
 // longer than MaxSampleTravel. The target stands out of reach (near face 55 cm ahead), so no hit races the turn.
@@ -20,7 +20,7 @@ class UMars_AutoTest_CrawlerMelee_Displacement : UMars_AutoTestRig_CrawlerMelee
         SpawnFloorAndCrawler(InHandle, Make_ArmedCrawlerSpec(4));
 
         Add_SettleSteps();
-        Add_Step("spawn a target out of reach; arm a 90 degree zero-speed steer on the first Strike sample", n"Step_Arm");
+        Add_Step("spawn a target out of reach; arm a 90 degree zero-speed steer as Strike begins", n"Step_Arm");
         Add_Step_WaitUntil("the target's hurtbox is traceable", n"Check_TargetTraceable", k_SlowPolls, 0);
         Add_Step("select the target and request one attack", n"Step_TargetAndStart");
         Add_Step_WaitUntil("the attack is admitted (Windup)", n"Check_Admitted", k_SlowPolls, 0);
@@ -36,7 +36,7 @@ class UMars_AutoTest_CrawlerMelee_Displacement : UMars_AutoTestRig_CrawlerMelee
         _Target = SpawnTargetAhead(InHandle, 55.0, FVector(10.0, 20.0, 20.0));
         _ForwardAtStart = Get_Forward();
 
-        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::StrikeSampleSubmitted, EMars_TESTONLY_CrawlerMelee_Action::SteerCrawler);
+        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::StrikeEntered, EMars_TESTONLY_CrawlerMelee_Action::SteerCrawler);
         Trigger.SteerDirection = Get_Right();
         _TriggerEntity = Add_Trigger(InHandle, Trigger);
     }
@@ -48,7 +48,7 @@ class UMars_AutoTest_CrawlerMelee_Displacement : UMars_AutoTestRig_CrawlerMelee
         const auto Combat = _Crawler.Get_Spec().Combat;
         const auto TurnedDegrees = Math::RadiansToDegrees(Math::Acos(Math::Clamp(Get_Forward().DotProduct(_ForwardAtStart), -1.0, 1.0)));
 
-        Assert_True(Trigger.Fired, "the crawler was steered on the first Strike sample");
+        Assert_True(Trigger.Fired, "the crawler was steered as Strike began");
         Assert_True(TurnedDegrees > Combat.Prepare.FacingToleranceDegrees,
             f"the root turned beyond the facing tolerance ({TurnedDegrees :.1} degrees)");
 

@@ -53,6 +53,11 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // Created on first use of each tint.
     private TArray<FMars_Crawler_TintedRenderer> _Renderers;
 
+    // The jab's clip, built once from the combat spec at construction (the spec never changes afterwards). This property
+    // keeps it alive; the kernel holds it weakly in Spec.Combat.AttackClip.
+    UPROPERTY()
+    private UCk_ProceduralAction_Data _AttackClip;
+
     // DebugDrawAttack only: the armed crawler and the last two accepted hit centres seen.
     private FCk_Handle_Crawler _DebugCrawler;
     private FVector _DebugCenter = FVector::ZeroVector;
@@ -81,7 +86,11 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
 
         CrawlerSpec.Rig = BuildRig(InHandle, RigData);
         if (CrawlerSpec.Combat.Enabled)
-        { DefaultCombatGeometry(CrawlerSpec); }
+        {
+            DefaultCombatGeometry(CrawlerSpec);
+            _AttackClip = utils_crawler::Make_AttackClip(CrawlerSpec.Combat, this);
+            CrawlerSpec.Combat.AttackClip = _AttackClip;
+        }
 
         const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");

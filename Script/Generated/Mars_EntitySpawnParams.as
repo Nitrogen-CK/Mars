@@ -1074,6 +1074,19 @@ namespace UMars_AutoTest_CrawlerMelee_AcquireAndLeash
 }
 
 USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_ActionScopeLoss_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_ActionScopeLoss
+{
+    FMars_AutoTest_CrawlerMelee_ActionScopeLoss_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_ActionScopeLoss_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CrawlerMelee_AggressionToggle_SpawnParams
 {
 }
@@ -1122,6 +1135,32 @@ namespace UMars_AutoTest_CrawlerMelee_CancelBeforeCommit
     FMars_AutoTest_CrawlerMelee_CancelBeforeCommit_SpawnParams Params()
     {
         return FMars_AutoTest_CrawlerMelee_CancelBeforeCommit_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_CancelReturnsThroughAction_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_CancelReturnsThroughAction
+{
+    FMars_AutoTest_CrawlerMelee_CancelReturnsThroughAction_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_CancelReturnsThroughAction_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_ClipDrivesPhases_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_ClipDrivesPhases
+{
+    FMars_AutoTest_CrawlerMelee_ClipDrivesPhases_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_ClipDrivesPhases_SpawnParams();
     }
 }
 
@@ -1230,6 +1269,162 @@ namespace UMars_AutoTest_CrawlerMelee_InvalidSpec
 }
 
 USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbBounds_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbBounds
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbBounds_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbBounds_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveCancel_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveCancel
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveCancel_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveCancel_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveClear_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveClear
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveClear_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveClear_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveDamage_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveDamage
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveDamage_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveDamage_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveScopeLoss_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveScopeLoss
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveScopeLoss_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveScopeLoss_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveSever_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveSever
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveSever_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveSever_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveTargetLoss_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveTargetLoss
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveTargetLoss_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveTargetLoss_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLiveWall_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLiveWall
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLiveWall_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLiveWall_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLoadedBranch_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLoadedBranch
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLoadedBranch_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLoadedBranch_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLoadedFastArc_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLoadedFastArc
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLoadedFastArc_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLoadedFastArc_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbLoadedProjected_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbLoadedProjected
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbLoadedProjected_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbLoadedProjected_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_LongLimbTargetBinding_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_LongLimbTargetBinding
+{
+    FMars_AutoTest_CrawlerMelee_LongLimbTargetBinding_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_LongLimbTargetBinding_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CrawlerMelee_MissAndCooldown_SpawnParams
 {
 }
@@ -1252,6 +1447,19 @@ namespace UMars_AutoTest_CrawlerMelee_Obstruction
     FMars_AutoTest_CrawlerMelee_Obstruction_SpawnParams Params()
     {
         return FMars_AutoTest_CrawlerMelee_Obstruction_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_OffenseWindowFromReceipt_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_OffenseWindowFromReceipt
+{
+    FMars_AutoTest_CrawlerMelee_OffenseWindowFromReceipt_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_OffenseWindowFromReceipt_SpawnParams();
     }
 }
 

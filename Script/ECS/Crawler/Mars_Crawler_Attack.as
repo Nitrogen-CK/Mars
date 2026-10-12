@@ -1,5 +1,6 @@
-// The body jab's pure evaluation (the shape of utils_hand_swing::Evaluate) and its hit query. The phase clock that drives
-// them is UMars_Processor_Crawler_AttackTick's; the samples they query are UMars_Processor_Crawler_AttackResolve's.
+// The body jab's compiled clip and its hit query. The clip action owns the motion's timing; the accepted intervals the
+// query sweeps are UMars_Processor_Crawler_AttackResolve's, and the phases they report drive
+// UMars_Processor_Crawler_AttackTick.
 //
 // Every attack query sets CollideWithBackFaces for convex bodies: Jolt keeps a convex cast hit only when that flag is set
 // or the contact normal points along the cast direction, so without it a zero-travel query, or a sweep that starts inside
@@ -7,24 +8,24 @@
 // at fraction 0 with the fallback up normal: a target there is a hit (the damage event carries that up normal), and a
 // world body there blocks the sample, which closes the damage window and cancels the attack as Obstructed.
 
-// What Evaluate_ActionOffset needs besides the authored pose.
-struct FMars_Crawler_PoseQuery
+// One posed phase of the attack clip: the body offset it moves from and to, over Seconds, eased by Easing.
+struct FMars_Crawler_ClipPhase
 {
-    EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
-
-    // Phase progress in [0, 1].
-    float32 Alpha = 0.0f;
-
-    // Where CancelRecover eases back from.
+    EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Windup;
+    float32 Seconds = 0.0f;
+    ECk_ProceduralAction_Easing Easing = ECk_ProceduralAction_Easing::Linear;
     FTransform From = FTransform::Identity;
+    FTransform To = FTransform::Identity;
 
-    FMars_Crawler_PoseQuery() {}
+    FMars_Crawler_ClipPhase() {}
 
-    FMars_Crawler_PoseQuery(EMars_Crawler_AttackPhase InPhase, float32 InAlpha, FTransform InFrom)
+    FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase InPhase, float32 InSeconds, ECk_ProceduralAction_Easing InEasing, FTransform InFrom, FTransform InTo)
     {
         Phase = InPhase;
-        Alpha = InAlpha;
+        Seconds = InSeconds;
+        Easing = InEasing;
         From = InFrom;
+        To = InTo;
     }
 }
 
@@ -37,49 +38,116 @@ namespace utils_crawler
             InPhase == EMars_Crawler_AttackPhase::Recover;
     }
 
-    // The authored length of a posed phase; 0 for Idle and Cooldown, which pose nothing.
-    float32 Make_PhaseDuration(const FMars_Crawler_AttackTiming& InTiming, EMars_Crawler_AttackPhase InPhase)
+    // The clip phase that poses InPhase; None for the phases the clip does not pose.
+    FName Get_ClipPhaseId(EMars_Crawler_AttackPhase InPhase)
     {
         switch (InPhase)
         {
-            case EMars_Crawler_AttackPhase::Windup: return InTiming.WindupSeconds;
-            case EMars_Crawler_AttackPhase::Strike: return InTiming.StrikeSeconds;
-            case EMars_Crawler_AttackPhase::Recover: return InTiming.RecoverSeconds;
-            case EMars_Crawler_AttackPhase::CancelRecover: return InTiming.CancelSeconds;
-            default: return 0.0f;
+            case EMars_Crawler_AttackPhase::Windup: return n"Windup";
+            case EMars_Crawler_AttackPhase::Strike: return n"Strike";
+            case EMars_Crawler_AttackPhase::Recover: return n"Recover";
+            default: return NAME_None;
         }
     }
 
-    // Windup: identity to the windup key; Strike: windup key to strike key; Recover: strike key to identity;
-    // CancelRecover: From to identity (eased like Recover). Unit scale throughout; identity outside the posed phases.
-    FTransform Evaluate_ActionOffset(const FMars_Crawler_AttackPose& InPose, const FMars_Crawler_PoseQuery& InQuery)
+    // The attack phase an accepted interval's PhaseId poses; Idle for any other id.
+    EMars_Crawler_AttackPhase Find_ClipPhase(FName InPhaseId)
     {
-        switch (InQuery.Phase)
+        if (InPhaseId == Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup))
+        { return EMars_Crawler_AttackPhase::Windup; }
+
+        if (InPhaseId == Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike))
+        { return EMars_Crawler_AttackPhase::Strike; }
+
+        if (InPhaseId == Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover))
+        { return EMars_Crawler_AttackPhase::Recover; }
+
+        return EMars_Crawler_AttackPhase::Idle;
+    }
+
+    // The clip window over [Windup 0, Recover 1): accepted motion inside it may sweep and hit.
+    FName Get_OffenseWindowId()
+    {
+        return n"Offense";
+    }
+
+    // A declared clip easing: Linear or one of the Quad and Cubic presets.
+    bool Get_IsClipEasing(ECk_ProceduralAction_Easing InEasing)
+    {
+        return InEasing == ECk_ProceduralAction_Easing::Linear ||
+            InEasing == ECk_ProceduralAction_Easing::InQuad || InEasing == ECk_ProceduralAction_Easing::OutQuad ||
+            InEasing == ECk_ProceduralAction_Easing::InOutQuad || InEasing == ECk_ProceduralAction_Easing::InCubic ||
+            InEasing == ECk_ProceduralAction_Easing::OutCubic || InEasing == ECk_ProceduralAction_Easing::InOutCubic;
+    }
+
+    // The jab as a clip on the body channel (identity offset at the start): Windup moves identity to the windup key,
+    // Strike the windup key to the strike key, Recover the strike key back to identity, each linear in space and eased by
+    // its pose easing; Offense spans all three. Built once per immutable combat spec into a new clip outered to InOwner,
+    // which must keep it referenced (a UPROPERTY). A timing or pose that Validate rejects builds nothing: Add reports
+    // that rejection.
+    UCk_ProceduralAction_Data Make_AttackClip(const FMars_Crawler_Combat& InCombat, UObject InOwner)
+    {
+        if (InCombat.Timing.Validate().IsValid() == false || InCombat.Pose.Validate().IsValid() == false)
+        { return nullptr; }
+
+        const auto& Timing = InCombat.Timing;
+        const auto& Pose = InCombat.Pose;
+        auto Draft = FCk_ProceduralAction_ClipDraft();
+
+        auto Body = FCk_ProceduralAction_BodyChannel();
+        Body.Set_Enabled(true);
+        Body.Set_InitialSource(ECk_ProceduralAction_InitialSource::IdentityOffset);
+        auto Reports = TArray<FCk_ProceduralAction_ValidationReport>();
+        Reports.Add(utils_procedural_action_builder::Set_BodyChannel(Draft, Body));
+
+        AddPosedPhase(Draft, FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase::Windup, Timing.WindupSeconds, Pose.WindupEasing,
+            FTransform::Identity, Pose.Windup), Reports);
+        AddPosedPhase(Draft, FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase::Strike, Timing.StrikeSeconds, Pose.StrikeEasing,
+            Pose.Windup, Pose.Strike), Reports);
+        AddPosedPhase(Draft, FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase::Recover, Timing.RecoverSeconds, Pose.RecoverEasing,
+            Pose.Strike, FTransform::Identity), Reports);
+
+        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(Get_OffenseWindowId(),
+            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup), FCk_FloatRange_0to1(0.0f)),
+            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover), FCk_FloatRange_0to1(1.0f)))));
+
+        auto Clip = Cast<UCk_ProceduralAction_Data>(NewObject(InOwner, UCk_ProceduralAction_Data));
+        if (ck::EnsureIfNot(ck::IsValid(Clip), "[Crawler] could not create the attack clip object"))
+        { return nullptr; }
+
+        Reports.Add(utils_procedural_action_builder::Build_Into(Draft, Clip));
+        for (const auto& Report : Reports)
         {
-            case EMars_Crawler_AttackPhase::Windup:
-                return Blend(FTransform::Identity, InPose.Windup, Ease(InPose.WindupEasing, InQuery.Alpha));
-            case EMars_Crawler_AttackPhase::Strike:
-                return Blend(InPose.Windup, InPose.Strike, Ease(InPose.StrikeEasing, InQuery.Alpha));
-            case EMars_Crawler_AttackPhase::Recover:
-                return Blend(InPose.Strike, FTransform::Identity, Ease(InPose.RecoverEasing, InQuery.Alpha));
-            case EMars_Crawler_AttackPhase::CancelRecover:
-                return Blend(InQuery.From, FTransform::Identity, Ease(InPose.RecoverEasing, InQuery.Alpha));
-            default:
-                return FTransform::Identity;
+            const auto Built = Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid;
+            if (ck::EnsureIfNot(Built, f"[Crawler] the attack clip did not build: {Get_FirstDiagnosticText(Report)}"))
+            { return nullptr; }
         }
+
+        return Clip;
     }
 
-    FTransform Blend(const FTransform& InFrom, const FTransform& InTo, float32 InAlpha)
+    FString Get_FirstDiagnosticText(const FCk_ProceduralAction_ValidationReport& InReport)
     {
-        auto Result = FTransform();
-        Result.SetLocation(Math::Lerp(InFrom.GetLocation(), InTo.GetLocation(), float(InAlpha)));
-        Result.SetRotation(FQuat::Slerp(InFrom.GetRotation(), InTo.GetRotation(), float(InAlpha)));
-        return Result;
+        const auto& Diagnostics = InReport.Get_Diagnostics();
+        if (Diagnostics.Num() == 0)
+        { return "no diagnostic"; }
+
+        const auto& First = Diagnostics[0];
+        return f"{First.Get_Code()} at [{First.Get_FieldPath()}] (expected [{First.Get_Expected()}], actual [{First.Get_Actual()}])";
     }
 
-    float32 Ease(ECk_TweenEasing InEasing, float32 InT)
+    // One posed phase of the attack clip: its two body keys at 0 and 1, eased by InPhase.Easing.
+    void AddPosedPhase(FCk_ProceduralAction_ClipDraft& InOutDraft, const FMars_Crawler_ClipPhase& InPhase,
+        TArray<FCk_ProceduralAction_ValidationReport>& OutReports)
     {
-        return utils_tween::Get_EasedProgress(InEasing, FCk_FloatRange_0to1(Math::Clamp(InT, 0.0f, 1.0f)));
+        const auto PhaseId = Get_ClipPhaseId(InPhase.Phase);
+        auto Phase = FCk_ProceduralAction_Phase(PhaseId, FCk_Time(float64(InPhase.Seconds)));
+        Phase.Set_Easing(InPhase.Easing);
+        OutReports.Add(utils_procedural_action_builder::Add_Phase(InOutDraft, Phase));
+        OutReports.Add(utils_procedural_action_builder::Add_BodyKey(InOutDraft, PhaseId, FCk_ProceduralAction_TransformKey(
+            FCk_FloatRange_0to1(0.0f), InPhase.From.GetLocation(), InPhase.From.GetRotation())));
+        OutReports.Add(utils_procedural_action_builder::Add_BodyKey(InOutDraft, PhaseId, FCk_ProceduralAction_TransformKey(
+            FCk_FloatRange_0to1(1.0f), InPhase.To.GetLocation(), InPhase.To.GetRotation())));
     }
 
     // Finite, unit scale, identity rotation: the v1 crawler authoring contract for attack keys.

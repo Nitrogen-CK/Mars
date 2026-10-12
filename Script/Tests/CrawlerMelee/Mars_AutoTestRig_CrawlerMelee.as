@@ -22,8 +22,16 @@ struct FMars_AutoTest_CrawlerMelee_PhaseRecord
     bool DamageCommitted = false;
     int64 CommittedSampleId = 0;
     int64 AcknowledgedSampleId = 0;
-    // The body pose's processed action input (the last sample submitted).
-    FVector ActionOffset = FVector::ZeroVector;
+    // The clip interval of the last accepted receipt when the phase changed (the one that caused a Strike, Recover or
+    // Cooldown entry), on the clip's timeline in seconds.
+    FName AcceptedPhaseId;
+    float64 AcceptedFrom = 0.0;
+    float64 AcceptedTo = 0.0;
+    // The action's terminal record had been read.
+    bool TerminalSeen = false;
+    // How far the presentation stood from its neutral root-relative transform (captured at admission).
+    float64 PresentationErrorCm = 0.0;
+    float64 Time = 0.0;
     int32 DamageRequests = 0;
     TOptional<EMars_Crawler_AttackCancel> LastCancel;
     // How the crawler stood and what its behaviour was doing.
@@ -251,18 +259,18 @@ class UMars_TESTONLY_Processor_CrawlerMelee_OverlapSample : UCk_Processor_Script
 // When a trigger fires, read from the crawler's public attack getters.
 enum EMars_TESTONLY_CrawlerMelee_When
 {
-    // The frame the kernel entered Strike (no Strike sample submitted yet).
+    // The frame the kernel entered Strike (on an accepted Strike interval: its first Strike sample is already resolved).
     StrikeEntered,
-    // The frame the first Strike sample was submitted.
-    StrikeSampleSubmitted,
-    // The frame Strike's endpoint sample was submitted.
-    StrikeEndpointSubmitted,
+    // The frame after the windup's endpoint was accepted, still in Windup: the player stages the first Strike sample
+    // later this frame, and the resolver sweeps it before the next attack tick.
+    WindupEndpointAccepted,
+    // The frame in Strike whose staged interval reaches the strike's end: the accepted clip time plus this frame's delta
+    // covers the rest of the strike, so the resolver sweeps the strike's terminal sample later this frame.
+    StrikeEndpointStaged,
     // The frame the kernel entered CancelRecover.
     CancelRecoverEntered,
     // A hit candidate is waiting for the next attack tick (FGroup_Overlap, after the resolver).
-    CandidatePending,
-    // Every frame the attack is in StealPhase (StealPose only).
-    WhilePhase
+    CandidatePending
 }
 
 enum EMars_TESTONLY_CrawlerMelee_Action
@@ -276,9 +284,7 @@ enum EMars_TESTONLY_CrawlerMelee_Action
     // Request_ApplyDamage on Health with Amount of blunt damage.
     DamageHealth,
     DestroyEntity,
-    CancelAttack,
-    // Submits a body pose action with an id of its own after the attack's sample, so the attack's sample is never published.
-    StealPose
+    CancelAttack
 }
 
 // Armed by the test, read and written only by the two trigger processors once armed.
@@ -296,18 +302,19 @@ struct FMars_TESTONLY_CrawlerMelee_Trigger
     float32 Amount = 0.0f;
     FCk_Handle Entity;
     EMars_Crawler_AttackCancel CancelReason = EMars_Crawler_AttackCancel::StateExit;
-    EMars_Crawler_AttackPhase StealPhase = EMars_Crawler_AttackPhase::CancelRecover;
 
     bool Armed = false;
     bool Fired = false;
     int64 FiredFrame = -1;
     int32 FiredGeneration = 0;
-    int32 StolenSamples = 0;
-    int64 NextStolenId = 1000000000000;
 
-    // Written by the Overlap trigger processor whatever the trigger: a candidate was pending after the resolver ran.
+    // Written by the Overlap trigger processor whatever the trigger: a candidate was pending after the resolver ran, on
+    // the accepted sample and clip interval it came from.
     bool SawCandidate = false;
     int64 SawCandidateFrame = -1;
+    int64 SawCandidateSampleId = 0;
+    FName SawCandidatePhaseId;
+    float64 SawCandidateTo = 0.0;
 }
 
 // Runs right after the attack tick, so it reads the frame's final attack state, and before the Health and HitZone drains,
@@ -335,46 +342,41 @@ class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_
             if (Trigger.Armed == false || ck::Is_NOT_Valid(Trigger.Crawler) || Trigger.When == EMars_TESTONLY_CrawlerMelee_When::CandidatePending)
             { continue; }
 
-            if (Trigger.When == EMars_TESTONLY_CrawlerMelee_When::WhilePhase)
-            {
-                if (Trigger.Crawler.Get_AttackPhase() == Trigger.StealPhase)
-                { StealPose(Trigger); }
-                continue;
-            }
-
-            if (Trigger.Fired || Get_IsDue(Trigger) == false)
+            if (Trigger.Fired || Get_IsDue(Trigger, InDeltaT.Get_Seconds()) == false)
             { continue; }
 
             utils_crawler_melee_trigger::Fire(Trigger);
         }
     }
 
-    private bool Get_IsDue(const FMars_TESTONLY_CrawlerMelee_Trigger& InTrigger)
+    private bool Get_IsDue(const FMars_TESTONLY_CrawlerMelee_Trigger& InTrigger, float64 InDeltaSeconds)
     {
         const auto Crawler = InTrigger.Crawler;
-        if (InTrigger.When == EMars_TESTONLY_CrawlerMelee_When::CancelRecoverEntered)
-        { return Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::CancelRecover; }
-
-        if (Crawler.Get_AttackPhase() != EMars_Crawler_AttackPhase::Strike)
-        { return false; }
+        const auto Phase = Crawler.Get_AttackPhase();
+        const auto Interval = Crawler.Get_AttackAcceptedInterval();
+        const auto Timing = Crawler.Get_Spec().Combat.Timing;
+        const auto WindupEnd = float64(Timing.WindupSeconds);
+        const auto StrikeEnd = WindupEnd + float64(Timing.StrikeSeconds);
+        const auto Tolerance = 1.0e-6;
 
         switch (InTrigger.When)
         {
-            case EMars_TESTONLY_CrawlerMelee_When::StrikeEntered: return Crawler.Get_AttackPendingSampleId() == 0;
-            case EMars_TESTONLY_CrawlerMelee_When::StrikeSampleSubmitted: return Crawler.Get_AttackPendingSampleId() != 0;
-            case EMars_TESTONLY_CrawlerMelee_When::StrikeEndpointSubmitted: return Crawler.Get_AttackEndpointSubmitted();
-            default: return false;
+            case EMars_TESTONLY_CrawlerMelee_When::StrikeEntered:
+                return Phase == EMars_Crawler_AttackPhase::Strike;
+            case EMars_TESTONLY_CrawlerMelee_When::WindupEndpointAccepted:
+                return Phase == EMars_Crawler_AttackPhase::Windup && Interval.Get_PhaseId() == n"Windup" &&
+                    Interval.Get_ToTime().Get_Seconds() >= WindupEnd - Tolerance;
+            case EMars_TESTONLY_CrawlerMelee_When::StrikeEndpointStaged:
+                return Phase == EMars_Crawler_AttackPhase::Strike && Interval.Get_PhaseId() == n"Strike" &&
+                    Interval.Get_ToTime().Get_Seconds() < StrikeEnd - Tolerance &&
+                    Interval.Get_ToTime().Get_Seconds() + InDeltaSeconds >= StrikeEnd - Tolerance;
+            case EMars_TESTONLY_CrawlerMelee_When::CancelRecoverEntered:
+                return Phase == EMars_Crawler_AttackPhase::CancelRecover;
+            default:
+                return false;
         }
     }
 
-    private void StealPose(FMars_TESTONLY_CrawlerMelee_Trigger& InOutTrigger)
-    {
-        auto BodyPose = InOutTrigger.Crawler.Get_BodyPose();
-        ++InOutTrigger.NextStolenId;
-        ++InOutTrigger.StolenSamples;
-        utils_procedural_body_pose::Request_SetActionOffset(BodyPose,
-            FCk_Request_ProceduralBodyPose_SetActionOffset(FTransform::Identity, InOutTrigger.NextStolenId));
-    }
 }
 
 // In FGroup_Overlap after the resolver: records that a candidate was pending, and fires CandidatePending triggers.
@@ -401,8 +403,12 @@ class UMars_TESTONLY_Processor_CrawlerMelee_CandidateTrigger : UCk_Processor_Scr
 
             if (Trigger.SawCandidate == false)
             {
+                const auto Interval = Trigger.Crawler.Get_AttackAcceptedInterval();
                 Trigger.SawCandidate = true;
                 Trigger.SawCandidateFrame = utils_time::Get_FrameCounter();
+                Trigger.SawCandidateSampleId = Trigger.Crawler.Get_AttackAcknowledgedSampleId();
+                Trigger.SawCandidatePhaseId = Interval.Get_PhaseId();
+                Trigger.SawCandidateTo = Interval.Get_ToTime().Get_Seconds();
             }
 
             if (Trigger.When == EMars_TESTONLY_CrawlerMelee_When::CandidatePending && Trigger.Fired == false)
@@ -447,6 +453,93 @@ namespace utils_crawler_melee_trigger
             auto Crawler = InOutTrigger.Crawler;
             Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(InOutTrigger.CancelReason));
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Accept watch: what the resolver accepted from the clip action, frame by frame
+//--------------------------------------------------------------------------------------------------------------------------
+
+// One frame of the accept watch, as the resolver left it.
+struct FMars_AutoTest_CrawlerMelee_AcceptRecord
+{
+    int64 Frame = -1;
+    float64 Time = 0.0;
+    EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
+    int32 Generation = 0;
+    int64 AckSampleId = 0;
+    FName AcceptedPhaseId;
+    float64 AcceptedFrom = 0.0;
+    float64 AcceptedTo = 0.0;
+    bool AcceptedInOffense = false;
+    bool OffenseEnded = false;
+    bool CandidatePending = false;
+    bool ActionValid = false;
+    ECk_ProceduralAction_State ActionState = ECk_ProceduralAction_State::PendingLoad;
+    ECk_ProceduralAction_Outcome ActionOutcome = ECk_ProceduralAction_Outcome::None;
+    ECk_ProceduralAction_Recovery ActionRecovery = ECk_ProceduralAction_Recovery::NotRequired;
+    float64 PresentationErrorCm = 0.0;
+}
+
+// Added to a crawler root by the test; written only by the accept watch processor.
+struct FMars_TESTONLY_CrawlerMelee_AcceptWatch
+{
+    TArray<FMars_AutoTest_CrawlerMelee_AcceptRecord> Frames;
+}
+
+namespace utils_crawler_melee_watch
+{
+    // The presentation's distance from its neutral root-relative transform, captured at the attack's admission.
+    float64 Get_PresentationErrorCm(const FCk_Handle_Crawler& InCrawler)
+    {
+        const auto Root = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
+        const auto Neutral = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).NeutralRootLocal * Root;
+        const auto Presented = utils_transform::Get_EntityCurrentTransform(InCrawler.Get_Presentation());
+        return (Presented.GetLocation() - Neutral.GetLocation()).Size();
+    }
+}
+
+// In FGroup_Overlap right after the resolver: one record per frame of what it accepted, the kernel's phase (written by
+// the attack tick earlier this frame) and the action's state.
+class UMars_TESTONLY_Processor_CrawlerMelee_AcceptWatch : UCk_Processor_Script_Base_UE
+{
+    default _Group = n"FGroup_Overlap";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Crawler_AttackResolve");
+
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Query.Require(FMars_Feature_Crawler);
+    }
+
+    void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_TESTONLY_CrawlerMelee_AcceptWatch& InWatch)
+    {
+        const auto Crawler = InHandle.As_Crawler();
+        const auto& Observations = Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
+        const auto Interval = Observations.AcceptedInterval;
+        const auto Action = Crawler.Get_AttackAction();
+
+        auto Record = FMars_AutoTest_CrawlerMelee_AcceptRecord();
+        Record.Frame = utils_time::Get_FrameCounter();
+        Record.Time = System::GetGameTimeInSeconds();
+        Record.Phase = Crawler.Get_AttackPhase();
+        Record.Generation = Crawler.Get_AttackGeneration();
+        Record.AckSampleId = Observations.AckSampleId;
+        Record.AcceptedPhaseId = Interval.Get_PhaseId();
+        Record.AcceptedFrom = Interval.Get_FromTime().Get_Seconds();
+        Record.AcceptedTo = Interval.Get_ToTime().Get_Seconds();
+        Record.AcceptedInOffense = Interval.Get_Windows().Contains(utils_crawler::Get_OffenseWindowId());
+        Record.OffenseEnded = Observations.OffenseEnded;
+        Record.CandidatePending = Observations.Candidate.IsSet();
+        Record.ActionValid = ck::IsValid(Action);
+        if (Record.ActionValid)
+        {
+            Record.ActionState = Action.Get_State();
+            Record.ActionOutcome = Action.Get_Result().Get_Outcome();
+            Record.ActionRecovery = Action.Get_Result().Get_Recovery();
+        }
+        Record.PresentationErrorCm = utils_crawler_melee_watch::Get_PresentationErrorCm(Crawler);
+        InWatch.Frames.Add(Record);
     }
 }
 
@@ -863,6 +956,20 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         return Point;
     }
 
+    // From now on the rig's crawler records, every frame, what its resolver accepted.
+    protected void Watch_Accepts()
+    {
+        _Crawler.Add_Fragment(FMars_TESTONLY_CrawlerMelee_AcceptWatch());
+    }
+
+    protected TArray<FMars_AutoTest_CrawlerMelee_AcceptRecord> Get_AcceptRecords() const
+    {
+        if (ck::Is_NOT_Valid(_Crawler) || _Crawler.Has_Fragment(FMars_TESTONLY_CrawlerMelee_AcceptWatch) == false)
+        { return TArray<FMars_AutoTest_CrawlerMelee_AcceptRecord>(); }
+
+        return _Crawler.Get_Fragment(FMars_TESTONLY_CrawlerMelee_AcceptWatch).Frames;
+    }
+
     // From now on the rig's crawler records its Engage stage changes and its navigator's MoveTos.
     protected void Watch_Engage()
     {
@@ -1154,7 +1261,13 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         Record.DamageCommitted = InCrawler.Get_AttackDamageCommitted();
         Record.CommittedSampleId = InCrawler.Get_AttackCommittedSampleId();
         Record.AcknowledgedSampleId = InCrawler.Get_AttackAcknowledgedSampleId();
-        Record.ActionOffset = utils_procedural_body_pose::Get_ActionOffset(InCrawler.Get_BodyPose()).GetLocation();
+        const auto Interval = InCrawler.Get_AttackAcceptedInterval();
+        Record.AcceptedPhaseId = Interval.Get_PhaseId();
+        Record.AcceptedFrom = Interval.Get_FromTime().Get_Seconds();
+        Record.AcceptedTo = Interval.Get_ToTime().Get_Seconds();
+        Record.TerminalSeen = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).TerminalSeen;
+        Record.PresentationErrorCm = utils_crawler_melee_watch::Get_PresentationErrorCm(InCrawler);
+        Record.Time = System::GetGameTimeInSeconds();
         Record.DamageRequests = InCrawler.Get_CombatDealer().Get_HitsDealt() + InCrawler.Get_CombatDealer().Get_HitsRejected();
         Record.LastCancel = InCrawler.Get_AttackLastCancel();
         const auto RootTransform = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());

@@ -3,7 +3,6 @@
 	"EngineAssociation": "{E4464C1C-43B7-7194-E787-E7B5711509D4}",
 	"Category": "",
 	"Description": "",
-	"DisableEnginePluginsByDefault": false,
 	"Modules": [
 		{
 			"Name": "Mars",
@@ -30,7 +29,10 @@
 		},
 		{
 			"Name": "XInputDevice",
-			"Enabled": true
+			"Enabled": true,
+			"SupportedTargetPlatforms": [
+				"Win64"
+			]
 		},
 		{
 			"Name": "ChaosVD",

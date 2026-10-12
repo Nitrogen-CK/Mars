@@ -1,10 +1,10 @@
 // A frame longer than a whole phase cannot skip it. The crawler's windup lasts 0.1 s and its strike 0.05 s, and the world
 // runs at 8x time dilation through the attack, so every tick's delta is longer than the strike (and, at the usual lane
-// frame rate, than the windup too). Each phase still clamps to its endpoint, submits that endpoint as a sample and
-// waits for its acknowledgment before the next phase begins. Windup is admitted and posed in one tick (its endpoint, in
-// one sample) and ends on the next; Strike, entered on a tick that poses nothing, spans at least two more. Strike enters
-// with the windup key posed and Recover with the strike key, the strike is swept in one sample no longer than
-// MaxSampleTravel, the target in its path takes the jab's one request (100 -> 85) and the recovery sweeps nothing more.
+// frame rate, than the windup too). The clip action stops each accepted interval at a phase boundary, so every phase
+// still gets an accepted interval of its own, and the attack enters each phase on a later tick than the one before.
+// Strike's interval starts where Windup ended (the windup key) and Recover's where Strike ended (the strike key), the
+// strike is swept in one sample no longer than MaxSampleTravel, the target in its path takes the jab's one request
+// (100 -> 85) and the recovery sweeps nothing more.
 //
 // The zero-delta half is not driven: SetGlobalTimeDilation clamps to the engine's MinGlobalTimeDilation (0.0001 in
 // BaseGame.ini), so the world never ticks with a zero delta. A tick with no positive time running cancellation only is
@@ -107,11 +107,15 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
             f"no phase was skipped: Windup > Strike > Recover > Cooldown > Idle (got{Phases})");
 
         Assert_True(ToStrike.Frame - ToWindup.Frame >= 1, f"Windup ended on a later tick than its admission (frames {ToWindup.Frame} -> {ToStrike.Frame})");
-        Assert_True(ToRecover.Frame - ToStrike.Frame >= 2, f"Strike spanned at least two ticks (frames {ToStrike.Frame} -> {ToRecover.Frame})");
-        Assert_True((ToStrike.ActionOffset - Combat.Pose.Windup.GetLocation()).Size() <= 0.01,
-            f"Strike began on the acknowledged windup endpoint (action {ToStrike.ActionOffset.ToString()})");
-        Assert_True((ToRecover.ActionOffset - Combat.Pose.Strike.GetLocation()).Size() <= 0.01,
-            f"Recover began on the acknowledged strike endpoint (action {ToRecover.ActionOffset.ToString()})");
+        // Approved change: phases follow accepted clip intervals, so Strike lasts one accepted interval here, not a
+        // posing tick plus an acknowledged endpoint.
+        Assert_True(ToRecover.Frame - ToStrike.Frame >= 1, f"Strike ended on a later tick than it began (frames {ToStrike.Frame} -> {ToRecover.Frame})");
+        const auto WindupEnd = float64(Combat.Timing.WindupSeconds);
+        const auto StrikeEnd = WindupEnd + float64(Combat.Timing.StrikeSeconds);
+        Assert_True(ToStrike.AcceptedPhaseId == n"Strike" && Math::Abs(ToStrike.AcceptedFrom - WindupEnd) <= 1.0e-4,
+            f"Strike began on an accepted Strike interval from the windup key (got {ToStrike.AcceptedPhaseId} from [{ToStrike.AcceptedFrom :.4}] s)");
+        Assert_True(ToRecover.AcceptedPhaseId == n"Recover" && Math::Abs(ToRecover.AcceptedFrom - StrikeEnd) <= 1.0e-4,
+            f"Recover began on an accepted Recover interval from the strike key (got {ToRecover.AcceptedPhaseId} from [{ToRecover.AcceptedFrom :.4}] s)");
         Assert_True(ToRecover.DamageCommitted, "the strike's hit was committed before Recover");
         Assert_True(_Crawler.Get_AttackLongestSweep() <= Combat.Hit.MaxSampleTravel,
             f"no sweep was longer than MaxSampleTravel [{Combat.Hit.MaxSampleTravel}] (longest {_Crawler.Get_AttackLongestSweep() :.2} cm)");

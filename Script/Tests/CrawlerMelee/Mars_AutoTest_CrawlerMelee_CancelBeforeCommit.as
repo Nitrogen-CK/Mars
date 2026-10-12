@@ -3,8 +3,9 @@
 // stores a candidate on that sample. Three attacks in turn, each proving the candidate existed and was discarded (no
 // damage request, the attack eased back through CancelRecover):
 //   1. the target is destroyed in the frame its candidate is stored (FGroup_Overlap, after the resolver): TargetLost;
-//   2. a fresh target's Health is depleted between the first Strike sample's submission and its resolution: TargetLost;
-//   3. a fresh target, and one of the crawler's leg zones is hit right after the first Strike sample is submitted. The
+//   2. a fresh target's Health is depleted in the frame the first Strike sample is staged, before its resolution:
+//      TargetLost;
+//   3. a fresh target, and one of the crawler's leg zones is hit in the frame the first Strike sample is staged. The
 //      zone hit reaches the leg's Health in the same frame, before the resolver, so the crawler's HurtCount changes
 //      between the candidate's sample and the commit pass: Hurt, decided by the attack tick's own HurtCount check, before
 //      the brain's IsHurt fact can reach the behaviour.
@@ -28,11 +29,11 @@ class UMars_AutoTest_CrawlerMelee_CancelBeforeCommit : UMars_AutoTestRig_Crawler
         Add_Step("(1) spawn a target; arm its destruction on the stored candidate", n"Step_ArmDestroyTarget");
         Add_AttackSteps("(1)");
         Add_Step("(1) the destroyed target's candidate was discarded", n"Step_AssertDestroyed");
-        Add_Step("(2) spawn a fresh target; arm the depletion of its Health on the first Strike sample", n"Step_ArmDepleteTarget");
+        Add_Step("(2) spawn a fresh target; arm the depletion of its Health as the first Strike sample is staged", n"Step_ArmDepleteTarget");
         Add_AttackSteps("(2)");
         Add_Step("(2) the depleted target's candidate was discarded; remove it", n"Step_AssertDepleted");
         Add_Step_WaitFrames("(3) let the depleted target go", 5);
-        Add_Step("(3) spawn a fresh target; arm a hit on a leg zone on the first Strike sample", n"Step_ArmHurtCrawler");
+        Add_Step("(3) spawn a fresh target; arm a hit on a leg zone as the first Strike sample is staged", n"Step_ArmHurtCrawler");
         Add_AttackSteps("(3)");
         Add_Step("(3) the hurt crawler's candidate was discarded", n"Step_AssertHurt");
         Run_Steps(InHandle);
@@ -94,7 +95,7 @@ class UMars_AutoTest_CrawlerMelee_CancelBeforeCommit : UMars_AutoTestRig_Crawler
     {
         _Target = SpawnTargetAhead(InHandle, k_FaceAhead, k_HalfExtents);
 
-        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::StrikeSampleSubmitted, EMars_TESTONLY_CrawlerMelee_Action::DamageHealth);
+        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::WindupEndpointAccepted, EMars_TESTONLY_CrawlerMelee_Action::DamageHealth);
         Trigger.Health = _Target.Health;
         Trigger.Amount = 100.0f;
         _TriggerEntity = Add_Trigger(InHandle, Trigger);
@@ -114,7 +115,7 @@ class UMars_AutoTest_CrawlerMelee_CancelBeforeCommit : UMars_AutoTestRig_Crawler
         _Target = SpawnTargetAhead(InHandle, k_FaceAhead, k_HalfExtents);
         _HurtCountBefore = _Crawler.Get_HurtCount();
 
-        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::StrikeSampleSubmitted, EMars_TESTONLY_CrawlerMelee_Action::HitZone);
+        auto Trigger = Make_Trigger(EMars_TESTONLY_CrawlerMelee_When::WindupEndpointAccepted, EMars_TESTONLY_CrawlerMelee_Action::HitZone);
         Trigger.HitZone = _Crawler.Get_LegParts()[0].Get_Zone();
         Trigger.Amount = 5.0f;
         _TriggerEntity = Add_Trigger(InHandle, Trigger);

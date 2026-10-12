@@ -1,6 +1,7 @@
 // A malformed enabled combat profile rejects the whole crawler, and a disabled one changes nothing.
-//   - Validate() names the first broken rule of an enabled profile (a rotated strike key; an AcquireRadius beyond the
-//     LoseRadius) and ignores every field of a disabled one, however broken.
+//   - Validate() names the first broken rule of an enabled profile (a rotated strike key; an easing outside the clip's
+//     Linear, Quad and Cubic presets, by field; an AcquireRadius beyond the LoseRadius; a missing AttackClip) and ignores
+//     every field of a disabled one, however broken.
 //   - A crawler spawned with either broken profile is rejected by utils_crawler::Add with one ensure before anything is
 //     composed: its root carries no crawler feature, no combat fragment and no damage dealer.
 //   - A crawler spawned with the default (disabled) profile composes as before combat existed: it is a crawler, it is not
@@ -93,9 +94,21 @@ class UMars_AutoTest_CrawlerMelee_InvalidSpec : UMars_AutoTestRig_CrawlerMelee
         Assert_True(Rotated.IsValid() == false && Rotated.Get_Error().Contains("translation-only"),
             f"a rotated strike key is rejected (got [{Rotated.Get_Error()}])");
 
+        auto BadEasing = Make_ArmedCrawlerSpec(4).Combat.Pose;
+        BadEasing.StrikeEasing = ECk_ProceduralAction_Easing(255);
+        const auto Easing = BadEasing.Validate();
+        Assert_True(Easing.IsValid() == false && Easing.Get_Error().Contains("StrikeEasing"),
+            f"an easing outside the clip presets is rejected by field (got [{Easing.Get_Error()}])");
+
         const auto BadRadii = Make_BadRadiiSpec().Combat.Validate();
         Assert_True(BadRadii.IsValid() == false && BadRadii.Get_Error().Contains("AcquireRadius"),
             f"an AcquireRadius beyond the LoseRadius is rejected (got [{BadRadii.Get_Error()}])");
+
+        auto NoClip = Make_ArmedCrawlerSpec(4).Combat;
+        NoClip.Prepare.StartDistance = 110.0f;
+        const auto Clipless = NoClip.Validate();
+        Assert_True(Clipless.IsValid() == false && Clipless.Get_Error().Contains("AttackClip"),
+            f"an enabled profile without its compiled clip is rejected (got [{Clipless.Get_Error()}])");
 
         auto Disabled = Make_RotatedKeySpec().Combat;
         Disabled.Enabled = false;

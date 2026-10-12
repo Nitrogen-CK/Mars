@@ -2,15 +2,32 @@
 // transforms into the probe bodies, so a target moved this frame is queried where it now is. It writes only the
 // observations mailbox; the attack tick consumes it on the next frame.
 //
-// A sample is acknowledged when the body pose has published the attack's pending sample id with a new revision; the
-// presentation must then sit exactly on the published transform (anything else is an integration failure, never a reason
-// to query the requested pose instead). In Windup, Strike and Recover the accepted hit centre is checked for displacement
-// first (non-finite, a jump beyond MaxSampleTravel, the root beyond MaxRootDrift from its start or turned beyond the facing
-// tolerance), and a displaced sample is never swept. Otherwise the sphere is swept from the previous accepted centre to
-// this one, ignoring the crawler's own hurtboxes: a world body is an obstruction in any of the three phases; in Strike,
-// before any damage was committed, the first hurtbox of the attack's target becomes the one candidate, and any other
-// hurtbox (a bystander, a friend) is an obstruction. Validity of the target and the crawler is the attack tick's to judge
-// at commit.
+// A sample is acknowledged only by this action's accepted receipt with a new subject-pose revision; the presentation must
+// then sit exactly on the settled transform. The receipt's clip interval is the attack's only clock: its PhaseId is the
+// posed phase the attack tick enters, and the Offense window's exit in its events ends the posed motion. While the
+// interval is inside the Offense window and no cancel closed the attack's damage window, the accepted hit centre is
+// checked for displacement first (non-finite, a jump beyond MaxSampleTravel, the root beyond MaxRootDrift from its start
+// or turned beyond the facing tolerance), and a displaced sample is never swept. Otherwise the sphere is swept from the
+// previous accepted centre to this one, ignoring the crawler's own hurtboxes: a world body is an obstruction in any posed
+// phase; in a Strike interval, before any damage was committed, the first hurtbox of the attack's target becomes the one
+// candidate, and any other hurtbox (a bystander, a friend) is an obstruction. Validity of the target and the crawler is
+// the attack tick's to judge at commit.
+
+// One accepted receipt of a read page. Only the page's latest can match the presentation as it stands now.
+struct FMars_Crawler_AcceptedReceipt
+{
+    FCk_ProceduralAction_Receipt Receipt;
+    bool Latest = false;
+
+    FMars_Crawler_AcceptedReceipt() {}
+
+    FMars_Crawler_AcceptedReceipt(FCk_ProceduralAction_Receipt InReceipt, bool InLatest)
+    {
+        Receipt = InReceipt;
+        Latest = InLatest;
+    }
+}
+
 class UMars_Processor_Crawler_AttackResolve : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Overlap";
@@ -35,25 +52,113 @@ class UMars_Processor_Crawler_AttackResolve : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Self = InHandle.As_Crawler();
-        const auto PendingSampleId = Self.Get_AttackPendingSampleId();
-        if (PendingSampleId == 0)
+        auto& Attack = Self.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        if (Attack.ActionIdentity.Get_Value() == 0 || ck::Is_NOT_Valid(Self.Get_ActionPlayer()))
         { return; }
 
-        const auto Sample = utils_procedural_body_pose::Get_ActionSample(Self.Get_BodyPose());
-        if (Sample.Get_SampleId() != PendingSampleId || Sample.Get_PoseRevision() <= InObservations.AckRevision)
+        if (utils_crawler::Get_IsAttackActionLost(Self))
+        {
+            Attack.WindowClosed = true;
+            InObservations.ActionStreamFailed = true;
+            InObservations.Candidate.Reset();
+        }
+
+        const auto Page = Self.Get_ActionPlayer().Read_Receipts(Attack.ActionIdentity, Attack.ReceiptCursor, 16);
+        if (Page.Get_Result() == ECk_ProceduralAction_ReadResult::Gap ||
+            Page.Get_Result() == ECk_ProceduralAction_ReadResult::StreamExpired ||
+            Page.Get_Result() == ECk_ProceduralAction_ReadResult::InvalidCursor ||
+            Page.Get_Result() == ECk_ProceduralAction_ReadResult::InvalidPlayer)
+        { InObservations.ActionStreamFailed = true; }
+
+        const auto& Records = Page.Get_Records();
+        auto LatestAccepted = -1;
+        for (int32 Index = 0; Index < Records.Num(); ++Index)
+        {
+            if (Records[Index].Get_Kind() == ECk_ProceduralAction_RecordKind::AcceptedPose)
+            { LatestAccepted = Index; }
+        }
+
+        for (int32 Index = 0; Index < Records.Num(); ++Index)
+        {
+            const auto& Record = Records[Index];
+            if (Record.Get_Identity().Get_Value() != Attack.ActionIdentity.Get_Value())
+            { InObservations.ActionStreamFailed = true; continue; }
+
+            if (Record.Get_Kind() == ECk_ProceduralAction_RecordKind::AcceptedPose &&
+                InObservations.ActionStreamFailed == false)
+            { ResolveAccepted(Self, FMars_Crawler_AcceptedReceipt(Record.Get_Receipt(), Index == LatestAccepted), InObservations); }
+            else if (Record.Get_Kind() == ECk_ProceduralAction_RecordKind::Terminal)
+            {
+                Attack.TerminalSeen = true;
+                if (Record.Get_Result().Get_Recovery() == ECk_ProceduralAction_Recovery::Failed)
+                { InObservations.ActionStreamFailed = true; }
+            }
+        }
+
+        if (Page.Get_LastStreamSequence() > Attack.ReceiptCursor)
+        { Attack.ReceiptCursor = Page.Get_LastStreamSequence(); }
+        if (Page.Get_Records().Num() > 0)
+        {
+            const auto Consume = FCk_Request_ProceduralActionPlayer_ConsumeReceipts(
+                Attack.ActionIdentity, Attack.ReceiptCursor);
+            if (Attack.TerminalSeen && Attack.TerminalConsumeIssued == false)
+            {
+                Attack.TerminalConsumeIssued = true;
+                utils_procedural_action_player::Request_ConsumeReceipts(Self.Get_ActionPlayer(), Consume,
+                    FCk_Delegate_Request_OnCompleted(this, n"OnTerminalConsumed"));
+            }
+            else
+            { utils_procedural_action_player::Request_ConsumeReceipts(Self.Get_ActionPlayer(), Consume); }
+        }
+    }
+
+    UFUNCTION()
+    private void OnTerminalConsumed(FCk_Handle InRequestOwner, ECk_Request_OperationResult InResult)
+    {
+        if (ck::Is_NOT_Valid(InRequestOwner))
         { return; }
 
-        const auto Accepted = Sample.Get_WorldTransform();
-        const auto Presented = utils_transform::Get_EntityCurrentTransform(Self.Get_Presentation());
-        const auto LocationError = (Presented.GetLocation() - Accepted.GetLocation()).Size();
-        const auto AngleError = Math::RadiansToDegrees(Presented.GetRotation().AngularDistance(Accepted.GetRotation()));
-        if (ck::EnsureIfNot(LocationError <= k_PresentationToleranceCm && AngleError <= k_PresentationToleranceDegrees,
-            f"[Crawler] [{Self.ToString()}] the presentation [{Presented.GetLocation().ToString()}] is not the published body pose sample [{Accepted.GetLocation().ToString()}] ({LocationError :.4} cm, {AngleError :.4} deg); sample [{PendingSampleId}] stays unacknowledged"))
+        const auto Crawler = InRequestOwner.As_Crawler();
+        if (ck::Is_NOT_Valid(Crawler) || Crawler.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
         { return; }
 
-        InObservations.AckSampleId = Sample.Get_SampleId();
-        InObservations.AckRevision = Sample.Get_PoseRevision();
+        auto& Attack = Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        if (Attack.TerminalSeen == false || Attack.TerminalConsumeIssued == false || Attack.TerminalConsumeSucceeded)
+        { return; }
+
+        if (InResult == ECk_Request_OperationResult::Succeeded)
+        { Attack.TerminalConsumeSucceeded = true; }
+        else
+        { Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).ActionStreamFailed = true; }
+    }
+
+    private void ResolveAccepted(FCk_Handle_Crawler& Self, const FMars_Crawler_AcceptedReceipt& InAccepted,
+        FMars_Fragment_Crawler_AttackObservations& InObservations)
+    {
+        const auto& Receipt = InAccepted.Receipt;
+        if (Receipt.Get_HasAcceptedPose() == false ||
+            Receipt.Get_Stamp().Get_SubjectPoseRevision() <= InObservations.AckRevision ||
+            Receipt.Get_CurrentPose().Get_HasBodyPresentation() == false)
+        { return; }
+
+        const auto SampleId = Receipt.Get_Stamp().Get_SampleSequence();
+        const auto Accepted = Receipt.Get_CurrentPose().Get_BodyPresentation();
+        if (InAccepted.Latest)
+        {
+            const auto Presented = utils_transform::Get_EntityCurrentTransform(Self.Get_Presentation());
+            const auto LocationError = (Presented.GetLocation() - Accepted.GetLocation()).Size();
+            const auto AngleError = Math::RadiansToDegrees(Presented.GetRotation().AngularDistance(Accepted.GetRotation()));
+            if (ck::EnsureIfNot(LocationError <= k_PresentationToleranceCm && AngleError <= k_PresentationToleranceDegrees,
+                f"[Crawler] [{Self.ToString()}] the presentation [{Presented.GetLocation().ToString()}] is not the accepted action receipt [{Accepted.GetLocation().ToString()}] ({LocationError :.4} cm, {AngleError :.4} deg); sample [{SampleId}] stays unacknowledged"))
+            { return; }
+        }
+
+        const auto Interval = Receipt.Get_Interval();
+        InObservations.AckSampleId = SampleId;
+        InObservations.AckRevision = Receipt.Get_Stamp().Get_SubjectPoseRevision();
         InObservations.AcceptedWorld = Accepted;
+        InObservations.AcceptedInterval = Interval;
+        ObservePhase(Interval, InObservations);
 
         const auto Combat = Self.Get_Spec().Combat;
         const auto Previous = InObservations.PreviousHitCenter;
@@ -61,9 +166,11 @@ class UMars_Processor_Crawler_AttackResolve : UCk_Processor_Script_Base_UE
         InObservations.PreviousHitCenter = Center;
         InObservations.AcceptedHitCenter = Center;
 
-        const auto Phase = Self.Get_AttackPhase();
-        if (utils_crawler::Get_IsOffensivePhase(Phase) == false)
+        if (Interval.Get_Windows().Contains(utils_crawler::Get_OffenseWindowId()) == false ||
+            Self.Get_Fragment(FMars_Fragment_Crawler_Attack).WindowClosed)
         { return; }
+
+        const auto Phase = utils_crawler::Find_ClipPhase(Interval.Get_PhaseId());
 
         if (Get_IsDisplaced(Self, Previous, Center))
         {
@@ -108,9 +215,24 @@ class UMars_Processor_Crawler_AttackResolve : UCk_Processor_Script_Base_UE
         Candidate.Location = Result.Get_HitLocation();
         Candidate.Normal = Result.Get_SurfaceNormal();
         Candidate.Generation = Self.Get_AttackGeneration();
-        Candidate.SampleId = Sample.Get_SampleId();
+        Candidate.SampleId = SampleId;
         Candidate.HurtCount = Self.Get_HurtCount();
         InObservations.Candidate = TOptional<FMars_Crawler_HitCandidate>(Candidate);
+    }
+
+    // The posed phase only advances within an action (records arrive in order); the Offense exit is an event at the end
+    // of the interval that reaches Recover's end.
+    private void ObservePhase(const FCk_ProceduralAction_Interval& InInterval, FMars_Fragment_Crawler_AttackObservations& InObservations)
+    {
+        const auto Phase = utils_crawler::Find_ClipPhase(InInterval.Get_PhaseId());
+        if (utils_crawler::Get_IsOffensivePhase(Phase) && int32(Phase) > int32(InObservations.AcceptedPhase))
+        { InObservations.AcceptedPhase = Phase; }
+
+        for (const auto& Event : InInterval.Get_Events())
+        {
+            if (Event.Get_Kind() == ECk_ProceduralAction_EventKind::WindowExit && Event.Get_Id() == utils_crawler::Get_OffenseWindowId())
+            { InObservations.OffenseEnded = true; }
+        }
     }
 
     private bool Get_IsDisplaced(const FCk_Handle_Crawler& InSelf, FVector InPrevious, FVector InCenter)
