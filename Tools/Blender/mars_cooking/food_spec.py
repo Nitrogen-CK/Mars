@@ -98,6 +98,14 @@ INGREDIENTS = {
     "Mushroom": dict(category="produce", size_cm=12.0, slots=("Skin", "Flesh"), morph=True, fryable=True, cpu_access=True,
                      cuts=("Half", "Slice"), prep=dict(shells="union", cpu_access=True),
                      ref="a chunky faceted button / cremini mushroom standing on its stem: domed cap 12 cm across with a slightly rolled rim, short thick stem, cream-tan cap with darker centre, pale stem; morph = shrinks ~12 % and the cap sags when cooked"),
+    # Stephen 2026-10-12: a pickle for the cutting bench whose cut face reads as a pickle. It IS its own prep mesh (one
+    # closed solid inside the runtime-mesh contract, like the MeatSlab; runtime_mesh=True makes the produce builder check
+    # the export). Straight along +X so every cross cut is a round; the cut face is not painted but drawn from the piece's
+    # local position by PickleFlesh_Mars_M (unreal/mars_pickle_ue.py), which reads the axis and the taper from the
+    # sidecar's section_* numbers.
+    "Pickle": dict(category="produce", size_cm=20.0, slots=("Skin",), morph=False, fryable=False, cpu_access=True,
+                   runtime_mesh=True,
+                   ref="a fat brined gherkin lying on its side: olive green, paler lengthwise stripes, a scatter of raised warts, flat stem and blossom scars; cut, it shows pale yellow-green flesh with a ring of seed pockets round a soft core"),
     # mortar & pestle minigame: separate meshes per stage, all piles share one pivot (the bowl floor centre)
     "SaltCrystal": dict(category="mortar", size_cm=2.5, slots=("Salt",), morph=False, fryable=False, variants=3,
                         ref="a single rough salt crystal (reference 6): translucent-white chunky octahedral lump"),

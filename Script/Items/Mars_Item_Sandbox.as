@@ -62,11 +62,13 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
 
     auto Presentation = Cast<UMars_ItemTrait_Presentation>(NewObject(this, UMars_ItemTrait_Presentation));
     Presentation.Visual.Mesh = assets::SM_PlayerBackpack();
+    // A quarter over the mesh's size (69 x 93 x 97 cm, pivot at its base): 86 x 116 x 121 cm, as tall as the chef's body.
+    Presentation.Visual.MeshScale = FVector(1.25, 1.25, 1.25);
     Presentation.Mounting.HeldOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -10.0));
     Presentation.Mounting.Persistence = EMars_WorldItem_Persistence::Persistent;
     Presentation.Mounting.CarryPoint = GameplayTags::AttachPoint_Mars_Back;
-    // Pushed back off the Back attach point so the worn pack stays out of the camera when looking down.
-    Presentation.Mounting.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(-20.0, 0.0, 0.0));
+    // The worn pack's front face on the Back attach point: the face is 35.7 cm ahead of the pivot, times MeshScale.
+    Presentation.Mounting.CarryOffset = FTransform(FRotator::ZeroRotator, FVector(-44.6, 0.0, 0.0));
     Presentation.WorldItem.ScriptClass = UMars_Backpack_EntityScript;
     Presentation.Grip.Handedness = EMars_ItemPresentation_Handedness::TwoHanded;
     _ItemTraits.Add(Presentation);

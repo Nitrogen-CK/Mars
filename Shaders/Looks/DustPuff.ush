@@ -1,0 +1,69 @@
+// /Project/Looks/DustPuff.ush
+//
+// A puff of dust seen from above, on a flat card: a noisy cloud that leaves the card's middle, spreads to its edge and
+// thins out as Age runs 0 -> 1, breaking into wisps and hollowing from the middle as it goes. Haze is a second, steady
+// cloud that slowly turns over the middle (something being ground). Lit and translucent, so the dust takes the room's
+// light and Tint is its albedo; SelfLight adds Tint again as its own light, so pale dust still reads pale in a dim room
+// and dark dust stays dark. Both clouds end inside the card, whatever the noise does.
+#pragma once
+#include "/CkUsf/Common.ush"
+
+// The puff's reach at birth and when gone, as a fraction of the card's half width.
+#ifndef MARS_DUSTPUFF_REACH_BORN
+#define MARS_DUSTPUFF_REACH_BORN 0.42f
+#endif
+#ifndef MARS_DUSTPUFF_REACH_GONE
+#define MARS_DUSTPUFF_REACH_GONE 1.0f
+#endif
+// How far the noise pushes the puff's edge in and out, in reaches.
+#ifndef MARS_DUSTPUFF_BILLOW
+#define MARS_DUSTPUFF_BILLOW 0.7f
+#endif
+// Radians a second the haze turns.
+#ifndef MARS_DUSTPUFF_HAZE_TURN
+#define MARS_DUSTPUFF_HAZE_TURN 0.9f
+#endif
+
+FCkUsf_SurfaceOutput Mars_Look_DustPuff(
+    FCkUsf_SurfaceInput In,
+    float3              Tint,
+    float               Age,
+    float               Density,
+    float               Haze,
+    float               Seed,
+    float               SelfLight)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const float2 P = In.UV * 2.0f - 1.0f;
+    const float  R = length(P);
+    const float  T = saturate(Age);
+
+    // The puff. The noise lives in the puff's own space, so its billows spread with it.
+    const float Reach  = lerp(MARS_DUSTPUFF_REACH_BORN, MARS_DUSTPUFF_REACH_GONE, 1.0f - (1.0f - T) * (1.0f - T));
+    const float Billow = CkUsf_Fbm(P / Reach * 2.2f + Seed * 37.0f);
+    const float FromMiddle = R / Reach + (Billow - 0.5f) * MARS_DUSTPUFF_BILLOW;
+    const float Body   = 1.0f - smoothstep(0.5f, 1.0f, FromMiddle);
+    const float Hollow = lerp(1.0f, smoothstep(0.0f, 0.6f, FromMiddle + 0.25f), T);
+    const float Wisps  = lerp(1.0f, saturate(Billow * 2.6f - 0.45f), T);
+    const float Fade   = 1.0f - smoothstep(0.2f, 1.0f, T);
+    const float PuffAlpha = Body * Hollow * Wisps * Fade * Density;
+
+    // The haze: the same noise, turning about the middle.
+    float HazeSin;
+    float HazeCos;
+    sincos(In.Time * MARS_DUSTPUFF_HAZE_TURN, HazeSin, HazeCos);
+    const float2 Turned = float2(P.x * HazeCos - P.y * HazeSin, P.x * HazeSin + P.y * HazeCos);
+    const float  Drift  = CkUsf_Fbm(Turned * 3.0f + Seed * 11.0f + In.Time * 0.15f);
+    const float  HazeAlpha = (1.0f - smoothstep(0.25f, 0.8f, R)) * smoothstep(0.3f, 0.75f, Drift) * Haze;
+
+    const float InsideCard = 1.0f - smoothstep(0.85f, 1.0f, R);
+
+    const float3 Dust = Tint * lerp(0.75f, 1.0f, Billow);
+    O.BaseColor     = Dust;
+    O.EmissiveColor = Dust * SelfLight;
+    O.Specular  = 0.0f;
+    O.Roughness = 1.0f;
+    O.Opacity   = saturate(PuffAlpha + HazeAlpha) * InsideCard;
+    return O;
+}

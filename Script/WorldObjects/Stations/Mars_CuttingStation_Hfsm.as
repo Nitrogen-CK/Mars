@@ -42,6 +42,16 @@ namespace utils_cutting
             InStationWorld.TransformVectorNoScale(FVector::ForwardVector));
     }
 
+    // What the bench cuts, the input dock's Kind: meat for the pan, and the pickle. A mushroom is not (a slice is already
+    // cut, a whole one goes to the fryer).
+    FGameplayTagQuery Make_BenchKindQuery()
+    {
+        auto Kinds = FGameplayTagContainer();
+        Kinds.AddTag(GameplayTags::Food_Meat);
+        Kinds.AddTag(GameplayTags::Food_Vegetable_Pickle);
+        return FGameplayTagQuery::MakeQuery_MatchAnyTags(Kinds);
+    }
+
     // The board takes one joint at a time: an add-food press is refused while it holds anything, cut or whole.
     bool Get_IsBoardBusy(const FCk_Handle_FoodBoard& InBoard)
     {

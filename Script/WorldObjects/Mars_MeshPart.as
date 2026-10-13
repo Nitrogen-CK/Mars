@@ -40,6 +40,10 @@ struct FMars_MeshPart
     UPROPERTY()
     bool CastShadow = true;
 
+    // Off: a decal projected over the part does not draw on it.
+    UPROPERTY()
+    bool ReceivesDecals = true;
+
     FMars_MeshPart() {}
 
     FMars_MeshPart(FTransform InLocalTransform, UStaticMesh InMesh, UMaterialInterface InMaterial, FName InCollisionProfile, FName InDebugName)
@@ -71,6 +75,8 @@ mixin FCk_Handle_UnrealComponent Add_MeshPart(FCk_Handle_Transform& Self, UObjec
     Archetype.SetCollisionProfileName(InPart.CollisionProfile);
     if (InPart.CastShadow == false)
     { Archetype.SetCastShadow(false); }
+    if (InPart.ReceivesDecals == false)
+    { Archetype.SetReceivesDecals(false); }
 
     // On the archetype: the hosted component is instanced from it and shares its override material.
     if (InPart.PrimaryColor.IsSet())

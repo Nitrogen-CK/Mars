@@ -133,4 +133,102 @@ class UMars_Gameplay_CheatManager : UCheatManager
 
         ck::Trace(f"[Mars_SwingState] phase [{Swing.Get_Phase() :n}] elapsed [{Swing.Get_Elapsed()}] pose [{Swing.Get_Pose().GetLocation()}] node offset [{NodeOffset.GetLocation()}] glove target R [{GloveTarget}] hotbar selected [{SelectedIndex}] slot items [{SlotItems}] selected item [{SelectedItemValid}] held item [{HeldValid}] use interactable [{UseInteractableValid}] best primary targets [{BestPrimary}]");
     }
+
+    // The local player takes the labelled station whose stand is nearest to them (within InRangeCm), by the reserve the Use
+    // interaction ends in: a station can be worked from the console without walking up to it and looking at it.
+    UFUNCTION(Exec)
+    void Mars_Operate(float32 InRangeCm = 300.0f)
+    {
+        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        if (ck::Is_NOT_Valid(Character))
+        { return; }
+
+        auto Player = Character.TryGet_ActorEntityHandle();
+        const auto Here = Character.GetActorLocation();
+        auto Nearest = FCk_Handle_Station();
+        auto NearestDistance = float64(InRangeCm);
+        for (auto Label : utils_entity_tag::ForEach_Entity(Player, n"TAG_MarsStationLabel"))
+        {
+            // Every feed station's label hangs under its station.
+            auto Owner = utils_entity_lifetime::Get_LifetimeOwner(Label);
+            while (ck::IsValid(Owner) && utils_entity_lifetime::Get_IsTransientEntity(Owner) == false)
+            {
+                const auto Station = Owner.As_Station(ECk_SanityCheck::UnChecked);
+                if (ck::IsValid(Station))
+                {
+                    const auto Distance = Station.Get_StandWorld().GetLocation().Distance(Here);
+                    if (Distance < NearestDistance)
+                    {
+                        Nearest = Station;
+                        NearestDistance = Distance;
+                    }
+
+                    break;
+                }
+
+                Owner = utils_entity_lifetime::Get_LifetimeOwner(Owner);
+            }
+        }
+
+        if (ck::Is_NOT_Valid(Nearest))
+        {
+            ck::Trace(f"[Mars_Operate] no labelled station within {InRangeCm} cm");
+            return;
+        }
+
+        Nearest.Request_Reserve(FMars_Request_Station_Reserve(Player));
+    }
+
+    // Bears down on (1) or lets up (0) the pestle of the mortar station the local player operates, as the station's control
+    // does for the Primary key.
+    UFUNCTION(Exec)
+    void Mars_MortarPress(bool InPressed)
+    {
+        auto Mortar = TryGet_OperatedMortar("Mars_MortarPress");
+        if (ck::Is_NOT_Valid(Mortar))
+        { return; }
+
+        if (InPressed)
+        { Mortar.Request_Press(FMars_Request_Mortar_Press()); }
+        else
+        { Mortar.Request_Release(FMars_Request_Mortar_Release()); }
+    }
+
+    // Logs the Mortar ledger of the station the local player operates: the batch, the pestle and the timing window.
+    UFUNCTION(Exec)
+    void Mars_MortarState()
+    {
+        const auto Mortar = TryGet_OperatedMortar("Mars_MortarState");
+        if (ck::Is_NOT_Valid(Mortar))
+        { return; }
+
+        const auto Batch = Mortar.Get_Batch();
+        const auto Window = Mortar.Get_Window();
+        ck::Trace(f"[Mars_MortarState] engaged [{Mortar.Get_IsEngaged()}] seasoning [{Batch.Seasoning :n}] stage [{Batch.Stage :n}] phase [{Batch.Phase :n}] hits [{Batch.CrushHits}] grind [{Batch.GrindProgress}] strike [{Mortar.Get_StrikePhase() :n}] pestle [{Mortar.Get_Pestle() :n}] window centre [{Window.Centre}] half width [{Window.HalfWidth}] marker [{Window.Marker}] progress [{Mortar.Get_Progress()}]");
+    }
+
+    // The Mortar of the station the local player operates; invalid (and said so, as InCheat) when there is none.
+    private FCk_Handle_Mortar TryGet_OperatedMortar(FString InCheat) const
+    {
+        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        if (ck::Is_NOT_Valid(Character))
+        {
+            ck::Trace(f"[{InCheat}] no local Mars player character");
+            return FCk_Handle_Mortar();
+        }
+
+        auto Operator = Character.TryGet_ActorEntityHandle().As_Operator(ECk_SanityCheck::UnChecked);
+        FCk_Handle Station = ck::IsValid(Operator) ? Operator.Get_Station() : FCk_Handle_Station();
+        if (ck::Is_NOT_Valid(Station))
+        {
+            ck::Trace(f"[{InCheat}] the player operates no station");
+            return FCk_Handle_Mortar();
+        }
+
+        const auto Mortar = Station.As_Mortar(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Mortar))
+        { ck::Trace(f"[{InCheat}] the operated station has no Mortar"); }
+
+        return Mortar;
+    }
 }

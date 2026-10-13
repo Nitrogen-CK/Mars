@@ -8,7 +8,7 @@ re-runnable:
     --save     writes food_spec.BLEND_DIR/Food_Produce.blend (the only .blend this builder writes)
     --sheets   workbench review sheets into food_spec.REVIEW_DIR/<Name>_sheet.png: rows iso / face-on (+X toward the
                camera) / front / top; raw left, cooked right for the morphing ones
-    --only     comma separated subset of the roster (default: all seven)
+    --only     comma separated subset of the roster (default: the whole produce roster)
                (--sheets also writes Mushroom_Cuts_sheet.png: whole | half | slice, rows iso / top / under / front;
                "under" flips the meshes so the cut faces face the camera)
 
@@ -66,8 +66,9 @@ CATEGORY = "produce"
 ROSTER = [k for k, v in spec.INGREDIENTS.items() if v["category"] == CATEGORY]
 BLEND_PATH = os.path.join(spec.BLEND_DIR, spec.CATEGORIES[CATEGORY][0])
 TRI_BUDGET = {k: (600, 3000 if k == "HerbPile" else 2500) for k in ROSTER}
-TRI_BUDGET.update({"Mushroom": (600, 1800), "Mushroom_Half": (300, 1800), "Mushroom_Slice": (300, 1800)})
-MANIFOLD_KEYS = ("HerbPile", "Mushroom")       # runtime-sliced: every mesh (and cut) must be closed manifold
+TRI_BUDGET.update({"Mushroom": (600, 1800), "Mushroom_Half": (300, 1800), "Mushroom_Slice": (300, 1800),
+                   "Pickle": (300, spec.PREP_TRI_BUDGET)})
+MANIFOLD_KEYS = ("HerbPile", "Mushroom", "Pickle")       # runtime-sliced: every mesh (and cut) must be closed manifold
 TAU = 2.0 * math.pi
 GOLDEN = math.pi * (3.0 - math.sqrt(5.0))
 UP = np.array([0.0, 0.0, 1.0])
@@ -1684,9 +1685,79 @@ def build_mushroom():
     return [whole, half, slc]
 
 
+# ================================================================ PICKLE
+# The pickle's solid of revolution about its long axis (+X), shared with the cut-face material: PickleFlesh_Mars_M draws a
+# cut from the piece's local position, so it rebuilds this radius from the sidecar's section_* numbers. Change one, change
+# both (mars_pickle_ue.SECTION_HLSL).
+PICKLE_HALF_LENGTH, PICKLE_RADIUS = 10.0, 3.4
+PICKLE_TAPER = (2.6, 2.2)         # r(u) = R (1 - |u|^a)^(1/b) (1 + PICKLE_FATTEN u), u = x / half length
+PICKLE_FATTEN = 0.07              # the blossom end (+X) is a little fatter than the stem end
+
+
+def pickle_radius(u):
+    a, b = PICKLE_TAPER
+    return PICKLE_RADIUS * (1.0 - np.abs(u) ** a) ** (1.0 / b) * (1.0 + PICKLE_FATTEN * u)
+
+
+def build_pickle():
+    """One closed solid inside the runtime-mesh contract: 24 rings of 12 lofted along +X, every other ring turned half a
+    step so the quads split into hand-cut triangles, vertices jittered, a scatter of raised warts, flat stem and blossom
+    scars. Straight on purpose: every cross cut is a round centred on the axis the cut-face material reads."""
+    name = "Pickle"
+    rng = np.random.default_rng(seed_of(name))
+    g = Geo(("Skin",))
+    K, SIDES = 24, 12
+    u = np.sin(np.linspace(-0.5 * math.pi, 0.5 * math.pi, K)) * 0.985
+    y_axis, z_axis = np.array([0.0, 1.0, 0.0]), np.array([0.0, 0.0, 1.0])
+    rings, wart = [], np.zeros((K, SIDES), bool)
+    wart[2:K - 2] = rng.uniform(size=(K - 4, SIDES)) < 0.13
+    for i in range(K):
+        r = pickle_radius(u[i]) * (1.0 + rng.uniform(-0.035, 0.035, SIDES)) + np.where(wart[i], 0.26, 0.0)
+        ang = TAU * (np.arange(SIDES) + 0.5 * (i % 2)) / SIDES
+        x = PICKLE_HALF_LENGTH * u[i] + (rng.uniform(-0.1, 0.1, SIDES) if 0 < i < K - 1 else 0.0)
+        rings.append(np.stack([x * np.ones(SIDES), r * np.cos(ang), r * np.sin(ang)], 1))
+    verts, faces = fc.loft(rings, True, True)
+    faces = orient_outward(verts, faces)
+    is_wart = wart.ravel()
+    tags = []
+    for f in faces:
+        if len(f) > 4:
+            tags.append("tip")
+        else:
+            tags.append("wart" if is_wart[list(f)].any() else "skin")
+    g.add(verts, faces, "Skin", tags=tags)
+
+    BASE, DARK, LIGHT = C(86, 104, 38), C(56, 74, 26), C(128, 138, 58)
+    WART, TIP = C(150, 156, 80), C(146, 128, 82)
+
+    def colorize(tags, c, n, noise, verts):
+        zc = 0.5 * (verts[:, 2].min() + verts[:, 2].max())
+        theta = np.arctan2(c[:, 2] - zc, c[:, 1])
+        stripe = fc.smoothstep(0.55, 0.95, np.cos(5.0 * theta + 0.35 * np.sin(0.6 * c[:, 0])))
+        body = mix(BASE, DARK, np.clip(-noise, 0.0, 1.0) * 0.6)
+        body = mix(body, LIGHT, np.clip(0.75 * stripe + 0.25 * np.clip(noise, 0.0, 1.0), 0.0, 1.0))
+        rgb = tag_rgb(tags, {"wart": WART, "tip": TIP}, default=(0.0, 0.0, 0.0))
+        for i, t in enumerate(tags):
+            if t == "skin":
+                rgb[i] = body[i]
+        return rgb
+
+    d = finalize(g, name, colorize)
+    s = d["scale"]
+    # The same axis and profile in the exported frame (Unreal local cm: x, -y, z), for the cut-face material.
+    d["props"] = {"section_axis_z_cm": round(float(-verts[:, 2].min() * s), 4),
+                  "section_centre_x_cm": round(float(-0.5 * (verts[:, 0].min() + verts[:, 0].max()) * s), 4),
+                  "section_radius_cm": round(PICKLE_RADIUS * s, 4),
+                  "section_half_length_cm": round(PICKLE_HALF_LENGTH * s, 4),
+                  "section_taper_a": PICKLE_TAPER[0], "section_taper_b": PICKLE_TAPER[1],
+                  "section_fatten": PICKLE_FATTEN}
+    d["rest_pose"] = "centred XY, lowest point z = 0, long axis +X (stem end -X, blossom end +X)"
+    return d
+
+
 BUILDERS = {"Puffer": build_puffer, "Turnip": build_turnip, "SpikedBerry": build_spiked_berry,
             "TomatoBulb": build_tomato_bulb, "ScaledPine": build_scaled_pine, "HerbPile": build_herb_pile,
-            "Mushroom": build_mushroom}
+            "Mushroom": build_mushroom, "Pickle": build_pickle}
 
 
 # ---------------------------------------------------------------- verification helpers
@@ -1854,6 +1925,8 @@ def realize(name, d, args):
     obj["size_spec_cm"] = size
     if stage:
         obj["stage"] = stage
+    for key, value in (d.get("props") or {}).items():      # builder facts for the sidecar (write_meta copies them)
+        obj[key] = value
     rep = dict(name=label, obj=obj.name, tris=fc.tri_count(obj), slots=[m.name for m in obj.data.materials],
                uv_layers=[u.name for u in obj.data.uv_layers], col=spec.COLOR_ATTR in obj.data.color_attributes,
                flat=fc._is_flat(obj.data), morph_max_cm=float(obj.get("morph_max_cm", 0.0)),
@@ -1901,6 +1974,16 @@ def realize(name, d, args):
         if "manifold" in rep:
             extra["manifold"] = rep["manifold"]
         rep["fbx"] = fc.export_fbx(obj, extra=extra)
+        if spec.INGREDIENTS[name].get("runtime_mesh") and not stage:
+            # the game slices this mesh as it is: the export itself must meet the contract (raises otherwise)
+            rm = fc.check_runtime_mesh(rep["fbx"])
+            meta_path = os.path.splitext(rep["fbx"])[0] + ".json"
+            with open(meta_path) as fh:
+                meta = json.load(fh)
+            meta["runtime_mesh"] = {k: v for k, v in rm.items() if k != "name"}
+            meta["cpu_access"] = True
+            with open(meta_path, "w") as fh:
+                json.dump(meta, fh, indent=2)
     if args["sheets"] and not stage:
         rep["sheet"] = make_sheet(obj, name, cooked)
     rep["seconds"] = round(time.time() - t0, 1)

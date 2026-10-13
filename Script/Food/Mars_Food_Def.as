@@ -13,7 +13,7 @@ struct FMars_Food_Data
     UPROPERTY()
     float MassKg = 0.0;
 
-    // What the food is, for the stations that gate on it (Food.Meat.Beef, Food.Vegetable.Mushroom); every piece cut from
+    // What the food is, for the stations that gate on it (Food.Meat.Beef, Food.Vegetable.Mushroom, Food.Vegetable.Pickle); every piece cut from
     // the joint carries it.
     UPROPERTY(meta = (Categories = "Food"))
     FGameplayTagContainer Kind;
@@ -426,5 +426,33 @@ namespace mars
         Visuals.Cap.Set_CmPerUVUnit(12.0);
 
         Visuals.Battered.Mesh = assets::Mushroom_Prep_Battered_Mars_SM();
+    }
+
+    // Pickle_Mars_SM: a fat gherkin lying on its side, 20.0 x 6.9 x 7.2 cm, long axis +X, 547 cm3, one closed solid inside
+    // RuntimeMesh's ceilings (572 triangles; it is its own prep mesh). 0.55 kg = 547 cm3 at 1.0 g/cm3. Slot Skin (0) wears
+    // Pickle_Mars_MI (the painted skin); the cap is slot 1 and wears Pickle_Section_Mars_MI, the same master drawing the cut
+    // face as a solid texture from the piece's local position (pale flesh, a ring of seed pockets, a thin rind), so a cut
+    // across shows a round and a cut along shows the seed rows, wherever the blade fell. The cap colour is that flesh,
+    // C(216, 224, 158), for anything that reads it; the cap's planar UVs are not used. Yawed 90 so the long axis runs along
+    // the cleaver's travel and every chop takes a round off the end. Not meat: it goes to the bench, not the pan, and it is
+    // not batterable.
+    asset Food_Pickle_Mars of UMars_Food_Def
+    {
+        Data.Mesh = assets::Pickle_Mars_SM();
+        Data.MassKg = 0.55;
+        Data.Kind.AddTag(GameplayTags::Food_Vegetable_Pickle);
+
+        // A 4 g, 0.5 cm portion: a thin round is a pickle chip.
+        Tuners = FMars_FoodPiece_Tuners(0.004, 0.5);
+
+        TArray<TSoftObjectPtr<UMaterialInterface>> Materials;
+        Materials.Add(TSoftObjectPtr<UMaterialInterface>(assets::Pickle_Mars_MI().ToSoftObjectPath()));
+        Materials.Add(TSoftObjectPtr<UMaterialInterface>(assets::Pickle_Section_Mars_MI().ToSoftObjectPath()));
+        Visuals.Display.Set_Materials(Materials);
+        Visuals.Cap.Set_MaterialID(1);
+        Visuals.Cap.Set_Color(FLinearColor(0.686f, 0.745f, 0.342f, 1.0f));
+        Visuals.Cap.Set_CmPerUVUnit(20.0);
+
+        Layout.YawDegrees = 90.0;
     }
 }

@@ -87,8 +87,9 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         auto Config = mars::Mars_PlayerCharacter_Config;
         const auto& Body = Config.TPBody;
 
-        // 150 / 79.67 (the unscaled MiniChef body's top, hat excluded).
-        Assert_True(Math::Abs(Body.Scale - 1.8828f) < 0.001f, f"the chef is scaled to 1.5 m (Scale [{Body.Scale}] ~ 1.883)");
+        // The body others see is smaller than the 1.5 m capsule: 79.67 (the unscaled MiniChef body's top, hat excluded)
+        // at Scale 1.5 is 120 cm.
+        Assert_True(Math::Abs(Body.Scale - 1.5f) < 0.001f, f"the body others see tops out at 120 cm (Scale [{Body.Scale}] ~ 1.5)");
         Assert_True(Math::Abs(Config.Body.CapsuleHalfHeight - 75.0f) < 0.001f, f"the capsule stands 1.5 m (half height [{Config.Body.CapsuleHalfHeight}])");
         Assert_True(Config.Body.CrouchedHalfHeight < Config.Body.CapsuleHalfHeight, "the crouched capsule is shorter than the standing one");
 
@@ -100,14 +101,16 @@ class UMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack : UCk_AutoTest_Base
         const auto CrouchedZ = Body.Get_BodyLocation(Config.Body.CapsuleHalfHeight, CrouchDrop).Z;
         Assert_True(Math::Abs(CrouchedZ + Config.Body.CrouchedHalfHeight) < 0.001, f"the crouched body's feet are on the crouched capsule's base (mesh z [{CrouchedZ}])");
 
-        // The view at the chef's face centre: 58.37 cm unscaled above the feet, measured from the capsule centre.
+        // The view sits inside the body's hood: above its face centre (58.37 cm unscaled above the feet) and under its
+        // top (79.67), both measured from the capsule centre like the eye height.
         const auto FaceHeight = 58.37f * Body.Scale - Config.Body.CapsuleHalfHeight;
-        Assert_True(Math::Abs(Config.View.EyeHeight.Height - FaceHeight) < 0.5f,
-            f"the eye height [{Config.View.EyeHeight.Height}] is the chef's face [{FaceHeight}] above the capsule centre");
+        const auto HoodTop = 79.67f * Body.Scale - Config.Body.CapsuleHalfHeight;
+        Assert_True(Config.View.EyeHeight.Height > FaceHeight && Config.View.EyeHeight.Height < HoodTop,
+            f"the eye height [{Config.View.EyeHeight.Height}] is between the body's face [{FaceHeight}] and its hood's top [{HoodTop}]");
 
-        // The MiniChef's walk clips are built to step at their own rate at the body's final height.
-        Assert_True(Math::Abs(Body.AuthoredScale - Body.Scale) < 0.001f, f"the locomotion clips are authored at the body's scale (AuthoredScale [{Body.AuthoredScale}])");
-        Assert_True(Math::Abs(Body.Get_LocomotionPlayRate() - 1.0f) < 0.001f, f"the locomotion play rate [{Body.Get_LocomotionPlayRate()}] is AuthoredScale / Scale");
+        // The MiniChef's walk clips are built for its legs at Scale 1.8828; the smaller body steps faster over the same ground.
+        Assert_True(Math::Abs(Body.AuthoredScale - 1.8828f) < 0.001f, f"the locomotion clips are authored at Scale 1.8828 (AuthoredScale [{Body.AuthoredScale}])");
+        Assert_True(Math::Abs(Body.Get_LocomotionPlayRate() - Body.AuthoredScale / Body.Scale) < 0.001f, f"the locomotion play rate [{Body.Get_LocomotionPlayRate()}] is AuthoredScale / Scale");
 
         Assert_False(Body.Head.Hat.Mesh.IsNull(), "the chef has a hat mesh");
         Assert_True(Body.Head.Hat.Socket == n"Hat", f"the hat rides the Hat socket (got [{Body.Head.Hat.Socket}])");

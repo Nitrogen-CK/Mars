@@ -93,6 +93,19 @@ asset Mars_ItemDef_Food_Mushroom of UCk_InventoryItem_Definition
     _ItemTraits.Add(Food);
 }
 
+asset Mars_ItemDef_Food_Pickle of UCk_InventoryItem_Definition
+{
+    _CoreInfo = FCk_InventoryItem_CoreInfo(FText::FromString("Pickle"));
+
+    // The pickle's long axis (its mesh +X) across the view, like the slab.
+    _ItemTraits.Add(mars_items::Make_FoodPresentation(this, FTransform(FRotator(0.0, 90.0, 0.0), FVector(14.0, 0.0, -12.0)), 10.0f));
+    _ItemTraits.Add(mars_items::Make_PlatterThrowable(this));
+
+    auto Food = Cast<UMars_ItemTrait_Food>(NewObject(this, UMars_ItemTrait_Food));
+    Food.Food = mars::Food_Pickle_Mars;
+    _ItemTraits.Add(Food);
+}
+
 namespace mars_items
 {
     UCk_InventoryItem_Definition Food_MeatSlab() { return Mars_ItemDef_Food_MeatSlab; }
@@ -108,6 +121,8 @@ namespace mars_items
     UCk_InventoryItem_Definition Food_SpikedBerry() { return Mars_ItemDef_Food_SpikedBerry; }
 
     UCk_InventoryItem_Definition Food_Mushroom() { return Mars_ItemDef_Food_Mushroom; }
+
+    UCk_InventoryItem_Definition Food_Pickle() { return Mars_ItemDef_Food_Pickle; }
 
     // A meshless, two-handed cradle at InHeldOffset whose palms sit InHalfWidth either side of the hold (no mesh to measure).
     // Stowed and not selected, the food rides the carrier's back, behind and below the Back point so it clears a worn pack;

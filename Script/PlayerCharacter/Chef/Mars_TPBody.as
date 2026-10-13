@@ -81,22 +81,20 @@ struct FMars_TPBody_Spec
     UPROPERTY()
     FTransform MeshOffset = FTransform(FRotator(0.0, -90.0, 0.0), FVector::ZeroVector, FVector::OneVector);
 
-    // Uniform body scale. The chef stands 1.5 m without its hat (settled 2026-10-03 after a trial in the crypt levels;
-    // SK_Chef is authored smaller, so this stays above one until the mesh is re-authored at 1.5 m):
-    //   Scale = 150 / ChefTopCm = 150 / 79.67 = 1.8828
-    // (ChefTopCm: the unscaled mesh's top above its feet, hat excluded. The MiniChef body, on trial since 2026-10-09,
-    // tops out at 79.67; the LowPoly chef it replaced at 91.167, Scale 1.6453.) The capsule
-    // (Config.Body.CapsuleHalfHeight 75) is the chef's height, and the view sits at the chef's face centre (unscaled
-    // 58.37 cm above the feet):
-    //   EyeHeight.Height = 58.37 * Scale - CapsuleHalfHeight = 109.9 - 75 = 35   (the LowPoly chef: 117.0 - 75 = 42)
-    // (EyeHeight is measured from the capsule centre). Re-derive all three when the chef mesh or the capsule changes.
+    // Uniform scale of the body others see. It is smaller than the player it stands for (2026-10-12): the capsule is
+    // 1.5 m and the view 110 cm up, but the MiniChef at that height (Scale 1.8828 = 150 / 79.67, the unscaled mesh's
+    // top above its feet, hat excluded) read too big beside the 70 cm stations - 92 cm wide, its hat at 189 cm, its
+    // face level with the viewer's eyes. At 1.5 the body tops out at 120 cm (hat 150 cm, 73 cm wide, inside the
+    // capsule) and other players look slightly down at it. Only the look changes: the capsule, the view height
+    // (Config.View.EyeHeight) and the reach stay the player's. The view sits 110 cm up, inside the hood (the face
+    // centre is 58.37 * Scale = 88 cm up); below about 1.4 it would be above the hood's top.
     UPROPERTY()
-    float32 Scale = 1.8828f;
+    float32 Scale = 1.5f;
 
     // The Scale the locomotion clips were authored against. ABP_Chef plays BS_Chef_Locomotion at AuthoredScale / Scale
-    // (Get_LocomotionPlayRate), so a body scaled up past its clips takes proportionally slower steps. The MiniChef's
-    // clips are built for its short legs to step at their own rate at the body's final height, so this equals Scale
-    // (play rate 1; the LowPoly chef's clips were authored at 1.0969).
+    // (Get_LocomotionPlayRate), so a body scaled up past its clips takes proportionally slower steps and one scaled
+    // down takes quicker ones. The MiniChef's clips are built for its legs at Scale 1.8828; at Scale 1.5 the shorter
+    // legs step 1.255 times as fast over the same ground (the LowPoly chef's clips were authored at 1.0969).
     UPROPERTY()
     float32 AuthoredScale = 1.8828f;
 

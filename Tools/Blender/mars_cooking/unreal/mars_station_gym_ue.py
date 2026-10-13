@@ -22,11 +22,16 @@ What is spawned (outliner folders):
   Mise_Gym/Pieces/..  everything of the kit that stands in the room, one StaticMeshActor each so it can be moved: piers
                       (with their fork capitals), crates, barrels, benches, banners, boards, rugs, chain hooks and eyes
   Mise_Gym/Chains     AMars_HangingChain lanterns and garlands;  Mise_Gym/Racks  AMars_HangingRack pot racks and rails
-  StationGym/Stations one ACk_EntitySpawner_UE per plan station (Mars_<Name>Station_EntityScript), yawed to its wall
+  StationGym/Stations one ACk_EntitySpawner_UE per plan station (Mars_<Name>Station_EntityScript), yawed to its wall,
+                      and one per EXTRA_STATIONS row (the mortar: Mars's own, not the plan's)
   StationGym/Islands, /Candles, /Furnace   the plan's Mars meshes, one actor each (food and candles without collision)
   StationGym/Lights   the plan's lamps as movable point lights (watts x LOOK light_scale; tagged with their watts)
   StationGym/Rig      warm height fog, flat ambient, reflection captures, the grade
   StationGym/Starts   four PlayerStarts inside the south arch
+  StationGym/Ingredients  the ingredient table in front of the starts: every food of the roster as a pickable item (one
+                      ACk_EntitySpawner_UE each, Mars_FoodItem_<Name>_EntityScript) with its name standing behind it, and
+                      two empty large platters to carry them on.  Mars's own, not the plan's (INGREDIENTS below);
+                      place_ingredient_table() adds it to the built map without a rebuild
 What rides on something is attached to it (the plan's "on" / "of" keys): food to its table, candles and their flame
 light to their crate, a capital to its pier, a lantern's light and wall eye to its chain - move the parent and the rest
 follows.
@@ -55,8 +60,13 @@ ROOM = "station_gym_kitchen"
 GYM_MAP = "/Game/Mars/Maps/StationGym_Mars_MAP"
 GAME_MODE = "/Script/Angelscript.Mars_Gameplay_GameMode"
 STATION_CLASS = "/Script/Angelscript.Mars_%sStation_EntityScript"
-# plan station name -> script name where they differ (the dicing station became the generic cutting station)
-STATION_SCRIPT = {"Dicing": "Cutting"}
+# plan station name -> the station's script class name, where the plan still uses an older one
+STATION_RENAMES = {"Dicing": "Cutting"}
+# Stations Mars adds to the plan's: (script class name, (x, y) Unreal cm, yaw). The mortar stands against the west wall,
+# beside the ingredient table.
+EXTRA_STATIONS = (("Mortar", (-1110.0, 1000.0), 180.0),)
+FOOD_ITEM_CLASS = "/Script/Angelscript.Mars_FoodItem_%s_EntityScript"
+PLATTER_CLASS = "/Script/Angelscript.Mars_Platter_Large_EntityScript"
 RACK_CLASS = "/Script/Angelscript.Mars_HangingRack"
 MESH_FOLDERS = ("/Game/Mars/Gameplay/Cooking/Stations/Meshes", "/Game/Mars/Gameplay/Cooking/Food/Meshes",
                 "/Game/Mars/Gameplay/Cooking/Meshes", "/Game/Mars/Gameplay/Cooking/Candles/Meshes")
@@ -66,6 +76,17 @@ AMBIENT_CUBE = "/Engine/EngineResources/GrayLightTextureCube"
 # these flat tints)
 F_STATION_MAT = "/Game/Mars/Gameplay/Cooking/Stations/Materials"
 DRESSING_MATERIALS = {"MeatSlab_Mars_SM": {"Flesh": "MeatSlabFlesh_Mars_MI", "Skin": "MeatSlabFat_Mars_MI"}}
+
+# The ingredient table: (food item class stem, what its label reads), in table order.  Every UMars_Food_Def of
+# Script/Food/Mars_Food_Def.as has a row; a new food gets one here and a Mars_FoodItem_<Name>_EntityScript class.
+INGREDIENTS = (("MeatSlab", "Meat slab"), ("Drumstick", "Drumstick"), ("Tentacle", "Tentacle"), ("Puffer", "Puffer"),
+               ("SpikedBerry", "Spiked berry"), ("Mushroom", "Mushroom"), ("MushroomSlice", "Mushroom slice"),
+               ("Pickle", "Pickle"))
+# Unreal cm.  Three PrepTable_Mars_SM (160 wide, 80 deep, 70 high) end to end along X, in front and to the left of the
+# player starts (which face -Y): the foods on the first two, 40 cm apart, the platters on the third.  Labels stand along
+# the far edge, facing the starts.
+INGREDIENT_TABLE = {"centre": (-520.0, 960.0), "table_width": 160.0, "table_depth": 80.0, "top": 70.0, "spacing": 40.0,
+                    "drop": 2.0, "label_size": 8.0, "title_size": 14.0, "label_color": (255, 240, 205)}
 # What of the kit is spawned as its own actor: the manifest groups that stand in a room, and the freestanding supports.
 LOOSE_GROUPS = ("box", "camp", "chain", "landmark", "platform")
 LOOSE_PIECES = ("crypt_capital_fork", "crypt_finial_potlid")
@@ -424,20 +445,165 @@ def spawn_stations(data, origin, reg):
     (UEditorActorSubsystem::SpawnActorFromObject on the entity script class)."""
     placed = []
     for s in data.get("stations", []):
-        cls = unreal.load_class(None, STATION_CLASS % STATION_SCRIPT.get(s["name"], s["name"]))
+        name = STATION_RENAMES.get(s["name"], s["name"])
+        cls = unreal.load_class(None, STATION_CLASS % name)
         if cls is None:
-            _warn("no script class for the %s station (AngelScript not compiled?)" % s["name"])
+            _warn("no script class for the %s station (AngelScript not compiled?)" % name)
             continue
         a = _eas().spawn_actor_from_object(cls, unreal.Vector(*_ue(origin, s["x"], s["y"], 0.0)),
                                            unreal.Rotator(roll=0.0, pitch=0.0, yaw=float(s["yaw_ue"])))
         if a is None:
             _warn("the %s station did not spawn" % s["name"])
             continue
-        a.set_actor_label("Gym_%sStation" % s["name"])
+        a.set_actor_label("Gym_%sStation" % name)
         a.set_folder_path(GYM_FOLDER + "/Stations")
-        reg.register("station:" + s["name"], a)
-        placed.append(s["name"])
+        reg.register("station:" + s["name"], a)        # the plan's own name: the key a rebuild finds it by
+        placed.append(name)
     return placed
+
+
+def spawn_extra_stations(reg, skip=()):
+    """EXTRA_STATIONS, as spawn_stations places the plan's (labels in skip are already in the map)."""
+    placed = []
+    for name, (x, y), yaw in EXTRA_STATIONS:
+        label = "Gym_%sStation" % name
+        if label in skip:
+            continue
+        cls = unreal.load_class(None, STATION_CLASS % name)
+        if cls is None:
+            _warn("no script class for the %s station (AngelScript not compiled?)" % name)
+            continue
+        a = _eas().spawn_actor_from_object(cls, unreal.Vector(x, y, 0.0), unreal.Rotator(roll=0.0, pitch=0.0, yaw=yaw))
+        if a is None:
+            _warn("the %s station did not spawn" % name)
+            continue
+        a.set_actor_label(label)
+        a.set_folder_path(GYM_FOLDER + "/Stations")
+        reg.register("station:" + name, a)
+        placed.append(name)
+    return placed
+
+
+def _label(text, loc, size, label, folder):
+    """A text standing at loc, facing +Y (the player starts)."""
+    a = mc._spawn(unreal.TextRenderActor, loc, (0.0, 0.0, 90.0), label, folder)
+    c = a.text_render
+    c.set_editor_property("text", text)
+    c.set_editor_property("world_size", size)
+    c.set_editor_property("horizontal_alignment", unreal.HorizTextAligment.EHTA_CENTER)
+    c.set_editor_property("vertical_alignment", unreal.VerticalTextAligment.EVRTA_TEXT_BOTTOM)
+    c.set_editor_property("text_render_color", _color(INGREDIENT_TABLE["label_color"]))
+    return a
+
+
+def spawn_ingredients(reg):
+    """The ingredient table (INGREDIENTS, INGREDIENT_TABLE): the tables, one food item spawner per row with its label,
+    two large platters and the title.  Returns the foods placed."""
+    t = INGREDIENT_TABLE
+    folder = GYM_FOLDER + "/Ingredients"
+    cx, cy = t["centre"]
+    w, top = t["table_width"], t["top"]
+    table = _mesh("PrepTable_Mars_SM")
+    if table is None:
+        _warn("PrepTable_Mars_SM is not imported: no ingredient table")
+        return []
+    for k in range(3):                                   # yawed 90: the table's width runs along X
+        a = mc._spawn(table, (cx + (k - 1) * w, cy, 0.0), (0.0, 0.0, 90.0), "Ingredients_Table_%d" % k, folder)
+        reg.register("ingredient:table:%d" % k, a)
+    back = cy - t["table_depth"] * 0.5 + 4.0
+    x0 = cx - 1.5 * w + 0.5 * (2.0 * w - (len(INGREDIENTS) - 1) * t["spacing"])
+    placed = []
+    for i, (stem, text) in enumerate(INGREDIENTS):
+        cls = unreal.load_class(None, FOOD_ITEM_CLASS % stem)
+        if cls is None:
+            _warn("no script class for the %s food item (AngelScript not compiled?)" % stem)
+            continue
+        x = x0 + i * t["spacing"]
+        a = _eas().spawn_actor_from_object(cls, unreal.Vector(x, cy + 6.0, top + t["drop"]), unreal.Rotator(0.0, 0.0, 0.0))
+        if a is None:
+            _warn("the %s food item did not spawn" % stem)
+            continue
+        a.set_actor_label("Ingredient_%s" % stem)
+        a.set_folder_path(folder)
+        reg.register("ingredient:food:" + stem, a)
+        reg.register("ingredient:label:" + stem,
+                     _label(text, (x, back, top + 1.0), t["label_size"], "Ingredient_%s_Label" % stem, folder))
+        placed.append(stem)
+    platter = unreal.load_class(None, PLATTER_CLASS)
+    if platter is None:
+        _warn("no script class for the large platter (AngelScript not compiled?)")
+    else:
+        for k, dx in enumerate((-0.25 * w, 0.25 * w)):
+            a = _eas().spawn_actor_from_object(platter, unreal.Vector(cx + w + dx, cy, top + 5.0), unreal.Rotator(0.0, 0.0, 0.0))
+            if a is not None:
+                a.set_actor_label("Ingredients_Platter_%d" % k)
+                a.set_folder_path(folder)
+                reg.register("ingredient:platter:%d" % k, a)
+        reg.register("ingredient:label:platters",
+                     _label("Platters", (cx + w, back, top + 1.0), t["label_size"], "Ingredients_Platters_Label", folder))
+    reg.register("ingredient:title", _label("INGREDIENTS", (cx - 0.5 * w, back, top + 32.0), t["title_size"],
+                                            "Ingredients_Title", folder))
+    return placed
+
+
+def _save_and_cook(les, cook_jolt=True):
+    """Save the open map, cook its Jolt static world (the tables are new static bodies) and save again."""
+    saved = bool(les.save_current_level())
+    cooked = None
+    if saved and cook_jolt and hasattr(unreal, "Ck_JoltCook_EditorSubsystem_UE"):
+        jc = unreal.get_editor_subsystem(unreal.Ck_JoltCook_EditorSubsystem_UE)
+        try:
+            jc.cook_mesh_shapes()
+            cooked = jc.cook_current_world()
+        except Exception as exc:
+            _warn("Jolt cook: %s" % exc)
+        saved = bool(les.save_current_level())
+    return saved, cooked
+
+
+def place_ingredient_table(cook_jolt=True):
+    """On the built gym map, without a rebuild: replace the ingredient table (everything in StationGym/Ingredients),
+    swap any station spawner whose script class no longer exists (the plan's Dicing station) for its STATION_RENAMES
+    class at the same place and add the EXTRA_STATIONS the map does not have yet, then save and cook Jolt.  Loads the
+    gym if another map is open (and clean)."""
+    if mc._in_pie():
+        raise RuntimeError("stop PIE before editing the station gym")
+    les = unreal.get_editor_subsystem(unreal.LevelEditorSubsystem)
+    world = unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
+    current = world.get_outermost().get_name() if world else None
+    if current != GYM_MAP:
+        dirty = [p.get_name() for p in unreal.EditorLoadingAndSavingUtils.get_dirty_map_packages()]
+        if current in dirty:
+            raise RuntimeError("%s has unsaved changes; save it before editing the station gym" % current)
+        les.load_level(GYM_MAP)
+    swapped = []
+    for a in list(_eas().get_all_level_actors()):
+        label = a.get_actor_label()
+        if not isinstance(a, unreal.Ck_EntitySpawner_UE) or a.get_editor_property("_EntityScript") is not None:
+            continue
+        old = label[len("Gym_"):-len("Station")] if label.startswith("Gym_") and label.endswith("Station") else None
+        cls = unreal.load_class(None, STATION_CLASS % STATION_RENAMES[old]) if old in STATION_RENAMES else None
+        if cls is None:
+            _warn("%s has no entity script and no rename to give it one" % label)
+            continue
+        b = _eas().spawn_actor_from_object(cls, a.get_actor_location(), a.get_actor_rotation())
+        b.set_actor_label("Gym_%sStation" % STATION_RENAMES[old])
+        b.set_folder_path(a.get_folder_path())
+        b.set_editor_property("tags", a.get_editor_property("tags"))       # its plan key and built pose
+        _eas().destroy_actor(a)
+        swapped.append("%s -> %s" % (old, STATION_RENAMES[old]))
+    folder = GYM_FOLDER + "/Ingredients"
+    _eas().destroy_actors([a for a in _eas().get_all_level_actors() if str(a.get_folder_path()) == folder])
+    reg = _Registry()
+    placed = spawn_ingredients(reg)
+    added = spawn_extra_stations(reg, skip=[a.get_actor_label() for a in _eas().get_all_level_actors()])
+    saved, cooked = _save_and_cook(les, cook_jolt)
+    report = {"map": GYM_MAP, "stations_swapped": swapped, "stations_added": added, "ingredients": placed, "cooked": cooked,
+              "saved": saved}
+    if not saved:
+        raise RuntimeError("the ingredient table is in memory but %s did not save - close it in any other editor and rerun" % GYM_MAP)
+    _log("ingredient table: %s" % report)
+    return report
 
 
 def spawn_starts(data, origin, reg):
@@ -596,8 +762,9 @@ def build_gym_map(export_dir=None, biome="Bellfold", cook_jolt=True, stay=False,
     racks = spawn_racks(data, origin, reg)
     lamps = spawn_lights(data, origin, reg)
     dressing = spawn_dressing(data, origin, reg)
-    stations = spawn_stations(data, origin, reg)
+    stations = spawn_stations(data, origin, reg) + spawn_extra_stations(reg)
     starts = spawn_starts(data, origin, reg)
+    ingredients = spawn_ingredients(reg)
     spawn_rig(data, origin, reg)
     riders = attach_riders(data, reg)
     all_keys = set(reg.actors)
@@ -613,18 +780,10 @@ def build_gym_map(export_dir=None, biome="Bellfold", cook_jolt=True, stay=False,
         _warn("%s not loaded: the map keeps the project's default game mode" % GAME_MODE)
     # A save fails (returns False, logs "Error saving") when another editor instance has the map open: the build is
     # then only in this editor's memory, so the report must say so.
-    saved = bool(les.save_current_level())
-    cooked = None
-    if saved and cook_jolt and hasattr(unreal, "Ck_JoltCook_EditorSubsystem_UE"):
-        jc = unreal.get_editor_subsystem(unreal.Ck_JoltCook_EditorSubsystem_UE)
-        try:
-            jc.cook_mesh_shapes()
-            cooked = jc.cook_current_world()
-        except Exception as exc:
-            _warn("Jolt cook: %s" % exc)
-        saved = bool(les.save_current_level())
+    saved, cooked = _save_and_cook(les, cook_jolt)
     report = {"map": GYM_MAP, "plan": data["name"], "instanced": instanced, "pieces": pieces, "chains": chains,
               "racks": racks, "lamps": lamps, "dressing": dressing, "stations": stations, "starts": starts,
+              "ingredients": ingredients,
               "attached": riders, "kept_moved": edits["kept_moved"], "kept_deleted": edits["kept_deleted"],
               "cooked": cooked, "saved": saved}
     if not saved:

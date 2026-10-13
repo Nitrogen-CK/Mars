@@ -234,6 +234,21 @@ Generated from the export sidecars (46 meshes, 2026-10-10; `OilBubble_Mars_SM` i
 | `TomatoBulb_Mars_SM` | 1640 | 12.0 | Skin, Leaf | 1.5 | - |
 | `Turnip_Mars_SM` | 2016 | 16.0 | Skin, Leaf | 7.4 | - |
 
+## Pickle (2026-10-12): a cut face drawn from local position
+
+`Pickle_Mars_SM` (`build_food_produce.py --only Pickle --export`; 572 tris, 20.0 x 6.9 x 7.2 cm, 547 cm3) is a bench
+ingredient that is its own prep mesh: one closed solid inside the runtime-mesh contract (`runtime_mesh=True` in
+`food_spec` makes the produce builder run `check_runtime_mesh` on the export), straight along +X so every cross cut is a
+round. Its cut face is not painted and not UV-mapped (the slicer gives a cap one colour and planar UVs anchored on the
+blade): `unreal/mars_pickle_ue.py` builds `Pickle_Mars_M`, which reads the pixel's position in the piece's local frame
+(the slicer never re-centres a piece) and draws the section that lies there: pale flesh, six seed pockets round a soft
+core with a row of seeds along each, a thin rind. A cut across shows the round, a cut along shows the seed rows. The axis
+and taper come from the sidecar's `section_*` numbers, which `build_pickle` writes from the same profile
+(`pickle_radius`); change one, rebuild both. `Pickle_Mars_MI` (Section 0, the painted skin) is the mesh's slot and
+`Pickle_Section_Mars_MI` (Section 1) the cap's slot in `Food_Pickle_Mars`. `mars_pickle_ue.run_all()` imports the one
+mesh and rebuilds the master in place; `mars_food_ue.run_all()` would re-parent `Pickle_Mars_MI` onto `Food_Mars_M`
+(its sidecar-driven instance pass does not know the pickle), so run `mars_pickle_ue.build_instances()` after it.
+
 ## Oil, bubbles and other liquids (version 2 of the VAT)
 
 - `OilSurface_Mars_SM` + `OilBubbles_Mars_SM` are shared by every liquid: the surface material (`OilVAT_Mars_M`)
@@ -264,6 +279,6 @@ Generated from the export sidecars (46 meshes, 2026-10-10; `OilBubble_Mars_SM` i
 
 ## Follow-ups noted during the build
 
-- Potato and pickle (stew / soup cuts) were mentioned but are not in the starter roster.
+- Potato (stew / soup cuts) was mentioned but is not in the roster.
 - Runtime slicing of the HerbPile is a gameplay feature (CkFoundation), not part of this library; the mesh is built
   closed and manifold so a slicer can cut it.
