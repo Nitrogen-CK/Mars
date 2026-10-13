@@ -41,9 +41,9 @@ struct FMars_PlayerCharacter_Movement
     float32 ClientAuthMaxError = 750.0f;
 }
 
-// The capsule is the chef's size: 1.5 m tall (Config.TPBody.Scale stands SK_Chef at 1.5 m), ~78 cm across (sized for
-// the LowPoly chef's +-37 cm torso; the MiniChef body's skirt is about +-46 cm at its scale, so its hem overhangs the
-// capsule a little). 1.5x the 1 m chef's capsule (half height 50, radius 26, crouched 35).
+// The capsule is the player's size: 1.5 m tall, ~78 cm across. The body others see is smaller (Config.TPBody.Scale: it
+// tops out at 120 cm and is 73 cm across, so it stands inside the capsule). 1.5x the 1 m chef's capsule (half height
+// 50, radius 26, crouched 35).
 struct FMars_PlayerCharacter_Body
 {
     UPROPERTY()
@@ -91,10 +91,11 @@ struct FMars_PlayerCharacter_Inventory
     UPROPERTY()
     int32 BagSlotCount = 3;
 
-    // Worn-backpack mount relative to the capsule root (X forward): the 1.5 m chef's upper back, 75 cm above its feet
-    // (the 1 m chef's was (-30, 0, 0)).
+    // Worn-backpack mount relative to the capsule root (its centre, X forward): the surface of the chef's back, 25 cm
+    // behind the centre and 30 cm above its feet (capsule half height 75), where a worn pack's base sits. For the body
+    // at TPBody.Scale 1.5; the pack brings its own depth (its CarryOffset).
     UPROPERTY()
-    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-45.0, 0.0, 0.0), FVector::OneVector);
+    FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-25.0, 0.0, -45.0), FVector::OneVector);
 
     // Drop held past this arms a throw.
     UPROPERTY()
@@ -231,8 +232,8 @@ namespace mars
         HandBobAir.Set_MaxLiftCm(0.0f);
         FPHands.Bob.Set_Air(HandBobAir);
 
-        // The view at the chef's face: 58.37 cm (unscaled) * TPBody.Scale 1.8828 = 109.9 cm above the feet, less
-        // Body.CapsuleHalfHeight 75 (FMars_TPBody_Spec::Scale). The LowPoly chef's was 42 (the 1 m chef's 28).
+        // The view 110 cm above the feet, less Body.CapsuleHalfHeight 75. It is the player's, not the body's: the
+        // body others see was shrunk under it (FMars_TPBody_Spec::Scale) and the view sits inside its hood.
         View.EyeHeight.Height = 35.0f;
 
         TPBody.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SK_Chef.SK_Chef"));
