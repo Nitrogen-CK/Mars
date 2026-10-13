@@ -33,9 +33,12 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Color = Get_PresetColor();
         Look = Get_PresetLook();
         Spec.RoamBounds = FBox(FVector(-3850.0, -550.0, 0.0), FVector(-2150.0, 550.0, 200.0));
-        // Authored for the radial box crawler; another layout's rig and size get it refitted.
-        Spec.Combat = utils_crawler::Fit_CombatToLayout(utils_crawler::Make_RearingPincerCombat(), Spec.Layout, Spec.LegCount);
+        Spec.Combat.Enabled = true;
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
+        Spec.Combat.JabClip = Get_PresetClip(EMars_Crawler_AttackClipKind::Jab);
+        Spec.Combat.PincerClip = Get_PresetClip(EMars_Crawler_AttackClipKind::Pincer);
+        // The hit's sample-travel guard grows with the layout's size, as its clips' body keys do.
+        Spec.Combat.Hit.MaxSampleTravel = DefaultMaxSampleTravel * utils_crawler::Get_LayoutSizeScale(Spec.Layout);
         _Sink.InputChannels.Empty();
         _Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression"));
 
@@ -69,6 +72,21 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Crawler.Request_SetAggression(FMars_Request_Crawler_SetAggression(Aggression));
     }
 
+    // The radial box crawler's sample-travel guard (FMars_Crawler_AttackHit's default).
+    private const float32 DefaultMaxSampleTravel = 80.0f;
+
+    // The layout's authored clip of InKind: <Prefix>_<Kind>_Mars_DA under the crawler's Actions folder, tuned in the clip
+    // editor (Mars.Crawler.SeedAttackClips writes the starting ones).
+    private TSoftObjectPtr<UCk_ProceduralAction_Data> Get_PresetClip(EMars_Crawler_AttackClipKind InKind) const
+    {
+        const FString Name = f"{Get_PresetClipPrefix()}_{utils_crawler::Get_ClipKindName(InKind)}_Mars_DA";
+        return TSoftObjectPtr<UCk_ProceduralAction_Data>(FSoftObjectPath(f"/Game/Mars/Gameplay/Monsters/Crawler/Actions/{Name}.{Name}"));
+    }
+
+    // Crawler: the radial layout's clips, valid on both radial rigs.
+    protected FString Get_PresetClipPrefix() const
+    { return "Crawler"; }
+
     protected int32 Get_PresetLegCount() const
     { return 4; }
 
@@ -99,6 +117,9 @@ class UMars_Sandbox_Crawler6_EntityScript : UMars_Sandbox_Crawler_EntityScript
     // build_crawler_pieces.py); their slot carries Crawler_Mars_MI.
     protected EMars_Crawler_Layout Get_PresetLayout() const override
     { return EMars_Crawler_Layout::Spider; }
+
+    protected FString Get_PresetClipPrefix() const override
+    { return "Spider"; }
 
     protected FMars_Crawler_Look Get_PresetLook() const override
     {

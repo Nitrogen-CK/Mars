@@ -53,7 +53,7 @@ class UMars_Processor_Crawler_AttackResolve : UCk_Processor_Script_Base_UE
 
         auto Self = InHandle.As_Crawler();
         auto& Attack = Self.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.ActionIdentity.Get_Value() == 0 || ck::Is_NOT_Valid(Self.Get_ActionPlayer()))
+        if (Attack.ActionIdentity.Get_Value() == 0 || Attack.TerminalSeen || ck::Is_NOT_Valid(Self.Get_ActionPlayer()))
         { return; }
 
         if (utils_crawler::Get_IsAttackActionLost(Self))
@@ -99,37 +99,9 @@ class UMars_Processor_Crawler_AttackResolve : UCk_Processor_Script_Base_UE
         { Attack.ReceiptCursor = Page.Get_LastStreamSequence(); }
         if (Page.Get_Records().Num() > 0)
         {
-            const auto Consume = FCk_Request_ProceduralActionPlayer_ConsumeReceipts(
-                Attack.ActionIdentity, Attack.ReceiptCursor);
-            if (Attack.TerminalSeen && Attack.TerminalConsumeIssued == false)
-            {
-                Attack.TerminalConsumeIssued = true;
-                utils_procedural_action_player::Request_ConsumeReceipts(Self.Get_ActionPlayer(), Consume,
-                    FCk_Delegate_Request_OnCompleted(this, n"OnTerminalConsumed"));
-            }
-            else
-            { utils_procedural_action_player::Request_ConsumeReceipts(Self.Get_ActionPlayer(), Consume); }
+            utils_procedural_action_player::Request_ConsumeReceipts(Self.Get_ActionPlayer(),
+                FCk_Request_ProceduralActionPlayer_ConsumeReceipts(Attack.ActionIdentity, Attack.ReceiptCursor));
         }
-    }
-
-    UFUNCTION()
-    private void OnTerminalConsumed(FCk_Handle InRequestOwner, ECk_Request_OperationResult InResult)
-    {
-        if (ck::Is_NOT_Valid(InRequestOwner))
-        { return; }
-
-        const auto Crawler = InRequestOwner.As_Crawler();
-        if (ck::Is_NOT_Valid(Crawler) || Crawler.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
-        { return; }
-
-        auto& Attack = Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.TerminalSeen == false || Attack.TerminalConsumeIssued == false || Attack.TerminalConsumeSucceeded)
-        { return; }
-
-        if (InResult == ECk_Request_OperationResult::Succeeded)
-        { Attack.TerminalConsumeSucceeded = true; }
-        else
-        { Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).ActionStreamFailed = true; }
     }
 
     private void ResolveAccepted(FCk_Handle_Crawler& Self, const FMars_Crawler_AcceptedReceipt& InAccepted,

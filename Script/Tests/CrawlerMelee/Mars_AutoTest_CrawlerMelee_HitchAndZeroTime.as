@@ -25,8 +25,7 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
     void DoBeginPlay(FCk_Handle InHandle)
     {
         auto Spec = Make_ArmedCrawlerSpec(4);
-        Spec.Combat.Timing.WindupSeconds = 0.1f;
-        Spec.Combat.Timing.StrikeSeconds = 0.05f;
+        Spec.Combat.JabClip = Make_SoftClip(Build_DerivedClip(Make_ShortDraft()));
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();
@@ -55,6 +54,17 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
 
         Gameplay::SetGlobalTimeDilation(1.0f);
         _Dilated = false;
+    }
+
+    // The reference jab with a 0.1 s windup and a 0.05 s strike.
+    private FCk_ProceduralAction_ClipDraft Make_ShortDraft()
+    {
+        auto Draft = Make_DraftOf(Get_ReferenceClip(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab));
+        auto Phases = Draft.Get_Phases();
+        Phases[0].Set_Duration(FCk_Time(0.1));
+        Phases[1].Set_Duration(FCk_Time(0.05));
+        Draft.Set_Phases(Phases);
+        return Draft;
     }
 
     UFUNCTION()
@@ -90,8 +100,10 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
         RestoreDilation();
 
         const auto Combat = _Crawler.Get_Spec().Combat;
-        Assert_True(_DilatedDeltaSeconds > Combat.Timing.StrikeSeconds,
-            f"the dilated frame delta ({_DilatedDeltaSeconds :.3} s) is longer than the whole strike ({Combat.Timing.StrikeSeconds :.3} s; windup {Combat.Timing.WindupSeconds :.3} s)");
+        const auto WindupEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Windup);
+        const auto StrikeEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Strike);
+        Assert_True(_DilatedDeltaSeconds > StrikeEnd - WindupEnd,
+            f"the dilated frame delta ({_DilatedDeltaSeconds :.3} s) is longer than the whole strike ({StrikeEnd - WindupEnd :.3} s; windup {WindupEnd :.3} s)");
 
         const auto Phases = Get_PhaseText(_RecordMark);
         Assert_True(_Records.Num() - _RecordMark == 5, f"exactly five phase changes (got{Phases})");
@@ -110,8 +122,6 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
         // Approved change: phases follow accepted clip intervals, so Strike lasts one accepted interval here, not a
         // posing tick plus an acknowledged endpoint.
         Assert_True(ToRecover.Frame - ToStrike.Frame >= 1, f"Strike ended on a later tick than it began (frames {ToStrike.Frame} -> {ToRecover.Frame})");
-        const auto WindupEnd = float64(Combat.Timing.WindupSeconds);
-        const auto StrikeEnd = WindupEnd + float64(Combat.Timing.StrikeSeconds);
         Assert_True(ToStrike.AcceptedPhaseId == n"Strike" && Math::Abs(ToStrike.AcceptedFrom - WindupEnd) <= 1.0e-4,
             f"Strike began on an accepted Strike interval from the windup key (got {ToStrike.AcceptedPhaseId} from [{ToStrike.AcceptedFrom :.4}] s)");
         Assert_True(ToRecover.AcceptedPhaseId == n"Recover" && Math::Abs(ToRecover.AcceptedFrom - StrikeEnd) <= 1.0e-4,

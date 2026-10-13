@@ -1,7 +1,8 @@
 // The jab is a compiled clip and its phases come only from what the resolver accepted from it.
-//   - utils_crawler::Build_AttackClip builds the spec's jab: the body channel from the identity offset; Windup, Strike and
-//     Recover with the spec's durations and easings; body keys identity -> windup key -> strike key -> identity, each
-//     phase starting on the key the one before it ended on; one Offense window over [Windup 0, Recover 1).
+//   - The jab the crawler plays is the clip its profile names (here the reference jab, Script/Editor/
+//     Mars_CrawlerAttackClips.as): the body channel from the identity offset; Windup, Strike and Recover with the
+//     reference durations and easings; body keys identity -> windup key -> strike key -> identity, each phase starting
+//     on the key the one before it ended on; one Offense window over [Windup 0, Recover 1); no slots.
 //   - One jab (the target out of reach) runs Windup > Strike > Recover > Cooldown > Idle. Watched every frame after the
 //     resolver: the attack tick changes a posed phase (into Strike, Recover or Cooldown) only on the tick right after a
 //     frame that accepted a new receipt, and only to the phase that receipt reports (Cooldown: the receipt carried the
@@ -38,34 +39,31 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
     UFUNCTION()
     private void Step_AssertClip(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        // The kernel rebuilds the clip at every admission with the claws that attack claims; a body-only jab claims none.
-        auto Combat = Make_ArmedCrawlerSpec(4).Combat;
-        _Clip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
-        auto Build = FMars_Crawler_ClipBuild();
-        Build.Combat = Combat;
-        const auto Built = utils_crawler::Build_AttackClip(Build, _Clip);
-        Assert_True(Built.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
-            f"Build_AttackClip built the body-only jab (got [{utils_crawler::Get_FirstDiagnosticText(Built)}])");
-        if (Built.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
+        _Clip = Get_ReferenceClip(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab);
+        if (ck::Is_NOT_Valid(_Clip))
         { return; }
 
         const auto Report = utils_procedural_action::Validate_Data(_Clip);
-        Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid, "the built clip validates");
+        Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid, "the jab clip validates");
+        const auto Check = utils_crawler::Validate_AttackClip(_Clip, EMars_Crawler_AttackClipKind::Jab);
+        Assert_True(Check.IsValid(), f"the jab clip passes the crawler's clip check (got [{Check.Get_Error()}])");
 
         const auto Body = _Clip.Get_BodyChannel();
         Assert_True(Body.Get_Enabled() && Body.Get_InitialSource() == ECk_ProceduralAction_InitialSource::IdentityOffset,
             "the clip drives the body channel from the identity offset");
+        Assert_Equals_Int(_Clip.Get_Slots().Num(), 0, "the jab declares no slots");
 
         const auto Phases = _Clip.Get_Phases();
         Assert_Equals_Int(Phases.Num(), 3, "the clip has three phases");
         if (Phases.Num() != 3)
         { return; }
 
-        const auto& Timing = Combat.Timing;
-        const auto& Pose = Combat.Pose;
-        Assert_Phase(Phases[0], FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase::Windup, Timing.WindupSeconds, Pose.WindupEasing, FTransform::Identity, Pose.Windup));
-        Assert_Phase(Phases[1], FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase::Strike, Timing.StrikeSeconds, Pose.StrikeEasing, Pose.Windup, Pose.Strike));
-        Assert_Phase(Phases[2], FMars_Crawler_ClipPhase(EMars_Crawler_AttackPhase::Recover, Timing.RecoverSeconds, Pose.RecoverEasing, Pose.Strike, FTransform::Identity));
+#if EDITOR
+        const auto Reference = utils_crawler::Make_ReferenceAttack(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab);
+        Assert_Phase(Phases[0], Reference.Windup, FTransform::Identity);
+        Assert_Phase(Phases[1], Reference.Strike, Reference.Windup.EndBody);
+        Assert_Phase(Phases[2], Reference.Recover, Reference.Strike.EndBody);
+#endif
 
         const auto Windows = _Clip.Get_Windows();
         Assert_Equals_Int(Windows.Num(), 1, "the clip has one window");
@@ -79,24 +77,26 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
             f"the window is Offense over [Windup 0, Recover 1) (got {Offense.Get_Id()} [{Offense.Get_Start().Get_PhaseId()} {Offense.Get_Start().Get_Time().Get_Value() :.2}, {Offense.Get_End().Get_PhaseId()} {Offense.Get_End().Get_Time().Get_Value() :.2}))");
     }
 
-    private void Assert_Phase(const FCk_ProceduralAction_Phase& InPhase, const FMars_Crawler_ClipPhase& InExpected)
+#if EDITOR
+    // InPhase lasts and eases as InExpected, and its two body keys run from InFrom to InExpected's end key.
+    private void Assert_Phase(const FCk_ProceduralAction_Phase& InPhase, const FMars_Crawler_ReferencePhase& InExpected, FTransform InFrom)
     {
-        const auto Label = utils_crawler::Get_ClipPhaseId(InExpected.Phase);
-        Assert_True(InPhase.Get_Id() == Label, f"phase {Label} is in order (got {InPhase.Get_Id()})");
+        const auto Label = InPhase.Get_Id();
         Assert_True(Math::Abs(InPhase.Get_Duration().Get_Seconds() - float64(InExpected.Seconds)) <= k_TimeTolerance,
-            f"{Label} lasts the spec's [{InExpected.Seconds :.3}] s (got [{InPhase.Get_Duration().Get_Seconds() :.3}])");
-        Assert_True(InPhase.Get_Easing() == InExpected.Easing, f"{Label} uses the spec's easing");
+            f"{Label} lasts the reference [{InExpected.Seconds :.3}] s (got [{InPhase.Get_Duration().Get_Seconds() :.3}])");
+        Assert_True(InPhase.Get_Easing() == InExpected.Easing, f"{Label} uses the reference easing");
 
         const auto Keys = InPhase.Get_BodyKeys();
         Assert_Equals_Int(Keys.Num(), 2, f"{Label} has two body keys");
         if (Keys.Num() != 2)
         { return; }
 
-        Assert_True(Keys[0].Get_Time().Get_Value() == 0.0 && (Keys[0].Get_Translation() - InExpected.From.GetLocation()).Size() <= k_KeyTolerance,
-            f"{Label} starts on [{InExpected.From.GetLocation().ToString()}] (got [{Keys[0].Get_Translation().ToString()}])");
-        Assert_True(Keys[1].Get_Time().Get_Value() == 1.0 && (Keys[1].Get_Translation() - InExpected.To.GetLocation()).Size() <= k_KeyTolerance,
-            f"{Label} ends on [{InExpected.To.GetLocation().ToString()}] (got [{Keys[1].Get_Translation().ToString()}])");
+        Assert_True(Keys[0].Get_Time().Get_Value() == 0.0 && (Keys[0].Get_Translation() - InFrom.GetLocation()).Size() <= k_KeyTolerance,
+            f"{Label} starts on [{InFrom.GetLocation().ToString()}] (got [{Keys[0].Get_Translation().ToString()}])");
+        Assert_True(Keys[1].Get_Time().Get_Value() == 1.0 && (Keys[1].Get_Translation() - InExpected.EndBody.GetLocation()).Size() <= k_KeyTolerance,
+            f"{Label} ends on [{InExpected.EndBody.GetLocation().ToString()}] (got [{Keys[1].Get_Translation().ToString()}])");
     }
+#endif
 
     UFUNCTION()
     private void Step_SpawnTargetAndWatch(FCk_Handle InHandle, FInstancedStruct InPayload)
@@ -119,6 +119,7 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
             Find_RecordSinceMark(EMars_Crawler_AttackPhase::Recover) >= 0 && Find_RecordSinceMark(EMars_Crawler_AttackPhase::Cooldown) >= 0,
             f"the jab ran Windup > Strike > Recover > Cooldown > Idle (got{Phases})");
         Assert_True(_Crawler.Get_AttackLastCancel().IsSet() == false, f"nothing cancelled the jab (last cancel {Get_LastCancelText()})");
+        Assert_True(_Crawler.Get_AttackClip() == _Clip, "the jab played the clip its profile names");
 
         const auto Watch = Get_AcceptRecords();
         int32 PosedChanges = 0;

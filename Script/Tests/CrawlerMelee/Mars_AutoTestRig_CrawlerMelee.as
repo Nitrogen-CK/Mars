@@ -44,6 +44,13 @@ struct FMars_AutoTest_CrawlerMelee_PhaseRecord
     EMars_Crawler_EngageStage EngageStage = EMars_Crawler_EngageStage::None;
 }
 
+// Where a pincer's two claws are keyed, in the root's frame at the attack's start: the right claw's, then the left's.
+struct FMars_AutoTest_CrawlerMelee_ClawKeys
+{
+    FVector Right = FVector::ZeroVector;
+    FVector Left = FVector::ZeroVector;
+}
+
 // A damageable target built by SpawnCombatTarget.
 struct FMars_AutoTest_CrawlerMelee_Target
 {
@@ -352,11 +359,14 @@ class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_
     private bool Get_IsDue(const FMars_TESTONLY_CrawlerMelee_Trigger& InTrigger, float64 InDeltaSeconds)
     {
         const auto Crawler = InTrigger.Crawler;
+        auto Clip = Crawler.Get_AttackClip();
+        if (ck::Is_NOT_Valid(Clip))
+        { return false; }
+
         const auto Phase = Crawler.Get_AttackPhase();
         const auto Interval = Crawler.Get_AttackAcceptedInterval();
-        const auto Timing = Crawler.Get_Spec().Combat.Timing;
-        const auto WindupEnd = float64(Timing.WindupSeconds);
-        const auto StrikeEnd = WindupEnd + float64(Timing.StrikeSeconds);
+        const auto WindupEnd = utils_crawler::Get_PhaseEndSeconds(Clip, EMars_Crawler_AttackPhase::Windup);
+        const auto StrikeEnd = utils_crawler::Get_PhaseEndSeconds(Clip, EMars_Crawler_AttackPhase::Strike);
         const auto Tolerance = 1.0e-6;
 
         switch (InTrigger.When)
@@ -830,22 +840,148 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
 
     // A combat-enabled, passive crawler of InLegCount legs, roaming +-150 around _Origin but dwelling 120 s after a stop,
     // so once stopped it stands still for the whole test. Passive: it chooses no target and its HasCombatTarget fact never
-    // rises, so its behaviour stays out of attacks a test drives directly. Behaviour tests make it aggressive.
-    protected FMars_Crawler_Spec Make_ArmedCrawlerSpec(int32 InLegCount) const
+    // rises, so its behaviour stays out of attacks a test drives directly. Behaviour tests make it aggressive. It plays the
+    // radial reference jab (Wear_ReferenceClips).
+    protected FMars_Crawler_Spec Make_ArmedCrawlerSpec(int32 InLegCount)
     {
         auto Spec = FMars_Crawler_Spec(InLegCount, FBox(_Origin - FVector(150.0, 150.0, 200.0), _Origin + FVector(150.0, 150.0, 200.0)));
         Spec.RoamDwellSeconds = 120.0f;
         Spec.Combat.Enabled = true;
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
+        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Jab);
         return Spec;
     }
 
     // Make_ArmedCrawlerSpec, aggressive: it chooses its own targets and engages them.
-    protected FMars_Crawler_Spec Make_AggressiveCrawlerSpec(int32 InLegCount) const
+    protected FMars_Crawler_Spec Make_AggressiveCrawlerSpec(int32 InLegCount)
     {
         auto Spec = Make_ArmedCrawlerSpec(InLegCount);
         Spec.Combat.StartAggressive = ECk_EnableDisable::Enable;
         return Spec;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Attack clips: the reference clips (Script/Editor/Mars_CrawlerAttackClips.as), never the authored assets
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Built on first use, Layout * 2 + Kind. The properties keep them alive; the spec's soft references resolve to them.
+    UPROPERTY()
+    private TArray<UCk_ProceduralAction_Data> _ReferenceClips;
+
+    // Clips a test derived from a draft (Build_DerivedClip).
+    UPROPERTY()
+    private TArray<UCk_ProceduralAction_Data> _DerivedClips;
+
+    // InOutSpec plays its layout's reference jab and, with InKind Pincer, its reference pincer; the hit's sample-travel
+    // guard grows with the layout's size, as the Room 5 presets set it.
+    protected void Wear_ReferenceClips(FMars_Crawler_Spec& InOutSpec, EMars_Crawler_AttackClipKind InKind)
+    {
+        InOutSpec.Combat.JabClip = Make_SoftClip(Get_ReferenceClip(InOutSpec.Layout, EMars_Crawler_AttackClipKind::Jab));
+        InOutSpec.Combat.PincerClip = InKind == EMars_Crawler_AttackClipKind::Pincer
+            ? Make_SoftClip(Get_ReferenceClip(InOutSpec.Layout, EMars_Crawler_AttackClipKind::Pincer))
+            : TSoftObjectPtr<UCk_ProceduralAction_Data>();
+        InOutSpec.Combat.Hit.MaxSampleTravel = FMars_Crawler_AttackHit().MaxSampleTravel * utils_crawler::Get_LayoutSizeScale(InOutSpec.Layout);
+    }
+
+    // A soft reference to a live, test-owned clip: it resolves for as long as the clip lives.
+    protected TSoftObjectPtr<UCk_ProceduralAction_Data> Make_SoftClip(UCk_ProceduralAction_Data InClip) const
+    {
+        return TSoftObjectPtr<UCk_ProceduralAction_Data>(InClip);
+    }
+
+    protected UCk_ProceduralAction_Data Get_ReferenceClip(EMars_Crawler_Layout InLayout, EMars_Crawler_AttackClipKind InKind)
+    {
+        const auto Index = int32(InLayout) * 2 + int32(InKind);
+        if (_ReferenceClips.Num() <= Index)
+        { _ReferenceClips.SetNum(Index + 1); }
+
+        if (ck::IsValid(_ReferenceClips[Index]))
+        { return _ReferenceClips[Index]; }
+
+#if EDITOR
+        auto Clip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
+        const auto Report = utils_crawler::Build_ReferenceClip(InLayout, InKind, Clip);
+        if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
+        {
+            FinishFailure(f"the reference {InKind :n} clip of the {InLayout :n} layout did not build: {utils_crawler::Get_FirstDiagnosticText(Report)}");
+            return nullptr;
+        }
+
+        _ReferenceClips[Index] = Clip;
+        return Clip;
+#else
+        FinishFailure("the crawler's reference clips come from an editor-only builder");
+        return nullptr;
+#endif
+    }
+
+    // The reference pincer's two claw keys at InPhase's end (the right claw's then the left's, in the root's frame at
+    // the attack's start): the windup keys, the strike keys, and the rest feet for Recover.
+    protected FMars_AutoTest_CrawlerMelee_ClawKeys Get_ReferenceClawKeys(EMars_Crawler_Layout InLayout, EMars_Crawler_AttackPhase InPhase)
+    {
+        auto Keys = FMars_AutoTest_CrawlerMelee_ClawKeys();
+#if EDITOR
+        const auto Reference = utils_crawler::Make_ReferenceClawKeys(InLayout);
+        if (InPhase == EMars_Crawler_AttackPhase::Recover)
+        {
+            Keys.Right = Reference.RightRest;
+            Keys.Left = Reference.LeftRest;
+            return Keys;
+        }
+
+        Keys.Right = InPhase == EMars_Crawler_AttackPhase::Strike ? Reference.Strike : Reference.Windup;
+        Keys.Left = utils_crawler::Make_LeftClawKey(Keys.Right);
+#else
+        FinishFailure("the crawler's reference clips come from an editor-only builder");
+#endif
+        return Keys;
+    }
+
+    // InSource as an editable draft, for a test that derives a clip from it (Build_DerivedClip).
+    protected FCk_ProceduralAction_ClipDraft Make_DraftOf(UCk_ProceduralAction_Data InSource)
+    {
+        auto Draft = FCk_ProceduralAction_ClipDraft();
+        const auto Report = utils_procedural_action_builder::Make_Draft_FromData(InSource, Draft);
+        Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+            f"a draft of [{InSource.GetName()}] (got [{utils_crawler::Get_FirstDiagnosticText(Report)}])");
+        return Draft;
+    }
+
+    // InDraft compiled into a new test-owned clip; a draft that does not compile fails the test.
+    protected UCk_ProceduralAction_Data Build_DerivedClip(const FCk_ProceduralAction_ClipDraft& InDraft)
+    {
+        auto Clip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
+        const auto Report = utils_procedural_action_builder::Build_Into(InDraft, Clip);
+        Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+            f"the derived clip compiles (got [{utils_crawler::Get_FirstDiagnosticText(Report)}])");
+        _DerivedClips.Add(Clip);
+        return Clip;
+    }
+
+    // InSource with its Strike phase's last body key yawed 30 degrees.
+    protected FCk_ProceduralAction_ClipDraft Make_DraftWithRotatedStrike(UCk_ProceduralAction_Data InSource)
+    {
+        auto Draft = Make_DraftOf(InSource);
+        auto Phases = Draft.Get_Phases();
+        for (auto& Phase : Phases)
+        {
+            if (Phase.Get_Id() != utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike))
+            { continue; }
+
+            auto Keys = Phase.Get_BodyKeys();
+            auto Last = Keys.Last();
+            Last.Set_Rotation(FRotator(0.0, 30.0, 0.0).Quaternion());
+            Keys[Keys.Num() - 1] = Last;
+            Phase.Set_BodyKeys(Keys);
+        }
+        Draft.Set_Phases(Phases);
+        return Draft;
+    }
+
+    // Where InPhase ends on the timeline of the clip the crawler's current (or last) attack played.
+    protected float64 Get_AttackPhaseEnd(EMars_Crawler_AttackPhase InPhase)
+    {
+        return utils_crawler::Get_PhaseEndSeconds(_Crawler.Get_AttackClip(), InPhase);
     }
 
     // Composed and Ready -> in Roam (its first MoveTo is out) -> stopped -> at rest.

@@ -1,0 +1,688 @@
+{
+	"assetName": "Crawler_Pincer_Mars_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Crawler_Pincer_Mars_DA.Crawler_Pincer_Mars_DA",
+	"assetClass": "Ck_ProceduralAction_Data",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "a88aebe7d2f1dedd8d261d6d2d1b8760",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"Ck_DataAsset_PDA",
+		"PrimaryDataAsset",
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CompatibilityVersion",
+			"type": "int32",
+			"category": "Content",
+			"value": 1
+		},
+		{
+			"name": "_BodyChannel",
+			"type": "FCk_ProceduralAction_BodyChannel",
+			"category": "Body",
+			"value":
+			{
+				"_Enabled": true,
+				"_InitialSource": "IdentityOffset"
+			}
+		},
+		{
+			"name": "_Slots",
+			"type": "TArray",
+			"category": "Slots",
+			"value": [
+				{
+					"_Id": "ClawRight",
+					"_InitialSource": "CapturedAcceptedPose",
+					"_RequiresTerminalOrientation": false,
+					"_HasExplicitRestTarget": false,
+					"_ExplicitRestTarget":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": 0
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					}
+				},
+				{
+					"_Id": "ClawLeft",
+					"_InitialSource": "CapturedAcceptedPose",
+					"_RequiresTerminalOrientation": false,
+					"_HasExplicitRestTarget": false,
+					"_ExplicitRestTarget":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": 0,
+							"Y": 0,
+							"Z": 0
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "_Phases",
+			"type": "TArray",
+			"category": "Phases",
+			"value": [
+				{
+					"_Id": "Windup",
+					"_Duration":
+					{
+						"_Seconds": 0.60000002384185791
+					},
+					"_Easing": "OutCubic",
+					"_Progress":
+					{
+						"_Mode": "Preset",
+						"_Keys": []
+					},
+					"_BodyInterpolation": "Linear",
+					"_BodyKeys": [
+						{
+							"_Time":
+							{
+								"_Value": 0
+							},
+							"_Translation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 1
+							},
+							"_Translation":
+							{
+								"X": -12,
+								"Y": 0,
+								"Z": 14
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0.24192189559966776,
+								"Z": 0,
+								"W": 0.97029572627599658
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						}
+					],
+					"_LimbTracks": [
+						{
+							"_Slot": "ClawRight",
+							"_Space": "RootAtStart",
+							"_AnchorId": "None",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_ClearanceResponse": "AbortOnCrossing",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 70,
+										"Y": 55,
+										"Z": 85
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						},
+						{
+							"_Slot": "ClawLeft",
+							"_Space": "RootAtStart",
+							"_AnchorId": "None",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_ClearanceResponse": "AbortOnCrossing",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 70,
+										"Y": -55,
+										"Z": 85
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						}
+					]
+				},
+				{
+					"_Id": "Strike",
+					"_Duration":
+					{
+						"_Seconds": 0.11999999731779099
+					},
+					"_Easing": "InQuad",
+					"_Progress":
+					{
+						"_Mode": "Preset",
+						"_Keys": []
+					},
+					"_BodyInterpolation": "Linear",
+					"_BodyKeys": [
+						{
+							"_Time":
+							{
+								"_Value": 0
+							},
+							"_Translation":
+							{
+								"X": -12,
+								"Y": 0,
+								"Z": 14
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0.24192189559966776,
+								"Z": 0,
+								"W": 0.97029572627599658
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 1
+							},
+							"_Translation":
+							{
+								"X": 30,
+								"Y": 0,
+								"Z": -6
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						}
+					],
+					"_LimbTracks": [
+						{
+							"_Slot": "ClawRight",
+							"_Space": "RootAtStart",
+							"_AnchorId": "None",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_ClearanceResponse": "AbortOnCrossing",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 0
+									},
+									"_Value":
+									{
+										"X": 70,
+										"Y": 55,
+										"Z": 85
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 125,
+										"Y": 16,
+										"Z": -30
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						},
+						{
+							"_Slot": "ClawLeft",
+							"_Space": "RootAtStart",
+							"_AnchorId": "None",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_ClearanceResponse": "AbortOnCrossing",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 0
+									},
+									"_Value":
+									{
+										"X": 70,
+										"Y": -55,
+										"Z": 85
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 125,
+										"Y": -16,
+										"Z": -30
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						}
+					]
+				},
+				{
+					"_Id": "Recover",
+					"_Duration":
+					{
+						"_Seconds": 0.5
+					},
+					"_Easing": "InOutCubic",
+					"_Progress":
+					{
+						"_Mode": "Preset",
+						"_Keys": []
+					},
+					"_BodyInterpolation": "Linear",
+					"_BodyKeys": [
+						{
+							"_Time":
+							{
+								"_Value": 0
+							},
+							"_Translation":
+							{
+								"X": 30,
+								"Y": 0,
+								"Z": -6
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 1
+							},
+							"_Translation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						}
+					],
+					"_LimbTracks": [
+						{
+							"_Slot": "ClawRight",
+							"_Space": "RootAtStart",
+							"_AnchorId": "None",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_ClearanceResponse": "AbortOnCrossing",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 0
+									},
+									"_Value":
+									{
+										"X": 125,
+										"Y": 16,
+										"Z": -30
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 70.710676573223722,
+										"Y": 70.710679664085745,
+										"Z": -65
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						},
+						{
+							"_Slot": "ClawLeft",
+							"_Space": "RootAtStart",
+							"_AnchorId": "None",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_ClearanceResponse": "AbortOnCrossing",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 0
+									},
+									"_Value":
+									{
+										"X": 125,
+										"Y": -16,
+										"Z": -30
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 70.710688936671033,
+										"Y": -70.710667300636814,
+										"Z": -65
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "_Markers",
+			"type": "TArray",
+			"category": "Markers",
+			"value": []
+		},
+		{
+			"name": "_Windows",
+			"type": "TArray",
+			"category": "Windows",
+			"value": [
+				{
+					"_Id": "Offense",
+					"_Start":
+					{
+						"_PhaseId": "Windup",
+						"_Time":
+						{
+							"_Value": 0
+						}
+					},
+					"_End":
+					{
+						"_PhaseId": "Recover",
+						"_Time":
+						{
+							"_Value": 1
+						}
+					}
+				}
+			]
+		}
+	]
+}

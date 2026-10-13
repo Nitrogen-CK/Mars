@@ -43,7 +43,7 @@ class UMars_AutoTest_CrawlerMelee_CancelReturnsThroughAction : UMars_AutoTestRig
     private void Check_HalfWindupAccepted(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto Interval = _Crawler.Get_AttackAcceptedInterval();
-        const auto HalfWindup = 0.5 * float64(_Crawler.Get_Spec().Combat.Timing.WindupSeconds);
+        const auto HalfWindup = 0.5 * Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Windup);
         auto Res = OutResult;
         Res.Set(_Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::Windup && Interval.Get_PhaseId() == n"Windup" &&
             Interval.Get_ToTime().Get_Seconds() >= HalfWindup);

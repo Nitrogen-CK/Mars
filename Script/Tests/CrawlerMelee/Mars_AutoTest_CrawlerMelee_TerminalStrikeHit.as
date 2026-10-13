@@ -59,8 +59,7 @@ class UMars_AutoTest_CrawlerMelee_TerminalStrikeHit : UMars_AutoTestRig_CrawlerM
         Assert_True(Trigger.Fired, "the target was moved as the strike's terminal sample was staged");
         Assert_True(Trigger.SawCandidate && Trigger.SawCandidateFrame == Trigger.FiredFrame,
             f"the candidate appeared in the frame of the terminal sample (move frame {Trigger.FiredFrame}, candidate frame {Trigger.SawCandidateFrame})");
-        const auto Timing = _Crawler.Get_Spec().Combat.Timing;
-        const auto StrikeEnd = float64(Timing.WindupSeconds) + float64(Timing.StrikeSeconds);
+        const auto StrikeEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Strike);
         Assert_True(Trigger.SawCandidatePhaseId == n"Strike" && Math::Abs(Trigger.SawCandidateTo - StrikeEnd) <= 1.0e-4,
             f"the candidate came from the strike's terminal interval (got {Trigger.SawCandidatePhaseId} to [{Trigger.SawCandidateTo :.4}] s, strike ends at [{StrikeEnd :.4}])");
         Assert_True(RecoverIndex >= 0 && CooldownIndex > RecoverIndex, f"the attack ran Strike > Recover > Cooldown (got{Phases})");

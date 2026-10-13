@@ -17,6 +17,10 @@ class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerC
 
     private FCk_Handle_Crawler _Crawler;
     private TArray<EMars_Crawler_AttackPhase> _Phases;
+    // The radial reference jab the crawler plays (Script/Editor/Mars_CrawlerAttackClips.as), never the authored asset;
+    // this property keeps it alive for the spec's soft reference.
+    UPROPERTY()
+    private UCk_ProceduralAction_Data _JabClip;
     private int32 _AdmissionPolls = 0;
     private float64 _RestSince = -1.0;
     private FVector _RestForward;
@@ -66,6 +70,15 @@ class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerC
         Spec.Combat.Enabled = true;
         // Passive: the behaviour layer never engages, so only this test's direct requests drive the attack.
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
+#if EDITOR
+        _JabClip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
+        const auto Report = utils_crawler::Build_ReferenceClip(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab, _JabClip);
+        Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+            f"the reference jab builds (got [{utils_crawler::Get_FirstDiagnosticText(Report)}])");
+        Spec.Combat.JabClip = TSoftObjectPtr<UCk_ProceduralAction_Data>(_JabClip);
+#else
+        FinishFailure("the crawler's reference clips come from an editor-only builder");
+#endif
 
         auto SpawnParams = UMars_Crawler_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0));

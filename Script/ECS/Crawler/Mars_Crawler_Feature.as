@@ -113,22 +113,13 @@ mixin FMars_Validation Validate(const FMars_Crawler_Rig& Self, int32 InLegCount)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// Combat spec: the body jab (Mars_Crawler_Attack.as builds its clip)
+// Combat spec: the attack clips (authored assets; Mars_Crawler_Attack.as reads and checks them)
 //--------------------------------------------------------------------------------------------------------------------------
 
-// One jab's phase lengths: the clip's Windup, Strike and Recover phases, then the game-owned cooldown. CancelSeconds is
-// the action's dedicated return to neutral after a cancel.
+// The game-owned clocks around an attack's clip: the cooldown after it, and the action's dedicated return to neutral
+// after a cancel. The clip's own phases time the motion.
 struct FMars_Crawler_AttackTiming
 {
-    UPROPERTY()
-    float32 WindupSeconds = 0.40f;
-
-    UPROPERTY()
-    float32 StrikeSeconds = 0.12f;
-
-    UPROPERTY()
-    float32 RecoverSeconds = 0.50f;
-
     UPROPERTY()
     float32 CooldownSeconds = 0.70f;
 
@@ -138,140 +129,19 @@ struct FMars_Crawler_AttackTiming
 
 mixin FMars_Validation Validate(const FMars_Crawler_AttackTiming& Self)
 {
-    if (utils_crawler::Get_IsPositiveFinite(Self.WindupSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.StrikeSeconds) == false ||
-        utils_crawler::Get_IsPositiveFinite(Self.RecoverSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.CooldownSeconds) == false ||
-        utils_crawler::Get_IsPositiveFinite(Self.CancelSeconds) == false)
-    {
-        return FMars_Validation(f"Crawler combat has a non-positive or non-finite duration (windup [{Self.WindupSeconds}], strike [{Self.StrikeSeconds}], recover [{Self.RecoverSeconds}], cooldown [{Self.CooldownSeconds}], cancel [{Self.CancelSeconds}])");
-    }
+    if (utils_crawler::Get_IsPositiveFinite(Self.CooldownSeconds) == false || utils_crawler::Get_IsPositiveFinite(Self.CancelSeconds) == false)
+    { return FMars_Validation(f"Crawler combat has a non-positive or non-finite duration (cooldown [{Self.CooldownSeconds}], cancel [{Self.CancelSeconds}])"); }
 
     return FMars_Validation();
 }
 
-// Body-local action keys in centimetres, in the simulation body's axes, unit scale, and the easing of the clip phase
-// that moves into each. The strike key is translation only. The windup key may also pitch (rear the body up or dip it,
-// about its own Y axis) by at most utils_crawler::MaxWindupPitchDegrees: the hit centre then travels an arc while the
-// straight sample-to-sample hit query covers its chords, and at that limit a whole phase posed in one sample leaves the
-// chord about 4 cm inside the arc for a hit centre 55 cm from the body's origin, well inside the hit sphere. Yaw and roll
-// would swing the hit centre off the committed direction and stay rejected.
-struct FMars_Crawler_AttackPose
+// Which of the combat profile's two clips an attack plays.
+enum EMars_Crawler_AttackClipKind
 {
-    UPROPERTY()
-    FTransform Windup = FTransform(FRotator::ZeroRotator, FVector(-10.0, 0.0, -5.0), FVector::OneVector);
-
-    UPROPERTY()
-    FTransform Strike = FTransform(FRotator::ZeroRotator, FVector(24.0, 0.0, 0.0), FVector::OneVector);
-
-    UPROPERTY()
-    ECk_ProceduralAction_Easing WindupEasing = ECk_ProceduralAction_Easing::OutCubic;
-
-    UPROPERTY()
-    ECk_ProceduralAction_Easing StrikeEasing = ECk_ProceduralAction_Easing::InQuad;
-
-    UPROPERTY()
-    ECk_ProceduralAction_Easing RecoverEasing = ECk_ProceduralAction_Easing::InOutCubic;
-}
-
-mixin FMars_Validation Validate(const FMars_Crawler_AttackPose& Self)
-{
-    if (utils_crawler::Get_IsPitchOnly(Self.Windup) == false || utils_crawler::Get_IsTranslationOnly(Self.Strike) == false)
-    {
-        return FMars_Validation(f"Crawler combat needs finite, unit-scale, translation-only keys, but for a windup pitch of at most {utils_crawler::MaxWindupPitchDegrees} degrees (windup [{Self.Windup.GetLocation().ToString()} {Self.Windup.Rotator().ToString()} {Self.Windup.GetScale3D().ToString()}], strike [{Self.Strike.GetLocation().ToString()} {Self.Strike.Rotator().ToString()} {Self.Strike.GetScale3D().ToString()}])");
-    }
-
-    if (utils_crawler::Get_IsClipEasing(Self.WindupEasing) == false)
-    { return FMars_Validation(f"Crawler combat WindupEasing [{int32(Self.WindupEasing)}] is not a Linear, Quad or Cubic clip easing"); }
-
-    if (utils_crawler::Get_IsClipEasing(Self.StrikeEasing) == false)
-    { return FMars_Validation(f"Crawler combat StrikeEasing [{int32(Self.StrikeEasing)}] is not a Linear, Quad or Cubic clip easing"); }
-
-    if (utils_crawler::Get_IsClipEasing(Self.RecoverEasing) == false)
-    { return FMars_Validation(f"Crawler combat RecoverEasing [{int32(Self.RecoverEasing)}] is not a Linear, Quad or Cubic clip easing"); }
-
-    return FMars_Validation();
-}
-
-// The pincer: the two front legs (the rig's first and last) leave the ground, are thrown up and apart through the windup
-// (a spider's threat display) and slam down together in front of the body on the strike, riding the same phase clock and
-// easings as the body keys. The keys are where the right claw's foot goes, in the simulation body's frame in centimetres
-// (the root's, so they do not ride the body keys); the left claw mirrors them across the body's XZ plane. Each claw
-// starts from, and recovers to, the spot its foot stood on. Off by default: a crawler without it, and one that cannot
-// spare both front legs (see utils_crawler::Find_AttackClaws), jabs with its body alone. The claws are posed, not swept:
-// the hit is still the body's sphere. utils_crawler::Make_RearingPincerCombat pairs these keys with body keys that rear.
-struct FMars_Crawler_AttackPincer
-{
-    UPROPERTY()
-    bool Enabled = false;
-
-    UPROPERTY()
-    FVector Windup = FVector(70.0, 55.0, 85.0);
-
-    UPROPERTY()
-    FVector Strike = FVector(125.0, 16.0, -30.0);
-
-    // Each key lies between these fractions of the chain's length from the front leg's hip.
-    UPROPERTY()
-    float32 MinReachFraction = 0.2f;
-
-    UPROPERTY()
-    float32 MaxReachFraction = 0.9f;
-}
-
-// Where utils_crawler::Fit_PincerToRig moves a pincer's keys: onto RigData's front leg, no key lower than GroundClearance
-// over its rest feet's ground.
-struct FMars_Crawler_PincerFit
-{
-    UPROPERTY()
-    UCk_ProceduralRig_Data RigData;
-
-    UPROPERTY()
-    float64 GroundClearance = 10.0;
-
-    FMars_Crawler_PincerFit() {}
-
-    FMars_Crawler_PincerFit(UCk_ProceduralRig_Data InRigData, float64 InGroundClearance)
-    {
-        RigData = InRigData;
-        GroundClearance = InGroundClearance;
-    }
-}
-
-// On the radial rig of InLegCount legs.
-mixin FMars_Validation Validate(const FMars_Crawler_AttackPincer& Self, int32 InLegCount)
-{
-    return Self.Validate_OnRig(utils_crawler::Get_RigData(InLegCount));
-}
-
-// A disabled pincer is never checked. Both front legs share a hip distance from the body's XZ plane, so the right one
-// answers for the pair.
-mixin FMars_Validation Validate_OnRig(const FMars_Crawler_AttackPincer& Self, UCk_ProceduralRig_Data InRigData)
-{
-    if (Self.Enabled == false)
-    { return FMars_Validation(); }
-
-    if (utils_crawler::Get_IsFinite(Self.Windup) == false || utils_crawler::Get_IsFinite(Self.Strike) == false)
-    { return FMars_Validation(f"Crawler pincer has a non-finite key (windup [{Self.Windup.ToString()}], strike [{Self.Strike.ToString()}])"); }
-
-    if (Self.Windup.Y < 0.0 || Self.Strike.Y < 0.0)
-    { return FMars_Validation(f"Crawler pincer keys are the right claw's and lie on the body's right (windup Y [{Self.Windup.Y}], strike Y [{Self.Strike.Y}])"); }
-
-    if (Self.MinReachFraction < 0.0f || Self.MaxReachFraction > 1.0f || Self.MinReachFraction >= Self.MaxReachFraction)
-    { return FMars_Validation(f"Crawler pincer has reach fractions [{Self.MinReachFraction}, {Self.MaxReachFraction}] outside 0 <= min < max <= 1"); }
-
-    if (ck::Is_NOT_Valid(InRigData))
-    { return FMars_Validation("Crawler pincer has no rig for its leg count"); }
-
-    const TArray<FCk_ProceduralLeg_Spec> Legs = InRigData.Get_Legs();
-    const auto Hip = Legs[0].Get_Placement().Get_HipLocal();
-    const auto Reach = utils_crawler::Get_ChainReach(Legs[0]);
-    const auto WindupDistance = (Self.Windup - Hip).Size();
-    const auto StrikeDistance = (Self.Strike - Hip).Size();
-    const auto Nearest = Reach * Self.MinReachFraction;
-    const auto Farthest = Reach * Self.MaxReachFraction;
-    if (WindupDistance < Nearest || WindupDistance > Farthest || StrikeDistance < Nearest || StrikeDistance > Farthest)
-    { return FMars_Validation(f"Crawler pincer keys must lie [{Nearest}, {Farthest}] cm from the front hip [{Hip.ToString()}] (windup [{WindupDistance}], strike [{StrikeDistance}])"); }
-
-    return FMars_Validation();
+    // The body alone.
+    Jab,
+    // The body with both front legs, through the ClawRight and ClawLeft slots.
+    Pincer
 }
 
 struct FMars_Crawler_AttackHit
@@ -411,11 +281,14 @@ struct FMars_Crawler_Combat
     UPROPERTY()
     FMars_Crawler_AttackTiming Timing;
 
+    // Played when the crawler cannot claim both front legs: phases Windup, Strike and Recover, an Offense window, the
+    // body channel and no slots (utils_crawler::Validate_AttackClip). The entity script loads it.
     UPROPERTY()
-    FMars_Crawler_AttackPose Pose;
+    TSoftObjectPtr<UCk_ProceduralAction_Data> JabClip;
 
+    // The same, plus the ClawRight and ClawLeft slots, played when it can. Unset: the crawler never lifts its claws.
     UPROPERTY()
-    FMars_Crawler_AttackPincer Pincer;
+    TSoftObjectPtr<UCk_ProceduralAction_Data> PincerClip;
 
     UPROPERTY()
     FMars_Crawler_AttackHit Hit;
@@ -425,12 +298,18 @@ struct FMars_Crawler_Combat
 
     UPROPERTY()
     FMars_Crawler_Prepare Prepare;
+}
 
-    // The object each attack's clip is built into at admission (utils_crawler::Build_AttackClip of Timing, Pose and the
-    // claws the attack claims). Weak: the spec is retained in a fragment, and the entity script that created the object
-    // owns it.
-    UPROPERTY()
-    TWeakObjectPtr<UCk_ProceduralAction_Data> AttackClip;
+// The loaded clip of InKind; null when that clip is unset or not loaded.
+mixin UCk_ProceduralAction_Data Get_Clip(const FMars_Crawler_Combat& Self, EMars_Crawler_AttackClipKind InKind)
+{
+    return InKind == EMars_Crawler_AttackClipKind::Pincer ? Self.PincerClip.Get() : Self.JabClip.Get();
+}
+
+// A pincer clip is set and loaded.
+mixin bool Get_HasPincer(const FMars_Crawler_Combat& Self)
+{
+    return ck::IsValid(Self.PincerClip.Get());
 }
 
 // A disabled profile is never checked: it composes nothing.
@@ -442,10 +321,6 @@ mixin FMars_Validation Validate(const FMars_Crawler_Combat& Self)
     const auto TimingValidation = Self.Timing.Validate();
     if (TimingValidation.IsValid() == false)
     { return TimingValidation; }
-
-    const auto PoseValidation = Self.Pose.Validate();
-    if (PoseValidation.IsValid() == false)
-    { return PoseValidation; }
 
     const auto HitValidation = Self.Hit.Validate();
     if (HitValidation.IsValid() == false)
@@ -459,10 +334,20 @@ mixin FMars_Validation Validate(const FMars_Crawler_Combat& Self)
     if (PrepareValidation.IsValid() == false)
     { return PrepareValidation; }
 
-    if (ck::Is_NOT_Valid(Self.AttackClip.Get()))
-    { return FMars_Validation("Crawler combat has no AttackClip (the entity script creates the object each attack's clip is built into)"); }
+    if (ck::Is_NOT_Valid(Self.JabClip.Get()))
+    { return FMars_Validation(f"Crawler combat has no loaded JabClip [{Self.JabClip.ToSoftObjectPath().ToString()}] (the entity script loads it)"); }
 
-    return FMars_Validation();
+    const auto JabValidation = utils_crawler::Validate_AttackClip(Self.JabClip.Get(), EMars_Crawler_AttackClipKind::Jab);
+    if (JabValidation.IsValid() == false)
+    { return JabValidation; }
+
+    if (Self.PincerClip.IsNull())
+    { return FMars_Validation(); }
+
+    if (ck::Is_NOT_Valid(Self.PincerClip.Get()))
+    { return FMars_Validation(f"Crawler combat has a PincerClip [{Self.PincerClip.ToSoftObjectPath().ToString()}] that is not loaded (the entity script loads it)"); }
+
+    return utils_crawler::Validate_AttackClip(Self.PincerClip.Get(), EMars_Crawler_AttackClipKind::Pincer);
 }
 
 struct FMars_Crawler_Spec
@@ -547,13 +432,6 @@ mixin FMars_Validation Validate(const FMars_Crawler_Spec& Self)
     const auto CombatValidation = Self.Combat.Validate();
     if (CombatValidation.IsValid() == false)
     { return CombatValidation; }
-
-    if (Self.Combat.Enabled)
-    {
-        const auto PincerValidation = Self.Combat.Pincer.Validate_OnRig(Self.Get_RigData());
-        if (PincerValidation.IsValid() == false)
-        { return PincerValidation; }
-    }
 
     return Vitals.LegDebris.Validate();
 }
@@ -737,13 +615,9 @@ struct FMars_Crawler_AttackClaw
     UPROPERTY()
     FName LegId;
 
-    // 1 on the body's right, -1 on its left: the sign the pincer keys' Y takes.
+    // 1 on the body's right (slot ClawRight), -1 on its left (ClawLeft).
     UPROPERTY()
     float32 Side = 1.0f;
-
-    // Where the foot stood when the attack was admitted: the claw's first and last key. Always set for a claimed claw.
-    UPROPERTY()
-    TOptional<FVector> Home;
 }
 
 // Owner: UMars_Processor_Crawler_AttackTick. Its inputs are the intents mailbox and the resolver's observations; the
@@ -781,10 +655,12 @@ struct FMars_Fragment_Crawler_Attack
     UPROPERTY()
     TArray<FMars_Crawler_AttackClaw> Claws;
 
-    // One scoped clip action per jab. The copied identity survives the action handle until its terminal stream drains.
+    // Which clip the current (or last) attack played; Jab before the first.
     UPROPERTY()
-    FCk_Handle ActionScope;
+    EMars_Crawler_AttackClipKind ClipKind = EMars_Crawler_AttackClipKind::Jab;
 
+    // One clip action per attack, an entity of the crawler. The copied identity outlives the action handle until the
+    // attack forgets the released action.
     UPROPERTY()
     FCk_Handle_ProceduralAction Action;
 
@@ -799,12 +675,6 @@ struct FMars_Fragment_Crawler_Attack
 
     UPROPERTY()
     bool TerminalSeen = false;
-
-    UPROPERTY()
-    bool TerminalConsumeIssued = false;
-
-    UPROPERTY()
-    bool TerminalConsumeSucceeded = false;
 
     // Latched by this attack's one damage request, whatever the dealer made of it; cleared by the next admission.
     UPROPERTY()

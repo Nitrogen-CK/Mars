@@ -1154,161 +1154,6 @@ class AMars_AutoTest_CrawlerMelee_JabThenWalks_Actor : ACk_AutoTestRunner
     }
 }
 
-class AMars_AutoTest_CrawlerMelee_LongLimbBounds_Actor : ACk_AutoTestRunner
-{
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbBounds");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveCancel_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveCancel");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveClear_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveClear");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveDamage_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveDamage");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveScopeLoss_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveScopeLoss");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveSever_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveSever");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveTargetLoss_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveTargetLoss");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLiveWall_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLiveWall");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLoadedBranch_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 30.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLoadedBranch");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLoadedFastArc_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 30.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLoadedFastArc");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbLoadedProjected_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 30.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbLoadedProjected");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
-class AMars_AutoTest_CrawlerMelee_LongLimbTargetBinding_Actor : ACk_AutoTestRunner
-{
-    default _TimeoutSeconds = 25.0f;
-    UFUNCTION(BlueprintOverride)
-    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
-    {
-        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_LongLimbTargetBinding");
-        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
-        ResolvedClass = Path.TryLoadClass();
-        return ResolvedClass;
-    }
-}
-
 class AMars_AutoTest_CrawlerMelee_MissAndCooldown_Actor : ACk_AutoTestRunner
 {
     default _TimeoutSeconds = 40.0f;
@@ -1510,6 +1355,18 @@ class AMars_AutoTest_CrawlerMelee_QueryPrimitives_Actor : ACk_AutoTestRunner
     TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
     {
         auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_QueryPrimitives");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_CrawlerMelee_ShippedClipsLoad_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_ShippedClipsLoad");
         TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
         ResolvedClass = Path.TryLoadClass();
         return ResolvedClass;

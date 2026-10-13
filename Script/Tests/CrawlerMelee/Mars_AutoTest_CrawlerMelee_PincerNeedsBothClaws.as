@@ -20,7 +20,7 @@ class UMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws : UMars_AutoTestRig_Crawl
     void DoBeginPlay(FCk_Handle InHandle)
     {
         auto Spec = Make_ArmedCrawlerSpec(4);
-        Spec.Combat.Pincer.Enabled = true;
+        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Pincer);
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();

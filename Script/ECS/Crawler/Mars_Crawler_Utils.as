@@ -70,24 +70,10 @@ namespace utils_crawler
         return FCk_ProceduralWalker_LegChain(InLeg.LegId, RigSpec);
     }
 
-    // The rearing pincer: the body rears back and up with its front thrown high while both claws go up and apart, then
-    // lunges forward and down as they slam together in front of it. A longer windup than the plain jab's, so the display
-    // reads before the strike. Everything else is the default combat profile; the caller sets StartAggressive.
-    FMars_Crawler_Combat Make_RearingPincerCombat()
-    {
-        auto Combat = FMars_Crawler_Combat();
-        Combat.Enabled = true;
-        Combat.Pincer.Enabled = true;
-        Combat.Pose.Windup = FTransform(FRotator(28.0, 0.0, 0.0), FVector(-12.0, 0.0, 14.0), FVector::OneVector);
-        Combat.Pose.Strike = FTransform(FRotator::ZeroRotator, FVector(30.0, 0.0, -6.0), FVector::OneVector);
-        Combat.Timing.WindupSeconds = 0.60f;
-        return Combat;
-    }
-
-    // The one tuning of the attack's clip action, used by both the player and each play spec. Sampling: the body jab keeps
+    // The attack player's tuning, the one every clip action plays with. Sampling: the body jab keeps
     // its game-owned travel guard (no accepted sample moves it further than MaxSampleTravel); a pincer's claws travel the
-    // chain's reach, so with a pincer the guard is raised to twice the front leg's reach (a hitch can pose a whole phase
-    // in one sample). Transition: no entry blend (the windup starts at admission, from the identity offset and the claws'
+    // chain's reach, so with a pincer clip the guard is raised to twice the front leg's reach (a hitch can pose a whole
+    // phase in one sample). Transition: no entry blend (the windup starts at admission, from the identity offset and the claws'
     // own feet), CancelSeconds as the dedicated return a cancel eases back through, and a return timeout no shorter than
     // that return, nor than the time the gait gets to step a released claw back down.
     FCk_ProceduralAction_Tuning Make_AttackTuning(const FMars_Crawler_Spec& InSpec)
@@ -98,7 +84,7 @@ namespace utils_crawler
         auto Sampling = Tuning.Get_Sampling();
         Sampling.Set_MaxEndpointTravelCm(Combat.Hit.MaxSampleTravel);
         Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
-        if (Combat.Pincer.Enabled)
+        if (Combat.Get_HasPincer())
         {
             const TArray<FCk_ProceduralLeg_Spec> Legs = InSpec.Get_RigData().Get_Legs();
             Sampling.Set_MaxEndpointTravelCm(Math::Max(Combat.Hit.MaxSampleTravel, 2.0f * Get_ChainReach(Legs[0])));
@@ -110,43 +96,44 @@ namespace utils_crawler
         Transition.Set_EntryBlend(FCk_Time(0.0));
         Transition.Set_DedicatedReturn(FCk_Time(CancelReturn));
         auto ReturnTimeout = Math::Max(Transition.Get_ReturnTimeout().Get_Seconds(), CancelReturn);
-        if (Combat.Pincer.Enabled)
+        if (Combat.Get_HasPincer())
         { ReturnTimeout = Math::Max(ReturnTimeout, float64(PincerReturnTimeoutSeconds)); }
         Transition.Set_ReturnTimeout(FCk_Time(ReturnTimeout));
         Tuning.Set_Transition(Transition);
         return Tuning;
     }
 
-    // A crawler without a pincer plays its jab on the body alone: a dedicated player. A pincer also borrows the two front
-    // legs from the gait: the player counts the legs left standing, lets them wait out a whole attack before a step the
-    // count forbids interrupts it, and hands a claw back to the gait as a real step from wherever the action left it (the
-    // windup key, when a cancel lands in the air) to where the gait wants the foot. That return gets the sampling's travel
-    // budget, since the default (2 cm and 5 degrees a sample, 1 s in all) times out on such a step and leaves the leg out
-    // of the gait.
+    // A crawler without a pincer clip plays its jab on the body alone and lends no leg (the default locomotion's support is
+    // Disabled). A pincer also borrows the two front legs from the gait, on Make_PincerLocomotion's terms.
     FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Spec& InSpec)
     {
-        const auto Tuning = Make_AttackTuning(InSpec);
+        auto Spec = FCk_ProceduralActionPlayer_Spec();
+        Spec.Set_Tuning(Make_AttackTuning(InSpec));
+        if (InSpec.Combat.Get_HasPincer())
+        { Spec.Set_Locomotion(Make_PincerLocomotion(InSpec)); }
+        return Spec;
+    }
+
+    // How a pincer borrows the front legs (the borrowing player's terms; a walking preview of the clip copies them): the
+    // player counts the legs left standing and lets them wait out the whole pincer clip and a cancel's return before a
+    // step the count forbids interrupts it, and hands a claw back to the gait as a real step from wherever the action left
+    // it (the windup key, when a cancel lands in the air) to where the gait wants the foot, within the attack tuning's
+    // sampling budget and PincerReturnTimeoutSeconds. Needs a loaded pincer clip.
+    FCk_ProceduralLimbControl_Locomotion Make_PincerLocomotion(const FMars_Crawler_Spec& InSpec)
+    {
         const auto& Combat = InSpec.Combat;
-        if (Combat.Pincer.Enabled == false)
-        { return utils_procedural_action_player::Make_DedicatedPlayerSpec(Tuning); }
-
-        const auto& Timing = Combat.Timing;
-        auto Support = utils_procedural_action_player::Make_CountOnlySupport(PincerMinStandingLegs);
-        Support.Set_SupportHoldTimeout(FCk_Time(float64(Timing.WindupSeconds + Timing.StrikeSeconds + Timing.RecoverSeconds + Timing.CancelSeconds)));
-
-        const auto Sampling = Tuning.Get_Sampling();
-        auto Motion = FCk_ProceduralLimbControl_MotionBudget();
-        Motion.Set_MaxEndpointTravelCm(Sampling.Get_MaxEndpointTravelCm());
-        Motion.Set_MaxSegmentAngularStepDegrees(Sampling.Get_MaxSegmentAngularStepDegrees());
+        const auto CancelSeconds = float64(Combat.Timing.CancelSeconds);
+        auto Support = FCk_ProceduralLimbControl_Support(ECk_ProceduralLimbControl_SupportMode::CountOnly, PincerMinStandingLegs);
+        Support.Set_SupportHoldTimeout(FCk_Time(Get_ClipSeconds(Combat.PincerClip.Get()) + CancelSeconds));
 
         auto Return = FCk_ProceduralLimbControl_Return();
-        Return.Set_Duration(FCk_Time(float64(Timing.CancelSeconds)));
+        Return.Set_Duration(FCk_Time(CancelSeconds));
         Return.Set_Timeout(FCk_Time(float64(PincerReturnTimeoutSeconds)));
-        Return.Set_Motion(Motion);
 
-        auto Borrowing = FCk_ProceduralActionPlayer_BorrowingSpec(Support, Return);
-        Borrowing.Set_Tuning(Tuning);
-        return utils_procedural_action_player::Make_BorrowingPlayerSpec(Borrowing);
+        auto Locomotion = FCk_ProceduralLimbControl_Locomotion();
+        Locomotion.Set_Support(Support);
+        Locomotion.Set_Return(Return);
+        return Locomotion;
     }
 
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
@@ -565,6 +552,15 @@ mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
     return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedDirection;
 }
 
+// The clip the current (or last) attack played; the jab before the first. Null on an unarmed crawler.
+mixin UCk_ProceduralAction_Data Get_AttackClip(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return nullptr; }
+
+    return Self.Get_Spec().Combat.Get_Clip(Self.Get_Fragment(FMars_Fragment_Crawler_Attack).ClipKind);
+}
+
 // The jab's clip action while one is held (an invalid handle otherwise).
 mixin FCk_Handle_ProceduralAction Get_AttackAction(const FCk_Handle_Crawler& Self)
 {
@@ -772,14 +768,16 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
     return TOptional<EMars_Crawler_AttackReject>();
 }
 
-// A world body stands between the hit centre now and where the windup key would put it.
+// A world body stands between the hit centre now and where the windup end key of the clip an attack admitted now would
+// play puts it.
 mixin bool Get_IsWindupBlocked(const FCk_Handle_Crawler& Self)
 {
     const auto Combat = Self.Get_Spec().Combat;
+    const auto WindupKey = utils_crawler::Get_PhaseEndBody(Combat.Get_Clip(utils_crawler::Get_NextClipKind(Self)), EMars_Crawler_AttackPhase::Windup);
     const auto Presentation = utils_transform::Get_EntityCurrentTransform(Self.Get_Presentation());
     const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
     const auto Neutral = utils_crawler::Get_HitCenter(Presentation, Combat.Hit.LocalCenter);
-    const auto Windup = Neutral + RootTransform.GetRotation().RotateVector(utils_crawler::Make_HitCenterOffset(Combat.Pose.Windup, Combat.Hit.LocalCenter));
+    const auto Windup = Neutral + RootTransform.GetRotation().RotateVector(utils_crawler::Make_HitCenterOffset(WindupKey, Combat.Hit.LocalCenter));
 
     auto Settings = utils_crawler::Make_AttackQuery(Neutral, Windup, Combat.Hit.Radius);
     Settings.Set_IgnoredEntities(Self.Get_AttackIgnoredEntities());

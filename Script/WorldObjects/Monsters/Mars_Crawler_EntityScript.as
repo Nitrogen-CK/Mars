@@ -221,10 +221,13 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // Created on first use of each tint.
     private TArray<FMars_Crawler_TintedRenderer> _Renderers;
 
-    // The object the kernel builds each attack's clip into at admission (the claws, and where their feet stand, change
-    // from one attack to the next). This property keeps it alive; the kernel holds it weakly in Spec.Combat.AttackClip.
+    // The combat profile's clips, loaded at construction: these properties keep them loaded for as long as the crawler
+    // lives (the kernel resolves the spec's soft references, which root nothing).
     UPROPERTY()
-    private UCk_ProceduralAction_Data _AttackClip;
+    private UCk_ProceduralAction_Data _JabClip;
+
+    UPROPERTY()
+    private UCk_ProceduralAction_Data _PincerClip;
 
     // Look only: its pieces (empty without one) and a renderer per piece, created on first use.
     private FMars_Crawler_LookMeshes _LookMeshes;
@@ -271,15 +274,14 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         if (CrawlerSpec.Combat.Enabled)
         {
             DefaultCombatGeometry(CrawlerSpec);
-            _AttackClip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
-            CrawlerSpec.Combat.AttackClip = _AttackClip;
+            Load_AttackClips(InHandle, CrawlerSpec.Combat);
         }
 
         const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");
 
         // The timer dies with the entity; nothing to unbind.
-        if (WithVisuals && ck::IsValid(Crawler) && CrawlerSpec.Combat.Enabled && CrawlerSpec.Combat.Pincer.Enabled)
+        if (WithVisuals && ck::IsValid(Crawler) && CrawlerSpec.Combat.Enabled && CrawlerSpec.Combat.Get_HasPincer())
         {
             _FangCrawler = Crawler;
             BuildFangs(InHandle, CrawlerSpec.Rig);
@@ -294,6 +296,25 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         }
 
         return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+
+    // Loads the profile's set clips into the properties that keep them loaded. A set clip that does not load ensures
+    // here, naming its path, and the kernel's Validate then rejects the spec.
+    private void Load_AttackClips(const FCk_Handle& InRoot, const FMars_Crawler_Combat& InCombat)
+    {
+        if (InCombat.JabClip.IsNull() == false)
+        {
+            _JabClip = System::LoadAsset_Blocking(InCombat.JabClip);
+            ck::EnsureIfNot(ck::IsValid(_JabClip),
+                f"[Crawler] [{InRoot.ToString()}] its JabClip [{InCombat.JabClip.ToSoftObjectPath().ToString()}] did not load (Mars.Crawler.SeedAttackClips writes the starting clips)");
+        }
+
+        if (InCombat.PincerClip.IsNull() == false)
+        {
+            _PincerClip = System::LoadAsset_Blocking(InCombat.PincerClip);
+            ck::EnsureIfNot(ck::IsValid(_PincerClip),
+                f"[Crawler] [{InRoot.ToString()}] its PincerClip [{InCombat.PincerClip.ToSoftObjectPath().ToString()}] did not load (Mars.Crawler.SeedAttackClips writes the starting clips)");
+        }
     }
 
     // The jab hits from the body's front face and starts within its half length plus StartDistanceMargin, unless the

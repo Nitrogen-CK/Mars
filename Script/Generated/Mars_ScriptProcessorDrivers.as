@@ -631,28 +631,6 @@ class UMars_Processor_Crawler_HandleRequests_Driver : UMars_Processor_Crawler_Ha
     }
 }
 
-class UMars_Processor_Crawler_LongLimbResolve_Driver : UMars_Processor_Crawler_LongLimbResolve
-{
-    UFUNCTION(BlueprintOverride)
-    void Configure(FCk_ScriptProcessorQuery& Query)
-    {
-        Query.ReadWrite(FMars_Fragment_Crawler_LongLimbDemo);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
-    {
-        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_Crawler_LongLimbResolve_Driver::ForEachBatch");
-        const int32 NumEntities = Batch.Num();
-        for (int32 i = 0; i < NumEntities; ++i)
-        {
-            auto Handle = Batch.GetHandle(i);
-            FMars_Fragment_Crawler_LongLimbDemo& P0 = Batch.Get(i, FMars_Fragment_Crawler_LongLimbDemo);
-            ForEachEntity(InDeltaT, Handle, P0);
-        }
-    }
-}
-
 class UMars_Processor_Crawler_Setup_Driver : UMars_Processor_Crawler_Setup
 {
     UFUNCTION(BlueprintOverride)

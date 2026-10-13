@@ -55,7 +55,7 @@ class UMars_AutoTest_CrawlerMelee_InterruptPriority : UMars_AutoTestRig_CrawlerM
     }
 
     // The settle's roam may carry the crawler up to ~200 cm from home along its heading: keep the far target inside the leash.
-    private FMars_Crawler_Spec Make_Spec() const
+    private FMars_Crawler_Spec Make_Spec()
     {
         auto Spec = Make_AggressiveCrawlerSpec(4);
         Spec.Combat.Targeting.LoseRadius = 1000.0f;

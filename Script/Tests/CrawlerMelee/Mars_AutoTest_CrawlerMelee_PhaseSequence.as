@@ -66,10 +66,9 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
 
         // Approved change: phases follow the accepted clip PhaseId, so a phase is entered on its own first accepted
         // interval (which starts on the previous phase's key) rather than on the previous phase's acknowledged endpoint.
-        const auto Timing = _Crawler.Get_Spec().Combat.Timing;
-        const auto WindupEnd = float64(Timing.WindupSeconds);
-        const auto StrikeEnd = WindupEnd + float64(Timing.StrikeSeconds);
-        const auto ClipEnd = StrikeEnd + float64(Timing.RecoverSeconds);
+        const auto WindupEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Windup);
+        const auto StrikeEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Strike);
+        const auto ClipEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Recover);
         Assert_True(ToStrike.AcceptedPhaseId == n"Strike" && Math::Abs(ToStrike.AcceptedFrom - WindupEnd) <= k_TimeTolerance,
             f"Strike is entered on the first accepted Strike interval, from the windup key at [{WindupEnd :.4}] s (got {ToStrike.AcceptedPhaseId} from [{ToStrike.AcceptedFrom :.4}])");
         Assert_True(ToRecover.AcceptedPhaseId == n"Recover" && Math::Abs(ToRecover.AcceptedFrom - StrikeEnd) <= k_TimeTolerance,
@@ -98,10 +97,8 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
         const auto NeutralErrorCm = (Presented.GetLocation() - ExpectedNeutral.GetLocation()).Size();
         Assert_True(NeutralErrorCm < k_KeyTolerance,
             f"the presentation follows the current support/conform neutral (error {NeutralErrorCm :.5} cm)");
-        Assert_True(utils_procedural_body_pose::Get_ActionOffset(BodyPose).Equals(FTransform::Identity),
-            "the legacy body-pose action offset is neutral after the scoped action releases");
         Assert_True(ck::Is_NOT_Valid(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action),
-            "the scoped action released ownership after its terminal receipt");
+            "the action released itself after its terminal receipt");
         Assert_True(_Crawler.Get_AttackLastCancel().IsSet() == false, f"nothing cancelled the attack (last cancel {Get_LastCancelText()})");
     }
 }

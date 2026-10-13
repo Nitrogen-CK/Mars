@@ -21,7 +21,7 @@ struct FMars_Crawler_AttackPhaseChange
 //   4. admission of a queued start (from Idle only; anything else records the reason in LastReject): the clip is built
 //      for this attack's claws and played;
 //   5. settling: CancelRecover ends in Cooldown on the action's terminal record; Cooldown counts down and returns to Idle
-//      once the terminal stream is acknowledged and the action released.
+//      once the player has released the action whose terminal record the resolver acknowledged.
 // A tick with no positive time runs step 1 only.
 class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 {
@@ -334,7 +334,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         { return; }
 
         Attack.CooldownRemaining = Math::Max(Attack.CooldownRemaining - InDeltaSeconds, 0.0f);
-        if (Attack.CooldownRemaining <= 0.0f && utils_crawler::Release_TerminalAttackAction(InSelf))
+        if (Attack.CooldownRemaining <= 0.0f && utils_crawler::Forget_ReleasedAttackAction(InSelf))
         { Enter(InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack), EMars_Crawler_AttackPhase::Idle, OutChanges); }
     }
 

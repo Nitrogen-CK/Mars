@@ -1,4 +1,4 @@
-// After a pincer strike the crawler walks as it did before it. An aggressive crawler with the rearing pincer profile attacks a target 300 cm ahead;
+// After a pincer strike the crawler walks as it did before it. An aggressive crawler playing the reference pincer clip attacks a target 300 cm ahead;
 // the target is then replaced by one 350 cm off to its side, which the crawler has to turn to, walk to and strike. While
 // it walks there every leg steps (the two that struck included), every leg takes part in the gait, and no foot is left
 // further from its hip than its chain reaches.
@@ -9,7 +9,7 @@ class UMars_AutoTest_CrawlerMelee_PincerThenWalks : UMars_AutoTestRig_CrawlerMel
 
     protected bool _WithPincer = true;
     protected int32 _LegCount = 4;
-    // The rearing pincer profile is authored for the radial box crawler and refitted to the layout, as the sandbox does.
+    // The layout's own reference clips, as the sandbox wears them.
     protected EMars_Crawler_Layout _Layout = EMars_Crawler_Layout::Radial;
     // Switches aggression off as the first attack enters Strike (its claws at the windup key, in the air): the Disabled
     // cancel skips the eased recovery, so the action is cancelled where it stands and the gait has to take the legs back
@@ -45,8 +45,7 @@ class UMars_AutoTest_CrawlerMelee_PincerThenWalks : UMars_AutoTestRig_CrawlerMel
     {
         auto Spec = Make_AggressiveCrawlerSpec(_LegCount);
         Spec.Layout = _Layout;
-        if (_WithPincer)
-        { Spec.Combat = utils_crawler::Fit_CombatToLayout(utils_crawler::Make_RearingPincerCombat(), Spec.Layout, Spec.LegCount); }
+        Wear_ReferenceClips(Spec, _WithPincer ? EMars_Crawler_AttackClipKind::Pincer : EMars_Crawler_AttackClipKind::Jab);
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();

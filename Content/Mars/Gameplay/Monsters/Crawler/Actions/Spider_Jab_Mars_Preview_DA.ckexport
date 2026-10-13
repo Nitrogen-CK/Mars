@@ -1,0 +1,1118 @@
+{
+	"assetName": "Spider_Jab_Mars_Preview_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider_Jab_Mars_Preview_DA.Spider_Jab_Mars_Preview_DA",
+	"assetClass": "Ck_ProceduralActionPreview_Config",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e169194a18c22654d0ad79115b0a0d0a",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"Ck_DataAsset_PDA",
+		"PrimaryDataAsset",
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_SubjectMode",
+			"type": "ECk_ProceduralActionPreview_SubjectMode",
+			"category": "Subject",
+			"value": "Walking"
+		},
+		{
+			"name": "_RootFrame",
+			"type": "FTransform",
+			"category": "Subject|Placement",
+			"value":
+			{
+				"Rotation":
+				{
+					"X": 0,
+					"Y": -0,
+					"Z": 0,
+					"W": 1
+				},
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 79.599998474121094
+				},
+				"Scale3D":
+				{
+					"X": 1,
+					"Y": 1,
+					"Z": 1
+				}
+			}
+		},
+		{
+			"name": "_Layout",
+			"type": "FCk_ProceduralArticulation_Layout",
+			"category": "Subject|Topology",
+			"value":
+			{
+				"_Limbs": [],
+				"_BodyEnvelopeMin":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"_BodyEnvelopeMax":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"_CompatibilityVersion": 1
+			}
+		},
+		{
+			"name": "_StandaloneClearanceSettings",
+			"type": "FCk_ProceduralArticulation_ClearanceSettings",
+			"category": "Subject|Clearance",
+			"value":
+			{
+				"_Query": "None",
+				"_Filter":
+				{
+					"_Channel": "ECC_Visibility",
+					"_MinResponse": "Block",
+					"_BodySelection": "Any",
+					"_CollideWithBackFacesConvex": false
+				}
+			}
+		},
+		{
+			"name": "_LimbBindings",
+			"type": "TArray",
+			"category": "Subject|Bindings",
+			"value": [
+				{
+					"_LimbId": "Leg0",
+					"_SegmentFrames": [
+						{
+							"Rotation":
+							{
+								"X": 0.18086131857082763,
+								"Y": -0.28467051851183361,
+								"Z": 0.504838139645716,
+								"W": 0.79460073753683247
+							},
+							"Translation":
+							{
+								"X": 32.479999999999997,
+								"Y": 12.15,
+								"Z": 30.739998474121094
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						},
+						{
+							"Rotation":
+							{
+								"X": -0.31936996089121406,
+								"Y": 0.4253030941270593,
+								"Z": 0.50849767560018566,
+								"W": 0.67716336294538448
+							},
+							"Translation":
+							{
+								"X": 55.500108932198891,
+								"Y": 61.200146244352297,
+								"Z": 75.279612892492878
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						}
+					],
+					"_TerminalFrame":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": -0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": 65.620000000000005,
+							"Y": 96.049999999999997,
+							"Z": -1.5258789005656581e-06
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					},
+					"_PreviewMesh": "",
+					"_PreviewMeshScale":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				{
+					"_LimbId": "Leg1",
+					"_SegmentFrames": [
+						{
+							"Rotation":
+							{
+								"X": 0.26732791606654954,
+								"Y": -0.24341830864417843,
+								"Z": 0.68938124363385489,
+								"W": 0.62772351655339709
+							},
+							"Translation":
+							{
+								"X": 25.09,
+								"Y": 5.6399999999999997,
+								"Z": 25.279998474121093
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						},
+						{
+							"Rotation":
+							{
+								"X": -0.44602759319829904,
+								"Y": 0.30289908965918982,
+								"Z": 0.69673291700517737,
+								"W": 0.4731540657659225
+							},
+							"Translation":
+							{
+								"X": 19.365240492576859,
+								"Y": 66.650880145774522,
+								"Z": 81.216755038866438
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						}
+					],
+					"_TerminalFrame":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": -0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": 5.5599999999999996,
+							"Y": 101.45,
+							"Z": -1.5258789005656581e-06
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					},
+					"_PreviewMesh": "",
+					"_PreviewMeshScale":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				{
+					"_LimbId": "Leg2",
+					"_SegmentFrames": [
+						{
+							"Rotation":
+							{
+								"X": 0.34135742377148975,
+								"Y": -0.20271156723053793,
+								"Z": 0.78915594027750657,
+								"W": 0.4686320856191506
+							},
+							"Translation":
+							{
+								"X": 13.880000000000001,
+								"Y": 14.800000000000001,
+								"Z": 27.709998474121093
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						},
+						{
+							"Rotation":
+							{
+								"X": -0.44311152571489487,
+								"Y": 0.075723814238502621,
+								"Z": 0.88049819175516408,
+								"W": 0.15046931265768534
+							},
+							"Translation":
+							{
+								"X": -12.294849950231942,
+								"Y": 62.822110040479274,
+								"Z": 85.91628263727624
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						}
+					],
+					"_TerminalFrame":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": -0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": -72.420000000000002,
+							"Y": 83.989999999999995,
+							"Z": -1.5258789005656581e-06
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					},
+					"_PreviewMesh": "",
+					"_PreviewMeshScale":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				{
+					"_LimbId": "Leg3",
+					"_SegmentFrames": [
+						{
+							"Rotation":
+							{
+								"X": -0.34135742377148975,
+								"Y": -0.20271156723053793,
+								"Z": -0.78915594027750657,
+								"W": 0.4686320856191506
+							},
+							"Translation":
+							{
+								"X": 13.880000000000001,
+								"Y": -14.800000000000001,
+								"Z": 27.709998474121093
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						},
+						{
+							"Rotation":
+							{
+								"X": 0.44311152571489487,
+								"Y": 0.075723814238502621,
+								"Z": -0.88049819175516408,
+								"W": 0.15046931265768534
+							},
+							"Translation":
+							{
+								"X": -12.294849950231942,
+								"Y": -62.822110040479274,
+								"Z": 85.91628263727624
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						}
+					],
+					"_TerminalFrame":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": -0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": -72.420000000000002,
+							"Y": -83.989999999999995,
+							"Z": -1.5258789005656581e-06
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					},
+					"_PreviewMesh": "",
+					"_PreviewMeshScale":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				{
+					"_LimbId": "Leg4",
+					"_SegmentFrames": [
+						{
+							"Rotation":
+							{
+								"X": -0.26732791606654954,
+								"Y": -0.24341830864417843,
+								"Z": -0.68938124363385489,
+								"W": 0.62772351655339709
+							},
+							"Translation":
+							{
+								"X": 25.09,
+								"Y": -5.6399999999999997,
+								"Z": 25.279998474121093
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						},
+						{
+							"Rotation":
+							{
+								"X": 0.44602759319829904,
+								"Y": 0.30289908965918982,
+								"Z": -0.69673291700517737,
+								"W": 0.4731540657659225
+							},
+							"Translation":
+							{
+								"X": 19.365240492576859,
+								"Y": -66.650880145774522,
+								"Z": 81.216755038866438
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						}
+					],
+					"_TerminalFrame":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": -0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": 5.5599999999999996,
+							"Y": -101.45,
+							"Z": -1.5258789005656581e-06
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					},
+					"_PreviewMesh": "",
+					"_PreviewMeshScale":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				},
+				{
+					"_LimbId": "Leg5",
+					"_SegmentFrames": [
+						{
+							"Rotation":
+							{
+								"X": -0.18086131857082763,
+								"Y": -0.28467051851183361,
+								"Z": -0.504838139645716,
+								"W": 0.79460073753683247
+							},
+							"Translation":
+							{
+								"X": 32.479999999999997,
+								"Y": -12.15,
+								"Z": 30.739998474121094
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						},
+						{
+							"Rotation":
+							{
+								"X": 0.31936996089121406,
+								"Y": 0.4253030941270593,
+								"Z": -0.50849767560018566,
+								"W": 0.67716336294538448
+							},
+							"Translation":
+							{
+								"X": 55.500108932198891,
+								"Y": -61.200146244352297,
+								"Z": 75.279612892492878
+							},
+							"Scale3D":
+							{
+								"X": 1,
+								"Y": 1,
+								"Z": 1
+							}
+						}
+					],
+					"_TerminalFrame":
+					{
+						"Rotation":
+						{
+							"X": 0,
+							"Y": -0,
+							"Z": 0,
+							"W": 1
+						},
+						"Translation":
+						{
+							"X": 65.620000000000005,
+							"Y": -96.049999999999997,
+							"Z": -1.5258789005656581e-06
+						},
+						"Scale3D":
+						{
+							"X": 1,
+							"Y": 1,
+							"Z": 1
+						}
+					},
+					"_PreviewMesh": "",
+					"_PreviewMeshScale":
+					{
+						"X": 1,
+						"Y": 1,
+						"Z": 1
+					}
+				}
+			]
+		},
+		{
+			"name": "_SlotBindings",
+			"type": "TArray",
+			"category": "Subject|Bindings",
+			"value": []
+		},
+		{
+			"name": "_AnchorBindings",
+			"type": "TArray",
+			"category": "Subject|Bindings",
+			"value": []
+		},
+		{
+			"name": "_WalkingRig",
+			"type": "TObjectPtr<UCk_ProceduralRig_Data>",
+			"category": "Subject|Walking",
+			"value":
+			{
+				"objectClass": "Ck_ProceduralRig_Data",
+				"objectClassPath": "/Script/CkProceduralAnimation.Ck_ProceduralRig_Data",
+				"objectName": "WalkingRig",
+				"objectPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider_Jab_Mars_Preview_DA.Spider_Jab_Mars_Preview_DA:WalkingRig",
+				"properties": [
+					{
+						"name": "_Legs",
+						"type": "TArray",
+						"category": "Ck_ProceduralRig_Data",
+						"value": [
+							{
+								"_Id": "Leg0",
+								"_Placement":
+								{
+									"_HipLocal":
+									{
+										"X": 32.479999999999997,
+										"Y": 12.15,
+										"Z": -48.859999999999999
+									},
+									"_RestFootLocal":
+									{
+										"X": 65.620000000000005,
+										"Y": 96.049999999999997,
+										"Z": -79.599999999999994
+									},
+									"_PhaseOffset": 0.66666668653488159,
+									"_StepThresholdScale": 1
+								},
+								"_Chain":
+								{
+									"_SegmentLengths": [
+										70.139999389648438,
+										83.569999694824219
+									],
+									"_PoleLocal":
+									{
+										"X": 60.420000000000002,
+										"Y": 63.869999999999997,
+										"Z": 60.979999999999997
+									}
+								},
+								"_FootContactRadius": 0
+							},
+							{
+								"_Id": "Leg1",
+								"_Placement":
+								{
+									"_HipLocal":
+									{
+										"X": 25.09,
+										"Y": 5.6399999999999997,
+										"Z": -54.32
+									},
+									"_RestFootLocal":
+									{
+										"X": 5.5599999999999996,
+										"Y": 101.45,
+										"Z": -79.599999999999994
+									},
+									"_PhaseOffset": 0.3333333432674408,
+									"_StepThresholdScale": 1
+								},
+								"_Chain":
+								{
+									"_SegmentLengths": [
+										82.970001220703125,
+										89.430000305175781
+									],
+									"_PoleLocal":
+									{
+										"X": 23.559999999999999,
+										"Y": 79.209999999999994,
+										"Z": 70.799999999999997
+									}
+								},
+								"_FootContactRadius": 0
+							},
+							{
+								"_Id": "Leg2",
+								"_Placement":
+								{
+									"_HipLocal":
+									{
+										"X": 13.880000000000001,
+										"Y": 14.800000000000001,
+										"Z": -51.890000000000001
+									},
+									"_RestFootLocal":
+									{
+										"X": -72.420000000000002,
+										"Y": 83.989999999999995,
+										"Z": -79.599999999999994
+									},
+									"_PhaseOffset": 0,
+									"_StepThresholdScale": 1
+								},
+								"_Chain":
+								{
+									"_SegmentLengths": [
+										79.870002746582031,
+										106.98000335693359
+									],
+									"_PoleLocal":
+									{
+										"X": 10.199999999999999,
+										"Y": 73.069999999999993,
+										"Z": 83.219999999999999
+									}
+								},
+								"_FootContactRadius": 0
+							},
+							{
+								"_Id": "Leg3",
+								"_Placement":
+								{
+									"_HipLocal":
+									{
+										"X": 13.880000000000001,
+										"Y": -14.800000000000001,
+										"Z": -51.890000000000001
+									},
+									"_RestFootLocal":
+									{
+										"X": -72.420000000000002,
+										"Y": -83.989999999999995,
+										"Z": -79.599999999999994
+									},
+									"_PhaseOffset": 0.3333333432674408,
+									"_StepThresholdScale": 1
+								},
+								"_Chain":
+								{
+									"_SegmentLengths": [
+										79.870002746582031,
+										106.98000335693359
+									],
+									"_PoleLocal":
+									{
+										"X": 10.199999999999999,
+										"Y": -73.069999999999993,
+										"Z": 83.219999999999999
+									}
+								},
+								"_FootContactRadius": 0
+							},
+							{
+								"_Id": "Leg4",
+								"_Placement":
+								{
+									"_HipLocal":
+									{
+										"X": 25.09,
+										"Y": -5.6399999999999997,
+										"Z": -54.32
+									},
+									"_RestFootLocal":
+									{
+										"X": 5.5599999999999996,
+										"Y": -101.45,
+										"Z": -79.599999999999994
+									},
+									"_PhaseOffset": 0.66666668653488159,
+									"_StepThresholdScale": 1
+								},
+								"_Chain":
+								{
+									"_SegmentLengths": [
+										82.970001220703125,
+										89.430000305175781
+									],
+									"_PoleLocal":
+									{
+										"X": 23.559999999999999,
+										"Y": -79.209999999999994,
+										"Z": 70.799999999999997
+									}
+								},
+								"_FootContactRadius": 0
+							},
+							{
+								"_Id": "Leg5",
+								"_Placement":
+								{
+									"_HipLocal":
+									{
+										"X": 32.479999999999997,
+										"Y": -12.15,
+										"Z": -48.859999999999999
+									},
+									"_RestFootLocal":
+									{
+										"X": 65.620000000000005,
+										"Y": -96.049999999999997,
+										"Z": -79.599999999999994
+									},
+									"_PhaseOffset": 0,
+									"_StepThresholdScale": 1
+								},
+								"_Chain":
+								{
+									"_SegmentLengths": [
+										70.139999389648438,
+										83.569999694824219
+									],
+									"_PoleLocal":
+									{
+										"X": 60.420000000000002,
+										"Y": -63.869999999999997,
+										"Z": 60.979999999999997
+									}
+								},
+								"_FootContactRadius": 0
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "_WalkingGait",
+			"type": "TObjectPtr<UCk_ProceduralGait_Data>",
+			"category": "Subject|Walking",
+			"value":
+			{
+				"objectClass": "Ck_ProceduralGait_Data",
+				"objectClassPath": "/Script/CkProceduralAnimation.Ck_ProceduralGait_Data",
+				"objectName": "WalkingGait",
+				"objectPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider_Jab_Mars_Preview_DA.Spider_Jab_Mars_Preview_DA:WalkingGait",
+				"properties": [
+					{
+						"name": "_Timing",
+						"type": "FCk_ProceduralGait_Timing",
+						"category": "Ck_ProceduralGait_Data",
+						"value":
+						{
+							"_CycleDuration":
+							{
+								"_Seconds": 0.45000000000000001
+							},
+							"_StepDuration":
+							{
+								"_Seconds": 0.12
+							},
+							"_CadenceSpeedRef": 216,
+							"_MaxCadenceScale": 3,
+							"_MaxSimultaneousSwings": 0,
+							"_LegLossPolicy": "RedistributeOffsets"
+						}
+					},
+					{
+						"name": "_Step",
+						"type": "FCk_ProceduralGait_Step",
+						"category": "Ck_ProceduralGait_Data",
+						"value":
+						{
+							"_Height": 45,
+							"_Threshold": 50,
+							"_ObstacleClearance": 6,
+							"_MaxVelocityLead": 108,
+							"_TargetReachFraction": 0.80000001192092896,
+							"_ForceStepReachFraction": 0.92000001668930054,
+							"_HardOverstretchReachFraction": 1
+						}
+					},
+					{
+						"name": "_Probe",
+						"type": "FCk_ProceduralGait_Probe",
+						"category": "Ck_ProceduralGait_Data",
+						"value":
+						{
+							"_Up": 100,
+							"_Down": 200,
+							"_OutwardLean": 0.34999999403953552,
+							"_ContactGrace":
+							{
+								"_Seconds": 0.12
+							},
+							"_QueryFilter":
+							{
+								"_Channel": "ECC_Visibility",
+								"_MinResponse": "Block",
+								"_BodySelection": "Any",
+								"_CollideWithBackFacesConvex": false
+							}
+						}
+					},
+					{
+						"name": "_Foothold",
+						"type": "FCk_ProceduralGait_Foothold",
+						"category": "Ck_ProceduralGait_Data",
+						"value":
+						{
+							"_SearchRadius": 0,
+							"_KeepRadius": 0,
+							"_MaxAngle": 90,
+							"_SlopeWeight": 0.5,
+							"_ContinuityWeight": 0.25,
+							"_OcclusionTolerance": 3
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "_WalkingLocomotion",
+			"type": "FCk_ProceduralLimbControl_Locomotion",
+			"category": "Subject|Walking",
+			"value":
+			{
+				"_Support":
+				{
+					"_Mode": "CountOnly",
+					"_MinimumTrustedContacts": 2,
+					"_ProjectedRegionInsetCm": 0,
+					"_MaxContactNormalSpreadDegrees": 20,
+					"_SupportHoldTimeout":
+					{
+						"_Seconds": 1.3700000271201134
+					}
+				},
+				"_Return":
+				{
+					"_Duration":
+					{
+						"_Seconds": 0.15000000596046448
+					},
+					"_Timeout":
+					{
+						"_Seconds": 3
+					},
+					"_MaxProbeAttempts": 3,
+					"_RetryInterval":
+					{
+						"_Seconds": 0.10000000000000001
+					},
+					"_ContactToleranceCm": 2,
+					"_Motion":
+					{
+						"_MaxEndpointTravelCm": 307.41998291015625,
+						"_MaxSegmentAngularStepDegrees": 180
+					}
+				}
+			}
+		},
+		{
+			"name": "_ActionTuning",
+			"type": "FCk_ProceduralAction_Tuning",
+			"category": "Playback|Action Tuning",
+			"value":
+			{
+				"_Playback":
+				{
+					"_PlayRate": 1
+				},
+				"_Transition":
+				{
+					"_EntryBlend":
+					{
+						"_Seconds": 0
+					},
+					"_DedicatedReturn":
+					{
+						"_Seconds": 0.15000000596046448
+					},
+					"_ReturnTimeout":
+					{
+						"_Seconds": 3
+					}
+				},
+				"_Watchdogs":
+				{
+					"_LoadTimeout":
+					{
+						"_Seconds": 5
+					},
+					"_AcquisitionTimeout":
+					{
+						"_Seconds": 1
+					},
+					"_PublicationTimeout":
+					{
+						"_Seconds": 1
+					},
+					"_MaxTimeBacklog":
+					{
+						"_Seconds": 0.5
+					}
+				},
+				"_Sampling":
+				{
+					"_MaxAdvance":
+					{
+						"_Seconds": 0.0083333333333333332
+					},
+					"_MaxEndpointTravelCm": 307.41998291015625,
+					"_MaxSegmentAngularStepDegrees": 180,
+					"_MaxSamples": 16
+				}
+			},
+			"tooltip": "Preview assembly only. Runtime clips keep motion/events; the production Player pins these tuners."
+		},
+		{
+			"name": "_PresentationFrame",
+			"type": "FTransform",
+			"category": "Subject|Bindings",
+			"value":
+			{
+				"Rotation":
+				{
+					"X": 0,
+					"Y": -0,
+					"Z": 0,
+					"W": 1
+				},
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 79.599998474121094
+				},
+				"Scale3D":
+				{
+					"X": 1,
+					"Y": 1,
+					"Z": 1
+				}
+			}
+		},
+		{
+			"name": "_HasStaticFloor",
+			"type": "bool",
+			"category": "Surface",
+			"value": true
+		},
+		{
+			"name": "_StaticFloorFrame",
+			"type": "FTransform",
+			"category": "Surface",
+			"value":
+			{
+				"Rotation":
+				{
+					"X": 0,
+					"Y": -0,
+					"Z": 0,
+					"W": 1
+				},
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": -25
+				},
+				"Scale3D":
+				{
+					"X": 1,
+					"Y": 1,
+					"Z": 1
+				}
+			}
+		},
+		{
+			"name": "_StaticFloorHalfExtents",
+			"type": "FVector",
+			"category": "Surface",
+			"value":
+			{
+				"X": 400,
+				"Y": 400,
+				"Z": 25
+			}
+		},
+		{
+			"name": "_StaticObstacles",
+			"type": "TArray",
+			"category": "Surface|Obstacles",
+			"value": []
+		},
+		{
+			"name": "_ObservationHorizonStep",
+			"type": "int64",
+			"category": "Scenario",
+			"value": 0,
+			"tooltip": "Zero preserves the usual stop at action terminal. A positive horizon keeps the private world\nobserving recovery after the action has closed, then stops at this bounded step."
+		},
+		{
+			"name": "_ScenarioEvents",
+			"type": "TArray",
+			"category": "Scenario",
+			"value": []
+		},
+		{
+			"name": "_InitialBody",
+			"type": "FTransform",
+			"category": "Authored|Initial Pose",
+			"value":
+			{
+				"Rotation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0,
+					"W": 1
+				},
+				"Translation":
+				{
+					"X": 0,
+					"Y": 0,
+					"Z": 0
+				},
+				"Scale3D":
+				{
+					"X": 1,
+					"Y": 1,
+					"Z": 1
+				}
+			}
+		},
+		{
+			"name": "_InitialLimbEndpoints",
+			"type": "TMap",
+			"category": "Authored|Initial Pose",
+			"value": []
+		},
+		{
+			"name": "_InitialBendDirections",
+			"type": "TMap",
+			"category": "Authored|Initial Pose",
+			"value": []
+		},
+		{
+			"name": "_BodyPreviewMesh",
+			"type": "TSoftObjectPtr<UStaticMesh>",
+			"category": "Appearance",
+			"value": ""
+		},
+		{
+			"name": "_BodyPreviewMeshScale",
+			"type": "FVector",
+			"category": "Appearance",
+			"value":
+			{
+				"X": 1,
+				"Y": 1,
+				"Z": 1
+			}
+		}
+	]
+}

@@ -1,8 +1,8 @@
-// The crawler owns damage, cooldown and cancellation policy. This adapter plays the jab's clip as one scoped action with
-// explicit receipt delivery (the resolver needs every accepted interval): the clip is rebuilt at every admission into the
-// clip object the entity script owns, with a claw slot bound to each front leg a pincer claims, homed on where that foot
-// stands. It cancels the action, and releases it after the copied terminal stream has been acknowledged; a released
-// pincer asks the gait to take back any claw its return left unplanted.
+// The crawler owns damage, cooldown and cancellation policy. This adapter plays one of the combat profile's authored
+// clips as an action of the crawler with explicit receipt delivery (the resolver needs every accepted interval): the
+// pincer clip, its ClawRight and ClawLeft slots bound to the front legs, when both can be claimed, else the body-only jab.
+// It cancels the action; the player releases it once the resolver has acknowledged its terminal record, and a pincer that
+// is gone asks the gait to take back any claw its return left unplanted.
 namespace utils_crawler
 {
     // A crawler lifting both claws keeps at least this many enabled legs on the ground.
@@ -11,20 +11,19 @@ namespace utils_crawler
     // How long the gait may take to step a released claw back onto the ground before the leg is given up as unplanted.
     const float32 PincerReturnTimeoutSeconds = 3.0f;
 
+    // The action is gone before its terminal record was read: something other than its own release destroyed it.
     bool Get_IsAttackActionLost(const FCk_Handle_Crawler& InSelf)
     {
         const auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        FCk_Handle Scope = Attack.ActionScope;
         FCk_Handle Action = Attack.Action;
-        return Attack.ActionIdentity.Get_Value() != 0 &&
-            (ck::Is_NOT_Valid(Action) || ck::Is_NOT_Valid(Scope) ||
-                utils_entity_lifetime::Get_IsPendingDestroy(Action, ECk_EntityLifetime_DestructionPhase::BeginDestroy) ||
-                utils_entity_lifetime::Get_IsPendingDestroy(Scope, ECk_EntityLifetime_DestructionPhase::BeginDestroy));
+        return Attack.ActionIdentity.Get_Value() != 0 && Attack.TerminalSeen == false &&
+            (ck::Is_NOT_Valid(Action) ||
+                utils_entity_lifetime::Get_IsPendingDestroy(Action, ECk_EntityLifetime_DestructionPhase::BeginDestroy));
     }
 
     // Asks the gait to take back every limb an earlier action's return left unplanted (the return ran out of time or of
-    // landing probes). Sent when a pincer's action is released and again before the next attack's action is created, when
-    // the crawler stands still: a leg left out of the gait is never the last word.
+    // landing probes). Sent when a pincer's action is gone and again before the next attack's action is created, when the
+    // crawler stands still: a leg left out of the gait is never the last word.
     void Recover_UnplantedLimbs(FCk_Handle_Crawler& InSelf)
     {
         auto Root = InSelf.As_Transform();
@@ -34,7 +33,7 @@ namespace utils_crawler
     }
 
     // The two front legs the pincer would claim, right (the rig's first leg) then left (its last); empty when the profile
-    // has no pincer, when either front leg is gone, disabled or not the gait's to lend (still returning from, or left
+    // has no pincer clip, when either front leg is gone, disabled or not the gait's to lend (still returning from, or left
     // unplanted by, an earlier action), or when lifting both would leave fewer than PincerMinStandingLegs enabled legs
     // standing. An empty answer is a body-only jab, never a rejected attack.
     TArray<FMars_Crawler_AttackClaw> Find_AttackClaws(const FCk_Handle_Crawler& InSelf)
@@ -44,7 +43,7 @@ namespace utils_crawler
 
         const auto Spec = InSelf.Get_Spec();
         const auto Parts = InSelf.Get_LegParts();
-        if (Spec.Combat.Pincer.Enabled == false || Parts.Num() != Spec.LegCount)
+        if (Spec.Combat.Get_HasPincer() == false || Parts.Num() != Spec.LegCount)
         { return TArray<FMars_Crawler_AttackClaw>(); }
 
         if (utils_procedural_gait::Get_EnabledLegCount(InSelf.Get_Gait()) - 2 < PincerMinStandingLegs)
@@ -106,8 +105,9 @@ namespace utils_crawler
         return Standing;
     }
 
-    // A pincer may start: every claw's own foot is planted (its home is then a spot on the ground, not a point of a step
-    // in flight) and enough of the other legs stand to hold the crawler up without them.
+    // A pincer may start: every claw's own foot is planted (the clip's windup lifts it from where it stands, so that is a
+    // spot on the ground, not a point of a step in flight) and enough of the other legs stand to hold the crawler up
+    // without them.
     bool Get_IsPincerStanceReady(const FCk_Handle_Crawler& InSelf, const TArray<FMars_Crawler_AttackClaw>& InClaws)
     {
         for (const auto& Claw : InClaws)
@@ -119,61 +119,51 @@ namespace utils_crawler
         return Count_StandingLegs(InSelf, InClaws) >= PincerMinStandingLegs;
     }
 
-    // Recovers unplanted limbs, finds the claws, homes each on its foot in the root's frame, builds the clip into the
-    // spec's clip object and plays it with the claw slots bound to their legs. False (nothing created) without a player
-    // or clip object, on a builder rejection (an ensure naming the first diagnostic) or when the action is not created.
+    // The clip an attack admitted now would play: the pincer when Find_AttackClaws claims both front legs, else the jab.
+    EMars_Crawler_AttackClipKind Get_NextClipKind(const FCk_Handle_Crawler& InSelf)
+    {
+        return Find_AttackClaws(InSelf).Num() > 0 ? EMars_Crawler_AttackClipKind::Pincer : EMars_Crawler_AttackClipKind::Jab;
+    }
+
+    // Recovers unplanted limbs, finds the claws and plays the pincer clip with its claw slots bound to their legs, or the
+    // jab when no claw is claimed. False (nothing created) without a player, without that clip loaded (an ensure: Validate
+    // admitted the spec with it) or when the action is not created.
     bool Create_AttackAction(FCk_Handle_Crawler& InSelf)
     {
         const auto Player = InSelf.Get_ActionPlayer();
-        const auto Spec = InSelf.Get_Spec();
-        auto Clip = Spec.Combat.AttackClip.Get();
-        if (ck::Is_NOT_Valid(Player) || ck::Is_NOT_Valid(Clip))
+        if (ck::Is_NOT_Valid(Player))
         { return false; }
 
         Recover_UnplantedLimbs(InSelf);
 
-        auto Build = FMars_Crawler_ClipBuild();
-        Build.Combat = Spec.Combat;
-        Build.Claws = Find_AttackClaws(InSelf);
-        const auto RootAtAdmission = utils_transform::Get_EntityCurrentTransform(InSelf.As_Transform());
-        for (auto& Claw : Build.Claws)
-        {
-            const auto Foot = utils_procedural_leg::Get_Foot(Claw.Leg);
-            Claw.Home = TOptional<FVector>(RootAtAdmission.InverseTransformPosition(Foot.Get_Position()));
-        }
-
-        const auto Report = Build_AttackClip(Build, Clip);
-        if (ck::EnsureIfNot(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
-            f"[Crawler] [{InSelf.ToString()}] the attack clip did not build: {Get_FirstDiagnosticText(Report)}"))
+        const auto Spec = InSelf.Get_Spec();
+        const auto Claws = Find_AttackClaws(InSelf);
+        const auto Kind = Claws.Num() > 0 ? EMars_Crawler_AttackClipKind::Pincer : EMars_Crawler_AttackClipKind::Jab;
+        auto Clip = Spec.Combat.Get_Clip(Kind);
+        if (ck::EnsureIfNot(ck::IsValid(Clip), f"[Crawler] [{InSelf.ToString()}] its {Kind :n} clip is not loaded"))
         { return false; }
 
         auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
-        for (const auto& Claw : Build.Claws)
+        for (const auto& Claw : Claws)
         { Bindings.Add(FCk_ProceduralAction_SlotBinding(Get_ClawSlotId(Claw), Claw.LegId)); }
 
-        auto PlaySpec = FCk_ProceduralAction_LoadedPlaySpec(Clip);
+        auto PlaySpec = FCk_ProceduralAction_PlaySpec(TSoftObjectPtr<UCk_ProceduralAction_Data>(Clip));
         PlaySpec.Set_SlotBindings(Bindings);
-        PlaySpec.Set_Tuning(Make_AttackTuning(Spec));
+        PlaySpec.Set_Delivery(ECk_ProceduralAction_Delivery::Explicit);
 
         FCk_Handle Owner = InSelf;
-        auto Scope = utils_entity_lifetime::Request_CreateEntity(Owner);
-        const auto Action = utils_procedural_action::Create_FromLoadedClip(Scope, Player, PlaySpec);
+        const auto Action = utils_procedural_action::Create_FromClip(Owner, Player, PlaySpec);
         if (ck::Is_NOT_Valid(Action))
-        {
-            utils_entity_lifetime::Request_DestroyEntity(Scope);
-            return false;
-        }
+        { return false; }
 
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Attack.ActionScope = Scope;
         Attack.Action = Action;
         Attack.ActionIdentity = Action.Get_Identity();
-        Attack.Claws = Build.Claws;
+        Attack.Claws = Claws;
+        Attack.ClipKind = Kind;
         Attack.ReceiptCursor = 0;
         Attack.CancelRequested = false;
         Attack.TerminalSeen = false;
-        Attack.TerminalConsumeIssued = false;
-        Attack.TerminalConsumeSucceeded = false;
         return true;
     }
 
@@ -189,21 +179,17 @@ namespace utils_crawler
         Attack.Action.Request_Cancel(FCk_Request_ProceduralAction_Cancel());
     }
 
-    bool Release_TerminalAttackAction(FCk_Handle_Crawler& InSelf)
+    // True once the attack's action is gone after its terminal record was read: the player released it when the resolver
+    // acknowledged that record. Forgets the action and lets the gait take back the claws.
+    bool Forget_ReleasedAttackAction(FCk_Handle_Crawler& InSelf)
     {
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.TerminalSeen == false || Attack.TerminalConsumeSucceeded == false ||
-            (ck::IsValid(Attack.Action) && Attack.Action.Get_State() != ECk_ProceduralAction_State::Finished))
+        FCk_Handle Action = Attack.Action;
+        if (Attack.TerminalSeen == false || (ck::IsValid(Action) &&
+            utils_entity_lifetime::Get_IsPendingDestroy(Action, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false))
         { return false; }
 
-        if (ck::IsValid(Attack.Action) && Get_IsAttackActionLost(InSelf) == false)
-        { Attack.Action.Request_Release(FCk_Request_ProceduralAction_Release()); }
-        if (ck::IsValid(Attack.ActionScope) &&
-            utils_entity_lifetime::Get_IsPendingDestroy(Attack.ActionScope,
-                ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false)
-        { utils_entity_lifetime::Request_DestroyEntity(Attack.ActionScope); }
         Attack.Action = FCk_Handle_ProceduralAction();
-        Attack.ActionScope = FCk_Handle();
         Attack.ActionIdentity = FCk_ProceduralAction_Identity();
         const auto HeldClaws = Attack.Claws.Num() > 0;
         Attack.Claws.Empty();
