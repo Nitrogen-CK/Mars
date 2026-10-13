@@ -1,0 +1,183 @@
+{
+	"assetName": "Impact_Light_CameraShake_Mars_BP",
+	"assetPath": "/Game/Mars/Fx/CameraShakes/Impact_Light_CameraShake_Mars_BP.Impact_Light_CameraShake_Mars_BP",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "01975b268ae9b0ac691723b2b7d9db68",
+		"exporterVersion": 3
+	},
+	"blueprintType": "Blueprint",
+	"parentClass": "CameraShakeBase",
+	"parentClassPath": "/Script/Engine.CameraShakeBase",
+	"implementedInterfaces": [],
+	"variables": [],
+	"classDefaults": [
+		{
+			"name": "bSingleInstance",
+			"type": "bool",
+			"category": "CameraShake",
+			"value": true,
+			"tooltip": "If true to only allow a single instance of this shake class to play at any given time.\nSubsequent attempts to play this shake will simply restart the timer."
+		},
+		{
+			"name": "RootShakePattern",
+			"type": "TObjectPtr<UCameraShakePattern>",
+			"category": "CameraShakePattern",
+			"value":
+			{
+				"objectClass": "WaveOscillatorCameraShakePattern",
+				"objectClassPath": "/Script/EngineCameras.WaveOscillatorCameraShakePattern",
+				"objectName": "WaveOscillatorCameraShakePattern_0",
+				"objectPath": "/Game/Mars/Fx/CameraShakes/Impact_Light_CameraShake_Mars_BP.Default__Impact_Light_CameraShake_Mars_BP_C:WaveOscillatorCameraShakePattern_0",
+				"properties": [
+					{
+						"name": "LocationAmplitudeMultiplier",
+						"type": "float",
+						"category": "Location",
+						"value": 1,
+						"tooltip": "Amplitude multiplier for all location oscillation"
+					},
+					{
+						"name": "LocationFrequencyMultiplier",
+						"type": "float",
+						"category": "Location",
+						"value": 1,
+						"tooltip": "Frequency multiplier for all location oscillation"
+					},
+					{
+						"name": "X",
+						"type": "FWaveOscillator",
+						"category": "Location",
+						"value":
+						{
+							"Amplitude": -0.20000000298023224,
+							"Frequency": 35,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "Oscillation in the X axis."
+					},
+					{
+						"name": "Y",
+						"type": "FWaveOscillator",
+						"category": "Location",
+						"value":
+						{
+							"Amplitude": 0.5,
+							"Frequency": 35,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "Oscillation in the Y axis."
+					},
+					{
+						"name": "Z",
+						"type": "FWaveOscillator",
+						"category": "Location",
+						"value":
+						{
+							"Amplitude": 0.5,
+							"Frequency": 35,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "Oscillation in the Z axis."
+					},
+					{
+						"name": "RotationAmplitudeMultiplier",
+						"type": "float",
+						"category": "Rotation",
+						"value": 0,
+						"tooltip": "Amplitude multiplier for all rotation oscillation"
+					},
+					{
+						"name": "RotationFrequencyMultiplier",
+						"type": "float",
+						"category": "Rotation",
+						"value": 1,
+						"tooltip": "Frequency multiplier for all rotation oscillation"
+					},
+					{
+						"name": "Pitch",
+						"type": "FWaveOscillator",
+						"category": "Rotation",
+						"value":
+						{
+							"Amplitude": 0.5,
+							"Frequency": 35,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "Pitch oscillation."
+					},
+					{
+						"name": "Yaw",
+						"type": "FWaveOscillator",
+						"category": "Rotation",
+						"value":
+						{
+							"Amplitude": 0.30000001192092896,
+							"Frequency": 35,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "Yaw oscillation."
+					},
+					{
+						"name": "Roll",
+						"type": "FWaveOscillator",
+						"category": "Rotation",
+						"value":
+						{
+							"Amplitude": 0.20000000298023224,
+							"Frequency": 35,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "Roll oscillation."
+					},
+					{
+						"name": "FOV",
+						"type": "FWaveOscillator",
+						"category": "FOV",
+						"value":
+						{
+							"Amplitude": 0,
+							"Frequency": 1,
+							"InitialOffsetType": "Random"
+						},
+						"tooltip": "FOV oscillation."
+					},
+					{
+						"name": "Duration",
+						"type": "float",
+						"category": "Timing",
+						"value": 0.15000000596046448,
+						"tooltip": "Duration in seconds of this shake. Zero or less means infinite."
+					},
+					{
+						"name": "BlendInTime",
+						"type": "float",
+						"category": "Timing",
+						"value": 0.05000000074505806,
+						"tooltip": "Blend-in time for this shake. Zero or less means no blend-in."
+					},
+					{
+						"name": "BlendOutTime",
+						"type": "float",
+						"category": "Timing",
+						"value": 0.10000000149011612,
+						"tooltip": "Blend-out time for this shake. Zero or less means no blend-out."
+					}
+				]
+			},
+			"tooltip": "The root pattern for this camera shake"
+		}
+	],
+	"components": [],
+	"eventGraphs": [
+		{
+			"graphName": "EventGraph",
+			"graphCategory": "EventGraph",
+			"executionFlows": [],
+			"nodes": []
+		}
+	],
+	"functionGraphs": [],
+	"macroGraphs": []
+}

@@ -28,6 +28,10 @@ class UMars_ItemTrait_Strike : UCk_ItemTrait
 
     UPROPERTY()
     float32 RecoverySeconds = 0.35f;
+
+    // Shakes the striker's camera when the blow lands on a zone (an Impact_*_CameraShake_Mars_BP); null shakes nothing.
+    UPROPERTY()
+    TSoftClassPtr<UCameraShakeBase> HitShake;
 }
 
 mixin bool Has_Strike(const FCk_Handle_Item& Self)

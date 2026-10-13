@@ -122,6 +122,7 @@ asset Mars_ItemDef_Cleaver of UCk_InventoryItem_Definition
     Strike.Damage = 20.0f;
     Strike.DamageType = GameplayTags::DamageType_Mars_Sever;
     Strike.Swing = utils_hand_swing::Make_ChopArc();
+    Strike.HitShake = assets::Impact_Light_CameraShake_Mars_BP_Class();
     _ItemTraits.Add(Strike);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -157,6 +158,7 @@ asset Mars_ItemDef_Tenderizer of UCk_InventoryItem_Definition
     Strike.WindupSeconds = 0.3f;
     Strike.RecoverySeconds = 0.45f;
     Strike.Swing = utils_hand_swing::Make_OverheadArc();
+    Strike.HitShake = assets::Impact_Light_CameraShake_Mars_BP_Class();
     _ItemTraits.Add(Strike);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));
@@ -186,6 +188,7 @@ asset Mars_ItemDef_Pan of UCk_InventoryItem_Definition
     Strike.Damage = 25.0f;
     Strike.DamageType = GameplayTags::DamageType_Mars_Blunt;
     Strike.Swing = utils_hand_swing::Make_SwipeArc();
+    Strike.HitShake = assets::Impact_Light_CameraShake_Mars_BP_Class();
     _ItemTraits.Add(Strike);
 
     auto Throwable = Cast<UMars_ItemTrait_Throwable>(NewObject(this, UMars_ItemTrait_Throwable));

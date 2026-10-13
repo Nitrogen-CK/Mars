@@ -1,6 +1,6 @@
 // The shipped table validates, has a row for every surface tag a Mars phys mat carries, plays each surface's own steps
 // (Carpet walks below a run's speed ratio and runs above it), plays impacts in the light / heavy bands, and every asset it
-// names loads.
+// names loads, as do the impact shakes combat hits play.
 class UMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads : UMars_AutoTestRig_SurfaceFx
 {
     default _TimeoutSeconds = 15.0f;
@@ -10,6 +10,7 @@ class UMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads : UMars_AutoTestRig
     {
         Add_Step("validate and resolve the shipped table", n"Step_Resolve");
         Add_Step("load every asset it names", n"Step_Load");
+        Add_Step("load the impact shakes", n"Step_LoadShakes");
         Run_Steps(InHandle);
     }
 
@@ -66,6 +67,21 @@ class UMars_AutoTest_SurfaceFx_ShippedTableValidatesAndLoads : UMars_AutoTestRig
         utils_surface_fx::Load_Assets(Table, Loaded);
         Assert_True(Named.Num() > 0, "the shipped table names assets");
         Assert_Equals_Int(Loaded.Num(), Named.Num(), "every asset the shipped table names loads");
+    }
+
+    UFUNCTION()
+    private void Step_LoadShakes(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        TArray<TSoftClassPtr<UCameraShakeBase>> Shakes;
+        Shakes.Add(assets::Impact_Light_CameraShake_Mars_BP_Class());
+        Shakes.Add(assets::Impact_Medium_CameraShake_Mars_BP_Class());
+        Shakes.Add(assets::Impact_Large_CameraShake_Mars_BP_Class());
+        for (auto Shake : Shakes)
+        {
+            TSubclassOf<UCameraShakeBase> ShakeClass;
+            ShakeClass = System::LoadClassAsset_Blocking(Shake);
+            Assert_True(ShakeClass.IsValid(), f"the impact shake [{Shake.ToString()}] loads");
+        }
     }
 
     private void Collect_Named(const FMars_SurfaceFx_Kinds& InKinds, TArray<FString>& OutNamed) const

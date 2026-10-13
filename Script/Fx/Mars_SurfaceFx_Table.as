@@ -132,7 +132,7 @@ namespace mars
         FMars_SurfaceFx_Row Flesh;
         Flesh.Kinds.ByKind.Add(GameplayTags::SurfaceFx_Impact, utils_surface_fx::Make_ImpactCell(
             utils_surface_fx::Make_Sound("/Game/Mars/Audio/WAVsCUEs/Impacts/HitImpact_Flesh_Mars_SND.HitImpact_Flesh_Mars_SND"),
-            TSoftObjectPtr<UNiagaraSystem>()));
+            HitDefaultVfx));
         Rows.Add(GameplayTags::Surface_Flesh, Flesh);
     }
 }

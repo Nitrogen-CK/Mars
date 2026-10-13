@@ -468,7 +468,7 @@ namespace utils_surface_fx
         Play_Vfx(Fx, InEvent.Contact);
 
         if (Control == ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
-        { Play_Shake(Fx); }
+        { Play_Shake(Fx.Shake); }
     }
 
     // IsNotValidPawn for no instigator or one that is not a pawn: the world's own events play as local ones without a shake.
@@ -525,9 +525,10 @@ namespace utils_surface_fx
             AutoDestroy, AutoActivate, ENCPoolMethod::None, PreCullCheck);
     }
 
-    void Play_Shake(const FMars_SurfaceFx_Resolved& InFx)
+    // Shakes the local player's camera; a null InShake plays nothing. The caller decides whose event deserves it.
+    void Play_Shake(TSoftClassPtr<UCameraShakeBase> InShake)
     {
-        if (InFx.Shake.IsNull())
+        if (InShake.IsNull())
         { return; }
 
         auto Controller = Gameplay::GetPlayerController(0);
@@ -535,8 +536,8 @@ namespace utils_surface_fx
         { return; }
 
         TSubclassOf<UCameraShakeBase> ShakeClass;
-        ShakeClass = System::LoadClassAsset_Blocking(InFx.Shake);
-        if (ck::EnsureIfNot(ShakeClass.IsValid(), f"[SurfaceFx] shake [{InFx.Shake.ToString()}] did not load"))
+        ShakeClass = System::LoadClassAsset_Blocking(InShake);
+        if (ck::EnsureIfNot(ShakeClass.IsValid(), f"[SurfaceFx] shake [{InShake.ToString()}] did not load"))
         { return; }
 
         Controller.PlayerCameraManager.StartCameraShake(ShakeClass, 1.0f, ECameraShakePlaySpace::CameraLocal, FRotator::ZeroRotator);

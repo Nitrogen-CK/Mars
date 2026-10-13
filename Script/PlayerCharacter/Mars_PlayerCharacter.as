@@ -236,7 +236,8 @@ class AMars_PlayerCharacter : AMars_Character
 
         utils_input_intents::Add(Player);
         utils_team::Add(Player, ECk_Team_ID::One, ECk_Replication::DoesNotReplicate);
-        utils_damage_dealer::Add(Player, FMars_DamageDealer_Spec());
+        auto Dealer = utils_damage_dealer::Add(Player, FMars_DamageDealer_Spec());
+        Dealer.BindTo_OnDamageDealt(FMars_Delegate_DamageDealer_OnDamageDealt(this, n"OnDamageDealt"));
 
         // The character's stride clock; the head and hand bobs below read it. The spec's tunables come from the config,
         // its motion source is this pawn's movement component.
@@ -385,6 +386,8 @@ class AMars_PlayerCharacter : AMars_Character
         if (ck::Is_NOT_Valid(Health))
         { return; }
 
+        Health.BindTo_OnDamaged(FMars_Delegate_Health_OnDamaged(this, n"OnHurt"));
+
         auto Zone = utils_hit_zone::Add(Player, utils_hit_zone::Make_FleshZoneSpec(GameplayTags::HitZone_Mars_Body, 1.0f));
         if (ck::Is_NOT_Valid(Zone))
         { return; }
@@ -402,6 +405,80 @@ class AMars_PlayerCharacter : AMars_Character
         { return; }
 
         utils_entity_tag::Add(Player, n"TAG_MarsCombatTarget");
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Hit feedback: a blow this player lands, on a zone or on the world, and a blow that lands on this player play the
+    // surface's impact (SurfaceFx) at the contact and shake this player's camera: the striker's by the item's
+    // Strike.HitShake, the victim's by Config.Combat.HurtShake. The striker's zone cue is the dealer's OnDamageDealt, not
+    // Health.OnDamaged: a leg hit spills to the body and damages twice. Every zone plays as flesh until a zone names its
+    // surface; the world plays its phys mat's surface.
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // A held item's strike was stopped by the world (a wall, a prop) short of any zone (UMars_SmTask_ItemUse_Strike).
+    void Play_StrikeWorldHit(FCk_ShapeCast_Result InHit, FCk_Handle_Item InItem)
+    {
+        if (ck::Is_NOT_Valid(_PlayerEntity) || utils_net::Get_CanExecuteCosmeticEvents(_PlayerEntity) == false)
+        { return; }
+
+        auto Contact = FMars_SurfaceFx_Contact();
+        Contact.Location = InHit.Get_HitLocation();
+        Contact.Normal = InHit.Get_SurfaceNormal();
+        PlayImpactFx(_PlayerEntity, utils_surface_fx::Get_SurfaceTags(InHit.Get_PhysicalMaterial().Get()), Contact);
+        PlayStrikeShake(_PlayerEntity, InItem);
+    }
+
+    UFUNCTION()
+    private void OnDamageDealt(FCk_Handle_DamageDealer InDealer, FCk_Handle_HitZone InZone, FMars_DamageEvent InEvent)
+    {
+        if (utils_net::Get_CanExecuteCosmeticEvents(InDealer) == false)
+        { return; }
+
+        PlayImpactFx(InDealer, GameplayTag::MakeContainerFromTag(GameplayTags::Surface_Flesh), Make_Contact(InEvent));
+        PlayStrikeShake(InDealer, InEvent.Source.Causer.As_Item(ECk_SanityCheck::UnChecked));
+    }
+
+    // Only the local receiver binds this (TryConstructCombatReceiver), so the victim is always this machine's player.
+    UFUNCTION()
+    private void OnHurt(FCk_Handle_Health InHealth, FMars_DamageEvent InEvent, float32 InApplied, float32 InRemaining)
+    {
+        if (utils_net::Get_CanExecuteCosmeticEvents(InHealth) == false)
+        { return; }
+
+        PlayImpactFx(InHealth, GameplayTag::MakeContainerFromTag(GameplayTags::Surface_Flesh), Make_Contact(InEvent));
+        utils_surface_fx::Play_Shake(Config.Combat.HurtShake);
+    }
+
+    private void PlayImpactFx(FCk_Handle InPlayer, FGameplayTagContainer InSurfaceTags, FMars_SurfaceFx_Contact InContact)
+    {
+        auto Event = FMars_SurfaceFx_Event();
+        Event.Kind = GameplayTags::SurfaceFx_Impact;
+        Event.SurfaceTags = InSurfaceTags;
+        Event.Contact = InContact;
+        // A blow always plays the surface's heavy hit, never the light knock.
+        Event.Intensity = constants_surface_fx::k_ImpactHeavyMinSpeed;
+        Event.Instigator = InPlayer;
+        utils_surface_fx::Play(Event);
+    }
+
+    // InItem's Strike.HitShake, on the striker's own machine only.
+    private void PlayStrikeShake(FCk_Handle InPlayer, FCk_Handle_Item InItem)
+    {
+        if (ck::Is_NOT_Valid(InItem) || InItem.Has_Strike() == false)
+        { return; }
+
+        if (utils_net::Get_IsEntityLocallyControlled_ByPlayer(InPlayer) != ECk_Utils_Net_IsLocallyControlled_Result::IsLocallyControlled)
+        { return; }
+
+        utils_surface_fx::Play_Shake(InItem.Get_Strike().HitShake);
+    }
+
+    private FMars_SurfaceFx_Contact Make_Contact(const FMars_DamageEvent& InEvent) const
+    {
+        auto Contact = FMars_SurfaceFx_Contact();
+        Contact.Location = InEvent.Hit.Location;
+        Contact.Normal = InEvent.Hit.Normal;
+        return Contact;
     }
 
     // The owning client (or the listen host, for its own pawn) is the SM's only start authority. Called when the entity is

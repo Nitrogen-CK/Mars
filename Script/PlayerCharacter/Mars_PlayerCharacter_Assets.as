@@ -65,6 +65,10 @@ struct FMars_PlayerCharacter_Combat
 
     UPROPERTY()
     float32 MaxHealth = 100.0f;
+
+    // Shakes the player's camera when a hit lands on them; null shakes nothing.
+    UPROPERTY()
+    TSoftClassPtr<UCameraShakeBase> HurtShake;
 }
 
 struct FMars_PlayerCharacter_View
@@ -163,6 +167,8 @@ namespace mars
         Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Operate, OperateChannels));
 
         InteractionResolver = FCk_InteractionResolver_Spec(Mappings);
+
+        Combat.HurtShake = assets::Impact_Medium_CameraShake_Mars_BP_Class();
 
         // The view trace reaches 250 uu; the gloves reach anything it hits (FPHands MaxReachCm unset = uncapped).
         View.Viewpoint.InteractionTraceDistance = 250.0f;
