@@ -1,5 +1,5 @@
-// The service steward's look: the body mesh and its idle, where its eyes sit and how they behave. Read by
-// UMars_Steward_EntityScript. The mesh, its eye plate and the numbers below come out of one pipeline: the Blender
+// The service steward's look: the body mesh and its idle, where its eyes sit and how they behave, and how it stages a
+// devouring. Read by UMars_Steward_EntityScript. The mesh, its eye plate and the numbers below come out of one pipeline: the Blender
 // builder (Tools/Blender/mars_steward/build_steward.py) and the editor-side importer next to it
 // (unreal/mars_steward_ue.py), which logs Face.Offset for the mesh it imported.
 
@@ -57,6 +57,159 @@ struct FMars_Steward_Gaze
     float32 ConeHalfAngleDeg = 85.0f;
 }
 
+// What the face plate shows at one instant: the MarsStewardMaw look's animated inputs (Shaders/Looks/StewardMaw.ush).
+struct FMars_Steward_MawFrame
+{
+    // The plate's glow; 0 is pure black.
+    float32 Strength = 0.0f;
+
+    // 0 shut .. 1 open.
+    float32 EyeOpen = 0.0f;
+
+    // 0 the resting eye .. 1 the evil one.
+    float32 Evil = 0.0f;
+
+    // 0 no mouth .. 1 the clenched grin.
+    float32 Mouth = 0.0f;
+
+    // 0 clenched .. 1 wide open.
+    float32 Jaw = 0.0f;
+
+    // The face's size about its mouth; 1 is the grin's.
+    float32 Zoom = 1.0f;
+
+    // How much of the world the plate hides: 1 all of it, 0 none.
+    float32 Veil = 1.0f;
+
+    // 0 the eyes glow as they do on the head .. 1 they burn.
+    float32 Heat = 0.0f;
+
+    // How far the view shudders, in half view widths.
+    float32 Shake = 0.0f;
+
+    // The head cocked in the view; negative leans its top to the view's left.
+    float32 TiltRadians = 0.0f;
+}
+
+namespace constants_steward
+{
+    // On every steward's entity: how the Mars_Devour cheat finds them.
+    const FName k_EntityTag = n"TAG_MarsSteward";
+
+    // The mechanism channel that tells every steward the service has failed. Anything may assert it (the sandbox's fail
+    // switch does, Mars_SandboxSteward.as); a steward devours a player each time it rises.
+    const FName k_ServiceFailedChannel = n"Mechanism.Channel.ServiceFailed";
+
+    // On whoever a steward may devour: the players monsters can hurt (AMars_PlayerCharacter's combat receiver).
+    const FName k_VictimTag = n"TAG_MarsCombatTarget";
+}
+
+// How the steward stages a devouring (the Devour feature runs its clock): where the victim's view is taken, and the face
+// plate that fills it from Blink on.
+struct FMars_Steward_Maw
+{
+    UPROPERTY()
+    FMars_Devour_Timing Timing;
+
+    // Where the victim's view is held once lifted: this far out of the face node along its +X, looking back at it.
+    UPROPERTY()
+    float32 BiteDistanceCm = 45.0f;
+
+    // The face plate: a square this wide, this far in front of the victim's eye. Just past the 10 cm near plane, so it
+    // is nearer than the first-person gloves and whatever they hold (drawn scaled toward the eye, FMars_FPHands_ViewSpec).
+    // It must cover the view: at a 90 degree field of view the view is twice the distance wide.
+    UPROPERTY()
+    float32 PlateSizeCm = 60.0f;
+
+    UPROPERTY()
+    float32 PlateDistanceCm = 12.0f;
+
+    // The plate's light while the face shows. The look divides it by the view's exposure, so it is what reaches the
+    // screen whatever the level's light: 1 is the tonemapper's near-white, where the teeth lose their shading.
+    UPROPERTY()
+    float32 Brightness = 0.7f;
+
+    // The face's Zoom while the open maw is held in view, and as the jaws close on the view.
+    UPROPERTY()
+    float32 GapeZoom = 1.12f;
+
+    UPROPERTY()
+    float32 BiteZoom = 3.4f;
+
+    // By the end of the grin: how hot the eyes burn and how far they have turned to the evil shape (both finish in the
+    // bite's first moments), and how far the head is cocked. And how far the view shudders by the bite's end (half
+    // view widths).
+    UPROPERTY()
+    float32 GrinHeat = 0.7f;
+
+    UPROPERTY()
+    float32 GrinEvil = 0.5f;
+
+    UPROPERTY()
+    float32 GrinTiltDeg = -8.0f;
+
+    UPROPERTY()
+    float32 BiteShake = 0.02f;
+
+    // The plate lifts off the victim's view over this long once the victim is let go: the world comes back from black.
+    UPROPERTY()
+    float32 FadeBackSeconds = 0.8f;
+}
+
+// The face plate through the run, InAlpha 0..1 through InPhase. Blink is black (the cut from the steward's head to the
+// plate). Grin opens the eyes at once, then splits the mouth into the clenched grin of needle teeth while the eyes
+// narrow, catch fire and start to turn, the head cocks and the face creeps closer. Bite finishes the eyes' turn to evil,
+// fully alight, as the jaws swing wide; the gaping maw is held in view (GapeZoom), shuddering, then comes down over the view (BiteZoom), snaps
+// shut and goes black. Swallowed stays black. Seize and Lift have no plate. The plate hides the whole world throughout
+// (Veil 1).
+mixin FMars_Steward_MawFrame Get_Frame(const FMars_Steward_Maw& Self, EMars_Devour_Phase InPhase, float32 InAlpha)
+{
+    auto Frame = FMars_Steward_MawFrame();
+    const float32 GrinZoom = 1.08f;
+    const float32 GrinEyeOpen = 0.8f;
+    const auto GrinTilt = float32(Math::DegreesToRadians(Self.GrinTiltDeg));
+
+    if (InPhase == EMars_Devour_Phase::Grin)
+    {
+        Frame.Strength = Self.Brightness;
+        Frame.EyeOpen = Math::SmoothStep(0.0f, 0.1f, InAlpha) * Math::Lerp(1.0f, GrinEyeOpen, Math::SmoothStep(0.4f, 1.0f, InAlpha));
+        Frame.Heat = Self.GrinHeat * Math::SmoothStep(0.2f, 0.9f, InAlpha);
+        Frame.Evil = Self.GrinEvil * Math::SmoothStep(0.55f, 1.0f, InAlpha);
+        Frame.Mouth = Math::SmoothStep(0.3f, 0.75f, InAlpha);
+        Frame.TiltRadians = GrinTilt * Math::SmoothStep(0.2f, 1.0f, InAlpha);
+        Frame.Zoom = Math::Lerp(1.0f, GrinZoom, InAlpha);
+    }
+    else if (InPhase == EMars_Devour_Phase::Bite)
+    {
+        // The jaws are wide by OpenAt and held in view to LungeFrom; the face then comes down over the view, the jaws
+        // starting to shut at ShutFrom and shut by ShutAt, and the plate is black from BlackAt.
+        const float32 OpenAt = 0.28f;
+        const float32 LungeFrom = 0.5f;
+        const float32 ShutFrom = 0.78f;
+        const float32 ShutAt = 0.88f;
+        const float32 BlackAt = 0.93f;
+
+        const auto Turning = Math::SmoothStep(0.0f, 0.2f, InAlpha);
+        Frame.Strength = InAlpha < BlackAt ? Self.Brightness : 0.0f;
+        Frame.EyeOpen = Math::Lerp(GrinEyeOpen, 1.0f, Turning);
+        Frame.Mouth = 1.0f;
+        Frame.Evil = Math::Lerp(Self.GrinEvil, 1.0f, Turning);
+        Frame.Heat = Math::Lerp(Self.GrinHeat, 1.0f, Turning);
+        Frame.TiltRadians = GrinTilt * (1.0f - Math::SmoothStep(0.0f, 0.25f, InAlpha));
+        Frame.Shake = Self.BiteShake * InAlpha;
+
+        const auto Opening = Math::Clamp(InAlpha / OpenAt, 0.0f, 1.0f);
+        const auto Shutting = Math::Clamp((InAlpha - ShutFrom) / (ShutAt - ShutFrom), 0.0f, 1.0f);
+        Frame.Jaw = (1.0f - (1.0f - Opening) * (1.0f - Opening)) * (1.0f - Shutting * Shutting);
+
+        const auto Gaping = Math::SmoothStep(0.0f, LungeFrom, InAlpha);
+        const auto Lunge = Math::Clamp((InAlpha - LungeFrom) / (ShutAt - LungeFrom), 0.0f, 1.0f);
+        Frame.Zoom = Math::Lerp(Math::Lerp(GrinZoom, Self.GapeZoom, Gaping), Self.BiteZoom, Lunge * Lunge);
+    }
+
+    return Frame;
+}
+
 class UMars_Steward_Config : UDataAsset
 {
     UPROPERTY(Category = "Body")
@@ -70,6 +223,9 @@ class UMars_Steward_Config : UDataAsset
 
     UPROPERTY(Category = "Face")
     FMars_Eyes_Spec Eyes;
+
+    UPROPERTY(Category = "Maw")
+    FMars_Steward_Maw Maw;
 
     // All-or-nothing: reports the first failing rule. The gaze numbers are checked by the Gaze spec they fill.
     FMars_Validation Validate() const
@@ -104,6 +260,41 @@ class UMars_Steward_Config : UDataAsset
         if (EyesValidation.IsValid() == false)
         { return FMars_Validation(f"Eyes: {EyesValidation.Get_Error()}"); }
 
+        const auto TimingValidation = Maw.Timing.Validate();
+        if (TimingValidation.IsValid() == false)
+        { return FMars_Validation(f"Maw.Timing: {TimingValidation.Get_Error()}"); }
+
+        // A NaN fails each comparison, so it is rejected too.
+        if ((Maw.BiteDistanceCm > 0.0f) == false)
+        { return FMars_Validation(f"Maw.BiteDistanceCm [{Maw.BiteDistanceCm}] must be positive"); }
+
+        if ((Maw.PlateDistanceCm > 0.0f) == false)
+        { return FMars_Validation(f"Maw.PlateDistanceCm [{Maw.PlateDistanceCm}] must be positive"); }
+
+        if ((Maw.PlateSizeCm >= Maw.PlateDistanceCm * 2.0f) == false)
+        { return FMars_Validation(f"Maw.PlateSizeCm [{Maw.PlateSizeCm}] must be at least twice PlateDistanceCm [{Maw.PlateDistanceCm}] to cover the view"); }
+
+        if ((Maw.GapeZoom >= 1.0f) == false)
+        { return FMars_Validation(f"Maw.GapeZoom [{Maw.GapeZoom}] must be at least 1"); }
+
+        if ((Maw.BiteZoom >= Maw.GapeZoom) == false)
+        { return FMars_Validation(f"Maw.BiteZoom [{Maw.BiteZoom}] must be at least GapeZoom [{Maw.GapeZoom}]"); }
+
+        if ((Maw.GrinHeat >= 0.0f && Maw.GrinHeat <= 1.0f) == false)
+        { return FMars_Validation(f"Maw.GrinHeat [{Maw.GrinHeat}] must be within 0..1"); }
+
+        if ((Maw.GrinEvil >= 0.0f && Maw.GrinEvil <= 1.0f) == false)
+        { return FMars_Validation(f"Maw.GrinEvil [{Maw.GrinEvil}] must be within 0..1"); }
+
+        if ((Maw.BiteShake >= 0.0f) == false)
+        { return FMars_Validation(f"Maw.BiteShake [{Maw.BiteShake}] is negative"); }
+
+        if ((Maw.Brightness >= 0.0f) == false)
+        { return FMars_Validation(f"Maw.Brightness [{Maw.Brightness}] is negative"); }
+
+        if ((Maw.FadeBackSeconds >= 0.0f) == false)
+        { return FMars_Validation(f"Maw.FadeBackSeconds [{Maw.FadeBackSeconds}] is negative"); }
+
         return FMars_Validation();
     }
 }
@@ -120,5 +311,9 @@ namespace mars
         Eyes.Style.Color = FLinearColor(1.0f, 0.9f, 0.72f, 1.0f);
         Eyes.Blink = FMars_Eyes_BlinkSpec();
         Eyes.Look = FMars_Eyes_LookSpec();
+
+        // Longer than the kernel's defaults: the grin has time to catch fire, and the open maw is held before it bites.
+        Maw.Timing.GrinSeconds = 1.6f;
+        Maw.Timing.BiteSeconds = 1.1f;
     }
 }

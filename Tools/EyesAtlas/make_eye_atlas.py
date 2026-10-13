@@ -294,6 +294,14 @@ def shape_half_lid():
     return ellipse(0.0, 0.0, OVAL_A, OVAL_B) & (Y <= 0.0)
 
 
+def shape_evil():
+    # The steward's eye as it bites: the oval cut to a blade. A heavy lid drops steeply to the inner edge (far lower
+    # than Angry's) and the under-lid rises to the outer edge, so the eye narrows to a point outward and glares inward.
+    lid = below_line(-OVAL_A, -6.0, OVAL_A, 34.0)
+    under = ~below_line(-OVAL_A, -34.0, OVAL_A, -12.0)
+    return ellipse(0.0, 0.0, OVAL_A, OVAL_B) & lid & under
+
+
 def shape_sparkle():
     big = dilate(astroid(-5.0, -5.0, 29.0, 0.42), 5.0)
     small = dilate(astroid(24.0, 24.0, 8.0, 0.45), 5.0)
@@ -348,7 +356,8 @@ CELLS = [
     ("Tiny dot", shape_tiny_dot),
     ("Ring", shape_ring),
     ("Wavy", shape_wavy),
-] + [("Blank", shape_blank)] * 8
+    ("Evil", shape_evil),
+] + [("Blank", shape_blank)] * 7
 
 ROUND_DOT_INDEX = 2
 

@@ -1,0 +1,297 @@
+// /Project/Looks/StewardMaw.ush
+//
+// The steward's face as its victim sees it: two eyes and a maw on a black void, drawn on one plate that fills the view.
+// The eyes are the eye plate's (one cell of the same distance-field atlas each, the left one mirrored), blended from the
+// resting shape to the evil one; Heat sets them alight (a white-hot heart, an orange body, a red rim, tongues of flame
+// licking up off them). The maw is drawn, not sampled: a crescent about a bite line whose corners curl up, a row of
+// uneven needle teeth off each gum line with a dim second row behind, a throat that is red at its edge and falls to
+// black, and strands of ichor between the jaws that stretch thin as they open, part and hang. It has no lips: the teeth
+// stand straight out of the dark.
+// Mouth splits it open from nothing to the clenched grin, the two rows meshed; Jaw then swings the jaws apart, the mouth
+// narrowing and the face tipping back so the whole gape stays in view. Zoom swells the face about the middle of the open
+// mouth, so the jaws pass the edges of the view and the view goes down the throat. Tilt cocks the head; Shake shudders it.
+//
+// The plate's UV is the view: P below is +-1 at the view's left and right edges, x right, y DOWN. Span makes it so: the
+// plate's width over (its distance from the eye times the tangent of half the horizontal field of view). Everything
+// that animates arrives as custom primitive data. The plate is translucent so it can lift off the view again: Veil is
+// how much of the world it hides (1 through the scene, down to 0 as the world comes back). With nothing written Veil is
+// 0 and the plate is not there.
+//
+// The face is all there is to see, so its light is divided by the view's exposure: Strength 1 is the same face in
+// daylight and in a crypt, and the eye's adapting to the black plate does not wash it out as the scene runs.
+//
+// Tools/StewardMaw/maw_preview.py is a numpy mirror of this file that draws the scene's frames without an editor;
+// keep the two in step when the shapes change.
+#pragma once
+#include "/CkUsf/Common.ush"
+#include "/Project/Looks/EyePlate.ush"
+
+// The mouth, in units of its half width (x -1..1 corner to corner).
+// How far the corners curl above the middle of the bite line.
+#ifndef MARS_MAW_CURL
+#define MARS_MAW_CURL 0.30f
+#endif
+// Half the clenched grin's thickness at its middle.
+#ifndef MARS_MAW_CLENCH
+#define MARS_MAW_CLENCH 0.15f
+#endif
+// At Jaw 1: how far the lower gum line drops and the upper one lifts, what is left of the mouth's width, and how far
+// the face tips back up the view (in half view widths) so both rows stay in it.
+#ifndef MARS_MAW_JAW_DROP
+#define MARS_MAW_JAW_DROP 0.85f
+#endif
+#ifndef MARS_MAW_JAW_LIFT
+#define MARS_MAW_JAW_LIFT 0.28f
+#endif
+#ifndef MARS_MAW_JAW_NARROW
+#define MARS_MAW_JAW_NARROW 0.72f
+#endif
+#ifndef MARS_MAW_JAW_RISE
+#define MARS_MAW_JAW_RISE 0.16f
+#endif
+// Teeth per row (upper, lower, the back rows) and the longest a tooth of each grows.
+#ifndef MARS_MAW_TEETH
+#define MARS_MAW_TEETH 15.0f
+#endif
+#ifndef MARS_MAW_LOW_TEETH
+#define MARS_MAW_LOW_TEETH 14.0f
+#endif
+#ifndef MARS_MAW_BACK_TEETH
+#define MARS_MAW_BACK_TEETH 19.0f
+#endif
+#ifndef MARS_MAW_TOOTH_LEN
+#define MARS_MAW_TOOTH_LEN 0.40f
+#endif
+#ifndef MARS_MAW_LOW_TOOTH_LEN
+#define MARS_MAW_LOW_TOOTH_LEN 0.36f
+#endif
+#ifndef MARS_MAW_BACK_TOOTH_LEN
+#define MARS_MAW_BACK_TOOTH_LEN 0.20f
+#endif
+// A tooth: its root's half width as a share of its place in the row, how fast it narrows to its point (below 1 keeps
+// the body full), and how far its point leans out of line.
+#ifndef MARS_MAW_TOOTH_HALF
+#define MARS_MAW_TOOTH_HALF 0.44f
+#endif
+#ifndef MARS_MAW_TOOTH_TAPER
+#define MARS_MAW_TOOTH_TAPER 0.75f
+#endif
+#ifndef MARS_MAW_TOOTH_LEAN
+#define MARS_MAW_TOOTH_LEAN 0.55f
+#endif
+// Where the fangs stand and how much longer than their row they are.
+#ifndef MARS_MAW_FANG_AT
+#define MARS_MAW_FANG_AT 0.52f
+#endif
+#ifndef MARS_MAW_FANG_LEN
+#define MARS_MAW_FANG_LEN 0.45f
+#endif
+// The black kept between an upper needle and the lower tooth it lies over.
+#ifndef MARS_MAW_OUTLINE
+#define MARS_MAW_OUTLINE 0.012f
+#endif
+// Ichor: how many strands and a strand's half width at its ends.
+#ifndef MARS_MAW_STRANDS
+#define MARS_MAW_STRANDS 5
+#endif
+#ifndef MARS_MAW_STRAND_WIDTH
+#define MARS_MAW_STRAND_WIDTH 0.045f
+#endif
+
+// One pixel in the look's coordinates.
+float Mars_Maw_PixelSize(float2 P)
+{
+#if PIXELSHADER
+    return max(length(fwidth(P)) * 0.7071f, 1e-5f);
+#else
+    return 1e-3f;
+#endif
+}
+
+// Coverage from a signed distance (negative inside) with a pixel of feather. The mouth's distances jump from tooth to
+// tooth, so the pixel size is passed in rather than taken from the distance's own derivative.
+float Mars_Maw_Edge(float Dist, float Px)
+{
+    return saturate(0.5f - Dist / Px);
+}
+
+// The crescent's profile: 1 in the middle of the mouth, 0 at its corners.
+float Mars_Maw_Profile(float Mx)
+{
+    return pow(saturate(1.0f - Mx * Mx), 0.6f);
+}
+
+// One row of needle teeth off a gum line. Dist is how far past the gum line the pixel is, into the mouth. Row is the
+// tooth count, the row's offset in teeth, and the longest tooth; each tooth draws its own length, width and lean from
+// its index and Seed. Returns the signed distance (negative inside a tooth); Along runs 0 at the root to 1 at the
+// point, Across -1..1 over the tooth's width.
+float Mars_Maw_ToothRow(float Mx, float Dist, float3 Row, float Seed, float Split, out float Along, out float Across)
+{
+    const float Q = (Mx * 0.5f + 0.5f) * Row.x + Row.y;
+    const float Index = floor(Q);
+    const float U = Q - Index - 0.5f;
+    const float Place = 2.0f / Row.x;
+    const float Centre = ((Index + 0.5f - Row.y) / Row.x) * 2.0f - 1.0f;
+    const float H = CkUsf_Hash21(float2(Index, Seed));
+    const float H2 = CkUsf_Hash21(float2(Index, Seed + 7.0f));
+    const float Fang = saturate(1.0f - abs(abs(Centre) - MARS_MAW_FANG_AT) * Row.x * 0.5f);
+    const float Length = Row.z * (0.55f + 0.45f * H + MARS_MAW_FANG_LEN * Fang) * sqrt(Mars_Maw_Profile(Centre)) * Split;
+    const float T = Dist / max(Length, 1e-4f);
+    const float Half = Place * MARS_MAW_TOOTH_HALF * (0.8f + 0.2f * H2) * pow(saturate(1.0f - T), MARS_MAW_TOOTH_TAPER);
+    const float Off = U * Place - (H2 - 0.5f) * MARS_MAW_TOOTH_LEAN * Place * T * T;
+
+    Along = saturate(T);
+    Across = Off / max(Half, 1e-4f);
+    return max(max(abs(Off) - Half, -Dist), Dist - Length);
+}
+
+// A tooth's colour: stained at the root, bone from halfway down, rounded off toward its sides.
+float3 Mars_Maw_ToothColor(float3 Bone, float Along, float Across)
+{
+    const float3 Stain = float3(0.42f, 0.17f, 0.07f);
+    return lerp(Stain, Bone, smoothstep(0.0f, 0.5f, Along)) * (1.0f - 0.45f * saturate(Across * Across));
+}
+
+FCkUsf_SurfaceOutput Mars_Look_StewardMaw(
+    FCkUsf_SurfaceInput In,
+    Texture2D           Atlas,
+    SamplerState        AtlasSampler,
+    float               Strength,
+    float               EyeOpen,
+    float               Evil,
+    float               Mouth,
+    float               Jaw,
+    float               Zoom,
+    float               Span,
+    float               Veil,
+    float3              Color,
+    float               Heat,
+    float               Shake,
+    float               Tilt,
+    float               AtlasCols,
+    float               AtlasRows,
+    float               RestCell,
+    float               EvilCell,
+    float               EyeSize,
+    float               EyeSpread,
+    float               EyeHeight,
+    float               MouthHeight,
+    float               MouthWidth,
+    float               GlowStrength,
+    float               CellPad,
+    float3              FireColor,
+    float3              FleshColor)
+{
+    FCkUsf_SurfaceOutput O = CkUsf_DefaultSurface();
+
+    const float Time = In.Time;
+    const float Open = saturate(Jaw);
+    const float Burn = saturate(Heat);
+    const float Split = saturate(Mouth);
+    const float Narrowed = MouthWidth * lerp(1.0f, MARS_MAW_JAW_NARROW, Open);
+
+    // The view, shuddering.
+    float2 S = (In.UV - 0.5f) * Span;
+    S += Shake * (float2(CkUsf_ValueNoise(float2(Time * 31.0f, 0.5f)), CkUsf_ValueNoise(float2(Time * 37.0f, 5.5f))) - 0.5f) * 2.0f;
+
+    // The face in it: the head cocked, tipped back as the jaw drops, swollen about the middle of the open mouth.
+    float TiltSin, TiltCos;
+    sincos(Tilt, TiltSin, TiltCos);
+    float2 P = float2(S.x * TiltCos - S.y * TiltSin, S.x * TiltSin + S.y * TiltCos);
+    P.y += MARS_MAW_JAW_RISE * Open;
+    const float2 Pivot = float2(0.0f, MouthHeight + Open * (MARS_MAW_JAW_DROP - MARS_MAW_JAW_LIFT) * 0.5f * Narrowed);
+    P = (P - Pivot) / max(Zoom, 0.01f) + Pivot;
+    const float Px = Mars_Maw_PixelSize(P);
+
+    float3 Face = 0.0f;
+
+    // --- The maw, in units of its half width.
+    const float2 M = float2(P.x, P.y - MouthHeight) / max(Narrowed, 0.001f);
+    const float MPx = Px / max(Narrowed, 0.001f);
+    const float Ax = abs(M.x);
+    const float Profile = Mars_Maw_Profile(M.x);
+    const float BiteLine = -MARS_MAW_CURL * M.x * M.x;
+    const float Top = BiteLine - (MARS_MAW_CLENCH + Open * MARS_MAW_JAW_LIFT) * Profile * Split;
+    const float Bottom = BiteLine + (MARS_MAW_CLENCH + Open * MARS_MAW_JAW_DROP) * Profile * Split;
+    const float PastCorner = Ax - 1.0f;
+    const float Opened = Split > 0.001f ? 1.0f : 0.0f;
+    const float Inside = Mars_Maw_Edge(max(max(Top - M.y, M.y - Bottom), PastCorner), MPx) * Opened;
+
+    // The throat: wet red at its edge, falling to black.
+    const float Depth = max(min(M.y - Top, Bottom - M.y), 0.0f);
+    Face = lerp(Face, FleshColor * 0.55f * exp(-Depth / 0.07f), Inside);
+
+    // The back rows, dim.
+    float Along, Across;
+    const float BackUpper = Mars_Maw_ToothRow(M.x, M.y - Top, float3(MARS_MAW_BACK_TEETH, 0.37f, MARS_MAW_BACK_TOOTH_LEN), 31.0f, Split, Along, Across);
+    const float BackLower = Mars_Maw_ToothRow(M.x, Bottom - M.y, float3(MARS_MAW_BACK_TEETH, 0.81f, MARS_MAW_BACK_TOOTH_LEN), 47.0f, Split, Along, Across);
+    const float Back = saturate(Mars_Maw_Edge(max(BackUpper, M.y - Bottom), MPx) + Mars_Maw_Edge(max(BackLower, Top - M.y), MPx)) * Inside;
+    Face = lerp(Face, Mars_Maw_ToothColor(Color, 0.6f, 0.0f) * 0.22f, Back);
+
+    // The front rows. The upper needles lie over the lower teeth, which stop an outline short of them.
+    float UpperAlong, UpperAcross, LowerAlong, LowerAcross;
+    float UpperDist = Mars_Maw_ToothRow(M.x, M.y - Top, float3(MARS_MAW_TEETH, 0.0f, MARS_MAW_TOOTH_LEN), 3.0f, Split, UpperAlong, UpperAcross);
+    float LowerDist = Mars_Maw_ToothRow(M.x, Bottom - M.y, float3(MARS_MAW_LOW_TEETH, 0.5f, MARS_MAW_LOW_TOOTH_LEN), 13.0f, Split, LowerAlong, LowerAcross);
+    UpperDist = max(max(UpperDist, M.y - Bottom), PastCorner);
+    LowerDist = max(max(LowerDist, Top - M.y), PastCorner);
+    const float Lower = Mars_Maw_Edge(max(LowerDist, MARS_MAW_OUTLINE - UpperDist), MPx) * Opened;
+    const float Upper = Mars_Maw_Edge(UpperDist, MPx) * Opened;
+    Face = lerp(Face, Mars_Maw_ToothColor(Color, LowerAlong, LowerAcross) * 0.85f, Lower);
+    Face = lerp(Face, Mars_Maw_ToothColor(Color, UpperAlong, UpperAcross), Upper);
+
+    // Ichor between the jaws: each strand thins in its middle and as the jaws open, parts at its own gape, and what
+    // is left of its two ends hangs.
+    const float Gape = max(Bottom - Top, 1e-4f);
+    const float Down = (M.y - Top) / Gape;
+    const float FromEnd = min(Down, 1.0f - Down);
+    const float Belly = sin(3.14159f * saturate(Down));
+    const float Waist = 2.0f * Down - 1.0f;
+    float Strands = 0.0f;
+    float Shine = 0.0f;
+    for (int StrandIndex = 0; StrandIndex < MARS_MAW_STRANDS; ++StrandIndex)
+    {
+        const float J = float(StrandIndex);
+        const float H = CkUsf_Hash21(float2(J + 1.0f, 91.0f));
+        const float H2 = CkUsf_Hash21(float2(J + 1.0f, 57.0f));
+        const float At = -0.78f + 1.56f * (J + H) / float(MARS_MAW_STRANDS)
+            + (0.10f * (H2 - 0.5f) + 0.02f * sin(Time * 2.3f + J * 1.7f)) * Belly;
+        const float Half = MARS_MAW_STRAND_WIDTH * (0.5f + H2) * (0.22f + 0.78f * Waist * Waist * Waist * Waist) / (1.0f + 1.5f * Open);
+        const float Parted = saturate((Open - (0.35f + 0.6f * H)) * 2.5f);
+        const float Kept = lerp(0.5f, 0.10f + 0.25f * H2, Parted);
+        const float Coverage = Mars_Maw_Edge(max(abs(M.x - At) - Half, (FromEnd - Kept) * Gape), MPx);
+        Strands = max(Strands, Coverage);
+        Shine = max(Shine, Coverage * (1.0f - smoothstep(0.0f, Half * 0.6f, abs(M.x - At - Half * 0.35f))));
+    }
+    Strands *= Inside * smoothstep(0.02f, 0.12f, Open);
+    Face = lerp(Face, FleshColor * 0.30f + Color * 0.45f * Shine, Strands);
+
+    // --- Eyes. Each cell is authored for the right half (cell left = inner edge), so |x| mirrors the left one.
+    const float Side = P.x < 0.0f ? 7.0f : 0.0f;
+    float2 EyeUV = float2(abs(P.x) - EyeSpread, P.y - EyeHeight) / max(EyeSize, 0.001f) + 0.5f;
+    EyeUV.y = (EyeUV.y - 0.5f) / max(EyeOpen, 0.04f) + 0.5f;
+    const float EyeInside = (all(EyeUV > 0.0f) && all(EyeUV < 1.0f) && EyeOpen > 0.001f) ? 1.0f : 0.0f;
+    // Alight, the shape is read through a field of rising noise: its upper edge tears into tongues that climb.
+    const float Lick = CkUsf_Fbm(float2(EyeUV.x * 4.0f + Side, EyeUV.y * 2.6f + Time * 2.4f));
+    const float Waver = CkUsf_Fbm(float2(EyeUV.x * 7.0f + Side + 3.0f, EyeUV.y * 4.0f + Time * 3.7f));
+    const float Rise = (1.0f - smoothstep(0.15f, 0.80f, EyeUV.y)) * Burn;
+    const float2 FlameUV = EyeUV + float2((Waver - 0.5f) * 0.16f, Lick * 0.34f) * Rise;
+    const float Field = lerp(
+        Mars_EyePlate_SampleCell(Atlas, AtlasSampler, RestCell, FlameUV, AtlasCols, AtlasRows, CellPad),
+        Mars_EyePlate_SampleCell(Atlas, AtlasSampler, EvilCell, FlameUV, AtlasCols, AtlasRows, CellPad),
+        saturate(Evil)) * EyeInside;
+    // As the eye plate: the field is 0.5 on the shape's edge and rises inside.
+    const float Core = CkUsf_SdfEdgeAA(0.5f - Field);
+    const float3 Calm = Color * saturate(Core + smoothstep(0.25f, 0.5f, Field) * GlowStrength);
+    const float Deep = saturate((Field - 0.5f) / 0.22f);
+    const float3 Hot = lerp(float3(0.9f, 0.10f, 0.02f), FireColor * 1.6f, smoothstep(0.0f, 0.45f, Deep))
+        + float3(1.0f, 0.85f, 0.5f) * 1.6f * smoothstep(0.35f, 1.0f, Deep);
+    const float Flicker = 0.82f + 0.36f * CkUsf_ValueNoise(float2(Time * 11.0f, Side + 2.0f));
+    const float3 Burning = (Hot * Core + FireColor * smoothstep(0.12f, 0.5f, Field) * (1.0f - Core) * 0.9f) * Flicker;
+    Face += lerp(Calm, Burning, Burn);
+
+    O.BaseColor = 0.0f;
+    // EyeAdaptationCommon.ush is included by MaterialTemplate.ush, so EyeAdaptationLookup() is in scope here.
+    O.EmissiveColor = Face * Strength / max(EyeAdaptationLookup(), 1e-4f);
+    O.Opacity = saturate(Veil);
+    return O;
+}

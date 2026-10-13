@@ -76,7 +76,9 @@ enum EMars_PlayerViewpoint_ViewHolder
     // The emote wheel: the look input steers its pointer.
     EmoteWheel,
     // A station whose look control is captured: the station reads the look input.
-    Station
+    Station,
+    // Held by a devourer: the view is the devourer's to move.
+    Devour
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

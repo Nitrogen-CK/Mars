@@ -179,6 +179,48 @@ class UMars_Gameplay_CheatManager : UCheatManager
         Nearest.Request_Reserve(FMars_Request_Station_Reserve(Player));
     }
 
+    // The steward nearest the local player (within InRangeCm) devours them: the fail scene, from the console.
+    UFUNCTION(Exec)
+    void Mars_Devour(float32 InRangeCm = 3000.0f)
+    {
+        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        if (ck::Is_NOT_Valid(Character))
+        { return; }
+
+        auto Player = Character.TryGet_ActorEntityHandle();
+        const auto Here = Character.GetActorLocation();
+        auto Nearest = FCk_Handle_Devour();
+        auto NearestDistance = float64(InRangeCm);
+        for (auto Steward : utils_entity_tag::ForEach_Entity(Player, constants_steward::k_EntityTag))
+        {
+            const auto Devour = Steward.As_Devour(ECk_SanityCheck::UnChecked);
+            const auto Transform = Steward.As_Transform(ECk_SanityCheck::UnChecked);
+            if (ck::Is_NOT_Valid(Devour) || ck::Is_NOT_Valid(Transform))
+            { continue; }
+
+            const auto Distance = utils_transform::Get_EntityCurrentLocation(Transform).Distance(Here);
+            if (Distance < NearestDistance)
+            {
+                Nearest = Devour;
+                NearestDistance = Distance;
+            }
+        }
+
+        if (ck::Is_NOT_Valid(Nearest))
+        {
+            ck::Trace(f"[Mars_Devour] no steward within {InRangeCm} cm");
+            return;
+        }
+
+        if (Nearest.Get_CanSeize(Player) == false)
+        {
+            ck::Trace("[Mars_Devour] the steward cannot seize the player now (it holds a victim, or the player is held)");
+            return;
+        }
+
+        Nearest.Request_Begin(FMars_Request_Devour_Begin(Player));
+    }
+
     // Bears down on (1) or lets up (0) the pestle of the mortar station the local player operates, as the station's control
     // does for the Primary key.
     UFUNCTION(Exec)

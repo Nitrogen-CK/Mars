@@ -1937,6 +1937,54 @@ class AMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes_Actor : ACk_AutoTestR
     }
 }
 
+class AMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Devour_ASecondBeginWhileHoldingIsIgnored_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Devour_ASecondBeginWhileHoldingIsIgnored");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Devour_RunsEveryPhaseInOrderAndLetsGo_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Devour_RunsEveryPhaseInOrderAndLetsGo");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
+class AMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime_Actor : ACk_AutoTestRunner
+{
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

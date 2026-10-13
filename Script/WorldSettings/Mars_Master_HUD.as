@@ -5,10 +5,17 @@ class AMars_Master_HUD : ACk_HUD_UE
 {
     protected UCk_UI_PrimaryGameLayout_UE ConstructedLayout;
 
+    // Set_LayoutHidden's last word, and the visibility the layout had before it was hidden.
+    private bool _LayoutHidden = false;
+    private ESlateVisibility _LayoutShownVisibility = ESlateVisibility::SelfHitTestInvisible;
+
     UFUNCTION(BlueprintOverride)
     void OnLayoutReady_Event(UCk_UI_PrimaryGameLayout_UE InLayout)
     {
         ConstructedLayout = InLayout;
+        _LayoutShownVisibility = InLayout.GetVisibility();
+        if (_LayoutHidden)
+        { InLayout.SetVisibility(ESlateVisibility::Collapsed); }
 
         auto PC = GetOwningPlayerController();
         if (ck::EnsureIfNot(ck::IsValid(PC), "[Mars_Master_HUD] the layout is ready but the HUD has no owning PlayerController"))
@@ -16,6 +23,23 @@ class AMars_Master_HUD : ACk_HUD_UE
 
         PC.OnPossessedPawnChanged.AddUFunction(this, n"HandlePossessedPawnChanged");
         TryAwaitChefEntity(GetOwningPawn());
+    }
+
+    // Takes the whole layout off the screen, or puts it back as it was (a devoured player sees nothing of its own). Asked
+    // before the layout exists, it is applied when the layout is ready.
+    void Set_LayoutHidden(bool InHidden)
+    {
+        if (_LayoutHidden == InHidden)
+        { return; }
+
+        _LayoutHidden = InHidden;
+        if (ck::Is_NOT_Valid(ConstructedLayout))
+        { return; }
+
+        if (InHidden)
+        { _LayoutShownVisibility = ConstructedLayout.GetVisibility(); }
+
+        ConstructedLayout.SetVisibility(InHidden ? ESlateVisibility::Collapsed : _LayoutShownVisibility);
     }
 
     // Runs before the layout receives InEntity; a mode adds its own widgets here.

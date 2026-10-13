@@ -2075,6 +2075,58 @@ namespace UMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes
 }
 
 USTRUCT()
+struct FMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled
+{
+    FMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled_SpawnParams Params()
+    {
+        return FMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Devour_ASecondBeginWhileHoldingIsIgnored_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Devour_ASecondBeginWhileHoldingIsIgnored
+{
+    FMars_AutoTest_Devour_ASecondBeginWhileHoldingIsIgnored_SpawnParams Params()
+    {
+        return FMars_AutoTest_Devour_ASecondBeginWhileHoldingIsIgnored_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Devour_RunsEveryPhaseInOrderAndLetsGo_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Devour_RunsEveryPhaseInOrderAndLetsGo
+{
+    FMars_AutoTest_Devour_RunsEveryPhaseInOrderAndLetsGo_SpawnParams Params()
+    {
+        return FMars_AutoTest_Devour_RunsEveryPhaseInOrderAndLetsGo_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime
+{
+    FMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime_SpawnParams Params()
+    {
+        return FMars_AutoTest_Devour_SpecValidateRejectsAPhaseWithNoTime_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_Emote_TagsMapToEveryEmoteAndBack_SpawnParams
 {
 }
@@ -6858,6 +6910,19 @@ namespace UMars_BatterStation_EntityScript
 }
 
 USTRUCT()
+struct FMars_CameraLayer_Devour_SpawnParams
+{
+}
+
+namespace UMars_CameraLayer_Devour
+{
+    FMars_CameraLayer_Devour_SpawnParams Params()
+    {
+        return FMars_CameraLayer_Devour_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_CameraLayer_Station_SpawnParams
 {
 }
@@ -9908,6 +9973,51 @@ namespace UMars_Sandbox_Crawler6_EntityScript
 }
 
 USTRUCT()
+struct FMars_Sandbox_FailSwitch_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Control_Spec Control = FMars_Control_Spec(ECk_Interaction_CompletionPolicy::Instant, 1.5f, EMars_Control_Behavior::Momentary, 1.0f, false, FMars_Control_Manipulation_Spec());
+
+    UPROPERTY()
+    FMars_MechanismSource_Spec Source;
+
+    UPROPERTY()
+    FVector PressOffset = FVector(0.0, 0.0, -6.0);
+
+    UPROPERTY()
+    float32 MoveDuration = 0.15000000596046448f;
+
+    UPROPERTY()
+    FText PromptText = FText::FromString("Fail the service");
+
+    FMars_Sandbox_FailSwitch_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FVector InPressOffset, float32 InMoveDuration, FText InPromptText)
+    {
+        SpawnTransform = InSpawnTransform;
+        Control = InControl;
+        Source = InSource;
+        PressOffset = InPressOffset;
+        MoveDuration = InMoveDuration;
+        PromptText = InPromptText;
+    }
+}
+
+namespace UMars_Sandbox_FailSwitch_EntityScript
+{
+    FMars_Sandbox_FailSwitch_EntityScript_SpawnParams Params()
+    {
+        return FMars_Sandbox_FailSwitch_EntityScript_SpawnParams();
+    }
+
+    FMars_Sandbox_FailSwitch_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Control_Spec InControl, FMars_MechanismSource_Spec InSource, FVector InPressOffset, float32 InMoveDuration, FText InPromptText)
+    {
+        return FMars_Sandbox_FailSwitch_EntityScript_SpawnParams(InSpawnTransform, InControl, InSource, InPressOffset, InMoveDuration, InPromptText);
+    }
+}
+
+USTRUCT()
 struct FMars_Sandbox_GateA_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -11499,6 +11609,19 @@ namespace UMars_SmCondition_IsClimbing
 }
 
 USTRUCT()
+struct FMars_SmCondition_IsDevoured_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsDevoured
+{
+    FMars_SmCondition_IsDevoured_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsDevoured_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_SmCondition_IsDownedOrDepleted_SpawnParams
 {
 }
@@ -11547,6 +11670,19 @@ namespace UMars_SmCondition_IsNotClimbing
     FMars_SmCondition_IsNotClimbing_SpawnParams Params()
     {
         return FMars_SmCondition_IsNotClimbing_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmCondition_IsNotDevoured_SpawnParams
+{
+}
+
+namespace UMars_SmCondition_IsNotDevoured
+{
+    FMars_SmCondition_IsNotDevoured_SpawnParams Params()
+    {
+        return FMars_SmCondition_IsNotDevoured_SpawnParams();
     }
 }
 
@@ -12002,6 +12138,19 @@ namespace UMars_SmState_Cutting_Operated
     FMars_SmState_Cutting_Operated_SpawnParams Params()
     {
         return FMars_SmState_Cutting_Operated_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmState_Devoured_SpawnParams
+{
+}
+
+namespace UMars_SmState_Devoured
+{
+    FMars_SmState_Devoured_SpawnParams Params()
+    {
+        return FMars_SmState_Devoured_SpawnParams();
     }
 }
 
@@ -12912,6 +13061,19 @@ namespace UMars_SmTask_CuttingFeed_OperatorInput
     FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams Params()
     {
         return FMars_SmTask_CuttingFeed_OperatorInput_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_SmTask_Devoured_View_SpawnParams
+{
+}
+
+namespace UMars_SmTask_Devoured_View
+{
+    FMars_SmTask_Devoured_View_SpawnParams Params()
+    {
+        return FMars_SmTask_Devoured_View_SpawnParams();
     }
 }
 

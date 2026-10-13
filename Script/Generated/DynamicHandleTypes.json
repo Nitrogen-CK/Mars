@@ -163,6 +163,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Devour",
+			"ShortName": "Devour",
+			"Description": "A devourer that seizes one victim and takes it through the timed phases of being eaten",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_DevourHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Devour"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_EmoteWheel",
 			"ShortName": "EmoteWheel",
 			"Description": "The player's emote wheel: the entries it offers, whether it is open and which sector its pointer hovers",

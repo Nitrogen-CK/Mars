@@ -3,7 +3,8 @@
 // mode that uses it: Locomotion is free roam, Operating is the station mode. A parent's transitions keep firing while
 // any descendant is active, and leaving a parent tears down its subtree - so Alive->Downed interrupts any locomotion or
 // operating state, and Locomotion->Operating tears down every free-roam task (focus cleared, intents closed,
-// manipulation ended, hints unregistered) before the station's enter.
+// manipulation ended, hints unregistered) before the station's enter. Alive->Devoured (a devourer holds the player,
+// Mars_PlayerCharacter_Hfsm_Devoured.as) interrupts them the same way.
 //
 // The SM is owning-client authoritative (Mars_PlayerCharacter::TryStartPlayerSm): the owner's transitions replicate, so
 // every copy (the server's, the other clients') enters the owner's states and runs their tasks' enter and exit; only the
@@ -44,6 +45,9 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
     {
         auto ToDowned = AddTransition(InHandle, UMars_SmState_Downed);
         AddCondition(ToDowned, UMars_SmCondition_IsDownedOrDepleted);
+
+        auto ToDevoured = AddTransition(InHandle, UMars_SmState_Devoured);
+        AddCondition(ToDevoured, UMars_SmCondition_IsDevoured);
 
         AddTask(InHandle, UMars_SmTask_MovementSpeedSync);
         AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);

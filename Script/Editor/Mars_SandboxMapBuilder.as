@@ -115,6 +115,14 @@ void Mars_PlaceSandboxEyesDummyFunc(const TArray<FString>& Args)
 const FConsoleCommand Mars_PlaceSandboxEyesDummyCommand("Mars.Sandbox.PlaceEyesDummy", n"Mars_PlaceSandboxEyesDummyFunc");
 
 UFUNCTION()
+void Mars_PlaceSandboxFailSwitchFunc(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::PlaceFailSwitch();
+}
+
+const FConsoleCommand Mars_PlaceSandboxFailSwitchCommand("Mars.Sandbox.PlaceFailSwitch", n"Mars_PlaceSandboxFailSwitchFunc");
+
+UFUNCTION()
 void Mars_PlaceSandboxLadderFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceLadder();
@@ -227,6 +235,8 @@ namespace utils_mars_sandbox
     const FString k_FoodMeatSlabLabel = "Sandbox_Food_MeatSlab";
     const FString k_FoodMushroomSliceLabel = "Sandbox_Food_MushroomSlice";
     const FString k_EyesDummyLabel = "EyesDummy";
+    const FString k_FailSwitchLabel = "Mech_FailSwitch";
+    const FString k_FailSwitchPedestalLabel = "FailSwitch_Pedestal";
 
     void Build()
     {
@@ -630,6 +640,20 @@ namespace utils_mars_sandbox
     {
         Spawn_Cube(k_LadderPlatformLabel, FVector(-1200.0, 1200.0, 150.0), FVector(4.0, 4.0, 3.0));
         Spawn_Mechanism(UMars_Ladder_EntityScript, FMars_MapBuilder_Placement("Sandbox_Ladder", FVector(-1200.0, 1000.0, 0.0), FRotator(0.0, -90.0, 0.0)));
+    }
+
+    // On a 100uu pedestal 2 m in front of the placed steward (it stands at (-700, -309) facing -X) and 1.3 m to its
+    // left, so whoever presses it stands in front of it.
+    void PlaceFailSwitch()
+    {
+        const FString Command = "Mars.Sandbox.PlaceFailSwitch";
+        if (Get_CanAdd(Command, k_FailSwitchLabel, "Delete it and its pedestal first to re-place.") == false)
+        { return; }
+
+        const auto Spot = FVector(-900.0, -180.0, 0.0);
+        Spawn_Cube(k_FailSwitchPedestalLabel, Spot + FVector(0.0, 0.0, 50.0), FVector(0.4, 0.4, 1.0));
+        Spawn_Mechanism(UMars_Sandbox_FailSwitch_EntityScript, FMars_MapBuilder_Placement(k_FailSwitchLabel, Spot + FVector(0.0, 0.0, 100.0)));
+        utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
     // Yawed 180 so it faces the player starts.

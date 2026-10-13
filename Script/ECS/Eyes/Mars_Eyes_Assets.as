@@ -189,6 +189,16 @@ asset Mars_EyeExpression_Downed of UMars_EyeExpression
     Def.AllowLook = false;
 }
 
+// A state expression: stays until cleared. The steward's eyes as it bites (atlas cell 24, the oval cut to a blade).
+asset Mars_EyeExpression_Evil of UMars_EyeExpression
+{
+    Def.LeftCell = 24;
+    Def.RightCell = 24;
+    Def.AllowBlink = false;
+    Def.AllowLook = false;
+    Def.BlendSeconds = 0.18f;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Catalog
 //--------------------------------------------------------------------------------------------------------------------------
@@ -217,6 +227,7 @@ asset Mars_EyeCatalog of UMars_EyeCatalog
     Expressions.Add(Mars_EyeExpression_Sparkle);
     Expressions.Add(Mars_EyeExpression_HalfLid);
     Expressions.Add(Mars_EyeExpression_Downed);
+    Expressions.Add(Mars_EyeExpression_Evil);
 }
 
 // Script asset globals are file-local: other files reach them through these accessors.
@@ -226,6 +237,7 @@ namespace utils_eyes
     UMars_EyeExpression Expression_Happy() { return Mars_EyeExpression_Happy; }
     UMars_EyeExpression Expression_Wink() { return Mars_EyeExpression_Wink; }
     UMars_EyeExpression Expression_Downed() { return Mars_EyeExpression_Downed; }
+    UMars_EyeExpression Expression_Evil() { return Mars_EyeExpression_Evil; }
 
     // The chef's resting style (AMars_PlayerCharacter's config); assets resolve across files through a namespace.
     UMars_EyeStyle Style_Wide() { return Mars_EyeStyle_Wide; }

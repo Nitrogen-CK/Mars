@@ -1,0 +1,786 @@
+{
+	"material": "M_CkUsf_Look_MarsStewardMaw",
+	"packagePath": "/Game/Mars/Materials/GeneratedLooks/M_CkUsf_Look_MarsStewardMaw",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "e1695ea06f73d27d686a3d86e7781d75",
+		"exporterVersion": 3
+	},
+	"blendMode": "BLEND_Translucent",
+	"twoSided": false,
+	"unlit": true,
+	"shadingModel": "MSM_Unlit",
+	"domain": "MD_Surface",
+	"connectedOutputs": [
+		"EmissiveColor",
+		"BaseColor",
+		"Opacity",
+		"Normal"
+	],
+	"expressions":
+	{
+		"CameraVectorWS": 1,
+		"Custom": 1,
+		"PixelDepth": 1,
+		"ScalarParameter": 22,
+		"TextureCoordinate": 1,
+		"TextureObjectParameter": 1,
+		"Time": 1,
+		"VectorParameter": 3,
+		"VertexColor": 1,
+		"VertexNormalWS": 1,
+		"VertexTangentWS": 1,
+		"WorldPosition": 1
+	},
+	"graph":
+	{
+		"nodes": [
+			{
+				"id": 0,
+				"class": "Custom",
+				"name": "MaterialExpressionCustom_0",
+				"inputs": [
+					{
+						"index": 0,
+						"name": "WorldPosition",
+						"node": 1,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 1,
+						"name": "CameraVector",
+						"node": 2,
+						"output": 0
+					},
+					{
+						"index": 2,
+						"name": "VertexNormal",
+						"node": 3,
+						"output": 0
+					},
+					{
+						"index": 3,
+						"name": "VertexTangent",
+						"node": 4,
+						"output": 0
+					},
+					{
+						"index": 4,
+						"name": "PixelDepth",
+						"node": 5,
+						"output": 0,
+						"mask": "r"
+					},
+					{
+						"index": 5,
+						"name": "VertexColor",
+						"node": 6,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 6,
+						"name": "Atlas",
+						"node": 7,
+						"output": 0
+					},
+					{
+						"index": 7,
+						"name": "Strength",
+						"node": 8,
+						"output": 0
+					},
+					{
+						"index": 8,
+						"name": "EyeOpen",
+						"node": 9,
+						"output": 0
+					},
+					{
+						"index": 9,
+						"name": "Evil",
+						"node": 10,
+						"output": 0
+					},
+					{
+						"index": 10,
+						"name": "Mouth",
+						"node": 11,
+						"output": 0
+					},
+					{
+						"index": 11,
+						"name": "Jaw",
+						"node": 12,
+						"output": 0
+					},
+					{
+						"index": 12,
+						"name": "Zoom",
+						"node": 13,
+						"output": 0
+					},
+					{
+						"index": 13,
+						"name": "Span",
+						"node": 14,
+						"output": 0
+					},
+					{
+						"index": 14,
+						"name": "Veil",
+						"node": 15,
+						"output": 0
+					},
+					{
+						"index": 15,
+						"name": "Color",
+						"node": 16,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 16,
+						"name": "Heat",
+						"node": 17,
+						"output": 0
+					},
+					{
+						"index": 17,
+						"name": "Shake",
+						"node": 18,
+						"output": 0
+					},
+					{
+						"index": 18,
+						"name": "Tilt",
+						"node": 19,
+						"output": 0
+					},
+					{
+						"index": 19,
+						"name": "AtlasCols",
+						"node": 20,
+						"output": 0
+					},
+					{
+						"index": 20,
+						"name": "AtlasRows",
+						"node": 21,
+						"output": 0
+					},
+					{
+						"index": 21,
+						"name": "RestCell",
+						"node": 22,
+						"output": 0
+					},
+					{
+						"index": 22,
+						"name": "EvilCell",
+						"node": 23,
+						"output": 0
+					},
+					{
+						"index": 23,
+						"name": "EyeSize",
+						"node": 24,
+						"output": 0
+					},
+					{
+						"index": 24,
+						"name": "EyeSpread",
+						"node": 25,
+						"output": 0
+					},
+					{
+						"index": 25,
+						"name": "EyeHeight",
+						"node": 26,
+						"output": 0
+					},
+					{
+						"index": 26,
+						"name": "MouthHeight",
+						"node": 27,
+						"output": 0
+					},
+					{
+						"index": 27,
+						"name": "MouthWidth",
+						"node": 28,
+						"output": 0
+					},
+					{
+						"index": 28,
+						"name": "GlowStrength",
+						"node": 29,
+						"output": 0
+					},
+					{
+						"index": 29,
+						"name": "CellPad",
+						"node": 30,
+						"output": 0
+					},
+					{
+						"index": 30,
+						"name": "FireColor",
+						"node": 31,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 31,
+						"name": "FleshColor",
+						"node": 32,
+						"output": 0,
+						"mask": "rgb"
+					},
+					{
+						"index": 32,
+						"name": "Time",
+						"node": 33,
+						"output": 0
+					},
+					{
+						"index": 33,
+						"name": "UV",
+						"node": 34,
+						"output": 0
+					}
+				],
+				"outputs": [
+					"return",
+					"EmissiveColor",
+					"Roughness",
+					"Metallic",
+					"Specular",
+					"AmbientOcclusion",
+					"Normal",
+					"Opacity",
+					"OpacityMask",
+					"Refraction",
+					"SubsurfaceColor",
+					"ClearCoat",
+					"ClearCoatRoughness"
+				],
+				"props":
+				{
+					"Code": "FCkUsf_SurfaceInput In = CkUsf_DefaultInput();\nIn.Time = Time;\nIn.UV = UV;\nIn.WorldPosition = WorldPosition;\nIn.CameraVector = CameraVector;\nIn.VertexNormal = VertexNormal;\nIn.VertexTangent = VertexTangent;\nIn.PixelDepth = PixelDepth;\nIn.VertexColor = VertexColor;\nFCkUsf_SurfaceOutput O = Mars_Look_StewardMaw(In, Atlas, AtlasSampler, Strength, EyeOpen, Evil, Mouth, Jaw, Zoom, Span, Veil, Color.rgb, Heat, Shake, Tilt, AtlasCols, AtlasRows, RestCell, EvilCell, EyeSize, EyeSpread, EyeHeight, MouthHeight, MouthWidth, GlowStrength, CellPad, FireColor.rgb, FleshColor.rgb);\nEmissiveColor = O.EmissiveColor;\nRoughness = O.Roughness;\nMetallic = O.Metallic;\nSpecular = O.Specular;\nAmbientOcclusion = O.AmbientOcclusion;\nNormal = O.Normal;\nOpacity = O.Opacity;\nOpacityMask = O.OpacityMask;\nRefraction = O.Refraction;\nSubsurfaceColor = O.SubsurfaceColor;\nClearCoat = O.ClearCoat;\nClearCoatRoughness = O.ClearCoatRoughness;\nreturn O.BaseColor;",
+					"IncludeFilePaths": [
+						"/Project/Looks/StewardMaw.ush"
+					]
+				}
+			},
+			{
+				"id": 1,
+				"class": "WorldPosition",
+				"name": "MaterialExpressionWorldPosition_0",
+				"outputs": [
+					"XYZ",
+					"XY",
+					"Z"
+				]
+			},
+			{
+				"id": 2,
+				"class": "CameraVectorWS",
+				"name": "MaterialExpressionCameraVectorWS_0"
+			},
+			{
+				"id": 3,
+				"class": "VertexNormalWS",
+				"name": "MaterialExpressionVertexNormalWS_0"
+			},
+			{
+				"id": 4,
+				"class": "VertexTangentWS",
+				"name": "MaterialExpressionVertexTangentWS_0"
+			},
+			{
+				"id": 5,
+				"class": "PixelDepth",
+				"name": "MaterialExpressionPixelDepth_0"
+			},
+			{
+				"id": 6,
+				"class": "VertexColor",
+				"name": "MaterialExpressionVertexColor_0",
+				"outputs": [
+					"None",
+					"None",
+					"None",
+					"None",
+					"None"
+				]
+			},
+			{
+				"id": 7,
+				"class": "TextureObjectParameter",
+				"name": "MaterialExpressionTextureObjectParameter_0",
+				"props":
+				{
+					"ParameterName": "Atlas",
+					"Texture": "/Game/Mars/Gameplay/PlayerCharacter/Eyes/Eyes_Atlas_Mars_T.Eyes_Atlas_Mars_T",
+					"SamplerType": "SAMPLERTYPE_LinearGrayscale"
+				}
+			},
+			{
+				"id": 8,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_0",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"ParameterName": "Strength"
+				}
+			},
+			{
+				"id": 9,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_1",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 1,
+					"ParameterName": "EyeOpen"
+				}
+			},
+			{
+				"id": 10,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_2",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 2,
+					"ParameterName": "Evil"
+				}
+			},
+			{
+				"id": 11,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_3",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 3,
+					"ParameterName": "Mouth"
+				}
+			},
+			{
+				"id": 12,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_4",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 4,
+					"ParameterName": "Jaw"
+				}
+			},
+			{
+				"id": 13,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_5",
+				"props":
+				{
+					"DefaultValue": 1,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 5,
+					"ParameterName": "Zoom"
+				}
+			},
+			{
+				"id": 14,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_6",
+				"props":
+				{
+					"DefaultValue": 5,
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 6,
+					"ParameterName": "Span"
+				}
+			},
+			{
+				"id": 15,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_7",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 7,
+					"ParameterName": "Veil"
+				}
+			},
+			{
+				"id": 16,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_0",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.900000,B=0.720000,A=1.000000)",
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 8,
+					"ParameterName": "Color"
+				}
+			},
+			{
+				"id": 17,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_8",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 12,
+					"ParameterName": "Heat"
+				}
+			},
+			{
+				"id": 18,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_9",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 13,
+					"ParameterName": "Shake"
+				}
+			},
+			{
+				"id": 19,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_10",
+				"props":
+				{
+					"bUseCustomPrimitiveData": true,
+					"PrimitiveDataIndex": 14,
+					"ParameterName": "Tilt"
+				}
+			},
+			{
+				"id": 20,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_11",
+				"props":
+				{
+					"DefaultValue": 8,
+					"ParameterName": "AtlasCols"
+				}
+			},
+			{
+				"id": 21,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_12",
+				"props":
+				{
+					"DefaultValue": 4,
+					"ParameterName": "AtlasRows"
+				}
+			},
+			{
+				"id": 22,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_13",
+				"props":
+				{
+					"DefaultValue": 1,
+					"ParameterName": "RestCell"
+				}
+			},
+			{
+				"id": 23,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_14",
+				"props":
+				{
+					"DefaultValue": 24,
+					"ParameterName": "EvilCell"
+				}
+			},
+			{
+				"id": 24,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_15",
+				"props":
+				{
+					"DefaultValue": 0.5,
+					"ParameterName": "EyeSize"
+				}
+			},
+			{
+				"id": 25,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_16",
+				"props":
+				{
+					"DefaultValue": 0.30000001192092896,
+					"ParameterName": "EyeSpread"
+				}
+			},
+			{
+				"id": 26,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_17",
+				"props":
+				{
+					"DefaultValue": -0.20999999344348907,
+					"ParameterName": "EyeHeight"
+				}
+			},
+			{
+				"id": 27,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_18",
+				"props":
+				{
+					"DefaultValue": 0.20999999344348907,
+					"ParameterName": "MouthHeight"
+				}
+			},
+			{
+				"id": 28,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_19",
+				"props":
+				{
+					"DefaultValue": 0.69999998807907104,
+					"ParameterName": "MouthWidth"
+				}
+			},
+			{
+				"id": 29,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_20",
+				"props":
+				{
+					"DefaultValue": 0.34999999403953552,
+					"ParameterName": "GlowStrength"
+				}
+			},
+			{
+				"id": 30,
+				"class": "ScalarParameter",
+				"name": "MaterialExpressionScalarParameter_21",
+				"props":
+				{
+					"DefaultValue": 0.019999999552965164,
+					"ParameterName": "CellPad"
+				}
+			},
+			{
+				"id": 31,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_1",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=1.000000,G=0.360000,B=0.050000,A=1.000000)",
+					"ParameterName": "FireColor"
+				}
+			},
+			{
+				"id": 32,
+				"class": "VectorParameter",
+				"name": "MaterialExpressionVectorParameter_2",
+				"outputs": [
+					"RGB",
+					"R",
+					"G",
+					"B",
+					"A",
+					"RGBA"
+				],
+				"props":
+				{
+					"DefaultValue": "(R=0.420000,G=0.030000,B=0.020000,A=1.000000)",
+					"ParameterName": "FleshColor"
+				}
+			},
+			{
+				"id": 33,
+				"class": "Time",
+				"name": "MaterialExpressionTime_0"
+			},
+			{
+				"id": 34,
+				"class": "TextureCoordinate",
+				"name": "MaterialExpressionTextureCoordinate_0"
+			}
+		],
+		"outputs": [
+			{
+				"property": "MP_EmissiveColor",
+				"node": 0,
+				"output": 1
+			},
+			{
+				"property": "MP_Opacity",
+				"node": 0,
+				"output": 7
+			},
+			{
+				"property": "MP_BaseColor",
+				"node": 0,
+				"output": 0
+			},
+			{
+				"property": "MP_Metallic",
+				"node": 0,
+				"output": 3
+			},
+			{
+				"property": "MP_Specular",
+				"node": 0,
+				"output": 4
+			},
+			{
+				"property": "MP_Roughness",
+				"node": 0,
+				"output": 2
+			},
+			{
+				"property": "MP_Normal",
+				"node": 0,
+				"output": 6
+			},
+			{
+				"property": "MP_AmbientOcclusion",
+				"node": 0,
+				"output": 5
+			}
+		]
+	},
+	"scalarParams": [
+		{
+			"name": "Strength",
+			"value": 0
+		},
+		{
+			"name": "EyeOpen",
+			"value": 0
+		},
+		{
+			"name": "Evil",
+			"value": 0
+		},
+		{
+			"name": "Mouth",
+			"value": 0
+		},
+		{
+			"name": "Jaw",
+			"value": 0
+		},
+		{
+			"name": "Zoom",
+			"value": 1
+		},
+		{
+			"name": "Span",
+			"value": 5
+		},
+		{
+			"name": "Veil",
+			"value": 0
+		},
+		{
+			"name": "Heat",
+			"value": 0
+		},
+		{
+			"name": "Shake",
+			"value": 0
+		},
+		{
+			"name": "Tilt",
+			"value": 0
+		},
+		{
+			"name": "AtlasCols",
+			"value": 8
+		},
+		{
+			"name": "AtlasRows",
+			"value": 4
+		},
+		{
+			"name": "RestCell",
+			"value": 1
+		},
+		{
+			"name": "EvilCell",
+			"value": 24
+		},
+		{
+			"name": "EyeSize",
+			"value": 0.5
+		},
+		{
+			"name": "EyeSpread",
+			"value": 0.30000001192092896
+		},
+		{
+			"name": "EyeHeight",
+			"value": -0.20999999344348907
+		},
+		{
+			"name": "MouthHeight",
+			"value": 0.20999999344348907
+		},
+		{
+			"name": "MouthWidth",
+			"value": 0.69999998807907104
+		},
+		{
+			"name": "GlowStrength",
+			"value": 0.34999999403953552
+		},
+		{
+			"name": "CellPad",
+			"value": 0.019999999552965164
+		}
+	],
+	"vectorParams": [
+		{
+			"name": "Color",
+			"value": "RGBA(1, 0.9, 0.72, 1)"
+		},
+		{
+			"name": "FireColor",
+			"value": "RGBA(1, 0.36, 0.05, 1)"
+		},
+		{
+			"name": "FleshColor",
+			"value": "RGBA(0.42, 0.03, 0.02, 1)"
+		}
+	],
+	"textureParams": [
+		{
+			"name": "Atlas",
+			"value": "/Game/Mars/Gameplay/PlayerCharacter/Eyes/Eyes_Atlas_Mars_T.Eyes_Atlas_Mars_T"
+		}
+	],
+	"usedTextures": [
+		"/Game/Mars/Gameplay/PlayerCharacter/Eyes/Eyes_Atlas_Mars_T.Eyes_Atlas_Mars_T"
+	]
+}
