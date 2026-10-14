@@ -461,6 +461,9 @@ struct FMars_Fragment_Crawler
     FCk_Handle_ProceduralGait Gait;
 
     UPROPERTY()
+    FCk_Handle_ProceduralArticulation Articulation;
+
+    UPROPERTY()
     FCk_Handle_ProceduralBodyPose BodyPose;
 
     // Armed crawlers own one body-channel player on the walker's articulation.

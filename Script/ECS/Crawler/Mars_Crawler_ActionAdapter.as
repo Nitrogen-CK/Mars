@@ -26,8 +26,7 @@ namespace utils_crawler
     // crawler stands still: a leg left out of the gait is never the last word.
     void Recover_UnplantedLimbs(FCk_Handle_Crawler& InSelf)
     {
-        auto Root = InSelf.As_Transform();
-        auto Subject = utils_procedural_articulation::DoCastChecked(Root);
+        auto Subject = InSelf.Get_Articulation();
         if (utils_procedural_articulation::Get_UnplantedLimbIds(Subject).Num() > 0)
         { utils_procedural_articulation::Request_RecoverUnplantedLimbs(Subject, FCk_Request_ProceduralArticulation_RecoverUnplantedLimbs()); }
     }
@@ -38,8 +37,7 @@ namespace utils_crawler
     // standing. An empty answer is a body-only jab, never a rejected attack.
     TArray<FMars_Crawler_AttackClaw> Find_AttackClaws(const FCk_Handle_Crawler& InSelf)
     {
-        auto Root = InSelf.As_Transform();
-        const auto Subject = utils_procedural_articulation::DoCastChecked(Root);
+        const auto Subject = InSelf.Get_Articulation();
 
         const auto Spec = InSelf.Get_Spec();
         const auto Parts = InSelf.Get_LegParts();

@@ -958,20 +958,34 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         return Clip;
     }
 
-    // InSource with its Strike phase's last body key yawed 30 degrees.
+    // InSource with its Strike phase's last body key and its Recover phase's first body key yawed 30 degrees (the clip
+    // stays continuous).
     protected FCk_ProceduralAction_ClipDraft Make_DraftWithRotatedStrike(UCk_ProceduralAction_Data InSource)
     {
+        const auto Yaw = FRotator(0.0, 30.0, 0.0).Quaternion();
         auto Draft = Make_DraftOf(InSource);
         auto Phases = Draft.Get_Phases();
         for (auto& Phase : Phases)
         {
-            if (Phase.Get_Id() != utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike))
+            auto Keys = Phase.Get_BodyKeys();
+            if (Keys.Num() == 0)
             { continue; }
 
-            auto Keys = Phase.Get_BodyKeys();
-            auto Last = Keys.Last();
-            Last.Set_Rotation(FRotator(0.0, 30.0, 0.0).Quaternion());
-            Keys[Keys.Num() - 1] = Last;
+            if (Phase.Get_Id() == utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike))
+            {
+                auto Last = Keys.Last();
+                Last.Set_Rotation(Yaw);
+                Keys[Keys.Num() - 1] = Last;
+            }
+            else if (Phase.Get_Id() == utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover))
+            {
+                auto First = Keys[0];
+                First.Set_Rotation(Yaw);
+                Keys[0] = First;
+            }
+            else
+            { continue; }
+
             Phase.Set_BodyKeys(Keys);
         }
         Draft.Set_Phases(Phases);

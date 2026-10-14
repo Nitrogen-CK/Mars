@@ -1232,6 +1232,19 @@ class AMars_AutoTest_CrawlerMelee_PincerCancelledInTheAirThenWalks_Actor : ACk_A
     }
 }
 
+class AMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike_Actor : ACk_AutoTestRunner
+{
+    default _TimeoutSeconds = 60.0f;
+    UFUNCTION(BlueprintOverride)
+    TSubclassOf<UCk_EntityScript_UE> Get_TestEntityScriptClass() const
+    {
+        auto Path = FSoftClassPath("/Script/Angelscript.Mars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike");
+        TSubclassOf<UCk_EntityScript_UE> ResolvedClass;
+        ResolvedClass = Path.TryLoadClass();
+        return ResolvedClass;
+    }
+}
+
 class AMars_AutoTest_CrawlerMelee_PincerKeyValidation_Actor : ACk_AutoTestRunner
 {
     UFUNCTION(BlueprintOverride)

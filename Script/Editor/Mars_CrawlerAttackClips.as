@@ -266,7 +266,7 @@ namespace utils_crawler
             f"[Mars.Crawler.SeedAttackClips] [{ClipPath}] did not build: {Get_FirstDiagnosticText(Report)}"))
         { return; }
 
-        Clip.Set_EditorSubject(Make_EditorSubject(Clip, InLayout, InKind));
+        utils_procedural_action_editor::Get_EditorData(Clip).Set_Subject(Make_EditorSubject(Clip, InLayout, InKind));
         const bool OnlyIfIsDirty = false;
         EditorAsset::SaveLoadedAsset(Clip, OnlyIfIsDirty);
         Print(f"[Mars.Crawler.SeedAttackClips] [{ClipPath}] written", 10.0f);
@@ -284,7 +284,7 @@ namespace utils_crawler
             return;
         }
 
-        Clip.Set_EditorSubject(Make_EditorSubject(Clip, InLayout, InKind));
+        utils_procedural_action_editor::Get_EditorData(Clip).Set_Subject(Make_EditorSubject(Clip, InLayout, InKind));
         const bool OnlyIfIsDirty = false;
         EditorAsset::SaveLoadedAsset(Clip, OnlyIfIsDirty);
         Print(f"[Mars.Crawler.SeedAttackClips] [{InClipPath}] now remembers its crawler", 10.0f);
@@ -294,7 +294,10 @@ namespace utils_crawler
     // subject has none of them.
     bool Get_IsEditorSubjectSet(UCk_ProceduralAction_Data InClip)
     {
-        const auto Subject = InClip.Get_EditorSubject();
+        const auto EditorData = utils_procedural_action_editor::TryGet_EditorData(InClip);
+        if (EditorData == nullptr)
+        { return false; }
+        const auto Subject = EditorData.Get_Subject();
         return Subject.Get_WalkingRig().IsNull() == false || Subject.Get_Layout().Get_Limbs().Num() > 0 ||
             Subject.Get_Scenario().IsNull() == false;
     }
@@ -309,22 +312,24 @@ namespace utils_crawler
     }
 
     // The crawler the clip editor previews a reference clip on: the reference rig and the layout's gait, copied into the
-    // clip (the script assets they come from are not saved packages), and a pincer's claw slots bound to the first and
-    // last leg. The editor derives the rest of the preview (floor, rest pose, support) from the rig.
-    FCk_ProceduralAction_EditorSubject Make_EditorSubject(UCk_ProceduralAction_Data InClip, EMars_Crawler_Layout InLayout,
+    // clip's editor data (the script assets they come from are not saved packages, and the runtime clip must not carry
+    // them), and a pincer's claw slots bound to the first and last leg. The editor derives the rest of the preview (floor,
+    // rest pose, support) from the rig.
+    FCk_ProceduralActionEditor_Subject Make_EditorSubject(UCk_ProceduralAction_Data InClip, EMars_Crawler_Layout InLayout,
         EMars_Crawler_AttackClipKind InKind)
     {
         const auto SourceGait = Get_LayoutGaitData(InLayout);
         const TArray<FCk_ProceduralLeg_Spec> Legs = Get_ReferenceRig(InLayout).Get_Legs();
-        auto Rig = Cast<UCk_ProceduralRig_Data>(NewObject(InClip, UCk_ProceduralRig_Data, n"SubjectRig"));
-        auto Gait = Cast<UCk_ProceduralGait_Data>(NewObject(InClip, UCk_ProceduralGait_Data, n"SubjectGait"));
+        auto EditorData = utils_procedural_action_editor::Get_EditorData(InClip);
+        auto Rig = Cast<UCk_ProceduralRig_Data>(NewObject(EditorData, UCk_ProceduralRig_Data, n"SubjectRig"));
+        auto Gait = Cast<UCk_ProceduralGait_Data>(NewObject(EditorData, UCk_ProceduralGait_Data, n"SubjectGait"));
         Rig.Set_Legs(Legs);
         Gait.Set_Timing(SourceGait.Get_Timing());
         Gait.Set_Step(SourceGait.Get_Step());
         Gait.Set_Probe(SourceGait.Get_Probe());
         Gait.Set_Foothold(SourceGait.Get_Foothold());
 
-        auto Subject = FCk_ProceduralAction_EditorSubject();
+        auto Subject = FCk_ProceduralActionEditor_Subject();
         Subject.Set_WalkingRig(TSoftObjectPtr<UCk_ProceduralRig_Data>(Rig));
         Subject.Set_WalkingGait(TSoftObjectPtr<UCk_ProceduralGait_Data>(Gait));
         if (InKind == EMars_Crawler_AttackClipKind::Pincer)

@@ -137,7 +137,7 @@ namespace utils_crawler
     }
 
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
-    // their visuals): surface motion -> walker (legs, gait, rigs) -> body pose (before any detach) -> monster -> the
+    // their visuals): surface motion -> walker (legs, gait, rigs, body pose, and the action player when armed) -> monster -> the
     // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
     // the body hurtbox -> the navigator (on the root, steering the surface motion) -> the brain (Mars_Crawler_Goap.as)
     // -> the crawler fragments and, armed only, the combat fragments -> LAST the state machine (Mars_Crawler_Hfsm.as),
@@ -160,11 +160,8 @@ namespace utils_crawler
         for (const auto& Leg : Rig.Legs)
         { Chains.Add(Make_LegChain(Leg, InSpec.Layout)); }
 
-        auto Walker = utils_procedural_animation::Add_Walker(InRoot, InSpec.Get_RigData(), Get_LayoutGaitData(InSpec.Layout), Chains);
-        auto Gait = Walker.Get_Gait();
-        if (ck::EnsureIfNot(ck::IsValid(Gait) && ck::IsValid(Motion),
-            f"[Crawler] [{RootEntity.ToString()}] surface motion or walker composition was rejected"))
-        { return FCk_Handle_Crawler(); }
+        const auto Armed = InSpec.Combat.Enabled &&
+            utils_local_session::Get_IsLocalCombatWorld(utils_entity_lifetime::Get_WorldForEntity(RootEntity));
 
         auto Support = FCk_ProceduralBodyPose_Support();
         Support.Set_CollapseDrop(45.0f);
@@ -174,24 +171,27 @@ namespace utils_crawler
         auto PoseSpec = FCk_ProceduralBodyPose_Spec(Rig.Presentation);
         PoseSpec.Set_Support(Support);
         PoseSpec.Set_Conform(Conform);
-        auto BodyPose = utils_procedural_body_pose::Add(Gait, PoseSpec);
+
+        auto WalkerSpec = FCk_ProceduralWalker_Spec(InSpec.Get_RigData(), Get_LayoutGaitData(InSpec.Layout));
+        WalkerSpec.Set_Chains(Chains);
+        WalkerSpec.Set_BodyPose(ECk_EnableDisable::Enable);
+        WalkerSpec.Set_BodyPoseSpec(PoseSpec);
+        // Armed crawlers own one body-channel player on the walker's articulation.
+        if (Armed)
+        {
+            WalkerSpec.Set_ActionPlayer(ECk_EnableDisable::Enable);
+            WalkerSpec.Set_ActionPlayerSpec(Make_AttackPlayerSpec(InSpec));
+        }
+        auto Walker = utils_procedural_animation::Add_Walker(InRoot, WalkerSpec);
+        auto Gait = Walker.Get_Gait();
+        if (ck::EnsureIfNot(ck::IsValid(Gait) && ck::IsValid(Motion),
+            f"[Crawler] [{RootEntity.ToString()}] surface motion or walker composition was rejected"))
+        { return FCk_Handle_Crawler(); }
 
         // Each sub-feature's Add ensures on its own rejection.
         auto Monster = utils_monster::Add(RootEntity, Make_MonsterSpec(InSpec.Vitals));
         if (ck::Is_NOT_Valid(Monster))
         { return FCk_Handle_Crawler(); }
-
-        const auto Armed = InSpec.Combat.Enabled &&
-            utils_local_session::Get_IsLocalCombatWorld(utils_entity_lifetime::Get_WorldForEntity(RootEntity));
-
-        auto ActionPlayer = FCk_Handle_ProceduralActionPlayer();
-        if (Armed)
-        {
-            auto Subject = utils_procedural_articulation::DoCastChecked(InRoot);
-            ActionPlayer = utils_procedural_action_player::Add(Subject, Make_AttackPlayerSpec(InSpec));
-            if (ck::Is_NOT_Valid(ActionPlayer))
-            { return FCk_Handle_Crawler(); }
-        }
 
         auto Dealer = FCk_Handle_DamageDealer();
         if (Armed)
@@ -238,8 +238,9 @@ namespace utils_crawler
         auto State = FMars_Fragment_Crawler();
         State.Motion = Motion;
         State.Gait = Gait;
-        State.BodyPose = BodyPose;
-        State.ActionPlayer = ActionPlayer;
+        State.Articulation = Walker.Get_Articulation();
+        State.BodyPose = Walker.Get_BodyPose();
+        State.ActionPlayer = Walker.Get_ActionPlayer();
         State.Presentation = Rig.Presentation;
         State.LegParts = LegParts;
         State.Navigator = Navigator;
@@ -332,6 +333,11 @@ mixin FCk_Handle_SurfaceMotion Get_Motion(const FCk_Handle_Crawler& Self)
 mixin FCk_Handle_ProceduralGait Get_Gait(const FCk_Handle_Crawler& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Crawler).Gait;
+}
+
+mixin FCk_Handle_ProceduralArticulation Get_Articulation(const FCk_Handle_Crawler& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Crawler).Articulation;
 }
 
 mixin FCk_Handle_ProceduralBodyPose Get_BodyPose(const FCk_Handle_Crawler& Self)

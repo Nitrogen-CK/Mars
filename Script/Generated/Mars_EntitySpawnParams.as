@@ -1360,6 +1360,19 @@ namespace UMars_AutoTest_CrawlerMelee_PincerCancelledInTheAirThenWalks
 }
 
 USTRUCT()
+struct FMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike
+{
+    FMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike_SpawnParams Params()
+    {
+        return FMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_CrawlerMelee_PincerKeyValidation_SpawnParams
 {
 }
