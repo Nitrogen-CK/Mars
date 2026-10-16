@@ -59,6 +59,14 @@ void Mars_BuildSandboxRoom5Func(const TArray<FString>& Args)
 const FConsoleCommand Mars_BuildSandboxRoom5Command("Mars.Sandbox.BuildRoom5", n"Mars_BuildSandboxRoom5Func");
 
 UFUNCTION()
+void Mars_BuildSandboxRoom6Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildRoom6();
+}
+
+const FConsoleCommand Mars_BuildSandboxRoom6Command("Mars.Sandbox.BuildRoom6", n"Mars_BuildSandboxRoom6Func");
+
+UFUNCTION()
 void Mars_PlaceSandboxCrawlersFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceCrawlers();
@@ -217,6 +225,7 @@ namespace utils_mars_sandbox
     const FString k_Room3FloorLabel = "Room3_Floor";
     const FString k_Room4FloorLabel = "Room4_Floor";
     const FString k_Room5FloorLabel = "Room5_Floor";
+    const FString k_Room6FloorLabel = "Room6_Floor";
     const FString k_Room5CrawlerLabelPrefix = "Mech5_Crawler";
     const FString k_Room5NavFieldLabel = "Mech5_NavField";
     const FString k_Room5AggressionLeverLabel = "Mech5_AggressionLever";
@@ -289,6 +298,7 @@ namespace utils_mars_sandbox
         Spawn_Room3();
         Spawn_Room4();
         Spawn_Room5();
+        Spawn_Room6();
         Spawn_Ladder();
         Spawn_Workbench();
         Spawn_CuttingStation();
@@ -366,6 +376,17 @@ namespace utils_mars_sandbox
         { return; }
 
         Spawn_Room5();
+        Apply_ProtoGridMaterials();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    void BuildRoom6()
+    {
+        const FString Command = "Mars.Sandbox.BuildRoom6";
+        if (Get_CanAdd(Command, k_Room6FloorLabel, "Delete the Room6_, Mech6_ and Item_Key actors first to rebuild.") == false)
+        { return; }
+
+        Spawn_Room6();
         Apply_ProtoGridMaterials();
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
@@ -835,6 +856,74 @@ namespace utils_mars_sandbox
         Spawn_Room5AggressionLever();
     }
 
+    // South of the main floor, entered through a doorway in its north wall at X=1000 (clear of the station row). A hall
+    // along the north wall faces a partition of four doors, each with its locks on the hall side; dividers split the vaults
+    // behind them. Every lock stands 200 uu beside its own door.
+    //   K1 (X -550): the red key, in the hall, opens the barred red door (latched); the yellow key lies behind it.
+    //   K2 (X 150): a blue lock AND a yellow lock either side of a solid door (AllChannels, latched); a plinth behind it.
+    //   K3 (X 850): two green locks and two green keys in the hall (AllSources, latched); the blue key lies behind the bars.
+    //   K4 (X 1550): a removable purple lock outside and another inside; the barred door is open only while either holds
+    //   the purple key (AnyChannel, not latched) and waits for its doorway to clear before closing.
+    void Spawn_Room6()
+    {
+        Spawn_Cube(k_Room6FloorLabel, FVector(500.0, -2700.0, -10.0), FVector(28.0, 14.0, 0.2));
+
+        Spawn_Cube("Room6_WallNorth_West", FVector(-25.0, -2000.0, 150.0), FVector(17.5, 0.2, 3.0));
+        Spawn_Cube("Room6_WallNorth_East", FVector(1525.0, -2000.0, 150.0), FVector(7.5, 0.2, 3.0));
+        Spawn_Cube("Room6_WallWest", FVector(-900.0, -2700.0, 150.0), FVector(0.2, 14.0, 3.0));
+        Spawn_Cube("Room6_WallEast", FVector(1900.0, -2700.0, 150.0), FVector(0.2, 14.0, 3.0));
+        Spawn_Cube("Room6_WallSouth", FVector(500.0, -3400.0, 150.0), FVector(28.2, 0.2, 3.0));
+
+        // Partition around four 240uu gate frames (X -550, 150, 850, 1550); headers close the gaps to the 300uu wall top.
+        // Gates are yawed 90 so their opening spans X.
+        const float64 PartitionY = -2500.0;
+        const auto GateRotation = FRotator(0.0, 90.0, 0.0);
+        Spawn_Cube("Room6_Partition_0", FVector(-785.0, PartitionY, 150.0), FVector(2.3, 0.2, 3.0));
+        Spawn_Cube("Room6_Partition_1", FVector(-200.0, PartitionY, 150.0), FVector(4.6, 0.2, 3.0));
+        Spawn_Cube("Room6_Partition_2", FVector(500.0, PartitionY, 150.0), FVector(4.6, 0.2, 3.0));
+        Spawn_Cube("Room6_Partition_3", FVector(1200.0, PartitionY, 150.0), FVector(4.6, 0.2, 3.0));
+        Spawn_Cube("Room6_Partition_4", FVector(1785.0, PartitionY, 150.0), FVector(2.3, 0.2, 3.0));
+        Spawn_Cube("Room6_GateHeader_K1", FVector(-550.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Cube("Room6_GateHeader_K2", FVector(150.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Cube("Room6_GateHeader_K3", FVector(850.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Cube("Room6_GateHeader_K4", FVector(1550.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Cube("Room6_Divider_0", FVector(-200.0, -2950.0, 150.0), FVector(0.2, 9.0, 3.0));
+        Spawn_Cube("Room6_Divider_1", FVector(500.0, -2950.0, 150.0), FVector(0.2, 9.0, 3.0));
+        Spawn_Cube("Room6_Divider_2", FVector(1200.0, -2950.0, 150.0), FVector(0.2, 9.0, 3.0));
+
+        Spawn_Mechanism(UMars_Sandbox_KeyDoor_Red_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorRed", FVector(-550.0, PartitionY, 0.0), GateRotation));
+        Spawn_Mechanism(UMars_Sandbox_KeyDoor_BlueYellow_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorBlueYellow", FVector(150.0, PartitionY, 0.0), GateRotation));
+        Spawn_Mechanism(UMars_Sandbox_KeyDoor_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorGreen", FVector(850.0, PartitionY, 0.0), GateRotation));
+        Spawn_Mechanism(UMars_Sandbox_KeyDoor_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorPurple", FVector(1550.0, PartitionY, 0.0), GateRotation));
+
+        // Locks on the partition's faces, their keyholes (local +Z) turned out of the wall: pitch -90 takes +Z to +X, then
+        // yaw 90 takes it to +Y (the hall), yaw -90 to -Y (a vault).
+        const auto HallFacing = FRotator(-90.0, 90.0, 0.0);
+        const auto VaultFacing = FRotator(-90.0, -90.0, 0.0);
+        const float64 HallFaceY = PartitionY + 10.0;
+        const float64 VaultFaceY = PartitionY - 10.0;
+        const float64 LockZ = 120.0;
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Red_EntityScript, FMars_MapBuilder_Placement("Mech6_LockRed", FVector(-350.0, HallFaceY, LockZ), HallFacing));
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Blue_EntityScript, FMars_MapBuilder_Placement("Mech6_LockBlue", FVector(-50.0, HallFaceY, LockZ), HallFacing));
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Yellow_EntityScript, FMars_MapBuilder_Placement("Mech6_LockYellow", FVector(350.0, HallFaceY, LockZ), HallFacing));
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_LockGreen_West", FVector(650.0, HallFaceY, LockZ), HallFacing));
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_LockGreen_East", FVector(1050.0, HallFaceY, LockZ), HallFacing));
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_LockPurple_Outside", FVector(1350.0, HallFaceY, LockZ), HallFacing));
+        Spawn_Mechanism(UMars_Sandbox_KeyLock_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_LockPurple_Inside", FVector(1300.0, VaultFaceY, LockZ), VaultFacing));
+
+        // The keys drop the 30uu onto the floor. The vault keys lie 500 uu behind their bars, beyond the interaction reach.
+        Spawn_Mechanism(UMars_WorldItem_Key_Red_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Red", FVector(-550.0, -2250.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Key_Green_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Green_0", FVector(750.0, -2250.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Key_Green_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Green_1", FVector(950.0, -2250.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Key_Purple_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Purple", FVector(1550.0, -2250.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Key_Yellow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Yellow", FVector(-550.0, -3000.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Key_Blue_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Blue", FVector(850.0, -3000.0, 30.0)));
+
+        // Something to reach behind the two-key door and the purple door.
+        Spawn_Cube("Room6_Plinth_K2", FVector(150.0, -3000.0, 40.0), FVector(1.0, 1.0, 0.8));
+        Spawn_Cube("Room6_Plinth_K4", FVector(1550.0, -3100.0, 40.0), FVector(1.0, 1.0, 0.8));
+    }
+
     void Spawn_Cube(const FString& InLabel, FVector InLocation, FVector InScale)
     {
         utils_mars_map_builder::Spawn_Block(engine::load::Cube(), FMars_MapBuilder_Block(InLabel, InLocation, InScale));
@@ -903,6 +992,12 @@ namespace utils_mars_sandbox
             else if (Label == "Room5_Pillar" || Label == "Room5_Step")
             { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Room5_"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label == k_Room6FloorLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label.StartsWith("Room6_Plinth"))
+            { Block.StaticMeshComponent.SetMaterial(0, Platform); }
+            else if (Label.StartsWith("Room6_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
             else if (Label.StartsWith(k_GauntletLabelPrefix))
             { Apply_GauntletMaterial(Block, Label); }
