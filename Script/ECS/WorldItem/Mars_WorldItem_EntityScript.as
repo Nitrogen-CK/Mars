@@ -61,6 +61,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
     private UCk_InventoryItem_Definition _Definition;
     private TSoftObjectPtr<UStaticMesh> _Mesh;
     private TSoftObjectPtr<UMaterialInterface> _MaterialOverride;
+    private TOptional<FLinearColor> _PrimaryColor;
     private FCk_Handle_Interactable _Pickup;
 
     // Valid while the pickup holds its HotbarFull claim because this focuser's hotbar had nowhere to stow the item.
@@ -87,6 +88,7 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         {
             _Mesh = Presentation.Visual.Mesh;
             _MaterialOverride = Presentation.Visual.MaterialOverride;
+            _PrimaryColor = Presentation.Visual.PrimaryColor;
             AddVisual(Root, Presentation.Visual.MeshScale);
         }
 
@@ -340,6 +342,13 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
 
         if (_MaterialOverride.IsNull() == false)
         { MeshComponent.SetMaterial(0, System::LoadAsset_Blocking(_MaterialOverride)); }
+
+        if (_PrimaryColor.IsSet())
+        {
+            auto TintedMaterial = MeshComponent.CreateDynamicMaterialInstance(0);
+            if (ck::IsValid(TintedMaterial))
+            { TintedMaterial.Set_ProtoGridColors(_PrimaryColor.GetValue()); }
+        }
 
         // A visual attached under the local player's hand is drawn with the first-person gloves holding it. The walk
         // starts at this item's root (the scene node under the hand): the component's own entity is no scene node.

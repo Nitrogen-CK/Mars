@@ -19,6 +19,11 @@ struct FMars_ItemPresentation_Visual
 
     UPROPERTY()
     TSoftObjectPtr<UMaterialInterface> MaterialOverride;
+
+    // Set: the mesh's slot 0 gets a dynamic instance with these ProtoGrid colours (Set_ProtoGridColors), on every visual of
+    // the item - in the world, in the hand, in a slot.
+    UPROPERTY()
+    TOptional<FLinearColor> PrimaryColor;
 }
 
 // Where a two-handed item's gloves sit (without grip sockets).
