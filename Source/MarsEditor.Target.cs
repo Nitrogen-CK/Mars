@@ -2,7 +2,6 @@
 
 using UnrealBuildTool;
 using EpicGames.Core;
-using System;
 using System.Collections.Generic;
 
 public class MarsEditorTarget : TargetRules
@@ -14,31 +13,31 @@ public class MarsEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
 		// Unique build environment (a project-specific MarsEditor.exe with Build/Windows/Application.ico)
-		// unless this clone's Project Storage options ask for Shared, which builds engine modules into the
-		// engine checkout and launches the engine's UnrealEditor.exe.
-		BuildEnvironment = Get_CloneEditorEnvironment(Target.ProjectFile);
+		// unless this clone's UnrealToolbox Project Storage options ask for Shared, which builds engine
+		// modules into the engine checkout and launches the engine's UnrealEditor.exe.
+		BuildEnvironment = TargetBuildEnvironment.Unique;
+		if (ProjectFile != null)
+		{
+			FileReference OptionsFile = FileReference.Combine(ProjectFile.Directory, "Saved", "UnrealBuildTool", "CkCloneBuildOptions.json");
+			if (FileReference.Exists(OptionsFile))
+			{
+				JsonObject Options = JsonObject.Read(OptionsFile);
+				if (Options.GetIntegerField("Schema") != 1)
+				{
+					throw new BuildException("Unsupported storage options schema: {0}", OptionsFile);
+				}
+				string Environment = Options.GetStringField("EditorEnvironment");
+				if (Environment == "Shared")
+				{
+					BuildEnvironment = TargetBuildEnvironment.Shared;
+				}
+				else if (Environment != "Unique")
+				{
+					throw new BuildException("Invalid EditorEnvironment in {0}", OptionsFile);
+				}
+			}
+		}
 
 		ExtraModuleNames.Add("Mars");
-	}
-
-	// Reads the untracked Saved/UnrealBuildTool/CkCloneBuildOptions.json that UnrealToolbox > Project
-	// Storage writes ({"EditorEnvironment":"Shared"|"Unique"}); anything missing or unreadable is Unique.
-	public static TargetBuildEnvironment Get_CloneEditorEnvironment(FileReference ProjectFile)
-	{
-		if (ProjectFile == null)
-		{
-			return TargetBuildEnvironment.Unique;
-		}
-
-		FileReference OptionsFile = FileReference.Combine(ProjectFile.Directory, "Saved", "UnrealBuildTool", "CkCloneBuildOptions.json");
-		if (!FileReference.Exists(OptionsFile) || !JsonObject.TryRead(OptionsFile, out JsonObject Options))
-		{
-			return TargetBuildEnvironment.Unique;
-		}
-
-		return Options.TryGetStringField("EditorEnvironment", out string Environment)
-			&& string.Equals(Environment, "Shared", StringComparison.OrdinalIgnoreCase)
-			? TargetBuildEnvironment.Shared
-			: TargetBuildEnvironment.Unique;
 	}
 }
