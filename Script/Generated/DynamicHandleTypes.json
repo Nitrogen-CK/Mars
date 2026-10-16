@@ -370,6 +370,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_KeyLock",
+			"ShortName": "KeyLock",
+			"Description": "One keyhole: a capacity-1 inventory taking only its AcceptedKey, the inserted key's visual, and an optional MechanismSource asserted while unlocked",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_KeyLockHandle",
+			"RequiredFragments": [
+				"Mars_Feature_KeyLock"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_Ladder",
 			"ShortName": "Ladder",
 			"Description": "A climbable ladder: its climb line and the two trigger zones that offer it to climbers",
