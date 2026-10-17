@@ -27,3 +27,15 @@ class UMars_WorldItem_Backpack_EntityScript : UMars_Backpack_EntityScript
 {
     default Definition = mars_items::Backpack();
 }
+
+// The lantern composes its light (UMars_Lantern_EntityScript); the tallow refuels it (Mars.Sandbox.BuildRoom7,
+// Mars.Warrens.PlaceLantern).
+class UMars_WorldItem_Lantern_EntityScript : UMars_Lantern_EntityScript
+{
+    default Definition = mars_items::Lantern();
+}
+
+class UMars_WorldItem_Tallow_EntityScript : UMars_WorldItem_EntityScript
+{
+    default Definition = mars_items::Tallow();
+}

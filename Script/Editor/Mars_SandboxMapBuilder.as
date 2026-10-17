@@ -67,6 +67,14 @@ void Mars_BuildSandboxRoom6Func(const TArray<FString>& Args)
 const FConsoleCommand Mars_BuildSandboxRoom6Command("Mars.Sandbox.BuildRoom6", n"Mars_BuildSandboxRoom6Func");
 
 UFUNCTION()
+void Mars_BuildSandboxRoom7Func(const TArray<FString>& Args)
+{
+    utils_mars_sandbox::BuildRoom7();
+}
+
+const FConsoleCommand Mars_BuildSandboxRoom7Command("Mars.Sandbox.BuildRoom7", n"Mars_BuildSandboxRoom7Func");
+
+UFUNCTION()
 void Mars_PlaceSandboxCrawlersFunc(const TArray<FString>& Args)
 {
     utils_mars_sandbox::PlaceCrawlers();
@@ -226,6 +234,7 @@ namespace utils_mars_sandbox
     const FString k_Room4FloorLabel = "Room4_Floor";
     const FString k_Room5FloorLabel = "Room5_Floor";
     const FString k_Room6FloorLabel = "Room6_Floor";
+    const FString k_Room7FloorLabel = "Room7_Floor";
     const FString k_Room5CrawlerLabelPrefix = "Mech5_Crawler";
     const FString k_Room5NavFieldLabel = "Mech5_NavField";
     const FString k_Room5AggressionLeverLabel = "Mech5_AggressionLever";
@@ -299,6 +308,7 @@ namespace utils_mars_sandbox
         Spawn_Room4();
         Spawn_Room5();
         Spawn_Room6();
+        Spawn_Room7();
         Spawn_Ladder();
         Spawn_Workbench();
         Spawn_CuttingStation();
@@ -387,6 +397,17 @@ namespace utils_mars_sandbox
         { return; }
 
         Spawn_Room6();
+        Apply_ProtoGridMaterials();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    void BuildRoom7()
+    {
+        const FString Command = "Mars.Sandbox.BuildRoom7";
+        if (Get_CanAdd(Command, k_Room7FloorLabel, "Delete the Room7_, Mech7_ and Item_Room7_ actors first to rebuild.") == false)
+        { return; }
+
+        Spawn_Room7();
         Apply_ProtoGridMaterials();
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
@@ -924,6 +945,51 @@ namespace utils_mars_sandbox
         Spawn_Cube("Room6_Plinth_K4", FVector(1550.0, -3100.0, 40.0), FVector(1.0, 1.0, 0.8));
     }
 
+    // The dark room, south of the main floor and west of room 6 (X -2500..-1000, Y -3300..-2000): walled and roofed, so
+    // only its own lights reach in. A baffle wall inside the north doorway keeps the daylight out. Between the doorway and
+    // the baffle: the light switch (toggles the four ceiling lights, which start off), two lanterns on the west plinth and
+    // three tallow cakes on the east plinth. The rest of the room is dark: a tallow cake, a ration and a cog lie in it.
+    void Spawn_Room7()
+    {
+        Spawn_Cube(k_Room7FloorLabel, FVector(-1750.0, -2650.0, -10.0), FVector(15.0, 13.0, 0.2));
+
+        Spawn_Cube("Room7_WallWest", FVector(-2500.0, -2650.0, 150.0), FVector(0.2, 13.0, 3.0));
+        Spawn_Cube("Room7_WallEast", FVector(-1000.0, -2650.0, 150.0), FVector(0.2, 13.0, 3.0));
+        Spawn_Cube("Room7_WallSouth", FVector(-1750.0, -3300.0, 150.0), FVector(15.2, 0.2, 3.0));
+        // A 240 uu doorway at X -1870..-1630.
+        Spawn_Cube("Room7_WallNorth_West", FVector(-2185.0, -2000.0, 150.0), FVector(6.3, 0.2, 3.0));
+        Spawn_Cube("Room7_WallNorth_East", FVector(-1315.0, -2000.0, 150.0), FVector(6.3, 0.2, 3.0));
+        Spawn_Cube("Room7_DoorHeader", FVector(-1750.0, -2000.0, 270.0), FVector(2.4, 0.2, 0.6));
+        Spawn_Cube("Room7_Baffle", FVector(-1750.0, -2250.0, 150.0), FVector(4.0, 0.2, 3.0));
+        // Underside at Z 300, on the wall tops.
+        Spawn_Cube("Room7_Roof", FVector(-1750.0, -2650.0, 310.0), FVector(15.2, 13.2, 0.2));
+
+        // The switch on the north wall's inner face east of the doorway, its button (local +Z) turned to face the room
+        // (-Y): pitch -90 takes +Z to +X, yaw -90 takes it to -Y.
+        Spawn_Mechanism(UMars_Sandbox_LightSwitch_EntityScript,
+            FMars_MapBuilder_Placement("Mech7_LightSwitch", FVector(-1560.0, -2010.0, 120.0), FRotator(-90.0, -90.0, 0.0)));
+
+        // Hung from the roof's underside.
+        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_0", FVector(-2125.0, -2550.0, 300.0)));
+        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_1", FVector(-1375.0, -2550.0, 300.0)));
+        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_2", FVector(-2125.0, -3000.0, 300.0)));
+        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_3", FVector(-1375.0, -3000.0, 300.0)));
+
+        // Plinth tops at Z 80; the items drop the 10 uu onto them.
+        Spawn_Cube("Room7_Plinth_Lanterns", FVector(-2300.0, -2130.0, 40.0), FVector(1.6, 0.8, 0.8));
+        Spawn_Cube("Room7_Plinth_Tallow", FVector(-1200.0, -2130.0, 40.0), FVector(1.6, 0.8, 0.8));
+        Spawn_Mechanism(UMars_WorldItem_Lantern_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Lantern_0", FVector(-2350.0, -2130.0, 90.0)));
+        Spawn_Mechanism(UMars_WorldItem_Lantern_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Lantern_1", FVector(-2250.0, -2130.0, 90.0)));
+        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_0", FVector(-1250.0, -2130.0, 90.0)));
+        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_1", FVector(-1200.0, -2130.0, 90.0)));
+        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_2", FVector(-1150.0, -2130.0, 90.0)));
+
+        // Something to find in the dark.
+        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_Back", FVector(-2400.0, -3200.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Ration_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Ration", FVector(-1100.0, -3200.0, 30.0)));
+        Spawn_Mechanism(UMars_WorldItem_Cog_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Cog", FVector(-1750.0, -2900.0, 30.0)));
+    }
+
     void Spawn_Cube(const FString& InLabel, FVector InLocation, FVector InScale)
     {
         utils_mars_map_builder::Spawn_Block(engine::load::Cube(), FMars_MapBuilder_Block(InLabel, InLocation, InScale));
@@ -998,6 +1064,12 @@ namespace utils_mars_sandbox
             else if (Label.StartsWith("Room6_Plinth"))
             { Block.StaticMeshComponent.SetMaterial(0, Platform); }
             else if (Label.StartsWith("Room6_"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            else if (Label == k_Room7FloorLabel)
+            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            else if (Label.StartsWith("Room7_Plinth"))
+            { Block.StaticMeshComponent.SetMaterial(0, Platform); }
+            else if (Label.StartsWith("Room7_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
             else if (Label.StartsWith(k_GauntletLabelPrefix))
             { Apply_GauntletMaterial(Block, Label); }
