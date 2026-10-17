@@ -177,6 +177,11 @@ mixin const FMars_FPHands_Spec& Get_Spec(const FCk_Handle_FPHands& Self)
     return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec;
 }
 
+mixin FCk_Handle_SceneNode Get_SideNode(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands_Params).Spec.SideNode;
+}
+
 // A free glove's arm swing this frame in the hand node's frame: the gait's stride swing, opposite per glove; the glove
 // swinging forward lifts. Zero without a gait.
 mixin FVector Get_ArmSwing(const FCk_Handle_FPHands& Self, EMars_Hand InHand)

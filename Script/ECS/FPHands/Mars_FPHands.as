@@ -61,7 +61,7 @@ struct FMars_FPHands_RestSpec
     FTransform CenteredHandOffset = FTransform(FRotator::ZeroRotator, FVector(60.0, 0.0, -20.0), FVector::OneVector);
 
     // One-handed items: the Hand node's rest offset from the camera, at the right glove that carries the item (X forward,
-    // Y right, Z up).
+    // Y right, Z up). Reached through the side node (Spec.SideNode) by Get_HandLateral; same rotation as CenteredHandOffset.
     UPROPERTY()
     FTransform OneHandedHandOffset = FTransform(FRotator::ZeroRotator, FVector(60.0, 25.0, -20.0), FVector::OneVector);
 
@@ -126,6 +126,13 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FCk_Handle_Transform HandNode;
 
+    // The scene node above HandNode that carries the hold's lateral (Player.HandSide): a one-handed item moves the hand
+    // node, and everything under it, to the right glove by Rest.OneHandedHandOffset - Rest.CenteredHandOffset. The owner
+    // writes its offset on a hold change (utils_fphands::Get_HandLateral); the anim instance reads the offset it actually
+    // carries each frame to keep the gloves still while it moves. Invalid = the hand node is not moved per hold.
+    UPROPERTY()
+    FCk_Handle_SceneNode SideNode;
+
     UPROPERTY()
     FMars_FPHands_VisualSpec Visual;
 
@@ -176,6 +183,9 @@ mixin FMars_Validation Validate(const FMars_FPHands_Spec& Self)
 {
     if (ck::Is_NOT_Valid(Self.HandNode))
     { return FMars_Validation("HandNode is invalid"); }
+
+    if (Self.Rest.OneHandedHandOffset.GetRotation().Equals(Self.Rest.CenteredHandOffset.GetRotation(), 0.0001) == false)
+    { return FMars_Validation("Rest.OneHandedHandOffset and Rest.CenteredHandOffset must share a rotation (a hold only moves the hand node sideways)"); }
 
     if (Self.ReachInterpSpeed.IsSet() && Self.ReachInterpSpeed.GetValue() <= 0.0f)
     { return FMars_Validation(f"ReachInterpSpeed [{Self.ReachInterpSpeed.GetValue()}] is not positive (unset snaps)"); }
@@ -236,6 +246,11 @@ struct FMars_FPHands_HandTargets
 
     UPROPERTY()
     FMars_FPHands_HandTarget Right;
+
+    // How far the hand node sits from its centred rest for the hold these are laid out for (utils_fphands::Get_HandLateral,
+    // the side node's offset): the anim instance keeps it out of the eased frame.
+    UPROPERTY()
+    FVector Lateral;
 }
 
 // What the glove targets are composed against this frame: the hand node's current world transform and each glove's
@@ -381,6 +396,7 @@ namespace utils_fphands
                                               const FMars_FPHands_TargetFrame& InFrame)
     {
         auto Targets = FMars_FPHands_HandTargets();
+        Targets.Lateral = Get_HandLateral(InRest, InHold);
         Targets.Left.Swing = InFrame.Swing_L;
         Targets.Right.Swing = InFrame.Swing_R;
         // Empty hands: both gloves either side of the centred Hand node.
@@ -458,6 +474,13 @@ namespace utils_fphands
         { return InRest.OneHandedHandOffset; }
 
         return InRest.CenteredHandOffset;
+    }
+
+    // How far a hold moves the hand node from its centred rest (the side node's offset, Spec.SideNode): zero for empty
+    // hands and two-handed holds, OneHandedHandOffset - CenteredHandOffset for one-handed ones.
+    FVector Get_HandLateral(const FMars_FPHands_RestSpec& InRest, const FMars_FPHands_Hold& InHold)
+    {
+        return Get_HandRestOffset(InRest, InHold).GetLocation() - InRest.CenteredHandOffset.GetLocation();
     }
 
     // The item's sides along the Hand node's Y axis and its underside along Z: its mesh bounds x InMeshScale, placed by

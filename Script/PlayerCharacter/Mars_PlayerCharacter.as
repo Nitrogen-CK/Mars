@@ -121,9 +121,9 @@ class AMars_PlayerCharacter : AMars_Character
     private const FName BodyGripBone_R = n"grip_r";
     private const FName BodyGripBone_L = n"grip_l";
 
-    // The Hand node rest offset last sent to _HandSway. The gloves' own hold only updates at their next drain, so a
-    // second item change before it would compare against a stale rest.
-    private FTransform _HandRestOffset;
+    // The scene node that carries the hold's lateral (Player.HandSide, FPHands.SideNode): a one-handed item moves the hand
+    // node to the right glove.
+    private FCk_Handle_SceneNode _HandSide;
 
     UFUNCTION(BlueprintOverride)
     void ConstructionScript()
@@ -294,11 +294,11 @@ class AMars_PlayerCharacter : AMars_Character
         auto HandPitch = utils_scene_node::Create(ViewAnchor, FTransform::Identity);
         utils_handle::Set_DebugName(HandPitch.H(), n"Player.HandPitch");
         auto HandPitchTransform = HandPitch.As_Transform();
-        _HandRestOffset = utils_fphands::Get_HandRestOffset(Config.FPHands.Rest, FMars_FPHands_Hold());
-        auto Hand = utils_scene_node::Create(HandPitchTransform, _HandRestOffset);
+        auto Hand = utils_scene_node::Create(HandPitchTransform, Config.FPHands.Rest.CenteredHandOffset);
         utils_handle::Set_DebugName(Hand.H(), n"Player.Hand");
 
-        // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; _HandRestOffset is its rest.
+        // Damped-spring lag of the hand behind the view. CkSway owns the Hand offset from here on; the centred rest is its
+        // rest for every hold (a hold's lateral is the HandSide node's, below the bob, so it never kicks the spring).
         _HandSway = utils_sway::Add(Hand, Config.HandSway);
 
         // Locomotion bob under the swaying hand, in phase with the head; the swing node, the held item and both gloves
@@ -309,15 +309,23 @@ class AMars_PlayerCharacter : AMars_Character
         auto HandBob = utils_bob::Create(HandTransform, FTransform::Identity, HandBobSpec);
         utils_handle::Set_DebugName(HandBob.H(), n"Player.HandBob");
 
-        // The melee swing under the bob: everything that hangs off the hand (both gloves and the held item) swings with
-        // it. HandSwing owns the node's offset; identity at rest.
+        // The hold's lateral under the bob: a one-handed item moves the swing node, the held item and both gloves' frame
+        // to the right glove (OnHeldItemChanged). A plain node of its own rather than the sway's rest, so the gloves' anim
+        // instance can read the offset it actually carries each frame and hold the gloves still while it moves.
         auto HandBobTransform = HandBob.As_Transform();
-        auto SwingNode = utils_scene_node::Create(HandBobTransform, FTransform::Identity);
+        _HandSide = utils_scene_node::Create(HandBobTransform, FTransform::Identity);
+        utils_handle::Set_DebugName(_HandSide.H(), n"Player.HandSide");
+
+        // The melee swing under that: everything that hangs off the hand (both gloves and the held item) swings with it.
+        // HandSwing owns the node's offset; identity at rest.
+        auto HandSideTransform = _HandSide.As_Transform();
+        auto SwingNode = utils_scene_node::Create(HandSideTransform, FTransform::Identity);
         utils_handle::Set_DebugName(SwingNode.H(), n"Player.HandSwing");
         _HandSwing = utils_hand_swing::Add(Player, FMars_HandSwing_Spec(SwingNode));
         _HandNode = SwingNode.As_Transform();
         auto HandsSpec = Config.FPHands;
         HandsSpec.HandNode = _HandNode;
+        HandsSpec.SideNode = _HandSide;
         HandsSpec.Pitch.Node = HandPitch;
         _Hands = utils_fphands::Add(Player, HandsSpec);
 
@@ -887,8 +895,8 @@ class AMars_PlayerCharacter : AMars_Character
     }
 
     // Empty hands and two-handed holds centre the Hand node between the gloves; one-handed items move it to the right.
-    // The gloves' own hold follows HeldItem through the player HFSM (UMars_SmTask_HeldItemDrivesHands); the rest offset is
-    // measured here from the same item. Stays on the actor: the Hand node's sway handle is held only here.
+    // The gloves' own hold follows HeldItem through the player HFSM (UMars_SmTask_HeldItemDrivesHands); the lateral is
+    // measured here from the same item and written to the HandSide node. Stays on the actor: that node is held only here.
     UFUNCTION()
     private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
     {
@@ -900,11 +908,8 @@ class AMars_PlayerCharacter : AMars_Character
         if (IsLocallyControlled())
         { Request_SetHeldView(utils_held_view::Make(InNew)); }
 
-        const auto NewRest = utils_fphands::Get_HandRestOffset(Config.FPHands.Rest, NewHold);
-        if (NewRest.Equals(_HandRestOffset))
-        { return; }
-
-        _HandRestOffset = NewRest;
-        utils_sway::Request_SetRestOffset(_HandSway, FCk_Request_Sway_SetRestOffset(NewRest));
+        const auto Lateral = utils_fphands::Get_HandLateral(Config.FPHands.Rest, NewHold);
+        utils_scene_node::Request_UpdateOffset(_HandSide,
+            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator::ZeroRotator, Lateral)));
     }
 }

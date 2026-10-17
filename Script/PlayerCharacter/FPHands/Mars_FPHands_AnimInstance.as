@@ -1,4 +1,4 @@
-// Both gloves' eased grips in the hand node's space.
+// Both gloves' eased grips in the hand node's space, raised by the hold's lateral (see BlueprintUpdateAnimation).
 struct FMars_FPHands_GloveGrips
 {
     UPROPERTY()
@@ -86,18 +86,28 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         const auto& Left = Targets.Left;
         const auto& Right = Targets.Right;
 
-        // Only the grip change is eased; the hand node's sway and bob, and the arm swing, stay crisp.
+        // Only the grip change is eased; the hand node's sway and bob, and the arm swing, stay crisp. The hold's lateral
+        // (a one-handed item moves the hand node to the right glove, through the side node) is kept out of the eased frame:
+        // the targets are laid out with the node at Targets.Lateral, so each is raised by it and eased in the side node's
+        // frame (the swing's rotation taken out), then lowered by the lateral the side node actually carries this frame.
+        // A glove whose place does not change between two holds then never moves, whichever frame the node does.
+        const auto SwingRotation = Get_SwingRotation(Hands, HandWorld);
+        const auto Raise = SwingRotation.UnrotateVector(Targets.Lateral);
+        const auto Lower = SwingRotation.UnrotateVector(Get_SideLateral(Hands, Targets.Lateral));
+        const auto TargetLeft = Raised(Left.GripInHand, Raise);
+        const auto TargetRight = Raised(Right.GripInHand, Raise);
         if (_Grips.IsSet() == false || Spec.ReachInterpSpeed.IsSet() == false)
-        { _Grips = TOptional<FMars_FPHands_GloveGrips>(FMars_FPHands_GloveGrips(Left.GripInHand, Right.GripInHand)); }
+        { _Grips = TOptional<FMars_FPHands_GloveGrips>(FMars_FPHands_GloveGrips(TargetLeft, TargetRight)); }
         else
         {
             const auto GripAlpha = Math::Clamp(1.0 - Math::Exp(-Spec.ReachInterpSpeed.GetValue() * DeltaTimeX), 0.0, 1.0);
             const auto Previous = _Grips.GetValue();
             _Grips = TOptional<FMars_FPHands_GloveGrips>(FMars_FPHands_GloveGrips(
-                InterpGrip(Previous.Left, Left.GripInHand, GripAlpha), InterpGrip(Previous.Right, Right.GripInHand, GripAlpha)));
+                InterpGrip(Previous.Left, TargetLeft, GripAlpha), InterpGrip(Previous.Right, TargetRight, GripAlpha)));
         }
 
-        const auto Grips = _Grips.GetValue();
+        const auto Eased = _Grips.GetValue();
+        const auto Grips = FMars_FPHands_GloveGrips(Raised(Eased.Left, -Lower), Raised(Eased.Right, -Lower));
 
         // The gloves attach to the UCk_CameraComponent, which FollowView moves onto the rendered view at the end of the frame;
         // the hand node hangs off that same view (the director's view anchor). Composing against the anchor rather than
@@ -148,6 +158,35 @@ class UMars_FPHands_AnimInstance : UAnimInstance
     {
         auto Result = InGrip;
         Result.SetLocation(InGrip.GetLocation() + InSwing);
+        return Result;
+    }
+
+    // The hand node's rotation relative to the side node (the melee swing; identity at rest). Identity without a side node.
+    private FQuat Get_SwingRotation(const FCk_Handle_FPHands& InHands, const FTransform& InHandWorld)
+    {
+        const auto SideNode = InHands.Get_SideNode();
+        if (ck::Is_NOT_Valid(SideNode))
+        { return FQuat::Identity; }
+
+        const auto SideWorld = utils_transform::Get_EntityCurrentTransform(SideNode.As_Transform());
+        return InHandWorld.GetRelativeTransform(SideWorld).GetRotation();
+    }
+
+    // How far the side node actually moves the hand node this frame: its offset, which lands a frame after the owner writes
+    // it. Without a side node, the targets' own lateral (nothing to take out).
+    private FVector Get_SideLateral(const FCk_Handle_FPHands& InHands, const FVector& InFallback)
+    {
+        const auto SideNode = InHands.Get_SideNode();
+        if (ck::Is_NOT_Valid(SideNode))
+        { return InFallback; }
+
+        return utils_scene_node::Get_Offset(SideNode).GetLocation();
+    }
+
+    private FTransform Raised(const FTransform& InGrip, const FVector& InBy)
+    {
+        auto Result = InGrip;
+        Result.SetLocation(InGrip.GetLocation() + InBy);
         return Result;
     }
 
