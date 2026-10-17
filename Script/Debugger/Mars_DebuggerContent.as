@@ -35,6 +35,7 @@ class UMars_DebuggerContent : UObject
         Initialized = true;
         Pages.Add(NewObject(this, UMars_DebugPage_Player));
         Pages.Add(NewObject(this, UMars_DebugPage_Monsters));
+        Pages.Add(NewObject(this, UMars_DebugPage_Anchors));
         Pages.Add(NewObject(this, UMars_DebugPage_Interaction));
         ActivateCurrentPage();
     }
