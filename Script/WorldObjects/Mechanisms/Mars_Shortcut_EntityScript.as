@@ -18,8 +18,8 @@ class UMars_Shortcut_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
 
-    UPROPERTY(ExposeOnSpawn)
-    FName ShortcutId;
+    UPROPERTY(ExposeOnSpawn, meta = (Categories = "Shortcut.Mars"))
+    FGameplayTag ShortcutId;
 
     // Unique per placement: the lever asserts it, the gate latches open on it.
     UPROPERTY(ExposeOnSpawn, meta = (Categories = "Mechanism.Channel"))
@@ -37,7 +37,7 @@ class UMars_Shortcut_EntityScript : UCk_GenericEntityScript_UE
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        if (ck::EnsureIfNot(Channel.IsValid(), f"[Shortcut] {ShortcutId} has no channel: its lever would open nothing"))
+        if (ck::EnsureIfNot(Channel.IsValid(), f"[Shortcut] {ShortcutId.ToString()} has no channel: its lever would open nothing"))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);

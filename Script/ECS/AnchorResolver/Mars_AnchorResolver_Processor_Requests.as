@@ -100,7 +100,7 @@ class UMars_Processor_AnchorResolver_HandleRequests : UCk_Processor_Script_Base_
         { Self.Get_Fragment(FMars_Fragment_AnchorResolver_Signals).OnAnchorResolved.Broadcast(Self, Entry); }
     }
 
-    private int32 Find_Entry(const TArray<FMars_AnchorLedger_Entry>& InLedger, FName InAnchorId) const
+    private int32 Find_Entry(const TArray<FMars_AnchorLedger_Entry>& InLedger, FGameplayTag InAnchorId) const
     {
         for (int32 Index = 0; Index < InLedger.Num(); ++Index)
         {

@@ -33,7 +33,7 @@ class UMars_AutoTest_AnchorResolver_ClosureSetsKeepReachability : UMars_AutoTest
                 { continue; }
 
                 if (Failures == 0)
-                { FirstFailure = f"{Entrance.AnchorId.ToString()} with [{Get_NamesText(Set.Closed)}] closed"; }
+                { FirstFailure = f"{Entrance.AnchorId.ToString()} with [{Get_TagsText(Set.Closed)}] closed"; }
                 ++Failures;
             }
         }

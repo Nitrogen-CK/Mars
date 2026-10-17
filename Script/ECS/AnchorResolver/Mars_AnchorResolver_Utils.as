@@ -23,7 +23,7 @@ mixin FMars_AnchorRun_Result Get_Result(const FCk_Handle_AnchorResolver& Self)
 mixin TArray<FMars_AnchorLedger_Entry> Get_Ledger(const FCk_Handle_AnchorResolver& Self)
 { return Self.Get_Fragment(FMars_Fragment_AnchorResolver).Ledger; }
 
-mixin TOptional<FMars_AnchorLedger_Entry> TryGet_LedgerEntry(const FCk_Handle_AnchorResolver& Self, FName InAnchorId)
+mixin TOptional<FMars_AnchorLedger_Entry> TryGet_LedgerEntry(const FCk_Handle_AnchorResolver& Self, FGameplayTag InAnchorId)
 {
     for (const auto& Entry : Self.Get_Fragment(FMars_Fragment_AnchorResolver).Ledger)
     {
@@ -34,15 +34,15 @@ mixin TOptional<FMars_AnchorLedger_Entry> TryGet_LedgerEntry(const FCk_Handle_An
 }
 
 // Ids the run's result planned for that no anchor in this world has resolved yet, sorted.
-mixin TArray<FName> Get_UnmatchedPlannedIds(const FCk_Handle_AnchorResolver& Self)
+mixin TArray<FGameplayTag> Get_UnmatchedPlannedIds(const FCk_Handle_AnchorResolver& Self)
 {
-    auto Unmatched = TArray<FName>();
+    auto Unmatched = TArray<FGameplayTag>();
     for (const auto& Entry : Self.Get_Result().Roles)
     {
         if (Self.TryGet_LedgerEntry(Entry.AnchorId).IsSet() == false)
         { Unmatched.Add(Entry.AnchorId); }
     }
-    utils_anchor_resolver::Sort_Names(Unmatched);
+    utils_anchor_resolver::Sort_Tags(Unmatched);
     return Unmatched;
 }
 

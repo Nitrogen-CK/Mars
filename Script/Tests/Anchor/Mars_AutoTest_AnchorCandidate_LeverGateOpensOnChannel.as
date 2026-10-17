@@ -12,7 +12,7 @@ class UMars_AutoTest_AnchorCandidate_LeverGateOpensOnChannel : UMars_AutoTestRig
     {
         _Channel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Anchor.Test.B");
         auto Context = FMars_Anchor_Context();
-        Context.AnchorId = n"T-LeverGate";
+        Context.AnchorId = GameplayTags::Anchor_Mars_Test_A;
         Context.Channel = _Channel;
         _Candidate = Spawn_Candidate(InHandle, UMars_Anchor_LeverGate_EntityScript, Context);
 

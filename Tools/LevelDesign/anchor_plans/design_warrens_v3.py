@@ -44,19 +44,19 @@ LINKS = [
     ('S4', 'SL', [], CORRIDOR, 'walk', None),
     ('S5', 'CI', [], CORRIDOR, 'walk', None),
     # The hearth's four doors.
-    ('K', 'H1', [(36, 40), (30, 39)], CORRIDOR, 'walk', 'B-R1'),
-    ('K', 'RS', [(60, 48), (68, 50)], CORRIDOR, 'walk', 'B-R4'),
+    ('K', 'H1', [(36, 40), (30, 39)], CORRIDOR, 'walk', 'R1'),
+    ('K', 'RS', [(60, 48), (68, 50)], CORRIDOR, 'walk', 'R4'),
     ('K', 'O', [(46, 50), (42, 54)], TUNNEL, 'walk', None),
     ('K', 'PU', [(46, 30), (43, 22)], TUNNEL, 'walk', None),
     # The ring of regions.
     ('H1', 'O', [(24, 50), (28, 55)], TUNNEL, 'walk', None),
-    ('O', 'RQ', [(44, 62), (50, 62)], CORRIDOR, 'walk', 'B-R5'),
+    ('O', 'RQ', [(44, 62), (50, 62)], CORRIDOR, 'walk', 'R5'),
     ('RQ', 'RS', [(62, 60), (68, 57)], TUNNEL, 'walk', None),
-    ('H1', 'CI', [(12, 30), (10, 26), (16, 18)], TUNNEL, 'walk', 'B-R6'),
+    ('H1', 'CI', [(12, 30), (10, 26), (16, 18)], TUNNEL, 'walk', 'R6'),
     ('CI', 'PU', [(28, 13), (34, 13)], TUNNEL, 'walk', None),
-    ('PU', 'SL', [(46, 15), (54, 15)], CORRIDOR, 'walk', 'B-R3'),
+    ('PU', 'SL', [(46, 15), (54, 15)], CORRIDOR, 'walk', 'R3'),
     ('SL', 'CH', [(68, 19), (72, 24)], TUNNEL, 'walk', None),
-    ('CH', 'RS', [(78, 33), (78, 40)], CORRIDOR, 'walk', 'B-R2'),
+    ('CH', 'RS', [(78, 33), (78, 40)], CORRIDOR, 'walk', 'R2'),
     # Room-internal walks to the stair heads.
     ('H1', 'c1', [], CORRIDOR, 'walk', None),
     ('PU', 'p1', [], CORRIDOR, 'walk', None),
@@ -64,7 +64,7 @@ LINKS = [
     ('RS', 'r1', [], CORRIDOR, 'walk', None),
     # Four stairs down into the Undercroft.
     ('c1', 'd3', [], 3.0, 'stair', None),
-    ('p1', 'd1', [], 3.0, 'stair', 'B-R7'),
+    ('p1', 'd1', [], 3.0, 'stair', 'R7'),
     ('sx', 'd4', [], 3.0, 'stair', None),
     ('r1', 'd2', [], 3.0, 'stair', None),
     # The Undercroft: four short tunnels into its court.
@@ -97,10 +97,10 @@ RAMP_ROOF_Z = -2.4  # a ramp is open to the main floor above this height and roo
 # packFits False: a worn backpack does not pass the 1.3 m lintel (a rule the build must add; without it a crawl is a
 # free bypass of a closed gate).
 CRAWLS = [
-    dict(id='crawl-cistern-court', a=(22, 17), b=(16.5, 27), packFits=False, note='beside B-R6'),
-    dict(id='crawl-ossuary-reliquary', a=(42, 66), b=(52, 66), packFits=False, note='beside B-R5'),
-    dict(id='crawl-pump-sluice', a=(44, 11), b=(56, 12), packFits=False, note='beside B-R3'),
-    dict(id='crawl-chimes-shaft', a=(82, 31), b=(84, 41), packFits=False, note='beside B-R2'),
+    dict(id='crawl-cistern-court', a=(22, 17), b=(16.5, 27), packFits=False, note='beside R6'),
+    dict(id='crawl-ossuary-reliquary', a=(42, 66), b=(52, 66), packFits=False, note='beside R5'),
+    dict(id='crawl-pump-sluice', a=(44, 11), b=(56, 12), packFits=False, note='beside R3'),
+    dict(id='crawl-chimes-shaft', a=(82, 31), b=(84, 41), packFits=False, note='beside R2'),
 ]
 GALLERIES = []  # v3 builds its galleries on the Rafters level (UPPER), not as free-standing ledges
 
@@ -184,8 +184,8 @@ LOCKS = [
          note='bring the key down from the Rafters, through the lair, to the door'),
 ]
 ANCHOR_AT = {
-    'B-R1': (34, 40), 'B-R2': (78, 36), 'B-R3': (50, 15), 'B-R4': (63, 48.75), 'B-R5': (47, 62), 'B-R6': (13, 22),
-    'B-R7': None,
+    'R1': (34, 40), 'R2': (78, 36), 'R3': (50, 15), 'R4': (63, 48.75), 'R5': (47, 62), 'R6': (13, 22),
+    'R7': None,
 }
 
 
@@ -204,8 +204,8 @@ def build():
         links.append(dict(a=a, b=b, via=[list(p) for p in via], width=w, kind=kind, closedBy=closed, costCm=int(round(cost * 100))))
     anchors = []
     for i in range(1, 6):
-        anchors.append(dict(id=f'B-S{i}', family='S', at=list(NODES[f'S{i}'][:2]), node=f'S{i}', note='foyer'))
-    for aid, node in (('B-H1', 'H1'), ('B-H2', 'H2'), ('B-H3', 'RS')):
+        anchors.append(dict(id=f'S{i}', family='S', at=list(NODES[f'S{i}'][:2]), node=f'S{i}', note='foyer'))
+    for aid, node in (('H1', 'H1'), ('H2', 'H2'), ('H3', 'RS')):
         anchors.append(dict(id=aid, family='H', at=list(NODES[node][:2]), node=node, note='hunt court'))
     for l in LINKS:
         if l[5]:
@@ -224,11 +224,11 @@ def build():
         pillars=[dict(p, rect=list(p['rect'])) for p in PILLARS], lowLinks=[list(l) for l in LOW_LINKS], lowRoof=LOW_ROOF,
         locks=LOCKS,
         lights=[dict(l, at=list(l['at'])) for l in LIGHTS],
-        groups=[dict(name='Warren', anchorIds=['B-R1', 'B-R2', 'B-R3', 'B-R4', 'B-R5', 'B-R6', 'B-R7'], maxClosed=3)],
-        entrances=[dict(anchorId=f'B-S{i}', playerStartTag=FOYERS[f'S{i}'], node=f'S{i}') for i in range(1, 6)],
-        courts=[dict(anchorId='B-H1', node='H1'), dict(anchorId='B-H2', node='H2'), dict(anchorId='B-H3', node='RS')],
+        groups=[dict(name='Warren', anchorIds=['R1', 'R2', 'R3', 'R4', 'R5', 'R6', 'R7'], maxClosed=3)],
+        entrances=[dict(anchorId=f'S{i}', playerStartTag=FOYERS[f'S{i}'], node=f'S{i}') for i in range(1, 6)],
+        courts=[dict(anchorId='H1', node='H1'), dict(anchorId='H2', node='H2'), dict(anchorId='H3', node='RS')],
         anchors=anchors,
-        channels={f'B-R{i}': f'Mechanism.Channel.Anchor.Warrens.R{i}' for i in range(1, 8)},
+        channels={f'R{i}': f'Mechanism.Channel.Anchor.Warrens.R{i}' for i in range(1, 8)},
         quarryMinWalkCm=5000,
     )
 

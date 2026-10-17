@@ -27,13 +27,13 @@ class UMars_AutoTest_AnchorResolver_LateAnchorResolves : UMars_AutoTestRig_Ancho
     private void Step_SpawnLate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Owner = InHandle;
-        _Anchor = Spawn_Anchor(Owner, n"T-A", FVector(0.0, 2000.0, 0.0), TOptional<int32>());
+        _Anchor = Spawn_Anchor(Owner, GameplayTags::Anchor_Mars_Test_A, FVector(0.0, 2000.0, 0.0), TOptional<int32>());
     }
 
     UFUNCTION()
     private void Check_Resolved(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSpawned(_Anchor) && _Resolver.As_AnchorResolver().TryGet_LedgerEntry(n"T-A").IsSet());
+        Res.Set(Get_IsSpawned(_Anchor) && _Resolver.As_AnchorResolver().TryGet_LedgerEntry(GameplayTags::Anchor_Mars_Test_A).IsSet());
     }
 }

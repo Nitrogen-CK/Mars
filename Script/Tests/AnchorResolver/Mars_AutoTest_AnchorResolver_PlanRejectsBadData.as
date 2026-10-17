@@ -22,7 +22,7 @@ class UMars_AutoTest_AnchorResolver_PlanRejectsBadData : UMars_AutoTestRig_Ancho
         Expect_Error(BadHearth, "the hearth is not a node");
 
         auto BadEndpoint = Make_FixturePlan();
-        BadEndpoint.Links.Add(FMars_AnchorPlan_Link(n"K", n"Nope", 100.0f, NAME_None));
+        BadEndpoint.Links.Add(FMars_AnchorPlan_Link(n"K", n"Nope", 100.0f, FGameplayTag()));
         Expect_Error(BadEndpoint, "a link names an unknown node");
 
         auto BadCost = Make_FixturePlan();
@@ -30,7 +30,7 @@ class UMars_AutoTest_AnchorResolver_PlanRejectsBadData : UMars_AutoTestRig_Ancho
         Expect_Error(BadCost, "a link cost must be positive");
 
         auto Ungrouped = Make_FixturePlan();
-        Ungrouped.Links.Add(FMars_AnchorPlan_Link(n"E", n"K", 5000.0f, n"X9"));
+        Ungrouped.Links.Add(FMars_AnchorPlan_Link(n"E", n"K", 5000.0f, GameplayTags::Anchor_Mars_Test_C));
         Expect_Error(Ungrouped, "a closable link's anchor is in no group");
 
         auto BadCap = Make_FixturePlan();

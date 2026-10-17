@@ -16,7 +16,7 @@ class UMars_AutoTest_AnchorResolver_PickRow : UMars_AutoTestRig_Anchor
         auto Query = FMars_AnchorRow_Query();
         Query.Role = InRole;
         Query.RunSeed = InSeed;
-        Query.AnchorId = n"P";
+        Query.AnchorId = GameplayTags::Anchor_Mars_Test_A;
         Query.PinnedRow = InPin;
         return utils_anchor_resolver::Pick_Row(utils_anchor::Table_Test(), Query);
     }

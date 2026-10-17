@@ -20,7 +20,7 @@ struct FMars_AnchorGraph
     TArray<float32> LinkCost;
 
     UPROPERTY()
-    TArray<FName> LinkClosedBy;
+    TArray<FGameplayTag> LinkClosedBy;
 }
 
 struct FMars_AnchorGraph_Query
@@ -29,11 +29,11 @@ struct FMars_AnchorGraph_Query
     FName From;
 
     UPROPERTY()
-    TArray<FName> Closed;
+    TArray<FGameplayTag> Closed;
 
     FMars_AnchorGraph_Query() {}
 
-    FMars_AnchorGraph_Query(FName InFrom, const TArray<FName>& InClosed)
+    FMars_AnchorGraph_Query(FName InFrom, const TArray<FGameplayTag>& InClosed)
     {
         From = InFrom;
         Closed = InClosed;
@@ -60,7 +60,7 @@ struct FMars_AnchorGraph_Paths
 struct FMars_AnchorClosureSet
 {
     UPROPERTY()
-    TArray<FName> Closed;
+    TArray<FGameplayTag> Closed;
 }
 
 struct FMars_AnchorConnectivity_Query
@@ -69,14 +69,14 @@ struct FMars_AnchorConnectivity_Query
     FName From;
 
     UPROPERTY()
-    TArray<FName> Closed;
+    TArray<FGameplayTag> Closed;
 
     UPROPERTY()
     TArray<FName> MustReach;
 
     FMars_AnchorConnectivity_Query() {}
 
-    FMars_AnchorConnectivity_Query(FName InFrom, const TArray<FName>& InClosed, const TArray<FName>& InMustReach)
+    FMars_AnchorConnectivity_Query(FName InFrom, const TArray<FGameplayTag>& InClosed, const TArray<FName>& InMustReach)
     {
         From = InFrom;
         Closed = InClosed;
@@ -96,11 +96,11 @@ struct FMars_AnchorWalk_Query
     FName Hearth;
 
     UPROPERTY()
-    TArray<FName> Closed;
+    TArray<FGameplayTag> Closed;
 
     FMars_AnchorWalk_Query() {}
 
-    FMars_AnchorWalk_Query(FName InEntrance, FName InQuarry, FName InHearth, const TArray<FName>& InClosed)
+    FMars_AnchorWalk_Query(FName InEntrance, FName InQuarry, FName InHearth, const TArray<FGameplayTag>& InClosed)
     {
         Entrance = InEntrance;
         Quarry = InQuarry;
@@ -114,11 +114,11 @@ struct FMars_AnchorRun_Record
 {
     // Entrance anchor id.
     UPROPERTY()
-    FName Entrance;
+    FGameplayTag Entrance;
 
     // Court anchor id.
     UPROPERTY()
-    FName Quarry;
+    FGameplayTag Quarry;
 
     UPROPERTY()
     TArray<int32> WalkedLinks;
@@ -137,14 +137,14 @@ struct FMars_AnchorRun_Input
 struct FMars_AnchorRun_RoleEntry
 {
     UPROPERTY()
-    FName AnchorId;
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     EMars_Anchor_Role Role = EMars_Anchor_Role::None;
 
     FMars_AnchorRun_RoleEntry() {}
 
-    FMars_AnchorRun_RoleEntry(FName InAnchorId, EMars_Anchor_Role InRole)
+    FMars_AnchorRun_RoleEntry(FGameplayTag InAnchorId, EMars_Anchor_Role InRole)
     {
         AnchorId = InAnchorId;
         Role = InRole;
@@ -157,17 +157,17 @@ struct FMars_AnchorRun_Result
     int32 Seed = 0;
 
     UPROPERTY()
-    FName Entrance;
+    FGameplayTag Entrance;
 
     UPROPERTY()
     FName PlayerStartTag;
 
     UPROPERTY()
-    FName Quarry;
+    FGameplayTag Quarry;
 
     // Sorted.
     UPROPERTY()
-    TArray<FName> Closed;
+    TArray<FGameplayTag> Closed;
 
     // Sorted by AnchorId.
     UPROPERTY()
@@ -187,7 +187,7 @@ struct FMars_AnchorRun_Result
     bool UsedFallback = false;
 
     // None when the plan does not name the anchor.
-    EMars_Anchor_Role Get_Role(FName InAnchorId) const
+    EMars_Anchor_Role Get_Role(FGameplayTag InAnchorId) const
     {
         for (const auto& Entry : Roles)
         {
@@ -216,7 +216,7 @@ struct FMars_AnchorRow_Query
     int32 RunSeed = 0;
 
     UPROPERTY()
-    FName AnchorId;
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     TOptional<int32> PinnedRow;
@@ -242,6 +242,10 @@ namespace utils_anchor_resolver
     FString Get_SortKey(FName InId)
     { return InId.ToString().ToLower(); }
 
+    // Anchor ids are tags; the key is the lowercase tag string, so the order never depends on the tag table.
+    FString Get_SortKey(FGameplayTag InId)
+    { return InId.ToString().ToLower(); }
+
     // Insertion sort by lowercase name: FName comparison would follow name-table indices, which differ per process.
     void Sort_Names(TArray<FName>& InOutNames)
     {
@@ -256,6 +260,22 @@ namespace utils_anchor_resolver
                 --Slot;
             }
             InOutNames[Slot + 1] = Moving;
+        }
+    }
+
+    void Sort_Tags(TArray<FGameplayTag>& InOutIds)
+    {
+        for (int32 Index = 1; Index < InOutIds.Num(); ++Index)
+        {
+            const auto Moving = InOutIds[Index];
+            const auto Key = Get_SortKey(Moving);
+            auto Slot = Index - 1;
+            while (Slot >= 0 && Get_SortKey(InOutIds[Slot]) > Key)
+            {
+                InOutIds[Slot + 1] = InOutIds[Slot];
+                --Slot;
+            }
+            InOutIds[Slot + 1] = Moving;
         }
     }
 
@@ -361,7 +381,7 @@ namespace utils_anchor_resolver
             for (int32 Link = 0; Link < InGraph.LinkA.Num(); ++Link)
             {
                 const auto ClosedBy = InGraph.LinkClosedBy[Link];
-                if (ClosedBy.IsNone() == false && InQuery.Closed.Contains(ClosedBy))
+                if (ClosedBy.IsValid() && InQuery.Closed.Contains(ClosedBy))
                 { continue; }
 
                 auto Other = k_NoIndex;
@@ -422,7 +442,7 @@ namespace utils_anchor_resolver
     }
 
     // Every combination of InSize ids, in lexicographic index order.
-    void Append_Combinations(const TArray<FName>& InIds, int32 InSize, TArray<FMars_AnchorClosureSet>& OutSets)
+    void Append_Combinations(const TArray<FGameplayTag>& InIds, int32 InSize, TArray<FMars_AnchorClosureSet>& OutSets)
     {
         if (InSize == 0)
         {
@@ -464,7 +484,7 @@ namespace utils_anchor_resolver
         for (const auto& Group : InPlan.Groups)
         {
             auto Ids = Group.AnchorIds;
-            Sort_Names(Ids);
+            Sort_Tags(Ids);
 
             auto GroupSets = TArray<FMars_AnchorClosureSet>();
             for (int32 Size = 0; Size <= Group.MaxClosed; ++Size)
@@ -477,7 +497,7 @@ namespace utils_anchor_resolver
                 {
                     auto Combined = Existing;
                     Combined.Closed.Append(Addition.Closed);
-                    Sort_Names(Combined.Closed);
+                    Sort_Tags(Combined.Closed);
                     Product.Add(Combined);
                 }
             }
@@ -506,10 +526,10 @@ namespace utils_anchor_resolver
         return 1.0f - float32(Shared) / float32(Union.Num());
     }
 
-    // FNV-1a 32-bit over the lowercase name: stable across processes, unlike an FName hash (a name-table index).
-    uint32 Get_StableHash(FName InId)
+    // FNV-1a 32-bit over an already-lowercased string: stable across processes, unlike a name-table or tag-table index.
+    uint32 Get_StableHash_Lower(const FString& InText)
     {
-        const auto Text = Get_SortKey(InId);
+        const auto Text = InText;
         auto Hash = uint32(2166136261);
         for (int32 Index = 0; Index < Text.Len(); ++Index)
         {
@@ -519,8 +539,16 @@ namespace utils_anchor_resolver
         return Hash;
     }
 
-    int32 Get_AnchorSeed(int32 InRunSeed, FName InAnchorId)
+    // The anchor's hash is over its lowercase tag string ("anchor.mars.warrens.r1").
+    uint32 Get_StableHash(FGameplayTag InId)
+    { return Get_StableHash_Lower(Get_SortKey(InId)); }
+
+    int32 Get_AnchorSeed(int32 InRunSeed, FGameplayTag InAnchorId)
     { return int32(Get_StableHash(InAnchorId) ^ (uint32(InRunSeed) * uint32(2654435761))); }
+
+    // The run stream's seed: the run seed mixed with a fixed key, so the first draws of consecutive seeds differ.
+    int32 Get_RunSeed(int32 InRunSeed)
+    { return int32(Get_StableHash_Lower("run") ^ (uint32(InRunSeed) * uint32(2654435761))); }
 
     // Mean divergence against the newest InDepth records; 1.0 with no history.
     float32 Get_Score(const TArray<int32>& InWalk, const FMars_AnchorRun_Input& InInput, int32 InDepth)
@@ -558,7 +586,7 @@ namespace utils_anchor_resolver
         Result.Seed = InInput.Seed;
         // Mixed first: FRandomStream is a linear congruential generator, so raw consecutive seeds (?seed=1, 2, 3...) give
         // nearly the same first draws and would all pick the same entrance.
-        auto Stream = FRandomStream(Get_AnchorSeed(InInput.Seed, n"Run"));
+        auto Stream = FRandomStream(Get_RunSeed(InInput.Seed));
         const auto HasHistory = InInput.History.Num() > 0;
 
         // 1. The entrance, drawn first: it depends on the seed and the last run only.
@@ -583,18 +611,18 @@ namespace utils_anchor_resolver
         const auto ExcludeLastQuarry = InPlan.Courts.Num() >= 2 && HasHistory;
         auto HasBest = false;
         auto BestScore = 0.0f;
-        auto BestClosed = TArray<FName>();
+        auto BestClosed = TArray<FGameplayTag>();
         auto BestQuarry = FMars_AnchorPlan_Court();
         auto BestWalk = TArray<int32>();
 
         // 3. Candidates: closures, hard rules, quarry court, divergence score.
         for (int32 Candidate = 0; Candidate < InPlan.Candidates; ++Candidate)
         {
-            auto Closed = TArray<FName>();
+            auto Closed = TArray<FGameplayTag>();
             for (const auto& Group : InPlan.Groups)
             {
                 auto Ids = Group.AnchorIds;
-                Sort_Names(Ids);
+                Sort_Tags(Ids);
                 const auto Count = Stream.RandRange(0, Group.MaxClosed);
                 for (int32 Index = 0; Index < Count; ++Index)
                 {
@@ -606,7 +634,7 @@ namespace utils_anchor_resolver
                 for (int32 Index = 0; Index < Count; ++Index)
                 { Closed.Add(Ids[Index]); }
             }
-            Sort_Names(Closed);
+            Sort_Tags(Closed);
 
             const auto Paths = Get_ShortestPaths(Graph, FMars_AnchorGraph_Query(Entrance.Node, Closed));
             auto KeepsConnected = true;
@@ -654,7 +682,7 @@ namespace utils_anchor_resolver
         // 4. Fallback: an open map and the farthest court.
         if (HasBest == false)
         {
-            const auto Open = Get_ShortestPaths(Graph, FMars_AnchorGraph_Query(Entrance.Node, TArray<FName>()));
+            const auto Open = Get_ShortestPaths(Graph, FMars_AnchorGraph_Query(Entrance.Node, TArray<FGameplayTag>()));
             auto HasFarthest = false;
             auto Farthest = 0.0f;
             for (const auto& Court : InPlan.Courts)

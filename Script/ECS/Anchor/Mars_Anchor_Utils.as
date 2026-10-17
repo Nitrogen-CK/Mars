@@ -30,7 +30,7 @@ namespace utils_anchor
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin FName Get_AnchorId(const FCk_Handle_Anchor& Self)
+mixin FGameplayTag Get_AnchorId(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor_Params).AnchorId; }
 
 mixin EMars_Anchor_Family Get_Family(const FCk_Handle_Anchor& Self)

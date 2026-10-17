@@ -10,7 +10,7 @@ class UMars_AutoTest_AnchorCandidate_RubbleStaysClosed : UMars_AutoTestRig_Ancho
     void DoBeginPlay(FCk_Handle InHandle)
     {
         auto Context = FMars_Anchor_Context();
-        Context.AnchorId = n"T-Rubble";
+        Context.AnchorId = GameplayTags::Anchor_Mars_Test_A;
         _Candidate = Spawn_Candidate(InHandle, UMars_Anchor_Rubble_EntityScript, Context);
 
         Add_Step_WaitUntil("the rubble composes its gate", n"Check_Composed");

@@ -5,7 +5,10 @@ such map has a frozen route graph here.
 
 - `data/<map>.json` is the frozen route graph for one anchored map: nodes and polylines in metres, `costCm` per link
   (the walk cost in centimetres; a ladder's climb time is folded in as walking distance), the entrances, the hunt
-  courts, the closure groups with their caps, and the channel tag per route anchor. Warrens' data also carries the
+  courts, the closure groups with their caps, and the channel tag per route anchor. An anchor id is the leaf of its
+  gameplay tag `Anchor.Mars.<Map>.<Id>` (registered by hand in `Config/DefaultGameplayTags.ini`; the emitter refuses an
+  unregistered or non-identifier id), so the emitted plan and the placed anchors name the same tags. Node ids stay
+  graph-internal names. Warrens' data also carries the
   greybox-only layers (rooms, crawl gaps, ladder galleries, lights, footprint, the Deep's rect); the emitter ignores
   them. `python design_warrens_r2.py` writes `data/warrens.json` from the authored layout; edit that script, not the
   JSON.

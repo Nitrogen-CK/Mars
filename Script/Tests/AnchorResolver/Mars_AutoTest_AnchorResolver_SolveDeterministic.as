@@ -48,16 +48,16 @@ class UMars_AutoTest_AnchorResolver_SolveDeterministic : UMars_AutoTestRig_Ancho
     private void Step_Variety(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Plan = utils_anchor_resolver::Plan_Warrens();
-        auto Entrances = TSet<FName>();
+        auto Entrances = TArray<FGameplayTag>();
         for (int32 Seed = 1; Seed <= 10; ++Seed)
-        { Entrances.Add(Solve_Seed(Plan, Seed).Entrance); }
+        { Entrances.AddUnique(Solve_Seed(Plan, Seed).Entrance); }
 
         Assert_True(Entrances.Num() >= 2, f"seeds 1..10 use {Entrances.Num()} distinct entrances");
 
-        // A raw FRandomStream seed gave B-S2 for seeds 1..4 (its first draw barely moves between consecutive seeds).
-        auto Consecutive = TSet<FName>();
+        // A raw FRandomStream seed gave Warrens.S2 for seeds 1..4 (its first draw barely moves between consecutive seeds).
+        auto Consecutive = TArray<FGameplayTag>();
         for (int32 Seed = 1; Seed <= 4; ++Seed)
-        { Consecutive.Add(Solve_Seed(Plan, Seed).Entrance); }
+        { Consecutive.AddUnique(Solve_Seed(Plan, Seed).Entrance); }
 
         Assert_True(Consecutive.Num() >= 2, f"consecutive seeds 1..4 use {Consecutive.Num()} distinct entrances");
     }

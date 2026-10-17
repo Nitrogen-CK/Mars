@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "c4a5cbeb66d3fe740c25de06f131ee98",
+		"sourceHash": "716c2ee8f50374dbdac3defe96654542",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -46,7 +46,7 @@
 			"category": "Ck_Jolt_CookedCell_UE",
 			"value": [
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_61",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_39",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -55,7 +55,7 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_61"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_39"
 					},
 					"_SourceHash": -2.0167285140780357e+18,
 					"_RuntimeCheckHash": 1.2336023239976328e+17,
@@ -134,7 +134,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_62",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_40",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -143,7 +143,7 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_62"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_40"
 					},
 					"_SourceHash": 9.1424223896514586e+17,
 					"_RuntimeCheckHash": 3.6849884206477261e+18,

@@ -79,8 +79,8 @@ class UMars_AnchorTable_Def : UDataAsset
 // Every candidate declares an ExposeOnSpawn property named exactly `Anchor` of this type, beside its SpawnTransform.
 struct FMars_Anchor_Context
 {
-    UPROPERTY()
-    FName AnchorId;
+    UPROPERTY(meta = (Categories = "Anchor"))
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     FGameplayTag Channel;
@@ -120,8 +120,8 @@ struct FMars_Anchor_SpawnParams
 
 struct FMars_Anchor_Spec
 {
-    UPROPERTY()
-    FName AnchorId;
+    UPROPERTY(meta = (Categories = "Anchor"))
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     EMars_Anchor_Family Family = EMars_Anchor_Family::Route;
@@ -149,7 +149,7 @@ struct FMars_Anchor_Spec
 
 mixin FMars_Validation Validate(const FMars_Anchor_Spec& Self)
 {
-    if (Self.AnchorId.IsNone())
+    if (Self.AnchorId.IsValid() == false)
     { return FMars_Validation("anchor id must be set"); }
 
     if (Self.Table.IsNull())
@@ -173,8 +173,8 @@ mixin FMars_Validation Validate(const FMars_Anchor_Spec& Self)
 
 struct FMars_Fragment_Anchor_Params
 {
-    UPROPERTY()
-    FName AnchorId;
+    UPROPERTY(meta = (Categories = "Anchor"))
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     EMars_Anchor_Family Family = EMars_Anchor_Family::Route;

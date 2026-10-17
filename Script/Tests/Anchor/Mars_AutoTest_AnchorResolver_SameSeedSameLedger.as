@@ -11,7 +11,7 @@ class UMars_AutoTest_AnchorResolver_SameSeedSameLedger : UMars_AutoTestRig_Ancho
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("spawn a resolver for seed 42 and anchors T-A, T-B, T-C", n"Step_Spawn");
+        Add_Step("spawn a resolver for seed 42 and anchors Test.A, Test.B, Test.C", n"Step_Spawn");
         Add_Step_WaitUntil("all three anchors resolve", n"Check_AllResolved");
         Add_Step("record the ledger and check the candidates", n"Step_RecordFirst");
         Add_Step("destroy the resolver and the anchors", n"Step_Destroy");
@@ -28,13 +28,13 @@ class UMars_AutoTest_AnchorResolver_SameSeedSameLedger : UMars_AutoTestRig_Ancho
         auto Owner = InHandle;
         _Anchors.Reset();
         // Three placements, three channels: the resolver ensures on anchors that share one.
-        _Anchors.Add(Spawn_Anchor(Owner, Make_AnchorParams(n"T-A", FVector(0.0, 0.0, 0.0), n"Mechanism.Channel.Anchor.Test.A")));
-        _Anchors.Add(Spawn_Anchor(Owner, Make_AnchorParams(n"T-B", FVector(500.0, 0.0, 0.0), n"Mechanism.Channel.Anchor.Test.B")));
-        _Anchors.Add(Spawn_Anchor(Owner, Make_AnchorParams(n"T-C", FVector(1000.0, 0.0, 0.0), n"Mechanism.Channel.Anchor.Test.C")));
+        _Anchors.Add(Spawn_Anchor(Owner, Make_AnchorParams(GameplayTags::Anchor_Mars_Test_A, FVector(0.0, 0.0, 0.0), n"Mechanism.Channel.Anchor.Test.A")));
+        _Anchors.Add(Spawn_Anchor(Owner, Make_AnchorParams(GameplayTags::Anchor_Mars_Test_B, FVector(500.0, 0.0, 0.0), n"Mechanism.Channel.Anchor.Test.B")));
+        _Anchors.Add(Spawn_Anchor(Owner, Make_AnchorParams(GameplayTags::Anchor_Mars_Test_C, FVector(1000.0, 0.0, 0.0), n"Mechanism.Channel.Anchor.Test.C")));
         _Resolver = Spawn_Resolver(Owner, Make_Result(42));
     }
 
-    private FMars_TESTONLY_AnchorSpawnParams Make_AnchorParams(FName InId, FVector InOffset, FName InChannel) const
+    private FMars_TESTONLY_AnchorSpawnParams Make_AnchorParams(FGameplayTag InId, FVector InOffset, FName InChannel) const
     {
         auto Params = FMars_TESTONLY_AnchorSpawnParams();
         Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _Base + InOffset);
@@ -68,9 +68,9 @@ class UMars_AutoTest_AnchorResolver_SameSeedSameLedger : UMars_AutoTestRig_Ancho
     {
         _FirstLedger = Describe_Ledger();
         const auto Resolver = _Resolver.As_AnchorResolver();
-        const auto EntryB = Resolver.TryGet_LedgerEntry(n"T-B");
-        Assert_True(EntryB.IsSet() && EntryB.GetValue().RowIndex == 1, "T-B (Closed) resolved to row 1");
-        Assert_True(EntryB.IsSet() && EntryB.GetValue().ScriptName.Contains("CandidateB"), "T-B's ledger names candidate B");
+        const auto EntryB = Resolver.TryGet_LedgerEntry(GameplayTags::Anchor_Mars_Test_B);
+        Assert_True(EntryB.IsSet() && EntryB.GetValue().RowIndex == 1, "Test.B (Closed) resolved to row 1");
+        Assert_True(EntryB.IsSet() && EntryB.GetValue().ScriptName.Contains("CandidateB"), "Test.B's ledger names candidate B");
         Assert_Equals_Int(Count_Tagged(InHandle, n"TAG_MarsTestAnchorCandidateB"), 1, "exactly one candidate B exists");
         Assert_Equals_Int(Resolver.Get_UnmatchedPlannedIds().Num(), 0, "every planned id resolved");
     }

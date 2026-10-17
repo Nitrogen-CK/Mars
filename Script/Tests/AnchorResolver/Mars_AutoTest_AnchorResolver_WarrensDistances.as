@@ -13,7 +13,7 @@ class UMars_AutoTest_AnchorResolver_WarrensDistances : UMars_AutoTestRig_AnchorR
 
     private void Expect_Row(const FMars_AnchorGraph& InGraph, FName InFrom, const TArray<float32>& InExpected)
     {
-        const auto Paths = utils_anchor_resolver::Get_ShortestPaths(InGraph, FMars_AnchorGraph_Query(InFrom, TArray<FName>()));
+        const auto Paths = utils_anchor_resolver::Get_ShortestPaths(InGraph, FMars_AnchorGraph_Query(InFrom, TArray<FGameplayTag>()));
         auto Targets = TArray<FName>();
         Targets.Add(n"K");
         Targets.Add(n"H1");

@@ -45,7 +45,7 @@ struct FMars_AnchorResolver_SpawnParams
 struct FMars_AnchorLedger_Entry
 {
     UPROPERTY()
-    FName AnchorId;
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     EMars_Anchor_Role Role = EMars_Anchor_Role::None;
@@ -75,7 +75,7 @@ struct FMars_Fragment_AnchorResolver_Params
 
 struct FMars_Fragment_AnchorResolver
 {
-    // Sorted by AnchorId (lowercase).
+    // Sorted by AnchorId (the lowercase tag string).
     UPROPERTY()
     TArray<FMars_AnchorLedger_Entry> Ledger;
 }

@@ -22,6 +22,8 @@ DATA = Path(os.environ.get('WARRENS_DATA', HERE / 'data' / 'warrens.json'))  # W
 OUT = ROOT / 'Saved' / 'AnchorPlans'
 MAP = '/Game/Mars/Maps/Warrens_Mars_MAP'
 OWN = 'Mars.Anchor.Authoring.Warrens'
+ANCHOR_TAG_ROOT = 'Anchor.Mars.Warrens'  # an anchor id in the data is the leaf of its tag (emit_plan.py emits the same tags)
+SHORTCUT_TAG_ROOT = 'Shortcut.Mars.Warrens'
 CUBE = '/Engine/BasicShapes/Cube'
 MATERIALS = {
     'floor': '/Game/Mars/Materials/ProtoGrid/ProtoGrid_Floor_Mars_MI',
@@ -57,6 +59,14 @@ DEVIATIONS = [
 
 def load():
     return json.loads(DATA.read_text(encoding='utf-8'))
+
+
+def anchor_tag(aid):
+    return dict(tag=ANCHOR_TAG_ROOT + '.' + aid)
+
+
+def shortcut_tag(sid):
+    return dict(tag=SHORTCUT_TAG_ROOT + '.' + sid)
 
 
 def seg_param(p, a, b):
@@ -262,7 +272,7 @@ def gate_leaks(grid, entities, crawl_ok=False, level_z=0.0):
                     seen[n] = seen[(i, j)] + 1
                     todo.append(n)
         if goal in seen:
-            leaks.append(e['props'].get('AnchorId', e['note']))
+            leaks.append(e['note'])
     return leaks
 
 
@@ -455,7 +465,7 @@ def manifest(write=True):
                              note=lk['id'] + ' key'))
     for sc in d.get('shortcuts', []):
         entities.append(dict(cls='Mars_Shortcut_EntityScript', at=[sc['at'][0], sc['at'][1], 0.0], yaw=sc['yaw'],
-                             props=dict(ShortcutId=sc['id'], Channel=dict(tag=sc['channel']), SpanCm=sc['spanCm'],
+                             props=dict(ShortcutId=shortcut_tag(sc['id']), Channel=dict(tag=sc['channel']), SpanCm=sc['spanCm'],
                                         LeverSide=dict(enum='EMars_Shortcut_LeverSide', value='Ahead' if sc['leverSide'] > 0 else 'Behind')),
                              note=sc['id']))
 
@@ -500,7 +510,7 @@ def manifest(write=True):
         aid, fam = anchor['id'], anchor['family']
         if fam == 'R':
             link = closers[aid]
-            props = dict(AnchorId=aid, Channel=dict(tag=d['channels'][aid]), SpanCm=link['width'] * 100.0)
+            props = dict(AnchorId=anchor_tag(aid), Channel=dict(tag=d['channels'][aid]), SpanCm=link['width'] * 100.0)
             if aid in ramp_of:
                 r = ramp_of[aid]
                 at, yaw, z = r['start'], r['yaw'], r['top']
@@ -512,12 +522,12 @@ def manifest(write=True):
             entities.append(dict(cls='Mars_Anchor_Route_EntityScript', at=[at[0], at[1], z], yaw=round(yaw, 3), props=props, note=aid))
         elif fam == 'H':
             n = nodes[anchor['node']]
-            entities.append(dict(cls='Mars_Anchor_Hunt_EntityScript', at=list(n), yaw=0.0, props=dict(AnchorId=aid, HomeRadiusCm=1000.0), note=aid))
+            entities.append(dict(cls='Mars_Anchor_Hunt_EntityScript', at=list(n), yaw=0.0, props=dict(AnchorId=anchor_tag(aid), HomeRadiusCm=1000.0), note=aid))
             entities.append(dict(cls='Mars_Anchor_CourtNavField_EntityScript', at=list(n), yaw=0.0, props={}, note=aid))
         elif fam == 'S':
             m = mouths[aid]
             entities.append(dict(cls='Mars_Anchor_Spawn_EntityScript', at=[m['at'][0], m['at'][1], 0.0], yaw=round(m['yaw'], 3),
-                                 props=dict(AnchorId=aid, SpanCm=m['width'] * 100.0), note=aid))
+                                 props=dict(AnchorId=anchor_tag(aid), SpanCm=m['width'] * 100.0), note=aid))
 
     leaks = gate_leaks(up, entities) + gate_leaks(deep, entities, level_z=DEEP_Z)
     breaks = walk_breaks(d, up, deep, raf)

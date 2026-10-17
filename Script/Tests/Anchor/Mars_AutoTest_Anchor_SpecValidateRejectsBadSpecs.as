@@ -12,7 +12,7 @@ class UMars_AutoTest_Anchor_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Anch
     private FMars_Anchor_Spec Make_ValidSpec() const
     {
         auto Spec = FMars_Anchor_Spec();
-        Spec.AnchorId = n"V";
+        Spec.AnchorId = GameplayTags::Anchor_Mars_Test_A;
         Spec.Table = TSoftObjectPtr<UMars_AnchorTable_Def>(utils_anchor::Table_Test());
         Spec.Channel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Anchor.Test.A");
         return Spec;
@@ -24,7 +24,7 @@ class UMars_AutoTest_Anchor_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Anch
         Assert_True(Make_ValidSpec().Validate().IsValid(), f"the valid spec passes: {Make_ValidSpec().Validate().Get_Error()}");
 
         auto NoId = Make_ValidSpec();
-        NoId.AnchorId = NAME_None;
+        NoId.AnchorId = FGameplayTag();
         Assert_Equals_String(NoId.Validate().Get_Error(), "anchor id must be set", "a missing id is rejected");
 
         auto NoTable = Make_ValidSpec();

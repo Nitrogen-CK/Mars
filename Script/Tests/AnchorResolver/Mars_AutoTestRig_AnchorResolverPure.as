@@ -21,16 +21,16 @@ class UMars_AutoTestRig_AnchorResolverPure : UCk_AutoTest_Base
         Plan.Nodes.Add(FMars_AnchorPlan_Node(n"B", FVector(0.0, 1500.0, 0.0)));
         Plan.Nodes.Add(FMars_AnchorPlan_Node(n"K", FVector(2000.0, 0.0, 0.0)));
         Plan.Nodes.Add(FMars_AnchorPlan_Node(n"Q", FVector(3000.0, 0.0, 0.0)));
-        Plan.Links.Add(FMars_AnchorPlan_Link(n"E", n"A", 1000.0f, n"X1"));
-        Plan.Links.Add(FMars_AnchorPlan_Link(n"A", n"K", 1000.0f, NAME_None));
-        Plan.Links.Add(FMars_AnchorPlan_Link(n"E", n"B", 1500.0f, n"X2"));
-        Plan.Links.Add(FMars_AnchorPlan_Link(n"B", n"K", 1500.0f, NAME_None));
-        Plan.Links.Add(FMars_AnchorPlan_Link(n"K", n"Q", 1000.0f, NAME_None));
-        Plan.Entrances.Add(FMars_AnchorPlan_Entrance(n"FX-S", n"Fixture.Entrance", n"E"));
-        Plan.Courts.Add(FMars_AnchorPlan_Court(n"FX-H", n"Q"));
+        Plan.Links.Add(FMars_AnchorPlan_Link(n"E", n"A", 1000.0f, GameplayTags::Anchor_Mars_Test_Fixture_X1));
+        Plan.Links.Add(FMars_AnchorPlan_Link(n"A", n"K", 1000.0f, FGameplayTag()));
+        Plan.Links.Add(FMars_AnchorPlan_Link(n"E", n"B", 1500.0f, GameplayTags::Anchor_Mars_Test_Fixture_X2));
+        Plan.Links.Add(FMars_AnchorPlan_Link(n"B", n"K", 1500.0f, FGameplayTag()));
+        Plan.Links.Add(FMars_AnchorPlan_Link(n"K", n"Q", 1000.0f, FGameplayTag()));
+        Plan.Entrances.Add(FMars_AnchorPlan_Entrance(GameplayTags::Anchor_Mars_Test_Fixture_Entrance, n"Fixture.Entrance", n"E"));
+        Plan.Courts.Add(FMars_AnchorPlan_Court(GameplayTags::Anchor_Mars_Test_Fixture_Court, n"Q"));
         auto Group = FMars_AnchorPlan_Group(n"G", 1);
-        Group.AnchorIds.Add(n"X1");
-        Group.AnchorIds.Add(n"X2");
+        Group.AnchorIds.Add(GameplayTags::Anchor_Mars_Test_Fixture_X1);
+        Group.AnchorIds.Add(GameplayTags::Anchor_Mars_Test_Fixture_X2);
         Plan.Groups.Add(Group);
         _Plans.Add(Plan);
         return Plan;
@@ -48,10 +48,22 @@ class UMars_AutoTestRig_AnchorResolverPure : UCk_AutoTest_Base
         return Names;
     }
 
-    protected FString Get_NamesText(const TArray<FName>& InNames) const
+    protected TArray<FGameplayTag> Make_Tags(FGameplayTag InA, FGameplayTag InB = FGameplayTag()) const
+    {
+        auto Tags = TArray<FGameplayTag>();
+        if (InA.IsValid())
+        { Tags.Add(InA); }
+
+        if (InB.IsValid())
+        { Tags.Add(InB); }
+
+        return Tags;
+    }
+
+    protected FString Get_TagsText(const TArray<FGameplayTag>& InTags) const
     {
         auto Text = "";
-        for (const auto& Each : InNames)
+        for (const auto& Each : InTags)
         { Text = f"{Text}{Each.ToString()} "; }
 
         return Text;
@@ -64,7 +76,7 @@ class UMars_AutoTestRig_AnchorResolverPure : UCk_AutoTest_Base
         return utils_anchor_resolver::Solve(InPlan, Input);
     }
 
-    protected FName Get_EntranceNode(UMars_AnchorPlan_Def InPlan, FName InEntrance) const
+    protected FName Get_EntranceNode(UMars_AnchorPlan_Def InPlan, FGameplayTag InEntrance) const
     {
         for (const auto& Entrance : InPlan.Entrances)
         {
@@ -74,7 +86,7 @@ class UMars_AutoTestRig_AnchorResolverPure : UCk_AutoTest_Base
         return NAME_None;
     }
 
-    protected FName Get_CourtNode(UMars_AnchorPlan_Def InPlan, FName InCourt) const
+    protected FName Get_CourtNode(UMars_AnchorPlan_Def InPlan, FGameplayTag InCourt) const
     {
         for (const auto& Court : InPlan.Courts)
         {

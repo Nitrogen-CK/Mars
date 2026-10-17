@@ -39,13 +39,13 @@ struct FMars_AnchorPlan_Link
     UPROPERTY()
     float32 CostCm = 0.0f;
 
-    // The anchor that removes this link when it resolves Closed; NAME_None for a link nothing can close.
-    UPROPERTY()
-    FName ClosedBy;
+    // The anchor that removes this link when it resolves Closed; an invalid tag for a link nothing can close.
+    UPROPERTY(meta = (Categories = "Anchor"))
+    FGameplayTag ClosedBy;
 
     FMars_AnchorPlan_Link() {}
 
-    FMars_AnchorPlan_Link(FName InA, FName InB, float32 InCostCm, FName InClosedBy)
+    FMars_AnchorPlan_Link(FName InA, FName InB, float32 InCostCm, FGameplayTag InClosedBy)
     {
         A = InA;
         B = InB;
@@ -56,8 +56,8 @@ struct FMars_AnchorPlan_Link
 
 struct FMars_AnchorPlan_Entrance
 {
-    UPROPERTY()
-    FName AnchorId;
+    UPROPERTY(meta = (Categories = "Anchor"))
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     FName PlayerStartTag;
@@ -67,7 +67,7 @@ struct FMars_AnchorPlan_Entrance
 
     FMars_AnchorPlan_Entrance() {}
 
-    FMars_AnchorPlan_Entrance(FName InAnchorId, FName InPlayerStartTag, FName InNode)
+    FMars_AnchorPlan_Entrance(FGameplayTag InAnchorId, FName InPlayerStartTag, FName InNode)
     {
         AnchorId = InAnchorId;
         PlayerStartTag = InPlayerStartTag;
@@ -77,15 +77,15 @@ struct FMars_AnchorPlan_Entrance
 
 struct FMars_AnchorPlan_Court
 {
-    UPROPERTY()
-    FName AnchorId;
+    UPROPERTY(meta = (Categories = "Anchor"))
+    FGameplayTag AnchorId;
 
     UPROPERTY()
     FName Node;
 
     FMars_AnchorPlan_Court() {}
 
-    FMars_AnchorPlan_Court(FName InAnchorId, FName InNode)
+    FMars_AnchorPlan_Court(FGameplayTag InAnchorId, FName InNode)
     {
         AnchorId = InAnchorId;
         Node = InNode;
@@ -100,8 +100,8 @@ struct FMars_AnchorPlan_Group
     UPROPERTY()
     int32 MaxClosed = 0;
 
-    UPROPERTY()
-    TArray<FName> AnchorIds;
+    UPROPERTY(meta = (Categories = "Anchor"))
+    TArray<FGameplayTag> AnchorIds;
 
     FMars_AnchorPlan_Group() {}
 
@@ -174,11 +174,14 @@ class UMars_AnchorPlan_Def : UDataAsset
             { return FMars_Validation("a link cost must be positive"); }
         }
 
-        TSet<FName> Grouped;
+        TArray<FGameplayTag> Grouped;
         for (const auto& Group : Groups)
         {
             for (const auto& AnchorId : Group.AnchorIds)
             {
+                if (AnchorId.IsValid() == false)
+                { return FMars_Validation("a group names an unset anchor"); }
+
                 if (Grouped.Contains(AnchorId))
                 { return FMars_Validation("an anchor is in two groups"); }
 
@@ -186,16 +189,16 @@ class UMars_AnchorPlan_Def : UDataAsset
             }
         }
 
-        TSet<FName> Closers;
+        TArray<FGameplayTag> Closers;
         for (const auto& Link : Links)
         {
-            if (Link.ClosedBy.IsNone())
+            if (Link.ClosedBy.IsValid() == false)
             { continue; }
 
             if (Grouped.Contains(Link.ClosedBy) == false)
             { return FMars_Validation("a closable link's anchor is in no group"); }
 
-            Closers.Add(Link.ClosedBy);
+            Closers.AddUnique(Link.ClosedBy);
         }
 
         for (const auto& AnchorId : Grouped)
@@ -213,10 +216,10 @@ class UMars_AnchorPlan_Def : UDataAsset
         if (Entrances.Num() < 1)
         { return FMars_Validation("entrances are missing or invalid"); }
 
-        TSet<FName> EntranceIds;
+        TArray<FGameplayTag> EntranceIds;
         for (const auto& Entrance : Entrances)
         {
-            if (EntranceIds.Contains(Entrance.AnchorId) || NodeIds.Contains(Entrance.Node) == false)
+            if (Entrance.AnchorId.IsValid() == false || EntranceIds.Contains(Entrance.AnchorId) || NodeIds.Contains(Entrance.Node) == false)
             { return FMars_Validation("entrances are missing or invalid"); }
 
             EntranceIds.Add(Entrance.AnchorId);
@@ -227,7 +230,7 @@ class UMars_AnchorPlan_Def : UDataAsset
 
         for (const auto& Court : Courts)
         {
-            if (NodeIds.Contains(Court.Node) == false)
+            if (Court.AnchorId.IsValid() == false || NodeIds.Contains(Court.Node) == false)
             { return FMars_Validation("courts are missing or invalid"); }
         }
 

@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "3596e8b089afd0ae33a52d310c4ed398",
+		"sourceHash": "a66e8843f425e9dade4fa0ddb80dacd7",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -46,7 +46,7 @@
 			"category": "Ck_Jolt_CookedCell_UE",
 			"value": [
 				{
-					"_SourceActorName": "Actor_6",
+					"_SourceActorName": "Actor_0",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -55,7 +55,7 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_6"
+						"SubPathString": "PersistentLevel.Actor_0"
 					},
 					"_SourceHash": -4.5302197704358226e+18,
 					"_RuntimeCheckHash": 6.7670082590336881e+18,
@@ -99,7 +99,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Actor_7",
+					"_SourceActorName": "Actor_1",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -108,7 +108,7 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_7"
+						"SubPathString": "PersistentLevel.Actor_1"
 					},
 					"_SourceHash": -6.0919784560682465e+18,
 					"_RuntimeCheckHash": -3.5290083207467894e+18,
@@ -152,7 +152,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Actor_9",
+					"_SourceActorName": "Actor_3",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -161,7 +161,7 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_9"
+						"SubPathString": "PersistentLevel.Actor_3"
 					},
 					"_SourceHash": 5.8037641756367094e+18,
 					"_RuntimeCheckHash": 6.9010520694219405e+17,

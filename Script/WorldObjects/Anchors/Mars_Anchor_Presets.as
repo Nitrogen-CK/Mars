@@ -44,8 +44,8 @@ class UMars_Anchor_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
 
-    UPROPERTY(ExposeOnSpawn)
-    FName AnchorId;
+    UPROPERTY(ExposeOnSpawn, meta = (Categories = "Anchor.Mars"))
+    FGameplayTag AnchorId;
 
     // The mechanism channel a lever-gate candidate wires its levers and gate to; unique per placement.
     UPROPERTY(ExposeOnSpawn, meta = (Categories = "Mechanism.Channel"))

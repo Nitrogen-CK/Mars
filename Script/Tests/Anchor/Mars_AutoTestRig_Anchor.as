@@ -72,7 +72,7 @@ struct FMars_TESTONLY_AnchorSpawnParams
     FTransform SpawnTransform;
 
     UPROPERTY()
-    FName AnchorId;
+    FGameplayTag AnchorId;
 
     // Unique per placement (the resolver ensures on a shared one); Spawn_Anchor defaults it to Test.A.
     UPROPERTY()
@@ -89,7 +89,7 @@ class UMars_AutoTestRig_Anchor : UCk_AutoTest_Base
 
     protected FVector _Base = FVector(0.0, 0.0, -82000.0);
 
-    protected FCk_Handle Spawn_Anchor(FCk_Handle InHandle, FName InId, FVector InOffset, TOptional<int32> InPinnedRow)
+    protected FCk_Handle Spawn_Anchor(FCk_Handle InHandle, FGameplayTag InId, FVector InOffset, TOptional<int32> InPinnedRow)
     {
         auto Params = FMars_TESTONLY_AnchorSpawnParams();
         Params.SpawnTransform = FTransform(FRotator::ZeroRotator, _Base + InOffset);
@@ -119,14 +119,14 @@ class UMars_AutoTestRig_Anchor : UCk_AutoTest_Base
         return Pending.Get_EntityUnderConstruction();
     }
 
-    // T-A Open, T-B Closed, T-C Other.
+    // Test.A Open, Test.B Closed, Test.C Other.
     protected FMars_AnchorRun_Result Make_Result(int32 InSeed) const
     {
         auto Result = FMars_AnchorRun_Result();
         Result.Seed = InSeed;
-        Result.Roles.Add(FMars_AnchorRun_RoleEntry(n"T-A", EMars_Anchor_Role::Open));
-        Result.Roles.Add(FMars_AnchorRun_RoleEntry(n"T-B", EMars_Anchor_Role::Closed));
-        Result.Roles.Add(FMars_AnchorRun_RoleEntry(n"T-C", EMars_Anchor_Role::Other));
+        Result.Roles.Add(FMars_AnchorRun_RoleEntry(GameplayTags::Anchor_Mars_Test_A, EMars_Anchor_Role::Open));
+        Result.Roles.Add(FMars_AnchorRun_RoleEntry(GameplayTags::Anchor_Mars_Test_B, EMars_Anchor_Role::Closed));
+        Result.Roles.Add(FMars_AnchorRun_RoleEntry(GameplayTags::Anchor_Mars_Test_C, EMars_Anchor_Role::Other));
         return Result;
     }
 

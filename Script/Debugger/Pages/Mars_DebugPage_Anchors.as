@@ -32,10 +32,10 @@ class UMars_DebugPage_Anchors : UMars_DebugPage_Base
         EndPageScrollBox();
     }
 
-    private FString Get_NamesText(const TArray<FName>& InNames) const
+    private FString Get_TagsText(const TArray<FGameplayTag>& InTags) const
     {
         auto Text = "";
-        for (const auto& Each : InNames)
+        for (const auto& Each : InTags)
         { Text = Text == "" ? Each.ToString() : f"{Text}, {Each.ToString()}"; }
 
         return Text == "" ? "none" : Text;
@@ -48,7 +48,7 @@ class UMars_DebugPage_Anchors : UMars_DebugPage_Base
         DrawKvRow("Seed", f"{Result.Seed}");
         DrawKvRow("Entrance", f"{Result.Entrance.ToString()} ({Result.PlayerStartTag.ToString()})");
         DrawKvRow("Quarry", Result.Quarry.ToString(), FLinearColor(1.0f, 0.5f, 0.4f));
-        DrawKvRow("Closed", Get_NamesText(Result.Closed));
+        DrawKvRow("Closed", Get_TagsText(Result.Closed));
         DrawKvRow("Divergence", f"{Result.Divergence :.2}");
         DrawKvRow("Fallback", BoolText(Result.UsedFallback), Result.UsedFallback ? FLinearColor(1.0f, 0.65f, 0.3f) : FLinearColor::White);
         DrawKvRow("Candidates rejected", f"{Result.CandidatesRejected}");
@@ -68,6 +68,6 @@ class UMars_DebugPage_Anchors : UMars_DebugPage_Base
         if (Unmatched.Num() == 0)
         { DrawKvRow("Unmatched", "none"); }
         else
-        { DrawWarningBox(f"Planned but never resolved in this world: {Get_NamesText(Unmatched)}"); }
+        { DrawWarningBox(f"Planned but never resolved in this world: {Get_TagsText(Unmatched)}"); }
     }
 }
