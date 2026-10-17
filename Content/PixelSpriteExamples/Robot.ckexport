@@ -1,0 +1,454 @@
+{
+	"assetName": "Robot",
+	"assetPath": "/Game/PixelSpriteExamples/Robot.Robot",
+	"assetClass": "Ck_PixelSpriteAsset_UE",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "9a668da1ec5e6745cf8a83a0acc9c7f8",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_DataFormatVersion",
+			"type": "int32",
+			"category": "Pixel Sprite",
+			"value": 1
+		},
+		{
+			"name": "_ManifestData",
+			"type": "FCk_PixelSprite_AssetManifest",
+			"category": "Pixel Sprite",
+			"value":
+			{
+				"_Width": 16,
+				"_Height": 16,
+				"_Sources": [
+					{
+						"_Path": "D:/Repositories/CkRepos/Orion/Plugins/CkFoundation/Tools/CkPixel/Examples/Robot.xpm",
+						"_Bytes": 501,
+						"_Grid":
+						{
+							"_Width": 16,
+							"_Height": 16,
+							"_Palette": [
+								{
+									"_Symbol": ".",
+									"_Color":
+									{
+										"B": 0,
+										"G": 0,
+										"R": 0,
+										"A": 0
+									}
+								},
+								{
+									"_Symbol": "K",
+									"_Color":
+									{
+										"B": 63,
+										"G": 35,
+										"R": 23,
+										"A": 255
+									}
+								},
+								{
+									"_Symbol": "B",
+									"_Color":
+									{
+										"B": 159,
+										"G": 140,
+										"R": 20,
+										"A": 255
+									}
+								},
+								{
+									"_Symbol": "C",
+									"_Color":
+									{
+										"B": 217,
+										"G": 223,
+										"R": 100,
+										"A": 255
+									}
+								},
+								{
+									"_Symbol": "E",
+									"_Color":
+									{
+										"B": 122,
+										"G": 227,
+										"R": 255,
+										"A": 255
+									}
+								},
+								{
+									"_Symbol": "G",
+									"_Color":
+									{
+										"B": 175,
+										"G": 156,
+										"R": 140,
+										"A": 255
+									}
+								},
+								{
+									"_Symbol": "R",
+									"_Color":
+									{
+										"B": 90,
+										"G": 106,
+										"R": 255,
+										"A": 255
+									}
+								}
+							],
+							"_Indices": [
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								4,
+								4,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								3,
+								3,
+								3,
+								3,
+								3,
+								3,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								3,
+								4,
+								3,
+								3,
+								4,
+								3,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								3,
+								3,
+								1,
+								1,
+								3,
+								3,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								5,
+								5,
+								5,
+								1,
+								2,
+								3,
+								3,
+								2,
+								1,
+								5,
+								5,
+								5,
+								0,
+								0,
+								0,
+								0,
+								5,
+								5,
+								5,
+								1,
+								2,
+								2,
+								2,
+								2,
+								1,
+								5,
+								5,
+								5,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								0,
+								1,
+								2,
+								2,
+								2,
+								2,
+								1,
+								0,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								0,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								0,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								5,
+								5,
+								0,
+								0,
+								5,
+								5,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								5,
+								5,
+								0,
+								0,
+								5,
+								5,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								5,
+								5,
+								0,
+								0,
+								5,
+								5,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								0,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								1,
+								0,
+								0,
+								0,
+								0
+							],
+							"_HasHotspot": false,
+							"_Hotspot":
+							{
+								"X": 0,
+								"Y": 0
+							}
+						}
+					}
+				],
+				"_Animations": [
+					{
+						"_Name": "default",
+						"_Playback": 0,
+						"_Frames": [
+							{
+								"_Source": "D:/Repositories/CkRepos/Orion/Plugins/CkFoundation/Tools/CkPixel/Examples/Robot.xpm",
+								"_SourceIndex": 0,
+								"_DurationMilliseconds": 100,
+								"_Anchors": [],
+								"_EventsJson": "[]",
+								"_MetadataJson": "{}"
+							}
+						],
+						"_EventsJson": "[]",
+						"_MetadataJson": "{}"
+					}
+				],
+				"_EventsJson": "[]",
+				"_MetadataJson": "{}"
+			}
+		},
+		{
+			"name": "_SourceFilename",
+			"type": "FString",
+			"category": "Pixel Sprite",
+			"value": "D:/Repositories/CkRepos/Orion/Plugins/CkFoundation/Tools/CkPixel/Examples/Robot.xpm"
+		},
+		{
+			"name": "_RenderSettings",
+			"type": "FCk_PixelSprite_RenderSettings",
+			"category": "Pixel Sprite|Render",
+			"value":
+			{
+				"_Mode": "Nearest",
+				"_Scale": 1,
+				"_Outline": false,
+				"_OutlineColor":
+				{
+					"B": 0,
+					"G": 0,
+					"R": 0,
+					"A": 255
+				},
+				"_Background":
+				{
+					"B": 0,
+					"G": 0,
+					"R": 0,
+					"A": 0
+				},
+				"_PaletteOverrides": []
+			}
+		},
+		{
+			"name": "_ImportData",
+			"type": "TObjectPtr<UAssetImportData>",
+			"category": "Pixel Sprite|Import",
+			"value":
+			{
+				"objectClass": "AssetImportData",
+				"objectClassPath": "/Script/Engine.AssetImportData",
+				"objectName": "ImportData",
+				"objectPath": "/Game/PixelSpriteExamples/Robot.Robot:ImportData",
+				"properties": [
+					{
+						"name": "SourceData",
+						"type": "FAssetImportInfo",
+						"category": "File Path",
+						"value":
+						{
+						},
+						"tooltip": "Source file data describing the files that were used to import this asset."
+					}
+				]
+			}
+		}
+	]
+}
