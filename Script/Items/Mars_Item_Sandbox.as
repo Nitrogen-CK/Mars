@@ -88,6 +88,9 @@ asset Mars_ItemDef_Backpack of UCk_InventoryItem_Definition
     Backpack.CargoSlots.Add(Mount);
     Mount.Socket = TOptional<FName>(n"Pocket3");
     Backpack.CargoSlots.Add(Mount);
+    // A lantern hook on the pack's right flank, a little under the top (86 x 116 x 121 cm at MeshScale): a hung lantern
+    // hangs beside the pack wherever it goes.
+    Backpack.LanternHookOffset = TOptional<FTransform>(FTransform(FRotator::ZeroRotator, FVector(0.0, 62.0, 95.0)));
     _ItemTraits.Add(Backpack);
 }
 

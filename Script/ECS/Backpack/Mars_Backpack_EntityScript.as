@@ -1,12 +1,13 @@
 // A World-mode, Persistent world item whose definition carries UMars_ItemTrait_Backpack: the base WorldItem composition,
-// then one cargo slot per mount of the trait (utils_backpack::Add).
+// then one cargo slot per mount of the trait (utils_backpack::Add), and a lantern hook when the trait names a
+// LanternHookOffset (AddLanternHook).
 //
 // Mounts resolve here: Socket unset -> Offset is pack-root relative; a named socket -> Offset on top of the socket
 // transform, the socket location scaled by Presentation.Visual.MeshScale (the pack root is unit scale; the visual node
 // carries the display scale). A named socket the mesh does not have is a configuration error: ensure, destroy self.
 //
-// While the pack is Held (in its carrier's hands) its cargo interactables hold the HolderHeld claim: nobody can reach them.
-// Every other mount releases it.
+// While the pack is Held (in its carrier's hands) its cargo and hook interactables hold the HolderHeld claim: nobody can
+// reach them. Every other mount releases it.
 //
 // The weight probe (Probe.Mars.Backpack) is what backpack pressure plates feel. It is enabled only while the pack lies in
 // the world (Mount World): a carried or held pack weighs on nothing.
@@ -59,6 +60,13 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         for (const auto& Slot : CargoSlots)
         { _CargoInteractables.Add(Slot.Get_Interactable()); }
 
+        if (BackpackTrait.LanternHookOffset.IsSet())
+        {
+            const auto Hook = AddLanternHook(InHandle, BackpackTrait.LanternHookOffset.GetValue());
+            if (ck::IsValid(Hook))
+            { _CargoInteractables.Add(Hook.Get_Interactable()); }
+        }
+
         _WeightProbe = AddWeightProbe(InHandle, Presentation);
 
         WorldItem.BindTo_OnMountChanged(FMars_Delegate_WorldItem_OnMountChanged(this, n"OnMountChanged"));
@@ -107,6 +115,34 @@ class UMars_Backpack_EntityScript : UMars_WorldItem_EntityScript
         }
 
         return TOptional<FMars_Backpack_Spec>(Spec);
+    }
+
+    // The pack's lantern hook: a scene-node child of the pack root at InOffset (so it dies with the pack, and a lantern
+    // hung on it with it) carrying the hook and its interactable; the lantern hangs by its bail. Its interactable shares the
+    // cargo's HolderHeld claim.
+    private FCk_Handle_LanternHook AddLanternHook(FCk_Handle& InHandle, const FTransform& InOffset)
+    {
+        auto HookNode = utils_scene_node::Create(InHandle.As_Transform(), InOffset).As_Transform();
+        utils_handle::Set_DebugName(HookNode.H(), n"Backpack.LanternHook");
+
+        auto Probe = FMars_Interactable_ProbeInfo();
+        Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
+        Probe.ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic);
+        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(14.0f));
+        Probe.ProbeOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -14.0));
+
+        auto InteractableSpec = FMars_Interactable_Spec();
+        InteractableSpec.ProbeInfo = Probe;
+        InteractableSpec.Targets.Add(utils_lantern_hook::Make_InteractTarget());
+        InteractableSpec.FocusPriority = constants_lantern_hook::k_FocusPriority;
+
+        auto Spec = FMars_LanternHook_Spec();
+        Spec.HangNode = HookNode;
+        Spec.HangOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -constants_lantern_item::k_BailHeight));
+        Spec.Interactable = utils_interactable::Create(HookNode, InteractableSpec);
+
+        FCk_Handle HookEntity = HookNode;
+        return utils_lantern_hook::Add(HookEntity, Spec);
     }
 
     // The same shape as the pickup probe (utils_world_item::Make_ProbeFit), as a separate probe: the pickup is a QueryOnly

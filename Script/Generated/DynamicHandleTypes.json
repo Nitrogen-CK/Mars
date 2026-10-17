@@ -397,6 +397,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_LanternHook",
+			"ShortName": "LanternHook",
+			"Description": "A hook for one lantern: a capacity-1 inventory taking only lanterns, the attach point a hung lantern rides, and an optional MechanismSource asserted while it holds a lit lantern",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_LanternHookHandle",
+			"RequiredFragments": [
+				"Mars_Feature_LanternHook"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_MechanismDriver",
 			"ShortName": "MechanismDriver",
 			"Description": "Per-world singleton that tracks every mechanism source and sink and pushes per-channel input counts to sinks",
