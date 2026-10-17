@@ -353,6 +353,14 @@ class UMars_WorldItem_EntityScript : UCk_GenericEntityScript_UE
         // A visual attached under the local player's hand is drawn with the first-person gloves holding it. The walk
         // starts at this item's root (the scene node under the hand): the component's own entity is no scene node.
         MeshComponent.SetFirstPersonPrimitiveType(utils_fphands::Get_FirstPersonType(_SelfEntity));
+
+        DoOnVisualMeshAdded(MeshComponent);
+    }
+
+    // The Presentation mesh's component exists and is set up: a subclass that dresses the mesh (its materials, its shadow)
+    // does it here.
+    protected void DoOnVisualMeshAdded(UStaticMeshComponent InMesh)
+    {
     }
 
     // A persistent item moving into or out of the local player's hand switches how it, and what it carries, is drawn.

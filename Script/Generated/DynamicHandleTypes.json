@@ -388,6 +388,15 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Lantern",
+			"ShortName": "Lantern",
+			"Description": "A tallow flame behind a shutter: burns measures of tallow while open, gutters on the last, and lights a radius that follows where it is carried",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_LanternHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Lantern"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_MechanismDriver",
 			"ShortName": "MechanismDriver",
 			"Description": "Per-world singleton that tracks every mechanism source and sink and pushes per-channel input counts to sinks",

@@ -106,6 +106,11 @@ struct FMars_PlayerCharacter_Inventory
     UPROPERTY()
     FTransform BackOffset = FTransform(FRotator::ZeroRotator, FVector(-25.0, 0.0, -45.0), FVector::OneVector);
 
+    // Belt mount relative to the capsule root: the right hip, a little ahead of the body, where a carried lantern's bail
+    // hangs (AttachPoint.Mars.Belt).
+    UPROPERTY()
+    FTransform BeltOffset = FTransform(FRotator::ZeroRotator, FVector(12.0, 30.0, 5.0), FVector::OneVector);
+
     // Drop held past this arms a throw.
     UPROPERTY()
     float32 ThrowHoldSeconds = 0.35f;

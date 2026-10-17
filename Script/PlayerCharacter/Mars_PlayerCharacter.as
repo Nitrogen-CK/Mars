@@ -332,9 +332,16 @@ class AMars_PlayerCharacter : AMars_Character
         auto Back = utils_scene_node::Create(PlayerTransform, Config.Inventory.BackOffset);
         utils_handle::Set_DebugName(Back.H(), n"Player.Back");
 
+        auto Belt = utils_scene_node::Create(PlayerTransform, Config.Inventory.BeltOffset);
+        utils_handle::Set_DebugName(Belt.H(), n"Player.Belt");
+
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, Back.As_Transform()));
+        // Unregistered until an editor that predates the tag restarts; the belt is then left out rather than failing the spec.
+        const auto BeltPoint = constants_lantern_item::Get_BeltPoint();
+        if (ck::EnsureIfNot(BeltPoint.IsValid(), "[PlayerCharacter] AttachPoint.Mars.Belt is not registered (restart the editor); a carried lantern has nowhere to hang") == false)
+        { AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(BeltPoint, Belt.As_Transform())); }
         // Other characters' gazes look here: Player.Head is the bob node the camera director renders from, i.e. the eyes.
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Head, HeadTransform));
         utils_attach_points::Add(Player, AttachPointsSpec);
