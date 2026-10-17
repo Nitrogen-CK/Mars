@@ -149,6 +149,66 @@ class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// PackSetsCrouchHeight
+//--------------------------------------------------------------------------------------------------------------------------
+
+// A worn backpack makes the crouched capsule taller (Body.CrouchedHalfHeightWithPack), so the pack never passes a crawl
+// gap: set on enter and whenever the backpack slot's item changes. Not gated on the owning copy: the crouched height is
+// movement state every simulating copy needs. CharacterMovement resizes only when a crouch starts, so a pack put on while
+// already crouched counts from the next crouch. A carrier without a hotbar (a test rig) sets nothing.
+class UMars_SmTask_PackSetsCrouchHeight : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
+
+    private FCk_Handle_Hotbar _Hotbar;
+    private AMars_PlayerCharacter _Character;
+
+    UFUNCTION(BlueprintOverride)
+    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        auto Player = ck::Ctx(InHandle);
+        _Hotbar = Player.As_Hotbar(ECk_SanityCheck::UnChecked);
+        _Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
+        if (ck::Is_NOT_Valid(_Hotbar) || ck::Is_NOT_Valid(_Character))
+        {
+            _Hotbar = FCk_Handle_Hotbar();
+            _Character = nullptr;
+            return;
+        }
+
+        _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
+        Apply();
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
+    {
+        if (ck::IsValid(_Hotbar))
+        { _Hotbar.UnbindFrom_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged")); }
+
+        _Hotbar = FCk_Handle_Hotbar();
+        _Character = nullptr;
+    }
+
+    UFUNCTION()
+    private void OnSlotItemChanged(FCk_Handle_Hotbar InHotbar, int32 InIndex, FCk_Handle_Item InMaybeItem)
+    {
+        const auto BackpackIndex = _Hotbar.Get_BackpackIndex();
+        if (BackpackIndex.IsSet() && BackpackIndex.GetValue() == InIndex)
+        { Apply(); }
+    }
+
+    private void Apply()
+    {
+        if (ck::Is_NOT_Valid(_Character))
+        { return; }
+
+        const auto& Body = _Character.Config.Body;
+        _Character.CharacterMovement.SetCrouchedHalfHeight(_Hotbar.Get_IsWearingBackpack() ? Body.CrouchedHalfHeightWithPack : Body.CrouchedHalfHeight);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 // HeldItemDrivesUse
 //--------------------------------------------------------------------------------------------------------------------------
 

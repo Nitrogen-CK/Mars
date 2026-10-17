@@ -52,6 +52,7 @@ class UMars_SmState_Alive : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_MovementSpeedSync);
         AddTask(InHandle, UMars_SmTask_HotbarEjectDrops);
         AddTask(InHandle, UMars_SmTask_HeldItemDrivesHands);
+        AddTask(InHandle, UMars_SmTask_PackSetsCrouchHeight);
         AddTask(InHandle, UMars_SmTask_AliveSubSm);
         AddTask(InHandle, UMars_SmTask_HandsSubSm);
     }

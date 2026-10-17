@@ -54,6 +54,11 @@ struct FMars_PlayerCharacter_Body
 
     UPROPERTY()
     float32 CrouchedHalfHeight = 52.5f;
+
+    // Crouched while wearing a backpack: the pack rides above the head, 140 cm, over a 130 cm crawl gap, so a worn pack
+    // never passes one (UMars_SmTask_PackSetsCrouchHeight).
+    UPROPERTY()
+    float32 CrouchedHalfHeightWithPack = 70.0f;
 }
 
 // The player as a local damage receiver: Health, a body HitZone and a hurtbox capsule that follows the movement capsule.
