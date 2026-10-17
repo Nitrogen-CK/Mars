@@ -1,0 +1,241 @@
+{
+  "checks": [
+    {
+      "check": "offline scene",
+      "cells": 238
+    },
+    {
+      "check": "continuous outer circuit",
+      "sample_spacing_m": 0.1,
+      "failures": 0
+    },
+    {
+      "check": "clear entrance A",
+      "at": [
+        48,
+        8,
+        0
+      ]
+    },
+    {
+      "check": "clear entrance B",
+      "at": [
+        8,
+        40,
+        0
+      ]
+    },
+    {
+      "check": "clear entrance C",
+      "at": [
+        88,
+        40,
+        0
+      ]
+    },
+    {
+      "check": "clear entrance D",
+      "at": [
+        48,
+        72,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / kitchen threshold",
+      "at": [
+        48,
+        31.940000000000023,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / west court opening",
+      "at": [
+        15.891699999958194,
+        31.940000000000023,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / west stair base",
+      "at": [
+        15.891699999958194,
+        51.08990000002097,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / west stair climbed",
+      "at": [
+        15.891699999958194,
+        60.89829999993758,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / west gallery",
+      "at": [
+        15.891699999958194,
+        67.78769999995848,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / upper stores",
+      "at": [
+        47.888,
+        67.78769999995848,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / east gallery",
+      "at": [
+        79.88430000004197,
+        67.78769999995848,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / east stair descended",
+      "at": [
+        79.88430000004197,
+        51.09200000000011,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / hunt through-route",
+      "at": [
+        79.88430000004197,
+        32.175900000020874,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / arrival return",
+      "at": [
+        48.12040000002087,
+        32.175900000020874,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / kitchen return",
+      "at": [
+        48.12040000002087,
+        11.978099999979186,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / shortcut approach",
+      "at": [
+        48.00350000000001,
+        31.945599999979212,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / shortcut west approach",
+      "at": [
+        16.00930000004171,
+        31.945599999979212,
+        0
+      ]
+    },
+    {
+      "check": "actual keys / shortcut stair",
+      "at": [
+        16.00930000004171,
+        61.02009999997929,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / shortcut gallery",
+      "at": [
+        16.00930000004171,
+        67.79190000002106,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / shortcut west link",
+      "at": [
+        23.832499999999996,
+        67.90880000004192,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / bridge west mouth",
+      "at": [
+        23.832499999999996,
+        48.05890000002091,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / pack plate reach",
+      "at": [
+        27.102900000020856,
+        48.05890000002091,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / chef plate",
+      "at": [
+        32.00709999997915,
+        48.05890000002091,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / pack recovery stance",
+      "at": [
+        27.219099999979136,
+        48.05890000002091,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / timed chain approach",
+      "at": [
+        58.981599999979295,
+        48.289900000020914,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / timed gate threshold",
+      "at": [
+        63.88650000000017,
+        48.289900000020914,
+        4
+      ]
+    },
+    {
+      "check": "actual keys / timed gate crossing",
+      "at": [
+        68.79209999997938,
+        48.289900000020914,
+        4
+      ]
+    },
+    {
+      "check": "plate latch, pack recovery, chain window, actual gate crossing",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "networkRequests": [],
+  "desktop_checks_completed": true,
+  "process_exit_code": 1,
+  "remaining_failure": "After desktop traversal and gate assertions, mobile verification tried to click Reset after the responsive CSS hid the desktop action. Harness ordering fixed in source; not rerun.",
+  "mobile_verified": false,
+  "html_sha256": "3fa514b59744b651b55b18529133d28c1419532ac6ba876ef415dc3c4c4dc56a",
+  "browser_preview": "In-app browser security policy denied observing local preview. No new browser inspection initiated after denial."
+}

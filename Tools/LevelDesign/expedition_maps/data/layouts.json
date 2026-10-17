@@ -1,0 +1,1771 @@
+[
+  {
+    "id": "broken-cistern",
+    "name": "The Broken Cistern",
+    "tag": "Recommended first prototype",
+    "envelope": [
+      180,
+      160
+    ],
+    "premise": "A broad circuit of banks, courts and terraces around a flooded monumental basin.",
+    "experience": "Choose a bank, recognize the opposite side, cross above it, then return with a changed mental map.",
+    "risk": "The central bridge can erase route choice if its approach gives away every objective.",
+    "reveal": "First see the aqueduct crown across 55 m of water; the opposite bank is visible before it is reachable.",
+    "opening": "Banks 10\u00e2\u20ac\u201c16 m wide; 42 \u00c3\u2014 30 m south court; 30 \u00c3\u2014 24 m hunt floor; 8 m raised crossing.",
+    "landmark": [
+      90,
+      91,
+      "Broken spout"
+    ],
+    "voids": [
+      {
+        "name": "Flooded basin / no traversal",
+        "points": [
+          [
+            63,
+            49
+          ],
+          [
+            116,
+            49
+          ],
+          [
+            125,
+            75
+          ],
+          [
+            116,
+            101
+          ],
+          [
+            63,
+            101
+          ],
+          [
+            56,
+            75
+          ]
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "K",
+        "name": "Kitchen lodge",
+        "at": [
+          90,
+          12,
+          0
+        ],
+        "size": [
+          32,
+          18
+        ],
+        "kind": "kitchen",
+        "note": ""
+      },
+      {
+        "id": "P",
+        "name": "South forecourt",
+        "at": [
+          90,
+          32,
+          0
+        ],
+        "size": [
+          42,
+          28
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "R",
+        "name": "Root bank",
+        "at": [
+          38,
+          35,
+          0
+        ],
+        "size": [
+          32,
+          26
+        ],
+        "kind": "forage",
+        "note": "Vine / root source"
+      },
+      {
+        "id": "W",
+        "name": "Mourner bank",
+        "at": [
+          36,
+          76,
+          0
+        ],
+        "size": [
+          34,
+          40
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "F",
+        "name": "Ash orchard",
+        "at": [
+          37,
+          117,
+          4
+        ],
+        "size": [
+          32,
+          27
+        ],
+        "kind": "forage",
+        "note": "Crackable husk"
+      },
+      {
+        "id": "N",
+        "name": "Crown terrace",
+        "at": [
+          90,
+          119,
+          4
+        ],
+        "size": [
+          44,
+          24
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "H",
+        "name": "Hunt court",
+        "at": [
+          90,
+          142,
+          4
+        ],
+        "size": [
+          30,
+          24
+        ],
+        "kind": "hunt",
+        "note": ""
+      },
+      {
+        "id": "U",
+        "name": "East overlook",
+        "at": [
+          145,
+          117,
+          4
+        ],
+        "size": [
+          32,
+          27
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "E",
+        "name": "Freight bank",
+        "at": [
+          145,
+          76,
+          0
+        ],
+        "size": [
+          34,
+          40
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "S",
+        "name": "Salt yard",
+        "at": [
+          145,
+          35,
+          0
+        ],
+        "size": [
+          32,
+          26
+        ],
+        "kind": "forage",
+        "note": "Censer / pepper source"
+      },
+      {
+        "id": "B",
+        "name": "Spout crossing",
+        "at": [
+          90,
+          75,
+          4
+        ],
+        "size": [
+          12,
+          12
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "A",
+        "name": "Drain mouth",
+        "at": [
+          18,
+          16,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "R"
+      },
+      {
+        "id": "B1",
+        "name": "Root breach",
+        "at": [
+          16,
+          143,
+          4
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "F"
+      },
+      {
+        "id": "C",
+        "name": "Quarry arch",
+        "at": [
+          164,
+          143,
+          4
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "U"
+      },
+      {
+        "id": "D",
+        "name": "Freight mouth",
+        "at": [
+          164,
+          16,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "S"
+      }
+    ],
+    "edges": [
+      {
+        "a": "K",
+        "b": "P",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "P",
+        "b": "R",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "P",
+        "b": "S",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "R",
+        "b": "W",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "W",
+        "b": "F",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "F",
+        "b": "N",
+        "width": 10,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "N",
+        "b": "H",
+        "width": 10,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "N",
+        "b": "U",
+        "width": 10,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "U",
+        "b": "E",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "E",
+        "b": "S",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "W",
+        "b": "B",
+        "width": 8,
+        "mode": "bridge",
+        "via": []
+      },
+      {
+        "a": "B",
+        "b": "E",
+        "width": 8,
+        "mode": "bridge",
+        "via": []
+      },
+      {
+        "a": "A",
+        "b": "R",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "B1",
+        "b": "F",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "C",
+        "b": "U",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "D",
+        "b": "S",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      }
+    ],
+    "shortcuts": [
+      {
+        "a": "F",
+        "b": "B",
+        "width": 8,
+        "source": "F",
+        "name": "Orchard crosswalk",
+        "via": []
+      },
+      {
+        "a": "U",
+        "b": "B",
+        "width": 8,
+        "source": "U",
+        "name": "Freight crosswalk",
+        "via": []
+      }
+    ],
+    "section": [
+      "R",
+      "W",
+      "B",
+      "E",
+      "U"
+    ],
+    "beats": [
+      [
+        "Root bank",
+        "Mourner plates / optional husk alcove",
+        "8 \u00c3\u2014 8 m",
+        "Pack + chef latches the optional alcove; main bank stays open."
+      ],
+      [
+        "Freight bank",
+        "Porter freight gate",
+        "6 \u00c3\u2014 11 m",
+        "Bonus salt niche, inside recovery chain; never closes the bank."
+      ],
+      [
+        "East overlook",
+        "Censer window",
+        "14 \u00c3\u2014 10 m",
+        "Fast lane plus protected 2.4 m walking bypass."
+      ],
+      [
+        "Crown terrace",
+        "Blind Choir / seal clue",
+        "16 \u00c3\u2014 14 m",
+        "View shutter reveals glyph order; optional vault is off the main floor."
+      ],
+      [
+        "Both upper banks",
+        "Lever crosswalk gates",
+        "4 m clear",
+        "Sources on the upper side latch the shortcuts open."
+      ]
+    ],
+    "golden": "A \u00e2\u2020\u2019 R \u00e2\u2020\u2019 W \u00e2\u2020\u2019 F \u00e2\u2020\u2019 N \u00e2\u2020\u2019 H \u00e2\u2020\u2019 N \u00e2\u2020\u2019 U \u00e2\u2020\u2019 E \u00e2\u2020\u2019 S \u00e2\u2020\u2019 P \u00e2\u2020\u2019 K",
+    "shots": [
+      "R facing northeast: water is revealed after the root arch.",
+      "W facing east: chef-scale piers frame the raised crossing and opposite bank.",
+      "U facing southwest: kitchen chimney and teal return arch reappear below."
+    ]
+  },
+  {
+    "id": "pilgrims-hollow",
+    "name": "Pilgrims\u00e2\u20ac\u2122 Hollow",
+    "tag": "Best sense of a lived-in district",
+    "envelope": [
+      200,
+      180
+    ],
+    "premise": "An inhabited undercity hillside: three plazas, broad stepped streets and garden terraces.",
+    "experience": "Read a district by its skyline and street openings, then thread a different return route through it.",
+    "risk": "Too many equally prominent streets become visual noise; retain three named plazas and one dominant kiln stack.",
+    "reveal": "A compressed 4 m arch opens onto a 45 m market view; the crown hunt is glimpsed over roofs.",
+    "opening": "Main street 12\u00e2\u20ac\u201c18 m; three 28\u00e2\u20ac\u201c44 m plazas; broad 8 m terrace connectors; skyline at +12 m.",
+    "landmark": [
+      83,
+      108,
+      "Kiln stack"
+    ],
+    "voids": [],
+    "nodes": [
+      {
+        "id": "K",
+        "name": "Kitchen square",
+        "at": [
+          30,
+          87,
+          4
+        ],
+        "size": [
+          32,
+          28
+        ],
+        "kind": "kitchen",
+        "note": ""
+      },
+      {
+        "id": "P",
+        "name": "Lower market",
+        "at": [
+          82,
+          70,
+          0
+        ],
+        "size": [
+          44,
+          34
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "R",
+        "name": "Root gardens",
+        "at": [
+          38,
+          32,
+          0
+        ],
+        "size": [
+          34,
+          26
+        ],
+        "kind": "forage",
+        "note": "Vine / root source"
+      },
+      {
+        "id": "F",
+        "name": "Husk terraces",
+        "at": [
+          57,
+          132,
+          8
+        ],
+        "size": [
+          36,
+          30
+        ],
+        "kind": "forage",
+        "note": "Crackable husk"
+      },
+      {
+        "id": "M",
+        "name": "Kiln plaza",
+        "at": [
+          103,
+          106,
+          4
+        ],
+        "size": [
+          36,
+          28
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "S",
+        "name": "Censer court",
+        "at": [
+          154,
+          97,
+          4
+        ],
+        "size": [
+          34,
+          28
+        ],
+        "kind": "forage",
+        "note": "Censer / pepper source"
+      },
+      {
+        "id": "J",
+        "name": "Freight square",
+        "at": [
+          137,
+          54,
+          0
+        ],
+        "size": [
+          36,
+          30
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "L",
+        "name": "Drain landing",
+        "at": [
+          177,
+          28,
+          0
+        ],
+        "size": [
+          20,
+          20
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "H",
+        "name": "Crown hunt",
+        "at": [
+          119,
+          148,
+          12
+        ],
+        "size": [
+          32,
+          26
+        ],
+        "kind": "hunt",
+        "note": ""
+      },
+      {
+        "id": "U",
+        "name": "Eastern kilns",
+        "at": [
+          166,
+          145,
+          8
+        ],
+        "size": [
+          32,
+          28
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "A",
+        "name": "Garden breach",
+        "at": [
+          16,
+          16,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "R"
+      },
+      {
+        "id": "B",
+        "name": "Drain mouth",
+        "at": [
+          185,
+          12,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "L"
+      },
+      {
+        "id": "C",
+        "name": "Pilgrim steps",
+        "at": [
+          16,
+          157,
+          8
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "F"
+      },
+      {
+        "id": "D",
+        "name": "Kiln gate",
+        "at": [
+          183,
+          166,
+          8
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "U"
+      }
+    ],
+    "edges": [
+      {
+        "a": "A",
+        "b": "R",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "B",
+        "b": "L",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "C",
+        "b": "F",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "D",
+        "b": "U",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "R",
+        "b": "P",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "R",
+        "b": "K",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "K",
+        "b": "F",
+        "width": 10,
+        "mode": "stair",
+        "via": [
+          [
+            18,
+            98,
+            4
+          ],
+          [
+            18,
+            132,
+            8
+          ]
+        ]
+      },
+      {
+        "a": "F",
+        "b": "M",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "M",
+        "b": "P",
+        "width": 14,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "K",
+        "b": "P",
+        "width": 12,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "P",
+        "b": "J",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "J",
+        "b": "L",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "J",
+        "b": "S",
+        "width": 12,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "S",
+        "b": "M",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "S",
+        "b": "U",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "U",
+        "b": "H",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "H",
+        "b": "F",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "M",
+        "b": "H",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      }
+    ],
+    "shortcuts": [
+      {
+        "a": "F",
+        "b": "K",
+        "width": 8,
+        "source": "F",
+        "name": "Garden service stair",
+        "via": []
+      },
+      {
+        "a": "H",
+        "b": "S",
+        "width": 8,
+        "source": "H",
+        "name": "Crown switchback",
+        "via": [
+          [
+            146,
+            136,
+            8
+          ]
+        ]
+      }
+    ],
+    "section": [
+      "R",
+      "P",
+      "M",
+      "H",
+      "U"
+    ],
+    "beats": [
+      [
+        "Lower market edge",
+        "Porter freight gate",
+        "6 \u00c3\u2014 11 m",
+        "A service arcade holds bonus ingredients; the plaza remains traversable."
+      ],
+      [
+        "Husk terraces",
+        "Mourner plates",
+        "8 \u00c3\u2014 8 m",
+        "Pack alcove beside a 4 \u00c3\u2014 4 m turnaround; no sole uphill route behind it."
+      ],
+      [
+        "Kiln plaza frontage",
+        "Blind Choir",
+        "16 \u00c3\u2014 14 m",
+        "Read the clue from the lower square and see its upper viewing window."
+      ],
+      [
+        "Eastern kilns",
+        "Censer window",
+        "14 \u00c3\u2014 10 m",
+        "Safe uphill street and optional timed cut-through meet in the same court."
+      ],
+      [
+        "Crown hunt exit",
+        "Latching return switchback",
+        "4 m clear",
+        "Opens after the hunt; stairs, not a lift or fall."
+      ]
+    ],
+    "golden": "A \u00e2\u2020\u2019 R \u00e2\u2020\u2019 P \u00e2\u2020\u2019 M \u00e2\u2020\u2019 F \u00e2\u2020\u2019 H \u00e2\u2020\u2019 U \u00e2\u2020\u2019 S \u00e2\u2020\u2019 M \u00e2\u2020\u2019 K",
+    "shots": [
+      "P facing uphill: kiln stack, upper garden and two viable streets in one view.",
+      "F facing southeast: lower market is visible over an uncluttered parapet.",
+      "H facing west: see the kitchen chimney below and the now-open descent."
+    ]
+  },
+  {
+    "id": "severed-aqueduct",
+    "name": "The Severed Aqueduct",
+    "tag": "Strongest landscape-scale reveal",
+    "envelope": [
+      240,
+      140
+    ],
+    "premise": "Two broad banks, a dry valley floor and the broken remains of a raised aqueduct.",
+    "experience": "Travel below a structure first, then recognize the same valley from its crown and opposite bank.",
+    "risk": "Long crossings can become empty travel. Use piers to create successive 25\u00e2\u20ac\u201c40 m views, not one 200 m sightline.",
+    "reveal": "The broken crown is visible across a 75 m valley; the missing span forces a legible walking descent.",
+    "opening": "Dry valley routes 14\u00e2\u20ac\u201c20 m wide; 8 m upper walks; 30 \u00c3\u2014 26 m hunt terrace; 32 \u00c3\u2014 18 m collapsed void.",
+    "landmark": [
+      120,
+      92,
+      "Severed crown"
+    ],
+    "voids": [
+      {
+        "name": "Collapsed span / no crossing",
+        "points": [
+          [
+            104,
+            83
+          ],
+          [
+            136,
+            83
+          ],
+          [
+            136,
+            101
+          ],
+          [
+            104,
+            101
+          ]
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "K",
+        "name": "Kitchen at sluice",
+        "at": [
+          120,
+          15,
+          0
+        ],
+        "size": [
+          34,
+          20
+        ],
+        "kind": "kitchen",
+        "note": ""
+      },
+      {
+        "id": "W",
+        "name": "West wash",
+        "at": [
+          48,
+          52,
+          0
+        ],
+        "size": [
+          42,
+          30
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "E",
+        "name": "East wash",
+        "at": [
+          192,
+          52,
+          0
+        ],
+        "size": [
+          42,
+          30
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "R",
+        "name": "Root bank",
+        "at": [
+          31,
+          101,
+          4
+        ],
+        "size": [
+          34,
+          28
+        ],
+        "kind": "forage",
+        "note": "Vine / root source"
+      },
+      {
+        "id": "F",
+        "name": "Husk bank",
+        "at": [
+          209,
+          101,
+          4
+        ],
+        "size": [
+          34,
+          28
+        ],
+        "kind": "forage",
+        "note": "Crackable husk"
+      },
+      {
+        "id": "S",
+        "name": "Dry-bed censer",
+        "at": [
+          120,
+          54,
+          0
+        ],
+        "size": [
+          38,
+          26
+        ],
+        "kind": "forage",
+        "note": "Censer / pepper source"
+      },
+      {
+        "id": "UW",
+        "name": "West aqueduct",
+        "at": [
+          66,
+          102,
+          8
+        ],
+        "size": [
+          28,
+          18
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "UE",
+        "name": "East aqueduct",
+        "at": [
+          174,
+          102,
+          8
+        ],
+        "size": [
+          28,
+          18
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "H",
+        "name": "Riverbed hunt",
+        "at": [
+          120,
+          87,
+          -4
+        ],
+        "size": [
+          32,
+          26
+        ],
+        "kind": "hunt",
+        "note": ""
+      },
+      {
+        "id": "A",
+        "name": "West sluice",
+        "at": [
+          13,
+          20,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "W"
+      },
+      {
+        "id": "B",
+        "name": "East culvert",
+        "at": [
+          227,
+          20,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "E"
+      },
+      {
+        "id": "C",
+        "name": "Root breach",
+        "at": [
+          17,
+          126,
+          4
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "R"
+      },
+      {
+        "id": "D",
+        "name": "Quarry gate",
+        "at": [
+          223,
+          126,
+          4
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "F"
+      }
+    ],
+    "edges": [
+      {
+        "a": "A",
+        "b": "W",
+        "width": 10,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "B",
+        "b": "E",
+        "width": 10,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "C",
+        "b": "R",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "D",
+        "b": "F",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "W",
+        "b": "R",
+        "width": 12,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "R",
+        "b": "UW",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "UW",
+        "b": "H",
+        "width": 8,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "H",
+        "b": "UE",
+        "width": 8,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "UE",
+        "b": "F",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "F",
+        "b": "E",
+        "width": 12,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "W",
+        "b": "S",
+        "width": 16,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "S",
+        "b": "E",
+        "width": 16,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "K",
+        "b": "S",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "W",
+        "b": "K",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "E",
+        "b": "K",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "UW",
+        "b": "S",
+        "width": 10,
+        "mode": "stair",
+        "via": [
+          [
+            78,
+            74,
+            4
+          ]
+        ]
+      },
+      {
+        "a": "S",
+        "b": "UE",
+        "width": 10,
+        "mode": "stair",
+        "via": [
+          [
+            162,
+            74,
+            4
+          ]
+        ]
+      },
+      {
+        "a": "S",
+        "b": "H",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      }
+    ],
+    "shortcuts": [
+      {
+        "a": "R",
+        "b": "S",
+        "width": 8,
+        "source": "R",
+        "name": "West maintenance descent",
+        "via": [
+          [
+            54,
+            71,
+            0
+          ]
+        ]
+      },
+      {
+        "a": "F",
+        "b": "S",
+        "width": 8,
+        "source": "F",
+        "name": "East maintenance descent",
+        "via": [
+          [
+            186,
+            71,
+            0
+          ]
+        ]
+      }
+    ],
+    "section": [
+      "R",
+      "UW",
+      "H",
+      "UE",
+      "F"
+    ],
+    "beats": [
+      [
+        "West wash",
+        "Mourner plates",
+        "8 \u00c3\u2014 8 m",
+        "Dry side alcove with visible reward; pack never parked in the valley lane."
+      ],
+      [
+        "East wash",
+        "Porter freight gate",
+        "6 \u00c3\u2014 11 m",
+        "Freight niche with inside chain; 14 m riverbed remains an independent route."
+      ],
+      [
+        "West aqueduct",
+        "Censer window",
+        "14 \u00c3\u2014 10 m",
+        "Both lanes remain on a broad pier, with rail and recovery apron."
+      ],
+      [
+        "East aqueduct",
+        "Blind Choir",
+        "16 \u00c3\u2014 14 m",
+        "Viewing slot points across the gap; control stays on the same accessible bank."
+      ],
+      [
+        "Root and husk banks",
+        "Return descents",
+        "4 m clear",
+        "Two local latching stairs converge on the recognizable sluice kitchen."
+      ]
+    ],
+    "golden": "A \u00e2\u2020\u2019 W \u00e2\u2020\u2019 R \u00e2\u2020\u2019 UW \u00e2\u2020\u2019 H \u00e2\u2020\u2019 UE \u00e2\u2020\u2019 F \u00e2\u2020\u2019 E \u00e2\u2020\u2019 S \u00e2\u2020\u2019 K",
+    "shots": [
+      "W facing northeast: a huge aqueduct passes overhead; a viable climb is visible ahead.",
+      "UW facing east: broken span reveals the valley-floor alternative.",
+      "H facing south: recognize both banks and the kitchen at the sluice."
+    ]
+  },
+  {
+    "id": "sunken-kitchens",
+    "name": "The Sunken Kitchens",
+    "tag": "Strongest vertical circulation experiment",
+    "envelope": [
+      180,
+      180
+    ],
+    "premise": "A stepped quarry reused as communal kitchens: terraces, kiln yards and one sunken hunt floor.",
+    "experience": "See the encounter below, descend deliberately, then climb out by a different terrace and prepare the haul.",
+    "risk": "Stacked floors can hide the correct stair. Every terrace needs a distinct profile and a visible next landing.",
+    "reveal": "The pit is revealed through a 6 m opening onto a broad lip; entry and retreat ramps are visible before descent.",
+    "opening": "Terraces 10\u00e2\u20ac\u201c18 m deep; 32 \u00c3\u2014 26 m pit arena; 8\u00e2\u20ac\u201c10 m spokes; two separate walking exits from the pit.",
+    "landmark": [
+      111,
+      109,
+      "Hearth chimney"
+    ],
+    "voids": [],
+    "nodes": [
+      {
+        "id": "K",
+        "name": "Kitchen terrace",
+        "at": [
+          29,
+          86,
+          4
+        ],
+        "size": [
+          30,
+          26
+        ],
+        "kind": "kitchen",
+        "note": ""
+      },
+      {
+        "id": "R",
+        "name": "Root yard",
+        "at": [
+          43,
+          38,
+          0
+        ],
+        "size": [
+          34,
+          30
+        ],
+        "kind": "forage",
+        "note": "Vine / root source"
+      },
+      {
+        "id": "SE",
+        "name": "Lower kiln yard",
+        "at": [
+          134,
+          37,
+          0
+        ],
+        "size": [
+          36,
+          28
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "E",
+        "name": "Freight lip",
+        "at": [
+          145,
+          85,
+          0
+        ],
+        "size": [
+          30,
+          36
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "F",
+        "name": "Husk terrace",
+        "at": [
+          143,
+          128,
+          4
+        ],
+        "size": [
+          30,
+          28
+        ],
+        "kind": "forage",
+        "note": "Crackable husk"
+      },
+      {
+        "id": "N",
+        "name": "Choir overlook",
+        "at": [
+          89,
+          136,
+          4
+        ],
+        "size": [
+          40,
+          24
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "NW",
+        "name": "Mourner lip",
+        "at": [
+          38,
+          132,
+          4
+        ],
+        "size": [
+          30,
+          28
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "S",
+        "name": "Censer crown",
+        "at": [
+          88,
+          160,
+          8
+        ],
+        "size": [
+          30,
+          20
+        ],
+        "kind": "forage",
+        "note": "Censer / pepper source"
+      },
+      {
+        "id": "U",
+        "name": "Upper kiln yard",
+        "at": [
+          132,
+          160,
+          8
+        ],
+        "size": [
+          28,
+          20
+        ],
+        "kind": "area",
+        "note": ""
+      },
+      {
+        "id": "H",
+        "name": "Sunken hunt",
+        "at": [
+          90,
+          88,
+          -4
+        ],
+        "size": [
+          32,
+          26
+        ],
+        "kind": "hunt",
+        "note": ""
+      },
+      {
+        "id": "A",
+        "name": "Root breach",
+        "at": [
+          16,
+          16,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "R"
+      },
+      {
+        "id": "B",
+        "name": "Freight arch",
+        "at": [
+          164,
+          16,
+          0
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "SE"
+      },
+      {
+        "id": "C",
+        "name": "Pilgrim gate",
+        "at": [
+          16,
+          160,
+          4
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "NW"
+      },
+      {
+        "id": "D",
+        "name": "Crown arch",
+        "at": [
+          164,
+          160,
+          8
+        ],
+        "size": [
+          8,
+          8
+        ],
+        "kind": "spawn",
+        "note": "U"
+      }
+    ],
+    "edges": [
+      {
+        "a": "A",
+        "b": "R",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "B",
+        "b": "SE",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "C",
+        "b": "NW",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "D",
+        "b": "U",
+        "width": 8,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "R",
+        "b": "K",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "K",
+        "b": "NW",
+        "width": 10,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "NW",
+        "b": "N",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "N",
+        "b": "F",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "F",
+        "b": "E",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "E",
+        "b": "SE",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "SE",
+        "b": "R",
+        "width": 14,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "R",
+        "b": "H",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "H",
+        "b": "E",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "H",
+        "b": "N",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "N",
+        "b": "S",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      },
+      {
+        "a": "S",
+        "b": "U",
+        "width": 12,
+        "mode": "walk",
+        "via": []
+      },
+      {
+        "a": "U",
+        "b": "F",
+        "width": 10,
+        "mode": "stair",
+        "via": []
+      }
+    ],
+    "shortcuts": [
+      {
+        "a": "H",
+        "b": "K",
+        "width": 8,
+        "source": "H",
+        "name": "Hearth service switchback",
+        "via": [
+          [
+            56,
+            87,
+            0
+          ]
+        ]
+      },
+      {
+        "a": "S",
+        "b": "NW",
+        "width": 8,
+        "source": "S",
+        "name": "Crown return stair",
+        "via": []
+      }
+    ],
+    "section": [
+      "R",
+      "H",
+      "N",
+      "S"
+    ],
+    "beats": [
+      [
+        "Mourner lip",
+        "Mourner plates",
+        "8 \u00c3\u2014 8 m",
+        "Latch a pantry alcove without gating the terrace circuit."
+      ],
+      [
+        "Freight lip",
+        "Porter freight gate",
+        "6 \u00c3\u2014 11 m",
+        "Side freight bay; safe apron clear of the arena exit."
+      ],
+      [
+        "Upper kiln yard",
+        "Censer window",
+        "14 \u00c3\u2014 10 m",
+        "Timing lane has a protected walk-around at the same level."
+      ],
+      [
+        "Choir overlook",
+        "Blind Choir",
+        "16 \u00c3\u2014 14 m",
+        "Lower wheel, upper sightline and nearby seals; no jump to the clue."
+      ],
+      [
+        "Sunken hunt edge",
+        "Service switchback",
+        "4 m clear",
+        "Latches after entry; three normal walking routes already reach the pit."
+      ]
+    ],
+    "golden": "A \u00e2\u2020\u2019 R \u00e2\u2020\u2019 H \u00e2\u2020\u2019 E \u00e2\u2020\u2019 F \u00e2\u2020\u2019 N \u00e2\u2020\u2019 S \u00e2\u2020\u2019 N \u00e2\u2020\u2019 NW \u00e2\u2020\u2019 K",
+    "shots": [
+      "R facing northeast: glimpse the sunken floor, far retreat and crown.",
+      "N facing down: observe the encounter without entering its arena.",
+      "H facing west: the opening service stair reframes the kitchen above."
+    ]
+  }
+]

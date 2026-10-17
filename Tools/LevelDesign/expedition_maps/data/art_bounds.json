@@ -1,0 +1,1879 @@
+[
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptArcadeBay4m_Mars_SM",
+    "min": [
+      -8.400445040024351e-06,
+      -67.0000228881836,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      6.9999847412109375,
+      400.5069274902344
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptRoof4x4_Mars_SM",
+    "min": [
+      -3.496911085676402e-05,
+      -400.0000305175781,
+      350.0
+    ],
+    "max": [
+      400.0,
+      0.0,
+      390.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/PlainStone_Bellfold_Mars_MI.PlainStone_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallFlatDiag5m7_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -44.00004959106445,
+      -39.5
+    ],
+    "max": [
+      565.6854858398438,
+      3.9999988079071045,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/StoneWall_Bellfold_Mars_MI.StoneWall_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallFlatDiag2m8_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -44.000022888183594,
+      -39.5
+    ],
+    "max": [
+      282.84271240234375,
+      3.9999988079071045,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/StoneWall_Bellfold_Mars_MI.StoneWall_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallFlat4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -44.00003433227539,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      3.9999988079071045,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/StoneWall_Bellfold_Mars_MI.StoneWall_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallFlat2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -44.00001525878906,
+      -39.5
+    ],
+    "max": [
+      200.0,
+      3.9999988079071045,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/StoneWall_Bellfold_Mars_MI.StoneWall_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampLedger_Mars_SM",
+    "min": [
+      -36.000003814697266,
+      -15.00000286102295,
+      0.0
+    ],
+    "max": [
+      35.5,
+      15.00000286102295,
+      26.82320213317871
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/Flame_Mars_MI.Flame_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampFirepit_Mars_SM",
+    "min": [
+      -155.28866577148438,
+      -155.27976989746094,
+      -1.4008668661117554
+    ],
+    "max": [
+      156.50811767578125,
+      154.91075134277344,
+      104.99999237060547
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/Flame_Mars_MI.Flame_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampCandleCluster_Mars_SM",
+    "min": [
+      -20.0,
+      -19.021129608154297,
+      0.0
+    ],
+    "max": [
+      20.0,
+      19.021129608154297,
+      30.000001907348633
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/Flame_Mars_MI.Flame_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallNiche2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -45.00000762939453,
+      -39.5
+    ],
+    "max": [
+      200.0,
+      9.999995231628418,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallFriezeOnion4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.38841247558594,
+      -0.5635114312171936
+    ],
+    "max": [
+      400.0,
+      13.314786911010742,
+      50.4401969909668
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallFriezeOnion2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -40.87535858154297,
+      0.0
+    ],
+    "max": [
+      200.0,
+      13.314786911010742,
+      50.05799102783203
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallDiag5m7_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.60820388793945,
+      -39.5
+    ],
+    "max": [
+      565.6854858398438,
+      1.758803367614746,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallDiag2m8_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.493526458740234,
+      -39.5
+    ],
+    "max": [
+      282.8843994140625,
+      1.2144155502319336,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallDiag1m4_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.375370025634766,
+      -39.5
+    ],
+    "max": [
+      141.43577575683594,
+      1.25102961063385,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallCourseDiag5m7_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.23554611206055,
+      0.0
+    ],
+    "max": [
+      565.6854858398438,
+      1.6023913621902466,
+      50.045936584472656
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallCourseDiag2m8_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.4538688659668,
+      -0.11461038142442703
+    ],
+    "max": [
+      282.84271240234375,
+      0.9594115614891052,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallCourseDiag1m4_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -40.75735855102539,
+      0.0
+    ],
+    "max": [
+      141.42135620117188,
+      0.7229718565940857,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWall2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.45796585083008,
+      -39.5
+    ],
+    "max": [
+      200.0,
+      1.5139504671096802,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWall1m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -40.80718994140625,
+      -39.5
+    ],
+    "max": [
+      100.0,
+      0.9026629328727722,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVertexcolH7m5_Mars_SM",
+    "min": [
+      -45.0,
+      -45.893428802490234,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      750.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVertexcolH15m5_Mars_SM",
+    "min": [
+      -45.0,
+      -45.893428802490234,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      1550.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptScreenSpatula4m_Mars_SM",
+    "min": [
+      -0.0499989315867424,
+      -48.00002670288086,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      7.999988555908203,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptScreenRosePan4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -51.00002670288086,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      10.999992370605469,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPortalKeystoneCleaver_Mars_SM",
+    "min": [
+      -32.5438346862793,
+      -58.999996185302734,
+      -20.0
+    ],
+    "max": [
+      32.54383087158203,
+      19.0,
+      58.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPortal2m4_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -50.00001907348633,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      9.999983787536621,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFloorPavers4x4_Mars_SM",
+    "min": [
+      -3.496911085676402e-05,
+      -400.0000305175781,
+      -40.0
+    ],
+    "max": [
+      400.0,
+      0.0,
+      -0.08517056703567505
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptCornerQuoin_Mars_SM",
+    "min": [
+      -25.36004066467285,
+      -25.709775924682617,
+      -39.5
+    ],
+    "max": [
+      25.274063110351562,
+      25.703052520751953,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptChainLink_Mars_SM",
+    "min": [
+      -6.799037933349609,
+      -1.5000004768371582,
+      -4.299037933349609
+    ],
+    "max": [
+      6.799037933349609,
+      1.5000004768371582,
+      4.299037933349609
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptChainHook_Mars_SM",
+    "min": [
+      -15.000001907348633,
+      -15.000001907348633,
+      -14.743650436401367
+    ],
+    "max": [
+      15.000001907348633,
+      15.000001907348633,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptChainEye_Mars_SM",
+    "min": [
+      -10.0,
+      -8.392586892114196e-07,
+      -10.0
+    ],
+    "max": [
+      10.0,
+      12.700000762939453,
+      10.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptCapitalForkHalf_Mars_SM",
+    "min": [
+      -50.46841812133789,
+      -4.000002861022949,
+      0.0
+    ],
+    "max": [
+      50.46842575073242,
+      51.126102447509766,
+      95.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptArchBarred2m4_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -50.00001907348633,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      9.999983787536621,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampWorkbench_Mars_SM",
+    "min": [
+      -100.00000762939453,
+      -50.00000762939453,
+      0.0
+    ],
+    "max": [
+      100.00000762939453,
+      61.99999237060547,
+      100.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampWardrobeRack_Mars_SM",
+    "min": [
+      -83.0,
+      -30.00000762939453,
+      0.0
+    ],
+    "max": [
+      83.0,
+      30.00000762939453,
+      195.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampTripod_Mars_SM",
+    "min": [
+      -117.63766479492188,
+      -134.33326721191406,
+      -2.3087430000305176
+    ],
+    "max": [
+      117.6376724243164,
+      70.42713928222656,
+      277.053466796875
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampToolBoard_Mars_SM",
+    "min": [
+      -100.0,
+      -8.689824426255655e-06,
+      0.0
+    ],
+    "max": [
+      102.0,
+      17.402551651000977,
+      120.00000762939453
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampSignHanging_Mars_SM",
+    "min": [
+      -95.39259338378906,
+      0.9999935030937195,
+      -20.0
+    ],
+    "max": [
+      95.39259338378906,
+      7.2000041007995605,
+      20.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampRugRunner_Mars_SM",
+    "min": [
+      -120.00000762939453,
+      -60.0000114440918,
+      0.0
+    ],
+    "max": [
+      120.00000762939453,
+      60.0000114440918,
+      1.600000023841858
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampRugRound_Mars_SM",
+    "min": [
+      -250.0,
+      -250.0,
+      0.0
+    ],
+    "max": [
+      250.0,
+      250.0,
+      1.2000000476837158
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampMirror_Mars_SM",
+    "min": [
+      -60.000003814697266,
+      -25.0000057220459,
+      0.0
+    ],
+    "max": [
+      60.000003814697266,
+      25.0000057220459,
+      230.00001525878906
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampMenuStandEasel_Mars_SM",
+    "min": [
+      -109.37012481689453,
+      -119.25810241699219,
+      -1.4555002450942993
+    ],
+    "max": [
+      109.37012481689453,
+      15.000007629394531,
+      286.0732421875
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampMenuStandCabinet_Mars_SM",
+    "min": [
+      -112.0,
+      -32.50000762939453,
+      0.0
+    ],
+    "max": [
+      112.00000762939453,
+      47.5000114440918,
+      42.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampMenuStandAframe_Mars_SM",
+    "min": [
+      -104.99999237060547,
+      -99.2945785522461,
+      -1.3441040515899658
+    ],
+    "max": [
+      105.0,
+      13.000008583068848,
+      269.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampMenuFrame_Mars_SM",
+    "min": [
+      -103.50000762939453,
+      -8.000008583068848,
+      -113.5
+    ],
+    "max": [
+      103.50000762939453,
+      5.300008773803711,
+      113.5
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampDoorStreet_Mars_SM",
+    "min": [
+      74.0,
+      -33.500030517578125,
+      0.0
+    ],
+    "max": [
+      326.0,
+      -12.800024032592773,
+      344.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampContractBoard_Mars_SM",
+    "min": [
+      -117.00000762939453,
+      -25.000009536743164,
+      0.0
+    ],
+    "max": [
+      117.00000762939453,
+      25.000009536743164,
+      205.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampBed_Mars_SM",
+    "min": [
+      -96.0,
+      -45.00000762939453,
+      0.0
+    ],
+    "max": [
+      96.0,
+      45.00000762939453,
+      68.29126739501953
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampBarrel_Mars_SM",
+    "min": [
+      -41.400001525878906,
+      -41.400001525878906,
+      0.0
+    ],
+    "max": [
+      41.400001525878906,
+      41.400001525878906,
+      90.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampBackpackGiant_Mars_SM",
+    "min": [
+      -139.0,
+      -75.00000762939453,
+      0.0
+    ],
+    "max": [
+      139.0,
+      95.00001525878906,
+      368.2869567871094
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampApronHooks_Mars_SM",
+    "min": [
+      -65.0,
+      0.49999430775642395,
+      -130.0
+    ],
+    "max": [
+      69.91961669921875,
+      16.549924850463867,
+      5.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxStoneBlock1m_Mars_SM",
+    "min": [
+      -50.50168228149414,
+      -26.123239517211914,
+      -0.34069541096687317
+    ],
+    "max": [
+      50.791439056396484,
+      25.926986694335938,
+      50.91516876220703
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxStoneBlock0m5_Mars_SM",
+    "min": [
+      -25.896753311157227,
+      -26.222702026367188,
+      -0.7891666293144226
+    ],
+    "max": [
+      25.965673446655273,
+      26.1673641204834,
+      50.60986328125
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrateStack2_Mars_SM",
+    "min": [
+      -61.0,
+      -61.0,
+      0.0
+    ],
+    "max": [
+      61.0,
+      61.0,
+      180.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrateLow_Mars_SM",
+    "min": [
+      -60.00000762939453,
+      -60.00000762939453,
+      0.0
+    ],
+    "max": [
+      60.00000762939453,
+      60.00000762939453,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrateLong2m_Mars_SM",
+    "min": [
+      -101.0,
+      -51.89999771118164,
+      0.0
+    ],
+    "max": [
+      101.0,
+      51.89999771118164,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrate1m_Mars_SM",
+    "min": [
+      -51.000003814697266,
+      -51.000003814697266,
+      0.0
+    ],
+    "max": [
+      51.000003814697266,
+      51.000003814697266,
+      100.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrate1m2_Mars_SM",
+    "min": [
+      -61.0,
+      -61.0,
+      0.0
+    ],
+    "max": [
+      61.0,
+      61.0,
+      120.00000762939453
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrate0m6_Mars_SM",
+    "min": [
+      -31.000003814697266,
+      -31.000003814697266,
+      0.0
+    ],
+    "max": [
+      31.000003814697266,
+      31.000003814697266,
+      60.000003814697266
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFloor4x4_Mars_SM",
+    "min": [
+      -3.496911085676402e-05,
+      -400.0000305175781,
+      -39.999996185302734
+    ],
+    "max": [
+      400.0,
+      0.0,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptStairFlight_Mars_SM",
+    "min": [
+      1.199905514717102,
+      -722.0,
+      0.0
+    ],
+    "max": [
+      298.79998779296875,
+      -0.6000003814697266,
+      400.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWall4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.51771545410156,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      1.6149336099624634,
+      350.2939758300781
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPortal6m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -50.000038146972656,
+      -39.5
+    ],
+    "max": [
+      800.0,
+      9.999967575073242,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPierH7m5_Mars_SM",
+    "min": [
+      -65.47376251220703,
+      -65.85321044921875,
+      -39.5
+    ],
+    "max": [
+      66.10523223876953,
+      66.06842041015625,
+      752.530517578125
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptExtractionArch_Mars_SM",
+    "min": [
+      12.999999046325684,
+      -4.000034332275391,
+      -39.5
+    ],
+    "max": [
+      387.0,
+      69.99999237060547,
+      334.4070739746094
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/Glow_Mars_MI.Glow_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampLantern_Mars_SM",
+    "min": [
+      -12.999999046325684,
+      -12.999999046325684,
+      0.0
+    ],
+    "max": [
+      12.999999046325684,
+      12.999999046325684,
+      58.26084518432617
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/Glow_Mars_MI.Glow_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampCauldron_Mars_SM",
+    "min": [
+      -79.7535629272461,
+      -80.04857635498047,
+      5.999999523162842
+    ],
+    "max": [
+      80.27609252929688,
+      80.00260925292969,
+      154.16506958007812
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampPrepTable_Mars_SM",
+    "min": [
+      -100.00000762939453,
+      -50.00000762939453,
+      0.0
+    ],
+    "max": [
+      100.00000762939453,
+      50.00000762939453,
+      102.57408905029297
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Camp/CampBannerFork_Mars_SM",
+    "min": [
+      -65.57769775390625,
+      -4.108870598429348e-06,
+      50.0
+    ],
+    "max": [
+      65.57769775390625,
+      15.40000057220459,
+      254.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVaultRibOct24_Mars_SM",
+    "min": [
+      4.999999523162842,
+      -21.000112533569336,
+      -12.0
+    ],
+    "max": [
+      1295.0,
+      20.999998092651367,
+      266.0357971191406
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxCrate1m5_Mars_SM",
+    "min": [
+      -76.00000762939453,
+      -76.00000762939453,
+      0.0
+    ],
+    "max": [
+      76.00000762939453,
+      76.00000762939453,
+      150.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxPlinthBackpack_Mars_SM",
+    "min": [
+      -80.00000762939453,
+      -60.00000762939453,
+      0.0
+    ],
+    "max": [
+      80.00000762939453,
+      60.00000762939453,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxPlinthPickup_Mars_SM",
+    "min": [
+      -105.0,
+      -55.0000114440918,
+      0.0
+    ],
+    "max": [
+      105.0,
+      55.0000114440918,
+      80.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxSarcophagusBroken_Mars_SM",
+    "min": [
+      -117.1862564086914,
+      -73.0170669555664,
+      -9.949699401855469
+    ],
+    "max": [
+      148.45252990722656,
+      110.38565826416016,
+      98.23833465576172
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxStoneBlock2m_Mars_SM",
+    "min": [
+      -105.0,
+      -55.0000114440918,
+      0.0
+    ],
+    "max": [
+      105.0,
+      55.0000114440918,
+      100.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Boxes/BoxTombSealed_Mars_SM",
+    "min": [
+      -116.0,
+      -56.0000114440918,
+      0.0
+    ],
+    "max": [
+      116.0,
+      56.0000114440918,
+      104.99999237060547
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptBalustrade4m_Mars_SM",
+    "min": [
+      -2.0000009536743164,
+      -37.00003433227539,
+      0.0
+    ],
+    "max": [
+      402.0,
+      3.0,
+      100.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptBarScreen4m_Mars_SM",
+    "min": [
+      -1.9999995231628418,
+      -18.000036239624023,
+      98.0
+    ],
+    "max": [
+      402.0,
+      -12.000000953674316,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptCapitalFork_Mars_SM",
+    "min": [
+      -62.12491226196289,
+      -62.12490463256836,
+      0.0
+    ],
+    "max": [
+      62.12490463256836,
+      62.12490463256836,
+      98.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptCorbelSpoon_Mars_SM",
+    "min": [
+      -29.999998092651367,
+      -2.430201768875122,
+      -149.15147399902344
+    ],
+    "max": [
+      30.000003814697266,
+      70.80867004394531,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptDais4x4H1m5_Mars_SM",
+    "min": [
+      -3.645934702944942e-05,
+      -400.0000915527344,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      -3.93402387999231e-07,
+      150.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFinialPotlid_Mars_SM",
+    "min": [
+      -50.000003814697266,
+      -50.000003814697266,
+      0.0
+    ],
+    "max": [
+      50.000003814697266,
+      50.000003814697266,
+      104.99999237060547
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFloor3x1_Mars_SM",
+    "min": [
+      -8.742277714191005e-06,
+      -100.0000228881836,
+      -39.999996185302734
+    ],
+    "max": [
+      300.0,
+      0.0,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFloor3x2_Mars_SM",
+    "min": [
+      -1.748455542838201e-05,
+      -200.00003051757812,
+      -39.999996185302734
+    ],
+    "max": [
+      300.0,
+      0.0,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFloor3x4_Mars_SM",
+    "min": [
+      -3.496911085676402e-05,
+      -400.0000305175781,
+      -39.999996185302734
+    ],
+    "max": [
+      300.0,
+      0.0,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptFloorEdgeBroken4m_Mars_SM",
+    "min": [
+      -1.0490733984624967e-05,
+      -120.00003814697266,
+      -40.0
+    ],
+    "max": [
+      400.0,
+      -1.5000004768371582,
+      7.729155540466309
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptGalleryEdge4m_Mars_SM",
+    "min": [
+      -8.742277714191005e-06,
+      -100.00003814697266,
+      -116.35525512695312
+    ],
+    "max": [
+      400.0,
+      50.26640319824219,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptHalfcolH11m5_Mars_SM",
+    "min": [
+      -45.0,
+      -0.6291399598121643,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      1150.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptHalfcolH15m5_Mars_SM",
+    "min": [
+      -45.0,
+      -0.7074497938156128,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      1550.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptHalfcolH3m5_Mars_SM",
+    "min": [
+      -45.0,
+      -0.3417607843875885,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptHalfcolH7m5_Mars_SM",
+    "min": [
+      -45.0,
+      -0.60805743932724,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      750.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptLedge4mSpoon_Mars_SM",
+    "min": [
+      0.0,
+      -2.4302327632904053,
+      -189.15145874023438
+    ],
+    "max": [
+      400.0,
+      160.0,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptLedge4m_Mars_SM",
+    "min": [
+      0.0,
+      -3.496911085676402e-05,
+      -120.20716857910156
+    ],
+    "max": [
+      400.0,
+      160.0,
+      0.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/StoneFloor_Bellfold_Mars_MI.StoneFloor_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPierH11m5_Mars_SM",
+    "min": [
+      -65.65272521972656,
+      -65.70723724365234,
+      -39.5
+    ],
+    "max": [
+      65.92076110839844,
+      65.46446990966797,
+      1151.606689453125
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPierH15m5_Mars_SM",
+    "min": [
+      -66.21713256835938,
+      -66.08152770996094,
+      -39.5
+    ],
+    "max": [
+      66.17863464355469,
+      65.87572479248047,
+      1550.7027587890625
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPierH3m5_Mars_SM",
+    "min": [
+      -66.12930297851562,
+      -65.98950958251953,
+      -39.5
+    ],
+    "max": [
+      66.17182159423828,
+      65.77011108398438,
+      350.6398620605469
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptPierH4m_Mars_SM",
+    "min": [
+      -65.884765625,
+      -66.0498046875,
+      -39.5
+    ],
+    "max": [
+      66.33009338378906,
+      66.2014389038086,
+      402.30712890625
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptRib4m_Mars_SM",
+    "min": [
+      -1.0490733757251292e-06,
+      -15.000035285949707,
+      269.0
+    ],
+    "max": [
+      400.0,
+      15.0,
+      343.8421630859375
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptRoof3x4_Mars_SM",
+    "min": [
+      -3.496911085676402e-05,
+      -400.0000305175781,
+      350.0
+    ],
+    "max": [
+      300.0,
+      0.0,
+      390.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/PlainStone_Bellfold_Mars_MI.PlainStone_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptScreenGrille4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -48.00003433227539,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      7.999995708465576,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptSpoutLadle_Mars_SM",
+    "min": [
+      -42.82653045654297,
+      -2.441662218188867e-06,
+      -30.000001907348633
+    ],
+    "max": [
+      42.82653045654297,
+      69.40255737304688,
+      46.63536071777344
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptStairCheekLow_Mars_SM",
+    "min": [
+      -48.00000762939453,
+      -722.0,
+      -39.5
+    ],
+    "max": [
+      7.999999523162842,
+      3.0000040531158447,
+      514.5491943359375
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/StoneWall_Bellfold_Mars_MI.StoneWall_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptStairLanding_Mars_SM",
+    "min": [
+      -1.3113416571286507e-05,
+      -150.00003051757812,
+      -40.0
+    ],
+    "max": [
+      300.0,
+      0.0,
+      -0.0077627599239349365
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptStairWallFull_Mars_SM",
+    "min": [
+      -40.00009536743164,
+      -720.0,
+      -39.5
+    ],
+    "max": [
+      0.0,
+      5.2453669923124835e-06,
+      750.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/StoneWall_Bellfold_Mars_MI.StoneWall_Bellfold_Mars_MI",
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptStatueAlcove_Mars_SM",
+    "min": [
+      -262.1000061035156,
+      -262.1000061035156,
+      -0.2532641887664795
+    ],
+    "max": [
+      262.1000061035156,
+      262.1000061035156,
+      1198.47314453125
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVaultRib4m_Mars_SM",
+    "min": [
+      4.999999523162842,
+      -21.00003433227539,
+      -12.0
+    ],
+    "max": [
+      395.0,
+      20.999998092651367,
+      94.41118621826172
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVaultRib8m_Mars_SM",
+    "min": [
+      4.999999523162842,
+      -21.00006866455078,
+      -12.0
+    ],
+    "max": [
+      795.0,
+      20.999998092651367,
+      174.57830810546875
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVaultRibOct16_Mars_SM",
+    "min": [
+      4.999999523162842,
+      -21.000072479248047,
+      -12.0
+    ],
+    "max": [
+      849.4003295898438,
+      20.999998092651367,
+      184.48068237304688
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVaultRibOct32_Mars_SM",
+    "min": [
+      4.999999523162842,
+      -21.000150680541992,
+      -12.0
+    ],
+    "max": [
+      1741.4249267578125,
+      20.999998092651367,
+      347.318359375
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVertexcolH11m5_Mars_SM",
+    "min": [
+      -45.0,
+      -45.893428802490234,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      1150.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptVertexcolH3m5_Mars_SM",
+    "min": [
+      -45.0,
+      -45.893428802490234,
+      -39.5
+    ],
+    "max": [
+      45.000003814697266,
+      52.0,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallCourse2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -40.91425323486328,
+      0.0
+    ],
+    "max": [
+      200.0,
+      0.5943241715431213,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallCourse4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -40.98149871826172,
+      0.0
+    ],
+    "max": [
+      400.0,
+      0.572029709815979,
+      50.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallOssuary4m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.127105712890625,
+      -39.5
+    ],
+    "max": [
+      400.0,
+      9.999999046325684,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallRoundel2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.30949020385742,
+      -39.5
+    ],
+    "max": [
+      200.0,
+      20.999996185302734,
+      350.0
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  },
+  {
+    "path": "/Game/Mars/Environment/Meshes/Crypt/CryptWallTomb2m_Mars_SM",
+    "min": [
+      -2.4478379145875806e-06,
+      -41.18115997314453,
+      -39.5
+    ],
+    "max": [
+      200.0,
+      15.099991798400879,
+      350.15606689453125
+    ],
+    "materials": [
+      "/Game/Mars/Environment/Materials/Instances/MiseAtlas_Bellfold_Mars_MI.MiseAtlas_Bellfold_Mars_MI"
+    ]
+  }
+]

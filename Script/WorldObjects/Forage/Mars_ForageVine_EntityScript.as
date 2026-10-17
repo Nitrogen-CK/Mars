@@ -44,7 +44,7 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
     private FCk_Handle_Forage _Forage;
     private FCk_Handle_Health _Health;
     private FCk_Handle_HitZone _Zone;
-    private FCk_Handle_UnrealComponent _FruitMesh;
+    protected FCk_Handle_UnrealComponent _FruitMesh;
 
     // Presets name the yield.
     protected TSoftObjectPtr<UCk_InventoryItem_Definition> Get_YieldDefinition() const
@@ -168,7 +168,7 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
 
     // Engine cube and sphere are 100 uu with their pivot at the centre. The post and the basin walls are solid (a
     // collision-bearing mesh part bakes into the Jolt static world), so a dropped fruit lands inside the ring.
-    private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Transform& InFruit)
+    protected void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Transform& InFruit)
     {
         auto CubeMesh = engine::load::Cube();
         auto WallMaterial = assets::load::ProtoGrid_Wall_Mars_MI();

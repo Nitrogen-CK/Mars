@@ -1,0 +1,44 @@
+{
+  "name": "The Broken Cistern",
+  "revision": "Grid study 01",
+  "envelope": [96, 80],
+  "grid": 4,
+  "eyeHeight": 1.7,
+  "playerRadius": 0.4,
+  "walkSpeed": 4.2,
+  "floors": [
+    {"id":"kitchen","rect":[36,4,60,20],"z":0},
+    {"id":"arrival","rect":[24,20,72,36],"z":0},
+    {"id":"roots","rect":[4,28,24,52],"z":0},
+    {"id":"hunt","rect":[72,28,92,52],"z":0},
+    {"id":"west","rect":[8,60,28,76],"z":4},
+    {"id":"north","rect":[28,64,68,76],"z":4},
+    {"id":"east","rect":[68,60,88,76],"z":4},
+    {"id":"west-link","rect":[20,44,28,64],"z":4},
+    {"id":"east-link","rect":[68,44,76,64],"z":4},
+    {"id":"bridge","rect":[28,44,68,52],"z":4}
+  ],
+  "stairs": [
+    {"id":"west-stair","rect":[12,52,20,60],"from":0,"to":4},
+    {"id":"east-stair","rect":[76,52,84,60],"from":0,"to":4}
+  ],
+  "basin": {"rect":[28,36,68,60],"z":-4},
+  "spawns": [
+    {"id":"A","at":[48,8,0],"yaw":0,"label":"South / kitchen"},
+    {"id":"B","at":[8,40,0],"yaw":1.5707963268,"label":"West / roots"},
+    {"id":"C","at":[88,40,0],"yaw":-1.5707963268,"label":"East / hunt"},
+    {"id":"D","at":[48,72,4],"yaw":3.1415926536,"label":"North / stores"}
+  ],
+  "zones": [
+    {"id":"kitchen","title":"Kitchen","at":[48,12,0],"size":"24 × 16 m","role":"Prepare the gathered food. Six station proxies face a 6 m clear central aisle. The kitchen opens through one 8 m threshold into the arrival court."},
+    {"id":"arrival","title":"Arrival court","at":[48,28,0],"size":"48 × 16 m","role":"Orient around the basin and choose a bank. Both 8 m side openings stay visible. This is the shared return space, with no scattered ingredients."},
+    {"id":"roots","title":"Root court","at":[14,40,0],"size":"20 × 24 m","role":"Harvest on the protected west edge; encounter proxy controls the approach. An 8 m stair climbs directly to the upper gallery. No empty basement or ladder."},
+    {"id":"hunt","title":"Hunt court","at":[82,40,0],"size":"20 × 24 m","role":"Open encounter space with a guarded protein pickup on a low plinth. The opposite stair makes this a through-route, rather than a dead-end arena."},
+    {"id":"north","title":"Upper stores","at":[48,70,4],"size":"40 × 12 m","role":"A purposeful upper destination for seasoning. Connected west to east at one continuous +4 m datum; the outer loop always works even when bridge gates are closed."},
+    {"id":"bridge","title":"Puzzle bridge","at":[48,48,4],"size":"40 × 8 m","role":"A clear cross-basin shortcut. Drop the pack on the west plate and stand on the second plate to latch the west gate. Either chain opens the east timed gate for 8 seconds."}
+  ],
+  "routes": {
+    "loop":[[48,12,0],[48,32,0],[16,32,0],[16,52,0],[16,60,4],[16,68,4],[48,68,4],[80,68,4],[80,60,4],[80,52,0],[80,32,0],[48,32,0],[48,12,0]],
+    "shortcut":[[24,68,4],[24,56,4],[24,48,4],[48,48,4],[72,48,4],[72,64,4],[80,68,4]]
+  }
+}
