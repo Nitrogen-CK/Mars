@@ -324,13 +324,13 @@ struct FMars_TESTONLY_CrawlerMelee_Trigger
     float64 SawCandidateTo = 0.0;
 }
 
-// Runs right after the attack tick, so it reads the frame's final attack state, and before the Health and HitZone drains,
-// so a Health or zone hit lands later this frame: after this frame's attack tick, before the resolver.
+// Reads the frame's final attack state after AttackTick. Health now drains before AttackTick, so direct Health requests
+// process next frame before commit; zone requests may still drain this frame. The catalogue boundary driver owns tests
+// that require an explicitly observed pre-Health boundary.
 class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
     default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Crawler_AttackTick");
-    default _RunBefore.Add(n"/Script/Angelscript.Mars_Processor_Health_HandleRequests");
     default _RunBefore.Add(n"/Script/Angelscript.Mars_Processor_HitZone_HandleRequests");
 
     UFUNCTION(BlueprintOverride)

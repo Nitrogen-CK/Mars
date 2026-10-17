@@ -1,0 +1,138 @@
+{
+	"assetName": "Crawler6_EndpointDemoLoadout_Mars_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler6_EndpointDemoLoadout_Mars_DA.Crawler6_EndpointDemoLoadout_Mars_DA",
+	"assetClass": "Mars_AttackLoadout_Data",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "b0d40c8bb13906e05bb56235f367ff0b",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "Spec",
+			"type": "FMars_Attack_Loadout",
+			"value":
+			{
+				"Entries": [
+					{
+						"Id": "Attack.Mars.Pincer",
+						"Definition": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler6_EndpointDemo_Pincer_Mars_DA.Crawler6_EndpointDemo_Pincer_Mars_DA",
+						"Priority": 100,
+						"Enabled": true
+					},
+					{
+						"Id": "Attack.Mars.SwipeRight",
+						"Definition": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler6_EndpointDemo_SwipeRight_Mars_DA.Crawler6_EndpointDemo_SwipeRight_Mars_DA",
+						"Priority": 50,
+						"Enabled": true
+					},
+					{
+						"Id": "Attack.Mars.SwipeLeft",
+						"Definition": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler6_EndpointDemo_SwipeLeft_Mars_DA.Crawler6_EndpointDemo_SwipeLeft_Mars_DA",
+						"Priority": 50,
+						"Enabled": true
+					},
+					{
+						"Id": "Attack.Mars.Jab",
+						"Definition": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler6_EndpointDemo_Jab_Mars_DA.Crawler6_EndpointDemo_Jab_Mars_DA",
+						"Priority": 0,
+						"Enabled": true
+					}
+				],
+				"Selection":
+				{
+					"TemporaryReadiness": "UseReadyAlternative",
+					"ControlWait": "PreferAvailable",
+					"ReadyAlternativeDelaySeconds": 0.25
+				},
+				"Execution":
+				{
+					"Tuning":
+					{
+						"_Playback":
+						{
+							"_PlayRate": 1
+						},
+						"_Transition":
+						{
+							"_EntryBlend":
+							{
+								"_Seconds": 0
+							},
+							"_DedicatedReturn":
+							{
+								"_Seconds": 0.15000000596046448
+							},
+							"_ReturnTimeout":
+							{
+								"_Seconds": 3
+							}
+						},
+						"_Watchdogs":
+						{
+							"_LoadTimeout":
+							{
+								"_Seconds": 5
+							},
+							"_AcquisitionTimeout":
+							{
+								"_Seconds": 1
+							},
+							"_PublicationTimeout":
+							{
+								"_Seconds": 1
+							}
+						},
+						"_Sampling":
+						{
+							"_MaxAdvance":
+							{
+								"_Seconds": 0.016666666666666666
+							},
+							"_MaxEndpointTravelCm": 16,
+							"_MaxSegmentAngularStepDegrees": 180,
+							"_MaxSamples": 1
+						}
+					},
+					"Locomotion":
+					{
+						"_Support":
+						{
+							"_Mode": "CountOnly",
+							"_MinimumTrustedContacts": 2,
+							"_ProjectedRegionInsetCm": 0,
+							"_MaxContactNormalSpreadDegrees": 20,
+							"_SupportHoldTimeout":
+							{
+								"_Seconds": 6
+							}
+						},
+						"_Return":
+						{
+							"_Duration":
+							{
+								"_Seconds": 0.15000000596046448
+							},
+							"_Timeout":
+							{
+								"_Seconds": 3
+							},
+							"_MaxProbeAttempts": 3,
+							"_RetryInterval":
+							{
+								"_Seconds": 0.10000000000000001
+							},
+							"_ContactToleranceCm": 2
+						}
+					},
+					"MaxRootDrift": 10,
+					"MaxGroundSlopeDegrees": 35
+				}
+			}
+		}
+	]
+}

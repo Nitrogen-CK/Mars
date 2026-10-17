@@ -179,10 +179,10 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     bool WithVisuals = true;
 
-    // Debugging only: each frame of an attack, draws the accepted hit sphere at the kernel's accepted hit centre, the
-    // segment the last accepted sample swept, and a line from the accepted body to the hit centre, coloured by phase
-    // (Windup yellow, Strike red, Recover and CancelRecover blue, Cooldown grey). Everything comes from the attack's
-    // recorded observations, never from the requested pose. Nothing is drawn while Idle or on an unarmed crawler.
+    // Debugging only: stored accepted emitter segments/radii, labelled with sample, attempt generation and overlap
+    // observation frame. Damage is red, active obstruction yellow (orange after obstruction), inactive recovery blue.
+    // Before the first accepted segment, a cyan root marker is explicitly labelled pending admission. No requested
+    // endpoint or reconstructed centre is drawn as accepted geometry. Idle and unarmed crawlers draw nothing.
     UPROPERTY(ExposeOnSpawn)
     bool DebugDrawAttack = false;
 
@@ -221,26 +221,22 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // Created on first use of each tint.
     private TArray<FMars_Crawler_TintedRenderer> _Renderers;
 
-    // The combat profile's clips, loaded at construction: these properties keep them loaded for as long as the crawler
-    // lives (the kernel resolves the spec's soft references, which root nothing).
+    // Loaded authored graph and source/frozen clips survive for the crawler's entire lifetime.
     UPROPERTY()
-    private UCk_ProceduralAction_Data _JabClip;
-
-    UPROPERTY()
-    private UCk_ProceduralAction_Data _PincerClip;
+    private FMars_Crawler_AttackConstruction _AttackConstruction;
 
     // Look only: its pieces (empty without one) and a renderer per piece, created on first use.
     private FMars_Crawler_LookMeshes _LookMeshes;
     private TArray<FMars_Crawler_MeshRenderer> _MeshRenderers;
 
-    // DebugDrawAttack only: the armed crawler and the last two accepted hit centres seen.
+    // DebugDrawAttack only: all geometry remains in the kernel's copied accepted observations.
     private FCk_Handle_Crawler _DebugCrawler;
-    private FVector _DebugCenter = FVector::ZeroVector;
-    private FVector _DebugPreviousCenter = FVector::ZeroVector;
 
     // Fangs only: the crawler they follow, the two nodes (right then left), their roots in the body's frame and the pose
     // they hold now.
     private FCk_Handle_Crawler _FangCrawler;
+    private EMars_Crawler_AttackPhase _FangCuePhase = EMars_Crawler_AttackPhase::Idle;
+    private bool _FangCueStopped = true;
     private TArray<FCk_Handle_SceneNode> _Fangs;
     private TArray<FVector> _FangRoots;
     // How far along its facing a fang's pivot sits from its root: half the box; 0 for a look's fang, which pivots at its
@@ -254,7 +250,6 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         // First: the crawler's sub-SM resolves ck::Ctx to this root only if the override precedes every child.
         InHandle.Request_OverrideToSelf();
 
-        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_handle::Set_DebugName(InHandle, FName(f"Crawler{Spec.LegCount}"));
 
         // Before any rig entity or visual is built: only some leg counts have a rig asset.
@@ -270,21 +265,30 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         }
 
         _LookMeshes = Load_Look(InHandle, RigData.Get_Legs().Num());
-        CrawlerSpec.Rig = BuildRig(InHandle, RigData);
+        CrawlerSpec.Rig.BodyHalfExtents = Get_BodyHalfExtents(RigData);
         if (CrawlerSpec.Combat.Enabled)
         {
-            DefaultCombatGeometry(CrawlerSpec);
-            Load_AttackClips(InHandle, CrawlerSpec.Combat);
+            if (CrawlerSpec.Combat.Loadout.IsNull())
+            { DefaultCombatGeometry(CrawlerSpec); }
+            const auto Report = utils_crawler::Resolve_AttackLoadout(CrawlerSpec, _AttackConstruction);
+            if (ck::EnsureIfNot(Report.Get_IsValid(), f"[Crawler] [{InHandle.ToString()}] rejected the spec: {utils_crawler::Get_AttackValidationText(Report)}"))
+            { return ECk_EntityScript_ConstructionFlow::Finished; }
+            CrawlerSpec.ResolvedAttacks = _AttackConstruction.Resolved;
         }
+
+        auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
+        CrawlerSpec.Rig = BuildRig(InHandle, RigData);
+        ComposeLightSense(Root, CrawlerSpec);
 
         const auto Crawler = utils_crawler::Add(Root, CrawlerSpec);
         utils_entity_tag::Add(InHandle, n"TAG_MarsCrawler");
 
         // The timer dies with the entity; nothing to unbind.
-        if (WithVisuals && ck::IsValid(Crawler) && CrawlerSpec.Combat.Enabled && CrawlerSpec.Combat.Get_HasPincer())
+        if (WithVisuals && ck::IsValid(Crawler) && CrawlerSpec.Combat.Enabled && Get_HasPincerCue(CrawlerSpec))
         {
             _FangCrawler = Crawler;
             BuildFangs(InHandle, CrawlerSpec.Rig);
+            _FangCrawler.BindTo_OnAttackCue(FMars_Delegate_Crawler_OnAttackCue(this, n"OnAttackCue"));
             utils_timer::Create_Tick(InHandle, FCk_Delegate_Timer(this, n"OnFangTick"));
         }
 
@@ -298,27 +302,63 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         return ECk_EntityScript_ConstructionFlow::Finished;
     }
 
-    // Loads the profile's set clips into the properties that keep them loaded. A set clip that does not load ensures
-    // here, naming its path, and the kernel's Validate then rejects the spec.
-    private void Load_AttackClips(const FCk_Handle& InRoot, const FMars_Crawler_Combat& InCombat)
+    UFUNCTION(BlueprintOverride)
+    void DoEndPlay(FCk_Handle InHandle)
     {
-        if (InCombat.JabClip.IsNull() == false)
-        {
-            _JabClip = System::LoadAsset_Blocking(InCombat.JabClip);
-            ck::EnsureIfNot(ck::IsValid(_JabClip),
-                f"[Crawler] [{InRoot.ToString()}] its JabClip [{InCombat.JabClip.ToSoftObjectPath().ToString()}] did not load (Mars.Crawler.SeedAttackClips writes the starting clips)");
-        }
-
-        if (InCombat.PincerClip.IsNull() == false)
-        {
-            _PincerClip = System::LoadAsset_Blocking(InCombat.PincerClip);
-            ck::EnsureIfNot(ck::IsValid(_PincerClip),
-                f"[Crawler] [{InRoot.ToString()}] its PincerClip [{InCombat.PincerClip.ToSoftObjectPath().ToString()}] did not load (Mars.Crawler.SeedAttackClips writes the starting clips)");
-        }
+        if (ck::IsValid(_FangCrawler))
+        { _FangCrawler.UnbindFrom_OnAttackCue(FMars_Delegate_Crawler_OnAttackCue(this, n"OnAttackCue")); }
+        _FangCueStopped = true;
+        _FangCuePhase = EMars_Crawler_AttackPhase::Idle;
     }
 
+    UFUNCTION()
+    private void OnAttackCue(FCk_Handle_Crawler InCrawler, FMars_Attack_CueBatch InBatch)
+    {
+        if (ck::Is_NOT_Valid(_FangCrawler) || InCrawler != _FangCrawler || InBatch.Profile != GameplayTags::AttackCue_Mars_Pincer)
+        { return; }
+        if (InBatch.Admitted)
+        { _FangCueStopped = false; }
+        if (InBatch.Interrupted || InBatch.Completed)
+        {
+            _FangCueStopped = true;
+            _FangCuePhase = EMars_Crawler_AttackPhase::Idle;
+            return;
+        }
+        if (_FangCueStopped || InBatch.Observations.IsEmpty())
+        { return; }
+        const auto Phase = InBatch.Observations.Last().Interval.Get_PhaseId();
+        _FangCuePhase = Phase == InBatch.Motion.WindupPhase ? EMars_Crawler_AttackPhase::Windup :
+            Phase == InBatch.Motion.StrikePhase ? EMars_Crawler_AttackPhase::Strike :
+            Phase == InBatch.Motion.RecoverPhase ? EMars_Crawler_AttackPhase::Recover : EMars_Crawler_AttackPhase::Idle;
+    }
     // The jab hits from the body's front face and starts within its half length plus StartDistanceMargin, unless the
     // spec authored either.
+    // What feels lantern light: a sphere of the body's half length on a scene node at the root, filtering Probe.Mars.Light,
+    // so a lantern's pool counts once it reaches the body. An Ignore crawler gets none; an editor that has not registered
+    // the light probe tag yet makes it Ignore (after an ensure).
+    private void ComposeLightSense(FCk_Handle_Transform& InRoot, FMars_Crawler_Spec& InOutSpec)
+    {
+        if (InOutSpec.Light.Response == EMars_Crawler_LightResponse::Ignore)
+        { return; }
+
+        const auto LightProbe = constants_lantern::Get_LightProbeName();
+        if (ck::EnsureIfNot(LightProbe.IsValid(), "[Crawler] Probe.Mars.Light is not registered (restart the editor); the crawler ignores light"))
+        {
+            InOutSpec.Light.Response = EMars_Crawler_LightResponse::Ignore;
+            return;
+        }
+
+        auto TriggerSpec = FMars_Trigger_Spec();
+        TriggerSpec.Shape = EMars_Trigger_Shape::Sphere;
+        TriggerSpec.SphereRadius = float32(InOutSpec.Rig.BodyHalfExtents.X);
+        TriggerSpec.DetectionFilter.AddTag(LightProbe);
+        TriggerSpec.Moving = true;
+
+        auto SenseNode = utils_scene_node::Create(InRoot, FTransform::Identity).As_Transform();
+        utils_handle::Set_DebugName(SenseNode.H(), n"Crawler.LightSense");
+        InOutSpec.Light.Sense = utils_trigger::Add(SenseNode, TriggerSpec);
+    }
+
     private void DefaultCombatGeometry(FMars_Crawler_Spec& InOutSpec)
     {
         const auto HalfLength = InOutSpec.Rig.BodyHalfExtents.X;
@@ -327,6 +367,22 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
 
         if (InOutSpec.Combat.Prepare.StartDistance == 0.0f)
         { InOutSpec.Combat.Prepare.StartDistance = float32(HalfLength + StartDistanceMargin); }
+    }
+
+    private FVector Get_BodyHalfExtents(UCk_ProceduralRig_Data InRig) const
+    {
+        return _LookMeshes.Get_IsComplete() ? Get_MeshHalfExtents(_LookMeshes.Body) :
+            (InRig.Get_Legs().Num() == 6 ? FVector(55.0, 30.0, 15.0) : FVector(40.0, 30.0, 15.0));
+    }
+
+    private bool Get_HasPincerCue(const FMars_Crawler_Spec& InSpec) const
+    {
+        for (const auto& Entry : InSpec.ResolvedAttacks.Entries)
+        {
+            if (Entry.Definition.CueProfile == GameplayTags::AttackCue_Mars_Pincer)
+            { return true; }
+        }
+        return false;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -388,7 +444,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(_FangCrawler))
         { return; }
 
-        const auto Phase = _FangCrawler.Get_AttackPhase();
+        const auto Phase = _FangCuePhase;
         const auto Target = Get_FangTarget(Phase);
         const auto Rate = Phase == EMars_Crawler_AttackPhase::Strike ? FangSnapRate : FangEaseRate;
         const auto Blend = 1.0f - Math::Exp(-Rate * float32(InDeltaT.Get_Seconds()));
@@ -409,42 +465,57 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
     // Attack debug drawing
     //----------------------------------------------------------------------------------------------------------------------
 
-    // A new accepted centre moves the previous one into _DebugPreviousCenter, so the line is the segment the kernel swept
-    // for that sample (from the neutral centre on the first sample of an attack).
     UFUNCTION()
     private void OnDebugDrawAttackTick(FCk_Handle_Timer InHandle, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        if (ck::Is_NOT_Valid(_DebugCrawler))
+        FCk_Handle Entity = _DebugCrawler;
+        if (ck::Is_NOT_Valid(_DebugCrawler) || utils_entity_lifetime::Get_IsPendingDestroy(Entity, ECk_EntityLifetime_DestructionPhase::BeginDestroy))
         { return; }
-
-        const auto Center = _DebugCrawler.Get_AttackAcceptedHitCenter();
-        if (Center.Equals(_DebugCenter) == false)
-        {
-            _DebugPreviousCenter = _DebugCenter;
-            _DebugCenter = Center;
-        }
-
         const auto Phase = _DebugCrawler.Get_AttackPhase();
         if (Phase == EMars_Crawler_AttackPhase::Idle)
         { return; }
-
-        const auto PhaseColor = Get_DebugPhaseColor(Phase);
-        const auto Radius = _DebugCrawler.Get_Spec().Combat.Hit.Radius;
-        utils_debug_draw::DrawDebugSphere(Center, Radius, 12, PhaseColor, 0.0f, DebugDrawThickness);
-        utils_debug_draw::DrawDebugLine(_DebugPreviousCenter, Center, PhaseColor, 0.0f, DebugDrawThickness * 2.0f);
-        utils_debug_draw::DrawDebugLine(_DebugCrawler.Get_AttackAcceptedWorld().GetLocation(), Center, FLinearColor::White, 0.0f, DebugDrawThickness);
+        const auto Segments = _DebugCrawler.Get_AttackAcceptedEmitters();
+        if (Segments.Num() == 0)
+        {
+            if (_DebugCrawler.Get_AttackAdmission().Accepted == false && Phase == EMars_Crawler_AttackPhase::Windup)
+            {
+                const auto Root = utils_transform::Get_EntityCurrentLocation(_DebugCrawler.As_Transform());
+                const auto PendingColor = FLinearColor(0.2f, 0.8f, 1.0f);
+                utils_debug_draw::DrawDebugSphere(Root, 4.0f, 8, PendingColor, 0.0f, DebugDrawThickness);
+                utils_debug_draw::DrawDebugString(Root + FVector(0.0, 0.0, 8.0),
+                    f"pending admission; no accepted segment; generation {_DebugCrawler.Get_AttackGeneration()}", PendingColor);
+            }
+            return;
+        }
+        const auto Snapshot = _DebugCrawler.Get_AttackDebugSnapshot();
+        for (const auto& Segment : Segments)
+        {
+            const auto From = Segment.Geometry.From;
+            const auto To = Segment.Geometry.To;
+            const auto Radius = Segment.Emitter.Radius;
+            if (utils_crawler::Get_IsFinite(From) == false || utils_crawler::Get_IsFinite(To) == false || utils_crawler::Get_IsPositiveFinite(Radius) == false)
+            { continue; }
+            const auto Color = Get_DebugEmitterColor(Segment, Snapshot.Status, Phase);
+            utils_debug_draw::DrawDebugSphere(From, Radius, 12, Color, 0.0f, DebugDrawThickness);
+            utils_debug_draw::DrawDebugSphere(To, Radius, 12, Color, 0.0f, DebugDrawThickness);
+            utils_debug_draw::DrawDebugLine(From, To, Color, 0.0f, DebugDrawThickness * 2.0f);
+            utils_debug_draw::DrawDebugString(To + FVector(0.0, 0.0, Radius + 4.0),
+                f"accepted {Segment.Emitter.Id}; sample {Segment.Sample.Stamp.Get_SampleSequence()}; generation {Segment.Sample.Generation}; overlap frame {Segment.Sample.ObservationFrame}; obstruction {Segment.Activity.Obstruction}; damage {Segment.Activity.Damage}", Color);
+        }
     }
 
-    private FLinearColor Get_DebugPhaseColor(EMars_Crawler_AttackPhase InPhase) const
+    private FLinearColor Get_DebugEmitterColor(const FMars_Crawler_EmitterSegment& InSegment,
+        const FMars_Crawler_AttackDebugStatus& InStatus, EMars_Crawler_AttackPhase InPhase) const
     {
-        switch (InPhase)
-        {
-            case EMars_Crawler_AttackPhase::Windup: return FLinearColor::Yellow;
-            case EMars_Crawler_AttackPhase::Strike: return FLinearColor::Red;
-            case EMars_Crawler_AttackPhase::Recover: return FLinearColor(0.2f, 0.4f, 1.0f);
-            case EMars_Crawler_AttackPhase::CancelRecover: return FLinearColor(0.2f, 0.4f, 1.0f);
-            default: return FLinearColor::Gray;
-        }
+        if (InSegment.Activity.Obstruction && InStatus.Obstructed)
+        { return FLinearColor(1.0f, 0.45f, 0.1f); }
+        if (InSegment.Activity.Damage)
+        { return FLinearColor::Red; }
+        if (InSegment.Activity.Obstruction)
+        { return FLinearColor::Yellow; }
+        if (InPhase == EMars_Crawler_AttackPhase::Recover || InPhase == EMars_Crawler_AttackPhase::CancelRecover || InPhase == EMars_Crawler_AttackPhase::Cooldown)
+        { return FLinearColor(0.2f, 0.4f, 1.0f); }
+        return FLinearColor::Gray;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -461,8 +532,7 @@ class UMars_Crawler_EntityScript : UCk_GenericEntityScript_UE
         const auto WearsLook = _LookMeshes.Get_IsComplete();
 
         auto Rig = FMars_Crawler_Rig();
-        const auto BoxBodyHalfExtents = LegSpecs.Num() == 6 ? FVector(55.0, 30.0, 15.0) : FVector(40.0, 30.0, 15.0);
-        Rig.BodyHalfExtents = WearsLook ? Get_MeshHalfExtents(_LookMeshes.Body) : BoxBodyHalfExtents;
+        Rig.BodyHalfExtents = Get_BodyHalfExtents(InRigData);
         Rig.Presentation = AddVisual(InRoot, FMars_Crawler_PartVisual(Rig.BodyHalfExtents, Color, _LookMeshes.Body));
 
         const auto FootHalfExtents = WearsLook ? Get_MeshHalfExtents(_LookMeshes.Foot) : FVector(FootHalfExtent, FootHalfExtent, FootHalfExtent);

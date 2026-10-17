@@ -19,6 +19,24 @@
 			]
 		},
 		{
+			"TypeName": "FCk_Handle_Anchor",
+			"ShortName": "Anchor",
+			"Description": "A placed level ingredient that resolves at run start into one candidate entity script, or nothing",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_AnchorHandle",
+			"RequiredFragments": [
+				"Mars_Feature_Anchor"
+			]
+		},
+		{
+			"TypeName": "FCk_Handle_AnchorResolver",
+			"ShortName": "AnchorResolver",
+			"Description": "Per-world driver that resolves every placed anchor from the run's solved result",
+			"SourceAsset": "/Script/AngelscriptAssets.Mars_AnchorResolverHandle",
+			"RequiredFragments": [
+				"Mars_Feature_AnchorResolver"
+			]
+		},
+		{
 			"TypeName": "FCk_Handle_AttachPoints",
 			"ShortName": "AttachPoints",
 			"Description": "A carrier that publishes named transform attach points (hand, back) by gameplay tag for items to mount to",

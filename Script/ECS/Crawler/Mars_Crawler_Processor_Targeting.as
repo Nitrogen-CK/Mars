@@ -61,6 +61,9 @@ class UMars_Processor_Crawler_Targeting : UCk_Processor_Script_Base_UE
     private FCk_Handle Find_Nearest(const FCk_Handle_Crawler& InSelf)
     {
         const auto Combat = InSelf.Get_Spec().Combat;
+        float32 MaxHeight = 0.0f;
+        for (const auto& Entry : InSelf.Get_Spec().ResolvedAttacks.Entries)
+        { MaxHeight = Math::Max(MaxHeight, Entry.Definition.Prepare.MaxHeightDifference); }
         const auto Root = utils_transform::Get_EntityCurrentLocation(InSelf.As_Transform());
 
         auto Best = FCk_Handle();
@@ -72,7 +75,7 @@ class UMars_Processor_Crawler_Targeting : UCk_Processor_Script_Base_UE
 
             const auto Offset = utils_transform::Get_EntityCurrentLocation(Candidate.As_Transform()) - Root;
             const auto Distance = Offset.Size2D();
-            if (Distance > Combat.Targeting.AcquireRadius || Math::Abs(Offset.Z) > Combat.Prepare.MaxHeightDifference)
+            if (Distance > Combat.Targeting.AcquireRadius || Math::Abs(Offset.Z) > MaxHeight)
             { continue; }
 
             const auto Closer = ck::Is_NOT_Valid(Best) || Distance < BestDistance ||

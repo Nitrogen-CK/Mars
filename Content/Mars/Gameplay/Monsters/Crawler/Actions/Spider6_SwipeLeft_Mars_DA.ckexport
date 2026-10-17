@@ -1,0 +1,717 @@
+{
+	"assetName": "Spider6_SwipeLeft_Mars_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider6_SwipeLeft_Mars_DA.Spider6_SwipeLeft_Mars_DA",
+	"assetClass": "Ck_ProceduralAction_Data",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "002c03309c13de767459da1e99feee8e",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"Ck_DataAsset_PDA",
+		"PrimaryDataAsset",
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "_CompatibilityVersion",
+			"type": "int32",
+			"category": "Content",
+			"value": 3
+		},
+		{
+			"name": "_BodyChannel",
+			"type": "FCk_ProceduralAction_BodyChannel",
+			"category": "Body",
+			"value":
+			{
+				"_Enabled": true,
+				"_InitialSource": "IdentityOffset"
+			}
+		},
+		{
+			"name": "_Slots",
+			"type": "TArray",
+			"category": "Slots",
+			"value": [
+				{
+					"_Id": "ClawLeft",
+					"_InitialSource": "CapturedAcceptedPose",
+					"_Space": "RootAtStart"
+				}
+			]
+		},
+		{
+			"name": "_Phases",
+			"type": "TArray",
+			"category": "Phases",
+			"value": [
+				{
+					"_Id": "Windup",
+					"_Duration":
+					{
+						"_Seconds": 0.44999998807907104
+					},
+					"_Easing": "OutCubic",
+					"_BodyInterpolation": "Linear",
+					"_BodyKeys": [
+						{
+							"_Time":
+							{
+								"_Value": 0
+							},
+							"_Translation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 1
+							},
+							"_Translation":
+							{
+								"X": -7.1999998092651367,
+								"Y": 0,
+								"Z": 7.1999998092651367
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0.087155742747658166,
+								"Z": 0,
+								"W": 0.99619469809174543
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						}
+					],
+					"_LimbTracks": [
+						{
+							"_Slot": "ClawLeft",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 63.221998291015623,
+										"Y": -96.69049530029298,
+										"Z": -2.7470025634765634
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						}
+					]
+				},
+				{
+					"_Id": "Strike",
+					"_Duration":
+					{
+						"_Seconds": 0.18000000715255737
+					},
+					"_Easing": "InQuad",
+					"_BodyInterpolation": "Linear",
+					"_BodyKeys": [
+						{
+							"_Time":
+							{
+								"_Value": 0
+							},
+							"_Translation":
+							{
+								"X": -7.1999998092651367,
+								"Y": 0,
+								"Z": 7.1999998092651367
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0.087155742747658166,
+								"Z": 0,
+								"W": 0.99619469809174543
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 0.25
+							},
+							"_Translation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 5.3999998569488525
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0.061048539534856873,
+								"Z": 0,
+								"W": 0.99813479842186692
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 0.75
+							},
+							"_Translation":
+							{
+								"X": 14.399999618530273,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 1
+							},
+							"_Translation":
+							{
+								"X": 16.199999570846558,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						}
+					],
+					"_LimbTracks": [
+						{
+							"_Slot": "ClawLeft",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 0
+									},
+									"_Value":
+									{
+										"X": 63.221998291015623,
+										"Y": -96.69049530029298,
+										"Z": -2.7470025634765634
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 0.25
+									},
+									"_Value":
+									{
+										"X": 106.26079589843749,
+										"Y": -73.633996582031259,
+										"Z": -62.599999999999994
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 0.75
+									},
+									"_Value":
+									{
+										"X": 132.39149444580079,
+										"Y": -21.37259948730469,
+										"Z": -62.599999999999994
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 140.07699401855467,
+										"Y": -2.9274005126953124,
+										"Z": -62.599999999999994
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						}
+					]
+				},
+				{
+					"_Id": "Recover",
+					"_Duration":
+					{
+						"_Seconds": 0.55000001192092896
+					},
+					"_Easing": "InOutCubic",
+					"_BodyInterpolation": "Linear",
+					"_BodyKeys": [
+						{
+							"_Time":
+							{
+								"_Value": 0
+							},
+							"_Translation":
+							{
+								"X": 16.199999570846558,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 0.34999999403953552
+							},
+							"_Translation":
+							{
+								"X": 3.5999999046325684,
+								"Y": 0,
+								"Z": 3.5999999046325684
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": -0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						},
+						{
+							"_Time":
+							{
+								"_Value": 1
+							},
+							"_Translation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_ArriveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_LeaveTangent":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							}
+						}
+					],
+					"_LimbTracks": [
+						{
+							"_Slot": "ClawLeft",
+							"_Interpolation": "Linear",
+							"_ReachPolicy": "RejectUnreachable",
+							"_PositionKeys": [
+								{
+									"_Time":
+									{
+										"_Value": 0
+									},
+									"_Value":
+									{
+										"X": 140.07699401855467,
+										"Y": -2.9274005126953124,
+										"Z": -62.599999999999994
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 0.34999999403953552
+									},
+									"_Value":
+									{
+										"X": 75.518797607421874,
+										"Y": -89.004995727539068,
+										"Z": -36.563200683593749
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								},
+								{
+									"_Time":
+									{
+										"_Value": 1
+									},
+									"_Value":
+									{
+										"X": 65.620000000000005,
+										"Y": -96.049999999999997,
+										"Z": -79.599999999999994
+									},
+									"_ArriveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_LeaveTangent":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									}
+								}
+							],
+							"_OrientationKeys": [],
+							"_BendKeys": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "_Markers",
+			"type": "TArray",
+			"category": "Markers",
+			"value": []
+		},
+		{
+			"name": "_Windows",
+			"type": "TArray",
+			"category": "Windows",
+			"value": [
+				{
+					"_Id": "Offense",
+					"_Start":
+					{
+						"_PhaseId": "Windup",
+						"_Time":
+						{
+							"_Value": 0
+						}
+					},
+					"_End":
+					{
+						"_PhaseId": "Recover",
+						"_Time":
+						{
+							"_Value": 1
+						}
+					}
+				},
+				{
+					"_Id": "Damage",
+					"_Start":
+					{
+						"_PhaseId": "Strike",
+						"_Time":
+						{
+							"_Value": 0.25
+						}
+					},
+					"_End":
+					{
+						"_PhaseId": "Strike",
+						"_Time":
+						{
+							"_Value": 0.75
+						}
+					}
+				},
+				{
+					"_Id": "ClawSweep",
+					"_Start":
+					{
+						"_PhaseId": "Windup",
+						"_Time":
+						{
+							"_Value": 0.80000000000000004
+						}
+					},
+					"_End":
+					{
+						"_PhaseId": "Recover",
+						"_Time":
+						{
+							"_Value": 0.25
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "_AssetUserDataEditorOnly",
+			"type": "TArray",
+			"category": "Editor",
+			"value": [
+				{
+					"objectClass": "Ck_ProceduralActionEditorData",
+					"objectClassPath": "/Script/CkProceduralAnimationEditor.Ck_ProceduralActionEditorData",
+					"objectName": "Ck_ProceduralActionEditorData_0",
+					"objectPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider6_SwipeLeft_Mars_DA.Spider6_SwipeLeft_Mars_DA:Ck_ProceduralActionEditorData_0",
+					"properties": [
+						{
+							"name": "_Subject",
+							"type": "FCk_ProceduralActionEditor_Subject",
+							"category": "Preview",
+							"value":
+							{
+								"_WalkingRig": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider6_SwipeLeft_Mars_DA.Spider6_SwipeLeft_Mars_DA:Ck_ProceduralActionEditorData_0.SubjectRig",
+								"_WalkingGait": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider6_SwipeLeft_Mars_DA.Spider6_SwipeLeft_Mars_DA:Ck_ProceduralActionEditorData_0.SubjectGait",
+								"_Layout":
+								{
+									"_Limbs": [],
+									"_BodyEnvelopeMin":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_BodyEnvelopeMax":
+									{
+										"X": 0,
+										"Y": 0,
+										"Z": 0
+									},
+									"_CompatibilityVersion": 1
+								},
+								"_SlotBindings": [
+									{
+										"_Slot": "ClawLeft",
+										"_LimbId": "Leg5"
+									}
+								],
+								"_Scenario": ""
+							}
+						}
+					]
+				},
+				{
+					"objectClass": "Mars_AttackPreviewPins",
+					"objectClassPath": "/Script/Mars.Mars_AttackPreviewPins",
+					"objectName": "Mars_AttackPreviewPins_0",
+					"objectPath": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider6_SwipeLeft_Mars_DA.Spider6_SwipeLeft_Mars_DA:Mars_AttackPreviewPins_0",
+					"properties": []
+				}
+			],
+			"tooltip": "The clip editor's data. Compile never sees it, so cooked motion data and content hashes ignore it."
+		}
+	]
+}

@@ -9,7 +9,7 @@
 // |         Engage  ->Idle [LeafNotEngage]   tasks: EngageSubSm; exit: Stop + CancelAttack(StateExit), stage None
 // |         `- Engage sub-SM (initial = Approach; each state one Tick task; transitions poll the Engage stage)
 // |              Approach ->Prepare ->Wait          MoveTo the target (throttled); inside StartDistance or Arrived -> Prepare; Failed -> Wait
-// |              Prepare  ->Attack ->Approach ->Wait   Stop; face at zero speed; admissible -> Attack; OutOfRange -> Approach; timeout -> Wait
+// |              Prepare  ->Attack ->Approach ->Wait   Stop; face at zero speed; admissible and not Warded -> Attack; OutOfRange -> Approach; timeout -> Wait
 // |              Attack   ->Wait                    StartAttack once; Cooldown -> Wait; not admitted -> Wait; exit cancels an offensive attack
 // |              Wait     ->Approach                Stop; cooldown over and RetryUntil passed -> Approach
 // `- Dead             (sink)  tasks: Die (EnterExitOnly): stop, brain off, shed legs, body zone off, corpse timer -> despawn
@@ -452,10 +452,17 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
         if (_Crawler.Get_IsCombatTargetValid(Target) == false)
         { return; }
 
+        if (_Crawler.Get_IsHeldByAttack())
+        { return; }
+
         const auto Combat = _Crawler.Get_Spec().Combat;
         const auto TargetLocation = Get_TargetLocation();
         const auto Root = utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform());
-        if ((TargetLocation - Root).Size2D() <= Combat.Prepare.StartDistance)
+        const auto Advice = utils_crawler::Evaluate_AttackLoadout(_Crawler, Target);
+        if (Advice.Selection.Preferred.IsSet() == false)
+        { HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds); return; }
+        const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, Advice.Selection.Preferred.GetValue());
+        if ((TargetLocation - Root).Size2D() <= Entry.GetValue().Definition.Prepare.MaxDistance)
         {
             InOutEngage.Stage = EMars_Crawler_EngageStage::Prepare;
             return;
@@ -510,7 +517,8 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
 // relinquished SurfaceMotion's steering), a zero-speed steer toward the target on the support plane turns the root in
 // place, re-sent only when that direction turns by more than 2 degrees. Then it polls the start admission: admissible
 // hands over to Attack, OutOfRange back to Approach, and anything still in the way after Prepare.TimeoutSeconds to Wait
-// for BlockedRetrySeconds.
+// for BlockedRetrySeconds. A Shun crawler facing a raised lit lantern (Get_IsWarded) holds here, facing its bearer,
+// until the lantern is lowered or the timeout hands over to Wait: it hesitates, never flees.
 class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
 {
     default Stage = EMars_Crawler_EngageStage::Prepare;
@@ -524,6 +532,7 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
     {
         _StopRequested = false;
         _AimedTangent.Reset();
+        _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Crawler.Get_CombatTarget()));
     }
 
     protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
@@ -537,7 +546,7 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
         }
 
         const auto Combat = _Crawler.Get_Spec().Combat;
-        if (InOutEngage.StageElapsed >= Combat.Prepare.TimeoutSeconds)
+        if (_Crawler.Get_AttackPreparation().TimedOut)
         {
             HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds);
             return;
@@ -552,15 +561,32 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
 
         AimAt(Get_TargetLocation());
 
-        const auto Rejection = _Crawler.Get_StartRejection(Target);
-        if (Rejection.IsSet() == false)
+        if (_Crawler.Get_IsWarded(Target))
+        { return; }
+
+        const auto Advice = _Crawler.Get_AttackEvaluation();
+        if (Advice.Selection.Selected.IsSet())
         {
             InOutEngage.Stage = EMars_Crawler_EngageStage::Attack;
             return;
         }
 
-        if (Rejection.GetValue() == EMars_Crawler_AttackReject::OutOfRange)
-        { InOutEngage.Stage = EMars_Crawler_EngageStage::Approach; }
+        if (Advice.Selection.Preferred.IsSet() == false)
+        { HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds); return; }
+
+        if (Advice.Selection.Preferred.IsSet())
+        {
+            const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, Advice.Selection.Preferred.GetValue());
+            const auto Distance = (Get_TargetLocation() - utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform())).Size2D();
+            if (Entry.IsSet() && Distance > Entry.GetValue().Definition.Prepare.MaxDistance)
+            { InOutEngage.Stage = EMars_Crawler_EngageStage::Approach; }
+        }
+    }
+
+    protected void ExitStage() override
+    {
+        if (_Crawler.Get_EngageStage() != EMars_Crawler_EngageStage::Attack)
+        { _Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(EMars_Crawler_AttackCancel::StateExit)); }
     }
 
     private void AimAt(FVector InTargetLocation)
@@ -603,7 +629,11 @@ class UMars_SmTask_Crawler_Engage_Attack : UMars_SmTask_Crawler_EngageStage
         _UnadmittedTicks = 0;
         _CommittedSteerSent = false;
 
-        _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Crawler.Get_CombatTarget()));
+        const auto Advice = _Crawler.Get_AttackEvaluation();
+        if (Advice.Selection.Selected.IsSet() == false)
+        { HandOverToWait(InOutEngage, _Crawler.Get_Spec().Combat.Targeting.BlockedRetrySeconds); return; }
+        _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Crawler.Get_CombatTarget(),
+            Advice.Selection.Selected.GetValue(), Advice.SelectionGeneration));
     }
 
     protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
@@ -655,7 +685,7 @@ class UMars_SmTask_Crawler_Engage_Wait : UMars_SmTask_Crawler_EngageStage
 
     protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
     {
-        if (_Crawler.Get_AttackCooldownRemaining() > 0.0f || InOutEngage.StageElapsed < InOutEngage.RetryUntil)
+        if (_Crawler.Get_IsHeldByAttack() || _Crawler.Get_AttackCooldownRemaining() > 0.0f || InOutEngage.StageElapsed < InOutEngage.RetryUntil)
         { return; }
 
         if (_Crawler.Get_IsCombatTargetValid(_Crawler.Get_CombatTarget()))
@@ -674,7 +704,8 @@ enum EMars_Crawler_RoamPhase
     Dwell
 }
 
-// Pick a goal in RoamBounds (once no attack holds the crawler where it stands, Get_IsHeldByAttack) -> MoveTo -> on Arrived
+// Pick a goal in RoamBounds - a Seek crawler standing in lantern light picks the light (TryGet_LightLure) - (once no
+// attack holds the crawler where it stands, Get_IsHeldByAttack) -> MoveTo -> on Arrived
 // dwell RoamDwellSeconds -> repeat. A failed move picks again at once,
 // except after 3 consecutive failures, when it dwells first (no tight NoPath loop); a move stopped from outside dwells
 // too. Always Running; the exit stops the navigator (a leaf change or death tears the state down mid-move).
@@ -713,7 +744,9 @@ class UMars_SmTask_Crawler_Roam : UCk_SmTask_EntityScript
             if (_Crawler.Get_IsHeldByAttack())
             { return ECk_SmTaskResult::Running; }
 
-            Navigator.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(_Crawler.Pick_RoamPoint()));
+            const auto Lure = _Crawler.TryGet_LightLure();
+            const auto Goal = Lure.IsSet() ? Lure.GetValue() : _Crawler.Pick_RoamPoint();
+            Navigator.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(Goal));
             _Phase = EMars_Crawler_RoamPhase::Travel;
             return ECk_SmTaskResult::Running;
         }

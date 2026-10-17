@@ -272,6 +272,11 @@ mixin FMars_Validation Validate(const FMars_Crawler_Prepare& Self)
 struct FMars_Crawler_Combat
 {
     UPROPERTY()
+    TSoftObjectPtr<UMars_AttackLoadout_Data> Loadout;
+
+    UPROPERTY()
+    TArray<FMars_Attack_AnatomyBinding> Anatomy;
+    UPROPERTY()
     bool Enabled = false;
 
     // Whether an armed crawler chooses combat targets from the start; Request_SetAggression switches it at run time.
@@ -318,6 +323,20 @@ mixin FMars_Validation Validate(const FMars_Crawler_Combat& Self)
     if (Self.Enabled == false)
     { return FMars_Validation(); }
 
+    if (Self.Loadout.IsNull() == false)
+    {
+        if (Self.JabClip.IsNull() == false || Self.PincerClip.IsNull() == false)
+        { return FMars_Validation("Crawler combat mixes Loadout with legacy clips"); }
+        const auto TargetingValidation = Self.Targeting.Validate();
+        if (TargetingValidation.IsValid() == false)
+        { return TargetingValidation; }
+        const auto Asset = Self.Loadout.Get();
+        if (ck::Is_NOT_Valid(Asset))
+        { return FMars_Validation("Crawler combat Loadout is not loaded"); }
+        const auto Report = utils_attack::Validate_Loadout(Asset.Spec);
+        return Report.Get_IsValid() ? FMars_Validation() : FMars_Validation(utils_crawler::Get_AttackValidationText(Report));
+    }
+
     const auto TimingValidation = Self.Timing.Validate();
     if (TimingValidation.IsValid() == false)
     { return TimingValidation; }
@@ -352,6 +371,9 @@ mixin FMars_Validation Validate(const FMars_Crawler_Combat& Self)
 
 struct FMars_Crawler_Spec
 {
+    // Construction-time immutable values. Assets and frozen clips are pinned by the entity script.
+    UPROPERTY(NotEditable, BlueprintHidden)
+    FMars_Attack_ResolvedLoadout ResolvedAttacks;
     // 4 or 6 on the Radial layout, 6 on the Spider (utils_crawler::Get_LayoutRigData).
     UPROPERTY()
     int32 LegCount = 4;
@@ -384,6 +406,10 @@ struct FMars_Crawler_Spec
     // Disabled by default.
     UPROPERTY()
     FMars_Crawler_Combat Combat;
+
+    // How it answers lantern light (Mars_Crawler_Light.as); the entity script builds its Sense.
+    UPROPERTY()
+    FMars_Crawler_Light Light;
 
     FMars_Crawler_Spec() {}
 
@@ -432,6 +458,10 @@ mixin FMars_Validation Validate(const FMars_Crawler_Spec& Self)
     const auto CombatValidation = Self.Combat.Validate();
     if (CombatValidation.IsValid() == false)
     { return CombatValidation; }
+
+    const auto LightValidation = Self.Light.Validate();
+    if (LightValidation.IsValid() == false)
+    { return LightValidation; }
 
     return Vitals.LegDebris.Validate();
 }
@@ -527,7 +557,8 @@ enum EMars_Crawler_AttackCancel
     // Combat was switched off for this crawler: no recovery, straight to neutral.
     Disabled,
     // A world body or another creature's hurtbox stood in the accepted sample path.
-    Obstructed
+    Obstructed,
+    RequiredPartUnavailable
 }
 
 enum EMars_Crawler_AttackReject
@@ -554,7 +585,13 @@ enum EMars_Crawler_AttackReject
     CancelPending,
     // A pincer's claws are not both planted yet, or fewer than PincerMinStandingLegs of the other legs stand on trusted
     // ground.
-    Stance
+    Stance,
+    SelectionStale,
+    AttackUnknown,
+    RequiredPartUnavailable,
+    SelectionNotPermitted,
+    // A Shun crawler stands in the light of a lantern the target holds (Get_IsWarded).
+    Warded
 }
 
 // Composed by Add on an armed crawler; never written afterwards.
@@ -603,6 +640,8 @@ struct FMars_Fragment_Crawler_CombatTarget
 struct FMars_Fragment_Crawler_AttackIntents
 {
     UPROPERTY()
+    TOptional<FMars_Request_Crawler_PrepareAttack> PendingPrepare;
+    UPROPERTY()
     TOptional<FMars_Request_Crawler_StartAttack> PendingStart;
 
     UPROPERTY()
@@ -627,6 +666,12 @@ struct FMars_Crawler_AttackClaw
 // clip action owns the motion's timing.
 struct FMars_Fragment_Crawler_Attack
 {
+    UPROPERTY() FMars_Attack_ResolvedPlan Plan;
+    UPROPERTY() FMars_Attack_Admission Admission;
+    UPROPERTY() FMars_Attack_Result Result;
+    // Once per accepted attempt, independent of native action-handle lifetime.
+    UPROPERTY() bool CueInterrupted = false;
+    UPROPERTY() FMars_Crawler_AttackCleanup Cleanup;
     UPROPERTY()
     EMars_Crawler_AttackPhase Phase = EMars_Crawler_AttackPhase::Idle;
 
@@ -687,6 +732,8 @@ struct FMars_Fragment_Crawler_Attack
     UPROPERTY()
     int64 CommittedSampleId = 0;
 
+    UPROPERTY() FMars_Crawler_EmitterContact CommittedEmitter;
+
     // Set by a cancel: no later accepted interval of this attack may sweep or produce a hit, whatever windows it carries.
     UPROPERTY()
     bool WindowClosed = false;
@@ -708,6 +755,8 @@ struct FMars_Fragment_Crawler_Attack
 // One stored hit on the attack's target, committed or discarded by the next attack tick.
 struct FMars_Crawler_HitCandidate
 {
+    UPROPERTY() FMars_Crawler_EmitterContact EmitterContact;
+
     UPROPERTY()
     FCk_Handle HitEntity;
 
@@ -738,6 +787,18 @@ struct FMars_Crawler_HitCandidate
 // at admission.
 struct FMars_Fragment_Crawler_AttackObservations
 {
+    // Every validated accepted interval from the bounded 4 x 16 record drain; Tick copies and clears once.
+    UPROPERTY() TArray<FMars_Attack_CueObservation> PendingCueObservations;
+    UPROPERTY() TArray<FMars_Crawler_EmitterSegment> AcceptedEmitters;
+    UPROPERTY() TArray<FMars_Attack_Blocker> EmitterFailures;
+    UPROPERTY() TOptional<FCk_ProceduralAction_Stamp> FirstAccepted;
+    UPROPERTY() TOptional<FCk_ProceduralAction_Result> Terminal;
+    UPROPERTY() FName TerminalSource;
+    UPROPERTY() TArray<FMars_Attack_Blocker> RequiredPartFailures;
+    UPROPERTY() int64 ContentRevision = 0;
+    UPROPERTY() int64 TopologyRevision = 0;
+    UPROPERTY() FName StreamFailure;
+    UPROPERTY() bool StreamUnavailable = false;
     // The sample sequence of the last accepted receipt of the current action; 0 when none.
     UPROPERTY()
     int64 AckSampleId = 0;
@@ -836,6 +897,10 @@ event void FMars_Delegate_Crawler_OnTargetChanged_MC(FCk_Handle_Crawler InCrawle
 
 struct FMars_Fragment_Crawler_Signals
 {
+    FMars_Delegate_Crawler_OnAttackCue_MC OnAttackCue;
+    FMars_Delegate_Crawler_OnAttackDecisionChanged_MC OnAttackDecisionChanged;
+    FMars_Delegate_Crawler_OnAttackAdmitted_MC OnAttackAdmitted;
+    FMars_Delegate_Crawler_OnAttackCompleted_MC OnAttackCompleted;
     FMars_Delegate_Crawler_OnAttackPhaseChanged_MC OnAttackPhaseChanged;
     FMars_Delegate_Crawler_OnTargetChanged_MC OnTargetChanged;
 }
@@ -877,6 +942,9 @@ struct FMars_Request_Crawler_SetCombatTarget
 // (Get_AttackLastReject); it is never queued behind an attack in flight.
 struct FMars_Request_Crawler_StartAttack
 {
+    // None: fresh selection; set: the exact evaluated choice (rejected when stale or not the permitted one).
+    UPROPERTY() FGameplayTag AttackId;
+    UPROPERTY() int32 SelectionGeneration = 0;
     UPROPERTY()
     FCk_Handle Target;
 
@@ -886,6 +954,20 @@ struct FMars_Request_Crawler_StartAttack
     {
         Target = InTarget;
     }
+
+    FMars_Request_Crawler_StartAttack(FCk_Handle InTarget, FGameplayTag InAttackId, int32 InSelectionGeneration)
+    {
+        Target = InTarget;
+        AttackId = InAttackId;
+        SelectionGeneration = InSelectionGeneration;
+    }
+}
+
+struct FMars_Request_Crawler_PrepareAttack
+{
+    UPROPERTY() FCk_Handle Target;
+    FMars_Request_Crawler_PrepareAttack() {}
+    FMars_Request_Crawler_PrepareAttack(FCk_Handle InTarget) { Target = InTarget; }
 }
 
 // Cancels the attack in flight. Idempotent: a recovery is never restarted. A start in the same drain is rejected.
@@ -906,6 +988,7 @@ struct FMars_Request_Crawler_CancelAttack
 // one considered.
 struct FMars_Fragment_Crawler_Requests
 {
+    UPROPERTY() TArray<FMars_Request_Crawler_PrepareAttack> PrepareAttackRequests;
     UPROPERTY()
     TArray<FMars_Request_Crawler_SetAggression> SetAggressionRequests;
 

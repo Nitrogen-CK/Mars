@@ -35,10 +35,9 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Spec.RoamBounds = FBox(FVector(-3850.0, -550.0, 0.0), FVector(-2150.0, 550.0, 200.0));
         Spec.Combat.Enabled = true;
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
-        Spec.Combat.JabClip = Get_PresetClip(EMars_Crawler_AttackClipKind::Jab);
-        Spec.Combat.PincerClip = Get_PresetClip(EMars_Crawler_AttackClipKind::Pincer);
-        // The hit's sample-travel guard grows with the layout's size, as its clips' body keys do.
-        Spec.Combat.Hit.MaxSampleTravel = DefaultMaxSampleTravel * utils_crawler::Get_LayoutSizeScale(Spec.Layout);
+        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(Get_AttackPreset(), Get_UsesEndpointDemo());
+        Spec.Combat.JabClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
+        Spec.Combat.PincerClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
         _Sink.InputChannels.Empty();
         _Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression"));
 
@@ -72,21 +71,15 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Crawler.Request_SetAggression(FMars_Request_Crawler_SetAggression(Aggression));
     }
 
-    // The radial box crawler's sample-travel guard (FMars_Crawler_AttackHit's default).
-    private const float32 DefaultMaxSampleTravel = 80.0f;
-
-    // The layout's authored clip of InKind: <Prefix>_<Kind>_Mars_DA under the crawler's Actions folder, tuned in the clip
-    // editor (Mars.Crawler.SeedAttackClips writes the starting ones).
-    private TSoftObjectPtr<UCk_ProceduralAction_Data> Get_PresetClip(EMars_Crawler_AttackClipKind InKind) const
+    protected EMars_Crawler_AttackPreset Get_AttackPreset() const
     {
-        const FString Name = f"{Get_PresetClipPrefix()}_{utils_crawler::Get_ClipKindName(InKind)}_Mars_DA";
-        return TSoftObjectPtr<UCk_ProceduralAction_Data>(FSoftObjectPath(f"/Game/Mars/Gameplay/Monsters/Crawler/Actions/{Name}.{Name}"));
+        return Get_PresetLayout() == EMars_Crawler_Layout::Spider ? EMars_Crawler_AttackPreset::Spider6 :
+            Get_PresetLegCount() == 4 ? EMars_Crawler_AttackPreset::Crawler4 : EMars_Crawler_AttackPreset::Crawler6;
     }
 
-    // Crawler: the radial layout's clips, valid on both radial rigs.
-    protected FString Get_PresetClipPrefix() const
-    { return "Crawler"; }
 
+    protected bool Get_UsesEndpointDemo() const
+    { return false; }
     protected int32 Get_PresetLegCount() const
     { return 4; }
 
@@ -118,8 +111,6 @@ class UMars_Sandbox_Crawler6_EntityScript : UMars_Sandbox_Crawler_EntityScript
     protected EMars_Crawler_Layout Get_PresetLayout() const override
     { return EMars_Crawler_Layout::Spider; }
 
-    protected FString Get_PresetClipPrefix() const override
-    { return "Spider"; }
 
     protected FMars_Crawler_Look Get_PresetLook() const override
     {
@@ -167,6 +158,30 @@ class UMars_Sandbox_AggressionLever_EntityScript : UMars_Lever_EntityScript
     }
 }
 
+// Separate opt-in placement classes; existing Room 5 presets retain body-sphere parity graphs.
+class UMars_Demo_EndpointCrawler4_EntityScript : UMars_Sandbox_Crawler4_EntityScript
+{
+    default _ShowInPlaceActors = true;
+    default DebugDrawAttack = true;
+    protected bool Get_UsesEndpointDemo() const override { return true; }
+}
+
+class UMars_Demo_EndpointCrawler6_EntityScript : UMars_Demo_EndpointCrawler4_EntityScript
+{
+    protected int32 Get_PresetLegCount() const override { return 6; }
+}
+
+class UMars_Demo_EndpointSpider6_EntityScript : UMars_Sandbox_Crawler6_EntityScript
+{
+    default _ShowInPlaceActors = true;
+    default DebugDrawAttack = true;
+    protected bool Get_UsesEndpointDemo() const override { return true; }
+}
+
+class UMars_Demo_EndpointAggressionLever_EntityScript : UMars_Sandbox_AggressionLever_EntityScript
+{
+    default _ShowInPlaceActors = true;
+}
 // The Room 5 ground-nav field: the framework's placeable volume script with Room 5's bake settings. The bounds are
 // local to the spawner's translation (rotation and scale are ignored): placed at (-3000, 0, 0) they cover the room,
 // X -4000..-2000, Y -700..700, Z -100..400. The spec is a class default because the volume's C++ Construct reads it

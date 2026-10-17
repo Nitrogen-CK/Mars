@@ -1,0 +1,76 @@
+{
+	"assetName": "Spider6_Parity_Jab_Mars_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Spider6_Parity_Jab_Mars_DA.Spider6_Parity_Jab_Mars_DA",
+	"assetClass": "Mars_AttackDefinition_Data",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "6ab70cce1182c25edca1629654323747",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "Def",
+			"type": "FMars_Attack_Definition",
+			"value":
+			{
+				"Clip": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Spider_Jab_Mars_DA.Spider_Jab_Mars_DA",
+				"Motion":
+				{
+					"WindupPhase": "Windup",
+					"StrikePhase": "Strike",
+					"RecoverPhase": "Recover",
+					"ObstructionWindow": "Offense"
+				},
+				"Requirements":
+				{
+					"Slots": [],
+					"Parts": []
+				},
+				"Prepare":
+				{
+					"MinDistance": 0,
+					"MaxDistance": 100,
+					"UseCreatureFrontRange": true,
+					"CreatureFrontRangeMargin": 70,
+					"FacingToleranceDegrees": 10,
+					"MaxHeightDifference": 60,
+					"MaxSpeedToStart": 3,
+					"TimeoutSeconds": 2
+				},
+				"Hit":
+				{
+					"Damage": 15,
+					"DamageType": "DamageType.Mars.Blunt",
+					"Emitters": [
+						{
+							"Id": "AttackEmitter.Mars.Body",
+							"Source": "Body",
+							"Slot": "None",
+							"DamageWindow": "Offense",
+							"ObstructionWindow": "None",
+							"LocalCenter":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"UseCreatureFrontCenter": true,
+							"Radius": 20,
+							"MaxSampleTravel": 144
+						}
+					]
+				},
+				"Cooldown":
+				{
+					"RecoverySeconds": 0.69999998807907104,
+					"ReuseSeconds": 0
+				},
+				"CueProfile": "AttackCue.Mars.Jab"
+			}
+		}
+	]
+}

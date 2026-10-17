@@ -51,7 +51,6 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
         Add_Step_WaitUntil("the target's hurtbox is traceable", n"Check_TargetTraceable", k_SlowPolls, 0);
         Add_Step("select the target", n"Step_SelectTarget");
         Add_Step_WaitUntil("the crawler would admit a start", n"Check_StartAdmissible", k_SlowPolls, 0);
-        Add_Step("request one attack", n"Step_Start");
         Add_Step_WaitUntil("the attack is admitted (Windup)", n"Check_Admitted", k_SlowPolls, 0);
         Add_Step_WaitUntil("the attack is back in Idle", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitUntil("the gait has both front legs back", n"Check_ClawsReturned", k_SlowPolls, 0);
@@ -77,7 +76,11 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
     private void Check_StartAdmissible(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Crawler.Get_HasPendingCombatRequests() == false && _Crawler.Get_StartRejection(_Target.Entity).IsSet() == false);
+        const auto Ready = _Crawler.Get_HasPendingCombatRequests() == false && _Crawler.Get_StartRejection(_Target.Entity).IsSet() == false;
+        // Enqueue once before the next gait solve can change the claimed feet's stance.
+        // Requests and AttackTick run after this timer callback and before ProceduralGait.
+        if (Ready) { Step_Start(InHandle, InPayload); }
+        Res.Set(Ready);
     }
 
     UFUNCTION()

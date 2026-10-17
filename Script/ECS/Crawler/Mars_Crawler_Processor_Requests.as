@@ -25,6 +25,7 @@ class UMars_Processor_Crawler_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Request_Crawler_SetCombatTarget> SetCombatTargetRequests = InRequests.SetCombatTargetRequests;
         TArray<FMars_Request_Crawler_StartAttack> StartAttackRequests = InRequests.StartAttackRequests;
         TArray<FMars_Request_Crawler_CancelAttack> CancelAttackRequests = InRequests.CancelAttackRequests;
+        TArray<FMars_Request_Crawler_PrepareAttack> PrepareAttackRequests = InRequests.PrepareAttackRequests;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Crawler_Requests);
@@ -63,6 +64,9 @@ class UMars_Processor_Crawler_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (StartAttackRequests.Num() > 0)
         { Intents.PendingStart = TOptional<FMars_Request_Crawler_StartAttack>(StartAttackRequests.Last()); }
+
+        if (PrepareAttackRequests.Num() > 0)
+        { Intents.PendingPrepare = TOptional<FMars_Request_Crawler_PrepareAttack>(PrepareAttackRequests.Last()); }
 
         if (TargetChanged && Self.Has_Fragment(FMars_Fragment_Crawler_Signals))
         { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnTargetChanged.Broadcast(Self, OldTarget, NewTarget); }

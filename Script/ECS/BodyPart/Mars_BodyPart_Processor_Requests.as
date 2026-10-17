@@ -10,6 +10,7 @@
 class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Health_HandleRequests");
     default _MarkedDirtyBy = FMars_Fragment_BodyPart_Requests;
 
     UFUNCTION(BlueprintOverride)

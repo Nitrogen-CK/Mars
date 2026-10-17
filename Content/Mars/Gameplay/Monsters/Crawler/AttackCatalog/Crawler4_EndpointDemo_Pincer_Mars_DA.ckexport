@@ -1,0 +1,103 @@
+{
+	"assetName": "Crawler4_EndpointDemo_Pincer_Mars_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler4_EndpointDemo_Pincer_Mars_DA.Crawler4_EndpointDemo_Pincer_Mars_DA",
+	"assetClass": "Mars_AttackDefinition_Data",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "c43aeae196f9a2e40572546076fd73d9",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "Def",
+			"type": "FMars_Attack_Definition",
+			"value":
+			{
+				"Clip": "/Game/Mars/Gameplay/Monsters/Crawler/Actions/Crawler4_EndpointPincer_Mars_DA.Crawler4_EndpointPincer_Mars_DA",
+				"Motion":
+				{
+					"WindupPhase": "Windup",
+					"StrikePhase": "Strike",
+					"RecoverPhase": "Recover",
+					"ObstructionWindow": "Offense"
+				},
+				"Requirements":
+				{
+					"Slots": [
+						{
+							"Slot": "ClawRight",
+							"Role": "AttackRole.Mars.FrontRight",
+							"MaxCondition": "Ruined"
+						},
+						{
+							"Slot": "ClawLeft",
+							"Role": "AttackRole.Mars.FrontLeft",
+							"MaxCondition": "Ruined"
+						}
+					],
+					"Parts": []
+				},
+				"Prepare":
+				{
+					"MinDistance": 0,
+					"MaxDistance": 190,
+					"UseCreatureFrontRange": false,
+					"CreatureFrontRangeMargin": 70,
+					"FacingToleranceDegrees": 10,
+					"MaxHeightDifference": 60,
+					"MaxSpeedToStart": 3,
+					"TimeoutSeconds": 2
+				},
+				"Hit":
+				{
+					"Damage": 15,
+					"DamageType": "DamageType.Mars.Blunt",
+					"Emitters": [
+						{
+							"Id": "AttackEmitter.Mars.ClawRight",
+							"Source": "LimbEndpoint",
+							"Slot": "ClawRight",
+							"DamageWindow": "Damage",
+							"ObstructionWindow": "ClawSweep",
+							"LocalCenter":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"UseCreatureFrontCenter": false,
+							"Radius": 12,
+							"MaxSampleTravel": 16
+						},
+						{
+							"Id": "AttackEmitter.Mars.ClawLeft",
+							"Source": "LimbEndpoint",
+							"Slot": "ClawLeft",
+							"DamageWindow": "Damage",
+							"ObstructionWindow": "ClawSweep",
+							"LocalCenter":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"UseCreatureFrontCenter": false,
+							"Radius": 12,
+							"MaxSampleTravel": 16
+						}
+					]
+				},
+				"Cooldown":
+				{
+					"RecoverySeconds": 0.69999998807907104,
+					"ReuseSeconds": 0.80000001192092896
+				},
+				"CueProfile": "AttackCue.Mars.Pincer"
+			}
+		}
+	]
+}

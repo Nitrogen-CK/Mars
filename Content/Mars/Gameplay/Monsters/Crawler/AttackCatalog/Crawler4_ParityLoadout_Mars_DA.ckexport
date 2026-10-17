@@ -1,0 +1,126 @@
+{
+	"assetName": "Crawler4_ParityLoadout_Mars_DA",
+	"assetPath": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler4_ParityLoadout_Mars_DA.Crawler4_ParityLoadout_Mars_DA",
+	"assetClass": "Mars_AttackLoadout_Data",
+	"_meta":
+	{
+		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
+		"sourceHash": "d6004bd875713537b5ad4b3a5fc629d3",
+		"exporterVersion": 2
+	},
+	"parentClasses": [
+		"DataAsset"
+	],
+	"properties": [
+		{
+			"name": "Spec",
+			"type": "FMars_Attack_Loadout",
+			"value":
+			{
+				"Entries": [
+					{
+						"Id": "Attack.Mars.Pincer",
+						"Definition": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler4_Parity_Pincer_Mars_DA.Crawler4_Parity_Pincer_Mars_DA",
+						"Priority": 100,
+						"Enabled": true
+					},
+					{
+						"Id": "Attack.Mars.Jab",
+						"Definition": "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog/Crawler4_Parity_Jab_Mars_DA.Crawler4_Parity_Jab_Mars_DA",
+						"Priority": 0,
+						"Enabled": true
+					}
+				],
+				"Selection":
+				{
+					"TemporaryReadiness": "WaitPreferred",
+					"ControlWait": "PreferAvailable",
+					"ReadyAlternativeDelaySeconds": 0.25
+				},
+				"Execution":
+				{
+					"Tuning":
+					{
+						"_Playback":
+						{
+							"_PlayRate": 1
+						},
+						"_Transition":
+						{
+							"_EntryBlend":
+							{
+								"_Seconds": 0
+							},
+							"_DedicatedReturn":
+							{
+								"_Seconds": 0.15000000596046448
+							},
+							"_ReturnTimeout":
+							{
+								"_Seconds": 3
+							}
+						},
+						"_Watchdogs":
+						{
+							"_LoadTimeout":
+							{
+								"_Seconds": 5
+							},
+							"_AcquisitionTimeout":
+							{
+								"_Seconds": 1
+							},
+							"_PublicationTimeout":
+							{
+								"_Seconds": 1
+							}
+						},
+						"_Sampling":
+						{
+							"_MaxAdvance":
+							{
+								"_Seconds": 0.0083333333333333332
+							},
+							"_MaxEndpointTravelCm": 280,
+							"_MaxSegmentAngularStepDegrees": 180,
+							"_MaxSamples": 16
+						}
+					},
+					"Locomotion":
+					{
+						"_Support":
+						{
+							"_Mode": "CountOnly",
+							"_MinimumTrustedContacts": 2,
+							"_ProjectedRegionInsetCm": 0,
+							"_MaxContactNormalSpreadDegrees": 20,
+							"_SupportHoldTimeout":
+							{
+								"_Seconds": 1.3700000271201134
+							}
+						},
+						"_Return":
+						{
+							"_Duration":
+							{
+								"_Seconds": 0.15000000596046448
+							},
+							"_Timeout":
+							{
+								"_Seconds": 3
+							},
+							"_MaxProbeAttempts": 3,
+							"_RetryInterval":
+							{
+								"_Seconds": 0.10000000000000001
+							},
+							"_ContactToleranceCm": 2
+						}
+					},
+					"MaxRootDrift": 10,
+					"MaxGroundSlopeDegrees": 35
+				}
+			}
+		}
+	]
+}

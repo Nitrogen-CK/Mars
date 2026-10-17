@@ -343,3 +343,301 @@ namespace utils_crawler
     }
 }
 #endif
+
+#if EDITOR
+// Proposed Phase 3 addition. These references are authored independently from Pincer.
+struct FMars_Crawler_ReferenceSwipeKeys
+{
+    bool Valid = false;
+    FName Slot;
+    FName LimbId;
+    FVector Rest;
+    FVector Windup;
+    FVector StrikeEntry;
+    FVector StrikeAcross;
+    FVector StrikeEnd;
+    FVector RecoverLift;
+}
+
+namespace utils_crawler
+{
+    // Endpoint emitters use radius 12 cm. The additional 5 cm is a reference-pose margin, measured again on accepted
+    // endpoint receipts by the Phase 3 fixture. It is not permission to ignore floor hits or stretch trace budgets.
+    const float64 ReferenceEndpointClawClearance = 17.0;
+
+    // Select by stable reference ID so changing asset array order cannot borrow another leg.
+    FMars_Crawler_ReferenceSwipeKeys Make_ReferenceSwipeKeys(EMars_Crawler_Layout InLayout, int32 InLegCount, bool InRight)
+    {
+        auto Keys = FMars_Crawler_ReferenceSwipeKeys();
+        if (InLayout != EMars_Crawler_Layout::Radial && InLayout != EMars_Crawler_Layout::Spider)
+        { return Keys; }
+        const auto Rig = Get_LayoutRigData(InLayout, InLegCount);
+        if (ck::Is_NOT_Valid(Rig))
+        { return Keys; }
+        Keys.Slot = InRight ? Get_RightClawSlotId() : Get_LeftClawSlotId();
+        Keys.LimbId = InRight ? n"Leg0" : FName(f"Leg{InLegCount - 1}");
+        for (const auto& Leg : Rig.Get_Legs())
+        {
+            if (Leg.Get_Id() != Keys.LimbId)
+            { continue; }
+            const auto Hip = Leg.Get_Placement().Get_HipLocal();
+            const auto Reach = float64(Get_ChainReach(Leg));
+            const auto Side = InRight ? 1.0 : -1.0;
+            Keys.Rest = Leg.Get_Placement().Get_RestFootLocal();
+            const auto Floor = Keys.Rest.Z + ReferenceEndpointClawClearance;
+            // Outward/back relative to the strike, with the foot raised. Strike closes across the front in three
+            // segments; Recover lifts outward before placing this same foot at its own authored rest position.
+            Keys.Windup = Hip + FVector(0.20, Side * 0.55, 0.30) * Reach;
+            Keys.StrikeEntry = Hip + FVector(0.48, Side * 0.40, -0.15) * Reach;
+            Keys.StrikeAcross = Hip + FVector(0.65, Side * 0.06, -0.20) * Reach;
+            Keys.StrikeEnd = Hip + FVector(0.70, -Side * 0.06, -0.20) * Reach;
+            Keys.RecoverLift = Hip + FVector(0.28, Side * 0.50, 0.08) * Reach;
+            Keys.StrikeEntry.Z = Math::Max(Keys.StrikeEntry.Z, Floor);
+            Keys.StrikeAcross.Z = Math::Max(Keys.StrikeAcross.Z, Floor);
+            Keys.StrikeEnd.Z = Math::Max(Keys.StrikeEnd.Z, Floor);
+            Keys.RecoverLift.Z = Math::Max(Keys.RecoverLift.Z, Floor);
+            Keys.Valid = true;
+            return Keys;
+        }
+        return Keys;
+    }
+
+    FCk_ProceduralAction_PoseKey Make_ReferenceSwipePoseKey(float32 InTime, FTransform InBody, FName InSlot, FVector InEndpoint)
+    {
+        auto Key = Make_ReferencePoseKey(InTime, InBody);
+        auto Limbs = TArray<FCk_ProceduralAction_LimbPoseTarget>();
+        Limbs.Add(FCk_ProceduralAction_LimbPoseTarget(InSlot, InEndpoint));
+        Key.Set_Limbs(Limbs);
+        return Key;
+    }
+
+    // Three supported reference morphologies: Radial4, Radial6 and Spider6. One claimed RootAtStart slot, independent
+    // windup/strike/recovery keys, body pitch <=10 degrees, identity Strike end and Recover rotations, linear channels.
+    // Build_Into leaves the destination untouched unless every public builder step and final compilation succeeds.
+    FCk_ProceduralAction_ValidationReport Build_ReferenceSwipeClip(EMars_Crawler_Layout InLayout, int32 InLegCount,
+        bool InRight, UCk_ProceduralAction_Data InClip)
+    {
+        const auto Keys = Make_ReferenceSwipeKeys(InLayout, InLegCount, InRight);
+        if (Keys.Valid == false)
+        {
+            auto Diagnostics = TArray<FCk_ProceduralAction_Diagnostic>();
+            Diagnostics.Add(FCk_ProceduralAction_Diagnostic(ECk_ProceduralAction_DiagnosticSeverity::Error,
+                n"ReferenceSwipeRigUnsupported", "", "ReferenceSwipe.Rig", NAME_None, NAME_None, -1,
+                "Radial4, Radial6 or Spider6 with the named front leg", f"{InLayout :n} {InLegCount}"));
+            return FCk_ProceduralAction_ValidationReport(ECk_ProceduralAction_ReportStatus::Invalid, Diagnostics);
+        }
+        const auto Size = float64(Get_LayoutSizeScale(InLayout));
+        const auto WindupBody = FTransform(FRotator(10.0, 0.0, 0.0), FVector(-4.0, 0.0, 4.0) * Size, FVector::OneVector);
+        const auto EntryBody = FTransform(FRotator(7.0, 0.0, 0.0), FVector(0.0, 0.0, 3.0) * Size, FVector::OneVector);
+        const auto AcrossBody = FTransform(FRotator::ZeroRotator, FVector(8.0, 0.0, 0.0) * Size, FVector::OneVector);
+        const auto StrikeBody = FTransform(FRotator::ZeroRotator, FVector(9.0, 0.0, 0.0) * Size, FVector::OneVector);
+        const auto RecoverBody = FTransform(FRotator::ZeroRotator, FVector(2.0, 0.0, 2.0) * Size, FVector::OneVector);
+        const auto WindupId = Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup);
+        const auto StrikeId = Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike);
+        const auto RecoverId = Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover);
+        auto Draft = FCk_ProceduralAction_ClipDraft();
+        auto Reports = TArray<FCk_ProceduralAction_ValidationReport>();
+        auto Body = FCk_ProceduralAction_BodyChannel();
+        Body.Set_Enabled(true);
+        Body.Set_InitialSource(ECk_ProceduralAction_InitialSource::IdentityOffset);
+        Reports.Add(utils_procedural_action_builder::Set_BodyChannel(Draft, Body));
+        Reports.Add(utils_procedural_action_builder::Add_Slot(Draft, FCk_ProceduralAction_Slot(Keys.Slot)));
+        Reports.Add(utils_procedural_action_builder::Set_SlotFrame(Draft, Keys.Slot, ECk_ProceduralAction_TrackSpace::RootAtStart));
+
+        Reports.Add(utils_procedural_action_builder::Add_Phase(Draft, Make_ReferencePhase(WindupId,
+            FMars_Crawler_ReferencePhase(0.45f, ECk_ProceduralAction_Easing::OutCubic, WindupBody))));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, WindupId, Make_ReferencePoseKey(0.0f, FTransform::Identity)));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, WindupId,
+            Make_ReferenceSwipePoseKey(1.0f, WindupBody, Keys.Slot, Keys.Windup)));
+
+        Reports.Add(utils_procedural_action_builder::Add_Phase(Draft, Make_ReferencePhase(StrikeId,
+            FMars_Crawler_ReferencePhase(0.18f, ECk_ProceduralAction_Easing::InQuad, StrikeBody))));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
+            Make_ReferenceSwipePoseKey(0.0f, WindupBody, Keys.Slot, Keys.Windup)));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
+            Make_ReferenceSwipePoseKey(0.25f, EntryBody, Keys.Slot, Keys.StrikeEntry)));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
+            Make_ReferenceSwipePoseKey(0.75f, AcrossBody, Keys.Slot, Keys.StrikeAcross)));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
+            Make_ReferenceSwipePoseKey(1.0f, StrikeBody, Keys.Slot, Keys.StrikeEnd)));
+
+        Reports.Add(utils_procedural_action_builder::Add_Phase(Draft, Make_ReferencePhase(RecoverId,
+            FMars_Crawler_ReferencePhase(0.55f, ECk_ProceduralAction_Easing::InOutCubic, FTransform::Identity))));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, RecoverId,
+            Make_ReferenceSwipePoseKey(0.0f, StrikeBody, Keys.Slot, Keys.StrikeEnd)));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, RecoverId,
+            Make_ReferenceSwipePoseKey(0.35f, RecoverBody, Keys.Slot, Keys.RecoverLift)));
+        Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, RecoverId,
+            Make_ReferenceSwipePoseKey(1.0f, FTransform::Identity, Keys.Slot, Keys.Rest)));
+
+        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(Get_OffenseWindowId(),
+            FCk_ProceduralAction_TimeRef(WindupId, FCk_FloatRange_0to1(0.0f)),
+            FCk_ProceduralAction_TimeRef(RecoverId, FCk_FloatRange_0to1(1.0f)))));
+        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"Damage",
+            FCk_ProceduralAction_TimeRef(StrikeId, FCk_FloatRange_0to1(0.25f)),
+            FCk_ProceduralAction_TimeRef(StrikeId, FCk_FloatRange_0to1(0.75f)))));
+        // The initial planted endpoint and final replant are deliberately outside this emitter's collision window.
+        // Offense stays full length for the existing lifecycle. Endpoint obstruction and damage use ClawSweep/Damage.
+        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"ClawSweep",
+            FCk_ProceduralAction_TimeRef(WindupId, FCk_FloatRange_0to1(0.80f)),
+            FCk_ProceduralAction_TimeRef(RecoverId, FCk_FloatRange_0to1(0.25f)))));
+        for (const auto& Report : Reports)
+        {
+            if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
+            { return Report; }
+        }
+        return utils_procedural_action_builder::Build_Into(Draft, InClip);
+    }
+
+    // Metadata only; caller sets it on a NEW owned clip. This function neither seeds nor saves an asset.
+    FCk_ProceduralActionEditor_Subject Make_ReferenceSwipeEditorSubject(UCk_ProceduralAction_Data InClip,
+        EMars_Crawler_Layout InLayout, int32 InLegCount, bool InRight)
+    {
+        const auto Keys = Make_ReferenceSwipeKeys(InLayout, InLegCount, InRight);
+        auto Subject = FCk_ProceduralActionEditor_Subject();
+        if (Keys.Valid == false)
+        { return Subject; }
+        const auto SourceRig = Get_LayoutRigData(InLayout, InLegCount);
+        const auto SourceGait = Get_LayoutGaitData(InLayout);
+        auto EditorData = utils_procedural_action_editor::Get_EditorData(InClip);
+        auto Rig = Cast<UCk_ProceduralRig_Data>(NewObject(EditorData, UCk_ProceduralRig_Data, n"SubjectRig"));
+        auto Gait = Cast<UCk_ProceduralGait_Data>(NewObject(EditorData, UCk_ProceduralGait_Data, n"SubjectGait"));
+        Rig.Set_Legs(SourceRig.Get_Legs());
+        Gait.Set_Timing(SourceGait.Get_Timing());
+        Gait.Set_Step(SourceGait.Get_Step());
+        Gait.Set_Probe(SourceGait.Get_Probe());
+        Gait.Set_Foothold(SourceGait.Get_Foothold());
+        Subject.Set_WalkingRig(TSoftObjectPtr<UCk_ProceduralRig_Data>(Rig));
+        Subject.Set_WalkingGait(TSoftObjectPtr<UCk_ProceduralGait_Data>(Gait));
+        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
+        Bindings.Add(FCk_ProceduralAction_SlotBinding(Keys.Slot, Keys.LimbId));
+        Subject.Set_SlotBindings(Bindings);
+        return Subject;
+    }
+
+    FCk_ProceduralAction_ValidationReport Make_ReferenceEndpointPincerError(FString InActual)
+    {
+        auto Diagnostics = TArray<FCk_ProceduralAction_Diagnostic>();
+        Diagnostics.Add(FCk_ProceduralAction_Diagnostic(ECk_ProceduralAction_DiagnosticSeverity::Error,
+            n"ReferenceEndpointPincerContract", "", "ReferenceEndpointPincer", NAME_None, NAME_None, -1,
+            "separate destination, valid reference pincer source, Radial4/Radial6/Spider6 rig", InActual));
+        return FCk_ProceduralAction_ValidationReport(ECk_ProceduralAction_ReportStatus::Invalid, Diagnostics);
+    }
+
+    // Opt-in endpoint pincer: copy the supplied legacy reference through the public draft surface. Neither the source
+    // object nor its saved package is changed. Keep its body motion/timings and two claws; clear each claw against its
+    // own current rig rest-floor, hold the raised Strike endpoint through early Recover, then recover to its own rest.
+    FCk_ProceduralAction_ValidationReport Build_ReferenceEndpointPincerClip(EMars_Crawler_Layout InLayout, int32 InLegCount,
+        UCk_ProceduralAction_Data InSource, UCk_ProceduralAction_Data InClip)
+    {
+        const auto Right = Make_ReferenceSwipeKeys(InLayout, InLegCount, true);
+        const auto Left = Make_ReferenceSwipeKeys(InLayout, InLegCount, false);
+        if (Right.Valid == false || Left.Valid == false || ck::Is_NOT_Valid(InSource) || InSource == InClip)
+        { return Make_ReferenceEndpointPincerError("unsupported rig, missing source or shared destination"); }
+        const auto Validation = Validate_AttackClip(InSource, EMars_Crawler_AttackClipKind::Pincer);
+        if (Validation.IsValid() == false)
+        { return Make_ReferenceEndpointPincerError(Validation.Get_Error()); }
+        auto Draft = FCk_ProceduralAction_ClipDraft();
+        const auto Copy = utils_procedural_action_builder::Make_Draft_FromData(InSource, Draft);
+        if (Copy.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
+        { return Copy; }
+        auto Phases = Draft.Get_Phases();
+        for (const auto& Phase : Phases)
+        {
+            const auto Tracks = Phase.Get_LimbTracks();
+            if (Tracks.Num() != 2)
+            { return Make_ReferenceEndpointPincerError("each reference phase needs both claw tracks"); }
+            auto HasRight = false;
+            auto HasLeft = false;
+            for (const auto& Track : Tracks)
+            {
+                HasRight = HasRight || Track.Get_Slot() == Right.Slot;
+                HasLeft = HasLeft || Track.Get_Slot() == Left.Slot;
+                if (Track.Get_PositionKeys().Num() == 0)
+                { return Make_ReferenceEndpointPincerError("each reference claw track needs position keys"); }
+            }
+            if (HasRight == false || HasLeft == false)
+            { return Make_ReferenceEndpointPincerError("each reference phase needs ClawRight and ClawLeft"); }
+        }
+        auto StrikeRight = FVector::ZeroVector;
+        auto StrikeLeft = FVector::ZeroVector;
+        for (int32 PhaseIndex = 0; PhaseIndex < Phases.Num(); ++PhaseIndex)
+        {
+            auto Phase = Phases[PhaseIndex];
+            auto Tracks = Phase.Get_LimbTracks();
+            for (int32 TrackIndex = 0; TrackIndex < Tracks.Num(); ++TrackIndex)
+            {
+                auto Track = Tracks[TrackIndex];
+                const auto Rest = Track.Get_Slot() == Right.Slot ? Right.Rest : Left.Rest;
+                const auto Floor = Rest.Z + ReferenceEndpointClawClearance;
+                auto Positions = Track.Get_PositionKeys();
+                if (Phase.Get_Id() == Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover))
+                {
+                    const auto Strike = Track.Get_Slot() == Right.Slot ? StrikeRight : StrikeLeft;
+                    Positions.Empty();
+                    Positions.Add(FCk_ProceduralAction_VectorKey(FCk_FloatRange_0to1(0.0f), Strike));
+                    Positions.Add(FCk_ProceduralAction_VectorKey(FCk_FloatRange_0to1(0.25f), Strike));
+                    Positions.Add(FCk_ProceduralAction_VectorKey(FCk_FloatRange_0to1(1.0f), Rest));
+                }
+                else
+                {
+                    for (int32 KeyIndex = 0; KeyIndex < Positions.Num(); ++KeyIndex)
+                    {
+                        auto Key = Positions[KeyIndex];
+                        auto Position = Key.Get_Value();
+                        Position.Z = Math::Max(Position.Z, Floor);
+                        Key.Set_Value(Position);
+                        Positions[KeyIndex] = Key;
+                    }
+                    if (Phase.Get_Id() == Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike))
+                    {
+                        if (Track.Get_Slot() == Right.Slot)
+                        { StrikeRight = Positions.Last().Get_Value(); }
+                        else
+                        { StrikeLeft = Positions.Last().Get_Value(); }
+                    }
+                }
+                Track.Set_PositionKeys(Positions);
+                // Linear interpolation and reject-unreachable keep the authored clearance argument meaningful.
+                // Native solved/accepted geometry is still measured before this reference is approved for gameplay.
+                Track.Set_Interpolation(ECk_ProceduralAction_Interpolation::Linear);
+                Track.Set_ReachPolicy(ECk_ProceduralAction_ReachPolicy::RejectUnreachable);
+                Tracks[TrackIndex] = Track;
+            }
+            Phase.Set_LimbTracks(Tracks);
+            Phases[PhaseIndex] = Phase;
+        }
+        Draft.Set_Phases(Phases);
+        auto Reports = TArray<FCk_ProceduralAction_ValidationReport>();
+        Reports.Add(utils_procedural_action_builder::Set_SlotFrame(Draft, Right.Slot, ECk_ProceduralAction_TrackSpace::RootAtStart));
+        Reports.Add(utils_procedural_action_builder::Set_SlotFrame(Draft, Left.Slot, ECk_ProceduralAction_TrackSpace::RootAtStart));
+        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"Damage",
+            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike), FCk_FloatRange_0to1(0.25f)),
+            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike), FCk_FloatRange_0to1(0.75f)))));
+        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"ClawSweep",
+            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup), FCk_FloatRange_0to1(0.80f)),
+            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover), FCk_FloatRange_0to1(0.25f)))));
+        for (const auto& Report : Reports)
+        {
+            if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
+            { return Report; }
+        }
+        return utils_procedural_action_builder::Build_Into(Draft, InClip);
+    }
+
+    FCk_ProceduralActionEditor_Subject Make_ReferenceEndpointPincerEditorSubject(UCk_ProceduralAction_Data InClip,
+        EMars_Crawler_Layout InLayout, int32 InLegCount)
+    {
+        const auto Right = Make_ReferenceSwipeKeys(InLayout, InLegCount, true);
+        const auto Left = Make_ReferenceSwipeKeys(InLayout, InLegCount, false);
+        auto Subject = Make_ReferenceSwipeEditorSubject(InClip, InLayout, InLegCount, true);
+        if (Right.Valid == false || Left.Valid == false)
+        { return Subject; }
+        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
+        Bindings.Add(FCk_ProceduralAction_SlotBinding(Right.Slot, Right.LimbId));
+        Bindings.Add(FCk_ProceduralAction_SlotBinding(Left.Slot, Left.LimbId));
+        Subject.Set_SlotBindings(Bindings);
+        return Subject;
+    }
+}
+#endif

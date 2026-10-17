@@ -152,6 +152,13 @@ namespace utils_crawler
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Crawler] [{RootEntity.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Crawler(); }
 
+        if (InSpec.Combat.Enabled)
+        {
+            const auto AttackValidation = utils_attack::Validate_ResolvedLoadout(InSpec.ResolvedAttacks);
+            if (ck::EnsureIfNot(AttackValidation.Get_IsValid(), f"[Crawler] invalid resolved attacks: {Get_AttackValidationText(AttackValidation)}"))
+            { return FCk_Handle_Crawler(); }
+        }
+
         const auto& Rig = InSpec.Rig;
 
         auto Motion = utils_surface_motion::Add(InRoot, Make_MotionSpec(InSpec.Layout));
@@ -180,7 +187,10 @@ namespace utils_crawler
         if (Armed)
         {
             WalkerSpec.Set_ActionPlayer(ECk_EnableDisable::Enable);
-            WalkerSpec.Set_ActionPlayerSpec(Make_AttackPlayerSpec(InSpec));
+            auto PlayerSpec = FCk_ProceduralActionPlayer_Spec();
+            PlayerSpec.Set_Tuning(InSpec.ResolvedAttacks.Execution.Tuning);
+            PlayerSpec.Set_Locomotion(InSpec.ResolvedAttacks.Execution.Locomotion);
+            WalkerSpec.Set_ActionPlayerSpec(PlayerSpec);
         }
         auto Walker = utils_procedural_animation::Add_Walker(InRoot, WalkerSpec);
         auto Gait = Walker.Get_Gait();
@@ -265,6 +275,14 @@ namespace utils_crawler
             RootEntity.Add_Fragment(FMars_Fragment_Crawler_Attack());
             RootEntity.Add_Fragment(FMars_Fragment_Crawler_AttackObservations());
             RootEntity.Add_Fragment(FMars_Fragment_Crawler_AttackIntents());
+            auto Selection = FMars_Fragment_Crawler_AttackSelection();
+            for (const auto& Entry : InSpec.ResolvedAttacks.Entries)
+            {
+                auto Reuse = FMars_Crawler_AttackReuse();
+                Reuse.Id = Entry.Identity.Id;
+                Selection.Reuse.Add(Reuse);
+            }
+            RootEntity.Add_Fragment(Selection);
             RootEntity.Add_Fragment(FMars_Fragment_Crawler_Engage());
         }
 
@@ -564,7 +582,15 @@ mixin UCk_ProceduralAction_Data Get_AttackClip(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return nullptr; }
 
-    return Self.Get_Spec().Combat.Get_Clip(Self.Get_Fragment(FMars_Fragment_Crawler_Attack).ClipKind);
+    const auto Plan = Self.Get_AttackPlan();
+    if (Plan.Entry.Identity.Id.IsValid())
+    { return Plan.Entry.SourceClip.Get(); }
+    for (const auto& Entry : Self.Get_Spec().ResolvedAttacks.Entries)
+    {
+        if (Entry.Identity.Id == GameplayTags::Attack_Mars_Jab)
+        { return Entry.SourceClip.Get(); }
+    }
+    return nullptr;
 }
 
 // The jab's clip action while one is held (an invalid handle otherwise).
@@ -707,14 +733,14 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_SupportRejection(const FCk_Handl
 
     const auto Normal = utils_surface_motion::Get_SupportNormal(Motion).GetSafeNormal();
     const auto SlopeDegrees = Math::RadiansToDegrees(Math::Acos(Math::Clamp(Normal.DotProduct(FVector::UpVector), -1.0, 1.0)));
-    if (Normal.IsNearlyZero() || SlopeDegrees > Self.Get_Spec().Combat.Prepare.MaxGroundSlopeDegrees)
+    if (Normal.IsNearlyZero() || SlopeDegrees > Self.Get_Spec().ResolvedAttacks.Execution.MaxGroundSlopeDegrees)
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Slope); }
 
     return TOptional<EMars_Crawler_AttackReject>();
 }
 
-// Why a start at InTarget would be rejected now, in admission order (Disarmed, Busy, NoTarget, TargetInvalid, Dead, Legs,
-// NotReady, Ungrounded, Slope, Stance, Height, OutOfRange, Moving, Facing, WindupBlocked); unset when it would be
+// Why a start at InTarget would be rejected now, in admission order (Disarmed, Busy, NoTarget, TargetInvalid, Dead, Warded,
+// Legs, NotReady, Ungrounded, Slope, Stance, Height, OutOfRange, Moving, Facing, WindupBlocked); unset when it would be
 // admitted. A cancel queued in the same drain (CancelPending) is the attack tick's to add. Stance only ever delays a
 // pincer: a crawler that just stopped waits for its feet to land instead of asking the gait for two legs it would refuse
 // to lend.
@@ -739,6 +765,9 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
     if (Self.Get_IsCombatDead())
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Dead); }
 
+    if (Self.Get_IsWarded(InTarget))
+    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Warded); }
+
     const auto Spec = Self.Get_Spec();
     if (utils_procedural_gait::Get_EnabledLegCount(Self.Get_Gait()) < Spec.MinLegsToWalk)
     { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Legs); }
@@ -747,49 +776,31 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
     if (SupportRejection.IsSet())
     { return SupportRejection; }
 
-    const auto Claws = utils_crawler::Find_AttackClaws(Self);
-    if (Claws.Num() > 0 && utils_crawler::Get_IsPincerStanceReady(Self, Claws) == false)
-    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Stance); }
-
-    const auto Prepare = Spec.Combat.Prepare;
-    const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
-    const auto ToTarget = utils_transform::Get_EntityCurrentLocation(InTarget.As_Transform()) - RootTransform.GetLocation();
-    if (Math::Abs(ToTarget.Z) > Prepare.MaxHeightDifference)
-    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Height); }
-
-    if (ToTarget.Size2D() > Prepare.StartDistance)
-    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::OutOfRange); }
-
-    const auto Motion = Self.Get_Motion();
-    if (utils_surface_motion::Get_Velocity(Motion).Size() > Prepare.MaxSpeedToStart)
-    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Moving); }
-
-    const auto Up = utils_surface_motion::Get_SupportNormal(Motion).GetSafeNormal();
-    if (utils_crawler::Get_PlanarAngleDegrees(RootTransform.GetRotation().GetForwardVector(), ToTarget, Up) > Prepare.FacingToleranceDegrees)
-    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::Facing); }
-
-    if (Self.Get_IsWindupBlocked())
-    { return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::WindupBlocked); }
-
-    return TOptional<EMars_Crawler_AttackReject>();
+    const auto Evaluation = utils_crawler::Evaluate_AttackLoadout(Self, InTarget);
+    if (Evaluation.Selection.Selected.IsSet())
+    { return TOptional<EMars_Crawler_AttackReject>(); }
+    if (Evaluation.Selection.Preferred.IsSet())
+    {
+        for (const auto& Entry : Evaluation.Evaluations)
+        {
+            if (Entry.AttackId == Evaluation.Selection.Preferred.GetValue() && Entry.Blockers.Num() > 0)
+            { return TOptional<EMars_Crawler_AttackReject>(utils_crawler::Get_LegacyAttackReject(Entry.Blockers[0].Code)); }
+        }
+    }
+    return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::RequiredPartUnavailable);
 }
 
 // A world body stands between the hit centre now and where the windup end key of the clip an attack admitted now would
 // play puts it.
 mixin bool Get_IsWindupBlocked(const FCk_Handle_Crawler& Self)
 {
-    const auto Combat = Self.Get_Spec().Combat;
-    const auto WindupKey = utils_crawler::Get_PhaseEndBody(Combat.Get_Clip(utils_crawler::Get_NextClipKind(Self)), EMars_Crawler_AttackPhase::Windup);
-    const auto Presentation = utils_transform::Get_EntityCurrentTransform(Self.Get_Presentation());
-    const auto RootTransform = utils_transform::Get_EntityCurrentTransform(Self.As_Transform());
-    const auto Neutral = utils_crawler::Get_HitCenter(Presentation, Combat.Hit.LocalCenter);
-    const auto Windup = Neutral + RootTransform.GetRotation().RotateVector(utils_crawler::Make_HitCenterOffset(WindupKey, Combat.Hit.LocalCenter));
-
-    auto Settings = utils_crawler::Make_AttackQuery(Neutral, Windup, Combat.Hit.Radius);
-    Settings.Set_IgnoredEntities(Self.Get_AttackIgnoredEntities());
-    FCk_Handle Tracer = Self;
-    const auto Result = utils_probe_trace::Request_SingleShapeTrace(Tracer, Settings);
-    return ck::IsValid(Result.Get_HitEntity()) && Result.Get_HitKind() == ECk_ProbeTrace_HitKind::World;
+    const auto Evaluation = utils_crawler::Evaluate_AttackLoadout(Self, Self.Get_CombatTarget());
+    for (const auto& Entry : Evaluation.Evaluations)
+    {
+        if (Evaluation.Selection.Preferred.IsSet() && Entry.AttackId == Evaluation.Selection.Preferred.GetValue())
+        { return utils_attack::Get_HasBlocker(Entry, n"WindupBlocked"); }
+    }
+    return false;
 }
 
 // The combat target is set and a start at it would be admitted now.
