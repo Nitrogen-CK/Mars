@@ -4161,6 +4161,19 @@ namespace UMars_AutoTest_FoodPiece_ABatteredVariantIsOptionalAndValidated
 }
 
 USTRUCT()
+struct FMars_AutoTest_FoodPiece_ACookStateSentMidCutReachesTheHalves_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_FoodPiece_ACookStateSentMidCutReachesTheHalves
+{
+    FMars_AutoTest_FoodPiece_ACookStateSentMidCutReachesTheHalves_SpawnParams Params()
+    {
+        return FMars_AutoTest_FoodPiece_ACookStateSentMidCutReachesTheHalves_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState_SpawnParams
 {
 }
@@ -17628,19 +17641,6 @@ namespace UMars_SmTask_Station_RequestReserve
 }
 
 USTRUCT()
-struct FMars_SmTask_StationFeed_Bridge_SpawnParams
-{
-}
-
-namespace UMars_SmTask_StationFeed_Bridge
-{
-    FMars_SmTask_StationFeed_Bridge_SpawnParams Params()
-    {
-        return FMars_SmTask_StationFeed_Bridge_SpawnParams();
-    }
-}
-
-USTRUCT()
 struct FMars_SmTask_StationFeed_OperatorHints_SpawnParams
 {
 }
@@ -17663,19 +17663,6 @@ namespace UMars_SmTask_StationFeed_OperatorInput
     FMars_SmTask_StationFeed_OperatorInput_SpawnParams Params()
     {
         return FMars_SmTask_StationFeed_OperatorInput_SpawnParams();
-    }
-}
-
-USTRUCT()
-struct FMars_SmTask_StationFeed_Source_SpawnParams
-{
-}
-
-namespace UMars_SmTask_StationFeed_Source
-{
-    FMars_SmTask_StationFeed_Source_SpawnParams Params()
-    {
-        return FMars_SmTask_StationFeed_Source_SpawnParams();
     }
 }
 
@@ -18147,6 +18134,93 @@ namespace UMars_TESTONLY_CrawlerSpiderLookProvider
     FMars_TESTONLY_CrawlerSpiderLookProvider_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack)
     {
         return FMars_TESTONLY_CrawlerSpiderLookProvider_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals, InDebugDrawAttack);
+    }
+}
+
+USTRUCT()
+struct FMars_TESTONLY_GripStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    FMars_TESTONLY_GripStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+    }
+}
+
+namespace UMars_TESTONLY_GripStation_EntityScript
+{
+    FMars_TESTONLY_GripStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_TESTONLY_GripStation_EntityScript_SpawnParams();
+    }
+
+    FMars_TESTONLY_GripStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        return FMars_TESTONLY_GripStation_EntityScript_SpawnParams(InSpawnTransform, InStation);
+    }
+}
+
+USTRUCT()
+struct FMars_TESTONLY_Station_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    FMars_TESTONLY_Station_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+    }
+}
+
+namespace UMars_TESTONLY_Station_EntityScript
+{
+    FMars_TESTONLY_Station_EntityScript_SpawnParams Params()
+    {
+        return FMars_TESTONLY_Station_EntityScript_SpawnParams();
+    }
+
+    FMars_TESTONLY_Station_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        return FMars_TESTONLY_Station_EntityScript_SpawnParams(InSpawnTransform, InStation);
+    }
+}
+
+USTRUCT()
+struct FMars_TESTONLY_SurfaceOnlyStation_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Station_Spec Station;
+
+    FMars_TESTONLY_SurfaceOnlyStation_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        SpawnTransform = InSpawnTransform;
+        Station = InStation;
+    }
+}
+
+namespace UMars_TESTONLY_SurfaceOnlyStation_EntityScript
+{
+    FMars_TESTONLY_SurfaceOnlyStation_EntityScript_SpawnParams Params()
+    {
+        return FMars_TESTONLY_SurfaceOnlyStation_EntityScript_SpawnParams();
+    }
+
+    FMars_TESTONLY_SurfaceOnlyStation_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Station_Spec InStation)
+    {
+        return FMars_TESTONLY_SurfaceOnlyStation_EntityScript_SpawnParams(InSpawnTransform, InStation);
     }
 }
 

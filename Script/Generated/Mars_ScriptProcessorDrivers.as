@@ -522,6 +522,27 @@ class UMars_Processor_CookingFeed_HandleRequests_Driver : UMars_Processor_Cookin
     }
 }
 
+class UMars_Processor_CookingFeed_Setup_Driver : UMars_Processor_CookingFeed_Setup
+{
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query)
+    {
+        Super::Configure(Query);
+    }
+
+    UFUNCTION(BlueprintOverride)
+    void ForEachBatch(FCk_ScriptQueryBatch Batch, FCk_Time InDeltaT)
+    {
+        auto _CkPerfScope = ck::ScopedStat("UMars_Processor_CookingFeed_Setup_Driver::ForEachBatch");
+        const int32 NumEntities = Batch.Num();
+        for (int32 i = 0; i < NumEntities; ++i)
+        {
+            auto Handle = Batch.GetHandle(i);
+            ForEachEntity(InDeltaT, Handle);
+        }
+    }
+}
+
 class UMars_Processor_CookingFeed_Tick_Driver : UMars_Processor_CookingFeed_Tick
 {
     UFUNCTION(BlueprintOverride)
