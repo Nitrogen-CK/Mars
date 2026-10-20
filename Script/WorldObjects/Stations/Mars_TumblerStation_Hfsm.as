@@ -1,16 +1,14 @@
 // The tumbler station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Tumbler_Idle). It runs on the STATION entity (context = the station, which also carries the Tumbler feature
 // and the raw platter's CookingFeed; its two platter docks are lifetime children of it) and reads the station's operator;
-// it only issues Tumbler and CookingFeed requests and registers the operator's legend rows. The feed tasks are the shared
-// ones (Mars_StationFeed_SmTasks.as).
+// it only issues Tumbler and CookingFeed requests and registers the operator's legend rows. The feed's operator tasks are
+// the shared ones (Mars_StationFeed_SmTasks.as); the feed sources itself from the input dock and lands its releases.
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source, StationFeed_Bridge (a release in flight lands; no
-//                                                 reset: the batch, its coverage and the feed's attempt persist across a
-//                                                 leave and a re-enter)
+//   Idle      ->Operated [StationIsOperated]      tasks: none (no reset: the batch, its coverage and the feed's attempt
+//                                                 persist across a leave and a re-enter)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Tumbler_OperatorInput (Tick), Tumbler_CancelOnExit,
-//                                                 StationFeed_Source, TumblerFeed_OperatorInput (Tick), StationFeed_Bridge,
-//                                                 StationFeed_OperatorHints, Tumbler_OperatorHints, StationFeed_TakeOutInput
-//                                                 (Tick)
+//                                                 TumblerFeed_OperatorInput (Tick), StationFeed_OperatorHints,
+//                                                 Tumbler_OperatorHints, StationFeed_TakeOutInput (Tick)
 //
 // A piece the drum hands back lands on the finished tray through the kernel's own landing, whoever operates. The
 // conditions are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose, the
@@ -23,9 +21,6 @@ class UMars_SmState_Tumbler_Idle : UCk_SmState_EntityScript
     {
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Tumbler_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
-
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
     }
 }
 
@@ -39,9 +34,7 @@ class UMars_SmState_Tumbler_Operated : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Tumbler_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Tumbler_CancelOnExit);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_TumblerFeed_OperatorInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_Tumbler_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);

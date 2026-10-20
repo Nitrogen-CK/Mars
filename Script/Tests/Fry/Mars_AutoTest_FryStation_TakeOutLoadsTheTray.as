@@ -1,7 +1,7 @@
 // The fry station's whole round on real pieces. A platter with a whole mushroom docks on the raw platter dock (its ledger
 // battered as the batter station's take-out leaves it: the fryer takes any battered food) and an empty platter on the
 // finished tray's; an operator takes the station and one add-food press
-// carries the mushroom: the bridge unloads it from the raw platter and the kernel admits it into the oil. After a second of
+// carries the mushroom: the feed unloads it from the raw platter and the kernel admits it into the oil. After a second of
 // frying the test takes that piece out by name, as a take-out press would: the station's take-out task loads it onto the
 // docked tray, where it rides as a scene-node child of the tray's root with its body Kinematic, carrying the heat the
 // kernel gave its faces; the fryer holds nothing and the kernel counts one piece taken out.

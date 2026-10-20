@@ -1,43 +1,15 @@
 namespace utils_station
 {
-    // Engage motion rates. The glide matches the player's walk speed, so being carried to the stand reads as finishing
-    // your own walk; the turn rate caps involuntary body rotation; the floor keeps a zero-travel engage from being an
-    // instant snap.
-    const float32 k_EngageGlideSpeed = 600.0f;
-    const float32 k_EngageMaxTurnRate = 220.0f;
-    const float32 k_EngageMinSeconds = 0.15f;
-    // How long the operator's view takes to blend to (and back from) the station's View node.
-    const float32 k_ViewBlendSeconds = 0.3f;
-
     // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
-    // View child node when Camera.ViewLocal is set, the Use interactable (probe-driven focus when Setup.Probe is set, else
-    // a transform-only child) with its one reserving target and Setup.UsePrompt, the grip table on the root (each spec grip
-    // on the node Setup.GripNodes registers under its tag), the grip interactable on the root, and the minigame state
-    // machine when the spec names one. A rejected spec, a grip naming a node tag nothing registers, or a minigame class
-    // that does not load ensures and returns an invalid handle with nothing composed.
+    // Use interactable (probe-driven focus when Setup.Probe is set, else a transform-only child) with its one reserving
+    // target and Setup.UsePrompt, the grip interactable on the root, and the minigame state machine when the spec names
+    // one; it keeps Setup.View as the operator's view. The glove grip table and the View node are the placing script's
+    // (UMars_Station_EntityScript). A rejected spec or a minigame class that does not load ensures and returns an invalid
+    // handle with nothing composed.
     FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec)
     {
-
         const auto Validation = InSpec.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Station] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
-        { return FCk_Handle_Station(); }
-
-        FString GripError;
-        auto GripEntries = TArray<FMars_FPHands_GripEntry>();
-        for (int32 Index = 0; Index < InSpec.Grips.Num() && GripError.IsEmpty(); ++Index)
-        {
-            const auto& Grip = InSpec.Grips[Index];
-            const auto Node = Find_GripNode(InSpec.Setup, Grip.Node);
-            if (ck::Is_NOT_Valid(Node))
-            {
-                GripError = f"grip [{Index}] names the node [{Grip.Node.ToString()}] that no grip node registers";
-                continue;
-            }
-
-            GripEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Grip.Socket == NAME_None ? TOptional<FName>() : TOptional<FName>(Grip.Socket), Grip.Pose, Grip.ReachOverrideCm, Grip.Frame, Grip.Roll));
-        }
-
-        if (ck::EnsureIfNot(GripError.IsEmpty(), f"[Station] [{InRoot.ToString()}] rejected the grips: {GripError}"))
         { return FCk_Handle_Station(); }
 
         // Unset = no minigame; set but not loadable is an authoring error.
@@ -54,17 +26,13 @@ namespace utils_station
 
         auto State = FMars_Fragment_Station();
         State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
-        if (InSpec.Camera.ViewLocal.IsSet())
-        { State.View = utils_scene_node::Create(InRoot, InSpec.Camera.ViewLocal.GetValue()).As_Transform(); }
+        State.View = InSpec.Setup.View;
 
         InRoot.Add_Fragment(FMars_Feature_Station());
         InRoot.Add_Fragment(Params);
         InRoot.Add_Fragment(State);
         InRoot.Add_Fragment(FMars_Tag_Station_NeedsSetup());
         auto Station = InRoot.As_Station();
-
-        if (GripEntries.Num() > 0)
-        { utils_fphands::Add_Grips(InRoot.H(), GripEntries); }
 
         auto UseSpec = FMars_Interactable_Spec();
         UseSpec.ProbeInfo = InSpec.Setup.Probe;
@@ -84,30 +52,6 @@ namespace utils_station
         StoredState.GripInteractable = GripInteractable;
         StoredState.MinigameSm = MinigameSm;
         return Station;
-    }
-
-    // The node InSetup registers under InTag; invalid when none does.
-    FCk_Handle_Transform Find_GripNode(const FMars_Station_Setup& InSetup, FGameplayTag InTag)
-    {
-        for (const auto& Entry : InSetup.GripNodes)
-        {
-            if (Entry.Tag == InTag)
-            { return Entry.Node; }
-        }
-
-        return FCk_Handle_Transform();
-    }
-
-    // Seconds the operator glides to the stand: as long as walking InDistance (uu) or turning InTurnDegrees would take,
-    // clamped to [k_EngageMinSeconds, InMaxSeconds]; 0 when InMaxSeconds is 0 (snap).
-    float32 Get_EngageSeconds(float32 InDistance, float32 InTurnDegrees, float32 InMaxSeconds)
-    {
-        if (InMaxSeconds <= 0.0f)
-        { return 0.0f; }
-
-        const auto GlideSeconds = InDistance / k_EngageGlideSpeed;
-        const auto TurnSeconds = Math::Abs(InTurnDegrees) / k_EngageMaxTurnRate;
-        return Math::Clamp(Math::Max(GlideSeconds, TurnSeconds), Math::Min(k_EngageMinSeconds, InMaxSeconds), InMaxSeconds);
     }
 
     // The interaction context of a station interaction sub-SM: the stamped sub-SM root's copy (the stamp lands before the
@@ -184,7 +128,7 @@ mixin bool Get_IsOperatedBy(const FCk_Handle_Station& Self, FCk_Handle InOperato
     return ck::IsValid(Operator) && Operator == InOperator;
 }
 
-// The operator's view node; invalid when the spec leaves Camera.ViewLocal unset.
+// The operator's view node (the placing script's, at Camera.ViewLocal); invalid when the spec leaves it unset.
 mixin FCk_Handle_Transform Get_View(const FCk_Handle_Station& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Station).View;

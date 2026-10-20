@@ -1,15 +1,15 @@
 // The batter station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Batter_Idle). It runs on the STATION entity (context = the station, which also carries the Batter feature
 // and the raw platter's CookingFeed; its two platter docks are lifetime children of it) and reads the station's operator;
-// it only issues Batter and CookingFeed requests and registers the operator's legend rows. The feed tasks are the shared
-// ones (Mars_StationFeed_SmTasks.as). It owns no clock: the coat clock and the dip's ease are the kernel's.
+// it only issues Batter and CookingFeed requests and registers the operator's legend rows. The feed's operator tasks are
+// the shared ones (Mars_StationFeed_SmTasks.as); the feed sources itself from the input dock and lands its releases. It
+// owns no clock: the coat clock and the dip's ease are the kernel's.
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source, StationFeed_Bridge (a release in flight lands; no
-//                                                 reset: the batch and its coats persist across a leave and a re-enter)
-//   Operated  ->Idle     [StationIsNotOperated]   tasks: Batter_OperatorInput (Tick), Batter_LiftOnExit, StationFeed_Source,
-//                                                 BatterFeed_OperatorInput (Tick), StationFeed_Bridge,
-//                                                 StationFeed_OperatorHints, Batter_OperatorHints, StationFeed_TakeOutInput
-//                                                 (Tick)
+//   Idle      ->Operated [StationIsOperated]      tasks: none (no reset: the batch and its coats persist across a leave and
+//                                                 a re-enter)
+//   Operated  ->Idle     [StationIsNotOperated]   tasks: Batter_OperatorInput (Tick), Batter_LiftOnExit,
+//                                                 BatterFeed_OperatorInput (Tick), StationFeed_OperatorHints,
+//                                                 Batter_OperatorHints, StationFeed_TakeOutInput (Tick)
 //
 // A piece the bowl hands back lands on the finished tray through the kernel's own landing, whoever operates. The conditions
 // are the shared station ones (Mars_Station_SmConditions.as). The player's Operating state owns the pose, the camera, the
@@ -22,9 +22,6 @@ class UMars_SmState_Batter_Idle : UCk_SmState_EntityScript
     {
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Batter_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
-
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
     }
 }
 
@@ -38,9 +35,7 @@ class UMars_SmState_Batter_Operated : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Batter_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Batter_LiftOnExit);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_BatterFeed_OperatorInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_Batter_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);

@@ -1,6 +1,6 @@
 // The cutting-station rig: the real station, spawned at an isolated origin, and a bare operator (no display; input only when
 // a test arms the add-food key) that takes and leaves it, so the station's own state machine runs Idle and Operated: its
-// feed draws from the docked input platter and its feed bridge lays a released joint on the board, its cut bridge turns
+// feed draws from the docked input platter and the feed lays a released joint on the board, its cut bridge turns
 // every chop into a board cut and its sweep bridge loads what a sweep hands off onto the docked finished tray. Add food,
 // chops and nudges are the CookingFeed and Cutting requests the operator's input tasks would issue (Add_Food bypasses the
 // station's board-busy gate; a test that needs the gate presses the real key: Arm_AddFoodKey); a sweep is the control's own
@@ -553,7 +553,7 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
             && _OutputDock.Get_HasArrived());
     }
 
-    // One Ready, shown joint on the board (the feed bridge runs in Idle and Operated).
+    // One Ready, shown joint on the board (the feed hands releases over whoever operates).
     UFUNCTION()
     protected void Check_JointOnBoard(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {

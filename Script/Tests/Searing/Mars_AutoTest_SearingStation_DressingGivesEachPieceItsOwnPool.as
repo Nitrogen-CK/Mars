@@ -1,5 +1,5 @@
 // Every piece on the searing pan gets its own oil pool. The real searing station (spawned through its entity script, the
-// only station in this world, nobody operating it) has two box food pieces admitted by hand, as its feed bridge would, each
+// only station in this world, nobody operating it) has two box food pieces admitted by hand, as its feed would, each
 // wearing its own display (the station hangs no part off either), and each is teleported (its middle) to its own point on the cooking surface, one either side of the centre. The pan's material then carries both
 // pools: Meat Footprint (slot 0, the first piece admitted) and Meat Footprint 1 (slot 1, the second) both have their piece's
 // own footprint radius and sit at their own piece's pan-local XY in art cm, as far apart as the two points, and slot 2 has no
@@ -258,7 +258,7 @@ class UMars_AutoTest_SearingStation_DressingGivesEachPieceItsOwnPool : UMars_Aut
         Assert_Equals_Int(Parts, 0, f"the station hung no part off [{InPiece.ToString()}]");
     }
 
-    // The bridge's job done by hand: a release of the box for transfer InPieceId.TransferIndex, its middle at the feed's
+    // The feed's hand-off done by hand: a release of the box for transfer InPieceId.TransferIndex, its middle at the feed's
     // release node (over the pan's centre, above the rim); the feed itself is not asked.
     private void Release(const FMars_CookingFeed_PieceId& InPieceId)
     {

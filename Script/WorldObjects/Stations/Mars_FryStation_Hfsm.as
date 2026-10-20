@@ -1,16 +1,14 @@
 // The fry station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass = UMars_SmState_Fry_Idle).
 // It runs on the STATION entity (context = the station, which also carries the Fry feature and the raw platter's
 // CookingFeed; its two platter docks are lifetime children of it) and reads the station's operator; it only issues Fry,
-// CookingFeed and Platter requests and registers the operator's legend rows.
-// The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as).
+// CookingFeed and Platter requests and registers the operator's legend rows. The feed's operator tasks are the shared ones
+// (Mars_StationFeed_SmTasks.as); the feed sources itself from the input dock and lands its releases (a transfer past its
+// grasp is committed, the feed's own rule).
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source,
-//                                                 StationFeed_Bridge (a release in flight lands: a transfer past its
-//                                                 grasp is committed, the feed's own rule), Fry_ResetOnEnter
-//                                                 (the skimmer parked and idle; the pieces stay in play)
+//   Idle      ->Operated [StationIsOperated]      tasks: Fry_ResetOnEnter (the skimmer parked and idle; the pieces stay in
+//                                                 play)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Fry_DriveOnEnter (the skimmer is in hand), Fry_OperatorInput (Tick),
-//                                                 Fry_OperatorHints, StationFeed_Source, FryFeed_OperatorInput (Tick),
-//                                                 StationFeed_Bridge, FryFeed_OperatorHints,
+//                                                 Fry_OperatorHints, FryFeed_OperatorInput (Tick), FryFeed_OperatorHints,
 //                                                 StationFeed_TakeOutInput (Tick)
 //
 // The fryer fries only battered pieces (the batter station's take-out writes the dip): the add-food press is gated shut and
@@ -31,8 +29,6 @@ class UMars_SmState_Fry_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Fry_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_Fry_ResetOnEnter);
     }
 }
@@ -48,9 +44,7 @@ class UMars_SmState_Fry_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Fry_DriveOnEnter);
         AddTask(InHandle, UMars_SmTask_Fry_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Fry_OperatorHints);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_FryFeed_OperatorInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_FryFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
     }

@@ -5,10 +5,30 @@ namespace constants_station
     const float64 k_CounterHeight = 70.0;
 }
 
+// A station node published under a role tag, for the spec's grips to name.
+struct FMars_Station_GripNode
+{
+    UPROPERTY()
+    FGameplayTag Tag;
+
+    UPROPERTY()
+    FCk_Handle_Transform Node;
+
+    FMars_Station_GripNode() {}
+
+    FMars_Station_GripNode(FGameplayTag InTag, FCk_Handle_Transform InNode)
+    {
+        Tag = InTag;
+        Node = InNode;
+    }
+}
+
 // Base placeable station: composes the transform and the Station feature (see FMars_Station_Spec for the frame: the root
-// is the station's origin on the floor; the operator stands at StandLocal facing its +X). Concrete stations fill in the
-// geometry-bound spec fields (stand, grips), the Use probe, the visuals and the nodes their grips name. The visuals are
-// built first so the grip nodes exist when the station resolves its grips.
+// is the station's origin on the floor; the operator stands at StandLocal facing its +X), and what the gloves and the
+// camera read off it: the gloves' grip table on the root (each spec grip on the node Register_GripNodes publishes under its
+// tag) and the operator's View node at Camera.ViewLocal. Concrete stations fill in the geometry-bound spec fields (stand,
+// grips), the Use probe, the visuals and the nodes their grips name. The visuals are built first so the grip nodes exist
+// when the grips are resolved; a grip naming a tag no node registers rejects the station whole (ensure, nothing composed).
 UCLASS(Abstract)
 class UMars_Station_EntityScript : UCk_GenericEntityScript_UE
 {
@@ -31,19 +51,60 @@ class UMars_Station_EntityScript : UCk_GenericEntityScript_UE
         Configure_Spec(Spec);
         AddVisuals(Root);
 
-        Spec.Setup.Probe = Make_Probe();
-        Register_GripNodes(Spec.Setup.GripNodes);
-        Spec.Setup.UsePrompt = FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, Spec.Prompt.Text);
+        auto GripNodes = TArray<FMars_Station_GripNode>();
+        Register_GripNodes(GripNodes);
+        auto GripEntries = TArray<FMars_FPHands_GripEntry>();
+        const auto GripError = Resolve_Grips(Spec.Grips, GripNodes, GripEntries);
+        if (ck::EnsureIfNot(GripError.IsEmpty(), f"[Station] [{Root.ToString()}] rejected the grips: {GripError}"))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
 
-        // A rejected spec or grip already ensured in utils_station::Add.
+        Spec.Setup.Probe = Make_Probe();
+        Spec.Setup.UsePrompt = FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, Spec.Prompt.Text);
+        if (Spec.Camera.ViewLocal.IsSet())
+        { Spec.Setup.View = utils_scene_node::Create(Root, Spec.Camera.ViewLocal.GetValue()).As_Transform(); }
+
+        // A rejected spec already ensured in utils_station::Add.
         auto StationHandle = utils_station::Add(Root, Spec);
-        if (ck::IsValid(StationHandle))
+        if (ck::Is_NOT_Valid(StationHandle))
+        { return ECk_EntityScript_ConstructionFlow::Finished; }
+
+        if (GripEntries.Num() > 0)
+        { utils_fphands::Add_Grips(InHandle, GripEntries); }
+
+        StationHandle.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnStationReserved"));
+        StationHandle.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnStationReleased"));
+        return ECk_EntityScript_ConstructionFlow::Finished;
+    }
+
+    // Each of InGrips on the node InNodes publishes under its tag, in order, into OutEntries; the first grip naming a tag no
+    // node registers stops it and is the returned error (empty = every grip resolved).
+    private FString Resolve_Grips(const TArray<FMars_Station_Grip>& InGrips, const TArray<FMars_Station_GripNode>& InNodes,
+        TArray<FMars_FPHands_GripEntry>& OutEntries) const
+    {
+        for (int32 Index = 0; Index < InGrips.Num(); ++Index)
         {
-            StationHandle.BindTo_OnReserved(FMars_Delegate_Station_OnReserved(this, n"OnStationReserved"));
-            StationHandle.BindTo_OnReleased(FMars_Delegate_Station_OnReleased(this, n"OnStationReleased"));
+            const auto& Grip = InGrips[Index];
+            const auto Node = Find_GripNode(InNodes, Grip.Node);
+            if (ck::Is_NOT_Valid(Node))
+            { return f"grip [{Index}] names the node [{Grip.Node.ToString()}] that no grip node registers"; }
+
+            const auto Socket = Grip.Socket == NAME_None ? TOptional<FName>() : TOptional<FName>(Grip.Socket);
+            OutEntries.Add(FMars_FPHands_GripEntry(Grip.Hand, Node, Socket, Grip.Pose, Grip.ReachOverrideCm, Grip.Frame, Grip.Roll));
         }
 
-        return ECk_EntityScript_ConstructionFlow::Finished;
+        return "";
+    }
+
+    // The node InNodes publishes under InTag; invalid when none does.
+    private FCk_Handle_Transform Find_GripNode(const TArray<FMars_Station_GripNode>& InNodes, FGameplayTag InTag) const
+    {
+        for (const auto& Entry : InNodes)
+        {
+            if (Entry.Tag == InTag)
+            { return Entry.Node; }
+        }
+
+        return FCk_Handle_Transform();
     }
 
     // The Use prompt reads Prompt.OccupiedText while an operator holds the station, and Prompt.Text once it is free.

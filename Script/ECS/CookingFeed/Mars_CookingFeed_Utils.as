@@ -15,8 +15,9 @@ namespace utils_cooking_feed
     // Composes the feed on InHandle (the station entity; the feature does not need the Station feature). The spec's Nodes are
     // built by the caller: Nodes.Release is sampled at every release, and the reserved piece rides Nodes.Hand from its grasp
     // to its release; with hand geometry in the spec the feed moves that node itself, so it must be a scene node under a
-    // parent. The feed starts unsourced (control sets the source from the station's input dock) with the hand idle. A
-    // rejected spec or a missing node ensures and returns an invalid handle.
+    // parent. Nodes.InputDock, when set, must be a lifetime child of InHandle: the feed's setup binds it, and the feed then
+    // draws from the platter that has arrived on it. The feed starts unsourced with the hand idle. A rejected spec, a
+    // missing node or a dock InHandle does not own ensures and returns an invalid handle.
     FCk_Handle_CookingFeed Add(FCk_Handle& InHandle, FMars_CookingFeed_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
@@ -38,12 +39,18 @@ namespace utils_cooking_feed
             { return FCk_Handle_CookingFeed(); }
         }
 
+        const auto InputDock = InSpec.Nodes.InputDock;
+        if (ck::EnsureIfNot(ck::Is_NOT_Valid(InputDock) || utils_entity_lifetime::Get_LifetimeOwner(InputDock) == InHandle,
+            f"[CookingFeed] [{InHandle.ToString()}] has an input dock [{InputDock.ToString()}] it does not own"))
+        { return FCk_Handle_CookingFeed(); }
+
         auto Params = FMars_Fragment_CookingFeed_Params();
         Params.Spec = InSpec;
 
         InHandle.Add_Fragment(FMars_Feature_CookingFeed());
         InHandle.Add_Fragment(Params);
         InHandle.Add_Fragment(FMars_Fragment_CookingFeed());
+        InHandle.Add_Fragment(FMars_Tag_CookingFeed_NeedsSetup());
         return InHandle.As_CookingFeed();
     }
 
@@ -152,7 +159,8 @@ namespace utils_cooking_feed
         return ck::IsValid(InPlatter) && utils_entity_lifetime::Get_IsPendingDestroy(InPlatter, ECk_EntityLifetime_DestructionPhase::BeginDestroy) == false;
     }
 
-    // A transfer past its grasp is committed: it lands through the station's bridge, so a Cancel or a Reset leaves it be.
+    // A transfer past its grasp is committed: it lands through the station's admission inbox, so a Cancel or a Reset leaves
+    // it be.
     bool Get_IsCommitted(EMars_CookingFeed_Phase InPhase)
     {
         return InPhase == EMars_CookingFeed_Phase::Carry || InPhase == EMars_CookingFeed_Phase::AwaitAdmission;
@@ -688,6 +696,12 @@ mixin FCk_Handle_Transform Get_ReleaseNode(const FCk_Handle_CookingFeed& Self)
 mixin FCk_Handle_Transform Get_HandNode(const FCk_Handle_CookingFeed& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.Hand;
+}
+
+// The station's input dock the feed draws from; invalid for a feed whose caller sets the source.
+mixin FCk_Handle_PlatterDock Get_InputDock(const FCk_Handle_CookingFeed& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_CookingFeed_Params).Spec.Nodes.InputDock;
 }
 
 // Where the reserved piece is; unset while idle.

@@ -1,5 +1,5 @@
 // The searing station's whole round on real pieces. The meat platter docks on the raw platter dock and an empty platter on
-// the finished tray's; an operator takes the station (the pan heats) and one add-food press carries the slab: the bridge
+// the finished tray's; an operator takes the station (the pan heats) and one add-food press carries the slab: the feed
 // unloads it from the raw platter and the kernel admits it, so the raw platter is empty and the pan holds the slab. After a
 // second on the hot pan the test asks the kernel by name to take that piece out (a still-cooking piece, which a take-out
 // press, naming none, would not hand back): the kernel loads it onto the docked tray, where it rides as a scene-node child

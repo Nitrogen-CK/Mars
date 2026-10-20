@@ -2,20 +2,18 @@
 // UMars_SmState_Cutting_Idle). It runs on the STATION entity (context = the station, which also carries the Cutting feature,
 // the FoodBoard and the input platter's CookingFeed; its two platter docks are lifetime children of it) and reads the
 // station's operator; it only issues Cutting, FoodBoard and CookingFeed requests and registers the operator's legend rows.
-// The feed tasks are the shared ones (Mars_StationFeed_SmTasks.as): add food (Q) sends the free glove to the whole food on
-// the input platter and the bridge hands it to the board through the station's inbox (the board poses it on its pile
-// node); the board takes one joint at a time, so a press while it holds anything is refused here.
+// The feed's operator tasks are the shared ones (Mars_StationFeed_SmTasks.as): add food (Q) sends the free glove to the
+// whole food on the input platter and the feed hands it to the board through the station's inbox (the board poses it on its
+// pile node); the board takes one joint at a time, so a press while it holds anything is refused here.
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source, StationFeed_Bridge (a release in flight
-//                                                         lands), Cutting_ResetOnEnter (the hand back at the centre for
-//                                                         the next operator)
+//   Idle      ->Operated [StationIsOperated]      tasks: Cutting_ResetOnEnter (the hand back at the centre for the next
+//                                                         operator)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Cutting_OperatorInput (Tick), Cutting_CutBridge,
-//                                                         StationFeed_Source, CuttingFeed_OperatorInput (Tick),
-//                                                         StationFeed_Bridge, CuttingFeed_OperatorHints (Tick),
-//                                                         Cutting_OperatorHints
+//                                                         CuttingFeed_OperatorInput (Tick), CuttingFeed_OperatorHints
+//                                                         (Tick), Cutting_OperatorHints
 //
-// The feed bridge runs in both states: it needs no operator, and a joint released over the board lands whoever is standing
-// there. The sweep (RMB) is this station's take-out (the station's take-out contract on the board), so the feed's take-out
+// The feed sources itself from the input dock and lands its releases without an operator: a joint released over the board
+// lands whoever is standing there. The sweep (RMB) is this station's take-out (the station's take-out contract on the board), so the feed's take-out
 // input is not added: the board lands what it lets go on the finished tray, places back what the tray refuses, and keeps
 // its pieces' pickups off while it holds them.
 //
@@ -77,8 +75,6 @@ class UMars_SmState_Cutting_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Cutting_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_Cutting_ResetOnEnter);
     }
 }
@@ -93,9 +89,7 @@ class UMars_SmState_Cutting_Operated : UCk_SmState_EntityScript
 
         AddTask(InHandle, UMars_SmTask_Cutting_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Cutting_CutBridge);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_CuttingFeed_OperatorInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_CuttingFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_Cutting_OperatorHints);
     }

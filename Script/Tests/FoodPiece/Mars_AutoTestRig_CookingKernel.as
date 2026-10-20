@@ -1,7 +1,7 @@
 // The test feed every cooking kernel's rig shares (Searing, Fry, Batter): the station entity on a transform-only root at the
 // rig's isolated origin, its admission answers recorded; box food pieces (the FoodPiece rig's box, under the world's
 // transient entity) built with no body and parked in a row beside the station, k_ParkPitch apart, handed out in build order;
-// and a release into the station's admission inbox, as the feed's bridge does, with the piece's middle at a given point.
+// and a release into the station's admission inbox, as the feed does, with the piece's middle at a given point.
 // The box's size is read from its metrics, never assumed. Each kernel's rig records its own OnPieceAdded into _AddedIds.
 UCLASS(Abstract)
 class UMars_AutoTestRig_CookingKernel : UMars_AutoTestRig_FoodPiece

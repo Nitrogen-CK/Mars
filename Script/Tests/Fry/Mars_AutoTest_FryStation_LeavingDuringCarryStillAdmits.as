@@ -1,7 +1,7 @@
 // An operator leaving the fry station mid-transfer, the searing station's twin. The raw platter carries two meat boxes and
 // docks; an operator takes the station and presses add food, then leaves while the hand carries: the leave's cancel is a
-// no-op for a transfer past its grasp (the feed's own rule: it is committed), so the release lands through the bridge
-// running in Idle and the fryer admits the box. The operator takes the station again, presses, and leaves while the hand
+// no-op for a transfer past its grasp (the feed's own rule: it is committed), so the feed still hands the release to the
+// station's inbox with nobody operating and the fryer admits the box. The operator takes the station again, presses, and leaves while the hand
 // still reaches: that transfer is Cancelled and the second box never left the raw platter.
 class UMars_AutoTest_FryStation_LeavingDuringCarryStillAdmits : UMars_AutoTestRig_HeatStation
 {

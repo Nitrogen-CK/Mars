@@ -620,8 +620,8 @@ struct FMars_Fry_Summary
     int32 OverdoneFaces = 0;
 }
 
-// Written only by the Fry processors (and Add). The station SM, the feed bridge and the operator only issue requests (the
-// bridge through the station's admission inbox, the take-out through the station's take-out contract).
+// Written only by the Fry processors (and Add). The station SM, the CookingFeed kernel and the operator only issue requests (the
+// feed through the station's admission inbox, the take-out through the station's take-out contract).
 struct FMars_Fragment_Fry
 {
     // In admission order. Lost pieces stay while they linger (one array, one identity space).

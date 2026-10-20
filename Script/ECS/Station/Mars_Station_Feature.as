@@ -40,8 +40,8 @@ enum EMars_Station_LookControl
     Captured
 }
 
-// One glove's grip while operating: the station node the glove rides, named by its role tag (the entity script registers
-// the node under that tag, FMars_Station_GripNode), and where on it.
+// One glove's grip while operating: the station node the glove rides, named by its role tag (the placing script registers
+// the node under that tag, FMars_Station_GripNode, and declares the gloves' grip table from these), and where on it.
 struct FMars_Station_Grip
 {
     UPROPERTY()
@@ -84,33 +84,16 @@ struct FMars_Station_Grip
     }
 }
 
-// A station node published under a role tag, for the spec's grips to name.
-struct FMars_Station_GripNode
-{
-    UPROPERTY()
-    FGameplayTag Tag;
-
-    UPROPERTY()
-    FCk_Handle_Transform Node;
-
-    FMars_Station_GripNode() {}
-
-    FMars_Station_GripNode(FGameplayTag InTag, FCk_Handle_Transform InNode)
-    {
-        Tag = InTag;
-        Node = InNode;
-    }
-}
-
 // What the placing script builds for the station at construction (FMars_Station_Spec.Setup, never saved): the Use probe
-// (unset = a transform-only Use interactable), the nodes its grips name, and the Use target's prompt.
+// (unset = a transform-only Use interactable), the operator's View node, and the Use target's prompt.
 struct FMars_Station_Setup
 {
     // Not a UPROPERTY, as FMars_Interactable_Spec.ProbeInfo.
     TOptional<FMars_Interactable_ProbeInfo> Probe;
 
-    UPROPERTY()
-    TArray<FMars_Station_GripNode> GripNodes;
+    // The node at Camera.ViewLocal in the station frame (a child of the root), when the spec sets one: what Get_View hands
+    // the operator's camera. Not a UPROPERTY: the spawn params never carry handles.
+    FCk_Handle_Transform View;
 
     // The Use target's prompt, input action included; unset = a prompt-less Use target. The kernel never re-texts it: the
     // placing script words it for the reservation (UMars_Station_EntityScript).
@@ -179,8 +162,8 @@ struct FMars_Station_Spec
     UPROPERTY()
     TArray<FMars_Station_Grip> Grips;
 
-    // Ceiling for the glide to the stand (seconds); the glide itself is derived from the distance and the turn
-    // (utils_station::Get_EngageSeconds). 0 snaps.
+    // Ceiling for the glide to the stand (seconds); the operator's Operating state derives the glide itself from the
+    // distance and the turn. 0 snaps.
     UPROPERTY()
     float32 EngageMaxSeconds = 0.35f;
 
@@ -217,8 +200,9 @@ struct FMars_Station_Spec
 }
 
 // A negative glide ceiling has no meaning, a yaw half angle outside (0, 180] fences nothing or everything, an empty
-// prompt text leaves the player a glyph with no verb, a grip without a node tag names nothing, a glove holds one grip,
-// and a Use prompt, when Setup carries one, must validate. Add resolves the grips against Setup.GripNodes.
+// prompt text leaves the player a glyph with no verb, a grip without a node tag names nothing, a glove holds one grip, a
+// Camera.ViewLocal needs the View node Setup carries, and a Use prompt, when Setup carries one, must validate. The placing
+// script resolves the grips against the nodes it registers (UMars_Station_EntityScript).
 mixin FMars_Validation Validate(const FMars_Station_Spec& Self)
 {
     for (int32 Index = 0; Index < Self.Grips.Num(); ++Index)
@@ -238,6 +222,9 @@ mixin FMars_Validation Validate(const FMars_Station_Spec& Self)
 
     if (Self.Camera.YawHalfAngle <= 0.0f || Self.Camera.YawHalfAngle > 180.0f)
     { return FMars_Validation(f"Station has Camera.YawHalfAngle [{Self.Camera.YawHalfAngle}] outside (0, 180]"); }
+
+    if (Self.Camera.ViewLocal.IsSet() && ck::Is_NOT_Valid(Self.Setup.View))
+    { return FMars_Validation("Station sets Camera.ViewLocal but Setup carries no View node"); }
 
     if (Self.Prompt.Text.IsEmpty())
     { return FMars_Validation("Station has an empty Prompt.Text"); }
@@ -284,7 +271,8 @@ struct FMars_Fragment_Station
     UPROPERTY()
     FCk_Handle_Transform Stand;
 
-    // Child scene node at Camera.ViewLocal: the operator's view while operating. Invalid when the spec leaves it unset.
+    // The operator's view while operating: the placing script's node at Camera.ViewLocal (Setup.View). Invalid when the
+    // spec leaves it unset.
     UPROPERTY()
     FCk_Handle_Transform View;
 
@@ -292,8 +280,8 @@ struct FMars_Fragment_Station
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
 
-    // Transform-only, prompt-less, on the root (its owner carries the grip table the gloves read): one ManuallyCompleted
-    // Operate target the Operating state starts so the gloves hold.
+    // Transform-only, prompt-less, on the root (its owner carries the grip table the placing script declared, which the
+    // gloves read): one ManuallyCompleted Operate target the Operating state starts so the gloves hold.
     UPROPERTY()
     FCk_Handle_Interactable GripInteractable;
 

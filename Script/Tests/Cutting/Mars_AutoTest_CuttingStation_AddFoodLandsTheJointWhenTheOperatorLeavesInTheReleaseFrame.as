@@ -1,7 +1,7 @@
 // The operator leaving in the frame the feed releases the joint strands nothing. The meat platter docks and an operator takes
-// the station and adds food; in the frame the feed asks for the release (the joint let go from the glove, the Operated
-// bridge placing it) the operator leaves. Whichever drains first, the board's answer or the state change, the joint lands on
-// the board: the Idle bridge takes the release in flight over. The station is Idle, the board holds the joint,
+// the station and adds food; in the frame the feed asks for the release (the joint let go from the glove, the feed already
+// handing it to the board) the operator leaves. Whichever drains first, the board's answer or the state change, the joint
+// lands on the board: the feed sees its own release through whoever operates. The station is Idle, the board holds the joint,
 // the platter is empty, the joint was placed once and the feed admitted it and is Idle. Isolated origin (19200, -9000,
 // -30000).
 class UMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInTheReleaseFrame : UMars_AutoTestRig_CuttingStation
@@ -33,7 +33,7 @@ class UMars_AutoTest_CuttingStation_AddFoodLandsTheJointWhenTheOperatorLeavesInT
         Run_Steps(InHandle);
     }
 
-    // Bound after the Operated bridge (it bound on enter): the bridge places the joint first, then the operator leaves.
+    // The feed hands the joint to the board's inbox before it broadcasts the release, so the operator leaves after.
     UFUNCTION()
     private void Step_AddFoodAndLeaveOnRelease(FCk_Handle InHandle, FInstancedStruct InPayload)
     {

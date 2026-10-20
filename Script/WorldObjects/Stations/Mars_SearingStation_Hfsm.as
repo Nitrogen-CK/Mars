@@ -1,16 +1,14 @@
 // The searing station's control layer: its own state machine (FMars_Station_Spec.MinigameStateClass =
 // UMars_SmState_Searing_Idle). It runs on the STATION entity (context = the station, which also carries the Searing
 // feature and the raw platter's CookingFeed; its two platter docks are lifetime children of it) and reads the station's
-// operator; it only issues Searing, CookingFeed and Platter requests and registers the operator's legend rows. The feed
-// tasks are the shared ones (Mars_StationFeed_SmTasks.as).
+// operator; it only issues Searing, CookingFeed and Platter requests and registers the operator's legend rows. The feed's
+// operator tasks are the shared ones (Mars_StationFeed_SmTasks.as); the feed sources itself from the input dock and lands
+// its releases (a transfer past its grasp is committed, the feed's own rule).
 //
-//   Idle      ->Operated [StationIsOperated]      tasks: StationFeed_Source,
-//                                                 StationFeed_Bridge (a release in flight lands: a transfer past its
-//                                                 grasp is committed, the feed's own rule),
-//                                                 Searing_ResetOnEnter (a level, cold pan; the pieces stay on it)
+//   Idle      ->Operated [StationIsOperated]      tasks: Searing_ResetOnEnter (a level, cold pan; the pieces stay on it)
 //   Operated  ->Idle     [StationIsNotOperated]   tasks: Searing_HeatOnEnter, Searing_OperatorInput (Tick), Searing_OperatorHints,
-//                                                 StationFeed_Source, StationFeed_OperatorInput (Tick), StationFeed_Bridge,
-//                                                 StationFeed_OperatorHints, StationFeed_TakeOutInput (Tick)
+//                                                 StationFeed_OperatorInput (Tick), StationFeed_OperatorHints,
+//                                                 StationFeed_TakeOutInput (Tick)
 //
 // A piece the pan hands back lands on the finished tray through the station's assembly (UMars_FeedStation_EntityScript),
 // whoever operates.
@@ -26,8 +24,6 @@ class UMars_SmState_Searing_Idle : UCk_SmState_EntityScript
         auto ToOperated = AddTransition(InHandle, UMars_SmState_Searing_Operated);
         AddCondition(ToOperated, UMars_SmCondition_StationIsOperated);
 
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_Searing_ResetOnEnter);
     }
 }
@@ -43,9 +39,7 @@ class UMars_SmState_Searing_Operated : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Searing_HeatOnEnter);
         AddTask(InHandle, UMars_SmTask_Searing_OperatorInput);
         AddTask(InHandle, UMars_SmTask_Searing_OperatorHints);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Source);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorInput);
-        AddTask(InHandle, UMars_SmTask_StationFeed_Bridge);
         AddTask(InHandle, UMars_SmTask_StationFeed_OperatorHints);
         AddTask(InHandle, UMars_SmTask_StationFeed_TakeOutInput);
     }

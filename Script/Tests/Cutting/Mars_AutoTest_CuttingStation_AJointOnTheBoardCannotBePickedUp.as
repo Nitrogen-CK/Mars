@@ -1,6 +1,6 @@
 // A whole food the board holds cannot be taken by hand: the board's ledger would never notice. The meat slab (a food item)
-// has its pickup live on the input platter; once the feed places it on the board (nobody operating: the feed's bridge runs
-// in Idle too) the pickup reads disabled. Swept onto the docked tray (a handoff release), the slab gets its pickup back.
+// has its pickup live on the input platter; once the feed places it on the board (nobody operating: the feed needs no
+// operator) the pickup reads disabled. Swept onto the docked tray (a handoff release), the slab gets its pickup back.
 class UMars_AutoTest_CuttingStation_AJointOnTheBoardCannotBePickedUp : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(16800.0, -21000.0, -30000.0);

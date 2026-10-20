@@ -16,13 +16,14 @@ struct FMars_CookingFeed_Frame
 // remainder into the next phase. Entering Grasp asks the source to unload the reserved piece; Carry's end lets the piece go
 // where the hand holds it (detached at its world pose) and samples the release (that pose, or the release node's when no
 // piece rode the hand; the spec's local velocity rotated to the node plus the inherited node velocity) and waits for the
-// admission answer; Return's end idles the hand. With hand geometry in the spec the hand node then takes this frame's pose
-// (utils_cooking_feed::Get_HandLocal: rest, the reserved piece's middle as it last lay on its own, the release node), so
-// the carry never depends on who draws the glove. Then the piece follows the hand: once its unload has landed (off the
-// source, its body Kinematic) it is attached under Nodes.Hand where it is, and through Grasp its offset lerps to
-// Motion.HeldOffset. Last, the stock is compared with what was last broadcast: the source changes under the feed without a
-// request, so its edges are found here. A feed torn down while it holds a piece (from the grasp until the admission
-// answer) ends that piece with it.
+// admission answer, handing the release to the station's admission inbox (Begin_Handoff; one whose piece is still coming
+// off its platter goes once that unload lands: Watch_Handoff); Return's end idles the hand. With hand geometry in the spec
+// the hand node then takes this frame's pose (utils_cooking_feed::Get_HandLocal: rest, the reserved piece's middle as it
+// last lay on its own, the release node), so the carry never depends on who draws the glove. Then the piece follows the
+// hand: once its unload has landed (off the source, its body Kinematic) it is attached under Nodes.Hand where it is, and
+// through Grasp its offset lerps to Motion.HeldOffset. Last, the stock is compared with what was last broadcast: the source
+// changes under the feed without a request, so its edges are found here. A feed torn down while it holds a piece (from the
+// grasp until the admission answer) ends that piece with it.
 class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -44,6 +45,7 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         Guard_Reservation(Frame, InState);
         Measure_Release(Frame, InState);
         Expire_Admission(Frame, InState);
+        Watch_Handoff(Frame, InState);
         Advance_Phase(Frame, InState);
         Move_Hand(Frame, InState);
         Carry_Piece(Frame, InState);
@@ -175,6 +177,9 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         if (utils_cooking_feed::Get_IsTimed(InState.Phase) == false)
         { InState.PhaseSeconds = 0.0f; }
 
+        if (Released)
+        { Begin_Handoff(InFrame, InState); }
+
         if (Entered.Num() == 0)
         { return; }
 
@@ -189,6 +194,66 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
 
         if (Released && Feed.Has_Fragment(FMars_Fragment_CookingFeed_Signals))
         { Feed.Get_Fragment(FMars_Fragment_CookingFeed_Signals).OnReleaseRequested.Broadcast(Feed, Release); }
+    }
+
+    // At the release. A station's feed (it has an input dock), or one a receiving kernel sits beside, hands the release to
+    // its own entity's admission inbox: at once when its piece is off every platter (or there is none), else once the unload
+    // lands (Watch_Handoff), since a piece another ledger holds is no kernel's to take. A bare feed leaves the release to
+    // whoever answers OnReleaseRequested.
+    private void Begin_Handoff(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
+    {
+        FCk_Handle Station = InFrame.Feed;
+        const auto IsStationFeed = ck::IsValid(InFrame.Spec.Nodes.InputDock) || utils_cooking_feed::Get_IsAdmitting(Station);
+        if (IsStationFeed == false)
+        {
+            InState.Handoff = EMars_CookingFeed_Handoff::None;
+            return;
+        }
+
+        const auto Release = InState.PendingRelease;
+        if (ck::IsValid(Release.Piece.TryGet_Platter()))
+        {
+            InState.Handoff = EMars_CookingFeed_Handoff::AwaitingUnload;
+            return;
+        }
+
+        InState.Handoff = EMars_CookingFeed_Handoff::Handed;
+        Hand_Off(InFrame, Release);
+    }
+
+    // A release whose piece was still coming off its platter goes to the inbox on the frame the piece is off it, unless the
+    // feed gave the release up meanwhile (a new source, or the admission budget ran out) and already sent the piece back. A
+    // piece gone meanwhile is never handed: the budget settles its release.
+    private void Watch_Handoff(FMars_CookingFeed_Frame& InFrame, FMars_Fragment_CookingFeed& InState)
+    {
+        if (InState.Handoff != EMars_CookingFeed_Handoff::AwaitingUnload)
+        { return; }
+
+        const auto Release = InState.PendingRelease;
+        if (InFrame.Feed.Get_IsAwaiting(Release.PieceId) == false)
+        {
+            InState.Handoff = EMars_CookingFeed_Handoff::None;
+            return;
+        }
+
+        if (Release.Piece.Get_IsGone() || ck::IsValid(Release.Piece.TryGet_Platter()))
+        { return; }
+
+        InState.Handoff = EMars_CookingFeed_Handoff::Handed;
+        Hand_Off(InFrame, Release);
+    }
+
+    // Into the feed's own entity's admission inbox; the receiving kernel answers on the station's OnAdmission, which the
+    // feed's setup forwards. A station no kernel receives at refuses the release here, so the hand returns and the piece
+    // goes back.
+    private void Hand_Off(const FMars_CookingFeed_Frame& InFrame, const FMars_CookingFeed_Release& InRelease)
+    {
+        FCk_Handle Station = InFrame.Feed;
+        if (utils_cooking_feed::Request_Admit(Station, InRelease))
+        { return; }
+
+        auto Feed = InFrame.Feed;
+        Feed.Request_ResolveAdmission(FMars_Request_CookingFeed_ResolveAdmission(InRelease.PieceId, EMars_CookingFeed_Admission::Rejected, "no receiver kernel"));
     }
 
     // The hand node's pose this frame (with hand geometry only), written on change. The reserved piece's middle is sampled

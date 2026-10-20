@@ -4,10 +4,10 @@
 // reserved piece's middle at the grasp and on the release node at the release, the held piece's middle on the node: nothing
 // here draws or moves a glove), and its stock: a platter (a plain Transform entity under the test, 200 to the side, standing
 // on a kinematic floor box, the large platter item's bounds and capacity with quick settle tuners so a pile re-settles
-// within a few frames) loaded with k_Stock box pieces. Add_Steps_SourceTheFeed waits for the pieces to land and sources the feed. The rig is the test receiver and
-// stands in for the station's bridge: it records every signal (phases, releases with the release node's pose at that
-// moment, settles, refusals, stock edges) and puts nothing back itself (the feed gives back every piece it took and nobody
-// admitted). Its steps answer the last release Accepted or Rejected. A test that needs a receiving kernel builds a Searing
+// within a few frames) loaded with k_Stock box pieces. Add_Steps_SourceTheFeed waits for the pieces to land and sources the
+// feed. The feed is a bare one (no input dock, no kernel beside it), so it hands its releases to nobody: the rig is the test
+// receiver. It records every signal (phases, releases with the release node's pose at that moment, settles, refusals,
+// stock edges) and puts nothing back itself (the feed gives back every piece it took and nobody admitted). Its steps answer the last release Accepted or Rejected. A test that needs a receiving kernel builds a Searing
 // under the release node (Build_Searing), on its own station entity, whose admission inbox it hands releases to.
 UCLASS(Abstract)
 class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece

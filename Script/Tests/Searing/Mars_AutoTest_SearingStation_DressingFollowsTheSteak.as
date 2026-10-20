@@ -1,8 +1,8 @@
 // The real searing station (spawned through its entity script, the only station in this world) starts with an empty pan
 // and no source for its feed (nothing is docked).
-// Nobody operates it here, so no release reaches its feed bridge: the test admits one piece itself (a box food piece wearing
+// Nobody operates it here, so its feed releases nothing: the test admits one piece itself (a box food piece wearing
 // its own display, as whoever makes a piece dresses it; into the station's admission inbox with its middle at the feed's
-// release node, as the bridge would) and reads the dressing the station builds from the kernel every frame. The station adds no part to the
+// release node, as the feed would) and reads the dressing the station builds from the kernel every frame. The station adds no part to the
 // admitted piece: it keeps its own display and nothing hangs off it. After a second of heat with the piece on the pan: the
 // kernel sears its down face (NegZ as released), the pan's material shows the piece's footprint at its pan-local XY in the
 // mesh's cm with the footprint radius and pool radius of the piece's own size, the oil trail has caught up with it, and the
@@ -149,7 +149,7 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         Res.Set(StateClass == UMars_SmState_Searing_Idle && _Searing.Has_Fragment(FMars_Fragment_Searing_Requests) == false);
     }
 
-    // The bridge's job done by hand: one release of the box, its middle at the feed's release node (over the pan's centre,
+    // The feed's hand-off done by hand: one release of the box, its middle at the feed's release node (over the pan's centre,
     // above the rim), with the feed's generation and slot 0; the feed itself is not asked.
     UFUNCTION()
     private void Step_AssertEmptyHeatAndAdd(FCk_Handle InHandle, FInstancedStruct InPayload)

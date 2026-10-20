@@ -48,13 +48,25 @@ class UMars_SmState_Operating : UCk_SmState_EntityScript
     }
 }
 
+namespace constants_station_engage
+{
+    // Engage motion rates. The glide matches the player's walk speed, so being carried to the stand reads as finishing
+    // your own walk; the turn rate caps involuntary body rotation; the floor keeps a zero-travel engage from being an
+    // instant snap.
+    const float32 k_EngageGlideSpeed = 600.0f;
+    const float32 k_EngageMaxTurnRate = 220.0f;
+    const float32 k_EngageMinSeconds = 0.15f;
+    // How long the operator's view takes to blend to (and back from) the station's View node.
+    const float32 k_ViewBlendSeconds = 0.3f;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // PoseLock
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Glides the capsule to the stand (feet on the stand, facing its +X) over utils_station::Get_EngageSeconds, each step a
-// teleport-set so the movement component does not drag against it, and keeps the body yaw off the view until exit. No
-// actor (headless) = nothing to do.
+// Glides the capsule to the stand (feet on the stand, facing its +X) over Get_EngageSeconds, each step a teleport-set so
+// the movement component does not drag against it, and keeps the body yaw off the view until exit. No actor (headless) =
+// nothing to do.
 class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::Tick;
@@ -101,7 +113,7 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
         { _DeltaYaw += 360.0; }
 
         const auto Distance = float32((_TargetLocation - _StartLocation).Size());
-        _GlideSeconds = utils_station::Get_EngageSeconds(Distance, float32(_DeltaYaw), Station.Get_Spec().EngageMaxSeconds);
+        _GlideSeconds = Get_EngageSeconds(Distance, float32(_DeltaYaw), Station.Get_Spec().EngageMaxSeconds);
         _GlideElapsed = 0.0f;
         _Gliding = true;
 
@@ -130,6 +142,19 @@ class UMars_SmTask_Operating_PoseLock : UCk_SmTask_EntityScript
         { _Character.bUseControllerRotationYaw = true; }
 
         _Character = nullptr;
+    }
+
+    // Seconds the operator glides to the stand: as long as walking InDistance (uu) or turning InTurnDegrees would take,
+    // clamped to [k_EngageMinSeconds, InMaxSeconds]; 0 when InMaxSeconds is 0 (snap).
+    private float32 Get_EngageSeconds(float32 InDistance, float32 InTurnDegrees, float32 InMaxSeconds) const
+    {
+        if (InMaxSeconds <= 0.0f)
+        { return 0.0f; }
+
+        const auto GlideSeconds = InDistance / constants_station_engage::k_EngageGlideSpeed;
+        const auto TurnSeconds = Math::Abs(InTurnDegrees) / constants_station_engage::k_EngageMaxTurnRate;
+        const auto MinSeconds = Math::Min(constants_station_engage::k_EngageMinSeconds, InMaxSeconds);
+        return Math::Clamp(Math::Max(GlideSeconds, TurnSeconds), MinSeconds, InMaxSeconds);
     }
 
     private void Apply_Pose(float32 InAlpha)
@@ -193,7 +218,7 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
         {
             auto Request = FCk_Request_Camera_AddLayer(UMars_CameraLayer_Station);
             Request.Set_StackingBehavior(ECk_Camera_StackingBehavior::OneOnly);
-            Request.Set_BlendInTime(FCk_Time(utils_station::k_ViewBlendSeconds));
+            Request.Set_BlendInTime(FCk_Time(constants_station_engage::k_ViewBlendSeconds));
             Request.Set_CameraTarget(FCk_Camera_Target(View, ECk_Camera_TargetMode::ViewTarget));
             _Camera.Request_AddLayer(Request);
             _HasStationView = true;
@@ -221,7 +246,7 @@ class UMars_SmTask_Operating_Camera : UCk_SmTask_EntityScript
             if (_HasStationView)
             {
                 auto Request = FCk_Request_Camera_RemoveLayer(UMars_CameraLayer_Station);
-                Request.Set_BlendOutTime(FCk_Time(utils_station::k_ViewBlendSeconds));
+                Request.Set_BlendOutTime(FCk_Time(constants_station_engage::k_ViewBlendSeconds));
                 _Camera.Request_RemoveLayer(Request);
             }
 

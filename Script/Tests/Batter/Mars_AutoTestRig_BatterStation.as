@@ -12,7 +12,7 @@ struct FMars_AutoTest_BatterStation_SpawnParams
 // The batter-station rig: the real batter station, spawned at an isolated origin through its entity script as its own
 // context (as the map's entity spawner does) with its two platter docks, and a bare operator (no input, no display) that
 // takes and leaves it, so the station's own state machine runs Idle and Operated: the feed draws from the docked raw
-// platter, its bridge hands each release to the station's admission inbox, and the kernel lands every piece a take-out
+// platter, the feed hands each release to the station's admission inbox, and the kernel lands every piece a take-out
 // hands back on the tray the take-out names. A press is the request the operator's input task would issue. Platters are
 // World-mode platter world items lying on static floors beside the station (the heat-station fixture's) until a test docks
 // them.

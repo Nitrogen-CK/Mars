@@ -209,7 +209,7 @@ struct FMars_Batter_PieceState
     EMars_Batter_CoatStage Stage = EMars_Batter_CoatStage::Bare;
 }
 
-// Written only by the two Batter processors (and Add). The station SM, the feed bridge and the operator only issue requests.
+// Written only by the two Batter processors (and Add). The station SM, the CookingFeed kernel and the operator only issue requests.
 struct FMars_Fragment_Batter
 {
     UPROPERTY()

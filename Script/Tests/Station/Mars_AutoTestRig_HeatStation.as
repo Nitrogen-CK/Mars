@@ -10,8 +10,8 @@ enum EMars_AutoTest_HeatStation
 
 // The heat-station rig: the real searing or fry station, spawned at an isolated origin through its entity script with its
 // two platter docks, and a bare operator (no input, no display) that takes and leaves it, so the station's own state
-// machine runs Idle and Operated: the feed draws from the docked raw platter, its bridge hands each release to the
-// station's admission inbox, and the kernel loads every piece a take-out hands back onto the tray the take-out names (a
+// machine runs Idle and Operated: the feed draws from the docked raw platter and hands each release to the station's
+// admission inbox; the kernel loads every piece a take-out hands back onto the tray the take-out names (a
 // piece the tray refuses goes back to the kernel). A press is the request the operator's input task would issue. Platters are World-mode
 // platter world items under the test (large ones unless a test asks for another), each lying on a static floor beside the
 // station (a platter drops what it is given only while it lies still) until a test docks them. The station, the platters,

@@ -93,8 +93,9 @@ struct FMars_Station_DockPolicies
 // hand geometry the feed moves that node by, Add_FeedHand) and the two docks (Get_DockLayout) with their markers; every
 // frame it poses the left glove (the feed's pose override) and writes every admitted piece's look (Add_PieceRecord on the
 // kernel's OnPieceAdded; the station says how the look follows its kernel: Get_HoldsPiece, Get_IsPieceFrozen,
-// Make_PieceLook). Where the station's food goes is its kernels': the feed hands each release to the station's admission
-// inbox, and the kernel loads what it hands back onto the tray and takes back what the tray refuses. The label (the counter
+// Make_PieceLook). Where the station's food goes is its kernels': the feed draws from the input dock it is composed with and
+// hands each release to the station's admission inbox, and the kernel loads what it hands back onto the tray and takes back
+// what the tray refuses. The label (the counter
 // base's) also flashes the feed's refusals and let-go pieces and the docks' failed interactions.
 UCLASS(Abstract)
 class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
@@ -298,20 +299,9 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
     // Composition
     //----------------------------------------------------------------------------------------------------------------------
 
+    // The docks first: the feed draws from the input dock it is composed with.
     private void Compose_Feed(FCk_Handle& InHandle)
     {
-        // A rejected feed spec already ensured in utils_cooking_feed::Add; the kernel still works without a platter.
-        auto FeedSpec = Feed;
-        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
-        FeedSpec.Motion.HeldOffset = _FeedHeldLocal;
-        FeedSpec.Hand = TOptional<FMars_CookingFeed_HandGeometry>(_FeedHandGeometry);
-        _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
-        if (ck::IsValid(_FeedHandle))
-        {
-            _FeedHandle.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnFeedTransferRefused"));
-            _FeedHandle.BindTo_OnPieceLetGo(FMars_Delegate_CookingFeed_OnPieceLetGo(this, n"OnFeedPieceLetGo"));
-        }
-
         const auto Layout = Get_DockLayout();
         _InputDock = Add_Dock(EMars_PlatterDock_Role::Input, Layout.Input);
         _OutputDock = Add_Dock(EMars_PlatterDock_Role::Output, Layout.Output);
@@ -321,6 +311,19 @@ class UMars_FeedStation_EntityScript : UMars_CounterStation_EntityScript
 
         if (ck::IsValid(_OutputDock))
         { Watch_Failures(_OutputDock.Get_Interactable()); }
+
+        // A rejected feed spec already ensured in utils_cooking_feed::Add; the kernel still works without a platter.
+        auto FeedSpec = Feed;
+        FeedSpec.Nodes = FMars_CookingFeed_Nodes(_ReleaseNode, _FeedHandNode.As_Transform());
+        FeedSpec.Nodes.InputDock = _InputDock;
+        FeedSpec.Motion.HeldOffset = _FeedHeldLocal;
+        FeedSpec.Hand = TOptional<FMars_CookingFeed_HandGeometry>(_FeedHandGeometry);
+        _FeedHandle = utils_cooking_feed::Add(InHandle, FeedSpec);
+        if (ck::IsValid(_FeedHandle))
+        {
+            _FeedHandle.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnFeedTransferRefused"));
+            _FeedHandle.BindTo_OnPieceLetGo(FMars_Delegate_CookingFeed_OnPieceLetGo(this, n"OnFeedPieceLetGo"));
+        }
     }
 
     // A dock on the counter top, a child of the root (it dies with the station), lifted so a docked platter's underside rests

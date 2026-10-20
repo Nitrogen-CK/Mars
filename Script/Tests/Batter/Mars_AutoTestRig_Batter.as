@@ -1,6 +1,6 @@
 // The batter rig: a Batter kernel on a transform-only root at an isolated origin, its bowl node k_BowlLocal above the root.
 // No meshes and no floor. The rig is the operator and the test feed: it dips and lifts, and Admit releases built piece
-// Slot as piece {1, Slot} into the station's admission inbox, as the feed's bridge does. Pieces are the cooking kernels'
+// Slot as piece {1, Slot} into the station's admission inbox, as the feed does. Pieces are the cooking kernels'
 // parked boxes (UMars_AutoTestRig_CookingKernel): Build_FoodPieces makes whole pieces of a food, Build_BatteredPieces the
 // same with a battered ledger. A take-out lands on a World-mode platter the
 // heat-station fixture lays on a floor beside the station (Spawn_Tray). The handlers record every signal, the station's

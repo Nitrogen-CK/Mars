@@ -570,7 +570,7 @@ struct FMars_Tumbler_PieceState
     float32 Coverage = 0.0f;
 }
 
-// Written only by the two Tumbler processors (and Add). The station SM, the feed bridge and the operator only issue requests;
+// Written only by the two Tumbler processors (and Add). The station SM, the CookingFeed kernel and the operator only issue requests;
 // a transfer in flight is read from the station's CookingFeed, never mirrored here.
 struct FMars_Fragment_Tumbler
 {

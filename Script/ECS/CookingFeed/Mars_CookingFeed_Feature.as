@@ -10,6 +10,9 @@ asset Mars_CookingFeedHandle of UCkDynamic_HandleDefinition
 }
 struct FMars_Feature_CookingFeed {}
 
+// On a feed from its Add until UMars_Processor_CookingFeed_Setup has bound it.
+struct FMars_Tag_CookingFeed_NeedsSetup {}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Vocabulary
 //--------------------------------------------------------------------------------------------------------------------------
@@ -127,6 +130,19 @@ struct FMars_CookingFeed_PieceId
 mixin bool Get_IsSame(const FMars_CookingFeed_PieceId& Self, const FMars_CookingFeed_PieceId& InOther)
 {
     return Self.Generation == InOther.Generation && Self.TransferIndex == InOther.TransferIndex;
+}
+
+// Where the release in flight stands with the admission inbox on the feed's own entity (meaningful only while the feed
+// awaits that release's answer).
+enum EMars_CookingFeed_Handoff
+{
+    // Not the feed's to hand: a bare feed (no input dock, no kernel receiving beside it) leaves the release to whoever
+    // answers OnReleaseRequested.
+    None,
+    // Its piece is still coming off its platter: it goes to the inbox once it is off.
+    AwaitingUnload,
+    // In the inbox, or refused for want of a receiving kernel: the answer is on its way.
+    Handed
 }
 
 // Where the reserved piece is, from the press to the admission answer. The feed takes it off the source itself at the grasp.
@@ -264,8 +280,9 @@ struct FMars_CookingFeed_MotionSpec
 }
 
 // Built by the placing script: the node whose world pose is sampled at release (on the searing station a child of the pan
-// mesh node above the rim; on the fryer a node over the oil), and the glove's carry node the reserved piece rides from the
-// grasp to the release (a scene node: the feed moves it when its spec carries hand geometry, the station otherwise).
+// mesh node above the rim; on the fryer a node over the oil), the glove's carry node the reserved piece rides from the
+// grasp to the release (a scene node: the feed moves it when its spec carries hand geometry, the station otherwise), and
+// the station's input dock.
 struct FMars_CookingFeed_Nodes
 {
     UPROPERTY()
@@ -273,6 +290,11 @@ struct FMars_CookingFeed_Nodes
 
     UPROPERTY()
     FCk_Handle_Transform Hand;
+
+    // Set, the feed is a station's: it draws from whatever platter has arrived on this dock (a lifetime child of the feed's
+    // entity), and a release no kernel receives beside it is refused at once. Unset, the caller sets the source. Not a
+    // UPROPERTY: the spawn params never carry handles.
+    FCk_Handle_PlatterDock InputDock;
 
     FMars_CookingFeed_Nodes() {}
 
@@ -442,6 +464,10 @@ struct FMars_Fragment_CookingFeed
     // source or coming off it, Ready), sampled every frame until it rides the hand; unset while idle.
     UPROPERTY()
     TOptional<FVector> GraspPoint;
+
+    // Where PendingRelease stands with the station's admission inbox; set at every release.
+    UPROPERTY()
+    EMars_CookingFeed_Handoff Handoff = EMars_CookingFeed_Handoff::None;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -455,8 +481,9 @@ event void FMars_Delegate_CookingFeed_OnStockChanged_MC(FCk_Handle_CookingFeed I
 delegate void FMars_Delegate_CookingFeed_OnPhaseChanged(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Phase InPhase);
 event void FMars_Delegate_CookingFeed_OnPhaseChanged_MC(FCk_Handle_CookingFeed InFeed, EMars_CookingFeed_Phase InPhase);
 
-// Once per transfer, at Carry's end: the station's bridge puts it in the station's admission inbox
-// (utils_cooking_feed::Request_Admit) and hands the kernel's answer (OnAdmission) back with Request_ResolveAdmission.
+// Once per transfer, at Carry's end. A station's feed has already handed it to its own entity's admission inbox (or will,
+// once its piece is off its platter) and takes the kernel's answer from the station's OnAdmission itself; a bare feed's
+// listener answers it with Request_ResolveAdmission.
 delegate void FMars_Delegate_CookingFeed_OnReleaseRequested(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease);
 event void FMars_Delegate_CookingFeed_OnReleaseRequested_MC(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease);
 

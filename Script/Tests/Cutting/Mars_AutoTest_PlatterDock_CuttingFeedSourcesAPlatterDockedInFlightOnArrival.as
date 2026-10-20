@@ -5,7 +5,7 @@
 // the platter but it has not arrived, the feed is unsourced (and there is at least one such frame); once it has arrived the
 // feed draws from it. Add food then lays the joint on the board at the pile: the board holds the joint, the joint hangs off
 // no scene node and its world location is within 2 cm of the board's pose for it on its pile node. Nobody operates the station: the
-// feed's source and bridge tasks run in Idle too. Isolated origin (20800, -9000, -30000).
+// feed follows its input dock whoever operates. Isolated origin (20800, -9000, -30000).
 class UMars_AutoTest_PlatterDock_CuttingFeedSourcesAPlatterDockedInFlightOnArrival : UMars_AutoTestRig_CuttingStation
 {
     private const FVector k_Origin = FVector(20800.0, -9000.0, -30000.0);
