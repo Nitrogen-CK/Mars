@@ -44,6 +44,23 @@ class UMars_AutoTest_AnchorResolver_PresetTablesCoverRoles : UMars_AutoTestRig_A
 
         Assert_True(Route.Rows[1].Script == UMars_Anchor_LeverGate_EntityScript, "Route row 1 is the lever-gate candidate");
         Assert_True(Route.Rows[2].Script == UMars_Anchor_Rubble_EntityScript, "Route row 2 is the rubble candidate");
+        Assert_True(Route.Rows[3].Script == UMars_Anchor_OneSidedLeverGate_EntityScript && Route.Rows[3].Need == EMars_AnchorRow_Need::LeverSide,
+            "Route row 3 is the one-sided lever gate and needs a lever side");
+
+        // The pocket families: every table has an Other row (an unplanned anchor's draw), the cache table Active and
+        // Dormant rows instead, and every weight is positive.
+        const auto Pockets = utils_anchor::Get_PocketTables();
+        Assert_True(Pockets.Num() == 7, "seven pocket tables");
+        for (auto Table : Pockets)
+        {
+            if (Table.Family == EMars_Anchor_Family::Cache)
+            { Assert_True(Has_Role(Table, EMars_Anchor_Role::Active) && Has_Role(Table, EMars_Anchor_Role::Dormant), "Cache has Active and Dormant rows"); }
+            else
+            { Assert_True(Has_Role(Table, EMars_Anchor_Role::Other), f"{Table.GetName()} has an Other row"); }
+
+            for (int32 Index = 0; Index < Table.Rows.Num(); ++Index)
+            { Assert_True(Table.Rows[Index].Weight > 0.0f, f"{Table.GetName()} row {Index} has a positive weight"); }
+        }
     }
 
     UFUNCTION()

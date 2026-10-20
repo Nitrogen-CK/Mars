@@ -22,7 +22,8 @@ class UMars_AutoTest_AnchorResolver_SolveDeterministic : UMars_AutoTestRig_Ancho
         Assert_True(First.WalkedLinks == Second.WalkedLinks, "same walked links");
         Assert_Equals_Float(First.Divergence, Second.Divergence, 0.0001f, "same divergence");
 
-        Assert_Equals_Int(First.Roles.Num(), 15, "15 planned anchors get a role");
+        const auto Planned = Plan.Entrances.Num() + Plan.Groups[0].AnchorIds.Num() + Plan.Courts.Num() + Plan.Caches.Num();
+        Assert_Equals_Int(First.Roles.Num(), Planned, f"every planned anchor gets a role ({Planned}: 5 entrances, 7 gates, 3 courts, {Plan.Caches.Num()} caches)");
         Assert_True(First.Closed.Num() <= 3, "at most 3 route anchors close");
         for (const auto& Id : First.Closed)
         { Assert_True(First.Get_Role(Id) == EMars_Anchor_Role::Closed, f"{Id.ToString()} is in Closed and has role Closed"); }

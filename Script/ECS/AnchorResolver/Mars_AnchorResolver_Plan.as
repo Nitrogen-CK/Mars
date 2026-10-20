@@ -1,12 +1,15 @@
 // Who an anchor turned out to be this run. Spawn and Route anchors are Open or Closed; Hunt anchors are Quarry or
-// Other; an anchor the plan does not name resolves with None.
+// Other; the plan's cache anchors are Active (within the run's cache budget) or Dormant; an anchor the plan does not
+// name resolves with None and draws from its table's Other rows.
 enum EMars_Anchor_Role
 {
     None,
     Open,
     Closed,
     Quarry,
-    Other
+    Other,
+    Active,
+    Dormant
 }
 
 struct FMars_AnchorPlan_Node
@@ -42,6 +45,11 @@ struct FMars_AnchorPlan_Link
     // The anchor that removes this link when it resolves Closed; an invalid tag for a link nothing can close.
     UPROPERTY(meta = (Categories = "Anchor"))
     FGameplayTag ClosedBy;
+
+    // For a closable link: the end (A or B) on whose side a one-sided lever gate puts its lever, so a chef who reaches
+    // that side (through the crawl beside the gate) opens it for the pack. None: no one-sided row for this gate.
+    UPROPERTY()
+    FName LeverNode;
 
     FMars_AnchorPlan_Link() {}
 
@@ -148,6 +156,13 @@ class UMars_AnchorPlan_Def : UDataAsset
     UPROPERTY()
     TArray<FMars_AnchorPlan_Group> Groups;
 
+    // The cache anchors the run budgets: MaxActiveCaches of them resolve Active, the rest Dormant.
+    UPROPERTY(meta = (Categories = "Anchor"))
+    TArray<FGameplayTag> Caches;
+
+    UPROPERTY()
+    int32 MaxActiveCaches = 2;
+
     FMars_Validation Validate() const
     {
         TSet<FName> NodeIds;
@@ -172,7 +187,22 @@ class UMars_AnchorPlan_Def : UDataAsset
         {
             if (Link.CostCm <= 0.0f)
             { return FMars_Validation("a link cost must be positive"); }
+
+            if (Link.LeverNode.IsNone() == false && (Link.ClosedBy.IsValid() == false || (Link.LeverNode != Link.A && Link.LeverNode != Link.B)))
+            { return FMars_Validation("a lever node must be an end of a closable link"); }
         }
+
+        TArray<FGameplayTag> CacheIds;
+        for (const auto& Cache : Caches)
+        {
+            if (Cache.IsValid() == false || CacheIds.Contains(Cache))
+            { return FMars_Validation("cache anchors must be set and unique"); }
+
+            CacheIds.Add(Cache);
+        }
+
+        if (MaxActiveCaches < 0)
+        { return FMars_Validation("the cache budget cannot be negative"); }
 
         TArray<FGameplayTag> Grouped;
         for (const auto& Group : Groups)

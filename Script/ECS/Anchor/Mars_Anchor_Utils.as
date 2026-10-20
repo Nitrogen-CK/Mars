@@ -16,6 +16,8 @@ namespace utils_anchor
         Params.Channel = InSpec.Channel;
         Params.SpanCm = InSpec.SpanCm;
         Params.HomeRadiusCm = InSpec.HomeRadiusCm;
+        Params.LeverSide = InSpec.LeverSide;
+        Params.CrawlOffsetCm = InSpec.CrawlOffsetCm;
         Params.PinnedRow = InSpec.PinnedRow;
 
         InHandle.Add_Fragment(FMars_Feature_Anchor());
@@ -53,6 +55,12 @@ mixin float32 Get_HomeRadiusCm(const FCk_Handle_Anchor& Self)
 
 mixin TOptional<int32> Get_PinnedRow(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor_Params).PinnedRow; }
+
+mixin EMars_Anchor_LeverSide Get_LeverSide(const FCk_Handle_Anchor& Self)
+{ return Self.Get_Fragment(FMars_Fragment_Anchor_Params).LeverSide; }
+
+mixin TOptional<FVector2D> Get_CrawlOffsetCm(const FCk_Handle_Anchor& Self)
+{ return Self.Get_Fragment(FMars_Fragment_Anchor_Params).CrawlOffsetCm; }
 
 mixin EMars_Anchor_State Get_State(const FCk_Handle_Anchor& Self)
 { return Self.Get_Fragment(FMars_Fragment_Anchor).State; }

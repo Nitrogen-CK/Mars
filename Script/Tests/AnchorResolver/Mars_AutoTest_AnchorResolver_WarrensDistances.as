@@ -1,5 +1,7 @@
-// Expected values: docs/plans/anchor-slice/fixtures/warrens_expected.json (computed from the frozen data's integer link
-// costs). They change only if Tools/LevelDesign/anchor_plans/data/warrens.json changes.
+// Expected values: Dijkstra over the frozen data's integer link costs (Tools/LevelDesign/anchor_plans/data/warrens.json,
+// Warrens v5 "The Well", written by design_warrens_v5.py). They change only if that data changes. The hunt courts are
+// H1 (node H1, the Charnel Court arena), H2 (node H2, the Pit) and H3 (node CH, the Chime Hall).
+// docs/plans/anchor-slice/fixtures/warrens_expected.json still holds the v3 numbers.
 class UMars_AutoTest_AnchorResolver_WarrensDistances : UMars_AutoTestRig_AnchorResolverPure
 {
     default _TimeoutSeconds = 10.0f;
@@ -18,7 +20,7 @@ class UMars_AutoTest_AnchorResolver_WarrensDistances : UMars_AutoTestRig_AnchorR
         Targets.Add(n"K");
         Targets.Add(n"H1");
         Targets.Add(n"H2");
-        Targets.Add(n"RS");
+        Targets.Add(n"CH");
         for (int32 Index = 0; Index < Targets.Num(); ++Index)
         {
             const auto Distance = utils_anchor_resolver::Get_Distance(InGraph, Paths, Targets[Index]);
@@ -42,11 +44,11 @@ class UMars_AutoTest_AnchorResolver_WarrensDistances : UMars_AutoTestRig_AnchorR
     private void Step_Distances(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Graph = utils_anchor_resolver::Make_Graph(utils_anchor_resolver::Plan_Warrens());
-        Assert_Equals_Int(Graph.LinkA.Num(), 29, "the graph keeps all 29 links");
-        Expect_Row(Graph, n"S1", Make_Row(5582.0f, 2470.0f, 7993.0f, 8953.0f));
-        Expect_Row(Graph, n"S2", Make_Row(5829.0f, 6470.0f, 7319.0f, 3956.0f));
-        Expect_Row(Graph, n"S3", Make_Row(7176.0f, 10288.0f, 7168.0f, 3805.0f));
-        Expect_Row(Graph, n"S4", Make_Row(6044.0f, 8402.0f, 4899.0f, 5678.0f));
-        Expect_Row(Graph, n"S5", Make_Row(6390.0f, 4918.0f, 8024.0f, 9761.0f));
+        Assert_Equals_Int(Graph.LinkA.Num(), 49, "the graph keeps all 49 links");
+        Expect_Row(Graph, n"S1", Make_Row(5023.0f, 2627.0f, 12339.0f, 10769.0f));
+        Expect_Row(Graph, n"S2", Make_Row(7529.0f, 9916.0f, 10735.0f, 3866.0f));
+        Expect_Row(Graph, n"S3", Make_Row(8339.0f, 10788.0f, 9205.0f, 2336.0f));
+        Expect_Row(Graph, n"S4", Make_Row(4376.0f, 6825.0f, 11692.0f, 7812.0f));
+        Expect_Row(Graph, n"S5", Make_Row(6397.0f, 6010.0f, 13713.0f, 9833.0f));
     }
 }

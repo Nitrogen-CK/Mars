@@ -220,6 +220,10 @@ struct FMars_AnchorRow_Query
 
     UPROPERTY()
     TOptional<int32> PinnedRow;
+
+    // The anchor has an authored lever side, so rows that need one (the one-sided lever gate) are eligible.
+    UPROPERTY()
+    bool HasLeverSide = false;
 }
 
 struct FMars_AnchorRow_Pick
@@ -738,6 +742,23 @@ namespace utils_anchor_resolver
             Result.Roles.Add(FMars_AnchorRun_RoleEntry(Court.AnchorId, Role));
         }
 
+        // 6. The cache budget: a seeded shuffle of the plan's cache anchors, the first MaxActiveCaches Active. Drawn
+        // last, so adding caches to a plan never changes the entrance, the closures or the quarry of a seed.
+        auto Caches = InPlan.Caches;
+        Sort_Tags(Caches);
+        for (int32 Index = 0; Index < Caches.Num(); ++Index)
+        {
+            const auto Swap = Stream.RandRange(Index, Caches.Num() - 1);
+            const auto Held = Caches[Index];
+            Caches[Index] = Caches[Swap];
+            Caches[Swap] = Held;
+        }
+        for (int32 Index = 0; Index < Caches.Num(); ++Index)
+        {
+            const auto Role = Index < InPlan.MaxActiveCaches ? EMars_Anchor_Role::Active : EMars_Anchor_Role::Dormant;
+            Result.Roles.Add(FMars_AnchorRun_RoleEntry(Caches[Index], Role));
+        }
+
         Sort_Roles(Result.Roles);
         return Result;
     }
@@ -763,6 +784,9 @@ namespace utils_anchor_resolver
         for (int32 Index = 0; Index < InTable.Rows.Num(); ++Index)
         {
             if (InTable.Rows[Index].Role != Wanted)
+            { continue; }
+
+            if (InTable.Rows[Index].Need == EMars_AnchorRow_Need::LeverSide && InQuery.HasLeverSide == false)
             { continue; }
 
             Eligible.Add(Index);

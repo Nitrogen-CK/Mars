@@ -25,7 +25,24 @@ enum EMars_Anchor_Family
     Cache,
     Omen,
     Traversal,
-    Rest
+    Rest,
+    // A pack plinth: where the carrier sets the pack down outside a hunt court.
+    Pack
+}
+
+// Which side of a route gate its single lever stands on, along the candidate's local X (the street a -> b).
+enum EMars_Anchor_LeverSide
+{
+    None,
+    Ahead,
+    Behind
+}
+
+// What an anchor must offer for a row to be eligible: a one-sided lever gate needs an authored lever side.
+enum EMars_AnchorRow_Need
+{
+    None,
+    LeverSide
 }
 
 // Idle until the resolver resolves it; Spawned once resolved (also when its row spawns nothing); Cleared after a clear.
@@ -53,6 +70,9 @@ struct FMars_AnchorTable_Row
     UPROPERTY()
     EMars_Anchor_Role Role = EMars_Anchor_Role::Other;
 
+    UPROPERTY()
+    EMars_AnchorRow_Need Need = EMars_AnchorRow_Need::None;
+
     FMars_AnchorTable_Row() {}
 
     FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE> InScript, float32 InWeight, EMars_Anchor_Role InRole)
@@ -60,6 +80,14 @@ struct FMars_AnchorTable_Row
         Script = InScript;
         Weight = InWeight;
         Role = InRole;
+    }
+
+    FMars_AnchorTable_Row(TSubclassOf<UCk_EntityScript_UE> InScript, float32 InWeight, EMars_Anchor_Role InRole, EMars_AnchorRow_Need InNeed)
+    {
+        Script = InScript;
+        Weight = InWeight;
+        Role = InRole;
+        Need = InNeed;
     }
 }
 
@@ -93,6 +121,15 @@ struct FMars_Anchor_Context
 
     UPROPERTY()
     int32 RunSeed = 0;
+
+    // Route anchors: the side the one lever stands on (None: no one-sided row is eligible), and the crawl gap beside the
+    // gate: the point of its centreline nearest the gate, in the gate's local frame (X along the street, Y across), in
+    // cm; unset: no crawl. A row that is not the one-sided gate plugs the crawl there.
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    TOptional<FVector2D> CrawlOffsetCm;
 }
 
 // Spawn params passed to every candidate. Injection matches by property name; an AngelScript class ignores a field it
@@ -142,6 +179,12 @@ struct FMars_Anchor_Spec
     UPROPERTY()
     float32 HomeRadiusCm = 1000.0f;
 
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    TOptional<FVector2D> CrawlOffsetCm;
+
     // Debug: always wins over the resolver's draw; the ledger marks it.
     UPROPERTY()
     TOptional<int32> PinnedRow;
@@ -163,6 +206,9 @@ mixin FMars_Validation Validate(const FMars_Anchor_Spec& Self)
 
     if (Self.Family == EMars_Anchor_Family::Route && Self.Channel.IsValid() == false)
     { return FMars_Validation("a route anchor needs a channel"); }
+
+    if (Self.Family != EMars_Anchor_Family::Route && (Self.LeverSide != EMars_Anchor_LeverSide::None || Self.CrawlOffsetCm.IsSet()))
+    { return FMars_Validation("only a route anchor has a lever side or a crawl"); }
 
     return FMars_Validation();
 }
@@ -193,6 +239,12 @@ struct FMars_Fragment_Anchor_Params
 
     UPROPERTY()
     float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    TOptional<FVector2D> CrawlOffsetCm;
 
     UPROPERTY()
     TOptional<int32> PinnedRow;

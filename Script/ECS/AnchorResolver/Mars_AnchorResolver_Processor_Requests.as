@@ -42,6 +42,7 @@ class UMars_Processor_AnchorResolver_HandleRequests : UCk_Processor_Script_Base_
             Query.RunSeed = Result.Seed;
             Query.AnchorId = AnchorId;
             Query.PinnedRow = Anchor.Get_PinnedRow();
+            Query.HasLeverSide = Anchor.Get_LeverSide() != EMars_Anchor_LeverSide::None;
 
             auto Table = Anchor.Get_Table();
             if (ck::EnsureIfNot(ck::IsValid(Table), f"[AnchorResolver] anchor {AnchorId.ToString()} has no loadable table"))
@@ -73,6 +74,8 @@ class UMars_Processor_AnchorResolver_HandleRequests : UCk_Processor_Script_Base_
             Context.SpanCm = Anchor.Get_SpanCm();
             Context.HomeRadiusCm = Anchor.Get_HomeRadiusCm();
             Context.RunSeed = Result.Seed;
+            Context.LeverSide = Anchor.Get_LeverSide();
+            Context.CrawlOffsetCm = Anchor.Get_CrawlOffsetCm();
             Anchor.Request_Resolve(FMars_Request_Anchor_Resolve(RowIndex, Role, Context));
 
             auto Entry = FMars_AnchorLedger_Entry();
