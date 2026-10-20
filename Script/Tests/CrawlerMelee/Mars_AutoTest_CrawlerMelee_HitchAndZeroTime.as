@@ -6,9 +6,8 @@
 // strike is swept in one sample no longer than MaxSampleTravel, the target in its path takes the jab's one request
 // (100 -> 85) and the recovery sweeps nothing more.
 //
-// The zero-delta half is not driven: SetGlobalTimeDilation clamps to the engine's MinGlobalTimeDilation (0.0001 in
-// BaseGame.ini), so the world never ticks with a zero delta. A tick with no positive time running cancellation only is
-// the attack tick's `InDeltaSeconds <= 0` return, read rather than run.
+// The zero-time half lives in CrawlerMelee_CatalogZeroDelta: SetGlobalTimeDilation clamps to the engine's
+// MinGlobalTimeDilation (0.0001 in BaseGame.ini), so a world tick never carries a zero delta here.
 //
 // The dilation is restored to 1 in the last step and in DoEndPlay, whatever ended the test.
 class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMelee
@@ -25,7 +24,7 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
     void DoBeginPlay(FCk_Handle InHandle)
     {
         auto Spec = Make_ArmedCrawlerSpec(4);
-        Spec.Combat.JabClip = Make_SoftClip(Build_DerivedClip(Make_ShortDraft()));
+        Wear_DerivedClip(Spec, GameplayTags::Attack_Mars_Jab, Build_DerivedClip(Make_ShortDraft()));
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();
@@ -99,7 +98,7 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
     {
         RestoreDilation();
 
-        const auto Combat = _Crawler.Get_Spec().Combat;
+        const auto MaxSampleTravel = Get_JabEmitter().MaxSampleTravel;
         const auto WindupEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Windup);
         const auto StrikeEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Strike);
         Assert_True(_DilatedDeltaSeconds > StrikeEnd - WindupEnd,
@@ -119,16 +118,15 @@ class UMars_AutoTest_CrawlerMelee_HitchAndZeroTime : UMars_AutoTestRig_CrawlerMe
             f"no phase was skipped: Windup > Strike > Recover > Cooldown > Idle (got{Phases})");
 
         Assert_True(ToStrike.Frame - ToWindup.Frame >= 1, f"Windup ended on a later tick than its admission (frames {ToWindup.Frame} -> {ToStrike.Frame})");
-        // Approved change: phases follow accepted clip intervals, so Strike lasts one accepted interval here, not a
-        // posing tick plus an acknowledged endpoint.
+        // Phases follow accepted clip intervals, so Strike lasts one accepted interval here.
         Assert_True(ToRecover.Frame - ToStrike.Frame >= 1, f"Strike ended on a later tick than it began (frames {ToStrike.Frame} -> {ToRecover.Frame})");
         Assert_True(ToStrike.AcceptedPhaseId == n"Strike" && Math::Abs(ToStrike.AcceptedFrom - WindupEnd) <= 1.0e-4,
             f"Strike began on an accepted Strike interval from the windup key (got {ToStrike.AcceptedPhaseId} from [{ToStrike.AcceptedFrom :.4}] s)");
         Assert_True(ToRecover.AcceptedPhaseId == n"Recover" && Math::Abs(ToRecover.AcceptedFrom - StrikeEnd) <= 1.0e-4,
             f"Recover began on an accepted Recover interval from the strike key (got {ToRecover.AcceptedPhaseId} from [{ToRecover.AcceptedFrom :.4}] s)");
         Assert_True(ToRecover.DamageCommitted, "the strike's hit was committed before Recover");
-        Assert_True(_Crawler.Get_AttackLongestSweep() <= Combat.Hit.MaxSampleTravel,
-            f"no sweep was longer than MaxSampleTravel [{Combat.Hit.MaxSampleTravel}] (longest {_Crawler.Get_AttackLongestSweep() :.2} cm)");
+        Assert_True(_Crawler.Get_AttackLongestSweep() <= MaxSampleTravel,
+            f"no sweep was longer than MaxSampleTravel [{MaxSampleTravel}] (longest {_Crawler.Get_AttackLongestSweep() :.2} cm)");
         Assert_Equals_Int(Get_DamageRequestCount(), 1, "the dealer drained exactly one damage request");
         Assert_Equals_Float(_Target.Health.Get_Current(), 85.0f, 0.01f, "the target lost 15 HP once");
     }

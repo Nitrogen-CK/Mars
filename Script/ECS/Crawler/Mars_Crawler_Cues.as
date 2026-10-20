@@ -40,9 +40,11 @@ namespace utils_crawler
         const auto Admission = InSelf.Get_AttackAdmission();
         if (Admission.Accepted == false || InSelf.Has_Fragment(FMars_Fragment_Crawler_Signals) == false)
         { return; }
+
         const auto Plan = InSelf.Get_AttackPlan();
         if (Plan.Entry.Definition.CueProfile.IsValid() == false)
         { return; }
+
         const auto Result = InSelf.Get_AttackResult();
         const auto Interrupted = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).CueInterrupted;
         const auto NewIdentity = Admission.ActionIdentity.Get_Value() != InBefore.Admission.ActionIdentity.Get_Value();

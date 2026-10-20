@@ -1,11 +1,11 @@
 // The production crawler's jab lands on the production player once: an armed, passive 4-leg crawler spawned through
 // UMars_Crawler_EntityScript settles on its floor, the real possessed AMars_PlayerCharacter is spawned standing in front of
-// it (capsule 20 cm ahead of the neutral hit centre, within StartDistance), and the crawler's kernel is driven directly
+// it (capsule 20 cm ahead of the neutral hit centre, within the jab's MaxDistance), and the crawler's kernel is driven directly
 // (SetCombatTarget + StartAttack on the player's entity; no state machine involved). The player's Health goes 100 -> 85
 // exactly once, through exactly one damage request on the crawler's dealer, routed by the player's own zone; a second
-// StartAttack during Cooldown is rejected Busy. Floor, crawler and settle are the CrawlerMelee rig's recipe
-// (Script/Tests/CrawlerMelee/Mars_AutoTestRig_CrawlerMelee.as), copied: this test stands on the PlayerCombat rig.
-// Isolated origin (-175000, 210000, 8000).
+// StartAttack during Cooldown is rejected Busy. The crawler plays its Crawler4 reference loadout cut down to the jab,
+// with the radial reference jab clip; floor, crawler and settle follow the CrawlerMelee rig, which this PlayerCombat
+// test does not stand on.
 class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerCombat
 {
     default _TimeoutSeconds = 45.0f;
@@ -17,10 +17,16 @@ class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerC
 
     private FCk_Handle_Crawler _Crawler;
     private TArray<EMars_Crawler_AttackPhase> _Phases;
-    // The radial reference jab the crawler plays (Script/Editor/Mars_CrawlerAttackClips.as), never the authored asset;
-    // this property keeps it alive for the spec's soft reference.
+    // The radial reference jab the crawler plays (Script/Editor/Mars_CrawlerAttackClips.as), never the authored asset,
+    // and the test-owned loadout and definition that name it; the properties keep them alive for the soft references.
     UPROPERTY()
     private UCk_ProceduralAction_Data _JabClip;
+
+    UPROPERTY()
+    private UMars_AttackLoadout_Data _Loadout;
+
+    UPROPERTY()
+    private UMars_AttackDefinition_Data _JabDefinition;
     private int32 _AdmissionPolls = 0;
     private float64 _RestSince = -1.0;
     private FVector _RestForward;
@@ -75,7 +81,7 @@ class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerC
         const auto Report = utils_crawler::Build_ReferenceClip(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab, _JabClip);
         Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
             f"the reference jab builds (got [{utils_crawler::Get_FirstDiagnosticText(Report)}])");
-        Spec.Combat.JabClip = TSoftObjectPtr<UCk_ProceduralAction_Data>(_JabClip);
+        Spec.Combat.Loadout = Make_JabLoadout();
 #else
         FinishFailure("the crawler's reference clips come from an editor-only builder");
 #endif
@@ -86,6 +92,42 @@ class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerC
         SpawnParams.WithVisuals = false;
         auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
         utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
+    }
+
+    // The shipped Crawler4 parity loadout with its jab entry alone, the jab definition playing _JabClip.
+    private TSoftObjectPtr<UMars_AttackLoadout_Data> Make_JabLoadout()
+    {
+        const auto Shipped = System::LoadAsset_Blocking(utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Crawler4, EMars_AttackReference_Kind::Parity));
+        if (ck::Is_NOT_Valid(Shipped))
+        {
+            FinishFailure("the Crawler4 reference loadout did not load");
+            return TSoftObjectPtr<UMars_AttackLoadout_Data>();
+        }
+
+        _Loadout = Cast<UMars_AttackLoadout_Data>(NewObject(this, UMars_AttackLoadout_Data));
+        _Loadout.Spec = Shipped.Spec;
+        _Loadout.Spec.Entries.Empty();
+        for (const auto& Entry : Shipped.Spec.Entries)
+        {
+            if (Entry.Id != GameplayTags::Attack_Mars_Jab)
+            { continue; }
+
+            _JabDefinition = Cast<UMars_AttackDefinition_Data>(NewObject(this, UMars_AttackDefinition_Data));
+            _JabDefinition.Def = System::LoadAsset_Blocking(Entry.Definition).Def;
+            _JabDefinition.Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(_JabClip);
+            auto Copy = Entry;
+            Copy.Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(_JabDefinition);
+            _Loadout.Spec.Entries.Add(Copy);
+        }
+
+        return TSoftObjectPtr<UMars_AttackLoadout_Data>(_Loadout);
+    }
+
+    // The resolved jab's body emitter centre, in the presentation's frame.
+    private FVector Get_JabLocalCenter() const
+    {
+        const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, GameplayTags::Attack_Mars_Jab);
+        return Entry.IsSet() && Entry.GetValue().Definition.Hit.Emitters.Num() > 0 ? Entry.GetValue().Definition.Hit.Emitters[0].LocalCenter : FVector::ZeroVector;
     }
 
     UFUNCTION()
@@ -193,7 +235,7 @@ class UMars_AutoTest_PlayerCombat_ProductionReceiver : UMars_AutoTestRig_PlayerC
     private void Step_SpawnPlayer(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Presentation = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
-        const auto NeutralHitCenter = utils_crawler::Get_HitCenter(Presentation, _Crawler.Get_Spec().Combat.Hit.LocalCenter);
+        const auto NeutralHitCenter = utils_crawler::Get_HitCenter(Presentation, Get_JabLocalCenter());
         const auto Radius = float64(mars::Mars_PlayerCharacter_Config.Body.CapsuleRadius);
         const auto Centre = NeutralHitCenter + CrawlerForward() * (k_CapsuleFaceAhead + Radius);
         SpawnFloorAndUnpossessedPawnAt(InHandle, FVector(Centre.X, Centre.Y, _Origin.Z));

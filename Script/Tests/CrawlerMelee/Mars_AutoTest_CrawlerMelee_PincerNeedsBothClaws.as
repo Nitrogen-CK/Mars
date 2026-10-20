@@ -20,7 +20,7 @@ class UMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws : UMars_AutoTestRig_Crawl
     void DoBeginPlay(FCk_Handle InHandle)
     {
         auto Spec = Make_ArmedCrawlerSpec(4);
-        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Pincer);
+        Wear_ReferenceLoadout(Spec, EMars_Crawler_AttackClipKind::Pincer);
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();
@@ -74,7 +74,7 @@ class UMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws : UMars_AutoTestRig_Crawl
     private void OnPincerPhaseChanged(FCk_Handle_Crawler InCrawler, EMars_Crawler_AttackPhase InOld, EMars_Crawler_AttackPhase InNew)
     {
         if (InNew == EMars_Crawler_AttackPhase::Strike)
-        { _ClawsAtStrike = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Claws.Num(); }
+        { _ClawsAtStrike = InCrawler.Get_AttackPlan().Entry.Slots.Num(); }
     }
 
     UFUNCTION()

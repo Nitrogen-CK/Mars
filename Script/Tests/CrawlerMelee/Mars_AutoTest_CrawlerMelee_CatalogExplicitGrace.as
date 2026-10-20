@@ -53,7 +53,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogExplicitGrace : UMars_AutoTestRig_Crawl
         Assert_True(Reject.IsSet() && Reject.GetValue() == EMars_Crawler_AttackReject::SelectionNotPermitted,
             "ready explicit Jab with a current token still rejects before authored preparation grace");
         Assert_True(_Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle &&
-            _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).ActionIdentity.Get_Value() == 0,
+            _Crawler.Get_AttackActionIdentity().Get_Value() == 0,
             "policy denial creates no native action");
         Assert_Equals_Int(_CatalogAdmissions.Num(), 0, "policy denial emits no admission");
         Assert_Equals_Int(Get_DamageRequestCount(), 0, "policy denial emits no damage");
@@ -61,7 +61,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogExplicitGrace : UMars_AutoTestRig_Crawl
 
     UFUNCTION()
     private void Step_Prepare(FCk_Handle InHandle, FInstancedStruct InPayload)
-    { _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Target.Entity)); }
+    { _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Target.Entity, ECk_EnableDisable::Enable)); }
 
     UFUNCTION()
     private void Check_AfterGrace(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)

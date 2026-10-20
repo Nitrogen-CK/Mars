@@ -3,9 +3,9 @@
 // navigator goes Moving with PathMode Provider and at least 3 waypoints, the body passes the wall's end (|Y| > 300) and
 // arrives within AcceptanceRadius of the goal, OnArrived once, OnFailed never.
 //
-// A field over runtime static Jolt bodies bakes them, but only once they are in the Jolt world: the field
-// (utils_surface_navigator::Make_NavFieldSpec) has AutoBuildOnSetup disabled and an explicit Request_Build follows the
-// floor and wall being added, so the bake waited on is the one that sees them.
+// A field over runtime static Jolt bodies bakes them, but only once they are in the Jolt world: this test's field
+// (utils_surface_navigator::Make_NavFieldSpec) turns AutoBuildOnSetup off and an explicit Request_Build follows the floor
+// and wall being added, so the bake waited on is the one that sees them.
 class UMars_AutoTest_SurfaceNavigator_ProviderPathRoutesAroundWall : UMars_AutoTestRig_SurfaceNavigator
 {
     default _TimeoutSeconds = 30.0f;

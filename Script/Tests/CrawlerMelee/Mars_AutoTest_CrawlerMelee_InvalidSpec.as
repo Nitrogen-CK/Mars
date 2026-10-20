@@ -1,12 +1,12 @@
 // A malformed enabled combat profile rejects the whole crawler, and a disabled one changes nothing.
-//   - Validate() names the first broken rule of an enabled profile (a jab clip whose strike end key is rotated; an
-//     AcquireRadius beyond the LoseRadius; no JabClip) and ignores every field of a disabled one, however broken. Clip
-//     easings are no longer the profile's to check: the clip compiler rejects one outside its presets when the clip is
-//     built or played, so the easing rule left this row with the profile's pose keys.
-//   - A crawler spawned with either broken profile is rejected by utils_crawler::Add with one ensure before anything is
-//     composed: its root carries no crawler feature, no combat fragment and no damage dealer.
-//   - A crawler spawned with the default (disabled) profile composes as before combat existed: it is a crawler, it is not
-//     armed, and its root carries no combat fragment and no damage dealer.
+//   - Validate() names the first broken rule of an enabled profile (a loadout whose jab clip's strike end key is
+//     rotated; an AcquireRadius beyond the LoseRadius; no Loadout; a retired clip still named) and ignores every field of
+//     a disabled one, however broken.
+//   - A crawler spawned with either broken profile is rejected with one ensure before anything is composed (the entity
+//     script's loadout resolution, or utils_crawler::Add): its root carries no crawler feature, no combat fragment and no
+//     damage dealer.
+//   - A crawler spawned with the default (disabled) profile composes no combat: it is a crawler, it is not armed, and its
+//     root carries no combat fragment and no damage dealer.
 // The two rejections are expected errors of this test's hand-authored wrapper at the bottom of the file.
 class UMars_AutoTest_CrawlerMelee_InvalidSpec : UMars_AutoTestRig_CrawlerMelee
 {
@@ -42,7 +42,7 @@ class UMars_AutoTest_CrawlerMelee_InvalidSpec : UMars_AutoTestRig_CrawlerMelee
         { _RotatedJab = Build_DerivedClip(Make_DraftWithRotatedStrike(Get_ReferenceClip(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab))); }
 
         auto Spec = Make_ArmedCrawlerSpec(4);
-        Spec.Combat.JabClip = Make_SoftClip(_RotatedJab);
+        Wear_DerivedClip(Spec, GameplayTags::Attack_Mars_Jab, _RotatedJab);
         return Spec;
     }
 
@@ -97,23 +97,25 @@ class UMars_AutoTest_CrawlerMelee_InvalidSpec : UMars_AutoTestRig_CrawlerMelee
     UFUNCTION()
     private void Step_AssertValidate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        // The clips are checked after Prepare, so this profile needs the StartDistance the entity script fills in.
-        auto RotatedCombat = Make_RotatedKeySpec().Combat;
-        RotatedCombat.Prepare.StartDistance = 110.0f;
-        const auto Rotated = RotatedCombat.Validate();
-        Assert_True(Rotated.IsValid() == false && Rotated.Get_Error().Contains("translation-only Strike end key"),
-            f"a jab clip with a rotated strike key is rejected (got [{Rotated.Get_Error()}])");
+        const auto Rotated = Make_RotatedKeySpec().Combat.Validate();
+        Assert_True(Rotated.IsValid() == false && Rotated.Get_Error().Contains("StrikeEndRotation"),
+            f"a loadout whose jab clip has a rotated strike key is rejected (got [{Rotated.Get_Error()}])");
 
         const auto BadRadii = Make_BadRadiiSpec().Combat.Validate();
         Assert_True(BadRadii.IsValid() == false && BadRadii.Get_Error().Contains("AcquireRadius"),
             f"an AcquireRadius beyond the LoseRadius is rejected (got [{BadRadii.Get_Error()}])");
 
-        auto NoClip = Make_ArmedCrawlerSpec(4).Combat;
-        NoClip.Prepare.StartDistance = 110.0f;
-        NoClip.JabClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
-        const auto Clipless = NoClip.Validate();
-        Assert_True(Clipless.IsValid() == false && Clipless.Get_Error().Contains("JabClip"),
-            f"an enabled profile without its jab clip is rejected (got [{Clipless.Get_Error()}])");
+        auto NoLoadout = Make_ArmedCrawlerSpec(4).Combat;
+        NoLoadout.Loadout = TSoftObjectPtr<UMars_AttackLoadout_Data>();
+        const auto Loadoutless = NoLoadout.Validate();
+        Assert_True(Loadoutless.IsValid() == false && Loadoutless.Get_Error().Contains("no Loadout"),
+            f"an enabled profile without a Loadout is rejected (got [{Loadoutless.Get_Error()}])");
+
+        auto Retired = Make_ArmedCrawlerSpec(4).Combat;
+        Retired.JabClip = Make_SoftClip(Get_ReferenceClip(EMars_Crawler_Layout::Radial, EMars_Crawler_AttackClipKind::Jab));
+        const auto RetiredClip = Retired.Validate();
+        Assert_True(RetiredClip.IsValid() == false && RetiredClip.Get_Error().Contains("JabClip") && RetiredClip.Get_Error().Contains("author a Loadout"),
+            f"an enabled profile that still names a retired clip is rejected (got [{RetiredClip.Get_Error()}])");
 
         auto Disabled = Make_RotatedKeySpec().Combat;
         Disabled.Enabled = false;
@@ -121,8 +123,8 @@ class UMars_AutoTest_CrawlerMelee_InvalidSpec : UMars_AutoTestRig_CrawlerMelee
         Disabled.Timing.CancelSeconds = 0.0f;
         Assert_True(Disabled.Validate().IsValid(), "a disabled profile is not checked, however broken");
 
-        Assert_True(Make_ArmedCrawlerSpec(4).Combat.Validate().IsValid() == false,
-            "an enabled profile with no StartDistance (the entity script's default fills it in) is rejected");
+        const auto Reference = Make_ArmedCrawlerSpec(4).Combat.Validate();
+        Assert_True(Reference.IsValid(), f"an enabled profile on its reference loadout passes (got [{Reference.Get_Error()}])");
     }
 
     private void Assert_NoCombat(FString InLabel, FCk_Handle InRoot)
@@ -149,8 +151,9 @@ class UMars_AutoTest_CrawlerMelee_InvalidSpec : UMars_AutoTestRig_CrawlerMelee
     }
 }
 
-// Hand-authored so the two expected rejections (utils_crawler::Add ensures on a malformed enabled combat profile) are
-// expected errors rather than failures. Pinned to each rule's own wording, so any other rejection still fails the test.
+// Hand-authored so the two expected rejections (the entity script's loadout resolution and utils_crawler::Add ensure on a
+// malformed enabled combat profile) are expected errors rather than failures. Pinned to each rule's own wording, so any
+// other rejection still fails the test.
 class AMars_AutoTest_CrawlerMelee_InvalidSpec_Actor : ACk_AutoTestRunner
 {
     default _TestEntityScriptClass = UMars_AutoTest_CrawlerMelee_InvalidSpec;
@@ -160,7 +163,7 @@ class AMars_AutoTest_CrawlerMelee_InvalidSpec_Actor : ACk_AutoTestRunner
     TArray<FString> Get_ExpectedLogErrors() const
     {
         TArray<FString> Out;
-        Out.Add("needs a finite, unit-scale, translation-only Strike end key");
+        Out.Add("StrikeEndRotation at Combat.Loadout.");
         Out.Add("rejected the spec: Crawler combat has an AcquireRadius");
         return Out;
     }

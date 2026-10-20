@@ -16,29 +16,9 @@ class UMars_Expedition_Crawler_EntityScript : UMars_Crawler_EntityScript
         Spec.Combat.Targeting.AcquireRadius = 1100.0f;
         Spec.Combat.Targeting.LoseRadius = 1400.0f;
         Spec.Combat.Targeting.HomeRadius = 1000.0f;
-        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Spider6, false);
+        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Spider6, EMars_AttackReference_Kind::Parity);
         Color = FLinearColor(0.35f, 0.55f, 0.2f, 1.0f);
-
-        Look.Body = Get_Piece("Body");
-        Look.Foot = Get_Piece("Foot");
-        Look.Fang = Get_Piece("Fang");
-        Look.FangRoot = FVector(87.4, 16.39, -28.95);
-        Look.Legs.Empty();
-        auto Pairs = TArray<FString>();
-        Pairs.Add("Front");
-        Pairs.Add("Mid");
-        Pairs.Add("Back");
-        Pairs.Add("Back");
-        Pairs.Add("Mid");
-        Pairs.Add("Front");
-        for (const auto& Pair : Pairs)
-        { Look.Legs.Add(FMars_Crawler_LegLook(Get_Piece(f"LegUpper{Pair}"), Get_Piece(f"LegLower{Pair}"))); }
+        Look = Make_SpiderLook();
         return Super::DoConstruct(InHandle);
-    }
-
-    private TSoftObjectPtr<UStaticMesh> Get_Piece(FString InPart) const
-    {
-        const FString PieceName = f"Crawler_{InPart}_Mars_SM";
-        return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(f"/Game/Mars/Gameplay/Monsters/Crawler/Meshes/{PieceName}.{PieceName}"));
     }
 }

@@ -142,34 +142,6 @@ mixin void Request_Die(FCk_Handle_Monster& Self, const FMars_Request_Monster_Die
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void BindTo_OnPartRegistered(FCk_Handle_Monster& Self, FMars_Delegate_Monster_OnPartRegistered InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Monster_Signals);
-    Fragment.OnPartRegistered.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnPartRegistered(FCk_Handle_Monster& Self, FMars_Delegate_Monster_OnPartRegistered InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Monster_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Monster_Signals).OnPartRegistered.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnPartSevered(FCk_Handle_Monster& Self, FMars_Delegate_Monster_OnPartSevered InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Monster_Signals);
-    Fragment.OnPartSevered.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnPartSevered(FCk_Handle_Monster& Self, FMars_Delegate_Monster_OnPartSevered InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Monster_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Monster_Signals).OnPartSevered.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
 mixin void BindTo_OnDied(FCk_Handle_Monster& Self, FMars_Delegate_Monster_OnDied InDelegate)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Monster_Signals);

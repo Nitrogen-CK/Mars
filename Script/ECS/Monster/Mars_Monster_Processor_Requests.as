@@ -44,10 +44,6 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         State.Parts.Add(Part);
-        Part.BindTo_OnSevered(FMars_Delegate_BodyPart_OnSevered(this, n"OnPartSevered"));
-
-        if (InMonster.Has_Fragment(FMars_Fragment_Monster_Signals))
-        { InMonster.Get_Fragment(FMars_Fragment_Monster_Signals).OnPartRegistered.Broadcast(InMonster, Part); }
     }
 
     private void HandleDie(FCk_Handle_Monster& InMonster, const FMars_Request_Monster_Die& InRequest)
@@ -61,17 +57,5 @@ class UMars_Processor_Monster_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InMonster.Has_Fragment(FMars_Fragment_Monster_Signals))
         { InMonster.Get_Fragment(FMars_Fragment_Monster_Signals).OnDied.Broadcast(InMonster, InRequest.Cause); }
-    }
-
-    // A severed part's monster may already be gone (the leg is world-owned by then).
-    UFUNCTION()
-    private void OnPartSevered(FCk_Handle_BodyPart InPart, FMars_DamageEvent InCause, TArray<FCk_Handle_Transform> InReleased)
-    {
-        auto Monster = InPart.Get_Monster();
-        if (ck::Is_NOT_Valid(Monster))
-        { return; }
-
-        if (Monster.Has_Fragment(FMars_Fragment_Monster_Signals))
-        { Monster.Get_Fragment(FMars_Fragment_Monster_Signals).OnPartSevered.Broadcast(Monster, InPart); }
     }
 }

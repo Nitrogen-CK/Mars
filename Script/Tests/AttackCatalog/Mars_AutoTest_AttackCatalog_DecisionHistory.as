@@ -61,7 +61,7 @@ class UMars_AutoTest_AttackCatalog_DecisionHistory : UMars_AutoTestRig_CrawlerAt
         Assert_Equals_Int(_CatalogAdmissions.Num(), 0, "no accepted game admission was broadcast");
         Assert_Equals_Int(_CatalogResults.Num(), 0, "no game terminal result was broadcast");
         Assert_Equals_Int(Get_DamageRequestCount(), 0, "decision changes queued no damage");
-        Assert_True(_Crawler.Get_AttackPreparation().Active == false, "the fixture queued no preparation lifecycle");
+        Assert_True(_Crawler.Get_AttackPreparation().State == EMars_Attack_PreparationState::Idle, "the fixture queued no preparation lifecycle");
         Assert_Equals_Float(_Crawler.Get_AttackCooldownRemaining(), 0.0f, 0.0001f, "common recovery cooldown is idle");
         for (const auto& Reuse : _Crawler.Get_AttackReuse())
         { Assert_True(Reuse.Remaining == 0.0f && Reuse.LastStartSequence == 0, "entry clocks have no accepted start to advance"); }

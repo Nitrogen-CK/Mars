@@ -38,7 +38,7 @@ class UMars_AutoTest_CrawlerMelee_EndpointPhysics : UMars_AutoTestRig_CrawlerEnd
         Add_Step_WaitUntil("calibration acknowledgement releases controls", n"Check_CalibrationReleased", k_SlowPolls, 0);
         Add_Step("choose a measured accepted Damage-window anchor", n"Step_SelectMeasuredAnchor");
         Add_Step("place the physical target and optional other-emitter blocker", n"Step_PlaceMeasuredTarget");
-        Add_Step_WaitFrames("let only the fixture's new physics bodies register", 3);
+        Add_Step_WaitUntil("the measured target's hurtbox is traceable", n"Check_TargetTraceableFromAbove", k_SlowPolls, 0);
         Add_Step("select the measured target", n"Step_CatalogSelectTarget");
         Add_Step_WaitUntil("target transport drains", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
         Add_Step_WaitUntil("the intended anatomy choice is fully ready", n"Check_ExpectedEndpointReady", k_SlowPolls, 0);
@@ -53,7 +53,7 @@ class UMars_AutoTest_CrawlerMelee_EndpointPhysics : UMars_AutoTestRig_CrawlerEnd
         Add_Step_WaitUntil("the game attack really accepts", n"Check_CatalogAccepted", k_SlowPolls, 0);
         Add_Step_WaitUntil("native action and game cleanup finish", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitUntil("surviving limbs return Default/Planted", n"Check_CalibrationReleased", k_SlowPolls, 0);
-        Add_Step("E01/E02/E03/E04/E06 actual accepted physics evidence", n"Step_AssertPhysics");
+        Add_Step("actual accepted physics evidence", n"Step_AssertPhysics");
         Add_Step("restore the saved test-world dilation", n"Step_RestoreHitch");
         Run_Steps(InHandle);
     }
@@ -235,7 +235,7 @@ class UMars_AutoTest_CrawlerMelee_EndpointPhysics : UMars_AutoTestRig_CrawlerEnd
             Assert_True(Command.Fired && Command.Frame > 0 && Command.Candidate.SampleId > 0,
                 "public cancellation was queued against a real candidate on an accepted Damage-window exit interval");
             Assert_Equals_Int(Command.IssuedAtBoundary, 0, "the pending final candidate had not issued damage");
-            Assert_Equals_Int(utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler), 0, "cancellation superseded the queued final-strike candidate");
+            Assert_Equals_Int(_Crawler.Get_IssuedDamageRequests(), 0, "cancellation superseded the queued final-strike candidate");
             Assert_True(Capture.CommitSample == 0 && _CatalogResults.Num() == 1 &&
                 _CatalogResults[0].Native.Get_Outcome() == ECk_ProceduralAction_Outcome::Cancelled,
                 "the final accepted candidate is discarded and native cancellation remains explicit");
@@ -243,7 +243,7 @@ class UMars_AutoTest_CrawlerMelee_EndpointPhysics : UMars_AutoTestRig_CrawlerEnd
         }
         if (_WorldBlocker || _BystanderBlocker)
         {
-            Assert_Equals_Int(utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler), 0, "other-emitter obstruction suppressed every damage request");
+            Assert_Equals_Int(_Crawler.Get_IssuedDamageRequests(), 0, "other-emitter obstruction suppressed every damage request");
             Assert_Equals_Float(_Target.Health.Get_Current(), 100.0f, 0.01f, "simultaneous target remained unharmed");
             if (_BystanderBlocker) { Assert_Equals_Float(_Bystander.Health.Get_Current(), 100.0f, 0.01f, "obstructing bystander also receives no damage"); }
             Assert_True(Capture.SimultaneousBlockedSamples > 0,
@@ -274,7 +274,7 @@ class UMars_AutoTest_CrawlerMelee_EndpointPhysics : UMars_AutoTestRig_CrawlerEnd
                 Contact.Fraction = Row.QueryFraction;
                 if (HaveBest == false || utils_crawler::Get_IsEarlierEmitterContact(Contact, Best)) { Best = Contact; HaveBest = true; }
                 for (const auto& Event : Row.Interval.Get_Events())
-                { ExitContact = ExitContact || Event.Get_Id() == n"Damage" && Event.Get_Kind() == ECk_ProceduralAction_EventKind::WindowExit; }
+                { ExitContact = ExitContact || (Event.Get_Id() == n"Damage" && Event.Get_Kind() == ECk_ProceduralAction_EventKind::WindowExit); }
             }
             Assert_True(HaveBest && Best.EmitterId == Capture.CommitContact.EmitterId && Math::Abs(Best.Fraction - Capture.CommitContact.Fraction) < 1.0e-5f,
                 "actual earliest contact and canonical emitter tie-break match the committed contact regardless authored array order");

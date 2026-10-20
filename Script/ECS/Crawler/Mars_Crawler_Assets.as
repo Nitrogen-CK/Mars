@@ -62,6 +62,7 @@ namespace utils_crawler
 
             Legs.Add(FCk_ProceduralLeg_Spec(FName(f"Leg{Index}"), Placement, Chain));
         }
+
         return Legs;
     }
 }
@@ -147,6 +148,13 @@ namespace utils_crawler
 // each rest foot is the claw tip dropped onto the ground the body stands SpiderClearance over; each pole lies as far past
 // the model's knee as the knee stands off the hip-to-foot midpoint, so the rig bends the knee in the model's leg plane.
 // Re-run the build and copy its numbers here after the model or the scale changes.
+// A side of the body, as the crawler faces.
+enum EMars_Crawler_Side
+{
+    Right,
+    Left
+}
+
 namespace utils_crawler
 {
     const float32 SpiderClearance = 79.6f;
@@ -168,10 +176,10 @@ namespace utils_crawler
     // front with left middle), each pair one phase group: the gait swings one group at a time, so three groups leave four
     // feet down through every swing where six (a half-cycle offset between the sides) would lift one leg at a time.
     // Index into Get_SpiderRightLegs (front to back).
-    float32 Get_SpiderWavePhase(int32 InRightLegIndex, bool InLeftSide)
+    float32 Get_SpiderWavePhase(int32 InRightLegIndex, EMars_Crawler_Side InSide)
     {
         const auto Right = float32(Get_SpiderRightLegs().Num() - 1 - InRightLegIndex) / 3.0f;
-        if (InLeftSide == false)
+        if (InSide == EMars_Crawler_Side::Right)
         { return Right; }
 
         const auto Left = Right + 1.0f / 3.0f;
@@ -188,7 +196,7 @@ namespace utils_crawler
         for (int32 Index = 0; Index < Right.Num(); ++Index)
         {
             Ordered.Add(Right[Index]);
-            Phases.Add(Get_SpiderWavePhase(Index, false));
+            Phases.Add(Get_SpiderWavePhase(Index, EMars_Crawler_Side::Right));
         }
 
         for (int32 Index = Right.Num() - 1; Index >= 0; --Index)
@@ -198,7 +206,7 @@ namespace utils_crawler
             Left.RestFoot.Y = -Left.RestFoot.Y;
             Left.Pole.Y = -Left.Pole.Y;
             Ordered.Add(Left);
-            Phases.Add(Get_SpiderWavePhase(Index, true));
+            Phases.Add(Get_SpiderWavePhase(Index, EMars_Crawler_Side::Left));
         }
 
         auto Legs = TArray<FCk_ProceduralLeg_Spec>();
@@ -218,6 +226,7 @@ namespace utils_crawler
 
             Legs.Add(FCk_ProceduralLeg_Spec(FName(f"Leg{Index}"), Placement, Chain));
         }
+
         return Legs;
     }
 

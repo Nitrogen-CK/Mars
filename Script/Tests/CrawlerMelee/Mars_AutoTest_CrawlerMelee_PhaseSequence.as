@@ -64,8 +64,8 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
             ToCooldown.New == EMars_Crawler_AttackPhase::Cooldown && ToIdle.New == EMars_Crawler_AttackPhase::Idle,
             f"the phases are Windup > Strike > Recover > Cooldown > Idle (got{Phases})");
 
-        // Approved change: phases follow the accepted clip PhaseId, so a phase is entered on its own first accepted
-        // interval (which starts on the previous phase's key) rather than on the previous phase's acknowledged endpoint.
+        // Phases follow the accepted clip PhaseId: a phase is entered on its own first accepted interval, which starts on
+        // the previous phase's key.
         const auto WindupEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Windup);
         const auto StrikeEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Strike);
         const auto ClipEnd = Get_AttackPhaseEnd(EMars_Crawler_AttackPhase::Recover);
@@ -83,7 +83,7 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
         Assert_True(ToRecover.DamageCommitted && ToCooldown.DamageCommitted,
             "the hit was committed during Strike and the latch survives into Recover and Cooldown");
 
-        // Approved change: ToStrike now carries the first Strike sample and ToRecover the first Recover sample.
+        // ToStrike carries the first Strike sample and ToRecover the first Recover sample.
         const auto Committed = _Crawler.Get_AttackCommittedSampleId();
         Assert_True(Committed >= ToStrike.AcknowledgedSampleId && Committed < ToRecover.AcknowledgedSampleId,
             f"the committed sample [{Committed}] is a Strike sample: no earlier than the first Strike interval [{ToStrike.AcknowledgedSampleId}], before the first Recover interval [{ToRecover.AcknowledgedSampleId}]");
@@ -97,7 +97,7 @@ class UMars_AutoTest_CrawlerMelee_PhaseSequence : UMars_AutoTestRig_CrawlerMelee
         const auto NeutralErrorCm = (Presented.GetLocation() - ExpectedNeutral.GetLocation()).Size();
         Assert_True(NeutralErrorCm < k_KeyTolerance,
             f"the presentation follows the current support/conform neutral (error {NeutralErrorCm :.5} cm)");
-        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action),
+        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_AttackAction()),
             "the action released itself after its terminal receipt");
         Assert_True(_Crawler.Get_AttackLastCancel().IsSet() == false, f"nothing cancelled the attack (last cancel {Get_LastCancelText()})");
     }

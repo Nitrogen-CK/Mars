@@ -76,6 +76,7 @@ class UMars_AutoTest_CrawlerMelee_ApproachAndPrepare : UMars_AutoTestRig_Crawler
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Spec = _Crawler.Get_Spec();
+        const auto Prepare = Get_ResolvedDefinition(GameplayTags::Attack_Mars_Jab).Prepare;
         const auto Stages = Get_StageRecords();
         const auto MoveTos = Get_MoveToRecords();
 
@@ -93,8 +94,8 @@ class UMars_AutoTest_CrawlerMelee_ApproachAndPrepare : UMars_AutoTestRig_Crawler
         const auto ApproachStart = (_InitialTarget - Stages[0].RootLocation).Size2D();
         const auto PrepareStart = (_InitialTarget - Stages[1].RootLocation).Size2D();
         Assert_True(ApproachStart >= 400.0, f"Approach began far from the target ({ApproachStart :.1} cm)");
-        Assert_True(PrepareStart <= Spec.Combat.Prepare.StartDistance + 5.0,
-            f"Approach handed over inside StartDistance [{Spec.Combat.Prepare.StartDistance :.1}] ({PrepareStart :.1} cm)");
+        Assert_True(PrepareStart <= Prepare.MaxDistance + 5.0,
+            f"Approach handed over inside the jab's MaxDistance [{Prepare.MaxDistance :.1}] ({PrepareStart :.1} cm)");
 
         auto ApproachMoveTos = 0;
         for (int32 Index = 0; Index < MoveTos.Num(); ++Index)
@@ -121,9 +122,9 @@ class UMars_AutoTest_CrawlerMelee_ApproachAndPrepare : UMars_AutoTestRig_Crawler
         const auto Windup = _Records[WindupIndex];
         const auto FacingError = Get_HeadingErrorTo(Windup.RootForward, Windup.RootLocation, _AsideTarget);
         const auto TurnDrift = (Windup.RootLocation - _TurnStartLocation).Size2D();
-        Assert_True(FacingError <= Spec.Combat.Prepare.FacingToleranceDegrees + 0.5,
+        Assert_True(FacingError <= Prepare.FacingToleranceDegrees + 0.5,
             f"the attack started facing the target within tolerance ({FacingError :.2} deg)");
-        Assert_True(Windup.Speed <= Spec.Combat.Prepare.MaxSpeedToStart, f"the attack started standing ({Windup.Speed :.2} cm/s)");
+        Assert_True(Windup.Speed <= Prepare.MaxSpeedToStart, f"the attack started standing ({Windup.Speed :.2} cm/s)");
         Assert_True(Windup.NavigatorMoving == false && Windup.NavigatorPending == false,
             f"the navigator had drained its stop when the attack started (moving {Windup.NavigatorMoving}, pending {Windup.NavigatorPending})");
         Assert_True(TurnDrift < k_MaxTurnDrift, f"the crawler turned in place ({TurnDrift :.2} cm from where it stood)");

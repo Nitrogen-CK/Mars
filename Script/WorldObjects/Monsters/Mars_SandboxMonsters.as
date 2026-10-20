@@ -35,9 +35,7 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
         Spec.RoamBounds = FBox(FVector(-3850.0, -550.0, 0.0), FVector(-2150.0, 550.0, 200.0));
         Spec.Combat.Enabled = true;
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
-        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(Get_AttackPreset(), Get_UsesEndpointDemo());
-        Spec.Combat.JabClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
-        Spec.Combat.PincerClip = TSoftObjectPtr<UCk_ProceduralAction_Data>();
+        Spec.Combat.Loadout = utils_crawler::Get_AttackReferenceLoadout(Get_AttackPreset(), Get_ReferenceKind());
         _Sink.InputChannels.Empty();
         _Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Room5Aggression"));
 
@@ -77,9 +75,11 @@ class UMars_Sandbox_Crawler_EntityScript : UMars_Crawler_EntityScript
             Get_PresetLegCount() == 4 ? EMars_Crawler_AttackPreset::Crawler4 : EMars_Crawler_AttackPreset::Crawler6;
     }
 
+    protected EMars_AttackReference_Kind Get_ReferenceKind() const
+    {
+        return EMars_AttackReference_Kind::Parity;
+    }
 
-    protected bool Get_UsesEndpointDemo() const
-    { return false; }
     protected int32 Get_PresetLegCount() const
     { return 4; }
 
@@ -106,39 +106,12 @@ class UMars_Sandbox_Crawler6_EntityScript : UMars_Sandbox_Crawler_EntityScript
     protected FLinearColor Get_PresetColor() const override
     { return FLinearColor(0.35f, 0.55f, 0.2f, 1.0f); }
 
-    // The spider: its measured rig and the pieces cut from the same model (Tools/Blender/mars_monsters/
-    // build_crawler_pieces.py); their slot carries Crawler_Mars_MI.
+    // The spider: its measured rig and the pieces cut from the same model; their slot carries Crawler_Mars_MI.
     protected EMars_Crawler_Layout Get_PresetLayout() const override
     { return EMars_Crawler_Layout::Spider; }
 
-
     protected FMars_Crawler_Look Get_PresetLook() const override
-    {
-        auto Pieces = FMars_Crawler_Look();
-        Pieces.Body = Get_SpiderMesh("Body");
-        // Rig order: front, mid and back on the right, then back, mid and front on the left; a left leg wears its right
-        // twin's pieces.
-        auto Pairs = TArray<FString>();
-        Pairs.Add("Front");
-        Pairs.Add("Mid");
-        Pairs.Add("Back");
-        Pairs.Add("Back");
-        Pairs.Add("Mid");
-        Pairs.Add("Front");
-        for (const auto& Pair : Pairs)
-        { Pieces.Legs.Add(FMars_Crawler_LegLook(Get_SpiderMesh(f"LegUpper{Pair}"), Get_SpiderMesh(f"LegLower{Pair}"))); }
-
-        Pieces.Foot = Get_SpiderMesh("Foot");
-        Pieces.Fang = Get_SpiderMesh("Fang");
-        Pieces.FangRoot = FVector(87.4, 16.39, -28.95);
-        return Pieces;
-    }
-
-    private TSoftObjectPtr<UStaticMesh> Get_SpiderMesh(FString InPart) const
-    {
-        const FString Name = f"Crawler_{InPart}_Mars_SM";
-        return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(f"/Game/Mars/Gameplay/Monsters/Crawler/Meshes/{Name}.{Name}"));
-    }
+    { return Make_SpiderLook(); }
 }
 
 // The Room 5 aggression lever on the west wall: an instant toggle asserting Mechanism.Channel.Room5Aggression while
@@ -158,31 +131,42 @@ class UMars_Sandbox_AggressionLever_EntityScript : UMars_Lever_EntityScript
     }
 }
 
-// Separate opt-in placement classes; existing Room 5 presets retain body-sphere parity graphs.
+// Opt-in placement classes that play the endpoint-demo loadouts; the Room 5 presets play the body-sphere parity ones.
 class UMars_Demo_EndpointCrawler4_EntityScript : UMars_Sandbox_Crawler4_EntityScript
 {
     default _ShowInPlaceActors = true;
     default DebugDrawAttack = true;
-    protected bool Get_UsesEndpointDemo() const override { return true; }
+
+    protected EMars_AttackReference_Kind Get_ReferenceKind() const override
+    {
+        return EMars_AttackReference_Kind::EndpointDemo;
+    }
 }
 
 class UMars_Demo_EndpointCrawler6_EntityScript : UMars_Demo_EndpointCrawler4_EntityScript
 {
-    protected int32 Get_PresetLegCount() const override { return 6; }
+    protected int32 Get_PresetLegCount() const override
+    { return 6; }
 }
 
 class UMars_Demo_EndpointSpider6_EntityScript : UMars_Sandbox_Crawler6_EntityScript
 {
     default _ShowInPlaceActors = true;
     default DebugDrawAttack = true;
-    protected bool Get_UsesEndpointDemo() const override { return true; }
+
+    protected EMars_AttackReference_Kind Get_ReferenceKind() const override
+    {
+        return EMars_AttackReference_Kind::EndpointDemo;
+    }
 }
 
 class UMars_Demo_EndpointAggressionLever_EntityScript : UMars_Sandbox_AggressionLever_EntityScript
 {
     default _ShowInPlaceActors = true;
 }
-// The Room 5 ground-nav field: the framework's placeable volume script with Room 5's bake settings. The bounds are
+
+// The Room 5 ground-nav field: the framework's placeable volume script with Room 5's bake settings
+// (utils_surface_navigator::Make_NavFieldSpec, Mars_NavFieldSpec.as). The bounds are
 // local to the spawner's translation (rotation and scale are ignored): placed at (-3000, 0, 0) they cover the room,
 // X -4000..-2000, Y -700..700, Z -100..400. The spec is a class default because the volume's C++ Construct reads it
 // before any script hook runs.

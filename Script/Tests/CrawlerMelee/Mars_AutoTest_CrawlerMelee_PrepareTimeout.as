@@ -70,6 +70,7 @@ class UMars_AutoTest_CrawlerMelee_PrepareTimeout : UMars_AutoTestRig_CrawlerMele
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Combat = _Crawler.Get_Spec().Combat;
+        const auto Timeout = Get_ResolvedDefinition(GameplayTags::Attack_Mars_Jab).Prepare.TimeoutSeconds;
         const auto Stages = Get_StageRecords();
         const auto First = _PrepareIndex;
 
@@ -82,8 +83,8 @@ class UMars_AutoTest_CrawlerMelee_PrepareTimeout : UMars_AutoTestRig_CrawlerMele
         for (int32 Offset = 0; Offset <= 3; Offset += 3)
         {
             const auto Prepared = Stages[First + Offset + 1].Time - Stages[First + Offset].Time;
-            Assert_True(Prepared >= Combat.Prepare.TimeoutSeconds - 0.02,
-                f"Prepare {Offset} lasted at least TimeoutSeconds [{Combat.Prepare.TimeoutSeconds :.2}] ({Prepared :.3} s)");
+            Assert_True(Prepared >= Timeout - 0.02,
+                f"Prepare {Offset} lasted at least the jab's TimeoutSeconds [{Timeout :.2}] ({Prepared :.3} s)");
         }
 
         const auto Waited = Stages[First + 2].Time - Stages[First + 1].Time;

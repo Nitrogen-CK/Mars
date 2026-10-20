@@ -54,7 +54,7 @@ struct FMars_DamageDealer_Spec
     }
 }
 
-// A melee swing's sphere sweep (utils_damage_dealer::Try_StrikeSweep), world space.
+// A melee swing's sphere sweep (Request_StrikeSweep), world space.
 struct FMars_DamageDealer_Sweep
 {
     UPROPERTY()
@@ -67,7 +67,7 @@ struct FMars_DamageDealer_Sweep
     float32 Radius = 25.0f;
 
     // Entities the sweep passes through (their probe or world bodies are skipped), on top of the dealer's own entity and
-    // its own zone's hurtboxes, which Try_StrikeSweep always skips.
+    // its own zone's hurtboxes, which Request_StrikeSweep always skips.
     UPROPERTY()
     TArray<FCk_Handle> IgnoredEntities;
 
@@ -83,8 +83,8 @@ struct FMars_DamageDealer_Sweep
 
 mixin FMars_Validation Validate(const FMars_DamageDealer_Spec& Self)
 {
-    if (Self.DamageScale < 0.0f)
-    { return FMars_Validation(f"DamageDealer has a negative DamageScale [{Self.DamageScale}]"); }
+    if (Math::IsFinite(Self.DamageScale) == false || Self.DamageScale < 0.0f)
+    { return FMars_Validation(f"DamageDealer has a non-finite or negative DamageScale [{Self.DamageScale}]"); }
 
     return FMars_Validation();
 }
@@ -111,10 +111,6 @@ struct FMars_Fragment_DamageDealer
 
     UPROPERTY()
     int32 HitsRejected = 0;
-
-    // The last forwarded (scaled) event; unset until a hit is dealt.
-    UPROPERTY()
-    TOptional<FMars_DamageEvent> LastDealt;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

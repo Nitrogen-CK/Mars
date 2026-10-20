@@ -6,6 +6,63 @@ enum EMars_Attack_ControlWaitPolicy { PreferAvailable, WaitForPreferred }
 enum EMars_Attack_Availability { Unavailable, Waiting, Ready }
 enum EMars_Attack_SelectionDisposition { Prepare, Start, Wait, NoCapability }
 
+// Why an attack cannot start now (admission codes, from utils_attack::Evaluate), or why an accepted hit's evidence was
+// rejected (emitter codes, from the crawler's emitter checks).
+enum EMars_Attack_BlockerCode
+{
+    // Admission: a required part or limb.
+    PartMissing,
+    PartPendingDestroy,
+    PartWrongOwner,
+    PartSevered,
+    PartBroken,
+    PartDepleted,
+    ConditionDisallowed,
+    LimbDetached,
+    LimbDisabled,
+    LimbUnavailable,
+    ControlBusy,
+    LimbReturning,
+    LimbUnplanted,
+    // Admission: the creature.
+    SupportStance,
+    SupportCapacity,
+    Dead,
+    NotReady,
+    Ungrounded,
+    Slope,
+    Moving,
+    WindupBlocked,
+    Cooldown,
+    GlobalCooldown,
+    // Admission: the target.
+    TargetLost,
+    OutOfRange,
+    TooClose,
+    Height,
+    Facing,
+    // Emitter evidence.
+    HitContactInvalid,
+    EmitterCount,
+    EmitterIdentity,
+    EmitterBounds,
+    AcceptedSourceInvalid,
+    AcceptedRootInvalid,
+    RootInvalid,
+    RootDrift,
+    FacingDrift,
+    AcceptedSourceMissing,
+    SampleTravel,
+    AcceptedPresentationMismatch
+}
+
+// A Permanent blocker makes the attack incapable (Unavailable); a Temporary one only makes it wait.
+enum EMars_Attack_BlockerKind { Permanent, Temporary }
+
+// Idle: no preparation. Active: preparing for the preferred attack, counting the readiness wait. TimedOut: the wait ran
+// past the preferred attack's Prepare.TimeoutSeconds; admission stops for that target until the preparation resets.
+enum EMars_Attack_PreparationState { Idle, Active, TimedOut }
+
 struct FMars_Attack_SlotRole
 {
     UPROPERTY() FName Slot;
@@ -274,7 +331,9 @@ struct FMars_Attack_EvaluationQuery
 
 struct FMars_Attack_Blocker
 {
-    UPROPERTY() FName Code;
+    UPROPERTY() EMars_Attack_BlockerCode Code = EMars_Attack_BlockerCode::NotReady;
+    // Follows Code (utils_attack::Get_BlockerKind); set by utils_attack::Make_Blocker.
+    UPROPERTY() EMars_Attack_BlockerKind Kind = EMars_Attack_BlockerKind::Temporary;
     UPROPERTY() FString Field;
     UPROPERTY() FGameplayTag Role;
     UPROPERTY() FName Slot;
@@ -303,12 +362,11 @@ struct FMars_Attack_SelectionCandidate
 
 struct FMars_Attack_Preparation
 {
-    UPROPERTY() bool Active = false;
+    UPROPERTY() EMars_Attack_PreparationState State = EMars_Attack_PreparationState::Idle;
     UPROPERTY() FGameplayTag Preferred;
     UPROPERTY() int64 TargetIdentity = 0;
     UPROPERTY() int32 TargetGeneration = 0;
     UPROPERTY() float32 ElapsedReadinessWait = 0.0f;
-    UPROPERTY() bool TimedOut = false;
 }
 
 struct FMars_Attack_SelectionQuery

@@ -3,7 +3,7 @@
 class UMars_AutoTest_CrawlerMelee_ActionScopeLoss : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 60.0f;
-    default _Origin = FVector(-280000.0, -150000.0, 600.0);
+    default _Origin = FVector(-280000.0, -210000.0, 600.0);
 
     private int64 _LostIdentity = 0;
     private int32 _LostGeneration = 0;
@@ -38,36 +38,35 @@ class UMars_AutoTest_CrawlerMelee_ActionScopeLoss : UMars_AutoTestRig_CrawlerMel
     UFUNCTION()
     private void Check_ActionSampling(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        // Approved change: the jab is a clip action that plays on its own (Playing), not a manual action awaiting samples.
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        // The jab is a clip action that plays on its own (Playing), not a manual action awaiting samples.
+        const auto Action = _Crawler.Get_AttackAction();
         auto Res = OutResult;
-        Res.Set(ck::IsValid(Attack.Action) && Attack.Action.Get_State() == ECk_ProceduralAction_State::Playing &&
+        Res.Set(ck::IsValid(Action) && Action.Get_State() == ECk_ProceduralAction_State::Playing &&
             _Crawler.Get_AttackAcknowledgedSampleId() != 0);
     }
 
     UFUNCTION()
     private void Step_DestroyAction(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Assert_True(ck::IsValid(_Crawler) && ck::IsValid(_Crawler.Get_ActionPlayer()) && ck::IsValid(Attack.Action),
+        FCk_Handle Action = _Crawler.Get_AttackAction();
+        Assert_True(ck::IsValid(_Crawler) && ck::IsValid(_Crawler.Get_ActionPlayer()) && ck::IsValid(Action),
             "the crawler, player and action exist before the injected loss");
-        _LostIdentity = Attack.ActionIdentity.Get_Value();
-        _LostGeneration = Attack.Generation;
-        FCk_Handle Action = Attack.Action;
+        _LostIdentity = _Crawler.Get_AttackActionIdentity().Get_Value();
+        _LostGeneration = _Crawler.Get_AttackGeneration();
         utils_entity_lifetime::Request_DestroyEntity(Action);
     }
 
     UFUNCTION()
     private void Step_AssertScopeLossDrained(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
         Assert_True(ck::IsValid(_Crawler) && ck::IsValid(_Crawler.Get_ActionPlayer()),
             "the crawler and player survived loss of the action");
-        Assert_True(Attack.WindowClosed && Attack.TerminalSeen,
+        Assert_True(_Crawler.Get_AttackWindowClosed() && _Crawler.Get_AttackTerminalSeen(),
             "offense closed and the lost action's terminal was observed");
-        Assert_True(ck::Is_NOT_Valid(Attack.Action) && Attack.ActionIdentity.Get_Value() == 0,
+        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_AttackAction()) && _Crawler.Get_AttackActionIdentity().Get_Value() == 0,
             "the lost action no longer owns control");
-        Assert_True(Attack.LastCancel.IsSet() && Attack.LastCancel.GetValue() == EMars_Crawler_AttackCancel::PoseFailed,
+        const auto LastCancel = _Crawler.Get_AttackLastCancel();
+        Assert_True(LastCancel.IsSet() && LastCancel.GetValue() == EMars_Crawler_AttackCancel::PoseFailed,
             "losing the action ended the first jab as PoseFailed");
         Assert_Equals_Int(Get_DamageRequestCount(), 0, "the lost jab emitted no damage request");
     }
@@ -75,19 +74,17 @@ class UMars_AutoTest_CrawlerMelee_ActionScopeLoss : UMars_AutoTestRig_CrawlerMel
     UFUNCTION()
     private void Step_AssertFreshAdmission(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Assert_True(ck::IsValid(Attack.Action) && Attack.ActionIdentity.Get_Value() != _LostIdentity &&
-            Attack.Generation > _LostGeneration,
+        Assert_True(ck::IsValid(_Crawler.Get_AttackAction()) && _Crawler.Get_AttackActionIdentity().Get_Value() != _LostIdentity &&
+            _Crawler.Get_AttackGeneration() > _LostGeneration,
             "the next jab admitted a fresh action identity and generation");
-        Assert_True(Attack.WindowClosed == false && Attack.TerminalSeen == false,
+        Assert_True(_Crawler.Get_AttackWindowClosed() == false && _Crawler.Get_AttackTerminalSeen() == false,
             "terminal and offense state from the lost action did not cross admission");
     }
 
     UFUNCTION()
     private void Step_AssertSecondDrained(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Assert_True(Attack.TerminalSeen && ck::Is_NOT_Valid(Attack.Action),
+        Assert_True(_Crawler.Get_AttackTerminalSeen() && ck::Is_NOT_Valid(_Crawler.Get_AttackAction()),
             "the second jab also observed its own terminal and its action released itself");
         Assert_Equals_Int(Get_DamageRequestCount(), 0, "neither out-of-reach jab emitted a damage request");
     }

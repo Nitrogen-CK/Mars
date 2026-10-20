@@ -1,7 +1,7 @@
 // A jab that reaches nothing (the target's near face 55 cm ahead of the neutral hit centre; the strike reaches 44) still
 // recovers and cools down: Windup > Strike > Recover > Cooldown > Idle with no damage. A start requested during Windup,
-// Recover and Cooldown is rejected as Busy and never queued: once the attack is back in Idle no second attack begins,
-// the generation is still the one admission's, and only one Windup was ever entered.
+// Recover and Cooldown drains and records exactly one Rejected history event, Busy, and is never queued: once the attack
+// is back in Idle no second attack begins, the generation is still the one admission's, and only one Windup was entered.
 class UMars_AutoTest_CrawlerMelee_MissAndCooldown : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 40.0f;
@@ -21,16 +21,16 @@ class UMars_AutoTest_CrawlerMelee_MissAndCooldown : UMars_AutoTestRig_CrawlerMel
         Add_Step("select the target and request one attack", n"Step_TargetAndStart");
         Add_Step_WaitUntil("the attack is admitted (Windup)", n"Check_Admitted", k_SlowPolls, 0);
         Add_Step("record the admission's generation; request another start during Windup", n"Step_StartDuringWindup");
-        Add_Step_WaitFrames("let the start drain", 3);
-        Add_Step("the Windup start was rejected as Busy", n"Step_AssertBusy");
+        Add_Step_WaitUntil("the start drained and was rejected", n"Check_StartRejected", k_SlowPolls, 0);
+        Add_Step("the Windup start was rejected once, as Busy", n"Step_AssertBusy");
         Add_Step_WaitUntil("the attack is in Recover", n"Check_InRecover", k_SlowPolls, 0);
         Add_Step("request another start during Recover", n"Step_StartAgain");
-        Add_Step_WaitFrames("let the start drain", 3);
-        Add_Step("the Recover start was rejected as Busy", n"Step_AssertBusy");
+        Add_Step_WaitUntil("the start drained and was rejected", n"Check_StartRejected", k_SlowPolls, 0);
+        Add_Step("the Recover start was rejected once, as Busy", n"Step_AssertBusy");
         Add_Step_WaitUntil("the attack is in Cooldown", n"Check_InCooldown", k_SlowPolls, 0);
         Add_Step("request another start during Cooldown", n"Step_StartAgain");
-        Add_Step_WaitFrames("let the start drain", 3);
-        Add_Step("the Cooldown start was rejected as Busy", n"Step_AssertBusy");
+        Add_Step_WaitUntil("the start drained and was rejected", n"Check_StartRejected", k_SlowPolls, 0);
+        Add_Step("the Cooldown start was rejected once, as Busy", n"Step_AssertBusy");
         Add_Step_WaitUntil("the attack is back in Idle", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitSeconds("watch Idle for 1 s", 1.0f);
         Add_Step("the miss recovered and cooled down, and no rejected start ran later", n"Step_Assert");
@@ -47,21 +47,19 @@ class UMars_AutoTest_CrawlerMelee_MissAndCooldown : UMars_AutoTestRig_CrawlerMel
     private void Step_StartDuringWindup(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _GenerationAtAdmission = _Crawler.Get_AttackGeneration();
-        _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Target.Entity));
+        Request_StartAndMark();
     }
 
     UFUNCTION()
     private void Step_StartAgain(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Target.Entity));
+        Request_StartAndMark();
     }
 
     UFUNCTION()
     private void Step_AssertBusy(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastReject = _Crawler.Get_AttackLastReject();
-        Assert_True(LastReject.IsSet() && LastReject.GetValue() == EMars_Crawler_AttackReject::Busy,
-            f"a start during {_Crawler.Get_AttackPhase() :n} is rejected as Busy (last reject {Get_LastRejectText()})");
+        Assert_RejectedOnce(EMars_Crawler_AttackReject::Busy, f"a start during {_Crawler.Get_AttackPhase() :n}");
         Assert_Equals_Int(_Crawler.Get_AttackGeneration(), _GenerationAtAdmission, "the rejected start did not begin a new attack");
     }
 

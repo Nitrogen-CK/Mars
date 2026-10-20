@@ -1,8 +1,10 @@
-// D04: the consumer only records copied evidence. Public fixture steps own every gameplay request.
+// The cue consumer only records copied evidence; public fixture steps own every gameplay request. Every batch arrives
+// with the admission it reports already accepted (a pending action is silent), each lifecycle transition fires once, and
+// a construction-time empty profile stays silent even when its source is edited during play.
 class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackCatalog
 {
     default _TimeoutSeconds = 90.0f;
-    default _Origin = FVector(-900000.0, -180000.0, 600.0);
+    default _Origin = FVector(-900000.0, -240000.0, 600.0);
     protected bool _BodyOnly = false;
     protected bool _CustomId = false;
     protected bool _Cancel = false;
@@ -10,8 +12,6 @@ class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackC
     protected FGameplayTag _ConfiguredProfile = GameplayTags::AttackCue_Mars_Pincer;
     private FGameplayTag _ExpectedId = GameplayTags::Attack_Mars_Pincer;
     UPROPERTY() private UMars_AttackDefinition_Data _CueDefinition;
-    UPROPERTY() private UMars_Processor_Crawler_HandleRequests _Requests;
-    UPROPERTY() private UMars_Processor_Crawler_AttackTick _Tick;
     private TArray<FMars_Attack_CueBatch> _CueBatches;
     private bool _CallbacksFullyWritten = true;
     private bool _ObservationsValid = true;
@@ -30,8 +30,6 @@ class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackC
         _CueDefinition.Def.CueProfile = _ConfiguredProfile;
         for (auto& Entry : _Catalog.Spec.Entries)
         { Entry.Enabled = Entry.Id == _ExpectedId; }
-        _Requests = Cast<UMars_Processor_Crawler_HandleRequests>(NewObject(this, UMars_Processor_Crawler_HandleRequests));
-        _Tick = Cast<UMars_Processor_Crawler_AttackTick>(NewObject(this, UMars_Processor_Crawler_AttackTick));
         SpawnFloorAndCrawler(InHandle, Spec);
         Add_CatalogSettleSteps();
         Add_Step("bind public committed cue batches", n"Step_BindCues");
@@ -40,15 +38,16 @@ class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackC
         Add_Step("select the target", n"Step_CatalogSelectTarget");
         Add_Step_WaitUntil("target transport drains", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
         Add_Step_WaitUntil("full fresh advice permits the authored identity", n"Check_CueReady", k_SlowPolls, 0);
-        Add_Step("create one real Pending action and prove pending admission is silent", n"Step_StartPending");
+        Add_Step("request one attack", n"Step_StartPending");
         Add_Step_WaitUntil("a real offensive native receipt accepts", n"Check_CatalogAccepted", k_SlowPolls, 0);
+        Add_Step("record the accepted admission", n"Step_RecordAdmission");
         Add_Step("edit only the pinned transient source profile after admission", n"Step_EditSourceProfile");
         if (_Cancel || _DestroyAction)
         { Add_Step("interrupt only through a public cancellation or owned action destruction", n"Step_Interrupt"); }
         Add_Step_WaitUntil("native terminal and game cleanup complete", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitUntil("surviving limbs return to the gait", n"Check_CatalogClawsReturned", k_SlowPolls, 0);
         Add_Step_WaitFrames("extra ticks cannot repeat interruption or completion", 3);
-        Add_Step("D04 copied native evidence and exact lifecycle transitions", n"Step_AssertCues");
+        Add_Step("copied native evidence and exact lifecycle transitions", n"Step_AssertCues");
         Add_Step("explicit public unbind ends the consumer lifetime", n"Step_UnbindCues");
         Run_Steps(InHandle);
     }
@@ -92,17 +91,12 @@ class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackC
         Assert_Equals_Int(_CueBatches.Num(), 0, "preparation and target selection emit no attack cue");
         _RecordMark = _Records.Num();
         _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Target.Entity));
-        FMars_Fragment_Crawler_Requests Requests = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Requests);
-        FCk_Handle Entity = _Crawler;
-        _Requests.ForEachEntity(FCk_Time(0.0), Entity, Requests);
-        _Tick.ForEachEntity(FCk_Time(0.000001), Entity);
+    }
+
+    UFUNCTION()
+    private void Step_RecordAdmission(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
         const auto Admission = _Crawler.Get_AttackAdmission();
-        const auto Action = _Crawler.Get_AttackAction();
-        Assert_True(Admission.Accepted == false && Admission.ActionIdentity.Get_Value() > 0 &&
-            ck::IsValid(Action) && Action.Get_State() == ECk_ProceduralAction_State::PendingAdmission &&
-            Action.Get_LastReceipt().Get_HasAcceptedPose() == false,
-            "the real owning kernel created Pending admission without a native accepted pose");
-        Assert_Equals_Int(_CueBatches.Num(), 0, "Pending state and requested motion emit no cue batch");
         _Identity = Admission.ActionIdentity.Get_Value();
         _Attempt = Admission.AttemptGeneration;
     }
@@ -114,7 +108,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackC
     UFUNCTION()
     private void Step_Interrupt(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _IssuedAtInterruption = utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler);
+        _IssuedAtInterruption = _Crawler.Get_IssuedDamageRequests();
         if (_DestroyAction)
         {
             FCk_Handle Action = _Crawler.Get_AttackAction();
@@ -215,7 +209,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogCues : UMars_AutoTestRig_CrawlerAttackC
         Assert_Equals_Int(Completed, 1, "the exact fully written accepted result fires once after cleanup");
         if (_Cancel || _DestroyAction)
         {
-            Assert_Equals_Int(utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler), _IssuedAtInterruption,
+            Assert_Equals_Int(_Crawler.Get_IssuedDamageRequests(), _IssuedAtInterruption,
                 "the cue consumer neither emits gameplay requests nor reopens offense after interruption");
             Assert_True(_Crawler.Get_AttackLastCancel().IsSet() && _Crawler.Get_AttackLastCancel().GetValue() ==
                 (_DestroyAction ? EMars_Crawler_AttackCancel::PoseFailed : EMars_Crawler_AttackCancel::StateExit),

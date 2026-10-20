@@ -24,17 +24,19 @@ class UMars_AutoTest_AttackCatalog_AuthoringValidationParity : UMars_AutoTestRig
     {
         auto Clip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
         _Clips.Add(Clip);
-        const auto Built = utils_crawler::Build_ReferenceSwipeClip(EMars_Crawler_Layout::Radial, 4, true, Clip);
+        const auto Built = utils_crawler::Build_ReferenceSwipeClip(FMars_Crawler_ReferenceBody(EMars_Crawler_Layout::Radial, 4), EMars_Crawler_Side::Right, Clip);
         if (Built.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
         { FinishFailure(f"endpoint policy fixture did not build: {utils_crawler::Get_FirstDiagnosticText(Built)}"); return; }
         auto Definition = Cast<UMars_AttackDefinition_Data>(NewObject(this, UMars_AttackDefinition_Data));
-        Definition.Def = utils_attack_authoring::Make_Definition(EMars_Crawler_AttackPreset::Crawler4, GameplayTags::Attack_Mars_SwipeRight, true, Clip);
+        Definition.Def = utils_attack_authoring::Make_Definition(FMars_AttackAuthoring_DefinitionKey(
+            EMars_Crawler_AttackPreset::Crawler4, EMars_AttackReference_Kind::EndpointDemo, GameplayTags::Attack_Mars_SwipeRight), Clip);
         _Definitions.Add(Definition);
         auto Loadout = Cast<UMars_AttackLoadout_Data>(NewObject(this, UMars_AttackLoadout_Data));
         auto Authored = FMars_Attack_Loadout();
         auto Entry = FMars_Attack_Entry(); Entry.Id = GameplayTags::Attack_Mars_Test_PublicationProbe;
         Entry.Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(Definition); Authored.Entries.Add(Entry);
-        Authored.Execution = utils_attack_authoring::Make_Execution(EMars_Crawler_AttackPreset::Crawler4, true, Clip, utils_crawler::Get_ClipSeconds(Clip));
+        Authored.Execution = utils_attack_authoring::Make_Execution(FMars_AttackAuthoring_ExecutionQuery(
+            EMars_Crawler_AttackPreset::Crawler4, EMars_AttackReference_Kind::EndpointDemo, Clip, utils_crawler::Get_ClipSeconds(Clip)));
         auto Sampling = Authored.Execution.Tuning.Get_Sampling(); Sampling.Set_MaxSamples(2);
         auto Tuning = Authored.Execution.Tuning; Tuning.Set_Sampling(Sampling); Authored.Execution.Tuning = Tuning;
         Loadout.Spec = Authored; _Loadouts.Add(Loadout);

@@ -47,12 +47,12 @@ class UMars_AutoTest_AttackCatalog_StableSelection : UMars_AutoTestRig_AttackCat
         Query.Candidates.Add(Make_Candidate(GameplayTags::Attack_Mars_Pincer, 100, EMars_Attack_Availability::Waiting));
         Query.Candidates.Add(Make_Candidate(GameplayTags::Attack_Mars_Jab, 0, EMars_Attack_Availability::Ready));
         auto Selection = utils_attack::Select(Query);
-        Assert_True(Selection.Preferred.GetValue() == GameplayTags::Attack_Mars_Pincer && Selection.ReadyChoice.GetValue() == GameplayTags::Attack_Mars_Jab &&
+        Assert_True(Selection.Preferred == GameplayTags::Attack_Mars_Pincer && Selection.ReadyChoice == GameplayTags::Attack_Mars_Jab &&
             Selection.Selected.IsSet() == false, "WaitPreferred preserves a stance-waiting preferred pincer");
         Query.Policy.TemporaryReadiness = EMars_Attack_TemporaryReadinessPolicy::UseReadyAlternative;
         Query.Policy.ReadyAlternativeDelaySeconds = 0.25f;
         Assert_True(utils_attack::Select(Query).Selected.IsSet() == false, "a direct request cannot spend an absent preparation grace clock");
-        Query.Preparation.Active = true;
+        Query.Preparation.State = EMars_Attack_PreparationState::Active;
         Query.Preparation.Preferred = GameplayTags::Attack_Mars_Pincer;
         Query.Preparation.TargetIdentity = 11;
         Query.Preparation.TargetGeneration = 7;
@@ -60,12 +60,12 @@ class UMars_AutoTest_AttackCatalog_StableSelection : UMars_AutoTestRig_AttackCat
         Assert_True(utils_attack::Select(Query).Selected.IsSet() == false, "ready alternative waits before the authored grace");
         Query.Preparation.ElapsedReadinessWait = 0.25f;
         Selection = utils_attack::Select(Query);
-        Assert_True(Get_Selected(Selection, GameplayTags::Attack_Mars_Jab) && Selection.Preferred.GetValue() == GameplayTags::Attack_Mars_Pincer,
+        Assert_True(Get_Selected(Selection, GameplayTags::Attack_Mars_Jab) && Selection.Preferred == GameplayTags::Attack_Mars_Pincer,
             "after grace Selected fallback differs from stable Preferred and diagnostic ReadyChoice");
-        Query.Preparation.Active = false;
+        Query.Preparation.State = EMars_Attack_PreparationState::Idle;
         Query.Policy.ReadyAlternativeDelaySeconds = 0.0f;
         Assert_True(Get_Selected(utils_attack::Select(Query), GameplayTags::Attack_Mars_Jab), "zero authored grace permits direct ready fallback");
-        Query.Preparation.Active = true;
+        Query.Preparation.State = EMars_Attack_PreparationState::Active;
         Query.Preparation.Preferred = GameplayTags::Attack_Mars_Jab;
         Query.Candidates[0].Evaluation.Availability = EMars_Attack_Availability::Ready;
         Assert_True(Get_Selected(utils_attack::Select(Query), GameplayTags::Attack_Mars_Jab), "a better candidate regaining readiness cannot replace a valid preparing preference");
@@ -76,16 +76,17 @@ class UMars_AutoTest_AttackCatalog_StableSelection : UMars_AutoTestRig_AttackCat
         Query.Candidates[1].Evaluation.Availability = EMars_Attack_Availability::Ready;
         Query.Preparation.TargetGeneration = 6;
         Assert_True(Get_Selected(utils_attack::Select(Query), GameplayTags::Attack_Mars_Pincer), "target-generation change invalidates retained preference");
-        Query.Preparation.TimedOut = true;
+        // The state the crawler's attack tick writes when the readiness wait runs out.
+        Query.Preparation.State = EMars_Attack_PreparationState::TimedOut;
         Assert_True(Get_Selected(utils_attack::Select(Query), GameplayTags::Attack_Mars_Pincer), "stale timed-out preparation cannot block a new target generation");
         Query.Preparation.TargetGeneration = 7;
-        Assert_True(utils_attack::Select(Query).Disposition == EMars_Attack_SelectionDisposition::Wait,
-            "a timeout on the current preparation target still stops admission");
-        Query.Preparation.TimedOut = false;
-        Query.Preparation.Active = false;
+        Selection = utils_attack::Select(Query);
+        Assert_True(Selection.Disposition == EMars_Attack_SelectionDisposition::Wait && Selection.Selected.IsSet() == false &&
+            Selection.Preferred == GameplayTags::Attack_Mars_Pincer, "a timeout on the current preparation target stops admission of a ready preferred attack");
+        Query.Preparation.State = EMars_Attack_PreparationState::Idle;
         Query.Candidates[0].Evaluation.Availability = EMars_Attack_Availability::Waiting;
         auto Busy = FMars_Attack_Blocker();
-        Busy.Code = n"ControlBusy";
+        Busy.Code = EMars_Attack_BlockerCode::ControlBusy;
         Query.Candidates[0].Evaluation.Blockers.Add(Busy);
         Query.Policy.ControlWait = EMars_Attack_ControlWaitPolicy::PreferAvailable;
         Assert_True(Get_Selected(utils_attack::Select(Query), GameplayTags::Attack_Mars_Jab), "PreferAvailable skips a temporarily controlled preferred limb");

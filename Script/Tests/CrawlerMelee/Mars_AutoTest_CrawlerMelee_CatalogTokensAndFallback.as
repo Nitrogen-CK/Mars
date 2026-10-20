@@ -18,10 +18,10 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
         Add_Step_WaitUntil("target requests drain", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
         Add_Step("reject an explicit unknown attack without fallback", n"Step_Unknown");
         Add_Step_WaitUntil("unknown request drains", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
-        Add_Step("C03 unknown explicit ID created no action", n"Step_AssertUnknown");
+        Add_Step("unknown explicit ID created no action", n"Step_AssertUnknown");
         Add_Step("automatically start the data-only custom fourth ID", n"Step_TargetAndStart");
         Add_Step_WaitUntil("the custom ID is actually accepted", n"Check_CatalogAccepted", k_SlowPolls, 0);
-        Add_Step("C02 custom body attack requires an unanimated front role", n"Step_AssertCustom");
+        Add_Step("custom body attack requires an unanimated front role", n"Step_AssertCustom");
         Add_Step_WaitUntil("the custom attempt ends", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step("prepare the custom attack and capture its live selection token", n"Step_Prepare");
         Add_Step_WaitUntil("preparation established a preferred attack", n"Check_Prepared", k_SlowPolls, 0);
@@ -30,10 +30,10 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
         Add_Step_WaitUntil("the retained preference invalidates and the token changes", n"Check_FreshJabAdvice", k_SlowPolls, 0);
         Add_Step("send the stale explicit custom token", n"Step_Stale");
         Add_Step_WaitUntil("stale request drains", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
-        Add_Step("C03 stale request has no action and no fallback", n"Step_AssertStale");
+        Add_Step("stale request has no action and no fallback", n"Step_AssertStale");
         Add_Step("fresh target-only admission falls back to Jab", n"Step_TargetAndStart");
         Add_Step_WaitUntil("the first fallback Jab accepts", n"Check_CatalogAccepted", k_SlowPolls, 0);
-        Add_Step("C02 stable anatomical loss selected Jab", n"Step_AssertJab");
+        Add_Step("stable anatomical loss selected Jab", n"Step_AssertJab");
         Add_Step_WaitUntil("the first Jab ends", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step("disable FrontRight as well", n"Step_DisableRight");
         Add_Step_WaitUntil("both front attack limbs are unavailable", n"Check_BothUnavailable", k_SlowPolls, 0);
@@ -43,7 +43,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
         Add_Step_WaitUntil("the body Jab ends", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step("deplete required body Health and request another start", n"Step_DepleteBodyAndStart");
         Add_Step_WaitUntil("body depletion has actually processed", n"Check_BodyDepleted", k_SlowPolls, 0);
-        Add_Step("C03 depleted required body cannot emit another attack", n"Step_AssertBodyGuard");
+        Add_Step("depleted required body cannot emit another attack", n"Step_AssertBodyGuard");
         Run_Steps(InHandle);
     }
 
@@ -59,7 +59,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
     {
         const auto Reject = _Crawler.Get_AttackLastReject();
         Assert_True(Reject.IsSet() && Reject.GetValue() == EMars_Crawler_AttackReject::AttackUnknown, "explicit unknown ID reports AttackUnknown");
-        Assert_True(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).ActionIdentity.Get_Value() == 0 &&
+        Assert_True(_Crawler.Get_AttackActionIdentity().Get_Value() == 0 &&
             _CatalogAdmissions.Num() == _AdmissionsBeforeReject, "an unknown explicit request created no action or admission");
     }
 
@@ -69,17 +69,17 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
         const auto Plan = _Crawler.Get_AttackPlan();
         Assert_True(Plan.Entry.Identity.Id == GameplayTags::Attack_Mars_Test_Fourth && Plan.Entry.Slots.Num() == 0,
             "a data-only custom ID executes a body clip without pretending to claim its prerequisite");
-        Assert_True(_Crawler.Get_AttackLegacyClipKind().IsSet() == false, "custom identity is never silently labelled as legacy Jab");
+        Assert_True(_Crawler.Get_AttackId() == GameplayTags::Attack_Mars_Test_Fourth, "the custom identity is reported as itself, never as the jab");
         auto RequiredLeft = false;
         for (const auto& Part : Plan.Entry.Parts)
-        { RequiredLeft = RequiredLeft || Part.Binding.Role == GameplayTags::AttackRole_Mars_FrontLeft && Part.Binding.LimbId == n"Leg5"; }
+        { RequiredLeft = RequiredLeft || (Part.Binding.Role == GameplayTags::AttackRole_Mars_FrontLeft && Part.Binding.LimbId == n"Leg5"); }
         Assert_True(RequiredLeft, "the unanimated required front role is frozen to its stable Leg5 identity");
     }
 
     UFUNCTION()
     private void Step_Prepare(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Target.Entity));
+        _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Target.Entity, ECk_EnableDisable::Enable));
     }
 
     UFUNCTION()
@@ -87,7 +87,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
     {
         const auto Preparation = _Crawler.Get_AttackPreparation();
         auto Res = OutResult;
-        const auto Ready = Preparation.Active && Preparation.Preferred == GameplayTags::Attack_Mars_Test_Fourth;
+        const auto Ready = Preparation.State == EMars_Attack_PreparationState::Active && Preparation.Preferred == GameplayTags::Attack_Mars_Test_Fourth;
         if (Ready)
         { _OldToken = _Crawler.Get_AttackEvaluation().SelectionGeneration; }
         Res.Set(Ready);
@@ -131,7 +131,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
         Assert_True(Reject.IsSet() && Reject.GetValue() == EMars_Crawler_AttackReject::SelectionStale,
             "processed anatomy change invalidates the explicit selection generation");
         Assert_True(_Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle &&
-            _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).ActionIdentity.Get_Value() == 0 &&
+            _Crawler.Get_AttackActionIdentity().Get_Value() == 0 &&
             _CatalogAdmissions.Num() == _AdmissionsBeforeReject, "stale explicit selection neither creates an action nor falls back");
     }
 
@@ -143,7 +143,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogTokensAndFallback : UMars_AutoTestRig_C
             "fresh automatic selection falls back to an eligible body-only Jab");
         auto StableLeft = false;
         for (const auto& Binding : _Crawler.Get_Spec().ResolvedAttacks.Anatomy)
-        { StableLeft = StableLeft || Binding.Role == GameplayTags::AttackRole_Mars_FrontLeft && Binding.LimbId == n"Leg5"; }
+        { StableLeft = StableLeft || (Binding.Role == GameplayTags::AttackRole_Mars_FrontLeft && Binding.LimbId == n"Leg5"); }
         Assert_True(StableLeft, "losing a limb never reassigns the FrontLeft role to a survivor");
     }
 

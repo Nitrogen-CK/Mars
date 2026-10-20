@@ -74,6 +74,12 @@ struct FMars_Attack_HistoryContext
     UPROPERTY() FMars_Attack_LoadoutEvaluation Evaluation;
 }
 
+namespace constants_crawler
+{
+    // The attack history ledger keeps the newest this many entries.
+    const int32 k_AttackHistoryCap = 16;
+}
+
 struct FMars_Attack_HistoryEntry
 {
     UPROPERTY() FMars_Attack_HistoryContext Context;
@@ -125,22 +131,65 @@ event void FMars_Delegate_Crawler_OnAttackCompleted_MC(FCk_Handle_Crawler InSelf
 
 namespace utils_crawler
 {
-    EMars_Crawler_AttackReject Get_LegacyAttackReject(FName InCode)
+    // The start rejection a preferred attack's first blocker reports. Exhaustive over the code: a new code needs a case.
+    EMars_Crawler_AttackReject Get_AttackReject(EMars_Attack_BlockerCode InCode)
     {
-        if (InCode == n"OutOfRange" || InCode == n"TooClose") { return EMars_Crawler_AttackReject::OutOfRange; }
-        if (InCode == n"Facing") { return EMars_Crawler_AttackReject::Facing; }
-        if (InCode == n"Moving") { return EMars_Crawler_AttackReject::Moving; }
-        if (InCode == n"Height") { return EMars_Crawler_AttackReject::Height; }
-        if (InCode == n"Ungrounded") { return EMars_Crawler_AttackReject::Ungrounded; }
-        if (InCode == n"Slope") { return EMars_Crawler_AttackReject::Slope; }
-        if (InCode == n"SupportStance") { return EMars_Crawler_AttackReject::Stance; }
-        if (InCode == n"WindupBlocked") { return EMars_Crawler_AttackReject::WindupBlocked; }
-        if (InCode == n"Dead") { return EMars_Crawler_AttackReject::Dead; }
-        if (InCode == n"SupportCapacity") { return EMars_Crawler_AttackReject::Legs; }
-        if (InCode == n"PartMissing" || InCode == n"PartSevered" || InCode == n"PartBroken" || InCode == n"PartDepleted" ||
-            InCode == n"PartWrongOwner" || InCode == n"PartPendingDestroy" || InCode == n"ConditionDisallowed" || InCode == n"LimbDisabled" || InCode == n"LimbDetached")
-        { return EMars_Crawler_AttackReject::RequiredPartUnavailable; }
-        return EMars_Crawler_AttackReject::NotReady;
+        switch (InCode)
+        {
+            case EMars_Attack_BlockerCode::OutOfRange:
+            case EMars_Attack_BlockerCode::TooClose:
+                return EMars_Crawler_AttackReject::OutOfRange;
+            case EMars_Attack_BlockerCode::Facing:
+                return EMars_Crawler_AttackReject::Facing;
+            case EMars_Attack_BlockerCode::Moving:
+                return EMars_Crawler_AttackReject::Moving;
+            case EMars_Attack_BlockerCode::Height:
+                return EMars_Crawler_AttackReject::Height;
+            case EMars_Attack_BlockerCode::Ungrounded:
+                return EMars_Crawler_AttackReject::Ungrounded;
+            case EMars_Attack_BlockerCode::Slope:
+                return EMars_Crawler_AttackReject::Slope;
+            case EMars_Attack_BlockerCode::SupportStance:
+                return EMars_Crawler_AttackReject::Stance;
+            case EMars_Attack_BlockerCode::WindupBlocked:
+                return EMars_Crawler_AttackReject::WindupBlocked;
+            case EMars_Attack_BlockerCode::Dead:
+                return EMars_Crawler_AttackReject::Dead;
+            case EMars_Attack_BlockerCode::SupportCapacity:
+                return EMars_Crawler_AttackReject::Legs;
+            case EMars_Attack_BlockerCode::PartMissing:
+            case EMars_Attack_BlockerCode::PartSevered:
+            case EMars_Attack_BlockerCode::PartBroken:
+            case EMars_Attack_BlockerCode::PartDepleted:
+            case EMars_Attack_BlockerCode::PartWrongOwner:
+            case EMars_Attack_BlockerCode::PartPendingDestroy:
+            case EMars_Attack_BlockerCode::ConditionDisallowed:
+            case EMars_Attack_BlockerCode::LimbDisabled:
+            case EMars_Attack_BlockerCode::LimbDetached:
+                return EMars_Crawler_AttackReject::RequiredPartUnavailable;
+            // Waits on a limb, a clock, the target or the creature's readiness; the emitter codes never block a start.
+            case EMars_Attack_BlockerCode::LimbUnavailable:
+            case EMars_Attack_BlockerCode::ControlBusy:
+            case EMars_Attack_BlockerCode::LimbReturning:
+            case EMars_Attack_BlockerCode::LimbUnplanted:
+            case EMars_Attack_BlockerCode::NotReady:
+            case EMars_Attack_BlockerCode::Cooldown:
+            case EMars_Attack_BlockerCode::GlobalCooldown:
+            case EMars_Attack_BlockerCode::TargetLost:
+            case EMars_Attack_BlockerCode::HitContactInvalid:
+            case EMars_Attack_BlockerCode::EmitterCount:
+            case EMars_Attack_BlockerCode::EmitterIdentity:
+            case EMars_Attack_BlockerCode::EmitterBounds:
+            case EMars_Attack_BlockerCode::AcceptedSourceInvalid:
+            case EMars_Attack_BlockerCode::AcceptedRootInvalid:
+            case EMars_Attack_BlockerCode::RootInvalid:
+            case EMars_Attack_BlockerCode::RootDrift:
+            case EMars_Attack_BlockerCode::FacingDrift:
+            case EMars_Attack_BlockerCode::AcceptedSourceMissing:
+            case EMars_Attack_BlockerCode::SampleTravel:
+            case EMars_Attack_BlockerCode::AcceptedPresentationMismatch:
+                return EMars_Crawler_AttackReject::NotReady;
+        }
     }
 
     TOptional<FMars_Attack_ResolvedEntry> Find_ResolvedAttack(const FMars_Attack_ResolvedLoadout& InLoadout, FGameplayTag InId)
@@ -150,22 +199,26 @@ namespace utils_crawler
             if (Entry.Identity.Id == InId)
             { return TOptional<FMars_Attack_ResolvedEntry>(Entry); }
         }
+
         return TOptional<FMars_Attack_ResolvedEntry>();
     }
+
     FString Get_AttackValidationText(const FMars_Attack_ValidationReport& InReport)
     {
-        if (InReport.Diagnostics.Num() == 1 && InReport.Diagnostics[0].Code == n"LegacyCombatInvalid")
-        { return InReport.Diagnostics[0].Actual; }
         auto Text = FString();
         for (const auto& Diagnostic : InReport.Diagnostics)
         { Text = f"{Text}{Diagnostic.Code} at {Diagnostic.Field}: expected {Diagnostic.Expected}, actual {Diagnostic.Actual}; "; }
+
         return Text;
     }
 
+    // The spec's authored anatomy, or the default one: the body, the rig's first leg as the front right and its last as the
+    // front left.
     TArray<FMars_Attack_AnatomyBinding> Make_AttackAnatomy(const FMars_Crawler_Spec& InSpec)
     {
         if (InSpec.Combat.Anatomy.Num() > 0)
         { return InSpec.Combat.Anatomy; }
+
         auto Bindings = TArray<FMars_Attack_AnatomyBinding>();
         auto Body = FMars_Attack_AnatomyBinding();
         Body.Role = GameplayTags::AttackRole_Mars_Body;
@@ -183,39 +236,6 @@ namespace utils_crawler
         return Bindings;
     }
 
-    FMars_Attack_Definition Make_LegacyAttack(const FMars_Crawler_Combat& InCombat, EMars_Crawler_AttackClipKind InKind)
-    {
-        auto Def = FMars_Attack_Definition();
-        Def.Clip = InKind == EMars_Crawler_AttackClipKind::Pincer ? InCombat.PincerClip : InCombat.JabClip;
-        Def.Prepare.MaxDistance = InCombat.Prepare.StartDistance;
-        Def.Prepare.FacingToleranceDegrees = InCombat.Prepare.FacingToleranceDegrees;
-        Def.Prepare.MaxHeightDifference = InCombat.Prepare.MaxHeightDifference;
-        Def.Prepare.MaxSpeedToStart = InCombat.Prepare.MaxSpeedToStart;
-        Def.Prepare.TimeoutSeconds = InCombat.Prepare.TimeoutSeconds;
-        Def.Hit.Damage = InCombat.Hit.Damage;
-        Def.Hit.DamageType = InCombat.Hit.DamageType;
-        auto Emitter = FMars_Attack_Emitter();
-        Emitter.Id = GameplayTags::AttackEmitter_Mars_Body;
-        Emitter.LocalCenter = InCombat.Hit.LocalCenter;
-        Emitter.Radius = InCombat.Hit.Radius;
-        Emitter.MaxSampleTravel = InCombat.Hit.MaxSampleTravel;
-        Def.Hit.Emitters.Add(Emitter);
-        Def.Cooldown.RecoverySeconds = InCombat.Timing.CooldownSeconds;
-        Def.CueProfile = InKind == EMars_Crawler_AttackClipKind::Pincer ? GameplayTags::AttackCue_Mars_Pincer : FGameplayTag();
-        if (InKind == EMars_Crawler_AttackClipKind::Pincer)
-        {
-            auto Right = FMars_Attack_SlotRole();
-            Right.Slot = n"ClawRight";
-            Right.Role = GameplayTags::AttackRole_Mars_FrontRight;
-            Def.Requirements.Slots.Add(Right);
-            auto Left = Right;
-            Left.Slot = n"ClawLeft";
-            Left.Role = GameplayTags::AttackRole_Mars_FrontLeft;
-            Def.Requirements.Slots.Add(Left);
-        }
-        return Def;
-    }
-
     FMars_Attack_AnatomyBinding Find_AttackBinding(const TArray<FMars_Attack_AnatomyBinding>& InAnatomy, FGameplayTag InRole)
     {
         for (const auto& Binding : InAnatomy)
@@ -223,6 +243,7 @@ namespace utils_crawler
             if (Binding.Role == InRole)
             { return Binding; }
         }
+
         return FMars_Attack_AnatomyBinding();
     }
 
@@ -233,15 +254,21 @@ namespace utils_crawler
         auto Needed = InOutDefinition.Prepare.UseCreatureFrontRange;
         for (const auto& Emitter : InOutDefinition.Hit.Emitters)
         { Needed = Needed || Emitter.UseCreatureFrontCenter; }
-        if (Needed == false) { return Report; }
+
+        if (Needed == false)
+        { return Report; }
+
         utils_attack::Add_Check(Report, utils_attack::Get_IsFinite(InBodyHalfExtents) && InBodyHalfExtents.X > 0.0,
             utils_attack::Make_Diagnostic(n"CreatureBodyBounds", "Rig.BodyHalfExtents", FMars_Attack_Comparison("finite bounds with positive front extent", InBodyHalfExtents.ToString())));
-        if (Report.Get_IsValid() == false) { return Report; }
+        if (Report.Get_IsValid() == false)
+        { return Report; }
+
         if (InOutDefinition.Prepare.UseCreatureFrontRange)
         {
             InOutDefinition.Prepare.MaxDistance = float32(InBodyHalfExtents.X) + InOutDefinition.Prepare.CreatureFrontRangeMargin;
             InOutDefinition.Prepare.UseCreatureFrontRange = false;
         }
+
         for (auto& Emitter : InOutDefinition.Hit.Emitters)
         {
             if (Emitter.UseCreatureFrontCenter && Emitter.Source == EMars_Attack_EmitterSource::Body)
@@ -250,121 +277,102 @@ namespace utils_crawler
                 Emitter.UseCreatureFrontCenter = false;
             }
         }
+
         return Report;
     }
-    FMars_Attack_ValidationReport Resolve_AttackLoadout(const FMars_Crawler_Spec& InSpec, FMars_Crawler_AttackConstruction& OutConstruction)
+
+    // The anatomy, every procedural limb a locomotor, each limb id one the spec's rig has.
+    void Resolve_AttackAnatomy(const FMars_Crawler_Spec& InSpec, FMars_Attack_ResolvedLoadout& InOutResolved, FMars_Attack_ValidationReport& InOutReport)
     {
-        OutConstruction = FMars_Crawler_AttackConstruction();
-        auto Report = FMars_Attack_ValidationReport();
-        if (InSpec.Combat.Enabled == false)
-        { return Report; }
-        auto& Resolved = OutConstruction.Resolved;
-        Resolved.Anatomy = Make_AttackAnatomy(InSpec);
-        for (auto& Binding : Resolved.Anatomy)
-        {
-            if (Binding.Source == EMars_Attack_AnatomySource::ProceduralLimb)
-            { Binding.Locomotor = true; }
-        }
-        Resolved.GameRevision = 1;
-        for (const auto& Binding : Resolved.Anatomy)
+        InOutResolved.Anatomy = Make_AttackAnatomy(InSpec);
+        for (auto& Binding : InOutResolved.Anatomy)
         {
             if (Binding.Source != EMars_Attack_AnatomySource::ProceduralLimb)
             { continue; }
+
+            Binding.Locomotor = true;
             auto Exists = false;
             for (const auto& Leg : InSpec.Get_RigData().Get_Legs())
             { Exists = Exists || Leg.Get_Id() == Binding.LimbId; }
-            utils_attack::Add_Check(Report, Exists, utils_attack::Make_Diagnostic(n"CrawlerLimbIdUnknown", "Anatomy",
+
+            utils_attack::Add_Check(InOutReport, Exists, utils_attack::Make_Diagnostic(n"CrawlerLimbIdUnknown", "Anatomy",
                 FMars_Attack_Comparison("stable ID in creature rig", Binding.LimbId.ToString())));
         }
-        auto Legacy = InSpec.Combat.Loadout.IsNull();
-        if (Legacy)
+    }
+
+    // Loads the loadout, its enabled definitions and their clips (pinned in InOutConstruction), copies them into entries
+    // and takes the loadout's selection and execution policy. False when the loadout does not load or does not validate.
+    bool Resolve_AttackEntries(const FMars_Crawler_Spec& InSpec, FMars_Crawler_AttackConstruction& InOutConstruction, FMars_Attack_ValidationReport& InOutReport)
+    {
+        auto& Resolved = InOutConstruction.Resolved;
+        InOutConstruction.Loadout = System::LoadAsset_Blocking(InSpec.Combat.Loadout);
+        if (ck::Is_NOT_Valid(InOutConstruction.Loadout))
         {
-            auto Combat = InSpec.Combat;
-            if (Combat.JabClip.IsNull() == false)
-            { OutConstruction.Clips.Add(System::LoadAsset_Blocking(Combat.JabClip)); }
-            if (Combat.PincerClip.IsNull() == false)
-            { OutConstruction.Clips.Add(System::LoadAsset_Blocking(Combat.PincerClip)); }
-            const auto Validation = Combat.Validate();
-            if (Validation.IsValid() == false)
-            {
-                utils_attack::Add_Check(Report, false, utils_attack::Make_Diagnostic(n"LegacyCombatInvalid", "Combat",
-                    FMars_Attack_Comparison("valid legacy profile", Validation.Get_Error())));
-                return Report;
-            }
-            auto Entry = FMars_Attack_ResolvedEntry();
-            Entry.Identity.Id = GameplayTags::Attack_Mars_Jab;
-            Entry.Definition = Make_LegacyAttack(Combat, EMars_Crawler_AttackClipKind::Jab);
-            Resolved.Entries.Add(Entry);
-            if (Combat.PincerClip.IsNull() == false)
-            {
-                Entry.Identity.Id = GameplayTags::Attack_Mars_Pincer;
-                Entry.Identity.Priority = 10;
-                Entry.Definition = Make_LegacyAttack(Combat, EMars_Crawler_AttackClipKind::Pincer);
-                Resolved.Entries.Add(Entry);
-            }
-            Resolved.Execution.Tuning = Make_AttackTuning(InSpec);
-            Resolved.Execution.MaxRootDrift = Combat.Hit.MaxRootDrift;
-            Resolved.Execution.MaxGroundSlopeDegrees = Combat.Prepare.MaxGroundSlopeDegrees;
-            if (Combat.Get_HasPincer())
-            { Resolved.Execution.Locomotion = Make_PincerLocomotion(InSpec); }
+            utils_attack::Add_Check(InOutReport, false, utils_attack::Make_Diagnostic(n"LoadoutUnloaded", "Combat.Loadout",
+                FMars_Attack_Comparison("loaded asset", InSpec.Combat.Loadout.ToString())));
+            return false;
         }
-        else
+
+        const auto Authored = InOutConstruction.Loadout.Spec;
+        for (int32 EntryIndex = 0; EntryIndex < Math::Min(Authored.Entries.Num(), utils_attack::MaxEntries); ++EntryIndex)
         {
-            utils_attack::Add_Check(Report, InSpec.Combat.JabClip.IsNull() && InSpec.Combat.PincerClip.IsNull(),
-                utils_attack::Make_Diagnostic(n"MixedCombatAuthoring", "Combat", FMars_Attack_Comparison("Loadout XOR legacy clips", "mixed")));
-            OutConstruction.Loadout = System::LoadAsset_Blocking(InSpec.Combat.Loadout);
-            if (ck::Is_NOT_Valid(OutConstruction.Loadout))
-            {
-                utils_attack::Add_Check(Report, false, utils_attack::Make_Diagnostic(n"LoadoutUnloaded", "Combat.Loadout",
-                    FMars_Attack_Comparison("loaded asset", InSpec.Combat.Loadout.ToString())));
-                return Report;
-            }
-            const auto Authored = OutConstruction.Loadout.Spec;
-            for (int32 EntryIndex = 0; EntryIndex < Math::Min(Authored.Entries.Num(), utils_attack::MaxEntries); ++EntryIndex)
-            {
-                const auto Entry = Authored.Entries[EntryIndex];
-                if (Entry.Enabled == false)
-                { continue; }
-                auto Asset = System::LoadAsset_Blocking(Entry.Definition);
-                if (ck::Is_NOT_Valid(Asset))
-                { continue; }
-                OutConstruction.Definitions.Add(Asset);
-                OutConstruction.Clips.Add(System::LoadAsset_Blocking(Asset.Def.Clip));
-                auto Runtime = FMars_Attack_ResolvedEntry();
-                Runtime.Identity.Id = Entry.Id;
-                Runtime.Identity.Priority = Entry.Priority;
-                Runtime.Identity.DefinitionPath = Entry.Definition;
-                Runtime.Definition = Asset.Def;
-                Resolved.Entries.Add(Runtime);
-            }
-            utils_attack::Append_Report(Report, utils_attack::Validate_Loadout(Authored), "Combat.Loadout.");
-            Resolved.Path = InSpec.Combat.Loadout;
-            Resolved.Selection = Authored.Selection;
-            Resolved.Execution = Authored.Execution;
-            if (Report.Get_IsValid() == false)
-            { return Report; }
+            const auto Entry = Authored.Entries[EntryIndex];
+            if (Entry.Enabled == false)
+            { continue; }
+
+            // Validate_Loadout below reports a definition that did not load (DefinitionUnloaded).
+            auto Asset = System::LoadAsset_Blocking(Entry.Definition);
+            if (ck::Is_NOT_Valid(Asset))
+            { continue; }
+
+            InOutConstruction.Definitions.Add(Asset);
+            InOutConstruction.Clips.Add(System::LoadAsset_Blocking(Asset.Def.Clip));
+            auto Runtime = FMars_Attack_ResolvedEntry();
+            Runtime.Identity.Id = Entry.Id;
+            Runtime.Identity.Priority = Entry.Priority;
+            Runtime.Identity.DefinitionPath = Entry.Definition;
+            Runtime.Definition = Asset.Def;
+            Resolved.Entries.Add(Runtime);
         }
-        utils_attack::Add_Check(Report, Resolved.Execution.Locomotion.Get_Support().Get_Mode() != ECk_ProceduralLimbControl_SupportMode::ProjectedSupportRegion,
+
+        utils_attack::Append_Report(InOutReport, utils_attack::Validate_Loadout(Authored), "Combat.Loadout.");
+        Resolved.Path = InSpec.Combat.Loadout;
+        Resolved.Selection = Authored.Selection;
+        Resolved.Execution = Authored.Execution;
+        return InOutReport.Get_IsValid();
+    }
+
+    // What the crawler adapter can execute: no projected support region, and a single physical publication per sample
+    // when any emitter rides a limb endpoint.
+    void Check_AttackExecution(const FMars_Attack_ResolvedLoadout& InResolved, FMars_Attack_ValidationReport& InOutReport)
+    {
+        utils_attack::Add_Check(InOutReport, InResolved.Execution.Locomotion.Get_Support().Get_Mode() != ECk_ProceduralLimbControl_SupportMode::ProjectedSupportRegion,
             utils_attack::Make_Diagnostic(n"CrawlerSupportRegionUnsupported", "Execution.Locomotion.Support.Mode",
                 FMars_Attack_Comparison("Disabled or CountOnly; no public region proof on crawler adapter", "ProjectedSupportRegion")));
         auto HasEndpoint = false;
-        for (const auto& Entry : Resolved.Entries)
+        for (const auto& Entry : InResolved.Entries)
         {
             for (const auto& Emitter : Entry.Definition.Hit.Emitters)
             { HasEndpoint = HasEndpoint || Emitter.Source == EMars_Attack_EmitterSource::LimbEndpoint; }
         }
+
         // Native refinements are predictions, followed by one physical publication. One qualified sample makes its
         // settled-motion validation compare against the previous physical pose, rather than an intermediate prediction.
-        utils_attack::Add_Check(Report, HasEndpoint == false || Resolved.Execution.Tuning.Get_Sampling().Get_MaxSamples() == 1,
+        utils_attack::Add_Check(InOutReport, HasEndpoint == false || InResolved.Execution.Tuning.Get_Sampling().Get_MaxSamples() == 1,
             utils_attack::Make_Diagnostic(n"EndpointPublicationSampling", "Execution.Tuning.Sampling.MaxSamples",
-                FMars_Attack_Comparison("1 for physical endpoint emitters", f"{Resolved.Execution.Tuning.Get_Sampling().Get_MaxSamples()}")));
-        // Bind every authored requirement to stable schema IDs, never positions in the live record.
-        float64 Longest = 0.0;
+                FMars_Attack_Comparison("1 for physical endpoint emitters", f"{InResolved.Execution.Tuning.Get_Sampling().Get_MaxSamples()}")));
+    }
+
+    // Binds every authored requirement to stable schema ids (never positions in the live record), solves the creature
+    // defaults, and swaps each entry's clip for a frozen copy, so an author editing the asset never changes an attempt.
+    void Freeze_AttackEntries(const FMars_Crawler_Spec& InSpec, FMars_Crawler_AttackConstruction& InOutConstruction, FMars_Attack_ValidationReport& InOutReport)
+    {
+        auto& Resolved = InOutConstruction.Resolved;
         for (int32 Index = 0; Index < Resolved.Entries.Num(); ++Index)
         {
             auto& Entry = Resolved.Entries[Index];
             Entry.Identity.GameRevision = Resolved.GameRevision;
-            utils_attack::Append_Report(Report, Resolve_AttackCreatureDefaults(Entry.Definition, InSpec.Rig.BodyHalfExtents), f"Entries[{Index}].");
+            utils_attack::Append_Report(InOutReport, Resolve_AttackCreatureDefaults(Entry.Definition, InSpec.Rig.BodyHalfExtents), f"Entries[{Index}].");
             Entry.SourceClip = Entry.Definition.Clip;
             for (const auto& Authored : Entry.Definition.Requirements.Slots)
             {
@@ -374,6 +382,7 @@ namespace utils_crawler
                 Slot.MaxCondition = Authored.MaxCondition;
                 Entry.Slots.Add(Slot);
             }
+
             for (const auto& Authored : Entry.Definition.Requirements.Parts)
             {
                 auto Part = FMars_Attack_ResolvedPart();
@@ -381,28 +390,44 @@ namespace utils_crawler
                 Part.MaxCondition = Authored.MaxCondition;
                 Entry.Parts.Add(Part);
             }
+
             auto Source = Entry.SourceClip.Get();
             if (ck::Is_NOT_Valid(Source))
             { continue; }
-            Longest = Math::Max(Longest, Get_ClipSeconds(Source));
+
             auto Draft = FCk_ProceduralAction_ClipDraft();
             const auto Copy = utils_procedural_action_builder::Make_Draft_FromData(Source, Draft);
             auto Frozen = Cast<UCk_ProceduralAction_Data>(NewObject(GetTransientPackage(), UCk_ProceduralAction_Data));
             const auto Built = utils_procedural_action_builder::Build_Into(Draft, Frozen);
-            utils_attack::Add_Check(Report, Copy.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid && Built.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+            utils_attack::Add_Check(InOutReport, Copy.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid && Built.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
                 utils_attack::Make_Diagnostic(n"ClipCopyFailed", f"Entries[{Index}].Clip", FMars_Attack_Comparison("public draft/build Valid", Source.GetName().ToString())));
-            OutConstruction.Clips.Add(Frozen);
+            InOutConstruction.Clips.Add(Frozen);
             Entry.Definition.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(Frozen);
         }
-        if (Legacy && InSpec.Combat.Get_HasPincer())
-        {
-            auto Locomotion = Resolved.Execution.Locomotion;
-            auto Support = Locomotion.Get_Support();
-            Support.Set_SupportHoldTimeout(FCk_Time(Longest + InSpec.Combat.Timing.CancelSeconds));
-            Locomotion.Set_Support(Support);
-            Resolved.Execution.Locomotion = Locomotion;
-        }
-        utils_attack::Append_Report(Report, utils_attack::Validate_ResolvedLoadout(Resolved), "");
+    }
+
+    // The armed spec's loadout resolved against its rig: anatomy -> entries -> execution checks -> frozen entries. Every
+    // loaded asset and frozen clip is pinned in OutConstruction, which the caller keeps for the crawler's lifetime.
+    FMars_Attack_ValidationReport Resolve_AttackLoadout(const FMars_Crawler_Spec& InSpec, FMars_Crawler_AttackConstruction& OutConstruction)
+    {
+        OutConstruction = FMars_Crawler_AttackConstruction();
+        auto Report = FMars_Attack_ValidationReport();
+        if (InSpec.Combat.Enabled == false)
+        { return Report; }
+
+        utils_attack::Add_Check(Report, InSpec.Combat.JabClip.IsNull() && InSpec.Combat.PincerClip.IsNull() && InSpec.Combat.Loadout.IsNull() == false,
+            utils_attack::Make_Diagnostic(n"LoadoutMissing", "Combat", FMars_Attack_Comparison("a Loadout and no retired clips", "author a Loadout")));
+        if (Report.Get_IsValid() == false)
+        { return Report; }
+
+        OutConstruction.Resolved.GameRevision = 1;
+        Resolve_AttackAnatomy(InSpec, OutConstruction.Resolved, Report);
+        if (Resolve_AttackEntries(InSpec, OutConstruction, Report) == false)
+        { return Report; }
+
+        Check_AttackExecution(OutConstruction.Resolved, Report);
+        Freeze_AttackEntries(InSpec, OutConstruction, Report);
+        utils_attack::Append_Report(Report, utils_attack::Validate_ResolvedLoadout(OutConstruction.Resolved), "");
         return Report;
     }
 
@@ -413,6 +438,7 @@ namespace utils_crawler
             if (ck::IsValid(Part) && ck::IsValid(Part.Get_Leg()) && Part.Get_Leg().Get_Id() == InLimbId)
             { return Part; }
         }
+
         return FCk_Handle_BodyPart();
     }
 
@@ -431,9 +457,11 @@ namespace utils_crawler
             Observation.Part.Depleted = InSelf.Get_Monster().Get_BodyHealth().Get_IsDepleted();
             return Observation;
         }
+
         const auto Part = Find_AttackPart(InSelf, InBinding.LimbId);
         if (ck::Is_NOT_Valid(Part))
         { return Observation; }
+
         FCk_Handle Entity = Part;
         Observation.Part.Live = true;
         Observation.Part.PendingDestroy = utils_entity_lifetime::Get_IsPendingDestroy(Entity, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
@@ -456,6 +484,7 @@ namespace utils_crawler
     {
         if (ck::Is_NOT_Valid(InTarget))
         { return 0; }
+
         auto Entity = FCk_Entity();
         InTarget.Break_Handle(Entity);
         int32 Id = 0;
@@ -470,6 +499,7 @@ namespace utils_crawler
         const auto Clip = InEntry.Definition.Clip.Get();
         if (ck::Is_NOT_Valid(Clip))
         { return false; }
+
         auto End = FTransform::Identity;
         for (const auto& Phase : Clip.Get_Phases())
         {
@@ -479,6 +509,7 @@ namespace utils_crawler
                 End = FTransform(Key.Get_Rotation(), Key.Get_Translation(), FVector::OneVector);
             }
         }
+
         const auto Presentation = utils_transform::Get_EntityCurrentTransform(InSelf.Get_Presentation());
         const auto Root = utils_transform::Get_EntityCurrentTransform(InSelf.As_Transform());
         for (const auto& Emitter : InEntry.Definition.Hit.Emitters)
@@ -486,6 +517,7 @@ namespace utils_crawler
             // Endpoint clearance is native claimed-channel admission plus accepted offense casts; no requested endpoint is contact evidence.
             if (Emitter.Source != EMars_Attack_EmitterSource::Body)
             { continue; }
+
             const auto Neutral = Get_HitCenter(Presentation, Emitter.LocalCenter);
             const auto Windup = Neutral + Root.GetRotation().RotateVector(Make_HitCenterOffset(End, Emitter.LocalCenter));
             auto Query = Make_AttackQuery(Neutral, Windup, Emitter.Radius);
@@ -495,6 +527,7 @@ namespace utils_crawler
             if (Hit.Get_HitKind() == ECk_ProbeTrace_HitKind::World)
             { return false; }
         }
+
         return true;
     }
 
@@ -504,6 +537,7 @@ namespace utils_crawler
         Result.ObservationFrame = utils_time::Get_FrameCounter();
         if (InSelf.Get_IsCombatArmed() == false)
         { return Result; }
+
         const auto Loadout = InSelf.Get_Spec().ResolvedAttacks;
         const auto& Selection = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackSelection);
         Result.SelectionGeneration = Selection.Generation;
@@ -524,6 +558,7 @@ namespace utils_crawler
             Query.Target.HeightDifference = float32(Offset.Z);
             Query.Target.FacingDegrees = float32(Get_PlanarAngleDegrees(Root.GetRotation().GetForwardVector(), Offset, Up));
         }
+
         Query.Self.State.Alive = InSelf.Get_IsCombatDead() == false;
         Query.Self.State.Ready = utils_procedural_gait::Get_Status(InSelf.Get_Gait()) == ECk_ProceduralAnimation_Status::Ready &&
             utils_procedural_body_pose::Get_Status(InSelf.Get_BodyPose()) == ECk_ProceduralAnimation_Status::Ready &&
@@ -536,10 +571,12 @@ namespace utils_crawler
         Query.Self.State.MobilityReady = utils_procedural_gait::Get_EnabledLegCount(InSelf.Get_Gait()) >= InSelf.Get_Spec().MinLegsToWalk;
         for (const auto& Binding : Loadout.Anatomy)
         { Query.Roles.Add(Capture_AttackRole(InSelf, Binding)); }
+
         for (const auto& Part : InSelf.Get_LegParts())
         {
             if (ck::Is_NOT_Valid(Part) || ck::Is_NOT_Valid(Part.Get_Leg()))
             { continue; }
+
             auto Binding = FMars_Attack_AnatomyBinding();
             Binding.Source = EMars_Attack_AnatomySource::ProceduralLimb;
             Binding.LimbId = Part.Get_Leg().Get_Id();
@@ -550,6 +587,7 @@ namespace utils_crawler
             Support.Limb = Role.Limb;
             Query.Self.SupportLimbs.Add(Support);
         }
+
         Query.Cooldown.GlobalRemaining = InSelf.Get_AttackCooldownRemaining();
         auto SelectionQuery = FMars_Attack_SelectionQuery();
         SelectionQuery.Policy = Loadout.Selection;
@@ -570,15 +608,18 @@ namespace utils_crawler
                     Candidate.LastStartSequence = Reuse.LastStartSequence;
                 }
             }
+
             // Spatial preflight is deferred while the evaluator already rejects an unready self or missing target.
             // Editor/populator registries can compose crawlers before a physics query context exists.
             Query.Self.WindupClear = true;
             if (Query.Target.Valid && Query.Self.State.Ready && Query.Self.State.Grounded)
             { Query.Self.WindupClear = Get_AttackWindupClear(InSelf, Entry); }
+
             Candidate.Evaluation = utils_attack::Evaluate(Query);
             Result.Evaluations.Add(Candidate.Evaluation);
             SelectionQuery.Candidates.Add(Candidate);
         }
+
         Result.Selection = utils_attack::Select(SelectionQuery);
         return Result;
     }
@@ -598,14 +639,18 @@ namespace utils_crawler
                 FCk_Handle Action = InSelf.Get_AttackAction();
                 if (Control.Get_State() != ECk_ProceduralLimbControl_State::Controlled || Control.Get_Owner() == Action)
                 { Role.Limb.Control = ECk_ProceduralLimbControl_State::Default; }
+
                 // Foot stance is an admission check. The action owns its admitted feet now.
                 Role.Limb.Planted = true;
                 Role.Limb.Trusted = true;
             }
+
             Roles.Add(Role);
         }
+
         for (const auto& Slot : Plan.Entry.Slots)
         { utils_attack::Evaluate_Role(Evaluation, Slot, Roles); }
+
         for (const auto& Part : Plan.Entry.Parts)
         {
             auto Requirement = FMars_Attack_ResolvedSlot();
@@ -613,6 +658,7 @@ namespace utils_crawler
             Requirement.MaxCondition = Part.MaxCondition;
             utils_attack::Evaluate_Role(Evaluation, Requirement, Roles);
         }
+
         return Evaluation.Blockers;
     }
 
@@ -621,10 +667,13 @@ namespace utils_crawler
         auto Signature = f"{InEvaluation.TargetIdentity}:{InEvaluation.TargetGeneration}";
         if (InEvaluation.Selection.Preferred.IsSet())
         { Signature = f"{Signature}|P:{InEvaluation.Selection.Preferred.GetValue().ToString()}"; }
+
         if (InEvaluation.Selection.ReadyChoice.IsSet())
         { Signature = f"{Signature}|R:{InEvaluation.Selection.ReadyChoice.GetValue().ToString()}"; }
+
         if (InEvaluation.Selection.Selected.IsSet())
         { Signature = f"{Signature}|S:{InEvaluation.Selection.Selected.GetValue().ToString()}"; }
+
         return f"{Signature}|{InEvaluation.Selection.Disposition :n}";
     }
 
@@ -635,64 +684,64 @@ namespace utils_crawler
         {
             Signature = f"{Signature}|{Evaluation.AttackId.ToString()}:{Evaluation.Availability :n}";
             for (const auto& Blocker : Evaluation.Blockers)
-            { Signature = f"{Signature}/{Blocker.Code}:{Blocker.Role.ToString()}:{Blocker.Slot}"; }
+            { Signature = f"{Signature}/{Blocker.Code :n}:{Blocker.Role.ToString()}:{Blocker.Slot}"; }
         }
+
         return Signature;
     }
 }
 
 mixin FMars_Attack_LoadoutEvaluation Get_AttackEvaluation(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Decision.Evaluation : FMars_Attack_LoadoutEvaluation(); }
+
 mixin FMars_Attack_Decision Get_AttackDecision(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Decision : FMars_Attack_Decision(); }
+
 mixin FMars_Attack_Admission Get_AttackAdmission(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Admission : FMars_Attack_Admission(); }
+
 mixin FMars_Attack_Result Get_AttackResult(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Result : FMars_Attack_Result(); }
+
 mixin FMars_Attack_ResolvedPlan Get_AttackPlan(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Plan : FMars_Attack_ResolvedPlan(); }
+
 mixin FGameplayTag Get_AttackId(const FCk_Handle_Crawler& Self)
 { return Self.Get_AttackPlan().Entry.Identity.Id; }
+
 mixin TArray<FMars_Attack_HistoryEntry> Get_AttackHistory(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Ledger.History : TArray<FMars_Attack_HistoryEntry>(); }
+
 mixin FMars_Attack_Preparation Get_AttackPreparation(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Preparation : FMars_Attack_Preparation(); }
+
 mixin TArray<FMars_Crawler_AttackReuse> Get_AttackReuse(const FCk_Handle_Crawler& Self)
 { return Self.Get_IsCombatArmed() ? Self.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Reuse : TArray<FMars_Crawler_AttackReuse>(); }
+
 mixin UCk_ProceduralAction_Data Get_AttackFrozenPlayedClip(const FCk_Handle_Crawler& Self)
 { return Self.Get_AttackPlan().Entry.Definition.Clip.Get(); }
-mixin TOptional<EMars_Crawler_AttackClipKind> Get_AttackLegacyClipKind(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Get_AttackId() == GameplayTags::Attack_Mars_Jab)
-    { return TOptional<EMars_Crawler_AttackClipKind>(EMars_Crawler_AttackClipKind::Jab); }
-    if (Self.Get_AttackId() == GameplayTags::Attack_Mars_Pincer)
-    { return TOptional<EMars_Crawler_AttackClipKind>(EMars_Crawler_AttackClipKind::Pincer); }
-    return TOptional<EMars_Crawler_AttackClipKind>();
-}
-
-mixin void Request_PrepareAttack(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_PrepareAttack& InRequest)
-{
-    if (Self.Get_IsCombatArmed() == false)
-    { return; }
-    Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests).PrepareAttackRequests.Add(InRequest);
-}
 
 mixin void BindTo_OnAttackDecisionChanged(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackDecisionChanged InDelegate)
 { Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Signals).OnAttackDecisionChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName()); }
+
 mixin void BindTo_OnAttackAdmitted(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackAdmitted InDelegate)
 { Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Signals).OnAttackAdmitted.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName()); }
+
 mixin void BindTo_OnAttackCompleted(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackCompleted InDelegate)
 { Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Signals).OnAttackCompleted.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName()); }
+
 mixin void UnbindFrom_OnAttackDecisionChanged(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackDecisionChanged InDelegate)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals))
     { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackDecisionChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName()); }
 }
+
 mixin void UnbindFrom_OnAttackAdmitted(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackAdmitted InDelegate)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals))
     { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackAdmitted.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName()); }
 }
+
 mixin void UnbindFrom_OnAttackCompleted(FCk_Handle_Crawler& Self, FMars_Delegate_Crawler_OnAttackCompleted InDelegate)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals))

@@ -3,15 +3,14 @@
 //   1-3. Request_CancelAttack(StateExit) in Windup, in Strike (as it begins) and in Recover: CancelRecover, Cooldown,
 //        Idle;
 //   4.   Request_CancelAttack(Disabled) in Windup: straight to Cooldown, no CancelRecover;
-//   6b.  a StateExit cancel in Windup, then the action's stream fails while CancelRecover waits for the return: PoseFailed
-//        enters Cooldown and the terminal is still consumed instead of waiting forever;
+//   6b.  a StateExit cancel in Windup, then the action entity is destroyed while CancelRecover waits for its return: the
+//        lost action is PoseFailed, which enters Cooldown and drains the stream instead of waiting forever;
 //   7.   a leg hit as Strike begins cancels as Hurt; as CancelRecover begins the target is destroyed and a second cancel
 //        arrives: CancelRecover still ends once, on the action's terminal, in the same generation, with the second cancel
 //        recorded and nothing restarted;
 //   8.   the crawler, settled again after its flinch, is destroyed mid-Strike: no ensure, no script error.
-// After 1-7 actual presentation has returned to neutral and the scoped action has released ownership. (5) and (6), the
-// game's acknowledgement watchdog (PoseTimeout), were removed with that watchdog: a clip action has no game-side pose
-// acknowledgement to time out.
+// After 1-7 actual presentation has returned to neutral and the scoped action has released ownership. There is no (5) or
+// (6): a clip action has no game-side pose acknowledgement to time out.
 class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 120.0f;
@@ -57,7 +56,7 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
         Add_Start("(6b)");
         Add_Step("(6b) cancel (StateExit) during Windup", n"Step_CancelStateExit");
         Add_Step_WaitUntil("(6b) the attack is in CancelRecover", n"Check_InCancelRecover", k_SlowPolls, 0);
-        Add_Step("(6b) fail the action's stream while CancelRecover waits for the return", n"Step_FailStreamDuringRecover");
+        Add_Step("(6b) destroy the action entity while CancelRecover waits for the return", n"Step_FailStreamDuringRecover");
         Add_Finish("(6b)");
         Add_Step("(6b) PoseFailed enters Cooldown and drains the terminal", n"Step_AssertActionFailedDuringRecover");
 
@@ -100,10 +99,10 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
 
         const auto LastCancel = _Crawler.Get_AttackLastCancel();
         Assert_True(LastCancel.IsSet() && LastCancel.GetValue() == InCancel, f"{InLabel} the last cancel is {InCancel :n} (got {Get_LastCancelText()})");
-        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action),
+        Assert_True(ck::Is_NOT_Valid(_Crawler.Get_AttackAction()),
             f"{InLabel} the scoped action returned ownership and was released");
         const auto Root = utils_transform::Get_EntityCurrentTransform(_Crawler.As_Transform());
-        const auto ExpectedNeutral = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).NeutralRootLocal * Root;
+        const auto ExpectedNeutral = _Crawler.Get_AttackNeutralRootLocal() * Root;
         const auto Presented = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
         Assert_True((Presented.GetLocation() - ExpectedNeutral.GetLocation()).Size() < 1.0f,
             f"{InLabel} the actual presentation returned to its neutral root-relative position");
@@ -184,15 +183,15 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
     UFUNCTION()
     private void Step_FailStreamDuringRecover(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Assert_True(ck::IsValid(Attack.Action) && Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover,
-            "(6b) the action is live in CancelRecover before the injected failure");
-        if (ck::Is_NOT_Valid(Attack.Action))
+        FCk_Handle Action = _Crawler.Get_AttackAction();
+        Assert_True(ck::IsValid(Action) && _Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::CancelRecover,
+            "(6b) the action is live in CancelRecover before it is destroyed");
+        if (ck::Is_NOT_Valid(Action))
         { return; }
 
-        // Approved change: there is no game acknowledgement left to fault. Fault the resolver's stream verdict instead,
-        // the mailbox a gap, an expired stream or a failed recovery writes.
-        _Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).ActionStreamFailed = true;
+        // The real input: the action vanishes before its terminal record, which the resolver and the tick read as a lost
+        // stream.
+        utils_entity_lifetime::Request_DestroyEntity(Action);
     }
 
     UFUNCTION()
@@ -238,8 +237,7 @@ class UMars_AutoTest_CrawlerMelee_EveryExit : UMars_AutoTestRig_CrawlerMelee
             "(7) the attack was cancelled as Hurt");
         Assert_Equals_Int(_Records[CooldownIndex].Generation, _Records[RecoverIndex].Generation,
             "(7) the second cancel did not start another recovery generation");
-        // Approved change: the cancel's return is the action's dedicated return, not game samples, so CancelRecover
-        // ends on the action's terminal record.
+        // The cancel's return is the action's dedicated return, so CancelRecover ends on the action's terminal record.
         Assert_True(_Records[RecoverIndex].TerminalSeen == false && _Records[CooldownIndex].TerminalSeen,
             "(7) CancelRecover ended on the action's terminal record");
     }

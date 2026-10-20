@@ -17,7 +17,7 @@ class UMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike : UMars_AutoTestRig
     {
         auto Spec = Make_AggressiveCrawlerSpec(6);
         Spec.Layout = EMars_Crawler_Layout::Spider;
-        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Pincer);
+        Wear_ReferenceLoadout(Spec, EMars_Crawler_AttackClipKind::Pincer);
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();
@@ -43,36 +43,25 @@ class UMars_AutoTest_CrawlerMelee_PincerClawSeveredMidStrike : UMars_AutoTestRig
         if (InNew != EMars_Crawler_AttackPhase::Strike || _Severed)
         { return; }
 
-        const auto Claws = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Claws;
-        if (Claws.Num() != 2)
+        const auto Claimed = InCrawler.Get_AttackPlan().Entry.Slots.Num();
+        auto Right = Find_ClaimedPart(InCrawler, utils_crawler::Get_RightClawSlotId());
+        const auto Left = Find_ClaimedPart(InCrawler, utils_crawler::Get_LeftClawSlotId());
+        if (Claimed != 2 || ck::Is_NOT_Valid(Right) || ck::Is_NOT_Valid(Left))
         {
-            FinishFailure(f"the pincer entered Strike with {Claws.Num()} claws, not 2");
+            FinishFailure(f"the pincer entered Strike claiming {Claimed} legs, not both claws");
             return;
         }
 
-        FCk_Handle Severed = Claws[0].Leg;
-        _SurvivingClaw = Claws[1].Leg;
-        auto Parts = _Crawler.Get_LegParts();
-        for (int32 Index = 0; Index < Parts.Num(); ++Index)
-        {
-            FCk_Handle PartEntity = Parts[Index];
-            if (PartEntity != Severed)
-            { continue; }
-
-            auto Health = Parts[Index].Get_Health();
-            Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(1000.0f, GameplayTags::DamageType_Mars_Sever)));
-            _Severed = true;
-            _SeverText = f"severed leg part {Index} ({Claws[0].LegId})";
-            return;
-        }
-        FinishFailure(f"the right claw {Claws[0].LegId} is not one of the crawler's leg parts");
+        _SurvivingClaw = Left.Get_Leg();
+        auto Health = Right.Get_Health();
+        Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(1000.0f, GameplayTags::DamageType_Mars_Sever)));
+        _Severed = true;
+        _SeverText = f"severed the right claw ({Right.Get_Leg().Get_Id()})";
     }
 
     private ECk_ProceduralArticulation_Health Get_RigHealth() const
     {
-        auto RootHandle = _Crawler.As_Transform();
-        const auto Subject = utils_procedural_articulation::DoCastChecked(RootHandle);
-        return utils_procedural_articulation::Get_Health(Subject);
+        return utils_procedural_articulation::Get_Health(_Crawler.Get_Articulation());
     }
 
     private FString Get_Diagnostics() const

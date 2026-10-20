@@ -10,9 +10,9 @@ class UMars_AutoTest_AttackCatalog_SeedReferenceGraphs : UMars_AutoTestRig_Attac
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("build transient preview subject with only its clip strongly held", n"Step_PreviewProbe");
+        Add_Step("capture the legacy source values; build transient preview subject with only its clip strongly held", n"Step_PreviewProbe");
         Add_Step("GC preview probe with only the clip retained", n"Step_PreviewProbeGC");
-        Add_Step("capture old values and inspect packages persisted by the native editor test", n"Step_PersistedPackages");
+        Add_Step("inspect packages persisted by the native editor test; the legacy values survived GC and the loads", n"Step_PersistedPackages");
         Add_Step("verify new preview metadata without writing it", n"Step_Previews");
         Run_Steps(InHandle);
     }
@@ -20,12 +20,17 @@ class UMars_AutoTest_AttackCatalog_SeedReferenceGraphs : UMars_AutoTestRig_Attac
     UFUNCTION()
     private void Step_PreviewProbe(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        // Captured before the GC step and the package loads, so the comparison spans both.
+        if (Capture_LegacyValues() == false)
+        { return; }
+
         _PreviewProbeClip = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
-        const auto Report = utils_crawler::Build_ReferenceSwipeClip(EMars_Crawler_Layout::Spider, 6, true, _PreviewProbeClip);
+        const auto Report = utils_crawler::Build_ReferenceSwipeClip(FMars_Crawler_ReferenceBody(EMars_Crawler_Layout::Spider, 6), EMars_Crawler_Side::Right, _PreviewProbeClip);
         if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
         { FinishFailure(f"preview lifetime probe clip failed to build: {utils_crawler::Get_FirstDiagnosticText(Report)}"); return; }
         // Subject contains soft references only. The helper's local hard references expire before the NEXT step.
-        const auto Subject = utils_crawler::Make_ReferenceSwipeEditorSubject(_PreviewProbeClip, EMars_Crawler_Layout::Spider, 6, true);
+        const auto Subject = utils_crawler::Make_ReferenceSwipeEditorSubject(_PreviewProbeClip,
+            FMars_Crawler_ReferenceBody(EMars_Crawler_Layout::Spider, 6), EMars_Crawler_Side::Right);
         utils_procedural_action_editor::Get_EditorData(_PreviewProbeClip).Set_Subject(Subject);
     }
 
@@ -63,7 +68,6 @@ class UMars_AutoTest_AttackCatalog_SeedReferenceGraphs : UMars_AutoTestRig_Attac
             Gait.Get_Step().Get_Threshold() != ExpectedGait.Get_Step().Get_Threshold())
         { FinishFailure("preview gait timing/step preset differs after GC; this PIE test wrote no assets"); return; }
         _PreviewProbePassed = true;
-        Assert_True(true, "clip-only strong ownership retains the exact embedded preview subject through a later GC step");
     }
 
     UFUNCTION()
@@ -71,7 +75,6 @@ class UMars_AutoTest_AttackCatalog_SeedReferenceGraphs : UMars_AutoTestRig_Attac
     {
         if (_PreviewProbePassed == false)
         { FinishFailure("preview ownership prerequisite did not pass; this PIE test performs no persistence"); return; }
-        if (Capture_LegacyValues() == false) { return; }
         const auto Paths = Get_DeclaredAssetPaths();
         Assert_Equals_Int(Paths.Num(), 33, "the approved reference package inventory is bounded and exact");
         for (const auto& Path : Paths)

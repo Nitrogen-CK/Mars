@@ -1,7 +1,7 @@
 // The combat request drain (armed crawlers only). In order: the last SetAggression (off clears the combat target and,
 // during Windup, Strike or Recover, queues a Disabled cancel), then the last SetCombatTarget (a change bumps the target
-// generation and, during an attack, queues a TargetLost cancel), then the first cancel reason, then the last start. A
-// start kept beside a cancel is rejected by the attack tick (CancelPending), never admitted. The brain's HasCombatTarget
+// generation and, during an attack, queues a TargetLost cancel), then the first cancel reason, then the last start and
+// the last prepare. A start kept beside a cancel is rejected by the attack tick (CancelPending), never admitted. The brain's HasCombatTarget
 // fact is Aggressive && a valid target, written whenever either changes: a passive crawler given a target explicitly
 // never raises it, so its behaviour never engages, while a direct start still attacks. Everything is written before
 // OnTargetChanged broadcasts, once, from the target before the drain to the target after it.

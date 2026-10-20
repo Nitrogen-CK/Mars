@@ -22,7 +22,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogParity : UMars_AutoTestRig_CrawlerAttac
         Add_Step_WaitUntil("the attack returns to Idle", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitUntil("the claws return to Default", n"Check_CatalogClawsReturned", k_SlowPolls, 0);
         Add_Step_WaitUntil("the target received the hit", n"Check_Hit", k_SlowPolls, 0);
-        Add_Step("C01/C06 catalogue body sphere keeps old phases, damage and return", n"Step_Assert");
+        Add_Step("catalogue body sphere keeps old phases, damage and return", n"Step_Assert");
         Run_Steps(InHandle);
     }
 
@@ -52,7 +52,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogParity : UMars_AutoTestRig_CrawlerAttac
             "normalized locomotor claims reject disabled common support through structured validation, without constructing an invalid crawler");
         _AcceptedId = Plan.Entry.Identity.Id;
         _ClaimedAtAccept = Plan.Entry.Slots.Num();
-        FCk_Handle ActionEntity = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
+        FCk_Handle ActionEntity = _Crawler.Get_AttackAction();
         for (const auto& Slot : Plan.Entry.Slots)
         {
             const auto Control = _Crawler.Get_Articulation().Get_LimbControl(Slot.Binding.LimbId);

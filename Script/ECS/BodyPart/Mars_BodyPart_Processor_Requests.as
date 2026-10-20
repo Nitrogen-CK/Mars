@@ -189,9 +189,7 @@ class UMars_Processor_BodyPart_HandleRequests : UCk_Processor_Script_Base_UE
         utils_monster::Add_DespawnTimer(InLeg, Debris.LifetimeSeconds, FCk_Delegate_Timer(this, n"OnDebrisExpired"));
 
         auto Cause = FMars_DamageEvent();
-        const auto HasCause = Part.Has_Fragment(FMars_Fragment_BodyPart_PendingSever);
-        ck::EnsureIfNot(HasCause, f"[BodyPart] [{Part.ToString()}] detached with no pending sever cause");
-        if (HasCause)
+        if (ck::EnsureIfNot(Part.Has_Fragment(FMars_Fragment_BodyPart_PendingSever), f"[BodyPart] [{Part.ToString()}] detached with no pending sever cause") == false)
         {
             Cause = Part.Get_Fragment(FMars_Fragment_BodyPart_PendingSever).Cause;
             Part.Request_TryRemove(FMars_Fragment_BodyPart_PendingSever);

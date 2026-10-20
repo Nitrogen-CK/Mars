@@ -34,7 +34,6 @@ class UMars_TargetDummy_EntityScript : UCk_GenericEntityScript_UE
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
-        utils_entity_tag::Add(InHandle, n"TAG_MarsTargetDummy");
         utils_team::Add(InHandle, ECk_Team_ID::Two, ECk_Replication::DoesNotReplicate);
 
         _Health = utils_health::Add(InHandle, FMars_Health_Spec(MaxHealth));

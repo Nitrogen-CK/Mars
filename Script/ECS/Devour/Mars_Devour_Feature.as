@@ -135,17 +135,14 @@ mixin FMars_Validation Validate(const FMars_Devour_Spec& Self)
 struct FMars_Fragment_Devour_Params
 {
     UPROPERTY()
-    FMars_Devour_Timing Timing;
-
-    UPROPERTY()
-    FCk_Handle_Transform View;
+    FMars_Devour_Spec Spec;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
-// Written only by the Devour processors and utils_devour::Add.
+// Written only by the Devour processors (UMars_Processor_Devour_Base) and utils_devour::Add.
 struct FMars_Fragment_Devour
 {
     UPROPERTY()
@@ -193,7 +190,7 @@ struct FMars_Fragment_Devour_Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Seizes InVictim. Ignored while a victim is held, and for a victim that is invalid, is the devourer itself or is already
-// held by another devourer.
+// held by another live devourer.
 struct FMars_Request_Devour_Begin
 {
     UPROPERTY()

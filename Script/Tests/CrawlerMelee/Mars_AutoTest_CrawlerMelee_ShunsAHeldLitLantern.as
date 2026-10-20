@@ -24,8 +24,8 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         Add_Step_WaitUntil("the lantern world item is composed", n"Check_LanternReady", k_SlowPolls, 0);
         Add_Step("the target picks the lantern up and opens it", n"Step_RaiseLitLantern");
         Add_Step_WaitUntil("the target holds the lit lantern and the crawler feels its Held pool", n"Check_Warded", k_SlowPolls, 0);
-        Add_Step("select the target and request an attack", n"Step_TargetAndStart");
-        Add_Step_WaitFrames("let the start drain", 3);
+        Add_Step("select the target and request an attack", n"Step_TargetAndStartMarked");
+        Add_Step_WaitUntil("the start drained and was rejected", n"Check_StartRejected", k_SlowPolls, 0);
         Add_Step("the start was rejected Warded and no attack began", n"Step_AssertWarded");
         Add_Step("the target stows the lantern", n"Step_LowerLantern");
         Add_Step_WaitUntil("the stowed lantern is dark, the crawler feels no light and the ward is lifted", n"Check_Lowered", k_SlowPolls, 0);
@@ -45,7 +45,7 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
         auto BeltNode = utils_scene_node::Create(_Target.Root, FTransform(FRotator::ZeroRotator, FVector(15.0, 25.0, 0.0))).As_Transform();
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, HandNode));
-        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(constants_lantern_item::Get_BeltPoint(), BeltNode));
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Belt, BeltNode));
         utils_attach_points::Add(_Target.Entity, AttachPointsSpec);
 
         auto HotbarSpec = FMars_Hotbar_Spec();
@@ -111,9 +111,7 @@ class UMars_AutoTest_CrawlerMelee_ShunsAHeldLitLantern : UMars_AutoTestRig_Crawl
     UFUNCTION()
     private void Step_AssertWarded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto LastReject = _Crawler.Get_AttackLastReject();
-        Assert_True(LastReject.IsSet() && LastReject.GetValue() == EMars_Crawler_AttackReject::Warded,
-            f"a start at a target raising a lit lantern is rejected Warded (last reject {Get_LastRejectText()})");
+        Assert_RejectedOnce(EMars_Crawler_AttackReject::Warded, "a start at a target raising a lit lantern");
         Assert_True(_Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle, f"no attack began (phase {_Crawler.Get_AttackPhase() :n})");
 
         const auto Rejection = _Crawler.Get_StartRejection(_Target.Entity);

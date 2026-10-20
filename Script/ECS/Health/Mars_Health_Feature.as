@@ -18,7 +18,7 @@ struct FMars_Feature_Health {}
 // Who dealt a hit.
 struct FMars_DamageEvent_Source
 {
-    // The dealer (the player entity).
+    // The dealer's entity.
     UPROPERTY()
     FCk_Handle Instigator;
 
@@ -113,10 +113,10 @@ struct FMars_Health_Spec
 // would be clamped on the first write.
 mixin FMars_Validation Validate(const FMars_Health_Spec& Self)
 {
-    if (Self.Max <= 0.0f)
-    { return FMars_Validation(f"Health has a non-positive Max [{Self.Max}]"); }
+    if (Math::IsFinite(Self.Max) == false || Self.Max <= 0.0f)
+    { return FMars_Validation(f"Health has a non-finite or non-positive Max [{Self.Max}]"); }
 
-    if (Self.Start.IsSet() && (Self.Start.GetValue() <= 0.0f || Self.Start.GetValue() > Self.Max))
+    if (Self.Start.IsSet() && (Math::IsFinite(Self.Start.GetValue()) == false || Self.Start.GetValue() <= 0.0f || Self.Start.GetValue() > Self.Max))
     { return FMars_Validation(f"Health has Start [{Self.Start.GetValue()}] outside (0, Max = {Self.Max}]"); }
 
     return FMars_Validation();

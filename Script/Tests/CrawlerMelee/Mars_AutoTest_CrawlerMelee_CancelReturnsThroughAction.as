@@ -76,9 +76,9 @@ class UMars_AutoTest_CrawlerMelee_CancelReturnsThroughAction : UMars_AutoTestRig
         Assert_True(Cooled.TerminalSeen && Cooled.PresentationErrorCm <= k_NeutralToleranceCm,
             f"Cooldown began on the action's terminal record, at neutral ({Cooled.PresentationErrorCm :.3} cm, terminal {Cooled.TerminalSeen})");
 
-        const auto CancelSeconds = float64(_Crawler.Get_Spec().Combat.Timing.CancelSeconds);
+        const auto CancelSeconds = _Crawler.Get_Spec().ResolvedAttacks.Execution.Tuning.Get_Transition().Get_DedicatedReturn().Get_Seconds();
         Assert_True(Cooled.Time - Cancelled.Time >= 0.75 * CancelSeconds,
-            f"the return took about the action's dedicated return ({Cooled.Time - Cancelled.Time :.3} s for CancelSeconds {CancelSeconds :.3})");
+            f"the return took about the action's dedicated return ({Cooled.Time - Cancelled.Time :.3} s for a {CancelSeconds :.3} s return)");
 
         auto SawCancelling = false;
         auto SawCancelledTerminal = false;

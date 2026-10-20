@@ -20,7 +20,7 @@ class UMars_AutoTest_CrawlerMelee_EndpointAnatomy : UMars_AutoTestRig_CrawlerEnd
         Add_Step_WaitUntil("four-entry advice selects the intended anatomy fallback", n"Check_ExpectedEndpointReady", k_SlowPolls, 0);
         Add_Step("request one automatic attack", n"Step_TargetAndStart");
         Add_Step_WaitUntil("the intended fallback really accepts", n"Check_CatalogAccepted", k_SlowPolls, 0);
-        Add_Step("C02 exact configured slot count and stable anatomical roles", n"Step_AssertSelection");
+        Add_Step("exact configured slot count and stable anatomical roles", n"Step_AssertSelection");
         Add_Step_WaitUntil("the chosen action finishes", n"Check_AttackFinished", k_SlowPolls, 0);
         Run_Steps(InHandle);
     }

@@ -79,8 +79,8 @@ mixin FMars_Validation Validate(const FMars_HitZone_Spec& Self)
     if (Self.ZoneTag.IsValid() == false)
     { return FMars_Validation("HitZone has no ZoneTag"); }
 
-    if (Self.DefaultMultiplier < 0.0f)
-    { return FMars_Validation(f"HitZone has a negative DefaultMultiplier [{Self.DefaultMultiplier}]"); }
+    if (Math::IsFinite(Self.DefaultMultiplier) == false || Self.DefaultMultiplier < 0.0f)
+    { return FMars_Validation(f"HitZone has a non-finite or negative DefaultMultiplier [{Self.DefaultMultiplier}]"); }
 
     for (int32 Index = 0; Index < Self.Reactions.Num(); ++Index)
     {
@@ -88,8 +88,8 @@ mixin FMars_Validation Validate(const FMars_HitZone_Spec& Self)
         if (Reaction.DamageType.IsValid() == false)
         { return FMars_Validation(f"HitZone reaction [{Index}] has no DamageType"); }
 
-        if (Reaction.Multiplier < 0.0f)
-        { return FMars_Validation(f"HitZone reaction [{Index}] has a negative Multiplier [{Reaction.Multiplier}]"); }
+        if (Math::IsFinite(Reaction.Multiplier) == false || Reaction.Multiplier < 0.0f)
+        { return FMars_Validation(f"HitZone reaction [{Index}] has a non-finite or negative Multiplier [{Reaction.Multiplier}]"); }
     }
 
     return FMars_Validation();

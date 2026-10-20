@@ -21,14 +21,14 @@ class UMars_AutoTestRig_AttackCatalogAuthoring : UMars_AutoTestRig_AttackCatalog
         {
             for (int32 Demo = 0; Demo < 2; ++Demo)
             {
-                const auto Endpoint = Demo == 1;
-                Paths.Add(utils_crawler::Get_AttackReferenceLoadoutPath(Preset, Endpoint));
-                Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, Endpoint, GameplayTags::Attack_Mars_Pincer));
-                Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, Endpoint, GameplayTags::Attack_Mars_Jab));
-                if (Endpoint)
+                const auto Kind = Demo == 1 ? EMars_AttackReference_Kind::EndpointDemo : EMars_AttackReference_Kind::Parity;
+                Paths.Add(utils_crawler::Get_AttackReferenceLoadoutPath(Preset, Kind));
+                Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, Kind, GameplayTags::Attack_Mars_Pincer));
+                Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, Kind, GameplayTags::Attack_Mars_Jab));
+                if (Kind == EMars_AttackReference_Kind::EndpointDemo)
                 {
-                    Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, true, GameplayTags::Attack_Mars_SwipeRight));
-                    Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, true, GameplayTags::Attack_Mars_SwipeLeft));
+                    Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, Kind, GameplayTags::Attack_Mars_SwipeRight));
+                    Paths.Add(utils_crawler::Get_AttackReferenceDefinitionPath(Preset, Kind, GameplayTags::Attack_Mars_SwipeLeft));
                 }
             }
             Paths.Add(utils_crawler::Get_AttackReferenceEndpointClipPath(Preset, GameplayTags::Attack_Mars_Pincer));

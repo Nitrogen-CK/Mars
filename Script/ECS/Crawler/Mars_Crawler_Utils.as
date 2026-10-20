@@ -70,79 +70,13 @@ namespace utils_crawler
         return FCk_ProceduralWalker_LegChain(InLeg.LegId, RigSpec);
     }
 
-    // The attack player's tuning, the one every clip action plays with. Sampling: the body jab keeps
-    // its game-owned travel guard (no accepted sample moves it further than MaxSampleTravel); a pincer's claws travel the
-    // chain's reach, so with a pincer clip the guard is raised to twice the front leg's reach (a hitch can pose a whole
-    // phase in one sample). Transition: no entry blend (the windup starts at admission, from the identity offset and the claws'
-    // own feet), CancelSeconds as the dedicated return a cancel eases back through, and a return timeout no shorter than
-    // that return, nor than the time the gait gets to step a released claw back down.
-    FCk_ProceduralAction_Tuning Make_AttackTuning(const FMars_Crawler_Spec& InSpec)
-    {
-        const auto& Combat = InSpec.Combat;
-        auto Tuning = FCk_ProceduralAction_Tuning();
-
-        auto Sampling = Tuning.Get_Sampling();
-        Sampling.Set_MaxEndpointTravelCm(Combat.Hit.MaxSampleTravel);
-        Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
-        if (Combat.Get_HasPincer())
-        {
-            const TArray<FCk_ProceduralLeg_Spec> Legs = InSpec.Get_RigData().Get_Legs();
-            Sampling.Set_MaxEndpointTravelCm(Math::Max(Combat.Hit.MaxSampleTravel, 2.0f * Get_ChainReach(Legs[0])));
-        }
-        Tuning.Set_Sampling(Sampling);
-
-        auto Transition = Tuning.Get_Transition();
-        const auto CancelReturn = float64(Combat.Timing.CancelSeconds);
-        Transition.Set_EntryBlend(FCk_Time(0.0));
-        Transition.Set_DedicatedReturn(FCk_Time(CancelReturn));
-        auto ReturnTimeout = Math::Max(Transition.Get_ReturnTimeout().Get_Seconds(), CancelReturn);
-        if (Combat.Get_HasPincer())
-        { ReturnTimeout = Math::Max(ReturnTimeout, float64(PincerReturnTimeoutSeconds)); }
-        Transition.Set_ReturnTimeout(FCk_Time(ReturnTimeout));
-        Tuning.Set_Transition(Transition);
-        return Tuning;
-    }
-
-    // A crawler without a pincer clip plays its jab on the body alone and lends no leg (the default locomotion's support is
-    // Disabled). A pincer also borrows the two front legs from the gait, on Make_PincerLocomotion's terms.
-    FCk_ProceduralActionPlayer_Spec Make_AttackPlayerSpec(const FMars_Crawler_Spec& InSpec)
-    {
-        auto Spec = FCk_ProceduralActionPlayer_Spec();
-        Spec.Set_Tuning(Make_AttackTuning(InSpec));
-        if (InSpec.Combat.Get_HasPincer())
-        { Spec.Set_Locomotion(Make_PincerLocomotion(InSpec)); }
-        return Spec;
-    }
-
-    // How a pincer borrows the front legs (the borrowing player's terms; a walking preview of the clip copies them): the
-    // player counts the legs left standing and lets them wait out the whole pincer clip and a cancel's return before a
-    // step the count forbids interrupts it, and hands a claw back to the gait as a real step from wherever the action left
-    // it (the windup key, when a cancel lands in the air) to where the gait wants the foot, within the attack tuning's
-    // sampling budget and PincerReturnTimeoutSeconds. Needs a loaded pincer clip.
-    FCk_ProceduralLimbControl_Locomotion Make_PincerLocomotion(const FMars_Crawler_Spec& InSpec)
-    {
-        const auto& Combat = InSpec.Combat;
-        const auto CancelSeconds = float64(Combat.Timing.CancelSeconds);
-        auto Support = FCk_ProceduralLimbControl_Support(ECk_ProceduralLimbControl_SupportMode::CountOnly, PincerMinStandingLegs);
-        Support.Set_SupportHoldTimeout(FCk_Time(Get_ClipSeconds(Combat.PincerClip.Get()) + CancelSeconds));
-
-        auto Return = FCk_ProceduralLimbControl_Return();
-        Return.Set_Duration(FCk_Time(CancelSeconds));
-        Return.Set_Timeout(FCk_Time(float64(PincerReturnTimeoutSeconds)));
-
-        auto Locomotion = FCk_ProceduralLimbControl_Locomotion();
-        Locomotion.Set_Support(Support);
-        Locomotion.Set_Return(Return);
-        return Locomotion;
-    }
-
     // Composes the crawler on InRoot (the simulation body; the entity script built the rig's transform entities and
     // their visuals): surface motion -> walker (legs, gait, rigs, body pose, and the action player when armed) -> monster -> the
     // damage dealer (armed only) -> one part per leg on the leg entity, with a hurtbox on every segment and the foot ->
     // the body hurtbox -> the navigator (on the root, steering the surface motion) -> the brain (Mars_Crawler_Goap.as)
     // -> the crawler fragments and, armed only, the combat fragments -> LAST the state machine (Mars_Crawler_Hfsm.as),
     // whose conditions bind the brain and the Dead attribute as it enters Alive. Armed = Spec.Combat.Enabled in a local
-    // combat world; an unarmed crawler composes exactly what it did before combat existed. A rejected spec (rig and
+    // combat world; an unarmed crawler composes no action player, dealer or combat fragment. A rejected spec (rig and
     // combat profile included) or sub-feature ensures and returns an invalid handle.
     FCk_Handle_Crawler Add(FCk_Handle_Transform& InRoot, FMars_Crawler_Spec InSpec)
     {
@@ -192,6 +126,7 @@ namespace utils_crawler
             PlayerSpec.Set_Locomotion(InSpec.ResolvedAttacks.Execution.Locomotion);
             WalkerSpec.Set_ActionPlayerSpec(PlayerSpec);
         }
+
         auto Walker = utils_procedural_animation::Add_Walker(InRoot, WalkerSpec);
         auto Gait = Walker.Get_Gait();
         if (ck::EnsureIfNot(ck::IsValid(Gait) && ck::IsValid(Motion),
@@ -282,6 +217,7 @@ namespace utils_crawler
                 Reuse.Id = Entry.Identity.Id;
                 Selection.Reuse.Add(Reuse);
             }
+
             RootEntity.Add_Fragment(Selection);
             RootEntity.Add_Fragment(FMars_Fragment_Crawler_Engage());
         }
@@ -385,6 +321,7 @@ mixin TArray<FCk_Handle_ProceduralLeg> Get_Legs(const FCk_Handle_Crawler& Self)
         else
         { Legs.Add(FCk_Handle_ProceduralLeg()); }
     }
+
     return Legs;
 }
 
@@ -441,6 +378,7 @@ mixin TSubclassOf<UCk_SmState_EntityScript> Get_BehaviorStateClass(const FCk_Han
 
             Next.Append(Entity.Get_LifetimeDependents());
         }
+
         Frontier = Next;
     }
 
@@ -565,7 +503,7 @@ mixin FCk_Handle Get_AttackTarget(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return FCk_Handle(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Target;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Start.Target;
 }
 
 mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
@@ -573,10 +511,19 @@ mixin FVector Get_AttackCommittedDirection(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return FVector::ZeroVector; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedDirection;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Start.Direction;
 }
 
-// The clip the current (or last) attack played; the jab before the first. Null on an unarmed crawler.
+// The presentation relative to the root at admission: where the body stands with no action offset.
+mixin FTransform Get_AttackNeutralRootLocal(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return FTransform::Identity; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Start.NeutralRootLocal;
+}
+
+// The source clip the current (or last) attack played; the jab's before the first. Null on an unarmed crawler.
 mixin UCk_ProceduralAction_Data Get_AttackClip(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
@@ -585,21 +532,61 @@ mixin UCk_ProceduralAction_Data Get_AttackClip(const FCk_Handle_Crawler& Self)
     const auto Plan = Self.Get_AttackPlan();
     if (Plan.Entry.Identity.Id.IsValid())
     { return Plan.Entry.SourceClip.Get(); }
+
     for (const auto& Entry : Self.Get_Spec().ResolvedAttacks.Entries)
     {
         if (Entry.Identity.Id == GameplayTags::Attack_Mars_Jab)
         { return Entry.SourceClip.Get(); }
     }
+
     return nullptr;
 }
 
-// The jab's clip action while one is held (an invalid handle otherwise).
+// The attack's clip action while one is held (an invalid handle otherwise).
 mixin FCk_Handle_ProceduralAction Get_AttackAction(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return FCk_Handle_ProceduralAction(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Stream.Action;
+}
+
+// The held action's identity; it outlives the action handle until the attack forgets the released action. Zero when none.
+mixin FCk_ProceduralAction_Identity Get_AttackActionIdentity(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return FCk_ProceduralAction_Identity(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Stream.Identity;
+}
+
+// The current (or last) attack's limb cleanup: the claimed limbs and how their return went.
+mixin FMars_Crawler_AttackCleanup Get_AttackCleanup(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return FMars_Crawler_AttackCleanup(); }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Cleanup;
+}
+
+// No later accepted interval of the current attack may sweep or hit: a cancel closed it, or the resolver did and the
+// next attack tick folds it in.
+mixin bool Get_AttackWindowClosed(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
+    { return false; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).WindowClosed ||
+        Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Stream.WindowClosed;
+}
+
+// The resolver has read the current action's terminal record.
+mixin bool Get_AttackTerminalSeen(const FCk_Handle_Crawler& Self)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
+    { return false; }
+
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Stream.TerminalSeen;
 }
 
 // The sample sequence of the current action's last accepted receipt; 0 when none.
@@ -608,7 +595,7 @@ mixin int64 Get_AttackAcknowledgedSampleId(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
     { return 0; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AckSampleId;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Stream.AckSampleId;
 }
 
 // The clip interval of the current action's last accepted receipt (its PhaseId is None before the first).
@@ -617,24 +604,7 @@ mixin FCk_ProceduralAction_Interval Get_AttackAcceptedInterval(const FCk_Handle_
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
     { return FCk_ProceduralAction_Interval(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedInterval;
-}
-
-// The presentation's world transform of the last acknowledged sample.
-mixin FTransform Get_AttackAcceptedWorld(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
-    { return FTransform::Identity; }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedWorld;
-}
-
-mixin FVector Get_AttackAcceptedHitCenter(const FCk_Handle_Crawler& Self)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
-    { return FVector::ZeroVector; }
-
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).AcceptedHitCenter;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Accepted.Interval;
 }
 
 // The longest sample-to-sample sweep of the current (or last) attack.
@@ -643,16 +613,21 @@ mixin float32 Get_AttackLongestSweep(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
     { return 0.0f; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).LongestSweep;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Hit.LongestSweep;
 }
 
-// A hit was observed and waits for the next attack tick to commit or discard it.
-mixin bool Get_AttackCandidatePending(const FCk_Handle_Crawler& Self)
+// The hit observed and waiting for the next attack tick to commit or discard it; unset when none.
+mixin TOptional<FMars_Crawler_HitCandidate> Get_AttackCandidate(const FCk_Handle_Crawler& Self)
 {
     if (Self.Has_Fragment(FMars_Fragment_Crawler_AttackObservations) == false)
-    { return false; }
+    { return TOptional<FMars_Crawler_HitCandidate>(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Candidate.IsSet();
+    return Self.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Hit.Candidate;
+}
+
+mixin bool Get_AttackCandidatePending(const FCk_Handle_Crawler& Self)
+{
+    return Self.Get_AttackCandidate().IsSet();
 }
 
 // This attack sent its one damage request (whatever the dealer made of it).
@@ -661,7 +636,7 @@ mixin bool Get_AttackDamageCommitted(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return false; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).DamageCommitted;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Ledger.Committed;
 }
 
 // The sample whose hit was committed; 0 when none.
@@ -670,7 +645,7 @@ mixin int64 Get_AttackCommittedSampleId(const FCk_Handle_Crawler& Self)
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return 0; }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).CommittedSampleId;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Ledger.SampleId;
 }
 
 mixin TOptional<EMars_Crawler_AttackCancel> Get_AttackLastCancel(const FCk_Handle_Crawler& Self)
@@ -678,7 +653,7 @@ mixin TOptional<EMars_Crawler_AttackCancel> Get_AttackLastCancel(const FCk_Handl
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return TOptional<EMars_Crawler_AttackCancel>(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).LastCancel;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Diagnostics.LastCancel;
 }
 
 mixin TOptional<EMars_Crawler_AttackReject> Get_AttackLastReject(const FCk_Handle_Crawler& Self)
@@ -686,7 +661,7 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_AttackLastReject(const FCk_Handl
     if (Self.Has_Fragment(FMars_Fragment_Crawler_Attack) == false)
     { return TOptional<EMars_Crawler_AttackReject>(); }
 
-    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).LastReject;
+    return Self.Get_Fragment(FMars_Fragment_Crawler_Attack).Diagnostics.LastReject;
 }
 
 // InTarget can be attacked and kept: live, not being destroyed, with a Health that is not depleted and an enabled HitZone,
@@ -779,34 +754,17 @@ mixin TOptional<EMars_Crawler_AttackReject> Get_StartRejection(const FCk_Handle_
     const auto Evaluation = utils_crawler::Evaluate_AttackLoadout(Self, InTarget);
     if (Evaluation.Selection.Selected.IsSet())
     { return TOptional<EMars_Crawler_AttackReject>(); }
+
     if (Evaluation.Selection.Preferred.IsSet())
     {
         for (const auto& Entry : Evaluation.Evaluations)
         {
             if (Entry.AttackId == Evaluation.Selection.Preferred.GetValue() && Entry.Blockers.Num() > 0)
-            { return TOptional<EMars_Crawler_AttackReject>(utils_crawler::Get_LegacyAttackReject(Entry.Blockers[0].Code)); }
+            { return TOptional<EMars_Crawler_AttackReject>(utils_crawler::Get_AttackReject(Entry.Blockers[0].Code)); }
         }
     }
+
     return TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::RequiredPartUnavailable);
-}
-
-// A world body stands between the hit centre now and where the windup end key of the clip an attack admitted now would
-// play puts it.
-mixin bool Get_IsWindupBlocked(const FCk_Handle_Crawler& Self)
-{
-    const auto Evaluation = utils_crawler::Evaluate_AttackLoadout(Self, Self.Get_CombatTarget());
-    for (const auto& Entry : Evaluation.Evaluations)
-    {
-        if (Evaluation.Selection.Preferred.IsSet() && Entry.AttackId == Evaluation.Selection.Preferred.GetValue())
-        { return utils_attack::Get_HasBlocker(Entry, n"WindupBlocked"); }
-    }
-    return false;
-}
-
-// The combat target is set and a start at it would be admitted now.
-mixin bool Get_CanStartAttack(const FCk_Handle_Crawler& Self)
-{
-    return Self.Get_StartRejection(Self.Get_CombatTarget()).IsSet() == false;
 }
 
 // The Engage behaviour's current stage; None outside Engage and on an unarmed crawler.
@@ -838,6 +796,16 @@ mixin void Request_SetCombatTarget(FCk_Handle_Crawler& Self, const FMars_Request
 
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests);
     Requests.SetCombatTargetRequests.Add(InRequest);
+}
+
+// The Engage Prepare stage's readiness wait (FMars_Request_Crawler_PrepareAttack); the last prepare of a drain wins.
+mixin void Request_PrepareAttack(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_PrepareAttack& InRequest)
+{
+    if (ck::EnsureIfNot(Self.Get_IsCombatArmed(), f"[Crawler] [{Self.ToString()}] is not armed for combat; PrepareAttack dropped"))
+    { return; }
+
+    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Crawler_Requests);
+    Requests.PrepareAttackRequests.Add(InRequest);
 }
 
 mixin void Request_StartAttack(FCk_Handle_Crawler& Self, const FMars_Request_Crawler_StartAttack& InRequest)

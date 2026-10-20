@@ -1,4 +1,4 @@
-// Try_StrikeSweep skips the dealer's own hurtboxes and the sweep's IgnoredEntities: a dealer that is itself a zone swings
+// Request_StrikeSweep skips the dealer's own hurtboxes and the sweep's IgnoredEntities: a dealer that is itself a zone swings
 // through its own hurtbox (a child entity, which the trace's own-entity skip does not cover) and then through a decoy
 // hurtbox listed in IgnoredEntities, and lands on the target's hurtbox behind both (10 Blunt, 90 left; the dealer's own
 // Health and the decoy's untouched; nothing rejected). The three-argument Sweep constructor leaves IgnoredEntities empty.
@@ -100,7 +100,7 @@ class UMars_AutoTest_DamageDealer_SweepIgnoresOwnHurtboxes : UCk_AutoTest_Base
     private void Step_Swing(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Template = utils_damage_dealer::Make_Event(_Dealer, 10.0f, GameplayTags::DamageType_Mars_Blunt);
-        _Result = utils_damage_dealer::Try_StrikeSweep(_Dealer, Make_Swing(), Template);
+        _Result = _Dealer.Request_StrikeSweep(Make_Swing(), Template);
     }
 
     UFUNCTION()

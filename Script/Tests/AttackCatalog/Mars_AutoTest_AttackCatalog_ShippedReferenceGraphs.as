@@ -45,9 +45,10 @@ class UMars_AutoTest_AttackCatalog_ShippedReferenceGraphs : UMars_AutoTestRig_At
         {
             for (int32 Demo = 0; Demo < 2; ++Demo)
             {
-                const auto Endpoint = Demo == 1;
-                const auto Path = utils_crawler::Get_AttackReferenceLoadoutPath(Preset, Endpoint);
-                const auto Loaded = System::LoadAsset_Blocking(utils_crawler::Get_AttackReferenceLoadout(Preset, Endpoint));
+                const auto Kind = Demo == 1 ? EMars_AttackReference_Kind::EndpointDemo : EMars_AttackReference_Kind::Parity;
+                const auto Endpoint = Kind == EMars_AttackReference_Kind::EndpointDemo;
+                const auto Path = utils_crawler::Get_AttackReferenceLoadoutPath(Preset, Kind);
+                const auto Loaded = System::LoadAsset_Blocking(utils_crawler::Get_AttackReferenceLoadout(Preset, Kind));
                 Assert_True(ck::IsValid(Loaded), f"native bootstrap prerequisite loads read-only: {Path}");
                 const auto Result = utils_attack_authoring::Get_LoadoutValidation(Path, Preset);
                 Assert_True(Result.Report.Get_IsValid(), f"command report validates {Path}: {utils_crawler::Get_AttackValidationText(Result.Report)}");
@@ -87,7 +88,7 @@ class UMars_AutoTest_AttackCatalog_ShippedReferenceGraphs : UMars_AutoTestRig_At
     UFUNCTION()
     private void Step_PrivateCopies(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        auto Source = System::LoadAsset_Blocking(utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Crawler4, false));
+        auto Source = System::LoadAsset_Blocking(utils_crawler::Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset::Crawler4, EMars_AttackReference_Kind::Parity));
         Assert_True(ck::IsValid(Source), "the shipped parity loadout is loaded");
         if (ck::Is_NOT_Valid(Source)) { return; }
         _Loadouts.Add(Source);

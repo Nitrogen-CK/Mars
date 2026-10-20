@@ -91,8 +91,8 @@ mixin FMars_Validation Validate(const FMars_Brain_Spec& Self)
     if (Self.Goal.Num() == 0)
     { return FMars_Validation("Brain has an empty goal"); }
 
-    if (Self.MinReplanIntervalSeconds < 0.0f)
-    { return FMars_Validation(f"Brain has a negative MinReplanIntervalSeconds [{Self.MinReplanIntervalSeconds}]"); }
+    if (Math::IsFinite(Self.MinReplanIntervalSeconds) == false || Self.MinReplanIntervalSeconds < 0.0f)
+    { return FMars_Validation(f"Brain has a non-finite or negative MinReplanIntervalSeconds [{Self.MinReplanIntervalSeconds}]"); }
 
     if (Self.Actions.Num() == 0)
     { return FMars_Validation("Brain has no actions"); }

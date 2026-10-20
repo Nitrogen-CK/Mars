@@ -49,8 +49,8 @@ class UMars_AutoTest_CrawlerMelee_StationaryFacing : UMars_AutoTestRig_CrawlerMe
 
         Add_Step_WaitUntil("the crawler is composed, its gait Ready and its 4 parts registered", n"Check_Ready", k_SlowPolls, 0);
         Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", k_SlowPolls, 0);
-        Add_Step("stop the navigator", n"Step_StopNavigator");
-        Add_Step_WaitUntil("the navigator has drained the stop and is not Moving", n"Check_NavigatorStopped", k_SlowPolls, 0);
+        Add_Step("stop the navigator", n"Step_StopCrawlerNavigator");
+        Add_Step_WaitUntil("the navigator has drained the stop and is not Moving", n"Check_CrawlerNavigatorStopped", k_SlowPolls, 0);
         Add_Step("record the stopped body's location", n"Step_RecordRest");
         Add_Step_WaitUntil("the stopped body rests, unsteered, for 1 s", n"Check_Rested", 0, 0);
         Add_Step("record the rest drift; steer at zero speed 90 degrees off the root's forward", n"Step_SteerSideways");
@@ -78,28 +78,6 @@ class UMars_AutoTest_CrawlerMelee_StationaryFacing : UMars_AutoTestRig_CrawlerMe
     //----------------------------------------------------------------------------------------------------------------------
     // Steps
     //----------------------------------------------------------------------------------------------------------------------
-
-    UFUNCTION()
-    private void Step_StopNavigator(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        auto Navigator = _Crawler.Get_Navigator();
-        Navigator.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
-    }
-
-    UFUNCTION()
-    private void Check_NavigatorStopped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Navigator = _Crawler.Get_Navigator();
-        auto Res = OutResult;
-        Res.Set(Navigator.Get_HasPendingRequests() == false && Navigator.Get_Status() != EMars_SurfaceNavigator_Status::Moving);
-    }
-
-    UFUNCTION()
-    private void Check_InRoam(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Crawler.Get_BehaviorStateClass() == UMars_SmState_Crawler_Roam);
-    }
 
     UFUNCTION()
     private void Step_RecordRest(FCk_Handle InHandle, FInstancedStruct InPayload)
@@ -192,7 +170,7 @@ class UMars_AutoTest_CrawlerMelee_StationaryFacing : UMars_AutoTestRig_CrawlerMe
     {
         const auto Converged = _ConvergedAfter.IsSet();
         const auto ConvergedAfter = Converged ? _ConvergedAfter.GetValue() : -1.0;
-        ck::Trace(f"[CrawlerMelee.P0] stationary-facing: startErr={_StartErrorDegrees :.1} converged={Converged} after={ConvergedAfter :.2}s finalErr={_ErrorDegrees :.1} maxDrift={_MaxDrift :.2}cm (xy {_MaxDriftHorizontal :.2}, |z| {_MaxDriftVertical :.2}) restDrift={_RestDrift.ToString()} polls={_Polls} pacing={_PacedPolls} blocked={_BlockedPolls} navigatorMovedAgain={_NavigatorMovedAgain} samples:{_Samples}");
+        ck::Trace(f"[CrawlerMelee] stationary-facing: startErr={_StartErrorDegrees :.1} converged={Converged} after={ConvergedAfter :.2}s finalErr={_ErrorDegrees :.1} maxDrift={_MaxDrift :.2}cm (xy {_MaxDriftHorizontal :.2}, |z| {_MaxDriftVertical :.2}) restDrift={_RestDrift.ToString()} polls={_Polls} pacing={_PacedPolls} blocked={_BlockedPolls} navigatorMovedAgain={_NavigatorMovedAgain} samples:{_Samples}");
 
         Assert_True(_StartErrorDegrees >= 80.0,
             f"the steer direction starts about 90 degrees off the root's forward (got {_StartErrorDegrees :.1}), so the turn is not vacuous");

@@ -22,7 +22,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogNoCapability : UMars_AutoTestRig_Crawle
         {
             Add_Step("repeat a target-only automatic start with no capable anatomy", n"Step_TargetAndStart");
             Add_Step_WaitUntil("the automatic start transport drains", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
-            Add_Step("C09 no-capability never creates or charges an action", n"Step_Assert");
+            Add_Step("no-capability never creates or charges an action", n"Step_Assert");
         }
         Add_Step("reenable the common front role through its existing public request", n"Step_Enable");
         Add_Step_WaitUntil("normal evaluation sees the recovered eligible custom entry", n"Check_EligibleAgain", k_SlowPolls, 0);
@@ -79,7 +79,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogNoCapability : UMars_AutoTestRig_Crawle
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Crawler.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle &&
-            _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).ActionIdentity.Get_Value() == 0,
+            _Crawler.Get_AttackActionIdentity().Get_Value() == 0,
             "repeated no-capability requests create no native action");
         Assert_Equals_Int(_CatalogAdmissions.Num(), 0, "no-capability emits no accepted admission");
         Assert_Equals_Int(_CatalogResults.Num(), 0, "no-capability does not fabricate a native attempt result");

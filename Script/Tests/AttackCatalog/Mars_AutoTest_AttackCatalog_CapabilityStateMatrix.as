@@ -13,11 +13,11 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         Run_Steps(InHandle);
     }
 
-    private void Assert_Block(const FMars_Attack_EvaluationQuery& InQuery, FName InCode, EMars_Attack_Availability InExpected)
+    private void Assert_Block(const FMars_Attack_EvaluationQuery& InQuery, EMars_Attack_BlockerCode InCode, EMars_Attack_Availability InExpected)
     {
         const auto Evaluation = utils_attack::Evaluate(InQuery);
         Assert_True(Evaluation.Availability == InExpected && utils_attack::Get_HasBlocker(Evaluation, InCode),
-            f"{InCode} reports {InExpected :n} with its named reason");
+            f"{InCode :n} reports {InExpected :n} with its named reason");
     }
 
     UFUNCTION()
@@ -27,39 +27,39 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         Assert_True(utils_attack::Evaluate(Ready).Availability == EMars_Attack_Availability::Ready, "healthy owned attached enabled anatomy is ready");
         auto Query = Ready;
         Query.Roles[0].Part.Live = false;
-        Assert_Block(Query, n"PartMissing", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartMissing, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Part.PendingDestroy = true;
-        Assert_Block(Query, n"PartPendingDestroy", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartPendingDestroy, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Part.OwnerMatches = false;
-        Assert_Block(Query, n"PartWrongOwner", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartWrongOwner, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Part.State = EMars_BodyPart_State::Severed;
-        Assert_Block(Query, n"PartSevered", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartSevered, EMars_Attack_Availability::Unavailable);
         Query.Roles[0].Part.State = EMars_BodyPart_State::Broken;
-        Assert_Block(Query, n"PartBroken", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartBroken, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Part.Depleted = true;
-        Assert_Block(Query, n"PartDepleted", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartDepleted, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Limb.Enabled = false;
-        Assert_Block(Query, n"LimbDisabled", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::LimbDisabled, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Limb.Attached = false;
-        Assert_Block(Query, n"LimbDetached", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::LimbDetached, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Part.Condition = EMars_BodyPart_Condition::Ruined;
         Assert_True(utils_attack::Evaluate(Query).Availability == EMars_Attack_Availability::Ready, "default Ruined ceiling preserves capability");
         Query.Entry.Slots[0].MaxCondition = EMars_BodyPart_Condition::Damaged;
-        Assert_Block(Query, n"ConditionDisallowed", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::ConditionDisallowed, EMars_Attack_Availability::Unavailable);
         Query = Ready;
         Query.Roles[0].Limb.Control = ECk_ProceduralLimbControl_State::Controlled;
-        Assert_Block(Query, n"ControlBusy", EMars_Attack_Availability::Waiting);
+        Assert_Block(Query, EMars_Attack_BlockerCode::ControlBusy, EMars_Attack_Availability::Waiting);
         Query.Roles[0].Limb.Control = ECk_ProceduralLimbControl_State::Returning;
-        Assert_Block(Query, n"LimbReturning", EMars_Attack_Availability::Waiting);
+        Assert_Block(Query, EMars_Attack_BlockerCode::LimbReturning, EMars_Attack_Availability::Waiting);
         Query.Roles[0].Limb.Control = ECk_ProceduralLimbControl_State::Unplanted;
-        Assert_Block(Query, n"LimbUnplanted", EMars_Attack_Availability::Waiting);
+        Assert_Block(Query, EMars_Attack_BlockerCode::LimbUnplanted, EMars_Attack_Availability::Waiting);
     }
 
     UFUNCTION()
@@ -68,7 +68,7 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         auto Query = Make_ReadyQuery();
         Assert_Equals_Int(Query.Entry.Parts.Num(), 0, "a claimed slot needs no redundant authored part requirement");
         Query.Roles[0].Part.Depleted = true;
-        Assert_Block(Query, n"PartDepleted", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartDepleted, EMars_Attack_Availability::Unavailable);
         Query = Make_ReadyQuery();
         auto Brace = FMars_Attack_ResolvedPart();
         Brace.Binding = Make_Binding(GameplayTags::AttackRole_Mars_Test_Brace, n"Brace0");
@@ -78,7 +78,7 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         Assert_True(utils_attack::Evaluate(Query).Availability == EMars_Attack_Availability::Ready,
             "an extra prerequisite is checked for capability without promising control ownership");
         Query.Roles[1].Part.State = EMars_BodyPart_State::Broken;
-        Assert_Block(Query, n"PartBroken", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::PartBroken, EMars_Attack_Availability::Unavailable);
     }
 
     UFUNCTION()
@@ -98,7 +98,7 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         auto Evaluation = utils_attack::Evaluate(Query);
         Assert_True(Evaluation.EnabledSupport == 2 && Evaluation.StandingSupport == 1 && Evaluation.Capable,
             "ordinary gait swing changes readiness without changing capacity");
-        Assert_Block(Query, n"SupportStance", EMars_Attack_Availability::Waiting);
+        Assert_Block(Query, EMars_Attack_BlockerCode::SupportStance, EMars_Attack_Availability::Waiting);
         Query.Self.SupportLimbs[2].Limb.Planted = true;
         Query.Self.SupportLimbs[2].Limb.Control = ECk_ProceduralLimbControl_State::Returning;
         Evaluation = utils_attack::Evaluate(Query);
@@ -106,16 +106,16 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
             "temporary borrowed/returning support is Waiting, not missing capability");
         Query.Self.SupportLimbs[2].Limb.Control = ECk_ProceduralLimbControl_State::Default;
         Query.Self.SupportLimbs[2].Part.Depleted = true;
-        Assert_Block(Query, n"SupportCapacity", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::SupportCapacity, EMars_Attack_Availability::Unavailable);
         Query.Self.SupportLimbs[2].Part.Depleted = false;
         Query.Self.SupportLimbs[2].Part.OwnerMatches = false;
-        Assert_Block(Query, n"SupportCapacity", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::SupportCapacity, EMars_Attack_Availability::Unavailable);
         Query.Self.SupportLimbs[2].Part.OwnerMatches = true;
         Query.Self.SupportLimbs[2].Part.State = EMars_BodyPart_State::Severed;
-        Assert_Block(Query, n"SupportCapacity", EMars_Attack_Availability::Unavailable);
+        Assert_Block(Query, EMars_Attack_BlockerCode::SupportCapacity, EMars_Attack_Availability::Unavailable);
         Query.Self.SupportLimbs[2].Part.State = EMars_BodyPart_State::Attached;
         Query.Self.SupportLimbs[2].Limb.Trusted = false;
-        Assert_Block(Query, n"SupportStance", EMars_Attack_Availability::Waiting);
+        Assert_Block(Query, EMars_Attack_BlockerCode::SupportStance, EMars_Attack_Availability::Waiting);
     }
 
     UFUNCTION()
@@ -124,7 +124,7 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         auto Query = Make_ReadyQuery();
         Query.Entry.Definition.Prepare.MinDistance = 10.0f;
         Query.Target.Distance = 5.0f;
-        Assert_Block(Query, n"TooClose", EMars_Attack_Availability::Waiting);
+        Assert_Block(Query, EMars_Attack_BlockerCode::TooClose, EMars_Attack_Availability::Waiting);
         Query.Target.Distance = 150.0f;
         Query.Target.HeightDifference = 70.0f;
         Query.Target.FacingDegrees = 30.0f;
@@ -136,11 +136,18 @@ class UMars_AutoTest_AttackCatalog_CapabilityStateMatrix : UMars_AutoTestRig_Att
         Query.Self.WindupClear = false;
         const auto Evaluation = utils_attack::Evaluate(Query);
         Assert_True(Evaluation.Capable && Evaluation.Availability == EMars_Attack_Availability::Waiting, "temporary blockers preserve capability");
-        auto Codes = TArray<FName>();
-        Codes.Add(n"OutOfRange"); Codes.Add(n"Height"); Codes.Add(n"Facing"); Codes.Add(n"Moving");
-        Codes.Add(n"Ungrounded"); Codes.Add(n"Slope"); Codes.Add(n"Cooldown"); Codes.Add(n"GlobalCooldown"); Codes.Add(n"WindupBlocked");
+        auto Codes = TArray<EMars_Attack_BlockerCode>();
+        Codes.Add(EMars_Attack_BlockerCode::OutOfRange);
+        Codes.Add(EMars_Attack_BlockerCode::Height);
+        Codes.Add(EMars_Attack_BlockerCode::Facing);
+        Codes.Add(EMars_Attack_BlockerCode::Moving);
+        Codes.Add(EMars_Attack_BlockerCode::Ungrounded);
+        Codes.Add(EMars_Attack_BlockerCode::Slope);
+        Codes.Add(EMars_Attack_BlockerCode::Cooldown);
+        Codes.Add(EMars_Attack_BlockerCode::GlobalCooldown);
+        Codes.Add(EMars_Attack_BlockerCode::WindupBlocked);
         for (const auto Code : Codes)
-        { Assert_True(utils_attack::Get_HasBlocker(Evaluation, Code), f"all applicable checks retain [{Code}]"); }
+        { Assert_True(utils_attack::Get_HasBlocker(Evaluation, Code), f"all applicable checks retain [{Code :n}]"); }
     }
 
     UFUNCTION()

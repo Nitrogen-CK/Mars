@@ -21,7 +21,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogFrozenAttempt : UMars_AutoTestRig_Crawl
         Add_Step("edit source definition, loadout and clip; collect garbage during the attempt", n"Step_EditSourcesAndCollect");
         Add_Step_WaitUntil("the original attempt finishes", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitUntil("the original claws return", n"Check_CatalogClawsReturned", k_SlowPolls, 0);
-        Add_Step("C04 the committed attack retained its original values and motion", n"Step_AssertFrozen");
+        Add_Step("the committed attack retained its original values and motion", n"Step_AssertFrozen");
         Add_Step("destroy the old crawler without touching its shared authored assets", n"Step_DestroyOld");
         Add_Step_WaitUntil("the old crawler is destroyed", n"Check_OldDestroyed", k_SlowPolls, 0);
         Add_Step("reconstruct a crawler from the edited authored sources", n"Step_Reconstruct");

@@ -19,7 +19,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogDisableBeforeAdmission : UMars_AutoTest
         Add_Step("start a pincer", n"Step_TargetAndStart");
         Add_Step_WaitUntil("disabled pending attempt reaches a reported terminal", n"Check_Reported", k_SlowPolls, 0);
         Add_Step_WaitUntil("game cleanup completes", n"Check_AttackFinished", k_SlowPolls, 0);
-        Add_Step("C07 disabled anatomy before native acceptance costs nothing", n"Step_Assert");
+        Add_Step("disabled anatomy before native acceptance costs nothing", n"Step_Assert");
         Run_Steps(InHandle);
     }
 
@@ -34,7 +34,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogDisableBeforeAdmission : UMars_AutoTest
     {
         if (_DisabledPending || InNew != EMars_Crawler_AttackPhase::Windup)
         { return; }
-        const auto Action = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
+        const auto Action = InCrawler.Get_AttackAction();
         Assert_True(ck::IsValid(Action) && Action.Get_State() == ECk_ProceduralAction_State::PendingAdmission &&
             Action.Get_LastReceipt().Get_HasAcceptedPose() == false,
             "Windup callback observes a real pending action with no accepted receipt");

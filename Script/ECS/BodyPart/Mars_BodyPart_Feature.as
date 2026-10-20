@@ -90,14 +90,14 @@ struct FMars_BodyPart_Debris
 
 mixin FMars_Validation Validate(const FMars_BodyPart_Debris& Self)
 {
-    if (Self.MassKg <= 0.0f)
-    { return FMars_Validation(f"BodyPart debris has a non-positive MassKg [{Self.MassKg}]"); }
+    if (Math::IsFinite(Self.MassKg) == false || Self.MassKg <= 0.0f)
+    { return FMars_Validation(f"BodyPart debris has a non-finite or non-positive MassKg [{Self.MassKg}]"); }
 
-    if (Self.LifetimeSeconds <= 0.0f)
-    { return FMars_Validation(f"BodyPart debris has a non-positive LifetimeSeconds [{Self.LifetimeSeconds}]"); }
+    if (Math::IsFinite(Self.LifetimeSeconds) == false || Self.LifetimeSeconds <= 0.0f)
+    { return FMars_Validation(f"BodyPart debris has a non-finite or non-positive LifetimeSeconds [{Self.LifetimeSeconds}]"); }
 
-    if (Self.OutwardSpeed < 0.0f || Self.UpSpeed < 0.0f)
-    { return FMars_Validation(f"BodyPart debris has a negative speed [{Self.OutwardSpeed}, {Self.UpSpeed}]"); }
+    if (Math::IsFinite(Self.OutwardSpeed) == false || Math::IsFinite(Self.UpSpeed) == false || Self.OutwardSpeed < 0.0f || Self.UpSpeed < 0.0f)
+    { return FMars_Validation(f"BodyPart debris has a non-finite or negative speed [{Self.OutwardSpeed}, {Self.UpSpeed}]"); }
 
     if (Self.CollisionProfile.IsNone())
     { return FMars_Validation("BodyPart debris has no CollisionProfile"); }
@@ -186,10 +186,10 @@ mixin FMars_Validation Validate(const FMars_BodyPart_Spec& Self)
     { return ZoneValidation; }
 
     const auto& Severance = Self.Severance;
-    if (Severance.SpillToBody < 0.0f || Severance.SpillToBody > 1.0f)
+    if (Math::IsFinite(Severance.SpillToBody) == false || Severance.SpillToBody < 0.0f || Severance.SpillToBody > 1.0f)
     { return FMars_Validation(f"BodyPart has SpillToBody [{Severance.SpillToBody}] outside [0, 1]"); }
 
-    if (Severance.RuinThreshold <= 0.0f || Severance.RuinThreshold > 1.0f)
+    if (Math::IsFinite(Severance.RuinThreshold) == false || Severance.RuinThreshold <= 0.0f || Severance.RuinThreshold > 1.0f)
     { return FMars_Validation(f"BodyPart has RuinThreshold [{Severance.RuinThreshold}] outside (0, 1]"); }
 
     if (ck::Is_NOT_Valid(Self.Monster))

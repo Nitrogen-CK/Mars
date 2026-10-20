@@ -42,7 +42,7 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
     {
         auto Spec = Make_ArmedCrawlerSpec(_LegCount);
         Spec.Layout = _Layout;
-        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Pincer);
+        Wear_ReferenceLoadout(Spec, EMars_Crawler_AttackClipKind::Pincer);
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();
@@ -126,7 +126,7 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
         if (InNew != EMars_Crawler_AttackPhase::Strike)
         { return; }
 
-        _ClawsAtStrike = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Claws.Num();
+        _ClawsAtStrike = InCrawler.Get_AttackPlan().Entry.Slots.Num();
     }
 
     UFUNCTION()
@@ -138,12 +138,23 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
     UFUNCTION()
     private void Check_ClawsReturned(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        auto Root = _Crawler.As_Transform();
-        const auto Subject = utils_procedural_articulation::DoCastChecked(Root);
+        const auto Subject = _Crawler.Get_Articulation();
 
         auto Res = OutResult;
         Res.Set(Subject.Get_LimbControl(_LegIds[0]).Get_State() == ECk_ProceduralLimbControl_State::Default &&
             Subject.Get_LimbControl(_LegIds[1]).Get_State() == ECk_ProceduralLimbControl_State::Default);
+    }
+
+    // The pitch of the body key the played clip's Windup phase ends on.
+    private float64 Get_WindupEndPitch() const
+    {
+        for (const auto& Phase : _Crawler.Get_AttackClip().Get_Phases())
+        {
+            if (Phase.Get_Id() == utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup) && Phase.Get_BodyKeys().Num() > 0)
+            { return Phase.Get_BodyKeys().Last().Get_Rotation().Rotator().Pitch; }
+        }
+
+        return 0.0;
     }
 
     // The two feet on the frame that accepted the InPhaseId interval ending at InEndSeconds of the clip (that phase's
@@ -169,11 +180,11 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
     {
         const auto Phases = Get_PhaseText(_RecordMark);
 
-        const auto& Attack = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        const auto Native = _Crawler.Get_AttackResult().Native;
         Assert_True(_Records.Num() - _RecordMark == 5 && _Crawler.Get_AttackLastCancel().IsSet() == false,
-            f"the attack ran Windup > Strike > Recover > Cooldown > Idle uncancelled (got{Phases}, last cancel {Get_LastCancelText()}, action {Attack.LastActionOutcome :n} [{Attack.LastActionReason}], planted feet {utils_procedural_gait::Get_PlantedCount(_Crawler.Get_Gait())}, trusted {utils_procedural_gait::Get_TrustedContactCount(_Crawler.Get_Gait())})");
+            f"the attack ran Windup > Strike > Recover > Cooldown > Idle uncancelled (got{Phases}, last cancel {Get_LastCancelText()}, action {Native.Get_Outcome() :n} [{Native.Get_Reason()}], planted feet {utils_procedural_gait::Get_PlantedCount(_Crawler.Get_Gait())}, trusted {utils_procedural_gait::Get_TrustedContactCount(_Crawler.Get_Gait())})");
         Assert_Equals_Int(_ClawsAtStrike, 2, "the attack's action claimed both front legs");
-        Assert_True(Attack.ClipKind == EMars_Crawler_AttackClipKind::Pincer, f"the attack played the pincer clip (got {Attack.ClipKind :n})");
+        Assert_True(_Crawler.Get_AttackId() == GameplayTags::Attack_Mars_Pincer, f"the attack played the pincer (got {_Crawler.Get_AttackId().ToString()})");
 
         // The claws' keys are checked on each phase's endpoint, the frame that accepted the interval ending there: the
         // clip action enters Strike and Recover on their own first accepted interval, which already carries that phase's
@@ -198,7 +209,7 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
         else
         { Assert_True(false, f"no frame accepted the windup's endpoint at [{WindupEnd :.4}] s (got{Phases})"); }
 
-        const auto WindupPitch = utils_crawler::Get_PhaseEndBody(_Crawler.Get_AttackClip(), EMars_Crawler_AttackPhase::Windup).Rotator().Pitch;
+        const auto WindupPitch = Get_WindupEndPitch();
         const auto StrikeIndex = _ClawPhases.FindIndex(EMars_Crawler_AttackPhase::Strike);
         const auto RecoverIndex = _ClawPhases.FindIndex(EMars_Crawler_AttackPhase::Recover);
         if (StrikeIndex >= 0 && RecoverIndex >= 0)
@@ -236,7 +247,7 @@ class UMars_AutoTest_CrawlerMelee_PincerStrike : UMars_AutoTestRig_CrawlerMelee
         Assert_True((RightNow - _FeetAtRest[0]).Size2D() <= _ReplantStep && (LeftNow - _FeetAtRest[1]).Size2D() <= _ReplantStep,
             f"both feet replanted within one step of where they stood (right {(RightNow - _FeetAtRest[0]).Size2D() :.2} cm off, left {(LeftNow - _FeetAtRest[1]).Size2D() :.2} cm off)");
         Assert_Equals_Int(utils_procedural_gait::Get_EnabledLegCount(_Crawler.Get_Gait()), _LegCount, "every leg is still enabled");
-        Assert_Equals_Int(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Claws.Num(), 0, "the released attack holds no claws");
+        Assert_True(_Crawler.Get_AttackCleanup().Released && ck::Is_NOT_Valid(_Crawler.Get_AttackAction()), "the attack released its action and with it the claws");
 
         Assert_Equals_Int(Get_DamageRequestCount(), 1, "the dealer drained exactly one damage request");
         Assert_Equals_Float(_Target.Health.Get_Current(), 85.0f, 0.01f, "the target lost the jab's 15 HP once");

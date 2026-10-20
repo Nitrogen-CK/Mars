@@ -11,7 +11,7 @@
 //       (synchronization) and through the zero-travel query itself.
 // (b) runs before (a) so a failing zero-travel query cannot be mistaken for a hurtbox that has not joined the physics
 // world yet. Each primitive has its own target, 1000 uu apart along Y, so no query sees another primitive's hurtbox.
-// Every observation is also logged with the prefix [CrawlerMelee.P0].
+// Every observation is also logged with the prefix [CrawlerMelee].
 class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMelee
 {
     default _TimeoutSeconds = 30.0f;
@@ -106,14 +106,14 @@ class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMel
     private void Step_AssertSweepAndZeroTravel(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto SweepIsHurtbox = _SweepA.Get_HitKind() == ECk_ProbeTrace_HitKind::Probe && _SweepA.Get_HitEntity() == _TargetA.Hurtbox;
-        ck::Trace(f"[CrawlerMelee.P0] (b) sweep: kind={_SweepA.Get_HitKind() :n} isHurtboxA={SweepIsHurtbox} location={_SweepA.Get_HitLocation().ToString()}");
+        ck::Trace(f"[CrawlerMelee] (b) sweep: kind={_SweepA.Get_HitKind() :n} isHurtboxA={SweepIsHurtbox} location={_SweepA.Get_HitLocation().ToString()}");
         Assert_True(SweepIsHurtbox, f"(b) an ordinary sweep through target A reports A's hurtbox as a Probe hit (kind {_SweepA.Get_HitKind() :n})");
 
         // Fully inside: a 10 uu sphere at the centre of a 20 uu half-extent box, Start == End.
         const auto ZeroTravel = utils_probe_trace::Request_SingleShapeTrace(_Self, Make_HitQuery(Get_CenterA(), Get_CenterA(), k_Radius));
         const auto ZeroTravelIsHurtbox = ck::IsValid(ZeroTravel.Get_HitEntity()) && ZeroTravel.Get_HitKind() == ECk_ProbeTrace_HitKind::Probe
             && ZeroTravel.Get_HitEntity() == _TargetA.Hurtbox;
-        ck::Trace(f"[CrawlerMelee.P0] (a) zero-travel: valid={ck::IsValid(ZeroTravel.Get_HitEntity())} kind={ZeroTravel.Get_HitKind() :n} isHurtboxA={ZeroTravelIsHurtbox} location={ZeroTravel.Get_HitLocation().ToString()} fraction={ZeroTravel.Get_Fraction()} normal={ZeroTravel.Get_SurfaceNormal().ToString()}");
+        ck::Trace(f"[CrawlerMelee] (a) zero-travel: valid={ck::IsValid(ZeroTravel.Get_HitEntity())} kind={ZeroTravel.Get_HitKind() :n} isHurtboxA={ZeroTravelIsHurtbox} location={ZeroTravel.Get_HitLocation().ToString()} fraction={ZeroTravel.Get_Fraction()} normal={ZeroTravel.Get_SurfaceNormal().ToString()}");
         Assert_True(ZeroTravelIsHurtbox,
             "(a) a zero-travel sphere (Start == End) wholly inside a registered hurtbox reports that hurtbox (initial overlap)");
         Assert_True((ZeroTravel.Get_HitLocation() - Get_CenterA()).Size() <= k_LocationTolerance,
@@ -127,7 +127,7 @@ class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMel
         const auto FacePoint = Get_CenterA() + FVector(k_HalfExtents.X, 0.0, 0.0);
         const auto Straddle = utils_probe_trace::Request_SingleShapeTrace(_Self, Make_HitQuery(FacePoint, FacePoint, k_Radius));
         const auto StraddleIsHurtbox = Straddle.Get_HitEntity() == _TargetA.Hurtbox;
-        ck::Trace(f"[CrawlerMelee.P0] (a-straddle) zero-travel on the face: valid={ck::IsValid(Straddle.Get_HitEntity())} kind={Straddle.Get_HitKind() :n} isHurtboxA={StraddleIsHurtbox} location={Straddle.Get_HitLocation().ToString()} fraction={Straddle.Get_Fraction()} normal={Straddle.Get_SurfaceNormal().ToString()}");
+        ck::Trace(f"[CrawlerMelee] (a-straddle) zero-travel on the face: valid={ck::IsValid(Straddle.Get_HitEntity())} kind={Straddle.Get_HitKind() :n} isHurtboxA={StraddleIsHurtbox} location={Straddle.Get_HitLocation().ToString()} fraction={Straddle.Get_Fraction()} normal={Straddle.Get_SurfaceNormal().ToString()}");
         Assert_True(StraddleIsHurtbox,
             "(a) a zero-travel sphere centred on the hurtbox's face (half inside) reports that hurtbox");
         Assert_True(Straddle.Get_HitKind() == ECk_ProbeTrace_HitKind::Probe,
@@ -167,7 +167,7 @@ class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMel
             { HurtboxReported = true; }
         }
 
-        ck::Trace(f"[CrawlerMelee.P0] (c) wall: kind={Single.Get_HitKind() :n} isWall={Single.Get_HitEntity() == _WallC} location={Single.Get_HitLocation().ToString()} multi={Multi.Num()} hurtboxReported={HurtboxReported}");
+        ck::Trace(f"[CrawlerMelee] (c) wall: kind={Single.Get_HitKind() :n} isWall={Single.Get_HitEntity() == _WallC} location={Single.Get_HitLocation().ToString()} multi={Multi.Num()} hurtboxReported={HurtboxReported}");
         Assert_True(Single.Get_HitKind() == ECk_ProbeTrace_HitKind::World,
             f"(c) a static Jolt wall between the start and C's hurtbox is the first hit, a World hit (kind {Single.Get_HitKind() :n})");
         Assert_True(Single.Get_HitEntity() == _WallC,
@@ -189,7 +189,7 @@ class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMel
             { InsideHurtboxReported = true; }
         }
 
-        ck::Trace(f"[CrawlerMelee.P0] (c-inside) sweep starting inside the wall: kind={InsideSingle.Get_HitKind() :n} isWall={InsideSingle.Get_HitEntity() == _WallC} fraction={InsideSingle.Get_Fraction()} location={InsideSingle.Get_HitLocation().ToString()} multi={InsideMulti.Num()} hurtboxReported={InsideHurtboxReported}");
+        ck::Trace(f"[CrawlerMelee] (c-inside) sweep starting inside the wall: kind={InsideSingle.Get_HitKind() :n} isWall={InsideSingle.Get_HitEntity() == _WallC} fraction={InsideSingle.Get_Fraction()} location={InsideSingle.Get_HitLocation().ToString()} multi={InsideMulti.Num()} hurtboxReported={InsideHurtboxReported}");
         Assert_True(InsideSingle.Get_HitKind() == ECk_ProbeTrace_HitKind::World,
             f"(c) a sweep that starts inside the wall reports the World hit first (kind {InsideSingle.Get_HitKind() :n})");
         Assert_True(InsideSingle.Get_HitEntity() == _WallC,
@@ -239,7 +239,7 @@ class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMel
             { FarReported = true; }
         }
 
-        ck::Trace(f"[CrawlerMelee.P0] (d) ignored: singleIsFar={Single.Get_HitEntity() == _FarHurtboxD} singleIsNear={Single.Get_HitEntity() == _TargetD.Hurtbox} multi={Multi.Num()} nearReported={NearReported} farReported={FarReported}");
+        ck::Trace(f"[CrawlerMelee] (d) ignored: singleIsFar={Single.Get_HitEntity() == _FarHurtboxD} singleIsNear={Single.Get_HitEntity() == _TargetD.Hurtbox} multi={Multi.Num()} nearReported={NearReported} farReported={FarReported}");
         Assert_True(Single.Get_HitEntity() == _FarHurtboxD,
             "(d) with D's near hurtbox ignored, the first hit is the far hurtbox further along the same sweep");
         Assert_True(NearReported == false,
@@ -294,8 +294,8 @@ class UMars_AutoTest_CrawlerMelee_QueryPrimitives : UMars_AutoTestRig_CrawlerMel
     private void Step_AssertSameFrame(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto& Sample = _Observer.Get_Fragment(FMars_TESTONLY_CrawlerMelee_OverlapSample);
-        ck::Trace(f"[CrawlerMelee.P0] (e) same-frame sweep instrument: moveFrame={Sample.MoveFrame} firstNewHitFrame={Sample.SweepFirstNewHitFrame} ticks={Sample.Ticks} newHitsBeforeMove={Sample.SweepNewLocationHitsBeforeMove} oldHitOnFirstNewHitFrame={Sample.SweepOldLocationHitOnFirstNewHitFrame} hurtboxAt={Sample.SweepHurtboxLocationAtFirstNewHit.ToString()}");
-        ck::Trace(f"[CrawlerMelee.P0] (e) same-frame zero-travel: moveFrame={Sample.MoveFrame} firstNewHitFrame={Sample.FirstNewHitFrame} oldLastHitFrame={Sample.OldLocationLastHitFrame} newHitsBeforeMove={Sample.NewLocationHitsBeforeMove} oldHitOnFirstNewHitFrame={Sample.OldLocationHitOnFirstNewHitFrame} hitLocation={Sample.FirstNewHitLocation.ToString()} hurtboxAt={Sample.HurtboxLocationAtFirstNewHit.ToString()}");
+        ck::Trace(f"[CrawlerMelee] (e) same-frame sweep instrument: moveFrame={Sample.MoveFrame} firstNewHitFrame={Sample.SweepFirstNewHitFrame} ticks={Sample.Ticks} newHitsBeforeMove={Sample.SweepNewLocationHitsBeforeMove} oldHitOnFirstNewHitFrame={Sample.SweepOldLocationHitOnFirstNewHitFrame} hurtboxAt={Sample.SweepHurtboxLocationAtFirstNewHit.ToString()}");
+        ck::Trace(f"[CrawlerMelee] (e) same-frame zero-travel: moveFrame={Sample.MoveFrame} firstNewHitFrame={Sample.FirstNewHitFrame} oldLastHitFrame={Sample.OldLocationLastHitFrame} newHitsBeforeMove={Sample.NewLocationHitsBeforeMove} oldHitOnFirstNewHitFrame={Sample.OldLocationHitOnFirstNewHitFrame} hitLocation={Sample.FirstNewHitLocation.ToString()} hurtboxAt={Sample.HurtboxLocationAtFirstNewHit.ToString()}");
 
         Assert_True(Sample.MoveFrame >= 0, "(e) the Gameplay_Script producer requested the move and stamped its frame");
 

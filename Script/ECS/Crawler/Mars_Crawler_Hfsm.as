@@ -9,7 +9,7 @@
 // |         Engage  ->Idle [LeafNotEngage]   tasks: EngageSubSm; exit: Stop + CancelAttack(StateExit), stage None
 // |         `- Engage sub-SM (initial = Approach; each state one Tick task; transitions poll the Engage stage)
 // |              Approach ->Prepare ->Wait          MoveTo the target (throttled); inside StartDistance or Arrived -> Prepare; Failed -> Wait
-// |              Prepare  ->Attack ->Approach ->Wait   Stop; face at zero speed; admissible and not Warded -> Attack; OutOfRange -> Approach; timeout -> Wait
+// |              Prepare  ->Attack ->Approach ->Wait   Stop; face at zero speed; admissible and not Warded -> Attack; out of range -> Approach; timeout -> Wait
 // |              Attack   ->Wait                    StartAttack once; Cooldown -> Wait; not admitted -> Wait; exit cancels an offensive attack
 // |              Wait     ->Approach                Stop; cooldown over and RetryUntil passed -> Approach
 // `- Dead             (sink)  tasks: Die (EnterExitOnly): stop, brain off, shed legs, body zone off, corpse timer -> despawn
@@ -458,18 +458,23 @@ class UMars_SmTask_Crawler_Engage_Approach : UMars_SmTask_Crawler_EngageStage
         const auto Combat = _Crawler.Get_Spec().Combat;
         const auto TargetLocation = Get_TargetLocation();
         const auto Root = utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform());
-        const auto Advice = utils_crawler::Evaluate_AttackLoadout(_Crawler, Target);
+        // The decision the attack tick ended its last pass on: the crawler's current target and its preferred attack.
+        const auto Advice = _Crawler.Get_AttackEvaluation();
         if (Advice.Selection.Preferred.IsSet() == false)
-        { HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds); return; }
+        {
+            HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds);
+            return;
+        }
+
         const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, Advice.Selection.Preferred.GetValue());
+        if (ck::EnsureIfNot(Entry.IsSet(), f"[Crawler] [{_Crawler.ToString()}] prefers [{Advice.Selection.Preferred.GetValue().ToString()}], which its loadout does not resolve"))
+        { return; }
+
         if ((TargetLocation - Root).Size2D() <= Entry.GetValue().Definition.Prepare.MaxDistance)
         {
             InOutEngage.Stage = EMars_Crawler_EngageStage::Prepare;
             return;
         }
-
-        if (_Crawler.Get_IsHeldByAttack())
-        { return; }
 
         auto Navigator = _Crawler.Get_Navigator();
         if (InOutEngage.LastRepathAt.IsSet() == false)
@@ -532,7 +537,7 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
     {
         _StopRequested = false;
         _AimedTangent.Reset();
-        _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Crawler.Get_CombatTarget()));
+        _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Crawler.Get_CombatTarget(), ECk_EnableDisable::Enable));
     }
 
     protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
@@ -546,7 +551,7 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
         }
 
         const auto Combat = _Crawler.Get_Spec().Combat;
-        if (_Crawler.Get_AttackPreparation().TimedOut)
+        if (_Crawler.Get_AttackPreparation().State == EMars_Attack_PreparationState::TimedOut)
         {
             HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds);
             return;
@@ -572,21 +577,22 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
         }
 
         if (Advice.Selection.Preferred.IsSet() == false)
-        { HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds); return; }
-
-        if (Advice.Selection.Preferred.IsSet())
         {
-            const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, Advice.Selection.Preferred.GetValue());
-            const auto Distance = (Get_TargetLocation() - utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform())).Size2D();
-            if (Entry.IsSet() && Distance > Entry.GetValue().Definition.Prepare.MaxDistance)
-            { InOutEngage.Stage = EMars_Crawler_EngageStage::Approach; }
+            HandOverToWait(InOutEngage, Combat.Targeting.BlockedRetrySeconds);
+            return;
         }
+
+        const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, Advice.Selection.Preferred.GetValue());
+        const auto Distance = (Get_TargetLocation() - utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform())).Size2D();
+        if (Entry.IsSet() && Distance > Entry.GetValue().Definition.Prepare.MaxDistance)
+        { InOutEngage.Stage = EMars_Crawler_EngageStage::Approach; }
     }
 
+    // Anywhere but Attack, the readiness wait this stage started is abandoned (the attack it would admit never starts).
     protected void ExitStage() override
     {
         if (_Crawler.Get_EngageStage() != EMars_Crawler_EngageStage::Attack)
-        { _Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(EMars_Crawler_AttackCancel::StateExit)); }
+        { _Crawler.Request_PrepareAttack(FMars_Request_Crawler_PrepareAttack(_Crawler.Get_CombatTarget(), ECk_EnableDisable::Disable)); }
     }
 
     private void AimAt(FVector InTargetLocation)
@@ -609,9 +615,9 @@ class UMars_SmTask_Crawler_Engage_Prepare : UMars_SmTask_Crawler_EngageStage
     }
 }
 
-// Asks the attack kernel for one jab on enter and follows it. Admission shows as a new attack generation; the kernel
+// Asks the attack kernel for the evaluated attack on enter and follows it. Admission shows as a new attack generation; the kernel
 // captures the root's heading as the committed direction, and the first tick that sees it re-sends that direction as a
-// zero-speed steer, once, so nothing turns the root during the jab. Once the attack reaches Cooldown (normally or through
+// zero-speed steer, once, so nothing turns the root during the attack. Once the attack reaches Cooldown (normally or through
 // a cancel) it hands over to Wait. A start that is not admitted shows as Idle with nothing queued on two consecutive
 // ticks (the attack tick runs once per frame, after the request drain, so the second look follows it): that hands over
 // to Wait for BlockedRetrySeconds, never a second start. Leaving while the attack is still offensive cancels it.
@@ -631,7 +637,11 @@ class UMars_SmTask_Crawler_Engage_Attack : UMars_SmTask_Crawler_EngageStage
 
         const auto Advice = _Crawler.Get_AttackEvaluation();
         if (Advice.Selection.Selected.IsSet() == false)
-        { HandOverToWait(InOutEngage, _Crawler.Get_Spec().Combat.Targeting.BlockedRetrySeconds); return; }
+        {
+            HandOverToWait(InOutEngage, _Crawler.Get_Spec().Combat.Targeting.BlockedRetrySeconds);
+            return;
+        }
+
         _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Crawler.Get_CombatTarget(),
             Advice.Selection.Selected.GetValue(), Advice.SelectionGeneration));
     }
@@ -650,6 +660,7 @@ class UMars_SmTask_Crawler_Engage_Attack : UMars_SmTask_Crawler_EngageStage
 
             if (Phase == EMars_Crawler_AttackPhase::Cooldown || Phase == EMars_Crawler_AttackPhase::Idle)
             { HandOverToWait(InOutEngage, 0.0f); }
+
             return;
         }
 
@@ -671,7 +682,7 @@ class UMars_SmTask_Crawler_Engage_Attack : UMars_SmTask_Crawler_EngageStage
     }
 }
 
-// Stands still until the attack's cooldown is over and RetryUntil has passed on the stage clock, then hands back to
+// Stands still until no attack holds the crawler (its cooldown is over) and RetryUntil has passed on the stage clock, then hands back to
 // Approach while the combat target is still valid.
 class UMars_SmTask_Crawler_Engage_Wait : UMars_SmTask_Crawler_EngageStage
 {
@@ -685,13 +696,14 @@ class UMars_SmTask_Crawler_Engage_Wait : UMars_SmTask_Crawler_EngageStage
 
     protected void TickStage(FMars_Fragment_Crawler_Engage& InOutEngage) override
     {
-        if (_Crawler.Get_IsHeldByAttack() || _Crawler.Get_AttackCooldownRemaining() > 0.0f || InOutEngage.StageElapsed < InOutEngage.RetryUntil)
+        if (_Crawler.Get_IsHeldByAttack() || InOutEngage.StageElapsed < InOutEngage.RetryUntil)
         { return; }
 
         if (_Crawler.Get_IsCombatTargetValid(_Crawler.Get_CombatTarget()))
         { InOutEngage.Stage = EMars_Crawler_EngageStage::Approach; }
     }
 }
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Behaviour tasks
 //--------------------------------------------------------------------------------------------------------------------------

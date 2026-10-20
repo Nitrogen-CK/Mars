@@ -1,4 +1,4 @@
-// The player's own hurtbox never intercepts the player's swing: a real utils_damage_dealer::Try_StrikeSweep from the
+// The player's own hurtbox never intercepts the player's swing: a real Request_StrikeSweep from the
 // production pawn's dealer, starting behind the pawn and travelling along its forward through its own hurtbox, hits a
 // hostile dummy's hurtbox ahead (10 Blunt lands, the player's Health is untouched, nothing is rejected as friendly).
 // With a static Jolt wall between the pawn and the dummy, the same swing stops at the wall. Isolated origin
@@ -76,7 +76,7 @@ class UMars_AutoTest_PlayerCombat_PlayerStrikeSelfExclusion : UMars_AutoTestRig_
     {
         auto Dealer = _Player.As_DamageDealer();
         auto Template = utils_damage_dealer::Make_Event(Dealer, 10.0f, GameplayTags::DamageType_Mars_Blunt);
-        _Result = utils_damage_dealer::Try_StrikeSweep(Dealer, Make_Swing(), Template);
+        _Result = Dealer.Request_StrikeSweep(Make_Swing(), Template);
     }
 
     UFUNCTION()

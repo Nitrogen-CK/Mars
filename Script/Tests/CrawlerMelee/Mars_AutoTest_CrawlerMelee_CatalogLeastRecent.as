@@ -24,7 +24,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogLeastRecent : UMars_AutoTestRig_Crawler
             Add_Step_WaitUntil("expected least-recent body entry is ready", n"Check_ExpectedAdvice", k_SlowPolls, 0);
             Add_Step("queue one automatic attack", n"Step_TargetAndStart");
             Add_Step_WaitUntil("this automatic attack actually accepts", n"Check_CatalogAccepted", k_SlowPolls, 0);
-            Add_Step("C09 accepted sequence drives deterministic equal-priority choice", n"Step_InspectAdmission");
+            Add_Step("accepted sequence drives deterministic equal-priority choice", n"Step_InspectAdmission");
             Add_Step_WaitUntil("the committed attempt finishes", n"Check_AttackFinished", k_SlowPolls, 0);
             Add_Step("advance the expected attempt", n"Step_NextAttempt");
         }

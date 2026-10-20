@@ -106,10 +106,14 @@ class UMars_AutoTest_AttackCatalog_EmitterEvidence : UCk_AutoTest_Base
         return Query;
     }
 
-    private bool Has_Failure(const FMars_Crawler_EmitterExtraction& InExtraction, FName InCode) const
+    private bool Has_Failure(const FMars_Crawler_EmitterExtraction& InExtraction, EMars_Attack_BlockerCode InCode) const
     {
         for (const auto& Failure : InExtraction.Failures)
-        { if (Failure.Code == InCode) { return true; } }
+        {
+            if (Failure.Code == InCode)
+            { return true; }
+        }
+
         return false;
     }
 
@@ -127,23 +131,23 @@ class UMars_AutoTest_AttackCatalog_EmitterEvidence : UCk_AutoTest_Base
                 "strike plus independently authored active windows permit this copied segment");
         }
         Query.Current = Pose_At(8.0, false);
-        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), n"AcceptedSourceMissing"),
+        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), EMars_Attack_BlockerCode::AcceptedSourceMissing),
             "missing accepted limb cannot substitute the body's presentation");
         Query = Make_Query();
         Query.Current = Pose_At(17.0, true);
-        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), n"SampleTravel"), "active centre travel beyond authored 16 cm is rejected before casts");
+        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), EMars_Attack_BlockerCode::SampleTravel), "active centre travel beyond authored 16 cm is rejected before casts");
         Query = Make_Query();
         Query.Plan.Entry.Definition.Hit.Emitters[0].LocalCenter.X = Math::Sqrt(-1.0);
-        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), n"EmitterBounds"), "nonfinite centre is rejected before casts without constructing a diagnostic-sanitized NaN transform");
+        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), EMars_Attack_BlockerCode::EmitterBounds), "nonfinite centre is rejected before casts without constructing a diagnostic-sanitized NaN transform");
         Query = Make_Query();
         Query.Root.Direction.X = Math::Sqrt(-1.0);
-        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), n"RootInvalid"), "nonfinite copied facing input is rejected before casts");
+        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), EMars_Attack_BlockerCode::RootInvalid), "nonfinite copied facing input is rejected before casts");
         Query = Make_Query();
         Query.Root.Current = FTransform(FRotator::ZeroRotator, FVector(20.0, 0.0, 0.0));
-        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), n"RootDrift"), "root displacement exceeds the copied execution budget");
+        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), EMars_Attack_BlockerCode::RootDrift), "root displacement exceeds the copied execution budget");
         Query = Make_Query();
         Query.Root.Current = FTransform(FRotator(0.0, 90.0, 0.0), FVector::ZeroVector);
-        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), n"FacingDrift"), "facing drift rejects before casts");
+        Assert_True(Has_Failure(utils_crawler::Extract_AttackEmitters(Query), EMars_Attack_BlockerCode::FacingDrift), "facing drift rejects before casts");
         Query = Make_Query();
         Query.GameWindowOpen = false;
         Extracted = utils_crawler::Extract_AttackEmitters(Query);

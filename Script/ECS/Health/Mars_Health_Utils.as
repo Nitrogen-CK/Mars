@@ -55,11 +55,6 @@ mixin bool Get_IsInvulnerable(const FCk_Handle_Health& Self)
     return Self.Get_Fragment(FMars_Fragment_Health).IsInvulnerable;
 }
 
-mixin FCk_Handle_FloatAttribute Get_Attribute(const FCk_Handle_Health& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Health).Attribute;
-}
-
 // Unset until a hit applies damage.
 mixin TOptional<FMars_DamageEvent> Get_LastHit(const FCk_Handle_Health& Self)
 {

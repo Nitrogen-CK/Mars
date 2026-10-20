@@ -67,7 +67,7 @@ class UMars_AutoTest_CrawlerMelee_TerminalStrikeHit : UMars_AutoTestRig_CrawlerM
         { return; }
 
         const auto ToRecover = _Records[RecoverIndex];
-        // Approved change: Recover is entered on its first accepted interval, staged the frame after the commit pass.
+        // Recover is entered on its first accepted interval, staged the frame after the commit pass.
         Assert_True(ToRecover.Frame == Trigger.SawCandidateFrame + 2,
             f"Recover was entered on the tick after the commit pass (candidate frame {Trigger.SawCandidateFrame}, Recover frame {ToRecover.Frame})");
         Assert_True(ToRecover.DamageCommitted, "the candidate was committed before Recover was entered");

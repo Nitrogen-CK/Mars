@@ -1,3 +1,42 @@
+// The holder command: armed by the test, it creates the independent pincer holder in the frame the game's start drains,
+// just before the drain, so both contenders are enqueued before native service can acquire either, the holder first.
+struct FMars_TESTONLY_CrawlerMelee_HolderCommand
+{
+    FCk_Handle_Crawler Crawler;
+    TSoftObjectPtr<UCk_ProceduralAction_Data> Clip;
+    bool Armed = false;
+    FCk_Handle_ProceduralAction Action;
+    int64 Frame = 0;
+}
+
+class UMars_TESTONLY_Processor_CrawlerMelee_HolderCommand : UCk_Processor_Script_Base_UE
+{
+    default _Group = n"FGroup_Gameplay_Script";
+    default _RunBefore.Add(n"/Script/Angelscript.Mars_Processor_Crawler_HandleRequests");
+
+    UFUNCTION(BlueprintOverride)
+    void Configure(FCk_ScriptProcessorQuery& Query) {}
+
+    void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_TESTONLY_CrawlerMelee_HolderCommand& InCommand)
+    {
+        if (InCommand.Armed == false || ck::IsValid(InCommand.Action) || ck::Is_NOT_Valid(InCommand.Crawler))
+        { return; }
+
+        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
+        Bindings.Add(FCk_ProceduralAction_SlotBinding(n"ClawRight", n"Leg0"));
+        Bindings.Add(FCk_ProceduralAction_SlotBinding(n"ClawLeft", n"Leg5"));
+        auto Play = FCk_ProceduralAction_PlaySpec(InCommand.Clip);
+        Play.Set_SlotBindings(Bindings);
+        Play.Set_Delivery(ECk_ProceduralAction_Delivery::Explicit);
+        InCommand.Action = utils_procedural_action::Create_FromClip(InHandle, InCommand.Crawler.Get_ActionPlayer(), Play);
+        InCommand.Frame = utils_time::Get_FrameCounter();
+        InCommand.Armed = false;
+    }
+}
+
+// An independent pincer holder and the game's own pincer contend for the same claws in one frame, the holder enqueued
+// first. The game's attempt is created and then refused by native acquisition (Busy): no accepted admission, no reuse or
+// least-recent charge, no damage. Once the holder is cancelled and released, a retry is admitted and charged once.
 class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig_CrawlerAttackCatalog
 {
     default _TimeoutSeconds = 90.0f;
@@ -9,8 +48,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
     private int64 _RaceFrame = 0;
     private FMars_Attack_LoadoutEvaluation _BeforeHolderAdvice;
     private bool _ImmediateDiagnostic = false;
-    UPROPERTY() private UMars_Processor_Crawler_HandleRequests _Requests;
-    UPROPERTY() private UMars_Processor_Crawler_AttackTick _Tick;
+    private FCk_Handle _HolderCommand;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -18,8 +56,6 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
         auto Spec = Make_CatalogSpec(false);
         _CatalogPincer.Def.Cooldown.ReuseSeconds = 5.0f;
         _CatalogJab.Def.Cooldown.ReuseSeconds = 5.0f;
-        _Requests = Cast<UMars_Processor_Crawler_HandleRequests>(NewObject(this, UMars_Processor_Crawler_HandleRequests));
-        _Tick = Cast<UMars_Processor_Crawler_AttackTick>(NewObject(this, UMars_Processor_Crawler_AttackTick));
         SpawnFloorAndCrawler(InHandle, Spec);
         Add_CatalogSettleSteps();
         Add_Step("spawn a reachable target", n"Step_CatalogTarget");
@@ -27,9 +63,11 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
         Add_Step("select the target", n"Step_CatalogSelectTarget");
         Add_Step_WaitUntil("target transport drains", n"Check_CatalogRequestsDrained", k_SlowPolls, 0);
         Add_Step_WaitUntil("fresh complete pincer advice is ready before creating either contender", n"Check_CatalogPincerReady", k_SlowPolls, 0);
-        Add_Step("create a pending native holder and queue one game start in the same step", n"Step_Race");
+        Add_Step("arm the holder and queue one game start in the same step", n"Step_Race");
+        Add_Step_WaitUntil("the holder and the game attempt both exist", n"Check_Contenders", k_SlowPolls, 0);
+        Add_Step("both contenders were created in one frame, the holder first", n"Step_AssertContenders");
         Add_Step_WaitUntil("the game attempt reports a real native acquisition terminal", n"Check_RejectedResult", k_SlowPolls, 0);
-        Add_Step("C05 no accepted charge or damage follows the real Busy outcome", n"Step_AssertRejected");
+        Add_Step("no accepted charge or damage follows the real Busy outcome", n"Step_AssertRejected");
         Add_Step("cancel the independent native holder", n"Step_CancelHolder");
         Add_Step_WaitUntil("holder terminal is read and acknowledged", n"Check_HolderTerminal", k_SlowPolls, 0);
         Add_Step_WaitUntil("native holder and game action both release", n"Check_Released", k_SlowPolls, 0);
@@ -46,34 +84,35 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
         _RaceFrame = utils_time::Get_FrameCounter();
         _BeforeHolderAdvice = utils_crawler::Evaluate_AttackLoadout(_Crawler, _Target.Entity);
         Log(Describe_RaceAdvice(_BeforeHolderAdvice, f"[CatalogRaceBeforeHolder] frame {_RaceFrame}"));
-        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
-        Bindings.Add(FCk_ProceduralAction_SlotBinding(n"ClawRight", n"Leg0"));
-        Bindings.Add(FCk_ProceduralAction_SlotBinding(n"ClawLeft", n"Leg5"));
-        auto Play = FCk_ProceduralAction_PlaySpec(TSoftObjectPtr<UCk_ProceduralAction_Data>(_CatalogPincerSource));
-        Play.Set_SlotBindings(Bindings);
-        Play.Set_Delivery(ECk_ProceduralAction_Delivery::Explicit);
-        auto Owner = InHandle;
-        _Holder.Action = utils_procedural_action::Create_FromClip(Owner, _Crawler.Get_ActionPlayer(), Play);
-        Assert_True(ck::IsValid(_Holder.Action) && _Holder.Action.Get_State() == ECk_ProceduralAction_State::PendingAdmission,
-            "the independent holder is valid but has not yet acquired control at creation");
-        _Holder.Identity = _Holder.Action.Get_Identity();
-        Log(f"[CatalogRaceAfterHolder] frame {utils_time::Get_FrameCounter()}, holder {_Holder.Identity.Get_Value()}, state {_Holder.Action.Get_State() :n}, accepted {_Holder.Action.Get_LastReceipt().Get_HasAcceptedPose()}");
+        auto Command = FMars_TESTONLY_CrawlerMelee_HolderCommand();
+        Command.Crawler = _Crawler;
+        Command.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(_CatalogPincerSource);
+        Command.Armed = true;
+        _HolderCommand = utils_entity_lifetime::Request_CreateEntity(InHandle);
+        _HolderCommand.Add_Fragment(Command);
         Step_TargetAndStart(InHandle, InPayload);
-        // Establish both real contenders before native service can acquire the holder. Native service traverses
-        // enqueue order, so its first acquisition belongs to the holder and the game must observe the actual Busy.
-        FMars_Fragment_Crawler_Requests Requests = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Requests);
-        FCk_Handle Entity = _Crawler;
-        _Requests.ForEachEntity(FCk_Time(0.0), Entity, Requests);
-        _Tick.ForEachEntity(FCk_Time(1.0e-6), Entity);
-        const auto GameAction = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
-        Assert_True(ck::IsValid(GameAction) && GameAction.Get_Identity().Get_Value() > 0 &&
-            GameAction.Get_State() == ECk_ProceduralAction_State::PendingAdmission &&
-            GameAction.Get_LastReceipt().Get_HasAcceptedPose() == false && _Crawler.Get_AttackAdmission().Accepted == false,
-            "the owning game kernel created a real pending contender before any native accepted pose");
-        Assert_True(_Holder.Action.Get_State() == ECk_ProceduralAction_State::PendingAdmission &&
-            _Holder.Action.Get_LastReceipt().Get_HasAcceptedPose() == false &&
-            _Holder.Identity.Get_Value() < _Crawler.Get_AttackAdmission().ActionIdentity.Get_Value(),
-            "both contenders are still pending and the native holder was enqueued first");
+    }
+
+    UFUNCTION()
+    private void Check_Contenders(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto& Command = _HolderCommand.Get_Fragment(FMars_TESTONLY_CrawlerMelee_HolderCommand);
+        auto Res = OutResult;
+        Res.Set(ck::IsValid(Command.Action) && _Crawler.Get_HasPendingCombatRequests() == false &&
+            (_Crawler.Get_AttackActionIdentity().Get_Value() > 0 || _CatalogResults.Num() > 0 || _Crawler.Get_AttackLastReject().IsSet()));
+    }
+
+    UFUNCTION()
+    private void Step_AssertContenders(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        const auto& Command = _HolderCommand.Get_Fragment(FMars_TESTONLY_CrawlerMelee_HolderCommand);
+        _Holder.Action = Command.Action;
+        _Holder.Identity = Command.Action.Get_Identity();
+        const auto GameIdentity = _Crawler.Get_AttackAdmission().ActionIdentity.Get_Value();
+        Assert_True(GameIdentity > 0 && _Crawler.Get_AttackLastReject().IsSet() == false,
+            f"the game kernel created its own attempt rather than refusing the start on advice (last reject {Get_LastRejectText()})");
+        Assert_True(_Holder.Identity.Get_Value() > 0 && _Holder.Identity.Get_Value() < GameIdentity,
+            f"the holder was enqueued before the game attempt (holder {_Holder.Identity.Get_Value()}, game {GameIdentity}, holder frame {Command.Frame})");
     }
 
     private FString Describe_RaceAdvice(const FMars_Attack_LoadoutEvaluation& InAdvice, FString InPrefix) const
@@ -83,7 +122,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
         {
             Details = f"{Details}; {Evaluation.AttackId} {Evaluation.Availability :n}";
             for (const auto& Blocker : Evaluation.Blockers)
-            { Details = f"{Details} [{Blocker.Code} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
+            { Details = f"{Details} [{Blocker.Code :n} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
         }
         return Details;
     }
@@ -133,11 +172,14 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
             Details = Describe_RaceAdvice(Fresh, Details + "; current-fresh");
             Log(Details);
         }
-        if (_CatalogResults.Num() == 0 && ++_RejectedPolls == 60)
+        if (_CatalogResults.Num() == 0)
+        { ++_RejectedPolls; }
+
+        if (_CatalogResults.Num() == 0 && _RejectedPolls == 60)
         {
             const auto Admission = _Crawler.Get_AttackAdmission();
             const auto Decision = _Crawler.Get_AttackDecision();
-            const auto Action = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
+            const auto Action = _Crawler.Get_AttackAction();
             const FString HolderState = ck::IsValid(_Holder.Action) ? f"{_Holder.Action.Get_State() :n}" : "Released";
             const FString GameState = ck::IsValid(Action) ? f"{Action.Get_State() :n}" : "Absent";
             auto Details = f"race frame {_RaceFrame}, now {utils_time::Get_FrameCounter()}, reject {Get_LastRejectText()}, results {_CatalogResults.Num()}, phase {_Crawler.Get_AttackPhase() :n}, game action {Admission.ActionIdentity.Get_Value()}/{GameState}, accepted {Admission.Accepted}, holder {_Holder.Identity.Get_Value()}/{HolderState}, holder accepted {_Holder.Accepted.Count}, holder terminal {_Holder.TerminalSeen}/{_Holder.Result.Get_Outcome() :n}/{_Holder.Result.Get_Reason()}, decision {Decision.Signature}; {Get_CrawlerDiagnostics()}";
@@ -145,9 +187,9 @@ class UMars_AutoTest_CrawlerMelee_CatalogAcquisitionConflict : UMars_AutoTestRig
             {
                 Details = f"{Details}; {Evaluation.AttackId} {Evaluation.Availability :n}";
                 for (const auto& Blocker : Evaluation.Blockers)
-                { Details = f"{Details} [{Blocker.Code} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
+                { Details = f"{Details} [{Blocker.Code :n} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
             }
-            for (const auto Id : _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Cleanup.ClaimedIds)
+            for (const auto Id : _Crawler.Get_AttackCleanup().ClaimedIds)
             {
                 const auto Control = _Crawler.Get_Articulation().Get_LimbControl(Id);
                 Details = f"{Details}; game claim {Id} {Control.Get_State() :n} owner {Control.Get_Owner().ToString()}";

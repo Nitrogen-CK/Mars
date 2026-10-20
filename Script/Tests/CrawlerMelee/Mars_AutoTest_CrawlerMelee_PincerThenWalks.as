@@ -45,7 +45,7 @@ class UMars_AutoTest_CrawlerMelee_PincerThenWalks : UMars_AutoTestRig_CrawlerMel
     {
         auto Spec = Make_AggressiveCrawlerSpec(_LegCount);
         Spec.Layout = _Layout;
-        Wear_ReferenceClips(Spec, _WithPincer ? EMars_Crawler_AttackClipKind::Pincer : EMars_Crawler_AttackClipKind::Jab);
+        Wear_ReferenceLoadout(Spec, _WithPincer ? EMars_Crawler_AttackClipKind::Pincer : EMars_Crawler_AttackClipKind::Jab);
         SpawnFloorAndCrawler(InHandle, Spec);
 
         Add_SettleSteps();
@@ -89,7 +89,7 @@ class UMars_AutoTest_CrawlerMelee_PincerThenWalks : UMars_AutoTestRig_CrawlerMel
         if (InNew != EMars_Crawler_AttackPhase::Strike || _ClawsAtFirstStrike >= 0)
         { return; }
 
-        _ClawsAtFirstStrike = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Claws.Num();
+        _ClawsAtFirstStrike = InCrawler.Get_AttackPlan().Entry.Slots.Num();
         if (_CancelFirstAttackMidAir)
         {
             _CancelSent = true;
@@ -116,9 +116,7 @@ class UMars_AutoTest_CrawlerMelee_PincerThenWalks : UMars_AutoTestRig_CrawlerMel
 
     private FCk_ProceduralLimbControl_Observation Get_Control(int32 InLeg) const
     {
-        auto RootHandle = _Crawler.As_Transform();
-        const auto Subject = utils_procedural_articulation::DoCastChecked(RootHandle);
-        return Subject.Get_LimbControl(utils_procedural_leg::Get_Id(_Legs[InLeg]));
+        return _Crawler.Get_Articulation().Get_LimbControl(utils_procedural_leg::Get_Id(_Legs[InLeg]));
     }
 
     UFUNCTION()

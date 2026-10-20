@@ -94,17 +94,13 @@ class UMars_AutoTest_AttackCatalog_SeverRecoveryEvidence : UMars_AutoTestRig_Att
         Log(f"[AttackCatalog SeverRecoveryEvidence] managed outcome {Result.Get_Outcome() :n}, recovery {Result.Get_Recovery() :n}, reason [{Result.Get_Reason()}]; unplanted limbs {Unplanted.Num()}");
         Assert_True(Result.Get_Outcome() != ECk_ProceduralAction_Outcome::Completed,
             "processed loss interrupted the managed pincer");
-        Assert_True(Result.Get_Recovery() == ECk_ProceduralAction_Recovery::Succeeded ||
-            (Result.Get_Recovery() == ECk_ProceduralAction_Recovery::Failed && Result.Get_Reason() != NAME_None),
-            "the terminal explicitly distinguishes successful return from a named managed recovery failure");
+        // The sever is fixed (claw 0 mid-Strike), so the verdict is too: the managed return fails with a named reason
+        // and leaves the surviving claw unplanted for the public recovery.
+        Assert_True(Result.Get_Recovery() == ECk_ProceduralAction_Recovery::Failed && Result.Get_Reason() != NAME_None,
+            f"the managed recovery fails with a named reason (recovery {Result.Get_Recovery() :n}, reason [{Result.Get_Reason()}])");
         _RequestedAutonomousRecovery = Unplanted.Contains(_ProbeLimbIds[1]);
-        if (_RequestedAutonomousRecovery)
-        { utils_crawler::Recover_UnplantedLimbs(_Crawler); }
-        if (Result.Get_Recovery() == ECk_ProceduralAction_Recovery::Failed)
-        {
-            Assert_True(_RequestedAutonomousRecovery,
-                "failed managed return exposes the surviving claw for a separate public autonomous recovery");
-        }
+        Assert_True(_RequestedAutonomousRecovery, "the failed managed return exposes the surviving claw for a separate public autonomous recovery");
+        utils_crawler::Recover_UnplantedLimbs(_Crawler);
     }
 
     UFUNCTION()

@@ -9,6 +9,14 @@ struct FMars_TESTONLY_AttackCatalog_Accepts
     float64 LastClipTime = 0.0;
 }
 
+// One front leg the probe claims through a claw slot.
+struct FMars_TESTONLY_AttackCatalog_Claw
+{
+    FCk_Handle_ProceduralLeg Leg;
+    FName LegId;
+    FName Slot;
+}
+
 struct FMars_TESTONLY_AttackCatalog_Stream
 {
     FCk_Handle_ProceduralAction Action;
@@ -25,7 +33,7 @@ class UMars_AutoTestRig_AttackCatalogPublicSurface : UMars_AutoTestRig_CrawlerMe
     UPROPERTY()
     protected UCk_ProceduralAction_Data _ProbeClip;
 
-    protected TArray<FMars_Crawler_AttackClaw> _ProbeClaws;
+    protected TArray<FMars_TESTONLY_AttackCatalog_Claw> _ProbeClaws;
     protected TArray<FCk_ProceduralAction_SlotBinding> _ProbeBindings;
     protected TArray<FName> _ProbeLimbIds;
 
@@ -33,7 +41,7 @@ class UMars_AutoTestRig_AttackCatalogPublicSurface : UMars_AutoTestRig_CrawlerMe
     {
         auto Spec = Make_ArmedCrawlerSpec(6);
         Spec.Layout = EMars_Crawler_Layout::Spider;
-        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Pincer);
+        Wear_ReferenceLoadout(Spec, EMars_Crawler_AttackClipKind::Pincer);
         _ProbeClip = Get_ReferenceClip(Spec.Layout, EMars_Crawler_AttackClipKind::Pincer);
         SpawnFloorAndCrawler(InHandle, Spec);
         Add_SettleSteps();
@@ -43,19 +51,25 @@ class UMars_AutoTestRig_AttackCatalogPublicSurface : UMars_AutoTestRig_CrawlerMe
     UFUNCTION()
     protected void Check_ProbeStance(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Claws = utils_crawler::Find_AttackClaws(_Crawler);
-        const auto Ready = Claws.Num() == 2 && utils_crawler::Get_IsPincerStanceReady(_Crawler, Claws);
+        const auto Ready = Get_IsClawStanceReady();
         if (Ready)
         {
-            _ProbeClaws = Claws;
+            const auto Legs = Get_FrontLegs();
+            _ProbeClaws.Reset();
             _ProbeBindings.Reset();
             _ProbeLimbIds.Reset();
-            for (const auto& Claw : Claws)
+            for (int32 Index = 0; Index < Legs.Num(); ++Index)
             {
-                _ProbeBindings.Add(FCk_ProceduralAction_SlotBinding(utils_crawler::Get_ClawSlotId(Claw), Claw.LegId));
+                auto Claw = FMars_TESTONLY_AttackCatalog_Claw();
+                Claw.Leg = Legs[Index];
+                Claw.LegId = utils_procedural_leg::Get_Id(Legs[Index]);
+                Claw.Slot = Index == 0 ? utils_crawler::Get_RightClawSlotId() : utils_crawler::Get_LeftClawSlotId();
+                _ProbeClaws.Add(Claw);
+                _ProbeBindings.Add(FCk_ProceduralAction_SlotBinding(Claw.Slot, Claw.LegId));
                 _ProbeLimbIds.Add(Claw.LegId);
             }
         }
+
         auto Res = OutResult;
         Res.Set(Ready);
     }

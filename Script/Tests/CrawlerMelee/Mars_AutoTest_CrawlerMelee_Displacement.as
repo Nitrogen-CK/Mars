@@ -45,11 +45,11 @@ class UMars_AutoTest_CrawlerMelee_Displacement : UMars_AutoTestRig_CrawlerMelee
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Trigger = _TriggerEntity.Get_Fragment(FMars_TESTONLY_CrawlerMelee_Trigger);
-        const auto Combat = _Crawler.Get_Spec().Combat;
+        const auto Jab = Get_ResolvedDefinition(GameplayTags::Attack_Mars_Jab);
         const auto TurnedDegrees = Math::RadiansToDegrees(Math::Acos(Math::Clamp(Get_Forward().DotProduct(_ForwardAtStart), -1.0, 1.0)));
 
         Assert_True(Trigger.Fired, "the crawler was steered as Strike began");
-        Assert_True(TurnedDegrees > Combat.Prepare.FacingToleranceDegrees,
+        Assert_True(TurnedDegrees > Jab.Prepare.FacingToleranceDegrees,
             f"the root turned beyond the facing tolerance ({TurnedDegrees :.1} degrees)");
 
         const auto LastCancel = _Crawler.Get_AttackLastCancel();
@@ -57,8 +57,8 @@ class UMars_AutoTest_CrawlerMelee_Displacement : UMars_AutoTestRig_CrawlerMelee
             f"the attack was cancelled as Displaced (last cancel {Get_LastCancelText()}, phases{Get_PhaseText(_RecordMark)})");
         Assert_True(Find_RecordSinceMark(EMars_Crawler_AttackPhase::CancelRecover) >= 0 && Find_RecordSinceMark(EMars_Crawler_AttackPhase::Cooldown) >= 0,
             f"the attack eased back through CancelRecover into Cooldown (phases{Get_PhaseText(_RecordMark)})");
-        Assert_True(_Crawler.Get_AttackLongestSweep() <= Combat.Hit.MaxSampleTravel,
-            f"no sweep was longer than MaxSampleTravel [{Combat.Hit.MaxSampleTravel}] (longest {_Crawler.Get_AttackLongestSweep() :.2} cm)");
+        Assert_True(_Crawler.Get_AttackLongestSweep() <= Get_JabEmitter().MaxSampleTravel,
+            f"no sweep was longer than MaxSampleTravel [{Get_JabEmitter().MaxSampleTravel}] (longest {_Crawler.Get_AttackLongestSweep() :.2} cm)");
         Assert_Equals_Int(Get_DamageRequestCount(), 0, "no damage request was sent");
         Assert_Equals_Float(_Target.Health.Get_Current(), 100.0f, 0.01f, "the target is untouched");
     }

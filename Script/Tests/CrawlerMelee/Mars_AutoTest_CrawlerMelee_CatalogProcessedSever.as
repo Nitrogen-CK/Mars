@@ -25,10 +25,10 @@ class UMars_AutoTest_CrawlerMelee_CatalogProcessedSever : UMars_AutoTestRig_Craw
         Add_Step_WaitUntil("Health depletion, BodyPart sever and native detach have processed", n"Check_Processed", k_SlowPolls, 0);
         Add_Step_WaitUntil("cancel/managed return/autonomous obligations finish", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitUntil("the survivor is Default and planted on an operational articulation", n"Check_Survivor", k_SlowPolls, 0);
-        Add_Step("C07 no candidate or damage survived processed invalidation", n"Step_AssertBoundary");
+        Add_Step("no candidate or damage survived processed invalidation", n"Step_AssertBoundary");
         // A processed hit exits Roam for Flinch. Re-entered Roam picks another goal once the attack releases;
         // establish this direct-start fixture's stationary geometry again before checking the next attack.
-        Add_Step_WaitUntil("Flinch has returned the passive crawler to Roam", n"Check_CrawlerInRoam", k_SlowPolls, 0);
+        Add_Step_WaitUntil("Flinch has returned the passive crawler to Roam", n"Check_InRoam", k_SlowPolls, 0);
         Add_Step("stop the resumed roaming navigator", n"Step_StopCrawlerNavigator");
         Add_Step_WaitUntil("the resumed navigation stop has drained", n"Check_CrawlerNavigatorStopped", k_SlowPolls, 0);
         Add_Step_WaitUntil("the recovered crawler rests with a stable heading for one second", n"Check_AtRest", k_SlowPolls, 0);
@@ -72,7 +72,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogProcessedSever : UMars_AutoTestRig_Craw
             _LostPart.Get_State() == EMars_BodyPart_State::Severed && utils_procedural_leg::Get_IsAttached(_LostPart.Get_Leg()) == false;
         if (Processed)
         {
-            _DamageAtProcessed = utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler);
+            _DamageAtProcessed = _Crawler.Get_IssuedDamageRequests();
             Assert_Equals_Int(_DamageAtProcessed, Evidence.DamageRequests,
                 "the canonical Health/BodyPart boundary invalidated the candidate before AttackTick could issue damage");
         }
@@ -80,16 +80,16 @@ class UMars_AutoTest_CrawlerMelee_CatalogProcessedSever : UMars_AutoTestRig_Craw
         {
             const auto Admission = _Crawler.Get_AttackAdmission();
             const auto Result = _Crawler.Get_AttackResult();
-            const auto Action = _Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).Action;
+            const auto Action = _Crawler.Get_AttackAction();
             const FString NativeState = ck::IsValid(Action) ? f"{Action.Get_State() :n}" : "Absent";
-            auto Details = f"[CatalogBoundaryDiagnostic] boundary {_Boundary :n}, fired {Evidence.Fired}/{Evidence.Frame}, candidate at fired {Evidence.CandidatePending}, candidate now {_Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Candidate.IsSet()}, phase {_Crawler.Get_AttackPhase() :n}, reject {Get_LastRejectText()}, cancel {Get_LastCancelText()}, action {Admission.ActionIdentity.Get_Value()}/{NativeState}, accepted {Admission.Accepted}, issued damage {utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler)}, native terminal {Result.Native.Get_Outcome() :n}/{Result.Native.Get_Reason()}, observed {Result.Evidence.Observed}/{Result.Evidence.Source}/{Result.Evidence.Failure}; {Get_CrawlerDiagnostics()}";
+            auto Details = f"[CatalogBoundaryDiagnostic] boundary {_Boundary :n}, fired {Evidence.Fired}/{Evidence.Frame}, candidate at fired {Evidence.CandidatePending}, candidate now {_Crawler.Get_AttackCandidatePending()}, phase {_Crawler.Get_AttackPhase() :n}, reject {Get_LastRejectText()}, cancel {Get_LastCancelText()}, action {Admission.ActionIdentity.Get_Value()}/{NativeState}, accepted {Admission.Accepted}, issued damage {_Crawler.Get_IssuedDamageRequests()}, native terminal {Result.Native.Get_Outcome() :n}/{Result.Native.Get_Reason()}, observed {Result.Evidence.Observed}/{Result.Evidence.Source}/{Result.Evidence.Failure}; {Get_CrawlerDiagnostics()}";
             const auto Fresh = utils_crawler::Evaluate_AttackLoadout(_Crawler, _Target.Entity);
             Details = f"{Details}; current advice {utils_crawler::Get_AttackDecisionSignature(Fresh)}";
             for (const auto& Evaluation : Fresh.Evaluations)
             {
                 Details = f"{Details}; {Evaluation.AttackId} {Evaluation.Availability :n}";
                 for (const auto& Blocker : Evaluation.Blockers)
-                { Details = f"{Details} [{Blocker.Code} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
+                { Details = f"{Details} [{Blocker.Code :n} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
             }
             Log(Details);
             // The current advice may have recovered by this poll. Preserve the kernel's copied rejection-time facts.
@@ -102,7 +102,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogProcessedSever : UMars_AutoTestRig_Craw
                 {
                     Rejected = f"{Rejected}; {Evaluation.AttackId} {Evaluation.Availability :n}";
                     for (const auto& Blocker : Evaluation.Blockers)
-                    { Rejected = f"{Rejected} [{Blocker.Code} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
+                    { Rejected = f"{Rejected} [{Blocker.Code :n} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
                 }
                 Log(Rejected);
             }
@@ -130,7 +130,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogProcessedSever : UMars_AutoTestRig_Craw
             Assert_True(Evidence.CandidatePending, "the sever exercise had a real candidate waiting for commit");
             Assert_Equals_Int(_DamageAtProcessed, 0, "the severed candidate never issued its damage request");
         }
-        Assert_Equals_Int(utils_mars_test_catalog::Get_IssuedDamageRequests(_Crawler), _DamageAtProcessed,
+        Assert_Equals_Int(_Crawler.Get_IssuedDamageRequests(), _DamageAtProcessed,
             "zero additional issued damage requests follow processed required-part invalidation, including pending dealer requests");
         Assert_True(_CatalogResults.Num() == 1 && _CatalogResults[0].AttackId == GameplayTags::Attack_Mars_Pincer && _CatalogResults[0].Accepted,
             "one accepted pincer terminates without replacing its committed identity");
@@ -141,8 +141,7 @@ class UMars_AutoTest_CrawlerMelee_CatalogProcessedSever : UMars_AutoTestRig_Craw
         Assert_True(Result.Native.Get_Recovery() != ECk_ProceduralAction_Recovery::Pending,
             "the result exposes a terminal native managed recovery outcome");
         Log(f"[CatalogProcessedSever] boundary {_Boundary :n}, managed {Result.Native.Get_Outcome() :n}/{Result.Native.Get_Recovery() :n} [{Result.Native.Get_Reason()}], game cleanup [{Result.CleanupOutcome}], survivor Default/Planted/Operational");
-        Assert_True(_Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack).WindowClosed &&
-            _Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Candidate.IsSet() == false,
+        Assert_True(_Crawler.Get_AttackWindowClosed() && _Crawler.Get_AttackCandidatePending() == false,
             "processed invalidation closes damage and discards candidate evidence");
     }
 

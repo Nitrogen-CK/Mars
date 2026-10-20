@@ -1,5 +1,5 @@
 // The production strike path end to end: an attacker (team One, a DamageDealer) swings at a roaming 4-leg crawler's
-// leg 0 with utils_damage_dealer::Try_StrikeSweep - the same helper the player's Strike task calls (sphere 25, reach
+// leg 0 with the dealer's Request_StrikeSweep - the same helper the player's Strike task calls (sphere 25, reach
 // 180, Probe.Mars.HitZone, Blocking, Silent) - as 20 Sever events from Make_Event. Each swing starts 150 uu outside the
 // leg along the body -> foot direction and sweeps inward through its lower segment; the hit is a probe whose zone is
 // leg 0's. Nothing touches a Health directly: dealer -> zone -> part ledger + spill -> Health -> depletion -> sever.
@@ -137,7 +137,7 @@ class UMars_AutoTest_Crawler_StrikeSeversLegEndToEnd : UMars_AutoTestRig_Crawler
         _LastSwingAt = Now;
 
         const auto Sweep = Make_SwingAtLeg0();
-        const auto Result = utils_damage_dealer::Try_StrikeSweep(_Dealer, Sweep, Make_Swing20Sever());
+        const auto Result = _Dealer.Request_StrikeSweep(Sweep, Make_Swing20Sever());
         if (Result.Get_HitKind() != ECk_ProbeTrace_HitKind::Probe || ck::Is_NOT_Valid(Result.Get_HitEntity()))
         {
             ck::Trace(f"[StrikeE2E] swing [{_Swings}] from [{Sweep.Start.ToString()}] to [{Sweep.End.ToString()}] missed");

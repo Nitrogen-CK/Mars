@@ -1,6 +1,3 @@
-// The Devour feature's public surface: the composer, the request writers, the getters and the signal binds. The Do*
-// functions are the two transitions its processors share; nothing else calls them.
-
 namespace utils_devour
 {
     // A spec that fails Validate() ensures and adds nothing.
@@ -11,8 +8,7 @@ namespace utils_devour
         { return FCk_Handle_Devour(); }
 
         auto Params = FMars_Fragment_Devour_Params();
-        Params.Timing = InSpec.Timing;
-        Params.View = InSpec.View;
+        Params.Spec = InSpec;
 
         InHandle.Add_Fragment(FMars_Feature_Devour());
         InHandle.Add_Fragment(Params);
@@ -21,44 +17,14 @@ namespace utils_devour
         return InHandle.As_Devour();
     }
 
-    // The devourer holding InVictim; invalid when nothing holds it.
+    // The devourer holding InVictim; invalid when nothing holds it, or when the devourer that held it is gone (a devourer
+    // destroyed mid-run never releases its victim's marker).
     FCk_Handle_Devour TryGet_Devourer(const FCk_Handle& InVictim)
     {
         if (ck::Is_NOT_Valid(InVictim) || InVictim.Has_Fragment(FMars_Fragment_Devour_Victim) == false)
         { return FCk_Handle_Devour(); }
 
         return InVictim.Get_Fragment(FMars_Fragment_Devour_Victim).Devourer;
-    }
-
-    // Processor-only: takes InVictim and enters Seize. The caller broadcasts.
-    void DoSeize(FCk_Handle_Devour& InDevour, FMars_Fragment_Devour& InState, FCk_Handle InVictim)
-    {
-        auto Marker = FMars_Fragment_Devour_Victim();
-        Marker.Devourer = InDevour;
-
-        // A by-value handle is read-only; the copy is the same entity.
-        auto Victim = InVictim;
-        Victim.Add_Fragment(Marker);
-
-        InState.Victim = Victim;
-        InState.Phase = EMars_Devour_Phase::Seize;
-        InState.PhaseSeconds = 0.0f;
-        InDevour.Add_Fragment(FMars_Tag_Devour_Running());
-    }
-
-    // Processor-only: lets the victim go and returns to Idle. Returns the victim that was held (it may be invalid). The
-    // caller broadcasts.
-    FCk_Handle DoRelease(FCk_Handle_Devour& InDevour, FMars_Fragment_Devour& InState)
-    {
-        auto Victim = InState.Victim;
-        if (ck::IsValid(Victim) && Victim.Has_Fragment(FMars_Fragment_Devour_Victim))
-        { Victim.Request_TryRemove(FMars_Fragment_Devour_Victim); }
-
-        InState.Victim = FCk_Handle();
-        InState.Phase = EMars_Devour_Phase::Idle;
-        InState.PhaseSeconds = 0.0f;
-        InDevour.Request_TryRemove(FMars_Tag_Devour_Running);
-        return Victim;
     }
 }
 
@@ -78,7 +44,7 @@ mixin bool Get_IsActive(const FCk_Handle_Devour& Self)
 }
 
 // Whether a Begin for InVictim would be taken now: nobody is held, and the victim is valid, is not the devourer itself
-// and is not already held.
+// and is not held by a live devourer.
 mixin bool Get_CanSeize(const FCk_Handle_Devour& Self, const FCk_Handle& InVictim)
 {
     if (Self.Get_IsActive() || ck::Is_NOT_Valid(InVictim))
@@ -87,7 +53,7 @@ mixin bool Get_CanSeize(const FCk_Handle_Devour& Self, const FCk_Handle& InVicti
     if (InVictim == Self.H())
     { return false; }
 
-    return InVictim.Has_Fragment(FMars_Fragment_Devour_Victim) == false;
+    return ck::Is_NOT_Valid(utils_devour::TryGet_Devourer(InVictim));
 }
 
 // Invalid while Idle.
@@ -112,15 +78,20 @@ mixin float32 Get_PhaseAlpha(const FCk_Handle_Devour& Self)
     return Math::Clamp(State.PhaseSeconds / Seconds, 0.0f, 1.0f);
 }
 
+mixin FMars_Devour_Spec Get_Spec(const FCk_Handle_Devour& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_Devour_Params).Spec;
+}
+
 mixin FMars_Devour_Timing Get_Timing(const FCk_Handle_Devour& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Devour_Params).Timing;
+    return Self.Get_Fragment(FMars_Fragment_Devour_Params).Spec.Timing;
 }
 
 // The node a held victim's view is given to; invalid when the spec named none.
 mixin FCk_Handle_Transform Get_View(const FCk_Handle_Devour& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Devour_Params).View;
+    return Self.Get_Fragment(FMars_Fragment_Devour_Params).Spec.View;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -133,10 +104,10 @@ mixin void Request_Begin(FCk_Handle_Devour& Self, const FMars_Request_Devour_Beg
     Requests.BeginRequests.Add(InRequest);
 }
 
-mixin void Request_Cancel(FCk_Handle_Devour& Self)
+mixin void Request_Cancel(FCk_Handle_Devour& Self, const FMars_Request_Devour_Cancel& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Devour_Requests);
-    Requests.CancelRequests.Add(FMars_Request_Devour_Cancel());
+    Requests.CancelRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

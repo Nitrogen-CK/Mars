@@ -8,6 +8,14 @@ enum EMars_Crawler_AttackPreset
     Spider6
 }
 
+// Which reference graph a loadout, definition or clip belongs to: the parity graph or the endpoint demo. Its name is the
+// graph's part of the asset name.
+enum EMars_AttackReference_Kind
+{
+    Parity,
+    EndpointDemo
+}
+
 namespace utils_crawler
 {
     const FString AttackReferenceFolder = "/Game/Mars/Gameplay/Monsters/Crawler/AttackCatalog";
@@ -97,19 +105,19 @@ namespace utils_crawler
     FString Get_AttackReferenceObjectPath(FString InFolder, FString InName)
     { return f"{InFolder}/{InName}.{InName}"; }
 
-    FString Get_AttackReferenceLoadoutPath(EMars_Crawler_AttackPreset InPreset, bool InEndpointDemo = false)
+    FString Get_AttackReferenceLoadoutPath(EMars_Crawler_AttackPreset InPreset, EMars_AttackReference_Kind InKind)
     {
-        const auto Kind = InEndpointDemo ? "EndpointDemo" : "Parity";
-        return Get_AttackReferenceObjectPath(AttackReferenceFolder, f"{InPreset :n}_{Kind}Loadout_Mars_DA");
+        return Get_AttackReferenceObjectPath(AttackReferenceFolder, f"{InPreset :n}_{InKind :n}Loadout_Mars_DA");
     }
 
-    TSoftObjectPtr<UMars_AttackLoadout_Data> Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset InPreset, bool InEndpointDemo = false)
-    { return TSoftObjectPtr<UMars_AttackLoadout_Data>(FSoftObjectPath(Get_AttackReferenceLoadoutPath(InPreset, InEndpointDemo))); }
-
-    FString Get_AttackReferenceDefinitionPath(EMars_Crawler_AttackPreset InPreset, bool InEndpointDemo, FGameplayTag InAttackId)
+    TSoftObjectPtr<UMars_AttackLoadout_Data> Get_AttackReferenceLoadout(EMars_Crawler_AttackPreset InPreset, EMars_AttackReference_Kind InKind)
     {
-        const auto Kind = InEndpointDemo ? "EndpointDemo" : "Parity";
-        return Get_AttackReferenceObjectPath(AttackReferenceFolder, f"{InPreset :n}_{Kind}_{Get_AttackReferenceName(InAttackId)}_Mars_DA");
+        return TSoftObjectPtr<UMars_AttackLoadout_Data>(FSoftObjectPath(Get_AttackReferenceLoadoutPath(InPreset, InKind)));
+    }
+
+    FString Get_AttackReferenceDefinitionPath(EMars_Crawler_AttackPreset InPreset, EMars_AttackReference_Kind InKind, FGameplayTag InAttackId)
+    {
+        return Get_AttackReferenceObjectPath(AttackReferenceFolder, f"{InPreset :n}_{InKind :n}_{Get_AttackReferenceName(InAttackId)}_Mars_DA");
     }
 
     FString Get_AttackReferenceEndpointClipPath(EMars_Crawler_AttackPreset InPreset, FGameplayTag InAttackId)
@@ -122,5 +130,74 @@ namespace utils_crawler
     {
         const auto Prefix = InPreset == EMars_Crawler_AttackPreset::Spider6 ? "Spider" : "Crawler";
         return Get_AttackReferenceObjectPath(AttackReferenceActionsFolder, f"{Prefix}_{Get_AttackReferenceName(InAttackId)}_Mars_DA");
+    }
+}
+
+// The reference loadouts' execution policy from a reference spec. Runtime-compiled (not under Script/Editor, which is
+// editor-only): the editor seeder and the catalog test fixtures both build it.
+namespace utils_crawler
+{
+    // A pincer lifting both claws keeps at least this many enabled legs on the ground.
+    const int32 PincerMinStandingLegs = 2;
+
+    // How long the gait may take to step a released claw back onto the ground before the leg is given up as unplanted.
+    const float32 PincerReturnTimeoutSeconds = 3.0f;
+
+    // The reference loadouts' action tuning, from InSpec's reference defaults (its retired Hit and Timing). Sampling: the
+    // body keeps its travel guard (no accepted sample moves it further than MaxSampleTravel); a pincer's claws travel the
+    // chain's reach, so with a pincer clip the guard is raised to twice the front leg's reach (a hitch can pose a whole
+    // phase in one sample). Transition: no entry blend (the windup starts at admission, from the identity offset and the
+    // claws' own feet), CancelSeconds as the dedicated return a cancel eases back through, and a return timeout no
+    // shorter than that return, nor than the time the gait gets to step a released claw back down.
+    FCk_ProceduralAction_Tuning Make_AttackTuning(const FMars_Crawler_Spec& InSpec)
+    {
+        const auto& Combat = InSpec.Combat;
+        const auto HasPincer = ck::IsValid(Combat.PincerClip.Get());
+        auto Tuning = FCk_ProceduralAction_Tuning();
+
+        auto Sampling = Tuning.Get_Sampling();
+        Sampling.Set_MaxEndpointTravelCm(Combat.Hit.MaxSampleTravel);
+        Sampling.Set_MaxSegmentAngularStepDegrees(180.0f);
+        if (HasPincer)
+        {
+            const TArray<FCk_ProceduralLeg_Spec> Legs = InSpec.Get_RigData().Get_Legs();
+            Sampling.Set_MaxEndpointTravelCm(Math::Max(Combat.Hit.MaxSampleTravel, 2.0f * Get_ChainReach(Legs[0])));
+        }
+
+        Tuning.Set_Sampling(Sampling);
+
+        auto Transition = Tuning.Get_Transition();
+        const auto CancelReturn = float64(Combat.Timing.CancelSeconds);
+        Transition.Set_EntryBlend(FCk_Time(0.0));
+        Transition.Set_DedicatedReturn(FCk_Time(CancelReturn));
+        auto ReturnTimeout = Math::Max(Transition.Get_ReturnTimeout().Get_Seconds(), CancelReturn);
+        if (HasPincer)
+        { ReturnTimeout = Math::Max(ReturnTimeout, float64(PincerReturnTimeoutSeconds)); }
+
+        Transition.Set_ReturnTimeout(FCk_Time(ReturnTimeout));
+        Tuning.Set_Transition(Transition);
+        return Tuning;
+    }
+
+    // How a pincer borrows the front legs (the borrowing player's terms; a walking preview of the clip copies them): the
+    // player counts the legs left standing and lets them wait out the whole pincer clip and a cancel's return before a
+    // step the count forbids interrupts it, and hands a claw back to the gait as a real step from wherever the action left
+    // it (the windup key, when a cancel lands in the air) to where the gait wants the foot, within the attack tuning's
+    // sampling budget and PincerReturnTimeoutSeconds. Needs InSpec's PincerClip loaded.
+    FCk_ProceduralLimbControl_Locomotion Make_PincerLocomotion(const FMars_Crawler_Spec& InSpec)
+    {
+        const auto& Combat = InSpec.Combat;
+        const auto CancelSeconds = float64(Combat.Timing.CancelSeconds);
+        auto Support = FCk_ProceduralLimbControl_Support(ECk_ProceduralLimbControl_SupportMode::CountOnly, PincerMinStandingLegs);
+        Support.Set_SupportHoldTimeout(FCk_Time(Get_ClipSeconds(Combat.PincerClip.Get()) + CancelSeconds));
+
+        auto Return = FCk_ProceduralLimbControl_Return();
+        Return.Set_Duration(FCk_Time(CancelSeconds));
+        Return.Set_Timeout(FCk_Time(float64(PincerReturnTimeoutSeconds)));
+
+        auto Locomotion = FCk_ProceduralLimbControl_Locomotion();
+        Locomotion.Set_Support(Support);
+        Locomotion.Set_Return(Return);
+        return Locomotion;
     }
 }

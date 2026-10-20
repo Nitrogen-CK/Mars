@@ -59,7 +59,6 @@ class UMars_Processor_DamageDealer_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto& State = InDealer.Get_Fragment(FMars_Fragment_DamageDealer);
         ++State.HitsDealt;
-        State.LastDealt = Event;
 
         if (InDealer.Has_Fragment(FMars_Fragment_DamageDealer_Signals))
         { InDealer.Get_Fragment(FMars_Fragment_DamageDealer_Signals).OnDamageDealt.Broadcast(InDealer, Zone, Event); }

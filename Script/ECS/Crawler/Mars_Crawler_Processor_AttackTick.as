@@ -1,3 +1,19 @@
+namespace utils_crawler
+{
+    // An attack clock that counts down (reuse, global recovery) after InDeltaSeconds: never below 0, and unmoved by a zero
+    // or negative delta.
+    float32 Get_CountdownAfter(float32 InRemaining, float32 InDeltaSeconds)
+    {
+        return Math::Max(InRemaining - Math::Max(InDeltaSeconds, 0.0f), 0.0f);
+    }
+
+    // An attack clock that counts up (the readiness wait, cleanup) after InDeltaSeconds: unmoved by a zero or negative delta.
+    float32 Get_CountupAfter(float32 InElapsed, float32 InDeltaSeconds)
+    {
+        return InElapsed + Math::Max(InDeltaSeconds, 0.0f);
+    }
+}
+
 // One phase change, broadcast once the tick has written everything.
 struct FMars_Crawler_AttackPhaseChange
 {
@@ -10,7 +26,7 @@ struct FMars_Crawler_AttackPhaseChange
 //   1. cancellation: the queued cancel, then the resolver's displacement and obstruction, then the direct guards (Dead,
 //      Hurt, Crippled, TargetLost, PoseFailed, Unsupported); the first reason wins. An offensive phase (Windup, Strike,
 //      Recover) drops its candidate, bumps the generation, closes the damage window and cancels the action, whose
-//      dedicated return eases the body back (and whose limb return hands a pincer's claws back to the gait) while the
+//      dedicated return eases the body back (and whose limb return hands claimed legs back to the gait) while the
 //      attack waits in CancelRecover; Dead, PoseFailed and Disabled go straight to Cooldown. A cancel during
 //      CancelRecover or Cooldown changes nothing but LastCancel, except a failed or lost action in CancelRecover, which
 //      ends the wait;
@@ -18,12 +34,12 @@ struct FMars_Crawler_AttackPhaseChange
 //      and unhurt since admission, becomes the attack's one damage request;
 //   3. accepted phase: each posed phase an accepted interval reached since the last tick is entered in order (a hitch
 //      never skips one), and Recover ends in Cooldown once the accepted motion closed the Offense window;
-//   4. admission of a queued start (from Idle only; anything else records the reason in LastReject): the clip is built
-//      for this attack's claws and played;
+//   4. admission of a queued start (from Idle only; anything else records the reason in LastReject): the plan's clip is
+//      played with its slots bound to the claimed limbs;
 //   5. settling: CancelRecover ends in Cooldown on the action's terminal record; Cooldown counts down and returns to Idle
 //      once the player has released the action whose terminal record the resolver acknowledged.
-// Existing accepted receipts establish admission/costs before cancellation, even at zero DeltaT. No readiness,
-// reuse, global recovery or autonomous-cleanup clock advances without positive time.
+// Existing accepted receipts establish admission and its costs before cancellation, even at zero DeltaT. No readiness,
+// reuse, global recovery or cleanup clock advances without positive time.
 class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -60,17 +76,21 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         if (Self.Has_Fragment(FMars_Fragment_Crawler_Signals) == false)
         { return; }
 
+        auto& Signals = Self.Get_Fragment(FMars_Fragment_Crawler_Signals);
         const auto Decision = Self.Get_AttackDecision();
         const auto Admission = Self.Get_AttackAdmission();
         const auto Result = Self.Get_AttackResult();
         if (Decision.Signature != OldDecision.Signature || Decision.LastReason != OldDecision.LastReason)
-        { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackDecisionChanged.Broadcast(Self, Decision); }
+        { Signals.OnAttackDecisionChanged.Broadcast(Self, Decision); }
+
         if (Admission.Accepted && (OldAdmission.Accepted == false || Admission.ActionIdentity.Get_Value() != OldAdmission.ActionIdentity.Get_Value()))
-        { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackAdmitted.Broadcast(Self, Admission); }
+        { Signals.OnAttackAdmitted.Broadcast(Self, Admission); }
+
         if (Result.Completed && (OldResult.Completed == false || Result.ActionIdentity.Get_Value() != OldResult.ActionIdentity.Get_Value()))
-        { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackCompleted.Broadcast(Self, Result); }
+        { Signals.OnAttackCompleted.Broadcast(Self, Result); }
+
         for (const auto& Change : Changes)
-        { Self.Get_Fragment(FMars_Fragment_Crawler_Signals).OnAttackPhaseChanged.Broadcast(Self, Change.Old, Change.New); }
+        { Signals.OnAttackPhaseChanged.Broadcast(Self, Change.Old, Change.New); }
     }
 
     private void Tick(FCk_Handle_Crawler& InSelf, float32 InDeltaSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
@@ -83,17 +103,19 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Intents.PendingCancel.Reset();
         Intents.PendingPrepare.Reset();
         LatchAdmission(InSelf);
+
         auto& Selection = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackSelection);
-        if (CancelIntent.IsSet() || ((Selection.Preparation.Active || Selection.Preparation.TimedOut) &&
+        const auto Abandoned = PrepareIntent.IsSet() && PrepareIntent.GetValue().Preparation == ECk_EnableDisable::Disable;
+        if (CancelIntent.IsSet() || Abandoned || (Selection.Preparation.State != EMars_Attack_PreparationState::Idle &&
             (Selection.Preparation.TargetIdentity != utils_crawler::Get_AttackTargetIdentity(InSelf.Get_CombatTarget()) ||
                 Selection.Preparation.TargetGeneration != InSelf.Get_CombatTargetGeneration())))
         { Selection.Preparation = FMars_Attack_Preparation(); }
 
         const auto CancelReason = Find_CancelReason(InSelf, CancelIntent);
 
-        auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
-        Observations.Displaced.Reset();
-        Observations.Obstructed = false;
+        auto& Hit = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Hit;
+        Hit.Displaced.Reset();
+        Hit.Obstructed = false;
 
         if (CancelReason.IsSet())
         { ApplyCancel(InSelf, CancelReason.GetValue(), OutChanges); }
@@ -101,17 +123,23 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         // A zero-time tick advances no clock, but every intent it drained is still applied (a dropped request would
         // leave the HFSM waiting on a preparation that never started).
         for (auto& Reuse : Selection.Reuse)
-        { Reuse.Remaining = Math::Max(Reuse.Remaining - InDeltaSeconds, 0.0f); }
-        if (PrepareIntent.IsSet() && CancelIntent.IsSet() == false && InSelf.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle &&
+        { Reuse.Remaining = utils_crawler::Get_CountdownAfter(Reuse.Remaining, InDeltaSeconds); }
+
+        if (PrepareIntent.IsSet() && Abandoned == false && CancelIntent.IsSet() == false &&
+            InSelf.Get_AttackPhase() == EMars_Crawler_AttackPhase::Idle &&
             PrepareIntent.GetValue().Target == InSelf.Get_CombatTarget() && InSelf.Get_IsCombatTargetValid(PrepareIntent.GetValue().Target))
         {
             Selection.Preparation = FMars_Attack_Preparation();
-            Selection.Preparation.Active = true;
+            Selection.Preparation.State = EMars_Attack_PreparationState::Active;
             Selection.Preparation.TargetIdentity = utils_crawler::Get_AttackTargetIdentity(PrepareIntent.GetValue().Target);
             Selection.Preparation.TargetGeneration = InSelf.Get_CombatTargetGeneration();
         }
-        UpdateDecision(InSelf);
-        if (Selection.Preparation.Active && Selection.Decision.Evaluation.Selection.Preferred.IsSet() == false)
+
+        // Without a drained intent, the decision the last tick ended on still stands.
+        if (PrepareIntent.IsSet() || CancelIntent.IsSet() || StartIntent.IsSet())
+        { UpdateDecision(InSelf); }
+
+        if (Selection.Preparation.State == EMars_Attack_PreparationState::Active && Selection.Decision.Evaluation.Selection.Preferred.IsSet() == false)
         {
             Selection.Preparation = FMars_Attack_Preparation();
             auto Event = FMars_Attack_HistoryEntry();
@@ -119,33 +147,33 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
             Event.Reason = n"NoPreferred";
             RecordHistory(InSelf, Event);
         }
-        if (Selection.Preparation.Active)
+
+        if (Selection.Preparation.State == EMars_Attack_PreparationState::Active)
         {
-            if (Selection.Decision.Evaluation.Selection.Preferred.IsSet())
-            { Selection.Preparation.Preferred = Selection.Decision.Evaluation.Selection.Preferred.GetValue(); }
-            Selection.Preparation.ElapsedReadinessWait += Math::Max(InDeltaSeconds, 0.0f);
+            Selection.Preparation.Preferred = Selection.Decision.Evaluation.Selection.Preferred.GetValue();
+            Selection.Preparation.ElapsedReadinessWait = utils_crawler::Get_CountupAfter(Selection.Preparation.ElapsedReadinessWait, InDeltaSeconds);
             const auto Preferred = utils_crawler::Find_ResolvedAttack(InSelf.Get_Spec().ResolvedAttacks, Selection.Preparation.Preferred);
             if (Preferred.IsSet() && Selection.Preparation.ElapsedReadinessWait >= Preferred.GetValue().Definition.Prepare.TimeoutSeconds)
             {
-                Selection.Preparation.TimedOut = true;
-                Selection.Preparation.Active = false;
+                Selection.Preparation.State = EMars_Attack_PreparationState::TimedOut;
                 auto Event = FMars_Attack_HistoryEntry();
                 Event.Event = n"PreparationTimedOut";
                 Event.AttackId = Selection.Preparation.Preferred;
                 Event.Reason = n"PrepareTimeout";
                 RecordHistory(InSelf, Event);
             }
+
             UpdateDecision(InSelf);
         }
+
         CommitCandidate(InSelf);
 
         FollowAcceptedPhase(InSelf, OutChanges);
 
         if (StartIntent.IsSet())
         {
-            auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
             if (CancelIntent.IsSet())
-            { Attack.LastReject = TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::CancelPending); }
+            { InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).Diagnostics.LastReject = TOptional<EMars_Crawler_AttackReject>(EMars_Crawler_AttackReject::CancelPending); }
             else
             { Admit(InSelf, StartIntent.GetValue(), OutChanges); }
         }
@@ -162,9 +190,10 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Entry.Context.SelectionGeneration = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Generation;
         Entry.Context.TargetGeneration = InSelf.Get_CombatTargetGeneration();
         Entry.Context.Evaluation = InSelf.Get_AttackEvaluation();
-        Entry.Sequence = ++Ledger.EventSequence;
+        ++Ledger.EventSequence;
+        Entry.Sequence = Ledger.EventSequence;
         Ledger.History.Add(Entry);
-        if (Ledger.History.Num() > 16)
+        if (Ledger.History.Num() > constants_crawler::k_AttackHistoryCap)
         { Ledger.History.RemoveAt(0); }
     }
 
@@ -179,6 +208,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         // selection, never with an unrelated entry's blocker (a reuse clock expiring elsewhere is not a stale choice).
         if (SelectionSignature != State.Decision.SelectionSignature)
         { ++State.Generation; }
+
         Evaluation.SelectionGeneration = State.Generation;
         State.Decision.Evaluation = Evaluation;
         State.Decision.Signature = Signature;
@@ -192,14 +222,16 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         }
     }
 
+    // Folds the resolver's stream evidence into the attack: the first accepted receipt of this action admits it (and
+    // spends its reuse), a terminal record is its native result, and a window the resolver closed stays closed.
     private void LatchAdmission(FCk_Handle_Crawler& InSelf)
     {
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
-        if (Observations.FirstAccepted.IsSet() && Attack.Admission.Accepted == false)
+        auto& Stream = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Stream;
+        if (Stream.FirstAccepted.IsSet() && Attack.Admission.Accepted == false)
         {
-            const auto Stamp = Observations.FirstAccepted.GetValue();
-            if (Stamp.Get_Identity().Get_Value() == Attack.ActionIdentity.Get_Value())
+            const auto Stamp = Stream.FirstAccepted.GetValue();
+            if (Stamp.Get_Identity().Get_Value() == Attack.Stream.Identity.Get_Value())
             {
                 Attack.Admission.Accepted = true;
                 Attack.Admission.SampleId = Stamp.Get_SampleSequence();
@@ -214,24 +246,30 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
                         Reuse.LastStartSequence = Selection.Ledger.StartSequence;
                     }
                 }
+
                 auto Event = FMars_Attack_HistoryEntry();
                 Event.Event = n"Admitted";
                 Event.AttackId = Attack.Plan.Entry.Identity.Id;
-                Event.ActionIdentity = Attack.ActionIdentity;
+                Event.ActionIdentity = Attack.Stream.Identity;
                 RecordHistory(InSelf, Event);
             }
         }
-        Observations.FirstAccepted.Reset();
-        if (Observations.Terminal.IsSet())
+
+        Stream.FirstAccepted.Reset();
+        if (Stream.Terminal.IsSet())
         {
             Attack.Result.Evidence.Observed = true;
-            Attack.Result.Evidence.Source = Observations.TerminalSource;
-            Attack.Result.Native = Observations.Terminal.GetValue();
-            Attack.LastActionOutcome = Attack.Result.Native.Get_Outcome();
-            Attack.LastActionReason = Attack.Result.Native.Get_Reason();
+            Attack.Result.Evidence.Source = Stream.TerminalSource;
+            Attack.Result.Native = Stream.Terminal.GetValue();
+            Attack.Diagnostics.LastActionOutcome = Attack.Result.Native.Get_Outcome();
+            Attack.Diagnostics.LastActionReason = Attack.Result.Native.Get_Reason();
         }
-        if (Observations.StreamFailure.IsNone() == false)
-        { Attack.Result.Evidence.Failure = Observations.StreamFailure; }
+
+        if (Stream.Failure.IsNone() == false)
+        { Attack.Result.Evidence.Failure = Stream.Failure; }
+
+        if (Stream.WindowClosed)
+        { Attack.WindowClosed = true; }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -249,30 +287,30 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
         if (utils_crawler::Get_IsOffensivePhase(Attack.Phase))
         {
-            if (Observations.Displaced.IsSet())
-            { return Observations.Displaced; }
+            if (Observations.Hit.Displaced.IsSet())
+            { return Observations.Hit.Displaced; }
 
-            if (Observations.Obstructed)
+            if (Observations.Hit.Obstructed)
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::Obstructed); }
 
             if (InSelf.Get_IsCombatDead())
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::Dead); }
 
-            if (InSelf.Get_HurtCount() != Attack.HurtCountAtStart)
+            if (InSelf.Get_HurtCount() != Attack.Start.HurtCount)
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::Hurt); }
 
-            if (utils_crawler::Evaluate_AttackContinuation(InSelf).Num() > 0 || Observations.RequiredPartFailures.Num() > 0)
+            if (utils_crawler::Evaluate_AttackContinuation(InSelf).Num() > 0 || Observations.Hit.RequiredPartFailures.Num() > 0)
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::RequiredPartUnavailable); }
 
             if (utils_procedural_gait::Get_EnabledLegCount(InSelf.Get_Gait()) < Spec.MinLegsToWalk)
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::Crippled); }
 
-            if (InSelf.Get_IsCombatTargetValid(Attack.Target) == false)
+            if (InSelf.Get_IsCombatTargetValid(Attack.Start.Target) == false)
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::TargetLost); }
 
             if (utils_procedural_body_pose::Get_Status(InSelf.Get_BodyPose()) == ECk_ProceduralAnimation_Status::Failed ||
-                Observations.ActionStreamFailed || utils_crawler::Get_IsAttackActionLost(InSelf) ||
-                Get_HasActionStoppedOnItsOwn(Attack))
+                Observations.Stream.Failed || utils_crawler::Get_IsAttackActionLost(InSelf) ||
+                Get_HasActionStoppedOnItsOwn(Attack.Stream))
             { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::PoseFailed); }
 
             if (InSelf.Get_SupportRejection().IsSet())
@@ -281,7 +319,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
         // The return cannot be waited for once the action's stream has failed or the action is gone.
         if (Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover &&
-            (Observations.ActionStreamFailed || utils_crawler::Get_IsAttackActionLost(InSelf)))
+            (Observations.Stream.Failed || utils_crawler::Get_IsAttackActionLost(InSelf)))
         { return TOptional<EMars_Crawler_AttackCancel>(EMars_Crawler_AttackCancel::PoseFailed); }
 
         return TOptional<EMars_Crawler_AttackCancel>();
@@ -289,17 +327,17 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
     // The library interrupted the clip (support loss, a rejected pose, a watchdog) or finished it short of completion. A
     // completed clip returns to neutral on its own; the accepted Offense exit ends its offense instead.
-    private bool Get_HasActionStoppedOnItsOwn(const FMars_Fragment_Crawler_Attack& InAttack) const
+    private bool Get_HasActionStoppedOnItsOwn(const FMars_Crawler_AttackStream& InStream) const
     {
-        if (ck::Is_NOT_Valid(InAttack.Action) || InAttack.CancelRequested)
+        if (ck::Is_NOT_Valid(InStream.Action) || InStream.CancelRequested)
         { return false; }
 
-        const auto State = InAttack.Action.Get_State();
+        const auto State = InStream.Action.Get_State();
         if (State == ECk_ProceduralAction_State::Cancelling)
         { return true; }
 
         return State == ECk_ProceduralAction_State::Finished &&
-            InAttack.Action.Get_Result().Get_Outcome() != ECk_ProceduralAction_Outcome::Completed;
+            InStream.Action.Get_Result().Get_Outcome() != ECk_ProceduralAction_Outcome::Completed;
     }
 
     private void ApplyCancel(FCk_Handle_Crawler& InSelf, EMars_Crawler_AttackCancel InReason, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
@@ -309,35 +347,37 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         if (Phase == EMars_Crawler_AttackPhase::Idle)
         { return; }
 
-        Attack.LastCancel = TOptional<EMars_Crawler_AttackCancel>(InReason);
+        Attack.Diagnostics.LastCancel = TOptional<EMars_Crawler_AttackCancel>(InReason);
         if (Attack.Result.RequiredPartFailures.Num() == 0)
         {
-            const auto ObservedFailures = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).RequiredPartFailures;
+            const auto ObservedFailures = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Hit.RequiredPartFailures;
             Attack.Result.RequiredPartFailures = ObservedFailures.Num() > 0 ? ObservedFailures : utils_crawler::Evaluate_AttackContinuation(InSelf);
         }
+
         InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Preparation = FMars_Attack_Preparation();
-        auto CancelEvent = FMars_Attack_HistoryEntry();
-        CancelEvent.Event = n"Cancelled";
-        CancelEvent.AttackId = Attack.Plan.Entry.Identity.Id;
-        CancelEvent.ActionIdentity = Attack.ActionIdentity;
-        CancelEvent.Reason = FName(f"{InReason :n}");
-        if (utils_crawler::Get_IsOffensivePhase(Phase))
-        { RecordHistory(InSelf, CancelEvent); }
-        if (InReason == EMars_Crawler_AttackCancel::PoseFailed && ck::IsValid(Attack.Action))
+        if (InReason == EMars_Crawler_AttackCancel::PoseFailed && ck::IsValid(Attack.Stream.Action))
         {
-            const auto Result = Attack.Action.Get_Result();
-            Attack.LastActionOutcome = Result.Get_Outcome();
-            Attack.LastActionReason = Result.Get_Reason();
+            const auto Result = Attack.Stream.Action.Get_Result();
+            Attack.Diagnostics.LastActionOutcome = Result.Get_Outcome();
+            Attack.Diagnostics.LastActionReason = Result.Get_Reason();
         }
 
         if (utils_crawler::Get_IsOffensivePhase(Phase))
         {
-            InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Candidate.Reset();
+            auto CancelEvent = FMars_Attack_HistoryEntry();
+            CancelEvent.Event = n"Cancelled";
+            CancelEvent.AttackId = Attack.Plan.Entry.Identity.Id;
+            CancelEvent.ActionIdentity = Attack.Stream.Identity;
+            CancelEvent.Reason = FName(f"{InReason :n}");
+            RecordHistory(InSelf, CancelEvent);
+
+            InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Hit.Candidate.Reset();
             if (Attack.Admission.Accepted)
             { Attack.CueInterrupted = true; }
+
             ++Attack.Generation;
             Attack.WindowClosed = true;
-            utils_crawler::Cancel_AttackAction(InSelf);
+            CancelAction(InSelf);
 
             const auto SkipsRecovery = InReason == EMars_Crawler_AttackCancel::Dead || InReason == EMars_Crawler_AttackCancel::PoseFailed ||
                 InReason == EMars_Crawler_AttackCancel::Disabled;
@@ -353,9 +393,21 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
         if (Phase == EMars_Crawler_AttackPhase::CancelRecover && InReason == EMars_Crawler_AttackCancel::PoseFailed)
         {
-            utils_crawler::Cancel_AttackAction(InSelf);
+            CancelAction(InSelf);
             EnterCooldown(InSelf, GetRecoverySeconds(InSelf), OutChanges);
         }
+    }
+
+    // Once per attack; the action's own return owns neutralization from wherever the body and the claimed limbs are.
+    private void CancelAction(FCk_Handle_Crawler& InSelf)
+    {
+        auto& Stream = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).Stream;
+        if (Stream.CancelRequested || utils_crawler::Get_IsAttackActionLost(InSelf) || ck::Is_NOT_Valid(Stream.Action) ||
+            Stream.Action.Get_State() == ECk_ProceduralAction_State::Finished)
+        { return; }
+
+        Stream.CancelRequested = true;
+        Stream.Action.Request_Cancel(FCk_Request_ProceduralAction_Cancel());
     }
 
     private void EnterCooldown(FCk_Handle_Crawler& InSelf, float32 InCooldownSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
@@ -371,21 +423,21 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
     private void CommitCandidate(FCk_Handle_Crawler& InSelf)
     {
-        auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
-        if (Observations.Candidate.IsSet() == false)
+        auto& Hit = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Hit;
+        if (Hit.Candidate.IsSet() == false)
         { return; }
 
-        const auto Candidate = Observations.Candidate.GetValue();
-        Observations.Candidate.Reset();
+        const auto Candidate = Hit.Candidate.GetValue();
+        Hit.Candidate.Reset();
 
         if (Get_IsCommittable(InSelf, Candidate) == false)
         { return; }
 
-        const auto Hit = InSelf.Get_AttackPlan().Entry.Definition.Hit;
+        const auto Definition = InSelf.Get_AttackPlan().Entry.Definition.Hit;
         auto Dealer = InSelf.Get_CombatDealer();
         FCk_Handle Root = InSelf;
 
-        auto Event = utils_damage_dealer::Make_Event(Dealer, Hit.Damage, Hit.DamageType);
+        auto Event = utils_damage_dealer::Make_Event(Dealer, Definition.Damage, Definition.DamageType);
         Event.Source.Instigator = Root;
         Event.Source.Causer = Root;
         Event.Hit.Location = Candidate.Location;
@@ -393,25 +445,25 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Event.Hit.Impulse = FVector::ZeroVector;
         Dealer.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(Candidate.HitEntity, Event));
 
-        auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        Attack.DamageCommitted = true;
-        Attack.CommittedSampleId = Candidate.SampleId;
-        Attack.CommittedEmitter = Candidate.EmitterContact;
+        auto& Ledger = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).Ledger;
+        Ledger.Committed = true;
+        Ledger.SampleId = Candidate.SampleId;
+        Ledger.Emitter = Candidate.EmitterContact;
     }
 
     private bool Get_IsCommittable(const FCk_Handle_Crawler& InSelf, const FMars_Crawler_HitCandidate& InCandidate)
     {
         const auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.DamageCommitted || InCandidate.Generation != Attack.Generation || InCandidate.Target != Attack.Target)
+        if (Attack.Ledger.Committed || InCandidate.Generation != Attack.Generation || InCandidate.Target != Attack.Start.Target)
         { return false; }
 
         if (ck::Is_NOT_Valid(InSelf.Get_CombatDealer()) || ck::Is_NOT_Valid(InCandidate.Zone) || InCandidate.Zone.Get_IsEnabled() == false)
         { return false; }
 
-        if (InSelf.Get_IsCombatTargetValid(Attack.Target) == false || InSelf.Get_IsCombatDead())
+        if (InSelf.Get_IsCombatTargetValid(Attack.Start.Target) == false || InSelf.Get_IsCombatDead())
         { return false; }
 
-        return Attack.Admission.Accepted && InSelf.Get_HurtCount() == Attack.HurtCountAtStart &&
+        return Attack.Admission.Accepted && InSelf.Get_HurtCount() == Attack.Start.HurtCount &&
             utils_crawler::Evaluate_AttackContinuation(InSelf).Num() == 0;
     }
 
@@ -421,13 +473,13 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
 
     private void FollowAcceptedPhase(FCk_Handle_Crawler& InSelf, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
-        const auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
+        const auto& Accepted = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Accepted;
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
 
-        while (utils_crawler::Get_IsOffensivePhase(Attack.Phase) && int32(Attack.Phase) < int32(Observations.AcceptedPhase))
+        while (utils_crawler::Get_IsOffensivePhase(Attack.Phase) && int32(Attack.Phase) < int32(Accepted.Phase))
         { Enter(Attack, EMars_Crawler_AttackPhase(int32(Attack.Phase) + 1), OutChanges); }
 
-        if (Attack.Phase == EMars_Crawler_AttackPhase::Recover && Observations.OffenseEnded)
+        if (Attack.Phase == EMars_Crawler_AttackPhase::Recover && Accepted.OffenseEnded)
         { EnterCooldown(InSelf, GetRecoverySeconds(InSelf), OutChanges); }
     }
 
@@ -438,11 +490,23 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
     private void Admit(FCk_Handle_Crawler& InSelf, const FMars_Request_Crawler_StartAttack& InRequest, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
         if (InSelf.Get_AttackPhase() != EMars_Crawler_AttackPhase::Idle)
-        { Reject(InSelf, EMars_Crawler_AttackReject::Busy); return; }
+        {
+            Reject(InSelf, EMars_Crawler_AttackReject::Busy);
+            return;
+        }
+
         if (InRequest.Target != InSelf.Get_CombatTarget() || InSelf.Get_IsCombatTargetValid(InRequest.Target) == false)
-        { Reject(InSelf, EMars_Crawler_AttackReject::TargetInvalid); return; }
+        {
+            Reject(InSelf, EMars_Crawler_AttackReject::TargetInvalid);
+            return;
+        }
+
         if (InSelf.Get_IsWarded(InRequest.Target))
-        { Reject(InSelf, EMars_Crawler_AttackReject::Warded); return; }
+        {
+            Reject(InSelf, EMars_Crawler_AttackReject::Warded);
+            return;
+        }
+
         const auto Advice = InSelf.Get_AttackEvaluation();
         auto Id = InRequest.AttackId;
         if (Id.IsValid() == false)
@@ -453,22 +517,40 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
                 Reject(InSelf, Rejection.IsSet() ? Rejection.GetValue() : EMars_Crawler_AttackReject::NotReady);
                 return;
             }
+
             Id = Advice.Selection.Selected.GetValue();
         }
         else
         {
             if (utils_crawler::Find_ResolvedAttack(InSelf.Get_Spec().ResolvedAttacks, Id).IsSet() == false)
-            { Reject(InSelf, EMars_Crawler_AttackReject::AttackUnknown); return; }
+            {
+                Reject(InSelf, EMars_Crawler_AttackReject::AttackUnknown);
+                return;
+            }
+
             if (InRequest.SelectionGeneration != Advice.SelectionGeneration)
-            { Reject(InSelf, EMars_Crawler_AttackReject::SelectionStale); return; }
+            {
+                Reject(InSelf, EMars_Crawler_AttackReject::SelectionStale);
+                return;
+            }
+
             if (Advice.Selection.Selected.IsSet() == false || Advice.Selection.Selected.GetValue() != Id)
-            { Reject(InSelf, EMars_Crawler_AttackReject::SelectionNotPermitted); return; }
+            {
+                Reject(InSelf, EMars_Crawler_AttackReject::SelectionNotPermitted);
+                return;
+            }
         }
+
         auto Ready = false;
         for (const auto& Evaluation : Advice.Evaluations)
         { Ready = Ready || (Evaluation.AttackId == Id && Evaluation.Availability == EMars_Attack_Availability::Ready); }
+
         if (Ready == false)
-        { Reject(InSelf, EMars_Crawler_AttackReject::NotReady); return; }
+        {
+            Reject(InSelf, EMars_Crawler_AttackReject::NotReady);
+            return;
+        }
+
         auto Plan = FMars_Attack_ResolvedPlan();
         Plan.Entry = utils_crawler::Find_ResolvedAttack(InSelf.Get_Spec().ResolvedAttacks, Id).GetValue();
         Plan.Execution = InSelf.Get_Spec().ResolvedAttacks.Execution;
@@ -476,53 +558,78 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Plan.Target = InRequest.Target;
         Plan.TargetGeneration = InSelf.Get_CombatTargetGeneration();
         Plan.SelectionGeneration = Advice.SelectionGeneration;
-        if (utils_crawler::Create_AttackAction(InSelf, Plan) == false)
-        { Reject(InSelf, EMars_Crawler_AttackReject::NotReady); return; }
+        if (CreateAction(InSelf, Plan) == false)
+        {
+            Reject(InSelf, EMars_Crawler_AttackReject::NotReady);
+            return;
+        }
 
         const auto Root = utils_transform::Get_EntityCurrentTransform(InSelf.As_Transform());
         const auto Up = utils_surface_motion::Get_SupportNormal(InSelf.Get_Motion()).GetSafeNormal();
         const auto Forward = Root.GetRotation().GetForwardVector();
         const auto Presentation = utils_transform::Get_EntityCurrentTransform(InSelf.Get_Presentation());
-        const auto Neutral = utils_crawler::Get_HitCenter(Presentation, Plan.Entry.Definition.Hit.Emitters[0].LocalCenter);
 
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
         ++Attack.Generation;
         Attack.Admission = FMars_Attack_Admission();
         Attack.Admission.AttackId = Plan.Entry.Identity.Id;
-        Attack.Admission.ActionIdentity = Attack.ActionIdentity;
+        Attack.Admission.ActionIdentity = Attack.Stream.Identity;
         Attack.Admission.AttemptGeneration = Attack.Generation;
         Attack.Admission.SelectionGeneration = Plan.SelectionGeneration;
         Attack.CueInterrupted = false;
         Attack.Result = FMars_Attack_Result();
         Attack.Result.AttackId = Plan.Entry.Identity.Id;
-        Attack.Result.ActionIdentity = Attack.ActionIdentity;
+        Attack.Result.ActionIdentity = Attack.Stream.Identity;
         InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Preparation = FMars_Attack_Preparation();
-        Attack.LastReject.Reset();
-        Attack.HurtCountAtStart = InSelf.Get_HurtCount();
-        Attack.RootAtStart = Root.GetLocation();
-        Attack.NeutralRootLocal = Presentation.GetRelativeTransform(Root);
-        Attack.CommittedDirection = (Forward - Up * Forward.DotProduct(Up)).GetSafeNormal();
-        Attack.Target = InRequest.Target;
-        Attack.DamageCommitted = false;
-        Attack.CommittedSampleId = 0;
-        Attack.CommittedEmitter = FMars_Crawler_EmitterContact();
+        Attack.Diagnostics.LastReject.Reset();
+        Attack.Start.HurtCount = InSelf.Get_HurtCount();
+        Attack.Start.Root = Root.GetLocation();
+        Attack.Start.NeutralRootLocal = Presentation.GetRelativeTransform(Root);
+        Attack.Start.Direction = (Forward - Up * Forward.DotProduct(Up)).GetSafeNormal();
+        Attack.Start.Target = InRequest.Target;
+        Attack.Ledger = FMars_Crawler_AttackDamageLedger();
         Attack.WindowClosed = false;
 
+        // A new action's stream starts from nothing: the resolver reads it from cursor 0.
         auto& Observations = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
         Observations = FMars_Fragment_Crawler_AttackObservations();
-        Observations.Candidate.Reset();
-        Observations.Obstructed = false;
-        Observations.Displaced.Reset();
-        Observations.ActionStreamFailed = false;
-        Observations.LongestSweep = 0.0f;
-        Observations.PreviousHitCenter = Neutral;
-        Observations.AcceptedHitCenter = Neutral;
-        Observations.AckSampleId = 0;
-        Observations.AcceptedInterval = FCk_ProceduralAction_Interval();
-        Observations.AcceptedPhase = EMars_Crawler_AttackPhase::Idle;
-        Observations.OffenseEnded = false;
 
         Enter(Attack, EMars_Crawler_AttackPhase::Windup, OutChanges);
+    }
+
+    // Takes back any limb an earlier return left unplanted, then plays the plan's clip with its slots bound to the claimed
+    // limbs. False (nothing created) without a player, without the plan's clip loaded, or when the action is not created.
+    private bool CreateAction(FCk_Handle_Crawler& InSelf, const FMars_Attack_ResolvedPlan& InPlan)
+    {
+        const auto Player = InSelf.Get_ActionPlayer();
+        if (ck::Is_NOT_Valid(Player) || ck::Is_NOT_Valid(InPlan.Entry.Definition.Clip.Get()))
+        { return false; }
+
+        utils_crawler::Recover_UnplantedLimbs(InSelf);
+        auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
+        auto Claimed = TArray<FName>();
+        for (const auto& Slot : InPlan.Entry.Slots)
+        {
+            Bindings.Add(FCk_ProceduralAction_SlotBinding(Slot.Slot, Slot.Binding.LimbId));
+            Claimed.Add(Slot.Binding.LimbId);
+        }
+
+        auto PlaySpec = FCk_ProceduralAction_PlaySpec(InPlan.Entry.Definition.Clip);
+        PlaySpec.Set_SlotBindings(Bindings);
+        PlaySpec.Set_Delivery(ECk_ProceduralAction_Delivery::Explicit);
+        FCk_Handle Owner = InSelf;
+        const auto Action = utils_procedural_action::Create_FromClip(Owner, Player, PlaySpec);
+        if (ck::Is_NOT_Valid(Action))
+        { return false; }
+
+        auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        Attack.Plan = InPlan;
+        Attack.Stream = FMars_Crawler_AttackStream();
+        Attack.Stream.Action = Action;
+        Attack.Stream.Identity = Action.Get_Identity();
+        Attack.Cleanup = FMars_Crawler_AttackCleanup();
+        Attack.Cleanup.ClaimedIds = Claimed;
+        return true;
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -532,7 +639,7 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
     private void Settle(FCk_Handle_Crawler& InSelf, float32 InDeltaSeconds, TArray<FMars_Crawler_AttackPhaseChange>& OutChanges)
     {
         auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover && Attack.TerminalSeen)
+        if (Attack.Phase == EMars_Crawler_AttackPhase::CancelRecover && InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Stream.TerminalSeen)
         {
             EnterCooldown(InSelf, GetRecoverySeconds(InSelf), OutChanges);
             return;
@@ -541,13 +648,16 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         if (Attack.Phase != EMars_Crawler_AttackPhase::Cooldown)
         { return; }
 
-        Attack.CooldownRemaining = Math::Max(Attack.CooldownRemaining - InDeltaSeconds, 0.0f);
+        Attack.CooldownRemaining = utils_crawler::Get_CountdownAfter(Attack.CooldownRemaining, InDeltaSeconds);
         if (Attack.CooldownRemaining > 0.0f)
         { return; }
-        if (Attack.Cleanup.Released == false && utils_crawler::Forget_ReleasedAttackAction(InSelf) == false)
+
+        if (Attack.Cleanup.Released == false && ForgetReleasedAction(InSelf) == false)
         { return; }
+
         if (Attack.Admission.Accepted == false)
         { Attack.Cleanup.ClaimedIds.Empty(); }
+
         auto Settled = InSelf.Get_Articulation().Get_Health() == ECk_ProceduralArticulation_Health::Operational;
         auto NeedsRecovery = false;
         for (const auto Id : Attack.Cleanup.ClaimedIds)
@@ -556,21 +666,25 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
             if (ck::Is_NOT_Valid(Part) || Part.Get_State() != EMars_BodyPart_State::Attached || ck::Is_NOT_Valid(Part.Get_Health()) ||
                 Part.Get_Health().Get_IsDepleted() || Part.Get_Leg().Get_IsAttached() == false)
             { continue; }
+
             const auto Control = InSelf.Get_Articulation().Get_LimbControl(Id).Get_State();
             NeedsRecovery = NeedsRecovery || Control == ECk_ProceduralLimbControl_State::Unplanted;
             Settled = Settled && Control == ECk_ProceduralLimbControl_State::Default &&
                 Part.Get_Leg().Get_Foot().Get_Phase() == ECk_ProceduralLeg_FootPhase::Planted;
         }
+
         if (NeedsRecovery && Attack.Cleanup.Requested == false)
         {
             utils_crawler::Recover_UnplantedLimbs(InSelf);
             Attack.Cleanup.Requested = true;
         }
-        Attack.Cleanup.Elapsed += InDeltaSeconds;
+
+        Attack.Cleanup.Elapsed = utils_crawler::Get_CountupAfter(Attack.Cleanup.Elapsed, InDeltaSeconds);
         const auto Limit = Math::Max(Attack.Plan.Execution.Locomotion.Get_Return().Get_Timeout().Get_Seconds(),
             Attack.Plan.Execution.Tuning.Get_Transition().Get_ReturnTimeout().Get_Seconds());
         if (Settled == false && Attack.Cleanup.Elapsed < Limit)
         { return; }
+
         Attack.Result.CleanupOutcome = Settled ? (Attack.Cleanup.Requested ? n"AutonomousRecovered" : n"Settled") : n"CleanupTimeout";
         Attack.Result.Completed = true;
         auto Event = FMars_Attack_HistoryEntry();
@@ -583,12 +697,40 @@ class UMars_Processor_Crawler_AttackTick : UCk_Processor_Script_Base_UE
         Enter(Attack, EMars_Crawler_AttackPhase::Idle, OutChanges);
     }
 
+    // True once the attack's action is gone after its terminal record was read (the player released it when the resolver
+    // acknowledged that record), or after its stream became unavailable. Forgets the action and lets the gait take back
+    // any claimed limb the return left unplanted.
+    private bool ForgetReleasedAction(FCk_Handle_Crawler& InSelf)
+    {
+        auto& Attack = InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack);
+        const auto& Stream = InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackObservations).Stream;
+        FCk_Handle Action = Attack.Stream.Action;
+        const auto Gone = ck::Is_NOT_Valid(Action) ||
+            utils_entity_lifetime::Get_IsPendingDestroy(Action, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+        if (Gone == false || (Stream.TerminalSeen == false && Stream.Unavailable == false))
+        { return false; }
+
+        // The owned action really disappeared: no native terminal result was observed, and none is invented.
+        if (Stream.TerminalSeen == false && Attack.Result.Evidence.Failure.IsNone())
+        { Attack.Result.Evidence.Failure = n"ActionLost"; }
+
+        Attack.Stream.Action = FCk_Handle_ProceduralAction();
+        Attack.Stream.Identity = FCk_ProceduralAction_Identity();
+        Attack.Cleanup.Released = true;
+        // Whatever admission reached (an unadmitted action may still have acquired its claims); Settle then waits for
+        // the limbs to plant.
+        if (Attack.Cleanup.ClaimedIds.Num() > 0 && utils_crawler::Recover_UnplantedLimbs(InSelf))
+        { Attack.Cleanup.Requested = true; }
+
+        return true;
+    }
+
     private float32 GetRecoverySeconds(const FCk_Handle_Crawler& InSelf) const
     { return InSelf.Get_AttackAdmission().Accepted ? InSelf.Get_AttackPlan().Entry.Definition.Cooldown.RecoverySeconds : 0.0f; }
 
     private void Reject(FCk_Handle_Crawler& InSelf, EMars_Crawler_AttackReject InReason)
     {
-        InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).LastReject = TOptional<EMars_Crawler_AttackReject>(InReason);
+        InSelf.Get_Fragment(FMars_Fragment_Crawler_Attack).Diagnostics.LastReject = TOptional<EMars_Crawler_AttackReject>(InReason);
         InSelf.Get_Fragment(FMars_Fragment_Crawler_AttackSelection).Decision.LastReason = FName(f"{InReason :n}");
         auto Event = FMars_Attack_HistoryEntry();
         Event.Event = n"Rejected";

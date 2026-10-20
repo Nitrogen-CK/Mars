@@ -31,7 +31,7 @@ class UMars_AutoTest_CrawlerMelee_StaleGeneration : UMars_AutoTestRig_CrawlerMel
         Add_Step_WaitUntil("(1) the attack is back in Idle", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step("(1) the replacement cancelled the attack", n"Step_AssertReplaced");
         Add_Step("(2) from Idle, request a cancel and a start in one frame", n"Step_CancelAndStart");
-        Add_Step_WaitFrames("(2) let them drain", 5);
+        Add_Step_WaitUntil("(2) the requests drained", n"Check_CombatRequestsDrained", k_SlowPolls, 0);
         Add_Step("(2) the start was rejected as CancelPending", n"Step_AssertCancelPending");
         Add_Step("(3) arm a cancel on the stored candidate", n"Step_ArmCancelOnCandidate");
         Add_Step("(3) select the target and request one attack", n"Step_TargetAndStart");

@@ -1,8 +1,7 @@
-// The crawler-melee rig. Floor and crawler are the crawler rig's recipe (Script/Tests/Crawler/Mars_AutoTestRig_Crawler.as):
-// a crawler spawned through its real entity script, without visuals, 65 uu above a runtime static Jolt floor
-// (3000 x 3000 uu, top face at _Origin.Z). It adds what the melee tests stand on: a tagged damageable target (the shape
-// a combat target has to have for the crawler to find and hurt it), a static Jolt wall, settling steps that leave an
-// armed crawler standing still, target placement relative to its neutral hit centre, a record of every attack phase
+// The crawler-melee rig, on the crawler rig (Script/Tests/Crawler/Mars_AutoTestRig_Crawler.as: floor, spawn, readiness).
+// It adds what the melee tests stand on: an armed crawler playing a reference loadout, a tagged damageable target (the
+// shape a combat target has to have for the crawler to find and hurt it), a static Jolt wall, settling steps that leave
+// an armed crawler standing still, target placement relative to its neutral hit centre, a record of every attack phase
 // change, and one-shot triggers timed against the attack's own state. Each test sets _Origin to its own isolated spot:
 // the Mars autotest map has no floor there, and nothing else in the map is near it.
 //
@@ -352,7 +351,7 @@ class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_
             if (Trigger.Fired || Get_IsDue(Trigger, InDeltaT.Get_Seconds()) == false)
             { continue; }
 
-            utils_crawler_melee_trigger::Fire(Trigger);
+            Trigger.Fire();
         }
     }
 
@@ -365,8 +364,8 @@ class UMars_TESTONLY_Processor_CrawlerMelee_Trigger : UCk_Processor_Script_Base_
 
         const auto Phase = Crawler.Get_AttackPhase();
         const auto Interval = Crawler.Get_AttackAcceptedInterval();
-        const auto WindupEnd = utils_crawler::Get_PhaseEndSeconds(Clip, EMars_Crawler_AttackPhase::Windup);
-        const auto StrikeEnd = utils_crawler::Get_PhaseEndSeconds(Clip, EMars_Crawler_AttackPhase::Strike);
+        const auto WindupEnd = Clip.Get_PhaseEndSeconds(utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup));
+        const auto StrikeEnd = Clip.Get_PhaseEndSeconds(utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike));
         const auto Tolerance = 1.0e-6;
 
         switch (InTrigger.When)
@@ -422,48 +421,71 @@ class UMars_TESTONLY_Processor_CrawlerMelee_CandidateTrigger : UCk_Processor_Scr
             }
 
             if (Trigger.When == EMars_TESTONLY_CrawlerMelee_When::CandidatePending && Trigger.Fired == false)
-            { utils_crawler_melee_trigger::Fire(Trigger); }
+            { Trigger.Fire(); }
         }
     }
 }
 
-namespace utils_crawler_melee_trigger
+// Fires the trigger's action once and stamps when.
+mixin void Fire(FMars_TESTONLY_CrawlerMelee_Trigger& Self)
 {
-    void Fire(FMars_TESTONLY_CrawlerMelee_Trigger& InOutTrigger)
-    {
-        InOutTrigger.Fired = true;
-        InOutTrigger.FiredFrame = utils_time::Get_FrameCounter();
-        InOutTrigger.FiredGeneration = InOutTrigger.Crawler.Get_AttackGeneration();
+    Self.Fired = true;
+    Self.FiredFrame = utils_time::Get_FrameCounter();
+    Self.FiredGeneration = Self.Crawler.Get_AttackGeneration();
 
-        const auto Action = InOutTrigger.Action;
-        if (Action == EMars_TESTONLY_CrawlerMelee_Action::MoveTarget)
+    switch (Self.Action)
+    {
+        case EMars_TESTONLY_CrawlerMelee_Action::MoveTarget:
         {
-            auto TargetRoot = InOutTrigger.TargetRoot;
-            utils_transform::Request_SetTransform(TargetRoot, InOutTrigger.Destination);
+            auto TargetRoot = Self.TargetRoot;
+            utils_transform::Request_SetTransform(TargetRoot, Self.Destination);
+            break;
         }
-        else if (Action == EMars_TESTONLY_CrawlerMelee_Action::SteerCrawler)
+        case EMars_TESTONLY_CrawlerMelee_Action::SteerCrawler:
         {
-            auto Motion = InOutTrigger.Crawler.Get_Motion();
-            utils_surface_motion::Request_Steering(Motion, FCk_Request_SurfaceMotion_Steering(InOutTrigger.SteerDirection, 0.0f));
+            auto Motion = Self.Crawler.Get_Motion();
+            utils_surface_motion::Request_Steering(Motion, FCk_Request_SurfaceMotion_Steering(Self.SteerDirection, 0.0f));
+            break;
         }
-        else if (Action == EMars_TESTONLY_CrawlerMelee_Action::HitZone)
+        case EMars_TESTONLY_CrawlerMelee_Action::HitZone:
         {
-            auto Zone = InOutTrigger.HitZone;
-            Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(InOutTrigger.Amount, GameplayTags::DamageType_Mars_Blunt)));
+            auto Zone = Self.HitZone;
+            Zone.Request_Hit(FMars_Request_HitZone_Hit(FMars_DamageEvent(Self.Amount, GameplayTags::DamageType_Mars_Blunt)));
+            break;
         }
-        else if (Action == EMars_TESTONLY_CrawlerMelee_Action::DamageHealth)
+        case EMars_TESTONLY_CrawlerMelee_Action::DamageHealth:
         {
-            auto Health = InOutTrigger.Health;
-            Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(InOutTrigger.Amount, GameplayTags::DamageType_Mars_Blunt)));
+            auto Health = Self.Health;
+            Health.Request_ApplyDamage(FMars_Request_Health_ApplyDamage(FMars_DamageEvent(Self.Amount, GameplayTags::DamageType_Mars_Blunt)));
+            break;
         }
-        else if (Action == EMars_TESTONLY_CrawlerMelee_Action::DestroyEntity)
-        { utils_entity_lifetime::Request_DestroyEntity(InOutTrigger.Entity); }
-        else if (Action == EMars_TESTONLY_CrawlerMelee_Action::CancelAttack)
+        case EMars_TESTONLY_CrawlerMelee_Action::DestroyEntity:
         {
-            auto Crawler = InOutTrigger.Crawler;
-            Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(InOutTrigger.CancelReason));
+            utils_entity_lifetime::Request_DestroyEntity(Self.Entity);
+            break;
+        }
+        case EMars_TESTONLY_CrawlerMelee_Action::CancelAttack:
+        {
+            auto Crawler = Self.Crawler;
+            Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(Self.CancelReason));
+            break;
         }
     }
+}
+
+// Where the phase InPhaseId ends on the clip's timeline: the durations of every phase up to and including it.
+mixin float64 Get_PhaseEndSeconds(const UCk_ProceduralAction_Data Self, FName InPhaseId)
+{
+    float64 End = 0.0;
+    for (const auto& Phase : Self.Get_Phases())
+    {
+        End += Phase.Get_Duration().Get_Seconds();
+        if (Phase.Get_Id() == InPhaseId)
+        { return End; }
+    }
+
+    ck::EnsureIfNot(false, f"[CrawlerMelee] clip [{Self.GetName()}] has no phase [{InPhaseId}]");
+    return End;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -499,31 +521,6 @@ struct FMars_TESTONLY_CrawlerMelee_AcceptWatch
     TArray<FMars_AutoTest_CrawlerMelee_AcceptRecord> Frames;
 }
 
-namespace utils_crawler_melee_watch
-{
-    // The presentation's distance from its neutral root-relative transform, captured at the attack's admission.
-    float64 Get_PresentationErrorCm(const FCk_Handle_Crawler& InCrawler)
-    {
-        const auto Root = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
-        const auto Neutral = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).NeutralRootLocal * Root;
-        const auto Presented = utils_transform::Get_EntityCurrentTransform(InCrawler.Get_Presentation());
-        return (Presented.GetLocation() - Neutral.GetLocation()).Size();
-    }
-
-    // The foot parts of the rig's first and last leg, in the root's frame; empty for a rig of fewer than two legs.
-    TArray<FVector> Get_FrontFeet(const FCk_Handle_Crawler& InCrawler)
-    {
-        auto Feet = TArray<FVector>();
-        const auto Legs = InCrawler.Get_Spec().Rig.Legs;
-        if (Legs.Num() < 2)
-        { return Feet; }
-
-        const auto Root = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
-        Feet.Add(Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Legs[0].Foot)));
-        Feet.Add(Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Legs[Legs.Num() - 1].Foot)));
-        return Feet;
-    }
-}
 
 // In FGroup_Overlap right after the resolver: one record per frame of what it accepted, the kernel's phase (written by
 // the attack tick earlier this frame) and the action's state.
@@ -541,8 +538,7 @@ class UMars_TESTONLY_Processor_CrawlerMelee_AcceptWatch : UCk_Processor_Script_B
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_TESTONLY_CrawlerMelee_AcceptWatch& InWatch)
     {
         const auto Crawler = InHandle.As_Crawler();
-        const auto& Observations = Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
-        const auto Interval = Observations.AcceptedInterval;
+        const auto Interval = Crawler.Get_AttackAcceptedInterval();
         const auto Action = Crawler.Get_AttackAction();
 
         auto Record = FMars_AutoTest_CrawlerMelee_AcceptRecord();
@@ -550,13 +546,13 @@ class UMars_TESTONLY_Processor_CrawlerMelee_AcceptWatch : UCk_Processor_Script_B
         Record.Time = System::GetGameTimeInSeconds();
         Record.Phase = Crawler.Get_AttackPhase();
         Record.Generation = Crawler.Get_AttackGeneration();
-        Record.AckSampleId = Observations.AckSampleId;
+        Record.AckSampleId = Crawler.Get_AttackAcknowledgedSampleId();
         Record.AcceptedPhaseId = Interval.Get_PhaseId();
         Record.AcceptedFrom = Interval.Get_FromTime().Get_Seconds();
         Record.AcceptedTo = Interval.Get_ToTime().Get_Seconds();
         Record.AcceptedInOffense = Interval.Get_Windows().Contains(utils_crawler::Get_OffenseWindowId());
-        Record.OffenseEnded = Observations.OffenseEnded;
-        Record.CandidatePending = Observations.Candidate.IsSet();
+        Record.OffenseEnded = Crawler.Get_AttackDebugSnapshot().Status.OffenseEnded;
+        Record.CandidatePending = Crawler.Get_AttackCandidatePending();
         Record.ActionValid = ck::IsValid(Action);
         if (Record.ActionValid)
         {
@@ -564,9 +560,33 @@ class UMars_TESTONLY_Processor_CrawlerMelee_AcceptWatch : UCk_Processor_Script_B
             Record.ActionOutcome = Action.Get_Result().Get_Outcome();
             Record.ActionRecovery = Action.Get_Result().Get_Recovery();
         }
-        Record.PresentationErrorCm = utils_crawler_melee_watch::Get_PresentationErrorCm(Crawler);
-        Record.FrontFeet = utils_crawler_melee_watch::Get_FrontFeet(Crawler);
+
+        Record.PresentationErrorCm = Get_PresentationErrorCm(Crawler);
+        Record.FrontFeet = Get_FrontFeet(Crawler);
         InWatch.Frames.Add(Record);
+    }
+
+    // The presentation's distance from its neutral root-relative transform, captured at the attack's admission.
+    private float64 Get_PresentationErrorCm(const FCk_Handle_Crawler& InCrawler) const
+    {
+        const auto Root = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
+        const auto Neutral = InCrawler.Get_AttackNeutralRootLocal() * Root;
+        const auto Presented = utils_transform::Get_EntityCurrentTransform(InCrawler.Get_Presentation());
+        return (Presented.GetLocation() - Neutral.GetLocation()).Size();
+    }
+
+    // The foot parts of the rig's first and last leg, in the root's frame; empty for a rig of fewer than two legs.
+    private TArray<FVector> Get_FrontFeet(const FCk_Handle_Crawler& InCrawler) const
+    {
+        auto Feet = TArray<FVector>();
+        const auto Legs = InCrawler.Get_Spec().Rig.Legs;
+        if (Legs.Num() < 2)
+        { return Feet; }
+
+        const auto Root = utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
+        Feet.Add(Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Legs[0].Foot)));
+        Feet.Add(Root.InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Legs[Legs.Num() - 1].Foot)));
+        return Feet;
     }
 }
 
@@ -676,14 +696,8 @@ class UMars_TESTONLY_Processor_CrawlerMelee_MoveToWatch : UCk_Processor_Script_B
 //--------------------------------------------------------------------------------------------------------------------------
 
 UCLASS(Abstract)
-class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
+class UMars_AutoTestRig_CrawlerMelee : UMars_AutoTestRig_Crawler
 {
-    // Composition, physics falls and deferred probe/body joins outrun the default poll budget at lane frame rate.
-    protected const int32 k_SlowPolls = 900;
-
-    protected FVector _Origin;
-    protected FCk_Handle_Crawler _Crawler;
-
     //----------------------------------------------------------------------------------------------------------------------
     // Targets and walls
     //----------------------------------------------------------------------------------------------------------------------
@@ -723,25 +737,15 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         return utils_hit_zone::AddHurtbox_Box(InTarget.Zone, InTarget.Root, FMars_HitZone_Hurtbox(InHalfExtents, InLocalOffset));
     }
 
-    // A static Jolt box centred at InCenter, BlockAll, like the floor. Returns the wall entity (a World hit's attribution).
+    // A static Jolt box centred at InCenter (SpawnStaticBox). Returns the wall entity (a World hit's attribution).
     protected FCk_Handle SpawnWall(FCk_Handle InHandle, FVector InCenter, FVector InHalfExtents)
     {
-        return SpawnWallAt(InHandle, FTransform(FRotator::ZeroRotator, InCenter), InHalfExtents);
+        return SpawnStaticBox(InHandle, FTransform(FRotator::ZeroRotator, InCenter), InHalfExtents);
     }
 
-    // SpawnWall with the box at InTransform.
     protected FCk_Handle SpawnWallAt(FCk_Handle InHandle, FTransform InTransform, FVector InHalfExtents)
     {
-        auto Wall = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        utils_transform::Add(Wall, InTransform, ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(InHalfExtents);
-        auto WallSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        WallSpec.Set_ShapeDimensions(Shape);
-        WallSpec.Set_MotionType(ECk_MotionType::Static);
-        WallSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Wall, WallSpec);
-        return Wall;
+        return SpawnStaticBox(InHandle, InTransform, InHalfExtents);
     }
 
     // The crawler hit query's settings from InStart to InEnd: a sphere filtered on
@@ -760,64 +764,9 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         return Settings;
     }
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Floor and crawler (the crawler rig's recipe)
-    //----------------------------------------------------------------------------------------------------------------------
-
-    // 4 legs, roaming the box of InRoamHalfExtent around _Origin.
-    protected FMars_Crawler_Spec Make_CrawlerSpec(FVector InRoamHalfExtent) const
+    protected void OnCrawlerSpawned() override
     {
-        return FMars_Crawler_Spec(4, FBox(_Origin - InRoamHalfExtent, _Origin + InRoamHalfExtent));
-    }
-
-    // Returns the floor.
-    protected FCk_Handle SpawnFloorAndCrawler(FCk_Handle InHandle, FMars_Crawler_Spec InSpec)
-    {
-        auto Floor = SpawnWall(InHandle, _Origin - FVector(0.0, 0.0, 10.0), FVector(1500.0, 1500.0, 10.0));
-
-        auto SpawnParams = UMars_Crawler_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, _Origin + FVector(0.0, 0.0, 65.0));
-        SpawnParams.Spec = InSpec;
-        SpawnParams.WithVisuals = false;
-        auto Pending = utils_entity_script::Request_SpawnEntity(InHandle, UMars_Crawler_EntityScript, SpawnParams);
-        utils_pending_entity_script::Promise_OnConstructed(Pending, FCk_Delegate_EntityScript_Constructed(this, n"OnCrawlerConstructed"));
-        return Floor;
-    }
-
-    protected FVector BodyLocation() const
-    {
-        return utils_transform::Get_EntityCurrentLocation(_Crawler.As_Transform());
-    }
-
-    // False until the crawler is constructed; a failed gait fails the test.
-    protected bool Get_IsGaitReady()
-    {
-        if (ck::Is_NOT_Valid(_Crawler))
-        { return false; }
-
-        const auto Gait = _Crawler.Get_Gait();
-        if (utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Failed)
-        {
-            FinishFailure(f"the crawler's gait failed: {utils_procedural_gait::Get_Failure(Gait) :n}");
-            return false;
-        }
-
-        return utils_procedural_gait::Get_Status(Gait) == ECk_ProceduralAnimation_Status::Ready;
-    }
-
-    UFUNCTION()
-    protected void OnCrawlerConstructed(FCk_Handle_EntityScript InEntityScriptHandle)
-    {
-        _Crawler = InEntityScriptHandle.As_Crawler();
         _Crawler.BindTo_OnAttackPhaseChanged(FMars_Delegate_Crawler_OnAttackPhaseChanged(this, n"OnAttackPhaseChanged"));
-    }
-
-    // The gait is Ready and the monster has registered one part per leg.
-    UFUNCTION()
-    protected void Check_Ready(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(Get_IsGaitReady() && _Crawler.Get_Monster().Get_Parts().Num() == _Crawler.Get_Spec().LegCount);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -840,15 +789,15 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
 
     // A combat-enabled, passive crawler of InLegCount legs, roaming +-150 around _Origin but dwelling 120 s after a stop,
     // so once stopped it stands still for the whole test. Passive: it chooses no target and its HasCombatTarget fact never
-    // rises, so its behaviour stays out of attacks a test drives directly. Behaviour tests make it aggressive. It plays the
-    // radial reference jab (Wear_ReferenceClips).
+    // rises, so its behaviour stays out of attacks a test drives directly. Behaviour tests make it aggressive. It plays its
+    // reference loadout's jab alone (Wear_ReferenceLoadout).
     protected FMars_Crawler_Spec Make_ArmedCrawlerSpec(int32 InLegCount)
     {
         auto Spec = FMars_Crawler_Spec(InLegCount, FBox(_Origin - FVector(150.0, 150.0, 200.0), _Origin + FVector(150.0, 150.0, 200.0)));
         Spec.RoamDwellSeconds = 120.0f;
         Spec.Combat.Enabled = true;
         Spec.Combat.StartAggressive = ECk_EnableDisable::Disable;
-        Wear_ReferenceClips(Spec, EMars_Crawler_AttackClipKind::Jab);
+        Wear_ReferenceLoadout(Spec, EMars_Crawler_AttackClipKind::Jab);
         return Spec;
     }
 
@@ -861,7 +810,101 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    // Attack clips: the reference clips (Script/Editor/Mars_CrawlerAttackClips.as), never the authored assets
+    // Attack loadouts: the shipped reference loadouts, cut down to the attacks a test plays
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // Test-owned loadouts and definitions; the properties keep them alive, the spec's soft references resolve to them.
+    UPROPERTY()
+    private TArray<UMars_AttackLoadout_Data> _Loadouts;
+
+    UPROPERTY()
+    private TArray<UMars_AttackDefinition_Data> _Definitions;
+
+    // The reference preset of InSpec's layout and leg count.
+    protected EMars_Crawler_AttackPreset Get_ReferencePreset(const FMars_Crawler_Spec& InSpec) const
+    {
+        if (InSpec.Layout == EMars_Crawler_Layout::Spider)
+        { return EMars_Crawler_AttackPreset::Spider6; }
+
+        return InSpec.LegCount == 4 ? EMars_Crawler_AttackPreset::Crawler4 : EMars_Crawler_AttackPreset::Crawler6;
+    }
+
+    // InOutSpec plays its preset's shipped parity loadout (utils_crawler::Get_AttackReferenceLoadout) cut down to its jab
+    // or, with InKind Pincer, to its pincer and its jab: a test-owned copy with the same definitions, selection and
+    // execution policy, each definition playing its layout's reference clip, so the tests never depend on clip content an
+    // author tunes.
+    protected void Wear_ReferenceLoadout(FMars_Crawler_Spec& InOutSpec, EMars_Crawler_AttackClipKind InKind)
+    {
+        const auto Shipped = System::LoadAsset_Blocking(utils_crawler::Get_AttackReferenceLoadout(Get_ReferencePreset(InOutSpec), EMars_AttackReference_Kind::Parity));
+        if (ck::Is_NOT_Valid(Shipped))
+        {
+            FinishFailure(f"the {Get_ReferencePreset(InOutSpec) :n} reference loadout did not load");
+            return;
+        }
+
+        auto Loadout = Cast<UMars_AttackLoadout_Data>(NewObject(this, UMars_AttackLoadout_Data));
+        Loadout.Spec = Shipped.Spec;
+        Loadout.Spec.Entries.Empty();
+        for (const auto& Entry : Shipped.Spec.Entries)
+        {
+            auto Kind = TOptional<EMars_Crawler_AttackClipKind>();
+            if (Entry.Id == GameplayTags::Attack_Mars_Jab)
+            { Kind = TOptional<EMars_Crawler_AttackClipKind>(EMars_Crawler_AttackClipKind::Jab); }
+            else if (Entry.Id == GameplayTags::Attack_Mars_Pincer && InKind == EMars_Crawler_AttackClipKind::Pincer)
+            { Kind = TOptional<EMars_Crawler_AttackClipKind>(EMars_Crawler_AttackClipKind::Pincer); }
+
+            if (Kind.IsSet() == false)
+            { continue; }
+
+            auto Definition = Cast<UMars_AttackDefinition_Data>(NewObject(this, UMars_AttackDefinition_Data));
+            Definition.Def = System::LoadAsset_Blocking(Entry.Definition).Def;
+            Definition.Def.Clip = Make_SoftClip(Get_ReferenceClip(InOutSpec.Layout, Kind.GetValue()));
+            _Definitions.Add(Definition);
+            auto Copy = Entry;
+            Copy.Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(Definition);
+            Loadout.Spec.Entries.Add(Copy);
+        }
+
+        _Loadouts.Add(Loadout);
+        InOutSpec.Combat.Loadout = TSoftObjectPtr<UMars_AttackLoadout_Data>(Loadout);
+    }
+
+    // Wear_ReferenceLoadout with InId's definition playing InClip instead (a copy; the shipped definition is untouched).
+    protected void Wear_DerivedClip(FMars_Crawler_Spec& InOutSpec, FGameplayTag InId, UCk_ProceduralAction_Data InClip)
+    {
+        auto Loadout = InOutSpec.Combat.Loadout.Get();
+        for (int32 Index = 0; Index < Loadout.Spec.Entries.Num(); ++Index)
+        {
+            if (Loadout.Spec.Entries[Index].Id != InId)
+            { continue; }
+
+            auto Definition = Cast<UMars_AttackDefinition_Data>(NewObject(this, UMars_AttackDefinition_Data));
+            Definition.Def = System::LoadAsset_Blocking(Loadout.Spec.Entries[Index].Definition).Def;
+            Definition.Def.Clip = Make_SoftClip(InClip);
+            _Definitions.Add(Definition);
+            Loadout.Spec.Entries[Index].Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(Definition);
+            return;
+        }
+
+        FinishFailure(f"the loadout has no [{InId.ToString()}] entry to derive");
+    }
+
+    // InId's resolved definition on the rig's crawler (its creature defaults solved); a default one when it has none.
+    protected FMars_Attack_Definition Get_ResolvedDefinition(FGameplayTag InId) const
+    {
+        const auto Entry = utils_crawler::Find_ResolvedAttack(_Crawler.Get_Spec().ResolvedAttacks, InId);
+        return Entry.IsSet() ? Entry.GetValue().Definition : FMars_Attack_Definition();
+    }
+
+    // The resolved jab's first (body) emitter.
+    protected FMars_Attack_Emitter Get_JabEmitter() const
+    {
+        const auto Definition = Get_ResolvedDefinition(GameplayTags::Attack_Mars_Jab);
+        return Definition.Hit.Emitters.Num() > 0 ? Definition.Hit.Emitters[0] : FMars_Attack_Emitter();
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Attack clips: the reference clips (Script/Editor/Mars_CrawlerAttackClips.as), for tests that derive or inspect one
     //----------------------------------------------------------------------------------------------------------------------
 
     // Built on first use, Layout * 2 + Kind. The properties keep them alive; the spec's soft references resolve to them.
@@ -872,8 +915,9 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
     UPROPERTY()
     private TArray<UCk_ProceduralAction_Data> _DerivedClips;
 
-    // InOutSpec plays its layout's reference jab and, with InKind Pincer, its reference pincer; the hit's sample-travel
-    // guard grows with the layout's size, as the Room 5 presets set it.
+    // The catalog fixtures' authoring inputs: InOutSpec's retired clip fields name its layout's reference jab and, with
+    // InKind Pincer, its reference pincer, and its retired hit guard grows with the layout's size. A crawler spawned with
+    // them set is rejected (author a Loadout): the fixture builds its own loadout from them and clears them first.
     protected void Wear_ReferenceClips(FMars_Crawler_Spec& InOutSpec, EMars_Crawler_AttackClipKind InKind)
     {
         InOutSpec.Combat.JabClip = Make_SoftClip(Get_ReferenceClip(InOutSpec.Layout, EMars_Crawler_AttackClipKind::Jab));
@@ -995,14 +1039,14 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
     // Where InPhase ends on the timeline of the clip the crawler's current (or last) attack played.
     protected float64 Get_AttackPhaseEnd(EMars_Crawler_AttackPhase InPhase)
     {
-        return utils_crawler::Get_PhaseEndSeconds(_Crawler.Get_AttackClip(), InPhase);
+        return _Crawler.Get_AttackClip().Get_PhaseEndSeconds(utils_crawler::Get_ClipPhaseId(InPhase));
     }
 
     // Composed and Ready -> in Roam (its first MoveTo is out) -> stopped -> at rest.
     protected void Add_SettleSteps()
     {
         Add_Step_WaitUntil("the crawler is composed, its gait Ready and every leg part registered", n"Check_Ready", k_SlowPolls, 0);
-        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_CrawlerInRoam", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the behaviour sub-SM is in Roam", n"Check_InRoam", k_SlowPolls, 0);
         Add_Step("stop the navigator", n"Step_StopCrawlerNavigator");
         Add_Step_WaitUntil("the navigator has drained the stop and is not Moving", n"Check_CrawlerNavigatorStopped", k_SlowPolls, 0);
         Add_Step_WaitUntil("the crawler has been at rest (speed under 0.5 cm/s, heading within 0.25 deg) for 1 s", n"Check_AtRest", k_SlowPolls, 0);
@@ -1019,11 +1063,11 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         return FVector::UpVector.CrossProduct(Get_Forward());
     }
 
-    // Where the hit sphere's centre sits with no action offset.
+    // Where the jab's hit sphere's centre sits with no action offset.
     protected FVector Get_NeutralHitCenter() const
     {
         const auto Presentation = utils_transform::Get_EntityCurrentTransform(_Crawler.Get_Presentation());
-        return utils_crawler::Get_HitCenter(Presentation, _Crawler.Get_Spec().Combat.Hit.LocalCenter);
+        return utils_crawler::Get_HitCenter(Presentation, Get_JabEmitter().LocalCenter);
     }
 
     // InAhead along the forward and InRight to the right of the neutral hit centre, at its height.
@@ -1274,13 +1318,6 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    protected void Check_CrawlerInRoam(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Crawler.Get_BehaviorStateClass() == UMars_SmState_Crawler_Roam);
-    }
-
-    UFUNCTION()
     protected void Check_CrawlerNavigatorStopped(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Navigator = _Crawler.Get_Navigator();
@@ -1329,9 +1366,25 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
     UFUNCTION()
     protected void Check_TargetTraceable(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        auto Res = OutResult;
+        Res.Set(Get_IsTargetFirstHit(InHandle, Get_Right() * -200.0));
+    }
+
+    // Check_TargetTraceable down from 200 cm above the target, for a target with another body beside it.
+    UFUNCTION()
+    protected void Check_TargetTraceableFromAbove(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_IsTargetFirstHit(InHandle, FVector::UpVector * 200.0));
+    }
+
+    // A sweep through _Target's root from +InAcross to -InAcross, past the crawler's own hurtboxes, meets a hurtbox of
+    // _Target's zone first; failing for 240 polls fails the test.
+    private bool Get_IsTargetFirstHit(FCk_Handle InHandle, FVector InAcross)
+    {
         const auto Center = utils_transform::Get_EntityCurrentLocation(_Target.Root);
-        const auto Across = Get_Right() * 200.0;
-        auto Settings = Make_HitQuery(Center - Across, Center + Across, 5.0f);
+        const auto Across = InAcross;
+        auto Settings = Make_HitQuery(Center + Across, Center - Across, 5.0f);
         Settings.Set_IgnoredEntities(_Crawler.Get_AttackIgnoredEntities());
         const auto Result = utils_probe_trace::Request_SingleShapeTrace(InHandle, Settings);
         FCk_Handle HitZone = utils_hit_zone::TryGet_Zone(Result.Get_HitEntity());
@@ -1345,8 +1398,7 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
             FinishFailure(f"no hurtbox of the target's zone (first hurtbox valid {ck::IsValid(_Target.Hurtbox)}) is the first hit across it: hit {HitName} ({Result.Get_HitKind() :n}) at {Result.Get_HitLocation().ToString()}, target at {Center.ToString()}; {Get_CrawlerDiagnostics()}");
         }
 
-        auto Res = OutResult;
-        Res.Set(Traceable);
+        return Traceable;
     }
 
     // Target and start in one frame, so they drain together.
@@ -1432,8 +1484,9 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         Record.AcceptedPhaseId = Interval.Get_PhaseId();
         Record.AcceptedFrom = Interval.Get_FromTime().Get_Seconds();
         Record.AcceptedTo = Interval.Get_ToTime().Get_Seconds();
-        Record.TerminalSeen = InCrawler.Get_Fragment(FMars_Fragment_Crawler_Attack).TerminalSeen;
-        Record.PresentationErrorCm = utils_crawler_melee_watch::Get_PresentationErrorCm(InCrawler);
+        Record.TerminalSeen = InCrawler.Get_AttackTerminalSeen();
+        const auto Neutral = InCrawler.Get_AttackNeutralRootLocal() * RootTransformOf(InCrawler);
+        Record.PresentationErrorCm = (utils_transform::Get_EntityCurrentLocation(InCrawler.Get_Presentation()) - Neutral.GetLocation()).Size();
         Record.Time = System::GetGameTimeInSeconds();
         Record.DamageRequests = InCrawler.Get_CombatDealer().Get_HitsDealt() + InCrawler.Get_CombatDealer().Get_HitsRejected();
         Record.LastCancel = InCrawler.Get_AttackLastCancel();
@@ -1447,5 +1500,142 @@ class UMars_AutoTestRig_CrawlerMelee : UCk_AutoTest_Base
         Record.Leaf = InCrawler.Get_Brain().Get_LeafClass();
         Record.EngageStage = InCrawler.Get_EngageStage();
         _Records.Add(Record);
+    }
+
+    private FTransform RootTransformOf(const FCk_Handle_Crawler& InCrawler) const
+    {
+        return utils_transform::Get_EntityCurrentTransform(InCrawler.As_Transform());
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Start rejections, read from the attack history
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The history's sequence when the last start was requested (Request_StartAndMark).
+    protected int64 _RejectMark = 0;
+
+    // The sequence of the crawler's newest attack history event; 0 before the first.
+    protected int64 Get_HistorySequence() const
+    {
+        const auto History = _Crawler.Get_AttackHistory();
+        return History.Num() > 0 ? History.Last().Sequence : 0;
+    }
+
+    // The reasons of the Rejected events recorded after InSequence, oldest first.
+    protected TArray<FName> Get_RejectionsSince(int64 InSequence) const
+    {
+        auto Reasons = TArray<FName>();
+        for (const auto& Entry : _Crawler.Get_AttackHistory())
+        {
+            if (Entry.Sequence > InSequence && Entry.Event == n"Rejected")
+            { Reasons.Add(Entry.Reason); }
+        }
+
+        return Reasons;
+    }
+
+    // Marks the history, then asks for one attack at _Target.
+    protected void Request_StartAndMark()
+    {
+        _RejectMark = Get_HistorySequence();
+        _Crawler.Request_StartAttack(FMars_Request_Crawler_StartAttack(_Target.Entity));
+    }
+
+    // Target and start in one frame, the history marked first (Check_StartRejected).
+    UFUNCTION()
+    protected void Step_TargetAndStartMarked(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _RecordMark = _Records.Num();
+        _AdmissionPolls = 0;
+        _Crawler.Request_SetCombatTarget(FMars_Request_Crawler_SetCombatTarget(_Target.Entity));
+        Request_StartAndMark();
+    }
+
+    // The combat request drain has run; the attack tick follows it in the same frame.
+    UFUNCTION()
+    protected void Check_CombatRequestsDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Crawler.Get_HasPendingCombatRequests() == false);
+    }
+
+    // The start requested last has drained and the attack tick recorded its rejection.
+    UFUNCTION()
+    protected void Check_StartRejected(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Crawler.Get_HasPendingCombatRequests() == false && Get_RejectionsSince(_RejectMark).Num() > 0);
+    }
+
+    // Exactly one rejection followed the mark, for InReason.
+    protected void Assert_RejectedOnce(EMars_Crawler_AttackReject InReason, FString InWhen)
+    {
+        const auto Reasons = Get_RejectionsSince(_RejectMark);
+        const auto First = Reasons.Num() > 0 ? Reasons[0] : NAME_None;
+        Assert_True(Reasons.Num() == 1 && First == FName(f"{InReason :n}"),
+            f"{InWhen}: one start rejected as {InReason :n} (got [{Reasons.Num()}] rejections, first [{First}])");
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Claw stance
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The leg part the current (or last) attack's plan claims through InSlot; invalid when it claims none.
+    protected FCk_Handle_BodyPart Find_ClaimedPart(const FCk_Handle_Crawler& InCrawler, FName InSlot) const
+    {
+        for (const auto& Slot : InCrawler.Get_AttackPlan().Entry.Slots)
+        {
+            if (Slot.Slot == InSlot)
+            { return utils_crawler::Find_AttackPart(InCrawler, Slot.Binding.LimbId); }
+        }
+
+        return FCk_Handle_BodyPart();
+    }
+
+    // The rig's first and last leg: the limbs the reference pincer claims (right claw, then left).
+    protected TArray<FCk_Handle_ProceduralLeg> Get_FrontLegs() const
+    {
+        auto Legs = TArray<FCk_Handle_ProceduralLeg>();
+        const auto Parts = _Crawler.Get_LegParts();
+        if (Parts.Num() < 2)
+        { return Legs; }
+
+        Legs.Add(Parts[0].Get_Leg());
+        Legs.Add(Parts.Last().Get_Leg());
+        return Legs;
+    }
+
+    // Both front feet are planted on trusted ground and at least two other enabled legs stand on trusted ground: the
+    // stance the pincer's support policy admits.
+    protected bool Get_IsClawStanceReady() const
+    {
+        const auto Claws = Get_FrontLegs();
+        if (Claws.Num() != 2)
+        { return false; }
+
+        for (const auto& Claw : Claws)
+        {
+            const auto Foot = utils_procedural_leg::Get_Foot(Claw);
+            if (Foot.Get_Phase() != ECk_ProceduralLeg_FootPhase::Planted || Foot.Get_Contact() != ECk_ProceduralLeg_FootContact::Trusted)
+            { return false; }
+        }
+
+        int32 Standing = 0;
+        for (const auto& Part : _Crawler.Get_LegParts())
+        {
+            const auto Leg = Part.Get_Leg();
+            if (ck::Is_NOT_Valid(Leg) || utils_procedural_leg::Get_Status(Leg) != ECk_ProceduralLeg_Status::Enabled)
+            { continue; }
+
+            const auto Id = utils_procedural_leg::Get_Id(Leg);
+            if (Id == utils_procedural_leg::Get_Id(Claws[0]) || Id == utils_procedural_leg::Get_Id(Claws[1]))
+            { continue; }
+
+            const auto Foot = utils_procedural_leg::Get_Foot(Leg);
+            if (Foot.Get_Phase() == ECk_ProceduralLeg_FootPhase::Planted && Foot.Get_Contact() == ECk_ProceduralLeg_FootContact::Trusted)
+            { ++Standing; }
+        }
+
+        return Standing >= 2;
     }
 }

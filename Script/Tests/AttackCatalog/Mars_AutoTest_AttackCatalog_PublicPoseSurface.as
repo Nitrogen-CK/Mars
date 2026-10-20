@@ -10,7 +10,6 @@ class UMars_AutoTest_AttackCatalog_PublicPoseSurface : UMars_AutoTestRig_AttackC
     void DoBeginPlay(FCk_Handle InHandle)
     {
         Spawn_ProbeCrawler(InHandle);
-        Add_Step("export the actual scheduler order and graph", n"Step_ExportScheduler");
         Add_Step("play a real claimed pincer through public APIs", n"Step_Play");
         Add_Step_WaitUntil("public previous and current poses name both moving claws", n"Check_Endpoints", k_SlowPolls, 0);
         Add_Step("cancel the observed action", n"Step_Cancel");
@@ -18,13 +17,6 @@ class UMars_AutoTest_AttackCatalog_PublicPoseSurface : UMars_AutoTestRig_AttackC
         Add_Step_WaitUntil("acknowledgement releases the stream and both claws", n"Check_Released", k_SlowPolls, 0);
         Add_Step("assert public accepted geometry and cleanup", n"Step_Assert");
         Run_Steps(InHandle);
-    }
-
-    UFUNCTION()
-    private void Step_ExportScheduler(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        System::ExecuteConsoleCommand("Ck.Ecs.Scheduler.ExportOrder Saved/CkEcs/AttackCatalog-P0-SchedulerOrder.txt");
-        System::ExecuteConsoleCommand("Ck.Ecs.Scheduler.ExportGraph Saved/CkEcs/AttackCatalog-P0-SchedulerGraph.dot");
     }
 
     UFUNCTION()

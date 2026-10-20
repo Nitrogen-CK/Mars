@@ -51,16 +51,16 @@ class UMars_TESTONLY_Processor_EndpointFinalCancel : UCk_Processor_Script_Base_U
     void ForEachEntity(FCk_Time InDeltaT, FCk_Handle& InHandle, FMars_TESTONLY_EndpointFinalCancel& InCommand)
     {
         if (InCommand.Fired || ck::Is_NOT_Valid(InCommand.Crawler)) { return; }
-        const auto& Observed = InCommand.Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
-        if (Observed.Candidate.IsSet() == false || Observed.Candidate.GetValue().SampleId != Observed.AckSampleId) { return; }
+        const auto Candidate = InCommand.Crawler.Get_AttackCandidate();
+        if (Candidate.IsSet() == false || Candidate.GetValue().SampleId != InCommand.Crawler.Get_AttackAcknowledgedSampleId()) { return; }
         auto Exit = false;
-        for (const auto& Event : Observed.AcceptedInterval.Get_Events())
-        { Exit = Exit || Event.Get_Id() == n"Damage" && Event.Get_Kind() == ECk_ProceduralAction_EventKind::WindowExit; }
+        for (const auto& Event : InCommand.Crawler.Get_AttackAcceptedInterval().Get_Events())
+        { Exit = Exit || (Event.Get_Id() == n"Damage" && Event.Get_Kind() == ECk_ProceduralAction_EventKind::WindowExit); }
         if (Exit == false) { return; }
         InCommand.Fired = true;
         InCommand.Frame = utils_time::Get_FrameCounter();
-        InCommand.Candidate = Observed.Candidate.GetValue();
-        InCommand.IssuedAtBoundary = utils_mars_test_catalog::Get_IssuedDamageRequests(InCommand.Crawler);
+        InCommand.Candidate = Candidate.GetValue();
+        InCommand.IssuedAtBoundary = InCommand.Crawler.Get_IssuedDamageRequests();
         InCommand.Crawler.Request_CancelAttack(FMars_Request_Crawler_CancelAttack(EMars_Crawler_AttackCancel::StateExit));
     }
 }
@@ -79,31 +79,32 @@ class UMars_TESTONLY_Processor_CrawlerEndpointCapture : UCk_Processor_Script_Bas
     {
         if (ck::Is_NOT_Valid(InCapture.Crawler)) { return; }
         const auto Crawler = InCapture.Crawler;
-        const auto& Observed = Crawler.Get_Fragment(FMars_Fragment_Crawler_AttackObservations);
-        const auto& Attack = Crawler.Get_Fragment(FMars_Fragment_Crawler_Attack);
-        if (Observed.Candidate.IsSet())
+        const auto Candidate = Crawler.Get_AttackCandidate();
+        const auto AcceptedInterval = Crawler.Get_AttackAcceptedInterval();
+        const auto AckSampleId = Crawler.Get_AttackAcknowledgedSampleId();
+        const auto Action = Crawler.Get_AttackAction();
+        if (Candidate.IsSet())
         {
-            const auto Candidate = Observed.Candidate.GetValue();
-            if (InCapture.Candidates.IsEmpty() || InCapture.Candidates.Last().SampleId != Candidate.SampleId)
-            { InCapture.Candidates.Add(Candidate); }
-            if (Observed.AcceptedInterval.Get_Windows().Contains(n"Damage") == false)
+            if (InCapture.Candidates.IsEmpty() || InCapture.Candidates.Last().SampleId != Candidate.GetValue().SampleId)
+            { InCapture.Candidates.Add(Candidate.GetValue()); }
+            if (AcceptedInterval.Get_Windows().Contains(n"Damage") == false)
             { ++InCapture.ClosedWindowCandidates; }
         }
-        if (Attack.CommittedSampleId > 0)
-        { InCapture.CommitSample = Attack.CommittedSampleId; InCapture.CommitContact = Attack.CommittedEmitter; }
-        if (Observed.AckSampleId == 0 || Observed.AckSampleId <= InCapture.LastSample || ck::Is_NOT_Valid(Attack.Action))
+        if (Crawler.Get_AttackCommittedSampleId() > 0)
+        { InCapture.CommitSample = Crawler.Get_AttackCommittedSampleId(); InCapture.CommitContact = Crawler.Get_AttackCommittedEmitter(); }
+        if (AckSampleId == 0 || AckSampleId <= InCapture.LastSample || ck::Is_NOT_Valid(Action))
         { return; }
-        InCapture.LastSample = Observed.AckSampleId;
-        const auto Receipt = Attack.Action.Get_LastReceipt();
+        InCapture.LastSample = AckSampleId;
+        const auto Receipt = Action.Get_LastReceipt();
         auto TargetContacts = 0;
         auto Blockers = 0;
-        for (const auto& Segment : Observed.AcceptedEmitters)
+        for (const auto& Segment : Crawler.Get_AttackAcceptedEmitters())
         {
             if (Segment.Sample.Stamp.Get_SampleSequence() != Receipt.Get_Stamp().Get_SampleSequence())
             { continue; }
             auto Row = FMars_TESTONLY_EndpointTrace();
             Row.Segment = Segment;
-            Row.Interval = Observed.AcceptedInterval;
+            Row.Interval = AcceptedInterval;
             Row.Sampling = Receipt.Get_Sampling();
             Row.Frame = utils_time::Get_FrameCounter();
             Row.DeltaSeconds = InDeltaT.Get_Seconds();
@@ -134,21 +135,21 @@ class UMars_TESTONLY_Processor_CrawlerEndpointCapture : UCk_Processor_Script_Bas
         }
         if (TargetContacts >= 2) { ++InCapture.DualContactSamples; }
         if (TargetContacts > 0 && Blockers > 0) { ++InCapture.SimultaneousBlockedSamples; }
-        if (Observed.AcceptedInterval.Get_PhaseId() == n"Strike" && Observed.AcceptedInterval.Get_Windows().Contains(n"Damage") == false)
+        if (AcceptedInterval.Get_PhaseId() == n"Strike" && AcceptedInterval.Get_Windows().Contains(n"Damage") == false)
         {
             auto PhaseStart = 0.0;
-            for (const auto& Phase : Attack.Plan.Entry.Definition.Clip.Get().Get_Phases())
+            for (const auto& Phase : Crawler.Get_AttackPlan().Entry.Definition.Clip.Get().Get_Phases())
             {
                 if (Phase.Get_Id() == n"Strike")
                 {
                     const auto Duration = Phase.Get_Duration().Get_Seconds();
-                    if (Observed.AcceptedInterval.Get_ToTime().Get_Seconds() <= PhaseStart + Duration * 0.25 + 1.0e-6) { ++InCapture.EarlyStrikeSamples; }
-                    if (Observed.AcceptedInterval.Get_FromTime().Get_Seconds() >= PhaseStart + Duration * 0.75 - 1.0e-6) { ++InCapture.LateStrikeSamples; }
+                    if (AcceptedInterval.Get_ToTime().Get_Seconds() <= PhaseStart + Duration * 0.25 + 1.0e-6) { ++InCapture.EarlyStrikeSamples; }
+                    if (AcceptedInterval.Get_FromTime().Get_Seconds() >= PhaseStart + Duration * 0.75 - 1.0e-6) { ++InCapture.LateStrikeSamples; }
                 }
                 PhaseStart += Phase.Get_Duration().Get_Seconds();
             }
         }
-        for (const auto& Event : Observed.AcceptedInterval.Get_Events())
+        for (const auto& Event : AcceptedInterval.Get_Events())
         { if (Event.Get_Kind() == ECk_ProceduralAction_EventKind::WindowExit && Event.Get_Id() == n"Damage") { ++InCapture.DamageExitSamples; } }
     }
 }
@@ -180,11 +181,11 @@ class UMars_AutoTestRig_CrawlerEndpointCatalog : UMars_AutoTestRig_CrawlerAttack
         _SwipeRight = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
         _SwipeLeft = Cast<UCk_ProceduralAction_Data>(NewObject(this, UCk_ProceduralAction_Data));
 #if EDITOR
-        Assert_True(utils_crawler::Build_ReferenceEndpointPincerClip(_CatalogLayout, _CatalogLegCount, _CatalogPincerSource, _EndpointPincer).Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+        Assert_True(utils_crawler::Build_ReferenceEndpointPincerClip(FMars_Crawler_ReferenceBody(_CatalogLayout, _CatalogLegCount), _CatalogPincerSource, _EndpointPincer).Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
             "opt-in endpoint pincer builder compiles without modifying its legacy source");
-        Assert_True(utils_crawler::Build_ReferenceSwipeClip(_CatalogLayout, _CatalogLegCount, true, _SwipeRight).Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+        Assert_True(utils_crawler::Build_ReferenceSwipeClip(FMars_Crawler_ReferenceBody(_CatalogLayout, _CatalogLegCount), EMars_Crawler_Side::Right, _SwipeRight).Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
             "independent right swipe public builder compiles");
-        Assert_True(utils_crawler::Build_ReferenceSwipeClip(_CatalogLayout, _CatalogLegCount, false, _SwipeLeft).Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
+        Assert_True(utils_crawler::Build_ReferenceSwipeClip(FMars_Crawler_ReferenceBody(_CatalogLayout, _CatalogLegCount), EMars_Crawler_Side::Left, _SwipeLeft).Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
             "independent left swipe public builder compiles");
 #endif
         _CatalogPincer.Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(_EndpointPincer);
@@ -305,7 +306,7 @@ class UMars_AutoTestRig_CrawlerEndpointCatalog : UMars_AutoTestRig_CrawlerAttack
             const FString CancelText = Cancel.IsSet() ? f"{Cancel.GetValue() :n}" : "-";
             Log(f"[EndpointReturn] {_CatalogLayout :n}/{_CatalogLegCount} {_ExpectedEndpointId}: accepted {Result.Accepted}, completed {Result.Completed}, native {Result.Native.Get_Outcome() :n}/{Result.Native.Get_Recovery() :n}/{Result.Native.Get_Reason()}, evidence {Result.Evidence.Failure}, cleanup {Result.CleanupOutcome}, cancel {CancelText}, articulation {_Crawler.Get_Articulation().Get_Health() :n}");
             for (const auto& Failure : _Crawler.Get_AttackEmitterFailures())
-            { Log(f"[EndpointReturnFailure] {Failure.Code} {Failure.Field} expected {Failure.Expected} actual {Failure.Actual}"); }
+            { Log(f"[EndpointReturnFailure] {Failure.Code :n} {Failure.Field} expected {Failure.Expected} actual {Failure.Actual}"); }
             for (const auto& Part : _Crawler.Get_LegParts())
             {
                 const auto Control = _Crawler.Get_Articulation().Get_LimbControl(Part.Get_Leg().Get_Id());

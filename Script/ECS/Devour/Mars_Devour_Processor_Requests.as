@@ -1,6 +1,6 @@
 // A Cancel applies first and lets the held victim go; then the Begins are tried in the order they were asked, and the
 // first one that can be taken (utils Get_CanSeize) seizes its victim. The rest are dropped: one victim at a time.
-class UMars_Processor_Devour_HandleRequests : UCk_Processor_Script_Base_UE
+class UMars_Processor_Devour_HandleRequests : UMars_Processor_Devour_Base
 {
     default _Group = n"FGroup_Gameplay_Script";
     default _MarkedDirtyBy = FMars_Fragment_Devour_Requests;
@@ -25,7 +25,7 @@ class UMars_Processor_Devour_HandleRequests : UCk_Processor_Script_Base_UE
         auto Released = FCk_Handle();
         const auto DidCancel = HasCancel && Self.Get_IsActive();
         if (DidCancel)
-        { Released = utils_devour::DoRelease(Self, InState); }
+        { Released = DoRelease(Self, InState); }
 
         auto DidSeize = false;
         for (const auto& Begin : Begins)
@@ -33,7 +33,7 @@ class UMars_Processor_Devour_HandleRequests : UCk_Processor_Script_Base_UE
             if (Self.Get_CanSeize(Begin.Victim) == false)
             { continue; }
 
-            utils_devour::DoSeize(Self, InState, Begin.Victim);
+            DoSeize(Self, InState, Begin.Victim);
             DidSeize = true;
             break;
         }

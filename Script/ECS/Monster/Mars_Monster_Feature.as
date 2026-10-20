@@ -61,8 +61,8 @@ mixin FMars_Validation Validate(const FMars_Monster_Spec& Self)
     if (ZoneValidation.IsValid() == false)
     { return ZoneValidation; }
 
-    if (Self.CorpseSeconds < 0.0f)
-    { return FMars_Validation(f"Monster has a negative CorpseSeconds [{Self.CorpseSeconds}]"); }
+    if (Math::IsFinite(Self.CorpseSeconds) == false || Self.CorpseSeconds < 0.0f)
+    { return FMars_Validation(f"Monster has a non-finite or negative CorpseSeconds [{Self.CorpseSeconds}]"); }
 
     return FMars_Validation();
 }
@@ -110,21 +110,12 @@ struct FMars_Tag_Monster_NeedsSetup {}
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_Monster_OnPartRegistered(FCk_Handle_Monster InMonster, FCk_Handle_BodyPart InPart);
-event void FMars_Delegate_Monster_OnPartRegistered_MC(FCk_Handle_Monster InMonster, FCk_Handle_BodyPart InPart);
-
-// The fan-in of every registered part's OnSevered.
-delegate void FMars_Delegate_Monster_OnPartSevered(FCk_Handle_Monster InMonster, FCk_Handle_BodyPart InPart);
-event void FMars_Delegate_Monster_OnPartSevered_MC(FCk_Handle_Monster InMonster, FCk_Handle_BodyPart InPart);
-
 // Once per monster; DeathCause and the Dead attribute request are already in place when it fires.
 delegate void FMars_Delegate_Monster_OnDied(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause);
 event void FMars_Delegate_Monster_OnDied_MC(FCk_Handle_Monster InMonster, FMars_DamageEvent InCause);
 
 struct FMars_Fragment_Monster_Signals
 {
-    FMars_Delegate_Monster_OnPartRegistered_MC OnPartRegistered;
-    FMars_Delegate_Monster_OnPartSevered_MC OnPartSevered;
     FMars_Delegate_Monster_OnDied_MC OnDied;
 }
 

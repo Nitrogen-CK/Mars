@@ -18,6 +18,9 @@ namespace utils_brain
         auto WorldStateSpec = FCk_Goap_WorldState_Spec();
         WorldStateSpec.Set_PreRegisteredKeys(Keys);
         auto WorldState = utils_goap_world_state::Create(InOwner, InSpec.WorldStateTag, WorldStateSpec);
+        if (ck::EnsureIfNot(ck::IsValid(WorldState), f"[Brain] [{InOwner.ToString()}] CkGoap rejected the world state"))
+        { return FCk_Handle_Brain(); }
+
         for (const auto& Fact : InSpec.Facts)
         { utils_goap_world_state::Set_Value(WorldState, Fact.Key, Fact.Initial); }
 
@@ -27,9 +30,12 @@ namespace utils_brain
         PlannerSpec.Set_ReplanPolicy(ECk_Goap_ReplanPolicy::OnWorldStateDirty);
         PlannerSpec.Set_MinReplanIntervalSeconds(InSpec.MinReplanIntervalSeconds);
         auto Planner = utils_goap_planner::Create(InOwner, InSpec.PlannerTag, PlannerSpec);
-        if (ck::EnsureIfNot(ck::IsValid(WorldState) && ck::IsValid(Planner),
-            f"[Brain] [{InOwner.ToString()}] CkGoap rejected the world state or the planner"))
-        { return FCk_Handle_Brain(); }
+        if (ck::EnsureIfNot(ck::IsValid(Planner), f"[Brain] [{InOwner.ToString()}] CkGoap rejected the planner"))
+        {
+            // Nothing composed: the world-state child goes with the rejected planner.
+            utils_entity_lifetime::Request_DestroyEntity(WorldState);
+            return FCk_Handle_Brain();
+        }
 
         for (const auto& Action : InSpec.Actions)
         {

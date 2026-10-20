@@ -80,7 +80,7 @@ class UMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled : UCk_AutoTe
     UFUNCTION()
     private void Step_Cancel(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Cancelled.Request_Cancel();
+        _Cancelled.Request_Cancel(FMars_Request_Devour_Cancel());
     }
 
     UFUNCTION()
@@ -106,7 +106,7 @@ class UMars_AutoTest_Devour_ACancelOrALostVictimEndsTheRunCancelled : UCk_AutoTe
     UFUNCTION()
     private void Step_CancelAndDestroy(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Cancelled.Request_Cancel();
+        _Cancelled.Request_Cancel(FMars_Request_Devour_Cancel());
         utils_entity_lifetime::Request_DestroyEntity(_LostVictim);
     }
 

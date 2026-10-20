@@ -25,43 +25,6 @@ namespace utils_damage_dealer
         Event.Source.Causer = InDealer;
         return Event;
     }
-
-    // One melee swing, traced now: a sphere sweep along InSweep filtered on Probe.Mars.HitZone, Blocking world policy (a
-    // wall in front of a hurtbox stops the swing) and Silent overlap notify (an aim query must not ping the hurtboxes),
-    // traced as InDealer's entity (its own bodies are skipped). The sweep also skips InSweep.IgnoredEntities and, when the
-    // dealer is itself a zone, that zone's own hurtboxes: they are child entities, which the trace's own-entity skip does
-    // not cover. A hurtbox hit is requested as damage through InDealer as InTemplate with the hit location and surface
-    // normal stamped; the dealer resolves the hurtbox to its zone. Returns the trace result: a miss is a default result
-    // whose HitKind reads Probe, so callers test the hit entity's validity.
-    FCk_ShapeCast_Result Try_StrikeSweep(FCk_Handle_DamageDealer& InDealer, FMars_DamageDealer_Sweep InSweep, FMars_DamageEvent InTemplate)
-    {
-        TArray<FCk_Handle> Ignored = InSweep.IgnoredEntities;
-        auto OwnZone = InDealer.As_HitZone(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(OwnZone))
-        {
-            for (auto Hurtbox : OwnZone.Get_Hurtboxes())
-            { Ignored.AddUnique(Hurtbox); }
-        }
-
-        auto Settings = FCk_ShapeCast_Settings(
-            InSweep.Start,
-            InSweep.End,
-            utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InSweep.Radius)),
-            GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_HitZone));
-        Settings.Set_WorldHitPolicy(ECk_ProbeTrace_WorldHitPolicy::Blocking);
-        Settings.Set_OverlapNotifyPolicy(ECk_ProbeResponse_Policy::Silent);
-        Settings.Set_IgnoredEntities(Ignored);
-
-        const auto Result = utils_probe_trace::Request_SingleShapeTrace(InDealer, Settings);
-        if (Result.Get_HitKind() != ECk_ProbeTrace_HitKind::Probe || ck::Is_NOT_Valid(Result.Get_HitEntity()))
-        { return Result; }
-
-        auto Event = InTemplate;
-        Event.Hit.Location = Result.Get_HitLocation();
-        Event.Hit.Normal = Result.Get_SurfaceNormal();
-        InDealer.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(Result.Get_HitEntity(), Event));
-        return Result;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -83,12 +46,6 @@ mixin int32 Get_HitsRejected(const FCk_Handle_DamageDealer& Self)
     return Self.Get_Fragment(FMars_Fragment_DamageDealer).HitsRejected;
 }
 
-// Unset until a hit is dealt.
-mixin TOptional<FMars_DamageEvent> Get_LastDealt(const FCk_Handle_DamageDealer& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_DamageDealer).LastDealt;
-}
-
 //--------------------------------------------------------------------------------------------------------------------------
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
@@ -97,6 +54,43 @@ mixin void Request_DealDamage(FCk_Handle_DamageDealer& Self, const FMars_Request
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_DamageDealer_Requests);
     Requests.DealDamageRequests.Add(InRequest);
+}
+
+// One melee swing, traced now: a sphere sweep along InSweep filtered on Probe.Mars.HitZone, Blocking world policy (a
+// wall in front of a hurtbox stops the swing) and Silent overlap notify (an aim query must not ping the hurtboxes),
+// traced as the dealer's entity (its own bodies are skipped). The sweep also skips InSweep.IgnoredEntities and, when the
+// dealer is itself a zone, that zone's own hurtboxes: they are child entities, which the trace's own-entity skip does
+// not cover. A hurtbox hit is requested as damage through the dealer as InTemplate with the hit location and surface
+// normal stamped; the dealer resolves the hurtbox to its zone. Returns the trace result: a miss is a default result
+// whose HitKind reads Probe, so callers test the hit entity's validity.
+mixin FCk_ShapeCast_Result Request_StrikeSweep(FCk_Handle_DamageDealer& Self, FMars_DamageDealer_Sweep InSweep, FMars_DamageEvent InTemplate)
+{
+    TArray<FCk_Handle> Ignored = InSweep.IgnoredEntities;
+    auto OwnZone = Self.As_HitZone(ECk_SanityCheck::UnChecked);
+    if (ck::IsValid(OwnZone))
+    {
+        for (auto Hurtbox : OwnZone.Get_Hurtboxes())
+        { Ignored.AddUnique(Hurtbox); }
+    }
+
+    auto Settings = FCk_ShapeCast_Settings(
+        InSweep.Start,
+        InSweep.End,
+        utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InSweep.Radius)),
+        GameplayTag::MakeContainerFromTag(GameplayTags::Probe_Mars_HitZone));
+    Settings.Set_WorldHitPolicy(ECk_ProbeTrace_WorldHitPolicy::Blocking);
+    Settings.Set_OverlapNotifyPolicy(ECk_ProbeResponse_Policy::Silent);
+    Settings.Set_IgnoredEntities(Ignored);
+
+    const auto Result = utils_probe_trace::Request_SingleShapeTrace(Self, Settings);
+    if (Result.Get_HitKind() != ECk_ProbeTrace_HitKind::Probe || ck::Is_NOT_Valid(Result.Get_HitEntity()))
+    { return Result; }
+
+    auto Event = InTemplate;
+    Event.Hit.Location = Result.Get_HitLocation();
+    Event.Hit.Normal = Result.Get_SurfaceNormal();
+    Self.Request_DealDamage(FMars_Request_DamageDealer_DealDamage(Result.Get_HitEntity(), Event));
+    return Result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -28,6 +28,7 @@ namespace utils_attack
     {
         if (InPassed)
         { return; }
+
         if (InOutReport.Diagnostics.Num() < MaxDiagnostics)
         { InOutReport.Diagnostics.Add(InDiagnostic); }
         else
@@ -39,9 +40,10 @@ namespace utils_attack
         for (const auto& SourceDiagnostic : InReport.Diagnostics)
         {
             FMars_Attack_Diagnostic Diagnostic = SourceDiagnostic;
-            Diagnostic.Field = InPrefix + Diagnostic.Field;
+            Diagnostic.Field = f"{InPrefix}{Diagnostic.Field}";
             Add_Check(InOutReport, false, Diagnostic);
         }
+
         InOutReport.Truncated = InOutReport.Truncated || InReport.Truncated;
     }
 
@@ -131,6 +133,7 @@ namespace utils_attack
             if (Window.Get_Id() == InId)
             { return true; }
         }
+
         return false;
     }
 
@@ -147,6 +150,7 @@ namespace utils_attack
             if (Phases[Index].Get_Id() == InEdge.Get_PhaseId())
             { return TOptional<float64>(float64(Index) + InEdge.Get_Time().Get_Value()); }
         }
+
         return TOptional<float64>();
     }
 
@@ -163,12 +167,14 @@ namespace utils_attack
                 InnerStart = Get_WindowEdgeCoordinate(InClip, Window.Get_Start());
                 InnerEnd = Get_WindowEdgeCoordinate(InClip, Window.Get_End());
             }
+
             if (Window.Get_Id() == InOuter)
             {
                 OuterStart = Get_WindowEdgeCoordinate(InClip, Window.Get_Start());
                 OuterEnd = Get_WindowEdgeCoordinate(InClip, Window.Get_End());
             }
         }
+
         return InnerStart.IsSet() && InnerEnd.IsSet() && OuterStart.IsSet() && OuterEnd.IsSet() &&
             InnerStart.GetValue() >= OuterStart.GetValue() && InnerEnd.GetValue() <= OuterEnd.GetValue();
     }
@@ -186,6 +192,7 @@ namespace utils_attack
             Add_Check(Report, Prepare.MinDistance <= Prepare.MaxDistance,
                 Make_Diagnostic(n"RangeBounds", "Prepare", FMars_Attack_Comparison("MinDistance <= MaxDistance", f"{Prepare.MinDistance}, {Prepare.MaxDistance}")));
         }
+
         Add_Check(Report, Get_IsPositive(Prepare.FacingToleranceDegrees) && Prepare.FacingToleranceDegrees <= 180.0f,
             Make_Diagnostic(n"FacingBounds", "Prepare.FacingToleranceDegrees", FMars_Attack_Comparison("(0,180] degrees", f"{Prepare.FacingToleranceDegrees}")));
         Check_Nonnegative(Report, Prepare.MaxHeightDifference, "Prepare.MaxHeightDifference");
@@ -204,24 +211,26 @@ namespace utils_attack
         {
             const auto Slot = InDefinition.Requirements.Slots[Index];
             const FString Field = f"Requirements.Slots[{Index}]";
-            Add_Check(Report, Slot.Slot.IsNone() == false, Make_Diagnostic(n"SlotMissing", Field + ".Slot", FMars_Attack_Comparison("named slot", "None")));
-            Add_Check(Report, Slot.Role.IsValid(), Make_Diagnostic(n"RoleMissing", Field + ".Role", FMars_Attack_Comparison("named role", "None")));
-            Add_Check(Report, Slots.Contains(Slot.Slot) == false, Make_Diagnostic(n"DuplicateSlot", Field + ".Slot", FMars_Attack_Comparison("unique ignoring case", Slot.Slot.ToString())));
-            Add_Check(Report, Roles.Contains(Slot.Role) == false, Make_Diagnostic(n"DuplicateRole", Field + ".Role", FMars_Attack_Comparison("unique claimed role", Slot.Role.ToString())));
-            Check_Condition(Report, Slot.MaxCondition, Field + ".MaxCondition");
+            Add_Check(Report, Slot.Slot.IsNone() == false, Make_Diagnostic(n"SlotMissing", f"{Field}.Slot", FMars_Attack_Comparison("named slot", "None")));
+            Add_Check(Report, Slot.Role.IsValid(), Make_Diagnostic(n"RoleMissing", f"{Field}.Role", FMars_Attack_Comparison("named role", "None")));
+            Add_Check(Report, Slots.Contains(Slot.Slot) == false, Make_Diagnostic(n"DuplicateSlot", f"{Field}.Slot", FMars_Attack_Comparison("unique ignoring case", Slot.Slot.ToString())));
+            Add_Check(Report, Roles.Contains(Slot.Role) == false, Make_Diagnostic(n"DuplicateRole", f"{Field}.Role", FMars_Attack_Comparison("unique claimed role", Slot.Role.ToString())));
+            Check_Condition(Report, Slot.MaxCondition, f"{Field}.MaxCondition");
             Slots.Add(Slot.Slot);
             Roles.Add(Slot.Role);
         }
+
         auto Parts = TArray<FGameplayTag>();
         for (int32 Index = 0; Index < Math::Min(InDefinition.Requirements.Parts.Num(), MaxRoles); ++Index)
         {
             const auto Part = InDefinition.Requirements.Parts[Index];
             const FString Field = f"Requirements.Parts[{Index}]";
-            Add_Check(Report, Part.Role.IsValid(), Make_Diagnostic(n"RoleMissing", Field + ".Role", FMars_Attack_Comparison("named role", "None")));
-            Add_Check(Report, Parts.Contains(Part.Role) == false, Make_Diagnostic(n"DuplicateRole", Field + ".Role", FMars_Attack_Comparison("unique prerequisite role", Part.Role.ToString())));
-            Check_Condition(Report, Part.MaxCondition, Field + ".MaxCondition");
+            Add_Check(Report, Part.Role.IsValid(), Make_Diagnostic(n"RoleMissing", f"{Field}.Role", FMars_Attack_Comparison("named role", "None")));
+            Add_Check(Report, Parts.Contains(Part.Role) == false, Make_Diagnostic(n"DuplicateRole", f"{Field}.Role", FMars_Attack_Comparison("unique prerequisite role", Part.Role.ToString())));
+            Check_Condition(Report, Part.MaxCondition, f"{Field}.MaxCondition");
             Parts.Add(Part.Role);
         }
+
         Add_Check(Report, InDefinition.Hit.Emitters.Num() > 0 && InDefinition.Hit.Emitters.Num() <= MaxEmitters,
             Make_Diagnostic(n"EmitterBounds", "Hit.Emitters", FMars_Attack_Comparison("[1,8] emitters", f"{InDefinition.Hit.Emitters.Num()}")));
         auto EmitterIds = TArray<FGameplayTag>();
@@ -230,28 +239,29 @@ namespace utils_attack
         {
             const auto Emitter = InDefinition.Hit.Emitters[Index];
             const FString Field = f"Hit.Emitters[{Index}]";
-            Add_Check(Report, Emitter.Id.IsValid(), Make_Diagnostic(n"EmitterIdMissing", Field + ".Id", FMars_Attack_Comparison("named emitter", "None")));
-            Add_Check(Report, EmitterIds.Contains(Emitter.Id) == false, Make_Diagnostic(n"DuplicateEmitter", Field + ".Id", FMars_Attack_Comparison("unique emitter tag", Emitter.Id.ToString())));
+            Add_Check(Report, Emitter.Id.IsValid(), Make_Diagnostic(n"EmitterIdMissing", f"{Field}.Id", FMars_Attack_Comparison("named emitter", "None")));
+            Add_Check(Report, EmitterIds.Contains(Emitter.Id) == false, Make_Diagnostic(n"DuplicateEmitter", f"{Field}.Id", FMars_Attack_Comparison("unique emitter tag", Emitter.Id.ToString())));
             EmitterIds.Add(Emitter.Id);
             Add_Check(Report, Emitter.Source == EMars_Attack_EmitterSource::Body || Emitter.Source == EMars_Attack_EmitterSource::LimbEndpoint,
-                Make_Diagnostic(n"EmitterSourceEnum", Field + ".Source", FMars_Attack_Comparison("Body or LimbEndpoint", f"{int32(Emitter.Source)}")));
-            Add_Check(Report, Get_IsFinite(Emitter.LocalCenter), Make_Diagnostic(n"EmitterCenterFinite", Field + ".LocalCenter", FMars_Attack_Comparison("finite vector", Emitter.LocalCenter.ToString())));
-            Check_Positive(Report, Emitter.Radius, Field + ".Radius");
-            Check_Positive(Report, Emitter.MaxSampleTravel, Field + ".MaxSampleTravel");
+                Make_Diagnostic(n"EmitterSourceEnum", f"{Field}.Source", FMars_Attack_Comparison("Body or LimbEndpoint", f"{int32(Emitter.Source)}")));
+            Add_Check(Report, Get_IsFinite(Emitter.LocalCenter), Make_Diagnostic(n"EmitterCenterFinite", f"{Field}.LocalCenter", FMars_Attack_Comparison("finite vector", Emitter.LocalCenter.ToString())));
+            Check_Positive(Report, Emitter.Radius, f"{Field}.Radius");
+            Check_Positive(Report, Emitter.MaxSampleTravel, f"{Field}.MaxSampleTravel");
             Add_Check(Report, Emitter.DamageWindow.IsNone() == false,
-                Make_Diagnostic(n"DamageWindowMissing", Field + ".DamageWindow", FMars_Attack_Comparison("named damage window", "None")));
+                Make_Diagnostic(n"DamageWindowMissing", f"{Field}.DamageWindow", FMars_Attack_Comparison("named damage window", "None")));
             if (Emitter.Source == EMars_Attack_EmitterSource::Body)
             {
                 HasBodyEmitter = true;
-                Add_Check(Report, Emitter.Slot.IsNone(), Make_Diagnostic(n"BodyEmitterSlot", Field + ".Slot", FMars_Attack_Comparison("None", Emitter.Slot.ToString())));
+                Add_Check(Report, Emitter.Slot.IsNone(), Make_Diagnostic(n"BodyEmitterSlot", f"{Field}.Slot", FMars_Attack_Comparison("None", Emitter.Slot.ToString())));
             }
             else if (Emitter.Source == EMars_Attack_EmitterSource::LimbEndpoint)
             {
-                Add_Check(Report, Emitter.UseCreatureFrontCenter == false, Make_Diagnostic(n"EndpointCreatureCenter", Field + ".UseCreatureFrontCenter", FMars_Attack_Comparison("false for limb endpoints", "true")));
-                Add_Check(Report, Slots.Contains(Emitter.Slot), Make_Diagnostic(n"EmitterSlotUnclaimed", Field + ".Slot", FMars_Attack_Comparison("declared claimed slot", Emitter.Slot.ToString())));
-                Add_Check(Report, Emitter.LocalCenter.IsNearlyZero(0.0), Make_Diagnostic(n"EndpointEmitterOffset", Field + ".LocalCenter", FMars_Attack_Comparison("zero offset", Emitter.LocalCenter.ToString())));
+                Add_Check(Report, Emitter.UseCreatureFrontCenter == false, Make_Diagnostic(n"EndpointCreatureCenter", f"{Field}.UseCreatureFrontCenter", FMars_Attack_Comparison("false for limb endpoints", "true")));
+                Add_Check(Report, Slots.Contains(Emitter.Slot), Make_Diagnostic(n"EmitterSlotUnclaimed", f"{Field}.Slot", FMars_Attack_Comparison("declared claimed slot", Emitter.Slot.ToString())));
+                Add_Check(Report, Emitter.LocalCenter.IsNearlyZero(0.0), Make_Diagnostic(n"EndpointEmitterOffset", f"{Field}.LocalCenter", FMars_Attack_Comparison("zero offset", Emitter.LocalCenter.ToString())));
             }
         }
+
         const auto Motion = InDefinition.Motion;
         Add_Check(Report, Motion.WindupPhase.IsNone() == false && Motion.StrikePhase.IsNone() == false && Motion.RecoverPhase.IsNone() == false &&
             Motion.WindupPhase != Motion.StrikePhase && Motion.WindupPhase != Motion.RecoverPhase && Motion.StrikePhase != Motion.RecoverPhase,
@@ -266,15 +276,17 @@ namespace utils_attack
             Add_Check(Report, false, Make_Diagnostic(n"ClipUnloaded", "Clip", FMars_Attack_Comparison("loaded before validation", InDefinition.Clip.ToString())));
             return Report;
         }
+
         const auto Compilation = utils_procedural_action::Validate_Data(Clip);
         for (const auto& Diagnostic : Compilation.Get_Diagnostics())
         {
             if (Diagnostic.Get_Severity() == ECk_ProceduralAction_DiagnosticSeverity::Error)
             {
-                Add_Check(Report, false, Make_Diagnostic(Diagnostic.Get_Code(), "Clip." + Diagnostic.Get_FieldPath(),
+                Add_Check(Report, false, Make_Diagnostic(Diagnostic.Get_Code(), f"Clip.{Diagnostic.Get_FieldPath()}",
                     FMars_Attack_Comparison(Diagnostic.Get_Expected(), Diagnostic.Get_Actual())));
             }
         }
+
         Add_Check(Report, Compilation.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid,
             Make_Diagnostic(n"ClipInvalid", "Clip", FMars_Attack_Comparison("public compiler Valid", f"{Compilation.Get_Status() :n}")));
         const auto Phases = Clip.Get_Phases();
@@ -286,6 +298,7 @@ namespace utils_attack
         {
             Add_Check(Report, Slots.Contains(Slot.Get_Id()), Make_Diagnostic(n"ClipSlotUnbound", "Requirements.Slots", FMars_Attack_Comparison("clip slot declared", Slot.Get_Id().ToString())));
         }
+
         Add_Check(Report, Get_HasWindow(Clip, Motion.ObstructionWindow), Make_Diagnostic(n"ObstructionWindowMissing", "Clip.Windows", FMars_Attack_Comparison("obstruction window exists", Motion.ObstructionWindow.ToString())));
         for (const auto& Window : Clip.Get_Windows())
         {
@@ -296,6 +309,7 @@ namespace utils_attack
                     Make_Diagnostic(n"ObstructionWindowCoverage", "Clip.Windows", FMars_Attack_Comparison("covers Windup start through Recover end", Window.Get_Id().ToString())));
             }
         }
+
         for (int32 Index = 0; Index < Math::Min(InDefinition.Hit.Emitters.Num(), MaxEmitters); ++Index)
         {
             const auto Emitter = InDefinition.Hit.Emitters[Index];
@@ -308,15 +322,18 @@ namespace utils_attack
             {
                 if (Window.Get_Id() != Emitter.DamageWindow || Emitter.DamageWindow == Motion.ObstructionWindow)
                 { continue; }
+
                 Add_Check(Report, Window.Get_Start().Get_PhaseId() == Motion.StrikePhase && Window.Get_End().Get_PhaseId() == Motion.StrikePhase,
                     Make_Diagnostic(n"DamageWindowPhase", f"Hit.Emitters[{Index}].DamageWindow", FMars_Attack_Comparison("contained in Strike", Emitter.DamageWindow.ToString())));
             }
         }
+
         if (HasBodyEmitter)
         {
             Add_Check(Report, Clip.Get_BodyChannel().Get_Enabled(),
                 Make_Diagnostic(n"BodyChannelContract", "Clip.BodyChannel", FMars_Attack_Comparison("enabled body for Body emitters", "disabled")));
         }
+
         if (Clip.Get_BodyChannel().Get_Enabled())
         {
             Add_Check(Report, Clip.Get_BodyChannel().Get_InitialSource() == ECk_ProceduralAction_InitialSource::IdentityOffset,
@@ -341,6 +358,7 @@ namespace utils_attack
                     Add_Check(Report, Key.Get_ArriveTangent().IsNearlyZero(0.0) && Key.Get_LeaveTangent().IsNearlyZero(0.0),
                         Make_Diagnostic(n"UnsupportedBodyCurve", f"{Field}[{KeyIndex}]", FMars_Attack_Comparison("zero body tangents", "nonzero tangent")));
                 }
+
                 if (Phase.Get_Id() == Motion.StrikePhase && Keys.Num() > 0)
                 {
                     Add_Check(Report, Keys.Last().Get_Rotation().IsIdentity(KINDA_SMALL_NUMBER),
@@ -348,6 +366,7 @@ namespace utils_attack
                 }
             }
         }
+
         return Report;
     }
 
@@ -363,21 +382,24 @@ namespace utils_attack
         {
             const auto Entry = InLoadout.Entries[Index];
             const FString Field = f"Entries[{Index}]";
-            Add_Check(Report, Entry.Id.IsValid(), Make_Diagnostic(n"AttackIdMissing", Field + ".Id", FMars_Attack_Comparison("named attack", "None")));
-            Add_Check(Report, Ids.Contains(Entry.Id) == false, Make_Diagnostic(n"DuplicateAttackId", Field + ".Id", FMars_Attack_Comparison("unique attack tag", Entry.Id.ToString())));
+            Add_Check(Report, Entry.Id.IsValid(), Make_Diagnostic(n"AttackIdMissing", f"{Field}.Id", FMars_Attack_Comparison("named attack", "None")));
+            Add_Check(Report, Ids.Contains(Entry.Id) == false, Make_Diagnostic(n"DuplicateAttackId", f"{Field}.Id", FMars_Attack_Comparison("unique attack tag", Entry.Id.ToString())));
             Ids.Add(Entry.Id);
             if (Entry.Enabled == false)
             { continue; }
+
             ++Enabled;
             auto Definition = Entry.Definition.Get();
-            Add_Check(Report, Entry.Definition.IsNull() == false, Make_Diagnostic(n"DefinitionMissing", Field + ".Definition", FMars_Attack_Comparison("configured definition", "null soft path")));
+            Add_Check(Report, Entry.Definition.IsNull() == false, Make_Diagnostic(n"DefinitionMissing", f"{Field}.Definition", FMars_Attack_Comparison("configured definition", "null soft path")));
             if (ck::Is_NOT_Valid(Definition))
             {
-                Add_Check(Report, false, Make_Diagnostic(n"DefinitionUnloaded", Field + ".Definition", FMars_Attack_Comparison("loaded before validation", Entry.Definition.ToString())));
+                Add_Check(Report, false, Make_Diagnostic(n"DefinitionUnloaded", f"{Field}.Definition", FMars_Attack_Comparison("loaded before validation", Entry.Definition.ToString())));
                 continue;
             }
-            Append_Report(Report, Validate_Definition(Definition.Def), Field + ".Definition.");
+
+            Append_Report(Report, Validate_Definition(Definition.Def), f"{Field}.Definition.");
         }
+
         Add_Check(Report, Enabled > 0, Make_Diagnostic(n"NoEnabledEntries", "Entries", FMars_Attack_Comparison("at least one enabled attack", "0")));
         return Report;
     }
@@ -394,6 +416,7 @@ namespace utils_attack
             if (Get_BindingsEqual(Binding, InBinding))
             { return true; }
         }
+
         return false;
     }
 
@@ -412,15 +435,15 @@ namespace utils_attack
         {
             const auto Binding = InLoadout.Anatomy[Index];
             const FString Field = f"Anatomy[{Index}]";
-            Add_Check(Report, Binding.Role.IsValid(), Make_Diagnostic(n"RoleMissing", Field + ".Role", FMars_Attack_Comparison("named role", "None")));
-            Add_Check(Report, Roles.Contains(Binding.Role) == false, Make_Diagnostic(n"DuplicateRole", Field + ".Role", FMars_Attack_Comparison("unique role tag", Binding.Role.ToString())));
+            Add_Check(Report, Binding.Role.IsValid(), Make_Diagnostic(n"RoleMissing", f"{Field}.Role", FMars_Attack_Comparison("named role", "None")));
+            Add_Check(Report, Roles.Contains(Binding.Role) == false, Make_Diagnostic(n"DuplicateRole", f"{Field}.Role", FMars_Attack_Comparison("unique role tag", Binding.Role.ToString())));
             Roles.Add(Binding.Role);
             Add_Check(Report, Binding.Source == EMars_Attack_AnatomySource::Body || Binding.Source == EMars_Attack_AnatomySource::ProceduralLimb,
-                Make_Diagnostic(n"AnatomySourceEnum", Field + ".Source", FMars_Attack_Comparison("Body or ProceduralLimb", f"{int32(Binding.Source)}")));
+                Make_Diagnostic(n"AnatomySourceEnum", f"{Field}.Source", FMars_Attack_Comparison("Body or ProceduralLimb", f"{int32(Binding.Source)}")));
             if (Binding.Source == EMars_Attack_AnatomySource::ProceduralLimb)
             {
-                Add_Check(Report, Binding.LimbId.IsNone() == false, Make_Diagnostic(n"LimbIdMissing", Field + ".LimbId", FMars_Attack_Comparison("stable limb id", "None")));
-                Add_Check(Report, LimbIds.Contains(Binding.LimbId) == false, Make_Diagnostic(n"DuplicateLimbId", Field + ".LimbId", FMars_Attack_Comparison("one semantic role per limb", Binding.LimbId.ToString())));
+                Add_Check(Report, Binding.LimbId.IsNone() == false, Make_Diagnostic(n"LimbIdMissing", f"{Field}.LimbId", FMars_Attack_Comparison("stable limb id", "None")));
+                Add_Check(Report, LimbIds.Contains(Binding.LimbId) == false, Make_Diagnostic(n"DuplicateLimbId", f"{Field}.LimbId", FMars_Attack_Comparison("one semantic role per limb", Binding.LimbId.ToString())));
                 LimbIds.Add(Binding.LimbId);
             }
             else if (Binding.Source == EMars_Attack_AnatomySource::Body)
@@ -429,25 +452,27 @@ namespace utils_attack
                     Make_Diagnostic(n"BodyBindingContract", Field, FMars_Attack_Comparison("body has no limb id or locomotor control", Binding.LimbId.ToString())));
             }
         }
+
         auto Ids = TArray<FGameplayTag>();
         for (int32 Index = 0; Index < Math::Min(InLoadout.Entries.Num(), MaxEntries); ++Index)
         {
             const auto Entry = InLoadout.Entries[Index];
             const FString Field = f"Entries[{Index}]";
-            Add_Check(Report, Entry.Identity.Id.IsValid(), Make_Diagnostic(n"AttackIdMissing", Field + ".Identity.Id", FMars_Attack_Comparison("named attack", "None")));
-            Add_Check(Report, Ids.Contains(Entry.Identity.Id) == false, Make_Diagnostic(n"DuplicateAttackId", Field + ".Identity.Id", FMars_Attack_Comparison("unique attack tag", Entry.Identity.Id.ToString())));
+            Add_Check(Report, Entry.Identity.Id.IsValid(), Make_Diagnostic(n"AttackIdMissing", f"{Field}.Identity.Id", FMars_Attack_Comparison("named attack", "None")));
+            Add_Check(Report, Ids.Contains(Entry.Identity.Id) == false, Make_Diagnostic(n"DuplicateAttackId", f"{Field}.Identity.Id", FMars_Attack_Comparison("unique attack tag", Entry.Identity.Id.ToString())));
             Ids.Add(Entry.Identity.Id);
             Add_Check(Report, Entry.Identity.GameRevision == InLoadout.GameRevision,
-                Make_Diagnostic(n"GameRevisionMismatch", Field + ".Identity.GameRevision", FMars_Attack_Comparison(f"{InLoadout.GameRevision}", f"{Entry.Identity.GameRevision}")));
-            Append_Report(Report, Validate_Definition(Entry.Definition), Field + ".Definition.");
+                Make_Diagnostic(n"GameRevisionMismatch", f"{Field}.Identity.GameRevision", FMars_Attack_Comparison(f"{InLoadout.GameRevision}", f"{Entry.Identity.GameRevision}")));
+            Append_Report(Report, Validate_Definition(Entry.Definition), f"{Field}.Definition.");
             Add_Check(Report, Entry.Definition.Prepare.UseCreatureFrontRange == false,
-                Make_Diagnostic(n"CreatureDefaultsUnresolved", Field + ".Definition.Prepare", FMars_Attack_Comparison("resolved numeric range", "creature default")));
+                Make_Diagnostic(n"CreatureDefaultsUnresolved", f"{Field}.Definition.Prepare", FMars_Attack_Comparison("resolved numeric range", "creature default")));
             for (const auto& Emitter : Entry.Definition.Hit.Emitters)
-            { Add_Check(Report, Emitter.UseCreatureFrontCenter == false, Make_Diagnostic(n"CreatureDefaultsUnresolved", Field + ".Definition.Hit.Emitters", FMars_Attack_Comparison("resolved numeric centre", "creature default"))); }
+            { Add_Check(Report, Emitter.UseCreatureFrontCenter == false, Make_Diagnostic(n"CreatureDefaultsUnresolved", f"{Field}.Definition.Hit.Emitters", FMars_Attack_Comparison("resolved numeric centre", "creature default"))); }
+
             Add_Check(Report, Entry.Slots.Num() == Entry.Definition.Requirements.Slots.Num() && Entry.Slots.Num() <= MaxRoles,
-                Make_Diagnostic(n"ResolvedSlotCoverage", Field + ".Slots", FMars_Attack_Comparison("exact authored slots", f"{Entry.Slots.Num()}")));
+                Make_Diagnostic(n"ResolvedSlotCoverage", f"{Field}.Slots", FMars_Attack_Comparison("exact authored slots", f"{Entry.Slots.Num()}")));
             Add_Check(Report, Entry.Parts.Num() == Entry.Definition.Requirements.Parts.Num() && Entry.Parts.Num() <= MaxRoles,
-                Make_Diagnostic(n"ResolvedPartCoverage", Field + ".Parts", FMars_Attack_Comparison("exact authored prerequisites", f"{Entry.Parts.Num()}")));
+                Make_Diagnostic(n"ResolvedPartCoverage", f"{Field}.Parts", FMars_Attack_Comparison("exact authored prerequisites", f"{Entry.Parts.Num()}")));
             auto BoundSlots = TArray<FName>();
             auto BoundLimbs = TArray<FName>();
             auto HasLocomotor = false;
@@ -455,30 +480,32 @@ namespace utils_attack
             {
                 const auto Slot = Entry.Slots[SlotIndex];
                 const FString SlotField = f"{Field}.Slots[{SlotIndex}]";
-                Add_Check(Report, Get_HasBinding(InLoadout.Anatomy, Slot.Binding), Make_Diagnostic(n"RoleUnbound", SlotField + ".Binding", FMars_Attack_Comparison("exact anatomy binding", Slot.Binding.Role.ToString())));
+                Add_Check(Report, Get_HasBinding(InLoadout.Anatomy, Slot.Binding), Make_Diagnostic(n"RoleUnbound", f"{SlotField}.Binding", FMars_Attack_Comparison("exact anatomy binding", Slot.Binding.Role.ToString())));
                 Add_Check(Report, Slot.Binding.Source == EMars_Attack_AnatomySource::ProceduralLimb,
-                    Make_Diagnostic(n"ClaimSource", SlotField + ".Binding.Source", FMars_Attack_Comparison("ProceduralLimb", f"{int32(Slot.Binding.Source)}")));
-                Add_Check(Report, BoundSlots.Contains(Slot.Slot) == false, Make_Diagnostic(n"DuplicateSlot", SlotField + ".Slot", FMars_Attack_Comparison("unique claimed slot", Slot.Slot.ToString())));
-                Add_Check(Report, BoundLimbs.Contains(Slot.Binding.LimbId) == false, Make_Diagnostic(n"DuplicateClaimedLimb", SlotField + ".Binding.LimbId", FMars_Attack_Comparison("distinct claimed limb", Slot.Binding.LimbId.ToString())));
+                    Make_Diagnostic(n"ClaimSource", f"{SlotField}.Binding.Source", FMars_Attack_Comparison("ProceduralLimb", f"{int32(Slot.Binding.Source)}")));
+                Add_Check(Report, BoundSlots.Contains(Slot.Slot) == false, Make_Diagnostic(n"DuplicateSlot", f"{SlotField}.Slot", FMars_Attack_Comparison("unique claimed slot", Slot.Slot.ToString())));
+                Add_Check(Report, BoundLimbs.Contains(Slot.Binding.LimbId) == false, Make_Diagnostic(n"DuplicateClaimedLimb", f"{SlotField}.Binding.LimbId", FMars_Attack_Comparison("distinct claimed limb", Slot.Binding.LimbId.ToString())));
                 auto Matches = 0;
                 for (const auto& Authored : Entry.Definition.Requirements.Slots)
                 {
                     if (Authored.Slot == Slot.Slot && Authored.Role == Slot.Binding.Role && Authored.MaxCondition == Slot.MaxCondition)
                     { ++Matches; }
                 }
+
                 Add_Check(Report, Matches == 1, Make_Diagnostic(n"ResolvedSlotMismatch", SlotField, FMars_Attack_Comparison("exact authored slot, role and ceiling", Slot.Slot.ToString())));
                 BoundSlots.Add(Slot.Slot);
                 BoundLimbs.Add(Slot.Binding.LimbId);
                 HasLocomotor = HasLocomotor || Slot.Binding.Locomotor;
             }
+
             auto BoundParts = TArray<FGameplayTag>();
             for (int32 PartIndex = 0; PartIndex < Math::Min(Entry.Parts.Num(), MaxRoles); ++PartIndex)
             {
                 const auto Part = Entry.Parts[PartIndex];
                 const FString PartField = f"{Field}.Parts[{PartIndex}]";
-                Add_Check(Report, Get_HasBinding(InLoadout.Anatomy, Part.Binding), Make_Diagnostic(n"RoleUnbound", PartField + ".Binding", FMars_Attack_Comparison("exact anatomy binding", Part.Binding.Role.ToString())));
+                Add_Check(Report, Get_HasBinding(InLoadout.Anatomy, Part.Binding), Make_Diagnostic(n"RoleUnbound", f"{PartField}.Binding", FMars_Attack_Comparison("exact anatomy binding", Part.Binding.Role.ToString())));
                 Add_Check(Report, BoundParts.Contains(Part.Binding.Role) == false,
-                    Make_Diagnostic(n"DuplicateResolvedPart", PartField + ".Binding.Role", FMars_Attack_Comparison("unique resolved prerequisite", Part.Binding.Role.ToString())));
+                    Make_Diagnostic(n"DuplicateResolvedPart", f"{PartField}.Binding.Role", FMars_Attack_Comparison("unique resolved prerequisite", Part.Binding.Role.ToString())));
                 BoundParts.Add(Part.Binding.Role);
                 auto Matches = 0;
                 for (const auto& Authored : Entry.Definition.Requirements.Parts)
@@ -486,18 +513,21 @@ namespace utils_attack
                     if (Authored.Role == Part.Binding.Role && Authored.MaxCondition == Part.MaxCondition)
                     { ++Matches; }
                 }
+
                 Add_Check(Report, Matches == 1, Make_Diagnostic(n"ResolvedPartMismatch", PartField, FMars_Attack_Comparison("exact authored role and ceiling", Part.Binding.Role.ToString())));
             }
+
             for (const auto& Authored : Entry.Definition.Requirements.Parts)
             {
-                Add_Check(Report, BoundParts.Contains(Authored.Role), Make_Diagnostic(n"ResolvedPartMissing", Field + ".Parts",
+                Add_Check(Report, BoundParts.Contains(Authored.Role), Make_Diagnostic(n"ResolvedPartMissing", f"{Field}.Parts",
                     FMars_Attack_Comparison("every authored prerequisite resolved", Authored.Role.ToString())));
             }
+
             if (HasLocomotor)
             {
                 const auto Support = InLoadout.Execution.Locomotion.Get_Support();
                 Add_Check(Report, Support.Get_Mode() != ECk_ProceduralLimbControl_SupportMode::Disabled,
-                    Make_Diagnostic(n"LocomotorSupportDisabled", Field + ".Slots", FMars_Attack_Comparison("enabled support policy for locomotor claims", "Disabled")));
+                    Make_Diagnostic(n"LocomotorSupportDisabled", f"{Field}.Slots", FMars_Attack_Comparison("enabled support policy for locomotor claims", "Disabled")));
                 auto Clip = Entry.Definition.Clip.Get();
                 const auto Rate = InLoadout.Execution.Tuning.Get_Playback().Get_PlayRate();
                 if (ck::IsValid(Clip) && Get_IsPositive(Rate))
@@ -505,26 +535,81 @@ namespace utils_attack
                     float64 Duration = 0.0;
                     for (const auto& Phase : Clip.Get_Phases())
                     { Duration += Phase.Get_Duration().Get_Seconds(); }
+
                     const auto MinimumHold = Duration / Rate + InLoadout.Execution.Tuning.Get_Transition().Get_DedicatedReturn().Get_Seconds();
                     Add_Check(Report, Support.Get_SupportHoldTimeout().Get_Seconds() + 1.0e-5 >= MinimumHold,
-                        Make_Diagnostic(n"SupportHoldCoverage", Field + ".Definition.Clip", FMars_Attack_Comparison(f"hold >= {MinimumHold} seconds", f"{Support.Get_SupportHoldTimeout().Get_Seconds()}")));
+                        Make_Diagnostic(n"SupportHoldCoverage", f"{Field}.Definition.Clip", FMars_Attack_Comparison(f"hold >= {MinimumHold} seconds", f"{Support.Get_SupportHoldTimeout().Get_Seconds()}")));
                 }
             }
         }
+
         return Report;
     }
 
-    void Add_Blocker(FMars_Attack_Evaluation& InOutEvaluation, const FMars_Attack_Blocker& InBlocker, bool InPermanent)
+    // Whether a code blocks for good (the attack is incapable) or only until the creature, the target or a timer changes.
+    // Exhaustive over the enum: a new code needs a case here.
+    EMars_Attack_BlockerKind Get_BlockerKind(EMars_Attack_BlockerCode InCode)
+    {
+        switch (InCode)
+        {
+            case EMars_Attack_BlockerCode::PartMissing:
+            case EMars_Attack_BlockerCode::PartPendingDestroy:
+            case EMars_Attack_BlockerCode::PartWrongOwner:
+            case EMars_Attack_BlockerCode::PartSevered:
+            case EMars_Attack_BlockerCode::PartBroken:
+            case EMars_Attack_BlockerCode::PartDepleted:
+            case EMars_Attack_BlockerCode::ConditionDisallowed:
+            case EMars_Attack_BlockerCode::LimbDetached:
+            case EMars_Attack_BlockerCode::LimbDisabled:
+            case EMars_Attack_BlockerCode::LimbUnavailable:
+            case EMars_Attack_BlockerCode::SupportCapacity:
+            case EMars_Attack_BlockerCode::Dead:
+            case EMars_Attack_BlockerCode::HitContactInvalid:
+            case EMars_Attack_BlockerCode::EmitterCount:
+            case EMars_Attack_BlockerCode::EmitterIdentity:
+            case EMars_Attack_BlockerCode::EmitterBounds:
+            case EMars_Attack_BlockerCode::AcceptedSourceInvalid:
+            case EMars_Attack_BlockerCode::AcceptedRootInvalid:
+            case EMars_Attack_BlockerCode::RootInvalid:
+            case EMars_Attack_BlockerCode::RootDrift:
+            case EMars_Attack_BlockerCode::FacingDrift:
+            case EMars_Attack_BlockerCode::AcceptedSourceMissing:
+            case EMars_Attack_BlockerCode::SampleTravel:
+            case EMars_Attack_BlockerCode::AcceptedPresentationMismatch:
+                return EMars_Attack_BlockerKind::Permanent;
+            case EMars_Attack_BlockerCode::ControlBusy:
+            case EMars_Attack_BlockerCode::LimbReturning:
+            case EMars_Attack_BlockerCode::LimbUnplanted:
+            case EMars_Attack_BlockerCode::SupportStance:
+            case EMars_Attack_BlockerCode::NotReady:
+            case EMars_Attack_BlockerCode::Ungrounded:
+            case EMars_Attack_BlockerCode::Slope:
+            case EMars_Attack_BlockerCode::Moving:
+            case EMars_Attack_BlockerCode::WindupBlocked:
+            case EMars_Attack_BlockerCode::Cooldown:
+            case EMars_Attack_BlockerCode::GlobalCooldown:
+            case EMars_Attack_BlockerCode::TargetLost:
+            case EMars_Attack_BlockerCode::OutOfRange:
+            case EMars_Attack_BlockerCode::TooClose:
+            case EMars_Attack_BlockerCode::Height:
+            case EMars_Attack_BlockerCode::Facing:
+                return EMars_Attack_BlockerKind::Temporary;
+        }
+    }
+
+    // A Permanent blocker makes the evaluation incapable.
+    void Add_Blocker(FMars_Attack_Evaluation& InOutEvaluation, const FMars_Attack_Blocker& InBlocker)
     {
         InOutEvaluation.Blockers.Add(InBlocker);
-        if (InPermanent)
+        if (InBlocker.Kind == EMars_Attack_BlockerKind::Permanent)
         { InOutEvaluation.Capable = false; }
     }
 
-    FMars_Attack_Blocker Make_Blocker(FName InCode, FString InField, const FMars_Attack_Comparison& InValues)
+    FMars_Attack_Blocker Make_Blocker(EMars_Attack_BlockerCode InCode, FString InField, const FMars_Attack_Comparison& InValues)
     {
         auto Blocker = FMars_Attack_Blocker();
         Blocker.Code = InCode;
+        Blocker.Kind = Get_BlockerKind(InCode);
         Blocker.Field = InField;
         Blocker.Expected = InValues.Expected;
         Blocker.Actual = InValues.Actual;
@@ -539,64 +624,78 @@ namespace utils_attack
         for (int32 Index = 0; Index < InRoles.Num(); ++Index)
         {
             if (InRoles[Index].Role == Binding.Role)
-            { Found = Index; break; }
+            {
+                Found = Index;
+                break;
+            }
         }
+
         const auto Field = f"Roles[{Binding.Role.ToString()}]";
         auto Failures = TArray<FMars_Attack_Blocker>();
-        auto Permanent = TArray<bool>();
         if (Found < 0)
         {
-            Failures.Add(Make_Blocker(n"PartMissing", Field, FMars_Attack_Comparison("copied role observation", "missing")));
-            Permanent.Add(true);
+            Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartMissing, Field, FMars_Attack_Comparison("copied role observation", "missing")));
         }
         else
         {
             const auto Observation = InRoles[Found];
             const auto Part = Observation.Part;
             if (Part.Live == false)
-            { Failures.Add(Make_Blocker(n"PartMissing", Field, FMars_Attack_Comparison("live", "false"))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartMissing, Field, FMars_Attack_Comparison("live", "false"))); }
+
             if (Part.PendingDestroy)
-            { Failures.Add(Make_Blocker(n"PartPendingDestroy", Field, FMars_Attack_Comparison("not pending destroy", "pending"))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartPendingDestroy, Field, FMars_Attack_Comparison("not pending destroy", "pending"))); }
+
             if (Part.OwnerMatches == false || Observation.Source != Binding.Source || Observation.LimbId != Binding.LimbId)
-            { Failures.Add(Make_Blocker(n"PartWrongOwner", Field, FMars_Attack_Comparison("expected owner/source/stable limb", Observation.LimbId.ToString()))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartWrongOwner, Field, FMars_Attack_Comparison("expected owner/source/stable limb", Observation.LimbId.ToString()))); }
+
             if (Binding.Source != EMars_Attack_AnatomySource::Body && Part.State == EMars_BodyPart_State::Severed)
-            { Failures.Add(Make_Blocker(n"PartSevered", Field, FMars_Attack_Comparison("Attached", "Severed"))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartSevered, Field, FMars_Attack_Comparison("Attached", "Severed"))); }
+
             if (Binding.Source != EMars_Attack_AnatomySource::Body && Part.State == EMars_BodyPart_State::Broken)
-            { Failures.Add(Make_Blocker(n"PartBroken", Field, FMars_Attack_Comparison("Attached", "Broken"))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartBroken, Field, FMars_Attack_Comparison("Attached", "Broken"))); }
+
             if (Part.Depleted)
-            { Failures.Add(Make_Blocker(n"PartDepleted", Field, FMars_Attack_Comparison("not depleted", "depleted"))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartDepleted, Field, FMars_Attack_Comparison("not depleted", "depleted"))); }
+
             if (int32(Part.Condition) > int32(InRequirement.MaxCondition) || int32(Part.Condition) < 0)
-            { Failures.Add(Make_Blocker(n"ConditionDisallowed", Field, FMars_Attack_Comparison(f"<= {InRequirement.MaxCondition :n}", f"{Part.Condition :n}"))); Permanent.Add(true); }
+            { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::ConditionDisallowed, Field, FMars_Attack_Comparison(f"<= {InRequirement.MaxCondition :n}", f"{Part.Condition :n}"))); }
+
             if (Binding.Source == EMars_Attack_AnatomySource::ProceduralLimb)
             {
                 const auto Limb = Observation.Limb;
                 if (Limb.Exists == false)
-                { Failures.Add(Make_Blocker(n"PartMissing", Field + ".Limb", FMars_Attack_Comparison("live procedural limb", "missing"))); Permanent.Add(true); }
+                { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::PartMissing, f"{Field}.Limb", FMars_Attack_Comparison("live procedural limb", "missing"))); }
+
                 if (Limb.Attached == false)
-                { Failures.Add(Make_Blocker(n"LimbDetached", Field + ".Limb", FMars_Attack_Comparison("attached", "false"))); Permanent.Add(true); }
+                { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::LimbDetached, f"{Field}.Limb", FMars_Attack_Comparison("attached", "false"))); }
+
                 if (Limb.Enabled == false)
-                { Failures.Add(Make_Blocker(n"LimbDisabled", Field + ".Limb", FMars_Attack_Comparison("enabled", "false"))); Permanent.Add(true); }
+                { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::LimbDisabled, f"{Field}.Limb", FMars_Attack_Comparison("enabled", "false"))); }
+
                 if (InRequirement.Slot.IsNone() == false)
                 {
                     if (Limb.Control == ECk_ProceduralLimbControl_State::Controlled)
-                    { Failures.Add(Make_Blocker(n"ControlBusy", Field + ".Control", FMars_Attack_Comparison("Default", "Controlled"))); Permanent.Add(false); }
+                    { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::ControlBusy, f"{Field}.Control", FMars_Attack_Comparison("Default", "Controlled"))); }
                     else if (Limb.Control == ECk_ProceduralLimbControl_State::Returning)
-                    { Failures.Add(Make_Blocker(n"LimbReturning", Field + ".Control", FMars_Attack_Comparison("Default", "Returning"))); Permanent.Add(false); }
+                    { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::LimbReturning, f"{Field}.Control", FMars_Attack_Comparison("Default", "Returning"))); }
                     else if (Limb.Control == ECk_ProceduralLimbControl_State::Unplanted)
-                    { Failures.Add(Make_Blocker(n"LimbUnplanted", Field + ".Control", FMars_Attack_Comparison("Default", "Unplanted"))); Permanent.Add(false); }
+                    { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::LimbUnplanted, f"{Field}.Control", FMars_Attack_Comparison("Default", "Unplanted"))); }
                     else if (Limb.Control != ECk_ProceduralLimbControl_State::Default)
-                    { Failures.Add(Make_Blocker(n"LimbUnavailable", Field + ".Control", FMars_Attack_Comparison("Default", "Unavailable"))); Permanent.Add(true); }
+                    { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::LimbUnavailable, f"{Field}.Control", FMars_Attack_Comparison("Default", "Unavailable"))); }
+
                     if (Binding.Locomotor && (Limb.Planted == false || Limb.Trusted == false))
-                    { Failures.Add(Make_Blocker(n"SupportStance", Field + ".Foot", FMars_Attack_Comparison("planted trusted claimed foot", "unplanted or untrusted"))); Permanent.Add(false); }
+                    { Failures.Add(Make_Blocker(EMars_Attack_BlockerCode::SupportStance, f"{Field}.Foot", FMars_Attack_Comparison("planted trusted claimed foot", "unplanted or untrusted"))); }
                 }
             }
         }
-        for (int32 Index = 0; Index < Failures.Num(); ++Index)
+
+        for (const auto& Failure : Failures)
         {
-            auto Blocker = Failures[Index];
+            auto Blocker = Failure;
             Blocker.Role = Binding.Role;
             Blocker.Slot = InRequirement.Slot;
-            Add_Blocker(InOutEvaluation, Blocker, Permanent[Index]);
+            Add_Blocker(InOutEvaluation, Blocker);
         }
     }
 
@@ -607,6 +706,7 @@ namespace utils_attack
             if (Slot.Binding.LimbId == InLimbId)
             { return true; }
         }
+
         return false;
     }
 
@@ -617,6 +717,7 @@ namespace utils_attack
         Evaluation.Capable = true;
         for (const auto& Slot : InQuery.Entry.Slots)
         { Evaluate_Role(Evaluation, Slot, InQuery.Roles); }
+
         for (const auto& Part : InQuery.Entry.Parts)
         {
             auto Requirement = FMars_Attack_ResolvedSlot();
@@ -624,85 +725,111 @@ namespace utils_attack
             Requirement.MaxCondition = Part.MaxCondition;
             Evaluate_Role(Evaluation, Requirement, InQuery.Roles);
         }
+
         auto SeenSupport = TArray<FName>();
         for (const auto& Limb : InQuery.Self.SupportLimbs)
         {
             if (SeenSupport.Contains(Limb.LimbId) || Limb.LimbId.IsNone())
             { continue; }
+
             SeenSupport.Add(Limb.LimbId);
             if (Get_IsClaimed(InQuery.Entry, Limb.LimbId) || Limb.Part.Live == false || Limb.Part.PendingDestroy ||
                 Limb.Part.OwnerMatches == false || Limb.Part.State != EMars_BodyPart_State::Attached || Limb.Part.Depleted ||
                 Limb.Limb.Exists == false || Limb.Limb.Attached == false || Limb.Limb.Enabled == false)
             { continue; }
+
             ++Evaluation.EnabledSupport;
             if (Limb.Limb.Control == ECk_ProceduralLimbControl_State::Default && Limb.Limb.Planted && Limb.Limb.Trusted)
             { ++Evaluation.StandingSupport; }
         }
+
         const auto Support = InQuery.Execution.Locomotion.Get_Support();
         const auto Minimum = Support.Get_Mode() == ECk_ProceduralLimbControl_SupportMode::Disabled ? 0 : Support.Get_MinimumTrustedContacts();
         if (Evaluation.EnabledSupport < Minimum)
-        { Add_Blocker(Evaluation, Make_Blocker(n"SupportCapacity", "Support.EnabledUnclaimed", FMars_Attack_Comparison(f">= {Minimum}", f"{Evaluation.EnabledSupport}")), true); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::SupportCapacity, "Support.EnabledUnclaimed", FMars_Attack_Comparison(f">= {Minimum}", f"{Evaluation.EnabledSupport}"))); }
+
         if (Evaluation.StandingSupport < Minimum)
-        { Add_Blocker(Evaluation, Make_Blocker(n"SupportStance", "Support.StandingUnclaimed", FMars_Attack_Comparison(f">= {Minimum}", f"{Evaluation.StandingSupport}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::SupportStance, "Support.StandingUnclaimed", FMars_Attack_Comparison(f">= {Minimum}", f"{Evaluation.StandingSupport}"))); }
+
         const auto State = InQuery.Self.State;
         if (State.Alive == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Dead", "Self.Alive", FMars_Attack_Comparison("alive", "false")), true); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Dead, "Self.Alive", FMars_Attack_Comparison("alive", "false"))); }
+
         if (State.MobilityReady == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"SupportCapacity", "Self.MobilityReady", FMars_Attack_Comparison("required locomotion capacity", "false")), true); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::SupportCapacity, "Self.MobilityReady", FMars_Attack_Comparison("required locomotion capacity", "false"))); }
+
         if (State.Ready == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"NotReady", "Self.Ready", FMars_Attack_Comparison("ready", "false")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::NotReady, "Self.Ready", FMars_Attack_Comparison("ready", "false"))); }
+
         if (State.Grounded == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Ungrounded", "Self.Grounded", FMars_Attack_Comparison("grounded", "false")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Ungrounded, "Self.Grounded", FMars_Attack_Comparison("grounded", "false"))); }
+
         if (Math::IsFinite(State.SlopeDegrees) == false || State.SlopeDegrees > InQuery.Execution.MaxGroundSlopeDegrees)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Slope", "Self.SlopeDegrees", FMars_Attack_Comparison(f"<= {InQuery.Execution.MaxGroundSlopeDegrees}", f"{State.SlopeDegrees}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Slope, "Self.SlopeDegrees", FMars_Attack_Comparison(f"<= {InQuery.Execution.MaxGroundSlopeDegrees}", f"{State.SlopeDegrees}"))); }
+
         if (Support.Get_Mode() == ECk_ProceduralLimbControl_SupportMode::ProjectedSupportRegion && State.SupportRegionReady == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"SupportStance", "Self.SupportRegionReady", FMars_Attack_Comparison("supported region", "false")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::SupportStance, "Self.SupportRegionReady", FMars_Attack_Comparison("supported region", "false"))); }
+
         if (InQuery.Cooldown.EntryRemaining > 0.0f || Math::IsFinite(InQuery.Cooldown.EntryRemaining) == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Cooldown", "Cooldown.EntryRemaining", FMars_Attack_Comparison("0", f"{InQuery.Cooldown.EntryRemaining}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Cooldown, "Cooldown.EntryRemaining", FMars_Attack_Comparison("0", f"{InQuery.Cooldown.EntryRemaining}"))); }
+
         if (InQuery.Cooldown.GlobalRemaining > 0.0f || Math::IsFinite(InQuery.Cooldown.GlobalRemaining) == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"GlobalCooldown", "Cooldown.GlobalRemaining", FMars_Attack_Comparison("0", f"{InQuery.Cooldown.GlobalRemaining}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::GlobalCooldown, "Cooldown.GlobalRemaining", FMars_Attack_Comparison("0", f"{InQuery.Cooldown.GlobalRemaining}"))); }
+
         const auto Prepare = InQuery.Entry.Definition.Prepare;
         const auto Target = InQuery.Target;
         if (Target.Valid == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"TargetLost", "Target.Valid", FMars_Attack_Comparison("live eligible target", "false")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::TargetLost, "Target.Valid", FMars_Attack_Comparison("live eligible target", "false"))); }
+
         if (Math::IsFinite(Target.Distance) == false || Target.Distance > Prepare.MaxDistance)
-        { Add_Blocker(Evaluation, Make_Blocker(n"OutOfRange", "Target.Distance", FMars_Attack_Comparison(f"<= {Prepare.MaxDistance}", f"{Target.Distance}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::OutOfRange, "Target.Distance", FMars_Attack_Comparison(f"<= {Prepare.MaxDistance}", f"{Target.Distance}"))); }
+
         if (Target.Distance < Prepare.MinDistance)
-        { Add_Blocker(Evaluation, Make_Blocker(n"TooClose", "Target.Distance", FMars_Attack_Comparison(f">= {Prepare.MinDistance}", f"{Target.Distance}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::TooClose, "Target.Distance", FMars_Attack_Comparison(f">= {Prepare.MinDistance}", f"{Target.Distance}"))); }
+
         if (Math::IsFinite(Target.HeightDifference) == false || Math::Abs(Target.HeightDifference) > Prepare.MaxHeightDifference)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Height", "Target.HeightDifference", FMars_Attack_Comparison(f"absolute <= {Prepare.MaxHeightDifference}", f"{Target.HeightDifference}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Height, "Target.HeightDifference", FMars_Attack_Comparison(f"absolute <= {Prepare.MaxHeightDifference}", f"{Target.HeightDifference}"))); }
+
         if (Math::IsFinite(Target.FacingDegrees) == false || Math::Abs(Target.FacingDegrees) > Prepare.FacingToleranceDegrees)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Facing", "Target.FacingDegrees", FMars_Attack_Comparison(f"<= {Prepare.FacingToleranceDegrees}", f"{Target.FacingDegrees}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Facing, "Target.FacingDegrees", FMars_Attack_Comparison(f"<= {Prepare.FacingToleranceDegrees}", f"{Target.FacingDegrees}"))); }
+
         if (Math::IsFinite(State.RootSpeed) == false || Math::Abs(State.RootSpeed) > Prepare.MaxSpeedToStart)
-        { Add_Blocker(Evaluation, Make_Blocker(n"Moving", "Self.RootSpeed", FMars_Attack_Comparison(f"<= {Prepare.MaxSpeedToStart}", f"{State.RootSpeed}")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::Moving, "Self.RootSpeed", FMars_Attack_Comparison(f"<= {Prepare.MaxSpeedToStart}", f"{State.RootSpeed}"))); }
+
         if (InQuery.Self.WindupClear == false)
-        { Add_Blocker(Evaluation, Make_Blocker(n"WindupBlocked", "Self.WindupClear", FMars_Attack_Comparison("clear preflight", "false")), false); }
+        { Add_Blocker(Evaluation, Make_Blocker(EMars_Attack_BlockerCode::WindupBlocked, "Self.WindupClear", FMars_Attack_Comparison("clear preflight", "false"))); }
+
         Evaluation.Availability = Evaluation.Capable == false ? EMars_Attack_Availability::Unavailable :
             Evaluation.Blockers.Num() > 0 ? EMars_Attack_Availability::Waiting : EMars_Attack_Availability::Ready;
         return Evaluation;
     }
 
-    bool Get_HasBlocker(const FMars_Attack_Evaluation& InEvaluation, FName InCode)
+    bool Get_HasBlocker(const FMars_Attack_Evaluation& InEvaluation, EMars_Attack_BlockerCode InCode)
     {
         for (const auto& Blocker : InEvaluation.Blockers)
         {
             if (Blocker.Code == InCode)
             { return true; }
         }
+
         return false;
     }
 
     bool Get_HasControlWait(const FMars_Attack_Evaluation& InEvaluation)
     {
-        return Get_HasBlocker(InEvaluation, n"ControlBusy") || Get_HasBlocker(InEvaluation, n"LimbReturning") || Get_HasBlocker(InEvaluation, n"LimbUnplanted");
+        return Get_HasBlocker(InEvaluation, EMars_Attack_BlockerCode::ControlBusy) ||
+            Get_HasBlocker(InEvaluation, EMars_Attack_BlockerCode::LimbReturning) ||
+            Get_HasBlocker(InEvaluation, EMars_Attack_BlockerCode::LimbUnplanted);
     }
 
     bool Get_IsBefore(const FMars_Attack_SelectionCandidate& InLeft, const FMars_Attack_SelectionCandidate& InRight)
     {
         if (InLeft.Priority != InRight.Priority)
         { return InLeft.Priority > InRight.Priority; }
+
         if (InLeft.LastStartSequence != InRight.LastStartSequence)
         { return InLeft.LastStartSequence < InRight.LastStartSequence; }
+
         return InLeft.Id.ToString().ToLower() < InRight.Id.ToString().ToLower();
     }
 
@@ -715,8 +842,10 @@ namespace utils_attack
             auto At = 0;
             while (At < Order.Num() && Get_IsBefore(InQuery.Candidates[Index], InQuery.Candidates[Order[At]]) == false)
             { ++At; }
+
             Order.Insert(Index, At);
         }
+
         auto CapableCount = 0;
         auto PreferredIndex = -1;
         auto ReadyIndex = -1;
@@ -725,16 +854,19 @@ namespace utils_attack
             const auto Candidate = InQuery.Candidates[Index];
             if (Candidate.Evaluation.Capable == false)
             { continue; }
+
             ++CapableCount;
             const auto Eligible = InQuery.Policy.ControlWait == EMars_Attack_ControlWaitPolicy::WaitForPreferred || Get_HasControlWait(Candidate.Evaluation) == false;
             if (PreferredIndex < 0 && Eligible)
             { PreferredIndex = Index; }
+
             if (ReadyIndex < 0 && Candidate.Evaluation.Availability == EMars_Attack_Availability::Ready)
             { ReadyIndex = Index; }
         }
+
         const auto Preparation = InQuery.Preparation;
         const auto MatchesTarget = Preparation.TargetIdentity == InQuery.Target.Identity && Preparation.TargetGeneration == InQuery.Target.Generation;
-        const auto Retain = Preparation.Active && Preparation.TimedOut == false && MatchesTarget;
+        const auto Retain = Preparation.State == EMars_Attack_PreparationState::Active && MatchesTarget;
         if (Retain)
         {
             for (const auto Index : Order)
@@ -742,31 +874,40 @@ namespace utils_attack
                 const auto Candidate = InQuery.Candidates[Index];
                 if (Candidate.Id == Preparation.Preferred && Candidate.Evaluation.Capable &&
                     (InQuery.Policy.ControlWait == EMars_Attack_ControlWaitPolicy::WaitForPreferred || Get_HasControlWait(Candidate.Evaluation) == false))
-                { PreferredIndex = Index; break; }
+                {
+                    PreferredIndex = Index;
+                    break;
+                }
             }
         }
+
         if (ReadyIndex >= 0)
         { Selection.ReadyChoice = TOptional<FGameplayTag>(InQuery.Candidates[ReadyIndex].Id); }
+
         if (CapableCount == 0)
         { return Selection; }
+
         if (PreferredIndex < 0)
         {
             Selection.Disposition = EMars_Attack_SelectionDisposition::Wait;
             return Selection;
         }
+
         const auto Preferred = InQuery.Candidates[PreferredIndex];
         Selection.Preferred = TOptional<FGameplayTag>(Preferred.Id);
-        if (Preparation.Active && Preparation.TimedOut && MatchesTarget)
+        if (Preparation.State == EMars_Attack_PreparationState::TimedOut && MatchesTarget)
         {
             Selection.Disposition = EMars_Attack_SelectionDisposition::Wait;
             return Selection;
         }
+
         if (Preferred.Evaluation.Availability == EMars_Attack_Availability::Ready)
         {
             Selection.Selected = TOptional<FGameplayTag>(Preferred.Id);
             Selection.Disposition = EMars_Attack_SelectionDisposition::Start;
             return Selection;
         }
+
         // A request without preparation has zero elapsed grace; it may fallback only when the authored delay is zero.
         const auto Elapsed = Retain ? Preparation.ElapsedReadinessWait : 0.0f;
         if (InQuery.Policy.TemporaryReadiness == EMars_Attack_TemporaryReadinessPolicy::UseReadyAlternative && ReadyIndex >= 0 &&
@@ -776,7 +917,11 @@ namespace utils_attack
             Selection.Disposition = EMars_Attack_SelectionDisposition::Start;
         }
         else
-        { Selection.Disposition = Preparation.Active ? EMars_Attack_SelectionDisposition::Wait : EMars_Attack_SelectionDisposition::Prepare; }
+        {
+            Selection.Disposition = Preparation.State == EMars_Attack_PreparationState::Active ?
+                EMars_Attack_SelectionDisposition::Wait : EMars_Attack_SelectionDisposition::Prepare;
+        }
+
         return Selection;
     }
 }

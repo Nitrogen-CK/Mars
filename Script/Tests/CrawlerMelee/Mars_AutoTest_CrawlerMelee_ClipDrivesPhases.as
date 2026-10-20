@@ -1,5 +1,5 @@
 // The jab is a compiled clip and its phases come only from what the resolver accepted from it.
-//   - The jab the crawler plays is the clip its profile names (here the reference jab, Script/Editor/
+//   - The jab the crawler plays is the clip its definition names (here the reference jab, Script/Editor/
 //     Mars_CrawlerAttackClips.as): the body channel from the identity offset; Windup, Strike and Recover with the
 //     reference durations and easings; body keys identity -> windup key -> strike key -> identity, each phase starting
 //     on the key the one before it ended on; one Offense window over [Windup 0, Recover 1); no slots.
@@ -18,11 +18,13 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
 
     private UCk_ProceduralAction_Data _Clip;
     private int32 _Generation = 0;
+    private FMars_Crawler_Spec _Spec;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        SpawnFloorAndCrawler(InHandle, Make_ArmedCrawlerSpec(4));
+        _Spec = Make_ArmedCrawlerSpec(4);
+        SpawnFloorAndCrawler(InHandle, _Spec);
 
         Add_Step("the attack clip is the spec's three posed phases and one Offense window", n"Step_AssertClip");
         Add_SettleSteps();
@@ -45,8 +47,9 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
 
         const auto Report = utils_procedural_action::Validate_Data(_Clip);
         Assert_True(Report.Get_Status() == ECk_ProceduralAction_ReportStatus::Valid, "the jab clip validates");
-        const auto Check = utils_crawler::Validate_AttackClip(_Clip, EMars_Crawler_AttackClipKind::Jab);
-        Assert_True(Check.IsValid(), f"the jab clip passes the crawler's clip check (got [{Check.Get_Error()}])");
+        const auto Check = utils_attack::Validate_Definition(Get_LoadoutJab());
+        Assert_True(Check.Get_IsValid() && Get_LoadoutJab().Clip.Get() == _Clip,
+            f"the jab definition plays the clip and it passes the definition's clip contract (got [{utils_crawler::Get_AttackValidationText(Check)}])");
 
         const auto Body = _Clip.Get_BodyChannel();
         Assert_True(Body.Get_Enabled() && Body.Get_InitialSource() == ECk_ProceduralAction_InitialSource::IdentityOffset,
@@ -75,6 +78,33 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
             Offense.Get_Start().Get_PhaseId() == n"Windup" && Offense.Get_Start().Get_Time().Get_Value() == 0.0 &&
             Offense.Get_End().Get_PhaseId() == n"Recover" && Offense.Get_End().Get_Time().Get_Value() == 1.0,
             f"the window is Offense over [Windup 0, Recover 1) (got {Offense.Get_Id()} [{Offense.Get_Start().Get_PhaseId()} {Offense.Get_Start().Get_Time().Get_Value() :.2}, {Offense.Get_End().Get_PhaseId()} {Offense.Get_End().Get_Time().Get_Value() :.2}))");
+    }
+
+    // The jab definition in the spec's loadout.
+    private FMars_Attack_Definition Get_LoadoutJab() const
+    {
+        for (const auto& Entry : _Spec.Combat.Loadout.Get().Spec.Entries)
+        {
+            if (Entry.Id == GameplayTags::Attack_Mars_Jab)
+            { return Entry.Definition.Get().Def; }
+        }
+
+        return FMars_Attack_Definition();
+    }
+
+    // The attack phase an accepted interval's PhaseId poses; Idle for any other id.
+    private EMars_Crawler_AttackPhase Find_ClipPhase(FName InPhaseId) const
+    {
+        if (InPhaseId == utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup))
+        { return EMars_Crawler_AttackPhase::Windup; }
+
+        if (InPhaseId == utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike))
+        { return EMars_Crawler_AttackPhase::Strike; }
+
+        if (InPhaseId == utils_crawler::Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover))
+        { return EMars_Crawler_AttackPhase::Recover; }
+
+        return EMars_Crawler_AttackPhase::Idle;
     }
 
 #if EDITOR
@@ -119,7 +149,7 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
             Find_RecordSinceMark(EMars_Crawler_AttackPhase::Recover) >= 0 && Find_RecordSinceMark(EMars_Crawler_AttackPhase::Cooldown) >= 0,
             f"the jab ran Windup > Strike > Recover > Cooldown > Idle (got{Phases})");
         Assert_True(_Crawler.Get_AttackLastCancel().IsSet() == false, f"nothing cancelled the jab (last cancel {Get_LastCancelText()})");
-        Assert_True(_Crawler.Get_AttackClip() == _Clip, "the jab played the clip its profile names");
+        Assert_True(_Crawler.Get_AttackClip() == _Clip, "the jab played the clip its definition names");
 
         const auto Watch = Get_AcceptRecords();
         int32 PosedChanges = 0;
@@ -132,7 +162,7 @@ class UMars_AutoTest_CrawlerMelee_ClipDrivesPhases : UMars_AutoTestRig_CrawlerMe
             if (Current.Generation != _Generation || Next.Generation != _Generation)
             { continue; }
 
-            const auto AcceptedPhase = utils_crawler::Find_ClipPhase(Current.AcceptedPhaseId);
+            const auto AcceptedPhase = Find_ClipPhase(Current.AcceptedPhaseId);
             if (Current.Phase == EMars_Crawler_AttackPhase::Strike || Current.Phase == EMars_Crawler_AttackPhase::Recover)
             {
                 Assert_True(int32(AcceptedPhase) >= int32(Current.Phase),

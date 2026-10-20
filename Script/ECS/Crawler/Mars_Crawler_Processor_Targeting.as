@@ -1,7 +1,7 @@
 // Chooses an aggressive armed crawler's combat target every SenseInterval (a passive one never scans), among the
 // entities tagged TAG_MarsCombatTarget in its
 // world: a valid target (Get_IsCombatTargetValid) Hostile to the crawler, within AcquireRadius of it (horizontally), within
-// HomeRadius of its home and within MaxHeightDifference of its height. The nearest wins; equal distances go to the lower
+// HomeRadius of its home and within the largest MaxHeightDifference of its loadout's attacks of its height. The nearest wins; equal distances go to the lower
 // handle string, so the choice is stable. A held target is kept, without the AcquireRadius check, until it stops being
 // valid, Hostile or within HomeRadius of home. Only a changed choice is published, as Request_SetCombatTarget, and no
 // scan runs while combat requests are pending (an explicit request is never overwritten by a scan of stale state).
@@ -40,8 +40,6 @@ class UMars_Processor_Crawler_Targeting : UCk_Processor_Script_Base_UE
         else
         { Choice = Find_Nearest(Self); }
 
-        InTargeting.Candidate = Choice;
-
         if (Choice != Held)
         { Self.Request_SetCombatTarget(FMars_Request_Crawler_SetCombatTarget(Choice)); }
     }
@@ -64,6 +62,7 @@ class UMars_Processor_Crawler_Targeting : UCk_Processor_Script_Base_UE
         float32 MaxHeight = 0.0f;
         for (const auto& Entry : InSelf.Get_Spec().ResolvedAttacks.Entries)
         { MaxHeight = Math::Max(MaxHeight, Entry.Definition.Prepare.MaxHeightDifference); }
+
         const auto Root = utils_transform::Get_EntityCurrentLocation(InSelf.As_Transform());
 
         auto Best = FCk_Handle();

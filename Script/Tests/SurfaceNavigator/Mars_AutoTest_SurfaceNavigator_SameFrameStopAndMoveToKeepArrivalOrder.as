@@ -1,5 +1,6 @@
-// A Stop and a MoveTo queued in the same frame apply in arrival order. MoveTo then Stop: the navigator stays Idle with no
-// waypoints and the body does not move for a second, with no signal. Stop then MoveTo: the move runs.
+// A Stop and a MoveTo queued in the same frame apply in arrival order. MoveTo then Stop: once the drain has run, the
+// navigator stays Idle with no waypoints and the body does not move for a second, with no signal. Stop then MoveTo: the
+// move runs.
 class UMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder : UMars_AutoTestRig_SurfaceNavigator
 {
     default _TimeoutSeconds = 15.0f;
@@ -14,6 +15,7 @@ class UMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder : U
 
         Add_Step_WaitUntil("the body's surface motion is Ready", n"Check_MotionReady", k_SlowPolls, 0);
         Add_Step("bind OnArrived/OnFailed; request a move 1200 uu along +X, then a Stop, in one frame", n"Step_MoveToThenStop");
+        Add_Step_WaitUntil("the navigator drained the requests", n"Check_Drained", k_SlowPolls, 0);
         Add_Step_WaitSeconds("a surviving move would show in a second", 1.0f);
         Add_Step("the navigator stayed Idle and the body did not move", n"Step_AssertStayedStopped");
         Add_Step("request a Stop, then a move 1200 uu along +X, in one frame", n"Step_StopThenMoveTo");
@@ -38,6 +40,13 @@ class UMars_AutoTest_SurfaceNavigator_SameFrameStopAndMoveToKeepArrivalOrder : U
         BindNavigatorSignals();
         _Nav.Request_MoveTo(FMars_Request_SurfaceNavigator_MoveTo(Get_Goal()));
         _Nav.Request_Stop(FMars_Request_SurfaceNavigator_Stop());
+    }
+
+    UFUNCTION()
+    private void Check_Drained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Nav.Get_HasPendingRequests() == false);
     }
 
     UFUNCTION()

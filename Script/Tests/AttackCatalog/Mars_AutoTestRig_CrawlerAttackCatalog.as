@@ -125,15 +125,7 @@ class UMars_AutoTestRig_CrawlerAttackCatalog : UMars_AutoTestRig_CrawlerMelee
     {
         Add_SettleSteps();
         Add_Step("bind the catalogue decision/admission/result signals", n"Step_BindCatalogSignals");
-        Add_Step("export the actual catalogue scheduler", n"Step_ExportCatalogScheduler");
         Add_Step_WaitUntil("the two front roles can be prepared for pincer", n"Check_CatalogStance", k_SlowPolls, 0);
-    }
-
-    UFUNCTION()
-    protected void Step_ExportCatalogScheduler(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        System::ExecuteConsoleCommand("Ck.Ecs.Scheduler.ExportOrder Saved/CkEcs/AttackCatalog-P2-SchedulerOrder.txt");
-        System::ExecuteConsoleCommand("Ck.Ecs.Scheduler.ExportGraph Saved/CkEcs/AttackCatalog-P2-SchedulerGraph.dot");
     }
 
     protected void Spawn_CatalogCrawlerOnly(FCk_Handle InHandle, const FMars_Crawler_Spec& InSpec)
@@ -192,7 +184,7 @@ class UMars_AutoTestRig_CrawlerAttackCatalog : UMars_AutoTestRig_CrawlerMelee
                 {
                     Details = f"{Details}; {Evaluation.AttackId} {Evaluation.Availability :n}";
                     for (const auto& Blocker : Evaluation.Blockers)
-                    { Details = f"{Details} [{Blocker.Code} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
+                    { Details = f"{Details} [{Blocker.Code :n} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
                 }
                 Log(f"[CatalogAdmissionDiagnostic] {Details}");
                 for (const auto& Event : _Crawler.Get_AttackHistory())
@@ -204,7 +196,7 @@ class UMars_AutoTestRig_CrawlerAttackCatalog : UMars_AutoTestRig_CrawlerMelee
                     {
                         Rejected = f"{Rejected}; {Evaluation.AttackId} {Evaluation.Availability :n}";
                         for (const auto& Blocker : Evaluation.Blockers)
-                        { Rejected = f"{Rejected} [{Blocker.Code} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
+                        { Rejected = f"{Rejected} [{Blocker.Code :n} {Blocker.Field}: {Blocker.Expected} / {Blocker.Actual}]"; }
                     }
                     Log(Rejected);
                 }
@@ -237,26 +229,9 @@ class UMars_AutoTestRig_CrawlerAttackCatalog : UMars_AutoTestRig_CrawlerMelee
     UFUNCTION()
     protected void Check_CatalogStance(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Parts = _Crawler.Get_LegParts();
-        auto Ready = Parts.Num() == _CatalogLegCount;
-        if (Ready)
-        {
-            auto Claws = TArray<FMars_Crawler_AttackClaw>();
-            auto Right = FMars_Crawler_AttackClaw();
-            Right.Leg = Parts[0].Get_Leg();
-            Right.LegId = utils_procedural_leg::Get_Id(Right.Leg);
-            Claws.Add(Right);
-            auto Left = FMars_Crawler_AttackClaw();
-            Left.Leg = Parts.Last().Get_Leg();
-            Left.LegId = utils_procedural_leg::Get_Id(Left.Leg);
-            Claws.Add(Left);
-            Ready = utils_crawler::Get_IsPincerStanceReady(_Crawler, Claws);
-            // The catalogue requires trusted contact on the claimed feet as well as standing support.
-            for (const auto& Claw : Claws)
-            { Ready = Ready && Claw.Leg.Get_Foot().Get_Contact() == ECk_ProceduralLeg_FootContact::Trusted; }
-        }
+        // The catalogue requires trusted contact on the claimed feet as well as standing support.
         auto Res = OutResult;
-        Res.Set(Ready);
+        Res.Set(_Crawler.Get_LegParts().Num() == _CatalogLegCount && Get_IsClawStanceReady());
     }
 
     UFUNCTION()
