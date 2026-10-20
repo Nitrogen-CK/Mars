@@ -15,6 +15,13 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
     UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
     FLinearColor ThumbIdle = FLinearColor(1.0f, 1.0f, 1.0f);
 
+    // Parchment-kit moss: the hovered or focused thumb, and its shade while dragged.
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
+    FLinearColor ThumbHovered = FLinearColor(0.55f, 0.72f, 0.30f, 1.0f);
+
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Style")
+    FLinearColor ThumbCaptured = FLinearColor(0.20f, 0.34f, 0.10f, 1.0f);
+
     private bool _Captured = false;
     private bool _InFocusPath = false;
 
@@ -81,8 +88,8 @@ class UMars_SettingsSliderRow_Widget : UCk_GameSettingsUI_RowWidget_Slider
         if (ck::Is_NOT_Valid(_ValueSlider))
         { return; }
 
-        _ValueSlider.SetSliderHandleColor(_Captured ? constants_ui_colors::k_MossDeep :
-            (_ValueSlider.IsHovered() || _InFocusPath) ? constants_ui_colors::k_Moss : ThumbIdle);
+        _ValueSlider.SetSliderHandleColor(_Captured ? ThumbCaptured :
+            (_ValueSlider.IsHovered() || _InFocusPath) ? ThumbHovered : ThumbIdle);
 
         if (ck::IsValid(FillSize))
         {

@@ -1,19 +1,19 @@
+enum EMars_PartyDeparture
+{
+    Staying,
+    Departing
+}
+
 struct FMars_CampPartyState
 {
     UPROPERTY()
     FName ServiceId;
 
     UPROPERTY()
-    bool IsDeparting = false;
+    EMars_PartyDeparture Departure = EMars_PartyDeparture::Staying;
 
     UPROPERTY()
     int32 Revision = 0;
-}
-
-enum EMars_PartyDeparture
-{
-    Staying,
-    Departing
 }
 
 event void FMars_CampPartyStateChanged();
@@ -39,12 +39,11 @@ class AMars_Camp_GameState : AMars_Master_GameState
     {
         if (ck::EnsureIfNot(HasAuthority(), "[Mars_Camp_GameState] Apply_PartyState called without authority"))
         { return; }
-        const bool IsDeparting = InDeparture == EMars_PartyDeparture::Departing;
-        if (_PartyState.ServiceId == InServiceId && _PartyState.IsDeparting == IsDeparting)
+        if (_PartyState.ServiceId == InServiceId && _PartyState.Departure == InDeparture)
         { return; }
 
         _PartyState.ServiceId = InServiceId;
-        _PartyState.IsDeparting = IsDeparting;
+        _PartyState.Departure = InDeparture;
         ++_PartyState.Revision;
         ForceNetUpdate();
         OnPartyStateChanged.Broadcast();

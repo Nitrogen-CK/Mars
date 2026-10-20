@@ -16,14 +16,17 @@ class UMars_AutoTest_SurfaceFx_ValidateRejectsInvalid : UMars_AutoTestRig_Surfac
     {
         const auto Good = Make_TableWithStone(GameplayTags::SurfaceFx_Footstep, Make_Cell(Make_Variant(0.0f, "StoneStep"))).Validate();
         Assert_True(Good.IsValid(), f"a table with a Default row is accepted (error: {Good.Get_Error()})");
+        const auto Base = Make_Table().Validate();
+        Assert_True(Base.IsValid(), f"the base table the cases below break is accepted (error: {Base.Get_Error()})");
 
         auto NoDefault = Make_Table();
         NoDefault.Rows.Remove(GameplayTags::Surface_Default);
-        AssertRejected(NoDefault, "a table without a Default row");
+        AssertRejected(NoDefault, "a table without a Default row", f"has no {GameplayTags::Surface_Default} row");
 
         auto KindMissing = Make_TableWithStone(GameplayTags::SurfaceFx_Land, Make_Cell(Make_Variant(0.0f, "StoneLand")));
         Remove_DefaultKind(KindMissing, GameplayTags::SurfaceFx_Land);
-        AssertRejected(KindMissing, "a row's kind the Default row lacks");
+        AssertRejected(KindMissing, "a row's kind the Default row lacks",
+            f"row {GameplayTags::Surface_Stone}: kind {GameplayTags::SurfaceFx_Land} is missing");
 
         auto OverrideKindMissing = Make_Table();
         auto Override = FMars_SurfaceFx_Kinds();
@@ -32,41 +35,42 @@ class UMars_AutoTest_SurfaceFx_ValidateRejectsInvalid : UMars_AutoTestRig_Surfac
         Stone.ByImpactor.Add(GameplayTags::Impactor, Override);
         OverrideKindMissing.Rows.Add(GameplayTags::Surface_Stone, Stone);
         Remove_DefaultKind(OverrideKindMissing, GameplayTags::SurfaceFx_Land);
-        AssertRejected(OverrideKindMissing, "an impactor override's kind the Default row lacks");
+        AssertRejected(OverrideKindMissing, "an impactor override's kind the Default row lacks",
+            f"impactor {GameplayTags::Impactor}: kind {GameplayTags::SurfaceFx_Land} is missing");
 
-        AssertRejected(Make_TableWithStone(FGameplayTag(), Make_Cell(Make_Variant(0.0f, "Nameless"))), "an invalid kind tag");
-        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Footstep, FMars_SurfaceFx_Cell()), "an empty cell");
+        AssertRejected(Make_TableWithStone(FGameplayTag(), Make_Cell(Make_Variant(0.0f, "Nameless"))), "an invalid kind tag", "an invalid kind tag");
+        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Footstep, FMars_SurfaceFx_Cell()), "an empty cell", "a cell has no variants");
 
         auto Unsorted = Make_Cell(Make_Variant(300.0f, "Heavy"));
         Unsorted.Variants.Add(Make_Variant(100.0f, "Light"));
-        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Unsorted), "variants in descending MinIntensity");
+        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Unsorted), "variants in descending MinIntensity", "strictly ascending MinIntensity");
 
         auto Duplicate = Make_Cell(Make_Variant(100.0f, "First"));
         Duplicate.Variants.Add(Make_Variant(100.0f, "Second"));
-        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Duplicate), "two variants at one MinIntensity");
+        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Duplicate), "two variants at one MinIntensity", "strictly ascending MinIntensity");
 
         AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Make_Variant(float32(Math::Sqrt(-1.0)), "NaN"))),
-            "a non-finite MinIntensity");
+            "a non-finite MinIntensity", "non-finite MinIntensity");
 
         auto Descending = Make_Variant(0.0f, "Descending");
         Descending.IntensityRange = FVector2D(300.0, 100.0);
-        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Descending)), "a descending IntensityRange");
+        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Descending)), "a descending IntensityRange", "IntensityRange");
 
         auto Negative = Make_Variant(0.0f, "Negative");
         Negative.VolumeRange = FVector2D(-0.1, 1.0);
-        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Negative)), "a negative volume");
+        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Negative)), "a negative volume", "VolumeRange");
 
         auto Jittery = Make_Variant(0.0f, "Jittery");
         Jittery.PitchJitter = 1.0f;
-        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Jittery)), "a PitchJitter of 1");
+        AssertRejected(Make_TableWithStone(GameplayTags::SurfaceFx_Impact, Make_Cell(Jittery)), "a PitchJitter of 1", "PitchJitter");
 
         auto Loud = Make_Table();
         Loud.RemoteVolumeScale = -0.5f;
-        AssertRejected(Loud, "a negative RemoteVolumeScale");
+        AssertRejected(Loud, "a negative RemoteVolumeScale", "RemoteVolumeScale");
 
         auto Deaf = Make_Table();
         Deaf.EarshotDistance = 0.0f;
-        AssertRejected(Deaf, "a zero EarshotDistance");
+        AssertRejected(Deaf, "a zero EarshotDistance", "EarshotDistance");
     }
 
     private void Remove_DefaultKind(UMars_SurfaceFx_Table InTable, FGameplayTag InKind)
@@ -77,10 +81,11 @@ class UMars_AutoTest_SurfaceFx_ValidateRejectsInvalid : UMars_AutoTestRig_Surfac
         InTable.Rows.Add(GameplayTags::Surface_Default, Default);
     }
 
-    private void AssertRejected(const UMars_SurfaceFx_Table InTable, const FString& InWhat)
+    // InRule is the part of the error that names the broken rule.
+    private void AssertRejected(const UMars_SurfaceFx_Table InTable, const FString& InWhat, const FString& InRule)
     {
         const auto Result = InTable.Validate();
         Assert_False(Result.IsValid(), f"{InWhat} is rejected");
-        Assert_True(Result.Get_Error().Len() > 0, f"the rejection of {InWhat} names its rule (error: {Result.Get_Error()})");
+        Assert_True(Result.Get_Error().Contains(InRule), f"the rejection of {InWhat} names [{InRule}] (error: {Result.Get_Error()})");
     }
 }

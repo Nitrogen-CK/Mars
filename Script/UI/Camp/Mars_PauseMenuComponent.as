@@ -13,13 +13,14 @@ class UMars_PauseMenuComponent : UActorComponent
     TSoftClassPtr<UMars_ChalkPause_Widget> PauseClass = assets::Pause_Mars_WBP_Class();
 
     UPROPERTY(EditDefaultsOnly, Category = "Mars|Widgets")
-    TSoftClassPtr<UCommonActivatableWidget> SettingsClass = TSoftClassPtr<UCommonActivatableWidget>(FSoftObjectPath(
-        "/Game/Mars/UI/Widgets/ChalkParchment/Settings_Mars_WBP.Settings_Mars_WBP_C"));
+    TSoftClassPtr<UMars_ChalkSettings_Widget> SettingsClass = assets::Settings_Mars_WBP_Class();
 
     UPROPERTY(EditDefaultsOnly, Category = "Mars|Widgets")
     TSoftClassPtr<UMars_ChalkConfirmation_Widget> ConfirmationClass = assets::Confirmation_Mars_WBP_Class();
 
     private UMars_ChalkPause_Widget _Pause;
+    // The Settings screen opened from pause; it closes with the pause.
+    private UCommonActivatableWidget _Settings;
     private UMars_ChalkConfirmation_Widget _Confirmation;
     private UMars_InputProfile_Pause _PauseProfile;
     private EMars_ChalkPauseAction _ConfirmationAction;
@@ -72,6 +73,8 @@ class UMars_PauseMenuComponent : UActorComponent
         {
             if (ck::IsValid(_Confirmation))
             { _Confirmation.DeactivateWidget(); }
+            if (ck::IsValid(_Settings))
+            { utils_u_i_layout::RemoveWidget(Controller, _Settings); }
             if (ck::IsValid(_Pause))
             { utils_u_i_layout::RemoveWidget(Controller, _Pause); }
 
@@ -84,6 +87,7 @@ class UMars_PauseMenuComponent : UActorComponent
         }
 
         _Confirmation = nullptr;
+        _Settings = nullptr;
         _Pause = nullptr;
         _PauseProfile = nullptr;
     }
@@ -110,7 +114,7 @@ class UMars_PauseMenuComponent : UActorComponent
         else if (InAction == EMars_ChalkPauseAction::Settings)
         {
             utils_u_i_layout::PushWidgetToLayer_Soft(Controller, GameplayTags::UI_Layer_Menu, SettingsClass,
-                FCk_Delegate_UI_OnWidgetReady());
+                FCk_Delegate_UI_OnWidgetReady(this, n"OnSettingsReady"));
         }
         else if (InAction == EMars_ChalkPauseAction::ReturnToCamp && CanReturnToCamp(Controller))
         {
@@ -128,27 +132,33 @@ class UMars_PauseMenuComponent : UActorComponent
         }
     }
 
+    // The layer reports the Settings instance it pushed; a pause closed before it arrived drops it at once.
+    UFUNCTION()
+    private void OnSettingsReady(UCommonActivatableWidget InWidget)
+    {
+        auto Controller = GetController();
+        if (ck::Is_NOT_Valid(_Pause))
+        {
+            if (ck::IsValid(Controller) && ck::IsValid(InWidget))
+            { utils_u_i_layout::RemoveWidget(Controller, InWidget); }
+            return;
+        }
+
+        _Settings = InWidget;
+    }
+
     private void ShowPauseConfirmation(EMars_ChalkPauseAction InAction, const FMars_ChalkConfirmation_Spec& InSpec)
     {
         if (ck::IsValid(_Confirmation))
         { return; }
 
-        auto Controller = GetController();
-        auto WidgetClass = System::LoadClassAsset_Blocking(ConfirmationClass);
-        if (ck::EnsureIfNot(ck::IsValid(WidgetClass), "[PauseMenu] the confirmation widget class is unset or did not load"))
+        _Confirmation = utils_chalk_confirmation::Push(GetController(), System::LoadClassAsset_Blocking(ConfirmationClass), InSpec);
+        if (ck::Is_NOT_Valid(_Confirmation))
         { return; }
 
-        auto Modal = Cast<UMars_ChalkConfirmation_Widget>(WidgetBlueprint::CreateWidget(WidgetClass, Controller));
-        if (ck::EnsureIfNot(ck::IsValid(Modal), "[PauseMenu] could not create the confirmation widget"))
-        { return; }
-
-        Modal.Configure(InSpec);
-        Modal.OnResult.AddUFunction(this, n"OnPauseConfirmationResult");
-        Modal.OnClosed.AddUFunction(this, n"OnConfirmationClosed");
         _ConfirmationAction = InAction;
-        _Confirmation = Cast<UMars_ChalkConfirmation_Widget>(utils_u_i_layout::PushWidgetToLayer_Instance(Controller,
-            GameplayTags::UI_Layer_Modal, Modal));
-        ck::EnsureIfNot(ck::IsValid(_Confirmation), "[PauseMenu] UI.Layer.Modal refused the confirmation widget");
+        _Confirmation.OnResult.AddUFunction(this, n"OnPauseConfirmationResult");
+        _Confirmation.OnClosed.AddUFunction(this, n"OnConfirmationClosed");
     }
 
     UFUNCTION()

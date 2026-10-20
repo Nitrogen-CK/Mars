@@ -40,7 +40,15 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         if (ck::EnsureIfNot(ck::IsValid(InputAction), "[Mars_InteractPrompt] Prompt has no resolvable InputAction"))
         { return; }
 
-        Set_Prompt(InPrompt.Get_DisplayText(), InputAction, InPrompt.Get_DisplayTextColor());
+        // The kernel names why the action is blocked; the widget words it.
+        auto Text = InPrompt.Get_DisplayText();
+        const auto Reason = InPrompt.Get_BlockedReason();
+        if (Reason == EMars_InteractPrompt_BlockedReason::HandsFull)
+        { Text = NSLOCTEXT("MarsInteraction", "HandsFullPrompt", "Hands full"); }
+        else if (Reason == EMars_InteractPrompt_BlockedReason::HotbarFull)
+        { Text = NSLOCTEXT("MarsInteraction", "HotbarFullPrompt", "Hotbar full"); }
+
+        Set_Prompt(Text, InputAction, InPrompt.Get_DisplayTextColor());
         Report_MissingIcon(PromptIcon, InputAction);
 
         auto Interaction = InPrompt.Get_CurrentInteraction();
@@ -53,15 +61,12 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         else
         { StopHoldProgress(); }
 
-        auto Control = FCk_Handle_Control();
         auto Target = InPrompt.As_InteractTarget(ECk_SanityCheck::UnChecked);
-        if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext)
-            && Target.Get_InteractionCompletionPolicy() == ECk_Interaction_CompletionPolicy::ManuallyCompleted)
-        { Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked); }
+        auto Control = ck::IsValid(Target) ? Target.TryGet_ManipulatedControl() : FCk_Handle_Control();
 
-        // A bar fills only for a timed hold or a pulled control: a WhileLive target is ManuallyCompleted too, and
+        // A bar fills only for a timed hold or a gripped control: a WhileLive target is ManuallyCompleted too, and
         // nothing would fill it.
-        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed || ck::IsValid(Control));
+        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed);
 
         if (ck::IsValid(Control))
         { ListenForManipulation(Control); }
@@ -71,13 +76,10 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
 
     void Set_Prompt(FText InText, UInputAction InAction, FLinearColor InColor)
     {
-        if (ck::IsValid(PromptText))
-        {
-            PromptText.SetText(InText);
-            PromptText.SetColorAndOpacity(FSlateColor(InColor));
-        }
+        PromptText.SetText(InText);
+        PromptText.SetColorAndOpacity(FSlateColor(InColor));
 
-        if (ck::IsValid(PromptIcon) && ck::IsValid(InAction))
+        if (ck::IsValid(InAction))
         { PromptIcon.SetEnhancedInputAction(InAction); }
     }
 
@@ -110,7 +112,7 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
     {
         if (_ManipulatedControl == InControl)
         {
-            Set_ProgressPercent(_ManipulatedControl.Get_ManipulationProgress());
+            Refresh_ManipulationBar();
             return;
         }
 
@@ -118,7 +120,15 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         _ManipulatedControl = InControl;
         _ManipulatedControl.BindTo_OnManipulationProgress(FMars_Delegate_Control_OnManipulationProgress(this, n"OnManipulationProgress"));
         _ManipulatedControl.BindTo_OnManipulationChanged(FMars_Delegate_Control_OnManipulationChanged(this, n"OnManipulationChanged"));
-        Set_ProgressPercent(_ManipulatedControl.Get_ManipulationProgress());
+        Refresh_ManipulationBar();
+    }
+
+    // Unset progress means not gripped (not "at rest"): the bar shows only while the control is held.
+    private void Refresh_ManipulationBar()
+    {
+        const auto Progress = _ManipulatedControl.TryGet_ManipulationProgress();
+        Show_Progress(Progress.IsSet());
+        Set_ProgressPercent(Progress.Get(0.0f));
     }
 
     private void StopManipulation()
@@ -144,6 +154,7 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
     UFUNCTION()
     private void OnManipulationChanged(FCk_Handle_Control InControl, EMars_Control_Grip InGrip)
     {
+        Show_Progress(InGrip == EMars_Control_Grip::Gripped);
         if (InGrip == EMars_Control_Grip::Released)
         { Set_ProgressPercent(0.0f); }
     }

@@ -9,6 +9,9 @@
 //
 // Window and Marker are children of a canvas panel (the bar) and are placed by their anchors alone, in bar lengths, so the
 // layout holds at any size; the WBP gives them zero offsets.
+//
+// A one-off: the shared gameplay HUD binds this mortar meter directly. A second station with an operator meter should not
+// follow it; give the station's assembly an operator HUD widget class instead.
 UCLASS(Abstract)
 class UMars_MortarMeter_Widget : UCk_UserWidget_UE
 {
@@ -28,6 +31,15 @@ class UMars_MortarMeter_Widget : UCk_UserWidget_UE
     UPROPERTY(meta = (BindWidget))
     UTextBlock Prompt;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Mortar")
+    FText CrushPrompt = NSLOCTEXT("MarsMortar", "CrushPrompt", "Crush: click on the green");
+
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Mortar")
+    FText GrindPrompt = NSLOCTEXT("MarsMortar", "GrindPrompt", "Grind: hold");
+
+    UPROPERTY(EditDefaultsOnly, Category = "Mars|Mortar")
+    FText DonePrompt = NSLOCTEXT("MarsMortar", "DonePrompt", "Ground");
+
     // The marker's half width, in bar lengths.
     private const float32 k_MarkerHalfWidth = 0.004f;
 
@@ -41,8 +53,7 @@ class UMars_MortarMeter_Widget : UCk_UserWidget_UE
     {
         _IsShown = false;
         _PromptPhase.Reset();
-        if (ck::IsValid(Body))
-        { Body.SetVisibility(ESlateVisibility::Collapsed); }
+        Body.SetVisibility(ESlateVisibility::Collapsed);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -116,15 +127,14 @@ class UMars_MortarMeter_Widget : UCk_UserWidget_UE
 
         _IsShown = InShown;
         _PromptPhase.Reset();
-        if (ck::IsValid(Body))
-        { Body.SetVisibility(InShown ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed); }
+        Body.SetVisibility(InShown ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
     }
 
     // InWidget spans the bar from InLeft to InRight (bar lengths, clamped to the bar) and its full height.
     private void Place_OnBar(UWidget InWidget, float32 InLeft, float32 InRight)
     {
         auto BarSlot = Cast<UCanvasPanelSlot>(InWidget.Slot);
-        if (ck::Is_NOT_Valid(BarSlot))
+        if (ck::EnsureIfNot(ck::IsValid(BarSlot), "[Mars_MortarMeter] Window/Marker must be children of a canvas panel"))
         { return; }
 
         auto Anchors = FAnchors();
@@ -136,11 +146,11 @@ class UMars_MortarMeter_Widget : UCk_UserWidget_UE
     private FText Get_PromptText(EMars_Mortar_Phase InPhase) const
     {
         if (InPhase == EMars_Mortar_Phase::Crush)
-        { return FText::FromString("Crush: click on the green"); }
+        { return CrushPrompt; }
 
         if (InPhase == EMars_Mortar_Phase::Grind)
-        { return FText::FromString("Grind: hold"); }
+        { return GrindPrompt; }
 
-        return FText::FromString("Ground");
+        return DonePrompt;
     }
 }

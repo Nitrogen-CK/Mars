@@ -4,7 +4,7 @@
 // definition, pipeline) is Script/ECS/Searing/GUIDELINE.md.
 struct FMars_CookState
 {
-    // Six, indexed by int32(EMars_Searing_Face): +X -X +Y -Y +Z -Z.
+    // Six, indexed by int32(EMars_FoodPiece_Face): +X -X +Y -Y +Z -Z.
     UPROPERTY()
     TArray<float32> FaceSear;
 

@@ -51,7 +51,7 @@ class AMars_Camp_GameMode : AMars_Master_GameMode
             if (ck::IsValid(Flow) && ck::IsValid(CampState.ServiceCatalog) &&
                 ck::IsValid(CampState.ServiceCatalog.Find(Flow.GetCommittedServiceId())))
             { CampState.Apply_PartyState(Flow.GetCommittedServiceId(), EMars_PartyDeparture::Staying); }
-            Session.Request_Play();
+            Session.Request_Play(FMars_Request_CampSession_Play());
         }
     }
 
@@ -63,7 +63,7 @@ class AMars_Camp_GameMode : AMars_Master_GameMode
         auto State = Get_CampState();
         auto Flow = Subsystem::GetGameInstanceSubsystem(UMars_LanFlow_Subsystem);
         if (ck::Is_NOT_Valid(State) || ck::Is_NOT_Valid(State.ServiceCatalog) || ck::Is_NOT_Valid(Flow) ||
-            Flow.GetState() != EMars_LanFlowState::Connected || State.Get_PartyState().IsDeparting ||
+            Flow.GetState() != EMars_LanFlowState::Connected || State.Get_PartyState().Departure == EMars_PartyDeparture::Departing ||
             ck::Is_NOT_Valid(State.ServiceCatalog.Find(InServiceId)))
         { return false; }
 
@@ -85,7 +85,7 @@ class AMars_Camp_GameMode : AMars_Master_GameMode
 
         const auto Party = State.Get_PartyState();
         auto Service = State.ServiceCatalog.Find(Party.ServiceId);
-        if (Party.IsDeparting || ck::Is_NOT_Valid(Service) || Service.Destination.IsNull())
+        if (Party.Departure == EMars_PartyDeparture::Departing || ck::Is_NOT_Valid(Service) || Service.Destination.IsNull())
         { return false; }
 
         TArray<AMars_GameSession> Sessions;

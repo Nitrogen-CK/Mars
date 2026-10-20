@@ -32,10 +32,10 @@ mixin bool Get_IsLive(const FCk_Handle_CampSession& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_Play(FCk_Handle_CampSession& Self)
+mixin void Request_Play(FCk_Handle_CampSession& Self, const FMars_Request_CampSession_Play& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_CampSession_Requests);
-    Requests.PlayRequests.Add(FMars_Request_CampSession_Play());
+    Requests.PlayRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

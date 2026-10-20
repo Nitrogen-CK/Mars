@@ -28,8 +28,7 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
     UFUNCTION(BlueprintOverride)
     void Construct()
     {
-        if (ck::IsValid(PromptContainer))
-        { PromptContainer.ClearChildren(); }
+        PromptContainer.ClearChildren();
 
         _ActivePrompts.Empty();
     }
@@ -52,7 +51,7 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
             if (PromptSlot.Stack.IsEmpty() || ck::Is_NOT_Valid(PromptSlot.Stack.Last().PromptHandle))
             { continue; }
 
-            OnPromptAppeared(_Display, PromptSlot.SlotKey, PromptSlot.SortOrder, PromptSlot.Stack.Last().PromptHandle);
+            OnPromptAppeared(_Display, FMars_InteractPromptDisplay_SlotEvent(PromptSlot.SlotKey, PromptSlot.SortOrder, PromptSlot.Stack.Last().PromptHandle));
         }
     }
 
@@ -67,46 +66,45 @@ class UMars_InteractPromptBox_Widget : UCk_UserWidget_UE
         }
 
         _Display = FCk_Handle_InteractPromptDisplay();
-        if (ck::IsValid(PromptContainer))
-        { PromptContainer.ClearChildren(); }
+        PromptContainer.ClearChildren();
 
         _ActivePrompts.Empty();
     }
 
     UFUNCTION()
-    private void OnPromptAppeared(FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt)
+    private void OnPromptAppeared(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent)
     {
-        if (_ActivePrompts.Contains(InSlotKey))
+        if (_ActivePrompts.Contains(InEvent.SlotKey))
         { return; }
 
         if (ck::EnsureIfNot(PromptWidgetClass != nullptr, "[Mars_InteractPromptBox] PromptWidgetClass is not set on the widget blueprint"))
         { return; }
 
         auto NewWidget = Cast<UMars_InteractPrompt_Widget>(WidgetBlueprint::CreateWidget(PromptWidgetClass, GetOwningPlayer()));
-        if (ck::EnsureIfNot(ck::IsValid(NewWidget), f"[Mars_InteractPromptBox] Could not create the prompt widget for slot [{InSlotKey.ToString()}]"))
+        if (ck::EnsureIfNot(ck::IsValid(NewWidget), f"[Mars_InteractPromptBox] Could not create the prompt widget for slot [{InEvent.SlotKey.ToString()}]"))
         { return; }
 
-        _ActivePrompts.Add(InSlotKey, NewWidget);
-        NewWidget.OnVisualUpdate(InPrompt);
+        _ActivePrompts.Add(InEvent.SlotKey, NewWidget);
+        NewWidget.OnVisualUpdate(InEvent.Prompt);
 
         RebuildContainer(InDisplay);
     }
 
     UFUNCTION()
-    private void OnPromptRemoved(FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt)
+    private void OnPromptRemoved(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent)
     {
-        if (_ActivePrompts.Contains(InSlotKey) == false)
+        if (_ActivePrompts.Contains(InEvent.SlotKey) == false)
         { return; }
 
-        _ActivePrompts[InSlotKey].RemoveFromParent();
-        _ActivePrompts.Remove(InSlotKey);
+        _ActivePrompts[InEvent.SlotKey].RemoveFromParent();
+        _ActivePrompts.Remove(InEvent.SlotKey);
     }
 
     UFUNCTION()
-    private void OnPromptUpdated(FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt)
+    private void OnPromptUpdated(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent)
     {
-        if (_ActivePrompts.Contains(InSlotKey))
-        { _ActivePrompts[InSlotKey].OnVisualUpdate(InPrompt); }
+        if (_ActivePrompts.Contains(InEvent.SlotKey))
+        { _ActivePrompts[InEvent.SlotKey].OnVisualUpdate(InEvent.Prompt); }
     }
 
     // In the display's own slot order: SortOrder, ties in arrival order, so equal-priority prompts never swap between

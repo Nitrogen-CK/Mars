@@ -240,18 +240,12 @@ class AMars_CampUiPresenter : AActor
 
     private AMars_CampBoardAnchor FindBoardAnchor(EMars_CampStation InStation)
     {
-        TArray<AMars_CampBoardAnchor> Anchors;
-        GetAllActorsOfClass(Anchors);
-        AMars_CampBoardAnchor Anchor;
-        int32 Matches = 0;
-        for (auto Candidate : Anchors)
-        {
-            if (ck::IsValid(Candidate) && Candidate.GetWorld() == GetWorld() && Candidate.Station == InStation)
-            { Anchor = Candidate; ++Matches; }
-        }
+        auto Anchor = utils_camp_station::TryGet_BoardAnchor(GetWorld(), InStation);
+        if (ck::Is_NOT_Valid(Anchor))
+        { return nullptr; }
 
-        if (ck::EnsureIfNot(Matches == 1 && ck::IsValid(Anchor) && Anchor.DrawSize.X > 0 && Anchor.DrawSize.Y > 0,
-            f"[CampUiPresenter] expected one valid board anchor for station [{InStation}], found [{Matches}]"))
+        if (ck::EnsureIfNot(Anchor.DrawSize.X > 0 && Anchor.DrawSize.Y > 0,
+            f"[CampUiPresenter] the board anchor for station [{InStation}] has no draw size"))
         { return nullptr; }
 
         return Anchor;
@@ -275,7 +269,7 @@ class AMars_CampUiPresenter : AActor
         { return; }
 
         _Board = InBoard;
-        _Controller.FocusStation(InStation, 0.0f);
+        _Controller.FocusStation(InStation);
         utils_world_space_widget::Request_SetEnabled(_WorldWidget, true);
         AcquireProfile();
         OpenInputHost();
@@ -408,7 +402,7 @@ class AMars_CampUiPresenter : AActor
         else if (InAction == EMars_CampUiAction::Depart)
         {
             if (ck::IsValid(_Departure) && _Board == _Departure && ck::IsValid(_State) && CanCommit() &&
-                !_State.Get_PartyState().ServiceId.IsNone() && !_State.Get_PartyState().IsDeparting)
+                !_State.Get_PartyState().ServiceId.IsNone() && _State.Get_PartyState().Departure != EMars_PartyDeparture::Departing)
             {
                 ShowConfirmation(FMars_ChalkConfirmation_Spec(
                     NSLOCTEXT("MarsCamp", "DepartTitle", "Depart for adventure?"),
@@ -418,39 +412,17 @@ class AMars_CampUiPresenter : AActor
         }
     }
 
-    private UMars_ChalkConfirmation_Widget CreateConfirmation(const FMars_ChalkConfirmation_Spec& InSpec)
-    {
-        auto WidgetClass = System::LoadClassAsset_Blocking(ConfirmationClass);
-        if (ck::EnsureIfNot(ck::IsValid(WidgetClass), "[CampUiPresenter] the confirmation widget class is unset or did not load"))
-        { return nullptr; }
-
-        auto Modal = Cast<UMars_ChalkConfirmation_Widget>(WidgetBlueprint::CreateWidget(WidgetClass, _Controller));
-        if (ck::EnsureIfNot(ck::IsValid(Modal), "[CampUiPresenter] could not create the confirmation widget"))
-        { return nullptr; }
-
-        Modal.Configure(InSpec);
-        Modal.OnClosed.AddUFunction(this, n"OnModalClosed");
-        return Modal;
-    }
-
-    private UCommonActivatableWidget PushModal(UCommonActivatableWidget InModal)
-    {
-        auto Pushed = utils_u_i_layout::PushWidgetToLayer_Instance(_Controller, GameplayTags::UI_Layer_Modal, InModal);
-        ck::EnsureIfNot(ck::IsValid(Pushed), "[CampUiPresenter] UI.Layer.Modal refused a modal widget");
-        return Pushed;
-    }
-
     private void ShowConfirmation(const FMars_ChalkConfirmation_Spec& InSpec)
     {
         if (ck::IsValid(_Confirmation))
         { return; }
 
-        auto Modal = CreateConfirmation(InSpec);
-        if (ck::Is_NOT_Valid(Modal))
+        _Confirmation = utils_chalk_confirmation::Push(_Controller, System::LoadClassAsset_Blocking(ConfirmationClass), InSpec);
+        if (ck::Is_NOT_Valid(_Confirmation))
         { return; }
 
-        Modal.OnResult.AddUFunction(this, n"OnConfirmationResult");
-        _Confirmation = Cast<UMars_ChalkConfirmation_Widget>(PushModal(Modal));
+        _Confirmation.OnResult.AddUFunction(this, n"OnConfirmationResult");
+        _Confirmation.OnClosed.AddUFunction(this, n"OnModalClosed");
     }
 
     UFUNCTION()

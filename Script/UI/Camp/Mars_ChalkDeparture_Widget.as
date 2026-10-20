@@ -30,11 +30,11 @@ class UMars_ChalkDeparture_Widget : UMars_WorldBoard_Widget
     void SetPartyState(FMars_CampPartyState InParty, UMars_ServiceCatalog InCatalog, bool InCanDepart)
     {
         auto Service = ck::IsValid(InCatalog) ? InCatalog.Find(InParty.ServiceId) : nullptr;
-        _CanDepart = InCanDepart && !InParty.IsDeparting && ck::IsValid(Service);
+        _CanDepart = InCanDepart && InParty.Departure != EMars_PartyDeparture::Departing && ck::IsValid(Service);
         ServiceTitle.SetText(ck::IsValid(Service)
             ? Service.Title
             : NSLOCTEXT("MarsCamp", "DepartureNoService", "No service selected"));
-        Status.SetText(InParty.IsDeparting
+        Status.SetText(InParty.Departure == EMars_PartyDeparture::Departing
             ? NSLOCTEXT("MarsCamp", "DepartureInProgress", "The party is departing.")
             : ck::Is_NOT_Valid(Service)
                 ? NSLOCTEXT("MarsCamp", "DepartureChooseService", "Choose and confirm a service at the contract board first.")
@@ -42,7 +42,7 @@ class UMars_ChalkDeparture_Widget : UMars_WorldBoard_Widget
                     ? NSLOCTEXT("MarsCamp", "DepartureReady", "The host may depart with the party.")
                     : NSLOCTEXT("MarsCamp", "DepartureHostOnly", "Only the host can depart with the party."));
         Depart.SetIsEnabled(_CanDepart);
-        Back.SetVisibility(InParty.IsDeparting
+        Back.SetVisibility(InParty.Departure == EMars_PartyDeparture::Departing
             ? ESlateVisibility::Collapsed
             : ESlateVisibility::Visible);
     }

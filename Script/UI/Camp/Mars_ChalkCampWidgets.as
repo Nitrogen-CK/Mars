@@ -85,6 +85,8 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
     private UMars_ServiceCatalog _Catalog;
     private FMars_CampPartyState _PartyState;
     private FName _PreviewServiceId;
+    // Set once the player picks a row; until then the preview follows the party's committed service.
+    private bool _HasBrowsed = false;
     private bool _CanCommit = false;
     private bool _ApplyingSelection = false;
     private UCommonButtonGroupBase _RowGroup;
@@ -119,6 +121,8 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
         { return; }
 
         _Catalog = InCatalog;
+        // Adding to a selection-required group may select a row; that is not the player browsing.
+        _ApplyingSelection = true;
         _RowGroup.RemoveAll();
         _Rows.Empty();
         ServiceRows.ClearChildren();
@@ -137,6 +141,7 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
                 _Rows.Add(Row);
             }
         }
+        _ApplyingSelection = false;
 
         ReconcilePreview();
     }
@@ -157,8 +162,9 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
     {
         _PartyState = InState;
         _CanCommit = InCanCommit;
-        if (_PreviewServiceId.IsNone())
+        if (_HasBrowsed == false)
         { _PreviewServiceId = InState.ServiceId; }
+
         ReconcilePreview();
     }
 
@@ -195,7 +201,7 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
 
         auto Current = ck::IsValid(_Catalog) ? _Catalog.Find(_PartyState.ServiceId) : nullptr;
         CurrentSelection.SetText(ck::IsValid(Current) ? Current.Title : FText());
-        Confirm.SetIsEnabled(_CanCommit && !_PartyState.IsDeparting && ck::IsValid(Preview));
+        Confirm.SetIsEnabled(_CanCommit && _PartyState.Departure != EMars_PartyDeparture::Departing && ck::IsValid(Preview));
     }
 
     UFUNCTION()
@@ -208,6 +214,7 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
         if (ck::EnsureIfNot(ck::IsValid(Row) && ck::IsValid(Row.GetService()), "[Service] a selected row has no service"))
         { return; }
 
+        _HasBrowsed = true;
         _PreviewServiceId = Row.GetService().Id;
         RefreshPreview();
     }
@@ -215,7 +222,7 @@ class UMars_ChalkService_Widget : UMars_WorldBoard_Widget
     UFUNCTION()
     private void OnConfirmClicked(UCommonButtonBase InButton)
     {
-        if (_CanCommit && !_PartyState.IsDeparting && ck::IsValid(_Catalog) &&
+        if (_CanCommit && _PartyState.Departure != EMars_PartyDeparture::Departing && ck::IsValid(_Catalog) &&
             ck::IsValid(_Catalog.Find(_PreviewServiceId)))
         { OnActionRequested.Broadcast(EMars_CampUiAction::ConfirmService); }
     }
@@ -252,6 +259,31 @@ struct FMars_ChalkConfirmation_Spec
         Message = InMessage;
         ConfirmLabel = InConfirmLabel;
         CancelLabel = InCancelLabel;
+    }
+}
+
+namespace utils_chalk_confirmation
+{
+    // Creates the confirmation modal from InLoadedClass (System::LoadClassAsset_Blocking of the caller's soft class),
+    // configures it with InSpec and pushes it to UI.Layer.Modal. Null, with an ensure, when a step fails. The caller binds
+    // OnResult / OnClosed on the result.
+    UMars_ChalkConfirmation_Widget Push(APlayerController InController, TSubclassOf<UUserWidget> InLoadedClass,
+        const FMars_ChalkConfirmation_Spec& InSpec)
+    {
+        if (ck::EnsureIfNot(ck::IsValid(InLoadedClass), "[ChalkConfirmation] the confirmation widget class is unset or did not load"))
+        { return nullptr; }
+
+        auto Modal = Cast<UMars_ChalkConfirmation_Widget>(WidgetBlueprint::CreateWidget(InLoadedClass, InController));
+        if (ck::EnsureIfNot(ck::IsValid(Modal), "[ChalkConfirmation] could not create the confirmation widget"))
+        { return nullptr; }
+
+        Modal.Configure(InSpec);
+        auto Pushed = Cast<UMars_ChalkConfirmation_Widget>(utils_u_i_layout::PushWidgetToLayer_Instance(InController,
+            GameplayTags::UI_Layer_Modal, Modal));
+        if (ck::EnsureIfNot(ck::IsValid(Pushed), "[ChalkConfirmation] UI.Layer.Modal refused the confirmation widget"))
+        { return nullptr; }
+
+        return Pushed;
     }
 }
 
@@ -317,12 +349,6 @@ class UMars_ChalkConfirmation_Widget : UCk_ActivatableWidget_UE
             Cancel.RefreshLabel();
         }
     }
-
-    void SetMessage(FText InMessage)
-    { MessageText.SetText(InMessage); }
-
-    void SetConfirmState(EMars_ButtonState InState)
-    { Confirm.SetActionState(InState); }
 
     private void Resolve(bool InConfirmed)
     {

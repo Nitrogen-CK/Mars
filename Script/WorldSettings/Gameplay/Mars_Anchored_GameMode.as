@@ -2,12 +2,9 @@
 // court once per run, and every placed anchor resolves against that result (Script/ECS/AnchorResolver). The solve is
 // pure and idempotent, so whichever asks first - the first ChoosePlayerStart or the resolver subsystem at world begin
 // play - triggers it, and both see the same result.
-class AMars_Anchored_GameMode : AMars_Gameplay_GameMode
+class AMars_Anchored_GameMode : AMars_Expedition_GameMode
 {
     private TOptional<FMars_AnchorRun_Result> _Result;
-    private int32 _NextSlot = 0;
-    private TArray<AController> _Controllers;
-    private TArray<AActor> _AssignedStarts;
 
     // Each anchored map's game mode returns its plan (Mars_Warrens_GameMode.as).
     UMars_AnchorPlan_Def Get_Plan() const
@@ -51,34 +48,7 @@ class AMars_Anchored_GameMode : AMars_Gameplay_GameMode
         return Result;
     }
 
-    // Mars_Expedition_GameMode.as's slot loop; only the entrance choice differs: the solved entrance, never a random tag.
-    UFUNCTION(BlueprintOverride)
-    AActor ChoosePlayerStart(AController Player)
-    {
-        for (int32 Index = 0; Index < _Controllers.Num(); ++Index)
-        {
-            if (_Controllers[Index] == Player && IsValid(_AssignedStarts[Index]))
-            { return _AssignedStarts[Index]; }
-        }
-
-        const auto Entrance = Ensure_Solved().PlayerStartTag;
-
-        TArray<APlayerStart> Starts;
-        GetAllActorsOfClass(Starts);
-        TArray<AActor> Slots;
-        for (auto Start : Starts)
-        {
-            if (IsValid(Start) && Start.PlayerStartTag == Entrance)
-            { Slots.Add(Start); }
-        }
-
-        if (ck::EnsureIfNot(Slots.Num() > 0, f"[AnchoredGameMode] no PlayerStart tagged {Entrance.ToString()}"))
-        { return nullptr; }
-
-        auto Chosen = Slots[_NextSlot % Slots.Num()];
-        ++_NextSlot;
-        _Controllers.Add(Player);
-        _AssignedStarts.Add(Chosen);
-        return Chosen;
-    }
+    // The solved entrance, never a random tag.
+    FName Choose_Entrance(const TArray<APlayerStart>& InStarts) override
+    { return Ensure_Solved().PlayerStartTag; }
 }

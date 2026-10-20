@@ -16,11 +16,8 @@ class UMars_ActionHint_Widget : UMars_KeyGlyph_Widget
         if (ck::EnsureIfNot(ck::IsValid(InputAction), "[Mars_ActionHint] Hint has no resolvable InputAction"))
         { return; }
 
-        if (ck::IsValid(HintText))
-        { HintText.SetText(InSpec.Text); }
-
-        if (ck::IsValid(HintIcon))
-        { HintIcon.SetEnhancedInputAction(InputAction); }
+        HintText.SetText(InSpec.Text);
+        HintIcon.SetEnhancedInputAction(InputAction);
 
         if (ck::IsValid(HoldLabel))
         {

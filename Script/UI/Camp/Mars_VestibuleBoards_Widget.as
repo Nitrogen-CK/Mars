@@ -20,9 +20,6 @@ class UMars_VestibuleMain_Widget : UMars_WorldBoard_Widget
     UPROPERTY(meta = (BindWidget))
     UWidget MenuActions;
 
-    UPROPERTY(meta = (BindWidgetOptional))
-    UCommonTextBlock Status;
-
     private bool _TitleActive = true;
     private EMars_CampUiAction _PreferredReturnAction = EMars_CampUiAction::Host;
 
@@ -95,12 +92,6 @@ class UMars_VestibuleMain_Widget : UMars_WorldBoard_Widget
         return Host;
     }
 
-    void SetStatus(FText InStatus)
-    {
-        if (ck::IsValid(Status))
-        { Status.SetText(InStatus); }
-    }
-
     void SetActionState(EMars_ButtonState InState)
     {
         Host.SetActionState(InState);
@@ -143,7 +134,7 @@ class UMars_VestibuleMain_Widget : UMars_WorldBoard_Widget
     { SetNavigationPresentation(false); }
 }
 
-// The join form can be a screen modal or a world board. In world mode the presenter owns navigation and Back.
+// The join form, shown on a world board: the vestibule presentation owns navigation and Back.
 UCLASS(Abstract)
 class UMars_VestibuleJoin_Widget : UCk_ActivatableWidget_UE
 {
@@ -163,12 +154,7 @@ class UMars_VestibuleJoin_Widget : UCk_ActivatableWidget_UE
     UCommonTextBlock Status;
 
     FMars_CampUiActionRequested OnActionRequested;
-    FMars_ChalkModalClosed OnClosed;
-    FMars_WorldBoardFocusRequested OnFocusRequested;
 
-    bool bWorldBoardPresentation = false;
-
-    private bool _Busy = false;
     private EMars_ButtonState _RequestedSubmitState = EMars_ButtonState::Enabled;
 
     UFUNCTION(BlueprintOverride)
@@ -188,9 +174,8 @@ class UMars_VestibuleJoin_Widget : UCk_ActivatableWidget_UE
     UFUNCTION()
     private bool AllowAddressCharacter(const FString& InCharacter) const
     {
-        if (InCharacter.Len() != 1) { return false; }
-        const int Code = int(InCharacter[0]);
-        return (Code >= 48 && Code <= 57) || Code == 46 || Code == 58;
+        auto Flow = Subsystem::GetGameInstanceSubsystem(UMars_LanFlow_Subsystem);
+        return ck::IsValid(Flow) && Flow.IsAddressCharacter(InCharacter);
     }
 
     UFUNCTION(BlueprintOverride)
@@ -208,18 +193,11 @@ class UMars_VestibuleJoin_Widget : UCk_ActivatableWidget_UE
     }
 
     UFUNCTION(BlueprintOverride)
-    void OnDeactivated()
-    { OnClosed.Broadcast(this); }
-
-    UFUNCTION(BlueprintOverride)
     UWidget BP_GetDesiredFocusTarget() const
     { return GetPreferredFocusTarget(); }
 
     UWidget GetPreferredFocusTarget() const
     { return Address.Input; }
-
-    void RequestAddressFocus()
-    { OnFocusRequested.Broadcast(GetPreferredFocusTarget()); }
 
     UFUNCTION(BlueprintOverride)
     bool OnHandleBackAction()
@@ -242,10 +220,9 @@ class UMars_VestibuleJoin_Widget : UCk_ActivatableWidget_UE
 
     void SetStatus(FText InStatus, EMars_ButtonState InSubmitState)
     {
-        _Busy = InSubmitState == EMars_ButtonState::Busy;
         _RequestedSubmitState = InSubmitState;
         Status.SetText(InStatus);
-        Address.SetIsEnabled(!_Busy);
+        Address.SetIsEnabled(InSubmitState != EMars_ButtonState::Busy);
         RefreshSubmitState();
     }
 
@@ -270,20 +247,7 @@ class UMars_VestibuleJoin_Widget : UCk_ActivatableWidget_UE
     }
 
     private void RequestClose()
-    {
-        if (bWorldBoardPresentation)
-        {
-            OnActionRequested.Broadcast(EMars_CampUiAction::Back);
-            return;
-        }
-        if (_Busy)
-        {
-            OnActionRequested.Broadcast(EMars_CampUiAction::Back);
-            return;
-        }
-
-        DeactivateWidget();
-    }
+    { OnActionRequested.Broadcast(EMars_CampUiAction::Back); }
 
     UFUNCTION()
     private void OnJoinClicked(UCommonButtonBase InButton)

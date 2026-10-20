@@ -17,14 +17,46 @@ enum EMars_CampStation
 
 namespace utils_camp_station
 {
-    AMars_CampStationCamera TryGet_Camera(const TArray<AMars_CampStationCamera>& InCameras, EMars_CampStation InStation)
+    // The one enabled station camera (a plain camera or a menu board station) for InStation in InWorld; ensures there is
+    // exactly one. Disabled cameras are authoring backups.
+    AMars_CampStationCamera TryGet_Camera(UWorld InWorld, EMars_CampStation InStation)
     {
-        for (auto Camera : InCameras)
+        AMars_CampStationCamera Result;
+        int32 Matches = 0;
+        for (auto Actor : utils_actor::Get_AllActorsOfClass(AMars_CampStationCamera))
         {
-            if (ck::IsValid(Camera) && Camera.Station == InStation)
-            { return Camera; }
+            auto Camera = Cast<AMars_CampStationCamera>(Actor);
+            if (ck::IsValid(Camera) && Camera.bStationEnabled && Camera.GetWorld() == InWorld && Camera.Station == InStation)
+            {
+                Result = Camera;
+                ++Matches;
+            }
         }
 
-        return nullptr;
+        if (ck::EnsureIfNot(Matches == 1, f"[CampStation] expected exactly one enabled camera for station [{InStation}], found [{Matches}]"))
+        { return nullptr; }
+
+        return Result;
+    }
+
+    // The one board anchor for InStation in InWorld; ensures there is exactly one.
+    AMars_CampBoardAnchor TryGet_BoardAnchor(UWorld InWorld, EMars_CampStation InStation)
+    {
+        AMars_CampBoardAnchor Result;
+        int32 Matches = 0;
+        for (auto Actor : utils_actor::Get_AllActorsOfClass(AMars_CampBoardAnchor))
+        {
+            auto Anchor = Cast<AMars_CampBoardAnchor>(Actor);
+            if (ck::IsValid(Anchor) && Anchor.GetWorld() == InWorld && Anchor.Station == InStation)
+            {
+                Result = Anchor;
+                ++Matches;
+            }
+        }
+
+        if (ck::EnsureIfNot(Matches == 1, f"[CampStation] expected exactly one board anchor for station [{InStation}], found [{Matches}]"))
+        { return nullptr; }
+
+        return Result;
     }
 }

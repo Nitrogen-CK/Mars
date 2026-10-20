@@ -29,8 +29,7 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
     UFUNCTION(BlueprintOverride)
     void Construct()
     {
-        if (ck::IsValid(HintContainer))
-        { HintContainer.ClearChildren(); }
+        HintContainer.ClearChildren();
 
         _ActiveHints.Empty();
         _SortOrders.Empty();
@@ -64,8 +63,7 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
         }
 
         _Display = FCk_Handle_ActionHintDisplay();
-        if (ck::IsValid(HintContainer))
-        { HintContainer.ClearChildren(); }
+        HintContainer.ClearChildren();
 
         _ActiveHints.Empty();
         _SortOrders.Empty();
@@ -128,9 +126,6 @@ class UMars_ActionHintBox_Widget : UCk_UserWidget_UE
     // Keyed by the row's Sequence, which the display assigns before the first broadcast of that row.
     private void RebuildContainer()
     {
-        if (ck::Is_NOT_Valid(HintContainer))
-        { return; }
-
         TArray<int64> SortedSequences;
         _ActiveHints.GetKeys(SortedSequences);
 

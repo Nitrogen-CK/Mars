@@ -25,12 +25,37 @@ enum EMars_LanFlowTravel
     ReturnToCamp
 }
 
+// What the flow is doing, or why it stopped. The flow holds state only; the presentation maps a status to its copy.
+enum EMars_LanFlowStatus
+{
+    None,
+    OpeningCamp,
+    JoiningCamp,
+    DepartingCamp,
+    ReturningToCamp,
+    JoinedCamp,
+    SessionActive,
+    InvalidAddress,
+    CouldNotOpenCamp,
+    CouldNotReachHost,
+    ConnectionLost,
+    TravelIncomplete,
+    ServerTravelFailed,
+    CouldNotLoadCamp
+}
+
 namespace constants_lan_flow
 {
     // Ticked (not wall-clock) seconds: wall time advances during the blocking LoadMap.
     const float32 k_TravelAbandonTickedSeconds = 30.0f;
     // A server travel loads the destination asynchronously while the old world keeps ticking.
     const float32 k_ServerTravelAbandonTickedSeconds = 90.0f;
+
+    // The character codes a direct address is made of: ':' before the port, '.' between octets, and the digits.
+    const int32 k_PortSeparator = 58;
+    const int32 k_OctetSeparator = 46;
+    const int32 k_DigitZero = 48;
+    const int32 k_DigitNine = 57;
 }
 
 event void FMars_LanFlow_OnStateChanged();
@@ -49,8 +74,8 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
     // Request context survives the covered recovery reload so the matching board can show Retry.
     private EMars_LanFlowAction _LastConnectAction = EMars_LanFlowAction::None;
     private FString _LastJoinAddress;
-    private FString _Status;
-    private TOptional<FString> _LastError;
+    private EMars_LanFlowStatus _Status = EMars_LanFlowStatus::None;
+    private TOptional<EMars_LanFlowStatus> _LastError;
     private float32 _TravelTickedSeconds = 0.0f;
     private UCk_LoadingProcess_Task_UE _LoadingHold;
     UPROPERTY()
@@ -99,7 +124,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
 
         _TravelTarget = assets::Camp_Mars_MAP();
         _LastConnectAction = EMars_LanFlowAction::HostCamp;
-        BeginOperation(EMars_LanFlowState::Hosting, "Opening LAN camp", EMars_LanFlowAction::HostCamp);
+        BeginOperation(EMars_LanFlowState::Hosting, EMars_LanFlowStatus::OpeningCamp, EMars_LanFlowAction::HostCamp);
         _CommittedServiceId = NAME_None;
     }
 
@@ -110,9 +135,8 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         { return; }
         if (IsValidDirectAddress(InDirectAddress) == false)
         {
-            const FString Error = "Enter an IPv4 address, optionally followed by a port from 1 to 65535";
-            _LastError = TOptional<FString>(Error);
-            _Status = Error;
+            _LastError = TOptional<EMars_LanFlowStatus>(EMars_LanFlowStatus::InvalidAddress);
+            _Status = EMars_LanFlowStatus::InvalidAddress;
             OnStateChanged.Broadcast();
             return;
         }
@@ -121,7 +145,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         _LastJoinAddress = InDirectAddress;
         _LastConnectAction = EMars_LanFlowAction::JoinAddress;
         _TravelTarget = assets::Camp_Mars_MAP();
-        BeginOperation(EMars_LanFlowState::Joining, "Joining LAN camp", EMars_LanFlowAction::JoinAddress);
+        BeginOperation(EMars_LanFlowState::Joining, EMars_LanFlowStatus::JoiningCamp, EMars_LanFlowAction::JoinAddress);
         _CommittedServiceId = NAME_None;
     }
 
@@ -148,7 +172,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
     void ReturnToMenu()
     {
         _LastConnectAction = EMars_LanFlowAction::None;
-        BeginRecovery(TOptional<FString>());
+        BeginRecovery(TOptional<EMars_LanFlowStatus>());
     }
 
     UFUNCTION()
@@ -163,9 +187,9 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
 
         _TravelTarget = InTarget;
         if (InTravel == EMars_LanFlowTravel::ReturnToCamp)
-        { BeginOperation(EMars_LanFlowState::Returning, "Returning to camp", EMars_LanFlowAction::ServerMap); }
+        { BeginOperation(EMars_LanFlowState::Returning, EMars_LanFlowStatus::ReturningToCamp, EMars_LanFlowAction::ServerMap); }
         else
-        { BeginOperation(EMars_LanFlowState::Departing, "Departing camp", EMars_LanFlowAction::ServerMap); }
+        { BeginOperation(EMars_LanFlowState::Departing, EMars_LanFlowStatus::DepartingCamp, EMars_LanFlowAction::ServerMap); }
         return true;
     }
 
@@ -174,10 +198,10 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
     { return _State != EMars_LanFlowState::Idle && _State != EMars_LanFlowState::Connected; }
 
     UFUNCTION()
-    FString GetStatus() const
+    EMars_LanFlowStatus GetStatus() const
     { return _Status; }
 
-    TOptional<FString> GetLastError() const
+    TOptional<EMars_LanFlowStatus> GetLastError() const
     { return _LastError; }
 
     EMars_LanFlowAction GetFailedConnectAction() const
@@ -209,7 +233,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
     FName GetCommittedServiceId() const
     { return _CommittedServiceId; }
 
-    private void BeginOperation(EMars_LanFlowState InState, FString InStatus, EMars_LanFlowAction InAction)
+    private void BeginOperation(EMars_LanFlowState InState, EMars_LanFlowStatus InStatus, EMars_LanFlowAction InAction)
     {
         ++_Generation;
         _LastError.Reset();
@@ -220,7 +244,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         QueueAction(InAction);
     }
 
-    private void BeginRecovery(TOptional<FString> InError)
+    private void BeginRecovery(TOptional<EMars_LanFlowStatus> InError)
     {
         ++_Generation;
         _PendingAction = EMars_LanFlowAction::None;
@@ -230,28 +254,28 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         _LastError = InError;
         _DepartureWorld = TWeakObjectPtr<UWorld>(GetWorld());
         _TravelTickedSeconds = 0.0f;
-        SetState(EMars_LanFlowState::Recovering, InError.IsSet() ? InError.GetValue() : "Returning to camp");
-        HoldLoading("Returning to camp");
+        SetState(EMars_LanFlowState::Recovering, InError.IsSet() ? InError.GetValue() : EMars_LanFlowStatus::ReturningToCamp);
+        HoldLoading(EMars_LanFlowStatus::ReturningToCamp);
         QueueAction(EMars_LanFlowAction::StandaloneCamp);
     }
 
     // The engine already travelled us back to a standalone world: a failed connect, a lost connection or a failed
     // listen all end here. A standalone camp is settled in place instead of being loaded a second time.
-    private void SettleAfterBounce(UWorld InWorld, FString InError)
+    private void SettleAfterBounce(UWorld InWorld, EMars_LanFlowStatus InError)
     {
         if (IsMap(InWorld, assets::Camp_Mars_MAP()) == false)
-        { BeginRecovery(TOptional<FString>(InError)); return; }
+        { BeginRecovery(TOptional<EMars_LanFlowStatus>(InError)); return; }
 
         ++_Generation;
         _PendingAction = EMars_LanFlowAction::None;
         _JoinAddress.Empty();
         _TravelTarget = assets::Camp_Mars_MAP();
         _CommittedServiceId = NAME_None;
-        _LastError = TOptional<FString>(InError);
+        _LastError = TOptional<EMars_LanFlowStatus>(InError);
         _DepartureWorld = nullptr;
         _TravelTickedSeconds = 0.0f;
         SetState(EMars_LanFlowState::Recovering, InError);
-        HoldLoading("Returning to camp");
+        HoldLoading(EMars_LanFlowStatus::ReturningToCamp);
     }
 
     private void QueueAction(EMars_LanFlowAction InAction)
@@ -278,7 +302,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
             auto CurrentWorld = GetWorld();
             if (ck::Is_NOT_Valid(CurrentWorld) || CurrentWorld.GetNetMode() != ENetMode::NM_ListenServer ||
                 CurrentWorld.ServerTravel(_TravelTarget.GetLongPackageName(), false, false) == false)
-            { BeginRecovery(TOptional<FString>("Server travel could not start")); }
+            { BeginRecovery(TOptional<EMars_LanFlowStatus>(EMars_LanFlowStatus::ServerTravelFailed)); }
         }
     }
 
@@ -290,7 +314,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         const auto Mode = CurrentWorld.GetNetMode();
         if (Mode == ENetMode::NM_Client || Mode == ENetMode::NM_ListenServer)
         { return; }
-        SettleAfterBounce(CurrentWorld, Get_FailureMessage());
+        SettleAfterBounce(CurrentWorld, Get_FailureStatus());
     }
 
     private void WatchTravel(float DeltaTime)
@@ -302,15 +326,15 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
             if (_State == EMars_LanFlowState::Recovering)
             {
                 if (Mode == ENetMode::NM_Standalone && IsExpectedMap(CurrentWorld) && IsLocalPlayerReady(CurrentWorld))
-                { FinishTravel(EMars_LanFlowState::Idle, _LastError.IsSet() ? _LastError.GetValue() : ""); return; }
+                { FinishTravel(EMars_LanFlowState::Idle, _LastError.IsSet() ? _LastError.GetValue() : EMars_LanFlowStatus::None); return; }
             }
             else if (Mode == ENetMode::NM_Standalone)
-            { SettleAfterBounce(CurrentWorld, Get_FailureMessage()); return; }
+            { SettleAfterBounce(CurrentWorld, Get_FailureStatus()); return; }
             else if (_State == EMars_LanFlowState::Joining && Mode == ENetMode::NM_Client && IsExpectedMap(CurrentWorld) && IsLocalPlayerReady(CurrentWorld))
-            { FinishTravel(EMars_LanFlowState::Connected, "Joined LAN camp"); return; }
+            { FinishTravel(EMars_LanFlowState::Connected, EMars_LanFlowStatus::JoinedCamp); return; }
             else if ((_State == EMars_LanFlowState::Hosting || _State == EMars_LanFlowState::Departing ||
                 _State == EMars_LanFlowState::Returning) && Mode == ENetMode::NM_ListenServer && IsExpectedMap(CurrentWorld) && IsLocalPlayerReady(CurrentWorld))
-            { FinishTravel(EMars_LanFlowState::Connected, "LAN session active"); return; }
+            { FinishTravel(EMars_LanFlowState::Connected, EMars_LanFlowStatus::SessionActive); return; }
         }
 
         if (_State == EMars_LanFlowState::Recovering && _TravelTickedSeconds >= constants_lan_flow::k_TravelAbandonTickedSeconds)
@@ -321,10 +345,10 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         if (_State == EMars_LanFlowState::Recovering)
         {
             ReleaseHold();
-            SetState(EMars_LanFlowState::Recovering, "Could not load camp. Retry return to menu");
+            SetState(EMars_LanFlowState::Recovering, EMars_LanFlowStatus::CouldNotLoadCamp);
             return;
         }
-        BeginRecovery(TOptional<FString>(Get_FailureMessage()));
+        BeginRecovery(TOptional<EMars_LanFlowStatus>(Get_FailureStatus()));
     }
 
     private float32 Get_AbandonBudget() const
@@ -334,18 +358,21 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         return constants_lan_flow::k_TravelAbandonTickedSeconds;
     }
 
-    private FString Get_FailureMessage() const
+    private EMars_LanFlowStatus Get_FailureStatus() const
     {
         if (_State == EMars_LanFlowState::Hosting)
-        { return "Could not open LAN camp"; }
+        { return EMars_LanFlowStatus::CouldNotOpenCamp; }
+
         if (_State == EMars_LanFlowState::Joining)
-        { return "Could not reach host"; }
+        { return EMars_LanFlowStatus::CouldNotReachHost; }
+
         if (_State == EMars_LanFlowState::Connected)
-        { return "Connection to the host was lost"; }
-        return "The party's travel did not complete";
+        { return EMars_LanFlowStatus::ConnectionLost; }
+
+        return EMars_LanFlowStatus::TravelIncomplete;
     }
 
-    private void FinishTravel(EMars_LanFlowState InState, FString InStatus)
+    private void FinishTravel(EMars_LanFlowState InState, EMars_LanFlowStatus InStatus)
     {
         _DepartureWorld = nullptr;
         _TravelTarget = TSoftObjectPtr<UWorld>();
@@ -354,17 +381,18 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         SetState(InState, InStatus);
     }
 
-    private void SetState(EMars_LanFlowState InState, FString InStatus)
+    private void SetState(EMars_LanFlowState InState, EMars_LanFlowStatus InStatus)
     {
         _State = InState;
         _Status = InStatus;
         OnStateChanged.Broadcast();
     }
 
-    private void HoldLoading(FString InReason)
+    // The reason is the loading screen's debug reason, not player-facing copy.
+    private void HoldLoading(EMars_LanFlowStatus InReason)
     {
         ReleaseHold();
-        _LoadingHold = UCk_LoadingProcess_Task_UE::Create(InReason, FCk_Time());
+        _LoadingHold = UCk_LoadingProcess_Task_UE::Create(f"[Mars_LanFlow] {InReason :n}", FCk_Time());
     }
 
     private void ReleaseHold()
@@ -420,6 +448,22 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         return true;
     }
 
+    // One character a direct address may contain: a digit, an octet separator or the port separator.
+    UFUNCTION()
+    bool IsAddressCharacter(const FString& InCharacter) const
+    {
+        if (InCharacter.Len() != 1)
+        { return false; }
+
+        const int32 Code = int32(InCharacter[0]);
+        return Get_IsDigit(Code) || Code == constants_lan_flow::k_OctetSeparator || Code == constants_lan_flow::k_PortSeparator;
+    }
+
+    private bool Get_IsDigit(int32 InCode) const
+    {
+        return InCode >= constants_lan_flow::k_DigitZero && InCode <= constants_lan_flow::k_DigitNine;
+    }
+
     // Dotted-decimal IPv4, optionally followed by a decimal port.
     UFUNCTION()
     bool IsValidDirectAddress(const FString& InAddress) const
@@ -431,7 +475,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         int32 HostLength = AddressLength;
         for (int32 Index = 0; Index < AddressLength; ++Index)
         {
-            if (int32(InAddress[Index]) != 58)
+            if (int32(InAddress[Index]) != constants_lan_flow::k_PortSeparator)
             { continue; }
             if (HostLength != AddressLength)
             { return false; }
@@ -446,7 +490,7 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         for (int32 Index = 0; Index < HostLength; ++Index)
         {
             const int32 Code = int32(InAddress[Index]);
-            if (Code == 46)
+            if (Code == constants_lan_flow::k_OctetSeparator)
             {
                 if (OctetDigits == 0 || OctetCount >= 4)
                 { return false; }
@@ -455,12 +499,12 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
                 OctetValue = 0;
                 continue;
             }
-            if (Code < 48 || Code > 57)
+            if (Get_IsDigit(Code) == false)
             { return false; }
             ++OctetDigits;
             if (OctetDigits > 3)
             { return false; }
-            OctetValue = OctetValue * 10 + Code - 48;
+            OctetValue = OctetValue * 10 + Code - constants_lan_flow::k_DigitZero;
             if (OctetValue > 255)
             { return false; }
         }
@@ -476,9 +520,9 @@ class UMars_LanFlow_Subsystem : UScriptGameInstanceSubsystem
         for (int32 Index = HostLength + 1; Index < AddressLength; ++Index)
         {
             const int32 Code = int32(InAddress[Index]);
-            if (Code < 48 || Code > 57)
+            if (Get_IsDigit(Code) == false)
             { return false; }
-            Port = Port * 10 + Code - 48;
+            Port = Port * 10 + Code - constants_lan_flow::k_DigitZero;
         }
         return Port >= 1 && Port <= 65535;
     }

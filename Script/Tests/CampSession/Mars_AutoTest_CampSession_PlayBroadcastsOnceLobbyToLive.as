@@ -33,7 +33,7 @@ class UMars_AutoTest_CampSession_PlayBroadcastsOnceLobbyToLive : UCk_AutoTest_Ba
     UFUNCTION()
     private void Step_RequestPlay(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Session.Request_Play();
+        _Session.Request_Play(FMars_Request_CampSession_Play());
     }
 
     UFUNCTION()

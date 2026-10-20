@@ -131,14 +131,6 @@ class UMars_Button_Widget : UCommonButtonBase
         RefreshIndicators();
     }
 
-    void ResetInteractionPresentation()
-    {
-        _HasFocus = false;
-        _IsHovered = false;
-        _NavigationPresentation = true;
-        RefreshIndicators();
-    }
-
     UFUNCTION()
     private void HandleHovered(UCommonButtonBase InButton)
     {

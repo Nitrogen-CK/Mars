@@ -9,14 +9,12 @@ class UMars_MenuCameraTransition : UObject
     private FQuat _StartRotation;
     private float _Elapsed = 0.0;
     private float _Duration = 0.0;
-    private bool _ReducedMotion = false;
     private bool _Moving = false;
 
     bool IsMoving() const
     { return _Moving; }
 
-    bool Start(APlayerController InController, AMars_CampStationCamera InTarget,
-        float InDuration, bool InReducedMotion)
+    bool Start(APlayerController InController, AMars_CampStationCamera InTarget, float InDuration)
     {
         auto Viewer = Cast<AMars_Camp_ViewerPawn>(InController.GetControlledPawn());
         if (ck::Is_NOT_Valid(Viewer) || ck::Is_NOT_Valid(InTarget) || InTarget.GetWorld() != Viewer.GetWorld())
@@ -27,8 +25,7 @@ class UMars_MenuCameraTransition : UObject
         _StartLocation = InController.PlayerCameraManager.GetCameraLocation();
         _StartRotation = InController.PlayerCameraManager.GetCameraRotation().Quaternion();
         _Elapsed = 0.0;
-        _Duration = InReducedMotion ? 0.12 : InDuration;
-        _ReducedMotion = InReducedMotion;
+        _Duration = InDuration;
         _Moving = _Duration > 0.0;
         _Controller.PlayerCameraManager.StopCameraFade();
         if (!_Moving)
@@ -52,24 +49,12 @@ class UMars_MenuCameraTransition : UObject
         const float Alpha = _Elapsed / _Duration;
         const auto EndLocation = _Target.CameraComponent.GetWorldLocation();
         const auto EndRotation = _Target.CameraComponent.GetWorldRotation();
-        if (_ReducedMotion)
-        {
-            // Fade alpha and the cut are owned by this animation, not an unrelated readiness timer.
-            const float Opacity = Alpha < 0.5 ? Alpha * 2.0 : (1.0 - Alpha) * 2.0;
-            _Controller.PlayerCameraManager.SetManualCameraFade(float32(Opacity), FLinearColor(0,0,0,1), false);
-            if (Alpha >= 0.5)
-            { _Viewer.SetActorLocationAndRotation(EndLocation, EndRotation); }
-        }
-        else
-        {
-            const float Ease = Alpha < 0.5 ? 2.0 * Alpha * Alpha : 1.0 - Math::Square(-2.0 * Alpha + 2.0) / 2.0;
-            _Viewer.SetActorLocationAndRotation(Math::Lerp(_StartLocation, EndLocation, Ease),
-                FQuat::Slerp(_StartRotation, EndRotation.Quaternion(), Ease).Rotator());
-        }
+        const float Ease = Alpha < 0.5 ? 2.0 * Alpha * Alpha : 1.0 - Math::Square(-2.0 * Alpha + 2.0) / 2.0;
+        _Viewer.SetActorLocationAndRotation(Math::Lerp(_StartLocation, EndLocation, Ease),
+            FQuat::Slerp(_StartRotation, EndRotation.Quaternion(), Ease).Rotator());
         if (_Elapsed >= _Duration)
         {
             _Controller.SetViewTargetWithBlend(_Target, 0.0f);
-            _Controller.PlayerCameraManager.StopCameraFade();
             _Moving = false;
         }
     }

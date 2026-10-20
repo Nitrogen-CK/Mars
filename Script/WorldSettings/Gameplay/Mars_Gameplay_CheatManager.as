@@ -11,7 +11,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
     UFUNCTION(Exec)
     void Mars_Swing(float32 InImpactSeconds = 0.15f, float32 InRecoverySeconds = 0.35f)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        auto Character = TryGet_LocalCharacter("Mars_Swing");
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
@@ -23,7 +23,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
     UFUNCTION(Exec)
     void Mars_Give(FString InItemName)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        auto Character = TryGet_LocalCharacter("Mars_Give");
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
@@ -81,7 +81,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
     UFUNCTION(Exec)
     void Mars_Primary(bool InPressed)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        auto Character = TryGet_LocalCharacter("Mars_Primary");
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
@@ -99,12 +99,9 @@ class UMars_Gameplay_CheatManager : UCheatManager
     UFUNCTION(Exec)
     void Mars_SwingState()
     {
-        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        auto Character = TryGet_LocalCharacter("Mars_SwingState");
         if (ck::Is_NOT_Valid(Character))
-        {
-            ck::Trace("[Mars_SwingState] no local Mars player character");
-            return;
-        }
+        { return; }
 
         auto Swing = Character.TryGet_ActorEntityHandle().As_HandSwing(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Swing))
@@ -141,7 +138,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
     UFUNCTION(Exec)
     void Mars_Operate(float32 InRangeCm = 300.0f)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        auto Character = TryGet_LocalCharacter("Mars_Operate");
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
@@ -185,7 +182,7 @@ class UMars_Gameplay_CheatManager : UCheatManager
     UFUNCTION(Exec)
     void Mars_Devour(float32 InRangeCm = 3000.0f)
     {
-        auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
+        auto Character = TryGet_LocalCharacter("Mars_Devour");
         if (ck::Is_NOT_Valid(Character))
         { return; }
 
@@ -251,15 +248,22 @@ class UMars_Gameplay_CheatManager : UCheatManager
         ck::Trace(f"[Mars_MortarState] engaged [{Mortar.Get_IsEngaged()}] seasoning [{Batch.Seasoning :n}] stage [{Batch.Stage :n}] phase [{Batch.Phase :n}] hits [{Batch.CrushHits}] grind [{Batch.GrindProgress}] strike [{Mortar.Get_StrikePhase() :n}] pestle [{Mortar.Get_Pestle() :n}] window centre [{Window.Centre}] half width [{Window.HalfWidth}] marker [{Window.Marker}] progress [{Mortar.Get_Progress()}]");
     }
 
-    // The Mortar of the station the local player operates; invalid (and said so, as InCheat) when there is none.
-    private FCk_Handle_Mortar TryGet_OperatedMortar(FString InCheat) const
+    // The local player's Mars character; null (and said so, as InCheat) when there is none.
+    private AMars_PlayerCharacter TryGet_LocalCharacter(FString InCheat) const
     {
         auto Character = Cast<AMars_PlayerCharacter>(Gameplay::GetPlayerController(0).GetControlledPawn());
         if (ck::Is_NOT_Valid(Character))
-        {
-            ck::Trace(f"[{InCheat}] no local Mars player character");
-            return FCk_Handle_Mortar();
-        }
+        { ck::Trace(f"[{InCheat}] no local Mars player character"); }
+
+        return Character;
+    }
+
+    // The Mortar of the station the local player operates; invalid (and said so, as InCheat) when there is none.
+    private FCk_Handle_Mortar TryGet_OperatedMortar(FString InCheat) const
+    {
+        auto Character = TryGet_LocalCharacter(InCheat);
+        if (ck::Is_NOT_Valid(Character))
+        { return FCk_Handle_Mortar(); }
 
         auto Operator = Character.TryGet_ActorEntityHandle().As_Operator(ECk_SanityCheck::UnChecked);
         FCk_Handle Station = ck::IsValid(Operator) ? Operator.Get_Station() : FCk_Handle_Station();

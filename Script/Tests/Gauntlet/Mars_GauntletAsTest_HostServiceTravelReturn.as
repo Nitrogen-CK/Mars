@@ -96,7 +96,7 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         if (ck::Is_NOT_Valid(State))
         { Fail("hosted camp has no Camp GameState"); return; }
         const auto Party = State.Get_PartyState();
-        if (!Party.ServiceId.IsNone() || Party.IsDeparting || !InFlow.GetCommittedServiceId().IsNone())
+        if (!Party.ServiceId.IsNone() || Party.Departure == EMars_PartyDeparture::Departing || !InFlow.GetCommittedServiceId().IsNone())
         { Fail("new host has stale party service state"); return; }
 
         TArray<AMars_GameSession> Sessions;
@@ -134,7 +134,7 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         const auto Party = State.Get_PartyState();
         if (Party.ServiceId != n"Sandbox")
         { return; }
-        if (Party.Revision != _InitialRevision + 1 || Party.IsDeparting ||
+        if (Party.Revision != _InitialRevision + 1 || Party.Departure == EMars_PartyDeparture::Departing ||
             InFlow.GetCommittedServiceId() != n"Sandbox")
         { Fail("Sandbox commit has inconsistent service or revision"); return; }
 
@@ -145,7 +145,7 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
 
         PC.Server_RequestDepart();
         const auto DepartingParty = State.Get_PartyState();
-        if (!DepartingParty.IsDeparting || DepartingParty.Revision != _InitialRevision + 2 ||
+        if (DepartingParty.Departure != EMars_PartyDeparture::Departing || DepartingParty.Revision != _InitialRevision + 2 ||
             Sessions[0].IsAdmissionOpen())
         { Fail("departure did not immediately close admission and advance party revision"); return; }
         Next(EMars_GauntletHostFlowStage::SandboxTravel, 45.0f, "departure requested");
@@ -165,7 +165,7 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
             if (ck::Is_NOT_Valid(State) || Sessions.Num() != 1)
             { Fail("departing camp lost party state or GameSession"); return; }
             const auto Party = State.Get_PartyState();
-            if (Party.IsDeparting)
+            if (Party.Departure == EMars_PartyDeparture::Departing)
             {
                 if (Sessions[0].IsAdmissionOpen() || Party.Revision != _InitialRevision + 2)
                 { Fail("admission stayed open or departure revision did not advance"); }
@@ -201,7 +201,7 @@ class UMars_GauntletAsTest_HostServiceTravelReturn : UCk_GauntletAsTest_Base
         { return; }
         auto State = Cast<AMars_Camp_GameState>(Gameplay::GetGameState());
         if (ck::Is_NOT_Valid(State) || State.Get_PartyState().ServiceId != n"Sandbox" ||
-            State.Get_PartyState().IsDeparting || InFlow.GetCommittedServiceId() != n"Sandbox")
+            State.Get_PartyState().Departure == EMars_PartyDeparture::Departing || InFlow.GetCommittedServiceId() != n"Sandbox")
         { Fail("returned camp did not restore committed service"); return; }
 
         TArray<AMars_GameSession> Sessions;
