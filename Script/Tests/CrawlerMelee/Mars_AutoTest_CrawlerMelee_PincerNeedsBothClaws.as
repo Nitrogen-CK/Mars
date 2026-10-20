@@ -30,7 +30,11 @@ class UMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws : UMars_AutoTestRig_Crawl
         Add_Step("record where the left front foot stands and watch the attack's phases", n"Step_RecordFoot");
         Add_Step("spawn a target the strike reaches mid-phase (near face 30 cm ahead of the neutral hit centre)", n"Step_SpawnTarget");
         Add_Step_WaitUntil("the target's hurtbox is traceable", n"Check_TargetTraceable", k_SlowPolls, 0);
-        Add_Step("select the target and request one attack", n"Step_TargetAndStart");
+        // With a leg disabled the gait re-plants after the body rests: a start requested before the remaining feet stand on
+        // trusted support is refused SupportStance and nothing retries it.
+        Add_Step("select the target", n"Step_SelectTarget");
+        Add_Step_WaitUntil("an attack is ready to start against the target", n"Check_StanceReady", k_SlowPolls, 0);
+        Add_Step("request one attack", n"Step_TargetAndStart");
         Add_Step_WaitUntil("the attack is admitted (Windup)", n"Check_Admitted", k_SlowPolls, 0);
         Add_Step_WaitUntil("the attack is back in Idle", n"Check_AttackFinished", k_SlowPolls, 0);
         Add_Step_WaitSeconds("settle 0.5 s", 0.5f);
@@ -88,6 +92,21 @@ class UMars_AutoTest_CrawlerMelee_PincerNeedsBothClaws : UMars_AutoTestRig_Crawl
     private void Step_SpawnTarget(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Target = SpawnTargetAhead(InHandle, 30.0, FVector(10.0, 20.0, 20.0));
+    }
+
+    UFUNCTION()
+    private void Step_SelectTarget(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _Crawler.Request_SetCombatTarget(FMars_Request_Crawler_SetCombatTarget(_Target.Entity));
+    }
+
+    // The crawler's cached decision has a ready choice against this target: some attack (here the body jab; the pincer
+    // stays blocked on SupportStance while its claw is disabled) can start now.
+    UFUNCTION()
+    private void Check_StanceReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Crawler.Get_AttackEvaluation().Selection.ReadyChoice.IsSet());
     }
 
     UFUNCTION()
