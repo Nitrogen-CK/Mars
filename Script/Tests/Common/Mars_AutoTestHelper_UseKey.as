@@ -1,4 +1,4 @@
-// One more intent row on a key of its own, baked beside the Use row: Token is the row's token in the intent grammar (the
+// One intent row on a key of its own: Token is the row's token in the intent grammar (the
 // gameplay input profile's own: BK Back, IP Interact_Primary, IS Interact_Secondary, AF StationAddFood).
 struct FMars_AutoTestHelper_KeyRow
 {
@@ -38,9 +38,16 @@ class UMars_AutoTestHelper_UseKey : UObject
     // The Use row on InUseKey and InExtraRows beside it, each on its own key.
     void Build_WithRows(FCk_Handle InOwner, FKey InUseKey, const TArray<FMars_AutoTestHelper_KeyRow>& InExtraRows)
     {
-        _Rows.Empty();
-        _Rows.Add(FMars_AutoTestHelper_KeyRow(InUseKey, GameplayTags::Mars_Intent_Interact_Use, n"IU"));
-        _Rows.Append(InExtraRows);
+        auto Rows = TArray<FMars_AutoTestHelper_KeyRow>();
+        Rows.Add(FMars_AutoTestHelper_KeyRow(InUseKey, GameplayTags::Mars_Intent_Interact_Use, n"IU"));
+        Rows.Append(InExtraRows);
+        Build_Rows(InOwner, Rows);
+    }
+
+    // InRows alone, each on its own key (no Use row unless InRows has one); Press and Release press the first.
+    void Build_Rows(FCk_Handle InOwner, const TArray<FMars_AutoTestHelper_KeyRow>& InRows)
+    {
+        _Rows = InRows;
 
         auto Parent = InOwner;
         auto Owner = utils_entity_lifetime::Request_CreateEntity(Parent);
@@ -151,5 +158,23 @@ class UMars_AutoTestHelper_UseKey : UObject
     {
         auto Event = FCk_InputSource_RawEvent(ECk_InputSource_DeviceClass::Keyboard, InKey, InEventType);
         utils_input_source::Request_InjectRawEvent(_Source, FCk_Request_InputSource_InjectRawEvent(Event));
+    }
+}
+
+namespace mars_test_interaction
+{
+    // The player's Use intent over the Use channel, unsorted: a test offers its targets one at a time (or none), so there
+    // is nothing to sort by distance.
+    FCk_InteractionResolver_Spec Make_UseResolverSpec()
+    {
+        auto Channels = TArray<FGameplayTag>();
+        Channels.Add(GameplayTags::InteractionChannel_Mars_Use);
+
+        auto Mapping = FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, Channels);
+        Mapping.Set_DistanceSorting(ECk_InteractionResolver_DistanceSorting::Disabled);
+
+        auto Mappings = TArray<FCk_InteractionResolver_IntentChannelMapping>();
+        Mappings.Add(Mapping);
+        return FCk_InteractionResolver_Spec(Mappings);
     }
 }
