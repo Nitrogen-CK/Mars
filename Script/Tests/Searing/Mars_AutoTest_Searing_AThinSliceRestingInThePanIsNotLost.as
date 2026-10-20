@@ -146,7 +146,7 @@ class UMars_AutoTest_Searing_AThinSliceRestingInThePanIsNotLost : UMars_AutoTest
 
     private float32 Get_DownSear() const
     {
-        return _Searing.Get_PieceState(_SliceId).FaceSear[int32(EMars_Searing_Face::NegZ)];
+        return _Searing.Get_PieceState(_SliceId).FaceSear[int32(EMars_FoodPiece_Face::NegZ)];
     }
 }
 

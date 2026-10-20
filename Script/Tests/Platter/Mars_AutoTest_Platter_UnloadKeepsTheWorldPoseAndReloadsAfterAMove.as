@@ -105,7 +105,8 @@ class UMars_AutoTest_Platter_UnloadKeepsTheWorldPoseAndReloadsAfterAMove : UMars
         Assert_Equals_Int(Get_AllRefusalCount(_Platter), 0, "nothing was refused");
         Assert_Equals_Int(Get_LoadedCount(_Platter), 2, "P landed twice");
         Assert_True(Get_IsFrozenOn(_Platter, _P), "P is frozen on the platter root again");
-        Assert_True(Get_IsInsideWalls(_Platter, _P), f"P rests inside the moved platter's walls ({Get_World(_P).GetLocation()})");
+        Assert_True(Get_IsInsideWalls(_Platter, _P), f"P lies inside the moved platter's walls ({Get_World(_P).GetLocation()})");
+        Assert_True(Get_RestsOnFloor(_Platter, _P), "P rests on the moved platter's floor");
         Assert_True(Get_PlatterWorld(_Platter).GetLocation().Equals(k_Origin + FVector(0.0, 400.0, 0.0), 0.1), "the platter moved 400 cm in all");
         Assert_True(_P.TryGet_Platter() == _Platter, "P carries the platter again");
     }

@@ -3,7 +3,7 @@
 // "Place Meat slab on platter", and its interaction (UMars_SmTask_PlaceHeldFood) has the gloves carry the slab over the
 // platter (a Place reach: Reach, then Grip) and only at the Grip releases the food (its world item back in the world, the
 // item back in its holder) and loads the joint: the platter drops it, it settles and OnLoaded fires with the
-// joint a scene-node child of the root. Then the slab's own pickup takes it back: the Mount processor detaches it from the
+// joint a scene-node child of the root, and the place's interaction finishes Succeeded with no failure reported. Then the slab's own pickup takes it back: the Mount processor detaches it from the
 // root, the platter's Reconcile broadcasts OnUnloaded and empties the ledger, and the slab is Held again. Isolated origin
 // (22000, -17000, -30000).
 class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMars_AutoTestRig_Carrier
@@ -28,6 +28,7 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
 
     private TArray<FCk_Handle_FoodPiece> _Loaded;
     private TArray<FCk_Handle_FoodPiece> _Unloaded;
+    private UMars_AutoTestHelper_InteractionOutcomes _Outcomes;
 
     // The gloves' phases when the food left the hands, and whether it was still Held the frame after the interaction began.
     private TArray<EMars_FPHands_Phase> _PhasesAtRelease;
@@ -43,12 +44,12 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
         Add_CarrierHands();
 
         auto Owner = InHandle;
-        Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_PlatterOffset);
         _PlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(
             FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5)),
             mars_items::Platter_Large()));
 
-        Spawn_Floor(Owner, k_Origin + k_FoodOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_FoodOffset);
         auto SpawnParams = UMars_FoodItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
@@ -76,6 +77,7 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
         Add_Step_WaitUntil("the food is released into the world", n"Check_FoodReleased", k_SlowPolls, 0);
         Add_Step("the food left the hands at the gloves' Grip, after their Reach", n"Step_AssertReleasedAtTheGrip");
         Add_Step_WaitUntil("the platter loaded the joint", n"Check_Loaded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the place's interaction finished", n"Check_PlaceFinished", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("the joint is on the platter and the hands are empty", n"Step_AssertOnThePlatter");
         Add_Step("the carrier unfocuses the platter", n"Step_UnfocusPlatter");
@@ -86,20 +88,6 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
         Add_Step_WaitUntil("the food is Held again and the platter unloaded it", n"Check_TakenBack", k_SlowPolls, 0);
         Add_Step("the platter is empty and the joint rides the hand", n"Step_AssertTakenBack");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle& InOwner, FVector InTop)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InOwner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -190,6 +178,9 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
     private void Step_Deposit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Target = Get_UseTarget(_PlatterItem);
+        _Outcomes = Cast<UMars_AutoTestHelper_InteractionOutcomes>(NewObject(this, UMars_AutoTestHelper_InteractionOutcomes));
+        _Outcomes.Watch_Target(Target);
+        _Outcomes.Watch_Interactable(Get_Pickup(_PlatterItem));
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 
@@ -235,8 +226,18 @@ class UMars_AutoTest_Platter_DepositPlacesTheHeldFoodAndPickupTakesItBack : UMar
     }
 
     UFUNCTION()
+    private void Check_PlaceFinished(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Outcomes.Get_FinishedCount(Get_UseTarget(_PlatterItem)) > 0);
+    }
+
+    UFUNCTION()
     private void Step_AssertOnThePlatter(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        const auto Result = _Outcomes.TryGet_Result(Get_UseTarget(_PlatterItem));
+        Assert_True(Result.IsSet() && Result.GetValue() == ECk_SucceededFailed::Succeeded, "the place's interaction finished Succeeded");
+        Assert_Equals_Int(_Outcomes.Get_FailureCount(), 0, "no failure was reported");
         FCk_Handle PlatterEntity = _Platter;
         Assert_True(Get_JointParent() == PlatterEntity.As_Transform(), "the joint is a scene-node child of the platter root");
         Assert_Equals_Int(_Platter.Get_HeldCount(), 1, "the platter holds one piece");

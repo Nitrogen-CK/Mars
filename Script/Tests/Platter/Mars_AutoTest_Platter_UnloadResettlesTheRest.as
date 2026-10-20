@@ -91,6 +91,8 @@ class UMars_AutoTest_Platter_UnloadResettlesTheRest : UMars_AutoTestRig_Platter
 
             Assert_True(Piece.TryGet_Platter() == _Platter, f"[{Piece.ToString()}] is still the platter's");
             Assert_False(Get_IsSceneNode(Piece), f"[{Piece.ToString()}] let go of the root");
+            Assert_True(Get_IsSettling(_Platter, Piece), f"[{Piece.ToString()}] is settling again");
+            Assert_True(TryGet_Motion(Piece) == ECk_MotionType::Dynamic, f"[{Piece.ToString()}]'s body is Dynamic again");
         }
     }
 

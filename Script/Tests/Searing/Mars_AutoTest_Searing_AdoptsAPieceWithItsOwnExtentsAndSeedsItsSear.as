@@ -56,14 +56,14 @@ class UMars_AutoTest_Searing_AdoptsAPieceWithItsOwnExtentsAndSeedsItsSear : UMar
         Assert_True(_Half.Get_Status() == EMars_FoodPiece_Status::Ready, "the half is Ready");
 
         auto CookState = _Half.Get_CookState();
-        CookState.Sear[int32(EMars_Searing_Face::PosX)] = k_SeededSear;
+        CookState.Sear[int32(EMars_FoodPiece_Face::PosX)] = k_SeededSear;
         _Half.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 
     UFUNCTION()
     private void Step_ReleaseHalf(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Float(_Half.Get_CookState().Sear[int32(EMars_Searing_Face::PosX)], k_SeededSear, 0.0001,
+        Assert_Equals_Float(_Half.Get_CookState().Sear[int32(EMars_FoodPiece_Face::PosX)], k_SeededSear, 0.0001,
             "the half carries its +X sear before it is released");
 
         _HalfId = FMars_CookingFeed_PieceId(k_Generation, _NextIndex);
@@ -102,14 +102,14 @@ class UMars_AutoTest_Searing_AdoptsAPieceWithItsOwnExtentsAndSeedsItsSear : UMar
         Assert_True(Get_IsOnPan(_HalfId), "the pan finds it on the pan from its middle");
 
         const auto Down = _Searing.Get_DownFace(_HalfId);
-        Assert_True(Down == EMars_Searing_Face::NegZ, f"it lies on its -Z face (got {Down :n})");
+        Assert_True(Down == EMars_FoodPiece_Face::NegZ, f"it lies on its -Z face (got {Down :n})");
 
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            const auto Face = EMars_Searing_Face(Index);
-            const auto Expected = Face == EMars_Searing_Face::PosX ? float64(k_SeededSear) : 0.0;
+            const auto Face = EMars_FoodPiece_Face(Index);
+            const auto Expected = Face == EMars_FoodPiece_Face::PosX ? float64(k_SeededSear) : 0.0;
             Assert_Equals_Float(_Searing.Get_FaceSear(_HalfId, Face), Expected, 0.0001,
-                f"face {utils_searing::Get_FaceName(Face)} arrived with the half's sear");
+                f"face {utils_foodpiece::Get_FaceName(Face)} arrived with the half's sear");
         }
 
         Assert_True(_Searing.Get_PieceStatus(_HalfId) == EMars_Searing_PieceStatus::Cooking, "a half-seared face leaves it cooking");

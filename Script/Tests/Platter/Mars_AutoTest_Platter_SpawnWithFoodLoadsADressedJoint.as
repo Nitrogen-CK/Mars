@@ -19,7 +19,8 @@ class UMars_AutoTest_Platter_SpawnWithFoodLoadsADressedJoint : UCk_AutoTest_Base
     void DoBeginPlay(FCk_Handle InHandle)
     {
         auto Owner = InHandle;
-        Spawn_Floor(Owner);
+        auto Fixture = Cast<UMars_AutoTestHelper_CookingFixture>(NewObject(this, UMars_AutoTestHelper_CookingFixture));
+        Fixture.Spawn_Floor(Owner, k_Origin, 100.0);
         _Entity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(
             FTransform(FRotator::ZeroRotator, k_Origin + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5)),
             mars_items::Platter_Large()));
@@ -33,20 +34,6 @@ class UMars_AutoTest_Platter_SpawnWithFoodLoadsADressedJoint : UCk_AutoTest_Base
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("the piece is the dressed whole beef joint, frozen inside the walls", n"Step_AssertDressedJoint");
         Run_Steps(InHandle);
-    }
-
-    // A static slab the tray lies on, its top at the origin.
-    private void Spawn_Floor(FCk_Handle& InOwner)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InOwner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, k_Origin - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(100.0, 100.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -63,8 +50,10 @@ class UMars_AutoTest_Platter_SpawnWithFoodLoadsADressedJoint : UCk_AutoTest_Base
         // stay inside it.
         const UMars_ItemTrait_Platter Trait = mars_items::Platter_Large().Get_ItemTraitByClass(UMars_ItemTrait_Platter);
         const auto Half = Trait.Platter.Bounds.InnerHalfExtents;
-        const auto InnerX = (Max.X - 0.546 - 0.5 - 1.6) * 1.8;
-        const auto InnerY = (Max.Y - 0.546 - 0.5 - 1.6) * 1.8;
+        const UMars_ItemTrait_Presentation Presentation = mars_items::Platter_Large().Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
+        const auto MeshScale = Presentation.Visual.MeshScale;
+        const auto InnerX = (Max.X - 0.546 - 0.5 - 1.6) * MeshScale.X;
+        const auto InnerY = (Max.Y - 0.546 - 0.5 - 1.6) * MeshScale.Y;
         const auto WallOuterX = Half.X + constants_platter::k_WallThicknessCm * 0.5;
         const auto WallOuterY = Half.Y + constants_platter::k_WallThicknessCm * 0.5;
         Log(f"[Mars_AutoTest_Platter_SpawnWithFoodLoadsADressedJoint] large inner floor half ({InnerX}, {InnerY}); walls' outer faces at ({WallOuterX}, {WallOuterY})");

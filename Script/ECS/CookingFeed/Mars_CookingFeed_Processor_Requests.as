@@ -140,7 +140,8 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     // Honoured only while awaiting admission for exactly this piece (same generation and transfer). The hand returns either way;
-    // a rejected piece goes back to the platter it came from before the hand turns home.
+    // a rejected piece goes back to the platter it came from before the hand turns home, and the kernel's reason goes to the
+    // log (it is debug text, never shown to the player).
     private void Apply_Resolve(FMars_CookingFeed_Drain& InDrain, FMars_Fragment_CookingFeed& InState,
                                const FMars_Request_CookingFeed_ResolveAdmission& InRequest)
     {
@@ -152,7 +153,10 @@ class UMars_Processor_CookingFeed_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         if (InRequest.Admission == EMars_CookingFeed_Admission::Rejected)
-        { Give_Back(InDrain, InState); }
+        {
+            Log(f"[CookingFeed] [{InDrain.Feed.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece)} was rejected: {InRequest.Reason}");
+            Give_Back(InDrain, InState);
+        }
 
         InState.Active.Reset();
         InState.Phase = EMars_CookingFeed_Phase::Return;

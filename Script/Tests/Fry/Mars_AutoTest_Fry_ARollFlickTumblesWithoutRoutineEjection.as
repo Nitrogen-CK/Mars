@@ -15,7 +15,7 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
     private const float32 k_LipClearanceCm = 1.0f;
 
     private FMars_CookingFeed_PieceId _Piece;
-    private EMars_Searing_Face _DownBefore = EMars_Searing_Face::NegZ;
+    private EMars_FoodPiece_Face _DownBefore = EMars_FoodPiece_Face::NegZ;
     private int32 _EdgesBeforeFlick = 0;
     private float32 _FlickTime = 0.0f;
     private float32 _PeakLift = -1000.0f;
@@ -114,10 +114,10 @@ class UMars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection : UMars_AutoTes
         if (DownAfter != _DownBefore)
         { Turned = "turned over"; }
 
-        Log(f"[Mars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection] kick {Kick :.2} above the dip, fastest piece {_MaxPieceSpeed :.1} cm/s, edges{Edges}, down face {utils_searing::Get_FaceName(_DownBefore)} -> {utils_searing::Get_FaceName(DownAfter)} ({Turned}), ends {_Fry.Get_PieceWhereabouts(_Piece) :n}");
+        Log(f"[Mars_AutoTest_Fry_ARollFlickTumblesWithoutRoutineEjection] kick {Kick :.2} above the dip, fastest piece {_MaxPieceSpeed :.1} cm/s, edges{Edges}, down face {utils_foodpiece::Get_FaceName(_DownBefore)} -> {utils_foodpiece::Get_FaceName(DownAfter)} ({Turned}), ends {_Fry.Get_PieceWhereabouts(_Piece) :n}");
 
         Assert_True(Kick >= k_MinKick, f"the flick lifted the scoop at least {k_MinKick} above the dip (got {Kick :.2})");
-        Assert_Equals_Int(_Fry.Get_Tally().Lost, 0, "no piece was lost");
+        Assert_Equals_Int(_Fry.Get_Tally().Losses, 0, "no piece was lost");
         Assert_Equals_Int(_LostIds.Num(), 0, "OnPieceLost never fired");
 
         const auto Whereabouts = _Fry.Get_PieceWhereabouts(_Piece);

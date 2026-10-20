@@ -1,7 +1,7 @@
 // Each policy rule refuses on its own, and a count never does: four docks on one root (A Kind = Food.Meat, B WholeOnly, C no
-// rule, D an Output dock, which takes only an empty platter) judge three platters (the whole beef joint on a large platter; two bare
-// boxes with no kind; empty) through the pure Get_Refusal, every combination: the two boxes pass every rule they do not
-// break. Two real Docks prove the signals: the box platter onto A is refused KindRejected, the dock stays empty and the
+// rule, D an Output dock, which takes only an empty platter) judge four platters (the whole beef joint on a large platter; two
+// bare boxes with no kind; empty; the two halves of a cut box) through the pure Get_Refusal, every combination: each rule
+// refuses what breaks it (B refuses the halves NotWhole) and the boxes pass every rule they do not break. Two real Docks prove the signals: the box platter onto A is refused KindRejected, the dock stays empty and the
 // platter stays in the world; the same two-piece platter onto C docks. Isolated Z band: -58000.
 class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_AutoTestRig_PlatterDock
 {
@@ -17,6 +17,7 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
     private const int32 k_Meat = 0;
     private const int32 k_Boxes = 1;
     private const int32 k_Empty = 2;
+    private const int32 k_Cut = 3;
 
     // _Docks index of the Output dock.
     private const int32 k_OutputDock = 3;
@@ -24,6 +25,9 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
     private TArray<FCk_Handle_PlatterDock> _Docks;
     private TArray<FCk_Handle_FoodPiece> _Boxes;
     private FCk_Handle_FoodPiece _Joint;
+    // A box cut through its middle; its two halves go onto the k_Cut platter.
+    private FCk_Handle_FoodPiece _CutSource;
+    private TArray<FCk_Handle_FoodPiece> _Halves;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -41,7 +45,7 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
             const auto MountLocal = FTransform(FRotator::ZeroRotator, FVector(0.0, 60.0 * Index, 70.0));
             auto Spec = Make_DockSpec(Policies[Index], MountLocal, f"dock {Index}");
             if (Index == k_OutputDock)
-            { Spec.Role = EMars_PlatterDock_Role::Output; }
+            { Spec.Spec.Role = EMars_PlatterDock_Role::Output; }
 
             _Docks.Add(Build_Dock(Root, Spec));
         }
@@ -51,14 +55,19 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
         Spawn_FoodOnto(k_Meat, mars_items::Food_MeatSlab(), k_Origin + FVector(200.0, 0.0, 60.0));
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 100.0, 0.0))));
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 200.0, 0.0))));
+        Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 300.0, 0.0))));
 
         _Boxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + FVector(300.0, 100.0, 0.0))));
         _Boxes.Add(Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + FVector(300.0, 150.0, 0.0))));
+        _CutSource = Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + FVector(300.0, 300.0, 0.0)));
+        _CutSource.BindTo_OnCutResolved(FMars_Delegate_FoodPiece_OnCutResolved(this, n"OnCutResolved"));
 
-        Add_Step_WaitUntil("the three platters are constructed and their holders hold their items", n"Check_PlattersConstructed");
-        Add_Step_WaitUntil("the beef joint landed on its platter and both boxes are Ready", n"Check_MeatLandedBoxesReady", k_SlowPolls, 0);
-        Add_Step("load both boxes onto the box platter", n"Step_LoadBoxes");
-        Add_Step_WaitUntil("both boxes landed", n"Check_BoxesLanded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the four platters are constructed and their holders hold their items", n"Check_PlattersConstructed");
+        Add_Step_WaitUntil("the beef joint landed on its platter and every box is Ready", n"Check_MeatLandedBoxesReady", k_SlowPolls, 0);
+        Add_Step("load both boxes onto the box platter; cut the third box", n"Step_LoadBoxesAndCut");
+        Add_Step_WaitUntil("the cut resolved and both halves are Ready", n"Check_HalvesReady", k_SlowPolls, 0);
+        Add_Step("load both halves onto the cut platter", n"Step_LoadHalves");
+        Add_Step_WaitUntil("both boxes and both halves landed", n"Check_BoxesLanded", k_SlowPolls, 0);
         Add_Step("Get_Refusal over every dock and platter", n"Step_AssertTable");
         Add_Step("dock the box platter onto the meat dock", n"Step_DockBoxesOntoMeat");
         Add_Step_WaitUntil("the meat dock refused it", n"Check_Refused");
@@ -102,7 +111,7 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
             Track_ForCleanup(_Joint);
         }
 
-        auto BoxesReady = true;
+        auto BoxesReady = _CutSource.Get_Status() == EMars_FoodPiece_Status::Ready;
         for (const auto& Box : _Boxes)
         { BoxesReady = BoxesReady && Box.Get_Status() == EMars_FoodPiece_Status::Ready; }
 
@@ -111,18 +120,59 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
     }
 
     UFUNCTION()
-    private void Step_LoadBoxes(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_LoadBoxesAndCut(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Platter = _Platters[k_Boxes];
         for (const auto& Box : _Boxes)
         { Platter.Request_Load(FMars_Request_Platter_Load(Box)); }
+
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(_CutSource.Get_Geometry());
+        auto Plane = FCk_RuntimeMesh_PlaneLocal();
+        Plane.Set_PositionCm((Metrics.Get_BoundsMinCm() + Metrics.Get_BoundsMaxCm()) * 0.5);
+        Plane.Set_Normal(FVector::ForwardVector);
+        Plane.Set_Tangent(FVector::UpVector);
+        _CutSource.Request_Cut(FMars_Request_FoodPiece_Cut(Plane));
+    }
+
+    UFUNCTION()
+    private void OnCutResolved(FCk_Handle_FoodPiece InSource, FMars_FoodPiece_CutResult InResult)
+    {
+        if (InResult.Outcome != EMars_FoodPiece_CutOutcome::Cut)
+        {
+            FinishFailure(f"the box's cut resolved {InResult.Outcome :n}, not Cut");
+            return;
+        }
+
+        Track_ForCleanup(InResult.Positive);
+        Track_ForCleanup(InResult.Negative);
+        _Halves.Add(InResult.Positive);
+        _Halves.Add(InResult.Negative);
+    }
+
+    UFUNCTION()
+    private void Check_HalvesReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Ready = _Halves.Num() == 2;
+        for (const auto& Half : _Halves)
+        { Ready = Ready && Half.Get_Status() == EMars_FoodPiece_Status::Ready; }
+
+        auto Res = OutResult;
+        Res.Set(Ready);
+    }
+
+    UFUNCTION()
+    private void Step_LoadHalves(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto Platter = _Platters[k_Cut];
+        for (const auto& Half : _Halves)
+        { Platter.Request_Load(FMars_Request_Platter_Load(Half)); }
     }
 
     UFUNCTION()
     private void Check_BoxesLanded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Platters[k_Boxes].Get_HeldCount() == 2);
+        Res.Set(_Platters[k_Boxes].Get_HeldCount() == 2 && _Platters[k_Cut].Get_HeldCount() == 2);
     }
 
     UFUNCTION()
@@ -131,6 +181,7 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
         const auto None = TOptional<EMars_PlatterDock_Refusal>();
         const auto KindRejected = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected);
         const auto MustBeEmpty = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::MustBeEmpty);
+        const auto NotWhole = TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::NotWhole);
 
         Assert_True(_Joint.Get_Kind().HasTag(GameplayTags::Food_Meat_Beef), "the meat platter carries the beef joint");
         Assert_True(_Platters[k_Boxes].Get_Kinds().IsEmpty(), "the boxes carry no kind");
@@ -150,6 +201,12 @@ class UMars_AutoTest_PlatterDock_PolicyRefusesKindWholeCountAndEmpty : UMars_Aut
         AssertCell(k_Empty, 1, None);
         AssertCell(k_Empty, 2, None);
         AssertCell(k_Empty, 3, None);
+
+        Assert_False(_Platters[k_Cut].Get_IsWhole(), "the cut platter holds cut pieces");
+        AssertCell(k_Cut, 0, KindRejected);
+        AssertCell(k_Cut, 1, NotWhole);
+        AssertCell(k_Cut, 2, None);
+        AssertCell(k_Cut, 3, MustBeEmpty);
     }
 
     private void AssertCell(int32 InPlatter, int32 InDock, TOptional<EMars_PlatterDock_Refusal> InExpected)

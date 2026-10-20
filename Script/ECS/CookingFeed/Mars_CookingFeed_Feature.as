@@ -81,6 +81,29 @@ enum EMars_CookingFeed_TakeOutRefusal
     NothingReady
 }
 
+// What a receiving kernel does with a piece it handed back and its tray refused (utils_cooking_feed::Get_ReadoptGate).
+enum EMars_CookingFeed_ReadoptGate
+{
+    // Back on the kernel's books.
+    Readopt,
+    // Gone or going: nothing is left to take back.
+    Gone,
+    // Another ledger holds it by now: its pickup's Ledger claim is that ledger's.
+    HeldElsewhere,
+    // Attached somewhere: it stays there, and the kernel releases its pickup's Ledger claim.
+    Attached
+}
+
+// Where an adopted piece is on its way to its release pose (utils_cooking_feed::Get_ArrivalVerdict).
+enum EMars_CookingFeed_Arrival
+{
+    // Not there yet, and still within the arrival timeout: nothing judges it.
+    OnItsWay,
+    Arrived,
+    // Past the arrival timeout without getting there: it is judged where it is.
+    Overdue
+}
+
 // One piece's identity: the attempt it belongs to (bumped by every Reset and SetSource) and the transfer that reserved it
 // within that attempt (TransferIndex: 0, 1, 2, ... in reservation order, never reused, so a source refilled between two
 // transfers cannot hand the same id out twice). A piece from an older generation is stale.
@@ -437,6 +460,7 @@ event void FMars_Delegate_CookingFeed_OnPhaseChanged_MC(FCk_Handle_CookingFeed I
 delegate void FMars_Delegate_CookingFeed_OnReleaseRequested(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease);
 event void FMars_Delegate_CookingFeed_OnReleaseRequested_MC(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_Release InRelease);
 
+// How the transfer ended. Only tests bind it today: the feed's test-pinned contract, kept for the assembly.
 delegate void FMars_Delegate_CookingFeed_OnTransferSettled(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Settle InSettle);
 event void FMars_Delegate_CookingFeed_OnTransferSettled_MC(FCk_Handle_CookingFeed InFeed, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Settle InSettle);
 
@@ -518,7 +542,8 @@ struct FMars_Request_CookingFeed_SetSource
 }
 
 // The cooking kernel's answer to a release. Honoured only while awaiting admission for exactly this PieceId; a rejected
-// piece goes back to the platter it came from.
+// piece goes back to the platter it came from. Reason is the kernel's own words for a rejection: debug text, logged when
+// the rejection is honoured, never shown to the player.
 struct FMars_Request_CookingFeed_ResolveAdmission
 {
     UPROPERTY()
@@ -638,6 +663,53 @@ struct FMars_Request_StationTakeOut
     {
         MaxPieces = InMaxPieces;
         Tray = InTray;
+    }
+}
+
+// One piece a receiving kernel's take-out handed back (Searing, Fry, Batter), broadcast after the kernel's whole drain
+// applied.
+struct FMars_CookingFeed_TakeOutResult
+{
+    FMars_CookingFeed_PieceId Id;
+    FCk_Handle_FoodPiece Piece;
+
+    FMars_CookingFeed_TakeOutResult() {}
+
+    FMars_CookingFeed_TakeOutResult(FMars_CookingFeed_PieceId InId, FCk_Handle_FoodPiece InPiece)
+    {
+        Id = InId;
+        Piece = InPiece;
+    }
+}
+
+// The surface of the body a heat kernel gives a piece that arrives without one (its shape is the piece's own mesh, its mass
+// the piece's own): utils_cooking_feed::Adopt_Body.
+struct FMars_CookingFeed_BodySurface
+{
+    float32 Friction = 0.5f;
+    float32 Restitution = 0.1f;
+    float32 LinearDamping = 0.05f;
+    float32 AngularDamping = 0.05f;
+    float32 GravityFactor = 1.0f;
+}
+
+// What utils_cooking_feed::Get_ArrivalVerdict judges: the adopted piece's body and entity, where it was released and how
+// long it has been on its way.
+struct FMars_CookingFeed_ArrivalQuery
+{
+    FCk_Handle_JoltBody Body;
+    FCk_Handle Entity;
+    FVector ReleaseLocation = FVector::ZeroVector;
+    float32 Seconds = 0.0f;
+
+    FMars_CookingFeed_ArrivalQuery() {}
+
+    FMars_CookingFeed_ArrivalQuery(FCk_Handle_JoltBody InBody, FCk_Handle InEntity, FVector InReleaseLocation, float32 InSeconds)
+    {
+        Body = InBody;
+        Entity = InEntity;
+        ReleaseLocation = InReleaseLocation;
+        Seconds = InSeconds;
     }
 }
 

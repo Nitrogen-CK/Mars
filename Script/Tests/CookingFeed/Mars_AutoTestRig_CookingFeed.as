@@ -50,11 +50,14 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
     protected TArray<int32> _StockAdmitted;
     // One entry per OnLoaded of the platter: a piece's every landing on it (the stock's first, and any return).
     protected TArray<FCk_Handle_FoodPiece> _Landed;
+    // One entry per OnPieceLetGo: a piece the feed let go where it lies, no platter being left to take it back.
+    protected TArray<FCk_Handle_FoodPiece> _LetGo;
 
     // Build_Searing's kernel, its station entity and its pan's base body.
     protected FCk_Handle_Searing _Searing;
     protected FCk_Handle _SearingStation;
     protected FCk_Handle_JoltBody _PanBaseBody;
+    private UMars_AutoTestHelper_CookingFixture _CookingFixture;
 
     // Quick timed phases, the default motion (the held piece's middle on the hand node, world-aligned), and the hand
     // geometry: rest at k_HandLocal, the hand node on the reserved piece's middle at the grasp and on the release node at the
@@ -90,6 +93,7 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         _Feed.BindTo_OnTransferSettled(FMars_Delegate_CookingFeed_OnTransferSettled(this, n"OnTransferSettled"));
         _Feed.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnTransferRefused"));
         _Feed.BindTo_OnStockChanged(FMars_Delegate_CookingFeed_OnStockChanged(this, n"OnStockChanged"));
+        _Feed.BindTo_OnPieceLetGo(FMars_Delegate_CookingFeed_OnPieceLetGo(this, n"OnPieceLetGo"));
 
         const UCk_InventoryItem_Definition PlatterItem = mars_items::Platter_Large();
         const UMars_ItemTrait_Platter PlatterTrait = PlatterItem.Get_ItemTraitByClass(UMars_ItemTrait_Platter);
@@ -100,7 +104,7 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
 
         auto PlatterEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto PlatterRoot = utils_transform::Add(PlatterEntity, FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterLocal), ECk_Replication::DoesNotReplicate);
-        Add_PlatterFloor(PlatterRoot, PlatterSpec.Bounds);
+        Get_CookingFixture().Add_PlatterFloorBox(PlatterRoot, PlatterSpec.Bounds);
         _Platter = utils_platter::Add(PlatterEntity, PlatterSpec);
         _Platter.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnPlatterLoaded"));
 
@@ -114,22 +118,12 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         }
     }
 
-    // A kinematic box under the platter's whole floor, its top at the root's Z (a platter item's tray body plays that part).
-    private void Add_PlatterFloor(FCk_Handle_Transform InRoot, const FMars_Platter_Bounds& InBounds)
+    private UMars_AutoTestHelper_CookingFixture Get_CookingFixture()
     {
-        auto Root = InRoot;
-        auto Node = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -1.0)));
+        if (ck::Is_NOT_Valid(_CookingFixture))
+        { _CookingFixture = Cast<UMars_AutoTestHelper_CookingFixture>(NewObject(this, UMars_AutoTestHelper_CookingFixture)); }
 
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(InBounds.InnerHalfExtents.X + 5.0, InBounds.InnerHalfExtents.Y + 5.0, 1.0));
-
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Kinematic);
-        FloorSpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
-        FloorSpec.Set_MassKg(1.0f);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Node.H(), FloorSpec);
+        return _CookingFixture;
     }
 
     // A Searing on its own station entity, its pan an Implement on a node k_PanBelowReleaseCm under the release node and its
@@ -151,15 +145,7 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
         auto Pan = utils_implement::Add(PanNode.H(), PanSpec);
 
         auto BodyNode = utils_scene_node::Create(PanNode.As_Transform(), FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -k_PanHalfExtents.Z)));
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(k_PanHalfExtents);
-        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BodySpec.Set_ShapeDimensions(Shape);
-        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
-        BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
-        BodySpec.Set_MassKg(1.0f);
-        BodySpec.Set_CollisionProfileName(n"BlockAll");
-        _PanBaseBody = utils_jolt_body::Add(BodyNode.H(), BodySpec);
+        _PanBaseBody = Get_CookingFixture().Add_KinematicBox(BodyNode, k_PanHalfExtents);
 
         auto Spec = FMars_Searing_Spec();
         Spec.Nodes = FMars_Searing_Nodes(Pan, _PanBaseBody);
@@ -388,5 +374,11 @@ class UMars_AutoTestRig_CookingFeed : UMars_AutoTestRig_FoodPiece
     protected void OnPlatterLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece)
     {
         _Landed.Add(InPiece);
+    }
+
+    UFUNCTION()
+    protected void OnPieceLetGo(FCk_Handle_CookingFeed InFeed, FCk_Handle_FoodPiece InPiece)
+    {
+        _LetGo.Add(InPiece);
     }
 }

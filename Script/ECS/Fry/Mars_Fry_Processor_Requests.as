@@ -10,13 +10,6 @@ struct FMars_Fry_AdmissionResult
     FCk_Handle Entity;
 }
 
-// One piece a TakeOut handed back, broadcast after the whole drain applied.
-struct FMars_Fry_TakeOutResult
-{
-    FMars_CookingFeed_PieceId Id;
-    FCk_Handle_FoodPiece Piece;
-}
-
 // Drains Reset -> SetDrive -> TakeOut (the station's take-outs after the fryer's own) -> Readopt -> the station inbox's
 // releases -> Skim -> Look. Reset resets the skimmer (carry, level, back at its park, idle) and zeroes the tally, and keeps
 // every piece with its heat; SetDrive is last-wins and drives the skimmer (an idle one carries); TakeOut hands pieces back
@@ -28,9 +21,9 @@ struct FMars_Fry_TakeOutResult
 // inside the pot, pours over the basket, carries anywhere, is refused elsewhere (the corridor) and ignored while idle; a
 // look moves the skimmer's target within the reach (the pot only while the scoop is dipped or still below the rim) while
 // driven. The new target goes to the skimmer's commanded slide once. The drive and skim edges and every refused skim, then
-// every take-out and every refused take-out, then every admission answer on the station's OnAdmission (and OnPieceAdded
-// for an accepted one, OnAdmissionRefused for a rejected one) are broadcast last. The drain collects and the Tick
-// measures: nothing here integrates over time.
+// every take-out and every refused take-out, then OnPieceAdded for every readopted piece, then every admission answer on
+// the station's OnAdmission (and OnPieceAdded for an accepted one, OnAdmissionRefused for a rejected one) are broadcast
+// last. The drain collects and the Tick measures: nothing here integrates over time.
 //
 // A piece is the kernel's guest: the kernel creates no entity, and a piece it holds ends only lost (the Tick) or with the
 // station (OnFryBeginDestroy). The fryer is the one owner of its pieces' lease facts: it stamps every piece it takes on
@@ -43,9 +36,6 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
     default _MarkedDirtyBy = FMars_Fragment_Fry_Requests;
-
-    // A piece's Resting counts a landing after this long apart as a hop (its own default; the kernel does not read hops).
-    private const float32 k_HopMinSeconds = 0.12f;
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)
@@ -84,20 +74,28 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         if (SetDriveRequests.Num() > 0)
         { Apply_SetDrive(Self, InState, SetDriveRequests.Last().Drive); }
 
-        TArray<FMars_Fry_TakeOutResult> TakenOut;
+        TArray<FMars_CookingFeed_TakeOutResult> TakenOut;
         TArray<EMars_CookingFeed_TakeOutRefusal> TakeOutRefusals;
         for (const auto& Request : TakeOutRequests)
         {
             const auto Taken = Apply_TakeOut(Self, InState, Request);
             if (Taken.Num() == 0)
-            { TakeOutRefusals.Add(Get_TakeOutRefusal(Request)); }
+            { TakeOutRefusals.Add(utils_cooking_feed::Get_TakeOutRefusal(Request.MaxPieces)); }
 
-            Land(Self, Request, Taken);
+            utils_cooking_feed::Land_OnTray(Self, Request.Tray, Taken);
+            if (Taken.Num() > 0 && ck::IsValid(Request.Tray))
+            { Watch_Tray(Request.Tray); }
+
             TakenOut.Append(Taken);
         }
 
+        TArray<FMars_Fry_PieceState> Readopted;
         for (const auto& Request : ReadoptRequests)
-        { Apply_Readopt(Self, InState, Request); }
+        {
+            const auto Readopt = Apply_Readopt(Self, InState, Request);
+            if (Readopt.IsSet())
+            { Readopted.Add(Readopt.GetValue()); }
+        }
 
         TArray<FMars_Fry_AdmissionResult> Admissions;
         for (const auto& Release : Inbox)
@@ -162,6 +160,12 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
             { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnTakeOutRefused.Broadcast(Self, Refusal); }
         }
 
+        for (const auto& Piece : Readopted)
+        {
+            if (Self.Has_Fragment(FMars_Fragment_Fry_Signals))
+            { Self.Get_Fragment(FMars_Fragment_Fry_Signals).OnPieceAdded.Broadcast(Self, Piece.Id, Piece.Entity); }
+        }
+
         FCk_Handle Station = Self;
         for (const auto& Result : Admissions)
         {
@@ -218,17 +222,17 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
     // A station take-out is the fryer's own TakeOut onto its tray, capped at the room the press read: no tray caps it at none.
     private FMars_Request_Fry_TakeOut Make_TakeOut(const FMars_Request_StationTakeOut& InTakeOut) const
     {
-        const auto MaxPieces = ck::IsValid(InTakeOut.Tray) ? InTakeOut.MaxPieces : 0;
+        const auto MaxPieces = utils_cooking_feed::Get_StationTakeOutCap(InTakeOut);
         return FMars_Request_Fry_TakeOut(TOptional<FCk_Handle_FoodPiece>(), TOptional<int32>(MaxPieces), InTakeOut.Tray);
     }
 
     // Unset Piece: every Drained piece, in admission order; set: that piece while it is in play and not lost. MaxPieces caps
     // either. Each one leaves play with its cook state written onto the piece, its body Kinematic (a platter takes it next)
     // and its holder fact gone; its Resting stays for whoever adopts it next to retarget.
-    private TArray<FMars_Fry_TakeOutResult> Apply_TakeOut(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState,
+    private TArray<FMars_CookingFeed_TakeOutResult> Apply_TakeOut(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState,
         const FMars_Request_Fry_TakeOut& InRequest)
     {
-        TArray<FMars_Fry_TakeOutResult> Taken;
+        TArray<FMars_CookingFeed_TakeOutResult> Taken;
         TArray<FMars_Fry_PieceState> Kept;
         for (const auto& Piece : InState.Pieces)
         {
@@ -240,11 +244,7 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
             }
 
             Hand_Back(InFry, Piece);
-
-            auto Result = FMars_Fry_TakeOutResult();
-            Result.Id = Piece.Id;
-            Result.Piece = Piece.Piece;
-            Taken.Add(Result);
+            Taken.Add(FMars_CookingFeed_TakeOutResult(Piece.Id, Piece.Piece));
         }
 
         InState.Pieces = Kept;
@@ -255,22 +255,13 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
 
     private bool Get_IsTakeable(const FMars_Fry_PieceState& InPiece, const FMars_Request_Fry_TakeOut& InRequest) const
     {
-        if (Get_IsGone(InPiece.Piece))
+        if (InPiece.Piece.Get_IsGone())
         { return false; }
 
         if (InRequest.Piece.IsSet())
         { return InPiece.Piece == InRequest.Piece.GetValue() && InPiece.Whereabouts != EMars_Fry_Whereabouts::Lost; }
 
         return InPiece.Drain == EMars_Fry_Drain::Drained;
-    }
-
-    // Why a take-out took nothing: a cap of zero left no room (no tray docked, or a full one), else nothing was takeable.
-    private EMars_CookingFeed_TakeOutRefusal Get_TakeOutRefusal(const FMars_Request_Fry_TakeOut& InRequest) const
-    {
-        if (InRequest.MaxPieces.IsSet() && InRequest.MaxPieces.GetValue() <= 0)
-        { return EMars_CookingFeed_TakeOutRefusal::NoRoom; }
-
-        return EMars_CookingFeed_TakeOutRefusal::NothingReady;
     }
 
     // The piece leaves with its batter and the oil the basket left on it (Receiver.DrainedOilCoat): its sheen at the next
@@ -287,87 +278,45 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         utils_foodpiece::Clear_Holder(Piece, InFry);
     }
 
-    // Every piece a take-out handed back goes onto the request's tray (detached first, its landing watched: its Ledger claim
-    // stays the fryer's until it lands), else to the caller, its claim released.
-    private void Land(const FCk_Handle_Fry& InFry, const FMars_Request_Fry_TakeOut& InRequest, const TArray<FMars_Fry_TakeOutResult>& InTaken)
-    {
-        for (const auto& Result : InTaken)
-        {
-            auto Piece = Result.Piece;
-            if (ck::IsValid(InRequest.Tray))
-            { utils_cooking_feed::Send_ToTray(Piece, FMars_Fragment_StationLanding(InFry, Result.Id, InRequest.Tray)); }
-            else
-            { utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable); }
-        }
-
-        if (InTaken.Num() > 0 && ck::IsValid(InRequest.Tray))
-        { Watch_Tray(InRequest.Tray); }
-    }
-
     // A handed-back piece nobody took, back in play where it lies (it is not moved): the record rebuilt from the piece (the
     // take-out wrote its faces' heat into its cook state as its batter), its body Dynamic again, its Resting on the scoop
     // and the basket, its holder fact and its pickup's Ledger claim the fryer's. It starts as an admitted piece does,
-    // Airborne and NotDraining: the Tick judges where it is from its pose, and a piece lying in the basket drains again. The take-out it undoes leaves the tally. A piece gone, attached, or that another ledger
-    // holds by now is not readopted.
-    private void Apply_Readopt(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, const FMars_Request_Fry_Readopt& InRequest)
+    // Airborne and NotDraining: the Tick judges where it is from its pose, and a piece lying in the basket drains again. The
+    // take-out it undoes leaves the tally; it may take the fryer past Supply.MaxPieces (it was already the fryer's). Unset
+    // when it is not readopted: a piece gone, or that another ledger holds by now, is left alone; one attached somewhere
+    // stays there with its claim released.
+    private TOptional<FMars_Fry_PieceState> Apply_Readopt(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, const FMars_Request_Fry_Readopt& InRequest)
     {
         auto Piece = InRequest.Piece;
         const auto PieceName = utils_cooking_feed::Get_PieceName(InRequest.PieceId);
-        if (Get_IsGone(Piece))
-        { return; }
+        const auto Gate = utils_cooking_feed::Get_ReadoptGate(InFry, Piece);
+        if (Gate == EMars_CookingFeed_ReadoptGate::Attached)
+        { utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable); }
+
+        if (Gate != EMars_CookingFeed_ReadoptGate::Readopt)
+        { return TOptional<FMars_Fry_PieceState>(); }
 
         FCk_Handle Entity = Piece;
-        const auto Holder = Piece.TryGet_Holder();
-        if ((ck::IsValid(Holder) && Holder != InFry) || Entity.Is_SceneNode())
-        { return; }
-
         const auto IsInPlay = utils_fry::Find_PieceIndexByHandle(InState.Pieces, Piece) >= 0
             || utils_fry::Find_PieceIndex(InState.Pieces, InRequest.PieceId) >= 0;
         if (ck::EnsureIfNot(IsInPlay == false, f"[Fry] [{InFry.ToString()}] was asked to readopt piece {PieceName} [{Piece.ToString()}], which is already in play"))
-        { return; }
+        { return TOptional<FMars_Fry_PieceState>(); }
 
         if (ck::EnsureIfNot(Entity.Is_JoltBody(), f"[Fry] [{InFry.ToString()}] was asked to readopt piece {PieceName} [{Piece.ToString()}], which has no body: it handed back only bodied pieces"))
-        { return; }
+        {
+            utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable);
+            return TOptional<FMars_Fry_PieceState>();
+        }
 
-        const auto Spec = InFry.Get_Spec();
         auto Body = Entity.As_JoltBody();
         utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
 
-        TArray<FCk_Handle> Supports;
-        Supports.Add(Spec.Nodes.ScoopBody);
-        Supports.Add(Spec.Nodes.BasketBody);
-        if (Entity.Is_Resting())
-        {
-            auto Resting = Entity.As_Resting();
-            Resting.Request_Retarget(FMars_Request_Resting_Retarget(Supports, Spec.Receiver.SupportGraceSeconds, k_HopMinSeconds));
-        }
-        else
-        { utils_resting::Add(Entity, FMars_Resting_Spec(Supports, Spec.Receiver.SupportGraceSeconds, k_HopMinSeconds)); }
-
-        const auto Metrics = utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry());
-        auto State = FMars_Fry_PieceState();
-        State.Id = InRequest.PieceId;
-        State.Piece = Piece;
-        State.Entity = Entity;
+        auto State = Make_PieceState(InRequest.PieceId, Piece);
         State.Body = Body;
-        State.CentreLocal = utils_searing::Get_BoundsCentre(Metrics);
-        State.HalfExtents = utils_searing::Get_BoundsHalfExtents(Metrics);
-        State.Whereabouts = EMars_Fry_Whereabouts::Airborne;
-        State.LastHome = EMars_Fry_Whereabouts::Oil;
 
-        const auto CookState = Piece.Get_CookState();
-        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
-        {
-            const auto Heat = CookState.Batter.IsValidIndex(Index) ? Math::Clamp(CookState.Batter[Index], 0.0f, 2.0f) : 0.0f;
-            State.FaceHeat.Add(Heat);
-            State.ReportedStage.Add(utils_fry::Get_HeatStage(Heat));
-        }
-
-        InState.Pieces.Add(State);
         InState.Tally.TakenOut = Math::Max(0, InState.Tally.TakenOut - 1);
-        utils_foodpiece::Stamp_Holder(Piece, InFry);
-        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
-        Watch_Teardown(InFry);
+        Take_InPlay(InFry, InState, State);
+        return TOptional<FMars_Fry_PieceState>(State);
     }
 
     // Adopted: the released piece (Release.Piece, Ready, held by no other ledger and on no scene node) moves to the release
@@ -391,7 +340,7 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         // A piece's Resting needs both bodies, and a piece dropped toward a body not there yet falls through it.
         if (utils_jolt_body::Get_IsBodyAdded(Spec.Nodes.ScoopBody) == false || utils_jolt_body::Get_IsBodyAdded(Spec.Nodes.BasketBody) == false)
         { Result.Reason = "the scoop or basket body is not in the simulation yet"; }
-        else if (Get_IsGone(Piece))
+        else if (Piece.Get_IsGone())
         { Result.Reason = "no piece"; }
         else if (Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
         { Result.Reason = "the piece is not ready"; }
@@ -417,108 +366,67 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         if (Result.Reason.Len() > 0)
         { return Result; }
 
-        const auto Body = Adopt_Body(Piece, InRelease, Spec.Piece);
-
-        TArray<FCk_Handle> Supports;
-        Supports.Add(Spec.Nodes.ScoopBody);
-        Supports.Add(Spec.Nodes.BasketBody);
-
-        // A piece that rested on another station's supports already tracks them: it is pointed at these instead.
-        if (Entity.Is_Resting())
-        {
-            auto Resting = Entity.As_Resting();
-            Resting.Request_Retarget(FMars_Request_Resting_Retarget(Supports, Spec.Receiver.SupportGraceSeconds, k_HopMinSeconds));
-        }
-        else
-        { utils_resting::Add(Entity, FMars_Resting_Spec(Supports, Spec.Receiver.SupportGraceSeconds, k_HopMinSeconds)); }
-
-        const auto Metrics = utils_runtime_mesh::Get_Metrics(Piece.Get_Geometry());
-        auto State = FMars_Fry_PieceState();
-        State.Id = InRelease.PieceId;
-        State.Piece = Piece;
-        State.Entity = Entity;
+        const auto Body = utils_cooking_feed::Adopt_Body(Piece, InRelease, Make_BodySurface(Spec.Piece));
+        auto State = Make_PieceState(InRelease.PieceId, Piece);
         State.Body = Body;
-        State.CentreLocal = utils_searing::Get_BoundsCentre(Metrics);
-        State.HalfExtents = utils_searing::Get_BoundsHalfExtents(Metrics);
         State.Arriving = TOptional<FVector>(InRelease.WorldTransform.GetLocation());
-        State.Whereabouts = EMars_Fry_Whereabouts::Airborne;
-        State.LastHome = EMars_Fry_Whereabouts::Oil;
-
-        // A face fried before arrives at its heat; its stage counts as reported.
-        const auto Seed = Piece.Get_CookState();
-        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
-        {
-            const auto Heat = Seed.Batter.IsValidIndex(Index) ? Math::Clamp(Seed.Batter[Index], 0.0f, 2.0f) : 0.0f;
-            State.FaceHeat.Add(Heat);
-            State.ReportedStage.Add(utils_fry::Get_HeatStage(Heat));
-        }
-
-        InState.Pieces.Add(State);
-        utils_foodpiece::Stamp_Holder(Piece, InFry);
-        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
-        Watch_Teardown(InFry);
+        Take_InPlay(InFry, InState, State);
 
         Result.Admission = EMars_CookingFeed_Admission::Accepted;
         Result.Entity = Entity;
         return Result;
     }
 
-    // A piece without a body is posed at the release first (a body reads its entity's pose when it is added) and given a
-    // dynamic convex body from its own mesh at its own mass. A piece that left another station keeps its body: switched back
-    // to Dynamic and teleported to the release. Either way the release's velocities follow (the body handles its requests
-    // once it is set up and added, so these wait for it).
-    private FCk_Handle_JoltBody Adopt_Body(FCk_Handle_FoodPiece InPiece, const FMars_CookingFeed_Release& InRelease,
-        const FMars_Fry_PieceSpec& InSpec)
+    // The record Add and Readopt share, its body still to set: the piece's geometry read once from its mesh's metrics,
+    // Airborne with the Oil its last home, its faces' heat seeded from its batter (a face fried before arrives at its heat;
+    // its stage counts as reported).
+    private FMars_Fry_PieceState Make_PieceState(const FMars_CookingFeed_PieceId& InPieceId, const FCk_Handle_FoodPiece& InPiece) const
     {
         FCk_Handle Entity = InPiece;
-        const auto Location = InRelease.WorldTransform.GetLocation();
-        const auto Rotation = InRelease.WorldTransform.Rotator();
+        const auto Metrics = utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry());
+        auto State = FMars_Fry_PieceState();
+        State.Id = InPieceId;
+        State.Piece = InPiece;
+        State.Entity = Entity;
+        State.CentreLocal = utils_foodpiece::Get_BoundsCentre(Metrics);
+        State.HalfExtents = utils_foodpiece::Get_BoundsHalfExtents(Metrics);
+        State.Whereabouts = EMars_Fry_Whereabouts::Airborne;
+        State.LastHome = EMars_Fry_Whereabouts::Oil;
+        State.FaceHeat = utils_cooking_feed::Seed_Faces(InPiece.Get_CookState().Batter, 2.0f);
+        for (const auto Heat : State.FaceHeat)
+        { State.ReportedStage.Add(utils_fry::Get_HeatStage(Heat)); }
 
-        auto Body = FCk_Handle_JoltBody();
-        if (Entity.Is_JoltBody())
-        {
-            Body = Entity.As_JoltBody();
-            utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
-            utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Location, Rotation));
-        }
-        else
-        {
-            auto Transform = Entity.As_Transform();
-            utils_transform::Request_SetLocation(Transform, FCk_Request_Transform_SetLocation(Location));
-            utils_transform::Request_SetRotation(Transform, FCk_Request_Transform_SetRotation(Rotation));
-
-            auto Convex = FCk_JoltBody_RuntimeConvexSpec();
-            Convex.Set_PointsCm(utils_runtime_mesh::Copy_LocalVerticesCm(InPiece.Get_Geometry()));
-
-            auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::RuntimeConvex);
-            BodySpec.Set_RuntimeConvex(Convex);
-            BodySpec.Set_MotionType(ECk_MotionType::Dynamic);
-            BodySpec.Set_MotionQuality(ECk_MotionQuality::LinearCast);
-            BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
-            BodySpec.Set_MassKg(float32(InPiece.Get_MassKg()));
-            BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
-            BodySpec.Set_Friction(InSpec.Friction);
-            BodySpec.Set_Restitution(InSpec.Restitution);
-            BodySpec.Set_LinearDamping(InSpec.LinearDamping);
-            BodySpec.Set_AngularDamping(InSpec.AngularDamping);
-            BodySpec.Set_GravityFactor(InSpec.GravityFactor);
-            // The Resting needs a Persisted contact every step from a resting awake piece.
-            BodySpec.Set_PersistContacts(ECk_EnableDisable::Enable);
-            Body = utils_jolt_body::Add(Entity, BodySpec);
-        }
-
-        if (InRelease.LinearVelocity.IsNearlyZero() == false)
-        { utils_jolt_body::Request_SetLinearVelocity(Body, FCk_Request_JoltBody_SetLinearVelocity(InRelease.LinearVelocity)); }
-
-        if (InRelease.AngularVelocity.IsNearlyZero() == false)
-        { utils_jolt_body::Request_SetAngularVelocity(Body, FCk_Request_JoltBody_SetAngularVelocity(InRelease.AngularVelocity)); }
-
-        return Body;
+        return State;
     }
 
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece) const
+    // InPiece in play (its body set): its Resting pointed at the scoop disc and the basket floor, the holder fact and its
+    // pickup's Ledger claim the fryer's, and the fryer's own teardown watched.
+    private void Take_InPlay(FCk_Handle_Fry& InFry, FMars_Fragment_Fry& InState, const FMars_Fry_PieceState& InPiece)
     {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+        const auto Spec = InFry.Get_Spec();
+        TArray<FCk_Handle> Supports;
+        Supports.Add(Spec.Nodes.ScoopBody);
+        Supports.Add(Spec.Nodes.BasketBody);
+        auto Entity = InPiece.Entity;
+        utils_cooking_feed::Rest_On(Entity,
+            FMars_Resting_Spec(Supports, Spec.Receiver.SupportGraceSeconds, utils_cooking_feed::k_PieceHopMinSeconds));
+
+        auto Piece = InPiece.Piece;
+        InState.Pieces.Add(InPiece);
+        utils_foodpiece::Stamp_Holder(Piece, InFry);
+        utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
+        Watch_Teardown(InFry);
+    }
+
+    private FMars_CookingFeed_BodySurface Make_BodySurface(const FMars_Fry_PieceSpec& InSpec) const
+    {
+        auto Surface = FMars_CookingFeed_BodySurface();
+        Surface.Friction = InSpec.Friction;
+        Surface.Restitution = InSpec.Restitution;
+        Surface.LinearDamping = InSpec.LinearDamping;
+        Surface.AngularDamping = InSpec.AngularDamping;
+        Surface.GravityFactor = InSpec.GravityFactor;
+        return Surface;
     }
 
     // Unbinding first keeps the watch single across admissions.
@@ -603,7 +511,7 @@ class UMars_Processor_Fry_HandleRequests : UCk_Processor_Script_Base_UE
         const auto State = FryEntity.Get_Fragment(FMars_Fragment_Fry);
         for (const auto& Piece : State.Pieces)
         {
-            if (Get_IsGone(Piece.Piece))
+            if (Piece.Piece.Get_IsGone())
             { continue; }
 
             utils_entity_lifetime::Request_DestroyEntity(Piece.Entity);

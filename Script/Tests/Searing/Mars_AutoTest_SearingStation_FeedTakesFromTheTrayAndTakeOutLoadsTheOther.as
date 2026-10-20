@@ -1,9 +1,10 @@
 // The searing station's whole round on real pieces. The meat platter docks on the raw platter dock and an empty platter on
 // the finished tray's; an operator takes the station (the pan heats) and one add-food press carries the slab: the bridge
 // unloads it from the raw platter and the kernel admits it, so the raw platter is empty and the pan holds the slab. After a
-// second on the hot pan the test takes that piece out by name, as a take-out press would: the station's take-out task loads
-// it onto the docked tray, where it rides as a scene-node child of the tray's root with its body Kinematic, carrying the
-// sear the kernel gave it; the pan holds nothing and the kernel counts one piece taken out.
+// second on the hot pan the test asks the kernel by name to take that piece out (a still-cooking piece, which a take-out
+// press, naming none, would not hand back): the kernel loads it onto the docked tray, where it rides as a scene-node child
+// of the tray's root with its body Kinematic, carrying the sear the kernel gave it; the pan holds nothing and the kernel
+// counts one piece taken out.
 class UMars_AutoTest_SearingStation_FeedTakesFromTheTrayAndTakeOutLoadsTheOther : UMars_AutoTestRig_HeatStation
 {
     private const FVector k_Origin = FVector(12800.0, -12000.0, -30000.0);
@@ -102,7 +103,7 @@ class UMars_AutoTest_SearingStation_FeedTakesFromTheTrayAndTakeOutLoadsTheOther 
         const auto PieceId = Get_PieceIds()[0];
         _SearAtTakeOut.Empty();
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
-        { _SearAtTakeOut.Add(_Searing.Get_FaceSear(PieceId, EMars_Searing_Face(Face))); }
+        { _SearAtTakeOut.Add(_Searing.Get_FaceSear(PieceId, EMars_FoodPiece_Face(Face))); }
 
         Request_TakeOut(_Slab);
     }

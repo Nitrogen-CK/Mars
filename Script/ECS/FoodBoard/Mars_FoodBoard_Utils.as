@@ -182,9 +182,14 @@ mixin void Request_Place(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoa
     Requests.PlaceRequests.Add(InRequest);
 }
 
-// Cuts, turns and releases are stamped in arrival order: the board queues them in that order whatever their kind.
+// Cuts, turns and releases are stamped in arrival order: the board queues them in that order whatever their kind. A
+// rejected Cut ensures and is dropped: nothing is cut.
 mixin void Request_Cut(FCk_Handle_FoodBoard& Self, const FMars_Request_FoodBoard_Cut& InRequest)
 {
+    const auto Validation = InRequest.Validate();
+    if (ck::EnsureIfNot(Validation.IsValid(), f"[FoodBoard] [{Self.ToString()}] rejected a Cut: {Validation.Get_Error()}"))
+    { return; }
+
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FoodBoard_Requests);
     auto Request = InRequest;
     Request.Sequence = Requests.NextSequence++;

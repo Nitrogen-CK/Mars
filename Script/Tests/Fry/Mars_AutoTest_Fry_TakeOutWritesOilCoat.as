@@ -22,7 +22,7 @@ class UMars_AutoTest_Fry_TakeOutWritesOilCoat : UMars_AutoTestRig_Fry
         Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", k_SlowPolls, 0);
         Add_Step("take out every drained piece", n"Step_TakeOut");
         Add_Step_WaitUntil("the take-out was answered", n"Check_TakenOut", 0, 0);
-        Add_Step_WaitFrames("the cook state drains", 2);
+        Add_Step_WaitUntil("the piece's ledger carries an oil coat", n"Check_OilCoated", 0, 0);
         Add_Step("the piece's cook state carries the drained oil coat", n"Step_AssertOilCoat");
         Run_Steps(InHandle);
     }
@@ -46,6 +46,13 @@ class UMars_AutoTest_Fry_TakeOutWritesOilCoat : UMars_AutoTestRig_Fry
     {
         auto Res = OutResult;
         Res.Set(_TakenOut.Num() >= 1);
+    }
+
+    UFUNCTION()
+    private void Check_OilCoated(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Food.Get_CookState().OilCoat > 0.0f);
     }
 
     UFUNCTION()

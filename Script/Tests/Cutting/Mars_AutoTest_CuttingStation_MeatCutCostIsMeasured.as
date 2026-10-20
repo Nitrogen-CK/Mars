@@ -36,7 +36,7 @@ class UMars_AutoTest_CuttingStation_MeatCutCostIsMeasured : UMars_AutoTestRig_Cu
         Spawn_InputPlatter(InHandle, mars_items::Food_MeatSlab());
 
         auto MarkerEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _Marker = utils_runtime_mesh::Add(MarkerEntity, FCk_RuntimeMesh_Spec(TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
+        _Marker = utils_runtime_mesh::Add(MarkerEntity, FCk_RuntimeMesh_Spec(Get_CookingFixture().Get_BoxMesh()));
         _MarkerOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
 
         _Laterals.Add(0.0f);

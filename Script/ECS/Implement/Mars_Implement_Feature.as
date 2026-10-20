@@ -456,7 +456,8 @@ struct FMars_Fragment_Implement
 delegate void FMars_Delegate_Implement_OnDriveChanged(FCk_Handle_Implement InImplement, EMars_Implement_Drive InDrive);
 event void FMars_Delegate_Implement_OnDriveChanged_MC(FCk_Handle_Implement InImplement, EMars_Implement_Drive InDrive);
 
-// A fast upward look started a lift (the toss cue); InExcessDegrees is the look beyond the flick speed that frame.
+// A fast upward look started a lift (the toss cue); InExcessDegrees is the look beyond the flick speed that frame. Broadcast
+// once the frame's pose is written. Only tests bind it today: the kernel's test-pinned contract, kept for the assembly.
 delegate void FMars_Delegate_Implement_OnLiftKicked(FCk_Handle_Implement InImplement, float32 InExcessDegrees);
 event void FMars_Delegate_Implement_OnLiftKicked_MC(FCk_Handle_Implement InImplement, float32 InExcessDegrees);
 

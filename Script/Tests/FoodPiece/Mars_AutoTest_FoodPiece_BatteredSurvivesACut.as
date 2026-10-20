@@ -34,7 +34,7 @@ class UMars_AutoTest_FoodPiece_BatteredSurvivesACut : UMars_AutoTestRig_FoodPiec
     private void Step_Batter(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto CookState = FMars_FoodPiece_CookState();
-        CookState.Batter[int32(EMars_Searing_Face::PosX)] = k_FriedHeat;
+        CookState.Batter[int32(EMars_FoodPiece_Face::PosX)] = k_FriedHeat;
         CookState.Battered = 1.0f;
         _Source.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
@@ -89,7 +89,7 @@ class UMars_AutoTest_FoodPiece_BatteredSurvivesACut : UMars_AutoTestRig_FoodPiec
         const auto CookState = InHalf.Get_CookState();
         Assert_False(InHalf.Get_IsWhole(), f"the {InWhich} half is not whole");
         Assert_Equals_Float(CookState.Battered, 1.0f, k_Tolerance, f"the {InWhich} half is battered");
-        Assert_Equals_Float(CookState.Batter[int32(EMars_Searing_Face::PosX)], k_FriedHeat, k_Tolerance,
+        Assert_Equals_Float(CookState.Batter[int32(EMars_FoodPiece_Face::PosX)], k_FriedHeat, k_Tolerance,
             f"the {InWhich} half keeps the fried +X");
     }
 }

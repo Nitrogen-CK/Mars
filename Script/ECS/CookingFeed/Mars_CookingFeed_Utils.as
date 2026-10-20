@@ -93,7 +93,7 @@ namespace utils_cooking_feed
 
         const auto Reservation = InState.Active.GetValue();
         auto Piece = Reservation.Piece;
-        if (Reservation.Hold == EMars_CookingFeed_PieceHold::OnSource || Get_IsGone(Piece))
+        if (Reservation.Hold == EMars_CookingFeed_PieceHold::OnSource || Piece.Get_IsGone())
         { return EMars_CookingFeed_PieceReturn::Kept; }
 
         FCk_Handle Entity = Piece;
@@ -145,11 +145,6 @@ namespace utils_cooking_feed
         FCk_Handle Entity = InPiece;
         auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
         return ck::IsValid(Node) && ck::IsValid(InHand) && utils_scene_node::Get_Parent(Node) == InHand;
-    }
-
-    bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece)
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 
     bool Get_IsAlive(const FCk_Handle_Platter& InPlatter)
@@ -386,6 +381,21 @@ namespace utils_cooking_feed
         Tray.Request_Load(FMars_Request_Platter_Load(InPiece));
     }
 
+    // Every piece a heat kernel's take-out handed back goes onto InTray (detached first, its landing watched by the kernel:
+    // its pickup's Ledger claim stays the kernel's until it lands), else to the caller, its claim released. The kernel's
+    // processor watches the tray itself (its handlers are the processor's).
+    void Land_OnTray(const FCk_Handle& InStation, const FCk_Handle_Platter& InTray, const TArray<FMars_CookingFeed_TakeOutResult>& InTaken)
+    {
+        for (const auto& Result : InTaken)
+        {
+            auto Piece = Result.Piece;
+            if (ck::IsValid(InTray))
+            { Send_ToTray(Piece, FMars_Fragment_StationLanding(InStation, Result.Id, InTray)); }
+            else
+            { utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable); }
+        }
+    }
+
     // InPiece's landing while it is on its way onto InTray; unset for any other piece or tray.
     TOptional<FMars_Fragment_StationLanding> TryGet_Landing(const FCk_Handle_FoodPiece& InPiece, const FCk_Handle_Platter& InTray)
     {
@@ -403,6 +413,137 @@ namespace utils_cooking_feed
     void Clear_Landing(FCk_Handle_FoodPiece& InPiece)
     {
         InPiece.Request_TryRemove(FMars_Fragment_StationLanding);
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // What the receiving heat kernels (Searing, Fry, Batter) share: the take-out cap and refusal, the readopt gate, a piece's
+    // body and Resting at adoption, its face seed, and its arrival
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // A piece's Resting counts a landing after this long apart as a hop (the Resting's own default; the heat kernels read no
+    // hops).
+    const float32 k_PieceHopMinSeconds = 0.12f;
+
+    // The cap a station take-out runs under: the room the press read, none without a tray.
+    int32 Get_StationTakeOutCap(const FMars_Request_StationTakeOut& InTakeOut)
+    {
+        return ck::IsValid(InTakeOut.Tray) ? InTakeOut.MaxPieces : 0;
+    }
+
+    // Why a take-out took nothing: a cap of zero left no room (no tray docked, or a full one), else nothing was takeable.
+    EMars_CookingFeed_TakeOutRefusal Get_TakeOutRefusal(TOptional<int32> InMaxPieces)
+    {
+        if (InMaxPieces.IsSet() && InMaxPieces.GetValue() <= 0)
+        { return EMars_CookingFeed_TakeOutRefusal::NoRoom; }
+
+        return EMars_CookingFeed_TakeOutRefusal::NothingReady;
+    }
+
+    // Whether InStation's kernel takes back InPiece, which its tray refused: not a piece gone, one another ledger holds by
+    // now, or one attached somewhere.
+    EMars_CookingFeed_ReadoptGate Get_ReadoptGate(const FCk_Handle& InStation, const FCk_Handle_FoodPiece& InPiece)
+    {
+        if (InPiece.Get_IsGone())
+        { return EMars_CookingFeed_ReadoptGate::Gone; }
+
+        const auto Holder = InPiece.TryGet_Holder();
+        if (ck::IsValid(Holder) && Holder != InStation)
+        { return EMars_CookingFeed_ReadoptGate::HeldElsewhere; }
+
+        FCk_Handle Entity = InPiece;
+        if (Entity.Is_SceneNode())
+        { return EMars_CookingFeed_ReadoptGate::Attached; }
+
+        return EMars_CookingFeed_ReadoptGate::Readopt;
+    }
+
+    // InEntity rests on InSpec's targets: a piece that rested on another station's supports already tracks them and is
+    // pointed at these instead.
+    void Rest_On(FCk_Handle& InEntity, const FMars_Resting_Spec& InSpec)
+    {
+        if (InEntity.Is_Resting() == false)
+        {
+            utils_resting::Add(InEntity, InSpec);
+            return;
+        }
+
+        auto Resting = InEntity.As_Resting();
+        Resting.Request_Retarget(FMars_Request_Resting_Retarget(InSpec));
+    }
+
+    // Six face values seeded from InSeed (one cook state channel), each clamped to [0, InMax]; a face the seed lacks is 0.
+    TArray<float32> Seed_Faces(const TArray<float32>& InSeed, float32 InMax)
+    {
+        TArray<float32> Faces;
+        for (int32 Index = 0; Index < utils_foodpiece::k_FaceCount; ++Index)
+        { Faces.Add(InSeed.IsValidIndex(Index) ? Math::Clamp(InSeed[Index], 0.0f, InMax) : 0.0f); }
+
+        return Faces;
+    }
+
+    // A piece without a body is posed at the release first (a body reads its entity's pose when it is added) and given a
+    // dynamic convex body from its own mesh at its own mass with InSurface. A piece that left another station keeps its body
+    // and its surface: switched back to Dynamic and teleported to the release. Either way the release's velocities follow
+    // (the body handles its requests once it is set up and added, so these wait for it).
+    FCk_Handle_JoltBody Adopt_Body(FCk_Handle_FoodPiece& InPiece, const FMars_CookingFeed_Release& InRelease,
+        const FMars_CookingFeed_BodySurface& InSurface)
+    {
+        FCk_Handle Entity = InPiece;
+        const auto Location = InRelease.WorldTransform.GetLocation();
+        const auto Rotation = InRelease.WorldTransform.Rotator();
+
+        auto Body = FCk_Handle_JoltBody();
+        if (Entity.Is_JoltBody())
+        {
+            Body = Entity.As_JoltBody();
+            utils_jolt_body::Request_SetMotionType(Body, FCk_Request_JoltBody_SetMotionType(ECk_MotionType::Dynamic));
+            utils_jolt_body::Request_Teleport(Body, FCk_Request_JoltBody_Teleport(Location, Rotation));
+        }
+        else
+        {
+            auto Transform = Entity.As_Transform();
+            utils_transform::Request_SetLocation(Transform, FCk_Request_Transform_SetLocation(Location));
+            utils_transform::Request_SetRotation(Transform, FCk_Request_Transform_SetRotation(Rotation));
+
+            auto Convex = FCk_JoltBody_RuntimeConvexSpec();
+            Convex.Set_PointsCm(utils_runtime_mesh::Copy_LocalVerticesCm(InPiece.Get_Geometry()));
+
+            auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::RuntimeConvex);
+            BodySpec.Set_RuntimeConvex(Convex);
+            BodySpec.Set_MotionType(ECk_MotionType::Dynamic);
+            BodySpec.Set_MotionQuality(ECk_MotionQuality::LinearCast);
+            BodySpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
+            BodySpec.Set_MassKg(float32(InPiece.Get_MassKg()));
+            BodySpec.Set_SurfaceSource(ECk_JoltBody_SurfaceSource::Explicit);
+            BodySpec.Set_Friction(InSurface.Friction);
+            BodySpec.Set_Restitution(InSurface.Restitution);
+            BodySpec.Set_LinearDamping(InSurface.LinearDamping);
+            BodySpec.Set_AngularDamping(InSurface.AngularDamping);
+            BodySpec.Set_GravityFactor(InSurface.GravityFactor);
+            // The Resting needs a Persisted contact every step from a resting awake piece.
+            BodySpec.Set_PersistContacts(ECk_EnableDisable::Enable);
+            Body = utils_jolt_body::Add(Entity, BodySpec);
+        }
+
+        if (InRelease.LinearVelocity.IsNearlyZero() == false)
+        { utils_jolt_body::Request_SetLinearVelocity(Body, FCk_Request_JoltBody_SetLinearVelocity(InRelease.LinearVelocity)); }
+
+        if (InRelease.AngularVelocity.IsNearlyZero() == false)
+        { utils_jolt_body::Request_SetAngularVelocity(Body, FCk_Request_JoltBody_SetAngularVelocity(InRelease.AngularVelocity)); }
+
+        return Body;
+    }
+
+    // An adopted piece is judged only once it is where it was released, or once it has taken too long to get there.
+    EMars_CookingFeed_Arrival Get_ArrivalVerdict(const FMars_CookingFeed_ArrivalQuery& InQuery)
+    {
+        if (utils_foodpiece::Get_HasArrived(InQuery.Body, InQuery.Entity, InQuery.ReleaseLocation))
+        { return EMars_CookingFeed_Arrival::Arrived; }
+
+        if (InQuery.Seconds < utils_foodpiece::k_ArrivalMaxSeconds)
+        { return EMars_CookingFeed_Arrival::OnItsWay; }
+
+        return EMars_CookingFeed_Arrival::Overdue;
     }
 
     void BindTo_OnAdmission(FCk_Handle& InStation, FMars_Delegate_StationAdmission_OnAdmission InDelegate)

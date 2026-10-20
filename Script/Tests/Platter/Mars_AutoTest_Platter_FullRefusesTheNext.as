@@ -18,7 +18,7 @@ class UMars_AutoTest_Platter_FullRefusesTheNext : UMars_AutoTestRig_Platter
 
         Add_Step_WaitUntil("the three boxes are Ready", n"Check_Ready");
         Add_Step("load all three in one step", n"Step_LoadThree");
-        Add_Step_WaitFrames("the loads drain", 2);
+        Add_Step_WaitUntil("the loads drained: a refusal was answered", n"Check_Refused", 0, 0);
         Add_Step("the third is refused Full before anything dropped", n"Step_AssertRefused");
         Add_Step_WaitUntil("the two accepted pieces landed", n"Check_TwoLanded", k_SlowPolls, 0);
         Add_Step("two held, the third never loaded", n"Step_AssertLanded");
@@ -41,6 +41,13 @@ class UMars_AutoTest_Platter_FullRefusesTheNext : UMars_AutoTestRig_Platter
     {
         for (const auto& Piece : _Pieces)
         { Load(_Platter, Piece); }
+    }
+
+    UFUNCTION()
+    private void Check_Refused(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_AllRefusalCount(_Platter) > 0);
     }
 
     UFUNCTION()

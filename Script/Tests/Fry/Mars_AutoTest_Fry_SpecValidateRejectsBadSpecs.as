@@ -1,13 +1,13 @@
 // Validate() accepts the rig's spec and rejects a kernel that takes no piece, a negative piece friction, a basket with no
-// interior, a scoop with no bowl, a dip not below the carry, a face that never goes golden, a piece restitution of 1.5, a
-// pot too narrow for the scoop, a receiver that never drains or drops its contact at once, and a reach with no corridor,
-// no basket box or no look.
+// interior, a scoop with no bowl, a basket that leaves the bowl no pour window, a dip not below the carry, a face that
+// never goes golden, a piece restitution of 1.5, a pot too narrow for the scoop, a receiver that never drains or drops its
+// contact at once, and a reach with no corridor, no basket box or no look.
 class UMars_AutoTest_Fry_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Fry
 {
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        Add_Step("validate the rig's spec and thirteen bad ones", n"Step_Validate");
+        Add_Step("validate the rig's spec and fourteen bad ones", n"Step_Validate");
         Run_Steps(InHandle);
     }
 
@@ -32,6 +32,11 @@ class UMars_AutoTest_Fry_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Fry
         auto NoBowl = Make_TestSpec();
         NoBowl.Scoop.BowlRadius = 0.0f;
         AssertRejected(NoBowl.Validate(), "a scoop BowlRadius <= 0");
+
+        // The rig's basket leaves exactly the minimum window (2 x (22 - 11) = 22): a wider bowl leaves less.
+        auto NoPourWindow = Make_TestSpec();
+        NoPourWindow.Scoop.BowlRadius = NoPourWindow.Scoop.BowlRadius + 1.0f;
+        AssertRejected(NoPourWindow.Validate(), "a basket that leaves the bowl no pour window");
 
         auto DipAboveCarry = Make_TestSpec();
         DipAboveCarry.Scoop.DipLift = DipAboveCarry.Scoop.CarryLift;

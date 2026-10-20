@@ -1,6 +1,7 @@
 // A turn is an offset, not a heading: two 90-degree turns requested in one step reach the board in one drain and compose
 // into half a turn about the board's pile node. A box off the pile node ends yawed 180 degrees, at the pile node plus its
-// old offset yawed 180 (within 0.05 cm and 0.1 degree); OnTurned fires twice, 90 each.
+// old offset yawed 180 (within 0.05 cm and 0.1 degree); OnTurned fires twice, 90 each, both in the same frame (one drain;
+// two drains would land the same pose a frame apart).
 class UMars_AutoTest_FoodBoard_TwoTurnsInOneDrainCompose : UMars_AutoTestRig_FoodBoard
 {
     private const float64 k_LocationToleranceCm = 0.05;
@@ -12,6 +13,8 @@ class UMars_AutoTest_FoodBoard_TwoTurnsInOneDrainCompose : UMars_AutoTestRig_Foo
     private FTransform _Before;
     private FVector _Pivot;
     private TArray<float32> _Turns;
+    // In parallel: the frame each OnTurned fired in.
+    private TArray<int64> _TurnFrames;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -56,6 +59,13 @@ class UMars_AutoTest_FoodBoard_TwoTurnsInOneDrainCompose : UMars_AutoTestRig_Foo
     private void Step_AssertComposed(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Turns.Num(), 2, "OnTurned fired once per turn");
+        if (_Turns.Num() == 2)
+        {
+            Assert_Equals_Float(_Turns[0], k_YawDegrees, 0.0001, "the first turn reported 90");
+            Assert_Equals_Float(_Turns[1], k_YawDegrees, 0.0001, "the second turn reported 90");
+            Assert_True(_TurnFrames[0] == _TurnFrames[1], f"both turns fired in one drain (frames {_TurnFrames[0]} and {_TurnFrames[1]})");
+        }
+
 
         const auto Yaw = FQuat(FVector::UpVector, Math::DegreesToRadians(2.0 * float64(k_YawDegrees)));
         const auto After = Get_World(_Box);
@@ -74,5 +84,6 @@ class UMars_AutoTest_FoodBoard_TwoTurnsInOneDrainCompose : UMars_AutoTestRig_Foo
     private void OnTurned(FCk_Handle_FoodBoard InBoard, float32 InYawDegrees)
     {
         _Turns.Add(InYawDegrees);
+        _TurnFrames.Add(utils_time::Get_FrameNumber());
     }
 }

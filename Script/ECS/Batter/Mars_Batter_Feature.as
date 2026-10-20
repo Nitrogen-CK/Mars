@@ -54,6 +54,14 @@ enum EMars_Batter_TakeOutRefusal
     CoatIncomplete
 }
 
+// Why the add-food press would not load a piece now. Full: Bowl.Capacity pieces are in. TransferInFlight: the station's
+// feed is mid-transfer.
+enum EMars_Batter_LoadRefusal
+{
+    Full,
+    TransferInFlight
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
@@ -219,8 +227,8 @@ struct FMars_Fragment_Batter
 delegate void FMars_Delegate_Batter_OnBowlChanged(FCk_Handle_Batter InBatter, EMars_Batter_Bowl InBowl);
 event void FMars_Delegate_Batter_OnBowlChanged_MC(FCk_Handle_Batter InBatter, EMars_Batter_Bowl InBowl);
 
-// A piece the station's inbox brought is in the bowl (right after the station's OnAdmission answered Accepted): the placing
-// script keeps its record here.
+// A piece is in the bowl: one the station's inbox brought (right after the station's OnAdmission answered Accepted), or one
+// readopted after its tray refused it. The placing script keeps its record here.
 delegate void FMars_Delegate_Batter_OnPieceAdded(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Batter_OnPieceAdded_MC(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
@@ -228,7 +236,8 @@ event void FMars_Delegate_Batter_OnPieceAdded_MC(FCk_Handle_Batter InBatter, FMa
 delegate void FMars_Delegate_Batter_OnAdmissionRefused(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, EMars_Batter_AdmissionRefusal InRefusal);
 event void FMars_Delegate_Batter_OnAdmissionRefused_MC(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, EMars_Batter_AdmissionRefusal InRefusal);
 
-// A piece's coat crossed into a new stage (once per crossing).
+// A piece's coat crossed into a new stage (once per crossing). Only tests bind it today: the kernel's test-pinned
+// contract, kept for the assembly to bind.
 delegate void FMars_Delegate_Batter_OnCoatStage(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, EMars_Batter_CoatStage InStage);
 event void FMars_Delegate_Batter_OnCoatStage_MC(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, EMars_Batter_CoatStage InStage);
 
@@ -284,8 +293,11 @@ struct FMars_Request_Batter_Lift
     FMars_Request_Batter_Lift() {}
 }
 
-// A piece a take-out handed back that its tray refused: back in the bowl at a free slot (the kernel's own landing watch
-// sends it).
+// A piece a take-out handed back that its tray refused: back in the bowl at a free slot, fully coated, with OnPieceAdded
+// again after the drain's take-outs (the kernel's own landing watch sends it). Not readopted: a piece gone, or that another
+// ledger holds by now, is left alone; one attached somewhere stays there, and one with no free slot left (a release was
+// admitted into the slot its take-out freed) ensures and lies where it is; both with their pickup's Ledger claim
+// released. A piece or PieceId already in the bowl ensures.
 struct FMars_Request_Batter_Readopt
 {
     UPROPERTY()

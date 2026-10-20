@@ -2,30 +2,22 @@
 // pan Implement (no swirl: the tests pin the ledger) and the pan: the pan mesh at the station's scale, a kinematic
 // triangle-mesh body on its own child node (built by utils_searing::Add_PanBody, as the station builds it). There is no
 // table or floor: a lost piece falls into the void until the kernel destroys it. The pan starts empty; the rig is the test
-// feed: Build_Pieces makes box food pieces (the FoodPiece rig's box, under the world's transient entity), parked beside the
-// station with no body, and its AddPiece helpers release them in build order with Ids {1, 0}, {1, 1}, ..., into the
-// station's admission inbox as the feed's bridge does, each so that the piece's middle lands at a pan-local point. A test waits on Check_PiecesReady before its first admission. The box's
-// size is read from its metrics, never assumed. The handlers record every signal by piece; the steps heat the pan, add
+// feed (UMars_AutoTestRig_CookingKernel): Build_Pieces makes its parked box pieces and the AddPiece helpers release them in
+// build order with Ids {1, 0}, {1, 1}, ..., each so that the piece's middle lands at a pan-local point. A test waits on
+// Check_PiecesReady before its first admission. The handlers record every signal by piece; the steps heat the pan, add
 // pieces, look, and wait on them.
 UCLASS(Abstract)
-class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
+class UMars_AutoTestRig_Searing : UMars_AutoTestRig_CookingKernel
 {
     protected const FVector k_Origin = FVector(-60000.0, 16000.0, -60000.0);
     // The station's pan: cooking_spec.py's pan (base radius 9.5, rim radius 14.5 at height 4.6, in the mesh's own cm) at
     // the station's scale.
     protected const float32 k_PanScale = 2.5f;
     protected const float32 k_PanRimRadius = 14.5f;
-    // The generation every rig piece carries.
-    protected const int32 k_Generation = 1;
-    // A rig piece's mass (the station's old steak's).
+    // A rig piece's mass.
     protected const float k_PieceMassKg = 0.1;
     // The clearance AddPiece leaves under a piece over the cooking surface.
     protected const float64 k_DropClearance = 2.0;
-    // Where built pieces wait for their release, beside the station, k_ParkPitch apart.
-    protected const FVector k_ParkLocal = FVector(0.0, -300.0, 0.0);
-    protected const float64 k_ParkPitch = 20.0;
-    // A poll budget, not a ceiling: the pan's mesh bakes into the simulation and the pieces import and land over seconds.
-    protected const int32 k_SlowPolls = 900;
 
     protected FCk_Handle_Searing _Searing;
     // The specs the station was built from, nodes included.
@@ -34,28 +26,23 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     protected FCk_Handle_SceneNode _PanNode;
     protected FCk_Handle_Implement _Pan;
     protected FCk_Handle_JoltBody _PanBaseBody;
-    // The station entity (the Searing's), which a test may destroy.
-    protected FCk_Handle _StationEntity;
-    // The next TransferIndex AddPiece hands out.
-    protected int32 _NextIndex = 0;
-    // Built in order; _NextPiece is the next one a release takes.
-    protected TArray<FCk_Handle_FoodPiece> _Pieces;
-    protected int32 _NextPiece = 0;
 
-    // In parallel: one entry per answer on the station's OnAdmission.
-    protected TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    protected TArray<EMars_CookingFeed_Admission> _Admissions;
-    protected TArray<FString> _AdmissionReasons;
-    // In parallel: one entry per OnPieceAdded.
-    protected TArray<FMars_CookingFeed_PieceId> _AddedIds;
+    // In parallel with _AddedIds: one entry per OnPieceAdded.
     protected TArray<FCk_Handle> _Added;
     // In parallel: one entry per OnPanContactChanged.
     protected TArray<FMars_CookingFeed_PieceId> _ContactIds;
     protected TArray<EMars_Searing_Contact> _Contacts;
     // In parallel: one entry per OnFaceSeared.
     protected TArray<FMars_CookingFeed_PieceId> _SearedIds;
-    protected TArray<EMars_Searing_Face> _Seared;
+    protected TArray<EMars_FoodPiece_Face> _Seared;
     protected int32 _ProgressSignals = 0;
+    // In parallel: one entry per OnSearProgress.
+    protected TArray<FMars_CookingFeed_PieceId> _ProgressIds;
+    protected TArray<EMars_FoodPiece_Face> _ProgressFaces;
+    protected TArray<float32> _ProgressAlphas;
+    // In parallel: one entry per OnAdmissionRefused.
+    protected TArray<FMars_CookingFeed_PieceId> _RefusedIds;
+    protected TArray<EMars_Searing_AdmissionRefusal> _Refusals;
     protected TArray<EMars_Searing_Sizzle> _Sizzles;
     protected TArray<EMars_Searing_Heat> _Heats;
     // In parallel: one entry per OnPieceReady.
@@ -89,13 +76,7 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
         _Spec = InSpec;
         _PanSpec = InPanSpec;
 
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _StationEntity = StationEntity;
-        // Tracked with the pieces so it is torn down in the frame they are, as a station's own teardown ends them: left
-        // to the runner's cascade it would tick on after they are gone, and a piece gone from under a live kernel is a
-        // defect the kernel ensures on.
-        Track_ForCleanup(StationEntity);
-        auto Root = utils_transform::Add(StationEntity, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
+        auto Root = Create_StationRoot(InHandle, k_Origin);
         _PanNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 100.0)));
 
         _PanSpec.Nodes = FMars_Implement_Nodes(_PanNode);
@@ -103,11 +84,11 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
         _PanBaseBody = Build_Pan(_PanNode);
 
         _Spec.Nodes = FMars_Searing_Nodes(_Pan, _PanBaseBody);
-        _Searing = utils_searing::Add(StationEntity, _Spec);
+        _Searing = utils_searing::Add(_StationEntity, _Spec);
 
         _Searing.BindTo_OnHeatChanged(FMars_Delegate_Searing_OnHeatChanged(this, n"OnHeatChanged"));
-        utils_cooking_feed::BindTo_OnAdmission(_StationEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
         _Searing.BindTo_OnPieceAdded(FMars_Delegate_Searing_OnPieceAdded(this, n"OnPieceAdded"));
+        _Searing.BindTo_OnAdmissionRefused(FMars_Delegate_Searing_OnAdmissionRefused(this, n"OnAdmissionRefused"));
         _Searing.BindTo_OnPanContactChanged(FMars_Delegate_Searing_OnPanContactChanged(this, n"OnPanContactChanged"));
         _Searing.BindTo_OnSearProgress(FMars_Delegate_Searing_OnSearProgress(this, n"OnSearProgress"));
         _Searing.BindTo_OnFaceSeared(FMars_Delegate_Searing_OnFaceSeared(this, n"OnFaceSeared"));
@@ -121,36 +102,7 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     protected void Build_Pieces(int32 InCount)
     {
         for (int32 Index = 0; Index < InCount; ++Index)
-        {
-            const auto Park = k_Origin + k_ParkLocal - FVector(0.0, k_ParkPitch * float64(_Pieces.Num()), 0.0);
-            _Pieces.Add(Build_Piece(Get_BoxMesh(), FTransform(FRotator::ZeroRotator, Park), Make_Spec(k_PieceMassKg)));
-        }
-    }
-
-    // The next built piece, in build order; a rig that built too few fails the test.
-    protected FCk_Handle_FoodPiece Take_Piece()
-    {
-        if (_NextPiece >= _Pieces.Num())
-        {
-            FinishFailure(f"the rig built {_Pieces.Num()} piece(s) and a release wants another");
-            return FCk_Handle_FoodPiece();
-        }
-
-        _NextPiece += 1;
-        return _Pieces[_NextPiece - 1];
-    }
-
-    // Half InPiece's bounds along its own axes, from its metrics.
-    protected FVector Get_HalfExtents(FCk_Handle_FoodPiece InPiece) const
-    {
-        const auto Metrics = Get_Metrics(InPiece);
-        return (Metrics.Get_BoundsMaxCm() - Metrics.Get_BoundsMinCm()) * 0.5;
-    }
-
-    // Every rig piece is the same box: the first one's half extents.
-    protected FVector Get_BoxHalfExtents() const
-    {
-        return Get_HalfExtents(_Pieces[0]);
+        { Build_ParkedPiece(Make_Spec(k_PieceMassKg)); }
     }
 
     protected FCk_Handle_JoltBody Build_Pan(FCk_Handle_SceneNode InPanNode)
@@ -179,8 +131,7 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     // with the pan.
     protected FMars_CookingFeed_PieceId AddPieceAt(FVector InPanLocal)
     {
-        const auto PieceId = FMars_CookingFeed_PieceId(k_Generation, _NextIndex);
-        _NextIndex += 1;
+        const auto PieceId = Take_NextId();
         Release_Piece(PieceId, InPanLocal);
         return PieceId;
     }
@@ -195,13 +146,7 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     protected void Release_ThePiece(const FMars_CookingFeed_PieceId& InPieceId, FCk_Handle_FoodPiece InPiece, FVector InPanLocal)
     {
         const auto PanBaseWorld = _Searing.Get_PanBaseWorld();
-        const auto Rotation = PanBaseWorld.GetRotation();
-        const auto Centre = PanBaseWorld.TransformPosition(InPanLocal);
-        const auto ReleaseWorld = FTransform(Rotation, Centre - Rotation.RotateVector(Get_BoundsCenter(InPiece)));
-
-        auto Release = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector);
-        Release.Piece = InPiece;
-        utils_cooking_feed::Request_Admit(_StationEntity, Release);
+        Release_At(InPieceId, InPiece, FTransform(PanBaseWorld.GetRotation(), PanBaseWorld.TransformPosition(InPanLocal)));
     }
 
     // Teleports the piece's body so its middle lands at InPanLocal (pan base frame), turned by InPanRotation on top of the
@@ -216,20 +161,6 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
         auto Body = _Searing.Get_PieceBody(InPieceId);
         utils_jolt_body::Request_Teleport(Body,
             FCk_Request_JoltBody_Teleport(Centre - Rotation.RotateVector(CentreLocal), Rotation.Rotator()));
-    }
-
-    protected float32 Get_Now()
-    {
-        return float32(System::GetGameTimeInSeconds());
-    }
-
-    // The first piece OnPieceAdded reported; a default Id before that.
-    protected FMars_CookingFeed_PieceId Get_FirstId() const
-    {
-        if (_AddedIds.Num() == 0)
-        { return FMars_CookingFeed_PieceId(); }
-
-        return _AddedIds[0];
     }
 
     protected int32 Get_AdmissionCount(EMars_CookingFeed_Admission InAdmission) const
@@ -270,15 +201,6 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     }
 
     UFUNCTION()
-    protected void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId,
-        EMars_CookingFeed_Admission InAdmission, FString InReason)
-    {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
-    }
-
-    UFUNCTION()
     protected void OnPieceAdded(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
         _AddedIds.Add(InPieceId);
@@ -297,13 +219,23 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
     }
 
     UFUNCTION()
-    protected void OnSearProgress(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, float32 InAlpha)
+    protected void OnAdmissionRefused(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_AdmissionRefusal InRefusal)
     {
-        _ProgressSignals += 1;
+        _RefusedIds.Add(InPieceId);
+        _Refusals.Add(InRefusal);
     }
 
     UFUNCTION()
-    protected void OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace)
+    protected void OnSearProgress(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, float32 InAlpha)
+    {
+        _ProgressSignals += 1;
+        _ProgressIds.Add(InPieceId);
+        _ProgressFaces.Add(InFace);
+        _ProgressAlphas.Add(InAlpha);
+    }
+
+    UFUNCTION()
+    protected void OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace)
     {
         _SearedIds.Add(InPieceId);
         _Seared.Add(InFace);
@@ -360,19 +292,13 @@ class UMars_AutoTestRig_Searing : UMars_AutoTestRig_FoodPiece
         Res.Set(utils_jolt_body::Get_IsBodyAdded(_PanBaseBody));
     }
 
-    // Every built piece has its metrics (a release reads them).
+    // The pan's swirl has eased in to its full radius (the orbit's share reaches 1 over Orbit.EaseSeconds once the heat
+    // drives the pan); never true on a pan built without an orbit.
     UFUNCTION()
-    protected void Check_PiecesReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    protected void Check_SwirlEasedIn(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        auto AllReady = _Pieces.Num() > 0;
-        for (const auto& Piece : _Pieces)
-        {
-            if (Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
-            { AllReady = false; }
-        }
-
         auto Res = OutResult;
-        Res.Set(AllReady);
+        Res.Set(_PanSpec.Orbit.Radius > 0.0f && _Pan.Get_OrbitOffset().Size() >= float64(_PanSpec.Orbit.Radius) - 0.001);
     }
 
     UFUNCTION()

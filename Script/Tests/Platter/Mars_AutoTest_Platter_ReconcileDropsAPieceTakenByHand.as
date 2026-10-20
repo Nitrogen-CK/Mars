@@ -1,6 +1,6 @@
 // Something that knows nothing of platters takes a frozen piece off the root (a hand picking it up: here a plain scene-node
 // detach). Within 2 frames the platter's reconcile notices: OnUnloaded fires for that piece, its membership is gone and the
-// occupancy drops by one; the piece left behind settles again.
+// occupancy drops by one; the piece left behind is still the platter's.
 class UMars_AutoTest_Platter_ReconcileDropsAPieceTakenByHand : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -21000.0, -30000.0);

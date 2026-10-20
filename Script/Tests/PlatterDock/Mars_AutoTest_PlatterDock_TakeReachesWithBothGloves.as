@@ -1,8 +1,8 @@
 // Taking a platter off a dock reaches with both gloves, as picking it off the ground does. The dock (the Take target's
 // owner) carries no world item of its own: once a platter has docked it hints the platter's fit and handedness (the
-// platter's world item hints them from its own composition), so a gloved carrier's Take reach resolves a Sides target with
-// both gloves on the tray. An empty dock hints nothing, before the dock and again after the platter is taken. Isolated
-// origin (31600, -21000, -30000).
+// platter's world item hints them from its own composition), so the Take a gloved carrier starts on it has its task ask
+// for a reach that resolves a Sides target with both gloves on the tray, and at the grip the task undocks the platter. An
+// empty dock hints nothing, before the dock and again after the platter is taken. Isolated origin (31600, -21000, -30000).
 class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_PlatterDock
 {
     default _TimeoutSeconds = 30.0f;
@@ -31,12 +31,11 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
         Add_Step_WaitUntil("the gloves rest, listening for a reach", n"Check_CarrierHandsRest", 0, 0);
         Add_Step("the platter hints two hands; the empty dock hints nothing; dock the platter", n"Step_AssertHintsAndDock");
         Add_Step_WaitUntil("the platter has landed on the dock", n"Check_Arrived", k_SlowPolls, 0);
-        Add_Step("the dock hints its platter; the carrier's gloves reach for the Take", n"Step_AssertDockHintAndReach");
-        Add_Step_WaitUntil("the gloves took the Take reach", n"Check_ReachTaken", 0, 0);
+        Add_Step("the dock hints its platter; the carrier starts the Take", n"Step_AssertDockHintAndTake");
+        Add_Step_WaitUntil("the Take's task has the gloves reaching for the dock", n"Check_ReachTaken", 0, 0);
         Add_Step("both gloves reach for the tray (Sides layout)", n"Step_AssertBothGloves");
+        Add_Step_WaitUntil("the Take's task undocked the platter at the grip", n"Check_Undocked", k_SlowPolls, 0);
         Add_Step_WaitUntil("the gloves rest again", n"Check_CarrierHandsRest", k_SlowPolls, 0);
-        Add_Step("take the platter into the overflow", n"Step_Take");
-        Add_Step_WaitUntil("the dock reports the platter undocked", n"Check_Undocked", 0, 0);
         Add_Step("the emptied dock hints nothing", n"Step_AssertNoDockHint");
         Run_Steps(InHandle);
     }
@@ -65,7 +64,7 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
     }
 
     UFUNCTION()
-    private void Step_AssertDockHintAndReach(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertDockHintAndTake(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const FCk_Handle DockEntity = _Dock;
         const FCk_Handle PlatterEntity = _WorldItems[0];
@@ -82,12 +81,9 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
         const auto Action = _Dock.Get_ActionFor(_Carrier);
         Assert_True(Action == EMars_PlatterDock_Action::Take, f"empty-handed, the occupied dock offers Take (got [{Action :n}])");
 
-        // The reach the player's HandsResolverBinds requests for a newly best Use target: its policy and its gesture.
         auto Interactable = _Dock.Get_Interactable();
         _TakeTarget = Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
-        const auto& Context = _TakeTarget.Get_Fragment(FMars_Fragment_InteractionContext);
-        const auto Subject = FMars_FPHands_ReachSubject(_TakeTarget, Context.Interactable, Context.InteractableOwner);
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, _TakeTarget.Get_InteractionCompletionPolicy(), Context.ReachKind));
+        _TakeTarget.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 
     UFUNCTION()
@@ -107,12 +103,6 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
     }
 
     UFUNCTION()
-    private void Step_Take(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        Undock(_Dock, _PlatterItems[0], _Hotbar.TryGet_StowTarget(_PlatterItems[0]));
-    }
-
-    UFUNCTION()
     private void Check_Undocked(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
@@ -124,5 +114,6 @@ class UMars_AutoTest_PlatterDock_TakeReachesWithBothGloves : UMars_AutoTestRig_P
     {
         const FCk_Handle DockEntity = _Dock;
         Assert_False(DockEntity.Has_ReachHint(), "the emptied dock hints nothing");
+        Assert_True(_Hotbar.Get_ItemAt(_Hotbar.Get_OverflowIndex()) == _PlatterItems[0], "the carrier's overflow holds the taken platter");
     }
 }

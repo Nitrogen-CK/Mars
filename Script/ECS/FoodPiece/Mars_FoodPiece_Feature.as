@@ -102,15 +102,27 @@ struct FMars_FoodPiece_MassSplit
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
+// A piece's six faces, by their outward normal in the piece's own frame (its bounds box's faces). int32(Face) indexes
+// every per-face channel of the cook state.
+enum EMars_FoodPiece_Face
+{
+    PosX,
+    NegX,
+    PosY,
+    NegY,
+    PosZ,
+    NegZ
+}
+
 // How cooked the piece is, as the kernels that cooked it wrote it (each its own channels; nothing clamps one channel into
 // another). A display shows it through utils_cookstate::Make_DisplayParams.
 struct FMars_FoodPiece_CookState
 {
-    // A pan's sear per face, 0 raw .. 1 full crust. Six, indexed by int32(EMars_Searing_Face).
+    // A pan's sear per face, 0 raw .. 1 full crust. Six, indexed by int32(EMars_FoodPiece_Face).
     UPROPERTY()
     TArray<float32> Sear;
 
-    // The fryer's batter heat per face, 0 pale .. 1 golden .. 2 overdone. Six, indexed by int32(EMars_Searing_Face).
+    // The fryer's batter heat per face, 0 pale .. 1 golden .. 2 overdone. Six, indexed by int32(EMars_FoodPiece_Face).
     UPROPERTY()
     TArray<float32> Batter;
 
@@ -129,7 +141,7 @@ struct FMars_FoodPiece_CookState
 
     FMars_FoodPiece_CookState()
     {
-        for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
+        for (int32 Index = 0; Index < utils_foodpiece::k_FaceCount; ++Index)
         {
             Sear.Add(0.0f);
             Batter.Add(0.0f);

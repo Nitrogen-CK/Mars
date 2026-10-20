@@ -9,10 +9,6 @@ class UMars_AutoTest_CookingFeed_AReleaseLandsInTheStationInbox : UMars_AutoTest
     // The station's inbox as each OnQueued found it.
     private TArray<FMars_CookingFeed_Release> _QueuedInbox;
     private int32 _QueuedSignals = 0;
-    // In parallel: one entry per answer on the Searing station's OnAdmission.
-    private TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    private TArray<EMars_CookingFeed_Admission> _Admissions;
-    private TArray<FString> _AdmissionReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -20,7 +16,7 @@ class UMars_AutoTest_CookingFeed_AReleaseLandsInTheStationInbox : UMars_AutoTest
         BuildFeed(InHandle, Make_TestSpec());
         auto Owner = InHandle;
         Build_Searing(Owner);
-        utils_cooking_feed::BindTo_OnAdmission(_SearingStation, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
+        Record_Admissions(_SearingStation);
         utils_cooking_feed::BindTo_OnQueued(_SearingStation, FMars_Delegate_StationAdmission_OnQueued(this, n"OnStationQueued"));
         Add_Steps_SourceTheFeed();
 
@@ -99,13 +95,5 @@ class UMars_AutoTest_CookingFeed_AReleaseLandsInTheStationInbox : UMars_AutoTest
     {
         _QueuedSignals += 1;
         _QueuedInbox = InStation.Get_Fragment(FMars_Fragment_StationAdmission).Inbox;
-    }
-
-    UFUNCTION()
-    private void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason)
-    {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
     }
 }

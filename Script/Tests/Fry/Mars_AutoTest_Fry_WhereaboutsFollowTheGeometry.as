@@ -111,7 +111,7 @@ class UMars_AutoTest_Fry_WhereaboutsFollowTheGeometry : UMars_AutoTestRig_Fry
         const auto Tally = _Fry.Get_Tally();
         Assert_Equals_Int(Tally.Catches, 1, "a hop that landed on the scoop is a catch");
         Assert_Equals_Int(Tally.Retrievals, 0, "no retrieval");
-        Assert_Equals_Int(Tally.Lost, 2, "two lost pieces in the tally");
+        Assert_Equals_Int(Tally.Losses, 2, "two lost pieces in the tally");
         Assert_Equals_Int(Tally.Ejections, 0, "nothing left the basket");
         Assert_Equals_Int(_LostIds.Num(), 2, "OnPieceLost fired twice");
 

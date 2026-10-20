@@ -50,13 +50,13 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
         _HeldItem = utils_held_item::Add(_Carrier);
 
         auto Owner = InHandle;
-        Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_PlatterOffset);
         _PlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(
             FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5)),
             Mars_ItemDef_AutoTest_PlatterOfOne));
         _Box = Build_Box(FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterOffset + FVector(0.0, 0.0, 60.0)));
 
-        Spawn_Floor(Owner, k_Origin + k_FoodOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_FoodOffset);
         auto SpawnParams = UMars_FoodItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MushroomSlice());
@@ -84,34 +84,12 @@ class UMars_AutoTest_Platter_DepositIsBlockedWhenFull : UMars_AutoTestRig_Carrie
         Run_Steps(InHandle);
     }
 
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle& InOwner, FVector InTop)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InOwner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-    }
-
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with no kind: Transform, RuntimeMesh and FoodPiece on a
-    // new entity under the world's transient entity, tracked for cleanup.
+    // The cooking fixture's box with no kind, tracked for cleanup.
     private FCk_Handle_FoodPiece Build_Box(FTransform InWorld)
     {
-        auto Spec = FMars_FoodPiece_Spec();
-        Spec.Data.MassKg = 0.8;
-        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
-
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        Track_ForCleanup(Entity);
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
-            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
-        return utils_foodpiece::Add(Entity, Spec);
+        const auto Box = Get_CookingFixture().Build_Box(InWorld, FGameplayTag(), 0.8);
+        Track_ForCleanup(Box);
+        return Box;
     }
 
     UFUNCTION()

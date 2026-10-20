@@ -16,17 +16,13 @@ class UMars_AutoTest_FoodBoard_DrainsTheInboxAsPlace : UMars_AutoTestRig_FoodBoa
     private FCk_Handle_FoodPiece _Piece;
     private FTransform _ReleaseWorld;
 
-    // In parallel: one entry per answer on the board's OnAdmission.
-    private TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    private TArray<EMars_CookingFeed_Admission> _Admissions;
-    private TArray<FString> _AdmissionReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
         _Board = Build_Board(InHandle, FTransform(FRotator(0.0, 40.0, 0.0), k_Origin), Make_Tuners());
         _BoardEntity = _Board;
-        utils_cooking_feed::BindTo_OnAdmission(_BoardEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
+        Record_Admissions(_BoardEntity);
         // Built off the board: only the release poses it there.
         _Piece = Build_Piece(Get_BoxMesh(), FTransform(FRotator::ZeroRotator, k_Origin + FVector(0.0, 200.0, 0.0)), Make_Spec(1.0));
 
@@ -96,13 +92,5 @@ class UMars_AutoTest_FoodBoard_DrainsTheInboxAsPlace : UMars_AutoTestRig_FoodBoa
             f"the piece lies at its pose on the pile node (got {PieceWorld.GetLocation()}, want {PoseWorld.GetLocation()})");
         Assert_True(PieceWorld.GetRotation().Equals(PoseWorld.GetRotation(), 0.0001), "the piece lies at its pose's rotation");
         Assert_False(PieceWorld.GetLocation().Equals(_ReleaseWorld.GetLocation(), 0.01), "not at the release's location");
-    }
-
-    UFUNCTION()
-    private void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason)
-    {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
     }
 }

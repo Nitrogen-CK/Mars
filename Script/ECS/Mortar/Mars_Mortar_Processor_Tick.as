@@ -20,7 +20,6 @@ class UMars_Processor_Mortar_Tick : UCk_Processor_Script_Base_UE
         auto Self = InHandle.As_Mortar();
         const auto Spec = Self.Get_Spec();
         const auto DeltaSeconds = float32(InDeltaT.Get_Seconds());
-        const auto MotionBefore = InState.Pestle.Motion;
         auto BatchChanged = false;
         auto Landed = TOptional<EMars_Mortar_Strike>();
 
@@ -65,17 +64,17 @@ class UMars_Processor_Mortar_Tick : UCk_Processor_Script_Base_UE
         }
 
         const auto Batch = InState.Batch;
-        const auto Motion = InState.Pestle.Motion;
 
         // InState is not read past this line: a listener may add fragments to the station.
-        if (Landed.IsSet() && Self.Has_Fragment(FMars_Fragment_Mortar_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnStrikeLanded.Broadcast(Self, Landed.GetValue()); }
+        if (Self.Has_Fragment(FMars_Fragment_Mortar_Signals) == false)
+        { return; }
 
-        if (BatchChanged && Self.Has_Fragment(FMars_Fragment_Mortar_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnBatchChanged.Broadcast(Self, Batch); }
+        auto& Signals = Self.Get_Fragment(FMars_Fragment_Mortar_Signals);
+        if (Landed.IsSet())
+        { Signals.OnStrikeLanded.Broadcast(Self, Landed.GetValue()); }
 
-        if (Motion != MotionBefore && Self.Has_Fragment(FMars_Fragment_Mortar_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnPestleChanged.Broadcast(Self, Motion); }
+        if (BatchChanged)
+        { Signals.OnBatchChanged.Broadcast(Self, Batch); }
     }
 
     // A hit in the Crush phase counts, and the last one needed cracks the batch and opens the Grind phase. True when the

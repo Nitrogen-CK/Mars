@@ -20,6 +20,12 @@ enum EMars_Mortar_Seasoning
     Pepper
 }
 
+namespace constants_mortar
+{
+    // One per EMars_Mortar_Seasoning value: the tally's size and the wrap of SwitchSeasoning.
+    const int32 k_SeasoningCount = 2;
+}
+
 // How fine the batch is: as loaded, after the crush, after the grind.
 enum EMars_Mortar_Stage
 {
@@ -104,23 +110,23 @@ struct FMars_Mortar_Spec
 
 mixin FMars_Validation Validate(const FMars_Mortar_Spec& Self)
 {
-    if (Self.Timing.SweepSeconds <= 0.0f)
-    { return FMars_Validation(f"Mortar has a non-positive Timing.SweepSeconds [{Self.Timing.SweepSeconds}]"); }
+    if (Math::IsFinite(Self.Timing.SweepSeconds) == false || Self.Timing.SweepSeconds <= 0.0f)
+    { return FMars_Validation(f"Mortar has a non-positive or non-finite Timing.SweepSeconds [{Self.Timing.SweepSeconds}]"); }
 
-    if (Self.Timing.WindowHalfWidth <= 0.0f || Self.Timing.WindowHalfWidth > 0.5f)
+    if (Math::IsFinite(Self.Timing.WindowHalfWidth) == false || Self.Timing.WindowHalfWidth <= 0.0f || Self.Timing.WindowHalfWidth > 0.5f)
     { return FMars_Validation(f"Mortar has Timing.WindowHalfWidth [{Self.Timing.WindowHalfWidth}] outside (0, 0.5]"); }
 
-    if (Self.Timing.Marker < 0.0f || Self.Timing.Marker > 1.0f)
+    if (Math::IsFinite(Self.Timing.Marker) == false || Self.Timing.Marker < 0.0f || Self.Timing.Marker > 1.0f)
     { return FMars_Validation(f"Mortar has Timing.Marker [{Self.Timing.Marker}] outside [0, 1]"); }
 
     if (Self.CrushesNeeded <= 0)
     { return FMars_Validation(f"Mortar has a non-positive CrushesNeeded [{Self.CrushesNeeded}]"); }
 
-    if (Self.GrindSeconds <= 0.0f)
-    { return FMars_Validation(f"Mortar has a non-positive GrindSeconds [{Self.GrindSeconds}]"); }
+    if (Math::IsFinite(Self.GrindSeconds) == false || Self.GrindSeconds <= 0.0f)
+    { return FMars_Validation(f"Mortar has a non-positive or non-finite GrindSeconds [{Self.GrindSeconds}]"); }
 
-    if (Self.StrikeSeconds <= 0.0f)
-    { return FMars_Validation(f"Mortar has a non-positive StrikeSeconds [{Self.StrikeSeconds}]"); }
+    if (Math::IsFinite(Self.StrikeSeconds) == false || Self.StrikeSeconds <= 0.0f)
+    { return FMars_Validation(f"Mortar has a non-positive or non-finite StrikeSeconds [{Self.StrikeSeconds}]"); }
 
     return FMars_Validation();
 }
@@ -183,14 +189,22 @@ struct FMars_Mortar_PestleState
     EMars_Mortar_Pestle Motion = EMars_Mortar_Pestle::Resting;
 }
 
-// Batches collected since the mortar was made.
+// Batches collected since the mortar was made, one count per EMars_Mortar_Seasoning (indexed by the enum's value).
 struct FMars_Mortar_Tally
 {
     UPROPERTY()
-    int32 Salt = 0;
+    TArray<int32> Counts;
 
-    UPROPERTY()
-    int32 Pepper = 0;
+    FMars_Mortar_Tally()
+    {
+        for (int32 Index = 0; Index < constants_mortar::k_SeasoningCount; ++Index)
+        { Counts.Add(0); }
+    }
+
+    int32 Get_Count(EMars_Mortar_Seasoning InSeasoning) const
+    {
+        return Counts[int32(InSeasoning)];
+    }
 }
 
 // Written only by the Mortar processors (and Add). The station SM and the operator only issue requests.
@@ -241,21 +255,11 @@ event void FMars_Delegate_Mortar_OnStrikeLanded_MC(FCk_Handle_Mortar InMortar, E
 delegate void FMars_Delegate_Mortar_OnBatchChanged(FCk_Handle_Mortar InMortar, FMars_Mortar_Batch InBatch);
 event void FMars_Delegate_Mortar_OnBatchChanged_MC(FCk_Handle_Mortar InMortar, FMars_Mortar_Batch InBatch);
 
-// Broadcast as the pestle starts and stops circling.
-delegate void FMars_Delegate_Mortar_OnPestleChanged(FCk_Handle_Mortar InMortar, EMars_Mortar_Pestle InPestle);
-event void FMars_Delegate_Mortar_OnPestleChanged_MC(FCk_Handle_Mortar InMortar, EMars_Mortar_Pestle InPestle);
-
-// Broadcast as a ground batch leaves the bowl (before OnBatchChanged for the new one).
-delegate void FMars_Delegate_Mortar_OnCollected(FCk_Handle_Mortar InMortar, EMars_Mortar_Seasoning InSeasoning);
-event void FMars_Delegate_Mortar_OnCollected_MC(FCk_Handle_Mortar InMortar, EMars_Mortar_Seasoning InSeasoning);
-
 struct FMars_Fragment_Mortar_Signals
 {
     FMars_Delegate_Mortar_OnStrikeStarted_MC OnStrikeStarted;
     FMars_Delegate_Mortar_OnStrikeLanded_MC OnStrikeLanded;
     FMars_Delegate_Mortar_OnBatchChanged_MC OnBatchChanged;
-    FMars_Delegate_Mortar_OnPestleChanged_MC OnPestleChanged;
-    FMars_Delegate_Mortar_OnCollected_MC OnCollected;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -310,7 +314,7 @@ struct FMars_Request_Mortar_Collect
     FMars_Request_Mortar_Collect() {}
 }
 
-// The other seasoning goes in the bowl. Ignored once the batch has taken a hit.
+// The next seasoning goes in the bowl (wrapping round the enum). Ignored once the batch has taken a hit.
 struct FMars_Request_Mortar_SwitchSeasoning
 {
     UPROPERTY()

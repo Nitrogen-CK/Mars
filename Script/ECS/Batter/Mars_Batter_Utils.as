@@ -30,8 +30,8 @@ namespace utils_batter
     }
 
     // The bowl takes a piece that is whole (never cut: a cut thing is not batterable) and whose food has a battered variant.
-    // A bare piece (no food) is not batterable. The one rule for "this piece can wear a battered shell": the assembly's
-    // Write_PieceLook reads it too.
+    // A bare piece (no food) is not batterable. The one rule for "this piece can wear a battered shell": the food's
+    // Write_Look reads it too.
     bool Get_IsBatterable(const FCk_Handle_FoodPiece& InPiece)
     {
         if (InPiece.Get_IsWhole() == false)
@@ -216,10 +216,21 @@ mixin int32 Get_CoatedCount(const FCk_Handle_Batter& Self)
     return utils_batter::Get_Takeable(Self.Get_Fragment(FMars_Fragment_Batter).Pieces).Num();
 }
 
-// Room in the bowl and no transfer in flight: the add-food press's gate.
-mixin bool Get_CanLoad(const FCk_Handle_Batter& Self)
+mixin bool Get_HasRoom(const FCk_Handle_Batter& Self)
 {
-    return Self.Get_PieceCount() < Self.Get_Spec().Bowl.Capacity && utils_batter::Get_FeedPhase(Self) == EMars_CookingFeed_Phase::Idle;
+    return Self.Get_PieceCount() < Self.Get_Spec().Bowl.Capacity;
+}
+
+// Why the add-food press would not load a piece now; unset when it would (room in the bowl, nothing in flight).
+mixin TOptional<EMars_Batter_LoadRefusal> TryGet_LoadRefusal(const FCk_Handle_Batter& Self)
+{
+    if (Self.Get_HasRoom() == false)
+    { return TOptional<EMars_Batter_LoadRefusal>(EMars_Batter_LoadRefusal::Full); }
+
+    if (utils_batter::Get_FeedPhase(Self) != EMars_CookingFeed_Phase::Idle)
+    { return TOptional<EMars_Batter_LoadRefusal>(EMars_Batter_LoadRefusal::TransferInFlight); }
+
+    return TOptional<EMars_Batter_LoadRefusal>();
 }
 
 // The bowl node's world transform.

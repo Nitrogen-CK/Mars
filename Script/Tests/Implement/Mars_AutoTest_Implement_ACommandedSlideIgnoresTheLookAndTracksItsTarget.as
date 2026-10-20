@@ -26,7 +26,7 @@ class UMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget :
         Add_Step("the target is taken as it is and the node carries it; look again", n"Step_AssertTrackedThenLook");
         Add_Step_WaitSeconds("the look would have moved a Look slide", 0.25f);
         Add_Step("the look moved nothing; set a target past the box", n"Step_AssertUnmovedThenSetFar");
-        Add_Step_WaitFrames("the far target drains", 2);
+        Add_Step_WaitUntil("the far target drained", n"Check_FarTargetApplied", 0, 0);
         Add_Step("the far target clamps at the half extent; the Look slide ignored its request", n"Step_AssertClamped");
         Run_Steps(InHandle);
     }
@@ -110,6 +110,13 @@ class UMars_AutoTest_Implement_ACommandedSlideIgnoresTheLookAndTracksItsTarget :
         Assert_Equals_Float(Target.Y, k_Target.Y, 0.001, "a second look left the target alone (Y)");
 
         _Implement.Request_SetSlideTarget(FMars_Request_Implement_SetSlideTarget(FVector2D(100.0, 0.0)));
+    }
+
+    UFUNCTION()
+    private void Check_FarTargetApplied(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Implement.Get_TargetSlide().X > k_Target.X);
     }
 
     UFUNCTION()

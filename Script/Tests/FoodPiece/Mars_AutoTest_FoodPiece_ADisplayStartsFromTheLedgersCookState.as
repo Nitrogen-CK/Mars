@@ -44,8 +44,8 @@ class UMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState : UMars_Aut
         Assert_False(Entity.Is_RuntimeMeshDisplay(), "the slice is not dressed yet");
 
         auto CookState = FMars_FoodPiece_CookState();
-        CookState.Sear[int32(EMars_Searing_Face::PosZ)] = 0.6f;
-        CookState.Batter[int32(EMars_Searing_Face::NegX)] = 1.5f;
+        CookState.Sear[int32(EMars_FoodPiece_Face::PosZ)] = 0.6f;
+        CookState.Batter[int32(EMars_FoodPiece_Face::NegX)] = 1.5f;
         CookState.OilCoat = 0.4f;
         _Slice.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
         _Expected = utils_cookstate::Make_DisplayParams(CookState);
@@ -105,7 +105,7 @@ class UMars_AutoTest_FoodPiece_ADisplayStartsFromTheLedgersCookState : UMars_Aut
             Assert_Equals_Float(Shown, Expected[Slot], k_Tolerance, f"display slot {Slot} [{Shown}] is the ledger's look [{Expected[Slot]}]");
         }
 
-        Assert_Equals_Float(_Expected.FaceSear[int32(EMars_Searing_Face::NegX)], 1.5f, k_Tolerance, "the fried -X shows its batter");
-        Assert_Equals_Float(_Expected.FaceSear[int32(EMars_Searing_Face::PosZ)], 0.6f, k_Tolerance, "the seared +Z shows its sear");
+        Assert_Equals_Float(_Expected.FaceSear[int32(EMars_FoodPiece_Face::NegX)], 1.5f, k_Tolerance, "the fried -X shows its batter");
+        Assert_Equals_Float(_Expected.FaceSear[int32(EMars_FoodPiece_Face::PosZ)], 0.6f, k_Tolerance, "the seared +Z shows its sear");
     }
 }

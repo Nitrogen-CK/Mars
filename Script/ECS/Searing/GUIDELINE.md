@@ -9,10 +9,10 @@ Where the pieces live:
 | Concern | Owner |
 |---|---|
 | The per-face cook ledger on every piece (`Sear[6]`, `Batter[6]`, `OilCoat`, `Crumb`, `Battered`) | `Script/ECS/FoodPiece/Mars_FoodPiece_Feature.as` (`FMars_FoodPiece_CookState`), written only by its processor via `Request_SetCookState` |
-| The six faces and the sear clock | `Script/ECS/Searing/` (`EMars_Searing_Face`: +X −X +Y −Y +Z −Z in that order; 3 s per face to 1.0; Ready after all six) |
+| The six faces and the sear clock | `Script/ECS/Searing/` (`EMars_FoodPiece_Face`: +X −X +Y −Y +Z −Z in that order; 3 s per face to 1.0; Ready after all six) |
 | The 14-float Custom Primitive Data block every cooking material reads | `Script/Common/Mars_CookState.as` (`utils_cookstate`) |
 | What a food is (mesh, slots, cap, kind, mass, battered variant) | `Script/Food/Mars_Food_Def.as` (`UMars_Food_Def`, `Validate`) |
-| The one place a piece's look is written | `utils_station::Write_PieceLook` in `Script/WorldObjects/Stations/Mars_FeedStation_EntityScript.as` |
+| The one place a piece's look is written | the `Write_Look` mixin on the food piece in `Script/Food/Mars_Food_Look.as` |
 | The art contract and the checker | `Tools/Blender/mars_cooking/FOOD_LIBRARY.md`, `food_common.check_runtime_mesh(cook_standard=...)` |
 
 ## 1. How the pan decides what is cooking

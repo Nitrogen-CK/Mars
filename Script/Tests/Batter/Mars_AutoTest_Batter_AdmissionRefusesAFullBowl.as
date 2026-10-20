@@ -45,7 +45,7 @@ class UMars_AutoTest_Batter_AdmissionRefusesAFullBowl : UMars_AutoTestRig_Batter
             && _Refusals[1] == EMars_Batter_AdmissionRefusal::Duplicate, "refused Full, then Duplicate");
 
         Assert_Equals_Int(_Batter.Get_PieceCount(), _Spec.Bowl.Capacity, "the bowl is full");
-        Assert_False(_Batter.Get_CanLoad(), "a full bowl cannot load");
+        Assert_False(_Batter.Get_HasRoom(), "a full bowl has no room");
         Assert_False(ck::IsValid(_Pieces[3].TryGet_Holder()), "nothing holds the refused fourth");
 
         TArray<int32> Slots;

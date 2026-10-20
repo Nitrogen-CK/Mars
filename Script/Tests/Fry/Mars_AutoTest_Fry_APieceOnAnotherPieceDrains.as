@@ -58,7 +58,7 @@ class UMars_AutoTest_Fry_APieceOnAnotherPieceDrains : UMars_AutoTestRig_Fry
         }
 
         const auto Resting = _Fry.Get_PieceState(_Top).Entity.As_Resting();
-        if (utils_resting::Find_TargetIndex(Resting.Get_Targets(), _Spec.Nodes.BasketBody) >= 0 && Resting.Get_IsRestingOn(_Spec.Nodes.BasketBody))
+        if (Resting.Get_HasTarget(_Spec.Nodes.BasketBody) && Resting.Get_IsRestingOn(_Spec.Nodes.BasketBody))
         { _TopTouchedTheFloor = true; }
 
         Res.Set(_Fry.Get_PieceDrain(_Top) == EMars_Fry_Drain::Drained);

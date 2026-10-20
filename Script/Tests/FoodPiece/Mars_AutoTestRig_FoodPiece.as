@@ -27,6 +27,11 @@ class UMars_AutoTestRig_FoodPiece : UCk_AutoTest_Base
     protected TArray<FCk_Handle_FoodPiece> _CutSources;
     protected TArray<FMars_FoodPiece_CutResult> _Cuts;
 
+    // In parallel: one entry per answer on the OnAdmission of a station Record_Admissions watches.
+    protected TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
+    protected TArray<EMars_CookingFeed_Admission> _Admissions;
+    protected TArray<FString> _AdmissionReasons;
+
     protected TSoftObjectPtr<UStaticMesh> Get_BoxMesh() const
     {
         return TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"));
@@ -151,6 +156,13 @@ class UMars_AutoTestRig_FoodPiece : UCk_AutoTest_Base
         return Pieces;
     }
 
+    // Records every answer InStation's kernel gives on its one OnAdmission signal.
+    protected void Record_Admissions(FCk_Handle InStation)
+    {
+        auto Station = InStation;
+        utils_cooking_feed::BindTo_OnAdmission(Station, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnStationAdmission"));
+    }
+
     private void Record(FCk_Handle_FoodPiece InPiece)
     {
         auto Piece = InPiece;
@@ -162,6 +174,15 @@ class UMars_AutoTestRig_FoodPiece : UCk_AutoTest_Base
     //----------------------------------------------------------------------------------------------------------------------
     // Handlers
     //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION()
+    private void OnStationAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission,
+        FString InReason)
+    {
+        _AdmissionIds.Add(InPieceId);
+        _Admissions.Add(InAdmission);
+        _AdmissionReasons.Add(InReason);
+    }
 
     UFUNCTION()
     private void OnPieceReady(FCk_Handle_FoodPiece InPiece)

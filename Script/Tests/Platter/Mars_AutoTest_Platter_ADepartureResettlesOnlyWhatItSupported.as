@@ -74,6 +74,9 @@ class UMars_AutoTest_Platter_ADepartureResettlesOnlyWhatItSupported : UMars_Auto
     UFUNCTION()
     private void Step_AssertOnlyTheThirdLetGo(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        Assert_True(_Unloaded.Num() == 1 && _Unloaded[0].Piece == _Frozen[1], "the unload named the second frozen piece");
+        Assert_True(ck::Is_NOT_Valid(_Frozen[1].TryGet_Platter()), "the second frozen piece names no platter");
+
         const auto Held = _Platter.Get_Held();
         Assert_True(Held.Num() == 1 && Held[0] == _Frozen[0], f"only the first frozen is still held (held {Held.Num()})");
         Assert_True(Get_IsFrozenOn(_Platter, _Frozen[0]), "the first frozen is still Kinematic on the root");

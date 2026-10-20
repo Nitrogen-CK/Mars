@@ -63,8 +63,7 @@ class UMars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId : UMars_AutoTest
         Assert_True(_Admissions[0] == EMars_CookingFeed_Admission::Accepted, "the first release is accepted");
         Assert_True(_Admissions[1] == EMars_CookingFeed_Admission::Rejected, "the duplicate is rejected");
         Assert_True(_AdmissionReasons[0].Len() == 0, f"an acceptance carries no reason (got {_AdmissionReasons[0]})");
-        Assert_True(_AdmissionReasons[1].Len() > 0, f"the rejection names its reason (got {_AdmissionReasons[1]})");
-        Log(f"[Mars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId] duplicate rejected: {_AdmissionReasons[1]}");
+        Assert_True(_AdmissionReasons[1].Contains("already on the pan"), f"the rejection names the duplicate Id (got {_AdmissionReasons[1]})");
 
         Assert_Equals_Int(_Added.Num(), 1, "one OnPieceAdded");
         Assert_Equals_Int(_Searing.Get_PieceIds().Num(), 1, "one piece on the books");
@@ -85,7 +84,7 @@ class UMars_AutoTest_Searing_AdmissionIsRejectedForADuplicateId : UMars_AutoTest
         { return; }
 
         Assert_True(_Admissions[2] == EMars_CookingFeed_Admission::Rejected, "the repeated Id is rejected in a later drain");
-        Assert_True(_AdmissionReasons[2].Len() > 0, "that rejection names its reason");
+        Assert_True(_AdmissionReasons[2].Contains("already on the pan"), f"that rejection names the duplicate Id (got {_AdmissionReasons[2]})");
         Assert_True(_Admissions[3] == EMars_CookingFeed_Admission::Accepted, "a new Id is accepted");
         Assert_False(_AdmissionIds[3].Get_IsSame(_FirstId), "the accepted one is the new Id");
 

@@ -2,7 +2,8 @@
 // on one root each hold a platter; a carrier without gloves (one overflow slot for a platter) focuses both and uses both
 // Takes in one frame, so each Take finds the overflow empty at its grip and asks its dock to undock into it. Only one
 // platter fits: one dock undocks (OnUndocked) and the carrier holds that platter, while the other's transfer is refused by
-// the full overflow, so that dock broadcasts OnUndockRefused for its item and keeps its platter, and its Take fails on it.
+// the full overflow, so that dock broadcasts OnUndockRefused for its item and keeps its platter, and its Take fails on it:
+// that dock's interactable reports UndockRefused and its interaction finishes Failed, while the other's finishes Succeeded.
 // Both docks' interactions end: their targets are Focused again.
 class UMars_AutoTest_PlatterDock_AnUndockThatFailsFailsTheTake : UMars_AutoTestRig_PlatterDock
 {
@@ -12,6 +13,7 @@ class UMars_AutoTest_PlatterDock_AnUndockThatFailsFailsTheTake : UMars_AutoTestR
 
     private TArray<FCk_Handle_PlatterDock> _Docks;
     private TArray<FCk_Handle_InteractTarget> _Targets;
+    private UMars_AutoTestHelper_InteractionOutcomes _Outcomes;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -57,12 +59,15 @@ class UMars_AutoTest_PlatterDock_AnUndockThatFailsFailsTheTake : UMars_AutoTestR
     UFUNCTION()
     private void Step_FocusBoth(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        _Outcomes = Cast<UMars_AutoTestHelper_InteractionOutcomes>(NewObject(this, UMars_AutoTestHelper_InteractionOutcomes));
         for (const auto& Dock : _Docks)
         {
             auto Interactable = Dock.Get_Interactable();
             Interactable.Request_Focus(FMars_Request_Interactable_Focus(_Carrier));
             Await_FocusOf(Interactable);
             _Targets.Add(Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use));
+            _Outcomes.Watch_Interactable(Interactable);
+            _Outcomes.Watch_Target(_Targets.Last());
         }
     }
 
@@ -86,7 +91,8 @@ class UMars_AutoTest_PlatterDock_AnUndockThatFailsFailsTheTake : UMars_AutoTestR
     {
         const auto Undocked = Get_UndockedCount(_Docks[0]) + Get_UndockedCount(_Docks[1]);
         auto Res = OutResult;
-        Res.Set(Undocked == 1 && _UndockRefused.Num() == 1 && Get_IsFocusedState(_Targets[0]) && Get_IsFocusedState(_Targets[1]));
+        Res.Set(Undocked == 1 && _UndockRefused.Num() == 1 && Get_IsFocusedState(_Targets[0]) && Get_IsFocusedState(_Targets[1])
+            && _Outcomes.Get_FinishedCount(_Targets[0]) == 1 && _Outcomes.Get_FinishedCount(_Targets[1]) == 1);
     }
 
     UFUNCTION()
@@ -111,6 +117,18 @@ class UMars_AutoTest_PlatterDock_AnUndockThatFailsFailsTheTake : UMars_AutoTestR
         Assert_True(_Hotbar.Get_ItemAt(_Hotbar.Get_OverflowIndex()) == _PlatterItems[TakenIndex], "the carrier's overflow holds the taken platter");
 
         Assert_True(Get_IsFocusedState(_Targets[0]) && Get_IsFocusedState(_Targets[1]), "both interactions ended: both targets are Focused");
+
+        const auto RefusedResult = _Outcomes.TryGet_Result(_Targets[RefusedIndex]);
+        Assert_True(RefusedResult.IsSet() && RefusedResult.GetValue() == ECk_SucceededFailed::Failed, "the refused dock's Take finished Failed");
+        const auto TakenResult = _Outcomes.TryGet_Result(_Targets[TakenIndex]);
+        Assert_True(TakenResult.IsSet() && TakenResult.GetValue() == ECk_SucceededFailed::Succeeded, "the other dock's Take finished Succeeded");
+
+        const auto Reasons = _Outcomes.Get_FailReasons(_Targets[RefusedIndex]);
+        Assert_Equals_Int(Reasons.Num(), 1, "the refused dock reported one failure");
+        if (Reasons.Num() == 1)
+        { Assert_True(Reasons[0] == EMars_Interaction_FailReason::UndockRefused, f"it failed UndockRefused (got [{Reasons[0] :n}])"); }
+
+        Assert_Equals_Int(_Outcomes.Get_FailureCount(), 1, "nothing else failed");
     }
 
     private bool Get_IsFocusedState(const FCk_Handle_InteractTarget& InTarget) const

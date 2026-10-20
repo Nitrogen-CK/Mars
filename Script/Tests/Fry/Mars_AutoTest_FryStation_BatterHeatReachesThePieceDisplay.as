@@ -113,7 +113,7 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     private void Check_WearsShell(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         FCk_Handle Entity = _Mushroom;
-        const auto Shell = utils_station::TryGet_BatteredShell(_Mushroom);
+        const auto Shell = utils_food::TryGet_BatteredShell(_Mushroom);
         auto Res = OutResult;
         Res.Set(Entity.Is_RuntimeMeshDisplay() && Entity.As_RuntimeMeshDisplay().Get_Visibility() == ECk_EnableDisable::Disable
             && ck::IsValid(Shell) && ck::IsValid(utils_unreal_component::Get_Component(Shell)));
@@ -209,6 +209,7 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     private void Step_AssertEdgesOnly(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         ck::Trace(f"[FryStation] over {_WindowPolls} frames: {_Rewrites} display writes, {_OffEdgeRewrites} off an edge, {_HeldWhileHeating} held while heating");
+        Assert_True(_Rewrites > 0, "the display was rewritten while the batter heated (a frozen display shows no change)");
         Assert_Equals_Int(_OffEdgeRewrites, 0, "every change the display showed was a jump of at least the write threshold");
         Assert_True(_HeldWhileHeating > 0, "a frame whose heat moved by less than the threshold shows the same values as the frame before");
     }
@@ -229,7 +230,7 @@ class UMars_AutoTest_FryStation_BatterHeatReachesThePieceDisplay : UMars_AutoTes
     {
         auto Heats = TArray<float32>();
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
-        { Heats.Add(_Fry.Get_FaceHeat(_PieceId, EMars_Searing_Face(Face))); }
+        { Heats.Add(_Fry.Get_FaceHeat(_PieceId, EMars_FoodPiece_Face(Face))); }
 
         return Heats;
     }

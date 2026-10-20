@@ -69,7 +69,7 @@ class UMars_AutoTest_CookingFeed_TheReleaseSampleFollowsTheMovingNodeAndInherits
 
         const auto Release = _Releases[0];
         const auto NodeWorld = _ReleaseNodeAtRelease[0];
-        const auto Centre = Release.WorldTransform.TransformPosition(utils_searing::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(Release.Piece.Get_Geometry())));
+        const auto Centre = Release.WorldTransform.TransformPosition(utils_foodpiece::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(Release.Piece.Get_Geometry())));
         const auto Gap = Centre.Distance(NodeWorld.GetLocation());
         const auto Trail = 2.0 * k_Speed * float64(_LongestFrameSeconds) + 1.0;
         Assert_True(Gap <= Trail, f"the released piece's middle is on the node the hand followed (gap {Gap}, two frames' travel {Trail})");

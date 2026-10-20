@@ -184,31 +184,3 @@ mixin void UnbindFrom_OnBatchChanged(FCk_Handle_Mortar& Self, FMars_Delegate_Mor
 
     Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnBatchChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
-
-mixin void BindTo_OnPestleChanged(FCk_Handle_Mortar& Self, FMars_Delegate_Mortar_OnPestleChanged InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Mortar_Signals);
-    Fragment.OnPestleChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnPestleChanged(FCk_Handle_Mortar& Self, FMars_Delegate_Mortar_OnPestleChanged InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Mortar_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnPestleChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void BindTo_OnCollected(FCk_Handle_Mortar& Self, FMars_Delegate_Mortar_OnCollected InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Mortar_Signals);
-    Fragment.OnCollected.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnCollected(FCk_Handle_Mortar& Self, FMars_Delegate_Mortar_OnCollected InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_Mortar_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnCollected.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}

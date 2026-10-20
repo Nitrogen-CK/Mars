@@ -10,10 +10,6 @@ class UMars_AutoTest_CookingFeed_ARefilledSourceNeverReusesAPieceId : UMars_Auto
     private const FVector k_RefillOffset = FVector(50.0, -60.0, 0.0);
 
     private FCk_Handle_FoodPiece _Refill;
-    // In parallel: one entry per answer on the Searing station's OnAdmission.
-    private TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    private TArray<EMars_CookingFeed_Admission> _Admissions;
-    private TArray<FString> _AdmissionReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -21,7 +17,7 @@ class UMars_AutoTest_CookingFeed_ARefilledSourceNeverReusesAPieceId : UMars_Auto
         BuildFeed(InHandle, Make_TestSpec());
         auto Owner = InHandle;
         Build_Searing(Owner);
-        utils_cooking_feed::BindTo_OnAdmission(_SearingStation, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
+        Record_Admissions(_SearingStation);
         Add_Steps_SourceTheFeed();
 
         Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanAdded", 0, 0);
@@ -100,13 +96,5 @@ class UMars_AutoTest_CookingFeed_ARefilledSourceNeverReusesAPieceId : UMars_Auto
 
         Assert_Equals_Int(_Searing.Get_PieceIds().Num(), 2, "the pan holds both pieces");
         Assert_Equals_Int(Get_SettleCount(EMars_CookingFeed_Settle::Admitted), 2, "the feed settled both Admitted");
-    }
-
-    UFUNCTION()
-    private void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason)
-    {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
     }
 }

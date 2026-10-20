@@ -2,7 +2,8 @@
 // deposits it on a large platter (the platter drops the joint, Dynamic, into Settling); as soon as the drop is seen, the
 // carrier starts its pickup on the settling slab, and the gloves' reach and grip take it long before it could freeze.
 // Past the longest settle the slab is still Held with the hand as its parent: the freeze's attach did not pull it back
-// onto the root. The platter forgot it silently (a first landing never landed): it is empty, no OnLoaded, no OnUnloaded.
+// onto the root. The platter forgot it silently (a first landing never landed): it is empty, no OnLoaded, no OnUnloaded;
+// the deposit's interaction finished Failed, its platter reporting LeftTheBooks.
 // Isolated origin (154000, -70000, -30000).
 class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack : UMars_AutoTestRig_Carrier
 {
@@ -26,6 +27,7 @@ class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack :
 
     private TArray<FCk_Handle_FoodPiece> _Loaded;
     private TArray<FCk_Handle_FoodPiece> _Unloaded;
+    private UMars_AutoTestHelper_InteractionOutcomes _Outcomes;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -36,12 +38,12 @@ class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack :
         Add_CarrierHands();
 
         auto Owner = InHandle;
-        Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_PlatterOffset);
         _PlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(
             FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5)),
             mars_items::Platter_Large()));
 
-        Spawn_Floor(Owner, k_Origin + k_FoodOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_FoodOffset);
         auto SpawnParams = UMars_FoodItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
@@ -70,23 +72,10 @@ class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack :
         Add_Step_WaitUntil("the platter dropped the joint", n"Check_Dropped", k_SlowPolls, 0);
         Add_Step("the carrier's pickup takes the food while it settles", n"Step_TakeWhileSettling");
         Add_Step_WaitUntil("the food is Held again", n"Check_FoodHeld", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the deposit's interaction ended", n"Check_DepositFinished", k_SlowPolls, 0);
         Add_Step_WaitSeconds("past the longest settle", PastTheLongestSettle);
         Add_Step("the food stayed in the hand and the platter is empty", n"Step_AssertStayedInTheHand");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle& InOwner, FVector InTop)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InOwner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -155,6 +144,9 @@ class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack :
     private void Step_Deposit(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Target = Get_UseTarget(_PlatterItem);
+        _Outcomes = Cast<UMars_AutoTestHelper_InteractionOutcomes>(NewObject(this, UMars_AutoTestHelper_InteractionOutcomes));
+        _Outcomes.Watch_Target(Target);
+        _Outcomes.Watch_Interactable(Get_Pickup(_PlatterItem));
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 
@@ -194,8 +186,23 @@ class UMars_AutoTest_Platter_AFoodTakenByTheGlovesWhileSettlingIsNotPulledBack :
     }
 
     UFUNCTION()
+    private void Check_DepositFinished(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Outcomes.Get_FinishedCount(Get_UseTarget(_PlatterItem)) > 0);
+    }
+
+    UFUNCTION()
     private void Step_AssertStayedInTheHand(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        const auto Target = Get_UseTarget(_PlatterItem);
+        const auto Result = _Outcomes.TryGet_Result(Target);
+        Assert_True(Result.IsSet() && Result.GetValue() == ECk_SucceededFailed::Failed, "the deposit's interaction finished Failed");
+        const auto Reasons = _Outcomes.Get_FailReasons(Target);
+        Assert_Equals_Int(Reasons.Num(), 1, "the platter reported one failure");
+        if (Reasons.Num() == 1)
+        { Assert_True(Reasons[0] == EMars_Interaction_FailReason::LeftTheBooks, f"it failed LeftTheBooks (got [{Reasons[0] :n}])"); }
+
         Assert_True(_Food.Get_Mount() == EMars_WorldItem_Mount::Held, "the food is still Held");
         Assert_True(Get_Parent(_Food) == _HandNode, "the food's parent is the hand, not the platter root");
         Assert_Equals_Int(_Platter.Get_Occupancy(), 0, "the platter is empty");

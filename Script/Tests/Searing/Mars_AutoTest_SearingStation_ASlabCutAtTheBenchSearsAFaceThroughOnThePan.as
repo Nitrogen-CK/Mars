@@ -24,7 +24,7 @@ class UMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan 
 
     private FCk_Handle_FoodPiece _Half;
     private FMars_CookingFeed_PieceId _HalfId;
-    private EMars_Searing_Face _SearedFace = EMars_Searing_Face::NegZ;
+    private EMars_FoodPiece_Face _SearedFace = EMars_FoodPiece_Face::NegZ;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -165,7 +165,7 @@ class UMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan 
         Assert_True(_Searing.Get_IsHot(), "the cook heated the pan");
 
         const auto HalfExtents = _Searing.Get_PieceHalfExtents(_HalfId);
-        const auto Expected = utils_searing::Get_BoundsHalfExtents(utils_runtime_mesh::Get_Metrics(_Half.Get_Geometry()));
+        const auto Expected = utils_foodpiece::Get_BoundsHalfExtents(utils_runtime_mesh::Get_Metrics(_Half.Get_Geometry()));
         ck::Trace(f"[SearingStation] bench half admitted with half extents {HalfExtents}");
         Assert_True((HalfExtents - Expected).Size() < 0.01, f"the pan reads the half's own extents {HalfExtents} (its bounds {Expected})");
         Assert_True(HalfExtents.X < 12.0 || HalfExtents.Y < 12.0, f"one axis is about half the slab's 36.6 cm long axis ({HalfExtents})");
@@ -185,14 +185,14 @@ class UMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan 
         Assert_True(_Searing.Get_PieceStatus(_HalfId) != EMars_Searing_PieceStatus::Lost, "the half was not lost");
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            if (_Searing.Get_FaceSear(_HalfId, EMars_Searing_Face(Index)) >= 1.0f)
+            if (_Searing.Get_FaceSear(_HalfId, EMars_FoodPiece_Face(Index)) >= 1.0f)
             {
-                _SearedFace = EMars_Searing_Face(Index);
+                _SearedFace = EMars_FoodPiece_Face(Index);
                 break;
             }
         }
 
-        ck::Trace(f"[SearingStation] bench half seared {utils_searing::Get_FaceName(_SearedFace)} through");
+        ck::Trace(f"[SearingStation] bench half seared {utils_foodpiece::Get_FaceName(_SearedFace)} through");
     }
 
     UFUNCTION()
@@ -206,7 +206,7 @@ class UMars_AutoTest_SearingStation_ASlabCutAtTheBenchSearsAFaceThroughOnThePan 
     private void Step_AssertDisplay(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Float(Get_DisplaySlot(int32(_SearedFace)), 1.0, 0.001,
-            f"the half's display slot {int32(_SearedFace)} ({utils_searing::Get_FaceName(_SearedFace)}) shows the full crust");
+            f"the half's display slot {int32(_SearedFace)} ({utils_foodpiece::Get_FaceName(_SearedFace)}) shows the full crust");
         Assert_Equals_Int(_Searing.Get_SearedFaceCount(_HalfId), 1, "one face is seared through");
         Assert_True(_Searing.Get_PieceStatus(_HalfId) == EMars_Searing_PieceStatus::Cooking, "the half is still cooking its other faces");
     }

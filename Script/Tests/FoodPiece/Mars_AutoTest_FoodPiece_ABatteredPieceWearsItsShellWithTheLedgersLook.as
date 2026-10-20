@@ -45,7 +45,7 @@ class UMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook : U
         Assert_True(utils_batter::Get_IsBatterable(_Slice), "the whole slice of a batterable food is batterable");
 
         auto CookState = FMars_FoodPiece_CookState();
-        CookState.Batter[int32(EMars_Searing_Face::NegX)] = 1.5f;
+        CookState.Batter[int32(EMars_FoodPiece_Face::NegX)] = 1.5f;
         CookState.OilCoat = 0.4f;
         CookState.Battered = 1.0f;
         _Slice.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
@@ -83,7 +83,7 @@ class UMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook : U
         const auto IsHidden = utils_runtime_mesh_display::Get_SetupState(Display) == ECk_RuntimeMesh_SetupState::Ready
             && Display.Get_Visibility() == ECk_EnableDisable::Disable;
 
-        const auto Shell = utils_station::TryGet_BatteredShell(_Slice);
+        const auto Shell = utils_food::TryGet_BatteredShell(_Slice);
         const auto ShellWritten = ck::IsValid(Shell) && ck::IsValid(utils_unreal_component::Get_Component(Shell))
             && utils_unreal_component::Get_CustomPrimitiveDataFloat(Shell, k_BatteredSlot) > 0.5f;
 
@@ -95,7 +95,7 @@ class UMars_AutoTest_FoodPiece_ABatteredPieceWearsItsShellWithTheLedgersLook : U
     {
         FCk_Handle Entity = _Slice;
         const auto Display = Entity.As_RuntimeMeshDisplay();
-        const auto Shell = utils_station::TryGet_BatteredShell(_Slice);
+        const auto Shell = utils_food::TryGet_BatteredShell(_Slice);
 
         const auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(Shell));
         Assert_True(ck::IsValid(Mesh), "the shell is a static mesh component");

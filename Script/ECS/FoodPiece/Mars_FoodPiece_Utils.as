@@ -10,7 +10,8 @@ namespace utils_foodpiece
     // Exact: a released piece's Jolt body admits only exactly unit scale.
     const float k_UnitScaleTolerance = 0.0;
 
-    // A piece is cooked face by face: the six faces of its bounds box.
+    // A piece is cooked face by face: the six faces of its bounds box. The owner of the count: every per-face channel of the
+    // cook state is this long, and the cooking kernels index it by face.
     const int32 k_FaceCount = 6;
 
     // Composes the piece on InHandle, which must already carry a Transform and a RuntimeMesh. A new root (invalid
@@ -185,6 +186,109 @@ namespace utils_foodpiece
         return FTransform(InPieceTransform.GetRotation(), InPieceTransform.TransformPosition(InCentreLocal));
     }
 
+    //----------------------------------------------------------------------------------------------------------------------
+    // The face vocabulary every cooking kernel shares: a piece is its mesh's bounds box in its own frame, its middle
+    // CentreLocal (Get_BoundsCentre) and its half sizes HalfExtents (Get_BoundsHalfExtents).
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // The face's outward normal in the piece's own frame.
+    FVector Get_FaceNormal(EMars_FoodPiece_Face InFace)
+    {
+        switch (InFace)
+        {
+            case EMars_FoodPiece_Face::PosX: return FVector(1.0, 0.0, 0.0);
+            case EMars_FoodPiece_Face::NegX: return FVector(-1.0, 0.0, 0.0);
+            case EMars_FoodPiece_Face::PosY: return FVector(0.0, 1.0, 0.0);
+            case EMars_FoodPiece_Face::NegY: return FVector(0.0, -1.0, 0.0);
+            case EMars_FoodPiece_Face::PosZ: return FVector(0.0, 0.0, 1.0);
+            default: return FVector(0.0, 0.0, -1.0);
+        }
+    }
+
+    // The face whose world normal (InPieceRotation applied to its body normal) has the smallest dot with InUp.
+    EMars_FoodPiece_Face Get_DownFace(const FQuat& InPieceRotation, const FVector& InUp)
+    {
+        auto Best = EMars_FoodPiece_Face::NegZ;
+        auto BestDot = 2.0;
+        for (int32 Index = 0; Index < k_FaceCount; ++Index)
+        {
+            const auto Face = EMars_FoodPiece_Face(Index);
+            const auto Dot = InPieceRotation.RotateVector(Get_FaceNormal(Face)).DotProduct(InUp);
+            if (Dot < BestDot)
+            {
+                BestDot = Dot;
+                Best = Face;
+            }
+        }
+
+        return Best;
+    }
+
+    // The piece rotation that lays InFace against -Z. MakeFromXZ(X, -N) turns the body's +Z onto -N (X is any body axis
+    // perpendicular to N); its inverse is the rotation that turns N onto -Z.
+    FRotator Make_FaceDownRotation(EMars_FoodPiece_Face InFace)
+    {
+        const auto Normal = Get_FaceNormal(InFace);
+        const auto Perpendicular = Math::Abs(Normal.X) > 0.5 ? FVector(0.0, 0.0, 1.0) : FVector(1.0, 0.0, 0.0);
+        const auto Basis = FTransform(FQuat(FRotator::MakeFromXZ(Perpendicular, -Normal)), FVector::ZeroVector, FVector::OneVector);
+        return Basis.InverseTransformRotation(FQuat::Identity).Rotator();
+    }
+
+    FString Get_FaceName(EMars_FoodPiece_Face InFace)
+    {
+        switch (InFace)
+        {
+            case EMars_FoodPiece_Face::PosX: return "+X";
+            case EMars_FoodPiece_Face::NegX: return "-X";
+            case EMars_FoodPiece_Face::PosY: return "+Y";
+            case EMars_FoodPiece_Face::NegY: return "-Y";
+            case EMars_FoodPiece_Face::PosZ: return "+Z";
+            default: return "-Z";
+        }
+    }
+
+    // The middle of InFace in InCentreFrame's parent frame: the face's normal picks the half extent it lies out.
+    FVector Get_FaceCentre(const FTransform& InCentreFrame, EMars_FoodPiece_Face InFace, const FVector& InHalfExtents)
+    {
+        const auto Normal = Get_FaceNormal(InFace);
+        const auto Out = FVector(Normal.X * InHalfExtents.X, Normal.Y * InHalfExtents.Y, Normal.Z * InHalfExtents.Z);
+        return InCentreFrame.GetLocation() + InCentreFrame.GetRotation().RotateVector(Out);
+    }
+
+    // The half height of the rotated box along its parent frame's Z: how far its bottom lies under its middle.
+    float64 Get_WorldHalfExtentZ(const FQuat& InRotation, const FVector& InHalfExtents)
+    {
+        return Math::Abs(InRotation.RotateVector(FVector::ForwardVector).Z) * InHalfExtents.X
+            + Math::Abs(InRotation.RotateVector(FVector::RightVector).Z) * InHalfExtents.Y
+            + Math::Abs(InRotation.RotateVector(FVector::UpVector).Z) * InHalfExtents.Z;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Arrival: a kernel that adopts a released piece judges it only once its transform reads the release
+    //----------------------------------------------------------------------------------------------------------------------
+
+    // How far an adopted piece's transform may read from its release location and count as arrived.
+    const float64 k_ArrivalToleranceCm = 5.0;
+    // How long an adopted piece may take to arrive: past it the kernel ensures (its pose never got there) and judges it
+    // where it is, so a piece is never left unjudged.
+    const float32 k_ArrivalMaxSeconds = 1.0f;
+
+    // An adopted piece has arrived once its body is in the simulation and its transform reads the release location (within
+    // k_ArrivalToleranceCm: a released piece may already have moved a frame's worth).
+    bool Get_HasArrived(const FCk_Handle_JoltBody& InBody, const FCk_Handle& InEntity, const FVector& InReleaseLocation)
+    {
+        if (utils_jolt_body::Get_IsBodyAdded(InBody) == false)
+        { return false; }
+
+        return Get_ArrivalDistance(InEntity, InReleaseLocation) <= k_ArrivalToleranceCm;
+    }
+
+    // How far an adopted piece's transform reads from its release location.
+    float64 Get_ArrivalDistance(const FCk_Handle& InEntity, const FVector& InReleaseLocation)
+    {
+        return (utils_transform::Get_EntityCurrentLocation(InEntity.As_Transform()) - InReleaseLocation).Size();
+    }
+
     // InOwner's ledger admitted InPiece. Called only by a ledger's processor, after its own refusals read the holder: a
     // live holder other than InOwner here would put the piece in two ledgers (a defect); the newest admission wins.
     void Stamp_Holder(FCk_Handle_FoodPiece& InPiece, FCk_Handle InOwner)
@@ -217,6 +321,12 @@ namespace utils_foodpiece
 //--------------------------------------------------------------------------------------------------------------------------
 // Getters
 //--------------------------------------------------------------------------------------------------------------------------
+
+// The piece is gone or going: an invalid handle, or an entity already in its BeginDestroy. Safe on any handle.
+mixin bool Get_IsGone(const FCk_Handle_FoodPiece& Self)
+{
+    return ck::Is_NOT_Valid(Self) || utils_entity_lifetime::Get_IsPendingDestroy(Self, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+}
 
 mixin FGuid Get_Id(const FCk_Handle_FoodPiece& Self)
 {

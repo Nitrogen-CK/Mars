@@ -4,6 +4,13 @@ struct FMars_AutoTest_PlatterDock_Docked
     FCk_Handle_Platter Platter;
 }
 
+// A dock to build: the kernel's spec and the words its prompt says (the assembly's half).
+struct FMars_AutoTest_PlatterDock_Setup
+{
+    FMars_PlatterDock_Spec Spec;
+    FMars_PlatterDock_PromptWords Words;
+}
+
 struct FMars_AutoTest_PlatterDock_Refusal
 {
     FCk_Handle_PlatterDock Dock;
@@ -43,10 +50,11 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         return utils_transform::Add(Entity, FTransform(FRotator::ZeroRotator, InOrigin), ECk_Replication::DoesNotReplicate);
     }
 
-    protected FCk_Handle_PlatterDock Build_Dock(FCk_Handle_Transform InRoot, FMars_PlatterDock_Spec InSpec)
+    protected FCk_Handle_PlatterDock Build_Dock(FCk_Handle_Transform InRoot, FMars_AutoTest_PlatterDock_Setup InSetup)
     {
         auto Root = InRoot;
-        auto Dock = utils_platter_dock::Create(Root, InSpec);
+        auto Dock = utils_platter_dock::Create(Root, InSetup.Spec);
+        utils_platter_dock::Add_Prompt(Dock, InSetup.Words);
         Dock.BindTo_OnDocked(FMars_Delegate_PlatterDock_OnDocked(this, n"OnDockDocked"));
         Dock.BindTo_OnArrived(FMars_Delegate_PlatterDock_OnArrived(this, n"OnDockArrived"));
         Dock.BindTo_OnUndocked(FMars_Delegate_PlatterDock_OnUndocked(this, n"OnDockUndocked"));
@@ -55,12 +63,14 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         return Dock;
     }
 
-    // An Input dock named InName at InMountLocal under InPolicy.
-    protected FMars_PlatterDock_Spec Make_DockSpec(FMars_PlatterDock_Policy InPolicy, FTransform InMountLocal, FString InName) const
+    // An Input dock named InName at InMountLocal under InPolicy, with the stations' placeholder prompt.
+    protected FMars_AutoTest_PlatterDock_Setup Make_DockSpec(FMars_PlatterDock_Policy InPolicy, FTransform InMountLocal, FString InName) const
     {
-        auto Spec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, InPolicy, InMountLocal);
-        Spec.Name = FText::FromString(InName);
-        return Spec;
+        auto Setup = FMars_AutoTest_PlatterDock_Setup();
+        Setup.Spec = FMars_PlatterDock_Spec(EMars_PlatterDock_Role::Input, InPolicy, InMountLocal);
+        Setup.Spec.Prompt = utils_platter_dock::Make_PromptSpec();
+        Setup.Words = FMars_PlatterDock_PromptWords(FText::FromString(InName), FText());
+        return Setup;
     }
 
     // Kind = InKind (none = any), WholeOnly = InWholeOnly; the optional caps are set on the result.
@@ -87,37 +97,15 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
     // above it); resolved by Check_PlattersConstructed.
     protected void Spawn_Platter(FCk_Handle InOwner, FMars_Platter_SpawnSpec InSpec)
     {
-        auto Owner = InOwner;
-        const auto FloorTop = InSpec.World.GetLocation();
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, FloorTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(45.0, 45.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-
-        auto Spec = InSpec;
-        Spec.World = FTransform(InSpec.World.Rotator(), FloorTop + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
-        _PlatterEntities.Add(utils_platter::Request_SpawnWorld(Owner, Spec));
+        _PlatterEntities.Add(Get_CookingFixture().Spawn_PlatterOnFloor(InOwner, InSpec, 45.0));
     }
 
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) with no kind: Transform, RuntimeMesh and FoodPiece on a
-    // new entity under the world's transient entity, tracked for cleanup.
+    // The cooking fixture's box with no kind, tracked for cleanup.
     protected FCk_Handle_FoodPiece Build_Box(FTransform InWorld)
     {
-        auto Spec = FMars_FoodPiece_Spec();
-        Spec.Data.MassKg = 0.8;
-        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
-
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        Track_ForCleanup(Entity);
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
-            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
-        return utils_foodpiece::Add(Entity, Spec);
+        const auto Box = Get_CookingFixture().Build_Box(InWorld, FGameplayTag(), 0.8);
+        Track_ForCleanup(Box);
+        return Box;
     }
 
     protected void Dock(FCk_Handle_PlatterDock InDock, FCk_Handle_Item InItem)
@@ -146,16 +134,6 @@ class UMars_AutoTestRig_PlatterDock : UMars_AutoTestRig_Carrier
         auto Holder = _WorldItems[InIndex].Get_Holder();
         Holder.Request_TransferItem_ToDataOnly(FCk_Request_Inventory_TransferItem_ToDataOnly(Item, Target),
             FCk_Delegate_Inventory_OnOperationResult_Transfer(this, n"OnPlatterStowComplete"));
-    }
-
-    // The node a world item's root hangs off; invalid while it is not scene-node attached.
-    protected FCk_Handle_Transform Get_MountParent(FCk_Handle_WorldItem InWorldItem) const
-    {
-        auto Node = InWorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        { return FCk_Handle_Transform(); }
-
-        return utils_scene_node::Get_Parent(Node);
     }
 
     protected FTransform Get_World(FCk_Handle InEntity) const

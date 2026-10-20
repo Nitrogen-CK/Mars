@@ -1,45 +1,32 @@
 // The batter rig: a Batter kernel on a transform-only root at an isolated origin, its bowl node k_BowlLocal above the root.
 // No meshes and no floor. The rig is the operator and the test feed: it dips and lifts, and Admit releases built piece
-// Slot as piece {1, Slot} into the station's admission inbox, as the feed's bridge does. Pieces are the FoodPiece rig's
-// box, bodiless, under the world's transient entity: Build_FoodPieces makes whole pieces of a food (the rig's batterable
-// test food by default), Build_BatteredPieces the same with a battered ledger. A take-out lands on a World-mode platter the
+// Slot as piece {1, Slot} into the station's admission inbox, as the feed's bridge does. Pieces are the cooking kernels'
+// parked boxes (UMars_AutoTestRig_CookingKernel): Build_FoodPieces makes whole pieces of a food, Build_BatteredPieces the
+// same with a battered ledger. A take-out lands on a World-mode platter the
 // heat-station fixture lays on a floor beside the station (Spawn_Tray). The handlers record every signal, the station's
 // admission answers included.
 UCLASS(Abstract)
-class UMars_AutoTestRig_Batter : UMars_AutoTestRig_FoodPiece
+class UMars_AutoTestRig_Batter : UMars_AutoTestRig_CookingKernel
 {
     default _TimeoutSeconds = 20.0f;
 
     protected const FVector k_Origin = FVector(-60000.0, 58000.0, -60000.0);
     protected const FVector k_BowlLocal = FVector(0.0, 0.0, 90.0);
-    // Where built pieces wait for their release, beside the station, k_ParkPitch apart.
-    protected const FVector k_ParkLocal = FVector(0.0, -300.0, 0.0);
-    protected const float64 k_ParkPitch = 20.0;
     // Where the tray's floor lies, clear of the bowl.
     protected const FVector k_TrayLocal = FVector(0.0, 300.0, 0.0);
-    // The generation every rig piece carries.
-    protected const int32 k_Generation = 1;
     protected const float k_PieceMassKg = 0.08;
     // A short coat so a test fills it within its time; a dip that takes a few frames.
     protected const float32 k_CoatSeconds = 0.5f;
     protected const float32 k_DipSeconds = 0.1f;
-    // A poll budget, not a ceiling: platters construct and settle, a coat takes its seconds.
-    protected const int32 k_SlowPolls = 900;
 
     protected FCk_Handle_Batter _Batter;
-    protected FCk_Handle _StationEntity;
     // The spec the station was built from, nodes included.
     protected FMars_Batter_Spec _Spec;
     protected FCk_Handle_Transform _BowlNode;
-    // In build order; piece Slot is released as {k_Generation, Slot}.
-    protected TArray<FCk_Handle_FoodPiece> _Pieces;
     protected UMars_AutoTestHelper_HeatStation _Fixture;
 
-    // One entry per signal, in order (parallel arrays where a signal carries more than one value).
-    protected TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    protected TArray<EMars_CookingFeed_Admission> _Admissions;
-    protected TArray<FString> _AdmissionReasons;
-    protected TArray<FMars_CookingFeed_PieceId> _AddedIds;
+    // One entry per signal, in order (parallel arrays where a signal carries more than one value). Piece Slot of _Pieces is
+    // released as {k_Generation, Slot}.
     protected TArray<FMars_CookingFeed_PieceId> _RefusedIds;
     protected TArray<EMars_Batter_AdmissionRefusal> _Refusals;
     protected TArray<EMars_Batter_Bowl> _Bowls;
@@ -60,17 +47,12 @@ class UMars_AutoTestRig_Batter : UMars_AutoTestRig_FoodPiece
     {
         _Spec = InSpec;
 
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _StationEntity = StationEntity;
-        // Tracked with the pieces so it is torn down in the frame they are, as a station's own teardown ends them.
-        Track_ForCleanup(StationEntity);
-        auto Root = utils_transform::Add(StationEntity, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
+        auto Root = Create_StationRoot(InHandle, k_Origin);
         _BowlNode = utils_scene_node::Create(Root, FTransform(k_BowlLocal)).As_Transform();
 
         _Spec.Nodes = FMars_Batter_Nodes(_BowlNode);
-        _Batter = utils_batter::Add(StationEntity, _Spec);
+        _Batter = utils_batter::Add(_StationEntity, _Spec);
 
-        utils_cooking_feed::BindTo_OnAdmission(StationEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
         _Batter.BindTo_OnPieceAdded(FMars_Delegate_Batter_OnPieceAdded(this, n"OnPieceAdded"));
         _Batter.BindTo_OnAdmissionRefused(FMars_Delegate_Batter_OnAdmissionRefused(this, n"OnAdmissionRefused"));
         _Batter.BindTo_OnBowlChanged(FMars_Delegate_Batter_OnBowlChanged(this, n"OnBowlChanged"));
@@ -83,7 +65,7 @@ class UMars_AutoTestRig_Batter : UMars_AutoTestRig_FoodPiece
     protected void Build_FoodPieces(int32 InCount, UMars_Food_Def InFood)
     {
         for (int32 Index = 0; Index < InCount; ++Index)
-        { _Pieces.Add(Build_Piece(Get_BoxMesh(), Get_NextPark(), Make_FoodSpec(k_PieceMassKg, InFood))); }
+        { Build_ParkedPiece(Make_FoodSpec(k_PieceMassKg, InFood)); }
     }
 
     // Build_FoodPieces, each arriving with a battered ledger.
@@ -93,13 +75,8 @@ class UMars_AutoTestRig_Batter : UMars_AutoTestRig_FoodPiece
         {
             auto Spec = Make_FoodSpec(k_PieceMassKg, InFood);
             Spec.Data.CookState.Battered = 1.0f;
-            _Pieces.Add(Build_Piece(Get_BoxMesh(), Get_NextPark(), Spec));
+            Build_ParkedPiece(Spec);
         }
-    }
-
-    private FTransform Get_NextPark() const
-    {
-        return FTransform(FRotator::ZeroRotator, k_Origin + k_ParkLocal - FVector(0.0, k_ParkPitch * float64(_Pieces.Num()), 0.0));
     }
 
     // An empty platter on a floor beside the station; constructed when Get_IsTrayReady says so.
@@ -172,15 +149,6 @@ class UMars_AutoTestRig_Batter : UMars_AutoTestRig_FoodPiece
     //----------------------------------------------------------------------------------------------------------------------
 
     UFUNCTION()
-    protected void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId,
-        EMars_CookingFeed_Admission InAdmission, FString InReason)
-    {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
-    }
-
-    UFUNCTION()
     protected void OnPieceAdded(FCk_Handle_Batter InBatter, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece)
     {
         _AddedIds.Add(InPieceId);
@@ -221,21 +189,6 @@ class UMars_AutoTestRig_Batter : UMars_AutoTestRig_FoodPiece
     //----------------------------------------------------------------------------------------------------------------------
     // Steps
     //----------------------------------------------------------------------------------------------------------------------
-
-    // Every built piece is Ready (a release reads its metrics).
-    UFUNCTION()
-    protected void Check_PiecesReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto AllReady = _Pieces.Num() > 0;
-        for (const auto& Piece : _Pieces)
-        {
-            if (Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
-            { AllReady = false; }
-        }
-
-        auto Res = OutResult;
-        Res.Set(AllReady);
-    }
 
     UFUNCTION()
     protected void Check_Answered1(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)

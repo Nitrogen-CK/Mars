@@ -18,6 +18,7 @@ struct FMars_Platter_Drain
     FCk_Handle_Platter Platter;
     EMars_Platter_Mounting Mounting = EMars_Platter_Mounting::Free;
     TArray<FCk_Handle_FoodPiece> Unloaded;
+    TArray<FCk_Handle_FoodPiece> Accepted;
     // Pieces this drain's Unloads took off before they ever landed: a second Unload of one of them is the same request.
     TArray<FCk_Handle_FoodPiece> Dropped;
     // Set when a landed piece left: the first freeze index it may have supported (utils_platter::Resettle).
@@ -25,11 +26,12 @@ struct FMars_Platter_Drain
     TArray<FMars_Platter_LoadRefused> Refused;
 }
 
-// Drains SetMounted -> Unload -> Load, then broadcasts Unloaded, LoadRefused. SetMounted switches the held and settling
-// pieces' profiles (a piece landing later takes the mode in Settle); a piece that leaves takes its own profile back. An
-// accepted Load only queues here (membership and holder stamped); UMars_Processor_Platter_Settle drops it, settles it and
-// broadcasts OnLoaded. An Unload of a landed piece re-settles the pieces frozen after it (those that may lie on it). It is also the platter's only
-// teardown listener: the pieces it holds, held, settling or queued, end with it. It never writes a FoodPiece fragment.
+// Drains SetMounted -> Unload -> Load, then broadcasts Unloaded, LoadAccepted, LoadRefused. SetMounted switches the held
+// and settling pieces' profiles (a piece landing later takes the mode in Settle); a piece that leaves takes its own profile
+// back. An accepted Load only queues here (membership and holder stamped); UMars_Processor_Platter_Settle drops it,
+// settles it and broadcasts OnLoaded. An Unload of a landed piece re-settles the pieces frozen after it (those that may lie
+// on it). It is also the platter's only teardown listener: the pieces it holds, held, settling or queued, end with it. The
+// only FoodPiece fragment it writes is the holder fact.
 class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -83,13 +85,13 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         InState.Mounting = InRequest.Mounting;
         for (const auto& Held : InState.Held)
         {
-            if (Get_IsGone(Held.Piece) == false)
+            if (Held.Piece.Get_IsGone() == false)
             { utils_platter::Apply_PileProfile(Held.Piece, InState.Mounting); }
         }
 
         for (const auto& Settling : InState.Settling)
         {
-            if (Get_IsGone(Settling.Piece) == false)
+            if (Settling.Piece.Get_IsGone() == false)
             { utils_platter::Apply_PileProfile(Settling.Piece, InState.Mounting); }
         }
     }
@@ -177,12 +179,13 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         utils_foodpiece::Stamp_Holder(Piece, InDrain.Platter);
 
         InState.Queue.Add(Piece);
+        InDrain.Accepted.Add(Piece);
         Watch_Teardown(InDrain.Platter);
     }
 
     private TOptional<EMars_Platter_LoadRefusal> Get_LoadRefusal(const FCk_Handle_Platter& InPlatter, const FCk_Handle_FoodPiece& InPiece)
     {
-        if (Get_IsGone(InPiece))
+        if (InPiece.Get_IsGone())
         { return TOptional<EMars_Platter_LoadRefusal>(EMars_Platter_LoadRefusal::Gone); }
 
         // The holder fact, whichever ledger it names: a board's or a pan's piece is refused as another platter's is.
@@ -217,18 +220,13 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
     // Takes the piece off the ledger's books and destroys it; false for a piece already gone.
     private bool End_Piece(const FCk_Handle_FoodPiece& InPiece)
     {
-        if (Get_IsGone(InPiece))
+        if (InPiece.Get_IsGone())
         { return false; }
 
         auto Piece = InPiece;
         Piece.Request_TryRemove(FMars_Fragment_Platter_Membership);
         utils_entity_lifetime::Request_DestroyEntity(Piece);
         return true;
-    }
-
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece)
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 
     private void Broadcast(FMars_Platter_Drain& InDrain)
@@ -239,6 +237,12 @@ class UMars_Processor_Platter_HandleRequests : UCk_Processor_Script_Base_UE
         {
             if (Platter.Has_Fragment(FMars_Fragment_Platter_Signals))
             { Platter.Get_Fragment(FMars_Fragment_Platter_Signals).OnUnloaded.Broadcast(Platter, Piece); }
+        }
+
+        for (const auto& Piece : InDrain.Accepted)
+        {
+            if (Platter.Has_Fragment(FMars_Fragment_Platter_Signals))
+            { Platter.Get_Fragment(FMars_Fragment_Platter_Signals).OnLoadAccepted.Broadcast(Platter, Piece); }
         }
 
         for (const auto& Refused : InDrain.Refused)

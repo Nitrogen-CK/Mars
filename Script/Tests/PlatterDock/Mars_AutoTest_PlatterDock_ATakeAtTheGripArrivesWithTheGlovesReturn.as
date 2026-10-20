@@ -69,8 +69,8 @@ class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMar
         Await_FocusOf(Interactable);
     }
 
-    // What the player's resolver and interaction glue do on a press: the gloves reach for the dock's Use target with its
-    // gesture, and the interaction starts.
+    // What the player's interaction glue does on a press: the interaction starts, and its Take task asks the gloves for the
+    // reach.
     UFUNCTION()
     private void Step_ReachAndTake(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -81,10 +81,6 @@ class UMars_AutoTest_PlatterDock_ATakeAtTheGripArrivesWithTheGlovesReturn : UMar
 
         auto Interactable = _Dock.Get_Interactable();
         auto Target = Interactable.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
-        const auto& Context = Target.Get_Fragment(FMars_Fragment_InteractionContext);
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(
-            FMars_FPHands_ReachSubject(Target, Context.Interactable, Context.InteractableOwner), Target.Get_InteractionCompletionPolicy(),
-            Context.ReachKind));
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 

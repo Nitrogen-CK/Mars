@@ -81,7 +81,7 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         if (InReservation.Hold == EMars_CookingFeed_PieceHold::OnSource)
         { return utils_cooking_feed::Get_IsOnSource(Piece, InState.Source); }
 
-        if (utils_cooking_feed::Get_IsGone(Piece))
+        if (Piece.Get_IsGone())
         { return false; }
 
         if (InReservation.Hold == EMars_CookingFeed_PieceHold::Unloading)
@@ -229,7 +229,7 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         const auto Reservation = InState.Active.GetValue();
         const auto LiesOnItsOwn = Reservation.Hold == EMars_CookingFeed_PieceHold::OnSource || Reservation.Hold == EMars_CookingFeed_PieceHold::Unloading;
         const auto& Piece = Reservation.Piece;
-        if (LiesOnItsOwn == false || utils_cooking_feed::Get_IsGone(Piece) || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
+        if (LiesOnItsOwn == false || Piece.Get_IsGone() || Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
         { return; }
 
         FCk_Handle Entity = Piece;
@@ -358,7 +358,7 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
     private FTransform Get_HeldRootOffset(const FMars_CookingFeed_Frame& InFrame, const FCk_Handle_FoodPiece& InPiece) const
     {
         const auto& HeldOffset = InFrame.Spec.Motion.HeldOffset;
-        const auto Centre = utils_searing::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry()));
+        const auto Centre = utils_foodpiece::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(InPiece.Get_Geometry()));
         return FTransform(HeldOffset.GetRotation(), HeldOffset.GetLocation() - HeldOffset.GetRotation().RotateVector(Centre));
     }
 
@@ -413,7 +413,7 @@ class UMars_Processor_CookingFeed_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         auto Piece = Active.GetValue().Piece;
-        if (utils_cooking_feed::Get_IsGone(Piece))
+        if (Piece.Get_IsGone())
         { return; }
 
         utils_entity_lifetime::Request_DestroyEntity(Piece);

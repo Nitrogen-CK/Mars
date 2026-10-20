@@ -101,7 +101,7 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
         for (const auto& Entry : InState.Settling)
         {
             auto Settling = Entry;
-            if (Get_IsGone(Settling.Piece))
+            if (Settling.Piece.Get_IsGone())
             {
                 StillSettling.Add(Settling);
                 continue;
@@ -288,7 +288,7 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
         for (int32 Index = 0; Index < InState.Queue.Num(); ++Index)
         {
             auto Piece = InState.Queue[Index];
-            if (Get_IsGone(Piece) || utils_platter::Get_IsTaken(Piece))
+            if (Piece.Get_IsGone() || utils_platter::Get_IsTaken(Piece))
             { continue; }
 
             const auto Status = Piece.Get_Status();
@@ -383,11 +383,6 @@ class UMars_Processor_Platter_Settle : UCk_Processor_Script_Base_UE
         InSettling.MotionTypeAsks = 0;
     }
 
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece) const
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
-    }
-
     private void Broadcast(FMars_Platter_SettlePass& InPass)
     {
         auto Platter = InPass.Platter;
@@ -474,7 +469,7 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
         for (const auto& Held : InState.Held)
         {
             auto Piece = Held.Piece;
-            if (Get_IsGone(Piece) == false && Get_IsOnRoot(Piece, Root))
+            if (Piece.Get_IsGone() == false && Get_IsOnRoot(Piece, Root))
             {
                 StillHeld.Add(Held);
                 continue;
@@ -491,7 +486,7 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
         for (const auto& Settling : InState.Settling)
         {
             auto Piece = Settling.Piece;
-            if (Get_IsGone(Piece) == false && utils_platter::Get_IsTaken(Piece) == false)
+            if (Piece.Get_IsGone() == false && utils_platter::Get_IsTaken(Piece) == false)
             {
                 StillSettling.Add(Settling);
                 continue;
@@ -511,7 +506,7 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
         for (const auto& Queued : InState.Queue)
         {
             auto Piece = Queued;
-            if (Get_IsGone(Piece))
+            if (Piece.Get_IsGone())
             {
                 Forget(Piece, Platter);
                 continue;
@@ -552,10 +547,5 @@ class UMars_Processor_Platter_Reconcile : UCk_Processor_Script_Base_UE
     private void Forget(FCk_Handle_FoodPiece& InPiece, const FCk_Handle_Platter& InPlatter)
     {
         utils_platter::Leave_Ledger(InPiece, InPlatter);
-    }
-
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece) const
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 }

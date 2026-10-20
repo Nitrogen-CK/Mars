@@ -36,12 +36,12 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
         auto Root = Build_StationRoot(InHandle, k_Origin);
         auto Spec = Make_DockSpec(Make_Policy(TOptional<FGameplayTag>(GameplayTags::Food_Meat), true),
             FTransform(FRotator::ZeroRotator, FVector(0.0, 60.0, 70.0)), "searing input");
-        Spec.KindRejectedText = FText::FromString("Meat only");
+        Spec.Words.KindRejectedText = FText::FromString("Meat only");
         _Dock = Build_Dock(Root, Spec);
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0)),
             mars_items::Platter_Large()));
 
-        Spawn_FoodFloor(InHandle, k_Origin + k_FoodOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_FoodOffset);
         auto SpawnParams = UMars_FoodItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MushroomSlice());
@@ -68,21 +68,6 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
         Add_Step_WaitSeconds("an interaction the press began would show here", 0.25f);
         Add_Step("the framework refused the press: the slice stays in the hands and the platter's books are unchanged", n"Step_AssertPressRefused");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_FoodFloor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -200,7 +185,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodIsRefusedByKind : UMars_AutoTestRig_Pl
         ++_InteractionsSincePress;
     }
 
-    // The dock's prompt left its placeholder ("Dock", utils_platter_dock::DoCreate_Interactable): the dock's prompt processor
+    // The dock's prompt left its placeholder ("Dock", utils_platter_dock::Make_PromptSpec): the dock's prompt processor
     // wrote what the focuser can do there.
     UFUNCTION()
     private void Check_DockPromptWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)

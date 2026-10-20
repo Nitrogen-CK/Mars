@@ -15,7 +15,7 @@ class UMars_SmState_PlatterDock_Interact : UMars_SmState_InteractTarget_RunTask
 
 // Re-evaluates Get_ActionFor for the initiator and moves the platter at the Grip of the initiator's gloves
 // (UMars_SmTask_ActAtGrip): a Place is a Place reach that sets the held platter down over the dock's node
-// (utils_platter_dock::Request_PlaceHeldPlatter), and the Dock is requested at its Grip, so the platter mounts on the dock
+// (utils_platter_dock::Start_PlaceReach), and the Dock is requested at its Grip, so the platter mounts on the dock
 // from where the gloves hold it; a Take waits for the gloves to close on the dock, then requests the Undock, its next
 // mount riding the gloves home. Without gloves both act at once. The task then runs until the dock reports the platter
 // docked or undocked, or that the dock or the undock was refused (the task fails).
@@ -38,21 +38,14 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
         _Item = FCk_Handle_Item();
         _Platter = FCk_Handle_Platter();
 
-        // The context is the InteractTarget; the initiator is stamped on the per-interaction sub-SM root.
-        auto Context = Get_StateMachineContext();
-        FCk_Handle SubSm = Get_OwningStateMachine();
-        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
-            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
-        if (ck::EnsureIfNot(HasContext, "[PlatterDock] Interaction ran without an interaction context"))
-        {
-            _Outcome = ECk_SmTaskResult::Failed;
-            return;
-        }
+        FCk_Handle Owner;
+        FCk_Handle Initiator;
+        if (TryGet_InteractionEnds(Owner, Initiator) == false)
+        { return; }
 
-        auto Owner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
-        auto Initiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
-        auto Dock = Owner.As_PlatterDock();
-        if (ck::Is_NOT_Valid(Dock) || ck::EnsureIfNot(ck::IsValid(Initiator), f"[PlatterDock] [{Dock.ToString()}] interaction has no initiator"))
+        auto Dock = Owner.As_PlatterDock(ECk_SanityCheck::UnChecked);
+        if (ck::EnsureIfNot(ck::IsValid(Dock), f"[PlatterDock] Interaction owner [{Owner.ToString()}] is no dock")
+            || ck::EnsureIfNot(ck::IsValid(Initiator), f"[PlatterDock] [{Dock.ToString()}] interaction has no initiator"))
         {
             _Outcome = ECk_SmTaskResult::Failed;
             return;
@@ -78,7 +71,7 @@ class UMars_SmTask_PlatterDock_PlaceOrTake : UMars_SmTask_ActAtGrip
             }
 
             Await_PlaceGrip(Hands);
-            utils_platter_dock::Request_PlaceHeldPlatter(Dock, _Item, Hands);
+            utils_platter_dock::Start_PlaceReach(Dock, _Item, Hands);
             return;
         }
 
@@ -202,7 +195,7 @@ namespace utils_platter_dock
     // Starts setting InItem (the held platter) down on InDock: the gloves carry it in a Place reach whose spot is the dock's
     // node lifted by the platter's held half height (its bounds centre lands there), anchored to the node. The dock is
     // asked to take it at the reach's Grip (UMars_SmTask_PlatterDock_PlaceOrTake).
-    void Request_PlaceHeldPlatter(const FCk_Handle_PlatterDock& InDock, const FCk_Handle_Item& InItem, FCk_Handle_FPHands InHands)
+    void Start_PlaceReach(const FCk_Handle_PlatterDock& InDock, const FCk_Handle_Item& InItem, FCk_Handle_FPHands InHands)
     {
         const auto WorldItem = InItem.Get_PersistentWorldItem();
         const auto HalfHeight = ck::IsValid(WorldItem) ? WorldItem.Get_BoundsFit().HalfExtents.Z : 0.0;

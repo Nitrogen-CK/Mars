@@ -2,8 +2,9 @@
 // the moment the kernel admits it, the test hangs it as a scene-node child of a node of its own 300 cm away, so the pose
 // the admission asked for is rejected (the parent owns a scene node's world transform) and the piece stays held there.
 // Half a second in, the kernel still holds it as arriving (it judges nothing about a piece that is not where it was
-// released); past utils_searing::k_ArrivalMaxSeconds it ensures, naming the piece and its distance, and judges it where it
-// is: the piece is no longer arriving and is still on the kernel's books.
+// released); past utils_foodpiece::k_ArrivalMaxSeconds it ensures, naming the piece and its distance, and judges it where it
+// is: the piece is no longer arriving and is still on the kernel's books, and, held 300 cm off the pan, it is then judged
+// lost (once, by its Id).
 class UMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout : UMars_AutoTestRig_Searing
 {
     default _TimeoutSeconds = 10.0f;
@@ -30,10 +31,12 @@ class UMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout : UMa
         Add_Step_WaitUntil("the rig's piece is ready", n"Check_PiecesReady", k_SlowPolls, 0);
         Add_Step("release the piece over the pan's centre", n"Step_Release");
         Add_Step_WaitUntil("the kernel admitted it and the test holds it away", n"Check_AdmittedAndHeld", 0, 0);
-        Add_Step_WaitSeconds("half the arrival timeout", utils_searing::k_ArrivalMaxSeconds * 0.5f);
+        Add_Step_WaitSeconds("half the arrival timeout", utils_foodpiece::k_ArrivalMaxSeconds * 0.5f);
         Add_Step("the piece is still arriving: nothing judges it", n"Step_AssertStillArriving");
         Add_Step_WaitUntil("the kernel stopped waiting for it", n"Check_NoLongerArriving", 0, 0);
         Add_Step("it timed out and is judged where it is", n"Step_AssertJudged");
+        Add_Step_WaitUntil("off the pan, it was judged lost", n"Check_Lost1", k_SlowPolls, 0);
+        Add_Step("the loss is the piece's, once", n"Step_AssertLost");
         Run_Steps(InHandle);
     }
 
@@ -70,7 +73,7 @@ class UMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout : UMa
     {
         const auto State = _Searing.Get_PieceState(_PieceId);
         Assert_True(State.Arriving.IsSet(), "the piece is still arriving half a second in");
-        Assert_True(State.ArrivingSeconds < utils_searing::k_ArrivalMaxSeconds, f"its arrival clock [{State.ArrivingSeconds}] is under the timeout");
+        Assert_True(State.ArrivingSeconds < utils_foodpiece::k_ArrivalMaxSeconds, f"its arrival clock [{State.ArrivingSeconds}] is under the timeout");
         Assert_Equals_Int(_Contacts.Num(), 0, "no contact edge was judged for it");
     }
 
@@ -90,9 +93,19 @@ class UMars_AutoTest_Searing_APieceThatNeverArrivesIsJudgedAfterTheTimeout : UMa
 
         const auto State = _Searing.Get_PieceState(_PieceId);
         Assert_False(State.Arriving.IsSet(), "the piece is no longer arriving");
-        Assert_True(State.ArrivingSeconds >= utils_searing::k_ArrivalMaxSeconds,
+        Assert_True(State.ArrivingSeconds >= utils_foodpiece::k_ArrivalMaxSeconds,
             f"it stopped arriving only at the timeout (after {State.ArrivingSeconds} s)");
         Assert_True(_Searing.Get_PieceContact(_PieceId) != EMars_Searing_Contact::OnPan, "held 300 cm away, it is not on the pan");
+    }
+
+    UFUNCTION()
+    private void Step_AssertLost(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_LostIds.Num(), 1, "one OnPieceLost");
+        if (_LostIds.Num() == 1)
+        { Assert_True(_LostIds[0].Get_IsSame(_PieceId), "the loss names the piece that never arrived"); }
+
+        Assert_Equals_Int(_Searing.Get_Tally().Losses, 1, "the tally counts one loss");
     }
 }
 

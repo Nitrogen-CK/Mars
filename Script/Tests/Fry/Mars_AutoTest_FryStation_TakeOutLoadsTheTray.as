@@ -98,7 +98,7 @@ class UMars_AutoTest_FryStation_TakeOutLoadsTheTray : UMars_AutoTestRig_HeatStat
         const auto PieceId = Get_PieceIds()[0];
         _HeatAtTakeOut.Empty();
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
-        { _HeatAtTakeOut.Add(_Fry.Get_FaceHeat(PieceId, EMars_Searing_Face(Face))); }
+        { _HeatAtTakeOut.Add(_Fry.Get_FaceHeat(PieceId, EMars_FoodPiece_Face(Face))); }
 
         Request_TakeOut(_Mushroom);
     }

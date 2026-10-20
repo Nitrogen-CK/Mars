@@ -10,7 +10,7 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
     // Pan-local, on the flat base clear of the ready piece at the centre.
     private const FVector k_SecondLocal = FVector(-15.0, 0.0, 8.0);
 
-    private TArray<EMars_Searing_Face> _Order;
+    private TArray<EMars_FoodPiece_Face> _Order;
     private int32 _FaceIndex = -1;
     private FMars_CookingFeed_PieceId _SecondId;
     private FCk_Handle_FoodPiece _ReadyPiece;
@@ -27,18 +27,18 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         _Searing.BindTo_OnTakeOutRefused(FMars_Delegate_Searing_OnTakeOutRefused(this, n"OnTakeOutRefused"));
         Build_Pieces(2);
 
-        _Order.Add(EMars_Searing_Face::NegZ);
-        _Order.Add(EMars_Searing_Face::PosZ);
-        _Order.Add(EMars_Searing_Face::PosX);
-        _Order.Add(EMars_Searing_Face::NegX);
-        _Order.Add(EMars_Searing_Face::PosY);
-        _Order.Add(EMars_Searing_Face::NegY);
+        _Order.Add(EMars_FoodPiece_Face::NegZ);
+        _Order.Add(EMars_FoodPiece_Face::PosZ);
+        _Order.Add(EMars_FoodPiece_Face::PosX);
+        _Order.Add(EMars_FoodPiece_Face::NegX);
+        _Order.Add(EMars_FoodPiece_Face::PosY);
+        _Order.Add(EMars_FoodPiece_Face::NegY);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();
         for (int32 Index = 0; Index < _Order.Num(); ++Index)
         {
-            Add_Step(f"teleport face {utils_searing::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
+            Add_Step(f"teleport face {utils_foodpiece::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
             Add_Step_WaitFrames("the teleport is applied and written back", 4);
             Add_Step_WaitUntil("the piece is on the pan", n"Check_FirstOnPan", k_SlowPolls, 0);
             Add_Step_WaitUntil("that face seared", n"Check_CurrentFaceSeared", 0, 0);
@@ -63,7 +63,7 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         _FaceIndex += 1;
         const auto Reach = _Searing.Get_PieceHalfExtents(Get_FirstId()).GetMax();
         Teleport_Piece(Get_FirstId(), FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + Reach + 1.0),
-            utils_searing::Make_FaceDownRotation(_Order[_FaceIndex]));
+            utils_foodpiece::Make_FaceDownRotation(_Order[_FaceIndex]));
     }
 
     UFUNCTION()
@@ -157,7 +157,7 @@ class UMars_AutoTest_Searing_TakeOutHandsReadyPiecesBackWithTheirCookState : UMa
         for (int32 Index = 0; Index < CookState.Sear.Num(); ++Index)
         {
             Assert_Equals_Float(CookState.Sear[Index], 1.0, 0.0001,
-                f"face {utils_searing::Get_FaceName(EMars_Searing_Face(Index))} is seared in its cook state");
+                f"face {utils_foodpiece::Get_FaceName(EMars_FoodPiece_Face(Index))} is seared in its cook state");
         }
 
         const auto Look = utils_cookstate::Make_DisplayParams(CookState);

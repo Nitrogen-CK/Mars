@@ -114,6 +114,6 @@ class UMars_AutoTest_CookingFeed_TheCarriedPieceRidesTheHandNode : UMars_AutoTes
     {
         FCk_Handle Entity = _Piece;
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
-        return PieceWorld.TransformPosition(utils_searing::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(_Piece.Get_Geometry())));
+        return PieceWorld.TransformPosition(utils_foodpiece::Get_BoundsCentre(utils_runtime_mesh::Get_Metrics(_Piece.Get_Geometry())));
     }
 }

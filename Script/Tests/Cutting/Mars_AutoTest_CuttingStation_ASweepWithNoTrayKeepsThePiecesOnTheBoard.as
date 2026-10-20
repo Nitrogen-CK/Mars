@@ -11,7 +11,6 @@ class UMars_AutoTest_CuttingStation_ASweepWithNoTrayKeepsThePiecesOnTheBoard : U
     private TArray<FCk_Handle_FoodPiece> _Halves;
     private int32 _PlacedBeforeHandoff = 0;
     private int32 _ReleasedBeforeHandoff = 0;
-    private TArray<EMars_FoodBoard_ReleaseRefusal> _ReleaseRefusals;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -63,7 +62,6 @@ class UMars_AutoTest_CuttingStation_ASweepWithNoTrayKeepsThePiecesOnTheBoard : U
         _Halves = _Board.Get_Held();
         _PlacedBeforeHandoff = _Placed.Num();
         _ReleasedBeforeHandoff = _Released.Num();
-        _Board.BindTo_OnReleaseRefused(FMars_Delegate_FoodBoard_OnReleaseRefused(this, n"OnReleaseRefused"));
 
         FCk_Handle Station = _Station;
         utils_cooking_feed::Request_StationTakeOut(Station, FMars_Request_StationTakeOut(_Halves.Num(), FCk_Handle_Platter()));
@@ -74,12 +72,6 @@ class UMars_AutoTest_CuttingStation_ASweepWithNoTrayKeepsThePiecesOnTheBoard : U
     {
         auto Res = OutResult;
         Res.Set(_ReleaseRefusals.Num() > 0);
-    }
-
-    UFUNCTION()
-    private void OnReleaseRefused(FCk_Handle_FoodBoard InBoard, EMars_FoodBoard_ReleaseRefusal InRefusal)
-    {
-        _ReleaseRefusals.Add(InRefusal);
     }
 
     UFUNCTION()

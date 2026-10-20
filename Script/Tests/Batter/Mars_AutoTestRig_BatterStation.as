@@ -228,7 +228,7 @@ class UMars_AutoTestRig_BatterStation : UCk_AutoTest_Base
     protected void Check_WearsShell(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         FCk_Handle Entity = _Food;
-        const auto Shell = utils_station::TryGet_BatteredShell(_Food);
+        const auto Shell = utils_food::TryGet_BatteredShell(_Food);
         auto Res = OutResult;
         Res.Set(Entity.Is_RuntimeMeshDisplay() && Entity.As_RuntimeMeshDisplay().Get_Visibility() == ECk_EnableDisable::Disable
             && ck::IsValid(Shell) && ck::IsValid(utils_unreal_component::Get_Component(Shell))

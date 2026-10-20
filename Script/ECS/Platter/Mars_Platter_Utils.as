@@ -261,23 +261,6 @@ namespace utils_platter
 
         return -1;
     }
-
-    // A platter world item (World mode) owned by InOwner (ck::TransientEntity() for one that must outlive its spawner).
-    // Returns the entity under construction: it is a WorldItem and a Platter once constructed.
-    FCk_Handle Request_SpawnWorld(FCk_Handle& InOwner, const FMars_Platter_SpawnSpec& InSpec)
-    {
-        UCk_InventoryItem_Definition Definition = InSpec.Definition.Get();
-        if (ck::Is_NOT_Valid(Definition))
-        { Definition = mars_items::Platter(); }
-
-        auto SpawnParams = UMars_Platter_EntityScript::Params();
-        SpawnParams.SpawnTransform = FTransform(InSpec.World.Rotator(), InSpec.World.GetLocation());
-        SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(Definition);
-        SpawnParams.Mode = EMars_WorldItem_Mode::World;
-
-        auto Pending = utils_entity_script::Request_SpawnEntity(InOwner, UMars_Platter_EntityScript, SpawnParams);
-        return Pending.Get_EntityUnderConstruction();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -431,6 +414,20 @@ mixin void UnbindFrom_OnLoaded(FCk_Handle_Platter& Self, FMars_Delegate_Platter_
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Platter_Signals).OnLoaded.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnLoadAccepted(FCk_Handle_Platter& Self, FMars_Delegate_Platter_OnLoadAccepted InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Platter_Signals);
+    Fragment.OnLoadAccepted.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnLoadAccepted(FCk_Handle_Platter& Self, FMars_Delegate_Platter_OnLoadAccepted InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Platter_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Platter_Signals).OnLoadAccepted.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnLoadRefused(FCk_Handle_Platter& Self, FMars_Delegate_Platter_OnLoadRefused InDelegate)

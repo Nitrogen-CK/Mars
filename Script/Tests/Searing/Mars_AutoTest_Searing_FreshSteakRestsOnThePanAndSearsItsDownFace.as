@@ -40,7 +40,7 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
             "the piece's middle rests its half height above the cooking surface");
 
         const auto Down = _Searing.Get_DownFace(PieceId);
-        Assert_True(Down == EMars_Searing_Face::NegZ, f"the piece lies on its -Z face (got {Down :n})");
+        Assert_True(Down == EMars_FoodPiece_Face::NegZ, f"the piece lies on its -Z face (got {Down :n})");
 
         Assert_True(_Sizzles.Num() > 0 && _Sizzles.Last() == EMars_Searing_Sizzle::Sizzling, "the pan sizzles under a raw face");
     }
@@ -51,7 +51,7 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
         Assert_Equals_Int(_Seared.Num(), 1, "OnFaceSeared fired once");
         if (_Seared.Num() > 0)
         {
-            Assert_True(_Seared[0] == EMars_Searing_Face::NegZ, f"the seared face is -Z (got {_Seared[0] :n})");
+            Assert_True(_Seared[0] == EMars_FoodPiece_Face::NegZ, f"the seared face is -Z (got {_Seared[0] :n})");
             Assert_True(_SearedIds[0].Get_IsSame(Get_FirstId()), "OnFaceSeared names the piece");
         }
 
@@ -59,9 +59,9 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
 
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            const auto Face = EMars_Searing_Face(Index);
-            const auto Expected = Face == EMars_Searing_Face::NegZ ? 1.0 : 0.0;
-            Assert_Equals_Float(_Searing.Get_FaceSear(Get_FirstId(), Face), Expected, 0.001, f"face {utils_searing::Get_FaceName(Face)} sear");
+            const auto Face = EMars_FoodPiece_Face(Index);
+            const auto Expected = Face == EMars_FoodPiece_Face::NegZ ? 1.0 : 0.0;
+            Assert_Equals_Float(_Searing.Get_FaceSear(Get_FirstId(), Face), Expected, 0.001, f"face {utils_foodpiece::Get_FaceName(Face)} sear");
         }
     }
 
@@ -75,7 +75,7 @@ class UMars_AutoTest_Searing_FreshSteakRestsOnThePanAndSearsItsDownFace : UMars_
     UFUNCTION()
     private void Step_AssertNoOvercook(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Float(_Searing.Get_FaceSear(Get_FirstId(), EMars_Searing_Face::NegZ), 1.0, 0.0001, "the seared face stays at 1");
+        Assert_Equals_Float(_Searing.Get_FaceSear(Get_FirstId(), EMars_FoodPiece_Face::NegZ), 1.0, 0.0001, "the seared face stays at 1");
         Assert_Equals_Int(_Seared.Num(), 1, "no second OnFaceSeared");
         Assert_Equals_Int(_Searing.Get_SearedFaceCount(Get_FirstId()), 1, "one face seared");
         Assert_Equals_Int(_Added.Num(), 1, "nothing else was added");

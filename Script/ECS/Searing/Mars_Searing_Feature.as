@@ -14,17 +14,6 @@ struct FMars_Feature_Searing {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// A piece's six faces, by their outward normal in the piece's own frame. int32(Face) indexes the sear ledger.
-enum EMars_Searing_Face
-{
-    PosX,
-    NegX,
-    PosY,
-    NegY,
-    PosZ,
-    NegZ
-}
-
 enum EMars_Searing_Heat
 {
     Cold,
@@ -42,6 +31,15 @@ enum EMars_Searing_Contact
 {
     Airborne,
     OnPan
+}
+
+// Why a release from the station's inbox was not admitted. Unavailable: the pan body is not in the simulation yet, no
+// piece, not Ready, already on the pan, its Id already on the pan, held by another ledger, still attached, or released in a
+// drain that also reset. Full: Supply.MaxPieces live pieces are on the pan.
+enum EMars_Searing_AdmissionRefusal
+{
+    Unavailable,
+    Full
 }
 
 // Cooking: on its way to six seared faces. Ready: six faces seared; it stays on the pan, inert, until it is taken out (a
@@ -86,6 +84,8 @@ struct FMars_Searing_CookSpec
 // The surface of the body an adopted piece is given (its shape is the piece's own mesh, its mass the piece's own).
 // Friction combines with the pan's as sqrt(a * b): 0.6 on an oiled pan's 0.15 gives 0.3, so a resting piece starts
 // sliding past a 17-degree tilt (into the pan's lip) and glides on a pan swirling a few uu at 1.5 Hz.
+// The surface applies only to a piece that arrives without a body: one that arrives with its own (off a platter, a whole
+// food item) keeps its own surface, since a live body's surface cannot be changed.
 struct FMars_Searing_PieceSpec
 {
     UPROPERTY()
@@ -317,21 +317,21 @@ struct FMars_Searing_PieceState
     FVector HalfExtents = FVector::ZeroVector;
 
     // The release location while the piece is still arriving: its transform reads where it was before admission until its
-    // pose request or teleport lands, so the Tick judges nothing about it until it is there (utils_searing::Get_HasArrived).
+    // pose request or teleport lands, so the Tick judges nothing about it until it is there (utils_foodpiece::Get_HasArrived).
     UPROPERTY()
     TOptional<FVector> Arriving;
 
-    // How long the piece has been arriving; past utils_searing::k_ArrivalMaxSeconds it is judged where it is.
+    // How long the piece has been arriving; past utils_foodpiece::k_ArrivalMaxSeconds it is judged where it is.
     UPROPERTY()
     float32 ArrivingSeconds = 0.0f;
 
-    // Six, 0 raw .. 1 seared, clamped, seeded from the piece's cook state; indexed by int32(EMars_Searing_Face).
+    // Six, 0 raw .. 1 seared, clamped, seeded from the piece's cook state; indexed by int32(EMars_FoodPiece_Face).
     UPROPERTY()
     TArray<float32> FaceSear;
 
     // The face that last counted as resting on the pan (NegZ at admission: a piece arrives flat); a change is a flip.
     UPROPERTY()
-    EMars_Searing_Face RestingFace = EMars_Searing_Face::NegZ;
+    EMars_FoodPiece_Face RestingFace = EMars_FoodPiece_Face::NegZ;
 
     // How long another face has been down while on the pan; it becomes the resting face at k_FaceSettleSeconds.
     UPROPERTY()
@@ -343,9 +343,13 @@ struct FMars_Searing_PieceState
     UPROPERTY()
     EMars_Searing_PieceStatus Status = EMars_Searing_PieceStatus::Cooking;
 
-    // The last tenth OnSearProgress reported for this piece's face on the pan; -1 forces the next report.
+    // The last tenth OnSearProgress reported for this piece, and the face it was reported for: a change of either is
+    // reported (a tumble onto a face at the same tenth included); -1 forces the next report.
     UPROPERTY()
     int32 LastProgressStep = -1;
+
+    UPROPERTY()
+    EMars_FoodPiece_Face LastProgressFace = EMars_FoodPiece_Face::NegZ;
 
     // Lost only: seconds since the loss; the piece is removed and its entity destroyed at Loss.LingerSeconds.
     UPROPERTY()
@@ -413,12 +417,15 @@ struct FMars_Fragment_Searing
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The kernel's edges. Some have only test binders today (OnSearProgress, OnPanContactChanged, OnSizzleChanged, OnPieceLost,
+// OnPieceReady): they are the kernel's test-pinned contract, kept for the assembly to bind.
+
 // A SetHeat that changed it; a Reset that found it Hot. Station-level: no piece.
 delegate void FMars_Delegate_Searing_OnHeatChanged(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 event void FMars_Delegate_Searing_OnHeatChanged_MC(FCk_Handle_Searing InSearing, EMars_Searing_Heat InHeat);
 
-// An adopted piece is on the pan's books (its body requested or switched back to Dynamic, not yet moving): the placing
-// script adds its visuals here.
+// A piece is on the pan's books (its body requested or switched back to Dynamic, not yet moving): admitted, or readopted
+// after its tray refused it. The placing script adds its visuals here.
 delegate void FMars_Delegate_Searing_OnPieceAdded(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Searing_OnPieceAdded_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
@@ -427,11 +434,11 @@ delegate void FMars_Delegate_Searing_OnPanContactChanged(FCk_Handle_Searing InSe
 event void FMars_Delegate_Searing_OnPanContactChanged_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Contact InContact);
 
 // Quantized at tenths, for one piece's face on the pan.
-delegate void FMars_Delegate_Searing_OnSearProgress(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, float32 InAlpha);
-event void FMars_Delegate_Searing_OnSearProgress_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, float32 InAlpha);
+delegate void FMars_Delegate_Searing_OnSearProgress(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, float32 InAlpha);
+event void FMars_Delegate_Searing_OnSearProgress_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, float32 InAlpha);
 
-delegate void FMars_Delegate_Searing_OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace);
-event void FMars_Delegate_Searing_OnFaceSeared_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace);
+delegate void FMars_Delegate_Searing_OnFaceSeared(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace);
+event void FMars_Delegate_Searing_OnFaceSeared_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace);
 
 // A piece's sixth seared face: that piece is Ready (the others keep cooking). InTally is the kernel's tally at that moment.
 delegate void FMars_Delegate_Searing_OnPieceReady(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, FMars_Searing_Tally InTally);
@@ -454,8 +461,14 @@ event void FMars_Delegate_Searing_OnPieceTakenOut_MC(FCk_Handle_Searing InSearin
 delegate void FMars_Delegate_Searing_OnTakeOutRefused(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal);
 event void FMars_Delegate_Searing_OnTakeOutRefused_MC(FCk_Handle_Searing InSearing, EMars_CookingFeed_TakeOutRefusal InRefusal);
 
+// A release the pan would not take (right after the station's OnAdmission answered Rejected with the kernel's words), and
+// why.
+delegate void FMars_Delegate_Searing_OnAdmissionRefused(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_AdmissionRefusal InRefusal);
+event void FMars_Delegate_Searing_OnAdmissionRefused_MC(FCk_Handle_Searing InSearing, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_AdmissionRefusal InRefusal);
+
 struct FMars_Fragment_Searing_Signals
 {
+    FMars_Delegate_Searing_OnAdmissionRefused_MC OnAdmissionRefused;
     FMars_Delegate_Searing_OnHeatChanged_MC OnHeatChanged;
     FMars_Delegate_Searing_OnPieceAdded_MC OnPieceAdded;
     FMars_Delegate_Searing_OnPanContactChanged_MC OnPanContactChanged;
@@ -515,7 +528,8 @@ struct FMars_Request_Searing_Reset
 // that many leave. Tray set: each one is loaded onto it (the pan keeps its pickup's Ledger claim until it lands, and
 // readopts it if the tray refuses it: the station's take-out contract, FMars_Request_StationTakeOut, arrives as this);
 // unset: each is the caller's, its claim released. A take-out that hands nothing back is refused with OnTakeOutRefused:
-// NoRoom when MaxPieces is set and at most 0, else NothingReady.
+// NoRoom when MaxPieces is set and at most 0, else NothingReady. Production goes through the station's take-out contract
+// only: sending this directly (a named piece, no tray) is a test hook.
 struct FMars_Request_Searing_TakeOut
 {
     UPROPERTY()
@@ -547,8 +561,11 @@ struct FMars_Request_Searing_TakeOut
 // pan's books where it lies, under PieceId, its holder fact and its pickup's Ledger claim the pan's again. Its record is
 // rebuilt from the piece itself: its sear from its cook state (seared all round = Ready, with OnPieceReady), its extents
 // from its mesh, its resting face from its pose; its body goes back to Dynamic and its Resting to the pan, and the take-out
-// it undoes no longer counts. No admission answer: nobody awaits one. A no-op for a piece that is gone, attached, or that another ledger holds by now; a piece or PieceId the pan
-// already holds ensures.
+// it undoes no longer counts. No admission answer (nobody awaits one), but OnPieceAdded again, after the drain's take-outs,
+// so the placing script dresses it again. A readopt may take the pan past Supply.MaxPieces: the piece was already the
+// pan's, and a release may have been admitted into the place its take-out freed. Not readopted: a piece gone, one another
+// ledger holds by now, or one attached somewhere (its pickup's Ledger claim released); a piece or PieceId the pan already
+// holds ensures.
 struct FMars_Request_Searing_Readopt
 {
     UPROPERTY()

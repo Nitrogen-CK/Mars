@@ -7,14 +7,17 @@ struct FMars_Implement_Frame
 
     // Drained once per frame (degrees; X yaw right+, Y pitch down+); zero unless Driven.
     FVector Look = FVector::ZeroVector;
+
+    // Set when a Kick lift was kicked from rest this frame: the excess degrees OnLiftKicked reports once the pose is written.
+    TOptional<float32> KickExcess;
 }
 
 // Every frame: the pending look (dropped unless Driven) steers the tilt targets by the spec's axes, less the fast upward
 // excess that kicks a Kick lift; a Commanded lift takes the look's Y as its target instead. The targets relax (always, or
 // only while Idle) and clamp, the tilt tracks them at a bounded rate, the lift spring tracks its target, a Look slide's
 // target follows the look across the rest plane (a Commanded one's only its requests) and its spring tracks it, the orbit
-// eases with the drive and turns, and ONE
-// offset write of the node (only when the pose changed) moves the kinematic bodies under it.
+// eases with the drive and turns, and ONE offset write of the node (only when the pose changed) moves the kinematic bodies
+// under it. A kick's OnLiftKicked is broadcast last, so a handler reads the integrated lift and the written pose.
 class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -46,6 +49,16 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         Advance_Slide(Frame, InState);
         Advance_Orbit(Frame, InState);
         Write_PoseIfChanged(Frame, InState);
+        Broadcast_Kick(Frame);
+    }
+
+    private void Broadcast_Kick(const FMars_Implement_Frame& InFrame)
+    {
+        if (InFrame.KickExcess.IsSet() == false || InFrame.Implement.Has_Fragment(FMars_Fragment_Implement_Signals) == false)
+        { return; }
+
+        auto Implement = InFrame.Implement;
+        Implement.Get_Fragment(FMars_Fragment_Implement_Signals).OnLiftKicked.Broadcast(Implement, InFrame.KickExcess.GetValue());
     }
 
     // The node keeps the last written offset, so an implement at rest (or within k_PoseTolerance of the last write: the
@@ -62,7 +75,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         if (Changed == false)
         { return; }
 
-        utils_implement::Apply_Pose(InFrame.Spec.Nodes.Node, InState, OrbitOffset, InFrame.Spec.Tilt.RestRadius);
+        utils_implement::Apply_Pose(InFrame.Implement, InState);
         InState.WrittenPitch = InState.Pitch;
         InState.WrittenRoll = InState.Roll;
         InState.WrittenYaw = InState.Yaw;
@@ -186,7 +199,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
     }
 
     // The excess degrees times Gain join the lift velocity; a kick that starts a rise (not one that adds to a rising
-    // implement) is the toss cue.
+    // implement) is the toss cue, broadcast once the frame applied (Broadcast_Kick).
     private void Kick_Lift(FMars_Implement_Frame& InFrame, FMars_Fragment_Implement& InState, float32 InExcess)
     {
         if (InExcess <= 0.0f)
@@ -198,8 +211,7 @@ class UMars_Processor_Implement_Tick : UCk_Processor_Script_Base_UE
         if (WasRising)
         { return; }
 
-        if (InFrame.Implement.Has_Fragment(FMars_Fragment_Implement_Signals))
-        { InFrame.Implement.Get_Fragment(FMars_Fragment_Implement_Signals).OnLiftKicked.Broadcast(InFrame.Implement, InExcess); }
+        InFrame.KickExcess = TOptional<float32>(InExcess);
     }
 
     // A damped spring pulls the lift toward its target (rest unless Commanded), so a yank overshoots and a still look

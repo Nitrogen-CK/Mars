@@ -66,7 +66,7 @@ class UMars_AutoTest_CuttingStation_InputDockTakesWholeMeatOnly : UMars_AutoTest
         const auto SliceRefusal = utils_platter_dock::Get_Refusal(Spec, _InputPlatter);
         Assert_True(SliceRefusal.IsSet() && SliceRefusal.GetValue() == EMars_PlatterDock_Refusal::KindRejected,
             "the slice's platter is refused for its kind");
-        Assert_Equals_String(utils_platter_dock::Get_RefusalText(Spec, SliceRefusal).ToString(), "Meat or pickle only", "the dock's prompt says why");
+        Assert_Equals_String(utils_platter_dock::Get_RefusalText(_InputDock.Get_PromptWords(), SliceRefusal).ToString(), "Meat or pickle only", "the dock's prompt says why");
         Assert_False(utils_platter_dock::Get_Refusal(Spec, _MeatPlatterEntity.As_Platter()).IsSet(), "the slab's platter may dock");
 
         _InputDock.BindTo_OnDockRefused(FMars_Delegate_PlatterDock_OnDockRefused(this, n"OnDockRefused"));

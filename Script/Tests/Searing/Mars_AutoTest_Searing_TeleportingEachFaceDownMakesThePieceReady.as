@@ -1,4 +1,4 @@
-// Teleporting a piece onto the hot pan with each face down in turn (utils_searing::Make_FaceDownRotation) lands that face
+// Teleporting a piece onto the hot pan with each face down in turn (utils_foodpiece::Make_FaceDownRotation) lands that face
 // on the pan (Get_DownFace agrees) and sears it; the sixth seared face makes that piece Ready once (OnPieceReady), not the
 // station: the ready piece stays on the pan, inert (no sizzle, the tally's seconds stop), and a second piece added beside
 // it still sears its down face. Each teleport after the first (NegZ, the resting face at admission) changes the resting
@@ -12,7 +12,7 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
     // How long the ready piece alone is watched for any more cooking.
     private const float32 k_InertSeconds = 0.3f;
 
-    private TArray<EMars_Searing_Face> _Order;
+    private TArray<EMars_FoodPiece_Face> _Order;
     private int32 _FaceIndex = -1;
     private float32 _TallySecondsAtReady = 0.0f;
     private FMars_CookingFeed_PieceId _SecondId;
@@ -25,18 +25,18 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
         BuildStation(InHandle, Spec);
         Build_Pieces(2);
 
-        _Order.Add(EMars_Searing_Face::NegZ);
-        _Order.Add(EMars_Searing_Face::PosZ);
-        _Order.Add(EMars_Searing_Face::PosX);
-        _Order.Add(EMars_Searing_Face::NegX);
-        _Order.Add(EMars_Searing_Face::PosY);
-        _Order.Add(EMars_Searing_Face::NegY);
+        _Order.Add(EMars_FoodPiece_Face::NegZ);
+        _Order.Add(EMars_FoodPiece_Face::PosZ);
+        _Order.Add(EMars_FoodPiece_Face::PosX);
+        _Order.Add(EMars_FoodPiece_Face::NegX);
+        _Order.Add(EMars_FoodPiece_Face::PosY);
+        _Order.Add(EMars_FoodPiece_Face::NegY);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Steps_AddPieceAndLand();
         for (int32 Index = 0; Index < _Order.Num(); ++Index)
         {
-            Add_Step(f"teleport face {utils_searing::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
+            Add_Step(f"teleport face {utils_foodpiece::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
             Add_Step_WaitFrames("the teleport is applied and written back", 4);
             Add_Step_WaitUntil("the piece is on the pan", n"Check_FirstOnPan", k_SlowPolls, 0);
             Add_Step("the teleported face is the one on the pan", n"Step_AssertDownFace");
@@ -63,7 +63,7 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
         Assert_True(utils_jolt_body::Get_IsBodyAdded(_Searing.Get_PieceBody(Get_FirstId())), "the piece's body is in the simulation");
 
         const auto Reach = _Searing.Get_PieceHalfExtents(Get_FirstId()).GetMax();
-        Teleport_Piece(Get_FirstId(), FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + Reach + 1.0), utils_searing::Make_FaceDownRotation(Face));
+        Teleport_Piece(Get_FirstId(), FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + Reach + 1.0), utils_foodpiece::Make_FaceDownRotation(Face));
     }
 
     UFUNCTION()
@@ -72,7 +72,7 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
         const auto Expected = _Order[_FaceIndex];
         const auto Down = _Searing.Get_DownFace(Get_FirstId());
         Assert_True(Down == Expected,
-            f"Make_FaceDownRotation({Expected :n}) = {utils_searing::Make_FaceDownRotation(Expected)} lands {Expected :n} on the pan (got {Down :n})");
+            f"Make_FaceDownRotation({Expected :n}) = {utils_foodpiece::Make_FaceDownRotation(Expected)} lands {Expected :n} on the pan (got {Down :n})");
     }
 
     UFUNCTION()
@@ -102,7 +102,7 @@ class UMars_AutoTest_Searing_TeleportingEachFaceDownMakesThePieceReady : UMars_A
 
         const auto Tally = _Searing.Get_Tally();
         ck::Trace(f"[Searing] teleported each face down: flips {Tally.Flips}, {Tally.Seconds :.2} s hot");
-        Assert_True(Tally.Flips >= 5, f"each teleport onto another face counted a flip (got {Tally.Flips}, want >= 5)");
+        Assert_Equals_Int(Tally.Flips, 5, "each of the five teleports onto another face counted one flip");
         _TallySecondsAtReady = Tally.Seconds;
     }
 

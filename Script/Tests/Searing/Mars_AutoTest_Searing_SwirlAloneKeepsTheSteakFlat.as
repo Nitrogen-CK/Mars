@@ -10,9 +10,14 @@ class UMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat : UMars_AutoTestRig_Sea
     // The station's SwirlHz.
     private const float32 k_SwirlHz = 1.5f;
     private const int32 k_SwirlSeconds = 12;
+    // The least spread of the traced pan-local XY that says the swirl moved the piece.
+    private const float64 k_MinGlideSpread = 0.5;
 
     private int32 _SecondsTraced = 0;
     private float64 _MaxRadius = 0.0;
+    // The bounds of the piece's traced pan-local XY: a still pan leaves them a point.
+    private FVector2D _MinLocalXY = FVector2D(1.0e9, 1.0e9);
+    private FVector2D _MaxLocalXY = FVector2D(-1.0e9, -1.0e9);
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -26,6 +31,7 @@ class UMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat : UMars_AutoTestRig_Sea
 
         Add_Steps_AddPieceAndLand();
         Add_Step("heat the pan: the swirl runs", n"Step_Heat");
+        Add_Step_WaitUntil("the swirl eased in to its full radius", n"Check_SwirlEasedIn", 0, 0);
         for (auto Second = 0; Second < k_SwirlSeconds; ++Second)
         {
             Add_Step_WaitSeconds("let the pan swirl", 1.0f);
@@ -42,8 +48,10 @@ class UMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat : UMars_AutoTestRig_Sea
         _SecondsTraced += 1;
         const auto Local = _Searing.Get_PiecePanLocal(Get_FirstId());
         _MaxRadius = Math::Max(_MaxRadius, Local.Size2D());
+        _MinLocalXY = FVector2D(Math::Min(_MinLocalXY.X, Local.X), Math::Min(_MinLocalXY.Y, Local.Y));
+        _MaxLocalXY = FVector2D(Math::Max(_MaxLocalXY.X, Local.X), Math::Max(_MaxLocalXY.Y, Local.Y));
         ck::Trace(f"[SearingSwirl] t={_SecondsTraced} s flips={_Searing.Get_Tally().Flips} r={Local.Size2D() :.2} "
-            + f"z={Local.Z :.2} down={utils_searing::Get_FaceName(_Searing.Get_DownFace(Get_FirstId()))}");
+            + f"z={Local.Z :.2} down={utils_foodpiece::Get_FaceName(_Searing.Get_DownFace(Get_FirstId()))}");
     }
 
     UFUNCTION()
@@ -55,6 +63,8 @@ class UMars_AutoTest_Searing_SwirlAloneKeepsTheSteakFlat : UMars_AutoTestRig_Sea
 
         Assert_True(Get_IsOnPan(Get_FirstId()), f"the piece stayed on the pan (contact {_Searing.Get_PieceContact(Get_FirstId()) :n})");
         Assert_Equals_Int(Tally.Losses, 0, "no loss");
+        const auto Spread = (_MaxLocalXY - _MinLocalXY).Size();
+        Assert_True(Spread > k_MinGlideSpread, f"the swirl moved the piece on the pan (pan-local XY spread {Spread :.2}, more than {k_MinGlideSpread :.1})");
         Assert_Equals_Int(Tally.Flips, 0, f"the swirl alone must not flip the piece (flips {Tally.Flips} in {k_SwirlSeconds} s)");
     }
 }

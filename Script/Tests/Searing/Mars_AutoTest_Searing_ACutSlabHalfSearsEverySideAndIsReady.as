@@ -2,7 +2,7 @@
 // long X axis at its centroid, as the cutting bench's cleaver parts it, and its positive half (about 18.3 x 20.0 x 12.2 cm,
 // its middle off its origin) is released over the hot pan's centre. The pan adopts it with its own extents (half the
 // slab's along the cut, the slab's across it) and its middle; it lands on its -Z face. Teleported onto the pan with each
-// face down in turn (utils_searing::Make_FaceDownRotation, about its middle), that face is the one on the pan
+// face down in turn (utils_foodpiece::Make_FaceDownRotation, about its middle), that face is the one on the pan
 // (Get_DownFace agrees), its middle rests its own half extent along that face's axis above the cooking surface, the
 // footprint the pan pools under it spans the two half extents across that face (Get_PieceFootprintHalf), and it sears
 // through; each teleport after the first counts a flip, and the sixth seared face makes the half Ready once, on the pan,
@@ -15,7 +15,7 @@ class UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady : UMars_AutoTe
     private FVector _SlabHalfExtents;
     private FCk_Handle_FoodPiece _Half;
     private FMars_CookingFeed_PieceId _HalfId;
-    private TArray<EMars_Searing_Face> _Order;
+    private TArray<EMars_FoodPiece_Face> _Order;
     private int32 _FaceIndex = -1;
 
     UFUNCTION(BlueprintOverride)
@@ -29,12 +29,12 @@ class UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady : UMars_AutoTe
         _Slab = Build_Piece(Slab.Data.Mesh, FTransform(FRotator::ZeroRotator, k_Origin + k_ParkLocal), Make_FoodSpec(Slab.Data.MassKg, Slab));
         _Pieces.Add(_Slab);
 
-        _Order.Add(EMars_Searing_Face::NegZ);
-        _Order.Add(EMars_Searing_Face::PosZ);
-        _Order.Add(EMars_Searing_Face::PosX);
-        _Order.Add(EMars_Searing_Face::NegX);
-        _Order.Add(EMars_Searing_Face::PosY);
-        _Order.Add(EMars_Searing_Face::NegY);
+        _Order.Add(EMars_FoodPiece_Face::NegZ);
+        _Order.Add(EMars_FoodPiece_Face::PosZ);
+        _Order.Add(EMars_FoodPiece_Face::PosX);
+        _Order.Add(EMars_FoodPiece_Face::NegX);
+        _Order.Add(EMars_FoodPiece_Face::PosY);
+        _Order.Add(EMars_FoodPiece_Face::NegY);
 
         Add_Step("heat the pan", n"Step_Heat");
         Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanBodyAdded", k_SlowPolls, 0);
@@ -46,7 +46,7 @@ class UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady : UMars_AutoTe
         Add_Step("the pan adopted the half with its own extents, on its -Z face", n"Step_AssertAdopted");
         for (int32 Index = 0; Index < _Order.Num(); ++Index)
         {
-            Add_Step(f"teleport face {utils_searing::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
+            Add_Step(f"teleport face {utils_foodpiece::Get_FaceName(_Order[Index])} down onto the pan", n"Step_TeleportNextFace");
             Add_Step_WaitFrames("the teleport is applied and written back", 4);
             Add_Step_WaitUntil("the half is on the pan", n"Check_HalfOnPan", k_SlowPolls, 0);
             Add_Step("the teleported face is the one on the pan, and the footprint spans it", n"Step_AssertDownFace");
@@ -113,15 +113,15 @@ class UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady : UMars_AutoTe
         Assert_Equals_Float(State.HalfExtents.Z, _SlabHalfExtents.Z, 0.5, "the half is about the slab's height");
 
         const auto Down = _Searing.Get_DownFace(_HalfId);
-        Assert_True(Down == EMars_Searing_Face::NegZ, f"it lies on its -Z face as released (got {Down :n})");
+        Assert_True(Down == EMars_FoodPiece_Face::NegZ, f"it lies on its -Z face as released (got {Down :n})");
         Assert_Equals_Int(_Lost.Num(), 0, "nothing was lost");
     }
 
     // The half's own half extent along InFace's axis.
-    private float64 Get_HalfExtentAlong(EMars_Searing_Face InFace) const
+    private float64 Get_HalfExtentAlong(EMars_FoodPiece_Face InFace) const
     {
         const auto HalfExtents = _Searing.Get_PieceHalfExtents(_HalfId);
-        const auto Normal = utils_searing::Get_FaceNormal(InFace);
+        const auto Normal = utils_foodpiece::Get_FaceNormal(InFace);
         return Math::Abs(Normal.X) * HalfExtents.X + Math::Abs(Normal.Y) * HalfExtents.Y + Math::Abs(Normal.Z) * HalfExtents.Z;
     }
 
@@ -135,7 +135,7 @@ class UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady : UMars_AutoTe
 
         // Its own half extent along the face's axis, plus a centimetre's drop.
         Teleport_Piece(_HalfId, FVector(0.0, 0.0, utils_searing::k_PanSurfaceZ + Get_HalfExtentAlong(Face) + 1.0),
-            utils_searing::Make_FaceDownRotation(Face));
+            utils_foodpiece::Make_FaceDownRotation(Face));
     }
 
     UFUNCTION()
@@ -178,13 +178,13 @@ class UMars_AutoTest_Searing_ACutSlabHalfSearsEverySideAndIsReady : UMars_AutoTe
 
         const auto Tally = _Searing.Get_Tally();
         ck::Trace(f"[Searing] cut slab half, each face down: flips {Tally.Flips}, {Tally.Seconds :.2} s hot");
-        Assert_True(Tally.Flips >= 5, f"each teleport onto another face counted a flip (got {Tally.Flips}, want >= 5)");
+        Assert_Equals_Int(Tally.Flips, 5, "each of the five teleports onto another face counted one flip");
 
         const auto CookState = _Searing.Get_PieceCookState(_HalfId);
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
             Assert_Equals_Float(CookState.Sear[Index], 1.0, 0.0001,
-                f"face {utils_searing::Get_FaceName(EMars_Searing_Face(Index))} is seared through in the cook state the pan hands back");
+                f"face {utils_foodpiece::Get_FaceName(EMars_FoodPiece_Face(Index))} is seared through in the cook state the pan hands back");
         }
     }
 }

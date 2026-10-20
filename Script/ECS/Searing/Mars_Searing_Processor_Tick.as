@@ -19,8 +19,8 @@ struct FMars_Searing_PieceEvents
     bool Lost = false;
     // Set when the face on the pan crossed a tenth: the face and the reported alpha.
     TOptional<float32> ProgressAlpha;
-    EMars_Searing_Face ProgressFace = EMars_Searing_Face::NegZ;
-    TOptional<EMars_Searing_Face> Seared;
+    EMars_FoodPiece_Face ProgressFace = EMars_FoodPiece_Face::NegZ;
+    TOptional<EMars_FoodPiece_Face> Seared;
     bool Ready = false;
 }
 
@@ -81,17 +81,18 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
             if (Piece.Arriving.IsSet())
             {
                 Piece.ArrivingSeconds += Frame.DeltaSeconds;
-                if (utils_searing::Get_HasArrived(Piece.Body, Piece.Entity, Piece.Arriving.GetValue()) == false)
+                const auto Arrival = utils_cooking_feed::Get_ArrivalVerdict(
+                    FMars_CookingFeed_ArrivalQuery(Piece.Body, Piece.Entity, Piece.Arriving.GetValue(), Piece.ArrivingSeconds));
+                if (Arrival == EMars_CookingFeed_Arrival::OnItsWay)
                 {
-                    if (Piece.ArrivingSeconds < utils_searing::k_ArrivalMaxSeconds)
-                    {
-                        InState.Pieces[Index] = Piece;
-                        continue;
-                    }
+                    InState.Pieces[Index] = Piece;
+                    continue;
+                }
 
-                    ck::EnsureIfNot(false, f"[Searing] [{Frame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}] "
-                        + f"never arrived at its release: {utils_searing::Get_ArrivalDistance(Piece.Entity, Piece.Arriving.GetValue())} cm away "
-                        + f"after {Piece.ArrivingSeconds} s; judged where it is");
+                if (Arrival == EMars_CookingFeed_Arrival::Overdue)
+                {
+                    const auto Distance = utils_foodpiece::Get_ArrivalDistance(Piece.Entity, Piece.Arriving.GetValue());
+                    ck::EnsureIfNot(false, f"[Searing] [{Frame.Searing.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}] never arrived at its release: {Distance} cm away after {Piece.ArrivingSeconds} s; judged where it is");
                 }
 
                 Piece.Arriving.Reset();
@@ -228,8 +229,9 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
     // Ledger
     //----------------------------------------------------------------------------------------------------------------------
 
-    // A cooking piece's face on a hot pan sears toward 1 (never past it). Progress is reported at tenths, each face once at
-    // 1, and the sixth seared face makes the piece Ready (the others keep cooking).
+    // A cooking piece's face on a hot pan sears toward 1 (never past it). Progress is reported at tenths, and whenever the
+    // face on the pan changes (a tumble onto a face at the same tenth), each face once at 1, and the sixth seared face makes
+    // the piece Ready (the others keep cooking).
     private void Advance_Sear(FMars_Searing_Frame& InFrame, FMars_Searing_PieceState& InPiece, FMars_Searing_PieceEvents& OutEvents)
     {
         if (InFrame.IsHot == false
@@ -244,9 +246,10 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         InPiece.FaceSear[Index] = After;
 
         const auto Step = Math::FloorToInt(After * float32(utils_searing::k_SearSignalSteps));
-        if (Step != InPiece.LastProgressStep)
+        if (Step != InPiece.LastProgressStep || Face != InPiece.LastProgressFace)
         {
             InPiece.LastProgressStep = Step;
+            InPiece.LastProgressFace = Face;
             OutEvents.ProgressFace = Face;
             OutEvents.ProgressAlpha = TOptional<float32>(float32(Step) / float32(utils_searing::k_SearSignalSteps));
         }
@@ -254,7 +257,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         if (Before >= 1.0f || After < 1.0f)
         { return; }
 
-        OutEvents.Seared = TOptional<EMars_Searing_Face>(Face);
+        OutEvents.Seared = TOptional<EMars_FoodPiece_Face>(Face);
         if (utils_searing::Get_SearedFaceCount(InPiece.FaceSear) < utils_searing::k_FaceCount)
         { return; }
 
@@ -353,10 +356,10 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         return utils_foodpiece::Get_CentreFrame(PieceWorld.GetRelativeTransform(InFrame.PanBaseWorld), InPiece.CentreLocal);
     }
 
-    private EMars_Searing_Face Get_DownFace(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
+    private EMars_FoodPiece_Face Get_DownFace(const FMars_Searing_Frame& InFrame, const FMars_Searing_PieceState& InPiece) const
     {
         const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(InPiece.Entity.As_Transform());
-        return utils_searing::Get_DownFace(PieceWorld.GetRotation(), InFrame.PanUp);
+        return utils_foodpiece::Get_DownFace(PieceWorld.GetRotation(), InFrame.PanUp);
     }
 
     // The piece's middle, in the pan base's frame, within PanRadius of the axis and between Loss.FallThroughCm below (a thin
@@ -367,7 +370,7 @@ class UMars_Processor_Searing_Tick : UCk_Processor_Script_Base_UE
         const auto Pose = Get_PanPose(InFrame, InPiece);
         const auto Local = Pose.GetLocation();
         const auto AboveTop = Local.Z - utils_searing::k_PanSurfaceZ;
-        const auto HalfHeight = utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents);
+        const auto HalfHeight = utils_foodpiece::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents);
         return Local.Size2D() <= InFrame.Spec.Loss.PanRadius && AboveTop >= -InFrame.Spec.Loss.FallThroughCm
             && AboveTop <= 3.0 * HalfHeight;
     }

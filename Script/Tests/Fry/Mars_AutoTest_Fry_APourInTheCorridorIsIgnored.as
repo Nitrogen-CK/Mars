@@ -1,6 +1,7 @@
-// The carried skimmer slid into the corridor (out of the pot, short of the basket) and a Dip asked there: the skim stays
-// Carry, no skim edge is broadcast, the lift target stays at the carry and the pitch target level (a dip there would drop the
-// disc into the counter; a pour would empty the scoop onto it).
+// The carried skimmer slid into the corridor (out of the pot, short of the basket), then a Dip and a Pour asked there: the
+// kernel refuses each (OnSkimRefused naming it), the skim stays Carry, no skim edge is broadcast, the lift target stays at
+// the carry and the pitch target level (a dip there would drop the disc into the counter; a pour would empty the scoop onto
+// it).
 class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
 {
     default _TimeoutSeconds = 10.0f;
@@ -18,8 +19,10 @@ class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
         Add_Step("slide the carried scoop into the corridor", n"Step_SlideToCorridor");
         Add_Step_WaitUntil("the scoop is in the corridor", n"Check_SlideSettled", k_SlowPolls, 0);
         Add_Step("neither in the pot nor over the basket; ask for a dip", n"Step_AskDip");
-        Add_Step_WaitFrames("the dip drains", 3);
-        Add_Step("the dip was ignored", n"Step_AssertIgnored");
+        Add_Step_WaitUntil("the dip was refused", n"Check_DipRefused");
+        Add_Step("ask for a pour", n"Step_AskPour");
+        Add_Step_WaitUntil("the pour was refused", n"Check_PourRefused");
+        Add_Step("both were ignored", n"Step_AssertIgnored");
         Run_Steps(InHandle);
     }
 
@@ -32,8 +35,6 @@ class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
     UFUNCTION()
     private void Step_AskDip(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto ScoopRoot = _Fry.Get_ScoopRoot();
-        Log(f"[Mars_AutoTest_Fry_APourInTheCorridorIsIgnored] scoop at root {ScoopRoot}, target {_Fry.Get_SkimmerTarget()}");
         Assert_Equals_Float(_Fry.Get_SkimmerTarget().Y, k_CorridorXY.Y, 0.01, "the corridor point is inside the reach (no clamp)");
         Assert_False(_Fry.Get_IsScoopInPot(), "the scoop is out of the pot");
         Assert_False(_Fry.Get_IsScoopOverBasket(), "the scoop is not over the basket");
@@ -43,8 +44,29 @@ class UMars_AutoTest_Fry_APourInTheCorridorIsIgnored : UMars_AutoTestRig_Fry
     }
 
     UFUNCTION()
+    private void Check_DipRefused(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_SkimRefusals.Contains(EMars_Fry_Skim::Dip));
+    }
+
+    UFUNCTION()
+    private void Step_AskPour(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        _Fry.Request_Skim(FMars_Request_Fry_Skim(EMars_Fry_Skim::Pour));
+    }
+
+    UFUNCTION()
+    private void Check_PourRefused(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_SkimRefusals.Contains(EMars_Fry_Skim::Pour));
+    }
+
+    UFUNCTION()
     private void Step_AssertIgnored(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        Assert_Equals_Int(_SkimRefusals.Num(), 2, "one refusal per ask");
         Assert_True(_Fry.Get_Skim() == EMars_Fry_Skim::Carry, f"the skim stays Carry (got {_Fry.Get_Skim() :n})");
         Assert_Equals_Int(_SkimChanges.Num(), _SkimEdgesBeforeDip, "no skim edge");
         Assert_Equals_Float(_Skimmer.Get_TargetLift(), _Spec.Scoop.CarryLift, 0.0001, "the lift target stays at the carry");

@@ -1,5 +1,5 @@
 // The real searing station (spawned through its entity script, the only station in this world) starts with an empty pan
-// and no source for its feed (nothing is docked), and shows no raw proxies: the docked platter is the stock's only visual.
+// and no source for its feed (nothing is docked).
 // Nobody operates it here, so no release reaches its feed bridge: the test admits one piece itself (a box food piece wearing
 // its own display, as whoever makes a piece dresses it; into the station's admission inbox with its middle at the feed's
 // release node, as the bridge would) and reads the dressing the station builds from the kernel every frame. The station adds no part to the
@@ -8,8 +8,9 @@
 // mesh's cm with the footprint radius and pool radius of the piece's own size, the oil trail has caught up with it, and the
 // footprint node sits under the piece on the cooking surface. A piece teleported across the pan leaves the trail behind at first and the trail
 // catches up within a second. The dressing is read back through the station's tagged pan part and footprint node. The
-// piece's own display carries its look: on arrival its face slots (0..5) and Shape (9) read the unseared 0, and once its
-// down face has seared past 0.05, at a frame a write lands (or the sear has stopped), those slots equal the kernel's face
+// piece's own display carries its look. Before admission the test seeds the piece's ledger with a PosZ (up) sear of 0.5,
+// which nothing writes to the display; on arrival the station's write carries it: slot PosZ reads 0.5, the other face
+// slots (0..5) 0 and Shape (9) their mean. Once its down face has seared past 0.05, at a frame a write lands (or the sear has stopped), those slots equal the kernel's face
 // sears and their mean within 0.03. The test destroys the station before it finishes: the table's static-world bake is an
 // entity of the world, removed only when the table's component tears down.
 class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_FoodPiece
@@ -24,13 +25,15 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
     private const float64 k_PanScale = 2.5;
     // Where the piece is teleported, in the pan body's frame (the pan mesh's own): over the base, above the surface.
     private const FVector k_TeleportLocal = FVector(10.0, 0.0, 20.0);
-    // Art cm. The swirl keeps the cube gliding under the 0.25 s lag, so the gap never settles below about 0.5 (0.24-0.46 seen).
+    // Art cm. The swirl keeps the cube gliding under the 0.25 s lag, so the gap never settles below about 0.5.
     private const float64 k_TrailCaughtUp = 0.75;
     // The cook state's display slots: the six face sears at 0..5, Shape at 9.
     private const int32 k_ShapeSlot = 9;
     // The write threshold (0.02) plus the frame or two a deferred write trails the kernel.
     private const float32 k_DisplayTolerance = 0.03f;
     private const float32 k_SearedPast = 0.05f;
+    // The up face's sear the ledger is seeded with before admission; only the station's arrival write puts it on the display.
+    private const float32 k_SeededUpSear = 0.5f;
     // A poll budget, not a ceiling: the pan's mesh bakes, the box imports and its display sets up over seconds.
     private const int32 k_SlowPolls = 900;
 
@@ -75,12 +78,15 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         Add_Step_WaitUntil("the station composed its Searing and its feed, the pan body exists and the box is ready", n"Check_StationReady", k_SlowPolls, 0);
         Add_Step("dress the box with its own display", n"Step_DressPiece");
         Add_Step_WaitUntil("the box's display is set up", n"Check_PieceShown", k_SlowPolls, 0);
+        Add_Step("seed the ledger's up face with a sear", n"Step_SeedUpSear");
+        Add_Step_WaitUntil("the ledger carries the seeded sear", n"Check_UpSearSeeded", 0, 0);
+        Add_Step("nothing wrote the seeded sear to the display", n"Step_AssertSeedNotShown");
         Add_Step_WaitUntil("the station's state machine is Idle and the kernel has no request pending", n"Check_IdleAndDrained", 0, 0);
         Add_Step("the pan is empty and the feed unsourced; heat the pan and admit a piece at the release node", n"Step_AssertEmptyHeatAndAdd");
         Add_Step_WaitUntil("the piece was admitted", n"Check_PieceAdded", 0, 0);
-        Add_Step_WaitFrames("the arrival write drains", 1);
-        Add_Step("the piece's display reads its unseared arrival look", n"Step_AssertArrivalWrite");
-        Add_Step("find the tagged pan part and footprint node; no raw proxy exists", n"Step_FindParts");
+        Add_Step_WaitUntil("the station's arrival write landed on the display", n"Check_ArrivalWritten", 0, 0);
+        Add_Step("the piece's display reads its arrival look", n"Step_AssertArrivalWrite");
+        Add_Step("find the tagged pan part and footprint node", n"Step_FindParts");
         Add_Step_WaitUntil("the pan's component exists", n"Check_ComponentsExist", 0, 0);
         Add_Step("the admitted piece wears only its own display", n"Step_AssertPieceUndressed");
         Add_Step_WaitUntil("the piece lies on the hot pan", n"Check_OnHotPan", k_SlowPolls, 0);
@@ -171,14 +177,49 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         Res.Set(_Searing.Get_HasPiece(_PieceId));
     }
 
-    // The station wrote the arrival look (the box's spec seeds no sear) before the piece has touched the pan.
+    UFUNCTION()
+    private void Step_SeedUpSear(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto CookState = _Piece.Get_CookState();
+        CookState.Sear[int32(EMars_FoodPiece_Face::PosZ)] = k_SeededUpSear;
+        _Piece.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
+    }
+
+    UFUNCTION()
+    private void Check_UpSearSeeded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Piece.Get_CookState().Sear[int32(EMars_FoodPiece_Face::PosZ)] == k_SeededUpSear);
+    }
+
+    UFUNCTION()
+    private void Step_AssertSeedNotShown(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Float(Get_DisplaySlot(int32(EMars_FoodPiece_Face::PosZ)), 0.0f, k_DisplayTolerance,
+            "the display still shows the up face unseared: a ledger write is not a display write");
+    }
+
+    // The station's arrival write: the up face's slot carries the ledger's seeded sear.
+    UFUNCTION()
+    private void Check_ArrivalWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Math::Abs(Get_DisplaySlot(int32(EMars_FoodPiece_Face::PosZ)) - k_SeededUpSear) <= k_DisplayTolerance);
+    }
+
+    // The station wrote the arrival look (the ledger's seeded up sear) before the piece has touched the pan.
     UFUNCTION()
     private void Step_AssertArrivalWrite(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        const auto UpSlot = int32(EMars_FoodPiece_Face::PosZ);
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
-        { Assert_Equals_Float(Get_DisplaySlot(Face), 0.0f, k_DisplayTolerance, f"display slot {Face} reads the unseared face on arrival"); }
+        {
+            const auto Expected = Face == UpSlot ? k_SeededUpSear : 0.0f;
+            Assert_Equals_Float(Get_DisplaySlot(Face), Expected, k_DisplayTolerance, f"display slot {Face} reads the ledger's sear on arrival");
+        }
 
-        Assert_Equals_Float(Get_DisplaySlot(k_ShapeSlot), 0.0f, k_DisplayTolerance, "display slot 9 reads the raw shape on arrival");
+        const auto Shape = k_SeededUpSear / float32(utils_searing::k_FaceCount);
+        Assert_Equals_Float(Get_DisplaySlot(k_ShapeSlot), Shape, k_DisplayTolerance, "display slot 9 reads the mean sear on arrival");
     }
 
     UFUNCTION()
@@ -186,10 +227,8 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
     {
         const auto Pans = utils_entity_tag::ForEach_Entity(InHandle, n"TAG_MarsSearingPan");
         const auto Footprints = utils_entity_tag::ForEach_Entity(InHandle, n"TAG_MarsSearingFootprint");
-        const auto RawSlots = utils_entity_tag::ForEach_Entity(InHandle, n"TAG_MarsSearingRawSlot");
         Assert_Equals_Int(Pans.Num(), 1, "one tagged pan part");
         Assert_Equals_Int(Footprints.Num(), 1, "one tagged footprint node");
-        Assert_Equals_Int(RawSlots.Num(), 0, "no raw slot proxy: the docked platter is the stock's only visual");
         if (Pans.Num() != 1 || Footprints.Num() != 1)
         { return; }
 
@@ -242,9 +281,9 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
     private void Step_AssertDressing(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Searing.Get_PieceContact(_PieceId) == EMars_Searing_Contact::OnPan, "the piece still lies on the pan");
-        Assert_True(_Searing.Get_DownFace(_PieceId) == EMars_Searing_Face::NegZ, f"NegZ is still down (got {_Searing.Get_DownFace(_PieceId) :n})");
+        Assert_True(_Searing.Get_DownFace(_PieceId) == EMars_FoodPiece_Face::NegZ, f"NegZ is still down (got {_Searing.Get_DownFace(_PieceId) :n})");
 
-        const auto Sear = _Searing.Get_FaceSear(_PieceId, EMars_Searing_Face::NegZ);
+        const auto Sear = _Searing.Get_FaceSear(_PieceId, EMars_FoodPiece_Face::NegZ);
         Assert_True(Sear > 0.05f, f"the piece's NegZ face sears (got {Sear})");
 
         auto Material = Get_PanMaterial();
@@ -321,8 +360,8 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
     UFUNCTION()
     private void Check_DisplayCaughtUp(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Sear = _Searing.Get_FaceSear(_PieceId, EMars_Searing_Face::NegZ);
-        const auto Slot = Get_DisplaySlot(int32(EMars_Searing_Face::NegZ));
+        const auto Sear = _Searing.Get_FaceSear(_PieceId, EMars_FoodPiece_Face::NegZ);
+        const auto Slot = Get_DisplaySlot(int32(EMars_FoodPiece_Face::NegZ));
         const auto Wrote = _PolledNegZSlot >= 0.0f && Slot != _PolledNegZSlot;
         const auto Stopped = Sear == _PolledNegZSear;
         _PolledNegZSlot = Slot;
@@ -340,7 +379,7 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         for (int32 Face = 0; Face < utils_searing::k_FaceCount; ++Face)
         {
             _SnapSlots.Add(Get_DisplaySlot(Face));
-            _SnapSears.Add(_Searing.Get_FaceSear(_PieceId, EMars_Searing_Face(Face)));
+            _SnapSears.Add(_Searing.Get_FaceSear(_PieceId, EMars_FoodPiece_Face(Face)));
         }
 
         _SnapSlots.Add(Get_DisplaySlot(k_ShapeSlot));
@@ -367,7 +406,7 @@ class UMars_AutoTest_SearingStation_DressingFollowsTheSteak : UMars_AutoTestRig_
         Assert_Equals_Float(_SnapSlots[utils_searing::k_FaceCount], Shape, k_DisplayTolerance,
             f"display slot 9 [{_SnapSlots[utils_searing::k_FaceCount]}] is the shape, the mean sear [{Shape}]");
 
-        const auto NegZ = int32(EMars_Searing_Face::NegZ);
+        const auto NegZ = int32(EMars_FoodPiece_Face::NegZ);
         Assert_True(_SnapSlots[NegZ] >= k_SearedPast - k_DisplayTolerance,
             f"the display carries the down face's sear [{_SnapSlots[NegZ]}], not the arrival's 0");
     }

@@ -1,11 +1,13 @@
 // The chop is the kernel's own clock: a Cutting with no cleaver drawn at all (no Mover anywhere) chops. A chop request
-// broadcasts OnChopStarted at once, lands (OnChopLanded) no sooner than ChopSeconds later while the kernel still reads
-// chopping, and the kernel reads Idle again no sooner than a second ChopSeconds after the landing; a second chop then
+// broadcasts OnChopStarted at once, lands (OnChopLanded) ChopSeconds later (within the poll slack either way) while the
+// kernel still reads chopping, and the kernel reads Idle again a second ChopSeconds after the landing; a second chop then
 // starts and lands the same way. Two starts, two landings.
 class UMars_AutoTest_Cutting_TheChopClockIsTheKernels : UMars_AutoTestRig_Cutting
 {
     // The poll that sees an edge comes up to a frame after the Tick that made it.
     private const float32 k_FrameSlackSeconds = 0.05f;
+    // Long against the slack, so a clock running at half or double speed misses its two-sided window.
+    private const float32 k_ChopSeconds = 0.5f;
 
     private float32 _ChopTime = 0.0f;
     private float32 _LandTime = 0.0f;
@@ -15,7 +17,9 @@ class UMars_AutoTest_Cutting_TheChopClockIsTheKernels : UMars_AutoTestRig_Cuttin
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
     {
-        BuildStation(InHandle, FMars_Cutting_Spec());
+        auto Spec = FMars_Cutting_Spec();
+        Spec.ChopSeconds = k_ChopSeconds;
+        BuildStation(InHandle, Spec);
 
         _Cutting.BindTo_OnChopStarted(FMars_Delegate_Cutting_OnChopStarted(this, n"OnChopStarted"));
         _Cutting.BindTo_OnChopLanded(FMars_Delegate_Cutting_OnChopLanded(this, n"OnChopLanded"));
@@ -62,10 +66,10 @@ class UMars_AutoTest_Cutting_TheChopClockIsTheKernels : UMars_AutoTestRig_Cuttin
     {
         const auto ChopSeconds = _Cutting.Get_Spec().ChopSeconds;
         Assert_Equals_Int(_ChopsStarted, 1, "OnChopStarted fired once");
-        Assert_True(_LandTime - _ChopTime >= ChopSeconds - k_FrameSlackSeconds,
+        Assert_Equals_Float(_LandTime - _ChopTime, ChopSeconds, 2.0f * k_FrameSlackSeconds,
             f"the chop landed {_LandTime - _ChopTime} s after it started (strike {ChopSeconds} s)");
         Assert_True(_ChoppingAtLanding, "the kernel still read chopping as the chop landed");
-        Assert_True(_IdleTime - _LandTime >= ChopSeconds - k_FrameSlackSeconds,
+        Assert_Equals_Float(_IdleTime - _LandTime, ChopSeconds, 2.0f * k_FrameSlackSeconds,
             f"the cleaver was back up {_IdleTime - _LandTime} s after the landing (recover {ChopSeconds} s)");
     }
 

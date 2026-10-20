@@ -110,9 +110,14 @@ class UMars_AutoTest_Implement_LookSteersTheTiltAndItLevelsOut : UMars_AutoTestR
     UFUNCTION()
     private void Step_AssertClampedOnTheNode(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        // The target, not the tilt: the tilt moves at most MaxTiltRateDegreesPerSecond a frame, so the first poll past 25
+        // reads under the clamp with or without it, while an unclamped target would still be near the look's 120.
+        const auto TargetRoll = _Implement.Get_TargetTilt().Roll;
+        Assert_True(TargetRoll > 25.0 - 0.01 && TargetRoll <= _Spec.Tilt.MaxTiltDegrees + 0.01,
+            f"a 120-degree roll target clamps at MaxTiltDegrees {_Spec.Tilt.MaxTiltDegrees} (got {TargetRoll})");
+
         const auto Roll = _Implement.Get_Tilt().Roll;
-        Assert_True(Roll <= _Spec.Tilt.MaxTiltDegrees + 0.01,
-            f"a 120-degree roll clamps at MaxTiltDegrees {_Spec.Tilt.MaxTiltDegrees} (got {Roll})");
+        Assert_True(Roll <= TargetRoll + 0.01, f"the roll {Roll} has not passed its target {TargetRoll}");
 
         const auto NodeRoll = utils_scene_node::Get_Offset(_Node).Rotator().Roll;
         Assert_Equals_Float(NodeRoll, Roll, 0.5, "the node's offset rotation shows the roll");

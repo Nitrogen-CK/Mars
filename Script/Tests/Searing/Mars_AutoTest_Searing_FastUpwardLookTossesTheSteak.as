@@ -7,7 +7,7 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
     default _TimeoutSeconds = 12.0f;
 
     private int32 _ContactsBeforeToss = 0;
-    private EMars_Searing_Face _DownFaceBefore = EMars_Searing_Face::NegZ;
+    private EMars_FoodPiece_Face _DownFaceBefore = EMars_FoodPiece_Face::NegZ;
     private float32 _TossTime = -1.0f;
     private float32 _AirborneTime = -1.0f;
     private float32 _PeakLiftVelocity = 0.0f;
@@ -95,7 +95,7 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
         {
             const auto DownFaceAfter = _Searing.Get_DownFace(Get_FirstId());
             ck::Trace(f"[Searing] toss outcome: LANDED after {_EndAirSeconds :.3} s airborne; peak lift velocity "
-                + f"{_PeakLiftVelocity :.1} uu/s; down face {utils_searing::Get_FaceName(_DownFaceBefore)} -> {utils_searing::Get_FaceName(DownFaceAfter)} "
+                + f"{_PeakLiftVelocity :.1} uu/s; down face {utils_foodpiece::Get_FaceName(_DownFaceBefore)} -> {utils_foodpiece::Get_FaceName(DownFaceAfter)} "
                 + f"after the settle (flips {Tally.Flips})");
             Assert_True(_Searing.Get_PieceStatus(Get_FirstId()) == EMars_Searing_PieceStatus::Cooking, "the tossed piece is still cooking");
             Assert_Equals_Int(Tally.Losses, 0, "the landed piece was not lost while it settled");
@@ -105,7 +105,7 @@ class UMars_AutoTest_Searing_FastUpwardLookTossesTheSteak : UMars_AutoTestRig_Se
         }
 
         ck::Trace(f"[Searing] toss outcome: LOST {_EndAirSeconds :.3} s after leaving the pan; peak lift velocity "
-            + f"{_PeakLiftVelocity :.1} uu/s; down face before {utils_searing::Get_FaceName(_DownFaceBefore)}");
+            + f"{_PeakLiftVelocity :.1} uu/s; down face before {utils_foodpiece::Get_FaceName(_DownFaceBefore)}");
         Assert_Equals_Int(Tally.Losses, 1, "the lost toss counted one loss");
         Assert_Equals_Int(_Searing.Get_Summary().Lost, 1, "the summary counts it lost");
     }

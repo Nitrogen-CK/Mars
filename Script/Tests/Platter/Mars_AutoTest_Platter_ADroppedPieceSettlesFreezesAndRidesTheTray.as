@@ -1,6 +1,7 @@
 // A cut-sized piece loaded onto a still platter drops between its walls, settles with physics and freezes into the pile:
-// within Settle.MaxSeconds of its drop OnLoaded fires once, the piece is a scene-node child of the root, its body reads
-// Kinematic and its bounds centre lies inside the walls. The platter root then moves 50 cm and the piece moves with it.
+// within Settle.MaxSeconds of its drop OnLoaded fires once, the freeze is the settle's own (Settled: the piece came to
+// rest, not the MaxSeconds clamp), the piece is a scene-node child of the root, its body reads Kinematic and it lies on the
+// floor inside the walls. The platter root then moves 50 cm and the piece moves with it.
 class UMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray : UMars_AutoTestRig_Platter
 {
     private const FVector k_Origin = FVector(14000.0, -18000.0, -30000.0);
@@ -48,6 +49,7 @@ class UMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray : UMars_
     UFUNCTION()
     private void Check_Loaded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        Record_Freezes(_Platter);
         auto Res = OutResult;
         Res.Set(TryGet_Loaded(_P).IsSet() || Get_AllRefusalCount(_Platter) > 0);
     }
@@ -60,7 +62,10 @@ class UMars_AutoTest_Platter_ADroppedPieceSettlesFreezesAndRidesTheTray : UMars_
 
         const auto Landing = TryGet_Loaded(_P);
         Assert_True(Landing.IsSet() && Landing.GetValue().BodyMotion == ECk_MotionType::Kinematic, "P's body read Kinematic when OnLoaded fired");
+        const auto Cause = TryGet_FreezeCause(_P);
+        Assert_True(Cause.IsSet() && Cause.GetValue() == EMars_Platter_FreezeCause::Settled, "P froze because it came to rest (Settled), not at MaxSeconds");
         Assert_True(Get_IsFrozenOn(_Platter, _P), "P is held, Kinematic and a scene-node child of the root");
+        Assert_True(Get_RestsOnFloor(_Platter, _P), "P lies on the platter's floor");
         Assert_True(Get_IsInsideWalls(_Platter, _P), f"P's bounds centre lies inside the walls (P at {Get_World(_P).GetLocation()}, root at {Get_PlatterWorld(_Platter).GetLocation()})");
         Assert_Equals_Int(_Platter.Get_PendingCount(), 0, "nothing else is queued or settling");
 

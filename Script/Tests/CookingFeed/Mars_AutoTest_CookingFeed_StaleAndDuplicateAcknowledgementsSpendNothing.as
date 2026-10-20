@@ -1,7 +1,8 @@
 // Only an answer for exactly the awaited piece counts: a transfer the reservation does not name and a newer generation are
 // ignored while awaiting, the right answer spends once, the same answer again spends nothing. After the source changes
 // mid-admission (unsourced and sourced again in one drain: the feed puts the released piece back on the platter it came
-// from), an Accepted answer for the old piece spends nothing in the new attempt.
+// from), a fresh press awaits its own piece, and an Accepted answer for the old piece arriving then spends nothing and
+// settles nothing (the id filter, not the phase, refuses it); the fresh piece's own answer still admits it.
 class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing : UMars_AutoTestRig_CookingFeed
 {
     private FMars_CookingFeed_PieceId _Awaited;
@@ -30,9 +31,12 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
         Add_Step("change the source mid-admission", n"Step_ResourceMidAdmission");
         Add_Step_WaitUntil("the source change applied", n"Check_ResourceApplied", 0, 0);
         Add_Step_WaitUntil("the released piece is back on the platter", n"Check_StaleBack", k_SlowPolls, 0);
-        Add_Step("accept the old piece", n"Step_AcceptStale");
+        Add_Step("the source change settled the old reservation; press add food again", n"Step_AssertResourcedAndBegin");
+        Add_Step_WaitUntil("the fresh piece awaits admission", n"Check_AwaitingAdmission", 0, 0);
+        Add_Step("accept the old piece while the fresh one is awaited", n"Step_AcceptStale");
         Add_Step_WaitFrames("the stale answer drains", 3);
-        Add_Step("the new attempt is untouched", n"Step_AssertFreshAttempt");
+        Add_Step("the fresh attempt is untouched; accept the fresh piece", n"Step_AssertFreshAttempt");
+        Add_Step_WaitUntil("the fresh piece is admitted", n"Check_OneAdmitted", 0, 0);
         Run_Steps(InHandle);
     }
 
@@ -91,6 +95,15 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     }
 
     UFUNCTION()
+    private void Step_AssertResourcedAndBegin(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_Settles.Num(), 2, "the source change settled the reservation");
+        Assert_True(_Settles.Num() == 2 && _Settles[1] == EMars_CookingFeed_Settle::Cancelled, "the reservation settled Cancelled");
+        Assert_True(_SettledPieces.Num() == 2 && _SettledPieces[1].Get_IsSame(_Stale), "under its old id");
+        Begin();
+    }
+
+    UFUNCTION()
     private void Step_AcceptStale(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Resolve(_Stale, EMars_CookingFeed_Admission::Accepted);
@@ -99,11 +112,11 @@ class UMars_AutoTest_CookingFeed_StaleAndDuplicateAcknowledgementsSpendNothing :
     UFUNCTION()
     private void Step_AssertFreshAttempt(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Ledger(k_Stock - 1, 0, "after the stale answer (the first piece stays spent)");
-        Assert_True(_Feed.Get_Phase() == EMars_CookingFeed_Phase::Idle, "the hand stays at rest");
-        Assert_Equals_Int(_Settles.Num(), 2, "the source change settled the reservation; the stale answer settled nothing");
-        Assert_True(_Settles.Num() == 2 && _Settles[1] == EMars_CookingFeed_Settle::Cancelled, "the reservation settled Cancelled");
-        Assert_True(_SettledPieces.Num() == 2 && _SettledPieces[1].Get_IsSame(_Stale), "under its old id");
-        Assert_Equals_Int(_Platter.Get_HeldCount(), k_Stock - 1, "the platter holds every piece but the admitted one");
+        Assert_False(_Releases.Last().PieceId.Get_IsSame(_Stale), "the fresh attempt released a piece of its own");
+        Assert_True(_Feed.Get_Phase() == EMars_CookingFeed_Phase::AwaitAdmission, f"the fresh attempt still awaits admission (got {_Feed.Get_Phase() :n})");
+        Assert_Ledger(k_Stock - 2, 0, "after the stale answer (the first piece stays spent, the fresh one reserved)");
+        Assert_Equals_Int(_Settles.Num(), 2, "the stale answer settled nothing");
+
+        Resolve(_Releases.Last().PieceId, EMars_CookingFeed_Admission::Accepted);
     }
 }

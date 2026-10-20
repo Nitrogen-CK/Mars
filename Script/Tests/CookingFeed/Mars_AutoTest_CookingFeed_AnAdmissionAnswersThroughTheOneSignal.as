@@ -1,5 +1,6 @@
 // A kernel answers a release on its station's one OnAdmission signal, and that answer, forwarded as it is, is what the feed
-// settles on (the station's bridge forwards it so). The test forwards the Searing station's OnAdmission (the rig's
+// settles on. The test stands in for the station's bridge (UMars_SmTask_StationFeed_Bridge, which the heat-station tests
+// run; this one does not): it forwards the Searing station's OnAdmission (the rig's
 // Build_Searing) to the feed and sends it the feed's release: one answer, Accepted, and the feed settles Admitted once and
 // its hand goes home. The same release sent again is answered on the same signal, Rejected "already admitted"; forwarded,
 // the feed ignores it (it awaits nothing): still one settle and one admitted, the pan still holds the one piece and is still
@@ -7,10 +8,6 @@
 class UMars_AutoTest_CookingFeed_AnAdmissionAnswersThroughTheOneSignal : UMars_AutoTestRig_CookingFeed
 {
     private FMars_CookingFeed_Release _Release;
-    // In parallel: one entry per answer on the Searing station's OnAdmission.
-    private TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    private TArray<EMars_CookingFeed_Admission> _Admissions;
-    private TArray<FString> _AdmissionReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -18,7 +15,8 @@ class UMars_AutoTest_CookingFeed_AnAdmissionAnswersThroughTheOneSignal : UMars_A
         BuildFeed(InHandle, Make_TestSpec());
         auto Owner = InHandle;
         Build_Searing(Owner);
-        utils_cooking_feed::BindTo_OnAdmission(_SearingStation, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
+        Record_Admissions(_SearingStation);
+        utils_cooking_feed::BindTo_OnAdmission(_SearingStation, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnAdmissionForward"));
         Add_Steps_SourceTheFeed();
 
         Add_Step_WaitUntil("the pan body is in the simulation", n"Check_PanAdded", 0, 0);
@@ -95,11 +93,8 @@ class UMars_AutoTest_CookingFeed_AnAdmissionAnswersThroughTheOneSignal : UMars_A
 
     // Forwarded as it is, as the station's bridge does.
     UFUNCTION()
-    private void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason)
+    private void OnAdmissionForward(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId, EMars_CookingFeed_Admission InAdmission, FString InReason)
     {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
         _Feed.Request_ResolveAdmission(FMars_Request_CookingFeed_ResolveAdmission(InPieceId, InAdmission, InReason));
     }
 }

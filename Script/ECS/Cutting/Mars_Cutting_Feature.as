@@ -42,10 +42,10 @@ struct FMars_Cutting_Spec
 // A board with no width has nowhere for the hand to go, and a zero-length strike is no chop at all.
 mixin FMars_Validation Validate(const FMars_Cutting_Spec& Self)
 {
-    if (Self.BoardHalfWidth <= 0.0f)
+    if (Math::IsFinite(Self.BoardHalfWidth) == false || Self.BoardHalfWidth <= 0.0f)
     { return FMars_Validation(f"Cutting has a non-positive BoardHalfWidth [{Self.BoardHalfWidth}]"); }
 
-    if (Self.ChopSeconds <= 0.0f)
+    if (Math::IsFinite(Self.ChopSeconds) == false || Self.ChopSeconds <= 0.0f)
     { return FMars_Validation(f"Cutting has a non-positive ChopSeconds [{Self.ChopSeconds}]"); }
 
     return FMars_Validation();

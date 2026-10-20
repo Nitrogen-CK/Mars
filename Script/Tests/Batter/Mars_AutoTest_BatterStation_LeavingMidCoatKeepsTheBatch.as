@@ -1,7 +1,7 @@
 // Leaving mid-coat lifts the batch out of the batter and keeps it. A whole mushroom is carried into the bowl of the real
 // batter station and dipped part way; the operator leaves: the station goes Idle, the bowl rests (the control layer's
 // lift on exit), the mushroom stays in the bowl and its coat holds where the leave left it. The operator takes the station
-// again, dips, and the coat completes from there. Isolated origin (196000, -76000, -30000).
+// again, dips, and the coat completes from there: it never reads below the coat the leave kept. Isolated origin (196000, -76000, -30000).
 class UMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch : UMars_AutoTestRig_BatterStation
 {
     private const FVector k_Origin = FVector(196000.0, -76000.0, -30000.0);
@@ -9,6 +9,8 @@ class UMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch : UMars_AutoTestR
     private const int32 k_IdleFrames = 20;
 
     private float32 _CoatAtLeave = 0.0f;
+    // The least coat read on any poll after the second dip.
+    private float32 _LeastCoatAfterRedip = 1.0f;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -29,7 +31,8 @@ class UMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch : UMars_AutoTestR
         Add_Step("the operator takes the station again", n"Step_Take");
         Add_Step_WaitUntil("the station is Operated", n"Check_Operated", k_SlowPolls, 0);
         Add_Step("dip", n"Step_Dip");
-        Add_Step_WaitUntil("the coat completes", n"Check_Coated", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the coat completes", n"Check_CoatedFromTheKeptCoat", k_SlowPolls, 0);
+        Add_Step("the coat resumed from where the leave left it", n"Step_AssertResumed");
         Run_Steps(InHandle);
     }
 
@@ -59,6 +62,28 @@ class UMars_AutoTest_BatterStation_LeavingMidCoatKeepsTheBatch : UMars_AutoTestR
     {
         _CoatAtLeave = _Batter.Get_PieceCoat(Get_FirstId());
         Assert_True(_CoatAtLeave >= k_PartialCoat && _CoatAtLeave < 1.0f, f"the leave kept a partial coat ({_CoatAtLeave :.3})");
+    }
+
+    // Every poll, the least coat seen since the second dip.
+    UFUNCTION()
+    private void Check_CoatedFromTheKeptCoat(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        if (_Batter.Get_PieceCount() != 1)
+        {
+            Res.Set(false);
+            return;
+        }
+
+        const auto Coat = _Batter.Get_PieceCoat(Get_FirstId());
+        _LeastCoatAfterRedip = Math::Min(_LeastCoatAfterRedip, Coat);
+        Res.Set(Coat >= 1.0f);
+    }
+
+    UFUNCTION()
+    private void Step_AssertResumed(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_LeastCoatAfterRedip >= _CoatAtLeave, f"the coat never fell below the kept {_CoatAtLeave :.3} (least {_LeastCoatAfterRedip :.3})");
     }
 
     UFUNCTION()

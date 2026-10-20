@@ -1,6 +1,7 @@
 namespace utils_searing
 {
-    // utils_foodpiece::k_FaceCount, repeated: a namespace constant cannot be initialized from another file's.
+    // utils_foodpiece::k_FaceCount (the owner: FoodPiece is the lower kernel), repeated because an AngelScript namespace
+    // constant cannot be initialized from another file's.
     const int32 k_FaceCount = 6;
     const int32 k_SearSignalSteps = 10;
     // The cooking surface's height in the pan body's frame: the pan node sits at the centre of that surface (the pan mesh's
@@ -11,11 +12,6 @@ namespace utils_searing
     // How long a new down face must stay down on the pan before it is the resting face (a flip): a tumbling cube passes
     // other faces down for a frame or two, and neither the liftoff nor the first contact shows the face it settles on.
     const float32 k_FaceSettleSeconds = 0.1f;
-    // How far an adopted piece's transform may read from its release location and count as arrived.
-    const float64 k_ArrivalToleranceCm = 5.0;
-    // How long an adopted piece may take to arrive: past it the kernel ensures (its pose never got there) and judges it
-    // where it is, so a piece is never left unjudged.
-    const float32 k_ArrivalMaxSeconds = 1.0f;
 
     // Composes the minigame on InHandle (the station entity; the feature does not need the Station feature), and the
     // station's admission inbox and take-out readout. The spec's Nodes are built by the caller: Nodes.Pan is the Implement on
@@ -120,128 +116,6 @@ namespace utils_searing
         return Count;
     }
 
-    // The face's outward normal in the piece's own frame.
-    FVector Get_FaceNormal(EMars_Searing_Face InFace)
-    {
-        switch (InFace)
-        {
-            case EMars_Searing_Face::PosX: return FVector(1.0, 0.0, 0.0);
-            case EMars_Searing_Face::NegX: return FVector(-1.0, 0.0, 0.0);
-            case EMars_Searing_Face::PosY: return FVector(0.0, 1.0, 0.0);
-            case EMars_Searing_Face::NegY: return FVector(0.0, -1.0, 0.0);
-            case EMars_Searing_Face::PosZ: return FVector(0.0, 0.0, 1.0);
-            default: return FVector(0.0, 0.0, -1.0);
-        }
-    }
-
-    EMars_Searing_Face Get_OppositeFace(EMars_Searing_Face InFace)
-    {
-        switch (InFace)
-        {
-            case EMars_Searing_Face::PosX: return EMars_Searing_Face::NegX;
-            case EMars_Searing_Face::NegX: return EMars_Searing_Face::PosX;
-            case EMars_Searing_Face::PosY: return EMars_Searing_Face::NegY;
-            case EMars_Searing_Face::NegY: return EMars_Searing_Face::PosY;
-            case EMars_Searing_Face::PosZ: return EMars_Searing_Face::NegZ;
-            default: return EMars_Searing_Face::PosZ;
-        }
-    }
-
-    // The face whose world normal (InPieceRotation applied to its body normal) has the smallest dot with InPanUp.
-    EMars_Searing_Face Get_DownFace(const FQuat& InPieceRotation, const FVector& InPanUp)
-    {
-        auto Best = EMars_Searing_Face::NegZ;
-        auto BestDot = 2.0;
-        for (int32 Index = 0; Index < k_FaceCount; ++Index)
-        {
-            const auto Face = EMars_Searing_Face(Index);
-            const auto Dot = InPieceRotation.RotateVector(Get_FaceNormal(Face)).DotProduct(InPanUp);
-            if (Dot < BestDot)
-            {
-                BestDot = Dot;
-                Best = Face;
-            }
-        }
-
-        return Best;
-    }
-
-    // The piece rotation that lays InFace against -Z. MakeFromXZ(X, -N) turns the body's +Z onto -N (X is any body axis
-    // perpendicular to N); its inverse is the rotation that turns N onto -Z.
-    FRotator Make_FaceDownRotation(EMars_Searing_Face InFace)
-    {
-        const auto Normal = Get_FaceNormal(InFace);
-        const auto Perpendicular = Math::Abs(Normal.X) > 0.5 ? FVector(0.0, 0.0, 1.0) : FVector(1.0, 0.0, 0.0);
-        const auto Basis = FTransform(FQuat(FRotator::MakeFromXZ(Perpendicular, -Normal)), FVector::ZeroVector, FVector::OneVector);
-        return Basis.InverseTransformRotation(FQuat::Identity).Rotator();
-    }
-
-    FString Get_FaceName(EMars_Searing_Face InFace)
-    {
-        switch (InFace)
-        {
-            case EMars_Searing_Face::PosX: return "+X";
-            case EMars_Searing_Face::NegX: return "-X";
-            case EMars_Searing_Face::PosY: return "+Y";
-            case EMars_Searing_Face::NegY: return "-Y";
-            case EMars_Searing_Face::PosZ: return "+Z";
-            default: return "-Z";
-        }
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Piece geometry: a piece is its mesh's bounds box in its own frame, its middle CentreLocal and its half sizes HalfExtents
-    // (a cut half's origin is the uncut piece's, not its own middle). Shared with Fry. The bounds and the centre frame are
-    // utils_foodpiece's; these forward to it.
-    //----------------------------------------------------------------------------------------------------------------------
-
-    FVector Get_BoundsCentre(const FCk_RuntimeMesh_Metrics& InMetrics)
-    {
-        return utils_foodpiece::Get_BoundsCentre(InMetrics);
-    }
-
-    FVector Get_BoundsHalfExtents(const FCk_RuntimeMesh_Metrics& InMetrics)
-    {
-        return utils_foodpiece::Get_BoundsHalfExtents(InMetrics);
-    }
-
-    FTransform Get_CentreFrame(const FTransform& InPieceTransform, const FVector& InCentreLocal)
-    {
-        return utils_foodpiece::Get_CentreFrame(InPieceTransform, InCentreLocal);
-    }
-
-    // The middle of InFace in InCentreFrame's parent frame: the face's normal picks the half extent it lies out.
-    FVector Get_FaceCentre(const FTransform& InCentreFrame, EMars_Searing_Face InFace, const FVector& InHalfExtents)
-    {
-        const auto Normal = Get_FaceNormal(InFace);
-        const auto Out = FVector(Normal.X * InHalfExtents.X, Normal.Y * InHalfExtents.Y, Normal.Z * InHalfExtents.Z);
-        return InCentreFrame.GetLocation() + InCentreFrame.GetRotation().RotateVector(Out);
-    }
-
-    // The half height of the rotated box along its parent frame's Z: how far its bottom lies under its middle.
-    float64 Get_WorldHalfExtentZ(const FQuat& InRotation, const FVector& InHalfExtents)
-    {
-        return Math::Abs(InRotation.RotateVector(FVector::ForwardVector).Z) * InHalfExtents.X
-            + Math::Abs(InRotation.RotateVector(FVector::RightVector).Z) * InHalfExtents.Y
-            + Math::Abs(InRotation.RotateVector(FVector::UpVector).Z) * InHalfExtents.Z;
-    }
-
-    // An adopted piece has arrived once its body is in the simulation and its transform reads the release location (within
-    // k_ArrivalToleranceCm: a released piece may already have moved a frame's worth).
-    bool Get_HasArrived(const FCk_Handle_JoltBody& InBody, const FCk_Handle& InEntity, const FVector& InReleaseLocation)
-    {
-        if (utils_jolt_body::Get_IsBodyAdded(InBody) == false)
-        { return false; }
-
-        return Get_ArrivalDistance(InEntity, InReleaseLocation) <= k_ArrivalToleranceCm;
-    }
-
-    // How far an adopted piece's transform reads from its release location.
-    float64 Get_ArrivalDistance(const FCk_Handle& InEntity, const FVector& InReleaseLocation)
-    {
-        return (utils_transform::Get_EntityCurrentLocation(InEntity.As_Transform()) - InReleaseLocation).Size();
-    }
-
     // How far the piece may reach from its middle sideways, whatever its rotation about the vertical (conservative).
     float64 Get_RadialExtent(const FVector& InHalfExtents)
     {
@@ -251,9 +125,9 @@ namespace utils_searing
     // The mean of the piece's two half extents across the pan with InDownFace on it (the axis through that face stands
     // up): what its footprint spans. A cube's is its own half whatever face is down; a cut half standing on its end covers
     // less of the pan than lying flat.
-    float64 Get_FootprintHalf(const FVector& InHalfExtents, EMars_Searing_Face InDownFace)
+    float64 Get_FootprintHalf(const FVector& InHalfExtents, EMars_FoodPiece_Face InDownFace)
     {
-        const auto Normal = Get_FaceNormal(InDownFace);
+        const auto Normal = utils_foodpiece::Get_FaceNormal(InDownFace);
         if (Math::Abs(Normal.X) > 0.5)
         { return (InHalfExtents.Y + InHalfExtents.Z) * 0.5; }
 
@@ -280,11 +154,6 @@ namespace utils_searing
 mixin FMars_Searing_Spec Get_Spec(const FCk_Handle_Searing& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Searing_Params).Spec;
-}
-
-mixin EMars_Searing_Heat Get_Heat(const FCk_Handle_Searing& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Searing).Heat;
 }
 
 mixin bool Get_IsHot(const FCk_Handle_Searing& Self)
@@ -351,17 +220,10 @@ mixin FMars_Searing_Summary Get_Summary(const FCk_Handle_Searing& Self)
     return Summary;
 }
 
-// The Ready pieces a TakeOut without a named piece would hand back.
+// The Ready pieces a TakeOut without a named piece would hand back: the station's take-out readout, as the Tick last wrote it.
 mixin int32 Get_TakeableCount(const FCk_Handle_Searing& Self)
 {
-    auto Count = 0;
-    for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Searing).Pieces)
-    {
-        if (Piece.Status == EMars_Searing_PieceStatus::Ready)
-        { Count += 1; }
-    }
-
-    return Count;
+    return utils_cooking_feed::Get_Takeable(Self).Num();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -438,7 +300,6 @@ mixin EMars_Searing_Contact Get_PieceContact(const FCk_Handle_Searing& Self, con
     return Self.Get_PieceState(InPieceId).Contact;
 }
 
-// 0 raw .. 1 seared.
 // The piece's cook state as the pan would hand it back now: its sears so far.
 mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
@@ -446,7 +307,8 @@ mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Searing& Sel
     return utils_searing::Get_CookState(Piece, Piece.Piece.Get_CookState());
 }
 
-mixin float32 Get_FaceSear(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_Searing_Face InFace)
+// 0 raw .. 1 seared.
+mixin float32 Get_FaceSear(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_FoodPiece_Face InFace)
 {
     const auto Piece = Self.Get_PieceState(InPieceId);
     const auto Index = int32(InFace);
@@ -473,14 +335,14 @@ mixin FVector Get_PiecePanLocal(const FCk_Handle_Searing& Self, const FMars_Cook
 }
 
 // The piece face pointing most against the pan's up; NegZ once its entity is gone.
-mixin EMars_Searing_Face Get_DownFace(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
+mixin EMars_FoodPiece_Face Get_DownFace(const FCk_Handle_Searing& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     const auto Entity = Self.Get_PieceEntity(InPieceId);
     if (ck::Is_NOT_Valid(Entity))
-    { return EMars_Searing_Face::NegZ; }
+    { return EMars_FoodPiece_Face::NegZ; }
 
     const auto PieceWorld = utils_transform::Get_EntityCurrentTransform(Entity.As_Transform());
-    return utils_searing::Get_DownFace(PieceWorld.GetRotation(), Self.Get_PanUp());
+    return utils_foodpiece::Get_DownFace(PieceWorld.GetRotation(), Self.Get_PanUp());
 }
 
 // The piece's footprint half on the pan now (utils_searing::Get_FootprintHalf over its own half extents and its down face).
@@ -656,6 +518,20 @@ mixin void UnbindFrom_OnPieceTakenOut(FCk_Handle_Searing& Self, FMars_Delegate_S
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnPieceTakenOut.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnAdmissionRefused(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnAdmissionRefused InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Searing_Signals);
+    Fragment.OnAdmissionRefused.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnAdmissionRefused(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnAdmissionRefused InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Searing_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Searing_Signals).OnAdmissionRefused.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }
 
 mixin void BindTo_OnTakeOutRefused(FCk_Handle_Searing& Self, FMars_Delegate_Searing_OnTakeOutRefused InDelegate)

@@ -95,31 +95,6 @@ struct FMars_PlatterDock_Policy
     }
 }
 
-// What a dock's prompt says to one focuser (utils_platter_dock::Get_PromptText).
-struct FMars_PlatterDock_PromptQuery
-{
-    UPROPERTY()
-    EMars_PlatterDock_Action Action = EMars_PlatterDock_Action::Blocked_NothingHeld;
-
-    // Blocked_Policy: the policy's reason.
-    UPROPERTY()
-    TOptional<EMars_PlatterDock_Refusal> Refusal;
-
-    // PlaceFood: the held food's name.
-    UPROPERTY()
-    FText FoodName;
-}
-
-// What each of a station's two docks lets a platter bring: the input platter it draws from and the finished tray it fills.
-struct FMars_Station_DockPolicies
-{
-    UPROPERTY()
-    FMars_PlatterDock_Policy Input;
-
-    UPROPERTY()
-    FMars_PlatterDock_Policy Output;
-}
-
 struct FMars_PlatterDock_Spec
 {
     UPROPERTY()
@@ -131,17 +106,13 @@ struct FMars_PlatterDock_Spec
     UPROPERTY()
     float32 ProbeRadius = 18.0f;
 
-    // What the prompt calls the dock ("input platter", "finished tray").
-    UPROPERTY()
-    FText Name;
-
     // The dock's pose in the station root's frame; the dock's node is created there.
     UPROPERTY()
     FTransform MountLocal = FTransform::Identity;
 
-    // The prompt's reason when the Kind query refuses a piece ("Meat only"); the other refusals have fixed texts.
+    // The dock's Use prompt (its input action and placeholder text): the assembly's words.
     UPROPERTY()
-    FText KindRejectedText;
+    FMars_InteractPrompt_Spec Prompt;
 
     FMars_PlatterDock_Spec() {}
 
@@ -153,14 +124,14 @@ struct FMars_PlatterDock_Spec
     }
 }
 
-// A probe needs a radius and the prompt a name; a non-finite pose has no place to mount.
+// A probe needs a finite radius and the prompt an input action; a non-finite pose has no place to mount.
 mixin FMars_Validation Validate(const FMars_PlatterDock_Spec& Self)
 {
-    if (Self.ProbeRadius <= 0.0f)
+    if (Math::IsFinite(Self.ProbeRadius) == false || Self.ProbeRadius <= 0.0f)
     { return FMars_Validation(f"PlatterDock has a non-positive ProbeRadius [{Self.ProbeRadius}]"); }
 
-    if (Self.Name.IsEmpty())
-    { return FMars_Validation("PlatterDock has no Name for its prompt"); }
+    if (Self.Prompt.InputAction.IsNull())
+    { return FMars_Validation("PlatterDock has no prompt input action"); }
 
     if (Self.MountLocal.ContainsNaN())
     { return FMars_Validation("PlatterDock's MountLocal is not a finite transform"); }
@@ -184,7 +155,7 @@ struct FMars_Fragment_PlatterDock_Params
 
 // Inventory, Interactable and Node are composed by utils_platter_dock::Create. WorldItem, Platter, LastSeen and
 // SettleWatchSeconds are written only by UMars_Processor_PlatterDock_Sync from what the inventory holds (polled, as a cargo
-// slot is), LastPromptAction only by UMars_Processor_PlatterDock_Prompt.
+// slot is).
 struct FMars_Fragment_PlatterDock
 {
     UPROPERTY()
@@ -212,10 +183,6 @@ struct FMars_Fragment_PlatterDock
     // settled, and after the watchdog reported it.
     UPROPERTY()
     TOptional<float32> SettleWatchSeconds;
-
-    // The action the prompt currently shows; unset while the dock is not focused.
-    UPROPERTY()
-    TOptional<EMars_PlatterDock_Action> LastPromptAction;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

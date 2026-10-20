@@ -63,7 +63,7 @@ class UMars_AutoTest_SearingStation_InputDockRefusesVegetablesAndTakesMeat : UMa
 
         Assert_False(_InputDock.Get_IsOccupied(), "the raw platter dock stays empty");
         Assert_False(_Feed.Get_IsSourced(), "the feed has no source");
-        Assert_True(utils_platter_dock::Get_RefusalText(_InputDock.Get_Spec(), TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected)).ToString() == "Meat only",
+        Assert_True(utils_platter_dock::Get_RefusalText(_InputDock.Get_PromptWords(), TOptional<EMars_PlatterDock_Refusal>(EMars_PlatterDock_Refusal::KindRejected)).ToString() == "Meat only",
             "the dock's prompt says why");
     }
 

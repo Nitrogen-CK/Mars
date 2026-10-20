@@ -316,6 +316,11 @@ struct FMars_Fragment_Platter_Membership
 delegate void FMars_Delegate_Platter_OnLoaded(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece);
 event void FMars_Delegate_Platter_OnLoaded_MC(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece);
 
+// The drain took a Load on its books (queued): OnLoaded or a silent forget follows (a piece taken or destroyed before it
+// landed).
+delegate void FMars_Delegate_Platter_OnLoadAccepted(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece);
+event void FMars_Delegate_Platter_OnLoadAccepted_MC(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece);
+
 delegate void FMars_Delegate_Platter_OnLoadRefused(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal);
 event void FMars_Delegate_Platter_OnLoadRefused_MC(FCk_Handle_Platter InPlatter, FCk_Handle_FoodPiece InPiece, EMars_Platter_LoadRefusal InRefusal);
 
@@ -326,6 +331,7 @@ event void FMars_Delegate_Platter_OnUnloaded_MC(FCk_Handle_Platter InPlatter, FC
 struct FMars_Fragment_Platter_Signals
 {
     FMars_Delegate_Platter_OnLoaded_MC OnLoaded;
+    FMars_Delegate_Platter_OnLoadAccepted_MC OnLoadAccepted;
     FMars_Delegate_Platter_OnLoadRefused_MC OnLoadRefused;
     FMars_Delegate_Platter_OnUnloaded_MC OnUnloaded;
 }
@@ -335,7 +341,7 @@ struct FMars_Fragment_Platter_Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
 // Put Piece on the platter. Refused at the drain (never deferred) Full / AlreadyHeld / HeldElsewhere / Gone / Cutting /
-// Failed with OnLoadRefused; accepted, it queues. A queued piece drops once it is Ready (one whose import or body setup
+// Failed with OnLoadRefused; accepted, it queues (OnLoadAccepted). A queued piece drops once it is Ready (one whose import or body setup
 // fails is refused Failed then) and the root is still, settles with physics and freezes into the pile (OnLoaded); one whose
 // body never reaches the simulation is refused Failed too. A queued piece something else takes (attaches) is forgotten
 // without a signal.

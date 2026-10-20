@@ -12,7 +12,7 @@ class UMars_AutoTestHelper_FoodItem_RefusingHolder : UMars_FoodItem_EntityScript
 // back, then interacts with a large platter: the gloves carry the slab over the platter and, at their Grip, the deposit
 // releases it - the release's transfer back into the holder is refused (OnReleaseRefused). The deposit fails before it asks
 // the platter for anything: the slab is still Held, still on the carrier's Hand node, its item in the bag slot; the platter
-// holds nothing and was never asked to load it; the interaction ends Failed. The rollback's warning and the release's
+// holds nothing and was never asked to load it; the interaction ends Failed, the platter reporting ReleaseRefused. The rollback's warning and the release's
 // ensure are expected (the actor below). Isolated origin (27600, -17000, -30000).
 class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_AutoTestRig_Carrier
 {
@@ -33,6 +33,7 @@ class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_A
     private TArray<EMars_WorldItem_ReleaseRefusal> _ReleaseRefusals;
     private TArray<FCk_Handle_FoodPiece> _LoadAnswers;
     private TArray<ECk_SucceededFailed> _DepositResults;
+    private TArray<EMars_Interaction_FailReason> _FailReasons;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -43,12 +44,12 @@ class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_A
         Add_CarrierHands();
 
         auto Owner = InHandle;
-        Spawn_Floor(Owner, k_Origin + k_PlatterOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_PlatterOffset);
         _PlatterEntity = utils_platter::Request_SpawnWorld(Owner, FMars_Platter_SpawnSpec(
             FTransform(FRotator::ZeroRotator, k_Origin + k_PlatterOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5)),
             mars_items::Platter_Large()));
 
-        Spawn_Floor(Owner, k_Origin + k_FoodOffset);
+        Spawn_FloorSlab(Owner, k_Origin + k_FoodOffset);
         auto SpawnParams = UMars_FoodItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
@@ -70,20 +71,6 @@ class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_A
         Add_Step_WaitUntil("the deposit's interaction ends", n"Check_DepositEnded", 0, 0);
         Add_Step("the release was refused, the deposit failed and the food stayed in the hands", n"Step_AssertKept");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_Floor(FCk_Handle& InOwner, FVector InTop)
-    {
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(InOwner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -148,6 +135,8 @@ class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_A
 
         auto Target = Get_UseTarget(_PlatterItem);
         Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnDepositFinished"));
+        auto PlatterPickup = _PlatterItem.Get_Pickup();
+        PlatterPickup.BindTo_OnInteractionFailed(FMars_Delegate_Interactable_OnInteractionFailed(this, n"OnDepositFailed"));
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 
@@ -176,6 +165,12 @@ class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_A
     }
 
     UFUNCTION()
+    private void OnDepositFailed(FCk_Handle_Interactable InInteractable, FMars_Interactable_Failure InFailure)
+    {
+        _FailReasons.Add(InFailure.Reason);
+    }
+
+    UFUNCTION()
     private void Check_DepositEnded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
@@ -188,6 +183,10 @@ class UMars_AutoTest_Platter_ADepositWhoseReleaseIsRefusedKeepsTheFood : UMars_A
         Assert_True(_ReleaseRefusals.Num() == 1 && _ReleaseRefusals[0] == EMars_WorldItem_ReleaseRefusal::TransferFailed,
             f"the release was refused once: its transfer back into the holder failed ({_ReleaseRefusals.Num()} refusal(s))");
         Assert_True(_DepositResults[0] == ECk_SucceededFailed::Failed, f"the deposit's interaction ended Failed (got {_DepositResults[0] :n})");
+        Assert_Equals_Int(_FailReasons.Num(), 1, "the platter reported one failure");
+        if (_FailReasons.Num() == 1)
+        { Assert_True(_FailReasons[0] == EMars_Interaction_FailReason::ReleaseRefused, f"it failed ReleaseRefused (got [{_FailReasons[0] :n}])"); }
+
         Assert_True(_Food.Get_Mount() == EMars_WorldItem_Mount::Held && _Food.Get_Carrier() == _Carrier, "the food is still Held by the carrier");
         Assert_True(Get_Parent(_Food) == _HandNode, "the food is still on the carrier's Hand node");
         Assert_True(_Hotbar.Get_ItemAt(0) == _FoodItem, "its item is still in the bag slot");

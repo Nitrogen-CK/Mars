@@ -2,7 +2,8 @@
 // picks the meat slab up into its bag slot and focuses the dock: the dock offers PlaceFood, its prompt reads "Place Meat
 // slab on prep tray" and its target is enabled. The dock's interaction has the gloves carry the slab over the docked
 // platter and releases it only at their Grip (still Held the frame after the interaction began); the docked platter loads
-// the joint (OnLoaded), the joint rides the platter root and the bag slot is empty. Isolated origin
+// the joint (OnLoaded), the joint rides the platter root, the bag slot is empty and the dock's interaction finishes
+// Succeeded with no failure reported. Isolated origin
 // (28000, -21000, -30000).
 class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTestRig_PlatterDock
 {
@@ -22,6 +23,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
     private TArray<FCk_Handle_FoodPiece> _Loaded;
     private TArray<EMars_FPHands_Phase> _PhasesAtRelease;
     private bool _Released = false;
+    private UMars_AutoTestHelper_InteractionOutcomes _Outcomes;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -37,7 +39,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
         Spawn_Platter(InHandle, FMars_Platter_SpawnSpec(FTransform(FRotator::ZeroRotator, k_Origin + FVector(200.0, 0.0, 0.0)),
             mars_items::Platter_Large()));
 
-        Spawn_FoodFloor(InHandle, k_Origin + k_FoodOffset);
+        Spawn_FloorSlab(InHandle, k_Origin + k_FoodOffset);
         auto SpawnParams = UMars_FoodItem_EntityScript::Params();
         SpawnParams.SpawnTransform = FTransform(FRotator::ZeroRotator, k_Origin + k_FoodOffset + FVector(0.0, 0.0, 5.0));
         SpawnParams.Definition = utils_held_item::Make_DefinitionSoft(mars_items::Food_MeatSlab());
@@ -66,24 +68,10 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
         Add_Step_WaitFrames("the interaction has begun", 1);
         Add_Step("the food is still in the hands", n"Step_AssertStillHeld");
         Add_Step_WaitUntil("the docked platter loaded the joint", n"Check_Loaded", k_SlowPolls, 0);
+        Add_Step_WaitUntil("the dock's interaction finished", n"Check_PlaceFinished", k_SlowPolls, 0);
         Add_Step_WaitFrames("the attach composes the world pose", 2);
         Add_Step("the joint rides the docked platter; it left the hands at the Grip", n"Step_AssertLoaded");
         Run_Steps(InHandle);
-    }
-
-    // A static slab whose top is at InTop.
-    private void Spawn_FoodFloor(FCk_Handle InOwner, FVector InTop)
-    {
-        auto Owner = InOwner;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
     }
 
     UFUNCTION()
@@ -173,6 +161,9 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
     private void Step_InteractWithDock(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Target = Get_DockTarget();
+        _Outcomes = Cast<UMars_AutoTestHelper_InteractionOutcomes>(NewObject(this, UMars_AutoTestHelper_InteractionOutcomes));
+        _Outcomes.Watch_Target(Target);
+        _Outcomes.Watch_Interactable(_Dock.Get_Interactable());
         Target.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Carrier, _Carrier));
     }
 
@@ -191,8 +182,18 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
     }
 
     UFUNCTION()
+    private void Check_PlaceFinished(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Outcomes.Get_FinishedCount(Get_DockTarget()) > 0);
+    }
+
+    UFUNCTION()
     private void Step_AssertLoaded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        const auto Result = _Outcomes.TryGet_Result(Get_DockTarget());
+        Assert_True(Result.IsSet() && Result.GetValue() == ECk_SucceededFailed::Succeeded, "the dock's interaction finished Succeeded");
+        Assert_Equals_Int(_Outcomes.Get_FailureCount(), 0, "no failure was reported");
         const auto Platter = _Platters[0];
         Assert_True(_Dock.Get_Platter() == Platter, "the platter is still docked");
         Assert_Equals_Int(Platter.Get_HeldCount(), 1, "the docked platter holds one piece");
@@ -226,7 +227,7 @@ class UMars_AutoTest_PlatterDock_PlaceFoodLoadsTheDockedPlatter : UMars_AutoTest
         _Loaded.Add(InPiece);
     }
 
-    // The dock's prompt left its placeholder ("Dock", utils_platter_dock::DoCreate_Interactable): the dock's prompt processor
+    // The dock's prompt left its placeholder ("Dock", utils_platter_dock::Make_PromptSpec): the dock's prompt processor
     // wrote what the focuser can do there.
     UFUNCTION()
     private void Check_DockPromptWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)

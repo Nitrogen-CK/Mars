@@ -2,15 +2,14 @@
 // operator's right (k_BasketLocal, its five kinematic boxes); the skimmer node, parked at carry height over the far oil,
 // carries the skimmer Implement (no look tilt, a pour roll and a commanded lift the skim sets, a Commanded slide the kernel
 // steers) and, at its origin, the scoop's disc and lip. No pot and no floor: the oil is a buoyant band in open space and a
-// lost piece falls into the void until the kernel destroys it. The pot starts empty; the rig is the test feed: Build_Pieces
-// makes box food pieces (the FoodPiece rig's box, under the world's transient entity), parked beside the station with no
-// body, each built with a battered ledger (the fryer admits only what the batter station coated; Build_RawPieces makes
-// them unbattered), and AddPiece releases them in build order with Ids {1, 0}, {1, 1}, ..., into the station's admission inbox as the
-// feed's bridge does, each with its middle at a root-frame point (k_ReleaseLocal is the station's release point). A test waits on Check_PiecesReady before its first admission. The box's
-// size is read from its metrics, never assumed. The handlers record every signal by piece; the helpers drive, dip, carry,
-// look, slide the skimmer and reset.
+// lost piece falls into the void until the kernel destroys it. The pot starts empty; the rig is the test feed
+// (UMars_AutoTestRig_CookingKernel): Build_Pieces makes its parked box pieces, each with a battered ledger (the fryer admits
+// only what the batter station coated), and AddPiece releases them in build order with Ids {1, 0}, {1, 1}, ..., each with
+// its middle at a root-frame point (k_ReleaseLocal is the station's release point). A test waits on Check_PiecesReady
+// before its first admission. The handlers record every signal by piece; the helpers drive, dip, carry, look, slide the
+// skimmer and reset.
 UCLASS(Abstract)
-class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
+class UMars_AutoTestRig_Fry : UMars_AutoTestRig_CookingKernel
 {
     protected const FVector k_Origin = FVector(-60000.0, 22000.0, -60000.0);
     // The basket frame (the floor's top centre) in the station frame: right of the pot, its floor above the oil and the rim.
@@ -25,40 +24,21 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     // piece on it is not thrown.
     protected const float32 k_SkimmerLiftSpringHz = 1.5f;
     protected const float32 k_SkimmerLiftDampingRatio = 1.0f;
-    // The generation every rig piece carries.
-    protected const int32 k_Generation = 1;
     protected const float32 k_LiftTolerance = 0.5f;
     protected const float32 k_SlideTolerance = 0.5f;
-    // A rig piece's mass (the station's old battered piece's).
+    // A rig piece's mass.
     protected const float k_PieceMassKg = 0.08;
-    // Where built pieces wait for their release, beside the station, k_ParkPitch apart.
-    protected const FVector k_ParkLocal = FVector(0.0, -300.0, 0.0);
-    protected const float64 k_ParkPitch = 20.0;
-    // A poll budget, not a ceiling: pieces fall, float and drain, and the skimmer's springs take their time.
-    protected const int32 k_SlowPolls = 900;
 
     protected FCk_Handle_Fry _Fry;
     // The specs the station was built from, nodes included.
     protected FMars_Fry_Spec _Spec;
     protected FMars_Implement_Spec _SkimmerSpec;
     protected FCk_Handle_Implement _Skimmer;
-    // The station entity (the Fry's).
-    protected FCk_Handle _StationEntity;
-    // The next TransferIndex AddPiece hands out.
-    protected int32 _NextIndex = 0;
-    // Built in order; _NextPiece is the next one a release takes.
-    protected TArray<FCk_Handle_FoodPiece> _Pieces;
-    protected int32 _NextPiece = 0;
 
-    // In parallel: one entry per answer on the station's OnAdmission.
-    protected TArray<FMars_CookingFeed_PieceId> _AdmissionIds;
-    protected TArray<EMars_CookingFeed_Admission> _Admissions;
-    protected TArray<FString> _AdmissionReasons;
     // In parallel: one entry per OnAdmissionRefused.
     protected TArray<FMars_CookingFeed_PieceId> _RefusedIds;
     protected TArray<EMars_Fry_AdmissionRefusal> _Refusals;
-    // In parallel: one entry per OnPieceAdded.
-    protected TArray<FMars_CookingFeed_PieceId> _AddedIds;
+    // In parallel with _AddedIds: one entry per OnPieceAdded.
     protected TArray<FCk_Handle> _Added;
     // In parallel: one entry per OnPieceWhereaboutsChanged.
     protected TArray<FMars_CookingFeed_PieceId> _WhereaboutsIds;
@@ -66,13 +46,15 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     protected TArray<EMars_Fry_Whereabouts> _WhereaboutsTo;
     // In parallel: one entry per OnFaceHeatStage.
     protected TArray<FMars_CookingFeed_PieceId> _StageIds;
-    protected TArray<EMars_Searing_Face> _StageFaces;
+    protected TArray<EMars_FoodPiece_Face> _StageFaces;
     protected TArray<EMars_Fry_HeatStage> _Stages;
     protected TArray<FMars_CookingFeed_PieceId> _DrainedIds;
     // In parallel: one entry per OnPieceLost.
     protected TArray<FMars_CookingFeed_PieceId> _LostIds;
     protected TArray<FCk_Handle> _Lost;
     protected TArray<EMars_Fry_Skim> _SkimChanges;
+    // One entry per OnSkimRefused.
+    protected TArray<EMars_Fry_Skim> _SkimRefusals;
     protected TArray<EMars_Implement_Drive> _DriveChanges;
     // In parallel: one entry per OnPieceTakenOut.
     protected TArray<FMars_CookingFeed_PieceId> _TakenOutIds;
@@ -100,13 +82,7 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     {
         _Spec = InSpec;
 
-        auto StationEntity = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _StationEntity = StationEntity;
-        // Tracked with the pieces so it is torn down in the frame they are, as a station's own teardown ends them: left
-        // to the runner's cascade it would tick on after they are gone, and a piece gone from under a live kernel is a
-        // defect the kernel ensures on.
-        Track_ForCleanup(StationEntity);
-        auto Root = utils_transform::Add(StationEntity, FTransform(FRotator::ZeroRotator, k_Origin), ECk_Replication::DoesNotReplicate);
+        auto Root = Create_StationRoot(InHandle, k_Origin);
 
         auto BasketNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, k_BasketLocal));
         const auto BasketBody = utils_fry::Add_BasketBodies(BasketNode, _Spec.Basket);
@@ -135,10 +111,9 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
         const auto ScoopBody = utils_fry::Add_ScoopBodies(ScoopNode, _Spec.Scoop);
 
         _Spec.Nodes = FMars_Fry_Nodes(_Skimmer, ScoopBody, BasketBody);
-        _Fry = utils_fry::Add(StationEntity, _Spec);
+        _Fry = utils_fry::Add(_StationEntity, _Spec);
 
         _Fry.BindTo_OnDriveChanged(FMars_Delegate_Fry_OnDriveChanged(this, n"OnDriveChanged"));
-        utils_cooking_feed::BindTo_OnAdmission(_StationEntity, FMars_Delegate_StationAdmission_OnAdmission(this, n"OnPieceAdmission"));
         _Fry.BindTo_OnPieceAdded(FMars_Delegate_Fry_OnPieceAdded(this, n"OnPieceAdded"));
         _Fry.BindTo_OnAdmissionRefused(FMars_Delegate_Fry_OnAdmissionRefused(this, n"OnAdmissionRefused"));
         _Fry.BindTo_OnPieceWhereaboutsChanged(FMars_Delegate_Fry_OnPieceWhereaboutsChanged(this, n"OnPieceWhereaboutsChanged"));
@@ -146,6 +121,7 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
         _Fry.BindTo_OnPieceDrained(FMars_Delegate_Fry_OnPieceDrained(this, n"OnPieceDrained"));
         _Fry.BindTo_OnPieceLost(FMars_Delegate_Fry_OnPieceLost(this, n"OnPieceLost"));
         _Fry.BindTo_OnSkimChanged(FMars_Delegate_Fry_OnSkimChanged(this, n"OnSkimChanged"));
+        _Fry.BindTo_OnSkimRefused(FMars_Delegate_Fry_OnSkimRefused(this, n"OnSkimRefused"));
         _Fry.BindTo_OnPieceTakenOut(FMars_Delegate_Fry_OnPieceTakenOut(this, n"OnPieceTakenOut"));
     }
 
@@ -154,21 +130,14 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     protected void Build_Pieces(int32 InCount)
     {
         for (int32 Index = 0; Index < InCount; ++Index)
-        { _Pieces.Add(Build_Piece(Get_BoxMesh(), Get_NextPark(), Make_Battered(Make_Spec(k_PieceMassKg)))); }
+        { Build_ParkedPiece(Make_Battered(Make_Spec(k_PieceMassKg))); }
     }
 
     // Build_Pieces, each a whole battered piece of InFood.
     protected void Build_FoodPieces(int32 InCount, UMars_Food_Def InFood)
     {
         for (int32 Index = 0; Index < InCount; ++Index)
-        { _Pieces.Add(Build_Piece(Get_BoxMesh(), Get_NextPark(), Make_Battered(Make_FoodSpec(k_PieceMassKg, InFood)))); }
-    }
-
-    // Build_Pieces with an unbattered ledger: the fryer refuses them.
-    protected void Build_RawPieces(int32 InCount)
-    {
-        for (int32 Index = 0; Index < InCount; ++Index)
-        { _Pieces.Add(Build_Piece(Get_BoxMesh(), Get_NextPark(), Make_Spec(k_PieceMassKg))); }
+        { Build_ParkedPiece(Make_Battered(Make_FoodSpec(k_PieceMassKg, InFood))); }
     }
 
     private FMars_FoodPiece_Spec Make_Battered(FMars_FoodPiece_Spec InSpec) const
@@ -178,43 +147,11 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
         return Spec;
     }
 
-    private FTransform Get_NextPark() const
-    {
-        return FTransform(FRotator::ZeroRotator, k_Origin + k_ParkLocal - FVector(0.0, k_ParkPitch * float64(_Pieces.Num()), 0.0));
-    }
-
-    // The next built piece, in build order; a rig that built too few fails the test.
-    protected FCk_Handle_FoodPiece Take_Piece()
-    {
-        if (_NextPiece >= _Pieces.Num())
-        {
-            FinishFailure(f"the rig built {_Pieces.Num()} piece(s) and a release wants another");
-            return FCk_Handle_FoodPiece();
-        }
-
-        _NextPiece += 1;
-        return _Pieces[_NextPiece - 1];
-    }
-
-    // Half InPiece's bounds along its own axes, from its metrics.
-    protected FVector Get_HalfExtents(FCk_Handle_FoodPiece InPiece) const
-    {
-        const auto Metrics = Get_Metrics(InPiece);
-        return (Metrics.Get_BoundsMaxCm() - Metrics.Get_BoundsMinCm()) * 0.5;
-    }
-
-    // Every rig piece is the same box: the first one's half extents.
-    protected FVector Get_BoxHalfExtents() const
-    {
-        return Get_HalfExtents(_Pieces[0]);
-    }
-
     // The next piece (with the next Id) released with its middle at InRootLocal in the station frame, at rest and level
     // with the root.
     protected FMars_CookingFeed_PieceId AddPiece(FVector InRootLocal)
     {
-        const auto PieceId = FMars_CookingFeed_PieceId(k_Generation, _NextIndex);
-        _NextIndex += 1;
+        const auto PieceId = Take_NextId();
         Release_ThePiece(PieceId, Take_Piece(), InRootLocal);
         return PieceId;
     }
@@ -223,13 +160,7 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     protected void Release_ThePiece(const FMars_CookingFeed_PieceId& InPieceId, FCk_Handle_FoodPiece InPiece, FVector InRootLocal)
     {
         const auto RootWorld = _Fry.Get_RootWorld();
-        const auto Rotation = RootWorld.GetRotation();
-        const auto Centre = RootWorld.TransformPosition(InRootLocal);
-        const auto ReleaseWorld = FTransform(Rotation, Centre - Rotation.RotateVector(Get_BoundsCenter(InPiece)));
-
-        auto Release = FMars_CookingFeed_Release(InPieceId, ReleaseWorld, FVector::ZeroVector);
-        Release.Piece = InPiece;
-        utils_cooking_feed::Request_Admit(_StationEntity, Release);
+        Release_At(InPieceId, InPiece, FTransform(RootWorld.GetRotation(), RootWorld.TransformPosition(InRootLocal)));
     }
 
     protected void Drive()
@@ -283,20 +214,6 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
         { utils_jolt_body::Request_SetLinearVelocity(Body, FCk_Request_JoltBody_SetLinearVelocity(RootWorld.GetRotation().RotateVector(InVelocity))); }
     }
 
-    protected float32 Get_Now() const
-    {
-        return float32(System::GetGameTimeInSeconds());
-    }
-
-    // The first piece OnPieceAdded reported; a default Id before that.
-    protected FMars_CookingFeed_PieceId Get_FirstId() const
-    {
-        if (_AddedIds.Num() == 0)
-        { return FMars_CookingFeed_PieceId(); }
-
-        return _AddedIds[0];
-    }
-
     // A piece's middle in the station frame.
     protected FVector Get_PieceRootLocal(const FMars_CookingFeed_PieceId& InPieceId) const
     {
@@ -309,16 +226,16 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     }
 
     // The piece face whose normal points most nearly up (station frame).
-    protected EMars_Searing_Face Get_UpFace(const FMars_CookingFeed_PieceId& InPieceId) const
+    protected EMars_FoodPiece_Face Get_UpFace(const FMars_CookingFeed_PieceId& InPieceId) const
     {
         const auto Rotation = utils_transform::Get_EntityCurrentTransform(_Fry.Get_PieceEntity(InPieceId).As_Transform()).GetRotation();
-        return utils_searing::Get_DownFace(Rotation, -_Fry.Get_RootWorld().GetRotation().GetUpVector());
+        return utils_foodpiece::Get_DownFace(Rotation, -_Fry.Get_RootWorld().GetRotation().GetUpVector());
     }
 
-    protected EMars_Searing_Face Get_DownFace(const FMars_CookingFeed_PieceId& InPieceId) const
+    protected EMars_FoodPiece_Face Get_DownFace(const FMars_CookingFeed_PieceId& InPieceId) const
     {
         const auto Rotation = utils_transform::Get_EntityCurrentTransform(_Fry.Get_PieceEntity(InPieceId).As_Transform()).GetRotation();
-        return utils_searing::Get_DownFace(Rotation, _Fry.Get_RootWorld().GetRotation().GetUpVector());
+        return utils_foodpiece::Get_DownFace(Rotation, _Fry.Get_RootWorld().GetRotation().GetUpVector());
     }
 
     // The whereabouts the piece passed through since edge InFromEdge, as "From->To" pairs; OutPath gets the places in order
@@ -379,15 +296,6 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     }
 
     UFUNCTION()
-    protected void OnPieceAdmission(FCk_Handle InStation, FMars_CookingFeed_PieceId InPieceId,
-        EMars_CookingFeed_Admission InAdmission, FString InReason)
-    {
-        _AdmissionIds.Add(InPieceId);
-        _Admissions.Add(InAdmission);
-        _AdmissionReasons.Add(InReason);
-    }
-
-    UFUNCTION()
     protected void OnAdmissionRefused(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_AdmissionRefusal InRefusal)
     {
         _RefusedIds.Add(InPieceId);
@@ -411,7 +319,7 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     }
 
     UFUNCTION()
-    protected void OnFaceHeatStage(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, EMars_Fry_HeatStage InStage)
+    protected void OnFaceHeatStage(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, EMars_Fry_HeatStage InStage)
     {
         _StageIds.Add(InPieceId);
         _StageFaces.Add(InFace);
@@ -438,6 +346,12 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     }
 
     UFUNCTION()
+    protected void OnSkimRefused(FCk_Handle_Fry InFry, EMars_Fry_Skim InSkim)
+    {
+        _SkimRefusals.Add(InSkim);
+    }
+
+    UFUNCTION()
     protected void OnPieceTakenOut(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle_FoodPiece InPiece)
     {
         _TakenOutIds.Add(InPieceId);
@@ -453,21 +367,6 @@ class UMars_AutoTestRig_Fry : UMars_AutoTestRig_FoodPiece
     {
         auto Res = OutResult;
         Res.Set(utils_jolt_body::Get_IsBodyAdded(_Spec.Nodes.ScoopBody) && utils_jolt_body::Get_IsBodyAdded(_Spec.Nodes.BasketBody));
-    }
-
-    // Every built piece has its metrics (a release reads them).
-    UFUNCTION()
-    protected void Check_PiecesReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto AllReady = _Pieces.Num() > 0;
-        for (const auto& Piece : _Pieces)
-        {
-            if (Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
-            { AllReady = false; }
-        }
-
-        auto Res = OutResult;
-        Res.Set(AllReady);
     }
 
     UFUNCTION()

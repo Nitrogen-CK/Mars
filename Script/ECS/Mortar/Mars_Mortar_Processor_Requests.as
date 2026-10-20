@@ -34,10 +34,8 @@ class UMars_Processor_Mortar_HandleRequests : UCk_Processor_Script_Base_UE
         const auto Spec = Self.Get_Spec();
         auto IsEngaged = Self.Has_Fragment(FMars_Tag_Mortar_Engaged);
         const auto WasEngaged = IsEngaged;
-        const auto MotionBefore = InState.Pestle.Motion;
         auto BatchChanged = false;
         auto StrikeStarted = false;
-        auto Collected = TOptional<EMars_Mortar_Seasoning>();
 
         if (HasDisengage)
         {
@@ -53,23 +51,17 @@ class UMars_Processor_Mortar_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (HasSwitch && utils_mortar::Get_IsFresh(InState.Batch))
         {
-            InState.Batch.Seasoning = InState.Batch.Seasoning == EMars_Mortar_Seasoning::Salt
-                ? EMars_Mortar_Seasoning::Pepper : EMars_Mortar_Seasoning::Salt;
+            InState.Batch.Seasoning = EMars_Mortar_Seasoning((int32(InState.Batch.Seasoning) + 1) % constants_mortar::k_SeasoningCount);
             BatchChanged = true;
         }
 
         if (HasCollect && InState.Batch.Phase == EMars_Mortar_Phase::Done)
         {
             const auto Seasoning = InState.Batch.Seasoning;
-            if (Seasoning == EMars_Mortar_Seasoning::Salt)
-            { InState.Tally.Salt += 1; }
-            else
-            { InState.Tally.Pepper += 1; }
-
+            InState.Tally.Counts[int32(Seasoning)] += 1;
             InState.Batch = FMars_Mortar_Batch();
             InState.Batch.Seasoning = Seasoning;
             InState.SweepSeconds = 0.0f;
-            Collected = Seasoning;
             BatchChanged = true;
         }
 
@@ -98,7 +90,6 @@ class UMars_Processor_Mortar_HandleRequests : UCk_Processor_Script_Base_UE
         { InState.Pestle.Motion = EMars_Mortar_Pestle::Resting; }
 
         const auto Batch = InState.Batch;
-        const auto Motion = InState.Pestle.Motion;
 
         // InState is not read past this line: the tag moves, and a listener may add fragments to the station.
         if (IsEngaged && WasEngaged == false)
@@ -109,16 +100,11 @@ class UMars_Processor_Mortar_HandleRequests : UCk_Processor_Script_Base_UE
         if (Self.Has_Fragment(FMars_Fragment_Mortar_Signals) == false)
         { return; }
 
-        if (Collected.IsSet())
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnCollected.Broadcast(Self, Collected.GetValue()); }
+        auto& Signals = Self.Get_Fragment(FMars_Fragment_Mortar_Signals);
+        if (BatchChanged)
+        { Signals.OnBatchChanged.Broadcast(Self, Batch); }
 
-        if (BatchChanged && Self.Has_Fragment(FMars_Fragment_Mortar_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnBatchChanged.Broadcast(Self, Batch); }
-
-        if (Motion != MotionBefore && Self.Has_Fragment(FMars_Fragment_Mortar_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnPestleChanged.Broadcast(Self, Motion); }
-
-        if (StrikeStarted && Self.Has_Fragment(FMars_Fragment_Mortar_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Mortar_Signals).OnStrikeStarted.Broadcast(Self); }
+        if (StrikeStarted)
+        { Signals.OnStrikeStarted.Broadcast(Self); }
     }
 }

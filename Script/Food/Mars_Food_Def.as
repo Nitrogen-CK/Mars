@@ -19,9 +19,9 @@ struct FMars_Food_Data
     FGameplayTagContainer Kind;
 }
 
-// The food dipped in batter: a static mesh shown in place of a whole piece's display once a fryer has battered it (a cut
-// piece keeps its display and shows its batter as browning). Display-only: the piece's RuntimeMesh stays its ledger and
-// its body. Unset Mesh: the food is not batterable.
+// The food dipped in batter: a static mesh shown in place of a whole piece's display once the batter station has battered
+// it (a cut piece keeps its display and shows its batter as browning; Write_Look in Mars_Food_Look.as). Display-only: the
+// piece's RuntimeMesh stays its ledger and its body. Unset Mesh: the food is not batterable.
 struct FMars_Food_BatteredVisuals
 {
     // Authored in the raw mesh's frame (a nested core and batter shell, its materials on its own slots).
@@ -166,7 +166,7 @@ class UMars_Food_Def : UDataAsset
         return FMars_Validation();
     }
 
-    // The food has a battered variant: a fryer batters a whole piece of it.
+    // The food has a battered variant: the batter station batters a whole piece of it.
     bool Get_IsBatterable() const
     {
         return Visuals.Battered.Mesh.IsNull() == false;
@@ -233,7 +233,7 @@ class UMars_Food_Def : UDataAsset
         // A rejected display already ensured in utils_runtime_mesh_display::Add.
         const auto Display = utils_runtime_mesh_display::Add(Owner, Spec);
         if (ck::IsValid(Display))
-        { utils_station::Write_PieceLook(InPiece, utils_cookstate::Make_DisplayParams(InPiece.Get_CookState())); }
+        { InPiece.Write_Look(utils_cookstate::Make_DisplayParams(InPiece.Get_CookState())); }
     }
 }
 

@@ -26,6 +26,7 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     // The input platter's food.
     protected UMars_Food_Def _Food;
     private UMars_AutoTestHelper_FoodOnPlatter _FoodOnPlatter;
+    private UMars_AutoTestHelper_CookingFixture _CookingFixture;
     protected FCk_Handle_Station _Station;
     protected FCk_Handle_Cutting _Cutting;
     protected FCk_Handle_FoodBoard _Board;
@@ -58,6 +59,8 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     protected int32 _PieceCuts = 0;
     protected TArray<FMars_FoodBoard_CutIssue> _Issues;
     protected TArray<FCk_Handle_FoodPiece> _Released;
+    // One entry per OnReleaseRefused of the board.
+    protected TArray<EMars_FoodBoard_ReleaseRefusal> _ReleaseRefusals;
     // In parallel: one entry per OnCutResolved of a watched piece.
     protected TArray<FCk_Handle_FoodPiece> _CutSources;
     protected TArray<EMars_FoodPiece_CutOutcome> _CutOutcomes;
@@ -162,28 +165,16 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     // InSpec's platter lying on a floor at InOffset from the station's origin (InSpec.World is replaced).
     protected FCk_Handle Spawn_PlatterAt(FCk_Handle InHandle, FVector InOffset, FMars_Platter_SpawnSpec InSpec)
     {
-        auto Owner = InHandle;
-        Spawn_PlatterFloor(Owner, _Origin + InOffset);
-
         auto Spec = InSpec;
-        Spec.World = FTransform(FRotator::ZeroRotator, _Origin + InOffset + FVector(0.0, 0.0, constants_platter::k_FloorAboveBase + 0.5));
-        return utils_platter::Request_SpawnWorld(Owner, Spec);
+        Spec.World = FTransform(FRotator::ZeroRotator, _Origin + InOffset);
+        return Get_CookingFixture().Spawn_PlatterOnFloor(InHandle, Spec, 60.0);
     }
 
     // A static slab whose top is at InTop, for a World-mode platter to lie still on (a platter drops what it is given only
     // while it lies still); a platter spawned at InTop + the tray's base height rests on it.
     protected void Spawn_PlatterFloor(FCk_Handle InHandle, FVector InTop)
     {
-        auto Owner = InHandle;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, InTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(60.0, 60.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
+        Get_CookingFixture().Spawn_Floor(InHandle, InTop, 60.0);
     }
 
 
@@ -197,22 +188,20 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         _OutputDock.Request_Dock(FMars_Request_PlatterDock_Dock(_OutputPlatterItem));
     }
 
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube) as beef (the bench's input dock takes meat only) with
-    // no definition: Transform, RuntimeMesh and FoodPiece on a new entity under the world's transient entity, tracked for
-    // cleanup.
+    // The cooking fixture's box as beef (the bench's input dock takes meat only), tracked for cleanup.
     protected FCk_Handle_FoodPiece Build_Box(FTransform InWorld)
     {
-        auto Spec = FMars_FoodPiece_Spec();
-        Spec.Data.MassKg = 0.8;
-        Spec.Data.Kind.AddTag(GameplayTags::Food_Meat_Beef);
-        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
+        const auto Box = Get_CookingFixture().Build_Box(InWorld, GameplayTags::Food_Meat_Beef, 0.8);
+        Track_ForCleanup(Box);
+        return Box;
+    }
 
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        Track_ForCleanup(Entity);
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
-            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
-        return utils_foodpiece::Add(Entity, Spec);
+    protected UMars_AutoTestHelper_CookingFixture Get_CookingFixture()
+    {
+        if (ck::Is_NOT_Valid(_CookingFixture))
+        { _CookingFixture = Cast<UMars_AutoTestHelper_CookingFixture>(NewObject(this, UMars_AutoTestHelper_CookingFixture)); }
+
+        return _CookingFixture;
     }
 
     // The common opening: the station and the input platter's joint are ready, the platter docks and the feed draws from
@@ -675,6 +664,7 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
         _Board.BindTo_OnPieceCut(FMars_Delegate_FoodBoard_OnPieceCut(this, n"OnBoardPieceCut"));
         _Board.BindTo_OnCutIssued(FMars_Delegate_FoodBoard_OnCutIssued(this, n"OnBoardCutIssued"));
         _Board.BindTo_OnReleased(FMars_Delegate_FoodBoard_OnReleased(this, n"OnBoardReleased"));
+        _Board.BindTo_OnReleaseRefused(FMars_Delegate_FoodBoard_OnReleaseRefused(this, n"OnBoardReleaseRefused"));
         _Board.BindTo_OnTurned(FMars_Delegate_FoodBoard_OnTurned(this, n"OnBoardTurned"));
         _Feed.BindTo_OnPhaseChanged(FMars_Delegate_CookingFeed_OnPhaseChanged(this, n"OnFeedPhaseChanged"));
         _Feed.BindTo_OnTransferRefused(FMars_Delegate_CookingFeed_OnTransferRefused(this, n"OnFeedTransferRefused"));
@@ -736,6 +726,12 @@ class UMars_AutoTestRig_CuttingStation : UCk_AutoTest_Base
     private void OnBoardReleased(FCk_Handle_FoodBoard InBoard, FCk_Handle_FoodPiece InPiece)
     {
         _Released.Add(InPiece);
+    }
+
+    UFUNCTION()
+    private void OnBoardReleaseRefused(FCk_Handle_FoodBoard InBoard, EMars_FoodBoard_ReleaseRefusal InRefusal)
+    {
+        _ReleaseRefusals.Add(InRefusal);
     }
 
     UFUNCTION()

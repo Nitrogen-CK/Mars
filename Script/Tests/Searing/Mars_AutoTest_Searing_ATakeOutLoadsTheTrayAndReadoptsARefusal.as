@@ -47,17 +47,8 @@ class UMars_AutoTest_Searing_ATakeOutLoadsTheTrayAndReadoptsARefusal : UMars_Aut
         auto Bounds = FMars_Platter_Bounds(FVector2D(15.0, 15.0), 40.0f, 25.0f);
         auto Entity = utils_entity_lifetime::Request_CreateEntity(InOwner);
         auto Root = utils_transform::Add(Entity, FTransform(FRotator::ZeroRotator, k_Origin + k_TrayLocal), ECk_Replication::DoesNotReplicate);
-        auto FloorNode = utils_scene_node::Create(Root, FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -1.0)));
-
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(Bounds.InnerHalfExtents.X + 5.0, Bounds.InnerHalfExtents.Y + 5.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Kinematic);
-        FloorSpec.Set_MassSource(ECk_JoltBody_MassSource::Explicit);
-        FloorSpec.Set_MassKg(1.0f);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(FloorNode.H(), FloorSpec);
+        auto Fixture = Cast<UMars_AutoTestHelper_CookingFixture>(NewObject(this, UMars_AutoTestHelper_CookingFixture));
+        Fixture.Add_PlatterFloorBox(Root, Bounds);
 
         _Tray = utils_platter::Add(Entity, FMars_Platter_Spec(1, Bounds));
         _Tray.BindTo_OnLoaded(FMars_Delegate_Platter_OnLoaded(this, n"OnTrayLoaded"));

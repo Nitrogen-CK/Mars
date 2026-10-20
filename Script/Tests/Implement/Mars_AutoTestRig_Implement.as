@@ -16,6 +16,9 @@ class UMars_AutoTestRig_Implement : UCk_AutoTest_Base
     protected TArray<float32> _KickExcess;
     // The target pitch as the kick fired: the tilt has taken the look's slow part that frame, never the excess.
     protected TArray<float32> _KickTargetPitch;
+    // The lift and the lift the node was last written with, as the kick fired.
+    protected TArray<float32> _KickLift;
+    protected TArray<float32> _KickWrittenLift;
 
     protected void BuildImplement(FCk_Handle InHandle, FMars_Implement_Spec InSpec)
     {
@@ -57,6 +60,8 @@ class UMars_AutoTestRig_Implement : UCk_AutoTest_Base
     {
         _KickExcess.Add(InExcessDegrees);
         _KickTargetPitch.Add(InImplement.Get_TargetTilt().Pitch);
+        _KickLift.Add(InImplement.Get_Lift());
+        _KickWrittenLift.Add(InImplement.Get_Fragment(FMars_Fragment_Implement).WrittenLift);
     }
 
     //----------------------------------------------------------------------------------------------------------------------

@@ -115,7 +115,8 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         for (const auto& Request : ResolveCutRequests)
         { Apply_ResolveCut(Drain, InState, Request); }
 
-        Drop_Gone(Drain, InState);
+        // A piece destroyed elsewhere is no longer the board's to cut or release.
+        Remove_Gone(InState.Held);
         Apply_Parting(Drain, InState);
 
         for (const auto& Request : PlaceRequests)
@@ -362,12 +363,6 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         InDrain.Moved = true;
     }
 
-    // A piece destroyed elsewhere is no longer the board's to cut or release.
-    private void Drop_Gone(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState)
-    {
-        Remove_Gone(InState.Held);
-    }
-
     private void Apply_Place(FMars_FoodBoard_Drain& InDrain, FMars_Fragment_FoodBoard& InState, const FMars_Request_FoodBoard_Place& InRequest)
     {
         auto Piece = InRequest.Piece;
@@ -422,7 +417,7 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
 
     private TOptional<EMars_FoodBoard_PlaceRefusal> Get_PlaceRefusal(const FCk_Handle_FoodBoard& InBoard, const FCk_Handle_FoodPiece& InPiece)
     {
-        if (Get_IsGone(InPiece))
+        if (InPiece.Get_IsGone())
         { return TOptional<EMars_FoodBoard_PlaceRefusal>(EMars_FoodBoard_PlaceRefusal::Gone); }
 
         // The holder fact, whichever ledger it names: a platter's or a pan's piece is refused as another board's is.
@@ -631,25 +626,13 @@ class UMars_Processor_FoodBoard_HandleRequests : UCk_Processor_Script_Base_UE
         utils_entity_lifetime::Request_DestroyEntity(InRequest.Negative);
     }
 
-    // Removes the dead entries; returns how many.
-    private int32 Remove_Gone(TArray<FCk_Handle_FoodPiece>& InOutPieces)
+    private void Remove_Gone(TArray<FCk_Handle_FoodPiece>& InOutPieces)
     {
-        auto Removed = 0;
         for (int32 Index = InOutPieces.Num() - 1; Index >= 0; --Index)
         {
-            if (Get_IsGone(InOutPieces[Index]))
-            {
-                InOutPieces.RemoveAt(Index);
-                ++Removed;
-            }
+            if (InOutPieces[Index].Get_IsGone())
+            { InOutPieces.RemoveAt(Index); }
         }
-
-        return Removed;
-    }
-
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece)
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 
     // Ready, not cutting, and no board cut awaiting its answer: a piece a chop may cut or a sweep may release.

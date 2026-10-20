@@ -39,14 +39,6 @@ class UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall : UMars_AutoTestRig_Sear
         Run_Steps(InHandle);
     }
 
-    // The orbit's share eases to 1 over the pan's Orbit.EaseSeconds once the heat drives the pan.
-    UFUNCTION()
-    private void Check_SwirlEasedIn(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
-    {
-        auto Res = OutResult;
-        Res.Set(_Pan.Get_OrbitOffset().Size() >= float64(k_SwirlRadius) - 0.001);
-    }
-
     UFUNCTION()
     private void Step_TeleportToWall(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
@@ -62,7 +54,7 @@ class UMars_AutoTest_Searing_SwirlWithTheSteakAtTheWall : UMars_AutoTestRig_Sear
         const auto Local = _Searing.Get_PiecePanLocal(Get_FirstId());
         _MaxRadius = Math::Max(_MaxRadius, Local.Size2D());
         ck::Trace(f"[SearingSwirl] t={_SecondsTraced} s flips={_Searing.Get_Tally().Flips} r={Local.Size2D() :.2} "
-            + f"z={Local.Z :.2} down={utils_searing::Get_FaceName(_Searing.Get_DownFace(Get_FirstId()))}");
+            + f"z={Local.Z :.2} down={utils_foodpiece::Get_FaceName(_Searing.Get_DownFace(Get_FirstId()))}");
     }
 
     UFUNCTION()

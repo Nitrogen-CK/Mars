@@ -360,6 +360,15 @@ struct FMars_Request_FoodBoard_Turn
     }
 }
 
+// A plane with no unit form (a non-finite position, a degenerate normal or tangent) cuts nothing.
+mixin FMars_Validation Validate(const FMars_Request_FoodBoard_Cut& Self)
+{
+    if (utils_foodboard::Get_UnitPlane(Self.Plane).IsSet() == false)
+    { return FMars_Validation(f"FoodBoard Cut has a degenerate plane (position {Self.Plane.PositionCm}, normal {Self.Plane.Normal})"); }
+
+    return FMars_Validation();
+}
+
 // A non-finite yaw would write non-finite poses onto every held piece.
 mixin FMars_Validation Validate(const FMars_Request_FoodBoard_Turn& Self)
 {

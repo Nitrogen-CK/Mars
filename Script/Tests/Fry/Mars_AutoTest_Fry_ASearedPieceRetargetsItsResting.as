@@ -128,7 +128,7 @@ class UMars_AutoTest_Fry_ASearedPieceRetargetsItsResting : UMars_AutoTestRig_Fry
     private void Step_AssertInOil(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Fry.Get_PieceWhereabouts(_Piece) == EMars_Fry_Whereabouts::Oil, "the piece floats in the oil");
-        Assert_Equals_Int(_Fry.Get_Tally().Lost, 0, "nothing was lost");
+        Assert_Equals_Int(_Fry.Get_Tally().Losses, 0, "nothing was lost");
     }
 
     private int32 Get_AdmissionCountAccepted() const

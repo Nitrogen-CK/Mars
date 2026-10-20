@@ -64,7 +64,9 @@ enum EMars_Fry_Skim
     Pour
 }
 
-// The surface of the body an adopted piece is given (its shape is the piece's own mesh, its mass the piece's own).
+// The surface of the body an adopted piece is given (its shape is the piece's own mesh, its mass the piece's own). It
+// applies only to a piece that arrives without a body: one that arrives with its own (off a platter, a whole food item)
+// keeps its own surface and gravity, since a live body's surface cannot be changed.
 struct FMars_Fry_PieceSpec
 {
     UPROPERTY()
@@ -377,10 +379,36 @@ struct FMars_Fry_Spec
     FMars_Fry_Nodes Nodes;
 }
 
-// A kernel that takes no piece, a basket or scoop with no size, a body surface outside the physical range, a skimmer whose
-// dip is not below its carry or whose pour does not tip (or tips past a usable angle), a face that never goes golden, a pot
-// too narrow for the bowl, a receiver that never drains or drops its contact at once, or a reach with no extent or no look
-// each make the minigame unplayable.
+// A basket with no size or a surface outside the physical range: utils_fry::Add_BasketBodies builds none.
+mixin FMars_Validation Validate(const FMars_Fry_BasketSpec& Self)
+{
+    if (Self.InnerHalfX <= 0.0f || Self.InnerHalfY <= 0.0f || Self.WallHeight <= 0.0f
+        || Self.WallThickness <= 0.0f || Self.FloorThickness <= 0.0f)
+    { return FMars_Validation(f"Fry has a non-positive basket size (InnerHalfX [{Self.InnerHalfX}], InnerHalfY [{Self.InnerHalfY}], WallHeight [{Self.WallHeight}], WallThickness [{Self.WallThickness}], FloorThickness [{Self.FloorThickness}])"); }
+
+    if (Self.Friction < 0.0f || Self.Restitution < 0.0f || Self.Restitution > 1.0f)
+    { return FMars_Validation(f"Fry has a basket Friction [{Self.Friction}] below 0 or Restitution [{Self.Restitution}] outside [0, 1]"); }
+
+    return FMars_Validation();
+}
+
+// A scoop with no size or a surface outside the physical range: utils_fry::Add_ScoopBodies builds none.
+mixin FMars_Validation Validate(const FMars_Fry_ScoopSpec& Self)
+{
+    if (Self.BowlRadius <= 0.0f || Self.LipHeight <= 0.0f || Self.LipThickness <= 0.0f || Self.DiscThickness <= 0.0f)
+    { return FMars_Validation(f"Fry has a non-positive scoop size (BowlRadius [{Self.BowlRadius}], LipHeight [{Self.LipHeight}], LipThickness [{Self.LipThickness}], DiscThickness [{Self.DiscThickness}])"); }
+
+    if (Self.Friction < 0.0f || Self.Restitution < 0.0f || Self.Restitution > 1.0f)
+    { return FMars_Validation(f"Fry has a scoop Friction [{Self.Friction}] below 0 or Restitution [{Self.Restitution}] outside [0, 1]"); }
+
+    return FMars_Validation();
+}
+
+// A kernel that takes no piece, a basket or scoop with no size, a body surface outside the physical range, a basket whose
+// interior leaves the bowl no pour window (utils_fry::Get_IsBowlOverInterior needs the bowl wholly over the interior), a
+// skimmer whose dip is not below its carry or whose pour does not tip (or tips past a usable angle), a face that never goes
+// golden, a pot too narrow for the bowl, a receiver that never drains or drops its contact at once, or a reach with no
+// extent or no look each make the minigame unplayable.
 mixin FMars_Validation Validate(const FMars_Fry_Spec& Self)
 {
     if (Self.Supply.MaxPieces <= 0)
@@ -393,20 +421,20 @@ mixin FMars_Validation Validate(const FMars_Fry_Spec& Self)
     if (Piece.Restitution < 0.0f || Piece.Restitution > 1.0f)
     { return FMars_Validation(f"Fry has Piece.Restitution [{Piece.Restitution}] outside [0, 1]"); }
 
+    const auto BasketValidation = Self.Basket.Validate();
+    if (BasketValidation.IsValid() == false)
+    { return BasketValidation; }
+
+    const auto ScoopValidation = Self.Scoop.Validate();
+    if (ScoopValidation.IsValid() == false)
+    { return ScoopValidation; }
+
     const auto& Basket = Self.Basket;
-    if (Basket.InnerHalfX <= 0.0f || Basket.InnerHalfY <= 0.0f || Basket.WallHeight <= 0.0f
-        || Basket.WallThickness <= 0.0f || Basket.FloorThickness <= 0.0f)
-    { return FMars_Validation(f"Fry has a non-positive basket size (InnerHalfX [{Basket.InnerHalfX}], InnerHalfY [{Basket.InnerHalfY}], WallHeight [{Basket.WallHeight}], WallThickness [{Basket.WallThickness}], FloorThickness [{Basket.FloorThickness}])"); }
-
-    if (Basket.Friction < 0.0f || Basket.Restitution < 0.0f || Basket.Restitution > 1.0f)
-    { return FMars_Validation(f"Fry has a basket Friction [{Basket.Friction}] below 0 or Restitution [{Basket.Restitution}] outside [0, 1]"); }
-
     const auto& Scoop = Self.Scoop;
-    if (Scoop.BowlRadius <= 0.0f || Scoop.LipHeight <= 0.0f || Scoop.LipThickness <= 0.0f || Scoop.DiscThickness <= 0.0f)
-    { return FMars_Validation(f"Fry has a non-positive scoop size (BowlRadius [{Scoop.BowlRadius}], LipHeight [{Scoop.LipHeight}], LipThickness [{Scoop.LipThickness}], DiscThickness [{Scoop.DiscThickness}])"); }
-
-    if (Scoop.Friction < 0.0f || Scoop.Restitution < 0.0f || Scoop.Restitution > 1.0f)
-    { return FMars_Validation(f"Fry has a scoop Friction [{Scoop.Friction}] below 0 or Restitution [{Scoop.Restitution}] outside [0, 1]"); }
+    const auto PourWindowX = 2.0f * (Basket.InnerHalfX - Scoop.BowlRadius);
+    const auto PourWindowY = 2.0f * (Basket.InnerHalfY - Scoop.BowlRadius);
+    if (PourWindowX < utils_fry::k_MinPourWindowCm || PourWindowY < utils_fry::k_MinPourWindowCm)
+    { return FMars_Validation(f"Fry has a basket (InnerHalfX [{Basket.InnerHalfX}], InnerHalfY [{Basket.InnerHalfY}]) that leaves a bowl of BowlRadius [{Scoop.BowlRadius}] a pour window under {utils_fry::k_MinPourWindowCm} cm"); }
 
     if (Scoop.DipLift >= Scoop.CarryLift)
     { return FMars_Validation(f"Fry has a scoop DipLift [{Scoop.DipLift}] not below its CarryLift [{Scoop.CarryLift}]"); }
@@ -490,15 +518,15 @@ struct FMars_Fry_PieceState
 
     // The release location while the piece is still arriving: its transform reads where it was before admission until its
     // pose request or teleport lands, so the Tick neither judges nor pushes it until it is there
-    // (utils_searing::Get_HasArrived).
+    // (utils_foodpiece::Get_HasArrived).
     UPROPERTY()
     TOptional<FVector> Arriving;
 
-    // How long the piece has been arriving; past utils_searing::k_ArrivalMaxSeconds it is judged where it is.
+    // How long the piece has been arriving; past utils_foodpiece::k_ArrivalMaxSeconds it is judged where it is.
     UPROPERTY()
     float32 ArrivingSeconds = 0.0f;
 
-    // Six, 0 pale .. 1 golden .. 2 overdone, seeded from the piece's batter; indexed by int32(EMars_Searing_Face).
+    // Six, 0 pale .. 1 golden .. 2 overdone, seeded from the piece's batter; indexed by int32(EMars_FoodPiece_Face).
     UPROPERTY()
     TArray<float32> FaceHeat;
 
@@ -549,7 +577,7 @@ struct FMars_Fry_Tally
     int32 Retrievals = 0;
 
     UPROPERTY()
-    int32 Lost = 0;
+    int32 Losses = 0;
 
     // Pieces handed back by TakeOut.
     UPROPERTY()
@@ -624,12 +652,15 @@ struct FMars_Fragment_Fry
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
+// The kernel's edges. Some have only test binders today (OnFaceHeatStage, OnPieceWhereaboutsChanged, OnPieceDrained,
+// OnDriveChanged): they are the kernel's test-pinned contract, kept for the assembly to bind.
+
 // A SetDrive that changed it; a Reset that found it Driven reports Idle.
 delegate void FMars_Delegate_Fry_OnDriveChanged(FCk_Handle_Fry InFry, EMars_Implement_Drive InDrive);
 event void FMars_Delegate_Fry_OnDriveChanged_MC(FCk_Handle_Fry InFry, EMars_Implement_Drive InDrive);
 
-// An adopted piece is in play (its body requested or switched back to Dynamic, not yet moving): the placing script adds its
-// visuals here.
+// A piece is in play (its body requested or switched back to Dynamic, not yet moving): admitted, or readopted after its
+// tray refused it. The placing script adds its visuals here.
 delegate void FMars_Delegate_Fry_OnPieceAdded(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 event void FMars_Delegate_Fry_OnPieceAdded_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, FCk_Handle InPiece);
 
@@ -637,8 +668,8 @@ delegate void FMars_Delegate_Fry_OnPieceWhereaboutsChanged(FCk_Handle_Fry InFry,
 event void FMars_Delegate_Fry_OnPieceWhereaboutsChanged_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Fry_Whereabouts InFrom, EMars_Fry_Whereabouts InTo);
 
 // A face crossing into Golden (heat 1) or Overdone (heat 2), once per crossing.
-delegate void FMars_Delegate_Fry_OnFaceHeatStage(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, EMars_Fry_HeatStage InStage);
-event void FMars_Delegate_Fry_OnFaceHeatStage_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_Searing_Face InFace, EMars_Fry_HeatStage InStage);
+delegate void FMars_Delegate_Fry_OnFaceHeatStage(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, EMars_Fry_HeatStage InStage);
+event void FMars_Delegate_Fry_OnFaceHeatStage_MC(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId, EMars_FoodPiece_Face InFace, EMars_Fry_HeatStage InStage);
 
 // A piece reached Receiver.DrainSeconds resting in the basket (again, after it was knocked out and came back).
 delegate void FMars_Delegate_Fry_OnPieceDrained(FCk_Handle_Fry InFry, FMars_CookingFeed_PieceId InPieceId);
@@ -738,7 +769,8 @@ struct FMars_Request_Fry_Skim
 // that many leave. Tray set: each one is loaded onto it (the fryer keeps its pickup's Ledger claim until it lands, and
 // readopts it if the tray refuses it: the station's take-out contract, FMars_Request_StationTakeOut, arrives as this);
 // unset: each is the caller's, its claim released. A take-out that hands nothing back is refused with OnTakeOutRefused:
-// NoRoom when MaxPieces is set and at most 0, else NothingReady.
+// NoRoom when MaxPieces is set and at most 0, else NothingReady. Production goes through the station's take-out contract
+// only: sending this directly (a named piece, no tray) is a test hook.
 struct FMars_Request_Fry_TakeOut
 {
     UPROPERTY()
@@ -771,8 +803,11 @@ struct FMars_Request_Fry_TakeOut
 // the piece itself: its faces' heat from its cook state, its extents from its mesh; its body goes back to Dynamic and its
 // Resting to the scoop and the basket, and the take-out it undoes no longer counts. Where it is, and whether it has
 // drained, the Tick judges again from its pose: it starts Airborne and NotDraining, so a piece lying in the basket drains
-// again (OnPieceDrained once more). No admission answer: nobody awaits one. A no-op for a piece that is gone, attached, or
-// that another ledger holds by now; a piece or PieceId already in play ensures.
+// again (OnPieceDrained once more). No admission answer (nobody awaits one), but OnPieceAdded again, after the drain's
+// take-outs, so the placing script dresses it again. A readopt may take the fryer past Supply.MaxPieces: the piece was
+// already the fryer's, and a release may have been admitted into the place its take-out freed. Not readopted: a piece
+// gone, one another ledger holds by now, or one attached somewhere (its pickup's Ledger claim released); a piece or
+// PieceId already in play ensures.
 struct FMars_Request_Fry_Readopt
 {
     UPROPERTY()

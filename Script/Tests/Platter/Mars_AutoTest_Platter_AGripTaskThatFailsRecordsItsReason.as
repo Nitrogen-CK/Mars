@@ -66,27 +66,8 @@ class UMars_AutoTest_Platter_AGripTaskThatFailsRecordsItsReason : UMars_AutoTest
     private void Add_SlowReachingHands()
     {
         auto Spec = FMars_FPHands_Spec();
-        Spec.HandNode = _HandNode;
         Spec.Reach.Grab.OutSeconds = k_ReachOutSeconds;
-        _Hands = utils_fphands::Add(_Carrier, Spec);
-        utils_interaction_resolver::Add(_Carrier, Make_UseResolverSpec(), ECk_Replication::DoesNotReplicate);
-        utils_input_intents::Add(_Carrier);
-        utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_CarrierHands));
-        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnCarrierHandsPhaseChanged"));
-    }
-
-    // The Use intent over the Use channel; nothing is offered to it here, so no distance sort.
-    private FCk_InteractionResolver_Spec Make_UseResolverSpec() const
-    {
-        auto Channels = TArray<FGameplayTag>();
-        Channels.Add(GameplayTags::InteractionChannel_Mars_Use);
-
-        auto Mapping = FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, Channels);
-        Mapping.Set_DistanceSorting(ECk_InteractionResolver_DistanceSorting::Disabled);
-
-        auto Mappings = TArray<FCk_InteractionResolver_IntentChannelMapping>();
-        Mappings.Add(Mapping);
-        return FCk_InteractionResolver_Spec(Mappings);
+        Add_CarrierHands(Spec);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -213,12 +194,11 @@ class UMars_AutoTest_Platter_AGripTaskThatFailsRecordsItsReason : UMars_AutoTest
     }
 
     UFUNCTION()
-    private void OnDockInteractionFailed(FCk_Handle_Interactable InInteractableHandle, FCk_Handle_InteractTarget InTarget,
-                                         FCk_Handle InInitiator, EMars_Interaction_FailReason InReason)
+    private void OnDockInteractionFailed(FCk_Handle_Interactable InInteractableHandle, FMars_Interactable_Failure InFailure)
     {
-        _FailedTargets.Add(InTarget);
-        _FailedInitiators.Add(InInitiator);
-        _FailReasons.Add(InReason);
+        _FailedTargets.Add(InFailure.Target);
+        _FailedInitiators.Add(InFailure.Initiator);
+        _FailReasons.Add(InFailure.Reason);
     }
 
     UFUNCTION()

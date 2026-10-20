@@ -93,16 +93,16 @@ class UMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine : UMars_AutoTestR
             auto Heats = FString();
             for (int32 FaceIndex = 0; FaceIndex < utils_searing::k_FaceCount; ++FaceIndex)
             {
-                const auto Face = EMars_Searing_Face(FaceIndex);
-                Heats = f"{Heats} {utils_searing::Get_FaceName(Face)} {_Fry.Get_FaceHeat(PieceId, Face) :.2}";
+                const auto Face = EMars_FoodPiece_Face(FaceIndex);
+                Heats = f"{Heats} {utils_foodpiece::Get_FaceName(Face)} {_Fry.Get_FaceHeat(PieceId, Face) :.2}";
             }
 
-            Log(f"[Mars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine] piece {PieceName} at root {Get_PieceRootLocal(PieceId)}, up {utils_searing::Get_FaceName(Up)}, heats{Heats}, {_Fry.Get_PaleFaceCount(PieceId)} pale");
+            Log(f"[Mars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine] piece {PieceName} at root {Get_PieceRootLocal(PieceId)}, up {utils_foodpiece::Get_FaceName(Up)}, heats{Heats}, {_Fry.Get_PaleFaceCount(PieceId)} pale");
 
             Assert_True(_Fry.Get_PieceStage(PieceId, Down) == EMars_Fry_HeatStage::Golden,
-                f"piece {PieceName}'s down face {utils_searing::Get_FaceName(Down)} is under the oil and Golden (heat {_Fry.Get_FaceHeat(PieceId, Down) :.3})");
+                f"piece {PieceName}'s down face {utils_foodpiece::Get_FaceName(Down)} is under the oil and Golden (heat {_Fry.Get_FaceHeat(PieceId, Down) :.3})");
             Assert_True(_Fry.Get_PieceStage(PieceId, Up) == EMars_Fry_HeatStage::Pale,
-                f"piece {PieceName}'s up face {utils_searing::Get_FaceName(Up)} floats above the line and is still Pale (heat {_Fry.Get_FaceHeat(PieceId, Up) :.3})");
+                f"piece {PieceName}'s up face {utils_foodpiece::Get_FaceName(Up)} floats above the line and is still Pale (heat {_Fry.Get_FaceHeat(PieceId, Up) :.3})");
             Assert_True(_Fry.Get_PaleFaceCount(PieceId) >= 1, f"piece {PieceName} has at least one pale face");
 
             for (int32 FaceIndex = 0; FaceIndex < utils_searing::k_FaceCount; ++FaceIndex)
@@ -110,11 +110,11 @@ class UMars_AutoTest_Fry_PiecesFloatInTheOilAndFryBelowTheLine : UMars_AutoTestR
                 auto Reports = 0;
                 for (int32 Signal = 0; Signal < _Stages.Num(); ++Signal)
                 {
-                    if (_StageIds[Signal].Get_IsSame(PieceId) && _StageFaces[Signal] == EMars_Searing_Face(FaceIndex))
+                    if (_StageIds[Signal].Get_IsSame(PieceId) && _StageFaces[Signal] == EMars_FoodPiece_Face(FaceIndex))
                     { Reports += 1; }
                 }
 
-                Assert_True(Reports <= 1, f"piece {PieceName} face {utils_searing::Get_FaceName(EMars_Searing_Face(FaceIndex))} reported at most once (got {Reports})");
+                Assert_True(Reports <= 1, f"piece {PieceName} face {utils_foodpiece::Get_FaceName(EMars_FoodPiece_Face(FaceIndex))} reported at most once (got {Reports})");
             }
         }
 

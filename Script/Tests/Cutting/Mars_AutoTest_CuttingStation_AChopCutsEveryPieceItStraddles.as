@@ -99,7 +99,7 @@ class UMars_AutoTest_CuttingStation_AChopCutsEveryPieceItStraddles : UMars_AutoT
         if (_Issues.Num() == 1)
         {
             Assert_Equals_Int(_Issues[0].Straddling, k_BoxCount, "the blade straddled every tentacle");
-            Assert_Equals_Int(_Issues[0].Budget, utils_foodboard::k_MaxCutsPerChop, "the budget is the station's MaxCutsPerChop");
+            Assert_Equals_Int(_Issues[0].Budget, _Board.Get_Tuners().MaxCutsPerChop, "the budget is the station's MaxCutsPerChop");
             Assert_Equals_Int(_Issues[0].Issued, k_BoxCount, "a cut was issued for every tentacle");
         }
 

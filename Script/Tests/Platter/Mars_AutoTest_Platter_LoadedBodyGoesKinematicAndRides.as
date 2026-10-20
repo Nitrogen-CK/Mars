@@ -60,6 +60,7 @@ class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig
     UFUNCTION()
     private void Check_Landed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
+        Record_Freezes(_Platter);
         auto Res = OutResult;
         Res.Set(TryGet_Loaded(_P).IsSet() || Get_AllRefusalCount(_Platter) > 0);
     }
@@ -74,7 +75,10 @@ class UMars_AutoTest_Platter_LoadedBodyGoesKinematicAndRides : UMars_AutoTestRig
             && Landing.GetValue().BodyMotion.GetValue() == ECk_MotionType::Kinematic, "P's body read Kinematic when it landed");
 
         Assert_True(Get_IsFrozenOn(_Platter, _P), "P is held, Kinematic and a scene-node child of the root");
-        Assert_True(Get_IsInsideWalls(_Platter, _P), f"P rests inside the walls ({Get_World(_P).GetLocation()})");
+        Assert_True(Get_IsInsideWalls(_Platter, _P), f"P lies inside the walls ({Get_World(_P).GetLocation()})");
+        Assert_True(Get_RestsOnFloor(_Platter, _P), "P rests on the platter's floor");
+        const auto Cause = TryGet_FreezeCause(_P);
+        Assert_True(Cause.IsSet() && Cause.GetValue() == EMars_Platter_FreezeCause::Settled, "P froze because it came to rest (Settled), not at MaxSeconds");
         FCk_Handle PEntity = _P;
         Assert_True(PEntity.As_JoltBody() == _Body, "P kept its own body");
 

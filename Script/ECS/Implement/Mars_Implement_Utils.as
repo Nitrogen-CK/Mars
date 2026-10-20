@@ -24,22 +24,24 @@ namespace utils_implement
         return InHandle.As_Implement();
     }
 
-    // ONE offset write: the tilt composed onto the rest rotation (rest x tilt, about the rest frame's axes), the orbit
-    // offset and the slide in the rest frame's XY plane and the lift along the rest frame's up, plus the ring-pivot rise
-    // (Tilt.RestRadius x sin of the tilt angle, so a tilted implement rolls on its rest ring rather than through it). An
-    // invalid node is an implement being torn down.
-    void Apply_Pose(FCk_Handle_SceneNode InNode, const FMars_Fragment_Implement& InState, FVector InOrbitOffset, float32 InRestRadius)
+    // ONE offset write of InImplement's node for InState: the tilt composed onto the rest rotation (rest x tilt, about the
+    // rest frame's axes), the orbit offset (Make_OrbitOffset) and the slide in the rest frame's XY plane and the lift along
+    // the rest frame's up, plus the ring-pivot rise (Tilt.RestRadius x sin of the tilt angle, so a tilted implement rolls on
+    // its rest ring rather than through it). An invalid node is an implement being torn down.
+    void Apply_Pose(const FCk_Handle_Implement& InImplement, const FMars_Fragment_Implement& InState)
     {
-        if (ck::Is_NOT_Valid(InNode))
+        const auto Spec = InImplement.Get_Spec();
+        auto Node = Spec.Nodes.Node;
+        if (ck::Is_NOT_Valid(Node))
         { return; }
 
         const auto& Rest = InState.RestOffset;
         const auto Tilt = FQuat(FRotator(InState.Pitch, InState.Yaw, InState.Roll));
         const auto Rotation = FQuat(Rest.Rotator()) * Tilt;
-        const auto Location = Rest.GetLocation() + InOrbitOffset
-            + FVector(InState.Slide.X, InState.Slide.Y, float64(InState.Lift) + Get_RingPivotRise(Tilt, InRestRadius));
+        const auto Location = Rest.GetLocation() + Make_OrbitOffset(Spec.Orbit, InState)
+            + FVector(InState.Slide.X, InState.Slide.Y, float64(InState.Lift) + Get_RingPivotRise(Tilt, Spec.Tilt.RestRadius));
         const auto Offset = FTransform(Rotation, Location, Rest.GetScale3D());
-        utils_scene_node::Request_UpdateOffset(InNode, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
+        utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(Offset));
     }
 
     // How far the node rises so an implement tilted by InTilt keeps the low side of its base on a rest ring of InRestRadius:
@@ -149,11 +151,6 @@ mixin FVector2D Get_TargetSlide(const FCk_Handle_Implement& Self)
 mixin FVector Get_OrbitOffset(const FCk_Handle_Implement& Self)
 {
     return utils_implement::Make_OrbitOffset(Self.Get_Spec().Orbit, Self.Get_Fragment(FMars_Fragment_Implement));
-}
-
-mixin FTransform Get_RestOffset(const FCk_Handle_Implement& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Implement).RestOffset;
 }
 
 mixin FCk_Handle_SceneNode Get_Node(const FCk_Handle_Implement& Self)

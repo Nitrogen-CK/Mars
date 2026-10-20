@@ -72,7 +72,7 @@ class UMars_AutoTest_Searing_ResetKeepsEveryPieceLevelsThePanAndChills : UMars_A
         }
 
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
-        { _FirstSearBeforeReset.Add(_Searing.Get_FaceSear(Get_FirstId(), EMars_Searing_Face(Index))); }
+        { _FirstSearBeforeReset.Add(_Searing.Get_FaceSear(Get_FirstId(), EMars_FoodPiece_Face(Index))); }
 
         Assert_Equals_Float(_Searing.Get_PanTilt().Roll, 18.0, 0.01, "the pan is tilted before the reset");
         Assert_True(_Searing.Get_SearedFaceCount(Get_FirstId()) >= 1, "a face is seared before the reset");
@@ -116,9 +116,9 @@ class UMars_AutoTest_Searing_ResetKeepsEveryPieceLevelsThePanAndChills : UMars_A
 
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            const auto Face = EMars_Searing_Face(Index);
+            const auto Face = EMars_FoodPiece_Face(Index);
             Assert_Equals_Float(_Searing.Get_FaceSear(Get_FirstId(), Face), _FirstSearBeforeReset[Index], 0.0001,
-                f"the first piece's face {utils_searing::Get_FaceName(Face)} kept its sear through the reset");
+                f"the first piece's face {utils_foodpiece::Get_FaceName(Face)} kept its sear through the reset");
         }
 
         Assert_True(_Searing.Get_SearedFaceCount(Get_FirstId()) >= 1, "the seared face is still seared");

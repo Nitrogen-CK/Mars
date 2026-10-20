@@ -20,7 +20,7 @@ struct FMars_Fry_PieceEvents
     EMars_Fry_Whereabouts To = EMars_Fry_Whereabouts::Airborne;
     EMars_Fry_Whereabouts HopStart = EMars_Fry_Whereabouts::Oil;
     // In parallel: each face that crossed a stage this frame and the stage it reached.
-    TArray<EMars_Searing_Face> StageFaces;
+    TArray<EMars_FoodPiece_Face> StageFaces;
     TArray<EMars_Fry_HeatStage> Stages;
     bool Drained = false;
 }
@@ -88,17 +88,18 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
             if (Piece.Arriving.IsSet())
             {
                 Piece.ArrivingSeconds += Frame.DeltaSeconds;
-                if (utils_searing::Get_HasArrived(Piece.Body, Piece.Entity, Piece.Arriving.GetValue()) == false)
+                const auto Arrival = utils_cooking_feed::Get_ArrivalVerdict(
+                    FMars_CookingFeed_ArrivalQuery(Piece.Body, Piece.Entity, Piece.Arriving.GetValue(), Piece.ArrivingSeconds));
+                if (Arrival == EMars_CookingFeed_Arrival::OnItsWay)
                 {
-                    if (Piece.ArrivingSeconds < utils_searing::k_ArrivalMaxSeconds)
-                    {
-                        InState.Pieces[Index] = Piece;
-                        continue;
-                    }
+                    InState.Pieces[Index] = Piece;
+                    continue;
+                }
 
-                    ck::EnsureIfNot(false, f"[Fry] [{Frame.Fry.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}] "
-                        + f"never arrived at its release: {utils_searing::Get_ArrivalDistance(Piece.Entity, Piece.Arriving.GetValue())} cm away "
-                        + f"after {Piece.ArrivingSeconds} s; judged where it is");
+                if (Arrival == EMars_CookingFeed_Arrival::Overdue)
+                {
+                    const auto Distance = utils_foodpiece::Get_ArrivalDistance(Piece.Entity, Piece.Arriving.GetValue());
+                    ck::EnsureIfNot(false, f"[Fry] [{Frame.Fry.ToString()}] piece {utils_cooking_feed::Get_PieceName(Piece.Id)} [{Piece.Entity.ToString()}] never arrived at its release: {Distance} cm away after {Piece.ArrivingSeconds} s; judged where it is");
                 }
 
                 Piece.Arriving.Reset();
@@ -163,7 +164,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
             if (float32(Centre.Size2D()) > InFrame.Spec.Zones.PotRadius)
             { continue; }
 
-            const auto HalfHeight = float32(utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), Piece.HalfExtents));
+            const auto HalfHeight = float32(utils_foodpiece::Get_WorldHalfExtentZ(Pose.GetRotation(), Piece.HalfExtents));
             const auto Immersion = utils_fry::Get_Immersion(float32(Centre.Z), HalfHeight, Oil.SurfaceZ);
             if (Immersion <= 0.0f)
             { continue; }
@@ -190,7 +191,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         const auto& Spec = InFrame.Spec;
         const auto& Zones = Spec.Zones;
         const auto Pose = Get_RootPose(InFrame, InPiece);
-        const auto HalfHeight = float32(utils_searing::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents));
+        const auto HalfHeight = float32(utils_foodpiece::Get_WorldHalfExtentZ(Pose.GetRotation(), InPiece.HalfExtents));
         const auto Root = Pose.GetLocation();
         const auto PieceWorld = InFrame.RootWorld.TransformPosition(Root);
         const auto BasketLocal = InFrame.BasketWorld.InverseTransformPosition(PieceWorld);
@@ -280,7 +281,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
         { InState.Tally.Retrievals += 1; }
 
         if (To == EMars_Fry_Whereabouts::Lost)
-        { InState.Tally.Lost += 1; }
+        { InState.Tally.Losses += 1; }
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -301,7 +302,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
 
         for (int32 FaceIndex = 0; FaceIndex < utils_searing::k_FaceCount; ++FaceIndex)
         {
-            const auto Face = EMars_Searing_Face(FaceIndex);
+            const auto Face = EMars_FoodPiece_Face(FaceIndex);
             if (utils_fry::Get_FaceCentreZ(Pose, Face, InPiece.HalfExtents) >= SurfaceZ)
             { continue; }
 
@@ -406,7 +407,7 @@ class UMars_Processor_Fry_Tick : UCk_Processor_Script_Base_UE
     private bool Get_IsRestingOn(const FMars_Fry_PieceState& InPiece, const FCk_Handle& InSupport) const
     {
         const auto Resting = InPiece.Entity.As_Resting();
-        if (utils_resting::Find_TargetIndex(Resting.Get_Targets(), InSupport) < 0)
+        if (Resting.Get_HasTarget(InSupport) == false)
         { return false; }
 
         return Resting.Get_IsRestingOn(InSupport);

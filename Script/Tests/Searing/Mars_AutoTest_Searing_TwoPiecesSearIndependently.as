@@ -62,7 +62,7 @@ class UMars_AutoTest_Searing_TwoPiecesSearIndependently : UMars_AutoTestRig_Sear
 
         const auto Reach = _Searing.Get_PieceHalfExtents(_FirstId).GetMax();
         Teleport_Piece(_FirstId, FVector(k_FirstLocal.X, k_FirstLocal.Y, utils_searing::k_PanSurfaceZ + Reach + 1.0),
-            utils_searing::Make_FaceDownRotation(EMars_Searing_Face::PosX));
+            utils_foodpiece::Make_FaceDownRotation(EMars_FoodPiece_Face::PosX));
     }
 
     UFUNCTION()
@@ -70,8 +70,8 @@ class UMars_AutoTest_Searing_TwoPiecesSearIndependently : UMars_AutoTestRig_Sear
     {
         const auto FirstDown = _Searing.Get_DownFace(_FirstId);
         const auto SecondDown = _Searing.Get_DownFace(_SecondId);
-        Assert_True(FirstDown == EMars_Searing_Face::PosX, f"the first piece lies on +X (got {FirstDown :n})");
-        Assert_True(SecondDown == EMars_Searing_Face::NegZ, f"the second piece lies on -Z (got {SecondDown :n})");
+        Assert_True(FirstDown == EMars_FoodPiece_Face::PosX, f"the first piece lies on +X (got {FirstDown :n})");
+        Assert_True(SecondDown == EMars_FoodPiece_Face::NegZ, f"the second piece lies on -Z (got {SecondDown :n})");
         Assert_Equals_Int(_Seared.Num() + _ProgressSignals, 0, "nothing seared on the cold pan");
 
         Heat();
@@ -82,20 +82,20 @@ class UMars_AutoTest_Searing_TwoPiecesSearIndependently : UMars_AutoTestRig_Sear
     {
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            const auto Face = EMars_Searing_Face(Index);
+            const auto Face = EMars_FoodPiece_Face(Index);
             const auto FirstSear = _Searing.Get_FaceSear(_FirstId, Face);
             const auto SecondSear = _Searing.Get_FaceSear(_SecondId, Face);
-            ck::Trace(f"[Searing] two pieces: face {utils_searing::Get_FaceName(Face)} first {FirstSear :.3} second {SecondSear :.3}");
+            ck::Trace(f"[Searing] two pieces: face {utils_foodpiece::Get_FaceName(Face)} first {FirstSear :.3} second {SecondSear :.3}");
 
-            if (Face == EMars_Searing_Face::PosX)
+            if (Face == EMars_FoodPiece_Face::PosX)
             { Assert_True(FirstSear > 0.1f && FirstSear < 1.0f, f"the first piece's +X rose (got {FirstSear})"); }
             else
-            { Assert_Equals_Float(FirstSear, 0.0, 0.0001, f"the first piece's {utils_searing::Get_FaceName(Face)} is raw"); }
+            { Assert_Equals_Float(FirstSear, 0.0, 0.0001, f"the first piece's {utils_foodpiece::Get_FaceName(Face)} is raw"); }
 
-            if (Face == EMars_Searing_Face::NegZ)
+            if (Face == EMars_FoodPiece_Face::NegZ)
             { Assert_True(SecondSear > 0.1f && SecondSear < 1.0f, f"the second piece's -Z rose (got {SecondSear})"); }
             else
-            { Assert_Equals_Float(SecondSear, 0.0, 0.0001, f"the second piece's {utils_searing::Get_FaceName(Face)} is raw"); }
+            { Assert_Equals_Float(SecondSear, 0.0, 0.0001, f"the second piece's {utils_foodpiece::Get_FaceName(Face)} is raw"); }
         }
 
         Assert_True(_Searing.Get_PieceStatus(_FirstId) == EMars_Searing_PieceStatus::Cooking, "the first piece is cooking");

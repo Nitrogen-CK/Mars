@@ -1,9 +1,10 @@
-// A cook state set and a cut issued in one step land in one drain: the cook state applies first, so the cut is not refused
-// and both halves carry the new state.
+// A cook state set and a cut issued in one step land in one drain: the cook state is not a cut, so the cut is not refused,
+// and both halves carry the new state. Which of the two the drain applies first is not observable here (the halves read
+// the ledger when the slice commits, a frame or more later), so this test does not claim an order.
 class UMars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain : UMars_AutoTestRig_FoodPiece
 {
     private const FVector k_Origin = FVector(12800.0, -13000.0, -30000.0);
-    private const float32 k_Penetration = 0.75f;
+    private const float32 k_OilCoat = 0.75f;
 
     private FCk_Handle_FoodPiece _Source;
 
@@ -30,7 +31,7 @@ class UMars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain : UMa
     private void Step_SetCookStateThenCut(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto CookState = FMars_FoodPiece_CookState();
-        CookState.OilCoat = k_Penetration;
+        CookState.OilCoat = k_OilCoat;
         _Source.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
         Cut(_Source, Get_BoundsCenter(_Source), FVector::ForwardVector);
     }
@@ -66,9 +67,7 @@ class UMars_AutoTest_FoodPiece_SetCookStateAppliesBeforeACutInTheSameDrain : UMa
         if (Result.Outcome != EMars_FoodPiece_CutOutcome::Cut)
         { return; }
 
-        Assert_True(Math::IsNearlyEqual(Result.Positive.Get_CookState().OilCoat, k_Penetration),
-            f"the positive half carries the cook state (OilCoat {Result.Positive.Get_CookState().OilCoat})");
-        Assert_True(Math::IsNearlyEqual(Result.Negative.Get_CookState().OilCoat, k_Penetration),
-            f"the negative half carries the cook state (OilCoat {Result.Negative.Get_CookState().OilCoat})");
+        Assert_Equals_Float(Result.Positive.Get_CookState().OilCoat, k_OilCoat, 0.0001, "the positive half carries the cook state");
+        Assert_Equals_Float(Result.Negative.Get_CookState().OilCoat, k_OilCoat, 0.0001, "the negative half carries the cook state");
     }
 }

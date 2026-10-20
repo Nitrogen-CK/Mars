@@ -33,7 +33,7 @@ class UMars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart : UMars_AutoT
         Add_Step_WaitUntil("the scoop and basket bodies are in the simulation", n"Check_BodiesAdded", 0, 0);
         Add_Step_WaitUntil("the rig's pieces are ready", n"Check_PiecesReady", 0, 0);
         Add_Step("fry the piece's +Z face golden and sear its -Z, as two stations would", n"Step_SeedChannels");
-        Add_Step_WaitFrames("the cook state drains", 2);
+        Add_Step_WaitUntil("the ledger carries both channels", n"Check_Seeded", 0, 0);
         Add_Step("release it just above the oil", n"Step_Release");
         Add_Step_WaitUntil("its body is in the simulation", n"Check_Added1", 0, 0);
         Add_Step("the fried face arrived golden, the rest pale", n"Step_AssertSeeded");
@@ -44,9 +44,30 @@ class UMars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart : UMars_AutoT
         Add_Step_WaitUntil("the piece drained", n"Check_FirstDrained", k_SlowPolls, 0);
         Add_Step("take out every drained piece", n"Step_TakeOut");
         Add_Step_WaitUntil("the take-out was answered and the body reads Kinematic", n"Check_TakenOut", 0, 0);
-        Add_Step_WaitFrames("the cook state drains", 2);
+        Add_Step_WaitUntil("the take-out's batter write reached the ledger", n"Check_BatterWritten", 0, 0);
         Add_Step("the piece came back with its heat as its batter and its sear untouched", n"Step_AssertTakenOut");
         Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Check_Seeded(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto CookState = _Food.Get_CookState();
+        auto Res = OutResult;
+        Res.Set(CookState.Batter[int32(EMars_FoodPiece_Face::PosZ)] == 1.0f && CookState.Sear[int32(EMars_FoodPiece_Face::NegZ)] == 1.0f);
+    }
+
+    // Every face's batter is the heat it had at the take-out.
+    UFUNCTION()
+    private void Check_BatterWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto CookState = _Food.Get_CookState();
+        auto Written = _HeatsAtTakeOut.Num() == utils_foodpiece::k_FaceCount;
+        for (int32 Index = 0; Index < _HeatsAtTakeOut.Num(); ++Index)
+        { Written = Written && Math::Abs(CookState.Batter[Index] - _HeatsAtTakeOut[Index]) <= 0.0001; }
+
+        auto Res = OutResult;
+        Res.Set(Written);
     }
 
     UFUNCTION()
@@ -54,16 +75,16 @@ class UMars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart : UMars_AutoT
     {
         _Food = _Pieces[0];
         auto CookState = _Food.Get_CookState();
-        CookState.Batter[int32(EMars_Searing_Face::PosZ)] = 1.0f;
-        CookState.Sear[int32(EMars_Searing_Face::NegZ)] = 1.0f;
+        CookState.Batter[int32(EMars_FoodPiece_Face::PosZ)] = 1.0f;
+        CookState.Sear[int32(EMars_FoodPiece_Face::NegZ)] = 1.0f;
         _Food.Request_SetCookState(FMars_Request_FoodPiece_SetCookState(CookState));
     }
 
     UFUNCTION()
     private void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_Float(_Food.Get_CookState().Batter[int32(EMars_Searing_Face::PosZ)], 1.0, 0.0001, "the piece's +Z is fried before it is released");
-        Assert_Equals_Float(_Food.Get_CookState().Sear[int32(EMars_Searing_Face::NegZ)], 1.0, 0.0001, "the piece's -Z is seared before it is released");
+        Assert_Equals_Float(_Food.Get_CookState().Batter[int32(EMars_FoodPiece_Face::PosZ)], 1.0, 0.0001, "the piece's +Z is fried before it is released");
+        Assert_Equals_Float(_Food.Get_CookState().Sear[int32(EMars_FoodPiece_Face::NegZ)], 1.0, 0.0001, "the piece's -Z is seared before it is released");
         _Piece = AddPiece(FVector(-30.0, 0.0, float64(_Spec.Oil.SurfaceZ) + Get_BoxHalfExtents().Z + 1.0));
     }
 
@@ -71,14 +92,14 @@ class UMars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart : UMars_AutoT
     private void Step_AssertSeeded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Fry.Get_PieceHandle(_Piece) == _Food, "the fryer holds the piece itself");
-        Assert_Equals_Float(_Fry.Get_FaceHeat(_Piece, EMars_Searing_Face::PosZ), 1.0, 0.0001, "the fried +Z arrived with heat 1");
-        Assert_True(_Fry.Get_PieceStage(_Piece, EMars_Searing_Face::PosZ) == EMars_Fry_HeatStage::Golden, "the fried +Z is Golden");
-        Assert_True(_Fry.Get_FaceHeat(_Piece, EMars_Searing_Face::NegZ) < 0.1f, "the seared -Z arrived pale: a sear is not batter");
+        Assert_Equals_Float(_Fry.Get_FaceHeat(_Piece, EMars_FoodPiece_Face::PosZ), 1.0, 0.0001, "the fried +Z arrived with heat 1");
+        Assert_True(_Fry.Get_PieceStage(_Piece, EMars_FoodPiece_Face::PosZ) == EMars_Fry_HeatStage::Golden, "the fried +Z is Golden");
+        Assert_True(_Fry.Get_FaceHeat(_Piece, EMars_FoodPiece_Face::NegZ) < 0.1f, "the seared -Z arrived pale: a sear is not batter");
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
         {
-            const auto Face = EMars_Searing_Face(Index);
-            if (Face != EMars_Searing_Face::PosZ)
-            { Assert_True(_Fry.Get_FaceHeat(_Piece, Face) < 0.1f, f"face {utils_searing::Get_FaceName(Face)} arrived pale"); }
+            const auto Face = EMars_FoodPiece_Face(Index);
+            if (Face != EMars_FoodPiece_Face::PosZ)
+            { Assert_True(_Fry.Get_FaceHeat(_Piece, Face) < 0.1f, f"face {utils_foodpiece::Get_FaceName(Face)} arrived pale"); }
         }
 
         Assert_Equals_Int(_Fry.Get_PaleFaceCount(_Piece), 5, "five faces are pale");
@@ -119,7 +140,7 @@ class UMars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart : UMars_AutoT
         // The basket never heats: these are the heats the take-out writes.
         _HeatsAtTakeOut.Empty();
         for (int32 Index = 0; Index < utils_searing::k_FaceCount; ++Index)
-        { _HeatsAtTakeOut.Add(_Fry.Get_FaceHeat(_Piece, EMars_Searing_Face(Index))); }
+        { _HeatsAtTakeOut.Add(_Fry.Get_FaceHeat(_Piece, EMars_FoodPiece_Face(Index))); }
 
         _Body = _Fry.Get_PieceBody(_Piece);
         _Fry.Request_TakeOut(FMars_Request_Fry_TakeOut());
@@ -150,17 +171,17 @@ class UMars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart : UMars_AutoT
         auto HeatSum = 0.0f;
         for (int32 Index = 0; Index < _HeatsAtTakeOut.Num(); ++Index)
         {
-            const auto Face = EMars_Searing_Face(Index);
+            const auto Face = EMars_FoodPiece_Face(Index);
             Assert_Equals_Float(CookState.Batter[Index], _HeatsAtTakeOut[Index], 0.0001,
-                f"face {utils_searing::Get_FaceName(Face)}'s batter is its heat");
+                f"face {utils_foodpiece::Get_FaceName(Face)}'s batter is its heat");
             HeatSum += _HeatsAtTakeOut[Index];
         }
 
         const auto Look = utils_cookstate::Make_DisplayParams(CookState);
         Log(f"[Mars_AutoTest_Fry_AdoptedPieceKeepsItsBatterAndItsSearApart] heat sum at the take-out {HeatSum :.3}, fry {Look.Fry :.3}");
         Assert_True(HeatSum > 1.1f, f"the oil heated faces beyond the seeded one (heat sum {HeatSum})");
-        Assert_Equals_Float(CookState.Batter[int32(EMars_Searing_Face::PosZ)], 1.0, 0.05, "the fried +Z is still golden");
-        Assert_Equals_Float(CookState.Sear[int32(EMars_Searing_Face::NegZ)], 1.0, 0.0001, "the seared -Z keeps its sear");
+        Assert_Equals_Float(CookState.Batter[int32(EMars_FoodPiece_Face::PosZ)], 1.0, 0.05, "the fried +Z is still golden");
+        Assert_Equals_Float(CookState.Sear[int32(EMars_FoodPiece_Face::NegZ)], 1.0, 0.0001, "the seared -Z keeps its sear");
         Assert_Equals_Float(Look.Fry, HeatSum / float32(utils_searing::k_FaceCount), 0.0001, "its look's fry is the faces' mean heat");
 
         Assert_Equals_Int(_Fry.Get_Summary().TakenOut, 1, "the summary counts one taken out");

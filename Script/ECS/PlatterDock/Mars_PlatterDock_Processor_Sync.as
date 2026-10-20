@@ -39,8 +39,7 @@ class UMars_Processor_PlatterDock_Sync : UCk_Processor_Script_Base_UE
 
         auto DockedWorldItem = InState.WorldItem;
 
-        // InState is not read past this line: the reach hint and a listener may add a fragment to the dock.
-        Sync_ReachHint(InHandle, Docked, DockedWorldItem);
+        // InState is not read past this line: a listener may add a fragment to the dock.
         auto Self = InHandle.As_PlatterDock();
         if (ck::IsValid(PreviousWorldItem))
         { Stop_Watching(PreviousWorldItem); }
@@ -58,21 +57,6 @@ class UMars_Processor_PlatterDock_Sync : UCk_Processor_Script_Base_UE
         // A mount committed without travel settled before this bind.
         if (Self.Get_HasArrived())
         { Report_Arrived(Self); }
-    }
-
-    // A docked platter is what a Take reaches for: the dock (the interactable's owner) hints the platter's own fit and
-    // handedness, so both gloves take the tray. The platter's root sits on the dock's node, so its fit holds in the dock's
-    // frame as is. An empty dock hints nothing (its Place is a Place reach at a spot).
-    private void Sync_ReachHint(FCk_Handle& InDock, const FCk_Handle_Platter& InDocked, const FCk_Handle_WorldItem& InWorldItem)
-    {
-        const FCk_Handle WorldItemEntity = InWorldItem;
-        if (ck::IsValid(InDocked) && WorldItemEntity.Has_ReachHint())
-        {
-            utils_reach_hint::Set(InDock, WorldItemEntity.Get_ReachHint());
-            return;
-        }
-
-        utils_reach_hint::Remove(InDock);
     }
 
     // The watchdog: a docked platter that has not settled on the dock past its arrival and the grace ensures once.

@@ -10,20 +10,14 @@ struct FMars_Batter_AdmissionResult
     FCk_Handle Entity;
 }
 
-// One piece a take-out handed back, broadcast after the whole drain applied.
-struct FMars_Batter_TakeOutResult
-{
-    FMars_CookingFeed_PieceId Id;
-    FCk_Handle_FoodPiece Piece;
-}
-
-// What one drain broadcasts once it applied: the bowl it started from (the edge), its take-outs and refused take-outs, and
-// its admission answers.
+// What one drain broadcasts once it applied: the bowl it started from (the edge), its take-outs and refused take-outs, the
+// pieces it readopted, and its admission answers.
 struct FMars_Batter_DrainEdges
 {
     EMars_Batter_Bowl StartBowl = EMars_Batter_Bowl::Resting;
-    TArray<FMars_Batter_TakeOutResult> TakenOut;
+    TArray<FMars_CookingFeed_TakeOutResult> TakenOut;
     TArray<EMars_Batter_TakeOutRefusal> TakeOutRefusals;
+    TArray<FMars_Batter_PieceState> Readopted;
     TArray<FMars_Batter_AdmissionResult> Admissions;
 }
 
@@ -32,11 +26,11 @@ struct FMars_Batter_DrainEdges
 // coats kept); a take-out hands back every fully coated piece lifted back to rest up to its cap, its ledger battered (Battered = 1, through the
 // FoodPiece request), detached and onto the take-out's tray, and one that hands none back is refused (NoRoom under a cap of
 // zero or with no tray, Empty with nothing in the bowl, StillInTheBatter for a coated piece not lifted yet, else
-// CoatIncomplete); Readopt puts a handed-back piece its tray
-// refused back at a free slot; each release in the station's inbox is adopted or rejected with a reason (NotWhole,
-// NotBatterable, AlreadyBattered, Full, or the identity and readiness gates); Dip holds the pieces under. The bowl edge,
-// every take-out and refused take-out, then every admission answer on the station's OnAdmission (and OnPieceAdded or
-// OnAdmissionRefused) are broadcast last. The drain decides and the Tick moves: nothing here integrates over time.
+// CoatIncomplete); Readopt puts a handed-back piece its tray refused back at a free slot; each release in the station's
+// inbox is adopted or rejected with a reason (NotWhole, NotBatterable, AlreadyBattered, Full, or the identity and readiness
+// gates); Dip holds the pieces under. The bowl edge, every take-out and refused take-out, then OnPieceAdded for every
+// readopted piece, then every admission answer on the station's OnAdmission (and OnPieceAdded or OnAdmissionRefused) are
+// broadcast last. The drain decides and the Tick moves: nothing here integrates over time.
 //
 // A piece is the bowl's guest: the kernel creates no entity, and a piece it holds ends only with a Reset or with the station
 // (OnBatterBeginDestroy). The bowl is the one owner of its pieces' lease facts: it stamps every piece it takes on with the
@@ -85,7 +79,11 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
         { Apply_TakeOut(Self, InState, TakeOut, Edges); }
 
         for (const auto& Request : ReadoptRequests)
-        { Apply_Readopt(Self, InState, Request); }
+        {
+            const auto Readopt = Apply_Readopt(Self, InState, Request);
+            if (Readopt.IsSet())
+            { Edges.Readopted.Add(Readopt.GetValue()); }
+        }
 
         for (const auto& Release : Inbox)
         { Edges.Admissions.Add(Apply_AddPiece(Self, InState, Release)); }
@@ -114,6 +112,12 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
             { InBatter.Get_Fragment(FMars_Fragment_Batter_Signals).OnTakeOutRefused.Broadcast(InBatter, Refusal); }
         }
 
+        for (const auto& Piece : InEdges.Readopted)
+        {
+            if (InBatter.Has_Fragment(FMars_Fragment_Batter_Signals))
+            { InBatter.Get_Fragment(FMars_Fragment_Batter_Signals).OnPieceAdded.Broadcast(InBatter, Piece.Id, Piece.Entity); }
+        }
+
         FCk_Handle Station = InBatter;
         for (const auto& Result : InEdges.Admissions)
         {
@@ -133,7 +137,7 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
     {
         for (const auto& Piece : InState.Pieces)
         {
-            if (Get_IsGone(Piece.Piece) == false)
+            if (Piece.Piece.Get_IsGone() == false)
             { utils_entity_lifetime::Request_DestroyEntity(Piece.Entity); }
         }
 
@@ -160,7 +164,7 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
         auto Piece = InRelease.Piece;
         FCk_Handle Entity = Piece;
 
-        if (Get_IsGone(Piece))
+        if (Piece.Get_IsGone())
         { Result.Reason = "no piece"; }
         else if (Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
         { Result.Reason = "the piece is not ready"; }
@@ -213,9 +217,9 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     // InSeed's piece at the lowest free slot, at rest, attached under the bowl node (detached first if it hangs anywhere),
-    // its body Kinematic, the holder fact and the Ledger claim the bowl's. Its coat starts at 0 (a piece is never admitted
-    // battered, and a readopted one had its full coat written to its ledger as Battered).
-    private void Adopt(FCk_Handle_Batter& InBatter, FMars_Fragment_Batter& InState, const FMars_Batter_PieceState_Seed& InSeed)
+    // its body Kinematic, the holder fact and the Ledger claim the bowl's: the record it seated. Its coat is the seed's (0
+    // for an admission: a piece is never admitted battered; 1 for a readopt, whose full coat its ledger already says).
+    private FMars_Batter_PieceState Adopt(FCk_Handle_Batter& InBatter, FMars_Fragment_Batter& InState, const FMars_Batter_PieceState_Seed& InSeed)
     {
         const auto Spec = InBatter.Get_Spec();
         auto Piece = InSeed.Piece;
@@ -241,6 +245,7 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
         utils_foodpiece::Stamp_Holder(Piece, InBatter);
         utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
         Watch_Teardown(InBatter);
+        return State;
     }
 
     // Every fully coated piece lifted back to rest, in admission order, up to the cap the press read (no tray caps it at
@@ -251,11 +256,11 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
     {
         const auto MaxPieces = ck::IsValid(InTakeOut.Tray) ? InTakeOut.MaxPieces : 0;
 
-        TArray<FMars_Batter_TakeOutResult> Taken;
+        TArray<FMars_CookingFeed_TakeOutResult> Taken;
         TArray<FMars_Batter_PieceState> Kept;
         for (const auto& Piece : InState.Pieces)
         {
-            const auto IsTakeable = Get_IsGone(Piece.Piece) == false && utils_batter::Get_IsTakeable(Piece);
+            const auto IsTakeable = Piece.Piece.Get_IsGone() == false && utils_batter::Get_IsTakeable(Piece);
             if (Taken.Num() >= MaxPieces || IsTakeable == false)
             {
                 Kept.Add(Piece);
@@ -264,10 +269,7 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
 
             Hand_Back(InBatter, Piece);
 
-            auto Result = FMars_Batter_TakeOutResult();
-            Result.Id = Piece.Id;
-            Result.Piece = Piece.Piece;
-            Taken.Add(Result);
+            Taken.Add(FMars_CookingFeed_TakeOutResult(Piece.Id, Piece.Piece));
         }
 
         if (Taken.Num() == 0)
@@ -315,36 +317,38 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
     }
 
     // A handed-back piece its tray refused, back in the bowl at a free slot: fully coated (its ledger says battered), its
-    // holder fact and its pickup's Ledger claim the bowl's. Not readopted: a piece gone, attached, or that another ledger
-    // holds by now, or a bowl with no free slot left (the piece stays where it lies).
-    private void Apply_Readopt(FCk_Handle_Batter& InBatter, FMars_Fragment_Batter& InState, const FMars_Request_Batter_Readopt& InRequest)
+    // holder fact and its pickup's Ledger claim the bowl's: the record it seated. Unset when it is not readopted: a piece
+    // gone, or that another ledger holds by now, is left alone; one attached somewhere stays there, and one the bowl has no
+    // free slot left for (a release was admitted into the slot its take-out freed) ensures and lies where it is; both with
+    // their pickup's Ledger claim released, so a hand can take them.
+    private TOptional<FMars_Batter_PieceState> Apply_Readopt(FCk_Handle_Batter& InBatter, FMars_Fragment_Batter& InState,
+        const FMars_Request_Batter_Readopt& InRequest)
     {
         auto Piece = InRequest.Piece;
-        if (Get_IsGone(Piece))
-        { return; }
-
-        FCk_Handle Entity = Piece;
-        const auto Holder = Piece.TryGet_Holder();
-        if ((ck::IsValid(Holder) && Holder != InBatter) || Entity.Is_SceneNode())
-        { return; }
-
         const auto PieceName = utils_cooking_feed::Get_PieceName(InRequest.PieceId);
+        const auto Gate = utils_cooking_feed::Get_ReadoptGate(InBatter, Piece);
+        if (Gate == EMars_CookingFeed_ReadoptGate::Attached)
+        { utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable); }
+
+        if (Gate != EMars_CookingFeed_ReadoptGate::Readopt)
+        { return TOptional<FMars_Batter_PieceState>(); }
+
         const auto IsInBowl = utils_batter::Find_PieceIndexByHandle(InState.Pieces, Piece) >= 0
             || utils_batter::Find_PieceIndex(InState.Pieces, InRequest.PieceId) >= 0;
         if (ck::EnsureIfNot(IsInBowl == false, f"[Batter] [{InBatter.ToString()}] was asked to readopt piece {PieceName} [{Piece.ToString()}], which it already holds"))
-        { return; }
+        { return TOptional<FMars_Batter_PieceState>(); }
 
-        if (utils_batter::Get_FreeSlot(InState.Pieces, InBatter.Get_Spec().Bowl.Capacity) < 0)
-        { return; }
+        const auto Capacity = InBatter.Get_Spec().Bowl.Capacity;
+        if (ck::EnsureIfNot(utils_batter::Get_FreeSlot(InState.Pieces, Capacity) >= 0,
+            f"[Batter] [{InBatter.ToString()}] has no free slot to readopt piece {PieceName} [{Piece.ToString()}] ({InState.Pieces.Num()} of {Capacity} taken): it lies where its tray refused it"))
+        {
+            utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Enable);
+            return TOptional<FMars_Batter_PieceState>();
+        }
 
         auto Seed = FMars_Batter_PieceState_Seed(InRequest.PieceId, Piece);
         Seed.Coat = 1.0f;
-        Adopt(InBatter, InState, Seed);
-    }
-
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece) const
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
+        return TOptional<FMars_Batter_PieceState>(Adopt(InBatter, InState, Seed));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -433,7 +437,7 @@ class UMars_Processor_Batter_HandleRequests : UCk_Processor_Script_Base_UE
         const auto State = BatterEntity.Get_Fragment(FMars_Fragment_Batter);
         for (const auto& Piece : State.Pieces)
         {
-            if (Get_IsGone(Piece.Piece))
+            if (Piece.Piece.Get_IsGone())
             { continue; }
 
             utils_entity_lifetime::Request_DestroyEntity(Piece.Entity);

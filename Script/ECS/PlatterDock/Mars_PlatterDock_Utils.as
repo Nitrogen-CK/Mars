@@ -50,7 +50,7 @@ namespace utils_platter_dock
 
         auto State = FMars_Fragment_PlatterDock();
         State.Inventory = Inventory;
-        State.Interactable = DoCreate_Interactable(Node, InSpec.ProbeRadius);
+        State.Interactable = DoCreate_Interactable(Node, InSpec);
         State.Node = Node;
 
         Node.Add_Fragment(FMars_Feature_PlatterDock());
@@ -144,72 +144,23 @@ namespace utils_platter_dock
         return FoodEntity.As_FoodPiece(ECk_SanityCheck::UnChecked);
     }
 
-    // The dock's Name for Place / Take, the food and the dock for PlaceFood; InQuery.Refusal is the policy's reason for
-    // Blocked_Policy (the Kind refusal reads the dock's KindRejectedText); the other Blocked_ texts are fixed.
-    FText Get_PromptText(const FMars_PlatterDock_Spec& InSpec, const FMars_PlatterDock_PromptQuery& InQuery)
-    {
-        const auto Name = InSpec.Name.ToString();
-        const auto Action = InQuery.Action;
-
-        if (Action == EMars_PlatterDock_Action::Place)
-        { return FText::FromString(f"Place on {Name}"); }
-
-        if (Action == EMars_PlatterDock_Action::PlaceFood)
-        { return FText::FromString(f"Place {InQuery.FoodName.ToString()} on {Name}"); }
-
-        if (Action == EMars_PlatterDock_Action::Take)
-        { return FText::FromString(f"Take {Name}"); }
-
-        if (Action == EMars_PlatterDock_Action::Blocked_NothingHeld)
-        { return FText::FromString("Nothing to place"); }
-
-        if (Action == EMars_PlatterDock_Action::Blocked_NotAPlatter)
-        { return FText::FromString("Not a platter"); }
-
-        if (Action == EMars_PlatterDock_Action::Blocked_HandsFull)
-        { return utils_interactable::Get_HandsFullText(); }
-
-        return Get_RefusalText(InSpec, InQuery.Refusal);
-    }
-
-    // The Blocked_Policy reason.
-    FText Get_RefusalText(const FMars_PlatterDock_Spec& InSpec, TOptional<EMars_PlatterDock_Refusal> InRefusal)
-    {
-        if (InRefusal == EMars_PlatterDock_Refusal::KindRejected)
-        { return InSpec.KindRejectedText.IsEmpty() ? FText::FromString("Not this food") : InSpec.KindRejectedText; }
-
-        if (InRefusal == EMars_PlatterDock_Refusal::NotWhole)
-        { return FText::FromString("Whole pieces only"); }
-
-        if (InRefusal == EMars_PlatterDock_Refusal::MustBeEmpty)
-        { return FText::FromString("Must be empty"); }
-
-        if (InRefusal == EMars_PlatterDock_Refusal::PlatterFull)
-        { return FText::FromString("Platter full"); }
-
-        return FText::FromString("Can't place that");
-    }
-
     // The probe carries Probe.Mars.Interact (the player's interaction trace only sees probes under that tag) and is
-    // Kinematic: it follows the station. The prompt text is a placeholder until UMars_Processor_PlatterDock_Prompt writes
-    // the focuser's action. The target is WhileLive: a Place or a Take moves the platter at the gloves' Grip.
-    FCk_Handle_Interactable DoCreate_Interactable(FCk_Handle_Transform& InNode, float32 InProbeRadius)
+    // Kinematic: it follows the station. The spec's prompt is a placeholder until the dock's prompt processor
+    // (UMars_Processor_PlatterDock_Prompt) words the focuser's action. The target is WhileLive: a Place or a Take moves the
+    // platter at the gloves' Grip.
+    FCk_Handle_Interactable DoCreate_Interactable(FCk_Handle_Transform& InNode, const FMars_PlatterDock_Spec& InSpec)
     {
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
         Probe.ProbeSpec.Set_MotionType(ECk_MotionType::Kinematic);
-        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InProbeRadius));
+        Probe.ProbeShape = utils_shapes::Make_Sphere(FCk_ShapeSphere_Dimensions(InSpec.ProbeRadius));
         Probe.ProbeOffset = FTransform::Identity;
 
         auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
 
-        auto Prompt = FMars_InteractPrompt_Spec();
-        Prompt.InputAction = mars::Mars_IA_Interact_Use;
-        Prompt.PromptText = FText::FromString("Dock");
-
         auto Target = FMars_Interactable_TargetEntry();
         Target.InteractTargetSpec = TargetSpec;
-        Target.InteractPromptSpec = Prompt;
+        Target.InteractPromptSpec = InSpec.Prompt;
         Target.InteractionStateClass = UMars_SmState_PlatterDock_Interact;
         Target.Work = EMars_Interactable_Work::WhileLive;
 

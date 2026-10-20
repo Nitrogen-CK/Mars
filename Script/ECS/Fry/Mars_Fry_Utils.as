@@ -43,6 +43,13 @@ namespace utils_fry
     // cm the scoop's centre may sit past the pot disc and still count as in the pot: the slide spring overshoots a target
     // on the disc's edge by a little.
     const float32 k_ReachTolerance = 1.0f;
+    // The narrowest square (cm each way) the bowl's centre must have over the basket interior for a pour to be aimed:
+    // Validate(FMars_Fry_Spec) rejects a basket that leaves less.
+    const float32 k_MinPourWindowCm = 22.0f;
+    // How far the skimmer's commanded lift may go past the dip and the carry (its spring's overshoot).
+    const float32 k_SkimmerLiftHeadroomCm = 2.0f;
+    // How far past the reach's bounding box the skimmer's own slide clamp lies (the kernel's reach clamp is the real one).
+    const float64 k_SkimmerSlideMarginCm = 1.0;
 
     // Composes the minigame on InHandle (the station entity, which carries the root transform), and the station's admission
     // inbox and take-out readout. The spec's Nodes are built by the caller and left as composed (the skimmer Idle at its
@@ -107,9 +114,8 @@ namespace utils_fry
     // Returns the floor body. A rejected spec ensures and returns an invalid handle.
     FCk_Handle_JoltBody Add_BasketBodies(FCk_Handle_SceneNode& InBasketNode, const FMars_Fry_BasketSpec& InSpec)
     {
-        if (ck::EnsureIfNot(InSpec.InnerHalfX > 0.0f && InSpec.InnerHalfY > 0.0f && InSpec.WallHeight > 0.0f
-            && InSpec.WallThickness > 0.0f && InSpec.FloorThickness > 0.0f,
-            f"[Fry] [{InBasketNode.ToString()}] rejected a basket with a non-positive size"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Fry] [{InBasketNode.ToString()}] rejected the basket spec: {Validation.Get_Error()}"))
         { return FCk_Handle_JoltBody(); }
 
         auto Parent = InBasketNode.As_Transform();
@@ -139,8 +145,8 @@ namespace utils_fry
     // the bowl. Returns the disc body. A rejected spec ensures and returns an invalid handle.
     FCk_Handle_JoltBody Add_ScoopBodies(FCk_Handle_SceneNode& InScoopNode, const FMars_Fry_ScoopSpec& InSpec)
     {
-        if (ck::EnsureIfNot(InSpec.BowlRadius > 0.0f && InSpec.LipHeight > 0.0f && InSpec.LipThickness > 0.0f && InSpec.DiscThickness > 0.0f,
-            f"[Fry] [{InScoopNode.ToString()}] rejected a scoop with a non-positive size"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Fry] [{InScoopNode.ToString()}] rejected the scoop spec: {Validation.Get_Error()}"))
         { return FCk_Handle_JoltBody(); }
 
         auto Parent = InScoopNode.As_Transform();
@@ -230,9 +236,51 @@ namespace utils_fry
         return Bounds;
     }
 
+    // The carried scoop's reach for a basket whose frame (the floor's top centre) sits at InBasketLocal in the station frame,
+    // on the pot's +Y side (the pot disc is Zones.PotRadius's): a corridor as wide as the basket from the pot's axis to the
+    // basket interior's near (-Y) edge (overlapping the pot disc, so the two join without a gap), and the basket's interior
+    // footprint. InSpec.Reach's look rate is kept.
+    FMars_Fry_ReachSpec Make_Reach(const FMars_Fry_Spec& InSpec, FVector InBasketLocal)
+    {
+        const auto& Basket = InSpec.Basket;
+        const auto InteriorNearY = InBasketLocal.Y - float64(Basket.InnerHalfY);
+
+        auto Reach = InSpec.Reach;
+        Reach.CorridorCentre = FVector2D(0.0, InteriorNearY * 0.5);
+        Reach.CorridorHalfExtent = FVector2D(float64(Basket.InnerHalfX), InteriorNearY * 0.5);
+        Reach.BasketCentre = FVector2D(InBasketLocal.X, InBasketLocal.Y);
+        Reach.BasketHalfExtent = FVector2D(float64(Basket.InnerHalfX), float64(Basket.InnerHalfY));
+        return Reach;
+    }
+
+    // The skimmer's Implement as the kernel drives it, from InBase (the assembly's feel: its max tilt, which must reach
+    // Scoop.PourPitchDegrees, its lift spring, and its Nodes): never tilted by the look; its slide is the kernel's
+    // (Commanded), clamped by the implement only to the box bounding the reach about the skimmer's park at InParkXY (station
+    // frame; the kernel's own clamp is the real one); its commanded lift and its pour tilt are the kernel's skim, never the
+    // look.
+    FMars_Implement_Spec Make_SkimmerImplementSpec(const FMars_Fry_Spec& InSpec, const FMars_Implement_Spec& InBase, FVector2D InParkXY)
+    {
+        const auto& Scoop = InSpec.Scoop;
+        const auto Bounds = Get_ReachBounds(InSpec);
+        auto Spec = InBase;
+        Spec.Tilt.Axes = EMars_Implement_TiltAxes::None;
+        Spec.Tilt.Relax = EMars_Implement_Relax::WhileIdle;
+        Spec.Lift.Mode = EMars_Implement_LiftMode::Commanded;
+        Spec.Lift.LiftPerLookDegree = 0.0f;
+        Spec.Lift.MinLift = Scoop.DipLift - k_SkimmerLiftHeadroomCm;
+        Spec.Lift.MaxLift = Scoop.CarryLift + k_SkimmerLiftHeadroomCm;
+        Spec.Slide.Mode = EMars_Implement_SlideMode::Commanded;
+        Spec.Slide.CmPerLookDegree = 0.0f;
+        Spec.Slide.Radius = 0.0f;
+        Spec.Slide.Centre = Bounds.Centre - InParkXY;
+        Spec.Slide.HalfExtentX = float32(Bounds.HalfExtent.X + k_SkimmerSlideMarginCm);
+        Spec.Slide.HalfExtentY = float32(Bounds.HalfExtent.Y + k_SkimmerSlideMarginCm);
+        return Spec;
+    }
+
     // Inside the basket interior (basket frame): over the floor within the walls, from the floor's underside up to a
     // piece's height above the wall tops (a piece hopping inside the walls is still in the basket). InHalfHeight is the
-    // piece's half height as it lies (utils_searing::Get_WorldHalfExtentZ).
+    // piece's half height as it lies (utils_foodpiece::Get_WorldHalfExtentZ).
     bool Get_IsInsideBasket(const FMars_Fry_BasketSpec& InBasket, FVector InBasketLocal, float32 InHalfHeight)
     {
         const auto Z = float32(InBasketLocal.Z);
@@ -277,10 +325,10 @@ namespace utils_fry
     }
 
     // The height (root frame) of a face's middle: InCentreFrame is the piece's root-relative frame at its middle
-    // (utils_searing::Get_CentreFrame).
-    float32 Get_FaceCentreZ(const FTransform& InCentreFrame, EMars_Searing_Face InFace, const FVector& InHalfExtents)
+    // (utils_foodpiece::Get_CentreFrame).
+    float32 Get_FaceCentreZ(const FTransform& InCentreFrame, EMars_FoodPiece_Face InFace, const FVector& InHalfExtents)
     {
-        return float32(utils_searing::Get_FaceCentre(InCentreFrame, InFace, InHalfExtents).Z);
+        return float32(utils_foodpiece::Get_FaceCentre(InCentreFrame, InFace, InHalfExtents).Z);
     }
 
     // The cook state InPiece's heat makes of InSeed (the state the piece arrived with): the batter heats are its faces'
@@ -450,23 +498,17 @@ mixin FMars_Fry_Summary Get_Summary(const FCk_Handle_Fry& Self)
         }
     }
 
-    Summary.Lost = State.Tally.Lost;
+    Summary.Lost = State.Tally.Losses;
     Summary.TakenOut = State.Tally.TakenOut;
     Summary.Admitted = Summary.InOil + Summary.OnSkimmer + Summary.Airborne + Summary.InBasket + Summary.Lost + Summary.TakenOut;
     return Summary;
 }
 
-// The Drained pieces a TakeOut without a named piece would hand back.
+// The Drained pieces a TakeOut without a named piece would hand back: the station's take-out readout, as the Tick last
+// wrote it.
 mixin int32 Get_TakeableCount(const FCk_Handle_Fry& Self)
 {
-    auto Count = 0;
-    for (const auto& Piece : Self.Get_Fragment(FMars_Fragment_Fry).Pieces)
-    {
-        if (Piece.Drain == EMars_Fry_Drain::Drained)
-        { Count += 1; }
-    }
-
-    return Count;
+    return utils_cooking_feed::Get_Takeable(Self).Num();
 }
 
 // The station root's world transform (the station frame).
@@ -482,12 +524,6 @@ mixin FTransform Get_BasketWorld(const FCk_Handle_Fry& Self)
     const auto FloorWorld = utils_transform::Get_EntityCurrentTransform(Spec.Nodes.BasketBody.As_Transform());
     const auto Top = FloorWorld.TransformPosition(FVector(0.0, 0.0, float64(Spec.Basket.FloorThickness) * 0.5));
     return FTransform(FloorWorld.GetRotation(), Top, FloorWorld.GetScale3D());
-}
-
-// The basket floor's top centre height in the station frame.
-mixin float32 Get_BasketFloorTopZ(const FCk_Handle_Fry& Self)
-{
-    return float32(Self.Get_RootWorld().InverseTransformPosition(Self.Get_BasketWorld().GetLocation()).Z);
 }
 
 // The scoop frame in world space: the disc body's node frame raised to the disc's top centre.
@@ -595,7 +631,6 @@ mixin FVector Get_PieceCentre(const FCk_Handle_Fry& Self, const FMars_CookingFee
     return PieceWorld.TransformPosition(Piece.CentreLocal);
 }
 
-// The release's preset index the piece arrived with.
 // The piece's cook state as the fryer would hand it back now: its batter the faces' heat so far.
 mixin FMars_FoodPiece_CookState Get_PieceCookState(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
@@ -624,7 +659,7 @@ mixin float32 Get_PieceDrainProgress(const FCk_Handle_Fry& Self, const FMars_Coo
 }
 
 // 0 pale .. 1 golden .. 2 overdone.
-mixin float32 Get_FaceHeat(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_Searing_Face InFace)
+mixin float32 Get_FaceHeat(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_FoodPiece_Face InFace)
 {
     const auto Piece = Self.Get_PieceState(InPieceId);
     const auto Index = int32(InFace);
@@ -634,7 +669,7 @@ mixin float32 Get_FaceHeat(const FCk_Handle_Fry& Self, const FMars_CookingFeed_P
     return Piece.FaceHeat[Index];
 }
 
-mixin EMars_Fry_HeatStage Get_PieceStage(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_Searing_Face InFace)
+mixin EMars_Fry_HeatStage Get_PieceStage(const FCk_Handle_Fry& Self, const FMars_CookingFeed_PieceId& InPieceId, EMars_FoodPiece_Face InFace)
 {
     return utils_fry::Get_HeatStage(Self.Get_FaceHeat(InPieceId, InFace));
 }

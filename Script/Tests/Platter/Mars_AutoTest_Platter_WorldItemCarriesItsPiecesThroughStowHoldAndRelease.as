@@ -46,20 +46,12 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
         Run_Steps(InHandle);
     }
 
-    // The FoodPiece rig's box fixture (a CPU-readable 1000 cm3 cube): Transform, RuntimeMesh and FoodPiece on a new entity
-    // under the world's transient entity, tracked for cleanup.
+    // The cooking fixture's box with no kind, tracked for cleanup.
     private FCk_Handle_FoodPiece Build_Piece(FTransform InWorld)
     {
-        auto Spec = FMars_FoodPiece_Spec();
-        Spec.Data.MassKg = 0.8;
-        Spec.Tuners = FMars_FoodPiece_Tuners(0.0001, 0.05);
-
-        auto Entity = utils_entity_lifetime::Request_CreateEntity(ck::TransientEntity());
-        Track_ForCleanup(Entity);
-        utils_transform::Add(Entity, InWorld, ECk_Replication::DoesNotReplicate);
-        utils_runtime_mesh::Add(Entity, FCk_RuntimeMesh_Spec(
-            TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/CkTests/CkRuntimeMesh/Cooked/SM_Import_CPU.SM_Import_CPU"))));
-        return utils_foodpiece::Add(Entity, Spec);
+        const auto Box = Get_CookingFixture().Build_Box(InWorld, FGameplayTag(), 0.8);
+        Track_ForCleanup(Box);
+        return Box;
     }
 
     UFUNCTION()
@@ -149,7 +141,7 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
         const auto OverflowIndex = _Hotbar.Get_OverflowIndex();
         Assert_True(_Hotbar.Get_ItemAt(OverflowIndex) == _Item, "the overflow slot holds the platter");
         Assert_True(_Hotbar.Get_SelectedIndex() == TOptional<int32>(OverflowIndex), "the overflow slot is selected");
-        Assert_True(Get_MountParent() == _HandNode, "the platter hangs off the Hand node");
+        Assert_True(Get_MountParent(_WorldItem) == _HandNode, "the platter hangs off the Hand node");
         Assert_True(Get_PieceParent() == Get_Root(), "the piece is still a scene-node child of the platter root");
 
         const UMars_ItemTrait_Presentation Presentation = mars_items::Platter().Get_ItemTraitByClass(UMars_ItemTrait_Presentation);
@@ -203,16 +195,6 @@ class UMars_AutoTest_Platter_WorldItemCarriesItsPiecesThroughStowHoldAndRelease 
     {
         FCk_Handle Entity = _Piece;
         auto Node = Entity.As_SceneNode(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Node))
-        { return FCk_Handle_Transform(); }
-
-        return utils_scene_node::Get_Parent(Node);
-    }
-
-    // Invalid while the platter is not scene-node attached.
-    private FCk_Handle_Transform Get_MountParent() const
-    {
-        auto Node = _WorldItem.As_SceneNode(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Node))
         { return FCk_Handle_Transform(); }
 

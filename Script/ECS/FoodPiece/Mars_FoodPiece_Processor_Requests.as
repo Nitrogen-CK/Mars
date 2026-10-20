@@ -100,7 +100,7 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
         auto Piece = Take_CutInFlight(WorldEntity, OperationID);
 
         // An expected absence, not a defect: a board or a test tore the piece down while its slice was queued.
-        if (Get_IsGone(Piece))
+        if (Piece.Get_IsGone())
         {
             Destroy_Halves(InResult);
             return;
@@ -149,11 +149,6 @@ class UMars_Processor_FoodPiece_HandleRequests : UCk_Processor_Script_Base_UE
 
         ck::EnsureIfNot(false, f"[FoodPiece] cut [{InOperationID.ToString(EGuidFormats::Short)}] resolved but is not in the PendingCuts ledger");
         return FCk_Handle_FoodPiece();
-    }
-
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece)
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 
     // The live piece's pending cut is InOperationID: set at submission, cleared only by that cut's resolution.

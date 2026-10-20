@@ -35,7 +35,7 @@ class UMars_AutoTest_BatterStation_APlatterSourcedPrepFoodIsBatteredAndWearsItsS
 
         FCk_Handle Entity = _Food;
         Assert_True(Entity.Is_RuntimeMeshDisplay(), "it wears its own display");
-        Assert_False(ck::IsValid(utils_station::TryGet_BatteredShell(_Food)), "no battered shell before the take-out");
+        Assert_False(ck::IsValid(utils_food::TryGet_BatteredShell(_Food)), "no battered shell before the take-out");
         Assert_False(utils_batter::Get_IsBattered(_Food.Get_CookState()), "its ledger is not battered yet");
     }
 
@@ -46,7 +46,7 @@ class UMars_AutoTest_BatterStation_APlatterSourcedPrepFoodIsBatteredAndWearsItsS
         Assert_True(_Food.TryGet_Platter() == _Tray.As_Platter(), "the mushroom is on the tray");
         Assert_Equals_Int(_Batter.Get_PieceCount(), 0, "the bowl is empty");
 
-        const auto Shell = utils_station::TryGet_BatteredShell(_Food);
+        const auto Shell = utils_food::TryGet_BatteredShell(_Food);
         const auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(Shell));
         Assert_True(ck::IsValid(Mesh), "the shell is a static mesh component");
         if (ck::Is_NOT_Valid(Mesh))

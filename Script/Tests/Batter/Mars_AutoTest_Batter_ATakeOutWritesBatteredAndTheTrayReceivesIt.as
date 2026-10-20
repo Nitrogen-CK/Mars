@@ -24,7 +24,7 @@ class UMars_AutoTest_Batter_ATakeOutWritesBatteredAndTheTrayReceivesIt : UMars_A
         Add_Step_WaitUntil("it is refused", n"Check_Refused1", 0, 0);
         Add_Step("refused StillInTheBatter; lift", n"Step_AssertStillInTheBatterAndLift");
         Add_Step_WaitUntil("it rose back to rest", n"Check_FirstAtRest", k_SlowPolls, 0);
-        Add_Step_WaitFrames("the readout follows", 2);
+        Add_Step_WaitUntil("the take-out readout lists it", n"Check_ReadoutListsIt", 0, 0);
         Add_Step("the readout lists it; take out onto the tray", n"Step_TakeOut");
         Add_Step_WaitUntil("it landed on the tray", n"Check_OnTray", k_SlowPolls, 0);
         Add_Step("it is battered and the tray holds it", n"Step_AssertOnTray");
@@ -49,6 +49,13 @@ class UMars_AutoTest_Batter_ATakeOutWritesBatteredAndTheTrayReceivesIt : UMars_A
     {
         Assert_Equals_Int(utils_cooking_feed::Get_Takeable(_StationEntity).Num(), 0, "a coated piece still under is not takeable");
         TakeOut(_Tray.As_Platter(), 4);
+    }
+
+    UFUNCTION()
+    private void Check_ReadoutListsIt(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(utils_cooking_feed::Get_Takeable(_StationEntity).Num() == 1);
     }
 
     UFUNCTION()
