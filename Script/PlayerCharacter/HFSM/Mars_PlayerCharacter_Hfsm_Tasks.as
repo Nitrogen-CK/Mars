@@ -857,6 +857,13 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
     protected FGameplayTag InputIntent;
     protected FGameplayTag ResolverIntent;
 
+    // Another intent row this one's key also drives, and the channel both resolve (Primary and Use share a key and Primary
+    // resolves the Use channel): a target on DeferredChannel, reached by a press whose hold began on the same frame as
+    // DeferToInputIntent's, is that intent's to start. This one joins it, so one press stays one interaction. Unset: never
+    // defers.
+    protected FGameplayTag DeferToInputIntent;
+    protected FGameplayTag DeferredChannel;
+
     private FCk_Handle _Player;
     private FCk_Handle_InteractionResolver _Resolver;
     private bool _IntentOpen = false;
@@ -1017,7 +1024,9 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
         Close_Intent();
     }
 
-    // Starts the player's interaction on InTarget for this press, unless one from the player is live there already.
+    // Starts the player's interaction on InTarget for this press, unless one from the player is live there already or the
+    // same press starts it through the intent this one defers to (both would otherwise start one in the same frame, before
+    // either is live, and the second would never end).
     private void Forward_To(FCk_Handle_InteractTarget InTarget)
     {
         _ForwardedFor = InTarget;
@@ -1026,10 +1035,20 @@ class UMars_SmTask_IntentToResolver : UMars_SmTask_IntentEdges
         _ForwardedFor.BindTo_OnInteractionFinished(
             FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnForwardedInteractionFinished"));
 
-        if (ck::IsValid(utils_interact_target::TryGet_Interaction(_ForwardedFor, _Player)))
+        if (ck::IsValid(utils_interact_target::TryGet_Interaction(_ForwardedFor, _Player)) || Get_DefersStart(_ForwardedFor))
         { return; }
 
         _ForwardedFor.Request_StartInteraction(FCk_Try_InteractTarget_StartInteraction(_Player, _Player));
+    }
+
+    // InTarget is on the deferred channel and the deferred-to row's hold began with this press.
+    private bool Get_DefersStart(const FCk_Handle_InteractTarget& InTarget) const
+    {
+        if (DeferToInputIntent.IsValid() == false || utils_interact_target::Get_InteractionChannel(InTarget) != DeferredChannel)
+        { return false; }
+
+        const auto DeferredFrame = TryGet_RowActivationFrame(DeferToInputIntent);
+        return DeferredFrame.IsSet() && _ForwardedFrame.IsSet() && DeferredFrame.GetValue() == _ForwardedFrame.GetValue();
     }
 
     // Cancels the player's live interaction on the forwarded target when it lasts while held.
@@ -1085,8 +1104,12 @@ class UMars_SmTask_UseIntentToResolver : UMars_SmTask_IntentToResolver
     default ResolverIntent = GameplayTags::InteractionIntent_Mars_Use;
 }
 
+// Primary resolves the Use channel first (a focused world prompt outranks the held item's use); where Use shares Primary's
+// key, the press that starts a Use target is Use's, and Primary joins it.
 class UMars_SmTask_PrimaryIntentToResolver : UMars_SmTask_IntentToResolver
 {
     default InputIntent = GameplayTags::Mars_Intent_Interact_Primary;
     default ResolverIntent = GameplayTags::InteractionIntent_Mars_Primary;
+    default DeferToInputIntent = GameplayTags::Mars_Intent_Interact_Use;
+    default DeferredChannel = GameplayTags::InteractionChannel_Mars_Use;
 }

@@ -64,9 +64,9 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         auto Target = InPrompt.As_InteractTarget(ECk_SanityCheck::UnChecked);
         auto Control = ck::IsValid(Target) ? Target.TryGet_ManipulatedControl() : FCk_Handle_Control();
 
-        // A bar fills only for a timed hold or a gripped control: a WhileLive target is ManuallyCompleted too, and
-        // nothing would fill it.
-        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed);
+        // A ring shows for a timed hold or a pulled control (empty until it fills): a WhileLive target is ManuallyCompleted
+        // too, and nothing would fill it.
+        Show_Progress(InPrompt.Get_CompletionPolicy() == ECk_Interaction_CompletionPolicy::Timed || ck::IsValid(Control));
 
         if (ck::IsValid(Control))
         { ListenForManipulation(Control); }
@@ -123,12 +123,10 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
         Refresh_ManipulationBar();
     }
 
-    // Unset progress means not gripped (not "at rest"): the bar shows only while the control is held.
+    // Unset progress means not gripped: the ring stays, empty, until the control is held.
     private void Refresh_ManipulationBar()
     {
-        const auto Progress = _ManipulatedControl.TryGet_ManipulationProgress();
-        Show_Progress(Progress.IsSet());
-        Set_ProgressPercent(Progress.Get(0.0f));
+        Set_ProgressPercent(_ManipulatedControl.TryGet_ManipulationProgress().Get(0.0f));
     }
 
     private void StopManipulation()
@@ -154,7 +152,6 @@ class UMars_InteractPrompt_Widget : UMars_KeyGlyph_Widget
     UFUNCTION()
     private void OnManipulationChanged(FCk_Handle_Control InControl, EMars_Control_Grip InGrip)
     {
-        Show_Progress(InGrip == EMars_Control_Grip::Gripped);
         if (InGrip == EMars_Control_Grip::Released)
         { Set_ProgressPercent(0.0f); }
     }
