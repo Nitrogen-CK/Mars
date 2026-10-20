@@ -7,6 +7,7 @@ public class Mars : ModuleRules
     public Mars(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        CkModuleRules.ApplyProjectPCHOptions(this, Target);
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
