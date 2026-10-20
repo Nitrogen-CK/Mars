@@ -112,6 +112,67 @@ namespace UCk_PlaceableTest_Sphere_EntityScript
 }
 
 USTRUCT()
+struct FMars_Anchor_Cache_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Cache_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Cache_EntityScript
+{
+    FMars_Anchor_Cache_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Cache_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Cache_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Cache_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
 struct FMars_Anchor_CourtNavField_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -141,6 +202,67 @@ namespace UMars_Anchor_CourtNavField_EntityScript
 }
 
 USTRUCT()
+struct FMars_Anchor_Forage_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Forage_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Forage_EntityScript
+{
+    FMars_Anchor_Forage_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Forage_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Forage_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Forage_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
 struct FMars_Anchor_Hunt_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -159,15 +281,31 @@ struct FMars_Anchor_Hunt_EntityScript_SpawnParams
     float32 HomeRadiusCm = 1000.0f;
 
     UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Hunt_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Hunt_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
         Channel = InChannel;
         SpanCm = InSpanCm;
         HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
     }
 }
@@ -179,9 +317,9 @@ namespace UMars_Anchor_Hunt_EntityScript
         return FMars_Anchor_Hunt_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Hunt_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Hunt_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
-        return FMars_Anchor_Hunt_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InPinnedRow);
+        return FMars_Anchor_Hunt_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
     }
 }
 
@@ -192,7 +330,7 @@ struct FMars_Anchor_LeverGate_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Anchor_Context Anchor = FMars_Anchor_Context();
+    FMars_Anchor_Context Anchor;
 
     FMars_Anchor_LeverGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
     {
@@ -215,6 +353,244 @@ namespace UMars_Anchor_LeverGate_EntityScript
 }
 
 USTRUCT()
+struct FMars_Anchor_Omen_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Omen_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Omen_EntityScript
+{
+    FMars_Anchor_Omen_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Omen_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Omen_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Omen_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_OmenLampBank_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Anchor_Context Anchor;
+
+    FMars_Anchor_OmenLampBank_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        SpawnTransform = InSpawnTransform;
+        Anchor = InAnchor;
+    }
+}
+
+namespace UMars_Anchor_OmenLampBank_EntityScript
+{
+    FMars_Anchor_OmenLampBank_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_OmenLampBank_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_OmenLampBank_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        return FMars_Anchor_OmenLampBank_EntityScript_SpawnParams(InSpawnTransform, InAnchor);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_OneSidedLeverGate_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Anchor_Context Anchor;
+
+    FMars_Anchor_OneSidedLeverGate_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        SpawnTransform = InSpawnTransform;
+        Anchor = InAnchor;
+    }
+}
+
+namespace UMars_Anchor_OneSidedLeverGate_EntityScript
+{
+    FMars_Anchor_OneSidedLeverGate_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_OneSidedLeverGate_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_OneSidedLeverGate_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        return FMars_Anchor_OneSidedLeverGate_EntityScript_SpawnParams(InSpawnTransform, InAnchor);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_Pack_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Pack_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Pack_EntityScript
+{
+    FMars_Anchor_Pack_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Pack_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Pack_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Pack_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_PackPlinth_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Anchor_Context Anchor;
+
+    FMars_Anchor_PackPlinth_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        SpawnTransform = InSpawnTransform;
+        Anchor = InAnchor;
+    }
+}
+
+namespace UMars_Anchor_PackPlinth_EntityScript
+{
+    FMars_Anchor_PackPlinth_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_PackPlinth_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_PackPlinth_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        return FMars_Anchor_PackPlinth_EntityScript_SpawnParams(InSpawnTransform, InAnchor);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_PocketNavField_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FCk_GroundNavVolume_Spec _Params;
+
+    UPROPERTY()
+    FTransform _SpawnTransform = FTransform::Identity;
+
+    FMars_Anchor_PocketNavField_EntityScript_SpawnParams(FCk_GroundNavVolume_Spec In_Params, FTransform In_SpawnTransform)
+    {
+        _Params = In_Params;
+        _SpawnTransform = In_SpawnTransform;
+    }
+}
+
+namespace UMars_Anchor_PocketNavField_EntityScript
+{
+    FMars_Anchor_PocketNavField_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_PocketNavField_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_PocketNavField_EntityScript_SpawnParams Params(FCk_GroundNavVolume_Spec In_Params, FTransform In_SpawnTransform)
+    {
+        return FMars_Anchor_PocketNavField_EntityScript_SpawnParams(In_Params, In_SpawnTransform);
+    }
+}
+
+USTRUCT()
 struct FMars_Anchor_QuarryCrawler4_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -233,7 +609,7 @@ struct FMars_Anchor_QuarryCrawler4_EntityScript_SpawnParams
     bool DebugDrawAttack = false;
 
     UPROPERTY()
-    FMars_Anchor_Context Anchor = FMars_Anchor_Context();
+    FMars_Anchor_Context Anchor;
 
     FMars_Anchor_QuarryCrawler4_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack, FMars_Anchor_Context InAnchor)
     {
@@ -260,6 +636,96 @@ namespace UMars_Anchor_QuarryCrawler4_EntityScript
 }
 
 USTRUCT()
+struct FMars_Anchor_Rest_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Rest_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Rest_EntityScript
+{
+    FMars_Anchor_Rest_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Rest_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Rest_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Rest_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_RestSconce_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Anchor_Context Anchor;
+
+    FMars_Anchor_RestSconce_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        SpawnTransform = InSpawnTransform;
+        Anchor = InAnchor;
+    }
+}
+
+namespace UMars_Anchor_RestSconce_EntityScript
+{
+    FMars_Anchor_RestSconce_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_RestSconce_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_RestSconce_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
+    {
+        return FMars_Anchor_RestSconce_EntityScript_SpawnParams(InSpawnTransform, InAnchor);
+    }
+}
+
+USTRUCT()
 struct FMars_Anchor_Route_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -278,15 +744,31 @@ struct FMars_Anchor_Route_EntityScript_SpawnParams
     float32 HomeRadiusCm = 1000.0f;
 
     UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Route_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Route_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
         Channel = InChannel;
         SpanCm = InSpanCm;
         HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
     }
 }
@@ -298,9 +780,9 @@ namespace UMars_Anchor_Route_EntityScript
         return FMars_Anchor_Route_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Route_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Route_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
-        return FMars_Anchor_Route_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InPinnedRow);
+        return FMars_Anchor_Route_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
     }
 }
 
@@ -311,7 +793,7 @@ struct FMars_Anchor_Rubble_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Anchor_Context Anchor = FMars_Anchor_Context();
+    FMars_Anchor_Context Anchor;
 
     FMars_Anchor_Rubble_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
     {
@@ -334,6 +816,51 @@ namespace UMars_Anchor_Rubble_EntityScript
 }
 
 USTRUCT()
+struct FMars_Anchor_SentryCrawler4_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FMars_Crawler_Spec Spec;
+
+    UPROPERTY()
+    FLinearColor Color = FLinearColor(0.75f, 0.3499999940395355f, 0.20000000298023224f, 1.0f);
+
+    UPROPERTY()
+    bool WithVisuals = true;
+
+    UPROPERTY()
+    bool DebugDrawAttack = false;
+
+    UPROPERTY()
+    FMars_Anchor_Context Anchor;
+
+    FMars_Anchor_SentryCrawler4_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack, FMars_Anchor_Context InAnchor)
+    {
+        SpawnTransform = InSpawnTransform;
+        Spec = InSpec;
+        Color = InColor;
+        WithVisuals = InWithVisuals;
+        DebugDrawAttack = InDebugDrawAttack;
+        Anchor = InAnchor;
+    }
+}
+
+namespace UMars_Anchor_SentryCrawler4_EntityScript
+{
+    FMars_Anchor_SentryCrawler4_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_SentryCrawler4_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_SentryCrawler4_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FMars_Crawler_Spec InSpec, FLinearColor InColor, bool InWithVisuals, bool InDebugDrawAttack, FMars_Anchor_Context InAnchor)
+    {
+        return FMars_Anchor_SentryCrawler4_EntityScript_SpawnParams(InSpawnTransform, InSpec, InColor, InWithVisuals, InDebugDrawAttack, InAnchor);
+    }
+}
+
+USTRUCT()
 struct FMars_Anchor_Spawn_EntityScript_SpawnParams
 {
     UPROPERTY()
@@ -352,15 +879,31 @@ struct FMars_Anchor_Spawn_EntityScript_SpawnParams
     float32 HomeRadiusCm = 1000.0f;
 
     UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_Anchor_Spawn_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Spawn_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
         Channel = InChannel;
         SpanCm = InSpanCm;
         HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
     }
 }
@@ -372,9 +915,131 @@ namespace UMars_Anchor_Spawn_EntityScript
         return FMars_Anchor_Spawn_EntityScript_SpawnParams();
     }
 
-    FMars_Anchor_Spawn_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_Anchor_Spawn_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
-        return FMars_Anchor_Spawn_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InPinnedRow);
+        return FMars_Anchor_Spawn_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_Threat_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 600.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Threat_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Threat_EntityScript
+{
+    FMars_Anchor_Threat_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Threat_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Threat_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Threat_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
+    }
+}
+
+USTRUCT()
+struct FMars_Anchor_Trap_EntityScript_SpawnParams
+{
+    UPROPERTY()
+    FTransform SpawnTransform = FTransform::Identity;
+
+    UPROPERTY()
+    FGameplayTag AnchorId = FGameplayTag();
+
+    UPROPERTY()
+    FGameplayTag Channel = FGameplayTag();
+
+    UPROPERTY()
+    float32 SpanCm = 400.0f;
+
+    UPROPERTY()
+    float32 HomeRadiusCm = 1000.0f;
+
+    UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
+    TOptional<int> PinnedRow;
+
+    FMars_Anchor_Trap_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        SpawnTransform = InSpawnTransform;
+        AnchorId = InAnchorId;
+        Channel = InChannel;
+        SpanCm = InSpanCm;
+        HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
+        PinnedRow = InPinnedRow;
+    }
+}
+
+namespace UMars_Anchor_Trap_EntityScript
+{
+    FMars_Anchor_Trap_EntityScript_SpawnParams Params()
+    {
+        return FMars_Anchor_Trap_EntityScript_SpawnParams();
+    }
+
+    FMars_Anchor_Trap_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
+    {
+        return FMars_Anchor_Trap_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
     }
 }
 
@@ -482,6 +1147,19 @@ namespace UMars_AutoTest_AnchorCandidate_LeverGateOpensOnChannel
 }
 
 USTRUCT()
+struct FMars_AutoTest_AnchorCandidate_OneSidedLeverGateOpensFromItsSide_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_AnchorCandidate_OneSidedLeverGateOpensFromItsSide
+{
+    FMars_AutoTest_AnchorCandidate_OneSidedLeverGateOpensFromItsSide_SpawnParams Params()
+    {
+        return FMars_AutoTest_AnchorCandidate_OneSidedLeverGateOpensFromItsSide_SpawnParams();
+    }
+}
+
+USTRUCT()
 struct FMars_AutoTest_AnchorCandidate_RubbleStaysClosed_SpawnParams
 {
 }
@@ -491,6 +1169,19 @@ namespace UMars_AutoTest_AnchorCandidate_RubbleStaysClosed
     FMars_AutoTest_AnchorCandidate_RubbleStaysClosed_SpawnParams Params()
     {
         return FMars_AutoTest_AnchorCandidate_RubbleStaysClosed_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_AnchorResolver_CacheBudget_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_AnchorResolver_CacheBudget
+{
+    FMars_AutoTest_AnchorResolver_CacheBudget_SpawnParams Params()
+    {
+        return FMars_AutoTest_AnchorResolver_CacheBudget_SpawnParams();
     }
 }
 
@@ -699,6 +1390,19 @@ namespace UMars_AutoTest_AnchorResolver_WarrensDistances
     FMars_AutoTest_AnchorResolver_WarrensDistances_SpawnParams Params()
     {
         return FMars_AutoTest_AnchorResolver_WarrensDistances_SpawnParams();
+    }
+}
+
+USTRUCT()
+struct FMars_AutoTest_AnchorResolver_WarrensLeverSides_SpawnParams
+{
+}
+
+namespace UMars_AutoTest_AnchorResolver_WarrensLeverSides
+{
+    FMars_AutoTest_AnchorResolver_WarrensLeverSides_SpawnParams Params()
+    {
+        return FMars_AutoTest_AnchorResolver_WarrensLeverSides_SpawnParams();
     }
 }
 
@@ -17971,15 +18675,31 @@ struct FMars_TESTONLY_Anchor_EntityScript_SpawnParams
     float32 HomeRadiusCm = 1000.0f;
 
     UPROPERTY()
+    EMars_Anchor_LeverSide LeverSide = EMars_Anchor_LeverSide::None;
+
+    UPROPERTY()
+    bool HasCrawl = false;
+
+    UPROPERTY()
+    float32 CrawlAlongCm = 0.0f;
+
+    UPROPERTY()
+    float32 CrawlOffsetCm = 0.0f;
+
+    UPROPERTY()
     TOptional<int> PinnedRow;
 
-    FMars_TESTONLY_Anchor_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_TESTONLY_Anchor_EntityScript_SpawnParams(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
         SpawnTransform = InSpawnTransform;
         AnchorId = InAnchorId;
         Channel = InChannel;
         SpanCm = InSpanCm;
         HomeRadiusCm = InHomeRadiusCm;
+        LeverSide = InLeverSide;
+        HasCrawl = InHasCrawl;
+        CrawlAlongCm = InCrawlAlongCm;
+        CrawlOffsetCm = InCrawlOffsetCm;
         PinnedRow = InPinnedRow;
     }
 }
@@ -17991,9 +18711,9 @@ namespace UMars_TESTONLY_Anchor_EntityScript
         return FMars_TESTONLY_Anchor_EntityScript_SpawnParams();
     }
 
-    FMars_TESTONLY_Anchor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, TOptional<int> InPinnedRow)
+    FMars_TESTONLY_Anchor_EntityScript_SpawnParams Params(FTransform InSpawnTransform, FGameplayTag InAnchorId, FGameplayTag InChannel, float32 InSpanCm, float32 InHomeRadiusCm, EMars_Anchor_LeverSide InLeverSide, bool InHasCrawl, float32 InCrawlAlongCm, float32 InCrawlOffsetCm, TOptional<int> InPinnedRow)
     {
-        return FMars_TESTONLY_Anchor_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InPinnedRow);
+        return FMars_TESTONLY_Anchor_EntityScript_SpawnParams(InSpawnTransform, InAnchorId, InChannel, InSpanCm, InHomeRadiusCm, InLeverSide, InHasCrawl, InCrawlAlongCm, InCrawlOffsetCm, InPinnedRow);
     }
 }
 
@@ -18004,7 +18724,7 @@ struct FMars_TESTONLY_AnchorCandidateA_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Anchor_Context Anchor = FMars_Anchor_Context();
+    FMars_Anchor_Context Anchor;
 
     FMars_TESTONLY_AnchorCandidateA_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
     {
@@ -18033,7 +18753,7 @@ struct FMars_TESTONLY_AnchorCandidateB_EntityScript_SpawnParams
     FTransform SpawnTransform = FTransform::Identity;
 
     UPROPERTY()
-    FMars_Anchor_Context Anchor = FMars_Anchor_Context();
+    FMars_Anchor_Context Anchor;
 
     FMars_TESTONLY_AnchorCandidateB_EntityScript_SpawnParams(FTransform InSpawnTransform, FMars_Anchor_Context InAnchor)
     {
