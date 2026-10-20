@@ -1,6 +1,7 @@
 // Every frame: advances PhaseTime, lets go of a held target that died, follows moving reach/focus anchors, eases the focus
 // lean (dropping a focus whose interactable has died), rides a picked-up item in with the gloves, carries a held item out
-// with a Place and turns the pitch node for the view's pitch. The phase itself is the Hands sub-SM's.
+// with a Place and turns the pitch node for the view's pitch. The phase itself is the Hands sub-SM's, except the end of a
+// Grip: the gloves move to Return here, on the clock the grip-taken item's arrival also runs on (see Tick_EndGrip).
 class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -26,6 +27,8 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         if (InState.PhaseState.Phase != EMars_FPHands_Phase::None)
         { InState.PhaseState.PhaseTime += DeltaSeconds; }
 
+        Tick_EndGrip(InHandle, Params, InState);
+
         Tick_HoldTarget(InHandle, InState);
         utils_fphands::Update_ReachTarget(InState.Reach.Target);
         utils_fphands::Update_ReachTarget(InState.Focus.Target);
@@ -35,6 +38,25 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         Tick_Carry(InHandle, Params, InState);
         Tick_Place(InHandle, Params, InState);
         Tick_Pitch(Params.Spec.Pitch, InState, DeltaSeconds);
+    }
+
+    // The Grip ends on its own seconds, here rather than a sub-SM step later, and the time past them carries into the
+    // Return: an item taken at the Grip waits out the same seconds on its own arrival clock (TryGet_RideHome), so under a
+    // long frame the two still turn together. The Hands sub-SM follows into Return; its SetPhase then keeps this clock.
+    private void Tick_EndGrip(FCk_Handle& InHandle, const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState)
+    {
+        const auto GripSeconds = InParams.Spec.Reach.Grab.GripSeconds;
+        if (InState.PhaseState.Phase != EMars_FPHands_Phase::Grip || InState.PhaseState.PhaseTime < GripSeconds)
+        { return; }
+
+        InState.PhaseState.Phase = EMars_FPHands_Phase::Return;
+        InState.PhaseState.PhaseTime -= GripSeconds;
+
+        if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
+        {
+            InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPhaseChanged.Broadcast(InHandle.As_FPHands(),
+                EMars_FPHands_Phase::Grip, EMars_FPHands_Phase::Return);
+        }
     }
 
     // A held interact target that died under the gloves (its device destroyed) is announced once (OnReachTargetLost, which

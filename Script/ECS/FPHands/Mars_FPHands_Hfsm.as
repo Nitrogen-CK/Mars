@@ -353,7 +353,7 @@ class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
     // PushEnd only: how long the wait has run, and the ticks it has run past the push's seconds.
     private float32 _PushWaitSeconds = 0.0f;
     private int32 _TicksPastPush = 0;
-    // The last frame's length: the gloves leave their Grip one state-machine step after its seconds run out.
+    // The last frame's length (the push wait's clock).
     private float32 _LastDeltaSeconds = 0.0f;
 
     UFUNCTION(BlueprintOverride)
@@ -410,7 +410,8 @@ class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
     protected void DoAtGrip() {}
 
     // Called from DoAtGrip: how a mount taken now arrives so the item rides the gloves home: still for what is left of
-    // their Grip (plus the frame the Hands state machine takes to enter Return), then over their return with its easing.
+    // their Grip, then over their return with its easing. The FPHands tick ends the Grip on the same seconds and carries
+    // any overshoot into the Return, so the item and the gloves turn on the same frame however long it is.
     // Unset when no gloves are gripping (no gloves, a refused reach): the item arrives as usual.
     protected TOptional<FMars_WorldItem_ArriveSpec> TryGet_RideHome() const
     {
@@ -418,7 +419,7 @@ class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
         { return TOptional<FMars_WorldItem_ArriveSpec>(); }
 
         const auto& Grab = _GripHands.Get_Spec().Reach.Grab;
-        const auto GripLeft = Math::Max(0.0f, Grab.GripSeconds - _GripHands.Get_PhaseTime()) + _LastDeltaSeconds;
+        const auto GripLeft = Math::Max(0.0f, Grab.GripSeconds - _GripHands.Get_PhaseTime());
         return TOptional<FMars_WorldItem_ArriveSpec>(FMars_WorldItem_ArriveSpec(GripLeft, Grab.BackSeconds, Grab.BackEasing));
     }
 
@@ -621,9 +622,15 @@ class UMars_SmCondition_HandsPhaseElapsed_Reach : UMars_SmCondition_HandsPhaseEl
     default Phase = EMars_FPHands_Phase::Reach;
 }
 
-class UMars_SmCondition_HandsPhaseElapsed_Grip : UMars_SmCondition_HandsPhaseElapsed
+// The Grip is the one timed phase the FPHands tick ends itself (it moves the gloves to Return on the Grip's seconds,
+// carrying the overshoot): the Grip state follows the gloves into Return.
+class UMars_SmCondition_HandsPhaseElapsed_Grip : UCk_SmCondition_Polled
 {
-    default Phase = EMars_FPHands_Phase::Grip;
+    UFUNCTION(BlueprintOverride)
+    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
+    {
+        return ck::Ctx(InHandle).As_FPHands().Get_Phase() == EMars_FPHands_Phase::Return;
+    }
 }
 
 class UMars_SmCondition_HandsPhaseElapsed_Return : UMars_SmCondition_HandsPhaseElapsed

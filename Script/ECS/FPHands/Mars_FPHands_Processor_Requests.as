@@ -332,10 +332,12 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         }
 
         InState.PhaseState.Phase = InNewPhase;
-        InState.PhaseState.PhaseTime = 0.0f;
 
+        // The phase the gloves are already in (the Return the tick entered at the Grip's end) keeps its clock.
         if (Previous == InNewPhase)
         { return; }
+
+        InState.PhaseState.PhaseTime = 0.0f;
 
         if (InHandle.Has_Fragment(FMars_Fragment_FPHands_Signals))
         { InHandle.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPhaseChanged.Broadcast(InHandle.As_FPHands(), Previous, InNewPhase); }
