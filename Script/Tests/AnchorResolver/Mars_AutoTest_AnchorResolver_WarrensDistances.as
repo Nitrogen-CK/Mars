@@ -1,5 +1,6 @@
 // Expected values: Dijkstra over the frozen data's integer link costs (Tools/LevelDesign/anchor_plans/data/warrens.json,
-// Warrens v5 "The Well", written by design_warrens_v5.py). They change only if that data changes. The hunt courts are
+// Warrens v6 "Kitchen first", written by design_warrens_v6.py). They change only if that data changes. K, the hearth,
+// sits in the sealed kitchen and is reached only through its east cargo port. The hunt courts are
 // H1 (node H1, the Charnel Court arena), H2 (node H2, the Pit) and H3 (node CH, the Chime Hall).
 // docs/plans/anchor-slice/fixtures/warrens_expected.json still holds the v3 numbers.
 class UMars_AutoTest_AnchorResolver_WarrensDistances : UMars_AutoTestRig_AnchorResolverPure
@@ -44,11 +45,11 @@ class UMars_AutoTest_AnchorResolver_WarrensDistances : UMars_AutoTestRig_AnchorR
     private void Step_Distances(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto Graph = utils_anchor_resolver::Make_Graph(utils_anchor_resolver::Plan_Warrens());
-        Assert_Equals_Int(Graph.LinkA.Num(), 49, "the graph keeps all 49 links");
-        Expect_Row(Graph, n"S1", Make_Row(5023.0f, 2627.0f, 12339.0f, 10769.0f));
-        Expect_Row(Graph, n"S2", Make_Row(7529.0f, 9916.0f, 10735.0f, 3866.0f));
-        Expect_Row(Graph, n"S3", Make_Row(8339.0f, 10788.0f, 9205.0f, 2336.0f));
-        Expect_Row(Graph, n"S4", Make_Row(4376.0f, 6825.0f, 11692.0f, 7812.0f));
-        Expect_Row(Graph, n"S5", Make_Row(6397.0f, 6010.0f, 13713.0f, 9833.0f));
+        Assert_Equals_Int(Graph.LinkA.Num(), 59, "the graph keeps all 59 links");
+        Expect_Row(Graph, n"S1", Make_Row(7572.0f, 2627.0f, 13488.0f, 10769.0f));
+        Expect_Row(Graph, n"S2", Make_Row(8929.0f, 9907.0f, 10735.0f, 3866.0f));
+        Expect_Row(Graph, n"S3", Make_Row(8339.0f, 11937.0f, 9205.0f, 2336.0f));
+        Expect_Row(Graph, n"S4", Make_Row(5553.0f, 7251.0f, 11469.0f, 7812.0f));
+        Expect_Row(Graph, n"S5", Make_Row(7574.0f, 6010.0f, 13490.0f, 9833.0f));
     }
 }

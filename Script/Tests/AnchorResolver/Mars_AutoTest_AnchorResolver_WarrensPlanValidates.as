@@ -16,8 +16,8 @@ class UMars_AutoTest_AnchorResolver_WarrensPlanValidates : UMars_AutoTestRig_Anc
         Assert_True(ck::IsValid(Plan), "the Warrens plan asset resolves");
         const auto Validation = Plan.Validate();
         Assert_True(Validation.IsValid(), f"the Warrens plan validates: {Validation.Get_Error()}");
-        Assert_Equals_Int(Plan.Nodes.Num(), 43, "43 nodes");
-        Assert_Equals_Int(Plan.Links.Num(), 49, "49 links");
+        Assert_Equals_Int(Plan.Nodes.Num(), 51, "51 nodes");
+        Assert_Equals_Int(Plan.Links.Num(), 59, "59 links");
         Assert_Equals_Int(Plan.Entrances.Num(), 5, "5 entrances");
         Assert_Equals_Int(Plan.Courts.Num(), 3, "3 courts");
         Assert_Equals_Int(Plan.Groups.Num(), 1, "one closure group");
