@@ -380,12 +380,14 @@ class UMars_AutoTestRig_CrawlerEndpointCatalog : UMars_AutoTestRig_CrawlerAttack
         _Capture.AddOrGet_Fragment(FMars_TESTONLY_EndpointCapture) = Data;
     }
 
+    // Ready, not only Selected: a selected entry can still be blocked by SupportStance while the gait re-plants, and the
+    // one start these tests send is refused then and never retried.
     UFUNCTION()
     protected void Check_ExpectedEndpointReady(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         const auto Advice = utils_crawler::Evaluate_AttackLoadout(_Crawler, _Target.Entity);
         auto Res = OutResult;
-        Res.Set(Advice.Selection.Selected.IsSet() && Advice.Selection.Selected.GetValue() == _ExpectedEndpointId);
+        Res.Set(Advice.Selection.Selected == _ExpectedEndpointId && Advice.Selection.ReadyChoice == _ExpectedEndpointId);
     }
 
     protected void Assert_MeasuredTrace()
