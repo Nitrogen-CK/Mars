@@ -2,8 +2,8 @@
 // basin ring. Every strike on the bob (or a thrown item against it at KnockMinSpeed or more) shakes a handful of
 // peppercorns out of it and sets it swinging for SwingSeconds; after Charges handfuls it is empty until it refills
 // RefillSeconds later. Both triggers are composed here: an invulnerable Health + Body zone + hurtbox whose every hit
-// spills, and a kinematic Jolt sphere riding the bob for the knock.
-class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
+// spills, and a kinematic Jolt sphere riding the bob for the knock, solid whether the censer is full or empty.
+class UMars_ForageCenser_EntityScript : UMars_ForageSource_EntityScript
 {
     default _ShowInPlaceActors = true;
     default _Replication = ECk_Replication::DoesNotReplicate;
@@ -59,14 +59,15 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
     private const float32 k_SpillBurstColor = 0.2f;
 
     private FCk_Handle_Oscillator _Swing;
-    private FCk_Handle_Forage _Forage;
-    private FCk_Handle_Health _Health;
-    private FCk_Handle_HitZone _Zone;
     private FCk_Handle_Transform _ReleasePoint;
     private FCk_Handle_Timer _SwingTimer;
-    private FCk_Handle_UnrealComponent _ClusterMesh;
     // The entity script is a UObject, not a fragment, so it may hold the component.
     private UNiagaraComponent _SpillBurst;
+
+    protected float32 Get_KnockMinSpeed() const override
+    {
+        return KnockMinSpeed;
+    }
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -104,8 +105,6 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
         const auto HurtboxHalfExtent = BobRadius + HurtboxMargin;
         utils_hit_zone::AddHurtbox_Box(_Zone, BobTransform, FMars_HitZone_Hurtbox(FVector(HurtboxHalfExtent, HurtboxHalfExtent, HurtboxHalfExtent), FTransform::Identity));
 
-        auto Body = AddKnockBody(BobTransform);
-
         auto Spec = FMars_Forage_Spec();
         Spec.Yield = FMars_Forage_YieldSpec(TSoftObjectPtr<UCk_InventoryItem_Definition>(mars_items::Peppercorns()), Charges);
         Spec.Exhaustion = FMars_Forage_ExhaustionSpec(EMars_Forage_Exhaustion::Regrows, RefillSeconds);
@@ -116,11 +115,16 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(_Forage))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
+        // Rides the bob: its own node directly under it.
+        auto KnockBody = FMars_ForageSource_KnockBody();
+        KnockBody.Radius = float32(BobRadius);
+        KnockBody.MotionType = ECk_MotionType::Kinematic;
+        KnockBody.Presence = EMars_ForageSource_KnockPresence::Permanent;
+        AddKnockBody(BobTransform, KnockBody);
+
         _Zone.BindTo_OnHit(FMars_Delegate_HitZone_OnHit(this, n"OnZoneHit"));
-        utils_jolt_body::BindTo_OnJoltBodyContactAdded(Body, FCk_Delegate_JoltBody_OnContact(this, n"OnBodyContact"));
         _Forage.BindTo_OnReleased(FMars_Delegate_Forage_OnReleased(this, n"OnSpilled"));
-        _Forage.BindTo_OnExhausted(FMars_Delegate_Forage_OnExhausted(this, n"OnExhausted"));
-        _Forage.BindTo_OnReplenished(FMars_Delegate_Forage_OnReplenished(this, n"OnReplenished"));
+        BindForage();
 
         if (WithVisuals)
         { AddVisuals(Root, PivotTransform, BobTransform); }
@@ -137,20 +141,6 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
         _SpillBurst = nullptr;
     }
 
-    // A kinematic sphere the size of the bob on its own node directly under it, so it rides the swing.
-    private FCk_Handle_JoltBody AddKnockBody(FCk_Handle_Transform& InBob)
-    {
-        auto BodyNode = utils_scene_node::Create(InBob, FTransform::Identity);
-
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Sphere);
-        Shape.Set_Radius(BobRadius);
-        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BodySpec.Set_ShapeDimensions(Shape);
-        BodySpec.Set_MotionType(ECk_MotionType::Kinematic);
-        BodySpec.Set_CollisionProfileName(n"BlockAll");
-        return utils_jolt_body::Add(BodyNode.H(), BodySpec);
-    }
-
     //----------------------------------------------------------------------------------------------------------------------
     // Triggers
     //----------------------------------------------------------------------------------------------------------------------
@@ -160,15 +150,6 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
     private void OnZoneHit(FCk_Handle_HitZone InZone, FMars_DamageEvent InScaledEvent, FMars_HitZone_Reaction InReaction)
     {
         _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Hit));
-    }
-
-    UFUNCTION()
-    private void OnBodyContact(FCk_Handle_JoltBody InBody, FCk_JoltBody_Payload_OnContact InPayload)
-    {
-        if (utils_forage::Get_IsKnock(InPayload, KnockMinSpeed) == false)
-        { return; }
-
-        _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Knock));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -181,21 +162,6 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
         _Swing.Request_SetRunning(FMars_Request_Oscillator_SetRunning(EMars_Oscillator_RunState::Running));
         _SwingTimer = RestartTimer(_SwingTimer, SwingSeconds, n"OnSwingDone");
         PlaySpillBurst();
-    }
-
-    UFUNCTION()
-    private void OnExhausted(FCk_Handle_Forage InForage)
-    {
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
-        SetClusterVisible(false);
-    }
-
-    UFUNCTION()
-    private void OnReplenished(FCk_Handle_Forage InForage)
-    {
-        _Health.Request_Heal(FMars_Request_Health_Heal(_Health.Get_Max()));
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Enable));
-        SetClusterVisible(true);
     }
 
     UFUNCTION()
@@ -250,19 +216,6 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
         { utils_particles::Request_ApplyTuningValues(_SpillBurst, k_SpillBurstSize, k_SpillBurstColor, 1.0f, 1.0f); }
     }
 
-    // The component is created after construction; until then (and under nullrhi) there is nothing to hide.
-    private void SetClusterVisible(bool InVisible)
-    {
-        if (ck::Is_NOT_Valid(_ClusterMesh))
-        { return; }
-
-        auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(_ClusterMesh));
-        if (ck::Is_NOT_Valid(Mesh))
-        { return; }
-
-        Mesh.SetVisibility(InVisible);
-    }
-
     // Engine cube and sphere are 100 uu with their pivot at the centre. The pivot block and the basin walls are solid (a
     // collision-bearing mesh part bakes into the Jolt static world), so a spilled handful lands inside the ring.
     private void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Transform& InPivot, FCk_Handle_Transform& InBob)
@@ -284,7 +237,7 @@ class UMars_ForageCenser_EntityScript : UCk_GenericEntityScript_UE
             FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector * (BobRadius * 2.0 * 0.01)),
             SphereMesh, InteractableMaterial, collision::profile::NoCollision, n"ForageCenser_Bob"));
 
-        _ClusterMesh = InBob.Add_MeshPart(this, FMars_MeshPart(
+        _YieldMesh = InBob.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, BobRadius + ClusterLift), FVector::OneVector * ClusterScale),
             SphereMesh, assets::load::ProtoGrid_Item_Mars_MI(), collision::profile::NoCollision, n"ForageCenser_Cluster"));
 

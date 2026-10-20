@@ -12,7 +12,7 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_Trap_Spec Trap = utils_trap::Make_SpikeTrapSpec();
 
-    // No sink is added while InputChannels is empty.
+    // Optional: unwired while InputChannels is empty (utils_mechanism_sink::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSink_Spec Sink;
 
@@ -49,12 +49,14 @@ class UMars_SpikeTrap_EntityScript : UCk_GenericEntityScript_UE
         auto HazardSpec = Hazard;
         if (HazardSpec.PushImpulse.IsNearlyZero())
         { HazardSpec.PushImpulse = FVector(0.0, 0.0, 700.0); }
-        auto HazardHandle = utils_hazard::Add(InHandle, HazardSpec, Trigger);
+        HazardSpec.Trigger = Trigger;
+        auto HazardHandle = utils_hazard::Add(InHandle, HazardSpec);
 
-        utils_trap::Add(InHandle, utils_trap::Resolve_Spec(Trap, utils_trap::Make_SpikeTrapSpec()), HazardHandle, Mover);
+        auto TrapSpec = utils_trap::Resolve_Spec(Trap, utils_trap::Make_SpikeTrapSpec());
+        TrapSpec.Parts = FMars_Trap_Parts(HazardHandle, Mover);
+        utils_trap::Add(InHandle, TrapSpec);
 
-        if (Sink.InputChannels.Num() > 0)
-        { utils_mechanism_sink::Add(InHandle, Sink); }
+        utils_mechanism_sink::TryAdd(InHandle, Sink);
 
         AddVisuals(TrapRoot, SpikeNode);
 

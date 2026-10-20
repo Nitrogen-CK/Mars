@@ -1,15 +1,6 @@
 // Preconfigured pieces for the sandbox map's room 7, the dark room (Mars.Sandbox.BuildRoom7 in
 // Script/Editor/Mars_SandboxMapBuilder.as). Not under Script/Editor: the saved map references them at runtime.
 
-namespace constants_sandbox_lights
-{
-    // Resolved by name: the accessor exists only once a restarted editor has registered the tag.
-    FGameplayTag Get_Channel()
-    {
-        return GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Lights");
-    }
-}
-
 // A wall switch that toggles the room's ceiling lights: each press flips its source.
 class UMars_Sandbox_LightSwitch_EntityScript : UMars_Switch_EntityScript
 {
@@ -22,7 +13,7 @@ class UMars_Sandbox_LightSwitch_EntityScript : UMars_Switch_EntityScript
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
         Control.Behavior = EMars_Control_Behavior::Toggle;
-        Source.OutputChannel = constants_sandbox_lights::Get_Channel();
+        Source.OutputChannel = GameplayTags::Mechanism_Channel_Lights;
         return Super::DoConstruct(InHandle);
     }
 }
@@ -34,7 +25,7 @@ class UMars_Sandbox_CeilingLight_EntityScript : UMars_LightFixture_EntityScript
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
     {
-        Sink.InputChannels.Add(constants_sandbox_lights::Get_Channel());
+        Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Lights);
         return Super::DoConstruct(InHandle);
     }
 }

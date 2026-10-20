@@ -19,6 +19,35 @@ namespace utils_mechanism_source
         utils_entity_tag::Add(InHandle, n"TAG_MarsMechanismSource");
         return InHandle.As_MechanismSource();
     }
+
+    // A placeable script's source is optional: an unset OutputChannel means unwired, and adds nothing (invalid handle).
+    FCk_Handle_MechanismSource TryAdd(FCk_Handle& InHandle, FMars_MechanismSource_Spec InParams)
+    {
+        if (InParams.OutputChannel.IsValid() == false)
+        { return FCk_Handle_MechanismSource(); }
+
+        return Add(InHandle, InParams);
+    }
+
+    // Every source in InAnyHandle's world that outputs on InChannel, found by tag as the driver finds them.
+    TArray<FCk_Handle_MechanismSource> Get_SourcesOn(const FCk_Handle& InAnyHandle, FGameplayTag InChannel)
+    {
+        auto Sources = TArray<FCk_Handle_MechanismSource>();
+        for (auto Entity : utils_entity_tag::ForEach_Entity(InAnyHandle, n"TAG_MarsMechanismSource"))
+        {
+            auto Source = Entity.As_MechanismSource(ECk_SanityCheck::UnChecked);
+            if (ck::IsValid(Source) && Source.Get_OutputChannel() == InChannel)
+            { Sources.Add(Source); }
+        }
+
+        return Sources;
+    }
+
+    // The one SetOutput builder for the link setups that mirror a feature's state onto the source on its entity.
+    FMars_Request_MechanismSource_SetOutput Make_SetOutput(EMars_MechanismSource_Output InOutput)
+    {
+        return FMars_Request_MechanismSource_SetOutput(InOutput);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

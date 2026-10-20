@@ -75,6 +75,13 @@ struct FMars_Fragment_Countdown_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Whether the powered sink holds the countdown full (HoldWhilePowered).
+enum EMars_Countdown_Hold
+{
+    Released,
+    Held
+}
+
 // Written only by the Countdown processors and utils_countdown::Add.
 struct FMars_Fragment_Countdown
 {
@@ -88,7 +95,7 @@ struct FMars_Fragment_Countdown
 
     // Held full by its powered sink (HoldWhilePowered): it does not drain.
     UPROPERTY()
-    bool IsHeld = false;
+    EMars_Countdown_Hold Hold = EMars_Countdown_Hold::Released;
 }
 
 // Present while Remaining > 0 and not held; gates UMars_Processor_Countdown_Tick.
@@ -122,17 +129,17 @@ struct FMars_Request_Countdown_Charge
     FMars_Request_Countdown_Charge() {}
 }
 
-// Absolute: holds the countdown full (Held) or lets it drain.
+// Absolute: holds the countdown full (Held) or lets it drain (Released).
 struct FMars_Request_Countdown_SetHeld
 {
     UPROPERTY()
-    bool Held = false;
+    EMars_Countdown_Hold Hold = EMars_Countdown_Hold::Released;
 
     FMars_Request_Countdown_SetHeld() {}
 
-    FMars_Request_Countdown_SetHeld(bool InHeld)
+    FMars_Request_Countdown_SetHeld(EMars_Countdown_Hold InHold)
     {
-        Held = InHeld;
+        Hold = InHold;
     }
 }
 

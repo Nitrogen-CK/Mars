@@ -1,5 +1,5 @@
 // A start enters phase 0 afresh (re-entering the kept index would apply only that phase's actions); a stop keeps the
-// index. A restart rewinds to phase 0 and re-enters it while running. An advance comes from the current phase's timer.
+// index. An advance comes from the current phase's timer.
 // Every broadcast comes last, and the fragments are re-read after one: a listener may enqueue requests.
 class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
 {
@@ -22,14 +22,10 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
         if (InRequests.SetRunningRequests.Num() > 0)
         { TargetRunState = InRequests.SetRunningRequests.Last().RunState; }
 
-        const auto HasRestart = InRequests.RestartRequests.Num() > 0;
         const auto HasAdvance = InRequests.AdvanceRequests.Num() > 0;
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Cycle_Requests);
-
-        if (HasRestart)
-        { InState.PhaseIndex = 0; }
 
         if (TargetRunState != InState.RunState)
         {
@@ -47,12 +43,6 @@ class UMars_Processor_Cycle_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (InState.RunState == EMars_Cycle_RunState::Stopped)
         { return; }
-
-        if (HasRestart)
-        {
-            EnterPhase(Self, 0);
-            return;
-        }
 
         if (HasAdvance)
         { Advance(Self, InState); }

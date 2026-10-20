@@ -1,5 +1,5 @@
 // A well-formed Forage spec validates; each broken rule (no Definition, Charges 0, Regrows with no RegrowSeconds, no
-// ReleasePoint) is rejected by Validate() without composing.
+// ReleasePoint) is rejected by Validate() without composing, and the error names the field.
 class UMars_AutoTest_Forage_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Forage
 {
     private const FVector k_Origin = FVector(-60000.0, 6000.0, -60000.0);
@@ -26,18 +26,25 @@ class UMars_AutoTest_Forage_SpecValidateRejectsBadSpecs : UMars_AutoTestRig_Fora
 
         auto NoDefinition = Make_ValidSpec();
         NoDefinition.Yield.Definition = TSoftObjectPtr<UCk_InventoryItem_Definition>();
-        Assert_False(NoDefinition.Validate().IsValid(), "an unset Definition is rejected");
+        AssertRejected(NoDefinition, "Yield.Definition", "an unset Definition");
 
         auto NoCharges = Make_ValidSpec();
         NoCharges.Yield.Charges = 0;
-        Assert_False(NoCharges.Validate().IsValid(), "Charges 0 is rejected");
+        AssertRejected(NoCharges, "Yield.Charges", "Charges 0");
 
         auto RegrowsNever = Make_ValidSpec();
         RegrowsNever.Exhaustion = FMars_Forage_ExhaustionSpec(EMars_Forage_Exhaustion::Regrows, 0.0f);
-        Assert_False(RegrowsNever.Validate().IsValid(), "Regrows with RegrowSeconds 0 is rejected");
+        AssertRejected(RegrowsNever, "Exhaustion.RegrowSeconds", "Regrows with RegrowSeconds 0");
 
         auto NoReleasePoint = Make_ValidSpec();
         NoReleasePoint.Parts = FMars_Forage_Parts();
-        Assert_False(NoReleasePoint.Validate().IsValid(), "an invalid ReleasePoint is rejected");
+        AssertRejected(NoReleasePoint, "Parts.ReleasePoint", "an invalid ReleasePoint");
+    }
+
+    private void AssertRejected(const FMars_Forage_Spec& InSpec, const FString& InField, const FString& InWhat)
+    {
+        const auto Validation = InSpec.Validate();
+        Assert_False(Validation.IsValid(), f"Validate() rejects {InWhat}");
+        Assert_True(Validation.Get_Error().Contains(InField), f"Validate() on {InWhat} names [{InField}] (got [{Validation.Get_Error()}])");
     }
 }

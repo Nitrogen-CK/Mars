@@ -52,7 +52,7 @@ class UMars_AutoTest_Resting_RetargetRestsOnTheNewTargetOnly : UMars_AutoTestRig
 
         TArray<FCk_Handle> Targets;
         Targets.Add(_PlateB);
-        _RetargetResting.Request_Retarget(FMars_Request_Resting_Retarget(Targets, 0.1f, 0.12f));
+        _RetargetResting.Request_Retarget(FMars_Request_Resting_Retarget(FMars_Resting_Spec(Targets, 0.1f, 0.12f)));
     }
 
     UFUNCTION()

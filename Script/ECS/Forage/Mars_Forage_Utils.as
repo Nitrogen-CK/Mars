@@ -47,11 +47,6 @@ mixin UCk_InventoryItem_Definition Get_Definition(const FCk_Handle_Forage& Self)
     return Self.Get_Fragment(FMars_Fragment_Forage_Params).Yield.Definition.Get();
 }
 
-mixin EMars_Forage_Exhaustion Get_ExhaustionPolicy(const FCk_Handle_Forage& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Forage_Params).Exhaustion.Policy;
-}
-
 mixin int32 Get_ChargesLeft(const FCk_Handle_Forage& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Forage).ChargesLeft;

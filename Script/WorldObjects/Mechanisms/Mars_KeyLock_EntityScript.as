@@ -16,7 +16,7 @@ class UMars_KeyLock_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     EMars_KeyLock_Release Release = EMars_KeyLock_Release::Kept;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -40,8 +40,7 @@ class UMars_KeyLock_EntityScript : UCk_GenericEntityScript_UE
         Spec.Interactable = AddInteractable(LockRoot);
         utils_key_lock::Add(InHandle, Spec);
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         AddVisuals(LockRoot);
 

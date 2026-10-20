@@ -1,6 +1,6 @@
 // Placeable swinging pendulum. The origin is on the floor below the pivot, which sits ArmLength + 50 uu up. The pivot
 // node's Oscillator swings the arm and the bob hung from it; the bob carries a moving trigger whose push hazard is
-// armed while the swing runs. An optional MechanismSink gates the swing per Pendulum.Powered.
+// armed while the bob swings. An optional MechanismSink gates the swing per Pendulum.Powered.
 class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
 {
     default _ShowInPlaceActors = true;
@@ -20,7 +20,7 @@ class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_Pendulum_Spec Pendulum;
 
-    // No sink is added while InputChannels is empty.
+    // Optional: unwired while InputChannels is empty (utils_mechanism_sink::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSink_Spec Sink;
 
@@ -59,12 +59,14 @@ class UMars_Pendulum_EntityScript : UCk_GenericEntityScript_UE
         auto HazardSpec = Hazard;
         if (HazardSpec.PushImpulse.IsNearlyZero())
         { HazardSpec.PushImpulse = FVector(600.0, 0.0, 300.0); }
-        auto HazardHandle = utils_hazard::Add(InHandle, HazardSpec, Trigger);
+        HazardSpec.Trigger = Trigger;
+        auto HazardHandle = utils_hazard::Add(InHandle, HazardSpec);
 
-        utils_pendulum::Add(InHandle, Pendulum, FMars_Pendulum_Parts(OscillatorHandle, HazardHandle));
+        auto PendulumSpec = Pendulum;
+        PendulumSpec.Parts = FMars_Pendulum_Parts(OscillatorHandle, HazardHandle);
+        utils_pendulum::Add(InHandle, PendulumSpec);
 
-        if (Sink.InputChannels.Num() > 0)
-        { utils_mechanism_sink::Add(InHandle, Sink); }
+        utils_mechanism_sink::TryAdd(InHandle, Sink);
 
         AddVisuals(PendulumRoot, PivotTransform, BobTransform);
 

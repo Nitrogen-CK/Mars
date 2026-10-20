@@ -22,10 +22,15 @@ class UMars_Processor_Resting_Tick : UCk_Processor_Script_Base_UE
         auto IsResting = false;
         for (int32 Index = 0; Index < InState.ContactAges.Num(); ++Index)
         {
-            const auto Age = InState.ContactAges[Index] + DeltaSeconds;
-            InState.ContactAges[Index] = Age;
+            auto IsRecent = false;
+            if (InState.ContactAges[Index].Seconds.IsSet())
+            {
+                const auto Age = InState.ContactAges[Index].Seconds.GetValue() + DeltaSeconds;
+                InState.ContactAges[Index].Seconds = TOptional<float32>(Age);
+                IsRecent = Age <= InState.GraceSeconds;
+            }
 
-            const auto IsOn = Age <= InState.GraceSeconds || (InState.RestingOn[Index] && IsAsleep);
+            const auto IsOn = IsRecent || (InState.RestingOn[Index] && IsAsleep);
             InState.RestingOn[Index] = IsOn;
             if (IsOn)
             { IsResting = true; }

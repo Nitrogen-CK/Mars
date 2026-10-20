@@ -56,6 +56,13 @@ mixin FMars_Validation Validate(const FMars_MechanismSink_Spec& Self)
     return FMars_Validation();
 }
 
+// How a sink on a consumer's entity gates that consumer's motion (a trap's cycle, a pendulum's swing).
+enum EMars_PoweredBehavior
+{
+    RunWhilePowered,
+    SuppressWhilePowered
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 // Params
 //--------------------------------------------------------------------------------------------------------------------------
@@ -118,10 +125,15 @@ event void FMars_Delegate_MechanismSink_OnPoweredChanged_MC(FCk_Handle_Mechanism
 delegate void FMars_Delegate_MechanismSink_OnInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, EMars_MechanismSource_Output InOutput);
 event void FMars_Delegate_MechanismSink_OnInputEdge_MC(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, EMars_MechanismSource_Output InOutput);
 
+// The rising edges of OnInputEdge alone: a source on InChannel flipped to Asserted.
+delegate void FMars_Delegate_MechanismSink_OnInputRose(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel);
+event void FMars_Delegate_MechanismSink_OnInputRose_MC(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel);
+
 struct FMars_Fragment_MechanismSink_Signals
 {
     FMars_Delegate_MechanismSink_OnPoweredChanged_MC OnPoweredChanged;
     FMars_Delegate_MechanismSink_OnInputEdge_MC OnInputEdge;
+    FMars_Delegate_MechanismSink_OnInputRose_MC OnInputRose;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

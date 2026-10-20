@@ -55,8 +55,11 @@ class UMars_Processor_MechanismSink_HandleRequests : UCk_Processor_Script_Base_U
 
         for (const auto& Edge : NotifyInputEdgeRequests)
         {
-            // Fetched per edge: a listener binding a signal on another entity can reallocate the signals storage.
+            // Fetched per broadcast: a listener binding a signal on another entity can reallocate the signals storage.
             Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge.Broadcast(Self, Edge.Channel, Edge.Output);
+
+            if (Edge.Output == EMars_MechanismSource_Output::Asserted)
+            { Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputRose.Broadcast(Self, Edge.Channel); }
         }
     }
 

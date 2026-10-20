@@ -34,7 +34,7 @@ mixin int32 Get_Progress(const FCk_Handle_Sequence& Self)
 
 mixin bool Get_IsComplete(const FCk_Handle_Sequence& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Sequence).IsComplete;
+    return Self.Get_Progress() >= Self.Get_Fragment(FMars_Fragment_Sequence_Params).Steps.Num();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

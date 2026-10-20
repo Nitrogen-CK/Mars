@@ -22,7 +22,7 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
     default Control.Behavior = EMars_Control_Behavior::Momentary;
     default Control.ActiveSeconds = 0.4f;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -49,10 +49,11 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
         MoverSpec.StartPose = Control.StartActive ? EMars_Mover_Pose::End : EMars_Mover_Pose::Start;
         auto Mover = utils_mover::Add(ButtonNode, MoverSpec);
 
-        auto ControlHandle = utils_control::Add(InHandle, Control, Mover);
+        auto ControlSpec = Control;
+        ControlSpec.Mover = Mover;
+        auto ControlHandle = utils_control::Add(InHandle, ControlSpec);
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         AddVisuals(SealRoot, ButtonNode);
         AddInteractable(SealRoot, ControlHandle);
@@ -111,7 +112,7 @@ class UMars_Seal_EntityScript : UCk_GenericEntityScript_UE
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(InControl.Make_InteractTarget(PromptText));
+        Spec.Targets.Add(InControl.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, PromptText)));
 
         utils_interactable::Create(InRoot, Spec);
     }

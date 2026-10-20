@@ -31,9 +31,8 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Sink))
         {
-            Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"));
-            if (Sink.Get_HasEvaluated())
-            { ApplyPowered(Trap, Sink.Get_IsPowered()); }
+            Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"),
+                ECk_Signal_BindingPolicy::FireIfPayloadInFlight);
         }
 
         Trap.Request_TryRemove(FMars_Tag_Trap_NeedsSetup);
@@ -61,10 +60,10 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
         }
     }
 
-    private void ApplyPowered(FCk_Handle_Trap& InTrap, bool InPowered)
+    private void ApplyPowered(FCk_Handle_Trap& InTrap, EMars_MechanismSink_Power InPower)
     {
         const auto Powered = InTrap.Get_Fragment(FMars_Fragment_Trap_Params).Spec.Powered;
-        const auto Running = Powered == EMars_PoweredBehavior::RunWhilePowered ? InPowered : (InPowered == false);
+        const auto Running = utils_mechanism_sink::Get_ShouldRun(Powered, InPower);
 
         auto Cycle = InTrap.Get_Fragment(FMars_Fragment_Trap).Cycle;
         Cycle.Request_SetRunning(FMars_Request_Cycle_SetRunning(Running ? EMars_Cycle_RunState::Running : EMars_Cycle_RunState::Stopped));
@@ -99,7 +98,7 @@ class UMars_Processor_Trap_Setup : UCk_Processor_Script_Base_UE
     private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower)
     {
         auto Trap = InSink.As_Trap();
-        ApplyPowered(Trap, InPower == EMars_MechanismSink_Power::Powered);
+        ApplyPowered(Trap, InPower);
     }
 
     UFUNCTION()

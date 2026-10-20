@@ -12,18 +12,18 @@ class UMars_AutoTest_Resting_SpecValidateRejectsNoTarget : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Validate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        AssertRejected(FMars_Resting_Spec().Validate(), "no Target");
+        AssertRejected(FMars_Resting_Spec().Validate(), "Targets", "no Target");
 
         const auto Targeted = FMars_Resting_Spec(InHandle).Validate();
         Assert_True(Targeted.IsValid(), f"a spec with a live target is accepted (error: {Targeted.Get_Error()})");
 
-        AssertRejected(FMars_Resting_Spec(InHandle, 0.0f, 0.12f).Validate(), "GraceSeconds <= 0");
-        AssertRejected(FMars_Resting_Spec(InHandle, 0.1f, -1.0f).Validate(), "HopMinSeconds < 0");
+        AssertRejected(FMars_Resting_Spec(InHandle, 0.0f, 0.12f).Validate(), "GraceSeconds", "GraceSeconds <= 0");
+        AssertRejected(FMars_Resting_Spec(InHandle, 0.1f, -1.0f).Validate(), "HopMinSeconds", "HopMinSeconds < 0");
     }
 
-    private void AssertRejected(const FMars_Validation& InValidation, const FString& InRule)
+    private void AssertRejected(const FMars_Validation& InValidation, const FString& InField, const FString& InRule)
     {
         Assert_False(InValidation.IsValid(), f"{InRule} is rejected");
-        Assert_True(InValidation.Get_Error().Len() > 0, f"the {InRule} rejection names its rule (error: {InValidation.Get_Error()})");
+        Assert_True(InValidation.Get_Error().Contains(InField), f"the {InRule} rejection names [{InField}] (error: {InValidation.Get_Error()})");
     }
 }

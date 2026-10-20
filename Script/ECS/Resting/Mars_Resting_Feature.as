@@ -92,6 +92,14 @@ mixin FMars_Validation Validate(const FMars_Resting_Spec& Self)
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// Seconds since the last contact with one target; unset before the first. A struct because AngelScript does not nest a
+// TOptional in a TArray.
+struct FMars_Resting_ContactAge
+{
+    UPROPERTY()
+    TOptional<float32> Seconds;
+}
+
 // Written only by the Resting processors (and Add). The targets and both tuners are state, not params: a Retarget replaces
 // them with the tracker.
 struct FMars_Fragment_Resting
@@ -110,10 +118,9 @@ struct FMars_Fragment_Resting
     UPROPERTY()
     EMars_Resting_State State = EMars_Resting_State::Apart;
 
-    // Parallel to Targets: seconds since the last contact with that target (0 on each Added / Persisted event;
-    // k_NoContactAge before the first).
+    // Parallel to Targets: 0 on each Added / Persisted contact with that target, unset before the first.
     UPROPERTY()
-    TArray<float32> ContactAges;
+    TArray<FMars_Resting_ContactAge> ContactAges;
 
     // Parallel to Targets: the last verdict for that target (a recent contact, or asleep while resting on it).
     UPROPERTY()
@@ -157,27 +164,19 @@ struct FMars_Fragment_Resting_Signals
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-// New targets and tuners for a body that moves on to other supports (a piece handed from one station's kernel to another's):
-// they replace the old ones and the tracker starts Apart on every new target with its hops and apart time zeroed, as Add
-// leaves it. A spec Validate rejects ensures and changes nothing. The last one in a drain wins.
+// A new spec for a body that moves on to other supports (a piece handed from one station's kernel to another's): its
+// targets and tuners replace the old ones and the tracker starts Apart on every new target with its hops and apart time
+// zeroed, as Add leaves it. A spec Validate rejects ensures and changes nothing. The last one in a drain wins.
 struct FMars_Request_Resting_Retarget
 {
     UPROPERTY()
-    TArray<FCk_Handle> Targets;
-
-    UPROPERTY()
-    float32 GraceSeconds = 0.1f;
-
-    UPROPERTY()
-    float32 HopMinSeconds = 0.12f;
+    FMars_Resting_Spec Spec;
 
     FMars_Request_Resting_Retarget() {}
 
-    FMars_Request_Resting_Retarget(const TArray<FCk_Handle>& InTargets, float32 InGraceSeconds, float32 InHopMinSeconds)
+    FMars_Request_Resting_Retarget(const FMars_Resting_Spec& InSpec)
     {
-        Targets = InTargets;
-        GraceSeconds = InGraceSeconds;
-        HopMinSeconds = InHopMinSeconds;
+        Spec = InSpec;
     }
 }
 

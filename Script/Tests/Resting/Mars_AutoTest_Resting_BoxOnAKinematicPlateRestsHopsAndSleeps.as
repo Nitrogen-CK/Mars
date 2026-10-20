@@ -1,22 +1,27 @@
 // A dynamic box dropped onto a kinematic plate comes to rest on it; the plate jumping 15 uu over two frames and back
-// throws the box clear (Apart), and it lands again: one hop, one OnLanded. Left alone it stays Resting, asleep or not
-// (Jolt reports no contacts for a sleeping pair; the Resting keeps its verdict while the body sleeps).
+// throws the box clear (Apart), and it lands again: one hop, one OnLanded. Left alone it stays Resting; put to sleep it
+// stays Resting for many GraceSeconds while asleep (Jolt reports no contacts for a sleeping pair; the Resting keeps its
+// verdict while the body sleeps).
 class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_AutoTestRig_Resting
 {
     default _TimeoutSeconds = 12.0f;
 
     private const float32 k_HopRaise = 15.0f;
-    // The watch's spans (Check_Watched).
+    // How long the awake box must stay Resting after the landing (Check_StayedResting).
     private const float32 k_StayRestingSeconds = 1.5f;
-    private const float32 k_SleepWatchSeconds = 3.0f;
-    // The watch ends on the first poll past its span: the slack covers that poll on any lane.
-    private const float32 k_WatchSlackSeconds = 0.5f;
+    // How long the box is watched asleep: many times the spec's GraceSeconds (0.1), so a verdict that needed a recent
+    // contact would have gone Apart well inside it.
+    private const float32 k_AsleepWatchSeconds = 1.0f;
+    // A poll budget for the sleep request to reach the body.
+    private const int32 k_SleepPolls = 120;
 
     private int32 _StatesBeforeHop = 0;
     private float32 _MaxPlateRaise = 0.0f;
     private float32 _WatchStart = -1.0f;
-    private float32 _AsleepAfter = -1.0f;
+    private float32 _AsleepSince = -1.0f;
     private bool _LeftRestingWhileWatched = false;
+    private bool _LeftRestingWhileAsleep = false;
+    private bool _WokeWhileWatched = false;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -33,8 +38,11 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
         Add_Step_WaitUntil("the box left the plate", n"Check_ApartAfterHop", 0, 0);
         Add_Step_WaitUntil("the box landed again", n"Check_LandedAgain", k_SlowPolls, 0);
         Add_Step("one hop, one landing", n"Step_AssertHop");
-        Add_Step_WaitUntil("the box stayed on the plate (asleep or not)", n"Check_Watched", 0, k_SleepWatchSeconds + k_WatchSlackSeconds);
-        Add_Step("the box is still resting", n"Step_AssertStillResting");
+        Add_Step_WaitUntil("the box stayed on the plate, awake", n"Check_StayedResting", 0, 0);
+        Add_Step("the box stayed Resting; put it to sleep", n"Step_AssertStayedThenSleep");
+        Add_Step_WaitUntil("the box is asleep", n"Check_Asleep", k_SleepPolls, 0);
+        Add_Step_WaitUntil("the box lay asleep on the plate", n"Check_SleptWatched", 0, 0);
+        Add_Step("the box is still resting, and still asleep", n"Step_AssertStillRestingAsleep");
         Run_Steps(InHandle);
     }
 
@@ -109,33 +117,59 @@ class UMars_AutoTest_Resting_BoxOnAKinematicPlateRestsHopsAndSleeps : UMars_Auto
         _WatchStart = Get_Now();
     }
 
-    // Samples the verdict every check: the box must stay Resting for k_StayRestingSeconds, and the watch runs on to
-    // k_SleepWatchSeconds for the sleep.
+    // Samples the verdict every check while the awake box lies on the plate for k_StayRestingSeconds.
     UFUNCTION()
-    private void Check_Watched(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_StayedResting(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto Elapsed = Get_Now() - _WatchStart;
         if (_Resting.Get_IsResting() == false)
         { _LeftRestingWhileWatched = true; }
 
-        if (_AsleepAfter < 0.0f && utils_jolt_body::Get_SleepState(_BoxBody) == ECk_Jolt_SleepState::Asleep)
-        { _AsleepAfter = Elapsed; }
-
         auto Res = OutResult;
-        Res.Set(Elapsed >= k_StayRestingSeconds && (_AsleepAfter >= 0.0f || Elapsed >= k_SleepWatchSeconds));
+        Res.Set(Get_Now() - _WatchStart >= k_StayRestingSeconds);
     }
 
     UFUNCTION()
-    private void Step_AssertStillResting(FCk_Handle InHandle, FInstancedStruct InPayload)
+    private void Step_AssertStayedThenSleep(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_False(_LeftRestingWhileWatched, "the box never left Resting while it lay on the plate");
+        Assert_False(_LeftRestingWhileWatched, "the box never left Resting while it lay on the plate awake");
+        Assert_True(_Resting.Get_IsResting(), "the box rests before it is put to sleep");
+
+        utils_jolt_body::Request_SetSleepState(_BoxBody, FCk_Request_JoltBody_SetSleepState(ECk_Jolt_SleepState::Asleep));
+    }
+
+    UFUNCTION()
+    private void Check_Asleep(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        const auto IsAsleep = utils_jolt_body::Get_SleepState(_BoxBody) == ECk_Jolt_SleepState::Asleep;
+        if (IsAsleep)
+        { _AsleepSince = Get_Now(); }
+
+        auto Res = OutResult;
+        Res.Set(IsAsleep);
+    }
+
+    // Samples the verdict and the sleep state every check for k_AsleepWatchSeconds.
+    UFUNCTION()
+    private void Check_SleptWatched(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        if (utils_jolt_body::Get_SleepState(_BoxBody) != ECk_Jolt_SleepState::Asleep)
+        { _WokeWhileWatched = true; }
+
+        if (_Resting.Get_IsResting() == false)
+        { _LeftRestingWhileAsleep = true; }
+
+        auto Res = OutResult;
+        Res.Set(Get_Now() - _AsleepSince >= k_AsleepWatchSeconds);
+    }
+
+    UFUNCTION()
+    private void Step_AssertStillRestingAsleep(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_False(_WokeWhileWatched, f"the box slept through the whole {k_AsleepWatchSeconds} s watch (nothing woke the pair)");
+        Assert_False(_LeftRestingWhileAsleep, "the box never left Resting while it slept");
         Assert_True(_Resting.Get_IsResting(), "the box is still resting");
         Assert_Equals_Int(_Resting.Get_Hops(), 1, "no further hop");
-
-        if (_AsleepAfter >= 0.0f)
-        { ck::Trace(f"[Resting] sleep: asleep {_AsleepAfter :.3} s after the landing was asserted; still Resting"); }
-        else
-        { ck::Trace(f"[Resting] sleep: not reached within {k_SleepWatchSeconds} s (the kinematic plate may keep the pair awake); still Resting"); }
+        Assert_Equals_Int(_Landings.Num(), 1, "no further landing");
     }
 
     private void Record_PlateRaise()

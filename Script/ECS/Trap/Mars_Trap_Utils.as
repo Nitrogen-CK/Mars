@@ -1,26 +1,16 @@
 namespace utils_trap
 {
-    // Composes the trap's cycle on InHandle; its phases drive InHazard and the optional InMover. InHazard must live on
-    // InHandle: the trap finds itself from the hazard's OnHit. A rejected spec, a hazard elsewhere, or actions that move a
-    // part with no mover ensure and return an invalid handle with nothing composed.
-    FCk_Handle_Trap Add(FCk_Handle& InHandle, FMars_Trap_Spec InSpec, FCk_Handle_Hazard InHazard, FCk_Handle_Mover InMover)
+    // Composes the trap's cycle on InHandle; its phases drive Spec.Parts' hazard and optional mover. The hazard must live
+    // on InHandle: the trap finds itself from the hazard's OnHit. A spec that fails Validate() or a hazard elsewhere
+    // ensures and returns an invalid handle with nothing composed.
+    FCk_Handle_Trap Add(FCk_Handle& InHandle, FMars_Trap_Spec InSpec)
     {
         const auto Validation = InSpec.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Trap] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Trap(); }
 
-        if (ck::EnsureIfNot(ck::IsValid(InHazard) && InHazard == InHandle,
-            f"[Trap] [{InHandle.ToString()}] needs its hazard on its own entity, not [{InHazard.ToString()}]; OnTriggered would never fire"))
-        { return FCk_Handle_Trap(); }
-
-        auto MovesAPart = false;
-        for (const auto& Action : InSpec.Actions)
-        {
-            if (Action.MoverAtEnd.IsSet())
-            { MovesAPart = true; }
-        }
-
-        if (ck::EnsureIfNot(MovesAPart == false || ck::IsValid(InMover), f"[Trap] [{InHandle.ToString()}] has actions that move a part but no mover"))
+        if (ck::EnsureIfNot(InSpec.Parts.Hazard == InHandle,
+            f"[Trap] [{InHandle.ToString()}] needs its hazard on its own entity, not [{InSpec.Parts.Hazard.ToString()}]; OnTriggered would never fire"))
         { return FCk_Handle_Trap(); }
 
         // utils_cycle::Add ensures on its own rejection.
@@ -33,8 +23,8 @@ namespace utils_trap
 
         auto State = FMars_Fragment_Trap();
         State.Cycle = Cycle;
-        State.Hazard = InHazard;
-        State.Mover = InMover;
+        State.Hazard = InSpec.Parts.Hazard;
+        State.Mover = InSpec.Parts.Mover;
 
         InHandle.Add_Fragment(FMars_Feature_Trap());
         InHandle.Add_Fragment(Params);

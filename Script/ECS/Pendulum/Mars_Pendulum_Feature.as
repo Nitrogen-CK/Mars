@@ -6,19 +6,13 @@ asset Mars_PendulumHandle of UCkDynamic_HandleDefinition
 {
     TypeName = "FCk_Handle_Pendulum";
     RequiredFragments.Add(FMars_Feature_Pendulum);
-    Description = "A swinging hazard: an oscillator whose hazard is armed while it runs";
+    Description = "A swinging hazard: an oscillator whose hazard is armed while it swings";
 }
 struct FMars_Feature_Pendulum {}
 
 //--------------------------------------------------------------------------------------------------------------------------
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
-
-struct FMars_Pendulum_Spec
-{
-    UPROPERTY()
-    EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
-}
 
 // The swing and the hazard a pendulum drives, built by its owner before Add. The pendulum finds itself from their signals,
 // so the hazard lives on the pendulum's entity and the oscillator on it or on a scene node created directly under it.
@@ -39,13 +33,23 @@ struct FMars_Pendulum_Parts
     }
 }
 
-mixin FMars_Validation Validate(const FMars_Pendulum_Parts& Self)
+// Spawn params of the placeable pendulum scripts: per-instance values live in saved maps.
+struct FMars_Pendulum_Spec
 {
-    if (ck::Is_NOT_Valid(Self.Oscillator))
-    { return FMars_Validation("Oscillator must be set: a pendulum without one never swings"); }
+    UPROPERTY()
+    EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
 
-    if (ck::Is_NOT_Valid(Self.Hazard))
-    { return FMars_Validation("Hazard must be set: a pendulum without one never hits"); }
+    // Construction input, never saved: the spawn params and maps do not carry it.
+    FMars_Pendulum_Parts Parts;
+}
+
+mixin FMars_Validation Validate(const FMars_Pendulum_Spec& Self)
+{
+    if (ck::Is_NOT_Valid(Self.Parts.Oscillator))
+    { return FMars_Validation("Parts.Oscillator must be set: a pendulum without one never swings"); }
+
+    if (ck::Is_NOT_Valid(Self.Parts.Hazard))
+    { return FMars_Validation("Parts.Hazard must be set: a pendulum without one never hits"); }
 
     return FMars_Validation();
 }

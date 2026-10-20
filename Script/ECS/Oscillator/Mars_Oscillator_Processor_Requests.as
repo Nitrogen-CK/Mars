@@ -31,7 +31,13 @@ class UMars_Processor_Oscillator_HandleRequests : UCk_Processor_Script_Base_UE
         // A caught swing is not running, so a stop never reaches it here; a start releases it.
         InState.State = Running ? EMars_Oscillator_State::Running : EMars_Oscillator_State::Stopped;
 
-        if (Self.Has_Fragment(FMars_Fragment_Oscillator_Signals))
-        { Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnRunningChanged.Broadcast(Self, TargetRunState); }
+        if (Self.Has_Fragment(FMars_Fragment_Oscillator_Signals) == false)
+        { return; }
+
+        Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnRunningChanged.Broadcast(Self, TargetRunState);
+
+        // A swing stopped before its envelope rose never reaches the Tick's rest edge; it is at rest already.
+        if (Running == false && Self.Get_IsSwinging() == false && Self.Has_Fragment(FMars_Fragment_Oscillator_Signals))
+        { Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnCameToRest.Broadcast(Self); }
     }
 }

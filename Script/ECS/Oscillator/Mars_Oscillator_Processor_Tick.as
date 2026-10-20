@@ -38,6 +38,8 @@ class UMars_Processor_Oscillator_Tick : UCk_Processor_Script_Base_UE
         const auto PreviousTime = InState.Time;
         InState.Time = float32(Math::Fmod(InState.Time + DeltaSeconds, Params.PeriodSeconds));
 
+        auto CameToRest = IsRunning == false && IsBraking == false && InState.Envelope <= 0.0f;
+
         if (IsBraking)
         {
             const auto RadiansPerSecond = 2.0 * PI / Params.PeriodSeconds;
@@ -49,14 +51,21 @@ class UMars_Processor_Oscillator_Tick : UCk_Processor_Script_Base_UE
             {
                 InState.Time = float32(Math::Fmod(CatchPhase.GetValue() / RadiansPerSecond, Params.PeriodSeconds));
                 InState.State = EMars_Oscillator_State::Caught;
+                CameToRest = true;
             }
         }
 
-        const auto Angle = Params.AmplitudeDegrees * InState.Envelope * float32(Math::Sin(2.0 * PI * InState.Time / Params.PeriodSeconds));
+        const auto Angle = utils_oscillator::Get_SwingAngle(Params, InState);
 
         auto Node = InHandle.As_SceneNode();
         utils_scene_node::Request_UpdateOffset_Rotation(Node,
             utils_oscillator::Make_NodeRotation(Params.RestRotation, Params.Axis, Angle),
             ECk_RelativeAbsolute::Absolute);
+
+        if (CameToRest && InHandle.Has_Fragment(FMars_Fragment_Oscillator_Signals))
+        {
+            auto Oscillator = InHandle.As_Oscillator();
+            Oscillator.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnCameToRest.Broadcast(Oscillator);
+        }
     }
 }

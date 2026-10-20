@@ -86,11 +86,9 @@ struct FMars_Fragment_Sequence_Params
 // Written only by UMars_Processor_Sequence_HandleRequests and utils_sequence::Add.
 struct FMars_Fragment_Sequence
 {
+    // Steps accepted; complete once it reaches the step count.
     UPROPERTY()
     int32 Progress = 0;
-
-    UPROPERTY()
-    bool IsComplete = false;
 
     // Step timeout while in progress; output pulse while complete and unlatched.
     UPROPERTY()

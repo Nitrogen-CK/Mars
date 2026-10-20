@@ -30,7 +30,7 @@ class UMars_AutoTest_Climber_MountClimbsAndTopsOut : UMars_AutoTestRig_Climber
 
         const auto Stuck = FMars_Climber_Spec(0.0f).Validate();
         Assert_False(Stuck.IsValid(), "ClimbSpeed 0 is rejected");
-        Assert_True(Stuck.Get_Error().Len() > 0, f"ClimbSpeed 0 names its rule (error: {Stuck.Get_Error()})");
+        Assert_True(Stuck.Get_Error().Contains("ClimbSpeed"), f"ClimbSpeed 0 names ClimbSpeed (error: {Stuck.Get_Error()})");
         Assert_True(Math::Abs(_Climber.Get_ClimbSpeed() - 300.0f) < 0.001f, f"the climber keeps its spec's speed ({_Climber.Get_ClimbSpeed()})");
     }
 

@@ -2,7 +2,8 @@
 // passes the catch angle and holds there, writing that angle to its node; restarting releases it and it swings again.
 // Two swings of amplitude 30 run side by side: one caught at the amplitude's edge (-30, passed once per period) and one
 // caught mid-amplitude (-15, passed twice per period, on the way out and on the way back). A spec whose catch angle lies
-// outside its amplitude fails Validate(). Isolated Z band: -77000.
+// outside its amplitude fails Validate(). Each swing broadcasts OnRunningChanged once per edge (Stopped on the brake,
+// Running on the release) and OnCameToRest once, at the catch, not at the stop. Isolated Z band: -77000.
 class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
 {
     // A poll budget, not a ceiling: a catch or a release waits on the swing's period.
@@ -17,6 +18,11 @@ class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
     private FCk_Handle_SceneNode _MidPivot;
     private float32 _MidCatchAngle = -15.0f;
 
+    private TArray<EMars_Oscillator_RunState> _EdgeRunChanges;
+    private TArray<EMars_Oscillator_RunState> _MidRunChanges;
+    private int32 _EdgeRests = 0;
+    private int32 _MidRests = 0;
+
     private bool _EdgeSwungAway = false;
     private bool _MidSwungAway = false;
 
@@ -30,6 +36,10 @@ class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
 
         _Oscillator = utils_oscillator::Add(_Pivot, MakeSpec(_CatchAngle));
         _MidOscillator = utils_oscillator::Add(_MidPivot, MakeSpec(_MidCatchAngle));
+        _Oscillator.BindTo_OnRunningChanged(FMars_Delegate_Oscillator_OnRunningChanged(this, n"OnEdgeRunningChanged"));
+        _MidOscillator.BindTo_OnRunningChanged(FMars_Delegate_Oscillator_OnRunningChanged(this, n"OnMidRunningChanged"));
+        _Oscillator.BindTo_OnCameToRest(FMars_Delegate_Oscillator_OnCameToRest(this, n"OnEdgeCameToRest"));
+        _MidOscillator.BindTo_OnCameToRest(FMars_Delegate_Oscillator_OnCameToRest(this, n"OnMidCameToRest"));
 
         Add_Step("a catch angle beyond the amplitude is rejected", n"Step_AssertValidate");
         Add_Step_WaitSeconds("let them swing", 0.3f);
@@ -40,6 +50,7 @@ class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
         Add_Step("still caught, still at the catch angle, written to the node", n"Step_AssertHeld");
         Add_Step("release them", n"Step_Start");
         Add_Step_WaitUntil("released, each swings away from its catch angle", n"Check_SwingingAgain", k_SlowPolls, 0);
+        Add_Step("one Stopped and one Running edge each, one rest each", n"Step_AssertEdges");
         Run_Steps(InHandle);
     }
 
@@ -73,6 +84,12 @@ class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_AssertAtCatchAngle(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
+        Assert_Equals_Int(_EdgeRunChanges.Num(), 1, "the brake broadcast one OnRunningChanged on the edge swing");
+        Assert_Equals_Int(_MidRunChanges.Num(), 1, "the brake broadcast one OnRunningChanged on the mid swing");
+        Assert_True(_EdgeRunChanges.Num() == 1 && _EdgeRunChanges[0] == EMars_Oscillator_RunState::Stopped, "the edge swing's edge is Stopped");
+        Assert_True(_MidRunChanges.Num() == 1 && _MidRunChanges[0] == EMars_Oscillator_RunState::Stopped, "the mid swing's edge is Stopped");
+        Assert_Equals_Int(_EdgeRests, 1, "the edge swing came to rest once, at its catch");
+        Assert_Equals_Int(_MidRests, 1, "the mid swing came to rest once, at its catch");
         Assert_False(_Oscillator.Get_IsRunning(), "a swing caught at the edge is stopped");
         Assert_Equals_Float(_Oscillator.Get_Angle(), _CatchAngle, 0.5, "caught at the edge catch angle");
         Assert_False(_MidOscillator.Get_IsRunning(), "a swing caught mid-amplitude is stopped");
@@ -111,6 +128,39 @@ class UMars_AutoTest_Oscillator_BrakeCatchesAtCatchAngle : UCk_AutoTest_Base
 
         auto Res = OutResult;
         Res.Set(_EdgeSwungAway && _MidSwungAway);
+    }
+
+    UFUNCTION()
+    private void Step_AssertEdges(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_True(_EdgeRunChanges.Num() == 2 && _EdgeRunChanges[1] == EMars_Oscillator_RunState::Running, "the edge swing's release is one Running edge");
+        Assert_True(_MidRunChanges.Num() == 2 && _MidRunChanges[1] == EMars_Oscillator_RunState::Running, "the mid swing's release is one Running edge");
+        Assert_Equals_Int(_EdgeRests, 1, "a released swing does not report rest again");
+        Assert_Equals_Int(_MidRests, 1, "a released swing does not report rest again");
+    }
+
+    UFUNCTION()
+    private void OnEdgeRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState)
+    {
+        _EdgeRunChanges.Add(InRunState);
+    }
+
+    UFUNCTION()
+    private void OnMidRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState)
+    {
+        _MidRunChanges.Add(InRunState);
+    }
+
+    UFUNCTION()
+    private void OnEdgeCameToRest(FCk_Handle_Oscillator InOscillator)
+    {
+        ++_EdgeRests;
+    }
+
+    UFUNCTION()
+    private void OnMidCameToRest(FCk_Handle_Oscillator InOscillator)
+    {
+        ++_MidRests;
     }
 
     private FMars_Oscillator_Spec MakeSpec(float32 InCatchAngle) const

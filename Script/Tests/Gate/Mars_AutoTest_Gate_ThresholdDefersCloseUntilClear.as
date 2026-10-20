@@ -1,7 +1,8 @@
 // A gate with a threshold does not close on someone: told to close while a Probe.Mars.Player stands in its doorway it stays
 // open with the close deferred; an open request meanwhile cancels the wait; told to close again, it closes as soon as the
 // occupant leaves. The gate and the occupant (a kinematic Silent Probe.Mars.Player sphere in its own context, like the
-// player's body probe) are built in the test, so no placeable or driver is involved. Isolated Z band: -76000.
+// player's body probe) are built in the test, so no placeable or driver is involved. OnOpenChanged fires once, for the
+// close that goes through: a deferred close and an open of an open gate are not edges. Isolated Z band: -76000.
 class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
 {
     // A poll budget, not a ceiling: the threshold sees the occupant come and go through physics overlaps.
@@ -10,6 +11,7 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
     private FVector _Origin = FVector(0.0, 0.0, -76000.0);
     private FCk_Handle_Gate _Gate;
     private FCk_Handle_Transform _Occupant;
+    private TArray<EMars_Gate_Position> _OpenChanges;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -27,6 +29,7 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
         GateSpec.StartOpen = true;
         GateSpec.Threshold = Threshold;
         _Gate = utils_gate::Add(GateRoot, GateSpec);
+        _Gate.BindTo_OnOpenChanged(FMars_Delegate_Gate_OnOpenChanged(this, n"OnOpenChanged"));
 
         _Occupant = MakeOccupant(InHandle, _Origin + FVector(0.0, 0.0, 110.0));
 
@@ -42,6 +45,7 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
         Add_Step_WaitUntil("the close is deferred again", n"Check_Deferred", 0, 0);
         Add_Step("the occupant leaves", n"Step_Leave");
         Add_Step_WaitUntil("the gate closes once the threshold clears", n"Check_Closed", k_SlowPolls, 0);
+        Add_Step("one OnOpenChanged, Closed", n"Step_AssertOneEdge");
         Run_Steps(InHandle);
     }
 
@@ -78,6 +82,7 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
     {
         Assert_True(_Gate.Get_IsOpen(), "a close does not go through while the threshold is occupied");
         Assert_True(_Gate.Get_IsCloseDeferred(), "the close waits");
+        Assert_Equals_Int(_OpenChanges.Num(), 0, "a deferred close broadcasts no OnOpenChanged");
     }
 
     UFUNCTION()
@@ -104,6 +109,19 @@ class UMars_AutoTest_Gate_ThresholdDefersCloseUntilClear : UCk_AutoTest_Base
     {
         auto Res = OutResult;
         Res.Set(_Gate.Get_IsOpen() == false && _Gate.Get_IsCloseDeferred() == false && _Gate.Get_IsThresholdOccupied() == false);
+    }
+
+    UFUNCTION()
+    private void Step_AssertOneEdge(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_OpenChanges.Num(), 1, "the close that went through broadcast OnOpenChanged once; the open of an open gate none");
+        Assert_True(_OpenChanges.Num() == 1 && _OpenChanges[0] == EMars_Gate_Position::Closed, "the edge is Closed");
+    }
+
+    UFUNCTION()
+    private void OnOpenChanged(FCk_Handle_Gate InGate, EMars_Gate_Position InPosition)
+    {
+        _OpenChanges.Add(InPosition);
     }
 
     // Its own owner and context, so the gate's threshold may overlap it.

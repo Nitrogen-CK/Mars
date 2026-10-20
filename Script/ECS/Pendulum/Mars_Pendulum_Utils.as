@@ -1,22 +1,22 @@
 namespace utils_pendulum
 {
-    // Parts that fail Validate(), or a hazard on another entity, ensure and add nothing.
-    FCk_Handle_Pendulum Add(FCk_Handle& InHandle, FMars_Pendulum_Spec InParams, FMars_Pendulum_Parts InParts)
+    // A spec that fails Validate(), or a hazard on another entity, ensures and adds nothing.
+    FCk_Handle_Pendulum Add(FCk_Handle& InHandle, FMars_Pendulum_Spec InSpec)
     {
-        const auto Validation = InParts.Validate();
-        if (ck::EnsureIfNot(Validation.IsValid(), f"[Pendulum] [{InHandle.ToString()}] rejected the parts: {Validation.Get_Error()}"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Pendulum] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Pendulum(); }
 
-        if (ck::EnsureIfNot(InParts.Hazard == InHandle,
-            f"[Pendulum] [{InHandle.ToString()}] was given Hazard [{InParts.Hazard.ToString()}] on another entity; OnTriggered could not fire"))
+        if (ck::EnsureIfNot(InSpec.Parts.Hazard == InHandle,
+            f"[Pendulum] [{InHandle.ToString()}] was given Hazard [{InSpec.Parts.Hazard.ToString()}] on another entity; OnTriggered could not fire"))
         { return FCk_Handle_Pendulum(); }
 
         auto Params = FMars_Fragment_Pendulum_Params();
-        Params.Powered = InParams.Powered;
+        Params.Powered = InSpec.Powered;
 
         auto State = FMars_Fragment_Pendulum();
-        State.Oscillator = InParts.Oscillator;
-        State.Hazard = InParts.Hazard;
+        State.Oscillator = InSpec.Parts.Oscillator;
+        State.Hazard = InSpec.Parts.Hazard;
 
         InHandle.Add_Fragment(FMars_Feature_Pendulum());
         InHandle.Add_Fragment(Params);

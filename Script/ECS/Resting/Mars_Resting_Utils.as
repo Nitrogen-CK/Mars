@@ -1,8 +1,5 @@
 namespace utils_resting
 {
-    // A target's contact age before its first contact: far past any grace.
-    const float32 k_NoContactAge = 999.0f;
-
     // Composes the tracker on InHandle, the entity of the dynamic body that rests (added before, with PersistContacts
     // enabled). It starts Apart on every target; the Setup processor binds the body's contacts. A rejected spec or an entity
     // without a body ensures and returns an invalid handle.
@@ -31,23 +28,23 @@ namespace utils_resting
         State.Body = InBody;
         for (int32 Index = 0; Index < InSpec.Targets.Num(); ++Index)
         {
-            State.ContactAges.Add(k_NoContactAge);
+            State.ContactAges.Add(FMars_Resting_ContactAge());
             State.RestingOn.Add(false);
         }
 
         return State;
     }
 
-    // The index of InEntity among InTargets; -1 = not a target.
-    int32 Find_TargetIndex(const TArray<FCk_Handle>& InTargets, const FCk_Handle& InEntity)
+    // The index of InEntity among InTargets; unset when it is not a target.
+    TOptional<int32> TryFind_TargetIndex(const TArray<FCk_Handle>& InTargets, const FCk_Handle& InEntity)
     {
         for (int32 Index = 0; Index < InTargets.Num(); ++Index)
         {
             if (InTargets[Index] == InEntity)
-            { return Index; }
+            { return TOptional<int32>(Index); }
         }
 
-        return -1;
+        return TOptional<int32>();
     }
 }
 
@@ -77,22 +74,23 @@ mixin bool Get_IsResting(const FCk_Handle_Resting& Self)
 // target the spec does not name ensures and answers false.
 mixin bool Get_IsRestingOn(const FCk_Handle_Resting& Self, const FCk_Handle& InTarget)
 {
-    const auto Index = utils_resting::Find_TargetIndex(Self.Get_Targets(), InTarget);
-    if (ck::EnsureIfNot(Index >= 0, f"[Resting] [{Self.ToString()}] has no target [{InTarget.ToString()}]"))
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Resting);
+    const auto Index = utils_resting::TryFind_TargetIndex(State.Targets, InTarget);
+    if (ck::EnsureIfNot(Index.IsSet(), f"[Resting] [{Self.ToString()}] has no target [{InTarget.ToString()}]"))
     { return false; }
 
-    return Self.Get_Fragment(FMars_Fragment_Resting).RestingOn[Index];
+    return State.RestingOn[Index.GetValue()];
+}
+
+// Whether the spec names InTarget.
+mixin bool Get_HasTarget(const FCk_Handle_Resting& Self, const FCk_Handle& InTarget)
+{
+    return utils_resting::TryFind_TargetIndex(Self.Get_Fragment(FMars_Fragment_Resting).Targets, InTarget).IsSet();
 }
 
 mixin int32 Get_Hops(const FCk_Handle_Resting& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Resting).Hops;
-}
-
-// 0 while Resting.
-mixin float32 Get_ApartSeconds(const FCk_Handle_Resting& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Resting).ApartSeconds;
 }
 
 // The first target (the only one of a single-target Resting).

@@ -26,6 +26,23 @@ namespace utils_mechanism_sink
         utils_entity_tag::Add(InHandle, n"TAG_MarsMechanismSink");
         return InHandle.As_MechanismSink();
     }
+
+    // A placeable script's sink is optional: an empty InputChannels means unwired, and adds nothing (invalid handle).
+    FCk_Handle_MechanismSink TryAdd(FCk_Handle& InHandle, FMars_MechanismSink_Spec InParams)
+    {
+        if (InParams.InputChannels.Num() == 0)
+        { return FCk_Handle_MechanismSink(); }
+
+        return Add(InHandle, InParams);
+    }
+
+    // Whether a consumer gated by InBehavior runs at InPower. Never called with Unevaluated: OnPoweredChanged never
+    // broadcasts it.
+    bool Get_ShouldRun(EMars_PoweredBehavior InBehavior, EMars_MechanismSink_Power InPower)
+    {
+        const auto IsPowered = InPower == EMars_MechanismSink_Power::Powered;
+        return InBehavior == EMars_PoweredBehavior::RunWhilePowered ? IsPowered : (IsPowered == false);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -96,10 +113,22 @@ mixin void Request_NotifyInputEdge(FCk_Handle_MechanismSink& Self, const FMars_R
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void BindTo_OnPoweredChanged(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnPoweredChanged InDelegate)
+// With FireIfPayloadInFlight (either flavour) a sink that has already evaluated calls InDelegate now with its current power,
+// so a link set up after the first evaluation needs no replay of its own. An unevaluated sink waits for its first broadcast.
+mixin void BindTo_OnPoweredChanged(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnPoweredChanged InDelegate,
+                                   ECk_Signal_BindingPolicy InPolicy = ECk_Signal_BindingPolicy::IgnorePayloadInFlight)
 {
     auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_MechanismSink_Signals);
     Fragment.OnPoweredChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+
+    if (InPolicy == ECk_Signal_BindingPolicy::IgnorePayloadInFlight)
+    { return; }
+
+    const auto Power = Self.Get_Fragment(FMars_Fragment_MechanismSink).Power;
+    if (Power == EMars_MechanismSink_Power::Unevaluated)
+    { return; }
+
+    InDelegate.ExecuteIfBound(Self, Power);
 }
 
 mixin void UnbindFrom_OnPoweredChanged(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnPoweredChanged InDelegate)
@@ -122,4 +151,18 @@ mixin void UnbindFrom_OnInputEdge(FCk_Handle_MechanismSink& Self, FMars_Delegate
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnInputRose(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnInputRose InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_MechanismSink_Signals);
+    Fragment.OnInputRose.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnInputRose(FCk_Handle_MechanismSink& Self, FMars_Delegate_MechanismSink_OnInputRose InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_MechanismSink_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputRose.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

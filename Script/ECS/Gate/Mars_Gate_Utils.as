@@ -45,6 +45,12 @@ mixin bool Get_IsOpen(const FCk_Handle_Gate& Self)
     return Self.Get_State() != EMars_Gate_State::Closed;
 }
 
+// Open while a close is deferred too.
+mixin EMars_Gate_Position Get_Position(const FCk_Handle_Gate& Self)
+{
+    return Self.Get_IsOpen() ? EMars_Gate_Position::Open : EMars_Gate_Position::Closed;
+}
+
 mixin bool Get_IsCloseDeferred(const FCk_Handle_Gate& Self)
 {
     return Self.Get_State() == EMars_Gate_State::CloseDeferred;

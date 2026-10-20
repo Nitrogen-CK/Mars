@@ -129,9 +129,15 @@ struct FMars_Fragment_Oscillator
 delegate void FMars_Delegate_Oscillator_OnRunningChanged(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState);
 event void FMars_Delegate_Oscillator_OnRunningChanged_MC(FCk_Handle_Oscillator InOscillator, EMars_Oscillator_RunState InRunState);
 
+// Once per stop: when a stopped swing's envelope reaches 0, or a braked swing is caught. A stop is not a rest: a stopped
+// swing keeps moving until then.
+delegate void FMars_Delegate_Oscillator_OnCameToRest(FCk_Handle_Oscillator InOscillator);
+event void FMars_Delegate_Oscillator_OnCameToRest_MC(FCk_Handle_Oscillator InOscillator);
+
 struct FMars_Fragment_Oscillator_Signals
 {
     FMars_Delegate_Oscillator_OnRunningChanged_MC OnRunningChanged;
+    FMars_Delegate_Oscillator_OnCameToRest_MC OnCameToRest;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

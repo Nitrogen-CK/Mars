@@ -10,7 +10,7 @@ class UMars_LanternSconce_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -32,8 +32,7 @@ class UMars_LanternSconce_EntityScript : UCk_GenericEntityScript_UE
         Spec.Interactable = AddInteractable(Root);
         utils_lantern_hook::Add(InHandle, Spec);
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         AddVisuals(Root);
 

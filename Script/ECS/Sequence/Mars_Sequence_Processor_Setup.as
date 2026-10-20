@@ -24,24 +24,22 @@ class UMars_Processor_Sequence_Setup : UCk_Processor_Script_Base_UE
                 f"[Sequence] [{Sequence.ToString()}] has step [{Step.ToString()}] that its sink does not listen to; the combination can never complete");
         }
 
-        Sink.BindTo_OnInputEdge(FMars_Delegate_MechanismSink_OnInputEdge(this, n"OnSinkInputEdge"));
+        Sink.BindTo_OnInputRose(FMars_Delegate_MechanismSink_OnInputRose(this, n"OnSinkInputRose"));
 
+        // The source asserts while the sequence is complete.
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
         {
             const auto Output = Sequence.Get_IsComplete() ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
-            Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(Output));
+            Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Output));
         }
 
         Sequence.Request_TryRemove(FMars_Tag_Sequence_NeedsSetup);
     }
 
     UFUNCTION()
-    private void OnSinkInputEdge(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel, EMars_MechanismSource_Output InOutput)
+    private void OnSinkInputRose(FCk_Handle_MechanismSink InSink, FGameplayTag InChannel)
     {
-        if (InOutput == EMars_MechanismSource_Output::Deasserted)
-        { return; }
-
         auto Sequence = InSink.As_Sequence();
         Sequence.Request_Input(FMars_Request_Sequence_Input(InChannel));
     }

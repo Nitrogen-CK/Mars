@@ -20,11 +20,11 @@ class UMars_Gate_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_Gate_Spec Gate;
 
-    // No sink is added while InputChannels is empty.
+    // Optional: unwired while InputChannels is empty (utils_mechanism_sink::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSink_Spec Sink;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -53,11 +53,9 @@ class UMars_Gate_EntityScript : UCk_GenericEntityScript_UE
 
         auto GateHandle = utils_gate::Add(GateRoot, GateSpec);
 
-        if (Sink.InputChannels.Num() > 0)
-        { utils_mechanism_sink::Add(InHandle, Sink); }
+        utils_mechanism_sink::TryAdd(InHandle, Sink);
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         AddFrame(GateRoot);
 

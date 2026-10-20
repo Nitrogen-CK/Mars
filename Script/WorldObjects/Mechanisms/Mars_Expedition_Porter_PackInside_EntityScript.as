@@ -1,18 +1,12 @@
 // Matches the expedition's 6 x 4 m freight reliquary. A pack anywhere inside keeps the existing grace circuit alive;
-// a pack outside its walls cannot power it. The interior rescue chain remains reachable without the pack.
-class UMars_Expedition_Porter_PackInside_EntityScript : UMars_OccupancyVolume_EntityScript
+// a pack outside its walls cannot power it. The interior rescue chain remains reachable without the pack. The gauntlet's
+// pack volume on the same channel, sized to the reliquary.
+class UMars_Expedition_Porter_PackInside_EntityScript : UMars_Gauntlet_Porter_PackInside_EntityScript
 {
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Gauntlet.Porter.PackInside");
+    default _ShowInPlaceActors = true;
 
-    UFUNCTION(BlueprintOverride)
-    ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
+    protected FVector Get_BoxHalfExtents() const override
     {
-        Trigger.Shape = EMars_Trigger_Shape::Box;
-        Trigger.BoxHalfExtents = FVector(280.0, 175.0, 60.0);
-        Trigger.LocalOffset = FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, 60.0));
-        Trigger.DetectionFilter = GameplayTag::MakeGameplayTagContainerFromTag(GameplayTags::Probe_Mars_Backpack);
-        Occupancy.RequiredCount = 1;
-        Occupancy.ReleaseDelaySeconds = 0.0f;
-        return Super::DoConstruct(InHandle);
+        return FVector(280.0, 175.0, 60.0);
     }
 }

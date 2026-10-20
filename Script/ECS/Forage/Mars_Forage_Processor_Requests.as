@@ -137,11 +137,15 @@ class UMars_Processor_Forage_HandleRequests : UCk_Processor_Script_Base_UE
         utils_entity_lifetime::Request_DestroyEntity(InForage);
     }
 
-    // The timer lives on the forage entity (utils_timer::Add) or, should the timer feature parent it, directly under it.
     UFUNCTION()
     private void OnRegrowDone(FCk_Handle_Timer InTimer, FCk_Chrono InChrono, FCk_Time InDeltaT)
     {
-        auto Forage = InTimer.Is_Forage() ? InTimer.As_Forage() : utils_entity_lifetime::Get_LifetimeOwner(InTimer).As_Forage();
+        // The owner is gone only while the forage is being torn down.
+        auto Owner = utils_entity_lifetime::Get_LifetimeOwner(InTimer);
+        if (ck::Is_NOT_Valid(Owner))
+        { return; }
+
+        auto Forage = Owner.As_Forage();
 
         // A replenish already destroyed the timer this one belonged to.
         if (Forage.Get_Fragment(FMars_Fragment_Forage).RegrowTimer != InTimer)

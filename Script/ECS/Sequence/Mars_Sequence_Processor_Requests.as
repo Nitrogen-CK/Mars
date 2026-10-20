@@ -43,7 +43,7 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
         const auto PulseSeconds = Params.OutputPulseSeconds > 0.0f ? Params.OutputPulseSeconds : k_FallbackPulseSeconds;
 
         auto& State = InSequence.Get_Fragment(FMars_Fragment_Sequence);
-        if (State.IsComplete || State.Progress >= StepCount)
+        if (State.Progress >= StepCount)
         { return; }
 
         if (Params.Steps[State.Progress] != InChannel)
@@ -64,8 +64,6 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
 
         if (Completed)
         {
-            State.IsComplete = true;
-
             if (Latch == false)
             { State.StepTimer = ArmTimer(InSequence, PulseSeconds); }
         }
@@ -81,7 +79,7 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
         // The source is optional: a sequence without an output still completes.
         auto Source = InSequence.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
-        { Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(EMars_MechanismSource_Output::Asserted)); }
+        { Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(EMars_MechanismSource_Output::Asserted)); }
 
         if (InSequence.Has_Fragment(FMars_Fragment_Sequence_Signals))
         { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnCompleted.Broadcast(InSequence); }
@@ -92,15 +90,14 @@ class UMars_Processor_Sequence_HandleRequests : UCk_Processor_Script_Base_UE
         auto& State = InSequence.Get_Fragment(FMars_Fragment_Sequence);
         DestroyStepTimer(State);
 
-        if (State.Progress == 0 && State.IsComplete == false)
+        if (State.Progress == 0)
         { return; }
 
         State.Progress = 0;
-        State.IsComplete = false;
 
         auto Source = InSequence.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
-        { Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(EMars_MechanismSource_Output::Deasserted)); }
+        { Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(EMars_MechanismSource_Output::Deasserted)); }
 
         if (InSequence.Has_Fragment(FMars_Fragment_Sequence_Signals))
         { InSequence.Get_Fragment(FMars_Fragment_Sequence_Signals).OnReset.Broadcast(InSequence); }

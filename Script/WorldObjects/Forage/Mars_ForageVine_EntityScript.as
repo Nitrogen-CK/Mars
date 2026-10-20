@@ -2,9 +2,9 @@
 // local -X and an arm reaches over to the fruit, which hangs HangHeight up. A strike that empties its Health, or a
 // thrown item closing on it at KnockMinSpeed or more, drops it as a world item into the basin ring; the vine regrows it
 // RegrowSeconds later. Both triggers are composed here: a Health + Body zone + hurtbox for the strike and a static Jolt
-// sphere at the fruit for the knock.
+// sphere at the fruit for the knock, there only while the fruit is.
 UCLASS(Abstract)
-class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
+class UMars_ForageVine_EntityScript : UMars_ForageSource_EntityScript
 {
     default _ShowInPlaceActors = true;
     default _Replication = ECk_Replication::DoesNotReplicate;
@@ -41,10 +41,10 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
     private const float64 HurtboxMargin = 6.0;
     private const FVector FruitLaunch = FVector(0.0, 0.0, -80.0);
 
-    private FCk_Handle_Forage _Forage;
-    private FCk_Handle_Health _Health;
-    private FCk_Handle_HitZone _Zone;
-    protected FCk_Handle_UnrealComponent _FruitMesh;
+    protected float32 Get_KnockMinSpeed() const override
+    {
+        return KnockMinSpeed;
+    }
 
     // Presets name the yield.
     protected TSoftObjectPtr<UCk_InventoryItem_Definition> Get_YieldDefinition() const
@@ -74,8 +74,6 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
         const auto HurtboxHalfExtent = FruitRadius + HurtboxMargin;
         utils_hit_zone::AddHurtbox_Box(_Zone, Root, FMars_HitZone_Hurtbox(FVector(HurtboxHalfExtent, HurtboxHalfExtent, HurtboxHalfExtent), FruitOffset));
 
-        auto Body = AddKnockBody(Root, FruitOffset);
-
         auto Spec = FMars_Forage_Spec();
         Spec.Yield = FMars_Forage_YieldSpec(Get_YieldDefinition(), 1);
         Spec.Exhaustion = FMars_Forage_ExhaustionSpec(EMars_Forage_Exhaustion::Regrows, RegrowSeconds);
@@ -86,29 +84,20 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(_Forage))
         { return ECk_EntityScript_ConstructionFlow::Finished; }
 
+        auto KnockBody = FMars_ForageSource_KnockBody();
+        KnockBody.Offset = FruitOffset;
+        KnockBody.Radius = FruitRadius;
+        KnockBody.MotionType = ECk_MotionType::Static;
+        KnockBody.Presence = EMars_ForageSource_KnockPresence::FollowsYield;
+        AddKnockBody(Root, KnockBody);
+
         _Health.BindTo_OnDepleted(FMars_Delegate_Health_OnDepleted(this, n"OnDepleted"));
-        utils_jolt_body::BindTo_OnJoltBodyContactAdded(Body, FCk_Delegate_JoltBody_OnContact(this, n"OnBodyContact"));
-        _Forage.BindTo_OnExhausted(FMars_Delegate_Forage_OnExhausted(this, n"OnExhausted"));
-        _Forage.BindTo_OnReplenished(FMars_Delegate_Forage_OnReplenished(this, n"OnReplenished"));
+        BindForage();
 
         if (WithVisuals)
         { AddVisuals(Root, FruitTransform); }
 
         return ECk_EntityScript_ConstructionFlow::Finished;
-    }
-
-    // A static sphere the size of the fruit on its own node at the fruit, so a thrown item's contact reaches it.
-    private FCk_Handle_JoltBody AddKnockBody(FCk_Handle_Transform& InRoot, FTransform InOffset)
-    {
-        auto BodyNode = utils_scene_node::Create(InRoot, InOffset);
-
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Sphere);
-        Shape.Set_Radius(FruitRadius);
-        auto BodySpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BodySpec.Set_ShapeDimensions(Shape);
-        BodySpec.Set_MotionType(ECk_MotionType::Static);
-        BodySpec.Set_CollisionProfileName(n"BlockAll");
-        return utils_jolt_body::Add(BodyNode.H(), BodySpec);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -121,50 +110,9 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
         _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Depleted));
     }
 
-    UFUNCTION()
-    private void OnBodyContact(FCk_Handle_JoltBody InBody, FCk_JoltBody_Payload_OnContact InPayload)
-    {
-        if (utils_forage::Get_IsKnock(InPayload, KnockMinSpeed) == false)
-        { return; }
-
-        _Forage.Request_Release(FMars_Request_Forage_Release(EMars_Forage_ReleaseReason::Knock));
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Exhaustion
-    //----------------------------------------------------------------------------------------------------------------------
-
-    UFUNCTION()
-    private void OnExhausted(FCk_Handle_Forage InForage)
-    {
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Disable));
-        SetFruitVisible(false);
-    }
-
-    UFUNCTION()
-    private void OnReplenished(FCk_Handle_Forage InForage)
-    {
-        _Health.Request_Heal(FMars_Request_Health_Heal(_Health.Get_Max()));
-        _Zone.Request_SetEnabled(FMars_Request_HitZone_SetEnabled(ECk_EnableDisable::Enable));
-        SetFruitVisible(true);
-    }
-
     //----------------------------------------------------------------------------------------------------------------------
     // Visuals
     //----------------------------------------------------------------------------------------------------------------------
-
-    // The component is created after construction; until then (and under nullrhi) there is nothing to hide.
-    private void SetFruitVisible(bool InVisible)
-    {
-        if (ck::Is_NOT_Valid(_FruitMesh))
-        { return; }
-
-        auto Mesh = Cast<UStaticMeshComponent>(utils_unreal_component::Get_Component(_FruitMesh));
-        if (ck::Is_NOT_Valid(Mesh))
-        { return; }
-
-        Mesh.SetVisibility(InVisible);
-    }
 
     // Engine cube and sphere are 100 uu with their pivot at the centre. The post and the basin walls are solid (a
     // collision-bearing mesh part bakes into the Jolt static world), so a dropped fruit lands inside the ring.
@@ -182,7 +130,7 @@ class UMars_ForageVine_EntityScript : UCk_GenericEntityScript_UE
             FTransform(FRotator::ZeroRotator, FVector(PostOffsetX * 0.5, 0.0, PostHeight), FVector(Math::Abs(PostOffsetX), ArmThickness, ArmThickness) * 0.01),
             CubeMesh, WallMaterial, collision::profile::NoCollision, n"ForageVine_Arm"));
 
-        _FruitMesh = InFruit.Add_MeshPart(this, FMars_MeshPart(
+        _YieldMesh = InFruit.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector * (FruitRadius * 2.0 * 0.01)),
             engine::load::Sphere(), assets::load::ProtoGrid_Interactable_Mars_MI(), collision::profile::NoCollision, n"ForageVine_Fruit"));
 

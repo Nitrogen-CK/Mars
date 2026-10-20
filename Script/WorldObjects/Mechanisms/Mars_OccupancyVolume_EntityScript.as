@@ -15,7 +15,7 @@ class UMars_OccupancyVolume_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_Occupancy_Spec Occupancy;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -26,10 +26,11 @@ class UMars_OccupancyVolume_EntityScript : UCk_GenericEntityScript_UE
         utils_entity_tag::Add(InHandle, n"TAG_MarsOccupancyVolume");
 
         auto TriggerHandle = utils_trigger::Add(Root, Trigger);
-        utils_occupancy::Add(InHandle, Occupancy, FMars_Occupancy_Parts(TriggerHandle));
+        auto OccupancySpec = Occupancy;
+        OccupancySpec.Parts = FMars_Occupancy_Parts(TriggerHandle);
+        utils_occupancy::Add(InHandle, OccupancySpec);
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         return ECk_EntityScript_ConstructionFlow::Finished;
     }

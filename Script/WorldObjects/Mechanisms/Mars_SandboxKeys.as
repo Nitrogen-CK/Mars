@@ -10,28 +10,28 @@ class UMars_Sandbox_KeyLock_Red_EntityScript : UMars_KeyLock_EntityScript
 {
     default _ShowInPlaceActors = false;
     default AcceptedKey = GameplayTags::Key_Mars_Red;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Red");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Keys_Red;
 }
 
 class UMars_Sandbox_KeyLock_Blue_EntityScript : UMars_KeyLock_EntityScript
 {
     default _ShowInPlaceActors = false;
     default AcceptedKey = GameplayTags::Key_Mars_Blue;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Blue");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Keys_Blue;
 }
 
 class UMars_Sandbox_KeyLock_Yellow_EntityScript : UMars_KeyLock_EntityScript
 {
     default _ShowInPlaceActors = false;
     default AcceptedKey = GameplayTags::Key_Mars_Yellow;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Yellow");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Keys_Yellow;
 }
 
 class UMars_Sandbox_KeyLock_Green_EntityScript : UMars_KeyLock_EntityScript
 {
     default _ShowInPlaceActors = false;
     default AcceptedKey = GameplayTags::Key_Mars_Green;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Green");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Keys_Green;
 }
 
 // Removable: the purple door is open only while a purple key is in one of its two locks.
@@ -40,7 +40,7 @@ class UMars_Sandbox_KeyLock_Purple_EntityScript : UMars_KeyLock_EntityScript
     default _ShowInPlaceActors = false;
     default AcceptedKey = GameplayTags::Key_Mars_Purple;
     default Release = EMars_KeyLock_Release::Removable;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Purple");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_Keys_Purple;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ class UMars_Sandbox_KeyDoor_Red_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
     default Leaf = EMars_Gate_Leaf::Bars;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Red"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Keys_Red);
     default Sink.Latch = true;
 }
 
@@ -60,8 +60,8 @@ class UMars_Sandbox_KeyDoor_Red_EntityScript : UMars_Gate_EntityScript
 class UMars_Sandbox_KeyDoor_BlueYellow_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Blue"));
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Yellow"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Keys_Blue);
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Keys_Yellow);
     default Sink.Rule = EMars_MechanismSink_Rule::AllChannels;
     default Sink.Latch = true;
 }
@@ -71,7 +71,7 @@ class UMars_Sandbox_KeyDoor_Green_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
     default Leaf = EMars_Gate_Leaf::Bars;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Green"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Keys_Green);
     default Sink.Rule = EMars_MechanismSink_Rule::AllSources;
     default Sink.Latch = true;
 }
@@ -82,7 +82,7 @@ class UMars_Sandbox_KeyDoor_Purple_EntityScript : UMars_Gate_EntityScript
     default _ShowInPlaceActors = false;
     default Leaf = EMars_Gate_Leaf::Bars;
     default WaitsForClearThreshold = true;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.Keys.Purple"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_Keys_Purple);
     default Sink.Rule = EMars_MechanismSink_Rule::AnyChannel;
 }
 

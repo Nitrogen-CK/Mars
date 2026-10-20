@@ -34,6 +34,21 @@ struct FMars_Hazard_Spec
     // Rotates PushImpulse by the hazard entity's world transform.
     UPROPERTY()
     bool PushIsRelative = true;
+
+    // Construction input, never saved: the spawn params and maps do not carry it. Several hazards may share one trigger.
+    FCk_Handle_Trigger Trigger;
+}
+
+// A trigger to hit through and a finite push.
+mixin FMars_Validation Validate(const FMars_Hazard_Spec& Self)
+{
+    if (ck::Is_NOT_Valid(Self.Trigger))
+    { return FMars_Validation("Trigger must be set: a hazard without one never hits"); }
+
+    if (Math::IsFinite(Self.PushImpulse.X) == false || Math::IsFinite(Self.PushImpulse.Y) == false || Math::IsFinite(Self.PushImpulse.Z) == false)
+    { return FMars_Validation(f"PushImpulse [{Self.PushImpulse.ToString()}] must be finite"); }
+
+    return FMars_Validation();
 }
 
 struct FMars_Tag_Hazard_NeedsSetup {}

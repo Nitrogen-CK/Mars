@@ -78,6 +78,12 @@ namespace utils_oscillator
         return (FQuat(InRestRotation) * FQuat(Make_SwingRotation(InAxis, InAngleDegrees))).Rotator();
     }
 
+    // The swing angle on top of the rest rotation, in degrees.
+    float32 Get_SwingAngle(const FMars_Fragment_Oscillator_Params& InParams, const FMars_Fragment_Oscillator& InState)
+    {
+        return InParams.AmplitudeDegrees * InState.Envelope * float32(Math::Sin(2.0 * PI * InState.Time / InParams.PeriodSeconds));
+    }
+
     FRotator Make_SwingRotation(EMars_Oscillator_Axis InAxis, float32 InAngleDegrees)
     {
         if (InAxis == EMars_Oscillator_Axis::Pitch)
@@ -104,12 +110,20 @@ mixin bool Get_IsCaught(const FCk_Handle_Oscillator& Self)
     return Self.Get_Fragment(FMars_Fragment_Oscillator).State == EMars_Oscillator_State::Caught;
 }
 
+// Running, or stopped but not yet at rest: easing out, or braking toward its catch angle.
+mixin bool Get_IsSwinging(const FCk_Handle_Oscillator& Self)
+{
+    const auto& State = Self.Get_Fragment(FMars_Fragment_Oscillator);
+    if (State.State != EMars_Oscillator_State::Stopped)
+    { return State.State == EMars_Oscillator_State::Running; }
+
+    return State.Envelope > 0.0f || Self.Get_Fragment(FMars_Fragment_Oscillator_Params).CatchAngleDegrees.IsSet();
+}
+
 // The swing angle the node shows now, on top of its rest rotation.
 mixin float32 Get_Angle(const FCk_Handle_Oscillator& Self)
 {
-    const auto& Params = Self.Get_Fragment(FMars_Fragment_Oscillator_Params);
-    const auto& State = Self.Get_Fragment(FMars_Fragment_Oscillator);
-    return Params.AmplitudeDegrees * State.Envelope * float32(Math::Sin(2.0 * PI * State.Time / Params.PeriodSeconds));
+    return utils_oscillator::Get_SwingAngle(Self.Get_Fragment(FMars_Fragment_Oscillator_Params), Self.Get_Fragment(FMars_Fragment_Oscillator));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -138,4 +152,18 @@ mixin void UnbindFrom_OnRunningChanged(FCk_Handle_Oscillator& Self, FMars_Delega
     { return; }
 
     Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnRunningChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void BindTo_OnCameToRest(FCk_Handle_Oscillator& Self, FMars_Delegate_Oscillator_OnCameToRest InDelegate)
+{
+    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_Oscillator_Signals);
+    Fragment.OnCameToRest.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
+}
+
+mixin void UnbindFrom_OnCameToRest(FCk_Handle_Oscillator& Self, FMars_Delegate_Oscillator_OnCameToRest InDelegate)
+{
+    if (Self.Has_Fragment(FMars_Fragment_Oscillator_Signals) == false)
+    { return; }
+
+    Self.Get_Fragment(FMars_Fragment_Oscillator_Signals).OnCameToRest.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

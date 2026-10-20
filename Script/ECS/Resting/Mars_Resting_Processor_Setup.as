@@ -31,11 +31,12 @@ class UMars_Processor_Resting_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Resting))
         { return; }
 
-        const auto Index = utils_resting::Find_TargetIndex(Resting.Get_Targets(), InPayload.Get_OtherEntity());
-        if (Index < 0)
+        // Fetched once: this runs on every Added and Persisted contact.
+        auto& State = Resting.Get_Fragment(FMars_Fragment_Resting);
+        const auto Index = utils_resting::TryFind_TargetIndex(State.Targets, InPayload.Get_OtherEntity());
+        if (Index.IsSet() == false)
         { return; }
 
-        auto& State = Resting.Get_Fragment(FMars_Fragment_Resting);
-        State.ContactAges[Index] = 0.0f;
+        State.ContactAges[Index.GetValue()].Seconds = TOptional<float32>(0.0f);
     }
 }

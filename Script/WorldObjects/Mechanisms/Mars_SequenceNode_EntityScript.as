@@ -11,7 +11,7 @@ class UMars_SequenceNode_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_Sequence_Spec Sequence;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -43,8 +43,7 @@ class UMars_SequenceNode_EntityScript : UCk_GenericEntityScript_UE
             _Sequence.BindTo_OnReset(FMars_Delegate_Sequence_OnReset(this, n"OnReset"));
         }
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         AddVisuals(Root);
 

@@ -20,16 +20,15 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         auto Sink = InHandle.As_MechanismSink(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Sink))
         {
-            Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"));
-            if (Sink.Get_HasEvaluated())
-            { Gate.Request_SetPosition(Make_SetPosition(Sink.Get_IsPowered())); }
+            Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnSinkPoweredChanged"),
+                ECk_Signal_BindingPolicy::FireIfPayloadInFlight);
         }
 
         auto Source = InHandle.As_MechanismSource(ECk_SanityCheck::UnChecked);
         if (ck::IsValid(Source))
         {
             Gate.BindTo_OnOpenChanged(FMars_Delegate_Gate_OnOpenChanged(this, n"OnGateOpenChanged"));
-            Source.Request_SetOutput(Make_SetOutput(Gate.Get_IsOpen()));
+            Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Get_SourceOutput(Gate.Get_Position())));
         }
 
         auto Threshold = Gate.Get_Threshold();
@@ -39,14 +38,10 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
         Gate.Request_TryRemove(FMars_Tag_Gate_NeedsSetup);
     }
 
-    private FMars_Request_Gate_SetPosition Make_SetPosition(bool InOpen) const
+    // The source asserts while the gate is open.
+    private EMars_MechanismSource_Output Get_SourceOutput(EMars_Gate_Position InPosition) const
     {
-        return FMars_Request_Gate_SetPosition(InOpen ? EMars_Gate_Position::Open : EMars_Gate_Position::Closed);
-    }
-
-    private FMars_Request_MechanismSource_SetOutput Make_SetOutput(bool InOpen) const
-    {
-        return FMars_Request_MechanismSource_SetOutput(InOpen ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted);
+        return InPosition == EMars_Gate_Position::Open ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
     }
 
     UFUNCTION()
@@ -72,13 +67,14 @@ class UMars_Processor_Gate_Setup : UCk_Processor_Script_Base_UE
     private void OnSinkPoweredChanged(FCk_Handle_MechanismSink InSink, EMars_MechanismSink_Power InPower)
     {
         auto Gate = InSink.As_Gate();
-        Gate.Request_SetPosition(Make_SetPosition(InPower == EMars_MechanismSink_Power::Powered));
+        const auto Position = InPower == EMars_MechanismSink_Power::Powered ? EMars_Gate_Position::Open : EMars_Gate_Position::Closed;
+        Gate.Request_SetPosition(FMars_Request_Gate_SetPosition(Position));
     }
 
     UFUNCTION()
     private void OnGateOpenChanged(FCk_Handle_Gate InGate, EMars_Gate_Position InPosition)
     {
         auto Source = InGate.As_MechanismSource();
-        Source.Request_SetOutput(Make_SetOutput(InPosition == EMars_Gate_Position::Open));
+        Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Get_SourceOutput(InPosition)));
     }
 }

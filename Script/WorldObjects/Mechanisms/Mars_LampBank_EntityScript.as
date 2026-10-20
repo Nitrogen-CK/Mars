@@ -16,7 +16,7 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSink_Spec Sink;
 
-    // No source is added while OutputChannel is unset.
+    // Optional: unwired while OutputChannel is unset (utils_mechanism_source::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSource_Spec Source;
 
@@ -29,17 +29,13 @@ class UMars_LampBank_EntityScript : UCk_GenericEntityScript_UE
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InHandle, n"TAG_MarsLampBank");
 
-        if (Sink.InputChannels.Num() > 0)
-        {
-            auto SinkSpec = Sink;
-            SinkSpec.Rule = EMars_MechanismSink_Rule::AnyChannel;
-            utils_mechanism_sink::Add(InHandle, SinkSpec);
-        }
+        auto SinkSpec = Sink;
+        SinkSpec.Rule = EMars_MechanismSink_Rule::AnyChannel;
+        utils_mechanism_sink::TryAdd(InHandle, SinkSpec);
 
         _Countdown = utils_countdown::Add(InHandle, Countdown);
 
-        if (Source.OutputChannel.IsValid())
-        { utils_mechanism_source::Add(InHandle, Source); }
+        utils_mechanism_source::TryAdd(InHandle, Source);
 
         // A rejected Countdown spec already ensured in utils_countdown::Add; the lamps then stay dark.
         if (ck::IsValid(_Countdown))

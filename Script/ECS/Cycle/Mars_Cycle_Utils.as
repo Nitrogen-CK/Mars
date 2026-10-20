@@ -53,13 +53,6 @@ mixin void Request_SetRunning(FCk_Handle_Cycle& Self, const FMars_Request_Cycle_
     Requests.SetRunningRequests.Add(InRequest);
 }
 
-// Rewinds to phase 0; re-enters it when the cycle is (or is being set) running.
-mixin void Request_Restart(FCk_Handle_Cycle& Self)
-{
-    auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Cycle_Requests);
-    Requests.RestartRequests.Add(FMars_Request_Cycle_Restart());
-}
-
 //--------------------------------------------------------------------------------------------------------------------------
 // Signal Binding
 //--------------------------------------------------------------------------------------------------------------------------

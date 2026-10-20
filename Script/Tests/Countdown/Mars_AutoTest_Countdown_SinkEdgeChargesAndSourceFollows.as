@@ -30,7 +30,7 @@ class UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows : UCk_AutoTest_Ba
         _Source = utils_mechanism_source::Add(Entity, SourceSpec);
 
         Add_Step("the input channel tag exists", n"Step_AssertChannel");
-        Add_Step_WaitUntil("the link is set up (the sink's edge signal is bound)", n"Check_LinkBound", 0, 0);
+        Add_Step_WaitUntil("the link is set up (the sink's rising-edge signal is bound)", n"Check_LinkBound", 0, 0);
         Add_Step("a falling edge on the input", n"Step_FallingEdge");
         Add_Step_WaitSeconds("let the sink drain it", 0.1f);
         Add_Step("a falling edge does not charge", n"Step_AssertNotCharged");
@@ -52,7 +52,7 @@ class UMars_AutoTest_Countdown_SinkEdgeChargesAndSourceFollows : UCk_AutoTest_Ba
         auto Res = OutResult;
         Res.Set(_Countdown.Has_Fragment(FMars_Tag_Countdown_NeedsSetup) == false
             && _Sink.Has_Fragment(FMars_Fragment_MechanismSink_Signals)
-            && _Sink.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputEdge._Inner.IsBound());
+            && _Sink.Get_Fragment(FMars_Fragment_MechanismSink_Signals).OnInputRose._Inner.IsBound());
     }
 
     UFUNCTION()

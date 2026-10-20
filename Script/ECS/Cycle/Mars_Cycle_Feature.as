@@ -129,14 +129,6 @@ struct FMars_Request_Cycle_SetRunning
     }
 }
 
-struct FMars_Request_Cycle_Restart
-{
-    UPROPERTY()
-    bool Requested = true;
-
-    FMars_Request_Cycle_Restart() {}
-}
-
 // Enqueued only by the processor's own phase timer.
 struct FMars_Request_Cycle_Advance
 {
@@ -146,14 +138,11 @@ struct FMars_Request_Cycle_Advance
     FMars_Request_Cycle_Advance() {}
 }
 
-// SetRunning is absolute: the latest one wins. Any number of restarts or advances in one drain act once.
+// SetRunning is absolute: the latest one wins. Any number of advances in one drain act once.
 struct FMars_Fragment_Cycle_Requests
 {
     UPROPERTY()
     TArray<FMars_Request_Cycle_SetRunning> SetRunningRequests;
-
-    UPROPERTY()
-    TArray<FMars_Request_Cycle_Restart> RestartRequests;
 
     UPROPERTY()
     TArray<FMars_Request_Cycle_Advance> AdvanceRequests;

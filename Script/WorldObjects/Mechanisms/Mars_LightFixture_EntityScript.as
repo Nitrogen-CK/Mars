@@ -9,7 +9,7 @@ class UMars_LightFixture_EntityScript : UCk_GenericEntityScript_UE
     UPROPERTY(ExposeOnSpawn)
     FTransform SpawnTransform = FTransform::Identity;
 
-    // No sink is added while InputChannels is empty.
+    // Optional: unwired while InputChannels is empty (utils_mechanism_sink::TryAdd).
     UPROPERTY(ExposeOnSpawn)
     FMars_MechanismSink_Spec Sink;
 
@@ -36,12 +36,9 @@ class UMars_LightFixture_EntityScript : UCk_GenericEntityScript_UE
         auto Root = utils_transform::Add(InHandle, SpawnTransform, ECk_Replication::DoesNotReplicate);
         utils_entity_tag::Add(InHandle, n"TAG_MarsLightFixture");
 
-        if (Sink.InputChannels.Num() > 0)
-        {
-            _Sink = utils_mechanism_sink::Add(InHandle, Sink);
-            if (ck::IsValid(_Sink))
-            { _Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnPoweredChanged")); }
-        }
+        _Sink = utils_mechanism_sink::TryAdd(InHandle, Sink);
+        if (ck::IsValid(_Sink))
+        { _Sink.BindTo_OnPoweredChanged(FMars_Delegate_MechanismSink_OnPoweredChanged(this, n"OnPoweredChanged")); }
 
         AddVisuals(Root);
         AddLight(Root);
@@ -94,7 +91,7 @@ class UMars_LightFixture_EntityScript : UCk_GenericEntityScript_UE
         if (ck::Is_NOT_Valid(_Sink))
         { return true; }
 
-        return _Sink.Get_HasEvaluated() && _Sink.Get_IsPowered();
+        return _Sink.Get_IsPowered();
     }
 
     // Visual only; the sink is the source of truth.

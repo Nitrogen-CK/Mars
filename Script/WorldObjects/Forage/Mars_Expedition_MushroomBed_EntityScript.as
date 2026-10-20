@@ -12,7 +12,7 @@ class UMars_Expedition_MushroomBed_EntityScript : UMars_ForageVine_EntityScript
 
     protected void AddVisuals(FCk_Handle_Transform& InRoot, FCk_Handle_Transform& InFruit) override
     {
-        _FruitMesh = InFruit.Add_MeshPart(this, FMars_MeshPart(
+        _YieldMesh = InFruit.Add_MeshPart(this, FMars_MeshPart(
             FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, -35.0), FVector::OneVector * 4.0),
             assets::load::Mushroom_Mars_SM(), nullptr, collision::profile::NoCollision, n"ExpeditionHarvest_Mushroom"));
     }

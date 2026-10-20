@@ -14,27 +14,6 @@ struct FMars_Feature_Occupancy {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-struct FMars_Occupancy_Spec
-{
-    UPROPERTY()
-    int32 RequiredCount = 1;
-
-    // 0 releases as soon as the count drops below RequiredCount.
-    UPROPERTY()
-    float32 ReleaseDelaySeconds = 0.0f;
-}
-
-mixin FMars_Validation Validate(const FMars_Occupancy_Spec& Self)
-{
-    if (Self.RequiredCount < 1)
-    { return FMars_Validation(f"RequiredCount [{Self.RequiredCount}] must be at least 1: an occupancy needing nobody is always active"); }
-
-    if (Self.ReleaseDelaySeconds < 0.0f)
-    { return FMars_Validation(f"ReleaseDelaySeconds [{Self.ReleaseDelaySeconds}] must not be negative"); }
-
-    return FMars_Validation();
-}
-
 // The entities an occupancy works through, built by its owner before Add.
 struct FMars_Occupancy_Parts
 {
@@ -55,10 +34,30 @@ struct FMars_Occupancy_Parts
     }
 }
 
-mixin FMars_Validation Validate(const FMars_Occupancy_Parts& Self)
+// Spawn params of the placeable plate and volume scripts: per-instance values live in saved maps.
+struct FMars_Occupancy_Spec
 {
-    if (ck::Is_NOT_Valid(Self.Trigger))
-    { return FMars_Validation("Trigger must be set: an occupancy without one never counts anybody"); }
+    UPROPERTY()
+    int32 RequiredCount = 1;
+
+    // 0 releases as soon as the count drops below RequiredCount.
+    UPROPERTY()
+    float32 ReleaseDelaySeconds = 0.0f;
+
+    // Construction input, never saved: the spawn params and maps do not carry it.
+    FMars_Occupancy_Parts Parts;
+}
+
+mixin FMars_Validation Validate(const FMars_Occupancy_Spec& Self)
+{
+    if (Self.RequiredCount < 1)
+    { return FMars_Validation(f"RequiredCount [{Self.RequiredCount}] must be at least 1: an occupancy needing nobody is always active"); }
+
+    if (Self.ReleaseDelaySeconds < 0.0f || Math::IsFinite(Self.ReleaseDelaySeconds) == false)
+    { return FMars_Validation(f"ReleaseDelaySeconds [{Self.ReleaseDelaySeconds}] must be finite and not negative"); }
+
+    if (ck::Is_NOT_Valid(Self.Parts.Trigger))
+    { return FMars_Validation("Parts.Trigger must be set: an occupancy without one never counts anybody"); }
 
     return FMars_Validation();
 }

@@ -26,8 +26,7 @@ class UMars_Processor_Resting_HandleRequests : UCk_Processor_Script_Base_UE
         if (RetargetRequests.Num() == 0)
         { return; }
 
-        const auto Request = RetargetRequests.Last();
-        const auto Spec = FMars_Resting_Spec(Request.Targets, Request.GraceSeconds, Request.HopMinSeconds);
+        const auto Spec = RetargetRequests.Last().Spec;
         const auto Validation = Spec.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Resting] [{Self.ToString()}] rejected the retarget: {Validation.Get_Error()}"))
         { return; }

@@ -1,11 +1,12 @@
 namespace utils_hazard
 {
-    // Composes the hazard on InHandle around InTrigger, which links back to its hazards (trigger signals carry only the
-    // trigger). An invalid trigger, or a push relative to InHandle's transform when InHandle has none, ensures and returns
-    // an invalid handle with nothing composed.
-    FCk_Handle_Hazard Add(FCk_Handle& InHandle, FMars_Hazard_Spec InSpec, FCk_Handle_Trigger InTrigger)
+    // Composes the hazard on InHandle around Spec.Trigger, which links back to its hazards (trigger signals carry only the
+    // trigger). A spec that fails Validate(), or a push relative to InHandle's transform when InHandle has none, ensures and
+    // returns an invalid handle with nothing composed.
+    FCk_Handle_Hazard Add(FCk_Handle& InHandle, FMars_Hazard_Spec InSpec)
     {
-        if (ck::EnsureIfNot(ck::IsValid(InTrigger), f"[Hazard] [{InHandle.ToString()}] needs a valid trigger; it would never hit"))
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[Hazard] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Hazard(); }
 
         const auto PushesRelative = InSpec.PushIsRelative && InSpec.PushImpulse.IsNearlyZero() == false;
@@ -18,7 +19,7 @@ namespace utils_hazard
 
         auto State = FMars_Fragment_Hazard();
         State.Arming = InSpec.StartArmed ? EMars_Hazard_Arming::Armed : EMars_Hazard_Arming::Disarmed;
-        State.Trigger = InTrigger;
+        State.Trigger = InSpec.Trigger;
 
         InHandle.Add_Fragment(FMars_Feature_Hazard());
         InHandle.Add_Fragment(Params);
@@ -26,7 +27,7 @@ namespace utils_hazard
         InHandle.Add_Fragment(FMars_Tag_Hazard_NeedsSetup());
         auto Hazard = InHandle.As_Hazard();
 
-        auto Trigger = InTrigger;
+        auto Trigger = InSpec.Trigger;
         Trigger.AddOrGet_Fragment(FMars_Fragment_Hazard_TriggerLink).Hazards.Add(Hazard);
 
         return Hazard;

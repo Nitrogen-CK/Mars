@@ -14,13 +14,6 @@ struct FMars_Feature_Trap {}
 // Spec
 //--------------------------------------------------------------------------------------------------------------------------
 
-// How an optional MechanismSink on the same entity gates the trap's motion.
-enum EMars_PoweredBehavior
-{
-    RunWhilePowered,
-    SuppressWhilePowered
-}
-
 // What the trap does as its cycle enters Phase; an unset field leaves that part alone.
 struct FMars_Trap_PhaseAction
 {
@@ -34,6 +27,26 @@ struct FMars_Trap_PhaseAction
     TOptional<bool> HazardArmed;
 }
 
+// The parts a trap's phases drive, built by its owner before Add. The trap finds itself from the hazard's OnHit, so the
+// hazard lives on the trap's entity.
+struct FMars_Trap_Parts
+{
+    UPROPERTY()
+    FCk_Handle_Hazard Hazard;
+
+    // Invalid when the trap moves no part.
+    UPROPERTY()
+    FCk_Handle_Mover Mover;
+
+    FMars_Trap_Parts() {}
+
+    FMars_Trap_Parts(FCk_Handle_Hazard InHazard, FCk_Handle_Mover InMover = FCk_Handle_Mover())
+    {
+        Hazard = InHazard;
+        Mover = InMover;
+    }
+}
+
 // Spawn params of the placeable trap scripts: per-instance values live in saved maps.
 struct FMars_Trap_Spec
 {
@@ -45,14 +58,21 @@ struct FMars_Trap_Spec
 
     UPROPERTY()
     EMars_PoweredBehavior Powered = EMars_PoweredBehavior::SuppressWhilePowered;
+
+    // Construction input, never saved: the spawn params and maps do not carry it.
+    FMars_Trap_Parts Parts;
 }
 
-// The cycle's own rules, and every action names one of its phases (an action on a missing phase would never run).
+// The cycle's own rules, every action names one of its phases (an action on a missing phase would never run), a hazard,
+// and a mover when an action moves a part.
 mixin FMars_Validation Validate(const FMars_Trap_Spec& Self)
 {
     const auto CycleValidation = Self.Cycle.Validate();
     if (CycleValidation.IsValid() == false)
     { return CycleValidation; }
+
+    if (ck::Is_NOT_Valid(Self.Parts.Hazard))
+    { return FMars_Validation("Parts.Hazard must be set: a trap without one never hits"); }
 
     for (int32 Index = 0; Index < Self.Actions.Num(); ++Index)
     {
@@ -67,6 +87,9 @@ mixin FMars_Validation Validate(const FMars_Trap_Spec& Self)
 
         if (IsCyclePhase == false)
         { return FMars_Validation(f"Trap action [{Index}] names phase [{Action.Phase.ToString()}], which the cycle does not have"); }
+
+        if (Action.MoverAtEnd.IsSet() && ck::Is_NOT_Valid(Self.Parts.Mover))
+        { return FMars_Validation(f"Trap action [{Index}] moves a part but Parts.Mover is not set"); }
     }
 
     return FMars_Validation();

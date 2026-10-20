@@ -21,18 +21,18 @@ class UMars_Sandbox_PulledLever_EntityScript : UMars_Lever_EntityScript
 
 class UMars_Sandbox_LeverA_EntityScript : UMars_Sandbox_PulledLever_EntityScript
 {
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.A");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_A;
 }
 
 class UMars_Sandbox_LeverB_EntityScript : UMars_Sandbox_PulledLever_EntityScript
 {
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.B");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_B;
 }
 
 class UMars_Sandbox_SwitchC_EntityScript : UMars_Switch_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.C");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_C;
 
     // Not a default: the spawn-params generator emits a non-default struct default as a positional constructor
     // call, which script structs do not have.
@@ -47,21 +47,21 @@ class UMars_Sandbox_SwitchC_EntityScript : UMars_Switch_EntityScript
 class UMars_Sandbox_GateA_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.A"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_A);
     default Sink.Rule = EMars_MechanismSink_Rule::AllChannels;
 }
 
 class UMars_Sandbox_GateB_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.B"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_B);
     default Sink.Rule = EMars_MechanismSink_Rule::AllSources;
 }
 
 class UMars_Sandbox_GateC_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.C"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_C);
     default Sink.Rule = EMars_MechanismSink_Rule::AllChannels;
 }
 
@@ -72,7 +72,7 @@ class UMars_Sandbox_GateC_EntityScript : UMars_Gate_EntityScript
 class UMars_Sandbox_PlateF_EntityScript : UMars_PressurePlate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.F");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_F;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -88,7 +88,7 @@ class UMars_Sandbox_PlateF_EntityScript : UMars_PressurePlate_EntityScript
 class UMars_Sandbox_BackpackPlateF_EntityScript : UMars_PressurePlate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.F");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_F;
     default DecalTexture = assets::Backpack_T();
 
     UFUNCTION(BlueprintOverride)
@@ -105,20 +105,20 @@ class UMars_Sandbox_BackpackPlateF_EntityScript : UMars_PressurePlate_EntityScri
 class UMars_Sandbox_GateF_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.F"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_F);
 }
 
 class UMars_Sandbox_SealG_EntityScript : UMars_Seal_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.G");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_G;
     default GlyphColor = FLinearColor(0.1f, 0.35f, 1.0f, 1.0f);
 }
 
 class UMars_Sandbox_SealH_EntityScript : UMars_Seal_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.H");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_H;
     default GlyphColor = FLinearColor(1.0f, 0.45f, 0.05f, 1.0f);
 }
 
@@ -126,22 +126,22 @@ class UMars_Sandbox_SealH_EntityScript : UMars_Seal_EntityScript
 class UMars_Sandbox_SequenceI_EntityScript : UMars_SequenceNode_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sequence.Steps.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.H"));
-    default Sequence.Steps.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.G"));
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.I");
+    default Sequence.Steps.Add(GameplayTags::Mechanism_Channel_H);
+    default Sequence.Steps.Add(GameplayTags::Mechanism_Channel_G);
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_I;
 }
 
 class UMars_Sandbox_GateI_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.I"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_I);
     default Sink.Latch = true;
 }
 
 class UMars_Sandbox_WheelJ_EntityScript : UMars_HandWheel_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.J");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_J;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -157,19 +157,19 @@ class UMars_Sandbox_WheelJ_EntityScript : UMars_HandWheel_EntityScript
 class UMars_Sandbox_VentJ_EntityScript : UMars_Vent_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.J"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_J);
     default Trap.Powered = EMars_PoweredBehavior::SuppressWhilePowered;
 }
 
 class UMars_Sandbox_LeverK_EntityScript : UMars_Sandbox_PulledLever_EntityScript
 {
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.K");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_K;
 }
 
 class UMars_Sandbox_SpikesK_EntityScript : UMars_SpikeTrap_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.K"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_K);
     default Trap.Powered = EMars_PoweredBehavior::SuppressWhilePowered;
 }
 
@@ -191,14 +191,14 @@ class UMars_Sandbox_Pendulum_EntityScript : UMars_Pendulum_EntityScript
 class UMars_Sandbox_ChainL_EntityScript : UMars_PullChain_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.L");
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_L;
 }
 
 class UMars_Sandbox_LampsL_EntityScript : UMars_LampBank_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.L"));
-    default Source.OutputChannel = GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.M");
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_L);
+    default Source.OutputChannel = GameplayTags::Mechanism_Channel_M;
 
     UFUNCTION(BlueprintOverride)
     ECk_EntityScript_ConstructionFlow DoConstruct(FCk_Handle& InHandle)
@@ -212,5 +212,5 @@ class UMars_Sandbox_LampsL_EntityScript : UMars_LampBank_EntityScript
 class UMars_Sandbox_GateM_EntityScript : UMars_Gate_EntityScript
 {
     default _ShowInPlaceActors = false;
-    default Sink.InputChannels.Add(GameplayTags::ResolveGameplayTag(n"Mechanism.Channel.M"));
+    default Sink.InputChannels.Add(GameplayTags::Mechanism_Channel_M);
 }

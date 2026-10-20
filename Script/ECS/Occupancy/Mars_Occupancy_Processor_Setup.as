@@ -36,14 +36,15 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
         Recount(Occupancy);
 
         if (ck::IsValid(Source))
-        { Source.Request_SetOutput(Make_SetOutput(Occupancy.Get_IsActive())); }
+        { Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Get_SourceOutput(Occupancy.Get_Activation()))); }
 
         Occupancy.Request_TryRemove(FMars_Tag_Occupancy_NeedsSetup);
     }
 
-    private FMars_Request_MechanismSource_SetOutput Make_SetOutput(bool InActive) const
+    // The source asserts while the occupancy is active.
+    private EMars_MechanismSource_Output Get_SourceOutput(EMars_Occupancy_Activation InActivation) const
     {
-        return FMars_Request_MechanismSource_SetOutput(InActive ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted);
+        return InActivation == EMars_Occupancy_Activation::Active ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
     }
 
     UFUNCTION()
@@ -62,7 +63,7 @@ class UMars_Processor_Occupancy_Setup : UCk_Processor_Script_Base_UE
     private void OnOccupancyActiveChanged(FCk_Handle_Occupancy InOccupancy, EMars_Occupancy_Activation InActivation)
     {
         auto Source = InOccupancy.As_MechanismSource();
-        Source.Request_SetOutput(Make_SetOutput(InActivation == EMars_Occupancy_Activation::Active));
+        Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Get_SourceOutput(InActivation)));
     }
 
     UFUNCTION()

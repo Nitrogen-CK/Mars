@@ -47,7 +47,7 @@ mixin bool Get_IsCharged(const FCk_Handle_Countdown& Self)
 
 mixin bool Get_IsHeld(const FCk_Handle_Countdown& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_Countdown).IsHeld;
+    return Self.Get_Fragment(FMars_Fragment_Countdown).Hold == EMars_Countdown_Hold::Held;
 }
 
 mixin bool Get_HoldWhilePowered(const FCk_Handle_Countdown& Self)

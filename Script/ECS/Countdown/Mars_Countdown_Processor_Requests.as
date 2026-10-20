@@ -19,9 +19,9 @@ class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
         const auto HasCharge = InRequests.ChargeRequests.Num() > 0;
         const auto HasSetHeld = InRequests.SetHeldRequests.Num() > 0;
 
-        auto Held = InState.IsHeld;
+        auto Hold = InState.Hold;
         if (HasSetHeld)
-        { Held = InRequests.SetHeldRequests.Last().Held; }
+        { Hold = InRequests.SetHeldRequests.Last().Hold; }
 
         // InRequests is invalid past this line; removing before broadcasting lets re-entrant requests survive.
         Self.Request_TryRemove(FMars_Fragment_Countdown_Requests);
@@ -30,7 +30,8 @@ class UMars_Processor_Countdown_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto Previous = InState.Remaining;
-        InState.IsHeld = Held;
+        InState.Hold = Hold;
+        const auto Held = Hold == EMars_Countdown_Hold::Held;
 
         if (Held || HasCharge)
         {
