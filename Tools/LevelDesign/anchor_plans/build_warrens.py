@@ -1,4 +1,4 @@
-"""Warrens greybox, built from data/warrens.json (authored by design_warrens_v5.py).
+"""Warrens greybox, built from data/warrens.json (authored by design_warrens_v6.py, which layers the r02 expansion on v5).
 
     python Tools/LevelDesign/anchor_plans/build_warrens.py      -> manifest(): plain Python, writes the manifest, prints a summary
     (Unreal Python, on the open /Game/Mars/Maps/Warrens_Mars_MAP)
@@ -52,8 +52,9 @@ MATERIALS = {  # box kind -> material; one HISM actor per kind
     'root': PROTO + 'Item_Mars_MI',
     'candle': PROTO + 'Interactable_Mars_MI',  # the brightest instance stands in for emissive tallow
     'inlay': PROTO + 'Item_Mars_MI',  # a floor groove drawn as a thin collision-free strip
+    'pier': PROTO + 'Wall_Mars_MI',  # the service spiral's central pier
 }
-MESHES = {'root': CYLINDER, 'candle': CYLINDER}
+MESHES = {'root': CYLINDER, 'candle': CYLINDER, 'pier': CYLINDER}
 COLLISION = {'water': 'NoCollision', 'inlay': 'NoCollision'}
 STRICT_TAGS = True  # False: an unregistered gameplay tag is logged and left unset instead of stopping apply() (an editor booted before the ini edit)
 CELL = 0.5
@@ -77,6 +78,22 @@ LIGHT_KINDS = {  # intensity, radius m, colour
     'dim': (700, 6.5, (1.0, 0.62, 0.32, 1.0)),
     'cold': (1600, 16.0, (0.55, 0.7, 1.0, 1.0)),
     'shaft': (5200, 20.0, (0.7, 0.85, 1.0, 1.0)),
+    'task': (500, 4.5, (1.0, 0.7, 0.45, 1.0)),  # a small warm work light (the kitchen crank, the Grotto crown)
+    'sky': (2400, 18.0, (0.62, 0.72, 0.8, 1.0)),  # cold light down a roof break
+}
+# The ambient floor: the post-process ambient cubemap's intensity and tint (the renderer is SSGI, not Lumen, so it reaches
+# every enclosed room unoccluded). Calibrated in game, not in editor scene captures (which render far darker): 0.12 is pitch
+# black, 0.5 leaves only wall silhouettes, 1.0 shows a whole room, 2.0 needs no lantern at all; the maintainer found 0.6
+# and 0.4 still too bright in play (in-game sweep: Saved/AnchorPlans/lighting-r1/ingame_sweep.png, 2026-10-20).
+AMBIENT_FILL = (0.2, (0.35, 0.45, 0.85))
+# District fills: one unshadowed, room-sized point light per room the data's `fills` names, tinted from the concept board.
+# FILL_SCALE multiplies every fill (the calibration knob); kind -> (intensity, colour).
+FILL_SCALE = 1.0
+FILL_KINDS = {
+    'amber': (150, (1.0, 0.62, 0.32)), 'funeral': (150, (0.5, 0.6, 0.95)), 'indigo': (150, (0.45, 0.45, 0.95)),
+    'ivory': (150, (1.0, 0.9, 0.75)), 'candle': (110, (1.0, 0.7, 0.45)), 'teal': (150, (0.4, 0.85, 0.8)),
+    'copper': (150, (1.0, 0.55, 0.3)), 'navy': (150, (0.35, 0.45, 0.9)), 'limestone': (150, (0.6, 0.8, 0.75)),
+    'chalk': (130, (0.9, 0.88, 0.8)),
 }
 WALKABLE = ('floor', 'low', 'crawl', 'grate', 'tread')
 BLOCKING = ('solid', 'crack', 'outside')
@@ -88,6 +105,11 @@ DEVIATIONS = [
     'the lair runs on under the well rim (no shaft walls below the rim; the viewer draws them)',
     'water is a sunk floor under a collision-free sheet; nothing slows or drains',
     'the glyph clue is a plain box; the seal order lives only in the sequence node',
+]
+V6_DEVIATIONS = [  # the explicit 3D layer (data with structures)
+    'terrain patches are stepped at 0.1 m per 0.5 m cell, not sloped triangles',
+    'a spiral tread is three radial band boxes on its outer chord (they overlap inward), not an annular sector',
+    'a kitchen wall blocks the leak search on grid cell edges; its exact 0.25 m box is collision only',
 ]
 
 
@@ -123,6 +145,18 @@ def seg_dist(p, a, b):
 def polyline(d, link):
     n = d['nodes']
     return [tuple(n[link['a']][:2])] + [tuple(p) for p in link['via']] + [tuple(n[link['b']][:2])]
+
+
+def triangle_height(p, a, b, c):
+    """The height at p of triangle abc (each (x, y, z)), or None when p is outside it."""
+    den = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1])
+    if abs(den) < 1e-9:
+        return None
+    u = ((b[1] - c[1]) * (p[0] - c[0]) + (c[0] - b[0]) * (p[1] - c[1])) / den
+    v = ((c[1] - a[1]) * (p[0] - c[0]) + (a[0] - c[0]) * (p[1] - c[1])) / den
+    if u < -1e-6 or v < -1e-6 or u + v > 1 + 1e-6:
+        return None
+    return u * a[2] + v * b[2] + (1 - u - v) * c[2]
 
 
 def point_in_poly(p, poly):
@@ -169,6 +203,7 @@ class Grid:
         self.c = [[fill] * self.nx for _ in range(self.ny)]
         self.zf = [[float(z)] * self.nx for _ in range(self.ny)]
         self.top = [[0.0] * self.nx for _ in range(self.ny)]
+        self.caps = {}  # (i, j) -> (deck top, air top): an over-crossing above this cell (stamp_over)
 
     def centre(self, i, j):
         return (self.x0 + (i + 0.5) * CELL, self.y0 + (j + 0.5) * CELL)
@@ -395,6 +430,113 @@ def gated_mouths(d):
     return out
 
 
+def crawl_pts(c):
+    """A crawl's centreline: a, its optional bends, b."""
+    return [tuple(c['a'])] + [tuple(p) for p in c.get('via', [])] + [tuple(c['b'])]
+
+
+# --- The explicit 3D layer (v6): structures, their opening cuts, the spiral's treads ------------------------------------
+# Structures use the proposal's convention: at is the box's bottom centre, size is full XYZ, yaw in degrees.
+
+def in_box2d(p, s, pad=0.0):
+    """p (x, y) inside structure s's footprint, grown by pad."""
+    a = -math.radians(s.get('yaw', 0.0))
+    dx, dy = p[0] - s['at'][0], p[1] - s['at'][1]
+    x, y = dx * math.cos(a) - dy * math.sin(a), dx * math.sin(a) + dy * math.cos(a)
+    return abs(x) <= s['size'][0] / 2 + pad and abs(y) <= s['size'][1] / 2 + pad
+
+
+def structure_pieces(s, openings):
+    """s minus the openings that name it (axis-aligned subtraction, as the review's geometry.js does): a list of
+    (lo, hi) corner pairs. A rotated structure may not be cut."""
+    lo = [s['at'][0] - s['size'][0] / 2, s['at'][1] - s['size'][1] / 2, s['at'][2]]
+    hi = [lo[0] + s['size'][0], lo[1] + s['size'][1], lo[2] + s['size'][2]]
+    boxes = [(lo, hi)]
+    for o in openings:
+        if s['id'] not in o.get('sourceIds', []):
+            continue
+        assert not s.get('yaw'), 'a rotated structure cannot take an opening cut: ' + s['id']
+        if o['kind'] == 'wall':
+            a, w, t = o['at'], o['width'] / 2, o.get('throughDepth', 0.5) / 2
+            cut = ([a[0] - t, a[1] - w, a[2], a[0] + t, a[1] + w, a[2] + o['height']] if o['axis'] == 'x'
+                   else [a[0] - w, a[1] - t, a[2], a[0] + w, a[1] + t, a[2] + o['height']])
+        else:
+            r, z, t = o['rect'], o.get('z', 0.0), o.get('throughDepth', 0.5)
+            cut = [r[0], r[1], z - t, r[2], r[3], z + t]
+        out = []
+        for b0, b1 in boxes:
+            c0 = [max(b0[k], cut[k]) for k in range(3)]
+            c1 = [min(b1[k], cut[k + 3]) for k in range(3)]
+            if any(c0[k] >= c1[k] for k in range(3)):
+                out.append((b0, b1))
+                continue
+            for p0, p1 in (((b0[0], b0[1], b0[2]), (c0[0], b1[1], b1[2])), ((c1[0], b0[1], b0[2]), (b1[0], b1[1], b1[2])),
+                           ((c0[0], b0[1], b0[2]), (c1[0], c0[1], b1[2])), ((c0[0], c1[1], b0[2]), (c1[0], b1[1], b1[2])),
+                           ((c0[0], c0[1], b0[2]), (c1[0], c1[1], c0[2])), ((c0[0], c0[1], c1[2]), (c1[0], c1[1], b1[2]))):
+                if all(p1[k] - p0[k] > 1e-6 for k in range(3)):
+                    out.append((list(p0), list(p1)))
+        boxes = out
+    return boxes
+
+
+def tread_span(c, tread):
+    """(inner radius, outer radius, start angle, end angle) of an annular tread polygon [inner0, outer0, outer1, inner1]."""
+    cx, cy = c['core']['at'][:2]
+    p0, p1, p3 = tread['poly'][0], tread['poly'][1], tread['poly'][3]
+    a0 = math.atan2(p0[1] - cy, p0[0] - cx)
+    a1 = math.atan2(p3[1] - cy, p3[0] - cx)
+    while a1 < a0:
+        a1 += 2 * math.pi
+    return math.dist(p0, (cx, cy)), math.dist(p1, (cx, cy)), a0, a1
+
+
+def tread_top_at(d, p):
+    """The top of the connector tread over p, or None."""
+    for c in d.get('connectors', []):
+        cx, cy = c['core']['at'][:2]
+        r = math.dist(p, (cx, cy))
+        ang = math.atan2(p[1] - cy, p[0] - cx)
+        for t in c['treads']:
+            r0, r1, a0, a1 = tread_span(c, t)
+            rel = (ang - a0) % (2 * math.pi)
+            if r0 - 1e-6 <= r <= r1 + 1e-6 and rel <= a1 - a0 + 1e-6:
+                return t['top']
+    return None
+
+
+def deck_over(d, p, z):
+    """An authored platform or a connector tread with its top within 0.3 m of z over p."""
+    for s in d.get('structures', []):
+        if s['kind'] == 'platform' and in_box2d(p, s) and abs(s['at'][2] + s['size'][2] - z) <= 0.3:
+            return True
+    top = tread_top_at(d, p)
+    return top is not None and abs(top - z) <= 0.3
+
+
+def stamp_over(grid, pts, half, z, value, cap, deck_fn):
+    """An over-crossing: square-ended segments plus a disc at each bend. Rock becomes floor at z; a cell already walkable
+    well below z keeps its class and height and gets a cap (deck top z, clear air above), so a corridor can pass over a
+    tunnel or a room without overwriting it. A tunnel ('low') is capped by the rock between; an open room only where an
+    authored deck or tread carries the walk (deck_fn(p, z)), the rest of the room stays open air beside a railed deck.
+    Returns the capped cells."""
+    capped = set()
+    bends = pts[1:-1]
+    for j in range(grid.ny):
+        for i in range(grid.nx):
+            p = grid.centre(i, j)
+            near = any(seg_dist(p, a, b) <= half and 0.0 <= seg_param(p, a, b) <= 1.0 for a, b in zip(pts, pts[1:])) \
+                or any(math.dist(p, v) <= half for v in bends)
+            if not near:
+                continue
+            c = grid.c[j][i]
+            if c == 'solid':
+                grid.set(i, j, value, z)
+            elif c in WALKABLE and grid.zf[j][i] < z - 1.0 and (c == 'low' or deck_fn(p, z)):
+                grid.caps[(i, j)] = (z, z + cap)
+                capped.add((i, j))
+    return capped
+
+
 def rasterize(d):
     """Every level as a Grid with per-cell floor heights and ceilings, plus the dive ramps and the in-level treads."""
     U = d.get('upper')
@@ -415,7 +557,7 @@ def rasterize(d):
     # 1. plan walk links
     for link in d['links']:
         za, zb = nodes[link['a']][2], nodes[link['b']][2]
-        if link['kind'] != 'walk' or abs(za - zb) > 0.01:
+        if link['kind'] != 'walk' or abs(za - zb) > 0.01 or link.get('over'):
             continue
         g = G(za)
         pts = polyline(d, link)
@@ -449,11 +591,13 @@ def rasterize(d):
         gl.stamp_segment(r['upper'], r['end'], r['width'] / 2, 'floor', zfn=lambda t, z=r['bottom']: z)
     # 5. crawls at their height, only through rock
     for c in d['crawls']:
-        G(c.get('z', 0)).stamp_segment(tuple(c['a']), tuple(c['b']), CRAWL_WIDTH / 2, 'crawl', only=('solid',), zfn=lambda t, z=c.get('z', 0): z)
+        pts = crawl_pts(c)
+        for a, b in zip(pts, pts[1:]):
+            G(c.get('z', 0)).stamp_segment(a, b, CRAWL_WIDTH / 2, 'crawl', only=('solid',), zfn=lambda t, z=c.get('z', 0): z)
     # 6. extra walks at their grid's base height
     for w in d.get('extraWalks', []):
         g = grids.get(w.get('level', 'main'))
-        if not g:
+        if not g or w.get('over'):
             continue
         if 'rect' in w:
             g.stamp_rect(w['rect'], 'floor', g.z)
@@ -500,6 +644,69 @@ def rasterize(d):
                 along = px - cx if m['axis'] == 'x' else py - cy
                 if abs(along) > GATE_OPENING / 2:
                     g.set(i, j, 'solid')
+    # 10. over-crossings: a link or extra walk flagged over is stamped last, capping the lower floor it passes above
+    for link in d['links']:
+        if link.get('over'):
+            za = nodes[link['a']][2]
+            is_low = tuple(sorted((link['a'], link['b']))) in low
+            stamp_over(G(za), polyline(d, link), link['width'] / 2, za, 'low' if is_low else 'floor',
+                       d.get('lowRoof', 2.2) if is_low else link.get('clearHeight', main_top), lambda p, z: deck_over(d, p, z))
+    for w in d.get('extraWalks', []):
+        if w.get('over'):
+            g = grids[w.get('level', 'main')]
+            stamp_over(g, [tuple(p) for p in w['pts']], w['width'] / 2, g.z, 'low' if w.get('low') else 'floor',
+                       d.get('lowRoof', 2.2) if w.get('low') else w.get('clearHeight', main_top), lambda p, z: deck_over(d, p, z))
+    # 11. terrain patches replace their cells' floor heights with the triangle mesh, quantised to 0.1 m (stepped)
+    for patch in d.get('terrain', []):
+        vs = patch['vertices']
+        g = G(vs[0][2])
+        for j in range(g.ny):
+            for i in range(g.nx):
+                p = g.centre(i, j)
+                if g.c[j][i] not in WALKABLE or not point_in_poly(p, patch['poly']):
+                    continue
+                for tri in patch['triangles']:
+                    h = triangle_height(p, *[vs[k] for k in tri])
+                    if h is not None:
+                        g.zf[j][i] = round(h, 1)
+                        break
+    # 12. structure walls block the cell edges they cross (minus their traversable openings): the leak search's walls.
+    # The grid keeps its floor under them; the walls themselves are boxes (manifest).
+    struct_blocked = {'main': set(), 'deep': set(), 'upper': set()}
+    for s in d.get('structures', []):
+        if s['kind'] != 'wall':
+            continue
+        assert not s.get('yaw'), 'a rotated wall cannot block grid edges: ' + s['id']
+        level = level_of_z(s['at'][2], U)
+        g = grids[level]
+        x0, y0 = s['at'][0] - s['size'][0] / 2, s['at'][1] - s['size'][1] / 2
+        x1, y1 = x0 + s['size'][0], y0 + s['size'][1]
+        along_y = s['size'][1] > s['size'][0]
+        spans = []
+        for o in d.get('openings', []):
+            if s['id'] in o.get('sourceIds', []) and o['kind'] == 'wall' and o.get('traversable'):
+                c = o['at'][1] if along_y else o['at'][0]
+                spans.append((c - o['width'] / 2, c + o['width'] / 2))
+        for j in range(g.ny):
+            for i in range(g.nx):
+                a = g.centre(i, j)
+                n = (i + 1, j) if along_y else (i, j + 1)
+                b = g.centre(*n)
+                crosses = (a[0] <= x1 and b[0] >= x0) if along_y else (a[1] <= y1 and b[1] >= y0)  # the centre-to-centre step meets the wall
+                if not crosses:
+                    continue
+                run, lo, hi = (a[1], y0, y1) if along_y else (a[0], x0, x1)  # where along the wall the step crosses
+                if not lo <= run <= hi or any(s0 <= run <= s1 for s0, s1 in spans):
+                    continue
+                struct_blocked[level].add(frozenset(((i, j), n)))
+    # 13. sky: main cells under an upper-level open hole (a roof break) carry no lintel, so the break reaches the roof
+    sky = set()
+    for h in d.get('holes', []):
+        if h['level'] == 'upper' and h['kind'] != 'grate':
+            for j in range(main.ny):
+                for i in range(main.nx):
+                    if shape_contains(h, main.centre(i, j)):
+                        sky.add((i, j))
 
     # Ceilings. Main: the cell's height plus mainTop, a room's own top, the upper roof over a tall room, the low/crawl lintels.
     tall = [r for r in d['rooms'] if U and r['id'] in U['tallRooms']]
@@ -518,6 +725,8 @@ def rasterize(d):
                 t = main.zf[j][i] + d.get('lowRoof', 2.2)
             elif c == 'crawl':
                 t = main.zf[j][i] + CRAWL_HEIGHT
+            if (i, j) in main.caps:  # an over-crossing above: the ceiling is its clear air
+                t = max(t, main.caps[(i, j)][1])
             main.top[j][i] = t
     if upper:
         for j in range(upper.ny):
@@ -539,7 +748,7 @@ def rasterize(d):
             else:
                 t = -SLAB
             deep.top[j][i] = t
-    return dict(main=main, deep=deep, upper=upper, ramps=ramps, treads=treads, U=U, main_top=main_top)
+    return dict(main=main, deep=deep, upper=upper, ramps=ramps, treads=treads, U=U, main_top=main_top, struct_blocked=struct_blocked, sky=sky)
 
 
 def cell_at(grid, pt):
@@ -755,7 +964,7 @@ def prop_boxes(boxes, p):
 def is_puzzle_standin(p):
     """A prop the viewer draws for a mechanism the builder places as an entity (the wheel, the grate, the plate, the seals)."""
     note = p.get('note', '')
-    return any(key in note for key in ('hand-wheel', 'sluice grate', 'pack plate', 'seal pair'))
+    return any(key in note for key in ('hand-wheel', 'sluice grate', 'pack plate', 'seal pair')) or p['kind'] == 'kitchen-drive'
 
 
 def manifest(write=True):
@@ -787,9 +996,19 @@ def manifest(write=True):
 
     def lintel(cls, height):
         def f(i, j):
-            if main.c[j][i] != cls:
+            if main.c[j][i] != cls or (i, j) in R['sky']:
+                return None
+            if (i, j) in main.caps:  # capped_lintel() builds it
                 return None
             return (main.zf[j][i] + height, main.zf[j][i] + main_top)
+        return f
+
+    def capped_lintel(height):
+        def f(i, j):  # a tunnel under an over-crossing: rock from its roof up to the crossing's floor, nothing above
+            cap = main.caps.get((i, j))
+            if main.c[j][i] != 'low' or cap is None or cap[0] <= main.zf[j][i] + height + 0.001:
+                return None
+            return (main.zf[j][i] + height, cap[0])
         return f
 
     for (b, t), rects in key_rects(main, main_floor).items():
@@ -800,6 +1019,8 @@ def manifest(write=True):
         slabs(boxes, 'wall', rects, b, t)
     for (b, t), rects in key_rects(main, lintel('low', d.get('lowRoof', main_top))).items():
         slabs(boxes, 'wall', rects, b, t)
+    for (b, t), rects in key_rects(main, capped_lintel(d.get('lowRoof', main_top))).items():
+        slabs(boxes, 'floor', rects, b, t)  # the rock over a capped tunnel is the over-crossing's floor
     for (b, t), rects in key_rects(main, lintel('crawl', CRAWL_HEIGHT)).items():
         slabs(boxes, 'wall', rects, b, t)
     for c in d.get('cracks', [])[:1]:  # all cracks share one sill and head
@@ -915,6 +1136,73 @@ def manifest(write=True):
     for p in d.get('props', []):
         if not is_puzzle_standin(p):
             prop_boxes(boxes, p)
+    # The explicit 3D layer: structures minus their opening cuts (a shutter is a Gate entity, not a box), rails on deck
+    # edges that drop to open air, the spiral's treads, rails and pier.
+    struct_kind = {'wall': 'wall', 'roof': 'wall', 'platform': 'gallery', 'beam': 'prop'}
+    openings = d.get('openings', [])
+    for s in d.get('structures', []):
+        if s['kind'] == 'door':
+            continue
+        if s.get('yaw'):
+            assert not any(s['id'] in o.get('sourceIds', []) for o in openings), 'a rotated structure cannot take an opening cut: ' + s['id']
+            boxes.append(box(struct_kind[s['kind']], (s['at'][0], s['at'][1], s['at'][2] + s['size'][2] / 2), s['size'], s['yaw']))
+            continue
+        for lo, hi in structure_pieces(s, openings):
+            boxes.append(box(struct_kind[s['kind']], [(lo[k] + hi[k]) / 2 for k in range(3)], [hi[k] - lo[k] for k in range(3)]))
+
+    def open_air(p, top):
+        """Beside a deck edge: walkable floor at least 1 m down, with no deck, tread or over-crossing near the deck's height."""
+        if main.at(p) not in WALKABLE or main.z_of(p) > top - 1.0:
+            return False
+        mi, mj = main.cell_of(p)
+        if main.top[mj][mi] < top + 1.0:  # roofed below the deck (a tunnel's lintel): rock, not a drop
+            return False
+        cap = main.caps.get(main.cell_of(p))
+        return not (cap is not None and abs(cap[0] - top) <= 0.3) and not deck_over(d, p, top)
+
+    deck_rails = 0
+    for s in d.get('structures', []):
+        if s['kind'] != 'platform' or s.get('rails') is False:
+            continue
+        top = s['at'][2] + s['size'][2]
+        a = math.radians(s.get('yaw', 0.0))
+        u, v = (math.cos(a), math.sin(a)), (-math.sin(a), math.cos(a))
+        hx, hy = s['size'][0] / 2, s['size'][1] / 2
+        for n, t, h_n, h_t in ((u, v, hx, hy), ((-u[0], -u[1]), v, hx, hy), (v, u, hy, hx), ((-v[0], -v[1]), u, hy, hx)):
+            steps = max(1, int(round(2 * h_t / 0.25)))
+            flags = []
+            for k in range(steps):
+                along = -h_t + (k + 0.5) * 2 * h_t / steps
+                edge = (s['at'][0] + n[0] * h_n + t[0] * along, s['at'][1] + n[1] * h_n + t[1] * along)
+                flags.append((along, open_air((edge[0] + n[0] * 0.25, edge[1] + n[1] * 0.25), top)))
+            runs, start = [], None
+            for k, (along, air) in enumerate(flags + [(None, False)]):
+                if air and start is None:
+                    start = k
+                elif not air and start is not None:
+                    runs.append((flags[start][0] - h_t / steps, flags[k - 1][0] + h_t / steps))
+                    start = None
+            for r0, r1 in runs:
+                mid = (r0 + r1) / 2
+                c = (s['at'][0] + n[0] * h_n + t[0] * mid, s['at'][1] + n[1] * h_n + t[1] * mid)
+                boxes.append(box('gallery', (c[0], c[1], top + GALLERY_RAIL / 2), (r1 - r0, 0.1, GALLERY_RAIL), math.degrees(math.atan2(t[1], t[0]))))
+                deck_rails += 1
+    for c in d.get('connectors', []):
+        cx, cy, cz = c['core']['at']
+        r_core, h_core = c['core']['radius'], c['core']['height']
+        boxes.append(box('pier', (cx, cy, cz + h_core / 2), (2 * r_core, 2 * r_core, h_core)))
+        rails_spec = c['rails']
+        for t in c['treads']:  # three radial bands per annular tread; each band takes its outer chord, so bands overlap inward
+            r0, r1, a0, a1 = tread_span(c, t)
+            am, da = (a0 + a1) / 2, a1 - a0
+            for k in range(3):
+                ri, ro = r0 + (r1 - r0) * k / 3, r0 + (r1 - r0) * (k + 1) / 3
+                rc = (ri + ro) / 2
+                boxes.append(box('floor', (cx + rc * math.cos(am), cy + rc * math.sin(am), t['top'] - t['thickness'] / 2),
+                                 (ro - ri, 2 * ro * math.sin(da / 2), t['thickness']), math.degrees(am)))
+            for r in (rails_spec['innerRadius'], rails_spec['outerRadius']):
+                boxes.append(box('gallery', (cx + r * math.cos(am), cy + r * math.sin(am), t['top'] + rails_spec['height'] / 2),
+                                 (rails_spec['thickness'], 2 * r * math.sin(da / 2), rails_spec['height']), math.degrees(am)))
 
     # --- Entities -------------------------------------------------------------------------------------------------------
     def entity(cls, at, yaw, props, note, pitch=0.0, **extra):
@@ -1000,6 +1288,22 @@ def manifest(write=True):
             entity('Mars_SequenceNode_EntityScript', [(x0 + x1) / 2, (y0 + y1) / 2, sz], 0.0,
                    dict(Sequence=dict(fields=dict(Steps=dict(array=[puzzle_channel(pz['id'] + '.' + leaf) for leaf, _ in glyphs]))),
                         Source=dict(fields=dict(OutputChannel=puzzle_channel(pz['id'])))), pz['id'] + ' sequence')
+        elif kind.startswith('kitchen shutters'):  # PK: one crank (and an inside release) latches both kitchen shutters open
+            kc = d['kitchen']
+            leaves = {s['id']: s for s in d.get('structures', []) if s['kind'] == 'door'}
+            for port in kc['ports']:
+                leaf = leaves[port['leaf']]
+                at = list(leaf['at'])
+                if not port['pack']:  # the packless port is smaller than the Gate's opening: its leaf stands on the aisle face
+                    at[0] -= 0.2
+                entity('Mars_Gate_EntityScript', at, 0.0,
+                       dict(Leaf=dict(enum='EMars_Gate_Leaf', value='Solid'),
+                            Sink=dict(fields=dict(InputChannels=dict(array=[puzzle_channel(pz['id'])]), Latch=True))),
+                       pz['id'] + ' ' + port['id'] + ' shutter', spanCm=GATE_OPENING * 100.0)
+            for key in ('exteriorCrank', 'interiorRelease'):
+                w = kc[key]
+                entity('Mars_HandWheel_EntityScript', list(w['at']), w['yaw'],
+                       dict(Source=dict(fields=dict(OutputChannel=puzzle_channel(pz['id'])))), pz['id'] + ' ' + key)
 
     # The hearth.
     k = nodes[d['hearth']]
@@ -1043,8 +1347,23 @@ def manifest(write=True):
                 break
             s_along += 0.25
         mouths[e['anchorId']] = dict(at=centred, z=sz, yaw=yaw, width=span)
-    for light in d['lights']:
-        lights.append(dict(at=light['at'], kind=light['kind']))
+    for light in d['lights']:  # a light's optional scale (the data's per-lamp tuning) multiplies its kind's intensity
+        lights.append(dict(at=light['at'], kind=light['kind'], **({'scale': light['scale']} if 'scale' in light else {})))
+    rooms_by_id = {r['id']: r for r in d['rooms']}
+    for f in d.get('fills', []):  # at the room's centre, under its ceiling, reaching about its half-diagonal
+        r = rooms_by_id[f['room']]
+        cx, cy = shape_centre(r)
+        x0, y0, x1, y1 = shape_bounds(r)
+        if U and r['id'] in U['tallRooms']:
+            fz = r['z'] + 3.5
+        elif r.get('top') is not None:
+            fz = r['top'] - 0.6
+        else:
+            fz = r['z'] + 3.0
+        intensity, colour = FILL_KINDS[f['kind']]
+        lights.append(dict(at=[round(cx, 3), round(cy, 3), round(fz, 3)], kind='fill_' + f['kind'], fill=True,
+                           radius=round(min(14.0, max(5.0, math.hypot(x1 - x0, y1 - y0) / 2)), 2),
+                           intensity=intensity * FILL_SCALE, colour=list(colour) + [1.0], room=r['id']))
 
     # Anchors.
     closers = {l['closedBy']: l for l in links if l['closedBy']}
@@ -1124,7 +1443,7 @@ def manifest(write=True):
     leaks = []
     for level, grid in (('main', main), ('deep', deep), ('upper', upper)):
         if grid:
-            leaks += gate_leaks(grid, level, entities, blocked=rail_blocked[level])
+            leaks += gate_leaks(grid, level, entities, blocked=rail_blocked[level] | R['struct_blocked'][level])
     breaks = walk_breaks(d, R)
     ladder_errors = ladder_checks(d, R)
     for lk in d.get('locks', []):
@@ -1141,10 +1460,10 @@ def manifest(write=True):
             ladder_errors.append(e['note'] + ': not on a floor of its level')
     for c in d['crawls']:  # a crawl has crawl cells and opens onto walkable floor at both ends
         g = R[level_of_z(c.get('z', 0), U)]
-        ax, ay = c['a']
-        bx, by = c['b']
-        n = max(2, int(math.dist(c['a'], c['b']) / 0.25))
-        cells = [g.at((ax + (bx - ax) * k / n, ay + (by - ay) * k / n)) for k in range(n + 1)]
+        cells = []
+        for (ax, ay), (bx, by) in zip(crawl_pts(c), crawl_pts(c)[1:]):
+            n = max(2, int(math.dist((ax, ay), (bx, by)) / 0.25))
+            cells += [g.at((ax + (bx - ax) * k / n, ay + (by - ay) * k / n)) for k in range(n + 1)]
         if 'crawl' not in cells:
             ladder_errors.append(c['id'] + ': no crawl cell (the line lies inside other floor)')
         elif cells.count('crawl') < 4:
@@ -1164,12 +1483,36 @@ def manifest(write=True):
     bypasses = []  # a gate passed within the crawl budget only when crawl cells may be used: the crawl is the bypass, not a room loop
     for level, grid in (('main', main), ('deep', deep), ('upper', upper)):
         if grid:
-            loops = gate_leaks(grid, level, entities, crawl_ok=False, budget=6 * SEAL_WALK, blocked=rail_blocked[level])
-            bypasses += [a for a in gate_leaks(grid, level, entities, crawl_ok=True, budget=6 * SEAL_WALK, blocked=rail_blocked[level]) if a not in loops]
+            walls = rail_blocked[level] | R['struct_blocked'][level]
+            loops = gate_leaks(grid, level, entities, crawl_ok=False, budget=6 * SEAL_WALK, blocked=walls)
+            bypasses += [a for a in gate_leaks(grid, level, entities, crawl_ok=True, budget=6 * SEAL_WALK, blocked=walls) if a not in loops]
+    cap_errors = []  # an over-crossing's walk line, wherever it passes above open room floor, runs on an authored deck or tread
+    over_lines = [(l['a'] + '-' + l['b'], polyline(d, l), nodes[l['a']][2]) for l in d['links'] if l.get('over')]
+    over_lines += [(w['id'], [tuple(p) for p in w['pts']], R[w.get('level', 'main')].z) for w in d.get('extraWalks', []) if w.get('over')]
+    for name, pts, z in over_lines:
+        for a, b in zip(pts, pts[1:]):
+            n = max(1, int(math.dist(a, b) / 0.25))
+            for k in range(n + 1):
+                q = (a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n)
+                if main.at(q) == 'floor' and main.z_of(q) < z - 1.0 and not deck_over(d, q, z):
+                    cap_errors.append(f'{name}: its walk line at ({q[0]:.2f}, {q[1]:.2f}) is above open floor with no deck')
+    connector_errors = []
+    for c in d.get('connectors', []):  # real treads: every riser low enough to walk, ends meeting the floor and the head deck
+        tops = [c['points'][0][2]] + [t['top'] for t in c['treads']]
+        risers = [b - a for a, b in zip(tops, tops[1:])]
+        if max(abs(r) for r in risers) > 0.2:
+            connector_errors.append(c['id'] + f': a riser of {max(abs(r) for r in risers):.2f} m')
+        foot, head = c['points'][0], c['points'][-1]
+        if main.at(foot[:2]) not in WALKABLE or abs(main.z_of(foot[:2]) - foot[2]) > 0.05:
+            connector_errors.append(c['id'] + ': the foot is not on floor at its height')
+        if abs(c['treads'][-1]['top'] - head[2]) > 0.01 or not deck_over(d, (head[0], head[1] - 0.2), head[2]):
+            connector_errors.append(c['id'] + ': the last tread does not meet a deck at the head')
+        if not any(l.get('connector') == c['id'] for l in d['links']):
+            connector_errors.append(c['id'] + ': no plan link is built from it')
     heights = sorted({round(z, 2) for g in (main, deep, upper) if g for row, crow in zip(g.zf, g.c) for z, c in zip(row, crow) if c in WALKABLE and c != 'tread'})
     result = dict(map=MAP, owner=OWN, boxes=boxes, starts=starts, entities=entities, lights=lights, pockets=pockets,
                   crawls=d['crawls'], rampDegrees=[round(r['degrees'], 1) for r in ramps],
-                  stairDegrees={tr['id']: round(tr['degrees'], 1) for tr in treads}, deviations=DEVIATIONS)
+                  stairDegrees={tr['id']: round(tr['degrees'], 1) for tr in treads}, deviations=DEVIATIONS + (V6_DEVIATIONS + d.get('geometryDeviations', []) if d.get('structures') else []))
     summary = dict(boxes=len(boxes), starts=len(starts),
                    anchors=sum(1 for e in entities if e['cls'].startswith('Mars_Anchor_') and 'NavField' not in e['cls']),
                    navfields=sum(1 for e in entities if 'NavField' in e['cls']),
@@ -1180,6 +1523,9 @@ def manifest(write=True):
                    pockets=len(pockets), props=sum(1 for b in boxes if b['kind'] in ('prop', 'root', 'candle', 'inlay')), water=len(d.get('water', [])),
                    crawls=len(d['crawls']), lights=len(lights), gateLeaks=leaks, crawlBypasses=bypasses, walkBreaks=breaks, ladderErrors=ladder_errors,
                    rails=len(rails), rampDegrees=result['rampDegrees'], stairDegrees=result['stairDegrees'], floorHeights=heights)
+    if d.get('structures') or d.get('connectors'):
+        summary.update(structures=len(d.get('structures', [])), caps=len(main.caps), deckRails=deck_rails, capErrors=cap_errors,
+                       connectorErrors=connector_errors)
     if write:
         OUT.mkdir(parents=True, exist_ok=True)
         (OUT / 'warrens-manifest.json').write_text(json.dumps(result, indent=1), encoding='utf-8')
@@ -1232,10 +1578,16 @@ def apply():
             c.add_instance(u.Transform(location=worldpos(u, b['centre']), rotation=u.Rotator(pitch=b['pitch'], yaw=b['yaw'], roll=0),
                                        scale=u.Vector(*b['size'])), world_space=True)
     for i, v in enumerate(man['lights']):
-        intensity, radius, colour = LIGHT_KINDS[v['kind']]
+        if v.get('fill'):
+            intensity, radius, colour = v['intensity'], v['radius'], v['colour']
+        else:
+            intensity, radius, colour = LIGHT_KINDS[v['kind']]
+            intensity *= v.get('scale', 1.0)
         a = actor(u.PointLight, 'Light_' + v['kind'] + '_' + str(i), worldpos(u, v['at']))
         c = a.point_light_component
         c.set_mobility(u.ComponentMobility.STATIONARY)
+        if v.get('fill'):  # a fill only lifts the room's darkness; no shadow (and no stationary-shadow overlap budget)
+            c.set_cast_shadows(False)
         c.set_intensity(intensity)
         c.set_attenuation_radius(radius * 100.0)
         c.set_light_color(u.LinearColor(*colour))
@@ -1296,7 +1648,7 @@ def apply():
     mode = u.load_class(None, '/Script/Angelscript.Mars_Warrens_GameMode')
     assert mode, 'Mars_Warrens_GameMode has not compiled'
     world.get_world_settings().set_editor_property('default_game_mode', mode)
-    # Lighting: no daylight. A faint cold ambient so unlit tunnels read as dark, not black, and fixed exposure so the
+    # Lighting: no daylight. A navy ambient floor (AMBIENT_FILL) so unlit rooms read as dark, not black, and fixed exposure so the
     # eye never adapts the dark away.
     for a in ea.get_all_level_actors():
         if isinstance(a, (u.SkyLight, u.DirectionalLight)) and OWN not in [str(t) for t in a.tags]:
@@ -1310,7 +1662,7 @@ def apply():
     a.set_editor_property('priority', 10)
     settings = a.get_editor_property('settings')
     for key, value in [('ambient_cubemap', u.load_asset('/Engine/EngineResources/GrayDarkTextureCube')),
-                       ('ambient_cubemap_intensity', .12), ('ambient_cubemap_tint', u.LinearColor(.55, .62, .8, 1)),
+                       ('ambient_cubemap_intensity', AMBIENT_FILL[0]), ('ambient_cubemap_tint', u.LinearColor(*AMBIENT_FILL[1], 1)),
                        ('auto_exposure_min_brightness', 1.0), ('auto_exposure_max_brightness', 1.0), ('auto_exposure_bias', 0.0)]:
         settings.set_editor_property(key, value)
         if key != 'ambient_cubemap':
@@ -1375,6 +1727,12 @@ def audit():
         uz = U['z']
         for walk in U['walkways']:
             paths += [(tuple(p), tuple(q), uz, uz) for p, q in zip(walk['pts'], walk['pts'][1:])]
+    for c in d.get('connectors', []):  # each spiral tread's centre, at its top
+        cx, cy = c['core']['at'][:2]
+        for t in c['treads']:
+            r0, r1, a0, a1 = tread_span(c, t)
+            at = (cx + (r0 + r1) / 2 * math.cos((a0 + a1) / 2), cy + (r0 + r1) / 2 * math.sin((a0 + a1) / 2))
+            paths.append((at, at, t['top'], t['top']))
     missing, count = [], 0
     for p, q, z0, z1 in paths:
         seg = math.dist(p, q)
@@ -1388,15 +1746,17 @@ def audit():
     # A crawl gap stops a standing chef and a crouched chef wearing a pack (140 cm), and passes a crouched one without.
     crawls_ok = 0
     for c in d['crawls']:
-        mx, my, cz = (c['a'][0] + c['b'][0]) / 2, (c['a'][1] + c['b'][1]) / 2, c.get('z', 0)
+        pa, pb = crawl_pts(c)[0], crawl_pts(c)[1]
+        mx, my, cz = (pa[0] + pb[0]) / 2, (pa[1] + pb[1]) / 2, c.get('z', 0)
         stands = capsule_blocked((mx, my, cz + 0.77), 75)
         pack = capsule_blocked((mx, my, cz + 0.72), 70)
         crouches = not capsule_blocked((mx, my, cz + 0.55), 52.5)
         crawls_ok += 1 if stands and pack and crouches else 0
-    # A low tunnel passes a standing chef along its whole length (except on the foot of a dive ramp, where the sample stands on the ramp's slab).
+    # A low tunnel passes a standing chef along its whole length (except on the foot of a dive ramp or a spiral, where the sample stands on its first slab or tread).
     low_blocked = []
     low = {tuple(sorted(pair)) for pair in d.get('lowLinks', [])}
     ramp_feet = [r['end'] for r in ramps_of(d)]
+    ramp_feet += [tuple(c['points'][0][:2]) for c in d.get('connectors', [])]  # a spiral's foot: the sample stands on its first tread
     for link in d['links']:
         if tuple(sorted((link['a'], link['b']))) not in low:
             continue
@@ -1411,9 +1771,17 @@ def audit():
                     continue
                 if capsule_blocked(pt, 75):
                     low_blocked.append([link['a'] + '-' + link['b'], round(pt[0], 2), round(pt[1], 2)])
+    # v6: the kitchen ports are shut as built (both shutters closed), and a standing chef fits on every deck's centre.
+    extra = {}
+    if d.get('kitchen'):
+        leaves = {s['id']: s for s in d.get('structures', []) if s['kind'] == 'door'}
+        extra['kitchenPortsShut'] = {p['id']: capsule_blocked((leaves[p['leaf']]['at'][0], leaves[p['leaf']]['at'][1], 0.55), 52.5) for p in d['kitchen']['ports']}
+    decks = [s for s in d.get('structures', []) if s['kind'] == 'platform' and s.get('rails') is not False]
+    if decks:
+        extra['decksClear'] = {s['id']: not capsule_blocked((s['at'][0], s['at'][1], s['at'][2] + s['size'][2] + 0.77), 75) for s in decks}
     jolt = u.get_editor_subsystem(u.Ck_JoltCook_EditorSubsystem_UE).validate_current_world()
     result = dict(samples=count, missing=len(missing), startsClear=clear, crawlsOk=crawls_ok, crawls=len(d['crawls']),
-                  lowTunnelBlocked=len(low_blocked), jolt=bool(jolt), deviations=DEVIATIONS)
+                  lowTunnelBlocked=len(low_blocked), jolt=bool(jolt), deviations=DEVIATIONS, **extra)
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / 'warrens-audit.json').write_text(json.dumps(dict(result, missingSamples=missing[:200], lowBlockedSamples=low_blocked[:50]), indent=1), encoding='utf-8')
     print(json.dumps(result))
