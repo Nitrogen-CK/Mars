@@ -89,7 +89,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         { Apply_Reset(Self, InState); }
 
         if (HasCancel)
-        { Apply_Cancel(Self, InState); }
+        { Apply_LetGo(Self, InState); }
 
         for (const auto& TakeOut : TakeOuts)
         { Apply_TakeOut(Self, InState, TakeOut, Edges); }
@@ -101,7 +101,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         { Edges.Admissions.Add(Apply_AddPiece(Self, InState, Release)); }
 
         for (int32 Index = 0; Index < ReleaseCount; ++Index)
-        { Apply_Release(Self, InState); }
+        { Apply_LetGo(Self, InState); }
 
         for (int32 Index = 0; Index < PressCount; ++Index)
         { Apply_Press(Self, InState, Edges.Refusals); }
@@ -159,7 +159,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
     {
         for (const auto& Piece : InState.Pieces)
         {
-            if (Get_IsGone(Piece.Piece) == false)
+            if (Piece.Piece.Get_IsGone() == false)
             { utils_entity_lifetime::Request_DestroyEntity(Piece.Entity); }
         }
 
@@ -170,7 +170,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         auto Lever = Spec.Nodes.Lever;
         if (InState.Hand.Mode == EMars_Tumbler_HandMode::Gripped)
         {
-            Lever.Request_EndManipulation();
+            Lever.Request_EndManipulation(FMars_Request_Control_EndManipulation());
             InState.Drum = EMars_Tumbler_Drum::Returning;
         }
 
@@ -185,20 +185,8 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         }
     }
 
-    // A leave mid-grip lets go (the Control settles the drum home); a leave mid-reach stops it.
-    private void Apply_Cancel(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState)
-    {
-        if (InState.Hand.Mode == EMars_Tumbler_HandMode::Free)
-        { return; }
-
-        if (InState.Hand.Mode == EMars_Tumbler_HandMode::Gripped)
-        { Let_Go(InTumbler, InState); }
-
-        InState.Hand.Mode = EMars_Tumbler_HandMode::Free;
-        InState.Hand.ReachElapsed = 0.0f;
-    }
-
-    private void Apply_Release(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState)
+    // Cancel and Release both: a grip lets go (the Control settles the drum home); a reach stops.
+    private void Apply_LetGo(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState)
     {
         if (InState.Hand.Mode == EMars_Tumbler_HandMode::Free)
         { return; }
@@ -213,7 +201,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
     private void Let_Go(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState)
     {
         auto Lever = InTumbler.Get_Spec().Nodes.Lever;
-        Lever.Request_EndManipulation();
+        Lever.Request_EndManipulation(FMars_Request_Control_EndManipulation());
         InState.Drum = EMars_Tumbler_Drum::Returning;
     }
 
@@ -305,13 +293,13 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         { Result.Reason = f"hatch is {InState.Hatch :n}"; }
         else if (InState.Drum != EMars_Tumbler_Drum::Home)
         { Result.Reason = f"drum is {InState.Drum :n}"; }
-        else if (Get_IsGone(Piece))
+        else if (Piece.Get_IsGone())
         { Result.Reason = "no piece"; }
         else if (Piece.Get_Status() != EMars_FoodPiece_Status::Ready)
         { Result.Reason = "the piece is not ready"; }
-        else if (utils_tumbler::Find_PieceIndexByHandle(InState.Pieces, Piece) >= 0)
+        else if (utils_tumbler::Find_PieceIndexByHandle(InState.Pieces, Piece).IsSet())
         { Result.Reason = "already admitted"; }
-        else if (utils_tumbler::Find_PieceIndex(InState.Pieces, InRelease.PieceId) >= 0)
+        else if (utils_tumbler::Find_PieceIndex(InState.Pieces, InRelease.PieceId).IsSet())
         { Result.Reason = f"piece {PieceName} is already in"; }
         else if (ck::IsValid(Piece.TryGet_Holder()))
         { Result.Reason = "another ledger holds it"; }
@@ -406,7 +394,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         TArray<FMars_Tumbler_PieceState> Kept;
         for (const auto& Piece : InState.Pieces)
         {
-            const auto IsTumbled = Get_IsGone(Piece.Piece) == false && Piece.Coverage >= TakeOutCoverage;
+            const auto IsTumbled = Piece.Piece.Get_IsGone() == false && Piece.Coverage >= TakeOutCoverage;
             if (Taken.Num() >= MaxPieces || IsTumbled == false)
             {
                 Kept.Add(Piece);
@@ -457,7 +445,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
     private void Apply_Readopt(FCk_Handle_Tumbler& InTumbler, FMars_Fragment_Tumbler& InState, const FMars_Request_Tumbler_Readopt& InRequest)
     {
         auto Piece = InRequest.Piece;
-        if (Get_IsGone(Piece))
+        if (Piece.Get_IsGone())
         { return; }
 
         FCk_Handle Entity = Piece;
@@ -466,8 +454,8 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto PieceName = utils_cooking_feed::Get_PieceName(InRequest.PieceId);
-        const auto IsInDrum = utils_tumbler::Find_PieceIndexByHandle(InState.Pieces, Piece) >= 0
-            || utils_tumbler::Find_PieceIndex(InState.Pieces, InRequest.PieceId) >= 0;
+        const auto IsInDrum = utils_tumbler::Find_PieceIndexByHandle(InState.Pieces, Piece).IsSet()
+            || utils_tumbler::Find_PieceIndex(InState.Pieces, InRequest.PieceId).IsSet();
         if (ck::EnsureIfNot(IsInDrum == false, f"[Tumbler] [{InTumbler.ToString()}] was asked to readopt piece {PieceName} [{Piece.ToString()}], which it already holds"))
         { return; }
 
@@ -489,11 +477,6 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         utils_foodpiece::Stamp_Holder(Piece, InTumbler);
         utils_world_item::Request_ClaimPickup(Piece, EMars_Interactable_DisableReason::Ledger, ECk_EnableDisable::Disable);
         Watch_Teardown(InTumbler);
-    }
-
-    private bool Get_IsGone(const FCk_Handle_FoodPiece& InPiece) const
-    {
-        return ck::Is_NOT_Valid(InPiece) || utils_entity_lifetime::Get_IsPendingDestroy(InPiece, ECk_EntityLifetime_DestructionPhase::BeginDestroy);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -582,7 +565,7 @@ class UMars_Processor_Tumbler_HandleRequests : UCk_Processor_Script_Base_UE
         const auto State = TumblerEntity.Get_Fragment(FMars_Fragment_Tumbler);
         for (const auto& Piece : State.Pieces)
         {
-            if (Get_IsGone(Piece.Piece))
+            if (Piece.Piece.Get_IsGone())
             { continue; }
 
             utils_entity_lifetime::Request_DestroyEntity(Piece.Entity);

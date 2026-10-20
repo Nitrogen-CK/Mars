@@ -126,7 +126,7 @@ class UMars_AutoTest_Tumbler_CoverageGrowsOnlyWithPieceMotionAndNeverFalls : UMa
     private void Check_LeverAtEndStop(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_Lever.Get_IsManipulating() && _Lever.Get_ManipulationAlpha() >= 1.0f);
+        Res.Set(_Lever.Get_IsManipulating() && _Lever.TryGet_ManipulationAlpha().Get(0.0f) >= 1.0f);
     }
 
     UFUNCTION()

@@ -30,7 +30,7 @@ mixin bool Get_IsOperating(const FCk_Handle_Operator& Self)
 
 // Asks the held station to release this operator (scoped to it); a no-op when not operating. The back-ref clears when the
 // station drains the release, not here.
-mixin void Request_Leave(FCk_Handle_Operator& Self)
+mixin void Request_Leave(FCk_Handle_Operator& Self, const FMars_Request_Operator_Leave& InRequest)
 {
     auto Station = Self.Get_Fragment(FMars_Fragment_Operator).Station;
     if (ck::Is_NOT_Valid(Station))

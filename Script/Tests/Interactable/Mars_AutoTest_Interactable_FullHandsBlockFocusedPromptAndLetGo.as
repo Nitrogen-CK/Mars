@@ -200,8 +200,8 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UMars_Au
     UFUNCTION()
     private void Step_AssertBlocked(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_Equals_String(_Prompt.Get_DisplayText().ToString(), utils_interactable::Get_HandsFullText().ToString(),
-            "the prompt shows the hands-full reason");
+        Assert_True(_Prompt.Get_BlockedReason() == EMars_InteractPrompt_BlockedReason::HandsFull,
+            f"the prompt is blocked HandsFull (got {_Prompt.Get_BlockedReason() :n})");
         Assert_True(_Prompt.Get_DisplayTextColor() == constants_ui_colors::k_PromptText_Blocked,
             f"the prompt shows the blocked colour (got {DoFormat_Color(_Prompt.Get_DisplayTextColor())})");
         Assert_Equals_String(_Prompt.Get_PromptText().ToString(), "Pull", "the prompt text underneath is kept");
@@ -243,10 +243,10 @@ class UMars_AutoTest_Interactable_FullHandsBlockFocusedPromptAndLetGo : UMars_Au
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
-        auto Control = utils_control::Add(RootEntity, ControlSpec, FCk_Handle_Mover());
+        auto Control = utils_control::Add(RootEntity, ControlSpec);
 
         auto Spec = FMars_Interactable_Spec();
-        Spec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Pull")));
+        Spec.Targets.Add(Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull"))));
         _Interactable = utils_interactable::Create(Root, Spec);
 
         const auto Targets = _Interactable.Get_AllInteractTargets();

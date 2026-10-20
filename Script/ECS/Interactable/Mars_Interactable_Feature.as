@@ -33,9 +33,9 @@ event void FMars_Delegate_Interactable_OnEnableDisableChanged_MC(FCk_Handle_Inte
 delegate void FMars_Delegate_Interactable_OnFocusableChanged(FCk_Handle_Interactable InInteractableHandle, ECk_EnableDisable InFocusable);
 event void FMars_Delegate_Interactable_OnFocusableChanged_MC(FCk_Handle_Interactable InInteractableHandle, ECk_EnableDisable InFocusable);
 
-// A WhileLive interaction on InTarget ended Failed for InInitiator, for the reason its work named.
-delegate void FMars_Delegate_Interactable_OnInteractionFailed(FCk_Handle_Interactable InInteractableHandle, FCk_Handle_InteractTarget InTarget, FCk_Handle InInitiator, EMars_Interaction_FailReason InReason);
-event void FMars_Delegate_Interactable_OnInteractionFailed_MC(FCk_Handle_Interactable InInteractableHandle, FCk_Handle_InteractTarget InTarget, FCk_Handle InInitiator, EMars_Interaction_FailReason InReason);
+// A WhileLive interaction on InFailure.Target failed for InFailure.Initiator, for the reason its work named.
+delegate void FMars_Delegate_Interactable_OnInteractionFailed(FCk_Handle_Interactable InInteractableHandle, FMars_Interactable_Failure InFailure);
+event void FMars_Delegate_Interactable_OnInteractionFailed_MC(FCk_Handle_Interactable InInteractableHandle, FMars_Interactable_Failure InFailure);
 
 struct FMars_Interactable_ChanneledStartedBinding
 {
@@ -96,8 +96,8 @@ enum EMars_Interactable_Work
     WhileLive
 }
 
-// Why a WhileLive interaction's work failed. The work's task names it on its interaction sub-SM's stamped context
-// (utils_interactable::Record_FailReason), and the sub-SM's Failed end reports it (OnInteractionFailed).
+// Why a WhileLive interaction's work failed. The work's task names it (utils_interactable::Record_FailReason), which
+// reports it (OnInteractionFailed).
 enum EMars_Interaction_FailReason
 {
     // The gloves left the reach (returned, let go) before its Grip.
@@ -130,6 +130,28 @@ enum EMars_Interaction_FailReason
     DockRefused,
     // The dock refused to hand its platter over.
     UndockRefused
+}
+
+// The payload of OnInteractionFailed: Target's WhileLive interaction from Initiator failed for Reason.
+struct FMars_Interactable_Failure
+{
+    UPROPERTY()
+    FCk_Handle_InteractTarget Target;
+
+    UPROPERTY()
+    FCk_Handle Initiator;
+
+    UPROPERTY()
+    EMars_Interaction_FailReason Reason = EMars_Interaction_FailReason::GlovesLeftBeforeGrip;
+
+    FMars_Interactable_Failure() {}
+
+    FMars_Interactable_Failure(FCk_Handle_InteractTarget InTarget, FCk_Handle InInitiator, EMars_Interaction_FailReason InReason)
+    {
+        Target = InTarget;
+        Initiator = InInitiator;
+        Reason = InReason;
+    }
 }
 
 struct FMars_Tag_Interactable_NeedsSetup {}
@@ -273,6 +295,10 @@ struct FMars_Fragment_Interactable
 // the interactable, its owner and what the target is for without walking the ownership chain.
 struct FMars_Fragment_InteractionContext
 {
+    // The interact target this context was stamped on; a sub-SM root's copy keeps it.
+    UPROPERTY()
+    FCk_Handle_InteractTarget Target;
+
     UPROPERTY()
     FCk_Handle_Interactable Interactable;
 
@@ -287,10 +313,6 @@ struct FMars_Fragment_InteractionContext
 
     UPROPERTY()
     EMars_FPHands_ReachKind ReachKind = EMars_FPHands_ReachKind::Grab;
-
-    // A sub-SM root only: why its WhileLive work failed, named by the work's task (utils_interactable::Record_FailReason).
-    UPROPERTY()
-    TOptional<EMars_Interaction_FailReason> FailReason;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

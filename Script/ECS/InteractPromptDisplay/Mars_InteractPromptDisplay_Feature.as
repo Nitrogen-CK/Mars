@@ -14,20 +14,37 @@ struct FMars_Feature_InteractPromptDisplay {}
 // Signals
 //--------------------------------------------------------------------------------------------------------------------------
 
-delegate void FMars_Delegate_InteractPromptDisplay_OnPromptAppeared(
-    FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt);
-event void FMars_Delegate_InteractPromptDisplay_OnPromptAppeared_MC(
-    FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt);
+// One slot's edge: its key, its order, and its top prompt (on a removal, the prompt that left, which may be invalid by
+// now; the key still names the slot).
+struct FMars_InteractPromptDisplay_SlotEvent
+{
+    UPROPERTY()
+    FName SlotKey;
 
-delegate void FMars_Delegate_InteractPromptDisplay_OnPromptRemoved(
-    FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt);
-event void FMars_Delegate_InteractPromptDisplay_OnPromptRemoved_MC(
-    FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt);
+    UPROPERTY()
+    int32 SortOrder = constants_interact_prompt::k_OtherSortOrder;
 
-delegate void FMars_Delegate_InteractPromptDisplay_OnPromptUpdated(
-    FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt);
-event void FMars_Delegate_InteractPromptDisplay_OnPromptUpdated_MC(
-    FCk_Handle_InteractPromptDisplay InDisplay, FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt);
+    UPROPERTY()
+    FCk_Handle_InteractPrompt Prompt;
+
+    FMars_InteractPromptDisplay_SlotEvent() {}
+
+    FMars_InteractPromptDisplay_SlotEvent(FName InSlotKey, int32 InSortOrder, FCk_Handle_InteractPrompt InPrompt)
+    {
+        SlotKey = InSlotKey;
+        SortOrder = InSortOrder;
+        Prompt = InPrompt;
+    }
+}
+
+delegate void FMars_Delegate_InteractPromptDisplay_OnPromptAppeared(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent);
+event void FMars_Delegate_InteractPromptDisplay_OnPromptAppeared_MC(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent);
+
+delegate void FMars_Delegate_InteractPromptDisplay_OnPromptRemoved(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent);
+event void FMars_Delegate_InteractPromptDisplay_OnPromptRemoved_MC(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent);
+
+delegate void FMars_Delegate_InteractPromptDisplay_OnPromptUpdated(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent);
+event void FMars_Delegate_InteractPromptDisplay_OnPromptUpdated_MC(FCk_Handle_InteractPromptDisplay InDisplay, FMars_InteractPromptDisplay_SlotEvent InEvent);
 
 struct FMars_Fragment_InteractPromptDisplay_Signals
 {

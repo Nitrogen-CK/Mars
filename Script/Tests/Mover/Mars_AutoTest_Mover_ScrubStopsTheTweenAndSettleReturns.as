@@ -76,7 +76,7 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
     UFUNCTION()
     private void Step_Settle(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Mover.Request_Settle();
+        _Mover.Request_Settle(FMars_Request_Mover_Settle());
     }
 
     UFUNCTION()
@@ -115,7 +115,7 @@ class UMars_AutoTest_Mover_ScrubStopsTheTweenAndSettleReturns : UCk_AutoTest_Bas
     {
         _LowestAlphaWhileSettling = 1.0f;
         _Mover.Request_Scrub(FMars_Request_Mover_Scrub(0.3f));
-        _Mover.Request_Settle();
+        _Mover.Request_Settle(FMars_Request_Mover_Settle());
     }
 
     UFUNCTION()

@@ -43,7 +43,7 @@ class UMars_SmTask_Control_Engage : UCk_SmTask_EntityScript
             return;
         }
 
-        Control.Request_Engage();
+        Control.Request_Engage(FMars_Request_Control_Engage());
         Mark_Result(ECk_SmTaskResult::Succeeded);
     }
 }

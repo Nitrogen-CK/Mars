@@ -1,7 +1,7 @@
 // Drains focus changes in arrival order, then claim changes in arrival order, then completion consumes, then failure reports
-// (each broadcast as OnInteractionFailed). Each focus change
-// is applied and broadcast before the next one, so a listener reads the state its event describes. A Focus from the
-// current focuser, and an Unfocus from anyone but the current focuser, change nothing and broadcast nothing.
+// (each broadcast as OnInteractionFailed). Each focus change is applied and broadcast before the next one, so a listener
+// reads the state its event describes. A Focus from the current focuser, and an Unfocus from anyone but the current
+// focuser, change nothing and broadcast nothing.
 //
 // Claim changes apply as one batch: when they leave the set of disable reasons different, every target's framework flag is
 // set from it (a disabled target refuses CanInteractWith, and Set_Enabled cancels its interactions), and
@@ -54,7 +54,10 @@ class UMars_Processor_Interactable_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         for (const auto& Request : ReportFailureRequests)
-        { Self.Get_Fragment(FMars_Fragment_Interactable_Signals).OnInteractionFailed.Broadcast(Self, Request.Target, Request.Initiator, Request.Reason); }
+        {
+            Self.Get_Fragment(FMars_Fragment_Interactable_Signals).OnInteractionFailed.Broadcast(Self,
+                FMars_Interactable_Failure(Request.Target, Request.Initiator, Request.Reason));
+        }
     }
 
     private void ApplyFocus(FCk_Handle_Interactable& InSelf, FMars_Fragment_Interactable& InState, const FCk_Handle& InFocuser)

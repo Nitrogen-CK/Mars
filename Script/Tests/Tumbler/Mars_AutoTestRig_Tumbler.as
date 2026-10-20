@@ -115,7 +115,8 @@ class UMars_AutoTestRig_Tumbler : UCk_AutoTest_Base
         LeverSpec.Manipulation.Stiffness = 60.0f;
         LeverSpec.Manipulation.Damping = 12.0f;
         auto AxleEntity = AxleNode.H();
-        _Lever = utils_control::Add(AxleEntity, LeverSpec, _Axle);
+        LeverSpec.Mover = _Axle;
+        _Lever = utils_control::Add(AxleEntity, LeverSpec);
         _Lever.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnLeverEngaged"));
 
         const auto DrumBody = utils_tumbler::Add_DrumBodies(AxleNode, _Spec);

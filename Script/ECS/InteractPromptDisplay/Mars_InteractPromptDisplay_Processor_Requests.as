@@ -200,19 +200,24 @@ class UMars_Processor_InteractPromptDisplay_HandleRequests : UCk_Processor_Scrip
     private void Broadcast_Appeared(FCk_Handle_InteractPromptDisplay& InDisplay, const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt)
     {
         if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptAppeared.Broadcast(InDisplay, InSlot.SlotKey, InSlot.SortOrder, InPrompt); }
+        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptAppeared.Broadcast(InDisplay, Make_Event(InSlot, InPrompt)); }
     }
 
     private void Broadcast_Removed(FCk_Handle_InteractPromptDisplay& InDisplay, const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt)
     {
         if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptRemoved.Broadcast(InDisplay, InSlot.SlotKey, InSlot.SortOrder, InPrompt); }
+        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptRemoved.Broadcast(InDisplay, Make_Event(InSlot, InPrompt)); }
     }
 
     private void Broadcast_Updated(FCk_Handle_InteractPromptDisplay& InDisplay, const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt)
     {
         if (InDisplay.Has_Fragment(FMars_Fragment_InteractPromptDisplay_Signals))
-        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptUpdated.Broadcast(InDisplay, InSlot.SlotKey, InSlot.SortOrder, InPrompt); }
+        { InDisplay.Get_Fragment(FMars_Fragment_InteractPromptDisplay_Signals).OnPromptUpdated.Broadcast(InDisplay, Make_Event(InSlot, InPrompt)); }
+    }
+
+    private FMars_InteractPromptDisplay_SlotEvent Make_Event(const FMars_InteractPromptDisplay_Slot& InSlot, FCk_Handle_InteractPrompt InPrompt) const
+    {
+        return FMars_InteractPromptDisplay_SlotEvent(InSlot.SlotKey, InSlot.SortOrder, InPrompt);
     }
 
     private void PruneInvalidTopEntries(FMars_InteractPromptDisplay_Slot& InSlot)

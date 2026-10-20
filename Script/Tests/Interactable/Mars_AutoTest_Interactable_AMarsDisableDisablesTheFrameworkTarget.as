@@ -44,10 +44,10 @@ class UMars_AutoTest_Interactable_AMarsDisableDisablesTheFrameworkTarget : UCk_A
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
-        auto Control = utils_control::Add(RootEntity, ControlSpec, FCk_Handle_Mover());
+        auto Control = utils_control::Add(RootEntity, ControlSpec);
 
         auto Spec = FMars_Interactable_Spec();
-        Spec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Pull")));
+        Spec.Targets.Add(Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull"))));
         _Lever = utils_interactable::Create(Root, Spec);
 
         const auto Targets = _Lever.Get_AllInteractTargets();

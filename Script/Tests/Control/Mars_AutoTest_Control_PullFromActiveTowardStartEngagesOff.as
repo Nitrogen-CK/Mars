@@ -49,7 +49,7 @@ class UMars_AutoTest_Control_PullFromActiveTowardStartEngagesOff : UMars_AutoTes
     UFUNCTION()
     private void Step_AssertSeeded(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Alpha = _Control.Get_ManipulationAlpha();
+        const auto Alpha = _Control.TryGet_ManipulationAlpha().Get(0.0f);
         Assert_True(Alpha > 0.999f, f"seeded from the Mover (manipulation alpha {Alpha})");
     }
 

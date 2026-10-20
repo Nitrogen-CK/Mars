@@ -115,6 +115,10 @@ struct FMars_Control_Spec
     UPROPERTY()
     FMars_Control_Manipulation_Spec Manipulation;
 
+    // What the control moves; invalid = nothing. A construction input the placing script builds (not a UPROPERTY: the
+    // spawn params and maps never carry it).
+    FCk_Handle_Mover Mover;
+
     // The spawn-params generator emits a non-default value as this positional call, Manipulation as a nested one.
     FMars_Control_Spec(
         ECk_Interaction_CompletionPolicy InInteraction,
@@ -303,24 +307,18 @@ struct FMars_Request_Control_BeginManipulation
     FCk_Handle_Interaction Interaction;
 
     UPROPERTY()
-    FCk_Handle Manipulator;
-
-    UPROPERTY()
     EMars_Control_ManipulationCompletion Completion = EMars_Control_ManipulationCompletion::AtEngageAlpha;
 
     FMars_Request_Control_BeginManipulation() {}
 
-    FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction, FCk_Handle InManipulator)
+    FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction)
     {
         Interaction = InInteraction;
-        Manipulator = InManipulator;
     }
 
-    FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction, FCk_Handle InManipulator,
-                                            EMars_Control_ManipulationCompletion InCompletion)
+    FMars_Request_Control_BeginManipulation(FCk_Handle_Interaction InInteraction, EMars_Control_ManipulationCompletion InCompletion)
     {
         Interaction = InInteraction;
-        Manipulator = InManipulator;
         Completion = InCompletion;
     }
 }

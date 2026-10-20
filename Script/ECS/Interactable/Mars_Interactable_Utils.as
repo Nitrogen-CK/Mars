@@ -10,12 +10,6 @@ class UMars_Interactable_FreeHandsPolicy : UObject
 
 namespace utils_interactable
 {
-    // The blocked reason a RequiresFreeHands prompt shows while the focuser holds an item.
-    FText Get_HandsFullText()
-    {
-        return FText::FromString("Hands full");
-    }
-
     // Nothing in hand. An entity without HeldItem (tests, an NPC) has free hands.
     bool Get_HandsAreFree(const FCk_Handle& InEntity)
     {
@@ -77,18 +71,23 @@ namespace utils_interactable
         return utils_interact_target::TryGet_Interaction(Target, Initiator);
     }
 
-    // Names why the WhileLive work a per-interaction sub-SM runs failed, on its root's stamped context (InSubSmRoot: the
-    // work task's owning state machine); the sub-SM's Failed end reports it (UMars_SmTask_EndInteraction_Failed). The
-    // stamp is the sub-SM's own copy, so the work's task writes it as the sub-SM's task wrote the stamp. A root that was
+    // Reports why the WhileLive work a per-interaction sub-SM runs failed. InSubSmRoot is the work task's owning state
+    // machine, whose stamped context names the target and the initiator; the interactable broadcasts the failure
+    // (OnInteractionFailed) at its next drain, and the failed task's Failed end ends the interaction. A root that was
     // never stamped is a work state run outside an interaction: ensured.
     void Record_FailReason(FCk_Handle InSubSmRoot, EMars_Interaction_FailReason InReason)
     {
-        auto Root = InSubSmRoot;
-        if (ck::EnsureIfNot(ck::IsValid(Root) && Root.Has_Fragment(FMars_Fragment_InteractionContext),
+        if (ck::EnsureIfNot(ck::IsValid(InSubSmRoot) && InSubSmRoot.Has_Fragment(FMars_Fragment_InteractionContext),
             f"[Interactable] a [{InReason :n}] failure names no stamped interaction sub-SM"))
         { return; }
 
-        Root.Get_Fragment(FMars_Fragment_InteractionContext).FailReason = TOptional<EMars_Interaction_FailReason>(InReason);
+        const auto Context = InSubSmRoot.Get_Fragment(FMars_Fragment_InteractionContext);
+        auto Interactable = Context.Interactable;
+        if (ck::EnsureIfNot(ck::IsValid(Interactable),
+            f"[Interactable] a [{InReason :n}] failure on [{InSubSmRoot.ToString()}] has no interactable to report it"))
+        { return; }
+
+        Interactable.Request_ReportFailure(FMars_Request_Interactable_ReportFailure(Context.Target, Context.Initiator, InReason));
     }
 
     // An AfterCompletion target whose completion needs the press kept (Timed, a pulled Control): its interaction is
@@ -174,6 +173,7 @@ namespace utils_interactable
 
             auto InteractTarget = utils_interact_target::Add(InteractableHandle, TargetSpec);
             InteractTarget.Request_OverrideToSelf();
+            Context.Target = InteractTarget;
             InteractTarget.Add_Fragment(Context);
 
             if (StartsEnabled == false)
@@ -253,6 +253,15 @@ mixin bool Get_IsFocused(const FCk_Handle_Interactable& Self)
 mixin FCk_Handle Get_CurrentFocuser(const FCk_Handle_Interactable& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Interactable).Focuser;
+}
+
+// The entity that composed the target's interactable; invalid for a target without a Mars interaction context.
+mixin FCk_Handle TryGet_InteractableOwner(const FCk_Handle_InteractTarget& Self)
+{
+    if (ck::Is_NOT_Valid(Self) || Self.Has_Fragment(FMars_Fragment_InteractionContext) == false)
+    { return FCk_Handle(); }
+
+    return Self.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
 }
 
 // InTarget's recorded completion that no consume has been queued for yet; unset otherwise (none, another target's, or

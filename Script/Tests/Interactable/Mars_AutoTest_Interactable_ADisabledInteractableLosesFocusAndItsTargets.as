@@ -13,7 +13,8 @@ class UMars_AutoTestState_FocusRig : UCk_SmState_EntityScript
 // InteractionFocus task. A lever whose probe lies on the trace is focused through the trace: it names the carrier as its
 // focuser, its Use target is the best Use target and its prompt is on the carrier's display. A ledger then claims the
 // lever: it is unfocused, its target leaves the resolver's best Use targets and its prompt leaves the display, while it
-// still lies under the trace. Released, it takes the focus back. Isolated origin (63200, -12000, -30000).
+// still lies under the trace. Released, it takes the focus back. OnFocusableChanged broadcasts once per edge: Disable at
+// the claim, Enable at the release. Isolated origin (63200, -12000, -30000).
 class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets : UCk_AutoTest_Base
 {
     default _TimeoutSeconds = 10.0f;
@@ -30,6 +31,7 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
     private FCk_Handle_InteractPromptDisplay _Display;
     private FCk_Handle_Interactable _Lever;
     private FCk_Handle_InteractTarget _Target;
+    private TArray<ECk_EnableDisable> _FocusableEdges;
 
     UFUNCTION(BlueprintOverride)
     void DoBeginPlay(FCk_Handle InHandle)
@@ -51,6 +53,7 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
         Add_Step("the lever is Disabled under the trace, its framework target with it", n"Step_AssertDisabledUnderTheTrace");
         Add_Step("the ledger lets go", n"Step_Release");
         Add_Step_WaitUntil("the lever took the focus back: its target is the best Use target and its prompt shows", n"Check_FocusedAndOffered", 0, 0);
+        Add_Step("OnFocusableChanged broadcast Disable at the claim and Enable at the release", n"Step_AssertFocusableEdges");
         Run_Steps(InHandle);
     }
 
@@ -100,7 +103,7 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
-        auto Control = utils_control::Add(RootEntity, ControlSpec, FCk_Handle_Mover());
+        auto Control = utils_control::Add(RootEntity, ControlSpec);
 
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
@@ -110,7 +113,7 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Pull")));
+        Spec.Targets.Add(Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull"))));
         _Lever = utils_interactable::Create(Root, Spec);
 
         const auto Targets = _Lever.Get_AllInteractTargets();
@@ -121,6 +124,13 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
         }
 
         _Target = Targets[0];
+        _Lever.BindTo_OnFocusableChanged(FMars_Delegate_Interactable_OnFocusableChanged(this, n"OnFocusableChanged"));
+    }
+
+    UFUNCTION()
+    private void OnFocusableChanged(FCk_Handle_Interactable InInteractable, ECk_EnableDisable InFocusable)
+    {
+        _FocusableEdges.Add(InFocusable);
     }
 
     private bool Get_IsBestUseTarget()
@@ -193,11 +203,23 @@ class UMars_AutoTest_Interactable_ADisabledInteractableLosesFocusAndItsTargets :
         { StillUnderTheTrace = StillUnderTheTrace || Overlap.Get_OtherEntity() == LeverEntity; }
 
         Assert_True(StillUnderTheTrace, "the lever still lies under the trace: only its enable state moved the focus");
+
+        Assert_Equals_Int(_FocusableEdges.Num(), 1, "the claim broadcast one OnFocusableChanged");
+        if (_FocusableEdges.Num() == 1)
+        { Assert_True(_FocusableEdges[0] == ECk_EnableDisable::Disable, f"the claim's edge is Disable (got {_FocusableEdges[0] :n})"); }
     }
 
     UFUNCTION()
     private void Step_Release(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Lever.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::Ledger));
+    }
+
+    UFUNCTION()
+    private void Step_AssertFocusableEdges(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        Assert_Equals_Int(_FocusableEdges.Num(), 2, "OnFocusableChanged broadcast once per edge");
+        if (_FocusableEdges.Num() == 2)
+        { Assert_True(_FocusableEdges[1] == ECk_EnableDisable::Enable, f"the release's edge is Enable (got {_FocusableEdges[1] :n})"); }
     }
 }

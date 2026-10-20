@@ -23,3 +23,16 @@ struct FMars_Fragment_Operator
     UPROPERTY()
     FCk_Handle_Station Station;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Requests
+//--------------------------------------------------------------------------------------------------------------------------
+
+// Payload-less: one placeholder field (request doctrine). Forwarded at once as a scoped release to the held station.
+struct FMars_Request_Operator_Leave
+{
+    UPROPERTY()
+    bool Requested = true;
+
+    FMars_Request_Operator_Leave() {}
+}

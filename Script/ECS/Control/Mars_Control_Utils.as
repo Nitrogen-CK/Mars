@@ -4,9 +4,9 @@ namespace utils_control
     // usable screen direction.
     const float64 k_MinScreenPullLength = 0.05;
 
-    // InMover is optional: an invalid handle means the control moves nothing. The completion policy and HoldSeconds are
-    // retained for Make_InteractTarget; a rejected spec ensures and returns an invalid handle.
-    FCk_Handle_Control Add(FCk_Handle& InHandle, FMars_Control_Spec InParams, FCk_Handle_Mover InMover)
+    // InParams.Mover is optional: an invalid handle means the control moves nothing. The completion policy and HoldSeconds
+    // are retained for Make_InteractTarget; a rejected spec ensures and returns an invalid handle.
+    FCk_Handle_Control Add(FCk_Handle& InHandle, FMars_Control_Spec InParams)
     {
         const auto Validation = InParams.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Control] [{InHandle.ToString()}] rejected the spec: {Validation.Get_Error()}"))
@@ -24,7 +24,7 @@ namespace utils_control
 
         auto State = FMars_Fragment_Control();
         State.IsActive = InParams.StartActive;
-        State.Mover = InMover;
+        State.Mover = InParams.Mover;
 
         InHandle.Add_Fragment(FMars_Feature_Control());
         InHandle.Add_Fragment(Params);
@@ -73,8 +73,8 @@ namespace utils_control
 // The interactable target a control's entity script mounts on the Use channel, routed to UMars_SmState_Control_Engage once
 // the interaction completes (AfterCompletion): Instant, Timed(HoldSeconds), or ManuallyCompleted (pulled; the Control's tick
 // ends the interaction at EngageAlpha). The gloves grab an Instant control and hold a timed or pulled one. Working a control
-// takes both hands (RequiresFreeHands).
-mixin FMars_Interactable_TargetEntry Make_InteractTarget(const FCk_Handle_Control& Self, FText InPromptText)
+// takes both hands (RequiresFreeHands). InPrompt is the caller's, input action included.
+mixin FMars_Interactable_TargetEntry Make_InteractTarget(const FCk_Handle_Control& Self, FMars_InteractPrompt_Spec InPrompt)
 {
     const auto& Params = Self.Get_Fragment(FMars_Fragment_Control_Params);
 
@@ -83,13 +83,9 @@ mixin FMars_Interactable_TargetEntry Make_InteractTarget(const FCk_Handle_Contro
     if (Params.CompletionPolicy == ECk_Interaction_CompletionPolicy::Timed)
     { TargetSpec.Set_InteractionDuration(FCk_Time(Params.HoldSeconds)); }
 
-    auto Prompt = FMars_InteractPrompt_Spec();
-    Prompt.InputAction = mars::Mars_IA_Interact_Use;
-    Prompt.PromptText = InPromptText;
-
     auto Target = FMars_Interactable_TargetEntry();
     Target.InteractTargetSpec = TargetSpec;
-    Target.InteractPromptSpec = Prompt;
+    Target.InteractPromptSpec = InPrompt;
     Target.InteractionStateClass = UMars_SmState_Control_Engage;
     Target.RequiresFreeHands = true;
     Target.ReachKind = Params.CompletionPolicy == ECk_Interaction_CompletionPolicy::Instant
@@ -107,6 +103,11 @@ mixin bool Get_IsActive(const FCk_Handle_Control& Self)
     return Self.Get_Fragment(FMars_Fragment_Control).IsActive;
 }
 
+mixin EMars_Control_Activation Get_Activation(const FCk_Handle_Control& Self)
+{
+    return Self.Get_IsActive() ? EMars_Control_Activation::Active : EMars_Control_Activation::Inactive;
+}
+
 mixin FCk_Handle_Mover Get_Mover(const FCk_Handle_Control& Self)
 {
     return Self.Get_Fragment(FMars_Fragment_Control).Mover;
@@ -122,24 +123,42 @@ mixin bool Get_IsManipulating(const FCk_Handle_Control& Self)
     return Self.Get_Fragment(FMars_Fragment_Control).Manipulation.IsSet();
 }
 
-// 0 when not manipulating.
-mixin float32 Get_ManipulationAlpha(const FCk_Handle_Control& Self)
+// The handle's position 0..1 while gripped; unset when not manipulating.
+mixin TOptional<float32> TryGet_ManipulationAlpha(const FCk_Handle_Control& Self)
 {
     const auto& State = Self.Get_Fragment(FMars_Fragment_Control);
     if (State.Manipulation.IsSet() == false)
-    { return 0.0f; }
+    { return TOptional<float32>(); }
 
-    return State.Manipulation.GetValue().Alpha;
+    return TOptional<float32>(State.Manipulation.GetValue().Alpha);
 }
 
-// 0 when not manipulating.
-mixin float32 Get_ManipulationProgress(const FCk_Handle_Control& Self)
+// 0..1 toward EngageAlpha in the pull's direction while gripped; unset when not manipulating.
+mixin TOptional<float32> TryGet_ManipulationProgress(const FCk_Handle_Control& Self)
 {
-    if (Self.Get_IsManipulating() == false)
-    { return 0.0f; }
+    const auto Alpha = Self.TryGet_ManipulationAlpha();
+    if (Alpha.IsSet() == false)
+    { return TOptional<float32>(); }
 
     const auto EngageAlpha = Self.Get_Fragment(FMars_Fragment_Control_Params).Manipulation.EngageAlpha;
-    return utils_control::Get_ProgressTowardEngage(Self.Get_PullDirection(), Self.Get_ManipulationAlpha(), EngageAlpha);
+    return TOptional<float32>(utils_control::Get_ProgressTowardEngage(Self.Get_PullDirection(), Alpha.GetValue(), EngageAlpha));
+}
+
+// The Control behind a ManuallyCompleted interact target (one Make_InteractTarget built); invalid for any other target.
+mixin FCk_Handle_Control TryGet_ManipulatedControl(const FCk_Handle_InteractTarget& Self)
+{
+    if (ck::Is_NOT_Valid(Self) || Self.Get_InteractionCompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+    { return FCk_Handle_Control(); }
+
+    const auto Owner = Self.TryGet_InteractableOwner();
+    if (ck::Is_NOT_Valid(Owner))
+    { return FCk_Handle_Control(); }
+
+    auto Control = Owner.As_Control(ECk_SanityCheck::UnChecked);
+    if (ck::Is_NOT_Valid(Control) || Control.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
+    { return FCk_Handle_Control(); }
+
+    return Control;
 }
 
 // How the current grip ends; AtEngageAlpha when not manipulating.
@@ -184,10 +203,10 @@ mixin FVector Get_PullDirectionWorld(const FCk_Handle_Control& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_Engage(FCk_Handle_Control& Self)
+mixin void Request_Engage(FCk_Handle_Control& Self, const FMars_Request_Control_Engage& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
-    Requests.EngageRequest = FMars_Request_Control_Engage();
+    Requests.EngageRequest = InRequest;
 }
 
 mixin void Request_SetActive(FCk_Handle_Control& Self, const FMars_Request_Control_SetActive& InRequest)
@@ -211,10 +230,10 @@ mixin void Request_Nudge(FCk_Handle_Control& Self, const FMars_Request_Control_N
 }
 
 // Lets go: the handle settles back to the current target pose. A no-op when not manipulating.
-mixin void Request_EndManipulation(FCk_Handle_Control& Self)
+mixin void Request_EndManipulation(FCk_Handle_Control& Self, const FMars_Request_Control_EndManipulation& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Control_Requests);
-    Requests.EndManipulationRequest = FMars_Request_Control_EndManipulation();
+    Requests.EndManipulationRequest = InRequest;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

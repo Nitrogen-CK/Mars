@@ -18,7 +18,7 @@ class UMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies : UCk_AutoTes
         auto TimedNoHold = FMars_Control_Spec();
         TimedNoHold.Interaction = ECk_Interaction_CompletionPolicy::Timed;
         TimedNoHold.HoldSeconds = 0.0f;
-        AssertInvalid(TimedNoHold, "Timed with HoldSeconds 0");
+        AssertInvalid(TimedNoHold, "Timed with HoldSeconds 0", "HoldSeconds");
 
         auto Timed = FMars_Control_Spec();
         Timed.Interaction = ECk_Interaction_CompletionPolicy::Timed;
@@ -31,28 +31,28 @@ class UMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies : UCk_AutoTes
 
         auto ManualNoEngage = Manual;
         ManualNoEngage.Manipulation.EngageAlpha = 0.0f;
-        AssertInvalid(ManualNoEngage, "ManuallyCompleted with EngageAlpha 0");
+        AssertInvalid(ManualNoEngage, "ManuallyCompleted with EngageAlpha 0", "EngageAlpha");
 
         auto ManualPastEnd = Manual;
         ManualPastEnd.Manipulation.EngageAlpha = 1.2f;
-        AssertInvalid(ManualPastEnd, "ManuallyCompleted with EngageAlpha 1.2");
+        AssertInvalid(ManualPastEnd, "ManuallyCompleted with EngageAlpha 1.2", "EngageAlpha");
 
         auto ManualNoTravel = Manual;
         ManualNoTravel.Manipulation.AlphaPerDegree = 0.0f;
-        AssertInvalid(ManualNoTravel, "ManuallyCompleted with AlphaPerDegree 0");
+        AssertInvalid(ManualNoTravel, "ManuallyCompleted with AlphaPerDegree 0", "AlphaPerDegree");
 
         auto ManualNoSpring = Manual;
         ManualNoSpring.Manipulation.Stiffness = 0.0f;
-        AssertInvalid(ManualNoSpring, "ManuallyCompleted with Stiffness 0");
+        AssertInvalid(ManualNoSpring, "ManuallyCompleted with Stiffness 0", "Stiffness");
 
         auto ManualPushingDamper = Manual;
         ManualPushingDamper.Manipulation.Damping = -1.0f;
-        AssertInvalid(ManualPushingDamper, "ManuallyCompleted with Damping -1");
+        AssertInvalid(ManualPushingDamper, "ManuallyCompleted with Damping -1", "Damping");
 
         auto MomentaryNoPulse = FMars_Control_Spec();
         MomentaryNoPulse.Behavior = EMars_Control_Behavior::Momentary;
         MomentaryNoPulse.ActiveSeconds = 0.0f;
-        AssertInvalid(MomentaryNoPulse, "Momentary with ActiveSeconds 0");
+        AssertInvalid(MomentaryNoPulse, "Momentary with ActiveSeconds 0", "ActiveSeconds");
     }
 
     private void AssertValid(const FMars_Control_Spec& InSpec, const FString& InCase)
@@ -61,10 +61,11 @@ class UMars_AutoTest_Control_SpecValidateRejectsMismatchedPolicies : UCk_AutoTes
         Assert_True(Validation.IsValid(), f"{InCase} is accepted (error: {Validation.Get_Error()})");
     }
 
-    private void AssertInvalid(const FMars_Control_Spec& InSpec, const FString& InCase)
+    // InField is the spec field the rejection must name.
+    private void AssertInvalid(const FMars_Control_Spec& InSpec, const FString& InCase, const FString& InField)
     {
         const auto Validation = InSpec.Validate();
         Assert_False(Validation.IsValid(), f"{InCase} is rejected");
-        Assert_True(Validation.Get_Error().Len() > 0, f"{InCase} names its rule (error: {Validation.Get_Error()})");
+        Assert_True(Validation.Get_Error().Contains(InField), f"{InCase} names [{InField}] (error: {Validation.Get_Error()})");
     }
 }

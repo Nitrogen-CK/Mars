@@ -55,43 +55,15 @@ class UMars_AutoTest_Interactable_AGripTaskTornDownMidWaitMovesNothing : UMars_A
     private void Add_SlowReachingHands()
     {
         auto Spec = FMars_FPHands_Spec();
-        Spec.HandNode = _HandNode;
         Spec.Reach.Grab.OutSeconds = k_ReachOutSeconds;
-        _Hands = utils_fphands::Add(_Carrier, Spec);
-        utils_interaction_resolver::Add(_Carrier, Make_UseResolverSpec(), ECk_Replication::DoesNotReplicate);
-        utils_input_intents::Add(_Carrier);
-        utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_CarrierHands));
-        _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnCarrierHandsPhaseChanged"));
-    }
-
-    // The Use intent over the Use channel; nothing is offered to it here, so no distance sort.
-    private FCk_InteractionResolver_Spec Make_UseResolverSpec() const
-    {
-        auto Channels = TArray<FGameplayTag>();
-        Channels.Add(GameplayTags::InteractionChannel_Mars_Use);
-
-        auto Mapping = FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, Channels);
-        Mapping.Set_DistanceSorting(ECk_InteractionResolver_DistanceSorting::Disabled);
-
-        auto Mappings = TArray<FCk_InteractionResolver_IntentChannelMapping>();
-        Mappings.Add(Mapping);
-        return FCk_InteractionResolver_Spec(Mappings);
+        Add_CarrierHands(Spec);
     }
 
     // A World-mode rock dropped onto a static floor of its own, both under the test.
     private FCk_Handle Spawn_RockOnAFloor(FCk_Handle InHandle)
     {
         auto Owner = InHandle;
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, k_FloorTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
-
+        Spawn_FloorSlab(Owner, k_FloorTop);
         return utils_world_item::Request_SpawnWorld(Owner, FMars_WorldItem_WorldSpec(
             utils_held_item::Make_DefinitionSoft(mars_items::Rock()), FTransform(FRotator::ZeroRotator, k_FloorTop + FVector(0.0, 0.0, 20.0))));
     }
@@ -103,11 +75,11 @@ class UMars_AutoTest_Interactable_AGripTaskTornDownMidWaitMovesNothing : UMars_A
     UFUNCTION()
     private void Check_RockConstructed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
-        const auto IsConstructed = ck::IsValid(_RockEntity) && _RockEntity.Is_WorldItem()
-            && ck::IsValid(_RockEntity.As_WorldItem().Get_HeldItem());
+        const auto Rock = TryGet_ConstructedWorldItem(_RockEntity);
+        const auto IsConstructed = ck::IsValid(Rock);
         if (IsConstructed && ck::Is_NOT_Valid(_Rock))
         {
-            _Rock = _RockEntity.As_WorldItem();
+            _Rock = Rock;
             _RockItem = _Rock.Get_HeldItem();
             auto Pickup = _Rock.Get_Pickup();
             _RockTarget = Pickup.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);

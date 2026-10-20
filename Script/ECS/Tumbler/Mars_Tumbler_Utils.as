@@ -235,29 +235,29 @@ namespace utils_tumbler
         return float32(0.5 - 0.5 * Math::Cos(Alpha * Math::DegreesToRadians(180.0)));
     }
 
-    // The index of the piece carrying InPieceId; -1 = none. Internal to the kernel: callers outside it address pieces by
+    // The index of the piece carrying InPieceId; unset = none. Internal to the kernel: callers outside it address pieces by
     // identity through the getters.
-    int32 Find_PieceIndex(const TArray<FMars_Tumbler_PieceState>& InPieces, const FMars_CookingFeed_PieceId& InPieceId)
+    TOptional<int32> Find_PieceIndex(const TArray<FMars_Tumbler_PieceState>& InPieces, const FMars_CookingFeed_PieceId& InPieceId)
     {
         for (int32 Index = 0; Index < InPieces.Num(); ++Index)
         {
             if (InPieces[Index].Id.Get_IsSame(InPieceId))
-            { return Index; }
+            { return TOptional<int32>(Index); }
         }
 
-        return -1;
+        return TOptional<int32>();
     }
 
-    // The index of the piece record holding InPiece; -1 = none.
-    int32 Find_PieceIndexByHandle(const TArray<FMars_Tumbler_PieceState>& InPieces, const FCk_Handle_FoodPiece& InPiece)
+    // The index of the piece record holding InPiece; unset = none.
+    TOptional<int32> Find_PieceIndexByHandle(const TArray<FMars_Tumbler_PieceState>& InPieces, const FCk_Handle_FoodPiece& InPiece)
     {
         for (int32 Index = 0; Index < InPieces.Num(); ++Index)
         {
             if (InPieces[Index].Piece == InPiece)
-            { return Index; }
+            { return TOptional<int32>(Index); }
         }
 
-        return -1;
+        return TOptional<int32>();
     }
 
     // A piece arrives with the crumb an earlier tumble wrote into its cook state: its coverage starts there.
@@ -322,10 +322,22 @@ namespace utils_tumbler
             && InState.Hand.Mode == EMars_Tumbler_HandMode::Free;
     }
 
-    bool Get_CanLoad(const FMars_Fragment_Tumbler& InState, EMars_CookingFeed_Phase InFeedPhase, int32 InCapacity)
+    // Unset when the drum would load a piece now: room in it, the hatch Open, the drum Home and nothing in flight.
+    TOptional<EMars_Tumbler_LoadRefusal> TryGet_LoadRefusal(const FMars_Fragment_Tumbler& InState, EMars_CookingFeed_Phase InFeedPhase, int32 InCapacity)
     {
-        return InState.Hatch == EMars_Tumbler_Hatch::Open && InState.Drum == EMars_Tumbler_Drum::Home
-            && InFeedPhase == EMars_CookingFeed_Phase::Idle && InState.Pieces.Num() < InCapacity;
+        if (InState.Pieces.Num() >= InCapacity)
+        { return TOptional<EMars_Tumbler_LoadRefusal>(EMars_Tumbler_LoadRefusal::Full); }
+
+        if (InState.Hatch != EMars_Tumbler_Hatch::Open)
+        { return TOptional<EMars_Tumbler_LoadRefusal>(EMars_Tumbler_LoadRefusal::HatchNotOpen); }
+
+        if (InState.Drum != EMars_Tumbler_Drum::Home)
+        { return TOptional<EMars_Tumbler_LoadRefusal>(EMars_Tumbler_LoadRefusal::NotHome); }
+
+        if (InFeedPhase != EMars_CookingFeed_Phase::Idle)
+        { return TOptional<EMars_Tumbler_LoadRefusal>(EMars_Tumbler_LoadRefusal::TransferInFlight); }
+
+        return TOptional<EMars_Tumbler_LoadRefusal>();
     }
 
     // Why a hatch press is refused; only meaningful when Get_CanToggleHatch is false.
@@ -463,9 +475,10 @@ mixin bool Get_CanGrip(const FCk_Handle_Tumbler& Self)
     return utils_tumbler::Get_CanGrip(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self));
 }
 
-mixin bool Get_CanLoad(const FCk_Handle_Tumbler& Self)
+// Why the add-food press would not load a piece now; unset when it would.
+mixin TOptional<EMars_Tumbler_LoadRefusal> TryGet_LoadRefusal(const FCk_Handle_Tumbler& Self)
 {
-    return utils_tumbler::Get_CanLoad(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self), Self.Get_Spec().Drum.Capacity);
+    return utils_tumbler::TryGet_LoadRefusal(Self.Get_Fragment(FMars_Fragment_Tumbler), utils_tumbler::Get_FeedPhase(Self), Self.Get_Spec().Drum.Capacity);
 }
 
 // The station root's world transform (the station frame).
@@ -496,7 +509,7 @@ mixin TArray<FMars_CookingFeed_PieceId> Get_PieceIds(const FCk_Handle_Tumbler& S
 
 mixin bool Get_HasPiece(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
-    return utils_tumbler::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces, InPieceId) >= 0;
+    return utils_tumbler::Find_PieceIndex(Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces, InPieceId).IsSet();
 }
 
 // A copy of the piece's state; an unknown Id ensures and answers a default state.
@@ -504,11 +517,11 @@ mixin FMars_Tumbler_PieceState Get_PieceState(const FCk_Handle_Tumbler& Self, co
 {
     const auto& Pieces = Self.Get_Fragment(FMars_Fragment_Tumbler).Pieces;
     const auto Index = utils_tumbler::Find_PieceIndex(Pieces, InPieceId);
-    if (ck::EnsureIfNot(Index >= 0,
+    if (ck::EnsureIfNot(Index.IsSet(),
         f"[Tumbler] [{Self.ToString()}] has no piece {utils_cooking_feed::Get_PieceName(InPieceId)} ({Pieces.Num()} in the drum)"))
     { return FMars_Tumbler_PieceState(); }
 
-    return Pieces[Index];
+    return Pieces[Index.GetValue()];
 }
 
 mixin float32 Get_PieceCoverage(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
@@ -538,16 +551,6 @@ mixin FCk_Handle Get_PieceEntity(const FCk_Handle_Tumbler& Self, const FMars_Coo
 mixin FCk_Handle_JoltBody Get_PieceBody(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
 {
     return Self.Get_PieceState(InPieceId).Body;
-}
-
-// The piece's centre in the drum frame (the axis along Y); zero once its entity is gone.
-mixin FVector Get_PieceAxleLocal(const FCk_Handle_Tumbler& Self, const FMars_CookingFeed_PieceId& InPieceId)
-{
-    const auto Entity = Self.Get_PieceEntity(InPieceId);
-    if (ck::Is_NOT_Valid(Entity))
-    { return FVector::ZeroVector; }
-
-    return Self.Get_AxleWorld().InverseTransformPosition(utils_transform::Get_EntityCurrentLocation(Entity.As_Transform()));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -52,6 +52,8 @@ namespace utils_reach_hint
     }
 
     // Replaces (or adds) the hint of an owner whose shape changes after composition (a dock gaining a platter).
+    // Set and Remove are the named exception to "only a feature's processors write its fragments": the hint is a declared
+    // fact with no processor of its own, written only by its owner's composer or its owner's own processor (the dock's sync).
     void Set(FCk_Handle& InOwner, const FMars_Fragment_ReachHint& InHint)
     {
         const auto Validation = InHint.Validate();

@@ -15,7 +15,7 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
         Add_Step("register a row", n"Step_Register");
         Add_Step_WaitUntil("the row is visible", n"Check_Registered");
         Add_Step("update with the same text", n"Step_UpdateSame");
-        Add_Step_WaitFrames("settle after a no-op update", 3);
+        Add_Step_WaitUntil("the unchanged update drained", n"Check_RequestsDrained");
         Add_Step("no update signal for unchanged text", n"Step_AssertNoUpdate");
         Add_Step("update with new text", n"Step_UpdateNew");
         Add_Step_WaitUntil("one update signal fired", n"Check_UpdatedOnce");
@@ -46,6 +46,13 @@ class UMars_AutoTest_ActionHintDisplay_UpdateBroadcastsOnlyOnChange : UCk_AutoTe
     private void Step_UpdateSame(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Display.Request_UpdateHint(FMars_Request_ActionHintDisplay_Update(_Row, FText::FromString("old")));
+    }
+
+    UFUNCTION()
+    private void Check_RequestsDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Display.Has_Fragment(FMars_Fragment_ActionHintDisplay_Requests) == false);
     }
 
     UFUNCTION()

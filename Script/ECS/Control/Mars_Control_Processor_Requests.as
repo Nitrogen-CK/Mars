@@ -108,7 +108,7 @@ class UMars_Processor_Control_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Mover = InState.Mover;
         if (ck::IsValid(Mover))
-        { Mover.Request_Settle(); }
+        { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
     }
 
     // Returns false when the control is not ManuallyCompleted (ensures). The grip starts where the handle stands (without

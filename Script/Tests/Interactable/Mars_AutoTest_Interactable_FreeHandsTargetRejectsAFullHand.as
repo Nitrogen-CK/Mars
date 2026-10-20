@@ -136,9 +136,9 @@ class UMars_AutoTest_Interactable_FreeHandsTargetRejectsAFullHand : UMars_AutoTe
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
-        auto Control = utils_control::Add(RootEntity, ControlSpec, FCk_Handle_Mover());
+        auto Control = utils_control::Add(RootEntity, ControlSpec);
 
-        auto Entry = Control.Make_InteractTarget(FText::FromString("Pull"));
+        auto Entry = Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull")));
         Entry.RequiresFreeHands = InRequiresFreeHands;
 
         auto Spec = FMars_Interactable_Spec();

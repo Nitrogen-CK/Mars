@@ -33,7 +33,7 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
     private void Step_BeginHeldGrip(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(
-            FCk_Handle_Interaction(), _Player, EMars_Control_ManipulationCompletion::OnRelease));
+            FCk_Handle_Interaction(), EMars_Control_ManipulationCompletion::OnRelease));
     }
 
     UFUNCTION()
@@ -48,7 +48,7 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
     private void Check_PushedToTheStop(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        if (_PushedFrames >= k_PushFrames && _Control.Get_ManipulationAlpha() > 0.97f)
+        if (_PushedFrames >= k_PushFrames && _Control.TryGet_ManipulationAlpha().Get(0.0f) > 0.97f)
         {
             Res.Set(true);
             return;
@@ -63,11 +63,11 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
     private void Step_AssertHeldAtTheStop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Control.Get_IsManipulating(), "a held grip is not ended by the threshold");
-        Assert_Equals_Float(_Control.Get_ManipulationAlpha(), 1.0f, 0.03f, "the handle rests at the far stop");
+        Assert_Equals_Float(_Control.TryGet_ManipulationAlpha().Get(0.0f), 1.0f, 0.03f, "the handle rests at the far stop");
         Assert_Equals_Int(_FinishedResults.Num(), 0, "nothing finished");
         Assert_Equals_Int(_EngagedCount, 0, "nothing engaged");
         Assert_False(_Control.Get_IsActive(), "the lever never flipped");
-        _AlphaBeforeRockBack = _Control.Get_ManipulationAlpha();
+        _AlphaBeforeRockBack = _Control.TryGet_ManipulationAlpha().Get(0.0f);
     }
 
     // At least k_RockBackFrames nudges back, and on until the handle has come back under 0.7.
@@ -75,7 +75,7 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
     private void Check_RockedBack(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        if (_RockedBackFrames >= k_RockBackFrames && _Control.Get_ManipulationAlpha() < 0.7f)
+        if (_RockedBackFrames >= k_RockBackFrames && _Control.TryGet_ManipulationAlpha().Get(0.0f) < 0.7f)
         {
             Res.Set(true);
             return;
@@ -90,7 +90,7 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
     private void Step_AssertRockedBack(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_True(_Control.Get_IsManipulating(), "still gripped after pulling back");
-        const auto Alpha = _Control.Get_ManipulationAlpha();
+        const auto Alpha = _Control.TryGet_ManipulationAlpha().Get(0.0f);
         Assert_True(Alpha < 0.7f && Alpha < _AlphaBeforeRockBack,
             f"the handle rocked back from {_AlphaBeforeRockBack} while held (got {Alpha})");
         Assert_Equals_Int(_EngagedCount, 0, "nothing engaged");
@@ -99,7 +99,7 @@ class UMars_AutoTest_Control_HeldGripRocksInsideTheArcUntilRelease : UMars_AutoT
     UFUNCTION()
     private void Step_EndManipulation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Control.Request_EndManipulation();
+        _Control.Request_EndManipulation(FMars_Request_Control_EndManipulation());
     }
 
     UFUNCTION()

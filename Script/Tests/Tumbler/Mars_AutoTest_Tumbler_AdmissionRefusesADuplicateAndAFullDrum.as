@@ -76,6 +76,6 @@ class UMars_AutoTest_Tumbler_AdmissionRefusesADuplicateAndAFullDrum : UMars_Auto
         Assert_Equals_Int(_Added.Num(), _Spec.Drum.Capacity, "one OnPieceAdded per accepted piece");
         Assert_False(ck::IsValid(_Boxes[1].TryGet_Holder()), "the refused box 1 is held by no ledger");
         Assert_False(ck::IsValid(_Boxes[7].TryGet_Holder()), "the refused box 7 is held by no ledger");
-        Assert_False(_Tumbler.Get_CanLoad(), "a full drum cannot load");
+        Assert_True(_Tumbler.TryGet_LoadRefusal() == EMars_Tumbler_LoadRefusal::Full, "a full drum refuses a load as Full");
     }
 }

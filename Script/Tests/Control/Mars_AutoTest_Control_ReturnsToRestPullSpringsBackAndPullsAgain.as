@@ -52,10 +52,11 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UMars_A
         ControlSpec.Manipulation.PullAxis = FVector(0.0, 0.0, -1.0);
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
         ControlSpec.Manipulation.ReturnsToRest = true;
-        _Control = utils_control::Add(RootEntity, ControlSpec, _Mover);
+        ControlSpec.Mover = _Mover;
+        _Control = utils_control::Add(RootEntity, ControlSpec);
 
         auto Spec = FMars_Interactable_Spec();
-        Spec.Targets.Add(_Control.Make_InteractTarget(FText::FromString("Pull chain")));
+        Spec.Targets.Add(_Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull chain"))));
         _Interactable = utils_interactable::Create(Root, Spec);
         _Target = _Interactable.Get_AllInteractTargets()[0];
         BindTargetSignals();
@@ -128,7 +129,7 @@ class UMars_AutoTest_Control_ReturnsToRestPullSpringsBackAndPullsAgain : UMars_A
     UFUNCTION()
     private void Step_AssertGripFromRest(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto Alpha = _Control.Get_ManipulationAlpha();
+        const auto Alpha = _Control.TryGet_ManipulationAlpha().Get(0.0f);
         Assert_True(Alpha < 0.01f, f"the grip is seeded from the rested handle (alpha {Alpha})");
     }
 

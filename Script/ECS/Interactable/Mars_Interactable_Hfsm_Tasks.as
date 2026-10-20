@@ -84,9 +84,8 @@ class UMars_SmTask_Interactable_ShowPrompt : UCk_SmTask_EntityScript
     }
 }
 
-// A RequiresFreeHands target while focused: its prompt reads utils_interactable::Get_HandsFullText while the focuser's
-// hands are full. Starting an interaction is refused by UMars_Interactable_FreeHandsPolicy, but the resolver only re-checks
-// it when dirtied, so when the hands fill this task re-offers the target to the focuser's resolver (remove + add, drained
+// A RequiresFreeHands target while focused: its prompt is blocked HandsFull while the focuser's hands are full. Starting
+// an interaction is refused by UMars_Interactable_FreeHandsPolicy, but the resolver only re-checks it when dirtied, so when the hands fill this task re-offers the target to the focuser's resolver (remove + add, drained
 // in order): the re-resolve drops it from the best targets, and the resolver's consumers let go - the player's Use task
 // cancels a live pull and the gloves release. A focuser without HeldItem binds nothing.
 class UMars_SmTask_Interactable_HandsGate : UCk_SmTask_EntityScript
@@ -155,11 +154,10 @@ class UMars_SmTask_Interactable_HandsGate : UCk_SmTask_EntityScript
         if (ck::Is_NOT_Valid(Prompt))
         { return; }
 
-        auto Request = FMars_Request_InteractPrompt_SetBlocked();
-        if (utils_interactable::Get_HandsAreFree(_Focuser) == false)
-        { Request = FMars_Request_InteractPrompt_SetBlocked(utils_interactable::Get_HandsFullText()); }
-
-        Prompt.Request_SetBlocked(Request);
+        const auto Reason = utils_interactable::Get_HandsAreFree(_Focuser)
+            ? EMars_InteractPrompt_BlockedReason::None
+            : EMars_InteractPrompt_BlockedReason::HandsFull;
+        Prompt.Request_SetBlocked(FMars_Request_InteractPrompt_SetBlocked(Reason));
     }
 
     // A focuser without a resolver (a test) has nothing to re-offer to.
@@ -171,75 +169,6 @@ class UMars_SmTask_Interactable_HandsGate : UCk_SmTask_EntityScript
 
         Resolver.Request_RemoveInteractTarget(FCk_Request_InteractionResolver_RemoveInteractTarget(_Target));
         Resolver.Request_AddInteractTarget(FCk_Request_InteractionResolver_AddInteractTarget(_Target));
-    }
-}
-
-// Claims an outline on the interactable's owner and its live entity subtree while focused. The source is the
-// owning state machine, so concurrent focus tasks clear only the claim they own. Only components hosted by the
-// entity (utils_unreal_component) are outlined - see AMars_TestLamp.
-class UMars_SmTask_Interactable_Outline : UCk_SmTask_EntityScript
-{
-    default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
-
-    // Valid while this task holds a claim.
-    private FCk_Handle _OutlineTarget;
-    private FCk_Handle _OutlineSource;
-    private FGameplayTag _OutlineTag;
-
-    UFUNCTION(BlueprintOverride)
-    void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        Release_Outline();
-
-        const auto& InteractableCtx = Get_StateMachineContext().Get_Fragment(FMars_Fragment_InteractionContext);
-        auto Interactable = InteractableCtx.Interactable;
-        if (ck::EnsureIfNot(ck::IsValid(Interactable), "InteractionContext is missing the Interactable handle"))
-        { return; }
-
-        auto Focuser = Interactable.Get_CurrentFocuser();
-        if (ck::Is_NOT_Valid(Focuser))
-        { return; }
-
-        // Interactables hosted on the player are not world objects; outlining their owner would outline the player.
-        if (InteractableCtx.InteractableOwner == Focuser)
-        { return; }
-
-        Claim_Outline(InteractableCtx.InteractableOwner);
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        Release_Outline();
-    }
-
-    private void Claim_Outline(FCk_Handle InTarget)
-    {
-        auto Target = InTarget;
-        FCk_Handle Source = Get_OwningStateMachine();
-        const auto Tag = UCk_Utils_Usf_Outline_Settings_UE::Get_GameplayInteractionOutlineTag();
-        if (ck::Is_NOT_Valid(Target) || ck::Is_NOT_Valid(Source))
-        { return; }
-
-        UCk_Utils_Usf_Outline_UE::Set_OutlineClaim(Target, Source, Tag, ECk_Usf_OutlineScope::EntityAndDependents);
-        if (UCk_Utils_Usf_Outline_UE::Has_OutlineClaim(Target, Source, Tag) == false)
-        { return; }
-
-        _OutlineTarget = Target;
-        _OutlineSource = Source;
-        _OutlineTag = Tag;
-    }
-
-    // The claim goes with its target: nothing to clear once the target is gone.
-    private void Release_Outline()
-    {
-        if (ck::IsValid(_OutlineTarget) && ck::IsValid(_OutlineSource) &&
-            UCk_Utils_Usf_Outline_UE::Has_OutlineClaim(_OutlineTarget, _OutlineSource, _OutlineTag))
-        { UCk_Utils_Usf_Outline_UE::Clear_OutlineClaim(_OutlineTarget, _OutlineSource, _OutlineTag); }
-
-        _OutlineTarget = FCk_Handle();
-        _OutlineSource = FCk_Handle();
-        _OutlineTag = FGameplayTag();
     }
 }
 
@@ -339,9 +268,9 @@ class UMars_SmTask_PerformInteractionSubSm : UCk_SmTask_SubStateMachine
     }
 }
 
-// The per-interaction sub-SM's end: ends the WhileLive interaction its root was stamped for with Result, and a Failed end
-// whose work named why (utils_interactable::Record_FailReason) reports it (OnInteractionFailed). An AfterCompletion
-// target's interaction ended before the sub-SM ran: nothing to end. Subclasses only set Result.
+// The per-interaction sub-SM's end: ends the WhileLive interaction its root was stamped for with Result. A failed work
+// reported its reason when it failed (utils_interactable::Record_FailReason). An AfterCompletion target's interaction
+// ended before the sub-SM ran: nothing to end. Subclasses only set Result.
 UCLASS(Abstract)
 class UMars_SmTask_EndInteraction : UCk_SmTask_EntityScript
 {
@@ -358,20 +287,6 @@ class UMars_SmTask_EndInteraction : UCk_SmTask_EntityScript
         { return; }
 
         utils_interaction::Request_EndInteraction(Interaction, FCk_Request_Interaction_EndInteraction(Result));
-
-        if (Result == ECk_SucceededFailed::Failed)
-        { Report_FailReason(OwningSm); }
-    }
-
-    private void Report_FailReason(const FCk_Handle& InOwningSm)
-    {
-        const auto Context = InOwningSm.Get_Fragment(FMars_Fragment_InteractionContext);
-        if (Context.FailReason.IsSet() == false)
-        { return; }
-
-        auto Interactable = Context.Interactable;
-        Interactable.Request_ReportFailure(FMars_Request_Interactable_ReportFailure(
-            Get_StateMachineContext().As_InteractTarget(), Context.Initiator, Context.FailReason.GetValue()));
     }
 }
 
@@ -383,4 +298,49 @@ class UMars_SmTask_EndInteraction_Succeeded : UMars_SmTask_EndInteraction
 class UMars_SmTask_EndInteraction_Failed : UMars_SmTask_EndInteraction
 {
     default Result = ECk_SucceededFailed::Failed;
+}
+
+// The base of a WhileLive work task (an interaction sub-SM's work state: a stow, a take, a deposit) that runs until its
+// work answers. The subclass resets _Outcome to Running on enter, reads its interaction's ends with TryGet_InteractionEnds,
+// sets _Outcome to Succeeded when the work lands, and calls DoFail with the reason when it does not; the task ticks and
+// returns _Outcome, so the work state's AllTasksSucceeded / AnyTaskFailed conditions route the sub-SM to its end. A
+// subclass that overrides DoTick calls Super.
+UCLASS(Abstract)
+class UMars_SmTask_InteractionWork : UCk_SmTask_EntityScript
+{
+    default _TaskMode = ECk_SmTaskMode::Tick;
+
+    protected ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
+
+    UFUNCTION(BlueprintOverride)
+    ECk_SmTaskResult DoTick(FCk_Handle_SmTask InHandle, FCk_Time InDeltaT, ECk_Sm_NetContext InNetContext)
+    {
+        return _Outcome;
+    }
+
+    // The work failed and nothing moved: InReason is reported (utils_interactable::Record_FailReason) and the task fails.
+    protected void DoFail(EMars_Interaction_FailReason InReason)
+    {
+        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
+        _Outcome = ECk_SmTaskResult::Failed;
+    }
+
+    // The interactable's owner (the state machine's context is its interact target) and the initiator stamped on the
+    // sub-SM root. A task run outside an interaction sub-SM has neither: ensured, and the task fails.
+    protected bool TryGet_InteractionEnds(FCk_Handle& OutOwner, FCk_Handle& OutInitiator)
+    {
+        auto Context = Get_StateMachineContext();
+        FCk_Handle SubSm = Get_OwningStateMachine();
+        const auto HasContext = Context.Has_Fragment(FMars_Fragment_InteractionContext)
+            && ck::IsValid(SubSm) && SubSm.Has_Fragment(FMars_Fragment_InteractionContext);
+        if (ck::EnsureIfNot(HasContext, f"[Interactable] [{GetClass().GetName()}] ran without an interaction context"))
+        {
+            _Outcome = ECk_SmTaskResult::Failed;
+            return false;
+        }
+
+        OutOwner = Context.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner;
+        OutInitiator = SubSm.Get_Fragment(FMars_Fragment_InteractionContext).Initiator;
+        return true;
+    }
 }

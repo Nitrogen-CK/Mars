@@ -26,7 +26,7 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UMars_AutoTes
     private void Check_PullPartWay(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        if (_Control.Get_ManipulationAlpha() > 0.35f)
+        if (_Control.TryGet_ManipulationAlpha().Get(0.0f) > 0.35f)
         {
             Res.Set(true);
             return;
@@ -46,7 +46,7 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UMars_AutoTes
     UFUNCTION()
     private void Step_EndManipulation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Control.Request_EndManipulation();
+        _Control.Request_EndManipulation(FMars_Request_Control_EndManipulation());
     }
 
     UFUNCTION()
@@ -55,7 +55,7 @@ class UMars_AutoTest_Control_ReleaseBeforeEngageAlphaSettlesBack : UMars_AutoTes
         Assert_False(_Control.Get_IsManipulating(), "let go");
         Assert_Equals_Int(_EngagedCount, 0, "nothing engaged");
         Assert_True(_Mover.Get_Target() == EMars_Mover_Pose::Start, "the target is still the rest pose");
-        Assert_Equals_Float(_Control.Get_ManipulationProgress(), 0.0, 0.0001, "no progress once released");
+        Assert_False(_Control.TryGet_ManipulationProgress().IsSet(), "no progress once released");
     }
 
     UFUNCTION()

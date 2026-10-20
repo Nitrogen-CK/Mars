@@ -1,6 +1,6 @@
-// Drains UpdateText, then SetBlocked, then SetInteraction, then broadcasts OnChanged and refreshes the display the prompt
-// is on, once, if anything changed. Text, colour and blocked state count as changed only when the drain ends somewhere
-// other than where it started; every SetInteraction counts (the widget re-renders the hold bar from it).
+// Drains UpdateText, then SetBlocked, then SetInteraction, then refreshes the display the prompt is on, once, if anything
+// changed. Text, colour and blocked state count as changed only when the drain ends somewhere other than where it started;
+// every SetInteraction counts (the widget re-renders the hold bar from it).
 class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -27,7 +27,7 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
 
         const auto StartText = InPromptComp.PromptText.ToString();
         const auto StartColor = InPromptComp.TextColor;
-        const auto StartBlocked = Get_BlockedKey(InPromptComp.BlockedText);
+        const auto StartReason = InPromptComp.BlockedReason;
 
         for (const auto& UpdateRequest : UpdateRequests)
         {
@@ -37,7 +37,7 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
         }
 
         for (const auto& SetBlockedRequest : SetBlockedRequests)
-        { InPromptComp.BlockedText = SetBlockedRequest.BlockedText; }
+        { InPromptComp.BlockedReason = SetBlockedRequest.Reason; }
 
         for (const auto& SetInteractionRequest : SetInteractionRequests)
         { InPromptComp.CurrentInteraction = SetInteractionRequest.Interaction; }
@@ -45,12 +45,9 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
         const auto Changed = SetInteractionRequests.Num() > 0
             || InPromptComp.PromptText.ToString() != StartText
             || InPromptComp.TextColor != StartColor
-            || Get_BlockedKey(InPromptComp.BlockedText) != StartBlocked;
+            || InPromptComp.BlockedReason != StartReason;
         if (Changed == false)
         { return; }
-
-        if (Self.Has_Fragment(FMars_Fragment_InteractPrompt_Signals))
-        { Self.Get_Fragment(FMars_Fragment_InteractPrompt_Signals).OnChanged.Broadcast(Self); }
 
         // The display only re-renders on add / refresh / remove, so a changed prompt refreshes the display it is on.
         if (Self.Has_Fragment(FMars_Fragment_InteractPrompt_DisplayBinding))
@@ -59,14 +56,5 @@ class UMars_Processor_InteractPrompt_HandleRequests : UCk_Processor_Script_Base_
             if (ck::IsValid(BoundDisplay))
             { BoundDisplay.Request_RefreshPrompt(FMars_Request_InteractPromptDisplay_RefreshPrompt(Self)); }
         }
-    }
-
-    // Blocked state as one comparable value: unset, or the reason text.
-    private TOptional<FString> Get_BlockedKey(const TOptional<FText>& InBlockedText) const
-    {
-        if (InBlockedText.IsSet() == false)
-        { return TOptional<FString>(); }
-
-        return TOptional<FString>(InBlockedText.GetValue().ToString());
     }
 }

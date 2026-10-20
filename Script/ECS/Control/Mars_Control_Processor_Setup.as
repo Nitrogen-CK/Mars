@@ -19,7 +19,7 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
         if (ck::IsValid(Source))
         {
             Control.BindTo_OnActiveChanged(FMars_Delegate_Control_OnActiveChanged(this, n"OnActiveChanged"));
-            Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(Control.Get_IsActive() ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted));
+            Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Get_SourceOutput(Control.Get_Activation())));
         }
 
         // A momentary control that starts active still has to release; activating it arms the release timer.
@@ -36,7 +36,11 @@ class UMars_Processor_Control_Setup : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(Source))
         { return; }
 
-        const auto Output = InActivation == EMars_Control_Activation::Active ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
-        Source.Request_SetOutput(FMars_Request_MechanismSource_SetOutput(Output));
+        Source.Request_SetOutput(utils_mechanism_source::Make_SetOutput(Get_SourceOutput(InActivation)));
+    }
+
+    private EMars_MechanismSource_Output Get_SourceOutput(EMars_Control_Activation InActivation) const
+    {
+        return InActivation == EMars_Control_Activation::Active ? EMars_MechanismSource_Output::Asserted : EMars_MechanismSource_Output::Deasserted;
     }
 }

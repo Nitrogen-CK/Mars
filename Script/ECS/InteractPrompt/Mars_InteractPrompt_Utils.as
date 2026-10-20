@@ -63,26 +63,26 @@ mixin FLinearColor Get_PromptTextColor(const FCk_Handle_InteractPrompt& Self)
 
 mixin bool Get_IsBlocked(const FCk_Handle_InteractPrompt& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).BlockedText.IsSet();
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).BlockedReason != EMars_InteractPrompt_BlockedReason::None;
 }
 
-// What the widget shows: the blocked reason while set, else the prompt text.
+mixin EMars_InteractPrompt_BlockedReason Get_BlockedReason(const FCk_Handle_InteractPrompt& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).BlockedReason;
+}
+
+// The prompt text; a blocked reason is worded by the prompt widget instead.
 mixin FText Get_DisplayText(const FCk_Handle_InteractPrompt& Self)
 {
-    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt);
-    if (Fragment.BlockedText.IsSet())
-    { return Fragment.BlockedText.GetValue(); }
-
-    return Fragment.PromptText;
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).PromptText;
 }
 
 mixin FLinearColor Get_DisplayTextColor(const FCk_Handle_InteractPrompt& Self)
 {
-    const auto& Fragment = Self.Get_Fragment(FMars_Fragment_InteractPrompt);
-    if (Fragment.BlockedText.IsSet())
+    if (Self.Get_IsBlocked())
     { return constants_ui_colors::k_PromptText_Blocked; }
 
-    return Fragment.TextColor;
+    return Self.Get_Fragment(FMars_Fragment_InteractPrompt).TextColor;
 }
 
 mixin FCk_Handle_Interaction Get_CurrentInteraction(const FCk_Handle_InteractPrompt& Self)
@@ -112,22 +112,4 @@ mixin void Request_SetInteraction(FCk_Handle_InteractPrompt& Self, const FMars_R
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Requests);
     Requests.SetInteractionRequests.Add(InRequest);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-// Signal Binding
-//--------------------------------------------------------------------------------------------------------------------------
-
-mixin void BindTo_OnPromptChanged(FCk_Handle_InteractPrompt& Self, FMars_Delegate_InteractPrompt_OnChanged InDelegate)
-{
-    auto& Fragment = Self.AddOrGet_Fragment(FMars_Fragment_InteractPrompt_Signals);
-    Fragment.OnChanged.AddUFunction(InDelegate.GetUObject(), InDelegate.GetFunctionName());
-}
-
-mixin void UnbindFrom_OnPromptChanged(FCk_Handle_InteractPrompt& Self, FMars_Delegate_InteractPrompt_OnChanged InDelegate)
-{
-    if (Self.Has_Fragment(FMars_Fragment_InteractPrompt_Signals) == false)
-    { return; }
-
-    Self.Get_Fragment(FMars_Fragment_InteractPrompt_Signals).OnChanged.Unbind(InDelegate.GetUObject(), InDelegate.GetFunctionName());
 }

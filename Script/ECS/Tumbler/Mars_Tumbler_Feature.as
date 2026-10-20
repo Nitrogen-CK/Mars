@@ -47,6 +47,16 @@ enum EMars_Tumbler_Drum
     Returning
 }
 
+// Why the add-food press would not load a piece now. Full: Drum.Capacity pieces are in. HatchNotOpen: the hatch is not
+// resting open. NotHome: the drum is gripped or returning. TransferInFlight: the station's feed is mid-transfer.
+enum EMars_Tumbler_LoadRefusal
+{
+    Full,
+    HatchNotOpen,
+    NotHome,
+    TransferInFlight
+}
+
 // Why a press did nothing. LoadingInFlight: the station's feed is mid-transfer.
 enum EMars_Tumbler_Refusal
 {

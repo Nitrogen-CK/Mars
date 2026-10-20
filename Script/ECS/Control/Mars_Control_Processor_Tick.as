@@ -66,7 +66,7 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
         Self.Request_TryRemove(FMars_Tag_Control_Manipulating);
 
         if (Self.Get_ReturnsToRest() && ck::IsValid(Mover))
-        { Mover.Request_Settle(); }
+        { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
 
         if (Self.Has_Fragment(FMars_Fragment_Control_Signals))
         { Self.Get_Fragment(FMars_Fragment_Control_Signals).OnManipulationChanged.Broadcast(Self, EMars_Control_Grip::Released); }
@@ -105,6 +105,6 @@ class UMars_Processor_Control_Tick : UCk_Processor_Script_Base_UE
 
         auto Mover = Control.Get_Mover();
         if (ck::IsValid(Mover))
-        { Mover.Request_Settle(); }
+        { Mover.Request_Settle(FMars_Request_Mover_Settle()); }
     }
 }

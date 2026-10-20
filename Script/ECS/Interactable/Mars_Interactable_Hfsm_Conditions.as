@@ -85,10 +85,15 @@ class UMars_SmCondition_InteractableIsNotFocusable : UMars_SmCondition_Interacta
     default _NegateResult = true;
 }
 
-// A WhileLive target (its context's Work): satisfied while it has a live interaction, level-checked at enter and kept by
-// its OnNewInteraction and OnInteractionFinished. Never satisfied on an AfterCompletion target.
-class UMars_SmCondition_InteractionLive : UCk_SmCondition_EventDriven
+// A WhileLive target (its context's Work) read from its interaction record: level-checked at enter and kept by its
+// OnNewInteraction and OnInteractionFinished. _SatisfiedWhileLive picks the side: satisfied while a live interaction exists
+// (InteractionLive) or once none is left (InteractionEnded). Never satisfied on an AfterCompletion target, which is why
+// the two are subclasses rather than one condition negated.
+UCLASS(Abstract)
+class UMars_SmCondition_InteractionRecord : UCk_SmCondition_EventDriven
 {
+    protected bool _SatisfiedWhileLive = true;
+
     private FCk_Handle_InteractTarget _Target;
 
     UFUNCTION(BlueprintOverride)
@@ -133,67 +138,24 @@ class UMars_SmCondition_InteractionLive : UCk_SmCondition_EventDriven
 
     private void Mark_FromRecord(const FCk_Handle_Interaction& InFinishing)
     {
-        if (ck::IsValid(utils_interactable::Get_LiveInteraction(_Target, InFinishing)))
+        const auto IsLive = ck::IsValid(utils_interactable::Get_LiveInteraction(_Target, InFinishing));
+        if (IsLive == _SatisfiedWhileLive)
         { MarkSatisfied(); }
         else
         { MarkUnsatisfied(); }
     }
 }
 
-// A WhileLive target (its context's Work): satisfied once it has no live interaction left, level-checked at enter and kept
-// by its OnNewInteraction and OnInteractionFinished; a cancel from outside the work ends Interacting with it. Never
-// satisfied on an AfterCompletion target.
-class UMars_SmCondition_InteractionEnded : UCk_SmCondition_EventDriven
+// Satisfied while the WhileLive target has a live interaction.
+class UMars_SmCondition_InteractionLive : UMars_SmCondition_InteractionRecord
 {
-    private FCk_Handle_InteractTarget _Target;
+    default _SatisfiedWhileLive = true;
+}
 
-    UFUNCTION(BlueprintOverride)
-    void DoEnterCondition(FCk_Handle_SmCondition InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        _Target = utils_interactable::TryGet_WhileLiveTarget(Get_StateMachineContext());
-        if (ck::Is_NOT_Valid(_Target))
-        {
-            MarkUnsatisfied();
-            return;
-        }
-
-        _Target.BindTo_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
-        _Target.BindTo_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnInteractionFinished"));
-        Mark_FromRecord(FCk_Handle_Interaction());
-    }
-
-    UFUNCTION(BlueprintOverride)
-    void DoExitCondition(FCk_Handle_SmCondition InHandle, ECk_Sm_NetContext InNetContext)
-    {
-        if (ck::IsValid(_Target))
-        {
-            _Target.UnbindFrom_OnNewInteraction(FCk_Delegate_InteractTarget_OnNewInteraction(this, n"OnNewInteraction"));
-            _Target.UnbindFrom_OnInteractionFinished(FCk_Delegate_InteractTarget_OnInteractionFinished(this, n"OnInteractionFinished"));
-        }
-
-        _Target = FCk_Handle_InteractTarget();
-    }
-
-    UFUNCTION()
-    private void OnNewInteraction(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction)
-    {
-        Mark_FromRecord(FCk_Handle_Interaction());
-    }
-
-    // The finishing interaction is still in the record while its finish broadcasts.
-    UFUNCTION()
-    private void OnInteractionFinished(FCk_Handle_InteractTarget InTarget, FCk_Handle_Interaction InInteraction, ECk_SucceededFailed InResult)
-    {
-        Mark_FromRecord(InInteraction);
-    }
-
-    private void Mark_FromRecord(const FCk_Handle_Interaction& InFinishing)
-    {
-        if (ck::IsValid(utils_interactable::Get_LiveInteraction(_Target, InFinishing)))
-        { MarkUnsatisfied(); }
-        else
-        { MarkSatisfied(); }
-    }
+// Satisfied once the WhileLive target has no live interaction left; a cancel from outside the work ends Interacting with it.
+class UMars_SmCondition_InteractionEnded : UMars_SmCondition_InteractionRecord
+{
+    default _SatisfiedWhileLive = false;
 }
 
 // An AfterCompletion target (its context's Work): satisfied while the interactable holds a fresh completion of this target

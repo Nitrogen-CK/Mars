@@ -102,8 +102,8 @@ struct FMars_Station_GripNode
     }
 }
 
-// What the placing script hands utils_station::Add beside the spec: the Use probe (unset = a transform-only Use
-// interactable) and the nodes its grips name.
+// What the placing script builds for the station at construction (FMars_Station_Spec.Setup, never saved): the Use probe
+// (unset = a transform-only Use interactable), the nodes its grips name, and the Use target's prompt.
 struct FMars_Station_Setup
 {
     // Not a UPROPERTY, as FMars_Interactable_Spec.ProbeInfo.
@@ -111,6 +111,10 @@ struct FMars_Station_Setup
 
     UPROPERTY()
     TArray<FMars_Station_GripNode> GripNodes;
+
+    // The Use target's prompt, input action included; unset = a prompt-less Use target. The kernel never re-texts it: the
+    // placing script words it for the reservation (UMars_Station_EntityScript).
+    TOptional<FMars_InteractPrompt_Spec> UsePrompt;
 }
 
 // The operator's view while operating.
@@ -144,7 +148,8 @@ struct FMars_Station_CameraSpec
     }
 }
 
-// What the Use prompt reads.
+// What the Use prompt reads. Read by the placing script, which words the Use prompt (FMars_Station_Setup.UsePrompt and its
+// re-texting on reserve and release); the kernel never reads it. The layout is frozen (placed maps carry it).
 struct FMars_Station_PromptSpec
 {
     UPROPERTY()
@@ -189,6 +194,9 @@ struct FMars_Station_Spec
     UPROPERTY()
     TSoftClassPtr<UCk_SmState_EntityScript> MinigameStateClass;
 
+    // Construction inputs the placing script builds (not a UPROPERTY: the spawn params and maps never carry it).
+    FMars_Station_Setup Setup;
+
     FMars_Station_Spec() {}
 
     FMars_Station_Spec(
@@ -209,7 +217,8 @@ struct FMars_Station_Spec
 }
 
 // A negative glide ceiling has no meaning, a yaw half angle outside (0, 180] fences nothing or everything, an empty
-// prompt text leaves the player a glyph with no verb, a grip without a node tag names nothing, and a glove holds one grip.
+// prompt text leaves the player a glyph with no verb, a grip without a node tag names nothing, a glove holds one grip,
+// and a Use prompt, when Setup carries one, must validate. Add resolves the grips against Setup.GripNodes.
 mixin FMars_Validation Validate(const FMars_Station_Spec& Self)
 {
     for (int32 Index = 0; Index < Self.Grips.Num(); ++Index)
@@ -235,6 +244,13 @@ mixin FMars_Validation Validate(const FMars_Station_Spec& Self)
 
     if (Self.Prompt.OccupiedText.IsEmpty())
     { return FMars_Validation("Station has an empty Prompt.OccupiedText"); }
+
+    if (Self.Setup.UsePrompt.IsSet())
+    {
+        const auto PromptValidation = Self.Setup.UsePrompt.GetValue().Validate();
+        if (PromptValidation.IsValid() == false)
+        { return FMars_Validation(f"Station Setup.UsePrompt: {PromptValidation.Get_Error()}"); }
+    }
 
     return FMars_Validation();
 }

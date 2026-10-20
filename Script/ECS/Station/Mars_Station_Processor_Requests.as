@@ -49,14 +49,22 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
             f"[Station] [{Operator.ToString()}] reserved [{InStation.ToString()}] without the Operator feature - compose utils_operator::Add first"))
         { return; }
 
+        // The holder re-reserving: nothing changes, and OnReserved answers it again.
+        if (InState.Operator == Operator)
+        {
+            BroadcastReserved(InStation, Operator);
+            return;
+        }
+
         if (ck::IsValid(InState.Operator))
         {
             BroadcastRejected(InStation, Operator, EMars_Station_RejectReason::Occupied);
             return;
         }
 
+        // Both ends are written together: an operator holding a station here holds another one.
         auto& OperatorState = Operator.Get_Fragment(FMars_Fragment_Operator);
-        if (ck::IsValid(OperatorState.Station) && OperatorState.Station != InStation)
+        if (ck::IsValid(OperatorState.Station))
         {
             BroadcastRejected(InStation, Operator, EMars_Station_RejectReason::AlreadyOperating);
             return;
@@ -72,8 +80,7 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
         InStation.H().UnbindFrom_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
         InStation.H().BindTo_OnBeginDestroy(FCk_Delegate_OnBeginDestroy(this, n"OnStationBeginDestroy"));
 
-        if (InStation.Has_Fragment(FMars_Fragment_Station_Signals))
-        { InStation.Get_Fragment(FMars_Fragment_Station_Signals).OnReserved.Broadcast(InStation, Operator); }
+        BroadcastReserved(InStation, Operator);
     }
 
     // Scoped: a release naming anyone but the current holder is a no-op (a rejected or stale caller cannot evict them).
@@ -146,6 +153,12 @@ class UMars_Processor_Station_HandleRequests : UCk_Processor_Script_Base_UE
 
         auto Station = StationEntity.As_Station();
         BroadcastReleased(Station, Operator, EMars_Station_ReleaseReason::StationDestroyed);
+    }
+
+    private void BroadcastReserved(FCk_Handle_Station& InStation, FCk_Handle InOperator)
+    {
+        if (InStation.Has_Fragment(FMars_Fragment_Station_Signals))
+        { InStation.Get_Fragment(FMars_Fragment_Station_Signals).OnReserved.Broadcast(InStation, InOperator); }
     }
 
     private void BroadcastRejected(FCk_Handle_Station& InStation, FCk_Handle InOperator, EMars_Station_RejectReason InReason)

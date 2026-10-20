@@ -40,11 +40,12 @@ class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
-        _Control = utils_control::Add(RootEntity, ControlSpec, _Mover);
+        ControlSpec.Mover = _Mover;
+        _Control = utils_control::Add(RootEntity, ControlSpec);
         _Control.BindTo_OnEngaged(FMars_Delegate_Control_OnEngaged(this, n"OnEngaged"));
 
         auto Spec = FMars_Interactable_Spec();
-        Spec.Targets.Add(_Control.Make_InteractTarget(FText::FromString("Pull")));
+        Spec.Targets.Add(_Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull"))));
         _Interactable = utils_interactable::Create(Root, Spec);
         _Target = _Interactable.Get_AllInteractTargets()[0];
         BindTargetSignals();
@@ -99,7 +100,7 @@ class UMars_AutoTestRig_Lever : UCk_AutoTest_Base
     UFUNCTION()
     protected void Step_BeginManipulation(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(_Interaction, _Player));
+        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(_Interaction));
     }
 
     UFUNCTION()

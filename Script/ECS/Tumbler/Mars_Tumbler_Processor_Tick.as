@@ -243,9 +243,8 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
             if (Linear >= 1.0f)
             {
                 auto Lever = Nodes.Lever;
-                auto Manipulator = InFrame.Tumbler;
                 Lever.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(
-                    FCk_Handle_Interaction(), Manipulator.H(), EMars_Control_ManipulationCompletion::OnRelease));
+                    FCk_Handle_Interaction(), EMars_Control_ManipulationCompletion::OnRelease));
                 Hand.Mode = EMars_Tumbler_HandMode::Gripped;
                 Hand.HandLocal = GripLocal;
                 Hand.HandRotationLocal = GripRotationLocal;
@@ -305,32 +304,23 @@ class UMars_Processor_Tumbler_Tick : UCk_Processor_Script_Base_UE
         const auto Hatch = InState.Hatch;
         const auto Drum = InState.Drum;
 
-        if (Drum != InEdges.StartDrum && Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Signals))
+        // Each broadcast re-reads the fragment: a listener may grow the signal storage under a held reference.
+        if (Drum != InEdges.StartDrum)
         { Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnDrumChanged.Broadcast(Tumbler, Drum); }
 
         for (int32 Index = 0; Index < InEdges.CoverageIds.Num(); ++Index)
-        {
-            if (Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Signals) == false)
-            { return; }
-
-            Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnCoverageChanged.Broadcast(Tumbler, InEdges.CoverageIds[Index], InEdges.Coverages[Index]);
-        }
+        { Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnCoverageChanged.Broadcast(Tumbler, InEdges.CoverageIds[Index], InEdges.Coverages[Index]); }
 
         for (const auto& ReseatId : InEdges.ReseatIds)
-        {
-            if (Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Signals) == false)
-            { return; }
+        { Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnPieceReseated.Broadcast(Tumbler, ReseatId); }
 
-            Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnPieceReseated.Broadcast(Tumbler, ReseatId);
-        }
-
-        if (Hatch != InEdges.StartHatch && Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Signals))
+        if (Hatch != InEdges.StartHatch)
         { Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnHatchChanged.Broadcast(Tumbler, Hatch); }
 
-        if (Hovered != InEdges.StartHovered && Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Signals))
+        if (Hovered != InEdges.StartHovered)
         { Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnHoverChanged.Broadcast(Tumbler, Hovered); }
 
-        if (Mode != InEdges.StartMode && Tumbler.Has_Fragment(FMars_Fragment_Tumbler_Signals))
+        if (Mode != InEdges.StartMode)
         { Tumbler.Get_Fragment(FMars_Fragment_Tumbler_Signals).OnHandModeChanged.Broadcast(Tumbler, Mode); }
     }
 }

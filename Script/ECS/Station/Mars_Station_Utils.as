@@ -10,13 +10,14 @@ namespace utils_station
     const float32 k_ViewBlendSeconds = 0.3f;
 
     // Composes the station on InRoot (its frame is InRoot's transform, see FMars_Station_Spec): the Stand child node, the
-    // View child node when Camera.ViewLocal is set, the Use interactable (probe-driven focus when InSetup.Probe is set,
-    // else a transform-only child) with its one reserving target, the grip table on the root (each spec grip on the node
-    // InSetup.GripNodes registers under its tag), the grip interactable on the root, and the minigame state machine when
-    // the spec names one. A rejected spec, a grip naming a node tag nothing registers, or a minigame class that does not
-    // load ensures and returns an invalid handle with nothing composed.
-    FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec, FMars_Station_Setup InSetup)
+    // View child node when Camera.ViewLocal is set, the Use interactable (probe-driven focus when Setup.Probe is set, else
+    // a transform-only child) with its one reserving target and Setup.UsePrompt, the grip table on the root (each spec grip
+    // on the node Setup.GripNodes registers under its tag), the grip interactable on the root, and the minigame state
+    // machine when the spec names one. A rejected spec, a grip naming a node tag nothing registers, or a minigame class
+    // that does not load ensures and returns an invalid handle with nothing composed.
+    FCk_Handle_Station Add(FCk_Handle_Transform& InRoot, FMars_Station_Spec InSpec)
     {
+
         const auto Validation = InSpec.Validate();
         if (ck::EnsureIfNot(Validation.IsValid(), f"[Station] [{InRoot.ToString()}] rejected the spec: {Validation.Get_Error()}"))
         { return FCk_Handle_Station(); }
@@ -26,7 +27,7 @@ namespace utils_station
         for (int32 Index = 0; Index < InSpec.Grips.Num() && GripError.IsEmpty(); ++Index)
         {
             const auto& Grip = InSpec.Grips[Index];
-            const auto Node = Find_GripNode(InSetup, Grip.Node);
+            const auto Node = Find_GripNode(InSpec.Setup, Grip.Node);
             if (ck::Is_NOT_Valid(Node))
             {
                 GripError = f"grip [{Index}] names the node [{Grip.Node.ToString()}] that no grip node registers";
@@ -45,8 +46,11 @@ namespace utils_station
             f"[Station] [{InRoot.ToString()}] names a MinigameStateClass that does not load"))
         { return FCk_Handle_Station(); }
 
+        // The construction inputs stay with the caller; only the Use prompt is read again (Make_UseTarget).
         auto Params = FMars_Fragment_Station_Params();
         Params.Spec = InSpec;
+        Params.Spec.Setup = FMars_Station_Setup();
+        Params.Spec.Setup.UsePrompt = InSpec.Setup.UsePrompt;
 
         auto State = FMars_Fragment_Station();
         State.Stand = utils_scene_node::Create(InRoot, InSpec.StandLocal).As_Transform();
@@ -63,7 +67,7 @@ namespace utils_station
         { utils_fphands::Add_Grips(InRoot.H(), GripEntries); }
 
         auto UseSpec = FMars_Interactable_Spec();
-        UseSpec.ProbeInfo = InSetup.Probe;
+        UseSpec.ProbeInfo = InSpec.Setup.Probe;
         UseSpec.Targets.Add(Station.Make_UseTarget());
         auto Interactable = utils_interactable::Create(InRoot, UseSpec);
 
@@ -126,20 +130,14 @@ namespace utils_station
 //--------------------------------------------------------------------------------------------------------------------------
 
 // The Use target: WhileLive, routed to UMars_SmState_Station_Use, which only reserves the station for the initiator and
-// ends the interaction with the answer. Operating takes both hands (RequiresFreeHands).
+// ends the interaction with the answer. Operating takes both hands (RequiresFreeHands). Its prompt is Setup.UsePrompt.
 mixin FMars_Interactable_TargetEntry Make_UseTarget(const FCk_Handle_Station& Self)
 {
     const auto& Spec = Self.Get_Fragment(FMars_Fragment_Station_Params).Spec;
 
-    auto TargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
-
-    auto Prompt = FMars_InteractPrompt_Spec();
-    Prompt.InputAction = mars::Mars_IA_Interact_Use;
-    Prompt.PromptText = Spec.Prompt.Text;
-
     auto Target = FMars_Interactable_TargetEntry();
-    Target.InteractTargetSpec = TargetSpec;
-    Target.InteractPromptSpec = Prompt;
+    Target.InteractTargetSpec = FCk_InteractTarget_Spec(GameplayTags::InteractionChannel_Mars_Use);
+    Target.InteractPromptSpec = Spec.Setup.UsePrompt;
     Target.InteractionStateClass = UMars_SmState_Station_Use;
     Target.RequiresFreeHands = true;
     Target.Work = EMars_Interactable_Work::WhileLive;
@@ -184,11 +182,6 @@ mixin bool Get_IsOperatedBy(const FCk_Handle_Station& Self, FCk_Handle InOperato
 {
     const auto Operator = Self.Get_Fragment(FMars_Fragment_Station).Operator;
     return ck::IsValid(Operator) && Operator == InOperator;
-}
-
-mixin FCk_Handle_Transform Get_Stand(const FCk_Handle_Station& Self)
-{
-    return Self.Get_Fragment(FMars_Fragment_Station).Stand;
 }
 
 // The operator's view node; invalid when the spec leaves Camera.ViewLocal unset.

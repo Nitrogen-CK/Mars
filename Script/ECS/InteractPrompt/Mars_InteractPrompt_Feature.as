@@ -25,6 +25,24 @@ struct FMars_InteractPrompt_Spec
 
     UPROPERTY()
     FLinearColor TextColor = constants_ui_colors::k_PromptText;
+
+    FMars_InteractPrompt_Spec() {}
+
+    FMars_InteractPrompt_Spec(TSoftObjectPtr<UInputAction> InInputAction, FText InPromptText)
+    {
+        InputAction = InInputAction;
+        PromptText = InPromptText;
+    }
+}
+
+// Why a prompt's action can't be taken right now. The kernel names the reason; the prompt widget words it.
+enum EMars_InteractPrompt_BlockedReason
+{
+    None,
+    // The action needs both hands and the focuser holds an item.
+    HandsFull,
+    // The focuser's hotbar has no slot for the item.
+    HotbarFull
 }
 
 // A prompt without an action renders no key glyph, and one without text leaves the player a glyph with no verb.
@@ -83,25 +101,13 @@ struct FMars_Fragment_InteractPrompt
     UPROPERTY()
     FLinearColor TextColor = constants_ui_colors::k_PromptText;
 
-    // Set while the action can't be taken: the reason shows instead of PromptText, which keeps following UpdateText.
+    // Not None while the action can't be taken: the widget words the reason instead of PromptText, which keeps following
+    // UpdateText.
     UPROPERTY()
-    TOptional<FText> BlockedText;
-
+    EMars_InteractPrompt_BlockedReason BlockedReason = EMars_InteractPrompt_BlockedReason::None;
     // The in-progress interaction on this prompt's target, tracked while the prompt is displayed.
     UPROPERTY()
     FCk_Handle_Interaction CurrentInteraction;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-// Signals
-//--------------------------------------------------------------------------------------------------------------------------
-
-delegate void FMars_Delegate_InteractPrompt_OnChanged(FCk_Handle_InteractPrompt InPrompt);
-event void FMars_Delegate_InteractPrompt_OnChanged_MC(FCk_Handle_InteractPrompt InPrompt);
-
-struct FMars_Fragment_InteractPrompt_Signals
-{
-    FMars_Delegate_InteractPrompt_OnChanged_MC OnChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -146,13 +152,12 @@ struct FMars_Request_InteractPrompt_SetInteraction
 struct FMars_Request_InteractPrompt_SetBlocked
 {
     UPROPERTY()
-    TOptional<FText> BlockedText;
-
+    EMars_InteractPrompt_BlockedReason Reason = EMars_InteractPrompt_BlockedReason::None;
     FMars_Request_InteractPrompt_SetBlocked() {}
 
-    FMars_Request_InteractPrompt_SetBlocked(const FText& InBlockedText)
+    FMars_Request_InteractPrompt_SetBlocked(EMars_InteractPrompt_BlockedReason InReason)
     {
-        BlockedText = TOptional<FText>(InBlockedText);
+        Reason = InReason;
     }
 }
 

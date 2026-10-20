@@ -84,10 +84,10 @@ mixin void Request_Scrub(FCk_Handle_Mover& Self, const FMars_Request_Mover_Scrub
     Requests.ScrubRequests.Add(InRequest);
 }
 
-mixin void Request_Settle(FCk_Handle_Mover& Self)
+mixin void Request_Settle(FCk_Handle_Mover& Self, const FMars_Request_Mover_Settle& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Mover_Requests);
-    Requests.SettleRequests.Add(FMars_Request_Mover_Settle());
+    Requests.SettleRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 // One-shot per station: keeps the Use interactable in step with the reservation. While an operator holds the station its
 // Use interactable holds the Operated claim (its framework target is disabled with it, so the resolver skips it and nobody
-// can start a second reserve) and its prompt is re-texted to Prompt.OccupiedText; on release the claim goes and the prompt
-// reads Prompt.Text. Operated keeps the interactable focusable, so a focuser sees the occupied text while the claim holds.
-// A reservation that landed before this setup ran (same-frame reserve) is applied here at once.
+// can start a second reserve); on release the claim goes. Operated keeps the interactable focusable, so a focuser still
+// sees the prompt (the placing script words it for the reservation). A reservation that landed before this setup ran
+// (same-frame reserve) is applied here at once.
 class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
@@ -32,7 +32,7 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
         Sync_UseTarget(InStation);
     }
 
-    // A same-drain re-seat broadcasts Released then Reserved; reading the station keeps the prompt right either way. A
+    // A same-drain re-seat broadcasts Released then Reserved; reading the station keeps the claim right either way. A
     // station released by its own destruction has nothing left to update.
     UFUNCTION()
     private void OnReleased(FCk_Handle_Station InStation, FCk_Handle InOperator, EMars_Station_ReleaseReason InReason)
@@ -43,23 +43,16 @@ class UMars_Processor_Station_Setup : UCk_Processor_Script_Base_UE
         Sync_UseTarget(InStation);
     }
 
-    // The Use interactable follows the reservation. Its target is missing only when its interactable was rejected (ensured
-    // there).
+    // The Use interactable follows the reservation. It is missing only when it was rejected (ensured there).
     private void Sync_UseTarget(FCk_Handle_Station InStation)
     {
-        auto Target = InStation.Get_UseTarget();
-        if (ck::Is_NOT_Valid(Target))
+        auto Interactable = InStation.Get_Interactable();
+        if (ck::Is_NOT_Valid(Interactable))
         { return; }
 
-        const auto Occupied = InStation.Get_IsOperated();
-        auto Interactable = InStation.Get_Interactable();
-        if (Occupied)
+        if (InStation.Get_IsOperated())
         { Interactable.Request_Disable(FMars_Request_Interactable_Disable(EMars_Interactable_DisableReason::Operated)); }
         else
         { Interactable.Request_Enable(FMars_Request_Interactable_Enable(EMars_Interactable_DisableReason::Operated)); }
-
-        const auto PromptSpec = InStation.Get_Spec().Prompt;
-        auto Prompt = Target.As_InteractPrompt();
-        Prompt.Request_UpdateText(FMars_Request_InteractPrompt_UpdateText(Occupied ? PromptSpec.OccupiedText : PromptSpec.Text));
     }
 }

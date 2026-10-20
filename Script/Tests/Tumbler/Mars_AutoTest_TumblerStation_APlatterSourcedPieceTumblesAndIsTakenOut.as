@@ -1,10 +1,11 @@
 // A piece sourced from a docked platter tumbles in the real tumbler station and the operator's take-out key puts it on the
 // tray. A box loaded onto the large raw platter (its body from the platter's drop) and an empty small tray dock on the
-// station; the operator rig's carrier takes the station through its Use interaction. The hatch is opened (the kernel's
-// press on the hovered tab), and one add-food key press carries the box into the drum: while the feed carries it the hatch
-// and the lever refuse the operator, and the drum adopts the box itself. The hatch is shut, the gripped lever rocked until
-// the box's coverage reaches the spec's TakeOutCoverage (0.1 here, at a hundredth per cm) and let go; the take-out key
-// hands the box back onto the docked tray, its cook state's Crumb above 0 and the drum empty. Isolated origin (188000,
+// station; the operator rig's carrier takes the station through its Use interaction. Every look and every hatch or lever
+// press is the carrier's own (look deltas on its intents, its Use key), read by the station's input task. The hatch is
+// opened (a Use press on the hovered tab), and one add-food key press carries the box into the drum: while the feed carries
+// it the hatch and the lever refuse the operator, and the drum adopts the box itself. The hatch is shut, the gripped lever
+// rocked by the look until the box's coverage reaches the spec's TakeOutCoverage (0.1 here, at a hundredth per cm) and let
+// go by releasing Use; the take-out key hands the box back onto the docked tray, its cook state's Crumb above 0 and the drum empty. Isolated origin (188000,
 // -70000, -30000).
 class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : UMars_AutoTestRig_Operator
 {
@@ -65,8 +66,10 @@ class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : U
         Add_Step_WaitUntil("the station's state machine is Operated and the feed draws the box", n"Check_OperatedAndSourced", 0, 0);
         Add_Step("look at the hatch", n"Step_LookToHatch");
         Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 0);
-        Add_Step("press on the hatch", n"Step_PressTumbler");
+        Add_Step("press Use on the hatch", n"Step_PressUse");
         Add_Step_WaitUntil("the hatch is open", n"Check_HatchOpen", 0, 0);
+        Add_Step("release Use", n"Step_ReleaseUse");
+        Add_Step_WaitUntil("Use is released", n"Check_UseReleased", 0, 0);
         Add_Step("press the add-food key", n"Step_PressAddFood");
         Add_Step_WaitUntil("the feed carries the box", n"Check_Carrying", k_SlowPolls, 0);
         Add_Step_WaitUntil("the drum adopted the box", n"Check_Admitted", k_SlowPolls, 0);
@@ -74,14 +77,16 @@ class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : U
         Add_Step_WaitUntil("the feed's hand is back at rest and the key is released", n"Check_FeedIdle", k_SlowPolls, 0);
         Add_Step("look at the open hatch", n"Step_LookToHatch");
         Add_Step_WaitUntil("the hatch is hovered", n"Check_HoveredHatch", 0, 0);
-        Add_Step("press on the hatch", n"Step_PressTumbler");
+        Add_Step("press Use on the hatch", n"Step_PressUse");
         Add_Step_WaitUntil("the hatch is closed", n"Check_HatchClosed", 0, 0);
+        Add_Step("release Use", n"Step_ReleaseUse");
+        Add_Step_WaitUntil("Use is released", n"Check_UseReleased", 0, 0);
         Add_Step("look at the lever", n"Step_LookToLever");
         Add_Step_WaitUntil("the lever is hovered", n"Check_HoveredLever", 0, 0);
-        Add_Step("press on the lever", n"Step_PressTumbler");
+        Add_Step("press Use on the lever", n"Step_PressUse");
         Add_Step_WaitUntil("the lever is gripped", n"Check_Gripped", k_SlowPolls, 0);
         Add_Step_WaitUntil("the lever rocks until the box is tumbled", n"Check_RockedUntilTumbled", k_SlowPolls, 0);
-        Add_Step("let go of the lever", n"Step_ReleaseTumbler");
+        Add_Step("let go of the lever by releasing Use", n"Step_ReleaseUse");
         Add_Step_WaitUntil("the drum is home", n"Check_DrumHome", 0, 0);
         Add_Step("press the take-out key", n"Step_PressTakeOut");
         Add_Step_WaitUntil("the box landed on the tray", n"Check_OnTheTray", k_SlowPolls, 0);
@@ -90,7 +95,7 @@ class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : U
         Run_Steps(InHandle);
     }
 
-    // One look that puts the kernel's cursor on InAnchor's projection on the reach plane.
+    // One look on the carrier's intents that puts the kernel's cursor on InAnchor's projection on the reach plane.
     private void LookToAnchor(const FCk_Handle_Transform& InAnchor)
     {
         const auto Spec = _Tumbler.Get_Spec();
@@ -98,7 +103,7 @@ class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : U
         const auto Centre = Spec.Hand.WorkspaceCentreLocal;
         const auto Delta = FVector2D(AnchorLocal.Y - Centre.Y, AnchorLocal.Z - Centre.Z) - _Tumbler.Get_Cursor();
         const auto Step = float64(Spec.Hand.CmPerLookDegree);
-        _Tumbler.Request_Look(FMars_Request_Tumbler_Look(FVector(Delta.X / Step, -Delta.Y / Step, 0.0)));
+        Add_LookDelta(FVector(Delta.X / Step, -Delta.Y / Step, 0.0));
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -129,18 +134,6 @@ class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : U
     private void Step_LookToLever(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         LookToAnchor(_Tumbler.Get_Spec().Nodes.LeverGrip);
-    }
-
-    UFUNCTION()
-    private void Step_PressTumbler(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Tumbler.Request_Press(FMars_Request_Tumbler_Press());
-    }
-
-    UFUNCTION()
-    private void Step_ReleaseTumbler(FCk_Handle InHandle, FInstancedStruct InPayload)
-    {
-        _Tumbler.Request_Release(FMars_Request_Tumbler_Release());
     }
 
     UFUNCTION()
@@ -305,7 +298,7 @@ class UMars_AutoTest_TumblerStation_APlatterSourcedPieceTumblesAndIsTakenOut : U
         }
 
         const auto Down = Math::IntegerDivisionTrunc(_RockedFrames, k_RockHalfCycleFrames) % 2 == 0;
-        _Tumbler.Request_Look(FMars_Request_Tumbler_Look(FVector(0.0, float64(Down ? k_RockDegrees : -k_RockDegrees), 0.0)));
+        Add_LookDelta(FVector(0.0, float64(Down ? k_RockDegrees : -k_RockDegrees), 0.0));
         _RockedFrames += 1;
         Res.Set(false);
     }
