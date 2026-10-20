@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "627a194cf2cdcaa68953f48097c0ec3c",
+		"sourceHash": "40337805cc453d59518b3e3202ef3e99",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -38,7 +38,7 @@
 			"name": "_ShapeCount",
 			"type": "int32",
 			"category": "Ck_Jolt_CookedCell_UE",
-			"value": 10
+			"value": 11
 		},
 		{
 			"name": "_ActorGroups",
@@ -46,7 +46,7 @@
 			"category": "Ck_Jolt_CookedCell_UE",
 			"value": [
 				{
-					"_SourceActorName": "Actor_0",
+					"_SourceActorName": "Actor_83",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -55,10 +55,10 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_0"
+						"SubPathString": "PersistentLevel.Actor_83"
 					},
-					"_SourceHash": -5.6979469941532068e+18,
-					"_RuntimeCheckHash": -6.1676498962496614e+18,
+					"_SourceHash": 2.1875784376607145e+18,
+					"_RuntimeCheckHash": -2.8087304411815086e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
@@ -99,7 +99,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Actor_1",
+					"_SourceActorName": "Actor_84",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -108,10 +108,10 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_1"
+						"SubPathString": "PersistentLevel.Actor_84"
 					},
-					"_SourceHash": 5.9921750610414817e+18,
-					"_RuntimeCheckHash": 7.9207019591943414e+18,
+					"_SourceHash": 1.4026468704266993e+18,
+					"_RuntimeCheckHash": 5.5088700215817277e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
@@ -152,7 +152,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Actor_2",
+					"_SourceActorName": "Actor_85",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -161,10 +161,10 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_2"
+						"SubPathString": "PersistentLevel.Actor_85"
 					},
-					"_SourceHash": 4.7811257712278979e+18,
-					"_RuntimeCheckHash": -7.7942366043228713e+18,
+					"_SourceHash": 8.963644152003413e+18,
+					"_RuntimeCheckHash": 2.9191049207601695e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
@@ -205,7 +205,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Actor_4",
+					"_SourceActorName": "Actor_87",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -214,10 +214,10 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Actor_4"
+						"SubPathString": "PersistentLevel.Actor_87"
 					},
-					"_SourceHash": 5.8361635437623101e+18,
-					"_RuntimeCheckHash": 4.0353570241805665e+18,
+					"_SourceHash": -3.2359081658601452e+18,
+					"_RuntimeCheckHash": -3.989378962745833e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
@@ -258,7 +258,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_42",
+					"_SourceActorName": "Actor_90",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -267,14 +267,67 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_42"
+						"SubPathString": "PersistentLevel.Actor_90"
+					},
+					"_SourceHash": -1.1665470311550147e+18,
+					"_RuntimeCheckHash": 2.6321142662676787e+18,
+					"_DataLayerNames": [],
+					"_Bodies": [
+						{
+							"_ShapeIndex": 4,
+							"_Position":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0
+							},
+							"_Rotation":
+							{
+								"X": 0,
+								"Y": 0,
+								"Z": 0,
+								"W": 1
+							},
+							"_Signature":
+							{
+								"_ObjectChannel": "ECC_WorldStatic",
+								"_ResponseMask": -6.1489148630353398e+18,
+								"_CollisionEnabled": "QueryAndPhysics",
+								"_Domain": "Static"
+							},
+							"_Friction": 0.69999998807907104,
+							"_Restitution": 0.30000001192092896,
+							"_SurfaceType": "SurfaceType_Default",
+							"_PhysicalMaterial":
+							{
+								"AssetPath":
+								{
+									"PackageName": "/Engine/EngineMaterials/DefaultPhysicalMaterial",
+									"AssetName": "DefaultPhysicalMaterial"
+								},
+								"SubPathString": ""
+							}
+						}
+					]
+				},
+				{
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_196",
+					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
+					"_SourceActorPath":
+					{
+						"AssetPath":
+						{
+							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
+							"AssetName": "Warrens_Mars_MAP"
+						},
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_196"
 					},
 					"_SourceHash": -1.2627928554606572e+18,
 					"_RuntimeCheckHash": -1.8540563333998246e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 4,
+							"_ShapeIndex": 5,
 							"_Position":
 							{
 								"X": 1900,
@@ -311,7 +364,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_43",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_197",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -320,14 +373,14 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_43"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_197"
 					},
 					"_SourceHash": 8.7794779905068923e+18,
 					"_RuntimeCheckHash": -5.5033658025831465e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 5,
+							"_ShapeIndex": 6,
 							"_Position":
 							{
 								"X": 2100,
@@ -364,7 +417,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_44",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_198",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -373,14 +426,14 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_44"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_198"
 					},
 					"_SourceHash": -1.9230882114120842e+18,
 					"_RuntimeCheckHash": -6.0055373304705659e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 5,
+							"_ShapeIndex": 6,
 							"_Position":
 							{
 								"X": 1700,
@@ -417,7 +470,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_45",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_199",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -426,14 +479,14 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_45"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_199"
 					},
 					"_SourceHash": -2.752714613692993e+18,
 					"_RuntimeCheckHash": -3.4375757430729303e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 6,
+							"_ShapeIndex": 7,
 							"_Position":
 							{
 								"X": 1900,
@@ -468,7 +521,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 6,
+							"_ShapeIndex": 7,
 							"_Position":
 							{
 								"X": 1900,
@@ -503,7 +556,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1812.5,
@@ -538,7 +591,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1837.5,
@@ -573,7 +626,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1862.5,
@@ -608,7 +661,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1887.5,
@@ -643,7 +696,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1912.5,
@@ -678,7 +731,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1937.5,
@@ -713,7 +766,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1962.5,
@@ -748,7 +801,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 1987.5,
@@ -783,7 +836,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 8,
+							"_ShapeIndex": 9,
 							"_Position":
 							{
 								"X": 1900,
@@ -818,7 +871,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 9,
+							"_ShapeIndex": 10,
 							"_Position":
 							{
 								"X": 1790,
@@ -853,7 +906,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 9,
+							"_ShapeIndex": 10,
 							"_Position":
 							{
 								"X": 2010,
@@ -890,7 +943,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_47",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_201",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -899,14 +952,14 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_47"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_201"
 					},
 					"_SourceHash": -3.4231161839824707e+18,
 					"_RuntimeCheckHash": -3.2436349236923889e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 6,
+							"_ShapeIndex": 7,
 							"_Position":
 							{
 								"X": 900,
@@ -941,7 +994,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 6,
+							"_ShapeIndex": 7,
 							"_Position":
 							{
 								"X": 900,
@@ -976,7 +1029,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 812.5,
@@ -1011,7 +1064,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 837.5,
@@ -1046,7 +1099,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 862.5,
@@ -1081,7 +1134,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 887.5,
@@ -1116,7 +1169,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 912.5,
@@ -1151,7 +1204,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 937.5,
@@ -1186,7 +1239,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 962.5,
@@ -1221,7 +1274,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 987.5,
@@ -1256,7 +1309,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 8,
+							"_ShapeIndex": 9,
 							"_Position":
 							{
 								"X": 900,
@@ -1291,7 +1344,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 9,
+							"_ShapeIndex": 10,
 							"_Position":
 							{
 								"X": 790,
@@ -1326,7 +1379,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 9,
+							"_ShapeIndex": 10,
 							"_Position":
 							{
 								"X": 1010,
@@ -1363,7 +1416,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_51",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_205",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1372,14 +1425,14 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_51"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_205"
 					},
 					"_SourceHash": 7.659126394336599e+18,
 					"_RuntimeCheckHash": -6.451759089751977e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 5,
+							"_ShapeIndex": 6,
 							"_Position":
 							{
 								"X": 200,
@@ -1416,7 +1469,7 @@
 					]
 				},
 				{
-					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_52",
+					"_SourceActorName": "Ck_EditorSelectionProxyHost_Actor_UE_206",
 					"_SourceLevelPackage": "/Game/Mars/Maps/Warrens_Mars_MAP",
 					"_SourceActorPath":
 					{
@@ -1425,14 +1478,14 @@
 							"PackageName": "/Game/Mars/Maps/Warrens_Mars_MAP",
 							"AssetName": "Warrens_Mars_MAP"
 						},
-						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_52"
+						"SubPathString": "PersistentLevel.Ck_EditorSelectionProxyHost_Actor_UE_206"
 					},
 					"_SourceHash": -9.0687414265050388e+18,
 					"_RuntimeCheckHash": -5.4886168001855468e+18,
 					"_DataLayerNames": [],
 					"_Bodies": [
 						{
-							"_ShapeIndex": 6,
+							"_ShapeIndex": 7,
 							"_Position":
 							{
 								"X": 300,
@@ -1467,7 +1520,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 6,
+							"_ShapeIndex": 7,
 							"_Position":
 							{
 								"X": 300,
@@ -1502,7 +1555,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1537,7 +1590,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1572,7 +1625,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1607,7 +1660,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1642,7 +1695,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1677,7 +1730,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1712,7 +1765,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1747,7 +1800,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 7,
+							"_ShapeIndex": 8,
 							"_Position":
 							{
 								"X": 300,
@@ -1782,7 +1835,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 8,
+							"_ShapeIndex": 9,
 							"_Position":
 							{
 								"X": 300,
@@ -1817,7 +1870,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 9,
+							"_ShapeIndex": 10,
 							"_Position":
 							{
 								"X": 300,
@@ -1852,7 +1905,7 @@
 							}
 						},
 						{
-							"_ShapeIndex": 9,
+							"_ShapeIndex": 10,
 							"_Position":
 							{
 								"X": 300,

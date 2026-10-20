@@ -5,7 +5,7 @@
 	"_meta":
 	{
 		"format": "CkAssetExporter sidecar - UTF-8 JSON export of the sibling .uasset of the same name",
-		"sourceHash": "09318bf32831673da1c9e7d1cd36bf5d",
+		"sourceHash": "df6dc3c5ca044659cc91fb98051e7495",
 		"exporterVersion": 2
 	},
 	"parentClasses": [
@@ -45,6 +45,30 @@
 				{
 					"_CellId":
 					{
+						"X": -1,
+						"Y": -1
+					},
+					"_Bounds":
+					{
+						"Min":
+						{
+							"X": -7800,
+							"Y": -3548.5500000000002,
+							"Z": -475
+						},
+						"Max":
+						{
+							"X": 1400,
+							"Y": 1700,
+							"Z": 355
+						},
+						"IsValid": true
+					},
+					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Warrens_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1"
+				},
+				{
+					"_CellId":
+					{
 						"X": 0,
 						"Y": 0
 					},
@@ -70,45 +94,21 @@
 					"_CellId":
 					{
 						"X": -1,
-						"Y": -1
-					},
-					"_Bounds":
-					{
-						"Min":
-						{
-							"X": -5800,
-							"Y": -3548.5500000000002,
-							"Z": -475
-						},
-						"Max":
-						{
-							"X": 1400,
-							"Y": 1700,
-							"Z": 355
-						},
-						"IsValid": true
-					},
-					"_CellAsset": "/Game/CkJoltData/Mars/Maps/Warrens_Mars_MAP/JoltCell_-1_-1.JoltCell_-1_-1"
-				},
-				{
-					"_CellId":
-					{
-						"X": -1,
 						"Y": 0
 					},
 					"_Bounds":
 					{
 						"Min":
 						{
-							"X": -5400,
-							"Y": -4300,
-							"Z": -180
+							"X": -2665,
+							"Y": 1635,
+							"Z": 252
 						},
 						"Max":
 						{
-							"X": 1600,
+							"X": -2535,
 							"Y": 1765,
-							"Z": 515
+							"Z": 254
 						},
 						"IsValid": true
 					},
