@@ -11,12 +11,11 @@
 // Game mode: the map picks up AMars_Camp_GameMode through the "Camp_Mars_" entry in Config/DefaultEngine.ini
 // [GameMapsSettings] GameModeMapPrefixes.
 //
-// Kit camp (v2.3): the crypt kit's planners (vns_trim_sheet crypt_camp.plan_camp + plan_vestibule ->
-// mise_mars_ue.build_camp_map over Monolith) replace the blockout geometry with the Sunken Chapel and the check-in
-// vestibule south of it, and drop TargetPoints tagged Mise_Socket: camp_cam_<Station>, camp_board_<Station> (the front
-// end's menu boards), camp_anchor_<Station> (world board anchors) and camp_start_<i>. On such a map Mars.Camp.Build
-// places only the gameplay actors, and Mars.Camp.PlaceStations moves the station view points, menu board stations and
-// board anchors already in the map onto those sockets (spawning any that are missing) and re-places the four starts.
+// Kit camp: a kit-built camp replaces the blockout geometry and drops TargetPoints tagged Mise_Socket: camp_cam_<Station>,
+// camp_board_<Station> (the front end's menu boards), camp_anchor_<Station> (world board anchors) and camp_start_<i>. On
+// such a map Mars.Camp.Build places only the gameplay actors, and Mars.Camp.PlaceStations moves the station view points,
+// menu board stations and board anchors already in the map onto those sockets (spawning any that are missing) and
+// re-places the four starts.
 
 #if EDITOR
 UFUNCTION()
@@ -76,6 +75,27 @@ struct FMars_CampStationRow
     }
 }
 
+// One world board anchor: its station, transform, scale and widget draw size.
+struct FMars_CampBoardAnchorPlacement
+{
+    EMars_CampStation Station;
+    FVector Location;
+    FRotator Rotation;
+    float32 Scale = 1.0f;
+    FIntPoint DrawSize;
+
+    FMars_CampBoardAnchorPlacement() {}
+
+    FMars_CampBoardAnchorPlacement(EMars_CampStation InStation, FVector InLocation, FRotator InRotation, float32 InScale, FIntPoint InDrawSize)
+    {
+        Station = InStation;
+        Location = InLocation;
+        Rotation = InRotation;
+        Scale = InScale;
+        DrawSize = InDrawSize;
+    }
+}
+
 // One station prop block (mirror, board, rack) on its station's angle, facing the centre.
 struct FMars_CampPropRow
 {
@@ -120,21 +140,17 @@ namespace utils_mars_camp
         if (ck::EnsureIfNot(ck::IsValid(World), f"[{Command}] No editor world"))
         { return; }
 
-        const FString WorldPath = World.GetPathName();
-        const bool IsUntitled = WorldPath.StartsWith("/Temp/");
-        if (IsUntitled)
+        // An untitled level, or the camp map itself open (empty, or a kit camp).
+        if (utils_mars_map_builder::Get_IsUntitled(World))
         {
-            if (EditorAsset::DoesAssetExist(k_MapPath))
-            {
-                ck::Trace(f"[{Command}] [{k_MapPath}] already exists. Open it (empty) or delete it first to rebuild.", NAME_None, 2.0f, FLinearColor::Yellow);
-                return;
-            }
+            if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_UntitledWorld(Command, k_MapPath)))
+            { return; }
         }
         else
         {
             if (utils_mars_map_builder::Get_IsMap(World, k_MapPath) == false)
             {
-                ck::Trace(f"[{Command}] The open level [{WorldPath}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.", NAME_None, 2.0f, FLinearColor::Yellow);
+                ck::Trace(f"[{Command}] The open level [{World.GetPathName()}] is neither untitled nor [{k_MapPath}]. Open File > New Level > Empty Level first.", NAME_None, 2.0f, FLinearColor::Yellow);
                 return;
             }
 
@@ -171,27 +187,22 @@ namespace utils_mars_camp
         // Title and menu share the entrance-side camera, with the board left of the hearth.
         Spawn_StationCamera(EMars_CampStation::Title, FVector(-1130.0, 0.0, 165.0), FRotator::ZeroRotator);
         Spawn_StationCamera(EMars_CampStation::Cauldron, FVector(-500.0, 0.0, 200.0), FRotator(-15.0, 0.0, 0.0));
-        Spawn_BoardAnchor(EMars_CampStation::Title, FVector(-650.0, -175.0, 165.0),
-            FRotator(0.0, 160.0, 0.0), 0.33f, FIntPoint(700, 900));
+        Spawn_BoardAnchor(FMars_CampBoardAnchorPlacement(EMars_CampStation::Title, FVector(-650.0, -175.0, 165.0),
+            FRotator(0.0, 160.0, 0.0), 0.33f, FIntPoint(700, 900)));
         Spawn_MenuStand();
-        Spawn_BoardAnchor(EMars_CampStation::Contracts, FVector(0.0, -895.0, 175.0),
-            FRotator(0.0, 90.0, 0.0), 0.27f, FIntPoint(1000, 1000));
-        Spawn_BoardAnchor(EMars_CampStation::Departure, FVector(870.0, 210.0, 155.0),
-            FRotator(0.0, 180.0, 0.0), 0.28f, FIntPoint(700, 650));
+        Spawn_BoardAnchor(FMars_CampBoardAnchorPlacement(EMars_CampStation::Contracts, FVector(0.0, -895.0, 175.0),
+            FRotator(0.0, 90.0, 0.0), 0.27f, FIntPoint(1000, 1000)));
+        Spawn_BoardAnchor(FMars_CampBoardAnchorPlacement(EMars_CampStation::Departure, FVector(870.0, 210.0, 155.0),
+            FRotator(0.0, 180.0, 0.0), 0.28f, FIntPoint(700, 650)));
 
-        auto Actors = UEditorActorSubsystem::Get();
-
-        auto Sun = Actors.SpawnActorFromClass(ADirectionalLight, FVector(0.0, 0.0, 800.0), FRotator(-50.0, 35.0, 0.0));
-        Sun.SetActorLabel("Sun");
-        Actors.SpawnActorFromClass(ASkyLight, FVector(0.0, 0.0, 900.0)).SetActorLabel("SkyLight");
-        Actors.SpawnActorFromClass(ASkyAtmosphere, FVector::ZeroVector).SetActorLabel("SkyAtmosphere");
+        utils_mars_map_builder::Spawn_DaylightRig();
         Spawn_FireLight();
 
         Apply_ProtoGridMaterials();
 
         int32 CameraCount = 0;
         int32 StartCount = 0;
-        for (auto Actor : Actors.GetAllLevelActors())
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
         {
             if (ck::IsValid(Cast<AMars_CampStationCamera>(Actor)))
             { ++CameraCount; }
@@ -199,12 +210,7 @@ namespace utils_mars_camp
             { ++StartCount; }
         }
 
-        bool Saved = false;
-        if (IsUntitled)
-        { Saved = UEditorLoadingAndSavingUtils::SaveMap(World, k_MapPath); }
-        else
-        { Saved = ULevelEditorSubsystem::Get().SaveCurrentLevel(); }
-
+        const bool Saved = utils_mars_map_builder::SaveWorld(World, k_MapPath);
         ck::Trace(f"[{Command}] cameras={CameraCount} starts={StartCount} saved={Saved}");
     }
 
@@ -299,7 +305,7 @@ namespace utils_mars_camp
 
     // Kit camp: moves every enabled station view point (plain cameras and the front end's menu board stations) and
     // every board anchor onto its kit socket, keeping the actor and whatever was authored on it, spawns the ones the
-    // map lacks and re-places the four starts. Sockets: camp_cam_<Station> (a camera; the pitch is the per-station
+    // map lacks and re-places the four starts (only the builder's own Camp_PlayerStart_<i>, each once its socket is found). Sockets: camp_cam_<Station> (a camera; the pitch is the per-station
     // framing), camp_board_<Station> (a menu board: the board centre, +X out of its face), camp_anchor_<Station> (a
     // world board anchor), camp_start_<i>. Returns how many actors were placed or moved.
     int32 Place_FromSockets()
@@ -317,8 +323,6 @@ namespace utils_mars_camp
             { Cameras.Add(Camera); }
             else if (ck::IsValid(Anchor))
             { Anchors.Add(Anchor); }
-            else if (ck::IsValid(Cast<APlayerStart>(Actor)))
-            { Actors.DestroyActor(Actor); }
         }
 
         TArray<EMars_CampStation> Stations;
@@ -369,19 +373,26 @@ namespace utils_mars_camp
 
         for (int32 Index = 0; Index < 4; ++Index)
         {
+            const FString StartLabel = f"{k_PlayerStartLabelPrefix}{Index}";
             auto Socket = TryGet_CampSocket(Sockets, f"camp_start_{Index}");
             if (ck::Is_NOT_Valid(Socket))
             {
-                ck::Trace(f"[Mars.Camp] no camp_start_{Index} socket in the map", NAME_None, 2.0f, FLinearColor::Yellow);
+                ck::Trace(f"[Mars.Camp] no camp_start_{Index} socket in the map: [{StartLabel}] stays where it is", NAME_None, 2.0f, FLinearColor::Yellow);
                 continue;
+            }
+
+            for (auto Actor : Actors.GetAllLevelActors())
+            {
+                if (Actor.GetActorLabel() == StartLabel)
+                { Actors.DestroyActor(Actor); }
             }
 
             auto Start = Actors.SpawnActorFromClass(APlayerStart, Socket.GetActorLocation(),
                 FRotator(0.0, Socket.GetActorRotation().Yaw, 0.0));
-            if (ck::Is_NOT_Valid(Start))
+            if (ck::EnsureIfNot(ck::IsValid(Start), f"[Mars.Camp] Failed to place [{StartLabel}]"))
             { continue; }
 
-            Start.SetActorLabel(f"{k_PlayerStartLabelPrefix}{Index}");
+            Start.SetActorLabel(StartLabel);
             ++Placed;
         }
 
@@ -453,16 +464,16 @@ namespace utils_mars_camp
         auto Contracts = TryGet_CampSocket(InSockets, "camp_anchor_Contracts");
         if (HasContracts == false && ck::IsValid(Contracts))
         {
-            Spawn_BoardAnchor(EMars_CampStation::Contracts, Contracts.GetActorLocation(),
-                FRotator(0.0, Contracts.GetActorRotation().Yaw, 0.0), 0.27f, FIntPoint(1000, 1000));
+            Spawn_BoardAnchor(FMars_CampBoardAnchorPlacement(EMars_CampStation::Contracts, Contracts.GetActorLocation(),
+                FRotator(0.0, Contracts.GetActorRotation().Yaw, 0.0), 0.27f, FIntPoint(1000, 1000)));
             ++Placed;
         }
 
         auto Departure = TryGet_CampSocket(InSockets, "camp_anchor_Departure");
         if (HasDeparture == false && ck::IsValid(Departure))
         {
-            Spawn_BoardAnchor(EMars_CampStation::Departure, Departure.GetActorLocation(),
-                FRotator(0.0, Departure.GetActorRotation().Yaw, 0.0), 0.28f, FIntPoint(700, 650));
+            Spawn_BoardAnchor(FMars_CampBoardAnchorPlacement(EMars_CampStation::Departure, Departure.GetActorLocation(),
+                FRotator(0.0, Departure.GetActorRotation().Yaw, 0.0), 0.28f, FIntPoint(700, 650)));
             ++Placed;
         }
 
@@ -645,18 +656,17 @@ namespace utils_mars_camp
         }
     }
 
-    void Spawn_BoardAnchor(EMars_CampStation InStation, FVector InLocation, FRotator InRotation,
-        float32 InScale, FIntPoint InDrawSize)
+    void Spawn_BoardAnchor(const FMars_CampBoardAnchorPlacement& InPlacement)
     {
-        const FString Label = f"Camp_BoardAnchor_{InStation :n}";
+        const FString Label = f"Camp_BoardAnchor_{InPlacement.Station :n}";
         auto Anchor = Cast<AMars_CampBoardAnchor>(
-            UEditorActorSubsystem::Get().SpawnActorFromClass(AMars_CampBoardAnchor, InLocation, InRotation));
+            UEditorActorSubsystem::Get().SpawnActorFromClass(AMars_CampBoardAnchor, InPlacement.Location, InPlacement.Rotation));
         if (ck::EnsureIfNot(ck::IsValid(Anchor), f"[Mars.Camp] Failed to place [{Label}]"))
         { return; }
 
-        Anchor.Station = InStation;
-        Anchor.DrawSize = InDrawSize;
-        Anchor.SetActorScale3D(FVector(InScale));
+        Anchor.Station = InPlacement.Station;
+        Anchor.DrawSize = InPlacement.DrawSize;
+        Anchor.SetActorScale3D(FVector(InPlacement.Scale));
         Anchor.SetActorLabel(Label);
     }
 
@@ -690,10 +700,7 @@ namespace utils_mars_camp
     // Matches blocks by the labels Build gives them.
     void Apply_ProtoGridMaterials()
     {
-        auto Floor = utils_mars_map_builder::Get_ProtoGrid_Floor();
-        auto Wall = utils_mars_map_builder::Get_ProtoGrid_Wall();
-        auto Platform = utils_mars_map_builder::Get_ProtoGrid_Platform();
-        auto Interactable = utils_mars_map_builder::Get_ProtoGrid_Interactable();
+        const auto Grid = utils_mars_map_builder::Load_ProtoGridSet();
 
         for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
         {
@@ -703,14 +710,14 @@ namespace utils_mars_camp
 
             const FString Label = Block.GetActorLabel();
             if (Label == "Camp_Floor")
-            { Block.StaticMeshComponent.SetMaterial(0, Floor); }
+            { Block.StaticMeshComponent.SetMaterial(0, Grid.Floor); }
             else if (Label.StartsWith("Camp_Wall_") || Label.StartsWith("Camp_Gate_") || Label == "Camp_FirePit"
                   || Label.StartsWith("Camp_Board_") || Label == "Camp_Mirror" || Label == "Camp_Rack")
-            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
+            { Block.StaticMeshComponent.SetMaterial(0, Grid.Wall); }
             else if (Label.StartsWith("Camp_Table_") || Label.StartsWith("Camp_Bedroll_"))
-            { Block.StaticMeshComponent.SetMaterial(0, Platform); }
+            { Block.StaticMeshComponent.SetMaterial(0, Grid.Platform); }
             else if (Label == "Camp_Cauldron")
-            { Block.StaticMeshComponent.SetMaterial(0, Interactable); }
+            { Block.StaticMeshComponent.SetMaterial(0, Grid.Interactable); }
         }
     }
 }

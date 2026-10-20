@@ -1,6 +1,7 @@
 // Every entity tagged TAG_MarsMonster in the selected player's world: its body health, dead flag and parts, and for a
 // crawler its gait, legs, navigator, attack (target, phase, samples, hit ledger), state machine (root and behaviour
 // states) and brain (leaf and facts). Read-only: it never requests or writes anything.
+
 class UMars_DebugPage_Monsters : UMars_DebugPage_Base
 {
     FString GetPageName() override
@@ -173,7 +174,7 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
     {
         for (const auto& Blocker : InBlockers)
         {
-            DrawKvRow(InLabel, f"{Blocker.Code} | {Blocker.Field} | role {Get_TagText(Blocker.Role)} / slot {Get_NameText(Blocker.Slot)}",
+            DrawKvRow(InLabel, f"{Blocker.Code :n} | {Blocker.Field} | role {Get_TagText(Blocker.Role)} / slot {Get_NameText(Blocker.Slot)}",
                 FLinearColor(1.0f, 0.65f, 0.3f));
             DrawKvRow("  Expected / actual", f"{Blocker.Expected} / {Blocker.Actual}");
         }
@@ -188,7 +189,7 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
         DrawKvRow("Preferred / ready / selected", f"{Get_ChoiceText(Evaluation.Selection.Preferred)} / {Get_ChoiceText(Evaluation.Selection.ReadyChoice)} / {Get_ChoiceText(Evaluation.Selection.Selected)}");
         DrawKvRow("Stored selection / target token", f"{Evaluation.SelectionGeneration} / {Evaluation.TargetIdentity}:{Evaluation.TargetGeneration}");
         const auto Preparation = InCrawler.Get_AttackPreparation();
-        DrawKvRow("Preparation", f"{Get_TagText(Preparation.Preferred)} | active {BoolText(Preparation.Active)} | timeout {BoolText(Preparation.TimedOut)} | wait {Preparation.ElapsedReadinessWait :.3} s");
+        DrawKvRow("Preparation", f"{Get_TagText(Preparation.Preferred)} | active {BoolText(Preparation.State == EMars_Attack_PreparationState::Active)} | timeout {BoolText(Preparation.State == EMars_Attack_PreparationState::TimedOut)} | wait {Preparation.ElapsedReadinessWait :.3} s");
         DrawKvRow("Preparation target token", f"{Preparation.TargetIdentity}:{Preparation.TargetGeneration}");
         const auto Loadout = InCrawler.Get_Spec().ResolvedAttacks;
         DrawKvRow("Frozen loadout revision", f"{Loadout.GameRevision} | {Loadout.Entries.Num()} enabled entries");
@@ -317,7 +318,7 @@ class UMars_DebugPage_Monsters : UMars_DebugPage_Base
 
     private void DrawAttackHistory(const TArray<FMars_Attack_HistoryEntry>& InHistory)
     {
-        DrawSectionHeading(f"Stored attack history ({InHistory.Num()} / 16 events)");
+        DrawSectionHeading(f"Stored attack history ({InHistory.Num()} / {constants_crawler::k_AttackHistoryCap} events)");
         for (const auto& Entry : InHistory)
         {
             DrawKvRow(f"#{Entry.Sequence} {Entry.Event}", f"{Get_TagText(Entry.AttackId)} | action {Entry.ActionIdentity.Get_Value()} | {Get_NameText(Entry.Reason)}");

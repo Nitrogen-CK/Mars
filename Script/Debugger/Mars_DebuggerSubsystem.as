@@ -110,10 +110,27 @@ class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
         return StoredContent;
     }
 
+    // Falls back to another live instance's content, so the first PIE client to leave does not blank the tab.
+    // Callers unregister before clearing, so the leaving subsystem is no longer in the list.
     void ClearContent(UMars_DebuggerContent InContent)
     {
-        if (StoredContent == InContent)
-        { StoredContent = nullptr; }
+        if (StoredContent != InContent)
+        { return; }
+
+        StoredContent = nullptr;
+
+        for (auto RegisteredSubsystem : RegisteredSubsystems)
+        {
+            if (ck::Is_NOT_Valid(RegisteredSubsystem))
+            { continue; }
+
+            auto Content = RegisteredSubsystem.GetContent();
+            if (ck::Is_NOT_Valid(Content))
+            { continue; }
+
+            StoredContent = Content;
+            return;
+        }
     }
 
     void RegisterSubsystem(UMars_DebuggerSubsystem InSubsystem)
@@ -166,7 +183,7 @@ class UMars_DebuggerEngineSubsystem : UScriptEngineSubsystem
         if (ck::Is_NOT_Valid(GameWorld) || GameWorld.IsGameWorld() == false)
         { return nullptr; }
 
-        return World;
+        return GameWorld;
     }
 }
 
@@ -222,6 +239,11 @@ class UMars_DebuggerSubsystem : UScriptGameInstanceSubsystem
             Content.Shutdown();
             Content = nullptr;
         }
+    }
+
+    UMars_DebuggerContent GetContent() const
+    {
+        return Content;
     }
 
     bool IsPopupWindowOpen() const

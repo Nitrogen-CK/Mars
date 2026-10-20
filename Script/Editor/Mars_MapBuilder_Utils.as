@@ -1,6 +1,6 @@
-// Editor-only helpers shared by the map builders (Mars.Sandbox.*, Mars.Camp.*): the command guards, ProtoGrid blocks
-// and the four ProtoGrid MaterialInstanceConstants under /Game/Mars/Materials/ProtoGrid (created on first use from the
-// CkUsf master).
+// Editor-only helpers shared by the map builders (Mars.Sandbox.*, Mars.Camp.*, Mars.Warrens.*): the command guards, the
+// level save, ProtoGrid blocks, entity-script placement, the daylight rig and the four ProtoGrid MaterialInstanceConstants
+// under /Game/Mars/Materials/ProtoGrid (created on first use from the CkUsf master).
 #if EDITOR
 // One static-mesh block: its label, centre, scale, rotation and surface.
 struct FMars_MapBuilder_Block
@@ -60,6 +60,15 @@ struct FMars_MapBuilder_ProtoGridLook
     }
 }
 
+// The four ProtoGrid material instances, loaded once per material pass.
+struct FMars_MapBuilder_ProtoGridSet
+{
+    UMaterialInstanceConstant Floor;
+    UMaterialInstanceConstant Wall;
+    UMaterialInstanceConstant Platform;
+    UMaterialInstanceConstant Interactable;
+}
+
 namespace utils_mars_map_builder
 {
     const FString k_MaterialFolder = "/Game/Mars/Materials/ProtoGrid";
@@ -82,6 +91,43 @@ namespace utils_mars_map_builder
 
         ck::Trace(f"[{InCommand}] Open [{InMapPath}] first.", NAME_None, 2.0f, FLinearColor::Yellow);
         return nullptr;
+    }
+
+    // The open editor world when it is an untitled level and nothing is saved at InMapPath yet; warns and returns null
+    // otherwise. A builder that needs a fresh level guards on this, then saves with SaveWorld.
+    UWorld TryGet_UntitledWorld(const FString& InCommand, const FString& InMapPath)
+    {
+        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
+        if (ck::EnsureIfNot(ck::IsValid(World), f"[{InCommand}] No editor world"))
+        { return nullptr; }
+
+        if (EditorAsset::DoesAssetExist(InMapPath))
+        {
+            ck::Trace(f"[{InCommand}] [{InMapPath}] already exists. Delete it first to rebuild.", NAME_None, 2.0f, FLinearColor::Yellow);
+            return nullptr;
+        }
+
+        if (Get_IsUntitled(World) == false)
+        {
+            ck::Trace(f"[{InCommand}] The open level [{World.GetPathName()}] is a saved map. Open File > New Level > Empty Level first.", NAME_None, 2.0f, FLinearColor::Yellow);
+            return nullptr;
+        }
+
+        return World;
+    }
+
+    bool Get_IsUntitled(UWorld InWorld)
+    {
+        return InWorld.GetPathName().StartsWith("/Temp/");
+    }
+
+    // Saves an untitled level as InMapPath, or the open saved level in place.
+    bool SaveWorld(UWorld InWorld, const FString& InMapPath)
+    {
+        if (Get_IsUntitled(InWorld))
+        { return UEditorLoadingAndSavingUtils::SaveMap(InWorld, InMapPath); }
+
+        return ULevelEditorSubsystem::Get().SaveCurrentLevel();
     }
 
     // A world's path is "<package>.<asset>", so matching up to the dot rejects a copy such as <map>_Backup.
@@ -150,6 +196,38 @@ namespace utils_mars_map_builder
 
         Actor.StaticMeshComponent.SetPhysMaterialOverride(PhysMat);
         return Actor;
+    }
+
+    // Goes through the spawner's actor factory (the Place Actors path): it instances the script class on a new
+    // ACk_EntitySpawner_UE, and the spawner injects its actor transform into SpawnTransform at spawn.
+    ACk_EntitySpawner_UE Spawn_EntityScript(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FMars_MapBuilder_Placement& InPlacement)
+    {
+        auto Spawner = Cast<ACk_EntitySpawner_UE>(
+            UEditorActorSubsystem::Get().SpawnActorFromObject(InScriptClass.Get(), InPlacement.Location, InPlacement.Rotation));
+        if (ck::EnsureIfNot(ck::IsValid(Spawner), f"[Mars.MapBuilder] Failed to place [{InPlacement.Label}] through the entity spawner factory"))
+        { return nullptr; }
+
+        Spawner.SetActorLabel(InPlacement.Label);
+        return Spawner;
+    }
+
+    // The outdoor light every builder starts from: a sun, a sky light and an atmosphere.
+    void Spawn_DaylightRig()
+    {
+        auto Actors = UEditorActorSubsystem::Get();
+        Actors.SpawnActorFromClass(ADirectionalLight, FVector(0.0, 0.0, 800.0), FRotator(-50.0, 35.0, 0.0)).SetActorLabel("Sun");
+        Actors.SpawnActorFromClass(ASkyLight, FVector(0.0, 0.0, 900.0)).SetActorLabel("SkyLight");
+        Actors.SpawnActorFromClass(ASkyAtmosphere, FVector::ZeroVector).SetActorLabel("SkyAtmosphere");
+    }
+
+    FMars_MapBuilder_ProtoGridSet Load_ProtoGridSet()
+    {
+        auto Set = FMars_MapBuilder_ProtoGridSet();
+        Set.Floor = Get_ProtoGrid_Floor();
+        Set.Wall = Get_ProtoGrid_Wall();
+        Set.Platform = Get_ProtoGrid_Platform();
+        Set.Interactable = Get_ProtoGrid_Interactable();
+        return Set;
     }
 
     UMaterialInstanceConstant Get_ProtoGrid_Floor()

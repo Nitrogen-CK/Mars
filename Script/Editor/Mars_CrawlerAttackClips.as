@@ -4,7 +4,7 @@
 // build their clips here too, so they never depend on content an author tunes.
 //
 // Four clips, all three phases Windup, Strike and Recover over one Offense window, the body channel from the identity
-// offset (utils_crawler::Validate_AttackClip): the body-only jab and the rearing pincer, each on the radial layout (valid
+// offset (the attack definition's clip contract, utils_attack::Validate_Definition): the body-only jab and the rearing pincer, each on the radial layout (valid
 // on both radial rigs) and on the spider (its body keys grown by its size, its claw keys moved onto its front leg).
 
 #if EDITOR
@@ -52,8 +52,6 @@ struct FMars_Crawler_ReferenceClawKeys
 
 namespace utils_crawler
 {
-    const FString ReferenceClipFolder = "/Game/Mars/Gameplay/Monsters/Crawler/Actions";
-
     // The rig a reference clip is authored on and previewed with: the radial clips on the four-leg rig (Room 5's radial
     // crawler), the spider's on its own.
     UCk_ProceduralRig_Data Get_ReferenceRig(EMars_Crawler_Layout InLayout)
@@ -61,11 +59,13 @@ namespace utils_crawler
         return InLayout == EMars_Crawler_Layout::Spider ? utils_crawler::Mars_SpiderRig6 : utils_crawler::Mars_CrawlerRig4;
     }
 
-    // <Crawler|Spider>_<Jab|Pincer>_Mars_DA.
-    FString Get_ReferenceClipName(EMars_Crawler_Layout InLayout, EMars_Crawler_AttackClipKind InKind)
+    // The reference clip's object path, the one the attack catalog's legacy definitions load: a radial layout's clip is
+    // shared by both radial presets, so Crawler4 names it.
+    FString Get_ReferenceClipPath(EMars_Crawler_Layout InLayout, EMars_Crawler_AttackClipKind InKind)
     {
-        const FString Prefix = InLayout == EMars_Crawler_Layout::Spider ? "Spider" : "Crawler";
-        return f"{Prefix}_{Get_ClipKindName(InKind)}_Mars_DA";
+        const auto Preset = InLayout == EMars_Crawler_Layout::Spider ? EMars_Crawler_AttackPreset::Spider6 : EMars_Crawler_AttackPreset::Crawler4;
+        const auto AttackId = InKind == EMars_Crawler_AttackClipKind::Pincer ? GameplayTags::Attack_Mars_Pincer : GameplayTags::Attack_Mars_Jab;
+        return Get_AttackReferenceLegacyClipPath(Preset, AttackId);
     }
 
     // The jab: a short dip back and down, then a lunge forward. The pincer: a longer windup that rears the body back and
@@ -232,9 +232,9 @@ namespace utils_crawler
     // Mars.Crawler.SeedAttackClips
     //----------------------------------------------------------------------------------------------------------------------
 
-    // Writes each reference clip that does not exist yet as <Name> under ReferenceClipFolder, remembering the crawler the
-    // clip editor previews it on (Make_EditorSubject). An existing asset keeps its motion, so authored work survives a
-    // re-run; one that does not remember its crawler yet is given it and saved.
+    // Writes each reference clip that does not exist yet at Get_ReferenceClipPath, remembering the crawler the clip editor
+    // previews it on (Make_EditorSubject, pinned so the save keeps it). An existing asset keeps its motion, so authored
+    // work survives a re-run; one that does not remember its crawler yet is given it and saved.
     void Seed_AttackClips()
     {
         auto Layouts = TArray<EMars_Crawler_Layout>();
@@ -249,15 +249,14 @@ namespace utils_crawler
 
     void Seed_AttackClip(EMars_Crawler_Layout InLayout, EMars_Crawler_AttackClipKind InKind)
     {
-        const auto Name = Get_ReferenceClipName(InLayout, InKind);
-        const auto ClipPath = f"{ReferenceClipFolder}/{Name}";
+        const auto ClipPath = Get_ReferenceClipPath(InLayout, InKind);
         if (EditorAsset::DoesAssetExist(ClipPath))
         {
             Seed_EditorSubject(ClipPath, InLayout, InKind);
             return;
         }
 
-        auto Clip = Cast<UCk_ProceduralAction_Data>(CreateDataAsset(Name, UCk_ProceduralAction_Data));
+        auto Clip = Cast<UCk_ProceduralAction_Data>(Create_DataAsset(ClipPath, AttackReferenceActionsFolder, UCk_ProceduralAction_Data));
         if (ck::EnsureIfNot(ck::IsValid(Clip), f"[Mars.Crawler.SeedAttackClips] Failed to create [{ClipPath}]"))
         { return; }
 
@@ -266,7 +265,10 @@ namespace utils_crawler
             f"[Mars.Crawler.SeedAttackClips] [{ClipPath}] did not build: {Get_FirstDiagnosticText(Report)}"))
         { return; }
 
-        utils_procedural_action_editor::Get_EditorData(Clip).Set_Subject(Make_EditorSubject(Clip, InLayout, InKind));
+        if (ck::EnsureIfNot(Set_PinnedPreviewSubject(Clip, Make_EditorSubject(Clip, InLayout, InKind)),
+            f"[Mars.Crawler.SeedAttackClips] [{ClipPath}] refused its preview pins"))
+        { return; }
+
         const bool OnlyIfIsDirty = false;
         EditorAsset::SaveLoadedAsset(Clip, OnlyIfIsDirty);
         Print(f"[Mars.Crawler.SeedAttackClips] [{ClipPath}] written", 10.0f);
@@ -284,7 +286,10 @@ namespace utils_crawler
             return;
         }
 
-        utils_procedural_action_editor::Get_EditorData(Clip).Set_Subject(Make_EditorSubject(Clip, InLayout, InKind));
+        if (ck::EnsureIfNot(Set_PinnedPreviewSubject(Clip, Make_EditorSubject(Clip, InLayout, InKind)),
+            f"[Mars.Crawler.SeedAttackClips] [{InClipPath}] refused its preview pins"))
+        { return; }
+
         const bool OnlyIfIsDirty = false;
         EditorAsset::SaveLoadedAsset(Clip, OnlyIfIsDirty);
         Print(f"[Mars.Crawler.SeedAttackClips] [{InClipPath}] now remembers its crawler", 10.0f);
@@ -302,36 +307,52 @@ namespace utils_crawler
             Subject.Get_Scenario().IsNull() == false;
     }
 
-    // A new asset of InClass named InName in ReferenceClipFolder. AssetTools::CreateAsset never runs the factory's
+    // A new asset of InClass at the object path InPath, in InFolder. AssetTools::CreateAsset never runs the factory's
     // class-picker dialog, and a data asset factory with no DataAssetClass (script cannot set it) creates the class it is
     // given.
-    UObject CreateDataAsset(FString InName, TSubclassOf<UDataAsset> InClass)
+    UObject Create_DataAsset(FString InPath, FString InFolder, TSubclassOf<UDataAsset> InClass)
     {
         auto Factory = Cast<UDataAssetFactory>(NewObject(GetTransientPackage(), UDataAssetFactory));
-        return AssetTools::CreateAsset(InName, ReferenceClipFolder, InClass, Factory);
+        return AssetTools::CreateAsset(FSoftObjectPath(InPath).GetAssetName(), InFolder, InClass, Factory);
     }
 
-    // The crawler the clip editor previews a reference clip on: the reference rig and the layout's gait, copied into the
-    // clip's editor data (the script assets they come from are not saved packages, and the runtime clip must not carry
-    // them), and a pincer's claw slots bound to the first and last leg. The editor derives the rest of the preview (floor,
-    // rest pose, support) from the rig.
-    FCk_ProceduralActionEditor_Subject Make_EditorSubject(UCk_ProceduralAction_Data InClip, EMars_Crawler_Layout InLayout,
-        EMars_Crawler_AttackClipKind InKind)
+    // A preview subject walking a copy of InLegs with a copy of InSourceGait, both embedded in the clip's editor data (the
+    // script assets they come from are not saved packages, and the runtime clip must not carry them). Soft references
+    // only: a seeder that saves the clip pins them with Set_PinnedPreviewSubject.
+    FCk_ProceduralActionEditor_Subject Make_EmbeddedPreviewSubject(UCk_ProceduralAction_Data InClip,
+        const TArray<FCk_ProceduralLeg_Spec>& InLegs, UCk_ProceduralGait_Data InSourceGait)
     {
-        const auto SourceGait = Get_LayoutGaitData(InLayout);
-        const TArray<FCk_ProceduralLeg_Spec> Legs = Get_ReferenceRig(InLayout).Get_Legs();
         auto EditorData = utils_procedural_action_editor::Get_EditorData(InClip);
         auto Rig = Cast<UCk_ProceduralRig_Data>(NewObject(EditorData, UCk_ProceduralRig_Data, n"SubjectRig"));
         auto Gait = Cast<UCk_ProceduralGait_Data>(NewObject(EditorData, UCk_ProceduralGait_Data, n"SubjectGait"));
-        Rig.Set_Legs(Legs);
-        Gait.Set_Timing(SourceGait.Get_Timing());
-        Gait.Set_Step(SourceGait.Get_Step());
-        Gait.Set_Probe(SourceGait.Get_Probe());
-        Gait.Set_Foothold(SourceGait.Get_Foothold());
+        Rig.Set_Legs(InLegs);
+        Gait.Set_Timing(InSourceGait.Get_Timing());
+        Gait.Set_Step(InSourceGait.Get_Step());
+        Gait.Set_Probe(InSourceGait.Get_Probe());
+        Gait.Set_Foothold(InSourceGait.Get_Foothold());
 
         auto Subject = FCk_ProceduralActionEditor_Subject();
         Subject.Set_WalkingRig(TSoftObjectPtr<UCk_ProceduralRig_Data>(Rig));
         Subject.Set_WalkingGait(TSoftObjectPtr<UCk_ProceduralGait_Data>(Gait));
+        return Subject;
+    }
+
+    // Sets InSubject on the clip and hard-pins its embedded rig and gait, without which the save drops them. Editor only,
+    // outside PIE; false when the pins are refused.
+    bool Set_PinnedPreviewSubject(UCk_ProceduralAction_Data InClip, const FCk_ProceduralActionEditor_Subject& InSubject)
+    {
+        utils_procedural_action_editor::Get_EditorData(InClip).Set_Subject(InSubject);
+        return UMars_AttackPreviewOwnership::Attach_EmbeddedPreviewObjects(InClip, InSubject.Get_WalkingRig().Get(), InSubject.Get_WalkingGait().Get());
+    }
+
+    // The crawler the clip editor previews a reference clip on: the reference rig and the layout's gait, and a pincer's
+    // claw slots bound to the first and last leg. The editor derives the rest of the preview (floor, rest pose, support)
+    // from the rig.
+    FCk_ProceduralActionEditor_Subject Make_EditorSubject(UCk_ProceduralAction_Data InClip, EMars_Crawler_Layout InLayout,
+        EMars_Crawler_AttackClipKind InKind)
+    {
+        const TArray<FCk_ProceduralLeg_Spec> Legs = Get_ReferenceRig(InLayout).Get_Legs();
+        auto Subject = Make_EmbeddedPreviewSubject(InClip, Legs, Get_LayoutGaitData(InLayout));
         if (InKind == EMars_Crawler_AttackClipKind::Pincer)
         {
             auto SlotBindings = TArray<FCk_ProceduralAction_SlotBinding>();
@@ -345,7 +366,8 @@ namespace utils_crawler
 #endif
 
 #if EDITOR
-// Proposed Phase 3 addition. These references are authored independently from Pincer.
+// One claw's swipe keys in the root's frame: the swipe references and the endpoint pincer, authored independently of the
+// reference pincer.
 struct FMars_Crawler_ReferenceSwipeKeys
 {
     bool Valid = false;
@@ -359,30 +381,46 @@ struct FMars_Crawler_ReferenceSwipeKeys
     FVector RecoverLift;
 }
 
+// The reference rig a reference clip is authored against.
+struct FMars_Crawler_ReferenceBody
+{
+    EMars_Crawler_Layout Layout = EMars_Crawler_Layout::Radial;
+    int32 LegCount = 4;
+
+    FMars_Crawler_ReferenceBody() {}
+
+    FMars_Crawler_ReferenceBody(EMars_Crawler_Layout InLayout, int32 InLegCount)
+    {
+        Layout = InLayout;
+        LegCount = InLegCount;
+    }
+}
+
 namespace utils_crawler
 {
     // Endpoint emitters use radius 12 cm. The additional 5 cm is a reference-pose margin, measured again on accepted
-    // endpoint receipts by the Phase 3 fixture. It is not permission to ignore floor hits or stretch trace budgets.
+    // endpoint receipts by the endpoint catalog tests. It is not permission to ignore floor hits or stretch trace budgets.
     const float64 ReferenceEndpointClawClearance = 17.0;
 
     // Select by stable reference ID so changing asset array order cannot borrow another leg.
-    FMars_Crawler_ReferenceSwipeKeys Make_ReferenceSwipeKeys(EMars_Crawler_Layout InLayout, int32 InLegCount, bool InRight)
+    FMars_Crawler_ReferenceSwipeKeys Make_ReferenceSwipeKeys(const FMars_Crawler_ReferenceBody& InBody, EMars_Crawler_Side InSide)
     {
         auto Keys = FMars_Crawler_ReferenceSwipeKeys();
-        if (InLayout != EMars_Crawler_Layout::Radial && InLayout != EMars_Crawler_Layout::Spider)
+        if (InBody.Layout != EMars_Crawler_Layout::Radial && InBody.Layout != EMars_Crawler_Layout::Spider)
         { return Keys; }
-        const auto Rig = Get_LayoutRigData(InLayout, InLegCount);
+        const auto Rig = Get_LayoutRigData(InBody.Layout, InBody.LegCount);
         if (ck::Is_NOT_Valid(Rig))
         { return Keys; }
-        Keys.Slot = InRight ? Get_RightClawSlotId() : Get_LeftClawSlotId();
-        Keys.LimbId = InRight ? n"Leg0" : FName(f"Leg{InLegCount - 1}");
+        const auto IsRight = InSide == EMars_Crawler_Side::Right;
+        Keys.Slot = IsRight ? Get_RightClawSlotId() : Get_LeftClawSlotId();
+        Keys.LimbId = IsRight ? n"Leg0" : FName(f"Leg{InBody.LegCount - 1}");
         for (const auto& Leg : Rig.Get_Legs())
         {
             if (Leg.Get_Id() != Keys.LimbId)
             { continue; }
             const auto Hip = Leg.Get_Placement().Get_HipLocal();
             const auto Reach = float64(Get_ChainReach(Leg));
-            const auto Side = InRight ? 1.0 : -1.0;
+            const auto Side = IsRight ? 1.0 : -1.0;
             Keys.Rest = Leg.Get_Placement().Get_RestFootLocal();
             const auto Floor = Keys.Rest.Z + ReferenceEndpointClawClearance;
             // Outward/back relative to the strike, with the foot raised. Strike closes across the front in three
@@ -402,11 +440,11 @@ namespace utils_crawler
         return Keys;
     }
 
-    FCk_ProceduralAction_PoseKey Make_ReferenceSwipePoseKey(float32 InTime, FTransform InBody, FName InSlot, FVector InEndpoint)
+    FCk_ProceduralAction_PoseKey Make_ReferenceSwipePoseKey(float32 InTime, FTransform InBody, const FCk_ProceduralAction_LimbPoseTarget& InClaw)
     {
         auto Key = Make_ReferencePoseKey(InTime, InBody);
         auto Limbs = TArray<FCk_ProceduralAction_LimbPoseTarget>();
-        Limbs.Add(FCk_ProceduralAction_LimbPoseTarget(InSlot, InEndpoint));
+        Limbs.Add(InClaw);
         Key.Set_Limbs(Limbs);
         return Key;
     }
@@ -414,19 +452,19 @@ namespace utils_crawler
     // Three supported reference morphologies: Radial4, Radial6 and Spider6. One claimed RootAtStart slot, independent
     // windup/strike/recovery keys, body pitch <=10 degrees, identity Strike end and Recover rotations, linear channels.
     // Build_Into leaves the destination untouched unless every public builder step and final compilation succeeds.
-    FCk_ProceduralAction_ValidationReport Build_ReferenceSwipeClip(EMars_Crawler_Layout InLayout, int32 InLegCount,
-        bool InRight, UCk_ProceduralAction_Data InClip)
+    FCk_ProceduralAction_ValidationReport Build_ReferenceSwipeClip(const FMars_Crawler_ReferenceBody& InBody, EMars_Crawler_Side InSide,
+        UCk_ProceduralAction_Data InClip)
     {
-        const auto Keys = Make_ReferenceSwipeKeys(InLayout, InLegCount, InRight);
+        const auto Keys = Make_ReferenceSwipeKeys(InBody, InSide);
         if (Keys.Valid == false)
         {
             auto Diagnostics = TArray<FCk_ProceduralAction_Diagnostic>();
             Diagnostics.Add(FCk_ProceduralAction_Diagnostic(ECk_ProceduralAction_DiagnosticSeverity::Error,
                 n"ReferenceSwipeRigUnsupported", "", "ReferenceSwipe.Rig", NAME_None, NAME_None, -1,
-                "Radial4, Radial6 or Spider6 with the named front leg", f"{InLayout :n} {InLegCount}"));
+                "Radial4, Radial6 or Spider6 with the named front leg", f"{InBody.Layout :n} {InBody.LegCount}"));
             return FCk_ProceduralAction_ValidationReport(ECk_ProceduralAction_ReportStatus::Invalid, Diagnostics);
         }
-        const auto Size = float64(Get_LayoutSizeScale(InLayout));
+        const auto Size = float64(Get_LayoutSizeScale(InBody.Layout));
         const auto WindupBody = FTransform(FRotator(10.0, 0.0, 0.0), FVector(-4.0, 0.0, 4.0) * Size, FVector::OneVector);
         const auto EntryBody = FTransform(FRotator(7.0, 0.0, 0.0), FVector(0.0, 0.0, 3.0) * Size, FVector::OneVector);
         const auto AcrossBody = FTransform(FRotator::ZeroRotator, FVector(8.0, 0.0, 0.0) * Size, FVector::OneVector);
@@ -448,39 +486,32 @@ namespace utils_crawler
             FMars_Crawler_ReferencePhase(0.45f, ECk_ProceduralAction_Easing::OutCubic, WindupBody))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, WindupId, Make_ReferencePoseKey(0.0f, FTransform::Identity)));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, WindupId,
-            Make_ReferenceSwipePoseKey(1.0f, WindupBody, Keys.Slot, Keys.Windup)));
+            Make_ReferenceSwipePoseKey(1.0f, WindupBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.Windup))));
 
         Reports.Add(utils_procedural_action_builder::Add_Phase(Draft, Make_ReferencePhase(StrikeId,
             FMars_Crawler_ReferencePhase(0.18f, ECk_ProceduralAction_Easing::InQuad, StrikeBody))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
-            Make_ReferenceSwipePoseKey(0.0f, WindupBody, Keys.Slot, Keys.Windup)));
+            Make_ReferenceSwipePoseKey(0.0f, WindupBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.Windup))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
-            Make_ReferenceSwipePoseKey(0.25f, EntryBody, Keys.Slot, Keys.StrikeEntry)));
+            Make_ReferenceSwipePoseKey(0.25f, EntryBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.StrikeEntry))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
-            Make_ReferenceSwipePoseKey(0.75f, AcrossBody, Keys.Slot, Keys.StrikeAcross)));
+            Make_ReferenceSwipePoseKey(0.75f, AcrossBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.StrikeAcross))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, StrikeId,
-            Make_ReferenceSwipePoseKey(1.0f, StrikeBody, Keys.Slot, Keys.StrikeEnd)));
+            Make_ReferenceSwipePoseKey(1.0f, StrikeBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.StrikeEnd))));
 
         Reports.Add(utils_procedural_action_builder::Add_Phase(Draft, Make_ReferencePhase(RecoverId,
             FMars_Crawler_ReferencePhase(0.55f, ECk_ProceduralAction_Easing::InOutCubic, FTransform::Identity))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, RecoverId,
-            Make_ReferenceSwipePoseKey(0.0f, StrikeBody, Keys.Slot, Keys.StrikeEnd)));
+            Make_ReferenceSwipePoseKey(0.0f, StrikeBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.StrikeEnd))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, RecoverId,
-            Make_ReferenceSwipePoseKey(0.35f, RecoverBody, Keys.Slot, Keys.RecoverLift)));
+            Make_ReferenceSwipePoseKey(0.35f, RecoverBody, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.RecoverLift))));
         Reports.Add(utils_procedural_action_builder::Add_PoseKey(Draft, RecoverId,
-            Make_ReferenceSwipePoseKey(1.0f, FTransform::Identity, Keys.Slot, Keys.Rest)));
+            Make_ReferenceSwipePoseKey(1.0f, FTransform::Identity, FCk_ProceduralAction_LimbPoseTarget(Keys.Slot, Keys.Rest))));
 
         Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(Get_OffenseWindowId(),
             FCk_ProceduralAction_TimeRef(WindupId, FCk_FloatRange_0to1(0.0f)),
             FCk_ProceduralAction_TimeRef(RecoverId, FCk_FloatRange_0to1(1.0f)))));
-        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"Damage",
-            FCk_ProceduralAction_TimeRef(StrikeId, FCk_FloatRange_0to1(0.25f)),
-            FCk_ProceduralAction_TimeRef(StrikeId, FCk_FloatRange_0to1(0.75f)))));
-        // The initial planted endpoint and final replant are deliberately outside this emitter's collision window.
-        // Offense stays full length for the existing lifecycle. Endpoint obstruction and damage use ClawSweep/Damage.
-        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"ClawSweep",
-            FCk_ProceduralAction_TimeRef(WindupId, FCk_FloatRange_0to1(0.80f)),
-            FCk_ProceduralAction_TimeRef(RecoverId, FCk_FloatRange_0to1(0.25f)))));
+        Add_EndpointClawWindows(Draft, Reports);
         for (const auto& Report : Reports)
         {
             if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
@@ -489,26 +520,31 @@ namespace utils_crawler
         return utils_procedural_action_builder::Build_Into(Draft, InClip);
     }
 
+    // The Strike-phase Damage window and the ClawSweep window an endpoint claw's emitters read. The initial planted
+    // endpoint and the final replant are deliberately outside ClawSweep; Offense stays full length for the lifecycle.
+    void Add_EndpointClawWindows(FCk_ProceduralAction_ClipDraft& InOutDraft, TArray<FCk_ProceduralAction_ValidationReport>& InOutReports)
+    {
+        const auto WindupId = Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup);
+        const auto StrikeId = Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike);
+        const auto RecoverId = Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover);
+        InOutReports.Add(utils_procedural_action_builder::Add_Window(InOutDraft, FCk_ProceduralAction_Window(n"Damage",
+            FCk_ProceduralAction_TimeRef(StrikeId, FCk_FloatRange_0to1(0.25f)),
+            FCk_ProceduralAction_TimeRef(StrikeId, FCk_FloatRange_0to1(0.75f)))));
+        InOutReports.Add(utils_procedural_action_builder::Add_Window(InOutDraft, FCk_ProceduralAction_Window(n"ClawSweep",
+            FCk_ProceduralAction_TimeRef(WindupId, FCk_FloatRange_0to1(0.80f)),
+            FCk_ProceduralAction_TimeRef(RecoverId, FCk_FloatRange_0to1(0.25f)))));
+    }
+
     // Metadata only; caller sets it on a NEW owned clip. This function neither seeds nor saves an asset.
     FCk_ProceduralActionEditor_Subject Make_ReferenceSwipeEditorSubject(UCk_ProceduralAction_Data InClip,
-        EMars_Crawler_Layout InLayout, int32 InLegCount, bool InRight)
+        const FMars_Crawler_ReferenceBody& InBody, EMars_Crawler_Side InSide)
     {
-        const auto Keys = Make_ReferenceSwipeKeys(InLayout, InLegCount, InRight);
-        auto Subject = FCk_ProceduralActionEditor_Subject();
+        const auto Keys = Make_ReferenceSwipeKeys(InBody, InSide);
         if (Keys.Valid == false)
-        { return Subject; }
-        const auto SourceRig = Get_LayoutRigData(InLayout, InLegCount);
-        const auto SourceGait = Get_LayoutGaitData(InLayout);
-        auto EditorData = utils_procedural_action_editor::Get_EditorData(InClip);
-        auto Rig = Cast<UCk_ProceduralRig_Data>(NewObject(EditorData, UCk_ProceduralRig_Data, n"SubjectRig"));
-        auto Gait = Cast<UCk_ProceduralGait_Data>(NewObject(EditorData, UCk_ProceduralGait_Data, n"SubjectGait"));
-        Rig.Set_Legs(SourceRig.Get_Legs());
-        Gait.Set_Timing(SourceGait.Get_Timing());
-        Gait.Set_Step(SourceGait.Get_Step());
-        Gait.Set_Probe(SourceGait.Get_Probe());
-        Gait.Set_Foothold(SourceGait.Get_Foothold());
-        Subject.Set_WalkingRig(TSoftObjectPtr<UCk_ProceduralRig_Data>(Rig));
-        Subject.Set_WalkingGait(TSoftObjectPtr<UCk_ProceduralGait_Data>(Gait));
+        { return FCk_ProceduralActionEditor_Subject(); }
+
+        const TArray<FCk_ProceduralLeg_Spec> Legs = Get_LayoutRigData(InBody.Layout, InBody.LegCount).Get_Legs();
+        auto Subject = Make_EmbeddedPreviewSubject(InClip, Legs, Get_LayoutGaitData(InBody.Layout));
         auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
         Bindings.Add(FCk_ProceduralAction_SlotBinding(Keys.Slot, Keys.LimbId));
         Subject.Set_SlotBindings(Bindings);
@@ -527,16 +563,16 @@ namespace utils_crawler
     // Opt-in endpoint pincer: copy the supplied legacy reference through the public draft surface. Neither the source
     // object nor its saved package is changed. Keep its body motion/timings and two claws; clear each claw against its
     // own current rig rest-floor, hold the raised Strike endpoint through early Recover, then recover to its own rest.
-    FCk_ProceduralAction_ValidationReport Build_ReferenceEndpointPincerClip(EMars_Crawler_Layout InLayout, int32 InLegCount,
+    FCk_ProceduralAction_ValidationReport Build_ReferenceEndpointPincerClip(const FMars_Crawler_ReferenceBody& InBody,
         UCk_ProceduralAction_Data InSource, UCk_ProceduralAction_Data InClip)
     {
-        const auto Right = Make_ReferenceSwipeKeys(InLayout, InLegCount, true);
-        const auto Left = Make_ReferenceSwipeKeys(InLayout, InLegCount, false);
+        const auto Right = Make_ReferenceSwipeKeys(InBody, EMars_Crawler_Side::Right);
+        const auto Left = Make_ReferenceSwipeKeys(InBody, EMars_Crawler_Side::Left);
         if (Right.Valid == false || Left.Valid == false || ck::Is_NOT_Valid(InSource) || InSource == InClip)
         { return Make_ReferenceEndpointPincerError("unsupported rig, missing source or shared destination"); }
-        const auto Validation = Validate_AttackClip(InSource, EMars_Crawler_AttackClipKind::Pincer);
-        if (Validation.IsValid() == false)
-        { return Make_ReferenceEndpointPincerError(Validation.Get_Error()); }
+        const auto Compiled = utils_procedural_action::Validate_Data(InSource);
+        if (Compiled.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
+        { return Make_ReferenceEndpointPincerError(f"the source does not compile: {Get_FirstDiagnosticText(Compiled)}"); }
         auto Draft = FCk_ProceduralAction_ClipDraft();
         const auto Copy = utils_procedural_action_builder::Make_Draft_FromData(InSource, Draft);
         if (Copy.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
@@ -611,12 +647,7 @@ namespace utils_crawler
         auto Reports = TArray<FCk_ProceduralAction_ValidationReport>();
         Reports.Add(utils_procedural_action_builder::Set_SlotFrame(Draft, Right.Slot, ECk_ProceduralAction_TrackSpace::RootAtStart));
         Reports.Add(utils_procedural_action_builder::Set_SlotFrame(Draft, Left.Slot, ECk_ProceduralAction_TrackSpace::RootAtStart));
-        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"Damage",
-            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike), FCk_FloatRange_0to1(0.25f)),
-            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Strike), FCk_FloatRange_0to1(0.75f)))));
-        Reports.Add(utils_procedural_action_builder::Add_Window(Draft, FCk_ProceduralAction_Window(n"ClawSweep",
-            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Windup), FCk_FloatRange_0to1(0.80f)),
-            FCk_ProceduralAction_TimeRef(Get_ClipPhaseId(EMars_Crawler_AttackPhase::Recover), FCk_FloatRange_0to1(0.25f)))));
+        Add_EndpointClawWindows(Draft, Reports);
         for (const auto& Report : Reports)
         {
             if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
@@ -626,11 +657,11 @@ namespace utils_crawler
     }
 
     FCk_ProceduralActionEditor_Subject Make_ReferenceEndpointPincerEditorSubject(UCk_ProceduralAction_Data InClip,
-        EMars_Crawler_Layout InLayout, int32 InLegCount)
+        const FMars_Crawler_ReferenceBody& InBody)
     {
-        const auto Right = Make_ReferenceSwipeKeys(InLayout, InLegCount, true);
-        const auto Left = Make_ReferenceSwipeKeys(InLayout, InLegCount, false);
-        auto Subject = Make_ReferenceSwipeEditorSubject(InClip, InLayout, InLegCount, true);
+        const auto Right = Make_ReferenceSwipeKeys(InBody, EMars_Crawler_Side::Right);
+        const auto Left = Make_ReferenceSwipeKeys(InBody, EMars_Crawler_Side::Left);
+        auto Subject = Make_ReferenceSwipeEditorSubject(InClip, InBody, EMars_Crawler_Side::Right);
         if (Right.Valid == false || Left.Valid == false)
         { return Subject; }
         auto Bindings = TArray<FCk_ProceduralAction_SlotBinding>();
@@ -638,6 +669,12 @@ namespace utils_crawler
         Bindings.Add(FCk_ProceduralAction_SlotBinding(Left.Slot, Left.LimbId));
         Subject.Set_SlotBindings(Bindings);
         return Subject;
+    }
+
+    // The swipe whose claw is InAttackId's (SwipeRight: the right claw).
+    EMars_Crawler_Side Get_ReferenceSwipeSide(FGameplayTag InAttackId)
+    {
+        return InAttackId == GameplayTags::Attack_Mars_SwipeRight ? EMars_Crawler_Side::Right : EMars_Crawler_Side::Left;
     }
 }
 #endif

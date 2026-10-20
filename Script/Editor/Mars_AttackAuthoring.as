@@ -29,6 +29,44 @@ void Mars_AttackSeedReferenceLoadoutsFunc(const TArray<FString>& Args)
 }
 const FConsoleCommand Mars_AttackSeedReferenceLoadoutsCommand("Mars.Attack.SeedReferenceLoadouts", n"Mars_AttackSeedReferenceLoadoutsFunc");
 
+// One reference definition: the preset, the graph it belongs to and the attack.
+struct FMars_AttackAuthoring_DefinitionKey
+{
+    EMars_Crawler_AttackPreset Preset = EMars_Crawler_AttackPreset::Crawler4;
+    EMars_AttackReference_Kind Kind = EMars_AttackReference_Kind::Parity;
+    FGameplayTag Id;
+
+    FMars_AttackAuthoring_DefinitionKey() {}
+
+    FMars_AttackAuthoring_DefinitionKey(EMars_Crawler_AttackPreset InPreset, EMars_AttackReference_Kind InKind, FGameplayTag InId)
+    {
+        Preset = InPreset;
+        Kind = InKind;
+        Id = InId;
+    }
+}
+
+// What a reference loadout's execution policy is built from: the preset and graph, the pincer clip the support follows and
+// the longest enabled clip.
+struct FMars_AttackAuthoring_ExecutionQuery
+{
+    EMars_Crawler_AttackPreset Preset = EMars_Crawler_AttackPreset::Crawler4;
+    EMars_AttackReference_Kind Kind = EMars_AttackReference_Kind::Parity;
+    UCk_ProceduralAction_Data Pincer;
+    float64 LongestClip = 0.0;
+
+    FMars_AttackAuthoring_ExecutionQuery() {}
+
+    FMars_AttackAuthoring_ExecutionQuery(EMars_Crawler_AttackPreset InPreset, EMars_AttackReference_Kind InKind,
+        UCk_ProceduralAction_Data InPincer, float64 InLongestClip)
+    {
+        Preset = InPreset;
+        Kind = InKind;
+        Pincer = InPincer;
+        LongestClip = InLongestClip;
+    }
+}
+
 // Strong references exist only in this editor operation, never in an ECS fragment. Existing objects are read-only.
 struct FMars_AttackAuthoring_ClipPlan
 {
@@ -49,6 +87,7 @@ struct FMars_AttackAuthoring_LoadoutPlan
 {
     FString Path;
     EMars_Crawler_AttackPreset Preset = EMars_Crawler_AttackPreset::Crawler4;
+    EMars_AttackReference_Kind Kind = EMars_AttackReference_Kind::Parity;
     bool Existed = false;
     UMars_AttackLoadout_Data Asset;
     FMars_Crawler_AttackConstruction Construction;
@@ -87,11 +126,15 @@ struct FMars_AttackAuthoring_SeedReport
 
 namespace utils_attack_authoring
 {
-    void Print_Report(FString InPath, EMars_Crawler_AttackPreset InPreset, const FMars_Attack_ValidationReport& InReport,
-        const FMars_Crawler_AttackConstruction& InConstruction)
+    bool Get_IsEndpointDemo(EMars_AttackReference_Kind InKind)
     {
-        LogDisplay(f"[Mars.Attack.ValidateLoadout] path={InPath} preset={InPreset :n} geometry=preset-box-only result={InReport.Get_IsValid()}");
-        for (const auto& Entry : InConstruction.Resolved.Entries)
+        return InKind == EMars_AttackReference_Kind::EndpointDemo;
+    }
+
+    void Print_Report(const FMars_AttackAuthoring_ValidationResult& InResult)
+    {
+        LogDisplay(f"[Mars.Attack.ValidateLoadout] path={InResult.Path} preset={InResult.Preset :n} geometry=preset-box-only result={InResult.Report.Get_IsValid()}");
+        for (const auto& Entry : InResult.Construction.Resolved.Entries)
         {
             LogDisplay(f"[Mars.Attack.ValidateLoadout] entry={Entry.Identity.Id.ToString()} definition={Entry.Identity.DefinitionPath.ToString()}");
             for (const auto& Slot : Entry.Slots)
@@ -99,7 +142,7 @@ namespace utils_attack_authoring
             for (const auto& Part : Entry.Parts)
             { LogDisplay(f"[Mars.Attack.ValidateLoadout] entry={Entry.Identity.Id.ToString()} role={Part.Binding.Role.ToString()} prerequisite=true limb={Part.Binding.LimbId}"); }
         }
-        for (const auto& Diagnostic : InReport.Diagnostics)
+        for (const auto& Diagnostic : InResult.Report.Diagnostics)
         {
             auto EntryId = FGameplayTag();
             auto Role = FGameplayTag();
@@ -107,9 +150,9 @@ namespace utils_attack_authoring
             auto Definition = FMars_Attack_Definition();
             // Raw graph diagnostics use original entry indices (including disabled entries); resolved diagnostics use
             // enabled runtime indices. The identity mapping must respect that distinction.
-            if (Diagnostic.Field.StartsWith("Combat.Loadout.") && ck::IsValid(InConstruction.Loadout))
+            if (Diagnostic.Field.StartsWith("Combat.Loadout.") && ck::IsValid(InResult.Construction.Loadout))
             {
-                const auto Entries = InConstruction.Loadout.Spec.Entries;
+                const auto Entries = InResult.Construction.Loadout.Spec.Entries;
                 for (int32 Index = 0; Index < Entries.Num(); ++Index)
                 {
                     if (Diagnostic.Field.Contains(f"Entries[{Index}]") == false) { continue; }
@@ -121,11 +164,11 @@ namespace utils_attack_authoring
             }
             else
             {
-                for (int32 Index = 0; Index < InConstruction.Resolved.Entries.Num(); ++Index)
+                for (int32 Index = 0; Index < InResult.Construction.Resolved.Entries.Num(); ++Index)
                 {
                     if (Diagnostic.Field.Contains(f"Entries[{Index}]") == false) { continue; }
-                    EntryId = InConstruction.Resolved.Entries[Index].Identity.Id;
-                    Definition = InConstruction.Resolved.Entries[Index].Definition;
+                    EntryId = InResult.Construction.Resolved.Entries[Index].Identity.Id;
+                    Definition = InResult.Construction.Resolved.Entries[Index].Definition;
                     break;
                 }
             }
@@ -142,9 +185,9 @@ namespace utils_attack_authoring
                 Role = Definition.Requirements.Parts[Index].Role;
                 break;
             }
-            LogDisplay(f"[Mars.Attack.ValidateLoadout] path={InPath} entry={EntryId.ToString()} role={Role.ToString()} slot={SlotId} code={Diagnostic.Code} field={Diagnostic.Field} expected={Diagnostic.Expected} actual={Diagnostic.Actual}");
+            LogDisplay(f"[Mars.Attack.ValidateLoadout] path={InResult.Path} entry={EntryId.ToString()} role={Role.ToString()} slot={SlotId} code={Diagnostic.Code} field={Diagnostic.Field} expected={Diagnostic.Expected} actual={Diagnostic.Actual}");
         }
-        if (InReport.Truncated)
+        if (InResult.Report.Truncated)
         { LogDisplay("[Mars.Attack.ValidateLoadout] validation diagnostics truncated at the shared bounded limit"); }
     }
 
@@ -152,9 +195,13 @@ namespace utils_attack_authoring
     {
         auto Spec = utils_crawler::Make_AttackReferenceSpec(InPreset);
         Spec.Combat.Loadout = TSoftObjectPtr<UMars_AttackLoadout_Data>(InLoadout);
-        const auto Report = utils_crawler::Resolve_AttackLoadout(Spec, OutConstruction);
-        Print_Report(ck::IsValid(InLoadout) ? InLoadout.GetPathName() : "null", InPreset, Report, OutConstruction);
-        return Report.Get_IsValid();
+        auto Result = FMars_AttackAuthoring_ValidationResult();
+        Result.Path = ck::IsValid(InLoadout) ? InLoadout.GetPathName() : "null";
+        Result.Preset = InPreset;
+        Result.Report = utils_crawler::Resolve_AttackLoadout(Spec, OutConstruction);
+        Result.Construction = OutConstruction;
+        Print_Report(Result);
+        return Result.Report.Get_IsValid();
     }
 
     // Loads and freezes through the runtime resolver; no editor data accessor, mutation or save is used here.
@@ -178,21 +225,30 @@ namespace utils_attack_authoring
     bool Validate_LoadoutPath(FString InPath, EMars_Crawler_AttackPreset InPreset)
     {
         const auto Result = Get_LoadoutValidation(InPath, InPreset);
-        Print_Report(InPath, InPreset, Result.Report, Result.Construction);
+        Print_Report(Result);
         return Result.Report.Get_IsValid();
     }
 
-    int32 Find_ClipPlan(const FMars_AttackAuthoring_Preflight& InPlan, FString InPath)
+    TOptional<int32> Find_ClipPlan(const FMars_AttackAuthoring_Preflight& InPlan, FString InPath)
     {
         for (int32 Index = 0; Index < InPlan.Clips.Num(); ++Index)
-        { if (InPlan.Clips[Index].Path == InPath) { return Index; } }
-        return -1;
+        {
+            if (InPlan.Clips[Index].Path == InPath)
+            { return TOptional<int32>(Index); }
+        }
+
+        return TOptional<int32>();
     }
-    int32 Find_DefinitionPlan(const FMars_AttackAuthoring_Preflight& InPlan, FString InPath)
+
+    TOptional<int32> Find_DefinitionPlan(const FMars_AttackAuthoring_Preflight& InPlan, FString InPath)
     {
         for (int32 Index = 0; Index < InPlan.Definitions.Num(); ++Index)
-        { if (InPlan.Definitions[Index].Path == InPath) { return Index; } }
-        return -1;
+        {
+            if (InPlan.Definitions[Index].Path == InPath)
+            { return TOptional<int32>(Index); }
+        }
+
+        return TOptional<int32>();
     }
 
     UCk_ProceduralAction_Data Load_LegacyClip(EMars_Crawler_AttackPreset InPreset, FGameplayTag InId, FMars_AttackAuthoring_Preflight& InOutPlan)
@@ -209,8 +265,8 @@ namespace utils_attack_authoring
     {
         const auto Path = utils_crawler::Get_AttackReferenceEndpointClipPath(InPreset, InId);
         const auto Found = Find_ClipPlan(InOutPlan, Path);
-        if (Found >= 0)
-        { return InOutPlan.Clips[Found].Asset; }
+        if (Found.IsSet())
+        { return InOutPlan.Clips[Found.GetValue()].Asset; }
         auto Plan = FMars_AttackAuthoring_ClipPlan();
         Plan.Path = Path;
         Plan.Preset = InPreset;
@@ -231,10 +287,13 @@ namespace utils_attack_authoring
                 auto Source = Load_LegacyClip(InPreset, GameplayTags::Attack_Mars_Pincer, InOutPlan);
                 if (ck::Is_NOT_Valid(Source))
                 { return nullptr; }
-                Report = utils_crawler::Build_ReferenceEndpointPincerClip(Spec.Layout, Spec.LegCount, Source, Plan.Asset);
+                Report = utils_crawler::Build_ReferenceEndpointPincerClip(FMars_Crawler_ReferenceBody(Spec.Layout, Spec.LegCount), Source, Plan.Asset);
             }
             else
-            { Report = utils_crawler::Build_ReferenceSwipeClip(Spec.Layout, Spec.LegCount, InId == GameplayTags::Attack_Mars_SwipeRight, Plan.Asset); }
+            {
+                const auto Body = FMars_Crawler_ReferenceBody(Spec.Layout, Spec.LegCount);
+                Report = utils_crawler::Build_ReferenceSwipeClip(Body, utils_crawler::Get_ReferenceSwipeSide(InId), Plan.Asset);
+            }
             if (Report.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid)
             { LogDisplay(f"[Mars.Attack.SeedReferenceLoadouts] preflight clip failed: {Path} {utils_crawler::Get_FirstDiagnosticText(Report)}"); return nullptr; }
         }
@@ -244,38 +303,40 @@ namespace utils_attack_authoring
         return Plan.Asset;
     }
 
-    FMars_Attack_Definition Make_Definition(EMars_Crawler_AttackPreset InPreset, FGameplayTag InId, bool InEndpointDemo, UCk_ProceduralAction_Data InClip)
+    FMars_Attack_Definition Make_Definition(const FMars_AttackAuthoring_DefinitionKey& InKey, UCk_ProceduralAction_Data InClip)
     {
+        const auto Id = InKey.Id;
+        const auto EndpointDemo = Get_IsEndpointDemo(InKey.Kind);
         auto Def = FMars_Attack_Definition();
         Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(InClip);
         Def.Hit.DamageType = GameplayTags::DamageType_Mars_Blunt;
         Def.Hit.Damage = 15.0f;
-        Def.CueProfile = utils_crawler::Get_AttackReferenceCueProfile(InId);
+        Def.CueProfile = utils_crawler::Get_AttackReferenceCueProfile(Id);
         Def.Prepare.FacingToleranceDegrees = 10.0f;
         Def.Prepare.MaxHeightDifference = 60.0f;
         Def.Cooldown.RecoverySeconds = 0.70f;
-        Def.Cooldown.ReuseSeconds = InEndpointDemo && InId != GameplayTags::Attack_Mars_Jab ? 0.80f : 0.0f;
-        if (InEndpointDemo && InId != GameplayTags::Attack_Mars_Jab)
+        Def.Cooldown.ReuseSeconds = EndpointDemo && Id != GameplayTags::Attack_Mars_Jab ? 0.80f : 0.0f;
+        if (EndpointDemo && Id != GameplayTags::Attack_Mars_Jab)
         { Def.Prepare.MaxDistance = 190.0f; }
         else
         {
             Def.Prepare.UseCreatureFrontRange = true;
             Def.Prepare.CreatureFrontRangeMargin = 70.0f;
         }
-        if (InId != GameplayTags::Attack_Mars_Jab)
+        if (Id != GameplayTags::Attack_Mars_Jab)
         {
-            if (InId == GameplayTags::Attack_Mars_Pincer || InId == GameplayTags::Attack_Mars_SwipeRight)
+            if (Id == GameplayTags::Attack_Mars_Pincer || Id == GameplayTags::Attack_Mars_SwipeRight)
             {
                 auto Slot = FMars_Attack_SlotRole(); Slot.Slot = n"ClawRight"; Slot.Role = GameplayTags::AttackRole_Mars_FrontRight;
                 Def.Requirements.Slots.Add(Slot);
             }
-            if (InId == GameplayTags::Attack_Mars_Pincer || InId == GameplayTags::Attack_Mars_SwipeLeft)
+            if (Id == GameplayTags::Attack_Mars_Pincer || Id == GameplayTags::Attack_Mars_SwipeLeft)
             {
                 auto Slot = FMars_Attack_SlotRole(); Slot.Slot = n"ClawLeft"; Slot.Role = GameplayTags::AttackRole_Mars_FrontLeft;
                 Def.Requirements.Slots.Add(Slot);
             }
         }
-        if (InEndpointDemo && InId != GameplayTags::Attack_Mars_Jab)
+        if (EndpointDemo && Id != GameplayTags::Attack_Mars_Jab)
         {
             for (const auto& Slot : Def.Requirements.Slots)
             {
@@ -295,17 +356,18 @@ namespace utils_attack_authoring
             auto Emitter = FMars_Attack_Emitter();
             Emitter.Id = GameplayTags::AttackEmitter_Mars_Body;
             Emitter.UseCreatureFrontCenter = true;
-            const auto Spec = utils_crawler::Make_AttackReferenceSpec(InPreset);
+            const auto Spec = utils_crawler::Make_AttackReferenceSpec(InKey.Preset);
             Emitter.MaxSampleTravel = FMars_Crawler_AttackHit().MaxSampleTravel * utils_crawler::Get_LayoutSizeScale(Spec.Layout);
             Def.Hit.Emitters.Add(Emitter);
         }
         return Def;
     }
 
-    UMars_AttackDefinition_Data Plan_Definition(EMars_Crawler_AttackPreset InPreset, bool InEndpointDemo, FGameplayTag InId, FMars_AttackAuthoring_Preflight& InOutPlan)
+    UMars_AttackDefinition_Data Plan_Definition(const FMars_AttackAuthoring_DefinitionKey& InKey, FMars_AttackAuthoring_Preflight& InOutPlan)
     {
+        const auto EndpointDemo = Get_IsEndpointDemo(InKey.Kind);
         auto Plan = FMars_AttackAuthoring_DefinitionPlan();
-        Plan.Path = utils_crawler::Get_AttackReferenceDefinitionPath(InPreset, InEndpointDemo, InId);
+        Plan.Path = utils_crawler::Get_AttackReferenceDefinitionPath(InKey.Preset, InKey.Kind, InKey.Id);
         Plan.Existed = EditorAsset::DoesAssetExist(Plan.Path);
         if (Plan.Existed)
         {
@@ -316,13 +378,13 @@ namespace utils_attack_authoring
         }
         else
         {
-            auto Clip = InEndpointDemo && InId != GameplayTags::Attack_Mars_Jab ? Plan_Clip(InPreset, InId, InOutPlan) : Load_LegacyClip(InPreset, InId, InOutPlan);
+            auto Clip = EndpointDemo && InKey.Id != GameplayTags::Attack_Mars_Jab ? Plan_Clip(InKey.Preset, InKey.Id, InOutPlan) : Load_LegacyClip(InKey.Preset, InKey.Id, InOutPlan);
             if (ck::Is_NOT_Valid(Clip))
             { return nullptr; }
-            Plan.ClipPath = InEndpointDemo && InId != GameplayTags::Attack_Mars_Jab ? utils_crawler::Get_AttackReferenceEndpointClipPath(InPreset, InId) :
-                utils_crawler::Get_AttackReferenceLegacyClipPath(InPreset, InId);
+            Plan.ClipPath = EndpointDemo && InKey.Id != GameplayTags::Attack_Mars_Jab ? utils_crawler::Get_AttackReferenceEndpointClipPath(InKey.Preset, InKey.Id) :
+                utils_crawler::Get_AttackReferenceLegacyClipPath(InKey.Preset, InKey.Id);
             Plan.Asset = Cast<UMars_AttackDefinition_Data>(NewObject(GetTransientPackage(), UMars_AttackDefinition_Data));
-            Plan.Asset.Def = Make_Definition(InPreset, InId, InEndpointDemo, Clip);
+            Plan.Asset.Def = Make_Definition(InKey, Clip);
         }
         if (ck::Is_NOT_Valid(Plan.Asset))
         { LogDisplay(f"[Mars.Attack.SeedReferenceLoadouts] code=DefinitionClassMismatch path={Plan.Path}"); return nullptr; }
@@ -330,21 +392,22 @@ namespace utils_attack_authoring
         return Plan.Asset;
     }
 
-    FMars_Attack_ExecutionPolicy Make_Execution(EMars_Crawler_AttackPreset InPreset, bool InEndpointDemo, UCk_ProceduralAction_Data InPincer, float64 InLongestClip)
+    FMars_Attack_ExecutionPolicy Make_Execution(const FMars_AttackAuthoring_ExecutionQuery& InQuery)
     {
-        auto Spec = utils_crawler::Make_AttackReferenceSpec(InPreset);
-        Spec.Combat.PincerClip = TSoftObjectPtr<UCk_ProceduralAction_Data>(InPincer);
+        const auto EndpointDemo = Get_IsEndpointDemo(InQuery.Kind);
+        auto Spec = utils_crawler::Make_AttackReferenceSpec(InQuery.Preset);
+        Spec.Combat.PincerClip = TSoftObjectPtr<UCk_ProceduralAction_Data>(InQuery.Pincer);
         Spec.Combat.Hit.MaxSampleTravel *= utils_crawler::Get_LayoutSizeScale(Spec.Layout);
         auto Execution = FMars_Attack_ExecutionPolicy();
         Execution.Tuning = utils_crawler::Make_AttackTuning(Spec);
         Execution.Locomotion = utils_crawler::Make_PincerLocomotion(Spec);
         auto Support = Execution.Locomotion.Get_Support();
         // Exact legacy resolver parity: longest enabled clip plus the original cancellation duration (0.15 s).
-        Support.Set_SupportHoldTimeout(FCk_Time(InEndpointDemo ? 6.0 : InLongestClip + float64(Spec.Combat.Timing.CancelSeconds)));
+        Support.Set_SupportHoldTimeout(FCk_Time(EndpointDemo ? 6.0 : InQuery.LongestClip + float64(Spec.Combat.Timing.CancelSeconds)));
         auto Locomotion = Execution.Locomotion;
         Locomotion.Set_Support(Support);
         Execution.Locomotion = Locomotion;
-        if (InEndpointDemo)
+        if (EndpointDemo)
         {
             auto Sampling = Execution.Tuning.Get_Sampling();
             Sampling.Set_MaxAdvance(FCk_Time(1.0 / 60.0));
@@ -362,11 +425,13 @@ namespace utils_attack_authoring
         return Execution;
     }
 
-    bool Plan_Loadout(EMars_Crawler_AttackPreset InPreset, bool InEndpointDemo, FMars_AttackAuthoring_Preflight& InOutPlan)
+    bool Plan_Loadout(EMars_Crawler_AttackPreset InPreset, EMars_AttackReference_Kind InKind, FMars_AttackAuthoring_Preflight& InOutPlan)
     {
+        const auto EndpointDemo = Get_IsEndpointDemo(InKind);
         auto Plan = FMars_AttackAuthoring_LoadoutPlan();
-        Plan.Path = utils_crawler::Get_AttackReferenceLoadoutPath(InPreset, InEndpointDemo);
+        Plan.Path = utils_crawler::Get_AttackReferenceLoadoutPath(InPreset, InKind);
         Plan.Preset = InPreset;
+        Plan.Kind = InKind;
         Plan.Existed = EditorAsset::DoesAssetExist(Plan.Path);
         if (Plan.Existed)
         {
@@ -377,19 +442,26 @@ namespace utils_attack_authoring
         {
             Plan.Asset = Cast<UMars_AttackLoadout_Data>(NewObject(GetTransientPackage(), UMars_AttackLoadout_Data));
             auto Ids = TArray<FGameplayTag>(); Ids.Add(GameplayTags::Attack_Mars_Pincer);
-            if (InEndpointDemo) { Ids.Add(GameplayTags::Attack_Mars_SwipeRight); Ids.Add(GameplayTags::Attack_Mars_SwipeLeft); }
+            if (EndpointDemo) { Ids.Add(GameplayTags::Attack_Mars_SwipeRight); Ids.Add(GameplayTags::Attack_Mars_SwipeLeft); }
             Ids.Add(GameplayTags::Attack_Mars_Jab);
             auto Loadout = FMars_Attack_Loadout();
             UCk_ProceduralAction_Data Pincer;
             float64 LongestClip = 0.0;
             for (const auto Id : Ids)
             {
-                auto Definition = Plan_Definition(InPreset, InEndpointDemo, Id, InOutPlan);
+                auto Definition = Plan_Definition(FMars_AttackAuthoring_DefinitionKey(InPreset, InKind, Id), InOutPlan);
                 if (ck::Is_NOT_Valid(Definition))
                 { return false; }
                 const auto DefinitionReport = utils_attack::Validate_Definition(Definition.Def);
                 if (DefinitionReport.Get_IsValid() == false)
-                { Print_Report(utils_crawler::Get_AttackReferenceDefinitionPath(InPreset, InEndpointDemo, Id), InPreset, DefinitionReport, FMars_Crawler_AttackConstruction()); return false; }
+                {
+                    auto Result = FMars_AttackAuthoring_ValidationResult();
+                    Result.Path = utils_crawler::Get_AttackReferenceDefinitionPath(InPreset, InKind, Id);
+                    Result.Preset = InPreset;
+                    Result.Report = DefinitionReport;
+                    Print_Report(Result);
+                    return false;
+                }
                 if (Id == GameplayTags::Attack_Mars_Pincer) { Pincer = Definition.Def.Clip.Get(); }
                 LongestClip = Math::Max(LongestClip, utils_crawler::Get_ClipSeconds(Definition.Def.Clip.Get()));
                 auto Entry = FMars_Attack_Entry();
@@ -398,8 +470,8 @@ namespace utils_attack_authoring
                 Entry.Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(Definition);
                 Loadout.Entries.Add(Entry);
             }
-            Loadout.Execution = Make_Execution(InPreset, InEndpointDemo, Pincer, LongestClip);
-            Loadout.Selection.TemporaryReadiness = InEndpointDemo ? EMars_Attack_TemporaryReadinessPolicy::UseReadyAlternative :
+            Loadout.Execution = Make_Execution(FMars_AttackAuthoring_ExecutionQuery(InPreset, InKind, Pincer, LongestClip));
+            Loadout.Selection.TemporaryReadiness = EndpointDemo ? EMars_Attack_TemporaryReadinessPolicy::UseReadyAlternative :
                 EMars_Attack_TemporaryReadinessPolicy::WaitPreferred;
             Loadout.Selection.ControlWait = EMars_Attack_ControlWaitPolicy::PreferAvailable;
             Loadout.Selection.ReadyAlternativeDelaySeconds = 0.25f;
@@ -417,10 +489,7 @@ namespace utils_attack_authoring
     {
         if (EditorAsset::DoesAssetExist(InPath))
         { LogDisplay(f"[Mars.Attack.SeedReferenceLoadouts] code=AssetAppearedDuringPreflight path={InPath}; no overwrite"); return nullptr; }
-        const auto Object = FSoftObjectPath(InPath);
-        const auto Name = Object.GetAssetName();
-        auto Factory = Cast<UDataAssetFactory>(NewObject(GetTransientPackage(), UDataAssetFactory));
-        return AssetTools::CreateAsset(Name, InFolder, InClass, Factory);
+        return utils_crawler::Create_DataAsset(InPath, InFolder, InClass);
     }
 
     bool Save_New(UObject InAsset, FString InPath, FMars_AttackAuthoring_SeedReport& InOutReport)
@@ -448,12 +517,10 @@ namespace utils_attack_authoring
             const auto Built = utils_procedural_action_builder::Build_Into(Draft, Clip);
             if (Built.Get_Status() != ECk_ProceduralAction_ReportStatus::Valid) { return false; }
             const auto Spec = utils_crawler::Make_AttackReferenceSpec(Plan.Preset);
-            const auto Subject = Plan.Kind == GameplayTags::Attack_Mars_Pincer ? utils_crawler::Make_ReferenceEndpointPincerEditorSubject(Clip, Spec.Layout, Spec.LegCount) :
-                utils_crawler::Make_ReferenceSwipeEditorSubject(Clip, Spec.Layout, Spec.LegCount, Plan.Kind == GameplayTags::Attack_Mars_SwipeRight);
-            utils_procedural_action_editor::Get_EditorData(Clip).Set_Subject(Subject);
-            auto PreviewRig = Subject.Get_WalkingRig().Get();
-            auto PreviewGait = Subject.Get_WalkingGait().Get();
-            if (UMars_AttackPreviewOwnership::Attach_EmbeddedPreviewObjects(Clip, PreviewRig, PreviewGait) == false)
+            const auto Body = FMars_Crawler_ReferenceBody(Spec.Layout, Spec.LegCount);
+            const auto Subject = Plan.Kind == GameplayTags::Attack_Mars_Pincer ? utils_crawler::Make_ReferenceEndpointPincerEditorSubject(Clip, Body) :
+                utils_crawler::Make_ReferenceSwipeEditorSubject(Clip, Body, utils_crawler::Get_ReferenceSwipeSide(Plan.Kind));
+            if (utils_crawler::Set_PinnedPreviewSubject(Clip, Subject) == false)
             { LogDisplay(f"[Mars.Attack.SeedReferenceLoadouts] code=PreviewOwnershipRejected path={Plan.Path}"); return false; }
             InOutPlan.Clips[Index].Asset = Clip;
             if (Save_New(Clip, Plan.Path, InOutReport) == false) { return false; }
@@ -473,8 +540,10 @@ namespace utils_attack_authoring
             InOutReport.CreatedPaths.Add(Plan.Path);
             auto Def = Plan.Asset.Def;
             const auto ClipIndex = Find_ClipPlan(InOutPlan, Plan.ClipPath);
-            if (ClipIndex >= 0) { Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(InOutPlan.Clips[ClipIndex].Asset); }
-            else { Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(FSoftObjectPath(Plan.ClipPath)); }
+            if (ClipIndex.IsSet())
+            { Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(InOutPlan.Clips[ClipIndex.GetValue()].Asset); }
+            else
+            { Def.Clip = TSoftObjectPtr<UCk_ProceduralAction_Data>(FSoftObjectPath(Plan.ClipPath)); }
             Definition.Def = Def;
             const auto Report = utils_attack::Validate_Definition(Def);
             if (Report.Get_IsValid() == false) { return false; }
@@ -493,14 +562,13 @@ namespace utils_attack_authoring
             auto& Plan = InOutPlan.Loadouts[Index];
             if (Plan.Existed) { continue; }
             auto Spec = Plan.Asset.Spec;
-            const auto EndpointDemo = Plan.Path.Contains("EndpointDemo");
             for (int32 EntryIndex = 0; EntryIndex < Spec.Entries.Num(); ++EntryIndex)
             {
                 auto Entry = Spec.Entries[EntryIndex];
-                const auto Path = utils_crawler::Get_AttackReferenceDefinitionPath(Plan.Preset, EndpointDemo, Entry.Id);
+                const auto Path = utils_crawler::Get_AttackReferenceDefinitionPath(Plan.Preset, Plan.Kind, Entry.Id);
                 const auto DefinitionIndex = Find_DefinitionPlan(InOutPlan, Path);
-                if (DefinitionIndex < 0) { return false; }
-                Entry.Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(InOutPlan.Definitions[DefinitionIndex].Asset);
+                if (DefinitionIndex.IsSet() == false) { return false; }
+                Entry.Definition = TSoftObjectPtr<UMars_AttackDefinition_Data>(InOutPlan.Definitions[DefinitionIndex.GetValue()].Asset);
                 Spec.Entries[EntryIndex] = Entry;
             }
             Plan.Asset.Spec = Spec;
@@ -543,7 +611,8 @@ namespace utils_attack_authoring
         auto Presets = TArray<EMars_Crawler_AttackPreset>(); Presets.Add(EMars_Crawler_AttackPreset::Crawler4); Presets.Add(EMars_Crawler_AttackPreset::Crawler6); Presets.Add(EMars_Crawler_AttackPreset::Spider6);
         for (const auto Preset : Presets)
         {
-            if (Plan_Loadout(Preset, false, Plan) == false || Plan_Loadout(Preset, true, Plan) == false)
+            if (Plan_Loadout(Preset, EMars_AttackReference_Kind::Parity, Plan) == false
+                || Plan_Loadout(Preset, EMars_AttackReference_Kind::EndpointDemo, Plan) == false)
             { OutReport.FailureStage = "Preflight"; LogDisplay("[Mars.Attack.SeedReferenceLoadouts] preflight rejected; no asset packages were created"); return false; }
         }
         OutReport.PreflightValid = true;
@@ -582,3 +651,4 @@ namespace utils_attack_authoring
     }
 }
 #endif
+

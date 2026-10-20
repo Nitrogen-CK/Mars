@@ -2,6 +2,9 @@
 // Level, then run Mars.Sandbox.Build. The Mars.Sandbox.BuildRoomN / Place* / Add* / BuildGauntlets commands add one part
 // to an already-built sandbox map, so a map built before that part existed can catch up without a rebuild.
 //
+// Build places every part except the fail switch: it stands relative to the steward, which is hand-placed, so Build skips
+// it (and says so) when no steward is in the level. Place the steward, then run Mars.Sandbox.PlaceFailSwitch.
+//
 // It must NOT create/load a level itself: swapping the editor world from inside a script call GCs the world the
 // calling script context holds, and the next nested script call (Ck processor Configure during the new world's
 // subsystem init) restores that dangling context -> access violation in FAngelscriptManager::AssignWorldContext.
@@ -240,6 +243,7 @@ namespace utils_mars_sandbox
     const FString k_Room5AggressionLeverLabel = "Mech5_AggressionLever";
     const FString k_Room3BackpackPlateLabel = "Mech3_BackpackPlate";
     const FString k_ItemLabelPrefix = "Item_";
+    const FString k_BackpackLabel = "Item_Backpack";
     const FString k_LadderPlatformLabel = "Sandbox_LadderPlatform";
     const FString k_WorkbenchLabel = "Sandbox_Workbench";
     const FString k_CuttingStationLabel = "Sandbox_CuttingStation";
@@ -254,26 +258,14 @@ namespace utils_mars_sandbox
     const FString k_FoodMushroomSliceLabel = "Sandbox_Food_MushroomSlice";
     const FString k_EyesDummyLabel = "EyesDummy";
     const FString k_FailSwitchLabel = "Mech_FailSwitch";
-    const FString k_FailSwitchPedestalLabel = "FailSwitch_Pedestal";
+    const FString k_FailSwitchPedestalLabel = "Sandbox_FailSwitch_Pedestal";
 
     void Build()
     {
-        auto World = UUnrealEditorSubsystem::Get().GetEditorWorld();
-        if (ck::EnsureIfNot(ck::IsValid(World), "[Mars.Sandbox.Build] No editor world"))
+        const FString Command = "Mars.Sandbox.Build";
+        auto World = utils_mars_map_builder::TryGet_UntitledWorld(Command, k_MapPath);
+        if (ck::Is_NOT_Valid(World))
         { return; }
-
-        if (EditorAsset::DoesAssetExist(k_MapPath))
-        {
-            ck::Trace(f"[Mars.Sandbox.Build] [{k_MapPath}] already exists. Delete it first to rebuild.", NAME_None, 2.0f, FLinearColor::Yellow);
-            return;
-        }
-
-        const FString WorldPath = World.GetPathName();
-        if (WorldPath.StartsWith("/Temp/") == false)
-        {
-            ck::Trace(f"[Mars.Sandbox.Build] The open level [{WorldPath}] is a saved map. Open File > New Level > Empty Level first.", NAME_None, 2.0f, FLinearColor::Yellow);
-            return;
-        }
 
         // Top face at Z=0.
         Spawn_Cube("Floor", FVector(0.0, 0.0, -10.0), FVector(40.0, 40.0, 0.2));
@@ -287,13 +279,9 @@ namespace utils_mars_sandbox
         Spawn_Cube("Tunnel_WallRight", FVector(500.0, 600.0, 65.0), FVector(4.0, 0.2, 1.3));
         Spawn_Cube("Tunnel_Roof", FVector(500.0, 450.0, 140.0), FVector(4.0, 3.2, 0.2));
 
+        utils_mars_map_builder::Spawn_DaylightRig();
+
         auto Actors = UEditorActorSubsystem::Get();
-
-        auto Sun = Actors.SpawnActorFromClass(ADirectionalLight, FVector(0.0, 0.0, 800.0), FRotator(-50.0, 35.0, 0.0));
-        Sun.SetActorLabel("Sun");
-        Actors.SpawnActorFromClass(ASkyLight, FVector(0.0, 0.0, 900.0)).SetActorLabel("SkyLight");
-        Actors.SpawnActorFromClass(ASkyAtmosphere, FVector::ZeroVector).SetActorLabel("SkyAtmosphere");
-
         for (int32 Index = 0; Index < 4; ++Index)
         {
             auto Start = Actors.SpawnActorFromClass(APlayerStart, FVector(-600.0, -225.0 + 150.0 * Index, 100.0));
@@ -319,11 +307,15 @@ namespace utils_mars_sandbox
         Spawn_BatterStation();
         Spawn_MortarStation();
         Spawn_Gauntlets();
+        Spawn_Items();
+        Spawn_Backpack();
+        Spawn_EyesDummy();
+        Spawn_FailSwitch(Command);
 
         Apply_ProtoGridMaterials();
 
-        const bool Saved = UEditorLoadingAndSavingUtils::SaveMap(World, k_MapPath);
-        ck::Trace(f"[Mars.Sandbox.Build] [{k_MapPath}] built, saved={Saved}");
+        const bool Saved = utils_mars_map_builder::SaveWorld(World, k_MapPath);
+        ck::Trace(f"[{Command}] [{k_MapPath}] built, saved={Saved}");
     }
 
     // The guard of every command that adds one part to an already-built sandbox map: the map is open and InLabel (the
@@ -421,6 +413,19 @@ namespace utils_mars_sandbox
         if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
         { return; }
 
+        for (const auto& Item : Get_Items())
+        {
+            auto Blocker = utils_mars_map_builder::TryGet_LevelActor(Item.Placement.Label);
+            if (utils_mars_map_builder::Get_IsUnblocked(Command, Blocker, "Delete the four sandbox items first to re-place.") == false)
+            { return; }
+        }
+
+        Spawn_Items();
+        utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    TArray<FMars_Sandbox_ItemPlacement> Get_Items()
+    {
         const float64 ItemX = -450.0;
         const float64 ItemZ = 50.0;
         TArray<FMars_Sandbox_ItemPlacement> Items;
@@ -432,30 +437,30 @@ namespace utils_mars_sandbox
             FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Ration", FVector(ItemX, 100.0, ItemZ))));
         Items.Add(FMars_Sandbox_ItemPlacement(UMars_WorldItem_Cog_EntityScript,
             FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Cog", FVector(ItemX, 300.0, ItemZ))));
+        return Items;
+    }
 
-        for (const auto& Item : Items)
-        {
-            auto Blocker = utils_mars_map_builder::TryGet_LevelActor(Item.Placement.Label);
-            if (utils_mars_map_builder::Get_IsUnblocked(Command, Blocker, "Delete the four sandbox items first to re-place.") == false)
-            { return; }
-        }
+    void Spawn_Items()
+    {
+        for (const auto& Item : Get_Items())
+        { utils_mars_map_builder::Spawn_EntityScript(Item.ScriptClass, Item.Placement); }
+    }
 
-        for (const auto& Item : Items)
-        { Spawn_Mechanism(Item.ScriptClass, Item.Placement); }
+    void PlaceBackpack()
+    {
+        const FString Command = "Mars.Sandbox.PlaceBackpack";
+        if (Get_CanAdd(Command, k_BackpackLabel, "Delete it first to re-place.") == false)
+        { return; }
 
+        Spawn_Backpack();
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
     // Past the Cog on the item line; it drops the 60uu onto the floor.
-    void PlaceBackpack()
+    void Spawn_Backpack()
     {
-        const FString Command = "Mars.Sandbox.PlaceBackpack";
-        const FString Label = f"{k_ItemLabelPrefix}Backpack";
-        if (Get_CanAdd(Command, Label, "Delete it first to re-place.") == false)
-        { return; }
-
-        Spawn_Mechanism(UMars_WorldItem_Backpack_EntityScript, FMars_MapBuilder_Placement(Label, FVector(-450.0, 500.0, 60.0)));
-        utils_mars_map_builder::SaveOpenLevel(Command);
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Backpack_EntityScript,
+            FMars_MapBuilder_Placement(k_BackpackLabel, FVector(-450.0, 500.0, 60.0)));
     }
 
     void PlaceBackpackPlate()
@@ -471,7 +476,7 @@ namespace utils_mars_sandbox
     // Between PlateF and room 3's south wall, on PlateF's channel: dropping the pack on it opens GateF.
     void Spawn_Room3BackpackPlate()
     {
-        Spawn_Mechanism(UMars_Sandbox_BackpackPlateF_EntityScript, FMars_MapBuilder_Placement(k_Room3BackpackPlateLabel, FVector(2600.0, 950.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_BackpackPlateF_EntityScript, FMars_MapBuilder_Placement(k_Room3BackpackPlateLabel, FVector(2600.0, 950.0, 0.0)));
     }
 
     void PlaceLadder()
@@ -534,27 +539,27 @@ namespace utils_mars_sandbox
     // into the room) and local +X to world +Z, so the handle rests level and a throw swings it down.
     void Spawn_Room5AggressionLever()
     {
-        Spawn_Mechanism(UMars_Sandbox_AggressionLever_EntityScript,
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_AggressionLever_EntityScript,
             FMars_MapBuilder_Placement(k_Room5AggressionLeverLabel, FVector(-3978.0, 0.0, 110.0), FRotator(90.0, 180.0, 0.0)));
     }
 
     // The preset's bounds are local to this placement, so placing it at the room's centre covers the room.
     void Spawn_Room5NavField()
     {
-        Spawn_Mechanism(UMars_Sandbox_NavField_EntityScript, FMars_MapBuilder_Placement(k_Room5NavFieldLabel, FVector(-3000.0, 0.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_NavField_EntityScript, FMars_MapBuilder_Placement(k_Room5NavFieldLabel, FVector(-3000.0, 0.0, 0.0)));
     }
 
     // 80uu up so they settle onto their feet.
     void Spawn_Room5Crawlers()
     {
-        Spawn_Mechanism(UMars_Sandbox_Crawler4_EntityScript, FMars_MapBuilder_Placement(f"{k_Room5CrawlerLabelPrefix}4", FVector(-3400.0, -300.0, 80.0)));
-        Spawn_Mechanism(UMars_Sandbox_Crawler6_EntityScript, FMars_MapBuilder_Placement(f"{k_Room5CrawlerLabelPrefix}6", FVector(-3400.0, 300.0, 80.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Crawler4_EntityScript, FMars_MapBuilder_Placement(f"{k_Room5CrawlerLabelPrefix}4", FVector(-3400.0, -300.0, 80.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Crawler6_EntityScript, FMars_MapBuilder_Placement(f"{k_Room5CrawlerLabelPrefix}6", FVector(-3400.0, 300.0, 80.0)));
     }
 
     // Unrotated, it faces +X: the player walks up from -X.
     void Spawn_Workbench()
     {
-        Spawn_Mechanism(UMars_WorkbenchStation_EntityScript, FMars_MapBuilder_Placement(k_WorkbenchLabel, FVector(-1200.0, -1200.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorkbenchStation_EntityScript, FMars_MapBuilder_Placement(k_WorkbenchLabel, FVector(-1200.0, -1200.0, 0.0)));
     }
 
     void PlaceCuttingStation()
@@ -570,7 +575,7 @@ namespace utils_mars_sandbox
     // Beside the workbench; unrotated, it faces +X: the player walks up from -X.
     void Spawn_CuttingStation()
     {
-        Spawn_Mechanism(UMars_CuttingStation_EntityScript, FMars_MapBuilder_Placement(k_CuttingStationLabel, FVector(-1200.0, -1600.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_CuttingStation_EntityScript, FMars_MapBuilder_Placement(k_CuttingStationLabel, FVector(-1200.0, -1600.0, 0.0)));
     }
 
     void PlaceSearingStation()
@@ -586,7 +591,7 @@ namespace utils_mars_sandbox
     // Beside the cutting station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
     void Spawn_SearingStation()
     {
-        Spawn_Mechanism(UMars_SearingStation_EntityScript, FMars_MapBuilder_Placement(k_SearingStationLabel, FVector(-800.0, -1600.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_SearingStation_EntityScript, FMars_MapBuilder_Placement(k_SearingStationLabel, FVector(-800.0, -1600.0, 0.0)));
     }
 
     void PlaceFryStation()
@@ -602,7 +607,7 @@ namespace utils_mars_sandbox
     // Beside the searing station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
     void Spawn_FryStation()
     {
-        Spawn_Mechanism(UMars_FryStation_EntityScript, FMars_MapBuilder_Placement(k_FryStationLabel, FVector(-400.0, -1600.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_FryStation_EntityScript, FMars_MapBuilder_Placement(k_FryStationLabel, FVector(-400.0, -1600.0, 0.0)));
     }
 
     void PlaceTumblerStation()
@@ -618,7 +623,7 @@ namespace utils_mars_sandbox
     // Beside the fry station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
     void Spawn_TumblerStation()
     {
-        Spawn_Mechanism(UMars_TumblerStation_EntityScript, FMars_MapBuilder_Placement(k_TumblerStationLabel, FVector(0.0, -1600.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_TumblerStation_EntityScript, FMars_MapBuilder_Placement(k_TumblerStationLabel, FVector(0.0, -1600.0, 0.0)));
     }
 
     void PlaceBatterStation()
@@ -631,10 +636,12 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::SaveOpenLevel(Command);
     }
 
-    // On the fry station's other side, 400 uu toward -X, so the batter bowl, the fryer and the tumbler line up along X.
+    // Beside the mortar station, 400 uu toward +X, the last slot on the station row; unrotated, it faces +X: the player
+    // walks up from -X.
     void Spawn_BatterStation()
     {
-        Spawn_Mechanism(UMars_BatterStation_EntityScript, FMars_MapBuilder_Placement(k_BatterStationLabel, FVector(-800.0, -1600.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_BatterStation_EntityScript,
+            FMars_MapBuilder_Placement(k_BatterStationLabel, FVector(800.0, -1600.0, 0.0)));
     }
 
     void PlaceMortarStation()
@@ -650,7 +657,7 @@ namespace utils_mars_sandbox
     // Beside the tumbler station, 400 uu toward +X; unrotated, it faces +X: the player walks up from -X.
     void Spawn_MortarStation()
     {
-        Spawn_Mechanism(UMars_MortarStation_EntityScript, FMars_MapBuilder_Placement(k_MortarStationLabel, FVector(400.0, -1600.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_MortarStation_EntityScript, FMars_MapBuilder_Placement(k_MortarStationLabel, FVector(400.0, -1600.0, 0.0)));
     }
 
     void PlacePlatters()
@@ -670,10 +677,10 @@ namespace utils_mars_sandbox
     // on a platter by hand.
     void Spawn_Food()
     {
-        Spawn_Mechanism(UMars_Platter_Large_EntityScript, FMars_MapBuilder_Placement(k_PlatterLargeLabel, FVector(-1320.0, -1700.0, 75.0)));
-        Spawn_Mechanism(UMars_Platter_EntityScript, FMars_MapBuilder_Placement(k_PlatterSmallLabel, FVector(-1320.0, -1500.0, 75.0)));
-        Spawn_Mechanism(UMars_FoodItem_MeatSlab_EntityScript, FMars_MapBuilder_Placement(k_FoodMeatSlabLabel, FVector(-1320.0, -1900.0, 20.0)));
-        Spawn_Mechanism(UMars_FoodItem_MushroomSlice_EntityScript, FMars_MapBuilder_Placement(k_FoodMushroomSliceLabel, FVector(-1320.0, -2100.0, 20.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Platter_Large_EntityScript, FMars_MapBuilder_Placement(k_PlatterLargeLabel, FVector(-1320.0, -1700.0, 75.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Platter_EntityScript, FMars_MapBuilder_Placement(k_PlatterSmallLabel, FVector(-1320.0, -1500.0, 75.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_FoodItem_MeatSlab_EntityScript, FMars_MapBuilder_Placement(k_FoodMeatSlabLabel, FVector(-1320.0, -1900.0, 20.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_FoodItem_MushroomSlice_EntityScript, FMars_MapBuilder_Placement(k_FoodMushroomSliceLabel, FVector(-1320.0, -2100.0, 20.0)));
     }
 
     // The ladder stands at the middle of the platform's south face, yawed so its local +X points away from the platform;
@@ -681,32 +688,71 @@ namespace utils_mars_sandbox
     void Spawn_Ladder()
     {
         Spawn_Cube(k_LadderPlatformLabel, FVector(-1200.0, 1200.0, 150.0), FVector(4.0, 4.0, 3.0));
-        Spawn_Mechanism(UMars_Ladder_EntityScript, FMars_MapBuilder_Placement("Sandbox_Ladder", FVector(-1200.0, 1000.0, 0.0), FRotator(0.0, -90.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Ladder_EntityScript, FMars_MapBuilder_Placement("Sandbox_Ladder", FVector(-1200.0, 1000.0, 0.0), FRotator(0.0, -90.0, 0.0)));
     }
 
-    // On a 100uu pedestal 2 m in front of the placed steward (it stands at (-700, -309) facing -X) and 1.3 m to its
-    // left, so whoever presses it stands in front of it.
     void PlaceFailSwitch()
     {
         const FString Command = "Mars.Sandbox.PlaceFailSwitch";
         if (Get_CanAdd(Command, k_FailSwitchLabel, "Delete it and its pedestal first to re-place.") == false)
         { return; }
 
-        const auto Spot = FVector(-900.0, -180.0, 0.0);
-        Spawn_Cube(k_FailSwitchPedestalLabel, Spot + FVector(0.0, 0.0, 50.0), FVector(0.4, 0.4, 1.0));
-        Spawn_Mechanism(UMars_Sandbox_FailSwitch_EntityScript, FMars_MapBuilder_Placement(k_FailSwitchLabel, Spot + FVector(0.0, 0.0, 100.0)));
-        utils_mars_map_builder::SaveOpenLevel(Command);
+        if (Spawn_FailSwitch(Command))
+        { utils_mars_map_builder::SaveOpenLevel(Command); }
     }
 
-    // Yawed 180 so it faces the player starts.
+    // On a 100uu pedestal on the floor, 2 m in front of the hand-placed steward and 1.3 m to its left, so whoever presses
+    // it stands in front of it. False, with a trace, when the level has no steward.
+    bool Spawn_FailSwitch(const FString& InCommand)
+    {
+        auto Steward = TryGet_Steward();
+        if (ck::Is_NOT_Valid(Steward))
+        {
+            ck::Trace(f"[{InCommand}] No steward (an entity spawner named *Steward*) in the level: the fail switch is not placed. Place the steward, then run Mars.Sandbox.PlaceFailSwitch.", NAME_None, 4.0f, FLinearColor::Yellow);
+            return false;
+        }
+
+        const auto Left = Steward.GetActorRightVector() * -1.0;
+        auto Spot = Steward.GetActorLocation() + Steward.GetActorForwardVector() * 200.0 + Left * 130.0;
+        Spot.Z = 0.0;
+        Spawn_Cube(k_FailSwitchPedestalLabel, Spot + FVector(0.0, 0.0, 50.0), FVector(0.4, 0.4, 1.0));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_FailSwitch_EntityScript,
+            FMars_MapBuilder_Placement(k_FailSwitchLabel, Spot + FVector(0.0, 0.0, 100.0)));
+        return true;
+    }
+
+    // The steward's entity script is not readable from script, so its spawner is found by name: the Place Actors factory
+    // puts the script class name in the spawner's label and object name.
+    ACk_EntitySpawner_UE TryGet_Steward()
+    {
+        for (auto Actor : UEditorActorSubsystem::Get().GetAllLevelActors())
+        {
+            auto Spawner = Cast<ACk_EntitySpawner_UE>(Actor);
+            if (ck::Is_NOT_Valid(Spawner))
+            { continue; }
+
+            if (Spawner.GetActorLabel().Contains("Steward") || Spawner.GetName().ToString().Contains("Steward"))
+            { return Spawner; }
+        }
+
+        return nullptr;
+    }
+
     void PlaceEyesDummy()
     {
         const FString Command = "Mars.Sandbox.PlaceEyesDummy";
         if (Get_CanAdd(Command, k_EyesDummyLabel, "Delete it first to re-place.") == false)
         { return; }
 
-        Spawn_Mechanism(UMars_EyesDummy_EntityScript, FMars_MapBuilder_Placement(k_EyesDummyLabel, FVector(-150.0, 0.0, 0.0), FRotator(0.0, 180.0, 0.0)));
+        Spawn_EyesDummy();
         utils_mars_map_builder::SaveOpenLevel(Command);
+    }
+
+    // Yawed 180 so it faces the player starts.
+    void Spawn_EyesDummy()
+    {
+        utils_mars_map_builder::Spawn_EntityScript(UMars_EyesDummy_EntityScript,
+            FMars_MapBuilder_Placement(k_EyesDummyLabel, FVector(-150.0, 0.0, 0.0), FRotator(0.0, 180.0, 0.0)));
     }
 
     // East of the main floor. The gated bays sit in a partition with an alcove behind each gate; controls stand 250uu in
@@ -738,20 +784,20 @@ namespace utils_mars_sandbox
 
         // Bay A: one lever opens the gate.
         Spawn_Cube("Room2_GateHeader_A", FVector(PartitionX, -460.0, 270.0), FVector(0.2, 2.4, 0.6));
-        Spawn_Mechanism(UMars_Sandbox_GateA_EntityScript, FMars_MapBuilder_Placement("Mech_GateA", FVector(PartitionX, -460.0, 0.0)));
-        Spawn_Mechanism(UMars_Sandbox_LeverA_EntityScript, FMars_MapBuilder_Placement("Mech_LeverA", FVector(ControlX, -460.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_GateA_EntityScript, FMars_MapBuilder_Placement("Mech_GateA", FVector(PartitionX, -460.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_LeverA_EntityScript, FMars_MapBuilder_Placement("Mech_LeverA", FVector(ControlX, -460.0, 0.0)));
 
         // Bay B: both levers on the same channel must be pulled.
         Spawn_Cube("Room2_GateHeader_B", FVector(PartitionX, 0.0, 270.0), FVector(0.2, 2.4, 0.6));
-        Spawn_Mechanism(UMars_Sandbox_GateB_EntityScript, FMars_MapBuilder_Placement("Mech_GateB", FVector(PartitionX, 0.0, 0.0)));
-        Spawn_Mechanism(UMars_Sandbox_LeverB_EntityScript, FMars_MapBuilder_Placement("Mech_LeverB1", FVector(ControlX, -80.0, 0.0)));
-        Spawn_Mechanism(UMars_Sandbox_LeverB_EntityScript, FMars_MapBuilder_Placement("Mech_LeverB2", FVector(ControlX, 80.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_GateB_EntityScript, FMars_MapBuilder_Placement("Mech_GateB", FVector(PartitionX, 0.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_LeverB_EntityScript, FMars_MapBuilder_Placement("Mech_LeverB1", FVector(ControlX, -80.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_LeverB_EntityScript, FMars_MapBuilder_Placement("Mech_LeverB2", FVector(ControlX, 80.0, 0.0)));
 
         // Bay C: a momentary switch on a 100uu pedestal holds the gate open for 4 seconds.
         Spawn_Cube("Room2_GateHeader_C", FVector(PartitionX, 460.0, 270.0), FVector(0.2, 2.4, 0.6));
-        Spawn_Mechanism(UMars_Sandbox_GateC_EntityScript, FMars_MapBuilder_Placement("Mech_GateC", FVector(PartitionX, 460.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_GateC_EntityScript, FMars_MapBuilder_Placement("Mech_GateC", FVector(PartitionX, 460.0, 0.0)));
         Spawn_Cube("Room2_SwitchPedestal_C", FVector(ControlX, 460.0, 50.0), FVector(0.4, 0.4, 1.0));
-        Spawn_Mechanism(UMars_Sandbox_SwitchC_EntityScript, FMars_MapBuilder_Placement("Mech_SwitchC", FVector(ControlX, 460.0, 100.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_SwitchC_EntityScript, FMars_MapBuilder_Placement("Mech_SwitchC", FVector(ControlX, 460.0, 100.0)));
     }
 
     // North of room 2, entered through a doorway in the shared wall (room 2's single north wall is replaced by two
@@ -787,17 +833,17 @@ namespace utils_mars_sandbox
         // Bay 1: standing on the plate opens GateF; it closes 1.5s after stepping off. The backpack plate south of it
         // holds GateF open while a dropped backpack lies on it.
         Spawn_Cube("Room3_GateHeader_F", FVector(2600.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
-        Spawn_Mechanism(UMars_Sandbox_GateF_EntityScript, FMars_MapBuilder_Placement("Mech3_GateF", FVector(2600.0, PartitionY, 0.0), GateRotation));
-        Spawn_Mechanism(UMars_Sandbox_PlateF_EntityScript, FMars_MapBuilder_Placement("Mech3_Plate", FVector(2600.0, 1250.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_GateF_EntityScript, FMars_MapBuilder_Placement("Mech3_GateF", FVector(2600.0, PartitionY, 0.0), GateRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_PlateF_EntityScript, FMars_MapBuilder_Placement("Mech3_Plate", FVector(2600.0, 1250.0, 0.0)));
         Spawn_Room3BackpackPlate();
 
         // Bay 2: seals face +X off the west wall (pitch -90); pressing H then G completes the sequence and latches GateI.
         const auto SealRotation = FRotator(-90.0, 0.0, 0.0);
-        Spawn_Mechanism(UMars_Sandbox_SealG_EntityScript, FMars_MapBuilder_Placement("Mech3_Seal1", FVector(2010.0, 1000.0, 120.0), SealRotation));
-        Spawn_Mechanism(UMars_Sandbox_SealH_EntityScript, FMars_MapBuilder_Placement("Mech3_Seal2", FVector(2010.0, 1200.0, 120.0), SealRotation));
-        Spawn_Mechanism(UMars_Sandbox_SequenceI_EntityScript, FMars_MapBuilder_Placement("Mech3_SeqNode", FVector(2100.0, 1400.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_SealG_EntityScript, FMars_MapBuilder_Placement("Mech3_Seal1", FVector(2010.0, 1000.0, 120.0), SealRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_SealH_EntityScript, FMars_MapBuilder_Placement("Mech3_Seal2", FVector(2010.0, 1200.0, 120.0), SealRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_SequenceI_EntityScript, FMars_MapBuilder_Placement("Mech3_SeqNode", FVector(2100.0, 1400.0, 0.0)));
         Spawn_Cube("Room3_GateHeader_I", FVector(2250.0, PartitionY, 270.0), FVector(2.4, 0.2, 0.6));
-        Spawn_Mechanism(UMars_Sandbox_GateI_EntityScript, FMars_MapBuilder_Placement("Mech3_GateI", FVector(2250.0, PartitionY, 0.0), GateRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_GateI_EntityScript, FMars_MapBuilder_Placement("Mech3_GateI", FVector(2250.0, PartitionY, 0.0), GateRotation));
 
         // East half: corridor dividers from the aisle (X=3150) to the east wall.
         Spawn_Cube("Room3_CorridorWall_0", FVector(3575.0, 1050.0, 150.0), FVector(8.5, 0.2, 3.0));
@@ -807,16 +853,16 @@ namespace utils_mars_sandbox
         // Bay 3 (Y 710..1040): the vent on the south wall fires north across the corridor; holding the wheel for 2s
         // suppresses it for 8s. Both are yawed 90 so their local +X points north.
         const auto NorthRotation = FRotator(0.0, 90.0, 0.0);
-        Spawn_Mechanism(UMars_Sandbox_WheelJ_EntityScript, FMars_MapBuilder_Placement("Mech3_Wheel", FVector(3300.0, 710.0, 110.0), NorthRotation));
-        Spawn_Mechanism(UMars_Sandbox_VentJ_EntityScript, FMars_MapBuilder_Placement("Mech3_Vent", FVector(3600.0, 710.0, 0.0), NorthRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_WheelJ_EntityScript, FMars_MapBuilder_Placement("Mech3_Wheel", FVector(3300.0, 710.0, 110.0), NorthRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_VentJ_EntityScript, FMars_MapBuilder_Placement("Mech3_Vent", FVector(3600.0, 710.0, 0.0), NorthRotation));
 
         // Bay 4 (Y 1060..1260): two spike tiles in a row, suppressed while the lever before them is pulled.
-        Spawn_Mechanism(UMars_Sandbox_LeverK_EntityScript, FMars_MapBuilder_Placement("Mech3_LeverK", FVector(3280.0, 1215.0, 0.0)));
-        Spawn_Mechanism(UMars_Sandbox_SpikesK_EntityScript, FMars_MapBuilder_Placement("Mech3_Spikes1", FVector(3500.0, 1160.0, 0.0)));
-        Spawn_Mechanism(UMars_Sandbox_SpikesK_EntityScript, FMars_MapBuilder_Placement("Mech3_Spikes2", FVector(3700.0, 1160.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_LeverK_EntityScript, FMars_MapBuilder_Placement("Mech3_LeverK", FVector(3280.0, 1215.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_SpikesK_EntityScript, FMars_MapBuilder_Placement("Mech3_Spikes1", FVector(3500.0, 1160.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_SpikesK_EntityScript, FMars_MapBuilder_Placement("Mech3_Spikes2", FVector(3700.0, 1160.0, 0.0)));
 
         // Bay 5 (Y 1280..1580): the pendulum swings across the corridor (yawed so its swing plane is north-south).
-        Spawn_Mechanism(UMars_Sandbox_Pendulum_EntityScript, FMars_MapBuilder_Placement("Mech3_Pendulum", FVector(3600.0, 1430.0, 0.0), NorthRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Pendulum_EntityScript, FMars_MapBuilder_Placement("Mech3_Pendulum", FVector(3600.0, 1430.0, 0.0), NorthRotation));
     }
 
     // South of room 2 (room 2's south wall is its north wall), entered from the main floor through a doorway in its west
@@ -836,15 +882,15 @@ namespace utils_mars_sandbox
         Spawn_Cube("Room4_Partition_South", FVector(PartitionX, -1810.0, 150.0), FVector(0.2, 5.8, 3.0));
         Spawn_Cube("Room4_Partition_North", FVector(PartitionX, -990.0, 150.0), FVector(0.2, 5.8, 3.0));
         Spawn_Cube("Room4_GateHeader_M", FVector(PartitionX, GateY, 270.0), FVector(0.2, 2.4, 0.6));
-        Spawn_Mechanism(UMars_Sandbox_GateM_EntityScript, FMars_MapBuilder_Placement("Mech4_GateM", FVector(PartitionX, GateY, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_GateM_EntityScript, FMars_MapBuilder_Placement("Mech4_GateM", FVector(PartitionX, GateY, 0.0)));
 
         // Lamps on the header's west face, facing the player (yaw 180 turns their local +X to -X).
         const auto WestFacing = FRotator(0.0, 180.0, 0.0);
-        Spawn_Mechanism(UMars_Sandbox_LampsL_EntityScript, FMars_MapBuilder_Placement("Mech4_Lamps", FVector(PartitionX - 10.0, GateY, 270.0), WestFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_LampsL_EntityScript, FMars_MapBuilder_Placement("Mech4_Lamps", FVector(PartitionX - 10.0, GateY, 270.0), WestFacing));
 
         // A chain beside the gate on each face of the partition, grip bar at about chest height.
-        Spawn_Mechanism(UMars_Sandbox_ChainL_EntityScript, FMars_MapBuilder_Placement("Mech4_ChainOutside", FVector(PartitionX - 10.0, -1650.0, 260.0), WestFacing));
-        Spawn_Mechanism(UMars_Sandbox_ChainL_EntityScript, FMars_MapBuilder_Placement("Mech4_ChainInside", FVector(PartitionX + 10.0, -1150.0, 260.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_ChainL_EntityScript, FMars_MapBuilder_Placement("Mech4_ChainOutside", FVector(PartitionX - 10.0, -1650.0, 260.0), WestFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_ChainL_EntityScript, FMars_MapBuilder_Placement("Mech4_ChainInside", FVector(PartitionX + 10.0, -1150.0, 260.0)));
 
         // Something to run to.
         Spawn_Cube("Room4_Plinth", FVector(3700.0, GateY, 40.0), FVector(1.0, 1.0, 0.8));
@@ -866,11 +912,11 @@ namespace utils_mars_sandbox
         Spawn_Cube("Room5_Pillar", FVector(-3300.0, 250.0, 150.0), FVector(0.6, 0.6, 3.0));
         Spawn_Cube("Room5_Step", FVector(-2700.0, -300.0, 20.0), FVector(2.0, 2.0, 0.4));
 
-        Spawn_Mechanism(UMars_TargetDummy_EntityScript, FMars_MapBuilder_Placement("Mech5_Dummy", FVector(-2400.0, 0.0, 0.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_TargetDummy_EntityScript, FMars_MapBuilder_Placement("Mech5_Dummy", FVector(-2400.0, 0.0, 0.0)));
 
         // The melee items drop the 30uu onto the floor.
-        Spawn_Mechanism(UMars_Sandbox_Cleaver_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Cleaver", FVector(-2250.0, -120.0, 30.0)));
-        Spawn_Mechanism(UMars_Sandbox_Tenderizer_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Tenderizer", FVector(-2250.0, 120.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Cleaver_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Cleaver", FVector(-2250.0, -120.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_Tenderizer_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Tenderizer", FVector(-2250.0, 120.0, 30.0)));
 
         Spawn_Room5Crawlers();
         Spawn_Room5NavField();
@@ -912,10 +958,10 @@ namespace utils_mars_sandbox
         Spawn_Cube("Room6_Divider_1", FVector(500.0, -2950.0, 150.0), FVector(0.2, 9.0, 3.0));
         Spawn_Cube("Room6_Divider_2", FVector(1200.0, -2950.0, 150.0), FVector(0.2, 9.0, 3.0));
 
-        Spawn_Mechanism(UMars_Sandbox_KeyDoor_Red_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorRed", FVector(-550.0, PartitionY, 0.0), GateRotation));
-        Spawn_Mechanism(UMars_Sandbox_KeyDoor_BlueYellow_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorBlueYellow", FVector(150.0, PartitionY, 0.0), GateRotation));
-        Spawn_Mechanism(UMars_Sandbox_KeyDoor_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorGreen", FVector(850.0, PartitionY, 0.0), GateRotation));
-        Spawn_Mechanism(UMars_Sandbox_KeyDoor_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorPurple", FVector(1550.0, PartitionY, 0.0), GateRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyDoor_Red_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorRed", FVector(-550.0, PartitionY, 0.0), GateRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyDoor_BlueYellow_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorBlueYellow", FVector(150.0, PartitionY, 0.0), GateRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyDoor_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorGreen", FVector(850.0, PartitionY, 0.0), GateRotation));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyDoor_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_DoorPurple", FVector(1550.0, PartitionY, 0.0), GateRotation));
 
         // Locks on the partition's faces, their keyholes (local +Z) turned out of the wall: pitch -90 takes +Z to +X, then
         // yaw 90 takes it to +Y (the hall), yaw -90 to -Y (a vault).
@@ -924,21 +970,21 @@ namespace utils_mars_sandbox
         const float64 HallFaceY = PartitionY + 10.0;
         const float64 VaultFaceY = PartitionY - 10.0;
         const float64 LockZ = 120.0;
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Red_EntityScript, FMars_MapBuilder_Placement("Mech6_LockRed", FVector(-350.0, HallFaceY, LockZ), HallFacing));
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Blue_EntityScript, FMars_MapBuilder_Placement("Mech6_LockBlue", FVector(-50.0, HallFaceY, LockZ), HallFacing));
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Yellow_EntityScript, FMars_MapBuilder_Placement("Mech6_LockYellow", FVector(350.0, HallFaceY, LockZ), HallFacing));
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_LockGreen_West", FVector(650.0, HallFaceY, LockZ), HallFacing));
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_LockGreen_East", FVector(1050.0, HallFaceY, LockZ), HallFacing));
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_LockPurple_Outside", FVector(1350.0, HallFaceY, LockZ), HallFacing));
-        Spawn_Mechanism(UMars_Sandbox_KeyLock_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_LockPurple_Inside", FVector(1300.0, VaultFaceY, LockZ), VaultFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Red_EntityScript, FMars_MapBuilder_Placement("Mech6_LockRed", FVector(-350.0, HallFaceY, LockZ), HallFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Blue_EntityScript, FMars_MapBuilder_Placement("Mech6_LockBlue", FVector(-50.0, HallFaceY, LockZ), HallFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Yellow_EntityScript, FMars_MapBuilder_Placement("Mech6_LockYellow", FVector(350.0, HallFaceY, LockZ), HallFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_LockGreen_West", FVector(650.0, HallFaceY, LockZ), HallFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Green_EntityScript, FMars_MapBuilder_Placement("Mech6_LockGreen_East", FVector(1050.0, HallFaceY, LockZ), HallFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_LockPurple_Outside", FVector(1350.0, HallFaceY, LockZ), HallFacing));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_KeyLock_Purple_EntityScript, FMars_MapBuilder_Placement("Mech6_LockPurple_Inside", FVector(1300.0, VaultFaceY, LockZ), VaultFacing));
 
         // The keys drop the 30uu onto the floor. The vault keys lie 500 uu behind their bars, beyond the interaction reach.
-        Spawn_Mechanism(UMars_WorldItem_Key_Red_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Red", FVector(-550.0, -2250.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Key_Green_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Green_0", FVector(750.0, -2250.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Key_Green_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Green_1", FVector(950.0, -2250.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Key_Purple_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Purple", FVector(1550.0, -2250.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Key_Yellow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Yellow", FVector(-550.0, -3000.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Key_Blue_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Blue", FVector(850.0, -3000.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Key_Red_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Red", FVector(-550.0, -2250.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Key_Green_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Green_0", FVector(750.0, -2250.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Key_Green_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Green_1", FVector(950.0, -2250.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Key_Purple_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Purple", FVector(1550.0, -2250.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Key_Yellow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Yellow", FVector(-550.0, -3000.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Key_Blue_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Key_Blue", FVector(850.0, -3000.0, 30.0)));
 
         // Something to reach behind the two-key door and the purple door.
         Spawn_Cube("Room6_Plinth_K2", FVector(150.0, -3000.0, 40.0), FVector(1.0, 1.0, 0.8));
@@ -966,28 +1012,28 @@ namespace utils_mars_sandbox
 
         // The switch on the north wall's inner face east of the doorway, its button (local +Z) turned to face the room
         // (-Y): pitch -90 takes +Z to +X, yaw -90 takes it to -Y.
-        Spawn_Mechanism(UMars_Sandbox_LightSwitch_EntityScript,
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_LightSwitch_EntityScript,
             FMars_MapBuilder_Placement("Mech7_LightSwitch", FVector(-1560.0, -2010.0, 120.0), FRotator(-90.0, -90.0, 0.0)));
 
         // Hung from the roof's underside.
-        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_0", FVector(-2125.0, -2550.0, 300.0)));
-        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_1", FVector(-1375.0, -2550.0, 300.0)));
-        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_2", FVector(-2125.0, -3000.0, 300.0)));
-        Spawn_Mechanism(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_3", FVector(-1375.0, -3000.0, 300.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_0", FVector(-2125.0, -2550.0, 300.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_1", FVector(-1375.0, -2550.0, 300.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_2", FVector(-2125.0, -3000.0, 300.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_Sandbox_CeilingLight_EntityScript, FMars_MapBuilder_Placement("Mech7_CeilingLight_3", FVector(-1375.0, -3000.0, 300.0)));
 
         // Plinth tops at Z 80; the items drop the 10 uu onto them.
         Spawn_Cube("Room7_Plinth_Lanterns", FVector(-2300.0, -2130.0, 40.0), FVector(1.6, 0.8, 0.8));
         Spawn_Cube("Room7_Plinth_Tallow", FVector(-1200.0, -2130.0, 40.0), FVector(1.6, 0.8, 0.8));
-        Spawn_Mechanism(UMars_WorldItem_Lantern_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Lantern_0", FVector(-2350.0, -2130.0, 90.0)));
-        Spawn_Mechanism(UMars_WorldItem_Lantern_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Lantern_1", FVector(-2250.0, -2130.0, 90.0)));
-        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_0", FVector(-1250.0, -2130.0, 90.0)));
-        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_1", FVector(-1200.0, -2130.0, 90.0)));
-        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_2", FVector(-1150.0, -2130.0, 90.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Lantern_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Lantern_0", FVector(-2350.0, -2130.0, 90.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Lantern_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Lantern_1", FVector(-2250.0, -2130.0, 90.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_0", FVector(-1250.0, -2130.0, 90.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_1", FVector(-1200.0, -2130.0, 90.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_2", FVector(-1150.0, -2130.0, 90.0)));
 
         // Something to find in the dark.
-        Spawn_Mechanism(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_Back", FVector(-2400.0, -3200.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Ration_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Ration", FVector(-1100.0, -3200.0, 30.0)));
-        Spawn_Mechanism(UMars_WorldItem_Cog_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Cog", FVector(-1750.0, -2900.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Tallow_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Tallow_Back", FVector(-2400.0, -3200.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Ration_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Ration", FVector(-1100.0, -3200.0, 30.0)));
+        utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Cog_EntityScript, FMars_MapBuilder_Placement(f"{k_ItemLabelPrefix}Room7_Cog", FVector(-1750.0, -2900.0, 30.0)));
     }
 
     void Spawn_Cube(const FString& InLabel, FVector InLocation, FVector InScale)
@@ -995,25 +1041,14 @@ namespace utils_mars_sandbox
         utils_mars_map_builder::Spawn_Block(engine::load::Cube(), FMars_MapBuilder_Block(InLabel, InLocation, InScale));
     }
 
-    // Goes through the spawner's actor factory (the Place Actors path): it instances the script class on a new
-    // ACk_EntitySpawner_UE, and the spawner injects its actor transform into SpawnTransform at spawn.
-    void Spawn_Mechanism(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FMars_MapBuilder_Placement& InPlacement)
-    {
-        auto Spawner = Cast<ACk_EntitySpawner_UE>(
-            UEditorActorSubsystem::Get().SpawnActorFromObject(InScriptClass.Get(), InPlacement.Location, InPlacement.Rotation));
-        if (ck::EnsureIfNot(ck::IsValid(Spawner), f"[Mars.Sandbox] Failed to place [{InPlacement.Label}] through the entity spawner factory"))
-        { return; }
-
-        Spawner.SetActorLabel(InPlacement.Label);
-    }
-
     // Matches blocks by the labels Build gives them.
     void Apply_ProtoGridMaterials()
     {
-        auto Floor = utils_mars_map_builder::Get_ProtoGrid_Floor();
-        auto Wall = utils_mars_map_builder::Get_ProtoGrid_Wall();
-        auto Platform = utils_mars_map_builder::Get_ProtoGrid_Platform();
-        auto Interactable = utils_mars_map_builder::Get_ProtoGrid_Interactable();
+        const auto Grid = utils_mars_map_builder::Load_ProtoGridSet();
+        auto Floor = Grid.Floor;
+        auto Wall = Grid.Wall;
+        auto Platform = Grid.Platform;
+        auto Interactable = Grid.Interactable;
 
         auto AllActors = UEditorActorSubsystem::Get().GetAllLevelActors();
         for (auto Actor : AllActors)
@@ -1072,7 +1107,9 @@ namespace utils_mars_sandbox
             else if (Label.StartsWith("Room7_"))
             { Block.StaticMeshComponent.SetMaterial(0, Wall); }
             else if (Label.StartsWith(k_GauntletLabelPrefix))
-            { Apply_GauntletMaterial(Block, Label); }
+            { Apply_GauntletMaterial(Block, Label, Grid); }
+            else if (Label.EndsWith("_Pedestal"))
+            { Block.StaticMeshComponent.SetMaterial(0, Wall); }
         }
     }
 }

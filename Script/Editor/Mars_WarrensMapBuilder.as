@@ -3,8 +3,9 @@
 //
 // Mars.Warrens.PlaceLantern: the expedition starts with a lantern and two tallow cakes lying beside the starting
 // backpack. Every entrance has its own backpack spawner (found by name) and a run picks one entrance, so each gets its own
-// set; a spawner that already has a lantern beside it is skipped, so re-running only fills the missing ones. Delete the
-// Item_Warrens_Lantern* / Item_Warrens_Tallow_* actors to re-place.
+// set; a spawner that already has a lantern beside it is skipped, so re-running only fills the missing ones. A set's labels
+// end in its pack spawner's label suffix, which stays put across rebuilds, so a top-up never reuses a surviving set's
+// label. Delete the Item_Warrens_Lantern* / Item_Warrens_Tallow_* actors to re-place.
 
 #if EDITOR
 UFUNCTION()
@@ -21,7 +22,8 @@ namespace utils_mars_warrens
     const FString k_LanternLabel = "Item_Warrens_Lantern";
     const FString k_TallowLabelPrefix = "Item_Warrens_Tallow_";
 
-    // How far to the backpack's right the lantern lies, and how far above the floor under the pack it drops from.
+    // How far to the backpack's right the lantern lies, and how far above the pack spawner's origin (itself above the
+    // floor) it drops from.
     const float64 k_SideOffset = 90.0;
     const float64 k_DropHeight = 30.0;
 
@@ -31,7 +33,7 @@ namespace utils_mars_warrens
         if (ck::Is_NOT_Valid(utils_mars_map_builder::TryGet_OpenMap(Command, k_MapPath)))
         { return; }
 
-        const auto Backpacks = Get_BackpackSpawners();
+        auto Backpacks = Get_BackpackSpawners();
         if (Backpacks.Num() == 0)
         {
             ck::Trace(f"[{Command}] No backpack spawner (an entity spawner named *Backpack*) in the map; nothing placed.", NAME_None, 2.0f, FLinearColor::Yellow);
@@ -39,9 +41,8 @@ namespace utils_mars_warrens
         }
 
         auto Placed = 0;
-        for (int32 Index = 0; Index < Backpacks.Num(); ++Index)
+        for (auto Backpack : Backpacks)
         {
-            const auto Backpack = Backpacks[Index];
             const auto Origin = Backpack.GetActorLocation();
             if (Get_HasLanternNear(Origin))
             { continue; }
@@ -49,13 +50,14 @@ namespace utils_mars_warrens
             const auto Right = Backpack.GetActorRightVector();
             const auto Forward = Backpack.GetActorForwardVector();
             const auto Lift = FVector(0.0, 0.0, k_DropHeight);
+            const FString Suffix = Get_PackSuffix(Backpack);
 
-            Spawn_Item(UMars_WorldItem_Lantern_EntityScript,
-                FMars_MapBuilder_Placement(f"{k_LanternLabel}_{Index}", Origin + Right * k_SideOffset + Lift));
-            Spawn_Item(UMars_WorldItem_Tallow_EntityScript,
-                FMars_MapBuilder_Placement(f"{k_TallowLabelPrefix}{Index}_0", Origin + Right * (k_SideOffset + 40.0) + Forward * 20.0 + Lift));
-            Spawn_Item(UMars_WorldItem_Tallow_EntityScript,
-                FMars_MapBuilder_Placement(f"{k_TallowLabelPrefix}{Index}_1", Origin + Right * (k_SideOffset + 40.0) - Forward * 20.0 + Lift));
+            utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Lantern_EntityScript,
+                FMars_MapBuilder_Placement(f"{k_LanternLabel}_{Suffix}", Origin + Right * k_SideOffset + Lift));
+            utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Tallow_EntityScript,
+                FMars_MapBuilder_Placement(f"{k_TallowLabelPrefix}{Suffix}_0", Origin + Right * (k_SideOffset + 40.0) + Forward * 20.0 + Lift));
+            utils_mars_map_builder::Spawn_EntityScript(UMars_WorldItem_Tallow_EntityScript,
+                FMars_MapBuilder_Placement(f"{k_TallowLabelPrefix}{Suffix}_1", Origin + Right * (k_SideOffset + 40.0) - Forward * 20.0 + Lift));
             ++Placed;
         }
 
@@ -95,15 +97,17 @@ namespace utils_mars_warrens
         return false;
     }
 
-    // The spawner's actor factory (the Place Actors path), as utils_mars_sandbox::Spawn_Mechanism.
-    void Spawn_Item(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FMars_MapBuilder_Placement& InPlacement)
+    // The text after the pack spawner label's last underscore (the map builder labels packs Warrens_<Class>_<i>), or the
+    // whole label when it has none.
+    FString Get_PackSuffix(ACk_EntitySpawner_UE InBackpack)
     {
-        auto Spawner = Cast<ACk_EntitySpawner_UE>(
-            UEditorActorSubsystem::Get().SpawnActorFromObject(InScriptClass.Get(), InPlacement.Location, InPlacement.Rotation));
-        if (ck::EnsureIfNot(ck::IsValid(Spawner), f"[Mars.Warrens] Failed to place [{InPlacement.Label}] through the entity spawner factory"))
-        { return; }
+        const FString Label = InBackpack.GetActorLabel();
+        FString Head;
+        FString Tail;
+        if (Label.Split("_", Head, Tail, ESearchCase::IgnoreCase, ESearchDir::FromEnd) && Tail.IsEmpty() == false)
+        { return Tail; }
 
-        Spawner.SetActorLabel(InPlacement.Label);
+        return Label;
     }
 }
 #endif

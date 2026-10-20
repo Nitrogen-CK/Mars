@@ -45,15 +45,24 @@ class UMars_DebugPage_Interaction : UMars_DebugPage_Base
         EndPageScrollBox();
     }
 
-    // The player character always composes a prompt display.
+    // The player character always composes a prompt display. A blocked prompt shows its reason beside the prompt text (the
+    // widget words it instead of the text).
     private void DrawPromptDisplay(FCk_Handle_InteractPromptDisplay InDisplay)
     {
         auto Slots = InDisplay.Get_Slots();
         DrawKvRow("Visible slots", f"{Slots.Num()}");
         for (const auto& PromptSlot : Slots)
         {
-            if (PromptSlot.Stack.IsEmpty() == false && ck::IsValid(PromptSlot.Stack.Last().PromptHandle))
-            { DrawKvRow(PromptSlot.SlotKey.ToString(), PromptSlot.Stack.Last().PromptHandle.Get_DisplayText().ToString()); }
+            if (PromptSlot.Stack.IsEmpty() || ck::Is_NOT_Valid(PromptSlot.Stack.Last().PromptHandle))
+            { continue; }
+
+            const auto Prompt = PromptSlot.Stack.Last().PromptHandle;
+            const auto Text = Prompt.Get_DisplayText().ToString();
+            const auto Reason = Prompt.Get_BlockedReason();
+            if (Reason == EMars_InteractPrompt_BlockedReason::None)
+            { DrawKvRow(PromptSlot.SlotKey.ToString(), Text); }
+            else
+            { DrawKvRow(PromptSlot.SlotKey.ToString(), f"{Text} (blocked: {Reason :n})"); }
         }
     }
 }

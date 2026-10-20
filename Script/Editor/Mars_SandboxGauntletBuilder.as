@@ -56,7 +56,7 @@ struct FMars_SandboxGauntlet_Cell
 
     void Place(TSubclassOf<UCk_EntityScript_UE> InScriptClass, const FString& InName, FTransform InLocal) const
     {
-        utils_mars_sandbox::Spawn_Mechanism(InScriptClass,
+        utils_mars_map_builder::Spawn_EntityScript(InScriptClass,
             FMars_MapBuilder_Placement(f"{Prefix}_{InName}", Origin + InLocal.GetLocation(), InLocal.Rotator()));
     }
 
@@ -405,16 +405,16 @@ namespace utils_mars_sandbox
 
     // Floors grey, raised and edge pieces (galleries, stairs, rails, plinths, the bell) orange, clue glyphs green, the rest
     // walls.
-    void Apply_GauntletMaterial(AStaticMeshActor InBlock, const FString& InLabel)
+    void Apply_GauntletMaterial(AStaticMeshActor InBlock, const FString& InLabel, const FMars_MapBuilder_ProtoGridSet& InGrid)
     {
-        auto Material = utils_mars_map_builder::Get_ProtoGrid_Wall();
+        auto Material = InGrid.Wall;
         if (InLabel.EndsWith("_Floor") || InLabel.EndsWith("AlcoveFloor"))
-        { Material = utils_mars_map_builder::Get_ProtoGrid_Floor(); }
+        { Material = InGrid.Floor; }
         else if (InLabel.Contains("_Glyph"))
-        { Material = utils_mars_map_builder::Get_ProtoGrid_Interactable(); }
+        { Material = InGrid.Interactable; }
         else if (InLabel.Contains("_Gallery") || InLabel.Contains("_Stair") || InLabel.Contains("Rail")
             || InLabel.Contains("Parapet") || InLabel.Contains("_Plinth") || InLabel.Contains("_Bell") || InLabel.Contains("LoftFloor"))
-        { Material = utils_mars_map_builder::Get_ProtoGrid_Platform(); }
+        { Material = InGrid.Platform; }
 
         InBlock.StaticMeshComponent.SetMaterial(0, Material);
     }

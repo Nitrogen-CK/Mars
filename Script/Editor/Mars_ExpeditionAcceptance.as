@@ -44,7 +44,7 @@ class UMars_ExpeditionAcceptance : UObject
         return true;
     }
 
-    // Already-scaled degrees, matching the two public requests issued by the gameplay input profile's OnLook.
+    // Already-scaled degrees, through the gameplay input profile's look path (utils_input_intents::Request_Look).
     UFUNCTION()
     bool Look(AMars_PlayerCharacter InCharacter, FVector InDelta)
     {
@@ -55,9 +55,7 @@ class UMars_ExpeditionAcceptance : UObject
         auto Viewpoint = Player.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
         if (ck::Is_NOT_Valid(Intents) || ck::Is_NOT_Valid(Viewpoint))
         { return false; }
-        Intents.Request_AddLookDelta(FMars_Request_InputIntents_AddLookDelta(InDelta));
-        auto Camera = Viewpoint.Get_Camera();
-        Camera.Request_SetOrientationIntention(InDelta);
+        utils_input_intents::Request_Look(Player, InDelta);
         return true;
     }
 
