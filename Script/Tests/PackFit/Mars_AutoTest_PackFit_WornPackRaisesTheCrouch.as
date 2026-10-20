@@ -30,6 +30,8 @@ class UMars_AutoTest_PackFit_WornPackRaisesTheCrouch : UMars_AutoTestRig_PlayerC
         Add_Step_WaitUntil("standing and not wearing the pack", n"Check_StandingAndNotWearing", k_SlowPolls, 0);
         Add_Step("no pack again: crouch", n"Step_Crouch");
         Add_Step_WaitUntil("crouched at 105 cm again", n"Check_CrouchedWithoutPack", k_SlowPolls, 0);
+        // Teardown in the frame the crouch lands destroys the pawn while its entity still syncs a moving transform.
+        Add_Step_WaitFrames("let the crouch settle", 10);
         Add_Step("tear down", n"Step_TearDown");
         Add_Step_WaitUntil("the player's entity is gone", n"Check_PlayerEntityGone", k_SlowPolls, 0);
         Run_Steps(InHandle);
