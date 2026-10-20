@@ -53,9 +53,10 @@ class UMars_AutoTestHelper_UseKey : UObject
         auto Owner = utils_entity_lifetime::Request_CreateEntity(Parent);
         _Source = utils_input_source::Add(Owner, FCk_InputSource_Spec(0));
 
+        // Rows may share a key (the player's Use and Primary share the left mouse button): it is minted once.
         TArray<FKey> PhysicalButtons;
         for (const auto& Row : _Rows)
-        { PhysicalButtons.Add(Row.Key); }
+        { PhysicalButtons.AddUnique(Row.Key); }
 
         _Map = utils_input_button_map::Add(Owner, FCk_InputButtonMap_Spec(PhysicalButtons));
         _Sampler = utils_intent_sampler::Add(Owner, FCk_IntentSampler_Spec(120));
