@@ -104,7 +104,7 @@ mixin void Get_ContactShapes(const FCk_Handle_FPHands& Self, const FTransform& I
 mixin FCk_Hands_ContactShape Get_ContactShape(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, EMars_Hand InHand)
 {
     const auto& Spec = Self.Get_Spec();
-    if (Self.Get_IsReaching(InHand) && Self.Get_ReachAlpha() > 0.6f)
+    if (Self.Get_IsReaching(InHand) && Self.Get_ReachAlpha() > Spec.Reach.Poses.ContactCurlFromAlpha)
     {
         // Reaching with this glove: the target is set and uses it.
         const auto MaybeTarget = Self.Get_Target();

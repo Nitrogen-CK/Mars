@@ -106,10 +106,10 @@ mixin TOptional<int32> Get_HoveredIndex(const FCk_Handle_EmoteWheel& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_Open(FCk_Handle_EmoteWheel& Self)
+mixin void Request_Open(FCk_Handle_EmoteWheel& Self, const FMars_Request_EmoteWheel_Open& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_EmoteWheel_Requests);
-    Requests.OpenRequests.Add(FMars_Request_EmoteWheel_Open());
+    Requests.OpenRequests.Add(InRequest);
 }
 
 mixin void Request_MovePointer(FCk_Handle_EmoteWheel& Self, const FMars_Request_EmoteWheel_MovePointer& InRequest)

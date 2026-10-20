@@ -26,14 +26,14 @@ class UMars_AutoTest_TPBody_SocketGripsCentreInTheHandFrame : UCk_AutoTest_Base
         Assert_True(Leaned.Y < -0.1 && Leaned.Z > 0.9, f"a positive lean tips the top toward -Y, screen left (got [{Leaned}])");
 
         auto Grip = FMars_HeldView_Grip();
-        Grip.IsTwoHanded = true;
+        Grip.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Grip.HasSocketGrips = true;
         Grip.SocketGrip_R = FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::OneVector) * Mount;
         Grip.SocketGrip_L = FTransform(FRotator::ZeroRotator, FVector(14.0, 0.0, 0.0), FVector::OneVector) * Mount;
 
         auto Query = FMars_TPBody_HoldQuery();
         Query.Grips = utils_held_view::Get_GripTargets(FMars_FPHands_Spec(), Grip);
-        Query.IsTwoHanded = true;
+        Query.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Query.IsSocketGrip = true;
         Query.Hold = FMars_TPBody_Hold();
         Query.BodyScale = 1.6453f;
@@ -63,12 +63,12 @@ class UMars_AutoTest_TPBody_SocketGripsCentreInTheHandFrame : UCk_AutoTest_Base
 
         // A fitted hold is laid out as before.
         auto Faces = FMars_HeldView_Grip();
-        Faces.IsTwoHanded = true;
+        Faces.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Faces.RightFaceY = 15.0;
         Faces.LeftFaceY = -15.0;
         auto FacesQuery = FMars_TPBody_HoldQuery();
         FacesQuery.Grips = utils_held_view::Get_GripTargets(FMars_FPHands_Spec(), Faces);
-        FacesQuery.IsTwoHanded = true;
+        FacesQuery.Kind = EMars_FPHands_HoldKind::TwoHanded;
         FacesQuery.Hold = FMars_TPBody_Hold();
         FacesQuery.BodyScale = 1.6453f;
         const auto FacesFrame = utils_held_view::Make_HoldFrame(FacesQuery);

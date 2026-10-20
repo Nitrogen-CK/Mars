@@ -20,6 +20,15 @@ struct FMars_FPHands_ViewSpec
     float32 FirstPersonScale = 0.5f;
 }
 
+// FirstPersonScale finite and within (0, 1].
+mixin FMars_Validation Validate(const FMars_FPHands_ViewSpec& Self)
+{
+    if (Math::IsFinite(Self.FirstPersonScale) == false || Self.FirstPersonScale <= 0.0f || Self.FirstPersonScale > 1.0f)
+    { return FMars_Validation(f"FirstPersonScale [{Self.FirstPersonScale}] is outside (0, 1]"); }
+
+    return FMars_Validation();
+}
+
 namespace constants_fphands_view
 {
     // Deepest attach chain looked through for a hand node (visual -> cargo slot -> pack -> hand is 4).
@@ -60,19 +69,20 @@ namespace utils_fphands
         return Tree;
     }
 
-    // InNode is the hand node of the gloves of the character this machine controls, with first-person rendering on.
+    // InNode is the hand node of the gloves of the player character this machine controls, with first-person rendering
+    // on (its config's FPHandsView).
     bool Get_IsFirstPersonHandNode(const FCk_Handle& InNode)
     {
-        auto Character = Cast<ACharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InNode));
+        auto Character = Cast<AMars_PlayerCharacter>(utils_owning_actor::TryGet_EntityOwningActor_Recursive(InNode));
         if (ck::Is_NOT_Valid(Character) || Character.IsLocallyControlled() == false || Character.Get_IsActorEcsReady() == false)
         { return false; }
 
         // Characters without gloves (any other pawn) have no first-person hand node.
         const auto Hands = Character.TryGet_ActorEntityHandle().As_FPHands(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Hands))
+        if (ck::Is_NOT_Valid(Hands) || ck::Is_NOT_Valid(Character.Config))
         { return false; }
 
-        return Hands.Get_Spec().View.FirstPersonRendering == ECk_EnableDisable::Enable && Hands.Get_HandNode() == InNode;
+        return Character.Config.FPHandsView.FirstPersonRendering == ECk_EnableDisable::Enable && Hands.Get_HandNode() == InNode;
     }
 
     // How a primitive on InNode is rendered: first-person when InNode hangs (through any number of scene nodes) off the

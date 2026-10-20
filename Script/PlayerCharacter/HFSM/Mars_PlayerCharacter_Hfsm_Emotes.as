@@ -161,7 +161,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         _IsOpen = true;
         // The delta drained before the press is not a pointer move.
         _SeenLookSequence = _InputIntents.Get_LookDeltaSequence();
-        _Wheel.Request_Open();
+        _Wheel.Request_Open(FMars_Request_EmoteWheel_Open());
 
         if (ck::IsValid(_Viewpoint))
         { _Viewpoint.Request_HoldView(FMars_Request_PlayerViewpoint_HoldView(EMars_PlayerViewpoint_ViewHolder::EmoteWheel)); }
@@ -191,10 +191,7 @@ class UMars_SmTask_EmoteWheelIntent : UMars_SmTask_IntentEdges
         auto BestTargets = _Resolver.Get_BestInteractTargets(GameplayTags::InteractionIntent_Mars_Use);
         for (auto Target : BestTargets)
         {
-            if (ck::Is_NOT_Valid(Target) || Target.Has_Fragment(FMars_Fragment_InteractionContext) == false)
-            { continue; }
-
-            auto Control = Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked);
+            const auto Control = Target.TryGet_ManipulatedControl();
             if (ck::IsValid(Control) && Control.Get_IsManipulating())
             { return true; }
         }

@@ -48,7 +48,7 @@ class UMars_SmCondition_ByteAttribute : UCk_SmCondition_EventDriven
 
     private void EvaluateAndMark(int32 InValue)
     {
-        if (UCk_Utils_IntComparison_UE::Get_IsComparisonTrue(InValue, Comparison))
+        if (utils_int_comparison::Get_IsComparisonTrue(InValue, Comparison))
         { MarkSatisfied(); }
         else
         { MarkUnsatisfied(); }

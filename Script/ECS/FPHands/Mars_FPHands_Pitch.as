@@ -16,13 +16,13 @@ struct FMars_FPHands_PitchSpec
     UPROPERTY()
     float32 FollowDown = 1.0f;
 
-    // How quickly the gloves take up a change of pitch (1/s). 0 = snap. The view's pitch is read one frame behind the
+    // How quickly the gloves take up a change of pitch (1/s); unset snaps. The view's pitch is read one frame behind the
     // render, so a snap shakes the gloves against the screen under a fast look; the ease hides that.
     UPROPERTY()
-    float32 InterpSpeed = 20.0f;
+    TOptional<float32> InterpSpeed = TOptional<float32>(20.0f);
 }
 
-// Both follow fractions within 0..1, InterpSpeed not negative.
+// Both follow fractions within 0..1, InterpSpeed positive when set.
 mixin FMars_Validation Validate(const FMars_FPHands_PitchSpec& Self)
 {
     if (Self.FollowUp < 0.0f || Self.FollowUp > 1.0f)
@@ -31,8 +31,8 @@ mixin FMars_Validation Validate(const FMars_FPHands_PitchSpec& Self)
     if (Self.FollowDown < 0.0f || Self.FollowDown > 1.0f)
     { return FMars_Validation(f"Pitch.FollowDown [{Self.FollowDown}] is outside [0, 1]"); }
 
-    if (Self.InterpSpeed < 0.0f)
-    { return FMars_Validation(f"Pitch.InterpSpeed [{Self.InterpSpeed}] is negative"); }
+    if (Self.InterpSpeed.IsSet() && (Self.InterpSpeed.GetValue() > 0.0f) == false)
+    { return FMars_Validation(f"Pitch.InterpSpeed [{Self.InterpSpeed.GetValue()}] is not positive (unset snaps)"); }
 
     return FMars_Validation();
 }

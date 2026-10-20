@@ -94,8 +94,8 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         const auto SwingRotation = Get_SwingRotation(Hands, HandWorld);
         const auto Raise = SwingRotation.UnrotateVector(Targets.Lateral);
         const auto Lower = SwingRotation.UnrotateVector(Get_SideLateral(Hands, Targets.Lateral));
-        const auto TargetLeft = Raised(Left.GripInHand, Raise);
-        const auto TargetRight = Raised(Right.GripInHand, Raise);
+        const auto TargetLeft = Offset(Left.GripInHand, Raise);
+        const auto TargetRight = Offset(Right.GripInHand, Raise);
         if (_Grips.IsSet() == false || Spec.ReachInterpSpeed.IsSet() == false)
         { _Grips = TOptional<FMars_FPHands_GloveGrips>(FMars_FPHands_GloveGrips(TargetLeft, TargetRight)); }
         else
@@ -103,11 +103,11 @@ class UMars_FPHands_AnimInstance : UAnimInstance
             const auto GripAlpha = Math::Clamp(1.0 - Math::Exp(-Spec.ReachInterpSpeed.GetValue() * DeltaTimeX), 0.0, 1.0);
             const auto Previous = _Grips.GetValue();
             _Grips = TOptional<FMars_FPHands_GloveGrips>(FMars_FPHands_GloveGrips(
-                InterpGrip(Previous.Left, TargetLeft, GripAlpha), InterpGrip(Previous.Right, TargetRight, GripAlpha)));
+                Blend(Previous.Left, TargetLeft, GripAlpha), Blend(Previous.Right, TargetRight, GripAlpha)));
         }
 
         const auto Eased = _Grips.GetValue();
-        const auto Grips = FMars_FPHands_GloveGrips(Raised(Eased.Left, -Lower), Raised(Eased.Right, -Lower));
+        const auto Grips = FMars_FPHands_GloveGrips(Offset(Eased.Left, -Lower), Offset(Eased.Right, -Lower));
 
         // The gloves attach to the UCk_CameraComponent, which FollowView moves onto the rendered view at the end of the frame;
         // the hand node hangs off that same view (the director's view anchor). Composing against the anchor rather than
@@ -115,14 +115,15 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         const auto Viewpoint = Character.TryGet_ActorEntityHandle().As_PlayerViewpoint().Get_Viewpoint();
         const auto ComponentWorld = Mesh.GetRelativeTransform() * utils_transform::Get_EntityCurrentTransform(Viewpoint);
 
-        GripTarget_L = (WithReach(WithSwing(Grips.Left, Left.Swing), Left) * HandWorld).GetRelativeTransform(ComponentWorld);
-        GripTarget_R = (WithReach(WithSwing(Grips.Right, Right.Swing), Right) * HandWorld).GetRelativeTransform(ComponentWorld);
+        // The reach is blended after the easing, so the gesture timing stays crisp.
+        GripTarget_L = (Blend(Offset(Grips.Left, Left.Swing), Left.ReachGrip, Left.ReachAlpha) * HandWorld).GetRelativeTransform(ComponentWorld);
+        GripTarget_R = (Blend(Offset(Grips.Right, Right.Swing), Right.ReachGrip, Right.ReachAlpha) * HandWorld).GetRelativeTransform(ComponentWorld);
 
         GripPoseIndex_L = int32(Left.Pose);
         GripPoseIndex_R = int32(Right.Pose);
 
         // An emote montage owns both gloves while it plays; the procedural placement fades out under it.
-        const auto EmoteWeight = Blueprint_GetSlotMontageLocalWeight(Spec.Emotes.Slot);
+        const auto EmoteWeight = Blueprint_GetSlotMontageLocalWeight(Character.Config.FPHandsEmotes.Slot);
         PlacementAlpha_L = float32(1.0 - Math::Clamp(EmoteWeight, 0.0, 1.0));
         PlacementAlpha_R = PlacementAlpha_L;
 
@@ -143,23 +144,6 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         ContactShape_R = FCk_Hands_ContactShape();
     }
 
-    private FTransform WithReach(const FTransform& InGrip, const FMars_FPHands_HandTarget& InTarget)
-    {
-        if (InTarget.ReachAlpha <= 0.0f)
-        { return InGrip; }
-
-        auto Result = FTransform();
-        Result.SetLocation(Math::Lerp(InGrip.GetLocation(), InTarget.ReachGrip.GetLocation(), float(InTarget.ReachAlpha)));
-        Result.SetRotation(FQuat::Slerp(InGrip.GetRotation(), InTarget.ReachGrip.GetRotation(), float(InTarget.ReachAlpha)));
-        return Result;
-    }
-
-    private FTransform WithSwing(const FTransform& InGrip, const FVector& InSwing)
-    {
-        auto Result = InGrip;
-        Result.SetLocation(InGrip.GetLocation() + InSwing);
-        return Result;
-    }
 
     // The hand node's rotation relative to the side node (the melee swing; identity at rest). Identity without a side node.
     private FQuat Get_SwingRotation(const FCk_Handle_FPHands& InHands, const FTransform& InHandWorld)
@@ -183,18 +167,20 @@ class UMars_FPHands_AnimInstance : UAnimInstance
         return utils_scene_node::Get_Offset(SideNode).GetLocation();
     }
 
-    private FTransform Raised(const FTransform& InGrip, const FVector& InBy)
+    // InGrip moved by InBy (hand node space), rotation kept.
+    private FTransform Offset(const FTransform& InGrip, const FVector& InBy)
     {
         auto Result = InGrip;
         Result.SetLocation(InGrip.GetLocation() + InBy);
         return Result;
     }
 
-    private FTransform InterpGrip(const FTransform& InCurrent, const FTransform& InTarget, float InAlpha)
+    // InAlpha of the way from InFrom to InTo: location lerped, rotation slerped, unit scale.
+    private FTransform Blend(const FTransform& InFrom, const FTransform& InTo, float InAlpha)
     {
         auto Result = FTransform();
-        Result.SetLocation(Math::Lerp(InCurrent.GetLocation(), InTarget.GetLocation(), InAlpha));
-        Result.SetRotation(FQuat::Slerp(InCurrent.GetRotation(), InTarget.GetRotation(), InAlpha));
+        Result.SetLocation(Math::Lerp(InFrom.GetLocation(), InTo.GetLocation(), InAlpha));
+        Result.SetRotation(FQuat::Slerp(InFrom.GetRotation(), InTo.GetRotation(), InAlpha));
         return Result;
     }
 }

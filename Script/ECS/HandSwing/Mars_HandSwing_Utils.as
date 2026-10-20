@@ -44,31 +44,33 @@ namespace utils_hand_swing
         return EMars_HandSwing_Phase::None;
     }
 
-    // The hand's offset InElapsed seconds into a swing that left InStartPose: through the windup and strike keys and back
+    // The hand's offset InElapsed seconds into InFlight: from its start pose through the windup and strike keys and back
     // to identity. Each segment eases with its destination key's easing (the recovery with the arc's).
-    FTransform Evaluate(const FMars_HandSwing_Arc& InArc, const FMars_HandSwing_Timeline& InTimeline,
-                        const FTransform& InStartPose, float32 InElapsed)
+    FTransform Evaluate(const FMars_HandSwing_Flight& InFlight, float32 InElapsed)
     {
-        const auto WindupPose = Make_Pose(InArc.Windup);
-        const auto StrikePose = Make_Pose(InArc.Strike);
+        const auto& Arc = InFlight.Arc;
+        const auto& Timeline = InFlight.Timeline;
+        const auto& StartPose = InFlight.StartPose;
+        const auto WindupPose = Make_Pose(Arc.Windup);
+        const auto StrikePose = Make_Pose(Arc.Strike);
 
-        if (InElapsed < InTimeline.WindupEnd)
+        if (InElapsed < Timeline.WindupEnd)
         {
-            const auto T = InElapsed / InTimeline.WindupEnd;
-            return Blend(InStartPose, WindupPose, Ease(InArc.Windup.Easing, T));
+            const auto T = InElapsed / Timeline.WindupEnd;
+            return Blend(StartPose, WindupPose, Ease(Arc.Windup.Easing, T));
         }
 
-        if (InElapsed < InTimeline.StrikeEnd)
+        if (InElapsed < Timeline.StrikeEnd)
         {
-            const auto From = InTimeline.WindupEnd > 0.0f ? WindupPose : InStartPose;
-            const auto T = (InElapsed - InTimeline.WindupEnd) / Math::Max(InTimeline.StrikeEnd - InTimeline.WindupEnd, KINDA_SMALL_NUMBER);
-            return Blend(From, StrikePose, Ease(InArc.Strike.Easing, T));
+            const auto From = Timeline.WindupEnd > 0.0f ? WindupPose : StartPose;
+            const auto T = (InElapsed - Timeline.WindupEnd) / Math::Max(Timeline.StrikeEnd - Timeline.WindupEnd, KINDA_SMALL_NUMBER);
+            return Blend(From, StrikePose, Ease(Arc.Strike.Easing, T));
         }
 
-        if (InElapsed < InTimeline.RecoverEnd)
+        if (InElapsed < Timeline.RecoverEnd)
         {
-            const auto T = (InElapsed - InTimeline.StrikeEnd) / Math::Max(InTimeline.RecoverEnd - InTimeline.StrikeEnd, KINDA_SMALL_NUMBER);
-            return Blend(StrikePose, FTransform::Identity, Ease(InArc.RecoverEasing, T));
+            const auto T = (InElapsed - Timeline.StrikeEnd) / Math::Max(Timeline.RecoverEnd - Timeline.StrikeEnd, KINDA_SMALL_NUMBER);
+            return Blend(StrikePose, FTransform::Identity, Ease(Arc.RecoverEasing, T));
         }
 
         return FTransform::Identity;
@@ -87,9 +89,10 @@ namespace utils_hand_swing
         return Result;
     }
 
+    // The 0to1 range type clamps InT.
     float32 Ease(ECk_TweenEasing InEasing, float32 InT)
     {
-        return utils_tween::Get_EasedProgress(InEasing, FCk_FloatRange_0to1(Math::Clamp(InT, 0.0f, 1.0f)));
+        return utils_tween::Get_EasedProgress(InEasing, FCk_FloatRange_0to1(InT));
     }
 
     bool Get_IsFinite(const FVector& InVector)
@@ -196,13 +199,13 @@ mixin float32 Get_Elapsed(const FCk_Handle_HandSwing& Self)
 
 mixin FMars_HandSwing_Timeline Get_Timeline(const FCk_Handle_HandSwing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_HandSwing).Timeline;
+    return Self.Get_Fragment(FMars_Fragment_HandSwing).Flight.Timeline;
 }
 
 // The arc in flight (or last flown). After a cancel its Strike key is the pose the recovery left from.
 mixin FMars_HandSwing_Arc Get_Arc(const FCk_Handle_HandSwing& Self)
 {
-    return Self.Get_Fragment(FMars_Fragment_HandSwing).Arc;
+    return Self.Get_Fragment(FMars_Fragment_HandSwing).Flight.Arc;
 }
 
 mixin FCk_Handle_SceneNode Get_Node(const FCk_Handle_HandSwing& Self)
@@ -220,10 +223,10 @@ mixin void Request_Start(FCk_Handle_HandSwing& Self, const FMars_Request_HandSwi
     Requests.StartRequests.Add(InRequest);
 }
 
-mixin void Request_Cancel(FCk_Handle_HandSwing& Self)
+mixin void Request_Cancel(FCk_Handle_HandSwing& Self, const FMars_Request_HandSwing_Cancel& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HandSwing_Requests);
-    Requests.CancelRequests.Add(FMars_Request_HandSwing_Cancel());
+    Requests.CancelRequests.Add(InRequest);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

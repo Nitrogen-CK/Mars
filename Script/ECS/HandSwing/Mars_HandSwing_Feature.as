@@ -123,6 +123,20 @@ struct FMars_Fragment_HandSwing_Params
 // State
 //--------------------------------------------------------------------------------------------------------------------------
 
+// A swing in flight: its arc, its phase boundaries and where the hand was when it started (identity from rest; mid-swing
+// for a restart). A cancel rewrites the arc's Strike key to the current pose, so the recovery starts from there.
+struct FMars_HandSwing_Flight
+{
+    UPROPERTY()
+    FMars_HandSwing_Arc Arc;
+
+    UPROPERTY()
+    FMars_HandSwing_Timeline Timeline;
+
+    UPROPERTY()
+    FTransform StartPose;
+}
+
 // Written only by UMars_Processor_HandSwing_HandleRequests, UMars_Processor_HandSwing_Tick and utils_hand_swing::Add.
 struct FMars_Fragment_HandSwing
 {
@@ -133,16 +147,9 @@ struct FMars_Fragment_HandSwing
     UPROPERTY()
     float32 Elapsed = 0.0f;
 
-    // The swing in flight. A cancel rewrites its Strike key to the current pose, so the recovery starts from there.
+    // The swing in flight (or last flown).
     UPROPERTY()
-    FMars_HandSwing_Arc Arc;
-
-    UPROPERTY()
-    FMars_HandSwing_Timeline Timeline;
-
-    // Where the hand was when the swing in flight started (identity from rest; mid-swing for a restart).
-    UPROPERTY()
-    FTransform StartPose;
+    FMars_HandSwing_Flight Flight;
 
     // The current offset, hand space. Identity at rest.
     UPROPERTY()

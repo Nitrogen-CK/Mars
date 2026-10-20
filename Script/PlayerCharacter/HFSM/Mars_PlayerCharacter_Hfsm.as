@@ -12,6 +12,8 @@
 // gloves, stations, the interaction resolver) or drives the movement component's stance gates on
 // utils_player_sm::Get_IsOwningCopy.
 
+// The player SM's own namespace by ruling: the player state machine is treated as the feature, and its helpers (the
+// owning-copy gate, the Downed reads, the grip-land bound) serve its tasks and conditions only.
 namespace utils_player_sm
 {
     // Standalone (also every DoesNotReplicate test SM), the owning client, or the listen host for its own pawn. Probes the

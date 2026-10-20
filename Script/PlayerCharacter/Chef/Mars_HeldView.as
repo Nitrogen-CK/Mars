@@ -13,8 +13,9 @@
 // How the gloves grip the held item: FMars_FPHands_Hold without its finger-contact shape (the body skips Contact Curl).
 struct FMars_HeldView_Grip
 {
+    // Empty: nothing is held (the body shows no item and lowers its arms).
     UPROPERTY()
-    bool IsTwoHanded = false;
+    EMars_FPHands_HoldKind Kind = EMars_FPHands_HoldKind::Empty;
 
     UPROPERTY()
     EMars_HandGripPose Pose = EMars_HandGripPose::Relaxed;
@@ -67,9 +68,6 @@ struct FMars_HeldView
     // Bumped on every change the owner requests, so holding an identical item again still replicates and re-applies.
     UPROPERTY()
     int32 Serial = 0;
-
-    UPROPERTY()
-    bool IsHolding = false;
 }
 
 // Each glove's grip bone target for a hold, in the hand node's space (world cm), as utils_fphands::Get_RestTargets
@@ -93,32 +91,13 @@ struct FMars_HeldView_GripTargets
 
 // Where the chef's hands hold an item (Config.TPBody.Hold). All transforms are in the body mesh's component space
 // (unscaled mesh units: the chef faces +Y, +X is its left, +Z up); offsets measured in the first-person hand node's space
-// stay world cm and are shrunk by TPBody.Scale on the way in.
-//
-// Derivation (SK_Chef reference pose, read back in the editor 2026-10-03, component space):
-//   spine_03 (0, -6.5, 47); upperarm_r (-19, -8, 57) / _l (19, -8, 57); lowerarm 13.39 from the upperarm, hand 6.76
-//   from the lowerarm, so a shoulder reaches 20.15. grip_r sits on hand_r at local (7.30, -0.25, 3.20), the same
-//   rotation as SK_FPHands' grip_r (its offset there is (8.20, -0.41, 3.18)): with the gloves' rest rotation the hand
-//   bone lands 7.2 behind and 3.3 below its grip. The torso's front is at y +9..+12 from z 36 to 60.
-//   HandFrame (0, 16, 50), yaw 90 (hand +X -> component +Y forward, hand +Y -> component -X the chef's right, +Z up):
-//   22.5 in front of spine_03, at the chest; a 30 cm item (half width 15 world cm) puts hand_r at (-16.8, 8.8, 46.7),
-//   19.8 from its shoulder (98% of the reach); a 50 cm item's hands sit 20.9 out, just past the reach. Further forward
-//   the stubby arms cannot follow (the brief's y 24 needs 27.7). An item deeper than ~12 world cm still sinks into the
-//   belly: the chef's arms are shorter than its torso is deep.
-//
-// The MiniChef body (on trial since 2026-10-09; the defaults below are derived for it and have NOT been seen in PIE):
-//   upperarm_r (-15, 1.2, 42); lowerarm 12.84 from the upperarm, hand 4.31 from the lowerarm, so a shoulder reaches
-//   17.15. grip_r sits on hand_r at local (12.76, 0, 2.62): the hand is three quarters of the arm's length, and the hand
-//   bone lands 12.8 behind and 2.6 below its grip. The belly's front is at y +20 from z 22 to 34 (the cowl +18.5 above),
-//   3 further out than the wrists can reach around it.
-//   HandFrame (0, 27.3, 36.6): a 30 cm item (half width 8 body units at Scale 1.8828) puts hand_r at (-10.8, 14.5, 34),
-//   16.1 from its shoulder (94% of the reach) with the item's back edge on the belly's front; the bracers sink about
-//   3 into the belly's sides, which no frame avoids. One-handed, 36 cm moves hand_r to (-20.1, 14.5, 34), 16.3 from the
-//   shoulder and clear of the flank.
-//   (The LowPoly chef's values: HandFrame (0, 16, 50), OneHandedOffset 14, elbows (+-24, -12, 46), palm 2.5.)
+// stay world cm and are shrunk by TPBody.Scale on the way in. The chef's arms are short for its body: a shoulder reaches
+// about 17 body units, the hand bone sits 12.8 behind and 2.6 below grip_r, and the belly's front is at y +20.
 struct FMars_TPBody_Hold
 {
-    // Plays the first-person Hand node's role for two-handed holds: the gloves' rest targets are laid out in it.
+    // Plays the first-person Hand node's role for two-handed holds: the gloves' rest targets are laid out in it. At the
+    // chest, yaw 90 (hand +X -> component +Y forward, hand +Y -> component -X the chef's right, +Z up), as far forward as
+    // the arms reach a 30 cm item.
     UPROPERTY()
     FTransform HandFrame = FTransform(FRotator(0.0, 90.0, 0.0), FVector(0.0, 27.3, 36.6), FVector::OneVector);
 
@@ -136,14 +115,14 @@ struct FMars_TPBody_Hold
     UPROPERTY()
     FVector ElbowOffset_R = FVector(-26.0, -10.0, 34.0);
 
-    // Grip bone to palm surface, world cm; replaces FPHands.PalmSurfaceOffset for the body's fitted two-handed grips.
-    // (grip_r floats 1.5 body units off the MiniChef glove's palm.)
+    // Grip bone to palm surface, world cm; replaces FPHands.PalmSurfaceOffset for the body's fitted two-handed grips
+    // (grip_r floats 1.5 body units off the glove's palm).
     UPROPERTY()
     float32 PalmSurfaceOffset = 2.8f;
 
-    // How quickly the arms take or leave a hold, 1/s (FPHands.ReachInterpSpeed's feel). 0 = snap.
+    // How quickly the arms take or leave a hold, 1/s (FPHands.ReachInterpSpeed's feel); unset snaps.
     UPROPERTY()
-    float32 InterpSpeed = 14.0f;
+    TOptional<float32> InterpSpeed = TOptional<float32>(14.0f);
 
     // How much of a swing's hand displacement the elbow pole targets follow, 0..1: the elbows rise with an overhead
     // windup and drop through the blow instead of pinning the arms to their hold pose.
@@ -176,8 +155,8 @@ mixin FMars_Validation Validate(const FMars_TPBody_Hold& Self)
     if ((Self.PalmSurfaceOffset >= 0.0f) == false)
     { return FMars_Validation(f"PalmSurfaceOffset [{Self.PalmSurfaceOffset}] must not be negative"); }
 
-    if ((Self.InterpSpeed >= 0.0f) == false)
-    { return FMars_Validation(f"InterpSpeed [{Self.InterpSpeed}] must not be negative"); }
+    if (Self.InterpSpeed.IsSet() && (Self.InterpSpeed.GetValue() > 0.0f) == false)
+    { return FMars_Validation(f"InterpSpeed [{Self.InterpSpeed.GetValue()}] must be positive (unset snaps)"); }
 
     if ((Self.SwingElbowFollow >= 0.0f && Self.SwingElbowFollow <= 1.0f) == false)
     { return FMars_Validation(f"SwingElbowFollow [{Self.SwingElbowFollow}] is outside [0, 1]"); }
@@ -223,8 +202,9 @@ struct FMars_TPBody_HoldQuery
     UPROPERTY()
     FMars_HeldView_GripTargets Grips;
 
+    // A one-handed hold raises the right arm only, moved by OneHandedOffset.
     UPROPERTY()
-    bool IsTwoHanded = false;
+    EMars_FPHands_HoldKind Kind = EMars_FPHands_HoldKind::Empty;
 
     // The grips come from the tool's authored sockets (a handle hold) rather than its fitted sides: they are centred in
     // the hand frame, their first-person framing offset dropped.
@@ -250,6 +230,8 @@ struct FMars_TPBody_HoldQuery
     FTransform Swing;
 }
 
+// HeldView is the PlayerCharacter's own namespace by ruling: the replicated hold view and the body's arm math have no
+// typed-handle feature behind them, and they serve only AMars_PlayerCharacter and its anim instance.
 namespace utils_held_view
 {
     // The view of an item held by the local gloves: its Presentation look and utils_fphands::Make_Hold's grip.
@@ -268,8 +250,7 @@ namespace utils_held_view
         View.HeldOffset = Presentation.Mounting.HeldOffset;
 
         const auto Hold = utils_fphands::Make_Hold(InItem);
-        View.IsHolding = Hold.Kind != EMars_FPHands_HoldKind::Empty;
-        View.Grip.IsTwoHanded = Hold.Kind == EMars_FPHands_HoldKind::TwoHanded;
+        View.Grip.Kind = Hold.Kind;
         View.Grip.Pose = Hold.Pose;
         View.Grip.Layout = Hold.Layout;
         View.Grip.RightFaceY = Hold.Faces.RightY;
@@ -284,11 +265,11 @@ namespace utils_held_view
         return View;
     }
 
-    // The first-person hold a grip stands for (holding, no finger-contact shape).
+    // The first-person hold a grip stands for (no finger-contact shape).
     FMars_FPHands_Hold To_Hold(const FMars_HeldView_Grip& InGrip)
     {
         auto Hold = FMars_FPHands_Hold();
-        Hold.Kind = InGrip.IsTwoHanded ? EMars_FPHands_HoldKind::TwoHanded : EMars_FPHands_HoldKind::OneHanded;
+        Hold.Kind = InGrip.Kind;
         Hold.Pose = InGrip.Pose;
         Hold.Layout = InGrip.Layout;
         Hold.Faces = FMars_FPHands_HoldFaces(InGrip.RightFaceY, InGrip.LeftFaceY, InGrip.BottomZ);
@@ -337,7 +318,7 @@ namespace utils_held_view
     {
         const auto& Hold = InQuery.Hold;
         auto RestFrame = Hold.HandFrame;
-        if (InQuery.IsTwoHanded == false)
+        if (InQuery.Kind != EMars_FPHands_HoldKind::TwoHanded)
         { RestFrame = Get_InBodyUnits(FTransform(FRotator::ZeroRotator, Hold.OneHandedOffset), InQuery.BodyScale) * Hold.HandFrame; }
 
         // The frame's own X is the hand node's forward (component +Y).
@@ -347,7 +328,7 @@ namespace utils_held_view
         const auto Frame = Get_InBodyUnits(InQuery.Swing, InQuery.BodyScale) * RestFrame;
         const auto ElbowFollow = RestFrame.TransformVector(InQuery.Swing.GetLocation() / float(InQuery.BodyScale)) * Hold.SwingElbowFollow;
 
-        const auto Grips = InQuery.IsSocketGrip ? Get_CentredGrips(InQuery.Grips, InQuery.IsTwoHanded) : InQuery.Grips;
+        const auto Grips = InQuery.IsSocketGrip ? Get_CentredGrips(InQuery.Grips, InQuery.Kind) : InQuery.Grips;
         const auto GripR = Get_InBodyUnits(Grips.Right, InQuery.BodyScale) * Frame;
         const auto GripL = Get_InBodyUnits(Grips.Left, InQuery.BodyScale) * Frame;
 
@@ -355,16 +336,16 @@ namespace utils_held_view
         Result.Right = Make_ArmTarget(InQuery.HandInGrip_R * GripR, Hold.ElbowOffset_R + ElbowFollow);
         Result.Left = Make_ArmTarget(InQuery.HandInGrip_L * GripL, Hold.ElbowOffset_L + ElbowFollow);
         Result.Right.Alpha = 1.0f;
-        Result.Left.Alpha = InQuery.IsTwoHanded ? 1.0f : 0.0f;
+        Result.Left.Alpha = InQuery.Kind == EMars_FPHands_HoldKind::TwoHanded ? 1.0f : 0.0f;
         return Result;
     }
 
     // The grips with their first-person framing removed: the midpoint of both (or the right grip alone, one-handed) is
     // moved to the hand node's origin, rotations and the hands' spacing kept. A tool the owner carries low and to the
     // right of its view is held in front of the body's chest, where its arms reach.
-    FMars_HeldView_GripTargets Get_CentredGrips(const FMars_HeldView_GripTargets& InGrips, bool InIsTwoHanded)
+    FMars_HeldView_GripTargets Get_CentredGrips(const FMars_HeldView_GripTargets& InGrips, EMars_FPHands_HoldKind InKind)
     {
-        const auto Centre = InIsTwoHanded
+        const auto Centre = InKind == EMars_FPHands_HoldKind::TwoHanded
             ? (InGrips.Right.GetLocation() + InGrips.Left.GetLocation()) * 0.5
             : InGrips.Right.GetLocation();
 

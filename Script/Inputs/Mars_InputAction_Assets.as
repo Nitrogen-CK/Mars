@@ -201,7 +201,7 @@ namespace mars
     {
     }
 
-    // CommonUI Back/Confirm (UMars_CommonUIInputData). No profile maps a key to them yet.
+    // CommonUI Back/Confirm (UMars_CommonUIInputData): the WorldUI profile maps them; CommonUI reads them as Back/Click.
     asset Mars_IA_UI_Back of UCk_Boolean_InputAction
     {
     }

@@ -6,6 +6,24 @@ namespace utils_input_intents
         InHandle.Add_Fragment(FMars_Fragment_InputIntents());
         return InHandle.As_InputIntents();
     }
+
+    // The one look path (the gameplay profile's OnLook, the acceptance driver): InIntention is degrees of view rotation
+    // (X yaw right+, Y pitch DOWN+). It goes to InPlayer's InputIntents, so a gripped control can read it, and,
+    // independently, to its view camera; each only when present.
+    void Request_Look(FCk_Handle InPlayer, FVector InIntention)
+    {
+        auto Intents = InPlayer.As_InputIntents(ECk_SanityCheck::UnChecked);
+        if (ck::IsValid(Intents))
+        { Intents.Request_AddLookDelta(FMars_Request_InputIntents_AddLookDelta(InIntention)); }
+
+        auto Viewpoint = InPlayer.As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
+        if (ck::Is_NOT_Valid(Viewpoint))
+        { return; }
+
+        auto Camera = Viewpoint.Get_Camera();
+        if (ck::IsValid(Camera))
+        { Camera.Request_SetOrientationIntention(InIntention); }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

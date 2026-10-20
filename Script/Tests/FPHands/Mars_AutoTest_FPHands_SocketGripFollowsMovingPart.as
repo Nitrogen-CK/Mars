@@ -1,7 +1,8 @@
 // A reach for an entity-built mechanism anchors to the part whose mesh carries the grip socket, not the object's root, so
 // the glove follows that part when it moves on its own. Rig: a lever-shaped tree (root -> Mover node -> handle mesh node
 // with the real LeverHandle_Mars_SM and its Grip socket); the Mover pitches the handle, the root stays put. The resolved
-// world grip is compared with the component's live socket, before and after the move.
+// world grip is compared with the component's live socket, before and after the move. With the right glove busy (a
+// one-handed hold) the free left glove takes the lead socket, anchored the same way.
 class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
 {
     private FCk_Handle _Root;
@@ -43,11 +44,11 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
             utils_unreal_component::Make_Params_FromArchetype(Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, n"Test_LeverHandle"));
 
         Add_Step("the lever handle mesh carries a Grip socket", n"Step_AssertMeshHasSocket");
-        Add_Step_WaitUntil("the handle mesh component exists", n"Check_HasComponent", 0, 0);
-        Add_Step_WaitSeconds("let the component take the entity transform", 0.1f);
+        Add_Step_WaitUntil("the handle mesh component sits on its node", n"Check_ComponentOnNode", 0, 0);
         Add_Step("resolve the reach: anchored to the mesh node, grip on the live socket", n"Step_ResolveAndAssert");
+        Add_Step("with the right glove busy the free left glove takes the lead socket", n"Step_AssertBusyRightTakesTheLeadSocket");
         Add_Step("pitch the handle part way", n"Step_MoveHandle");
-        Add_Step_WaitSeconds("let the offset and the component follow", 0.2f);
+        Add_Step_WaitUntil("the handle has pitched and the component follows its node", n"Check_MovedAndComponentOnNode", 0, 0);
         Add_Step("the refreshed grip is still on the live socket", n"Step_AssertFollows");
         Run_Steps(InHandle);
     }
@@ -61,10 +62,52 @@ class UMars_AutoTest_FPHands_SocketGripFollowsMovingPart : UCk_AutoTest_Base
     }
 
     UFUNCTION()
-    private void Check_HasComponent(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_ComponentOnNode(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(ck::IsValid(Get_HandleComponent()));
+        Res.Set(Get_IsComponentOnNode());
+    }
+
+    UFUNCTION()
+    private void Check_MovedAndComponentOnNode(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_IsComponentOnNode() && Get_LiveSocket().Distance(_GripBeforeMove) > 10.0
+            && Math::IsNearlyEqual(_Mover.Get_Alpha(), 0.8f, 0.001f));
+    }
+
+    // The mesh component exists and stands where its entity is this frame.
+    private bool Get_IsComponentOnNode()
+    {
+        auto Component = Get_HandleComponent();
+        if (ck::Is_NOT_Valid(Component))
+        { return false; }
+
+        const auto NodeWorld = utils_transform::Get_EntityCurrentTransform(_MeshNode.As_Transform());
+        return Component.GetWorldLocation().Equals(NodeWorld.GetLocation(), 0.01)
+            && Component.GetWorldRotation().Quaternion().Equals(NodeWorld.GetRotation(), 0.0001);
+    }
+
+    UFUNCTION()
+    private void Step_AssertBusyRightTakesTheLeadSocket(FCk_Handle InHandle, FInstancedStruct InPayload)
+    {
+        auto OneHanded = FMars_FPHands_Hold();
+        OneHanded.Kind = EMars_FPHands_HoldKind::OneHanded;
+        const auto Hand = FMars_FPHands_HandState(OneHanded, FTransform::Identity, EMars_Hand::Right);
+        const auto Subject = FMars_FPHands_ReachSubject(FCk_Handle_Interactable(), _Root);
+        const auto Busy = utils_fphands::Resolve_ReachTarget(_Spec.Reach, FMars_FPHands_ReachQuery(Subject, Hand));
+
+        Assert_True(utils_fphands::Get_UsesHand(Busy, EMars_Hand::Left), "the free left glove reaches");
+        Assert_False(utils_fphands::Get_UsesHand(Busy, EMars_Hand::Right), "the busy right glove does not");
+        if (utils_fphands::Get_UsesHand(Busy, EMars_Hand::Left) == false)
+        { return; }
+
+        const auto Target = Busy.GetValue();
+        Assert_True(Target.Left.GetValue().Anchor == _MeshNode, "the left glove anchors to the mesh node that carries the socket");
+        auto Grip = FMars_FPHands_GripQuery(FTransform::Identity, EMars_Hand::Left, FTransform::Identity);
+        utils_fphands::Resolve_WorldGrip(_Spec, Target, Grip);
+        const auto Error = Grip.WorldGrip.GetLocation().Distance(Get_LiveSocket());
+        Assert_True(Error < 0.5, f"the left glove's grip is on the lead (Grip) socket (off by {Error} cm)");
     }
 
     UFUNCTION()

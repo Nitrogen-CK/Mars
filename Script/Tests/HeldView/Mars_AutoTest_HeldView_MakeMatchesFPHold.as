@@ -37,7 +37,7 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
     private void Step_AssertEmpty(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto View = utils_held_view::Make(FCk_Handle_Item());
-        Assert_False(View.IsHolding, "an invalid item is not held");
+        Assert_True(View.Grip.Kind == EMars_FPHands_HoldKind::Empty, "an invalid item is not held");
         Assert_True(View.Mesh.IsNull(), "an invalid item has no mesh");
     }
 
@@ -51,14 +51,14 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
         const auto Hold = utils_fphands::Make_Hold(InItem);
         const auto View = utils_held_view::Make(InItem);
 
-        Assert_True(View.IsHolding && Hold.Kind != EMars_FPHands_HoldKind::Empty, f"{InName}: the view and the gloves both hold it");
+        Assert_True(View.Grip.Kind != EMars_FPHands_HoldKind::Empty && Hold.Kind != EMars_FPHands_HoldKind::Empty, f"{InName}: the view and the gloves both hold it");
         Assert_True(View.Mesh == Presentation.Visual.Mesh, f"{InName}: the view carries the Presentation mesh");
         Assert_True(View.Material == Presentation.Visual.MaterialOverride, f"{InName}: the view carries the Presentation material");
         Assert_True(View.MeshScale.Equals(Presentation.Visual.MeshScale), f"{InName}: the view carries MeshScale [{View.MeshScale}]");
         Assert_True(View.HeldOffset.Equals(Presentation.Mounting.HeldOffset), f"{InName}: the view carries HeldOffset");
 
         const auto& Grip = View.Grip;
-        Assert_True(Grip.IsTwoHanded == (Hold.Kind == EMars_FPHands_HoldKind::TwoHanded), f"{InName}: two-handedness matches ({Grip.IsTwoHanded})");
+        Assert_True(Grip.Kind == Hold.Kind, f"{InName}: the hold kind matches ({Grip.Kind :n})");
         Assert_True(Grip.Pose == Hold.Pose, f"{InName}: the grip pose matches");
         Assert_True(Grip.HasSocketGrips == Hold.SocketGrips.IsSet(), f"{InName}: socket grips match");
         Assert_True(Math::Abs(Grip.RightFaceY - Hold.Faces.RightY) < 0.001, f"{InName}: RightFaceY [{Grip.RightFaceY}] matches [{Hold.Faces.RightY}]");
@@ -82,7 +82,7 @@ class UMars_AutoTest_HeldView_MakeMatchesFPHold : UCk_AutoTest_Base
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

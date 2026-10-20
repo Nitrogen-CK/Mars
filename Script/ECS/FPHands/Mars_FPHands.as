@@ -10,8 +10,8 @@ enum EMars_HandGripPose
     Open
 }
 
-// Player emotes, played on the first-person gloves (FMars_FPHands_EmoteSpec::Montages maps each to its montage) and the
-// third-person body - append only. Each value's wheel tag is Mars.Emote.<value name> (utils_fphands::Get_EmoteTag /
+// Player emotes, played on the first-person gloves (UMars_PlayerCharacter_Config::FPHandsEmotes maps each to its montage)
+// and the third-person body - append only. Each value's wheel tag is Mars.Emote.<value name> (utils_fphands::Get_EmoteTag /
 // TryGet_Emote).
 enum EMars_FPEmote
 {
@@ -36,24 +36,16 @@ enum EMars_FPHands_HoldKind
     TwoHanded
 }
 
-struct FMars_FPHands_VisualSpec
-{
-    UPROPERTY()
-    TSoftObjectPtr<USkeletalMesh> Mesh;
-
-    UPROPERTY()
-    TSoftClassPtr<UAnimInstance> AnimClass;
-}
-
 // Where the gloves and their Hand node rest, before any reach or lean.
 struct FMars_FPHands_RestSpec
 {
-    // Each glove's grip bone rotation relative to the camera at rest: palms in, thumbs up (matches A_FPHands_Ready).
+    // Each glove's grip bone rotation relative to the camera at rest (matches A_FPHands_Ready): fingers forward and 14
+    // degrees up, palms turned in and 20 degrees down.
     UPROPERTY()
-    FRotator GripRotation_R = FRotator(65.186, -128.076, 144.583);
+    FQuat GripRotation_R = utils_fphands::Make_GripRotation(EMars_Hand::Right, FVector(0.9659, -0.0885, 0.2432), FVector(0.0, -0.9397, -0.342));
 
     UPROPERTY()
-    FRotator GripRotation_L = FRotator(65.186, 128.076, -144.583);
+    FQuat GripRotation_L = utils_fphands::Make_GripRotation(EMars_Hand::Left, FVector(0.9659, 0.0885, 0.2432), FVector(0.0, 0.9397, -0.342));
 
     // Empty hands and two-handed items: the Hand node's rest offset from the camera, centred between the gloves so
     // sway and bob pivot at screen centre.
@@ -105,19 +97,6 @@ struct FMars_FPHands_ArmSwingSpec
     float32 LiftCm = 1.0f;
 }
 
-// An emote montage drives both gloves (placement and fingers) through Slot; the procedural placement fades out under it.
-struct FMars_FPHands_EmoteSpec
-{
-    UPROPERTY()
-    TMap<EMars_FPEmote, TSoftObjectPtr<UAnimMontage>> Montages;
-
-    UPROPERTY()
-    FName Slot = n"DefaultSlot";
-
-    UPROPERTY()
-    float32 CancelBlendSeconds = 0.2f;
-}
-
 // The local player's first-person gloves (floating hands). Remote players never see them (owner-only component).
 struct FMars_FPHands_Spec
 {
@@ -132,9 +111,6 @@ struct FMars_FPHands_Spec
     // carries each frame to keep the gloves still while it moves. Invalid = the hand node is not moved per hold.
     UPROPERTY()
     FCk_Handle_SceneNode SideNode;
-
-    UPROPERTY()
-    FMars_FPHands_VisualSpec Visual;
 
     UPROPERTY()
     FMars_FPHands_RestSpec Rest;
@@ -164,25 +140,38 @@ struct FMars_FPHands_Spec
     UPROPERTY()
     FMars_FPHands_ContactSpec Contact;
 
-    // First-person rendering of the gloves and what they hold.
-    UPROPERTY()
-    FMars_FPHands_ViewSpec View;
-
     // How much of the view's pitch the gloves follow.
     UPROPERTY()
     FMars_FPHands_PitchSpec Pitch;
-
-    // Indexed by EMars_FPEmote. An emote montage drives both gloves (placement and fingers) through EmoteSlot; the
-    // procedural placement fades out under it.
-    UPROPERTY()
-    FMars_FPHands_EmoteSpec Emotes;
 }
 
-// A hand node to hang off, positive rates and durations, and fractions within 0..1.
+// A hand node to hang off, positive rates and durations, and fractions within 0..1. Finiteness first: a NaN passes every
+// range comparison.
 mixin FMars_Validation Validate(const FMars_FPHands_Spec& Self)
 {
     if (ck::Is_NOT_Valid(Self.HandNode))
     { return FMars_Validation("HandNode is invalid"); }
+
+    const auto& Focus = Self.Reach.Focus;
+    if (Math::IsFinite(Focus.Lean) == false || Math::IsFinite(Focus.InterpSpeed) == false || Math::IsFinite(Focus.SideSwitchMarginCm) == false)
+    { return FMars_Validation(f"Reach.Focus [Lean {Focus.Lean}, InterpSpeed {Focus.InterpSpeed}, SideSwitchMarginCm {Focus.SideSwitchMarginCm}] is not finite"); }
+
+    if (Focus.InterpSpeed <= 0.0f)
+    { return FMars_Validation(f"Reach.Focus.InterpSpeed [{Focus.InterpSpeed}] is not positive"); }
+
+    if (Focus.SideSwitchMarginCm < 0.0f)
+    { return FMars_Validation(f"Reach.Focus.SideSwitchMarginCm [{Focus.SideSwitchMarginCm}] is negative"); }
+
+    const auto Poses = Self.Reach.Poses.Validate();
+    if (Poses.IsValid() == false)
+    { return Poses; }
+
+    if (Math::IsFinite(Self.Push.OpenAtOutFraction) == false || Self.Push.OpenAtOutFraction < 0.0f || Self.Push.OpenAtOutFraction > 1.0f)
+    { return FMars_Validation(f"Push.OpenAtOutFraction [{Self.Push.OpenAtOutFraction}] is outside [0, 1]"); }
+
+    const auto& Contact = Self.Contact;
+    if ((Contact.SocketHandleRadiusCm > 0.0f) == false || (Contact.SocketHandleHalfLengthCm > 0.0f) == false)
+    { return FMars_Validation(f"Contact.SocketHandleRadiusCm [{Contact.SocketHandleRadiusCm}] and SocketHandleHalfLengthCm [{Contact.SocketHandleHalfLengthCm}] must be positive"); }
 
     if (Self.Rest.OneHandedHandOffset.GetRotation().Equals(Self.Rest.CenteredHandOffset.GetRotation(), 0.0001) == false)
     { return FMars_Validation("Rest.OneHandedHandOffset and Rest.CenteredHandOffset must share a rotation (a hold only moves the hand node sideways)"); }
@@ -595,15 +584,20 @@ mixin void Get_HandTargets(const FCk_Handle_FPHands& Self, const FMars_FPHands_T
 }
 
 // A glove takes the larger of its focus lean and its reach (to its own grip on the target); the reach's finger pose (or
-// that glove's pose override) wins while it plays.
+// that glove's pose override) wins while it plays. The lean is the sum of the lean toward the focus target and the lean
+// still easing out of the one before it (focus moved straight between interactables, or the hold changed), toward their
+// grips blended by those leans: the glove cross-fades from one to the other instead of jumping.
 mixin void Apply_HandReach(const FCk_Handle_FPHands& Self, const FTransform& InHandWorld, EMars_Hand InHand,
                            FMars_FPHands_HandTarget& InOutHand)
 {
     const auto& Spec = Self.Get_Spec();
     const auto FocusTarget = Self.Get_FocusTarget();
+    const auto OutgoingTarget = Self.Get_OutgoingFocusTarget();
     const auto IsReaching = Self.Get_IsReaching(InHand);
     const auto ReachAlpha = IsReaching ? Self.Get_ReachAlpha() : 0.0f;
-    const auto FocusAlpha = utils_fphands::Get_UsesHand(FocusTarget, InHand) ? Self.Get_FocusAlpha(InHand) : 0.0f;
+    const auto IncomingAlpha = utils_fphands::Get_UsesHand(FocusTarget, InHand) ? Self.Get_FocusAlpha(InHand) : 0.0f;
+    const auto OutgoingAlpha = utils_fphands::Get_UsesHand(OutgoingTarget, InHand) ? Self.Get_OutgoingFocusAlpha(InHand) : 0.0f;
+    const auto FocusAlpha = IncomingAlpha + OutgoingAlpha;
     const auto Alpha = Math::Max(ReachAlpha, FocusAlpha);
     if (Alpha <= 0.001f)
     { return; }
@@ -618,19 +612,38 @@ mixin void Apply_HandReach(const FCk_Handle_FPHands& Self, const FTransform& InH
         { Pose = Override; }
     }
 
-    if (Pose.IsSet() == false && FocusAlpha > Spec.Reach.Focus.Lean * 0.5f)
+    if (Pose.IsSet() == false && FocusAlpha > Spec.Reach.Focus.Lean * Spec.Reach.Poses.FocusOpensAtLeanFraction)
     { Pose = TOptional<EMars_HandGripPose>(Spec.Reach.Poses.Approach); }
 
-    // The reach target when it leads, else the focus target; whichever it is uses this glove (its alpha is above zero).
-    auto Target = FocusTarget;
-    if (ReachAlpha >= FocusAlpha)
-    { Target = Self.Get_Target(); }
-
-    auto Grip = FMars_FPHands_GripQuery(InHandWorld, InHand, InOutHand.GripInHand);
-    utils_fphands::Resolve_WorldGrip(Spec, Target.GetValue(), Grip);
-
-    InOutHand.ReachGrip = utils_fphands::Make_ReachedGrip(Spec.Reach, Grip);
     InOutHand.ReachAlpha = Alpha;
+    const auto Query = FMars_FPHands_GripQuery(InHandWorld, InHand, InOutHand.GripInHand);
+    if (ReachAlpha >= FocusAlpha)
+    {
+        // The reach leads, and its target uses this glove (its alpha is above zero).
+        InOutHand.ReachGrip = Self.Make_LeanedGrip(Query, Self.Get_Target().GetValue());
+    }
+    else if (OutgoingAlpha <= 0.0f)
+    { InOutHand.ReachGrip = Self.Make_LeanedGrip(Query, FocusTarget.GetValue()); }
+    else if (IncomingAlpha <= 0.0f)
+    { InOutHand.ReachGrip = Self.Make_LeanedGrip(Query, OutgoingTarget.GetValue()); }
+    else
+    {
+        const auto Incoming = Self.Make_LeanedGrip(Query, FocusTarget.GetValue());
+        const auto Outgoing = Self.Make_LeanedGrip(Query, OutgoingTarget.GetValue());
+        const auto OutgoingShare = float(OutgoingAlpha / FocusAlpha);
+        InOutHand.ReachGrip = FTransform(FQuat::Slerp(Incoming.GetRotation(), Outgoing.GetRotation(), OutgoingShare),
+            Math::Lerp(Incoming.GetLocation(), Outgoing.GetLocation(), OutgoingShare), FVector::OneVector);
+    }
+
     if (Pose.IsSet())
     { InOutHand.Pose = Pose.GetValue(); }
+}
+
+// One glove fully reached from InQuery's rest grip toward its grip on InTarget (hand node space).
+mixin FTransform Make_LeanedGrip(const FCk_Handle_FPHands& Self, const FMars_FPHands_GripQuery& InQuery, const FMars_FPHands_ReachTarget& InTarget)
+{
+    const auto& Spec = Self.Get_Spec();
+    auto Grip = InQuery;
+    utils_fphands::Resolve_WorldGrip(Spec, InTarget, Grip);
+    return utils_fphands::Make_ReachedGrip(Spec.Reach, Grip);
 }

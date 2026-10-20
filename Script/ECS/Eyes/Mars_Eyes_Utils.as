@@ -71,25 +71,25 @@ mixin void Request_SetPlatePrimitive(FCk_Handle_Eyes& Self, const FMars_Request_
     Requests.SetPlatePrimitiveRequests.Add(InRequest);
 }
 
-mixin void Request_SetStyle(FCk_Handle_Eyes& Self, FMars_Request_Eyes_SetStyle InRequest)
+mixin void Request_SetStyle(FCk_Handle_Eyes& Self, const FMars_Request_Eyes_SetStyle& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Eyes_Requests);
     Requests.SetStyleRequests.Add(InRequest);
 }
 
-mixin void Request_PlayExpression(FCk_Handle_Eyes& Self, FMars_Request_Eyes_PlayExpression InRequest)
+mixin void Request_PlayExpression(FCk_Handle_Eyes& Self, const FMars_Request_Eyes_PlayExpression& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Eyes_Requests);
     Requests.PlayExpressionRequests.Add(InRequest);
 }
 
-mixin void Request_SetStateExpression(FCk_Handle_Eyes& Self, FMars_Request_Eyes_SetStateExpression InRequest)
+mixin void Request_SetStateExpression(FCk_Handle_Eyes& Self, const FMars_Request_Eyes_SetStateExpression& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Eyes_Requests);
     Requests.SetStateExpressionRequests.Add(InRequest);
 }
 
-mixin void Request_ClearExpression(FCk_Handle_Eyes& Self, FMars_Request_Eyes_ClearExpression InRequest)
+mixin void Request_ClearExpression(FCk_Handle_Eyes& Self, const FMars_Request_Eyes_ClearExpression& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_Eyes_Requests);
     Requests.ClearExpressionRequests.Add(InRequest);

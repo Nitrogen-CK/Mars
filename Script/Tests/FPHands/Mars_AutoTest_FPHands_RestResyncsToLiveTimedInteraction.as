@@ -64,11 +64,12 @@ class UMars_AutoTest_FPHands_RestResyncsToLiveTimedInteraction : UMars_AutoTestR
         auto ControlSpec = FMars_Control_Spec();
         ControlSpec.Interaction = ECk_Interaction_CompletionPolicy::Timed;
         ControlSpec.HoldSeconds = 5.0f;
-        auto Control = utils_control::Add(RootEntity, ControlSpec, Mover);
+        ControlSpec.Mover = Mover;
+        auto Control = utils_control::Add(RootEntity, ControlSpec);
 
         // No ProbeInfo: a transform-only child; the reach resolves as a point grip at the owner.
         auto Spec = FMars_Interactable_Spec();
-        Spec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Turn")));
+        Spec.Targets.Add(Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Turn"))));
         auto Interactable = utils_interactable::Create(Root, Spec);
         _Target = Interactable.Get_AllInteractTargets()[0];
     }

@@ -5,9 +5,8 @@
 // component that is destroyed under the eyes is skipped until the next one, which receives every group. The primitives
 // are bare engine planes made through CkUnrealComponent so their data can be read back; no material is needed. Isolated
 // Z band: -69000.
-class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
+class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UMars_AutoTestRig_Eyes
 {
-    private FCk_Handle_Eyes _Eyes;
     private FCk_Handle_Transform _FaceNode;
     private FCk_Handle_UnrealComponent _Primitive;
     private FCk_Handle_UnrealComponent _Plate;
@@ -33,7 +32,7 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
         Spec.Style.Color = _StyleColor;
         _Eyes = utils_eyes::Add(_FaceNode, Spec);
 
-        _Primitive = MakePrimitive(_FaceNode, n"EyesTest_Primitive");
+        _Primitive = Make_PlatePrimitive(_FaceNode, n"EyesTest_Primitive");
 
         Add_Step("the eyes have a presentation", n"Step_AssertComposed");
         Add_Step_WaitUntil("the primitive's component exists", n"Check_PrimitiveExists");
@@ -87,15 +86,15 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
     private void Check_StyleWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_Primitive, 0, 3.0f) && Get_IsSlot(_Primitive, 1, 4.0f) && Get_IsSlot(_Primitive, 7, 6.0f));
+        Res.Set(Get_IsSlot(_Primitive, LeftCellSlot, 3.0f) && Get_IsSlot(_Primitive, RightCellSlot, 4.0f) && Get_IsSlot(_Primitive, StrengthSlot, 6.0f));
     }
 
     UFUNCTION()
     private void Step_AssertLookAndColor(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Get_IsSlot(_Primitive, 4, 1.0f), f"slot 4 holds the settled blend 1 (got [{Get_Slot(_Primitive, 4)}])");
-        Assert_True(Get_IsSlot(_Primitive, 8, 0.0f), f"slot 8 holds LookX 0 (got [{Get_Slot(_Primitive, 8)}])");
-        Assert_True(Get_IsSlot(_Primitive, 9, 0.0f), f"slot 9 holds LookY 0 (got [{Get_Slot(_Primitive, 9)}])");
+        Assert_True(Get_IsSlot(_Primitive, BlendSlot, 1.0f), f"slot 4 holds the settled blend 1 (got [{Get_Slot(_Primitive, BlendSlot)}])");
+        Assert_True(Get_IsSlot(_Primitive, LookXSlot, 0.0f), f"slot 8 holds LookX 0 (got [{Get_Slot(_Primitive, LookXSlot)}])");
+        Assert_True(Get_IsSlot(_Primitive, LookYSlot, 0.0f), f"slot 9 holds LookY 0 (got [{Get_Slot(_Primitive, LookYSlot)}])");
         Assert_True(Get_IsColor(_Primitive, _StyleColor),
             f"slots 10..12 hold the style's colour (got [{Get_ColorText(_Primitive)}])");
     }
@@ -114,21 +113,21 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
     private void Check_AngryWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_Primitive, 0, 16.0f) && Get_IsSlot(_Primitive, 1, 16.0f));
+        Res.Set(Get_IsSlot(_Primitive, LeftCellSlot, 16.0f) && Get_IsSlot(_Primitive, RightCellSlot, 16.0f));
     }
 
     UFUNCTION()
     private void Step_AssertPrevAndStrength(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(Get_IsSlot(_Primitive, 2, 3.0f), f"slot 2 holds the previous left cell 3 (got [{Get_Slot(_Primitive, 2)}])");
-        Assert_True(Get_IsSlot(_Primitive, 3, 4.0f), f"slot 3 holds the previous right cell 4 (got [{Get_Slot(_Primitive, 3)}])");
-        Assert_True(Get_IsSlot(_Primitive, 7, 6.0f), f"slot 7 still holds the strength 6 (got [{Get_Slot(_Primitive, 7)}])");
+        Assert_True(Get_IsSlot(_Primitive, PrevLeftCellSlot, 3.0f), f"slot 2 holds the previous left cell 3 (got [{Get_Slot(_Primitive, PrevLeftCellSlot)}])");
+        Assert_True(Get_IsSlot(_Primitive, PrevRightCellSlot, 4.0f), f"slot 3 holds the previous right cell 4 (got [{Get_Slot(_Primitive, PrevRightCellSlot)}])");
+        Assert_True(Get_IsSlot(_Primitive, StrengthSlot, 6.0f), f"slot 7 still holds the strength 6 (got [{Get_Slot(_Primitive, StrengthSlot)}])");
     }
 
     UFUNCTION()
     private void Step_SetPlate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Plate = MakePrimitive(_FaceNode, n"EyesTest_Plate");
+        _Plate = Make_PlatePrimitive(_FaceNode, n"EyesTest_Plate");
         Assert_Valid(_Plate, "the plate component handle");
         _Eyes.Request_SetPlate(FMars_Request_Eyes_SetPlate(_Plate));
     }
@@ -137,7 +136,7 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
     private void Check_PlateWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_Plate, 0, 16.0f) && Get_IsSlot(_Plate, 1, 16.0f) && Get_IsSlot(_Plate, 7, 6.0f)
+        Res.Set(Get_IsSlot(_Plate, LeftCellSlot, 16.0f) && Get_IsSlot(_Plate, RightCellSlot, 16.0f) && Get_IsSlot(_Plate, StrengthSlot, 6.0f)
             && Get_IsColor(_Plate, _StyleColor));
     }
 
@@ -166,7 +165,7 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_MakeDoomedPrimitive(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _DoomedPrimitive = MakePrimitive(_FaceNode, n"EyesTest_DoomedPrimitive");
+        _DoomedPrimitive = Make_PlatePrimitive(_FaceNode, n"EyesTest_DoomedPrimitive");
         Assert_Valid(_DoomedPrimitive, "the doomed primitive's component handle");
     }
 
@@ -206,7 +205,7 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
     private void Step_MakeLastPrimitive(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         Assert_Equals_Int(_Eyes.Get_ResolvedLeftCell(), 9, "Happy resolved while there was nothing to draw on");
-        _LastPrimitive = MakePrimitive(_FaceNode, n"EyesTest_LastPrimitive");
+        _LastPrimitive = Make_PlatePrimitive(_FaceNode, n"EyesTest_LastPrimitive");
         Assert_Valid(_LastPrimitive, "the last primitive's component handle");
     }
 
@@ -228,57 +227,10 @@ class UMars_AutoTest_Eyes_ApplyWritesComponentPlate : UCk_AutoTest_Base
     private void Check_LastPrimitiveWritten(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(Get_IsSlot(_LastPrimitive, 0, 9.0f) && Get_IsSlot(_LastPrimitive, 1, 9.0f)
-            && Get_IsSlot(_LastPrimitive, 2, 16.0f) && Get_IsSlot(_LastPrimitive, 3, 16.0f)
-            && Get_IsSlot(_LastPrimitive, 7, 6.0f)
-            && Get_IsSlot(_LastPrimitive, 8, 0.0f) && Get_IsSlot(_LastPrimitive, 9, 0.0f)
+        Res.Set(Get_IsSlot(_LastPrimitive, LeftCellSlot, 9.0f) && Get_IsSlot(_LastPrimitive, RightCellSlot, 9.0f)
+            && Get_IsSlot(_LastPrimitive, PrevLeftCellSlot, 16.0f) && Get_IsSlot(_LastPrimitive, PrevRightCellSlot, 16.0f)
+            && Get_IsSlot(_LastPrimitive, StrengthSlot, 6.0f)
+            && Get_IsSlot(_LastPrimitive, LookXSlot, 0.0f) && Get_IsSlot(_LastPrimitive, LookYSlot, 0.0f)
             && Get_IsColor(_LastPrimitive, _NewStyleColor));
-    }
-
-    // Null while the component is not created yet or after it was removed.
-    private UPrimitiveComponent Get_PrimitiveComponent(const FCk_Handle_UnrealComponent& InPrimitive) const
-    {
-        if (ck::Is_NOT_Valid(InPrimitive))
-        { return nullptr; }
-
-        return Cast<UPrimitiveComponent>(utils_unreal_component::Get_Component(InPrimitive));
-    }
-
-    private float32 Get_Slot(const FCk_Handle_UnrealComponent& InPrimitive, int32 InIndex) const
-    {
-        return utils_unreal_component::Get_CustomPrimitiveDataFloat(InPrimitive, InIndex);
-    }
-
-    private bool Get_IsSlot(const FCk_Handle_UnrealComponent& InPrimitive, int32 InIndex, float32 InExpected) const
-    {
-        return Math::Abs(Get_Slot(InPrimitive, InIndex) - InExpected) < 0.001f;
-    }
-
-    private bool Get_IsColor(const FCk_Handle_UnrealComponent& InPrimitive, const FLinearColor& InColor) const
-    {
-        return Get_IsSlot(InPrimitive, 10, InColor.R) && Get_IsSlot(InPrimitive, 11, InColor.G)
-            && Get_IsSlot(InPrimitive, 12, InColor.B);
-    }
-
-    private FString Get_ColorText(const FCk_Handle_UnrealComponent& InPrimitive) const
-    {
-        return f"{Get_Slot(InPrimitive, 10)}, {Get_Slot(InPrimitive, 11)}, {Get_Slot(InPrimitive, 12)}";
-    }
-
-    // An engine plane under the face node, without collision so nothing bakes it into the static world.
-    private FCk_Handle_UnrealComponent MakePrimitive(FCk_Handle_Transform& InFaceNode, FName InDebugName)
-    {
-        auto Node = utils_scene_node::Create(InFaceNode, FTransform::Identity);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component is registered first and then receives the entity transform, which a Static component
-        // refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(Cast<UStaticMesh>(LoadObject(this, "/Engine/BasicShapes/Plane.Plane")));
-        Archetype.SetCollisionProfileName(n"NoCollision");
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        return utils_unreal_component::Add(FCk_Handle(Node), ComponentParams);
     }
 }

@@ -28,7 +28,7 @@ class UMars_AutoTest_HeldView_ItemSitsAtTheRightPalm : UCk_AutoTest_Base
     private void Step_AssertItemInGrip(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         const auto View = utils_held_view::Make(_RockHolder.Get_Items()[0]);
-        Assert_True(View.IsHolding && View.Grip.IsTwoHanded && View.Grip.HasSocketGrips == false,
+        Assert_True(View.Grip.Kind == EMars_FPHands_HoldKind::TwoHanded && View.Grip.HasSocketGrips == false,
             "the rock is a fitted two-handed hold");
         Assert_True(View.HeldOffset.Equals(FTransform::Identity), "the rock's HeldOffset is identity (centred on the hand node)");
 
@@ -61,7 +61,7 @@ class UMars_AutoTest_HeldView_ItemSitsAtTheRightPalm : UCk_AutoTest_Base
     {
         auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
         auto Params = utils_inventory_data_only::Make_Params_Bounded(
-            utils_gameplay_tag::ResolveGameplayTag(n"Inventory.Mars.WorldItemHolder"), 1,
+            GameplayTags::Inventory_Mars_WorldItemHolder, 1,
             FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(),
             FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
         auto Holder = utils_inventory_data_only::Add(HolderOwner, Params, ECk_Replication::DoesNotReplicate);

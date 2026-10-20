@@ -48,7 +48,7 @@ class AMars_PlayerCharacter : AMars_Character
     default CameraComponent._Placement = ECk_Camera_OutputComponentPlacement::FollowView;
 
     // Floating first-person gloves. Owner-only: other players see the full body. Mesh and anim class come from
-    // Config.FPHands.Visual; UMars_FPHands_AnimInstance places each glove from the player entity's FPHands feature.
+    // Config.FPHandsVisual; UMars_FPHands_AnimInstance places each glove from the player entity's FPHands feature.
     UPROPERTY(DefaultComponent, Attach = CameraComponent)
     USkeletalMeshComponent FPHands;
     default FPHands.RelativeRotation = FRotator(0.0, -90.0, 0.0);
@@ -121,10 +121,6 @@ class AMars_PlayerCharacter : AMars_Character
     private const FName BodyGripBone_R = n"grip_r";
     private const FName BodyGripBone_L = n"grip_l";
 
-    // The scene node that carries the hold's lateral (Player.HandSide, FPHands.SideNode): a one-handed item moves the hand
-    // node to the right glove.
-    private FCk_Handle_SceneNode _HandSide;
-
     UFUNCTION(BlueprintOverride)
     void ConstructionScript()
     {
@@ -147,7 +143,9 @@ class AMars_PlayerCharacter : AMars_Character
         CharacterMovement.SetCrouchedHalfHeight(Body.CrouchedHalfHeight);
 
         // The gloves render first-person; held items tag themselves as they attach under the hand (Mars_FPHands_View).
-        const auto& View = Config.FPHands.View;
+        const auto& View = Config.FPHandsView;
+        const auto ViewValidation = View.Validate();
+        ck::EnsureIfNot(ViewValidation.IsValid(), f"[PlayerCharacter] FPHandsView: {ViewValidation.Get_Error()}");
         const auto IsFirstPerson = View.FirstPersonRendering == ECk_EnableDisable::Enable;
         FPHands.SetFirstPersonPrimitiveType(IsFirstPerson ? EFirstPersonPrimitiveType::FirstPerson : EFirstPersonPrimitiveType::None);
         // The body and its held item stay hidden from the owner but cast the owner's shadow (the first-person shadow path).
@@ -157,7 +155,7 @@ class AMars_PlayerCharacter : AMars_Character
         CameraComponent.SetEnableFirstPersonScale(IsFirstPerson);
         CameraComponent.SetFirstPersonScale(View.FirstPersonScale);
 
-        const auto& Visual = Config.FPHands.Visual;
+        const auto& Visual = Config.FPHandsVisual;
         if (Visual.Mesh.IsNull() == false)
         { FPHands.SetSkeletalMeshAsset(System::LoadAsset_Blocking(Visual.Mesh)); }
 
@@ -171,7 +169,8 @@ class AMars_PlayerCharacter : AMars_Character
         if (ck::EnsureIfNot(ck::IsValid(MarsMovement), "[Mars_PlayerCharacter] the movement component is not a UMars_CharacterMovementComponent"))
         { return; }
 
-        MarsMovement.ClientAuthMaxError = Movement.ClientAuthMaxError;
+        // 0 is the movement component's stock server-authoritative correction.
+        MarsMovement.ClientAuthMaxError = Movement.ClientAuthMaxError.IsSet() ? Movement.ClientAuthMaxError.GetValue() : 0.0f;
     }
 
     // Before PostInitializeComponents, so ACharacter caches this placement as the mesh's base (the target its network
@@ -310,22 +309,23 @@ class AMars_PlayerCharacter : AMars_Character
         utils_handle::Set_DebugName(HandBob.H(), n"Player.HandBob");
 
         // The hold's lateral under the bob: a one-handed item moves the swing node, the held item and both gloves' frame
-        // to the right glove (OnHeldItemChanged). A plain node of its own rather than the sway's rest, so the gloves' anim
-        // instance can read the offset it actually carries each frame and hold the gloves still while it moves.
+        // to the right glove (UMars_SmTask_HeldItemDrivesHands writes it, FPHands.SideNode). A plain node of its own rather
+        // than the sway's rest, so the gloves' anim instance can read the offset it actually carries each frame and hold
+        // the gloves still while it moves.
         auto HandBobTransform = HandBob.As_Transform();
-        _HandSide = utils_scene_node::Create(HandBobTransform, FTransform::Identity);
-        utils_handle::Set_DebugName(_HandSide.H(), n"Player.HandSide");
+        auto HandSide = utils_scene_node::Create(HandBobTransform, FTransform::Identity);
+        utils_handle::Set_DebugName(HandSide.H(), n"Player.HandSide");
 
         // The melee swing under that: everything that hangs off the hand (both gloves and the held item) swings with it.
         // HandSwing owns the node's offset; identity at rest.
-        auto HandSideTransform = _HandSide.As_Transform();
+        auto HandSideTransform = HandSide.As_Transform();
         auto SwingNode = utils_scene_node::Create(HandSideTransform, FTransform::Identity);
         utils_handle::Set_DebugName(SwingNode.H(), n"Player.HandSwing");
         _HandSwing = utils_hand_swing::Add(Player, FMars_HandSwing_Spec(SwingNode));
         _HandNode = SwingNode.As_Transform();
         auto HandsSpec = Config.FPHands;
         HandsSpec.HandNode = _HandNode;
-        HandsSpec.SideNode = _HandSide;
+        HandsSpec.SideNode = HandSide;
         HandsSpec.Pitch.Node = HandPitch;
         _Hands = utils_fphands::Add(Player, HandsSpec);
 
@@ -338,10 +338,7 @@ class AMars_PlayerCharacter : AMars_Character
         auto AttachPointsSpec = FMars_AttachPoints_Spec();
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Hand, _HandNode));
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Back, Back.As_Transform()));
-        // Unregistered until an editor that predates the tag restarts; the belt is then left out rather than failing the spec.
-        const auto BeltPoint = constants_lantern_item::Get_BeltPoint();
-        if (ck::EnsureIfNot(BeltPoint.IsValid(), "[PlayerCharacter] AttachPoint.Mars.Belt is not registered (restart the editor); a carried lantern has nowhere to hang") == false)
-        { AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(BeltPoint, Belt.As_Transform())); }
+        AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Belt, Belt.As_Transform()));
         // Other characters' gazes look here: Player.Head is the bob node the camera director renders from, i.e. the eyes.
         AttachPointsSpec.Points.Add(FMars_AttachPoint_Entry(GameplayTags::AttachPoint_Mars_Head, HeadTransform));
         utils_attach_points::Add(Player, AttachPointsSpec);
@@ -349,13 +346,12 @@ class AMars_PlayerCharacter : AMars_Character
         auto HotbarSpec = FMars_Hotbar_Spec();
         HotbarSpec.BagSlotCount = Config.Inventory.BagSlotCount;
         utils_hotbar::Add(Player, HotbarSpec);
-        auto HeldItem = utils_held_item::Add(Player);
-        HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
+        utils_held_item::Add(Player);
         utils_held_item_use::Add(Player);
         utils_emote_wheel::Add(Player, Config.EmoteWheel);
         utils_climber::Add(Player, FMars_Climber_Spec(Config.Movement.Speeds.Climb));
         utils_operator::Add(Player);
-        utils_locomotion_speed::Add(Player, Config.Movement.Speeds.Walk);
+        utils_locomotion_speed::Add(Player, FMars_LocomotionSpeed_Spec(Config.Movement.Speeds.Walk, Config.Movement.Speeds.Sprint));
 
         // Owning-client authoritative: the owner evaluates the conditions against its input and its transitions replicate
         // to the server and the other clients, so every copy runs the owner's states. It must not auto-start: the start
@@ -658,7 +654,7 @@ class AMars_PlayerCharacter : AMars_Character
         { return false; }
 
         const auto IsOwner = IsLocallyControlled();
-        const auto PlayedHands = IsOwner && utils_player_emotes::Play_Emote(_Hands, InEmote);
+        const auto PlayedHands = IsOwner && utils_fphands::Play_Emote(_Hands, InEmote);
         const auto PlayedBody = PlayBodyEmote(InEmote);
         if (PlayedHands == false && PlayedBody == false)
         { return false; }
@@ -669,7 +665,7 @@ class AMars_PlayerCharacter : AMars_Character
         return true;
     }
 
-    // Ends the body's emote; the gloves' own is stopped by utils_player_emotes::Stop_Emote, which calls this. The owner
+    // Ends the body's emote; the gloves' own is stopped by utils_fphands::Stop_Emote, which calls this. The owner
     // forwards the stop.
     void Request_StopEmote()
     {
@@ -741,12 +737,11 @@ class AMars_PlayerCharacter : AMars_Character
 
     private bool PlayBodyEmote(EMars_FPEmote InEmote)
     {
-        const auto Index = int32(InEmote);
         const auto& Montages = Config.TPBody.Montages.EmoteMontages;
-        if (Montages.IsValidIndex(Index) == false)
+        if (Montages.Contains(InEmote) == false)
         { return false; }
 
-        auto Montage = PlayBodyMontage(Montages[Index]);
+        auto Montage = PlayBodyMontage(Montages[InEmote]);
         if (ck::Is_NOT_Valid(Montage))
         { return false; }
 
@@ -832,9 +827,9 @@ class AMars_PlayerCharacter : AMars_Character
     void Update_BodyHold(float32 InDeltaSeconds)
     {
         auto Target = _BodyHoldTarget;
-        const auto Speed = Config.TPBody.Hold.InterpSpeed;
-        auto Step = Speed <= 0.0f ? 1.0f : Math::Clamp(InDeltaSeconds * Speed, 0.0f, 1.0f);
-        if (_HeldView.IsHolding && ck::IsValid(_HandSwing) && _HandSwing.Get_IsSwinging())
+        const auto& Speed = Config.TPBody.Hold.InterpSpeed;
+        auto Step = Speed.IsSet() ? Math::Clamp(InDeltaSeconds * Speed.GetValue(), 0.0f, 1.0f) : 1.0f;
+        if (_HeldView.Grip.Kind != EMars_FPHands_HoldKind::Empty && ck::IsValid(_HandSwing) && _HandSwing.Get_IsSwinging())
         {
             auto Query = _BodyHoldQuery;
             Query.Swing = _HandSwing.Get_Pose();
@@ -852,7 +847,7 @@ class AMars_PlayerCharacter : AMars_Character
     private void ApplyHeldView()
     {
         const auto& View = _HeldView;
-        if (View.IsHolding == false)
+        if (View.Grip.Kind == EMars_FPHands_HoldKind::Empty)
         {
             BodyHeldItem.SetStaticMesh(nullptr);
             _BodyHoldTarget.Left.Alpha = 0.0f;
@@ -881,7 +876,7 @@ class AMars_PlayerCharacter : AMars_Character
 
         auto Query = FMars_TPBody_HoldQuery();
         Query.Grips = utils_held_view::Get_GripTargets(HandsSpec, View.Grip);
-        Query.IsTwoHanded = View.Grip.IsTwoHanded;
+        Query.Kind = View.Grip.Kind;
         Query.IsSocketGrip = View.Grip.HasSocketGrips;
         Query.Hold = Body.Hold;
         Query.BodyScale = Body.Scale;
@@ -899,24 +894,5 @@ class AMars_PlayerCharacter : AMars_Character
         { return FTransform::Identity; }
 
         return Mesh.GetRefPoseTransform(Index).Inverse();
-    }
-
-    // Empty hands and two-handed holds centre the Hand node between the gloves; one-handed items move it to the right.
-    // The gloves' own hold follows HeldItem through the player HFSM (UMars_SmTask_HeldItemDrivesHands); the lateral is
-    // measured here from the same item and written to the HandSide node. Stays on the actor: that node is held only here.
-    UFUNCTION()
-    private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
-    {
-        const auto NewHold = utils_fphands::Make_Hold(InNew);
-        if (NewHold.Kind != EMars_FPHands_HoldKind::Empty)
-        { utils_player_emotes::Stop_Emote(_Hands); }
-
-        // Only the owner's held item is real (nothing about items replicates); everyone else learns it from _HeldView.
-        if (IsLocallyControlled())
-        { Request_SetHeldView(utils_held_view::Make(InNew)); }
-
-        const auto Lateral = utils_fphands::Get_HandLateral(Config.FPHands.Rest, NewHold);
-        utils_scene_node::Request_UpdateOffset(_HandSide,
-            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator::ZeroRotator, Lateral)));
     }
 }

@@ -38,6 +38,13 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
     protected FCk_Handle_SceneNode _Eye;
     protected FCk_Handle_StateMachine _Sm;
 
+    // A rock a test spawned (Spawn_WorldItem) for Check_PathRockStill / Check_PathRockStowed to watch; _PathRock is set
+    // once it is constructed, _PathRockLastLocation once it was sampled.
+    protected FCk_Handle _PathRockEntity;
+    protected FCk_Handle_WorldItem _PathRock;
+    protected TOptional<FVector> _PathRockLastLocation;
+    private int32 _PathRockStillFrames = 0;
+
     protected void Build_PlayerPath(FCk_Handle InHandle, FVector InOrigin)
     {
         _Origin = InOrigin;
@@ -56,7 +63,7 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnCarrierHandsPhaseChanged"));
 
         Add_ViewTrace();
-        Add_StaticBox(InHandle, FVector(150.0, 0.0, -1.0), FVector(400.0, 400.0, 1.0));
+        Spawn_StaticSlab(InHandle, _Origin + FVector(150.0, 0.0, -1.0), FVector(400.0, 400.0, 1.0));
     }
 
     // Up to a composed, idle rig: the Use row is live on the carrier's matcher, the player's tasks run and the gloves rest,
@@ -106,7 +113,7 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
         ControlSpec.Manipulation.PullAxis = FVector(-1.0, 0.0, 0.0);
         ControlSpec.Manipulation.AlphaPerDegree = 0.02f;
         ControlSpec.Manipulation.EngageAlpha = 0.85f;
-        auto Control = utils_control::Add(RootEntity, ControlSpec, FCk_Handle_Mover());
+        auto Control = utils_control::Add(RootEntity, ControlSpec);
 
         auto Probe = FMars_Interactable_ProbeInfo();
         Probe.ProbeSpec = FCk_Probe_Spec(GameplayTags::Probe_Mars_Interact);
@@ -116,7 +123,7 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
 
         auto Spec = FMars_Interactable_Spec();
         Spec.ProbeInfo = Probe;
-        Spec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Pull")));
+        Spec.Targets.Add(Control.Make_InteractTarget(FMars_InteractPrompt_Spec(mars::Mars_IA_Interact_Use, FText::FromString("Pull"))));
         return utils_interactable::Create(Root, Spec);
     }
 
@@ -157,6 +164,17 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
     protected void Aim_ViewAway()
     {
         Set_EyeOffset(FTransform(FRotator(0.0, 90.0, 0.0), FVector(0.0, 0.0, _EyeHeight), FVector::OneVector));
+    }
+
+    // The rock's world item gave its item up (a transient rock's world item ends once its holder does).
+    protected bool Get_IsPathRockGivenUp() const
+    {
+        return ck::Is_NOT_Valid(_PathRock) || ck::Is_NOT_Valid(_PathRock.Get_HeldItem());
+    }
+
+    protected bool Get_IsAnItemInABagSlot() const
+    {
+        return ck::IsValid(_Hotbar.Get_ItemAt(0)) || ck::IsValid(_Hotbar.Get_ItemAt(1));
     }
 
     protected bool Get_IsUseHeld()
@@ -214,20 +232,6 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
         _Carrier.Add_Fragment(Viewpoint);
     }
 
-    private void Add_StaticBox(FCk_Handle InOwner, FVector InCentreLocal, FVector InHalfExtents)
-    {
-        auto Owner = InOwner;
-        auto Box = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Box, FTransform(FRotator::ZeroRotator, _Origin + InCentreLocal), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(InHalfExtents);
-        auto BoxSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        BoxSpec.Set_ShapeDimensions(Shape);
-        BoxSpec.Set_MotionType(ECk_MotionType::Static);
-        BoxSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Box, BoxSpec);
-    }
-
     //----------------------------------------------------------------------------------------------------------------------
     // Steps
     //----------------------------------------------------------------------------------------------------------------------
@@ -270,6 +274,37 @@ class UMars_AutoTestRig_PlayerPath : UMars_AutoTestRig_Carrier
             && _Hands.Get_Phase() == EMars_FPHands_Phase::None
             && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
             && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound());
+    }
+
+    // The rock world item is constructed and moved less than 1.5 mm a frame for 10 frames.
+    UFUNCTION()
+    protected void Check_PathRockStill(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        if (ck::Is_NOT_Valid(_PathRock))
+        {
+            if (Get_IsConstructedWorldItem(_PathRockEntity) == false)
+            {
+                Res.Set(false);
+                return;
+            }
+
+            _PathRock = _PathRockEntity.As_WorldItem();
+        }
+
+        const auto Location = utils_transform::Get_EntityCurrentTransform(_PathRockEntity.As_Transform()).GetLocation();
+        const auto IsStill = _PathRockLastLocation.IsSet() && _PathRockLastLocation.GetValue().Equals(Location, 0.15);
+        _PathRockStillFrames = IsStill ? _PathRockStillFrames + 1 : 0;
+        _PathRockLastLocation = TOptional<FVector>(Location);
+        Res.Set(_PathRockStillFrames >= 10);
+    }
+
+    // The rock's world item gave its item up and the item sits in a bag slot.
+    UFUNCTION()
+    protected void Check_PathRockStowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(Get_IsPathRockGivenUp() && Get_IsAnItemInABagSlot());
     }
 
     UFUNCTION()

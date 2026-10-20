@@ -18,14 +18,14 @@ class UMars_Processor_HandSwing_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.Elapsed += float32(InDeltaT.Get_Seconds());
-        InState.Pose = utils_hand_swing::Evaluate(InState.Arc, InState.Timeline, InState.StartPose, InState.Elapsed);
+        InState.Pose = utils_hand_swing::Evaluate(InState.Flight, InState.Elapsed);
 
         auto Node = InHandle.Get_Fragment(FMars_Fragment_HandSwing_Params).Node;
         if (ck::IsValid(Node))
         { utils_scene_node::Request_UpdateOffset(Node, FCk_Request_SceneNode_UpdateRelativeTransform(InState.Pose)); }
 
         const auto Previous = InState.Phase;
-        InState.Phase = utils_hand_swing::Get_PhaseAt(InState.Timeline, InState.Elapsed);
+        InState.Phase = utils_hand_swing::Get_PhaseAt(InState.Flight.Timeline, InState.Elapsed);
         if (InState.Phase == Previous)
         { return; }
 

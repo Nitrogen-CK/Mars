@@ -17,10 +17,10 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UMars_AutoTestRig_Han
         Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("request a timed reach", n"Step_RequestTimedReach");
         Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
-        Add_Step_WaitSeconds("hold for longer than any phase timer", 0.6f);
+        Add_Step_WaitUntil("Hold has run longer than any phase timer", n"Check_HeldPastEveryTimer", k_SlowPolls, 0);
         Add_Step("the phase is still Hold", n"Step_AssertStillHold");
         Add_Step("request a second timed reach while holding", n"Step_RequestTimedReach");
-        Add_Step_WaitSeconds("let the drain run", 0.1f);
+        Add_Step_WaitUntil("the second reach request is drained", n"Check_RequestsDrained", 0, 0);
         Add_Step("a reach requested mid-Hold is ignored", n"Step_AssertHoldIgnoresReach");
         Add_Step_WaitUntil("the Hold state listens for a lost target", n"Check_HoldListening", 0, 0);
         Add_Step("request a release", n"Step_RequestRelease");
@@ -29,10 +29,25 @@ class UMars_AutoTest_FPHands_TimedReachHoldsUntilRelease : UMars_AutoTestRig_Han
         Run_Steps(InHandle);
     }
 
+    // Every phase timer here is 0.2 s; Hold's own clock (PhaseTime) passing 0.6 s means none of them moved it on.
+    UFUNCTION()
+    private void Check_HeldPastEveryTimer(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hands.Get_Phase() != EMars_FPHands_Phase::Hold || _Hands.Get_PhaseTime() > 0.6f);
+    }
+
+    UFUNCTION()
+    private void Check_RequestsDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hands.Has_Fragment(FMars_Fragment_FPHands_Requests) == false);
+    }
+
     UFUNCTION()
     private void Step_AssertStillHold(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the phase is still Hold after 0.6s (got {_Hands.Get_Phase() :n})");
+        Assert_True(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold, f"the phase is still Hold 0.6 s into it (got {_Hands.Get_Phase() :n})");
         Assert_True(utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Hold, "the Hands SM is still in Hold");
     }
 

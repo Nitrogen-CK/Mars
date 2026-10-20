@@ -7,6 +7,12 @@ enum EMars_GameplayInput_SwapState
     Succeeded
 }
 
+// One button row: its token in the intent grammar, the Mapped button it terminates on (the action's player-mappable
+// name, as `PlayerMappableKeySettings.Name` sets it in Mars_InputAction_Assets.as) and the intent it raises. The name
+// is a literal on purpose: reading `InAction.PlayerMappableKeySettings.Name` through the base-typed reference yields
+// the settings object's UObject name (`Ck_PlayerMappableKeySettings_UE_0`), not the mapping name, so every row would
+// wait on a button that is never minted (seen in PIE 2026-10-19). A mismatch surfaces as the compose-timeout ensure,
+// which names the unminted rows.
 struct FMars_Gameplay_IntentRow
 {
     FString Token;
@@ -39,8 +45,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     private float32 MouseLookScale = 0.4f;
     private float32 GamepadYawRate = 70.0f;
     private float32 GamepadPitchRate = 45.0f;
-    private bool _SprintToggleMode = false;
-    private bool _SprintToggleLatched = false;
 
     private FCk_Handle_InputLayer _Layer;
     private FCk_Handle_IntentMatcher _Matcher;
@@ -67,10 +71,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnCycleSlot"));
         InInputComponent.BindAction(mars::Mars_IA_Pause, ETriggerEvent::Started,
             FEnhancedInputActionHandlerDynamicSignature(this, n"OnPause"));
-        InInputComponent.BindAction(mars::Mars_IA_Sprint, ETriggerEvent::Started,
-            FEnhancedInputActionHandlerDynamicSignature(this, n"OnSprintStarted"));
-        InInputComponent.BindAction(mars::Mars_IA_Crouch, ETriggerEvent::Started,
-            FEnhancedInputActionHandlerDynamicSignature(this, n"OnCrouchStarted"));
     }
 
     UFUNCTION(BlueprintOverride)
@@ -78,10 +78,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     {
         Super::Activate(InController, InPawn);
 
-        _SprintToggleLatched = false;
-        _SprintToggleMode = utils_game_settings::Get_SettingValue_Bool(n"controls.sprint_toggle", false);
-        utils_game_settings::BindTo_OnSettingChanged(n"controls.sprint_toggle",
-            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnSprintModeChanged"));
         _SwapState = EMars_GameplayInput_SwapState::NotRequested;
         DoStart_ComposeRetry();
     }
@@ -91,7 +87,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     UFUNCTION(BlueprintOverride)
     void Repoint(APawn InNewPawn)
     {
-        _SprintToggleLatched = false;
         DoRelease_PawnIntents();
         Super::Repoint(InNewPawn);
 
@@ -107,9 +102,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     UFUNCTION(BlueprintOverride)
     void Deactivate(APlayerController InController)
     {
-        utils_game_settings::UnbindFrom_OnSettingChanged(n"controls.sprint_toggle",
-            FCk_Delegate_GameSettings_OnSettingChanged(this, n"OnSprintModeChanged"));
-        _SprintToggleLatched = false;
         System::ClearAndInvalidateTimerHandle(_ComposeTimer);
         DoRelease_PawnIntents();
 
@@ -121,26 +113,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         _SwapState = EMars_GameplayInput_SwapState::NotRequested;
 
         Super::Deactivate(InController);
-    }
-
-    bool Get_IsSprintToggleMode() const
-    { return _SprintToggleMode; }
-
-    bool Get_IsSprintToggleLatched() const
-    { return _SprintToggleLatched && Get_HasCurrentMatcher(); }
-
-    private bool Get_HasCurrentMatcher() const
-    {
-        auto Intents = TryGet_PawnIntents();
-        return ck::IsValid(_Matcher) && ck::IsValid(Intents) &&
-            Intents.Get_Matcher() == _Matcher;
-    }
-
-    UFUNCTION()
-    private void OnSprintModeChanged(FName InKey, FString InNewValue)
-    {
-        _SprintToggleLatched = false;
-        _SprintToggleMode = utils_game_settings::Get_SettingValue_Bool(n"controls.sprint_toggle", false);
     }
 
     private void DoStart_ComposeRetry()
@@ -282,19 +254,6 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
     }
 
     UFUNCTION()
-    private void OnSprintStarted(FInputActionValue ActionValue, float32 ElapsedTime,
-        float32 TriggeredTime, const UInputAction SourceAction)
-    {
-        if (_SprintToggleMode && Get_HasCurrentMatcher())
-        { _SprintToggleLatched = !_SprintToggleLatched; }
-    }
-
-    UFUNCTION()
-    private void OnCrouchStarted(FInputActionValue ActionValue, float32 ElapsedTime,
-        float32 TriggeredTime, const UInputAction SourceAction)
-    { _SprintToggleLatched = false; }
-
-    UFUNCTION()
     private void OnMove(FInputActionValue ActionValue, float32 ElapsedTime,
         float32 TriggeredTime, const UInputAction SourceAction)
     {
@@ -312,36 +271,21 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
 
     // CkCamera consumes the intention as a per-frame delta: degrees of view rotation = intention x the profile's LookSpeed.
     // A positive Y pitches DOWN, so mouse/stick up is negated here. The stick mapping is already dt-scaled (SetupGamepadBindings).
-    // The same intention goes to InputIntents, independently of the camera, so a gripped control can read it.
+    // utils_input_intents::Request_Look hands it to InputIntents and the camera.
     UFUNCTION()
     private void OnLook(FInputActionValue ActionValue, float32 ElapsedTime,
         float32 TriggeredTime, const UInputAction SourceAction)
     {
         const auto LookDelta = ActionValue.GetAxis2D();
-        const auto Sensitivity = utils_game_settings::Get_SettingValue_Float(n"controls.look_sensitivity", 1.0f);
-        const auto PitchSign = utils_game_settings::Get_SettingValue_Bool(n"controls.invert_y", false) ? 1.0f : -1.0f;
+        const auto Sensitivity = utils_game_settings::Get_SettingValue_Float(constants_settings::k_LookSensitivity, 1.0f);
+        const auto PitchSign = utils_game_settings::Get_SettingValue_Bool(constants_settings::k_InvertY, false) ? 1.0f : -1.0f;
         const auto Scale = MouseLookScale * LegacyLookScale * Sensitivity;
         const auto Intention = FVector(LookDelta.X * Scale, LookDelta.Y * Scale * PitchSign, 0.0);
 
-        auto Intents = TryGet_PawnIntents();
-        if (ck::IsValid(Intents))
-        { Intents.Request_AddLookDelta(FMars_Request_InputIntents_AddLookDelta(Intention)); }
-
-        auto Camera = TryGet_PawnCamera();
-        if (ck::IsValid(Camera))
-        { Camera.Request_SetOrientationIntention(Intention); }
-    }
-
-    private FCk_Handle_Camera TryGet_PawnCamera() const
-    {
         if (ck::Is_NOT_Valid(ControlledPawn) || ControlledPawn.Get_IsActorEcsReady() == false)
-        { return FCk_Handle_Camera(); }
+        { return; }
 
-        auto Viewpoint = ControlledPawn.TryGet_ActorEntityHandle().As_PlayerViewpoint(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Viewpoint))
-        { return FCk_Handle_Camera(); }
-
-        return Viewpoint.Get_Camera();
+        utils_input_intents::Request_Look(ControlledPawn.TryGet_ActorEntityHandle(), Intention);
     }
 
     // A wheel tick is pressed and released inside one frame, which a polled level row can miss - so cycling is an
@@ -356,9 +300,9 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
 
         const auto Value = ActionValue.GetAxis1D();
         if (Value > 0.0f)
-        { Hotbar.Request_CycleNext(); }
+        { Hotbar.Request_Cycle(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Next)); }
         else if (Value < 0.0f)
-        { Hotbar.Request_CyclePrevious(); }
+        { Hotbar.Request_Cycle(FMars_Request_Hotbar_Cycle(EMars_Hotbar_CycleDirection::Previous)); }
     }
 
     private FCk_Handle_Hotbar TryGet_PawnHotbar() const
@@ -430,7 +374,9 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         _ComposeAttempts += 1;
         const auto HasSwapped = _SwapState == EMars_GameplayInput_SwapState::Succeeded;
         if (_ComposeAttempts == 50 && HasSwapped == false)
-        { ck::EnsureIfNot(false, "[GameplayInput] the intent set has not composed after 5s - is every IA_* row's Mapped button minted (IMC registered with user settings)?"); }
+        {
+            ck::EnsureIfNot(false, f"[GameplayInput] the intent set has not composed after 5s (swap state [{_SwapState}], unminted rows [{Get_UnmintedRowNames(ButtonMap)}]) - is every IA_* row's Mapped button minted (IMC registered with user settings)?");
+        }
 
         if (HasSwapped == false)
         { return; }
@@ -477,6 +423,26 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         return true;
     }
 
+    // The rows whose Mapped button has no key yet, for the compose-timeout diagnostic.
+    private FString Get_UnmintedRowNames(FCk_Handle_InputButtonMap InButtonMap) const
+    {
+        if (ck::Is_NOT_Valid(InButtonMap))
+        { return "no button map"; }
+
+        FString Names;
+        auto Rows = Get_IntentRows();
+        for (const auto& Row : Rows)
+        {
+            const auto Button = FCk_Input_ButtonId(ECk_Input_ButtonTier::Mapped, Row.MappingName);
+            if (utils_input_button_map::TryGet_KeyForButton(InButtonMap, Button).IsValid())
+            { continue; }
+
+            Names = Names.IsEmpty() ? Row.MappingName.ToString() : f"{Names}, {Row.MappingName.ToString()}";
+        }
+
+        return Names;
+    }
+
     private void DoRequestSwap()
     {
         TArray<FCk_Intent_Definition> Definitions;
@@ -513,11 +479,15 @@ class UMars_InputProfile_Gameplay : UMars_InputProfile
         if (InResult != ECk_Request_OperationResult::Succeeded)
         {
             // A terminal lost its key between the mint check and the drain - retry from the tick.
+            Log(f"[GameplayInput] the intent set swap was refused ([{InResult}]) at compose attempt [{_ComposeAttempts}]; retrying");
             _SwapState = EMars_GameplayInput_SwapState::NotRequested;
             return;
         }
 
         _SwapState = EMars_GameplayInput_SwapState::Succeeded;
+        // How long the first mint took (the 5 s ensure fires at 50): AngelScript binds no Verbose level, Log is the
+        // lowest (log file only).
+        Log(f"[GameplayInput] the intent set swapped in after [{_ComposeAttempts}] compose attempt(s) at 0.1 s");
         DoTryCompose();
     }
 }

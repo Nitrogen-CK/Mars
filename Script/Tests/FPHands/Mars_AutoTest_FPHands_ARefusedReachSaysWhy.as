@@ -96,25 +96,13 @@ class UMars_AutoTest_FPHands_ARefusedReachSaysWhy : UMars_AutoTestRig_Hands
         Run_Steps(InHandle);
     }
 
-    // A Timed lever (a long hold) with a transform-only interactable; a reach for it resolves as a point grip at its root.
+    // A Timed lever (a long hold); a reach for it resolves as a point grip at its root.
     private void Build_Lever(FCk_Handle InHandle, FVector InLocation)
     {
-        auto Parent = InHandle;
-        auto LeverRoot = utils_entity_lifetime::Request_CreateEntity(Parent);
-        auto Root = utils_transform::Add(LeverRoot, FTransform(FRotator::ZeroRotator, InLocation), ECk_Replication::DoesNotReplicate);
-
-        auto ControlSpec = FMars_Control_Spec();
-        ControlSpec.Interaction = ECk_Interaction_CompletionPolicy::Timed;
-        ControlSpec.HoldSeconds = 5.0f;
-        auto Control = utils_control::Add(LeverRoot, ControlSpec, FCk_Handle_Mover());
-
-        auto InteractableSpec = FMars_Interactable_Spec();
-        InteractableSpec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Turn")));
-        auto Interactable = utils_interactable::Create(Root, InteractableSpec);
-
-        _LeverRoots.Add(LeverRoot);
-        _LeverInteractables.Add(Interactable);
-        _LeverTargets.Add(Interactable.Get_AllInteractTargets()[0]);
+        const auto Lever = Add_TimedLever(InHandle, InLocation, 5.0f);
+        _LeverRoots.Add(Lever.Root);
+        _LeverInteractables.Add(Lever.Interactable);
+        _LeverTargets.Add(Lever.Target);
     }
 
     // A rock item seeded in a one-slot holder (what the gloves come to hold), and a World-mode rock lying on a static floor
@@ -122,23 +110,8 @@ class UMars_AutoTest_FPHands_ARefusedReachSaysWhy : UMars_AutoTestRig_Hands
     private void Build_Rocks(FCk_Handle InHandle)
     {
         auto Owner = InHandle;
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(Owner);
-        auto HolderParams = utils_inventory_data_only::Make_Params_Bounded(GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(), FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        _Holder = utils_inventory_data_only::Add(HolderOwner, HolderParams, ECk_Replication::DoesNotReplicate);
-        auto AddRequest = FCk_Request_Inventory_AddItemByDefinition(mars_items::Rock(), 1);
-        AddRequest.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        _Holder.Request_AddItemByDefinition(AddRequest, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
-
-        auto Floor = utils_entity_lifetime::Request_CreateEntity(Owner);
-        utils_transform::Add(Floor, FTransform(FRotator::ZeroRotator, k_RockFloorTop - FVector(0.0, 0.0, 1.0)), ECk_Replication::DoesNotReplicate);
-        auto Shape = FCk_Jolt_ShapeDimensions(ECk_Jolt_ShapeType::Box);
-        Shape.Set_HalfExtents(FVector(80.0, 80.0, 1.0));
-        auto FloorSpec = FCk_JoltBody_Spec(ECk_JoltBody_ShapeSource::ExplicitShape);
-        FloorSpec.Set_ShapeDimensions(Shape);
-        FloorSpec.Set_MotionType(ECk_MotionType::Static);
-        FloorSpec.Set_CollisionProfileName(n"BlockAll");
-        utils_jolt_body::Add(Floor, FloorSpec);
+        _Holder = Add_SeededHolder(Owner, mars_items::Rock());
+        Add_StaticBox(Owner, k_RockFloorTop - FVector(0.0, 0.0, 1.0), FVector(80.0, 80.0, 1.0));
 
         _WorldRockEntity = utils_world_item::Request_SpawnWorld(Owner, FMars_WorldItem_WorldSpec(
             utils_held_item::Make_DefinitionSoft(mars_items::Rock()), FTransform(FRotator::ZeroRotator, k_RockFloorTop + FVector(0.0, 0.0, 20.0))));
@@ -337,16 +310,6 @@ class UMars_AutoTest_FPHands_ARefusedReachSaysWhy : UMars_AutoTestRig_Hands
         _RefusedTargets.Add(InTarget);
         _RefusedKinds.Add(InKind);
         _RefusedReasons.Add(InReason);
-    }
-
-    // The Hands SM is in Rest, the gloves at None, and Rest's reach and push conditions are listening.
-    private bool Get_IsRestListening()
-    {
-        return utils_state_machine::Get_CurrentStateClass(_Sm) == UMars_SmState_Hands_Rest
-            && _Hands.Get_Phase() == EMars_FPHands_Phase::None
-            && _Hands.Has_Fragment(FMars_Fragment_FPHands_Signals)
-            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnReachRequested._Inner.IsBound()
-            && _Hands.Get_Fragment(FMars_Fragment_FPHands_Signals).OnPushRequested._Inner.IsBound();
     }
 
     private FMars_FPHands_ReachSubject Make_LeverSubject(int32 InLever)

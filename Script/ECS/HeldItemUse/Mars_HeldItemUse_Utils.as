@@ -25,22 +25,22 @@ mixin bool Get_ThrowArmed(const FCk_Handle_HeldItemUse& Self)
 // Requests
 //--------------------------------------------------------------------------------------------------------------------------
 
-mixin void Request_RefreshFromHeldItem(FCk_Handle_HeldItemUse& Self)
+mixin void Request_RefreshFromHeldItem(FCk_Handle_HeldItemUse& Self, const FMars_Request_HeldItemUse_RefreshFromHeldItem& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
-    Requests.RefreshFromHeldItemRequests.Add(FMars_Request_HeldItemUse_RefreshFromHeldItem());
+    Requests.RefreshFromHeldItemRequests.Add(InRequest);
 }
 
-mixin void Request_Drop(FCk_Handle_HeldItemUse& Self)
+mixin void Request_Drop(FCk_Handle_HeldItemUse& Self, const FMars_Request_HeldItemUse_Drop& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
-    Requests.DropRequests.Add(FMars_Request_HeldItemUse_Drop());
+    Requests.DropRequests.Add(InRequest);
 }
 
-mixin void Request_Throw(FCk_Handle_HeldItemUse& Self)
+mixin void Request_Throw(FCk_Handle_HeldItemUse& Self, const FMars_Request_HeldItemUse_Throw& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_HeldItemUse_Requests);
-    Requests.ThrowRequests.Add(FMars_Request_HeldItemUse_Throw());
+    Requests.ThrowRequests.Add(InRequest);
 }
 
 // HUD-only (see FMars_Fragment_HeldItemUse::ThrowArmed); the drain broadcasts OnThrowArmedChanged on change.

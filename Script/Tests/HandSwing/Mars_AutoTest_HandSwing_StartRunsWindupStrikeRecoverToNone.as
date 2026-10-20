@@ -55,18 +55,22 @@ class UMars_AutoTest_HandSwing_StartRunsWindupStrikeRecoverToNone : UCk_AutoTest
         Assert_Equals_Float(Timeline.RecoverEnd, _ImpactSeconds + _RecoverySeconds, 0.0001, "rest comes RecoverySeconds after the impact");
 
         const auto Rest = FTransform::Identity;
-        Assert_True(utils_hand_swing::Evaluate(Arc, Timeline, Rest, 0.0f).Equals(Rest, 0.001), "at 0 the hand is where it started");
-        Assert_True(utils_hand_swing::Evaluate(Arc, Timeline, Rest, Timeline.WindupEnd).Equals(utils_hand_swing::Make_Pose(Arc.Windup), 0.001),
+        auto Flight = FMars_HandSwing_Flight();
+        Flight.Arc = Arc;
+        Flight.Timeline = Timeline;
+        Flight.StartPose = Rest;
+        Assert_True(utils_hand_swing::Evaluate(Flight, 0.0f).Equals(Rest, 0.001), "at 0 the hand is where it started");
+        Assert_True(utils_hand_swing::Evaluate(Flight, Timeline.WindupEnd).Equals(utils_hand_swing::Make_Pose(Arc.Windup), 0.001),
             "at the windup's end the hand is on the windup key");
-        Assert_True(utils_hand_swing::Evaluate(Arc, Timeline, Rest, Timeline.StrikeEnd).Equals(utils_hand_swing::Make_Pose(Arc.Strike), 0.001),
+        Assert_True(utils_hand_swing::Evaluate(Flight, Timeline.StrikeEnd).Equals(utils_hand_swing::Make_Pose(Arc.Strike), 0.001),
             "at the strike's end the hand is on the strike key");
-        Assert_True(utils_hand_swing::Evaluate(Arc, Timeline, Rest, Timeline.RecoverEnd).Equals(Rest, 0.001),
+        Assert_True(utils_hand_swing::Evaluate(Flight, Timeline.RecoverEnd).Equals(Rest, 0.001),
             "at the recovery's end the hand is back at rest");
         Assert_True(utils_hand_swing::Get_PhaseAt(Timeline, Timeline.RecoverEnd) == EMars_HandSwing_Phase::None,
             "past the recovery the phase is None");
 
         // ImpactFraction is a fraction of the strike's time: at the impact the hand is where the strike's easing puts it.
-        const auto AtImpact = utils_hand_swing::Evaluate(Arc, Timeline, Rest, _ImpactSeconds);
+        const auto AtImpact = utils_hand_swing::Evaluate(Flight, _ImpactSeconds);
         const auto Expected = Math::Lerp(Arc.Windup.Location, Arc.Strike.Location, float(utils_hand_swing::Ease(Arc.Strike.Easing, Arc.ImpactFraction)));
         Assert_True(AtImpact.GetLocation().Equals(Expected, 0.01),
             f"at the impact the hand is ImpactFraction of the strike's time along its eased travel (got [{AtImpact.GetLocation()}], expected [{Expected}])");

@@ -36,7 +36,7 @@ class UMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose : UCk_AutoTest_B
     UFUNCTION()
     private void Step_CancelAtRest(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Swing.Request_Cancel();
+        _Swing.Request_Cancel(FMars_Request_HandSwing_Cancel());
     }
 
     UFUNCTION()
@@ -64,7 +64,7 @@ class UMars_AutoTest_HandSwing_CancelRecoversFromTheCurrentPose : UCk_AutoTest_B
     {
         _PoseAtCancel = _Swing.Get_Pose();
         Assert_True(_PoseAtCancel.Equals(FTransform::Identity, 0.01) == false, "the hand had left rest before the cancel");
-        _Swing.Request_Cancel();
+        _Swing.Request_Cancel(FMars_Request_HandSwing_Cancel());
     }
 
     UFUNCTION()

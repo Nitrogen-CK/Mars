@@ -4,14 +4,6 @@
 // group. The plates are bare engine planes; no material is needed to read the data back. Isolated Z band: -68000.
 class UMars_AutoTest_Eyes_ApplyWritesPlate : UMars_AutoTestRig_Eyes
 {
-    private const int32 LeftCellSlot = constants_eyes::k_Slot_Cells;
-    private const int32 RightCellSlot = constants_eyes::k_Slot_Cells + 1;
-    private const int32 PrevLeftCellSlot = constants_eyes::k_Slot_Cells + 2;
-    private const int32 PrevRightCellSlot = constants_eyes::k_Slot_Cells + 3;
-    private const int32 BlendSlot = constants_eyes::k_Slot_Anim;
-    private const int32 StrengthSlot = constants_eyes::k_Slot_Anim + 3;
-    private const int32 LookXSlot = constants_eyes::k_Slot_Look;
-    private const int32 LookYSlot = constants_eyes::k_Slot_Look + 1;
 
     private FCk_Handle_Transform _FaceNode;
     private FCk_Handle_UnrealComponent _Plate;
@@ -30,7 +22,7 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UMars_AutoTestRig_Eyes
         Spec.Style.RightCell = 4;
         Spec.Style.EmissiveStrength = 6.0f;
         Spec.Style.Color = _StyleColor;
-        _Plate = MakePlate(_FaceNode, n"EyesTest_Plate");
+        _Plate = Make_PlatePrimitive(_FaceNode, n"EyesTest_Plate");
         Spec.Plate = _Plate;
         _Eyes = utils_eyes::Add(_FaceNode, Spec);
 
@@ -116,7 +108,7 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UMars_AutoTestRig_Eyes
     UFUNCTION()
     private void Step_SetSecondPlate(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _SecondPlate = MakePlate(_FaceNode, n"EyesTest_SecondPlate");
+        _SecondPlate = Make_PlatePrimitive(_FaceNode, n"EyesTest_SecondPlate");
         Assert_Valid(_SecondPlate, "the second plate component handle");
         _Eyes.Request_SetPlate(FMars_Request_Eyes_SetPlate(_SecondPlate));
     }
@@ -131,44 +123,5 @@ class UMars_AutoTest_Eyes_ApplyWritesPlate : UMars_AutoTestRig_Eyes
             && Get_IsSlot(_SecondPlate, BlendSlot, 1.0f) && Get_IsSlot(_SecondPlate, StrengthSlot, 6.0f)
             && Get_IsSlot(_SecondPlate, LookXSlot, 0.0f) && Get_IsSlot(_SecondPlate, LookYSlot, 0.0f)
             && Get_IsColor(_SecondPlate, _NewStyleColor));
-    }
-
-    private float32 Get_Slot(const FCk_Handle_UnrealComponent& InPlate, int32 InIndex) const
-    {
-        return utils_unreal_component::Get_CustomPrimitiveDataFloat(InPlate, InIndex);
-    }
-
-    private bool Get_IsSlot(const FCk_Handle_UnrealComponent& InPlate, int32 InIndex, float32 InExpected) const
-    {
-        return Math::Abs(Get_Slot(InPlate, InIndex) - InExpected) < 0.001f;
-    }
-
-    private bool Get_IsColor(const FCk_Handle_UnrealComponent& InPlate, const FLinearColor& InColor) const
-    {
-        return Get_IsSlot(InPlate, constants_eyes::k_Slot_Color, InColor.R)
-            && Get_IsSlot(InPlate, constants_eyes::k_Slot_Color + 1, InColor.G)
-            && Get_IsSlot(InPlate, constants_eyes::k_Slot_Color + 2, InColor.B);
-    }
-
-    private FString Get_ColorText(const FCk_Handle_UnrealComponent& InPlate) const
-    {
-        return f"{Get_Slot(InPlate, constants_eyes::k_Slot_Color)}, {Get_Slot(InPlate, constants_eyes::k_Slot_Color + 1)}, {Get_Slot(InPlate, constants_eyes::k_Slot_Color + 2)}";
-    }
-
-    // An engine plane under the face node, without collision so nothing bakes it into the static world.
-    private FCk_Handle_UnrealComponent MakePlate(FCk_Handle_Transform& InFaceNode, FName InDebugName)
-    {
-        auto PlateNode = utils_scene_node::Create(InFaceNode, FTransform::Identity);
-
-        auto Archetype = NewObject(this, UStaticMeshComponent);
-        // Movable: the component is registered first and then receives the entity transform, which a Static component
-        // refuses once the world has begun play.
-        Archetype.SetMobility(EComponentMobility::Movable);
-        Archetype.SetStaticMesh(Cast<UStaticMesh>(LoadObject(this, "/Engine/BasicShapes/Plane.Plane")));
-        Archetype.SetCollisionProfileName(n"NoCollision");
-
-        auto ComponentParams = utils_unreal_component::Make_Params_FromArchetype(
-            Archetype, ECk_UnrealComponent_TickPolicy::DoNotTick, InDebugName);
-        return utils_unreal_component::Add(PlateNode, ComponentParams);
     }
 }

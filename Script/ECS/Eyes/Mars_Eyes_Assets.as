@@ -96,8 +96,8 @@ asset Mars_EyeStyle_Cracked of UMars_EyeStyle
     Def.RightCell = 11;
 }
 
-// The chef's resting eyes (2026-10-03): atlas cell 19 is a full circle, which the body's 8.5 x 6 cm eye quads draw as
-// a wide 1.42:1 oval, like the concept art's big eyes.
+// The chef's resting eyes: atlas cell 19 is a full circle, which the body's 8.5 x 6 cm eye quads draw as a wide 1.42:1
+// oval.
 asset Mars_EyeStyle_Wide of UMars_EyeStyle
 {
     Def.LeftCell = 19;

@@ -1,12 +1,13 @@
 // Xbox gamepad key glyphs for UCommonActionWidget / UCk_InputActionWidget_UE.
-// No Xbox glyph textures exist yet, so every key maps to an empty brush (the generic gamepad data has them).
+// No Xbox or PS5 glyph textures exist yet, so every key maps to an empty brush (the generic gamepad data has them).
 
-TArray<FCommonInputKeyBrushConfiguration> Get_Mars_XboxGamepadBrushEntries()
+// Every gamepad key with an empty brush; the Xbox and PS5 controller data share it until their glyphs exist.
+TArray<FCommonInputKeyBrushConfiguration> Get_Mars_EmptyGamepadBrushEntries()
 {
     auto Entries = TArray<FCommonInputKeyBrushConfiguration>();
     const auto EmptyBrush = FSlateBrush();
 
-    // Face buttons  (Bottom=A, Right=B, Left=X, Top=Y)
+    // Face buttons  (Bottom=A/Cross, Right=B/Circle, Left=X/Square, Top=Y/Triangle)
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_FaceButton_Bottom, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_FaceButton_Right, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_FaceButton_Left, EmptyBrush));
@@ -28,7 +29,7 @@ TArray<FCommonInputKeyBrushConfiguration> Get_Mars_XboxGamepadBrushEntries()
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_DPad_Left, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_DPad_Right, EmptyBrush));
 
-    // Special buttons (View / Menu - aka Back / Start)
+    // Special buttons (View / Menu, Create / Options)
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_Special_Left, EmptyBrush));
     Entries.Add(Make_CommonInputKeyBrushConfiguration(EKeys::Gamepad_Special_Right, EmptyBrush));
 
@@ -56,5 +57,5 @@ class UMars_XboxGamepad_ControllerData : UCommonInputBaseControllerData
 {
     default InputType = ECommonInputType::Gamepad;
     default GamepadName = n"XboxOne";
-    default InputBrushDataMap = Get_Mars_XboxGamepadBrushEntries();
+    default InputBrushDataMap = Get_Mars_EmptyGamepadBrushEntries();
 }

@@ -49,7 +49,7 @@ class UMars_AutoTest_Emote_WheelEntryNChoosesEmoteN : UCk_AutoTest_Base
         const auto Point = utils_emote_wheel::Get_SectorPoint(_NextIndex, _Count, 1.0f);
         _NextIndex += 1;
 
-        _Wheel.Request_Open();
+        _Wheel.Request_Open(FMars_Request_EmoteWheel_Open());
         _Wheel.Request_MovePointer(FMars_Request_EmoteWheel_MovePointer(Point * _Travel));
         _Wheel.Request_Close(FMars_Request_EmoteWheel_Close(EMars_EmoteWheel_CloseAction::Choose));
     }

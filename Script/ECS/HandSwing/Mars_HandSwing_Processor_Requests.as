@@ -47,9 +47,9 @@ class UMars_Processor_HandSwing_HandleRequests : UCk_Processor_Script_Base_UE
         if (InState.Phase == EMars_HandSwing_Phase::None)
         { return; }
 
-        InState.Arc.Strike.Location = InState.Pose.GetLocation();
-        InState.Arc.Strike.Rotation = InState.Pose.Rotator();
-        InState.Elapsed = InState.Timeline.StrikeEnd;
+        InState.Flight.Arc.Strike.Location = InState.Pose.GetLocation();
+        InState.Flight.Arc.Strike.Rotation = InState.Pose.Rotator();
+        InState.Elapsed = InState.Flight.Timeline.StrikeEnd;
         InState.Phase = EMars_HandSwing_Phase::Recover;
     }
 
@@ -59,10 +59,10 @@ class UMars_Processor_HandSwing_HandleRequests : UCk_Processor_Script_Base_UE
         if (ck::EnsureIfNot(Validation.IsValid(), f"[HandSwing] [{InSwing.ToString()}] rejected a start: {Validation.Get_Error()}"))
         { return; }
 
-        InState.StartPose = InState.Pose;
-        InState.Arc = InRequest.Arc;
-        InState.Timeline = utils_hand_swing::Make_Timeline(InRequest.Arc, InRequest.ImpactSeconds, InRequest.RecoverySeconds);
+        InState.Flight.StartPose = InState.Pose;
+        InState.Flight.Arc = InRequest.Arc;
+        InState.Flight.Timeline = utils_hand_swing::Make_Timeline(InRequest.Arc, InRequest.ImpactSeconds, InRequest.RecoverySeconds);
         InState.Elapsed = 0.0f;
-        InState.Phase = utils_hand_swing::Get_PhaseAt(InState.Timeline, 0.0f);
+        InState.Phase = utils_hand_swing::Get_PhaseAt(InState.Flight.Timeline, 0.0f);
     }
 }

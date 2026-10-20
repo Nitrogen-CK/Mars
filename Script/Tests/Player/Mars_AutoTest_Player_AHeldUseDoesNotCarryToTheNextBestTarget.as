@@ -23,7 +23,7 @@ class UMars_AutoTestState_UseIntentRig : UCk_SmState_EntityScript
 }
 
 // One held press is one interaction. The carrier (Hotbar with two bag slots, HeldItem, the player's UseIntentToResolver
-// task, a Use resolver and a real Use level row on F9) has two pebbles focused. Pebble A is
+// task, a Use resolver and a real Use level row on F9 from UMars_AutoTestHelper_UseKey) has two pebbles focused. A is
 // offered to the resolver and Use is pressed: A is picked up. With Use still held, A's target leaves the resolver and B's
 // joins it, as the view moving on would: B becomes the best target, yet nothing picks it up while the row stays held.
 // Releasing and pressing Use again picks B up. Isolated origin (28000, -27000, -30000).
@@ -37,11 +37,7 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
 
     private FCk_Handle_InputIntents _Intents;
     private FCk_Handle_InteractionResolver _Resolver;
-    private FCk_Handle_InputSource _Source;
-    private FCk_Handle_InputButtonMap _Map;
-    private FCk_Handle_IntentSampler _Sampler;
-    private FCk_Handle_IntentMatcher _Matcher;
-    private FKey _UseKey;
+    private UMars_AutoTestHelper_UseKey _UseKey;
 
     // Under construction until each is a WorldItem whose holder holds its item.
     private FCk_Handle _EntityA;
@@ -59,7 +55,8 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         _HeldItem = utils_held_item::Add(_Carrier);
         _Intents = utils_input_intents::Add(_Carrier);
         _Resolver = utils_interaction_resolver::Add(_Carrier, Make_ResolverSpec(), ECk_Replication::DoesNotReplicate);
-        Build_UseInput(InHandle);
+        _UseKey = Cast<UMars_AutoTestHelper_UseKey>(NewObject(this, UMars_AutoTestHelper_UseKey));
+        _UseKey.Build(InHandle, EKeys::F9);
 
         _EntityA = Spawn_Pebble(InHandle, k_Origin + FVector(150.0, -60.0, 0.0));
         _EntityB = Spawn_Pebble(InHandle, k_Origin + FVector(150.0, 60.0, 0.0));
@@ -95,23 +92,6 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         return FCk_InteractionResolver_Spec(Mappings);
     }
 
-    // A private input stack (source, button map, sampler, layer, matcher) the test presses F9 on.
-    private void Build_UseInput(FCk_Handle InHandle)
-    {
-        _UseKey = EKeys::F9;
-
-        auto Owner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        _Source = utils_input_source::Add(Owner, FCk_InputSource_Spec(0));
-
-        TArray<FKey> PhysicalButtons;
-        PhysicalButtons.Add(_UseKey);
-        _Map = utils_input_button_map::Add(Owner, FCk_InputButtonMap_Spec(PhysicalButtons));
-        _Sampler = utils_intent_sampler::Add(Owner, FCk_IntentSampler_Spec(120));
-
-        FCk_Handle LayerEntity = utils_input_layer::Create(Owner, FCk_InputLayer_Spec(_Source, 50));
-        _Matcher = utils_intent_matcher::Add(LayerEntity, FCk_IntentMatcher_Spec());
-    }
-
     // A pebble world item resting on a static floor of its own.
     private FCk_Handle Spawn_Pebble(FCk_Handle InHandle, FVector InFloorTop)
     {
@@ -136,12 +116,6 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         return Pickup.Get_InteractTarget(GameplayTags::InteractionChannel_Mars_Use);
     }
 
-    private void Inject_UseKey(ECk_InputSource_EventType InEventType)
-    {
-        auto Event = FCk_InputSource_RawEvent(ECk_InputSource_DeviceClass::Keyboard, _UseKey, InEventType);
-        utils_input_source::Request_InjectRawEvent(_Source, FCk_Request_InputSource_InjectRawEvent(Event));
-    }
-
     //----------------------------------------------------------------------------------------------------------------------
     // Steps
     //----------------------------------------------------------------------------------------------------------------------
@@ -149,35 +123,16 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
     UFUNCTION()
     private void Step_SwapUseSet(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        const auto UseTag = GameplayTags::Mars_Intent_Interact_Use;
-        auto Parsed = utils_intent_grammar::Parse("IU level", UseTag.TagName, 0, UseTag);
-        if (Parsed.Get_Outcome() != ECk_SucceededFailed::Succeeded)
-        {
-            FinishFailure("the Use level notation failed to parse");
-            return;
-        }
-
-        TArray<FCk_Intent_Definition> Definitions;
-        Definitions.Add(Parsed.Get_Definition());
-
-        TArray<FCk_Intent_ButtonNameRow> Rows;
-        Rows.Add(FCk_Intent_ButtonNameRow(n"IU", FCk_Input_ButtonId(ECk_Input_ButtonTier::Physical, _UseKey.GetKeyName())));
-
-        auto Baked = utils_intent_grammar::Bake(Definitions, Rows);
-        if (Baked.Get_Outcome() != ECk_SucceededFailed::Succeeded)
-        {
-            FinishFailure("the Use level row failed to bake");
-            return;
-        }
-
-        utils_intent_matcher::Request_SwapSet(_Matcher, FCk_Request_IntentMatcher_SwapSet(Baked.Get_CompiledSet()));
+        const auto Swapped = _UseKey.Request_SwapUseSet();
+        if (Swapped.IsValid() == false)
+        { FinishFailure(Swapped.Get_Error()); }
     }
 
     // Stands in for the player's InteractionFocus task: both pebbles focused, A offered to the resolver.
     UFUNCTION()
     private void Step_ComposeRig(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(_Matcher));
+        _Intents.Request_SetMatcher(FMars_Request_InputIntents_SetMatcher(_UseKey.Get_Matcher()));
         utils_state_machine::Add(_Carrier, FCk_StateMachine_Spec(UMars_AutoTestState_UseIntentRig));
 
         auto PickupA = _PebbleA.Get_Pickup();
@@ -191,7 +146,7 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
     UFUNCTION()
     private void Step_PressUse(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Inject_UseKey(ECk_InputSource_EventType::Pressed);
+        _UseKey.Press();
     }
 
     UFUNCTION()
@@ -215,7 +170,7 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
     UFUNCTION()
     private void Step_ReleaseUse(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        Inject_UseKey(ECk_InputSource_EventType::Released);
+        _UseKey.Release();
     }
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -226,16 +181,14 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
     private void Check_Recording(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(utils_input_button_map::Get_ButtonIdsForKey(_Map, _UseKey).Num() >= 1 &&
-                utils_intent_sampler::Get_FrameCount(_Sampler) >= 1);
+        Res.Set(_UseKey.Get_IsRecording());
     }
 
     UFUNCTION()
     private void Check_UseSetActive(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(utils_intent_matcher::Get_ActiveIntentCount(_Matcher) == 1 &&
-                utils_intent_matcher::Get_RegisteredCaptureKeys(_Matcher).Contains(_UseKey));
+        Res.Set(_UseKey.Get_IsUseSetActive());
     }
 
     UFUNCTION()
@@ -262,7 +215,7 @@ class UMars_AutoTest_Player_AHeldUseDoesNotCarryToTheNextBestTarget : UMars_Auto
         const auto FocusedB = utils_state_machine::Get_CurrentStateClass(Get_UseTarget(_PebbleB).As_StateMachine()) == UMars_SmState_Interactable_Focused;
 
         auto Res = OutResult;
-        Res.Set(_Intents.Get_Matcher() == _Matcher && FocusedA && FocusedB);
+        Res.Set(_Intents.Get_Matcher() == _UseKey.Get_Matcher() && FocusedA && FocusedB);
     }
 
     UFUNCTION()

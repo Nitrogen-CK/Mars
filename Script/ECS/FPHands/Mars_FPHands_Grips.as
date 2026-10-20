@@ -484,7 +484,7 @@ namespace utils_fphands
     }
 
     // A grip table: each glove to its own row. With the right glove busy (InLeadHand Left), the free left glove takes the
-    // right row (its own row is then dropped), as the socket paths do.
+    // lead (right) row and its own row is dropped: the rule the item and object socket paths follow too.
     FMars_FPHands_ReachTarget Resolve_GripTable(const TArray<FMars_FPHands_GripEntry>& InEntries, EMars_Hand InLeadHand)
     {
         auto RightGrip = TOptional<FMars_FPHands_HandGrip>();
@@ -702,18 +702,17 @@ namespace utils_fphands
             Shared.Roll = EMars_FPHands_GripRoll::FaceViewer;
             Target.Layout = EMars_FPHands_GripLayout::Authored;
             const auto RightGrip = Sockets.Right.GetRelativeTransform(Shared.AnchorWorld);
-            auto LeftGrip = RightGrip;
-            if (Sockets.Left.IsSet())
-            { LeftGrip = Sockets.Left.GetValue().GetRelativeTransform(Shared.AnchorWorld); }
-
             if (BothFree)
             {
                 Target.Right = Make_UsedGrip(Shared, RightGrip);
                 if (Sockets.Left.IsSet())
-                { Target.Left = Make_UsedGrip(Shared, LeftGrip); }
+                { Target.Left = Make_UsedGrip(Shared, Sockets.Left.GetValue().GetRelativeTransform(Shared.AnchorWorld)); }
             }
             else
-            { Target.Left = Make_UsedGrip(Shared, LeftGrip); }
+            {
+                // Right glove busy: the free left glove takes the lead (right) socket, as the grip table and item sockets do.
+                Target.Left = Make_UsedGrip(Shared, RightGrip);
+            }
 
             return TOptional<FMars_FPHands_ReachTarget>(Target);
         }

@@ -38,6 +38,7 @@ struct FMars_FPHands_StretchSpec
     float32 AimFraction = 0.6f;
 }
 
+// The finger poses a reach plays, and when it switches between them (each a fraction, 0..1).
 struct FMars_FPHands_ReachPoseSpec
 {
     UPROPERTY()
@@ -46,6 +47,44 @@ struct FMars_FPHands_ReachPoseSpec
     // Contact pose when the target has none of its own (pickups use their item's GripPose).
     UPROPERTY()
     EMars_HandGripPose Contact = EMars_HandGripPose::Power;
+
+    // A reach out (Grab's Reach, Hold's reach) plays Approach until this fraction of its seconds, then Contact.
+    UPROPERTY()
+    float32 ApproachUntilFraction = 0.7f;
+
+    // A grab's Return keeps Contact for this fraction of its seconds before the glove's own pose comes back.
+    UPROPERTY()
+    float32 ContactReturnFraction = 0.5f;
+
+    // A Release opens the hand (Approach) for this fraction of its seconds.
+    UPROPERTY()
+    float32 ReleaseOpenFraction = 0.6f;
+
+    // A reaching glove's fingers close on the target (finger contact) once the reach alpha is past this.
+    UPROPERTY()
+    float32 ContactCurlFromAlpha = 0.6f;
+
+    // A focus lean past this fraction of Focus.Lean opens the hand (Approach).
+    UPROPERTY()
+    float32 FocusOpensAtLeanFraction = 0.5f;
+}
+
+// Every fraction finite and within 0..1.
+mixin FMars_Validation Validate(const FMars_FPHands_ReachPoseSpec& Self)
+{
+    TArray<float32> Fractions;
+    Fractions.Add(Self.ApproachUntilFraction);
+    Fractions.Add(Self.ContactReturnFraction);
+    Fractions.Add(Self.ReleaseOpenFraction);
+    Fractions.Add(Self.ContactCurlFromAlpha);
+    Fractions.Add(Self.FocusOpensAtLeanFraction);
+    for (const auto Fraction : Fractions)
+    {
+        if (Math::IsFinite(Fraction) == false || Fraction < 0.0f || Fraction > 1.0f)
+        { return FMars_Validation(f"Reach.Poses: a fraction [{Fraction}] is outside [0, 1]"); }
+    }
+
+    return FMars_Validation();
 }
 
 // Instant interactions: reach out, close the hands, come back (seconds).
@@ -254,12 +293,6 @@ mixin bool Get_IsGrippingTarget(const FCk_Handle_FPHands& Self, FCk_Handle_Inter
         && Self.Get_ReachAlpha() >= 0.999f;
 }
 
-// 1 = a picked-up item is where it lay, 0 = at its hold offset. Follows the grab.
-mixin float32 Get_CarryWeight(const FCk_Handle_FPHands& Self)
-{
-    return utils_fphands::Get_PhaseCarryWeight(Self.Get_PhaseState(), Self.Get_Spec().Reach);
-}
-
 mixin bool Get_IsReaching(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
 {
     return Self.Get_Phase() != EMars_FPHands_Phase::None && utils_fphands::Get_UsesHand(Self.Get_Target(), InHand);
@@ -288,18 +321,18 @@ mixin TOptional<EMars_HandGripPose> TryGet_ReachPose(const FCk_Handle_FPHands& S
     }
 
     if (Phase == EMars_FPHands_Phase::Reach)
-    { return TOptional<EMars_HandGripPose>(T < Spec.Reach.Grab.OutSeconds * 0.7f ? Poses.Approach : Contact); }
+    { return TOptional<EMars_HandGripPose>(T < Spec.Reach.Grab.OutSeconds * Poses.ApproachUntilFraction ? Poses.Approach : Contact); }
 
     if (Phase == EMars_FPHands_Phase::Grip)
     { return TOptional<EMars_HandGripPose>(Contact); }
 
-    if (Phase == EMars_FPHands_Phase::Return && T < Spec.Reach.Grab.BackSeconds * 0.5f)
+    if (Phase == EMars_FPHands_Phase::Return && T < Spec.Reach.Grab.BackSeconds * Poses.ContactReturnFraction)
     { return TOptional<EMars_HandGripPose>(Contact); }
 
     if (Phase == EMars_FPHands_Phase::Hold)
-    { return TOptional<EMars_HandGripPose>(T < Spec.Reach.Hold.ReachSeconds * 0.7f ? Poses.Approach : Contact); }
+    { return TOptional<EMars_HandGripPose>(T < Spec.Reach.Hold.ReachSeconds * Poses.ApproachUntilFraction ? Poses.Approach : Contact); }
 
-    if (Phase == EMars_FPHands_Phase::Release && T < Spec.Reach.Hold.ReleaseSeconds * 0.6f)
+    if (Phase == EMars_FPHands_Phase::Release && T < Spec.Reach.Hold.ReleaseSeconds * Poses.ReleaseOpenFraction)
     { return TOptional<EMars_HandGripPose>(Poses.Approach); }
 
     return TOptional<EMars_HandGripPose>();

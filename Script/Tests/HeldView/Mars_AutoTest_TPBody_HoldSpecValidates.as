@@ -44,8 +44,8 @@ class UMars_AutoTest_TPBody_HoldSpecValidates : UCk_AutoTest_Base
         Assert_False(NegativePalm.Validate().IsValid(), "a negative palm offset is rejected");
 
         auto NegativeSpeed = FMars_TPBody_Hold();
-        NegativeSpeed.InterpSpeed = -1.0f;
-        Assert_False(NegativeSpeed.Validate().IsValid(), "a negative interp speed is rejected");
+        NegativeSpeed.InterpSpeed = TOptional<float32>(-1.0f);
+        Assert_False(NegativeSpeed.Validate().IsValid(), "a negative interp speed is rejected (unset snaps)");
 
         auto BodyWithBrokenHold = Config.TPBody;
         BodyWithBrokenHold.Hold.PalmSurfaceOffset = -1.0f;
@@ -57,14 +57,14 @@ class UMars_AutoTest_TPBody_HoldSpecValidates : UCk_AutoTest_Base
     {
         const auto Spec = FMars_FPHands_Spec();
         auto Grip = FMars_HeldView_Grip();
-        Grip.IsTwoHanded = true;
+        Grip.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Grip.RightFaceY = 15.0;
         Grip.LeftFaceY = -15.0;
 
         const auto BodyScale = 1.0969f;
         auto Query = FMars_TPBody_HoldQuery();
         Query.Grips = utils_held_view::Get_GripTargets(Spec, Grip);
-        Query.IsTwoHanded = true;
+        Query.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Query.Hold = FMars_TPBody_Hold();
         Query.BodyScale = BodyScale;
         // Identity: each hand bone is its grip bone, so the targets are the laid-out grips themselves.
@@ -94,11 +94,11 @@ class UMars_AutoTest_TPBody_HoldSpecValidates : UCk_AutoTest_Base
     {
         const auto Spec = FMars_FPHands_Spec();
         auto Grip = FMars_HeldView_Grip();
-        Grip.IsTwoHanded = false;
+        Grip.Kind = EMars_FPHands_HoldKind::OneHanded;
 
         auto Query = FMars_TPBody_HoldQuery();
         Query.Grips = utils_held_view::Get_GripTargets(Spec, Grip);
-        Query.IsTwoHanded = false;
+        Query.Kind = EMars_FPHands_HoldKind::OneHanded;
         Query.Hold = FMars_TPBody_Hold();
         Query.BodyScale = 1.0f;
         Query.HandInGrip_R = FTransform::Identity;

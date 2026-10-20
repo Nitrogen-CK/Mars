@@ -29,6 +29,7 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         Tick_HoldTarget(InHandle, InState);
         utils_fphands::Update_ReachTarget(InState.Reach.Target);
         utils_fphands::Update_ReachTarget(InState.Focus.Target);
+        utils_fphands::Update_ReachTarget(InState.Focus.OutgoingTarget);
 
         Tick_FocusLean(Params.Spec.Reach.Focus, InState.Focus, DeltaSeconds);
         Tick_Carry(InHandle, Params, InState);
@@ -105,12 +106,12 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
         { return; }
 
         const auto ViewPitch = float32(utils_scene_node::Get_DriverWorldTransform(Node).Rotator().Pitch);
-        if (InState.ViewPitchDeg.IsSet() == false || InSpec.InterpSpeed <= 0.0f)
+        if (InState.ViewPitchDeg.IsSet() == false || InSpec.InterpSpeed.IsSet() == false)
         { InState.ViewPitchDeg = TOptional<float32>(ViewPitch); }
         else
         {
             const auto Previous = InState.ViewPitchDeg.GetValue();
-            const auto Alpha = float32(1.0 - Math::Exp(-InSpec.InterpSpeed * InDeltaSeconds));
+            const auto Alpha = float32(1.0 - Math::Exp(-InSpec.InterpSpeed.GetValue() * InDeltaSeconds));
             InState.ViewPitchDeg = TOptional<float32>(Previous + (ViewPitch - Previous) * Alpha);
         }
 
@@ -123,8 +124,9 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
 
     // The focus target outlives the focus while the gloves lean back out (an unfocus, or a focused pickup destroyed under
     // the view trace), and is cleared once both leans have eased to zero - so the gloves ease back to rest instead of
-    // snapping, and never keep leaning toward a dead item's frozen spot. A reach takes the larger of lean and reach, so it
-    // launches from and settles back into the lean.
+    // snapping, and never keep leaning toward a dead item's frozen spot. The outgoing target (the one a refocus or a hold
+    // change replaced) eases out at the same rate and is cleared the same way. A reach takes the larger of lean and reach,
+    // so it launches from and settles back into the lean.
     private void Tick_FocusLean(const FMars_FPHands_FocusSpec& InSpec, FMars_FPHands_FocusState& InOutFocus, float32 InDeltaSeconds)
     {
         const auto HasFocus = InOutFocus.Target.IsSet() && ck::IsValid(InOutFocus.FocusedFor);
@@ -139,6 +141,18 @@ class UMars_Processor_FPHands_Tick : UCk_Processor_Script_Base_UE
             InOutFocus.Target.Reset();
             InOutFocus.Alpha_R = 0.0f;
             InOutFocus.Alpha_L = 0.0f;
+        }
+
+        if (InOutFocus.OutgoingTarget.IsSet() == false)
+        { return; }
+
+        InOutFocus.OutgoingAlpha_R -= InOutFocus.OutgoingAlpha_R * LeanAlpha;
+        InOutFocus.OutgoingAlpha_L -= InOutFocus.OutgoingAlpha_L * LeanAlpha;
+        if (InOutFocus.OutgoingAlpha_R < 0.001f && InOutFocus.OutgoingAlpha_L < 0.001f)
+        {
+            InOutFocus.OutgoingTarget.Reset();
+            InOutFocus.OutgoingAlpha_R = 0.0f;
+            InOutFocus.OutgoingAlpha_L = 0.0f;
         }
     }
 

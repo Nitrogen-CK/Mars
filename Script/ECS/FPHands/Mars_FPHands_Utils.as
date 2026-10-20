@@ -142,6 +142,21 @@ mixin float32 Get_FocusAlpha(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
     return Focus.Alpha_L;
 }
 
+// The focus target a refocus or a hold change replaced, while its lean eases out; unset otherwise.
+mixin TOptional<FMars_FPHands_ReachTarget> Get_OutgoingFocusTarget(const FCk_Handle_FPHands& Self)
+{
+    return Self.Get_Fragment(FMars_Fragment_FPHands).Focus.OutgoingTarget;
+}
+
+mixin float32 Get_OutgoingFocusAlpha(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
+{
+    const auto& Focus = Self.Get_Fragment(FMars_Fragment_FPHands).Focus;
+    if (InHand == EMars_Hand::Right)
+    { return Focus.OutgoingAlpha_R; }
+
+    return Focus.OutgoingAlpha_L;
+}
+
 // One glove's finger pose override; unset = none. Applied only while that glove is on a reach target.
 mixin TOptional<EMars_HandGripPose> TryGet_PoseOverride(const FCk_Handle_FPHands& Self, EMars_Hand InHand)
 {
@@ -218,10 +233,10 @@ mixin void Request_StartPush(FCk_Handle_FPHands& Self, const FMars_Request_FPHan
     Requests.StartPushRequests.Add(InRequest);
 }
 
-mixin void Request_Release(FCk_Handle_FPHands& Self)
+mixin void Request_Release(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_Release& InRequest)
 {
     auto& Requests = Self.AddOrGet_Fragment(FMars_Fragment_FPHands_Requests);
-    Requests.ReleaseRequests.Add(FMars_Request_FPHands_Release());
+    Requests.ReleaseRequests.Add(InRequest);
 }
 
 mixin void Request_SetFocus(FCk_Handle_FPHands& Self, const FMars_Request_FPHands_SetFocus& InRequest)

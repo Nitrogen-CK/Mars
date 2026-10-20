@@ -1,6 +1,8 @@
 // Inventory links. The features stay pure data + request processors; these tasks decide when they talk, and never call
-// into each other - they meet only through the features' fragments and signals.
-// Single-player: these run on the local pawn only. Multiplayer needs a local-controller gate on the hint and input tasks.
+// into each other - they meet only through the features' fragments and signals. Items, the hotbar and HeldItem never
+// replicate, so every task that binds them or drives the owner's gloves, hints or drops gates on
+// utils_player_sm::Get_IsOwningCopy; the intent tasks need no gate (only the owner reads input). The crouch height is
+// movement state every copy needs, so it runs everywhere.
 
 //--------------------------------------------------------------------------------------------------------------------------
 // HotbarIntents
@@ -72,6 +74,9 @@ class UMars_SmTask_HotbarEjectDrops : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         auto Player = ck::Ctx(InHandle);
         _Hotbar = Player.As_Hotbar();
         _Use = Player.As_HeldItemUse(ECk_SanityCheck::UnChecked);
@@ -93,7 +98,7 @@ class UMars_SmTask_HotbarEjectDrops : UCk_SmTask_EntityScript
     private void OnOverflowEjectRequested(FCk_Handle_Hotbar InHotbar, FCk_Handle_Item InItem)
     {
         if (ck::IsValid(_Use))
-        { _Use.Request_Drop(); }
+        { _Use.Request_Drop(FMars_Request_HeldItemUse_Drop()); }
     }
 }
 
@@ -102,13 +107,18 @@ class UMars_SmTask_HotbarEjectDrops : UCk_SmTask_EntityScript
 //--------------------------------------------------------------------------------------------------------------------------
 
 // The gloves hold what HeldItem holds (FPHands builds the hold from the item, utils_fphands::Make_Hold): told on enter and
-// on every held-item change. A carrier without gloves or HeldItem (a test rig) binds nothing.
+// on every held-item change. With it go the hold's other two consumers: the character's replicated view of it (the body
+// others see, AMars_PlayerCharacter::Request_SetHeldView) and the hold's lateral on the gloves' side node (empty hands and
+// two-handed holds centre the hand node between the gloves; a one-handed item moves it to the right glove). An item in the
+// hands stops a playing emote. A carrier without gloves or HeldItem (a test rig) binds nothing; one without a character
+// or side node skips those.
 class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
 {
     default _TaskMode = ECk_SmTaskMode::EnterExitOnly;
 
     private FCk_Handle_HeldItem _HeldItem;
     private FCk_Handle_FPHands _Hands;
+    private AMars_PlayerCharacter _Character;
 
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
@@ -126,8 +136,9 @@ class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
             return;
         }
 
+        _Character = Cast<AMars_PlayerCharacter>(ck::ToActor(Player, ECk_SanityCheck::UnChecked));
         _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
-        _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(_HeldItem.Get_CurrentItem()));
+        Apply_Hold(_HeldItem.Get_CurrentItem());
     }
 
     UFUNCTION(BlueprintOverride)
@@ -138,13 +149,34 @@ class UMars_SmTask_HeldItemDrivesHands : UCk_SmTask_EntityScript
 
         _HeldItem = FCk_Handle_HeldItem();
         _Hands = FCk_Handle_FPHands();
+        _Character = nullptr;
     }
 
     UFUNCTION()
     private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
     {
         if (ck::IsValid(_Hands))
-        { _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(InNew)); }
+        { Apply_Hold(InNew); }
+    }
+
+    private void Apply_Hold(FCk_Handle_Item InItem)
+    {
+        _Hands.Request_SetHold(FMars_Request_FPHands_SetHold(InItem));
+
+        const auto Hold = utils_fphands::Make_Hold(InItem);
+        if (Hold.Kind != EMars_FPHands_HoldKind::Empty)
+        { utils_fphands::Stop_Emote(_Hands); }
+
+        if (ck::IsValid(_Character))
+        { _Character.Request_SetHeldView(utils_held_view::Make(InItem)); }
+
+        auto SideNode = _Hands.Get_SideNode();
+        if (ck::Is_NOT_Valid(SideNode))
+        { return; }
+
+        const auto Lateral = utils_fphands::Get_HandLateral(_Hands.Get_Spec().Rest, Hold);
+        utils_scene_node::Request_UpdateOffset(SideNode,
+            FCk_Request_SceneNode_UpdateRelativeTransform(FTransform(FRotator::ZeroRotator, Lateral)));
     }
 }
 
@@ -222,12 +254,15 @@ class UMars_SmTask_HeldItemDrivesUse : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         auto Player = ck::Ctx(InHandle);
         _HeldItem = Player.As_HeldItem();
         _Use = Player.As_HeldItemUse();
 
         _HeldItem.BindTo_OnHeldItemChanged(FMars_Delegate_HeldItem_OnHeldItemChanged(this, n"OnHeldItemChanged"));
-        _Use.Request_RefreshFromHeldItem();
+        _Use.Request_RefreshFromHeldItem(FMars_Request_HeldItemUse_RefreshFromHeldItem());
     }
 
     UFUNCTION(BlueprintOverride)
@@ -244,7 +279,7 @@ class UMars_SmTask_HeldItemDrivesUse : UCk_SmTask_EntityScript
     private void OnHeldItemChanged(FCk_Handle_HeldItem InHeldItem, FCk_Handle_Item InPrev, FCk_Handle_Item InNew)
     {
         if (ck::IsValid(_Use))
-        { _Use.Request_RefreshFromHeldItem(); }
+        { _Use.Request_RefreshFromHeldItem(FMars_Request_HeldItemUse_RefreshFromHeldItem()); }
     }
 }
 
@@ -362,9 +397,9 @@ class UMars_SmTask_DropThrowIntent : UMars_SmTask_IntentEdges
         if (ck::IsValid(_Use) && ck::IsValid(_HeldItem) && ck::IsValid(_HeldItem.Get_CurrentItem()))
         {
             if (_Armed)
-            { _Use.Request_Throw(); }
+            { _Use.Request_Throw(FMars_Request_HeldItemUse_Throw()); }
             else
-            { _Use.Request_Drop(); }
+            { _Use.Request_Drop(FMars_Request_HeldItemUse_Drop()); }
         }
 
         CancelHold();
@@ -416,6 +451,9 @@ class UMars_SmTask_HeldItemHints : UCk_SmTask_EntityScript
     UFUNCTION(BlueprintOverride)
     void DoEnterTask(FCk_Handle_SmTask InHandle, ECk_Sm_NetContext InNetContext)
     {
+        if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
+        { return; }
+
         auto Player = ck::Ctx(InHandle);
         _HeldItem = Player.As_HeldItem();
         _Use = Player.As_HeldItemUse();

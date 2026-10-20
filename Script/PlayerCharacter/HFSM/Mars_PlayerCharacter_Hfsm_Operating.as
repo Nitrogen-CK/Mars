@@ -37,17 +37,14 @@ class UMars_SmState_Operating : UCk_SmState_EntityScript
         AddTask(InHandle, UMars_SmTask_Operating_Hints);
     }
 
-    // A teardown that did not come from the station's release (Downed): release it, scoped to this player. It reaches the
-    // arbiter on its next drain, so the back-ref may lag a frame; nothing re-enters Operating meanwhile (Alive is gone).
+    // A teardown that did not come from the station's release (Downed): the operator leaves, scoped to this player (a
+    // no-op once the station has let go). It reaches the arbiter on its next drain, so the back-ref may lag a frame;
+    // nothing re-enters Operating meanwhile (Alive is gone).
     UFUNCTION(BlueprintOverride)
     void DoExitState(FCk_Handle_SmState InHandle, ECk_Sm_NetContext InNetContext)
     {
-        auto Player = ck::Ctx(InHandle);
-        auto Station = Player.As_Operator().Get_Station();
-        if (ck::Is_NOT_Valid(Station) || Station.Get_IsOperatedBy(Player) == false)
-        { return; }
-
-        Station.Request_Release(FMars_Request_Station_Release(Player, EMars_Station_ReleaseReason::StationRequested));
+        auto Operator = ck::Ctx(InHandle).As_Operator();
+        Operator.Request_Leave(FMars_Request_Operator_Leave());
     }
 }
 
@@ -251,7 +248,7 @@ class UMars_CameraLayer_Station : UCk_CameraLayer_EntityScript
 // Grip
 //--------------------------------------------------------------------------------------------------------------------------
 
-namespace utils_player_sm
+namespace utils_fphands
 {
     // The ticks past Get_GripLandSeconds after which a station grip the gloves have not taken never will be: the gloves
     // re-read the resolver only as they come to rest, release or return, and those edges reach the grip's watch a state
@@ -263,7 +260,7 @@ namespace utils_player_sm
     float32 Get_GripLandSeconds(const FCk_Handle_FPHands& InHands)
     {
         const auto& Spec = InHands.Get_Spec();
-        return utils_fphands::Get_PushSeconds(Spec.Push) + Spec.Reach.Grab.OutSeconds;
+        return Get_PushSeconds(Spec.Push) + Spec.Reach.Grab.OutSeconds;
     }
 }
 
@@ -289,7 +286,7 @@ enum EMars_Operating_GripLanding
 // Exit cancels the interaction, removes the target and closes Operate. The close needs only the resolver: the grip target
 // dies with its station, and a station destroyed under the operator must not leave Operate open.
 //
-// The gloves must take the grip (Hold on its target) within utils_player_sm::Get_GripLandSeconds and k_GripLandGraceTicks
+// The gloves must take the grip (Hold on its target) within utils_fphands::Get_GripLandSeconds and k_GripLandGraceTicks
 // more. A reach they refuse outright (out of reach: a two-handed hold; the subject gone; malformed), or one they never
 // take, leaves the operator nothing to hold, so the operator leaves the station (Request_Leave, as Back does) instead of
 // standing there Operating with the station held. A reach refused only for now (busy, superseded, a push starting, a pickup
@@ -355,11 +352,11 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
         }
 
         _WaitSeconds += float32(InDeltaT.Get_Seconds());
-        if (_WaitSeconds < utils_player_sm::Get_GripLandSeconds(_Hands))
+        if (_WaitSeconds < utils_fphands::Get_GripLandSeconds(_Hands))
         { return ECk_SmTaskResult::Running; }
 
         _TicksPastBound += 1;
-        if (_TicksPastBound < utils_player_sm::k_GripLandGraceTicks)
+        if (_TicksPastBound < utils_fphands::k_GripLandGraceTicks)
         { return ECk_SmTaskResult::Running; }
 
         Give_Up();
@@ -394,7 +391,7 @@ class UMars_SmTask_Operating_Grip : UCk_SmTask_EntityScript
         Stop_Watching(EMars_Operating_GripLanding::Unwatched);
 
         auto Operator = _Player.As_Operator();
-        Operator.Request_Leave();
+        Operator.Request_Leave(FMars_Request_Operator_Leave());
     }
 
     private void Stop_Watching(EMars_Operating_GripLanding InLanding)
@@ -449,7 +446,7 @@ class UMars_SmTask_Operating_LeaveIntent : UMars_SmTask_IntentEdges
         if (InIntent != GameplayTags::Mars_Intent_Back)
         { return; }
 
-        _Operator.Request_Leave();
+        _Operator.Request_Leave(FMars_Request_Operator_Leave());
     }
 }
 

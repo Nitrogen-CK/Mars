@@ -56,7 +56,7 @@ class UMars_AutoTest_FPHands_ReleaseQueuedWithHoldLetsGo : UMars_AutoTestRig_Han
     {
         _Phases.Empty();
         _Hands.Request_SetPhase(FMars_Request_FPHands_SetPhase(EMars_FPHands_Phase::Hold));
-        _Hands.Request_Release();
+        _Hands.Request_Release(FMars_Request_FPHands_Release());
     }
 
     UFUNCTION()

@@ -12,34 +12,81 @@ enum EMars_LocomotionSpeed
     Sprint
 }
 
+// The two speeds the attribute moves between: Walk is its base, Sprint / Walk the sprint modifier's multiplier.
+struct FMars_LocomotionSpeed_Spec
+{
+    UPROPERTY()
+    float32 Walk = 420.0f;
+
+    UPROPERTY()
+    float32 Sprint = 700.0f;
+
+    FMars_LocomotionSpeed_Spec() {}
+
+    FMars_LocomotionSpeed_Spec(float32 InWalk, float32 InSprint)
+    {
+        Walk = InWalk;
+        Sprint = InSprint;
+    }
+}
+
+// Both speeds finite and positive.
+mixin FMars_Validation Validate(const FMars_LocomotionSpeed_Spec& Self)
+{
+    if (Math::IsFinite(Self.Walk) == false || Math::IsFinite(Self.Sprint) == false)
+    { return FMars_Validation(f"Walk [{Self.Walk}] or Sprint [{Self.Sprint}] is not finite"); }
+
+    if (Self.Walk <= 0.0f || Self.Sprint <= 0.0f)
+    { return FMars_Validation(f"Walk [{Self.Walk}] and Sprint [{Self.Sprint}] must be positive"); }
+
+    return FMars_Validation();
+}
+
+// Retained from the Spec at Add: what Sprint multiplies the attribute by.
+struct FMars_Fragment_LocomotionSpeed_Params
+{
+    UPROPERTY()
+    float32 SprintMultiplier = 1.0f;
+}
+
 namespace utils_locomotion_speed
 {
-    // Resolved by name: freshly declared tags have no generated GameplayTags:: accessor in a running editor.
-    FGameplayTag Get_AttributeName()
+    // Composes the attribute on InPlayer. Its value is one moment of movement state, so it is never saved. A spec that
+    // fails Validate adds nothing.
+    FCk_Handle_FloatAttribute Add(FCk_Handle InPlayer, FMars_LocomotionSpeed_Spec InSpec)
     {
-        return utils_gameplay_tag::ResolveGameplayTag(n"FloatAttribute.Mars.Player.MovementSpeed");
-    }
+        const auto Validation = InSpec.Validate();
+        if (ck::EnsureIfNot(Validation.IsValid(), f"[LocomotionSpeed] [{InPlayer.ToString()}] rejected the spec: {Validation.Get_Error()}"))
+        { return FCk_Handle_FloatAttribute(); }
 
-    FGameplayTag Get_SprintModifierName()
-    {
-        return utils_gameplay_tag::ResolveGameplayTag(n"AttributeModifier.Mars.Player.Sprint");
-    }
+        auto Player = InPlayer;
+        auto Params = FMars_Fragment_LocomotionSpeed_Params();
+        Params.SprintMultiplier = InSpec.Sprint / InSpec.Walk;
+        Player.Add_Fragment(Params);
 
-    // Composes the attribute on the player. Its value is one moment of movement state, so it is never saved.
-    FCk_Handle_FloatAttribute Add(FCk_Handle InPlayer, float32 InWalkSpeed)
-    {
-        auto Spec = FCk_FloatAttribute_Spec(Get_AttributeName(), InWalkSpeed);
+        auto Spec = FCk_FloatAttribute_Spec(GameplayTags::FloatAttribute_Mars_Player_MovementSpeed, InSpec.Walk);
         Spec.Set_PersistValue(ECk_EnableDisable::Disable);
-        return utils_float_attribute::Add(InPlayer, Spec, ECk_Replication::Replicates);
+        return utils_float_attribute::Add(Player, Spec, ECk_Replication::Replicates);
+    }
+
+    // InPlayer's sprint modifier is on: it entered Sprint and has not walked, stopped or crouched since.
+    bool Get_IsSprinting(FCk_Handle InPlayer)
+    {
+        auto Attribute = utils_float_attribute::TryGet(InPlayer, GameplayTags::FloatAttribute_Mars_Player_MovementSpeed);
+        if (ck::Is_NOT_Valid(Attribute))
+        { return false; }
+
+        return ck::IsValid(utils_float_attribute_modifier::TryGet(Attribute, GameplayTags::AttributeModifier_Mars_Player_Sprint));
     }
 
     void Apply(FCk_Handle InPlayer, EMars_LocomotionSpeed InSpeed)
     {
-        auto Attribute = utils_float_attribute::TryGet(InPlayer, Get_AttributeName());
-        if (ck::EnsureIfNot(ck::IsValid(Attribute), f"[LocomotionSpeed] [{InPlayer.ToString()}] has no movement speed attribute"))
+        auto Attribute = utils_float_attribute::TryGet(InPlayer, GameplayTags::FloatAttribute_Mars_Player_MovementSpeed);
+        if (ck::EnsureIfNot(ck::IsValid(Attribute) && InPlayer.Has_Fragment(FMars_Fragment_LocomotionSpeed_Params),
+            f"[LocomotionSpeed] [{InPlayer.ToString()}] has no movement speed attribute (utils_locomotion_speed::Add)"))
         { return; }
 
-        auto Sprint = utils_float_attribute_modifier::TryGet(Attribute, Get_SprintModifierName());
+        auto Sprint = utils_float_attribute_modifier::TryGet(Attribute, GameplayTags::AttributeModifier_Mars_Player_Sprint);
         if (InSpeed == EMars_LocomotionSpeed::Walk)
         {
             if (ck::IsValid(Sprint))
@@ -51,16 +98,9 @@ namespace utils_locomotion_speed
         if (ck::IsValid(Sprint))
         { return; }
 
-        auto Character = Cast<AMars_PlayerCharacter>(ck::ToActor(InPlayer));
-        if (ck::EnsureIfNot(ck::IsValid(Character), "[LocomotionSpeed] the context actor is not an AMars_PlayerCharacter"))
-        { return; }
-
-        const auto& Speeds = Character.Config.Movement.Speeds;
-        if (ck::EnsureIfNot(Speeds.Walk > 0.0f, f"[LocomotionSpeed] Speeds.Walk [{Speeds.Walk}] must be positive to scale it to Sprint"))
-        { return; }
-
-        utils_float_attribute_modifier::Add_Revocable(Attribute, Get_SprintModifierName(), ECk_AttributeModifier_Operation::Multiply,
-            FCk_FloatAttributeModifier_Spec(Speeds.Sprint / Speeds.Walk, ECk_MinMaxCurrent::Current));
+        const auto Multiplier = InPlayer.Get_Fragment(FMars_Fragment_LocomotionSpeed_Params).SprintMultiplier;
+        utils_float_attribute_modifier::Add_Revocable(Attribute, GameplayTags::AttributeModifier_Mars_Player_Sprint,
+            ECk_AttributeModifier_Operation::Multiply, FCk_FloatAttributeModifier_Spec(Multiplier, ECk_MinMaxCurrent::Current));
     }
 }
 
@@ -104,7 +144,7 @@ class UMars_SmTask_MovementSpeedSync : UCk_SmTask_EntityScript
         if (ck::EnsureIfNot(ck::IsValid(_Character), "[MovementSpeedSync] the context actor is not an ACharacter"))
         { return; }
 
-        _Attribute = utils_float_attribute::TryGet(Player, utils_locomotion_speed::Get_AttributeName());
+        _Attribute = utils_float_attribute::TryGet(Player, GameplayTags::FloatAttribute_Mars_Player_MovementSpeed);
         if (ck::EnsureIfNot(ck::IsValid(_Attribute), f"[MovementSpeedSync] [{Player.ToString()}] has no movement speed attribute"))
         { return; }
 

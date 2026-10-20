@@ -80,7 +80,7 @@ class UMars_AutoTest_EmoteWheel_OpenHoverChooseClose : UCk_AutoTest_Base
     UFUNCTION()
     private void Step_Open(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Wheel.Request_Open();
+        _Wheel.Request_Open(FMars_Request_EmoteWheel_Open());
     }
 
     UFUNCTION()

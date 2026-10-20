@@ -37,7 +37,7 @@ class UMars_AutoTest_Player_APressDuringAPushStillReaches : UMars_AutoTestRig_Pi
     private void Step_WatchAndDrop(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         _Hotbar.BindTo_OnSlotItemChanged(FMars_Delegate_Hotbar_OnSlotItemChanged(this, n"OnSlotItemChanged"));
-        _Use.Request_Drop();
+        _Use.Request_Drop(FMars_Request_HeldItemUse_Drop());
     }
 
     UFUNCTION()

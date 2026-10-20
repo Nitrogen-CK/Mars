@@ -288,8 +288,9 @@ class UMars_SmTask_InteractionFocus : UCk_SmTask_EntityScript
     {
         for (auto Target : InInteractable.Get_AllInteractTargets())
         {
-            if (ck::IsValid(Target) && Target.Has_Fragment(FMars_Fragment_InteractionContext))
-            { return Target.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner; }
+            const auto Owner = Target.TryGet_InteractableOwner();
+            if (ck::IsValid(Owner))
+            { return Owner; }
         }
 
         return FCk_Handle();
@@ -490,7 +491,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 
         for (auto NewTarget : InNewTargets)
         {
-            auto Control = Get_ManipulatedControl(NewTarget);
+            auto Control = NewTarget.TryGet_ManipulatedControl();
             if (ck::Is_NOT_Valid(Control))
             { continue; }
 
@@ -638,7 +639,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
 
         // The delta that was drained before the grip is not a pull.
         _SeenLookSequence = ck::IsValid(_Intents) ? _Intents.Get_LookDeltaSequence() : 0;
-        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction, _Player));
+        _Control.Request_BeginManipulation(FMars_Request_Control_BeginManipulation(Interaction));
         HoldView();
     }
 
@@ -655,22 +656,6 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         { ReleaseView(); }
     }
 
-    // The Control behind a ManuallyCompleted interact target; invalid for any other target.
-    private FCk_Handle_Control Get_ManipulatedControl(FCk_Handle_InteractTarget InTarget) const
-    {
-        if (ck::Is_NOT_Valid(InTarget) || InTarget.Has_Fragment(FMars_Fragment_InteractionContext) == false)
-        { return FCk_Handle_Control(); }
-
-        if (InTarget.Get_InteractionCompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
-        { return FCk_Handle_Control(); }
-
-        auto Control = InTarget.Get_Fragment(FMars_Fragment_InteractionContext).InteractableOwner.As_Control(ECk_SanityCheck::UnChecked);
-        if (ck::Is_NOT_Valid(Control) || Control.Get_CompletionPolicy() != ECk_Interaction_CompletionPolicy::ManuallyCompleted)
-        { return FCk_Handle_Control(); }
-
-        return Control;
-    }
-
     private void EndManipulation()
     {
         if (_IsManipulating == false)
@@ -679,7 +664,7 @@ class UMars_SmTask_ManipulateControl : UCk_SmTask_EntityScript
         _IsManipulating = false;
 
         if (ck::IsValid(_Control))
-        { _Control.Request_EndManipulation(); }
+        { _Control.Request_EndManipulation(FMars_Request_Control_EndManipulation()); }
 
         ReleaseView();
     }

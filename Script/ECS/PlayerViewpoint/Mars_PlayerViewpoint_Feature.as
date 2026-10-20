@@ -53,6 +53,9 @@ mixin FMars_Validation Validate(const FMars_PlayerViewpoint_Spec& Self)
     if (Math::IsFinite(Self.LookSpeed) == false)
     { return FMars_Validation(f"LookSpeed [{Self.LookSpeed}] is not finite"); }
 
+    if (Math::IsFinite(Self.PitchLimits._Min) == false || Math::IsFinite(Self.PitchLimits._Max) == false)
+    { return FMars_Validation(f"PitchLimits [{Self.PitchLimits._Min}, {Self.PitchLimits._Max}] is not finite"); }
+
     if (Self.InteractionTraceDistance <= 0.0f)
     { return FMars_Validation(f"InteractionTraceDistance [{Self.InteractionTraceDistance}] must be > 0"); }
 
@@ -61,6 +64,9 @@ mixin FMars_Validation Validate(const FMars_PlayerViewpoint_Spec& Self)
 
     if (Self.PitchLimits._Min > Self.PitchLimits._Max)
     { return FMars_Validation(f"PitchLimits min [{Self.PitchLimits._Min}] exceeds max [{Self.PitchLimits._Max}]"); }
+
+    if (Self.PitchLimits._Min < -90.0f || Self.PitchLimits._Max > 90.0f)
+    { return FMars_Validation(f"PitchLimits [{Self.PitchLimits._Min}, {Self.PitchLimits._Max}] is outside [-90, 90]"); }
 
     if (Self.LookSpeed <= 0.0f)
     { return FMars_Validation(f"LookSpeed [{Self.LookSpeed}] must be > 0"); }

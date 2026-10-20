@@ -96,7 +96,7 @@ class UMars_AutoTest_HeldItem_SyncsFromTheHotbarWithoutATask : UMars_AutoTestRig
     UFUNCTION()
     private void Step_Deselect(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
-        _Hotbar.Request_Deselect();
+        _Hotbar.Request_Deselect(FMars_Request_Hotbar_Deselect());
     }
 
     UFUNCTION()

@@ -2,7 +2,7 @@
 // (the Hands sub-SM's state enter tasks); StartPush, StartReach and Release only broadcast, and the sub-SM's conditions
 // turn those broadcasts into transitions.
 //
-// SetPhase drains first so the others gate on the phase the sub-SM is in now: a Release queued beside Hold's
+// SetPhase drains before Release, StartPush and StartReach so they gate on the phase the sub-SM is in now: a Release queued beside Hold's
 // SetPhase(Hold) lets go, and a StartPush / StartReach beside Rest's SetPhase(None) is honoured. Release is honoured
 // only while holding; StartPush only at rest; StartReach at rest and while letting go (Release, Return), the phases
 // whose states listen for it - a reach requested mid-grab, mid-hold or mid-push leaves the current target alone, so a
@@ -45,7 +45,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         Self.Request_TryRemove(FMars_Fragment_FPHands_Requests);
 
         for (const auto& Request : SetHoldRequests)
-        { HandleSetHold(InState, Request); }
+        { HandleSetHold(Params, InState, Request); }
 
         for (const auto& Request : SetFocusRequests)
         { HandleSetFocus(Params, InState, Request); }
@@ -85,12 +85,15 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
 
     // A pickup that lands while the gloves are still on it rides in with them (see the Tick processor's carry). Not a
     // Persistent item: its own world item lerps itself onto the hand (the mount Arrival), and a carry would fight that
-    // for the same scene node offset.
-    private void HandleSetHold(FMars_Fragment_FPHands& InState, const FMars_Request_FPHands_SetHold& InRequest)
+    // for the same scene node offset. The focus lean is re-resolved for the new hold: a glove that now holds the item no
+    // longer leans at what is looked at.
+    private void HandleSetHold(const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState,
+                               const FMars_Request_FPHands_SetHold& InRequest)
     {
         const auto& Item = InRequest.Item;
         InState.Hold = utils_fphands::Make_Hold(Item);
         InState.Carry.Reset();
+        Refresh_Focus(InParams, InState);
 
         if (utils_fphands::Get_IsGrabbing(InState.PhaseState.Phase) == false || InState.Reach.Target.IsSet() == false)
         { return; }
@@ -113,6 +116,7 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         if (ck::Is_NOT_Valid(InRequest.Interactable))
         {
             InState.Focus.FocusedFor = FCk_Handle_Interactable();
+            InState.Focus.FocusedOwner = FCk_Handle();
             return;
         }
 
@@ -120,8 +124,29 @@ class UMars_Processor_FPHands_HandleRequests : UCk_Processor_Script_Base_UE
         { return; }
 
         InState.Focus.FocusedFor = InRequest.Interactable;
-        InState.Focus.Target = Resolve_Target(InParams, InState,
-            FMars_FPHands_ReachQuery(FMars_FPHands_ReachSubject(InRequest.Interactable, InRequest.Owner), Make_HandState(InParams, InState)));
+        InState.Focus.FocusedOwner = InRequest.Owner;
+        Refresh_Focus(InParams, InState);
+    }
+
+    // Resolves the focus target for the focused interactable against the current hold. The target it replaces (with its
+    // leans) becomes the outgoing one and eases out while the new one eases in. No focus: nothing changes.
+    private void Refresh_Focus(const FMars_Fragment_FPHands_Params& InParams, FMars_Fragment_FPHands& InState)
+    {
+        if (ck::Is_NOT_Valid(InState.Focus.FocusedFor))
+        { return; }
+
+        auto& Focus = InState.Focus;
+        if (Focus.Target.IsSet() && (Focus.Alpha_R > 0.001f || Focus.Alpha_L > 0.001f))
+        {
+            Focus.OutgoingTarget = Focus.Target;
+            Focus.OutgoingAlpha_R = Focus.Alpha_R;
+            Focus.OutgoingAlpha_L = Focus.Alpha_L;
+        }
+
+        Focus.Alpha_R = 0.0f;
+        Focus.Alpha_L = 0.0f;
+        const auto Subject = FMars_FPHands_ReachSubject(Focus.FocusedFor, Focus.FocusedOwner);
+        Focus.Target = Resolve_Target(InParams, InState, FMars_FPHands_ReachQuery(Subject, Make_HandState(InParams, InState)));
     }
 
     // Last wins per glove.

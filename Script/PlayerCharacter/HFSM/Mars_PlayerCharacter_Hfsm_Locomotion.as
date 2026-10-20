@@ -3,17 +3,25 @@
 // Crouch is a toggle on fresh presses, not holds, so crouching mid-sprint with sprint still held does not bounce
 // straight back to Sprint. Landing goes straight to the moving state: a frame in Idle drops MaxWalkSpeed and input,
 // braking the run.
+//
+// Sprint is held or toggled (the controls.sprint_toggle setting, read on every evaluation so a change applies at once).
+// Toggled, a fresh press starts it and the next fresh press ends it; crouching or stopping ends it too (their own
+// transitions). Being in Sprint is the toggle's whole state: Jump and Airborne keep the sprint speed modifier they arrived
+// with, so a landing resumes Sprint exactly when the modifier is still on (utils_locomotion_speed::Get_IsSprinting).
 
-namespace utils_mars_sprint
+enum EMars_SprintMode
 {
-    UMars_InputProfile_Gameplay Get_ActiveProfile(FCk_Handle_SmCondition InCondition)
+    Hold,
+    Toggle
+}
+
+namespace utils_locomotion_speed
+{
+    EMars_SprintMode Get_SprintMode()
     {
-        auto Player = Cast<AMars_PlayerCharacter>(
-            utils_owning_actor::TryGet_EntityOwningActor_Recursive(ck::Ctx(InCondition)));
-        auto Controller = ck::IsValid(Player)
-            ? Cast<AMars_Master_PlayerController>(Player.GetController()) : nullptr;
-        return ck::IsValid(Controller)
-            ? Cast<UMars_InputProfile_Gameplay>(Controller.InputComp.GetActiveProfile()) : nullptr;
+        return utils_game_settings::Get_SettingValue_Bool(constants_settings::k_SprintToggle, false)
+            ? EMars_SprintMode::Toggle
+            : EMars_SprintMode::Hold;
     }
 }
 
@@ -32,38 +40,57 @@ class UMars_SmCondition_JumpReleased : UMars_SmCondition_JumpHeld
     default _NegateResult = true;
 }
 
-class UMars_SmCondition_SprintHeld : UMars_SmCondition_IntentActive
-{
-    default IntentTag = GameplayTags::Mars_Intent_Sprint;
-
-    UFUNCTION(BlueprintOverride)
-    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
-    {
-        auto Profile = utils_mars_sprint::Get_ActiveProfile(InHandle);
-        if (ck::IsValid(Profile) && Profile.Get_IsSprintToggleMode())
-        { return Profile.Get_IsSprintToggleLatched(); }
-
-        return Super::DoEvaluate(InHandle, InDeltaT);
-    }
-}
-
-class UMars_SmCondition_SprintReleased : UMars_SmCondition_SprintHeld
-{
-    default _NegateResult = true;
-}
-
+// A fresh Sprint press (since the condition entered), in either mode.
 class UMars_SmCondition_SprintPressed : UMars_SmCondition_IntentPressed
 {
     default IntentTag = GameplayTags::Mars_Intent_Sprint;
 
+    // The Sprint row is Active (held) now.
+    protected bool Get_IsSprintHeld(FCk_Handle_SmCondition InHandle) const
+    {
+        auto Intents = ck::Ctx(InHandle).As_InputIntents(ECk_SanityCheck::UnChecked);
+        return ck::IsValid(Intents) && Intents.Get_IsIntentActive(IntentTag);
+    }
+}
+
+// Walk -> Sprint: held, while Sprint is held; toggled, on a fresh press.
+class UMars_SmCondition_SprintStarts : UMars_SmCondition_SprintPressed
+{
     UFUNCTION(BlueprintOverride)
     bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
     {
-        auto Profile = utils_mars_sprint::Get_ActiveProfile(InHandle);
-        if (ck::IsValid(Profile) && Profile.Get_IsSprintToggleMode() && !Profile.Get_IsSprintToggleLatched())
-        { return false; }
+        if (utils_locomotion_speed::Get_SprintMode() == EMars_SprintMode::Toggle)
+        { return Super::DoEvaluate(InHandle, InDeltaT); }
 
-        return Super::DoEvaluate(InHandle, InDeltaT);
+        return Get_IsSprintHeld(InHandle);
+    }
+}
+
+// Sprint -> Walk: held, once Sprint is let go; toggled, on the next fresh press (the press that started it was held
+// when this condition entered, so it is not one).
+class UMars_SmCondition_SprintEnds : UMars_SmCondition_SprintPressed
+{
+    UFUNCTION(BlueprintOverride)
+    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
+    {
+        if (utils_locomotion_speed::Get_SprintMode() == EMars_SprintMode::Toggle)
+        { return Super::DoEvaluate(InHandle, InDeltaT); }
+
+        return Get_IsSprintHeld(InHandle) == false;
+    }
+}
+
+// Airborne -> Sprint on landing: held, while Sprint is held; toggled, when the jump left Sprint (its speed modifier is
+// still on).
+class UMars_SmCondition_SprintResumes : UMars_SmCondition_SprintPressed
+{
+    UFUNCTION(BlueprintOverride)
+    bool DoEvaluate(FCk_Handle_SmCondition InHandle, FCk_Time InDeltaT) const
+    {
+        if (utils_locomotion_speed::Get_SprintMode() == EMars_SprintMode::Toggle)
+        { return utils_locomotion_speed::Get_IsSprinting(ck::Ctx(InHandle)); }
+
+        return Get_IsSprintHeld(InHandle);
     }
 }
 
@@ -136,7 +163,7 @@ class UMars_SmState_Loco_Walk : UCk_SmState_EntityScript
         AddCondition(ToIdle, UMars_SmCondition_NoMoveIntent);
 
         auto ToSprint = AddTransition(InHandle, UMars_SmState_Loco_Sprint);
-        AddCondition(ToSprint, UMars_SmCondition_SprintHeld);
+        AddCondition(ToSprint, UMars_SmCondition_SprintStarts);
 
         AddTask(InHandle, UMars_SmTask_LocomotionSpeed_Walk);
         AddTask(InHandle, UMars_SmTask_Movement);
@@ -164,14 +191,15 @@ class UMars_SmState_Loco_Sprint : UCk_SmState_EntityScript
         AddCondition(ToIdle, UMars_SmCondition_NoMoveIntent);
 
         auto ToWalk = AddTransition(InHandle, UMars_SmState_Loco_Walk);
-        AddCondition(ToWalk, UMars_SmCondition_SprintReleased);
+        AddCondition(ToWalk, UMars_SmCondition_SprintEnds);
 
         AddTask(InHandle, UMars_SmTask_LocomotionSpeed_Sprint);
         AddTask(InHandle, UMars_SmTask_Movement);
     }
 }
 
-// Crouched speed is MaxWalkSpeedCrouched, which CharacterMovement applies itself.
+// Crouched speed is MaxWalkSpeedCrouched, which CharacterMovement applies itself. Crouching ends a sprint: the walk speed
+// task drops its modifier, so a jump out of the crouch never lands back in a toggled Sprint.
 class UMars_SmState_Loco_Crouch : UCk_SmState_EntityScript
 {
     UFUNCTION(BlueprintOverride)
@@ -193,6 +221,7 @@ class UMars_SmState_Loco_Crouch : UCk_SmState_EntityScript
         auto ToIdle = AddTransition(InHandle, UMars_SmState_Loco_Idle);
         AddCondition(ToIdle, UMars_SmCondition_CrouchPressed);
 
+        AddTask(InHandle, UMars_SmTask_LocomotionSpeed_Walk);
         AddTask(InHandle, UMars_SmTask_Crouch);
         AddTask(InHandle, UMars_SmTask_Movement);
     }
@@ -231,7 +260,7 @@ class UMars_SmState_Loco_Airborne : UCk_SmState_EntityScript
         auto ToSprint = AddTransition(InHandle, UMars_SmState_Loco_Sprint);
         AddCondition(ToSprint, UMars_SmCondition_IsGrounded);
         AddCondition(ToSprint, UMars_SmCondition_HasMoveIntent);
-        AddCondition(ToSprint, UMars_SmCondition_SprintHeld);
+        AddCondition(ToSprint, UMars_SmCondition_SprintResumes);
 
         auto ToWalk = AddTransition(InHandle, UMars_SmState_Loco_Walk);
         AddCondition(ToWalk, UMars_SmCondition_IsGrounded);

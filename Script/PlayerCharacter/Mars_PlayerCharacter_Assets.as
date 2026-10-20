@@ -1,3 +1,26 @@
+// The gloves' skeletal mesh and anim class (AMars_PlayerCharacter::FPHands).
+struct FMars_FPHands_VisualSpec
+{
+    UPROPERTY()
+    TSoftObjectPtr<USkeletalMesh> Mesh;
+
+    UPROPERTY()
+    TSoftClassPtr<UAnimInstance> AnimClass;
+}
+
+// An emote montage drives both gloves (placement and fingers) through Slot; the procedural placement fades out under it.
+struct FMars_FPHands_EmoteSpec
+{
+    UPROPERTY()
+    TMap<EMars_FPEmote, TSoftObjectPtr<UAnimMontage>> Montages;
+
+    UPROPERTY()
+    FName Slot = n"DefaultSlot";
+
+    UPROPERTY()
+    float32 CancelBlendSeconds = 0.2f;
+}
+
 struct FMars_PlayerCharacter_Speeds
 {
     UPROPERTY()
@@ -36,9 +59,9 @@ struct FMars_PlayerCharacter_Movement
 
     // How far (cm) the server lets the owner's reported position stray from its own before it corrects the owner
     // (UMars_CharacterMovementComponent::ClientAuthMaxError). Co-op, not competitive: within it the owner's position is
-    // taken as truth, so latency never rubber-bands the owner. 0 = stock server-authoritative correction.
+    // taken as truth, so latency never rubber-bands the owner. Unset = stock server-authoritative correction.
     UPROPERTY()
-    float32 ClientAuthMaxError = 750.0f;
+    TOptional<float32> ClientAuthMaxError = TOptional<float32>(750.0f);
 }
 
 // The capsule is the player's size: 1.5 m tall, ~78 cm across. The body others see is smaller (Config.TPBody.Scale: it
@@ -144,6 +167,18 @@ class UMars_PlayerCharacter_Config : UDataAsset
     UPROPERTY(Category = "Hands")
     FMars_FPHands_Spec FPHands;
 
+    // The gloves' mesh and anim class (the pawn's FPHands component).
+    UPROPERTY(Category = "Hands")
+    FMars_FPHands_VisualSpec FPHandsVisual;
+
+    // The gloves' emote montages (utils_fphands::Play_Emote).
+    UPROPERTY(Category = "Hands")
+    FMars_FPHands_EmoteSpec FPHandsEmotes;
+
+    // First-person rendering of the gloves and what they hold.
+    UPROPERTY(Category = "Hands")
+    FMars_FPHands_ViewSpec FPHandsView;
+
     // The third-person chef body other players see (the character's Mesh), its hat and where its eyes sit.
     UPROPERTY(Category = "Body")
     FMars_TPBody_Spec TPBody;
@@ -167,7 +202,10 @@ namespace mars
         TArray<FCk_InteractionResolver_IntentChannelMapping> Mappings;
         Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Use, UseChannels));
 
+        // Channel order is priority: a focused world prompt outranks the held item's use, so a Primary press while
+        // looking at a hook hangs the lantern instead of working its shutter; with nothing focused it uses the item.
         TArray<FGameplayTag> PrimaryChannels;
+        PrimaryChannels.Add(GameplayTags::InteractionChannel_Mars_Use);
         PrimaryChannels.Add(GameplayTags::InteractionChannel_Mars_Primary_UsableItem);
         Mappings.Add(FCk_InteractionResolver_IntentChannelMapping(GameplayTags::InteractionIntent_Mars_Primary, PrimaryChannels));
 
@@ -195,10 +233,8 @@ namespace mars
         HandSway.Set_TeleportDistanceCm(300.0f);
         HandSway.Set_TeleportAngleDeg(90.0f);
 
-        // The movement component is supplied by the pawn at composition; only tunables live here. The 1.5 m chef's legs
-        // are 1.5x the 1 m chef's, so at the walk speed it takes 1 / 1.5 the steps: 1.6 / 1.5 = 1.07 strides per second.
-        // (That matched the LowPoly body's locomotion play rate; the MiniChef body steps at its clips' own rate,
-        // FMars_TPBody_Spec::AuthoredScale, and the first-person cadence was left as it was.)
+        // The movement component is supplied by the pawn at composition; only tunables live here. The first-person stride
+        // cadence at the walk speed; the body steps at its clips' own rate (FMars_TPBody_Spec::AuthoredScale).
         View.Gait = FCk_Gait_Spec();
         auto GaitStride = View.Gait.Get_Stride();
         GaitStride.Set_ReferenceSpeed(420.0f);
@@ -227,19 +263,19 @@ namespace mars
         View.HeadBob.Set_BreathCm(0.25f);
         View.HeadBob.Set_MaxOffsetCm(10.0f);
 
-        FPHands.Visual.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/SK_FPHands.SK_FPHands"));
-        FPHands.Visual.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/ABP_FPHands.ABP_FPHands_C"));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Wave, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Wave.AM_FPHands_Emote_Wave")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::ThumbsUp, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_ThumbsUp.AM_FPHands_Emote_ThumbsUp")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Point, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Point.AM_FPHands_Emote_Point")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Clap, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Clap.AM_FPHands_Emote_Clap")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::FlipOff, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_FlipOff.AM_FPHands_Emote_FlipOff")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Cheer, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Cheer.AM_FPHands_Emote_Cheer")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Laugh, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Laugh.AM_FPHands_Emote_Laugh")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Bow, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Bow.AM_FPHands_Emote_Bow")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Dance, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Dance.AM_FPHands_Emote_Dance")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Shrug, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Shrug.AM_FPHands_Emote_Shrug")));
-        FPHands.Emotes.Montages.Add(EMars_FPEmote::Rest, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Rest.AM_FPHands_Emote_Rest")));
+        FPHandsVisual.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Meshes/SK_FPHands.SK_FPHands"));
+        FPHandsVisual.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/ABP_FPHands.ABP_FPHands_C"));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Wave, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Wave.AM_FPHands_Emote_Wave")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::ThumbsUp, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_ThumbsUp.AM_FPHands_Emote_ThumbsUp")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Point, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Point.AM_FPHands_Emote_Point")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Clap, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Clap.AM_FPHands_Emote_Clap")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::FlipOff, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_FlipOff.AM_FPHands_Emote_FlipOff")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Cheer, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Cheer.AM_FPHands_Emote_Cheer")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Laugh, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Laugh.AM_FPHands_Emote_Laugh")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Bow, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Bow.AM_FPHands_Emote_Bow")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Dance, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Dance.AM_FPHands_Emote_Dance")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Shrug, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Shrug.AM_FPHands_Emote_Shrug")));
+        FPHandsEmotes.Montages.Add(EMars_FPEmote::Rest, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/FPHands/Anims/Emotes/AM_FPHands_Emote_Rest.AM_FPHands_Emote_Rest")));
 
         // The hands' bob keeps the landing dip but adds no airborne lift: CkSway on the parent Hand node already lags
         // the hands while the body rises and falls (HandSway LocationFromLinearVelocity.Z). One owner per effect.
@@ -254,20 +290,20 @@ namespace mars
 
         TPBody.Mesh = TSoftObjectPtr<USkeletalMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SK_Chef.SK_Chef"));
         TPBody.AnimClass = TSoftClassPtr<UAnimInstance>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/ABP_Chef.ABP_Chef_C"));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Wave.AM_Chef_Emote_Wave")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_ThumbsUp.AM_Chef_Emote_ThumbsUp")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Point.AM_Chef_Emote_Point")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Clap.AM_Chef_Emote_Clap")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_FlipOff.AM_Chef_Emote_FlipOff")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Cheer.AM_Chef_Emote_Cheer")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Laugh.AM_Chef_Emote_Laugh")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Bow.AM_Chef_Emote_Bow")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Dance.AM_Chef_Emote_Dance")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Shrug.AM_Chef_Emote_Shrug")));
-        TPBody.Montages.EmoteMontages.Add(TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Rest.AM_Chef_Emote_Rest")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Wave, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Wave.AM_Chef_Emote_Wave")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::ThumbsUp, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_ThumbsUp.AM_Chef_Emote_ThumbsUp")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Point, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Point.AM_Chef_Emote_Point")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Clap, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Clap.AM_Chef_Emote_Clap")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::FlipOff, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_FlipOff.AM_Chef_Emote_FlipOff")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Cheer, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Cheer.AM_Chef_Emote_Cheer")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Laugh, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Laugh.AM_Chef_Emote_Laugh")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Bow, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Bow.AM_Chef_Emote_Bow")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Dance, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Dance.AM_Chef_Emote_Dance")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Shrug, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Shrug.AM_Chef_Emote_Shrug")));
+        TPBody.Montages.EmoteMontages.Add(EMars_FPEmote::Rest, TSoftObjectPtr<UAnimMontage>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Anims/Emotes/AM_Chef_Emote_Rest.AM_Chef_Emote_Rest")));
         TPBody.Head.Hat.Mesh = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath("/Game/Mars/Gameplay/PlayerCharacter/Chef/Meshes/SM_Chef_Hat.SM_Chef_Hat"));
 
-        // Big wide eyes, as the concept art: the Wide style on the body's 8.5 x 6 cm eye quads (Mars_Eyes_Assets.as).
+        // Big wide eyes: the Wide style on the body's 8.5 x 6 cm eye quads (Mars_Eyes_Assets.as).
         Eyes.Style = utils_eyes::Style_Wide().Def;
 
         EmoteWheel.Definition = TSoftObjectPtr<UMars_EmoteWheel_Definition>(FSoftObjectPath("/Game/Mars/Gameplay/Emotes/EmoteWheel_Mars_DA.EmoteWheel_Mars_DA"));

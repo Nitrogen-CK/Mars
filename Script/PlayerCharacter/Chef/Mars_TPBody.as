@@ -3,15 +3,12 @@
 // ABP's DefaultSlot (AMars_PlayerCharacter::Request_Emote), its held-item strike is the procedural HandSwing carried
 // through the arms' IK (Mars_HeldView.as, AMars_PlayerCharacter::Request_Strike).
 
-// The body's montages. EmoteMontages is indexed by EMars_FPEmote (the gloves' FMars_FPHands_EmoteSpec::Montages maps it).
+// The body's montages: one per EMars_FPEmote, as the gloves' FMars_FPHands_EmoteSpec::Montages. Each plays through the
+// slot its montage names.
 struct FMars_TPBody_Montages
 {
     UPROPERTY()
-    TArray<TSoftObjectPtr<UAnimMontage>> EmoteMontages;
-
-    // The ABP_Chef slot the emote montages play through.
-    UPROPERTY()
-    FName EmoteSlot = n"DefaultSlot";
+    TMap<EMars_FPEmote, TSoftObjectPtr<UAnimMontage>> EmoteMontages;
 
     UPROPERTY()
     float32 EmoteCancelBlendSeconds = 0.2f;
@@ -41,12 +38,8 @@ struct FMars_TPBody_Face
     FName Bone = n"head";
 
     // The face node relative to Bone, in unscaled body units: +X out of the face, +Y the chef's right, +Z up, midway
-    // between the two eye quads. Derived from SK_Chef's reference pose (the MiniChef body, 2026-10-09): head bone at
-    // component (0, 1.5, 45), its X straight up, Y to the chef's left, Z out of the face. The eye quads (MiniChef_Eyes,
-    // two 8.5 x 8.5 cm quads flush on the face plate over its painted eyes, centred at x +-6.4, z 58.4) have their
-    // midpoint at component (0, 14.07, 58.37), facing +Y: Offset = FaceInComponent * Inverse(HeadInComponent), i.e. the
-    // delta (0, 12.57, 13.37) in head axes. Gaze aims from here. Scale must stay one (the body's Scale sizes it).
-    // (The LowPoly chef this body replaced: FRotator(87.138, 180, 0), FVector(8.26, 0, 15.09).)
+    // between the two eye quads (SK_Chef's head bone has X up, Y to the chef's left, Z out of the face). Gaze aims from
+    // here. Scale must stay one (the body's Scale sizes it).
     UPROPERTY()
     FTransform Offset = FTransform(FRotator(90.0, 180.0, 0.0), FVector(13.37, 0.0, 12.57), FVector::OneVector);
 
@@ -81,20 +74,16 @@ struct FMars_TPBody_Spec
     UPROPERTY()
     FTransform MeshOffset = FTransform(FRotator(0.0, -90.0, 0.0), FVector::ZeroVector, FVector::OneVector);
 
-    // Uniform scale of the body others see. It is smaller than the player it stands for (2026-10-12): the capsule is
-    // 1.5 m and the view 110 cm up, but the MiniChef at that height (Scale 1.8828 = 150 / 79.67, the unscaled mesh's
-    // top above its feet, hat excluded) read too big beside the 70 cm stations - 92 cm wide, its hat at 189 cm, its
-    // face level with the viewer's eyes. At 1.5 the body tops out at 120 cm (hat 150 cm, 73 cm wide, inside the
-    // capsule) and other players look slightly down at it. Only the look changes: the capsule, the view height
-    // (Config.View.EyeHeight) and the reach stay the player's. The view sits 110 cm up, inside the hood (the face
-    // centre is 58.37 * Scale = 88 cm up); below about 1.4 it would be above the hood's top.
+    // Uniform scale of the body others see. It is smaller than the player it stands for: at 1.5 the body tops out at
+    // 120 cm (hat 150 cm, 73 cm wide, inside the 1.5 m capsule) and other players look slightly down at it. Only the look
+    // changes: the capsule, the view height (Config.View.EyeHeight) and the reach stay the player's. The view sits 110 cm
+    // up, inside the hood; below about 1.4 it would be above the hood's top.
     UPROPERTY()
     float32 Scale = 1.5f;
 
     // The Scale the locomotion clips were authored against. ABP_Chef plays BS_Chef_Locomotion at AuthoredScale / Scale
     // (Get_LocomotionPlayRate), so a body scaled up past its clips takes proportionally slower steps and one scaled
-    // down takes quicker ones. The MiniChef's clips are built for its legs at Scale 1.8828; at Scale 1.5 the shorter
-    // legs step 1.255 times as fast over the same ground (the LowPoly chef's clips were authored at 1.0969).
+    // down takes quicker ones.
     UPROPERTY()
     float32 AuthoredScale = 1.8828f;
 
@@ -142,8 +131,12 @@ mixin FMars_Validation Validate(const FMars_TPBody_Spec& Self)
     { return FMars_Validation(f"MeshOffset scale [{Self.MeshOffset.GetScale3D()}] must be one - the Scale field sizes the body"); }
 
     const auto EmoteCount = utils_fphands::Get_EmoteCount();
-    if (Self.Montages.EmoteMontages.Num() != EmoteCount)
-    { return FMars_Validation(f"EmoteMontages has [{Self.Montages.EmoteMontages.Num()}] entries, EMars_FPEmote has [{EmoteCount}]"); }
+    for (int32 Value = 0; Value < EmoteCount; ++Value)
+    {
+        const auto Emote = EMars_FPEmote(Value);
+        if (Self.Montages.EmoteMontages.Contains(Emote) == false)
+        { return FMars_Validation(f"EmoteMontages has no montage for [{Emote :n}]"); }
+    }
 
     if (Self.Montages.EmoteCancelBlendSeconds < 0.0f)
     { return FMars_Validation(f"EmoteCancelBlendSeconds [{Self.Montages.EmoteCancelBlendSeconds}] is negative"); }

@@ -26,8 +26,7 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UMars_AutoTest
         Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
         Add_Step("each glove has its own anchor, both are used, the left takes its own pose", n"Step_AssertPerHandAnchors");
         Add_Step("move node R to the Mover's end", n"Step_MoveR");
-        Add_Step_WaitUntil("the Mover reached its end", n"Check_MoverAtEnd", k_SlowPolls, 0);
-        Add_Step_WaitSeconds("let the offset and the anchors refresh", 0.1f);
+        Add_Step_WaitUntil("the Mover reached its end and the right anchor followed node R", n"Check_MoverAtEndAndAnchorFollowed", k_SlowPolls, 0);
         Add_Step("the right anchor moved down 20, the left did not move", n"Step_AssertOnlyRightFollows");
         Run_Steps(InHandle);
     }
@@ -93,11 +92,23 @@ class UMars_AutoTest_FPHands_GripTableGivesEachHandItsOwnAnchor : UMars_AutoTest
         _MoverR.Request_MoveTo(FMars_Request_Mover_MoveTo(EMars_Mover_Pose::End));
     }
 
+    // The anchors refresh every Tick (Update_ReachTarget): node R's world location and the right anchor's agree once both
+    // have taken the Mover's end offset.
     UFUNCTION()
-    private void Check_MoverAtEnd(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    private void Check_MoverAtEndAndAnchorFollowed(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
     {
         auto Res = OutResult;
-        Res.Set(_MoverR.Get_Target() == EMars_Mover_Pose::End && _MoverR.Get_Alpha() >= 0.999f);
+        const auto Target = _Hands.Get_Target();
+        if (_MoverR.Get_Target() != EMars_Mover_Pose::End || _MoverR.Get_Alpha() < 0.999f
+            || utils_fphands::Get_UsesHand(Target, EMars_Hand::Right) == false)
+        {
+            Res.Set(false);
+            return;
+        }
+
+        const auto NodeR = utils_transform::Get_EntityCurrentTransform(_NodeR).GetLocation();
+        const auto Anchor = Target.GetValue().Right.GetValue().AnchorWorld.GetLocation();
+        Res.Set(NodeR.Z < _RightBeforeMove.GetLocation().Z - 19.5 && Anchor.Equals(NodeR, 0.01));
     }
 
     UFUNCTION()

@@ -30,13 +30,7 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
         _Hands.BindTo_OnReachRequested(FMars_Delegate_FPHands_OnReachRequested(this, n"OnReachRequested"));
         _Hands.BindTo_OnPhaseChanged(FMars_Delegate_FPHands_OnPhaseChanged(this, n"OnPhaseRecordTarget"));
 
-        auto HolderOwner = utils_entity_lifetime::Request_CreateEntity(InHandle);
-        auto HolderParams = utils_inventory_data_only::Make_Params_Bounded(GameplayTags::Inventory_Mars_WorldItemHolder, 1,
-            FCk_Delegate_Inventory_CustomCanAcceptItem_Dynamic(), FCk_Delegate_Inventory_CustomCanStackItems_Dynamic());
-        _Holder = utils_inventory_data_only::Add(HolderOwner, HolderParams, ECk_Replication::DoesNotReplicate);
-        auto AddRequest = FCk_Request_Inventory_AddItemByDefinition(mars_items::Rock(), 1);
-        AddRequest.Set_Policy(ECk_Inventory_AddPolicy::ForceNewItem);
-        _Holder.Request_AddItemByDefinition(AddRequest, FCk_Delegate_Inventory_OnOperationResult_AddByDefinition());
+        _Holder = Add_SeededHolder(InHandle, mars_items::Rock());
 
         auto Owner = InHandle;
         _SubjectEntity = utils_world_item::Request_SpawnWorld(Owner, FMars_WorldItem_WorldSpec(
@@ -156,8 +150,12 @@ class UMars_AutoTest_FPHands_APlaceReachCarriesATwoHandedHoldToTheTarget : UMars
         const auto SubjectFit = _Subject.Get_BoundsFit();
         const auto HeldFit = _Hands.Get_Hold().Bounds;
         const auto Expected = SubjectFit.Centre + FVector(0.0, 0.0, SubjectFit.HalfExtents.Z + HeldFit.HalfExtents.Z);
-        Assert_True(Target.PlaceAt.IsSet() && Target.PlaceAt.GetValue().Equals(Expected, 0.01),
-            f"the rock's centre is set down on the subject's top ({Target.PlaceAt.GetValue()} vs {Expected})");
+        Assert_True(Target.PlaceAt.IsSet(), "the Place reach carries a place spot");
+        if (Target.PlaceAt.IsSet())
+        {
+            Assert_True(Target.PlaceAt.GetValue().Equals(Expected, 0.01),
+                f"the rock's centre is set down on the subject's top ({Target.PlaceAt.GetValue()} vs {Expected})");
+        }
         Assert_True(HeldFit.HalfExtents.Z > 0.0, "the held rock has a height");
     }
 

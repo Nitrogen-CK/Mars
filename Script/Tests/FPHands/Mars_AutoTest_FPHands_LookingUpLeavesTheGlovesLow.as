@@ -27,7 +27,7 @@ class UMars_AutoTest_FPHands_LookingUpLeavesTheGlovesLow : UCk_AutoTest_Base
         Spec.Pitch.Node = PitchNode;
         Spec.Pitch.FollowUp = k_FollowUp;
         Spec.Pitch.FollowDown = 1.0f;
-        Spec.Pitch.InterpSpeed = 0.0f;
+        Spec.Pitch.InterpSpeed.Reset();
         auto Player = InHandle;
         Spec.HandNode = _HandNode;
         _Hands = utils_fphands::Add(Player, Spec);

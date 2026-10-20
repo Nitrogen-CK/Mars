@@ -20,24 +20,37 @@ class UMars_AutoTest_FPHands_PoseOverrideAppliesOnlyWhileReaching : UMars_AutoTe
 
         Add_Step_WaitUntil("the Hands SM rests in Rest, listening for a reach", n"Check_RestListening", 0, 0);
         Add_Step("override the left glove to Cradle", n"Step_OverrideLeft");
-        Add_Step_WaitFrames("the override drains", 2);
+        Add_Step_WaitUntil("the override drains", n"Check_RequestsDrained", 0, 0);
         Add_Step("at rest the left glove keeps its rest pose", n"Step_AssertLeftAtRest");
         Add_Step("request a bare timed reach (right only)", n"Step_RequestTimedReach");
-        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
-        Add_Step_WaitSeconds("the reach completes", 0.2f);
+        Add_Step_WaitUntil("the phase is Hold and the reach is complete", n"Check_HoldReached", k_SlowPolls, 0);
         Add_Step("the left glove is not on the target: its pose is unchanged", n"Step_AssertLeftAtRest");
         Add_Step("let go", n"Step_RequestRelease");
         Add_Step_WaitUntil("the gloves are back at rest", n"Check_IsNone", k_SlowPolls, 0);
         Add_Step("the return to None cleared the override", n"Step_AssertCleared");
         Add_Step_WaitUntil("the Hands SM listens again", n"Check_RestListening", 0, 0);
         Add_Step("override the left glove to Cradle again; reach for the owner's grip table", n"Step_OverrideAndReachForOwner");
-        Add_Step_WaitUntil("the phase is Hold", n"Check_IsHold", 0, 0);
-        Add_Step_WaitSeconds("the reach completes", 0.2f);
+        Add_Step_WaitUntil("the phase is Hold and the reach is complete", n"Check_HoldReached", k_SlowPolls, 0);
         Add_Step("the left glove plays Cradle, the right its own Power", n"Step_AssertLeftCradle");
         Add_Step("let go", n"Step_RequestRelease");
         Add_Step_WaitUntil("the gloves are back at rest", n"Check_IsNone", k_SlowPolls, 0);
         Add_Step("the return to None cleared the override", n"Step_AssertCleared");
         Run_Steps(InHandle);
+    }
+
+    UFUNCTION()
+    private void Check_RequestsDrained(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hands.Has_Fragment(FMars_Fragment_FPHands_Requests) == false);
+    }
+
+    // Past the reach's ApproachUntilFraction the reach pose is the contact pose: the reach alpha at 1 is past it.
+    UFUNCTION()
+    private void Check_HoldReached(FCk_Handle InHandle, FCk_SharedBool OutResult, FInstancedStruct InPayload)
+    {
+        auto Res = OutResult;
+        Res.Set(_Hands.Get_Phase() == EMars_FPHands_Phase::Hold && _Hands.Get_ReachAlpha() >= 0.999f);
     }
 
     private void BuildOwner(FCk_Handle InHandle)

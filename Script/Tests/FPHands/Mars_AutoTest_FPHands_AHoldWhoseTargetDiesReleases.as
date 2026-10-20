@@ -13,7 +13,10 @@ class UMars_AutoTest_FPHands_AHoldWhoseTargetDiesReleases : UMars_AutoTestRig_Ha
         auto Spec = FMars_FPHands_Spec();
         Spec.Reach.Hold.ReleaseSeconds = 0.2f;
         Add_Hands(InHandle, Spec);
-        BuildLever(InHandle);
+        const auto Lever = Add_TimedLever(InHandle, FVector(60.0, 0.0, 0.0), 5.0f);
+        _LeverRoot = Lever.Root;
+        _Interactable = Lever.Interactable;
+        _Target = Lever.Target;
         Add_HandsSm();
         Log_Phases();
 
@@ -24,24 +27,6 @@ class UMars_AutoTest_FPHands_AHoldWhoseTargetDiesReleases : UMars_AutoTestRig_Ha
         Add_Step_WaitUntil("the gloves let go and rest", n"Check_IsNone", 0, 0);
         Add_Step("the phases ran Hold, Release, None", n"Step_AssertReleased");
         Run_Steps(InHandle);
-    }
-
-    // A Timed lever (a long hold) with a transform-only interactable; the reach resolves as a point grip at its root.
-    private void BuildLever(FCk_Handle InHandle)
-    {
-        auto Parent = InHandle;
-        _LeverRoot = utils_entity_lifetime::Request_CreateEntity(Parent);
-        auto Root = utils_transform::Add(_LeverRoot, FTransform(FRotator::ZeroRotator, FVector(60.0, 0.0, 0.0)), ECk_Replication::DoesNotReplicate);
-
-        auto ControlSpec = FMars_Control_Spec();
-        ControlSpec.Interaction = ECk_Interaction_CompletionPolicy::Timed;
-        ControlSpec.HoldSeconds = 5.0f;
-        auto Control = utils_control::Add(_LeverRoot, ControlSpec, FCk_Handle_Mover());
-
-        auto InteractableSpec = FMars_Interactable_Spec();
-        InteractableSpec.Targets.Add(Control.Make_InteractTarget(FText::FromString("Turn")));
-        _Interactable = utils_interactable::Create(Root, InteractableSpec);
-        _Target = _Interactable.Get_AllInteractTargets()[0];
     }
 
     UFUNCTION()

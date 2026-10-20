@@ -1,5 +1,5 @@
 // Drains Refresh, then Drop, then Throw, then SetThrowArmed. Refresh, Drop and Throw carry no payload, so each kind is
-// applied at most once per drain; a Drop and a Throw of one held item are one launch (LaunchedItem), the second traced.
+// applied at most once per drain; a Drop and a Throw of one held item are one launch (LaunchedItem): the second is dropped.
 //
 // Refresh owns the use interactable: a no-probe child of the player whose single Primary.UsableItem target runs the held
 // item's UseAction state. Nothing traces it, so it is focused and offered to the player's resolver here, and torn down

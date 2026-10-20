@@ -11,6 +11,19 @@
 // and conditions only issue FPHands requests and read its getters; ck::Ctx is the player entity (the sub-SM inherits
 // its parent's context).
 
+namespace utils_fphands
+{
+    // The reach for InTarget: its interactable and owner as the subject, its completion policy and its own gesture. Every
+    // task that asks the gloves to reach an interact target builds it here, so the drain sees one request as the reach
+    // it is already on (Get_IsOnRequestedTarget) whoever asked first.
+    FMars_Request_FPHands_StartReach Make_TargetReach(const FCk_Handle_InteractTarget& InTarget)
+    {
+        const auto& Context = InTarget.Get_Fragment(FMars_Fragment_InteractionContext);
+        const auto Subject = FMars_FPHands_ReachSubject(InTarget, Context.Interactable, Context.InteractableOwner);
+        return FMars_Request_FPHands_StartReach(Subject, InTarget.Get_InteractionCompletionPolicy(), Context.ReachKind);
+    }
+}
+
 // Leaving it (Downed, a teardown) puts the gloves back to rest: the phase goes to None, which also forgets the reach
 // target, so nothing is left stretched toward a device. A player already torn down has no gloves to reset.
 class UMars_SmTask_HandsSubSm : UCk_SmTask_SubStateMachine
@@ -138,7 +151,7 @@ class UMars_SmTask_Hands_StopEmote : UCk_SmTask_EntityScript
         if (utils_player_sm::Get_IsOwningCopy(InHandle, InNetContext) == false)
         { return; }
 
-        utils_player_emotes::Stop_Emote(ck::Ctx(InHandle).As_FPHands());
+        utils_fphands::Stop_Emote(ck::Ctx(InHandle).As_FPHands());
     }
 }
 
@@ -235,7 +248,7 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
             || Get_IsBestReachTarget(GameplayTags::InteractionIntent_Mars_Operate))
         { return; }
 
-        _Hands.Request_Release();
+        _Hands.Request_Release(FMars_Request_FPHands_Release());
     }
 
     private bool Get_IsBestReachTarget(FGameplayTag InIntent)
@@ -252,9 +265,7 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
 
     private void Request_Reach(FCk_Handle_InteractTarget InTarget)
     {
-        const auto& Context = InTarget.Get_Fragment(FMars_Fragment_InteractionContext);
-        const auto Subject = FMars_FPHands_ReachSubject(InTarget, Context.Interactable, Context.InteractableOwner);
-        _Hands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, InTarget.Get_InteractionCompletionPolicy(), Context.ReachKind));
+        _Hands.Request_StartReach(utils_fphands::Make_TargetReach(InTarget));
     }
 
     UFUNCTION()
@@ -271,7 +282,7 @@ class UMars_SmTask_HandsResolverBinds : UCk_SmTask_EntityScript
         for (auto Removed : InRemovedTargets)
         {
             if (_Hands.Get_IsReachTarget(Removed))
-            { _Hands.Request_Release(); }
+            { _Hands.Request_Release(FMars_Request_FPHands_Release()); }
         }
 
         for (auto Target : InNewTargets)
@@ -321,9 +332,8 @@ enum EMars_FPHands_GripWait
 // sub-SM's Failed end reports. The task ticks and returns _Outcome; a subclass that overrides DoTick or DoExitTask calls
 // Super.
 UCLASS(Abstract)
-class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
+class UMars_SmTask_ActAtGrip : UMars_SmTask_InteractionWork
 {
-    default _TaskMode = ECk_SmTaskMode::Tick;
 
     // The gloves answer a reach in the drain after it is asked, so by this many ticks after the request it was taken or
     // refused.
@@ -333,8 +343,6 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
     // and that phase edge reaches this task in the drain after: a PushEnd wait this many ticks past the push's seconds has
     // outlived the push (its phase frozen, the gloves' state machine torn down mid-push) and asks for the reach anyway.
     protected const int32 k_PushEndGraceTicks = 2;
-
-    protected ECk_SmTaskResult _Outcome = ECk_SmTaskResult::Running;
 
     private EMars_FPHands_GripWait _GripWait = EMars_FPHands_GripWait::None;
     private FCk_Handle_FPHands _GripHands;
@@ -414,24 +422,13 @@ class UMars_SmTask_ActAtGrip : UCk_SmTask_EntityScript
         return TOptional<FMars_WorldItem_ArriveSpec>(FMars_WorldItem_ArriveSpec(GripLeft, Grab.BackSeconds, Grab.BackEasing));
     }
 
-    // The wait (or the work) failed and nothing moved: InReason is named on the interaction's stamped context, which the
-    // sub-SM's Failed end reports. Sets _Outcome.
-    protected void DoFail(EMars_Interaction_FailReason InReason)
-    {
-        utils_interactable::Record_FailReason(Get_OwningStateMachine(), InReason);
-        _Outcome = ECk_SmTaskResult::Failed;
-    }
-
-    // The subject and the gesture the resolver's binds would ask for (UMars_SmTask_HandsResolverBinds), so a reach they
-    // already started is the same reach.
+    // The reach the resolver's binds ask for too (UMars_SmTask_HandsResolverBinds), so a reach they already started is the
+    // same reach.
     private void Ask_TargetReach()
     {
         _GripWait = EMars_FPHands_GripWait::TargetReach;
         _TicksSinceAsked = TOptional<int32>(0);
-
-        const auto& Context = _GripTarget.Get_Fragment(FMars_Fragment_InteractionContext);
-        const auto Subject = FMars_FPHands_ReachSubject(_GripTarget, Context.Interactable, Context.InteractableOwner);
-        _GripHands.Request_StartReach(FMars_Request_FPHands_StartReach(Subject, _GripTarget.Get_InteractionCompletionPolicy(), Context.ReachKind));
+        _GripHands.Request_StartReach(utils_fphands::Make_TargetReach(_GripTarget));
     }
 
     // A push still running k_PushEndGraceTicks ticks past its own seconds: the reach is asked for now, and the gloves take or

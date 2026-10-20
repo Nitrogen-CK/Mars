@@ -102,12 +102,28 @@ struct FMars_FPHands_FocusState
     UPROPERTY()
     FCk_Handle_Interactable FocusedFor;
 
-    // Smoothed lean per glove (each eases on its own, so switching sides cross-fades).
+    // FocusedFor's owner: the focus target is re-resolved from both when the hold changes.
+    UPROPERTY()
+    FCk_Handle FocusedOwner;
+
+    // Smoothed lean per glove toward Target.
     UPROPERTY()
     float32 Alpha_L = 0.0f;
 
     UPROPERTY()
     float32 Alpha_R = 0.0f;
+
+    // The target a refocus or a hold change replaced, with the leans it had then: they ease out on their own while
+    // Target's ease in, so the gloves cross-fade between the two. Cleared once both are gone. A third target arriving
+    // before then replaces it.
+    UPROPERTY()
+    TOptional<FMars_FPHands_ReachTarget> OutgoingTarget;
+
+    UPROPERTY()
+    float32 OutgoingAlpha_L = 0.0f;
+
+    UPROPERTY()
+    float32 OutgoingAlpha_R = 0.0f;
 }
 
 // What a push follows through from.

@@ -4,6 +4,7 @@
 class UMars_Processor_Eyes_Blink : UCk_Processor_Script_Base_UE
 {
     default _Group = n"FGroup_Gameplay_Script";
+    default _RunAfter.Add(n"/Script/Angelscript.Mars_Processor_Eyes_Resolve");
 
     UFUNCTION(BlueprintOverride)
     void Configure(FCk_ScriptProcessorQuery& Query)

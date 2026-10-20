@@ -15,19 +15,27 @@ class UMars_AutoTest_TPBody_SwingMovesTheHoldFrame : UCk_AutoTest_Base
     private void Step_Assert(FCk_Handle InHandle, FInstancedStruct InPayload)
     {
         auto Grip = FMars_HeldView_Grip();
-        Grip.IsTwoHanded = true;
+        Grip.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Grip.RightFaceY = 15.0;
         Grip.LeftFaceY = -15.0;
 
         auto Query = FMars_TPBody_HoldQuery();
         Query.Grips = utils_held_view::Get_GripTargets(FMars_FPHands_Spec(), Grip);
-        Query.IsTwoHanded = true;
+        Query.Kind = EMars_FPHands_HoldKind::TwoHanded;
         Query.Hold = FMars_TPBody_Hold();
         Query.BodyScale = 1.6453f;
 
+        // Rest is the query as built (no swing set); the identity query sets the swing explicitly.
         const auto Rest = utils_held_view::Make_HoldFrame(Query);
-        Assert_True(utils_held_view::Make_HoldFrame(Query).Right.HandLocation.Equals(Rest.Right.HandLocation, 0.0001),
-            "an identity swing changes nothing");
+        auto Identity = Query;
+        Identity.Swing = FTransform::Identity;
+        const auto IdentityFrame = utils_held_view::Make_HoldFrame(Identity);
+        Assert_True(IdentityFrame.Right.HandLocation.Equals(Rest.Right.HandLocation, 0.0001) &&
+            IdentityFrame.Left.HandLocation.Equals(Rest.Left.HandLocation, 0.0001), "an identity swing leaves both hands");
+        Assert_True(IdentityFrame.Right.HandRotation.Equals(Rest.Right.HandRotation, 0.0001) &&
+            IdentityFrame.Left.HandRotation.Equals(Rest.Left.HandRotation, 0.0001), "an identity swing leaves both hand rotations");
+        Assert_True(IdentityFrame.Right.ElbowTarget.Equals(Rest.Right.ElbowTarget, 0.0001) &&
+            IdentityFrame.Left.ElbowTarget.Equals(Rest.Left.ElbowTarget, 0.0001), "an identity swing leaves both elbows");
 
         const auto SwingLocation = FVector(10.0, 0.0, 20.0);
         auto Swung = Query;
