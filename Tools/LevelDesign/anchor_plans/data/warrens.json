@@ -1,12 +1,12 @@
 {
  "map": "Warrens",
- "revision": "v5r4",
- "source": "Tools/LevelDesign/anchor_plans/design_warrens_v5.py (Warrens v5 The Well, round 4: lever sides, pocket anchors and the cache budget, 2026-10-19)",
+ "revision": "v6r1",
+ "source": "Tools/LevelDesign/anchor_plans/design_warrens_v6.py (Warrens v6 Kitchen first: v5 The Well + the r02 proposal-i expansion, 2026-10-20)",
  "units": "metres; costCm is the walk cost in centimetres",
  "hearth": "K",
  "footprint": [
-  0,
-  0,
+  -29,
+  -3,
   104,
   88
  ],
@@ -232,6 +232,46 @@
    34,
    3,
    -2.5
+  ],
+  "aW": [
+   33,
+   45.6,
+   0
+  ],
+  "aS": [
+   42,
+   39.5,
+   0
+  ],
+  "aE": [
+   47,
+   44,
+   0
+  ],
+  "aN": [
+   40,
+   51.5,
+   0
+  ],
+  "gE": [
+   0,
+   15,
+   -2.5
+  ],
+  "gN": [
+   -6,
+   24,
+   -2.5
+  ],
+  "sp0": [
+   -4.5,
+   43,
+   -2.5
+  ],
+  "sp1": [
+   -8,
+   39.5,
+   0
   ]
  },
  "links": [
@@ -304,46 +344,6 @@
    "leverNode": null
   },
   {
-   "a": "K",
-   "b": "h0",
-   "via": [
-    [
-     31,
-     44
-    ]
-   ],
-   "width": 3.0,
-   "kind": "walk",
-   "closedBy": "R1",
-   "costCm": 1216,
-   "leverNode": null
-  },
-  {
-   "a": "K",
-   "b": "wW",
-   "via": [
-    [
-     49,
-     44
-    ]
-   ],
-   "width": 3.0,
-   "kind": "walk",
-   "closedBy": null,
-   "costCm": 1200,
-   "leverNode": null
-  },
-  {
-   "a": "K",
-   "b": "kn",
-   "via": [],
-   "width": 3.0,
-   "kind": "walk",
-   "closedBy": null,
-   "costCm": 850,
-   "leverNode": null
-  },
-  {
    "a": "kn",
    "b": "o0",
    "via": [],
@@ -361,16 +361,6 @@
    "kind": "walk",
    "closedBy": null,
    "costCm": 608,
-   "leverNode": null
-  },
-  {
-   "a": "K",
-   "b": "ks",
-   "via": [],
-   "width": 3.0,
-   "kind": "walk",
-   "closedBy": null,
-   "costCm": 873,
    "leverNode": null
   },
   {
@@ -868,6 +858,240 @@
    "closedBy": null,
    "costCm": 3836,
    "leverNode": null
+  },
+  {
+   "a": "aW",
+   "b": "h0",
+   "via": [
+    [
+     32,
+     45.6
+    ],
+    [
+     31,
+     44
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": "R1",
+   "costCm": 605,
+   "leverNode": null
+  },
+  {
+   "a": "aW",
+   "b": "aS",
+   "via": [
+    [
+     33,
+     39.5
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 1510,
+   "leverNode": null
+  },
+  {
+   "a": "aS",
+   "b": "aE",
+   "via": [
+    [
+     47,
+     39.5
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 950,
+   "leverNode": null
+  },
+  {
+   "a": "aS",
+   "b": "ks",
+   "via": [],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 400,
+   "leverNode": null
+  },
+  {
+   "a": "aW",
+   "b": "aN",
+   "via": [
+    [
+     33,
+     51.5
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 1290,
+   "leverNode": null
+  },
+  {
+   "a": "aN",
+   "b": "aE",
+   "via": [
+    [
+     47,
+     51.5
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 1450,
+   "leverNode": null
+  },
+  {
+   "a": "aN",
+   "b": "kn",
+   "via": [],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 100,
+   "leverNode": null
+  },
+  {
+   "a": "aE",
+   "b": "wW",
+   "via": [
+    [
+     49,
+     44
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 500,
+   "leverNode": null
+  },
+  {
+   "a": "aE",
+   "b": "K",
+   "via": [
+    [
+     45,
+     44
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 700,
+   "leverNode": null
+  },
+  {
+   "a": "CI",
+   "b": "gE",
+   "via": [
+    [
+     23,
+     19
+    ],
+    [
+     16,
+     19
+    ],
+    [
+     10,
+     15
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 3521,
+   "leverNode": null
+  },
+  {
+   "a": "gE",
+   "b": "gN",
+   "via": [
+    [
+     -4,
+     17
+    ],
+    [
+     -4.75,
+     21
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 1179,
+   "leverNode": null
+  },
+  {
+   "a": "c1",
+   "b": "sp1",
+   "via": [
+    [
+     8,
+     32
+    ],
+    [
+     1,
+     31.5
+    ],
+    [
+     -1,
+     35
+    ],
+    [
+     -8,
+     38.75
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 2513,
+   "leverNode": null,
+   "over": true,
+   "clearHeight": 2.4
+  },
+  {
+   "a": "sp1",
+   "b": "sp0",
+   "via": [],
+   "width": 2.5,
+   "kind": "spiral",
+   "closedBy": null,
+   "costCm": 1668,
+   "leverNode": null,
+   "connector": "service-spiral"
+  },
+  {
+   "a": "sp0",
+   "b": "gN",
+   "via": [
+    [
+     -1,
+     39
+    ],
+    [
+     -1,
+     34
+    ],
+    [
+     -5,
+     31
+    ]
+   ],
+   "width": 3.0,
+   "kind": "walk",
+   "closedBy": null,
+   "costCm": 2239,
+   "leverNode": null
   }
  ],
  "rooms": [
@@ -1152,6 +1376,103 @@
    ],
    "z": -5,
    "light": null
+  },
+  {
+   "id": "root-grotto",
+   "label": "Root Grotto",
+   "poly": [
+    [
+     -24,
+     6
+    ],
+    [
+     -17,
+     0
+    ],
+    [
+     -4,
+     1
+    ],
+    [
+     2,
+     7
+    ],
+    [
+     2,
+     21
+    ],
+    [
+     -6,
+     27
+    ],
+    [
+     -19,
+     23
+    ],
+    [
+     -25,
+     14
+    ]
+   ],
+   "z": -2.5,
+   "district": "grotto",
+   "note": "New west extension, not a re-skin of the Cistern. Dry perimeter circulation around an explicit floor-founded harvest shelf and central mineral divider; one shelf has a short exposed approach and a full-width safe bypass. Keep a continuous 3 m pack route. No water is added in this first prototype. Shell opens from the 2.2 m entry to 4 m clear height; exact irregular roof is a later blockout target.",
+   "top": 1.5,
+   "light": null
+  },
+  {
+   "id": "grotto-recess",
+   "label": "Root Listener's Recess",
+   "rect": [
+    -26,
+    30,
+    -18,
+    36
+   ],
+   "z": -2.5,
+   "district": "grotto",
+   "note": "Small new standing discovery pocket reached by one optional 1.5 x 1.3 m packless squeeze. A fixed environmental find and view into root strata; no required ingredient, new exit, or always-active loot promise.",
+   "top": 0.0,
+   "light": null
+  },
+  {
+   "id": "spiral-well",
+   "label": "Old Service Spiral",
+   "rect": [
+    -13.5,
+    37.5,
+    -2.5,
+    48.5
+   ],
+   "z": -2.5,
+   "top": 3,
+   "district": "bone",
+   "note": "A small new vertical service room with its main floor at -2.5. Eighteen supported spiral treads climb 270 degrees to a separate upper landing at 0. The upper approach crosses on an explicit supported deck; no flat upper floor bypasses the stair.",
+   "light": null
+  },
+  {
+   "id": "cellar-vents-shell",
+   "label": "",
+   "rect": [
+    66,
+    5,
+    70,
+    8
+   ],
+   "z": -2.5,
+   "note": "retired pocket: the recess stays, no anchor"
+  },
+  {
+   "id": "pump-trap-shell",
+   "label": "",
+   "rect": [
+    54,
+    24,
+    58,
+    27
+   ],
+   "z": -2.5,
+   "note": "retired pocket: the recess stays, no anchor"
   }
  ],
  "crawls": [
@@ -1229,6 +1550,27 @@
    "packFits": false,
    "note": "a gap behind the Chime Hall's east wall",
    "purpose": "the one squeeze that leads somewhere new: the Sealed Burial, a cache room no gate or stair reaches (Deep Dish Dungeon's hidden regions)"
+  },
+  {
+   "id": "grotto-recess-crawl",
+   "a": [
+    -19,
+    22
+   ],
+   "b": [
+    -22,
+    31
+   ],
+   "via": [
+    [
+     -22,
+     25
+    ]
+   ],
+   "z": -2.5,
+   "packFits": false,
+   "note": "to the Root Listener's Recess",
+   "purpose": "an optional packless squeeze to a small standing discovery pocket; no required ingredient"
   }
  ],
  "galleries": [],
@@ -1415,6 +1757,30 @@
    ],
    "kind": "open",
    "note": "the closet ladder comes up here"
+  },
+  {
+   "id": "grotto-roof-break",
+   "level": "upper",
+   "rect": [
+    -4,
+    17.5,
+    2,
+    24
+   ],
+   "kind": "open",
+   "note": "Remove the Grotto ceiling above the overlook for headroom and sky light. This is a real opening, not a crack texture."
+  },
+  {
+   "id": "overlook-approach-roof-break",
+   "level": "upper",
+   "rect": [
+    -4,
+    17.5,
+    2,
+    24
+   ],
+   "kind": "open",
+   "note": "Continue the same sky aperture through the upper approach roof; do not leave a second roof hiding the Grotto break."
   }
  ],
  "extraWalks": [
@@ -1468,6 +1834,27 @@
    ],
    "width": 2.5,
    "note": "the Drowned Gallery: a knee-deep tunnel from the Cistern stair to the Pit, barred at the Pit mouth by the sluice grate (P2); off the plan graph"
+  },
+  {
+   "id": "overlook-approach",
+   "pts": [
+    [
+     -1,
+     35
+    ],
+    [
+     -1,
+     28
+    ],
+    [
+     -1,
+     23
+    ]
+   ],
+   "width": 2.0,
+   "over": true,
+   "low": true,
+   "note": "the scout spur from the Court corridor onto the overlook deck; a one-way drop, so not a plan link"
   }
  ],
  "shortcuts": [
@@ -1575,6 +1962,10 @@
   [
    "PU",
    "CI"
+  ],
+  [
+   "sp0",
+   "gN"
   ]
  ],
  "lowRoof": 2.2,
@@ -1701,6 +2092,21 @@
     -5
    ],
    "needsNote": "climb the closet ladder out of the lair; the lever is on the closet side"
+  },
+  {
+   "id": "PK",
+   "kind": "kitchen shutters (latched)",
+   "at": [
+    45,
+    44,
+    0
+   ],
+   "needsAt": [
+    34.875,
+    49.2,
+    1.1
+   ],
+   "needsNote": "the exterior hand crank on the kitchen's west wall: one turn latches both shutters open for the run"
   }
  ],
  "extraRamps": [
@@ -1930,19 +2336,6 @@
    "anchorId": "CellarSalt"
   },
   {
-   "id": "cellar-vents",
-   "rect": [
-    66,
-    5,
-    70,
-    8
-   ],
-   "z": -2.5,
-   "family": "X",
-   "note": "steam vent pair in the south niche",
-   "anchorId": "CellarVents"
-  },
-  {
    "id": "porter",
    "rect": [
     86,
@@ -2006,19 +2399,6 @@
    "family": "P",
    "note": "pack plinth at the Pit south-west, outside the home radius",
    "anchorId": "PitPack"
-  },
-  {
-   "id": "pump-trap",
-   "rect": [
-    54,
-    24,
-    58,
-    27
-   ],
-   "z": -2.5,
-   "family": "X",
-   "note": "spike tiles on the north niche",
-   "anchorId": "PumpTrap"
   },
   {
    "id": "cistern-forage",
@@ -2125,13 +2505,13 @@
   {
    "kind": "bench",
    "at": [
-    36,
-    51,
+    38,
+    47.9,
     0
    ],
    "size": [
-    2.0,
-    0.8,
+    2.8,
+    1.2,
     0.9
    ],
    "note": "cutting bench"
@@ -2139,8 +2519,8 @@
   {
    "kind": "station",
    "at": [
-    41,
-    51.5,
+    42,
+    48,
     0
    ],
    "size": [
@@ -2153,8 +2533,8 @@
   {
    "kind": "station",
    "at": [
-    45,
-    51,
+    44,
+    48.5,
     0
    ],
    "size": [
@@ -2482,6 +2862,291 @@
     0.5
    ],
    "note": "tallow"
+  },
+  {
+   "kind": "mineral-divider",
+   "at": [
+    -10,
+    18.5,
+    -2.5
+   ],
+   "size": [
+    6,
+    2,
+    2.4
+   ],
+   "yaw": 0,
+   "note": "Grotto mineral island: bounds x[-13,-7], y[17.5,19.5]; direct shelf approach passes south, 3 m dry alternative passes north/west. Vent is supported on its south face."
+  },
+  {
+   "kind": "harvest-shelf",
+   "at": [
+    -16,
+    16,
+    -2.5
+   ],
+   "size": [
+    2,
+    1.6,
+    0.65
+   ],
+   "yaw": 0,
+   "note": "Required fungal crown grows from this floor-founded mineral shelf; work from its east or west face. This is an interaction target, not a walking waypoint."
+  },
+  {
+   "kind": "vent-mouth",
+   "at": [
+    -10,
+    17.3,
+    -1.8
+   ],
+   "size": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "yaw": 0,
+   "note": "Wall-mounted mouth touches the mineral divider south face; jet/hiss points south across the direct approach. Visible brackets/pipe fix it to the shoulder. No floating mid-lane trap."
+  },
+  {
+   "kind": "chime-post",
+   "at": [
+    80.5,
+    48,
+    0
+   ],
+   "size": [
+    0.35,
+    0.35,
+    3.5
+   ],
+   "yaw": 0,
+   "note": "West support outside the CH-ch1 walked corridor: approximately2.3 m from its centreline before subtracting post half-width. Check pawn/pack swept clearance in blockout."
+  },
+  {
+   "kind": "chime-post",
+   "at": [
+    88,
+    48,
+    0
+   ],
+   "size": [
+    0.35,
+    0.35,
+    3.5
+   ],
+   "yaw": 0,
+   "note": "East support shifted to x88 to clear the S3-CH diagonal as well as CH-ch2; verify swept pack clearance after actual support construction."
+  },
+  {
+   "kind": "chime-beam",
+   "at": [
+    84.25,
+    48,
+    3.5
+   ],
+   "size": [
+    7.85,
+    0.35,
+    0.35
+   ],
+   "yaw": 0,
+   "note": "Supported crossbeam spans both post tops (x80.325..88.175) and contacts the original bar at z3.5; existing strands retain 2.1 m minimum height."
+  },
+  {
+   "kind": "bait-basin",
+   "at": [
+    59,
+    39,
+    -5
+   ],
+   "size": [
+    1.2,
+    1.2,
+    0.45
+   ],
+   "yaw": 0,
+   "note": "Grounded bait display, off the sump centreline; exact creature approach and retreat-clearance test required."
+  },
+  {
+   "kind": "kitchen-pendant",
+   "at": [
+    40,
+    44,
+    2.35
+   ],
+   "size": [
+    0.25,
+    0.25,
+    0.35
+   ],
+   "yaw": 0,
+   "note": "Ceiling-mounted warm fixture: its top at2.7 contacts the kitchen roof underside."
+  },
+  {
+   "kind": "kitchen-drive",
+   "at": [
+    34.6,
+    49.2,
+    0.7
+   ],
+   "size": [
+    0.45,
+    0.5,
+    0.8
+   ],
+   "yaw": 0,
+   "note": "Exterior hand crank on a bracket connected to the west wall atx34.875. Operation needs no tool, kitchen item or second player."
+  },
+  {
+   "kind": "drive-bracket",
+   "at": [
+    34.75,
+    49.2,
+    0.95
+   ],
+   "size": [
+    0.3,
+    0.18,
+    0.18
+   ],
+   "yaw": 0,
+   "note": "Bracket joins the crank mount to the west wall with visible physical contact."
+  },
+  {
+   "kind": "drive-shaft",
+   "at": [
+    35,
+    49.2,
+    1.1
+   ],
+   "size": [
+    0.6,
+    0.1,
+    0.1
+   ],
+   "yaw": 0,
+   "note": "Wall-bearing shaft carries the persistent release for both shutters. Mechanism animation is proposed work."
+  },
+  {
+   "kind": "spiral-bridge-post",
+   "at": [
+    -5.5,
+    38.5,
+    -2.5
+   ],
+   "size": [
+    0.3,
+    0.3,
+    2.3
+   ],
+   "yaw": 0,
+   "note": "Floor-founded bearing to the upper deck/landing underside at -0.2; outside the central walking trace."
+  },
+  {
+   "kind": "spiral-bridge-post",
+   "at": [
+    -9,
+    38.5,
+    -2.5
+   ],
+   "size": [
+    0.3,
+    0.3,
+    2.3
+   ],
+   "yaw": 0,
+   "note": "Floor-founded bearing to the upper deck/landing underside at -0.2; outside the central walking trace."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    -2.5,
+    18.5,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    0.5,
+    18.5,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    -2.5,
+    22.25,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "overlook-post",
+   "at": [
+    -0.5,
+    22.25,
+    -2.5
+   ],
+   "size": [
+    0.25,
+    0.25,
+    2.1
+   ],
+   "yaw": 0,
+   "note": "Grounded inside the Grotto polygon; top -0.4 bears the overlook crossbeam."
+  },
+  {
+   "kind": "crank-lamp-bracket",
+   "at": [
+    34.85,
+    49.2,
+    1.7
+   ],
+   "size": [
+    0.15,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "note": "Visible wall contact for the task lamp at34.75,49.2,1.8; bracket intersects the kitchen west wall rather than leaving the light floating."
+  },
+  {
+   "kind": "spiral-ceiling-fixture",
+   "at": [
+    -4.9,
+    43,
+    2.65
+   ],
+   "size": [
+    0.2,
+    0.2,
+    0.35
+   ],
+   "yaw": 0,
+   "note": "A short roof-mounted fixture for the service-well light; top3.0 contacts the room ceiling. Keep the source outside the central pier."
   }
  ],
  "lights": [
@@ -2489,7 +3154,7 @@
    "at": [
     40,
     44,
-    3.0
+    2.4
    ],
    "kind": "hearth"
   },
@@ -2499,7 +3164,8 @@
     46,
     8.0
    ],
-   "kind": "shaft"
+   "kind": "shaft",
+   "scale": 0.1
   },
   {
    "at": [
@@ -2515,7 +3181,8 @@
     40,
     -1.0
    ],
-   "kind": "cold"
+   "kind": "cold",
+   "scale": 0.1
   },
   {
    "at": [
@@ -2531,7 +3198,8 @@
     17,
     0.1
    ],
-   "kind": "dim"
+   "kind": "dim",
+   "scale": 0.25
   },
   {
    "at": [
@@ -2564,6 +3232,42 @@
     -0.5
    ],
    "kind": "dim"
+  },
+  {
+   "at": [
+    34.75,
+    49.2,
+    1.8
+   ],
+   "kind": "task",
+   "note": "find-drive: West-wall bracket"
+  },
+  {
+   "at": [
+    -4.9,
+    43,
+    2.7
+   ],
+   "kind": "dim",
+   "note": "spiral-depth: Service-well roof at3.0"
+  },
+  {
+   "at": [
+    -1,
+    20,
+    4
+   ],
+   "kind": "sky",
+   "note": "grotto-roof-light: Sky through the two aligned ceiling cuts"
+  },
+  {
+   "at": [
+    -16,
+    16,
+    -1.7
+   ],
+   "kind": "task",
+   "note": "crown-focus: Fungal growth on the floor-founded harvest shelf"
   }
  ],
  "groups": [
@@ -2704,16 +3408,6 @@
    "note": "hunt court"
   },
   {
-   "id": "R1",
-   "family": "R",
-   "at": [
-    30,
-    44
-   ],
-   "node": "K",
-   "note": "route gate"
-  },
-  {
    "id": "R4",
    "family": "R",
    "at": [
@@ -2772,6 +3466,16 @@
    ],
    "node": "CE",
    "note": "route gate"
+  },
+  {
+   "id": "R1",
+   "family": "R",
+   "at": [
+    30,
+    44
+   ],
+   "node": "aW",
+   "note": "route gate"
   }
  ],
  "channels": {
@@ -2783,5 +3487,1414 @@
   "R6": "Mechanism.Channel.Anchor.Warrens.R6",
   "R7": "Mechanism.Channel.Anchor.Warrens.R7"
  },
- "quarryMinWalkCm": 5000
+ "quarryMinWalkCm": 5000,
+ "structures": [
+  {
+   "id": "kitchen-west",
+   "kind": "wall",
+   "at": [
+    35,
+    45.5,
+    0
+   ],
+   "size": [
+    0.25,
+    10,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Cut only named peek/crawl apertures; other wall remains continuous."
+  },
+  {
+   "id": "kitchen-east",
+   "kind": "wall",
+   "at": [
+    45,
+    45.5,
+    0
+   ],
+   "size": [
+    0.25,
+    10,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Only the named cargo aperture interrupts this wall; its leaf fills the opening while locked."
+  },
+  {
+   "id": "kitchen-south",
+   "kind": "wall",
+   "at": [
+    40,
+    40.5,
+    0
+   ],
+   "size": [
+    10.25,
+    0.25,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": ""
+  },
+  {
+   "id": "kitchen-north",
+   "kind": "wall",
+   "at": [
+    40,
+    50.5,
+    0
+   ],
+   "size": [
+    10.25,
+    0.25,
+    2.7
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": ""
+  },
+  {
+   "id": "kitchen-roof",
+   "kind": "roof",
+   "at": [
+    40,
+    45.5,
+    2.7
+   ],
+   "size": [
+    10.25,
+    10.25,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Continuous solid roof with top at 2.9. About 1.7 m remains beneath the old loft underside. No roof opening enters the kitchen."
+  },
+  {
+   "id": "kitchen-cargo-leaf",
+   "kind": "door",
+   "at": [
+    45,
+    44,
+    0
+   ],
+   "size": [
+    0.25,
+    2.0,
+    2.2
+   ],
+   "yaw": 0,
+   "state": "locked",
+   "collision": true,
+   "note": "Withdraw and latch clear after operating the exterior crank. The player need not hold the control."
+  },
+  {
+   "id": "kitchen-crawl-leaf",
+   "kind": "door",
+   "at": [
+    35,
+    47.8,
+    0
+   ],
+   "size": [
+    0.25,
+    1.5,
+    1.3
+   ],
+   "yaw": 0,
+   "state": "locked",
+   "collision": true,
+   "note": "Initially latched. The same exterior release opens this port, so it cannot bypass the initial lock."
+  },
+  {
+   "id": "roof-recovery-ledge",
+   "kind": "platform",
+   "at": [
+    44,
+    51.2,
+    1.2
+   ],
+   "size": [
+    2,
+    1.25,
+    0.25
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Visible roof recovery: descend from 2.9 to 1.45, then to the public floor. Keep the x40 north approach clear; verify collision and fall damage.",
+   "rails": false
+  },
+  {
+   "id": "spiral-upper-landing",
+   "kind": "platform",
+   "at": [
+    -8,
+    38.75,
+    -0.2
+   ],
+   "size": [
+    2.5,
+    1.5,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Upper landing at z0 meets the spiral south end and supported Court approach."
+  },
+  {
+   "id": "grotto-overlook",
+   "kind": "platform",
+   "at": [
+    -1,
+    21.0,
+    -0.2
+   ],
+   "size": [
+    4,
+    6.0,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Supported deck with top at0. Subtract its named floor opening only from this deck. The lower floor remains intact; clear height beneath the deck is2.3 m."
+  },
+  {
+   "id": "spiral-entry-bridge",
+   "kind": "platform",
+   "at": [
+    -4.5,
+    36.875,
+    -0.2
+   ],
+   "size": [
+    7.941190087134295,
+    3,
+    0.2
+   ],
+   "yaw": 151.82140989004085,
+   "state": "always",
+   "collision": true,
+   "note": "Explicit upper deck across the service-well floor below. Supported by the existing-height approach, upper landing and two floor posts; top is 0."
+  },
+  {
+   "id": "spiral-bearing-00",
+   "kind": "beam",
+   "at": [
+    -4.57952,
+    43.45032,
+    -2.79111
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 7.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-01",
+   "kind": "beam",
+   "at": [
+    -4.81262,
+    44.32026,
+    -2.65222
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 22.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-02",
+   "kind": "beam",
+   "at": [
+    -5.26293,
+    45.10023,
+    -2.51333
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 37.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-03",
+   "kind": "beam",
+   "at": [
+    -5.89977,
+    45.73707,
+    -2.37444
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 52.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-04",
+   "kind": "beam",
+   "at": [
+    -6.67974,
+    46.18738,
+    -2.23556
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 67.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-05",
+   "kind": "beam",
+   "at": [
+    -7.54968,
+    46.42048,
+    -2.09667
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 82.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-06",
+   "kind": "beam",
+   "at": [
+    -8.45032,
+    46.42048,
+    -1.95778
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 97.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-07",
+   "kind": "beam",
+   "at": [
+    -9.32026,
+    46.18738,
+    -1.81889
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 112.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-08",
+   "kind": "beam",
+   "at": [
+    -10.10023,
+    45.73707,
+    -1.68
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 127.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-09",
+   "kind": "beam",
+   "at": [
+    -10.73707,
+    45.10023,
+    -1.54111
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 142.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-10",
+   "kind": "beam",
+   "at": [
+    -11.18738,
+    44.32026,
+    -1.40222
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 157.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-11",
+   "kind": "beam",
+   "at": [
+    -11.42048,
+    43.45032,
+    -1.26333
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 172.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-12",
+   "kind": "beam",
+   "at": [
+    -11.42048,
+    42.54968,
+    -1.12444
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 187.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-13",
+   "kind": "beam",
+   "at": [
+    -11.18738,
+    41.67974,
+    -0.98556
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 202.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-14",
+   "kind": "beam",
+   "at": [
+    -10.73707,
+    40.89977,
+    -0.84667
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 217.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-15",
+   "kind": "beam",
+   "at": [
+    -10.10023,
+    40.26293,
+    -0.70778
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 232.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-16",
+   "kind": "beam",
+   "at": [
+    -9.32026,
+    39.81262,
+    -0.56889
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 247.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "spiral-bearing-17",
+   "kind": "beam",
+   "at": [
+    -8.45032,
+    39.57952,
+    -0.43
+   ],
+   "size": [
+    2.7,
+    0.18,
+    0.25
+   ],
+   "yaw": 262.5,
+   "state": "always",
+   "collision": true,
+   "note": "Radial tread bearing, embedded in the central pier and below the 0.18 m tread slab."
+  },
+  {
+   "id": "overlook-bearing-0",
+   "kind": "beam",
+   "at": [
+    -1,
+    18.5,
+    -0.4
+   ],
+   "size": [
+    4,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Crossbeam between floor posts and overlook deck underside -0.2."
+  },
+  {
+   "id": "overlook-bearing-1",
+   "kind": "beam",
+   "at": [
+    -1,
+    22.25,
+    -0.4
+   ],
+   "size": [
+    4,
+    0.2,
+    0.2
+   ],
+   "yaw": 0,
+   "state": "always",
+   "collision": true,
+   "note": "Crossbeam between floor posts and overlook deck underside -0.2."
+  }
+ ],
+ "openings": [
+  {
+   "id": "kitchen-cargo-aperture",
+   "kind": "wall",
+   "axis": "x",
+   "at": [
+    45,
+    44,
+    0
+   ],
+   "width": 2.0,
+   "height": 2.2,
+   "z": 0,
+   "throughDepth": 0.5,
+   "traversable": true,
+   "sourceIds": [
+    "kitchen-east"
+   ],
+   "note": "Cargo opening; the matching shutter closes it in the locked state."
+  },
+  {
+   "id": "kitchen-crawl-aperture",
+   "kind": "wall",
+   "axis": "x",
+   "at": [
+    35,
+    47.8,
+    0
+   ],
+   "width": 1.5,
+   "height": 1.3,
+   "z": 0,
+   "throughDepth": 0.5,
+   "traversable": true,
+   "sourceIds": [
+    "kitchen-west"
+   ],
+   "note": "Packless service opening after unlock. Its matching shutter prevents initial entry."
+  },
+  {
+   "id": "kitchen-fracture",
+   "kind": "wall",
+   "axis": "x",
+   "at": [
+    35,
+    44.1,
+    1.05
+   ],
+   "width": 1.6,
+   "height": 0.6,
+   "z": 1.05,
+   "throughDepth": 0.5,
+   "traversable": false,
+   "sourceIds": [
+    "kitchen-west"
+   ],
+   "note": "Sight only: y43.3\u201344.9, z1.05\u20131.65. The0.6 m aperture cannot fit the1.05 m crouched body. It adds no traversal edge or interaction-through-wall release."
+  },
+  {
+   "id": "overlook-floor-break",
+   "kind": "floor",
+   "rect": [
+    -2.2,
+    19,
+    -0.8,
+    20.4
+   ],
+   "z": 0,
+   "throughDepth": 0.4,
+   "traversable": true,
+   "sourceIds": [
+    "grotto-overlook"
+   ],
+   "note": "Actual1.4\u00d71.4 m deck opening above a visible floor2.5 m below. Optional drop; pack clearance is unproven. Return by the spiral or Cistern, without climbing back through the hole."
+  }
+ ],
+ "connectors": [
+  {
+   "id": "service-spiral",
+   "kind": "spiral-stair",
+   "points": [
+    [
+     -4.5,
+     43.0,
+     -2.5
+    ],
+    [
+     -4.61926,
+     43.90587,
+     -2.36111
+    ],
+    [
+     -4.96891,
+     44.75,
+     -2.22222
+    ],
+    [
+     -5.52513,
+     45.47487,
+     -2.08333
+    ],
+    [
+     -6.25,
+     46.03109,
+     -1.94444
+    ],
+    [
+     -7.09413,
+     46.38074,
+     -1.80556
+    ],
+    [
+     -8.0,
+     46.5,
+     -1.66667
+    ],
+    [
+     -8.90587,
+     46.38074,
+     -1.52778
+    ],
+    [
+     -9.75,
+     46.03109,
+     -1.38889
+    ],
+    [
+     -10.47487,
+     45.47487,
+     -1.25
+    ],
+    [
+     -11.03109,
+     44.75,
+     -1.11111
+    ],
+    [
+     -11.38074,
+     43.90587,
+     -0.97222
+    ],
+    [
+     -11.5,
+     43.0,
+     -0.83333
+    ],
+    [
+     -11.38074,
+     42.09413,
+     -0.69444
+    ],
+    [
+     -11.03109,
+     41.25,
+     -0.55556
+    ],
+    [
+     -10.47487,
+     40.52513,
+     -0.41667
+    ],
+    [
+     -9.75,
+     39.96891,
+     -0.27778
+    ],
+    [
+     -8.90587,
+     39.61926,
+     -0.13889
+    ],
+    [
+     -8.0,
+     39.5,
+     0.0
+    ]
+   ],
+   "width": 2.5,
+   "thickness": 0.18,
+   "clearHeight": 2.2,
+   "core": {
+    "at": [
+     -8,
+     43,
+     -2.5
+    ],
+    "radius": 2.3,
+    "height": 5.5
+   },
+   "stepCount": 18,
+   "ports": [
+    "spiral-low",
+    "spiral-high"
+   ],
+   "role": "optional",
+   "note": "Eighteen broad treads through 270 degrees, rising 2.5 m: about 0.139 m per riser. Centreline radius 3.5 m, width 2.5 m. Emit real horizontal treads with risers and guards. The 2.3 m central pier bears into their inner edges; explicit radial beams support the outer span. Never collapse this to a straight ramp. Worn-pack turns and headroom need observation.",
+   "rails": {
+    "innerRadius": 2.4,
+    "outerRadius": 4.7,
+    "height": 0.9,
+    "thickness": 0.08
+   },
+   "treads": [
+    {
+     "id": "service-tread-00",
+     "poly": [
+      [
+       -5.75,
+       43.0
+      ],
+      [
+       -3.25,
+       43.0
+      ],
+      [
+       -3.411852,
+       44.22939
+      ],
+      [
+       -5.826667,
+       43.582343
+      ]
+     ],
+     "top": -2.361111,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-01",
+     "poly": [
+      [
+       -5.826667,
+       43.582343
+      ],
+      [
+       -3.411852,
+       44.22939
+      ],
+      [
+       -3.886379,
+       45.375
+      ],
+      [
+       -6.051443,
+       44.125
+      ]
+     ],
+     "top": -2.222222,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-02",
+     "poly": [
+      [
+       -6.051443,
+       44.125
+      ],
+      [
+       -3.886379,
+       45.375
+      ],
+      [
+       -4.641243,
+       46.358757
+      ],
+      [
+       -6.40901,
+       44.59099
+      ]
+     ],
+     "top": -2.083333,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-03",
+     "poly": [
+      [
+       -6.40901,
+       44.59099
+      ],
+      [
+       -4.641243,
+       46.358757
+      ],
+      [
+       -5.625,
+       47.113621
+      ],
+      [
+       -6.875,
+       44.948557
+      ]
+     ],
+     "top": -1.944444,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-04",
+     "poly": [
+      [
+       -6.875,
+       44.948557
+      ],
+      [
+       -5.625,
+       47.113621
+      ],
+      [
+       -6.77061,
+       47.588148
+      ],
+      [
+       -7.417657,
+       45.173333
+      ]
+     ],
+     "top": -1.805556,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-05",
+     "poly": [
+      [
+       -7.417657,
+       45.173333
+      ],
+      [
+       -6.77061,
+       47.588148
+      ],
+      [
+       -8.0,
+       47.75
+      ],
+      [
+       -8.0,
+       45.25
+      ]
+     ],
+     "top": -1.666667,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-06",
+     "poly": [
+      [
+       -8.0,
+       45.25
+      ],
+      [
+       -8.0,
+       47.75
+      ],
+      [
+       -9.22939,
+       47.588148
+      ],
+      [
+       -8.582343,
+       45.173333
+      ]
+     ],
+     "top": -1.527778,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-07",
+     "poly": [
+      [
+       -8.582343,
+       45.173333
+      ],
+      [
+       -9.22939,
+       47.588148
+      ],
+      [
+       -10.375,
+       47.113621
+      ],
+      [
+       -9.125,
+       44.948557
+      ]
+     ],
+     "top": -1.388889,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-08",
+     "poly": [
+      [
+       -9.125,
+       44.948557
+      ],
+      [
+       -10.375,
+       47.113621
+      ],
+      [
+       -11.358757,
+       46.358757
+      ],
+      [
+       -9.59099,
+       44.59099
+      ]
+     ],
+     "top": -1.25,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-09",
+     "poly": [
+      [
+       -9.59099,
+       44.59099
+      ],
+      [
+       -11.358757,
+       46.358757
+      ],
+      [
+       -12.113621,
+       45.375
+      ],
+      [
+       -9.948557,
+       44.125
+      ]
+     ],
+     "top": -1.111111,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-10",
+     "poly": [
+      [
+       -9.948557,
+       44.125
+      ],
+      [
+       -12.113621,
+       45.375
+      ],
+      [
+       -12.588148,
+       44.22939
+      ],
+      [
+       -10.173333,
+       43.582343
+      ]
+     ],
+     "top": -0.972222,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-11",
+     "poly": [
+      [
+       -10.173333,
+       43.582343
+      ],
+      [
+       -12.588148,
+       44.22939
+      ],
+      [
+       -12.75,
+       43.0
+      ],
+      [
+       -10.25,
+       43.0
+      ]
+     ],
+     "top": -0.833333,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-12",
+     "poly": [
+      [
+       -10.25,
+       43.0
+      ],
+      [
+       -12.75,
+       43.0
+      ],
+      [
+       -12.588148,
+       41.77061
+      ],
+      [
+       -10.173333,
+       42.417657
+      ]
+     ],
+     "top": -0.694444,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-13",
+     "poly": [
+      [
+       -10.173333,
+       42.417657
+      ],
+      [
+       -12.588148,
+       41.77061
+      ],
+      [
+       -12.113621,
+       40.625
+      ],
+      [
+       -9.948557,
+       41.875
+      ]
+     ],
+     "top": -0.555556,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-14",
+     "poly": [
+      [
+       -9.948557,
+       41.875
+      ],
+      [
+       -12.113621,
+       40.625
+      ],
+      [
+       -11.358757,
+       39.641243
+      ],
+      [
+       -9.59099,
+       41.40901
+      ]
+     ],
+     "top": -0.416667,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-15",
+     "poly": [
+      [
+       -9.59099,
+       41.40901
+      ],
+      [
+       -11.358757,
+       39.641243
+      ],
+      [
+       -10.375,
+       38.886379
+      ],
+      [
+       -9.125,
+       41.051443
+      ]
+     ],
+     "top": -0.277778,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-16",
+     "poly": [
+      [
+       -9.125,
+       41.051443
+      ],
+      [
+       -10.375,
+       38.886379
+      ],
+      [
+       -9.22939,
+       38.411852
+      ],
+      [
+       -8.582343,
+       40.826667
+      ]
+     ],
+     "top": -0.138889,
+     "thickness": 0.18
+    },
+    {
+     "id": "service-tread-17",
+     "poly": [
+      [
+       -8.582343,
+       40.826667
+      ],
+      [
+       -9.22939,
+       38.411852
+      ],
+      [
+       -8.0,
+       38.25
+      ],
+      [
+       -8.0,
+       40.75
+      ]
+     ],
+     "top": 0.0,
+     "thickness": 0.18
+    }
+   ]
+  }
+ ],
+ "terrain": [
+  {
+   "id": "grotto-natural-rise",
+   "poly": [
+    [
+     -22,
+     5
+    ],
+    [
+     -8,
+     3
+    ],
+    [
+     -3,
+     9
+    ],
+    [
+     -7,
+     12
+    ],
+    [
+     -21,
+     12
+    ]
+   ],
+   "vertices": [
+    [
+     -22,
+     5,
+     -2.5
+    ],
+    [
+     -8,
+     3,
+     -2.5
+    ],
+    [
+     -3,
+     9,
+     -2.5
+    ],
+    [
+     -7,
+     12,
+     -2.5
+    ],
+    [
+     -21,
+     12,
+     -2.5
+    ],
+    [
+     -13,
+     8,
+     -1.8
+    ]
+   ],
+   "triangles": [
+    [
+     0,
+     1,
+     5
+    ],
+    [
+     1,
+     2,
+     5
+    ],
+    [
+     2,
+     3,
+     5
+    ],
+    [
+     3,
+     4,
+     5
+    ],
+    [
+     4,
+     0,
+     5
+    ]
+   ],
+   "mode": "replace-floor",
+   "note": "Replace the flat floor with a triangulated natural rise of0.7 m. Boundary vertices stay at\u22122.5 for continuous joins. This optional southern approach does not narrow the required northern bypass; no jump is needed."
+  }
+ ],
+ "kitchen": {
+  "volume": {
+   "rect": [
+    35,
+    40.5,
+    45,
+    50.5
+   ],
+   "floor": 0,
+   "ceiling": 2.7,
+   "roofTop": 2.9
+  },
+  "ports": [
+   {
+    "id": "cargo-east",
+    "opening": "kitchen-cargo-aperture",
+    "leaf": "kitchen-cargo-leaf",
+    "initial": "locked",
+    "after": "open",
+    "pack": true
+   },
+   {
+    "id": "service-west",
+    "opening": "kitchen-crawl-aperture",
+    "leaf": "kitchen-crawl-leaf",
+    "initial": "locked",
+    "after": "open",
+    "pack": false
+   }
+  ],
+  "actuator": {
+   "id": "kitchen-drive",
+   "at": [
+    34.6,
+    49.2,
+    1.1
+   ],
+   "approach": [
+    33.5,
+    49.2,
+    0
+   ],
+   "requiresTool": false,
+   "requiresKitchenAccess": false
+  },
+  "publicNodes": {
+   "west": [
+    33,
+    45.6,
+    0
+   ],
+   "east": [
+    47,
+    44,
+    0
+   ],
+   "north": [
+    40,
+    52,
+    0
+   ],
+   "south": [
+    40,
+    38.5,
+    0
+   ]
+  },
+  "interiorRelease": {
+   "at": [
+    35.125,
+    49.2,
+    1.1
+   ],
+   "yaw": 0.0,
+   "note": "interior emergency release on the west wall inside face"
+  },
+  "exteriorCrank": {
+   "at": [
+    34.875,
+    49.2,
+    1.1
+   ],
+   "yaw": 180.0,
+   "note": "exterior hand crank on the west wall outside face"
+  }
+ },
+ "geometryDeviations": [
+  "grotto-overlook deck extended north from y 23.0 to 24.0 so the approach never spans open air over the Grotto edge (the edge slants from y 23.25 at x -1 to 24.0 at x -2)",
+  "kitchen cargo aperture 2.0 x 2.2 m (Mars_Gate fixed opening, decision D2) instead of 2.5 x 2.3 m"
+ ],
+ "fills": [
+  {
+   "room": "chapel",
+   "kind": "amber"
+  },
+  {
+   "room": "court",
+   "kind": "funeral"
+  },
+  {
+   "room": "bridge",
+   "kind": "indigo"
+  },
+  {
+   "room": "ossuary",
+   "kind": "ivory"
+  },
+  {
+   "room": "reliquary",
+   "kind": "candle"
+  },
+  {
+   "room": "chime",
+   "kind": "teal"
+  },
+  {
+   "room": "pump",
+   "kind": "copper"
+  },
+  {
+   "room": "cellar",
+   "kind": "copper"
+  },
+  {
+   "room": "sluice",
+   "kind": "teal"
+  },
+  {
+   "room": "cistern",
+   "kind": "navy"
+  },
+  {
+   "room": "root-grotto",
+   "kind": "limestone"
+  },
+  {
+   "room": "spiral-well",
+   "kind": "chalk"
+  }
+ ]
 }
